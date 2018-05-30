@@ -1362,14 +1362,13 @@ JobNode.prototype.updatePanels = function() {
 
 
 	// Info:
-	var info = 'ID:' + this.params.id;
-	info += ' S/N:' + this.params.serial;
-	info += '<br>Branch:<br> ' + this.params.branch;
-	info += '<br>Created:<br> ' + cm_DateTimeStrFromSec(this.params.time_creation);
+	var info = '<p>ID:' + this.params.id + ' S/N:' + this.params.serial + '</p>';
+	info += '<p>Branch: ' + this.params.branch + '</p>';
+	info += '<p>Created: ' + cm_DateTimeStrFromSec(this.params.time_creation) + '</p>';
 	if (this.params.time_started)
-		info += '<br>Started:<br> ' + cm_DateTimeStrFromSec(this.params.time_started);
+		info += '<p>Started: ' + cm_DateTimeStrFromSec(this.params.time_started) + '</p>';
 	if (this.params.time_done)
-		info += '<br>Finished:<br> ' + cm_DateTimeStrFromSec(this.params.time_done);
+		info += '<p>Finished: ' + cm_DateTimeStrFromSec(this.params.time_done) + '</p>';
 	this.monitor.setPanelInfo(info);
 
 

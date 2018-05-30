@@ -89,9 +89,17 @@ BranchNode.prototype.update = function(i_obj) {
 
 	// Add/Remove CSS classes to highlight/colorize/mute:
 	if (this.params.jobs_total == null)
+	{
 		this.element.classList.add('empty');
+		this.elFlags.style.display = 'none';
+		this.elActiveJobs.style.display = 'none';
+	}
 	else
+	{
 		this.element.classList.remove('empty');
+		this.elFlags.style.display = 'block';
+		this.elActiveJobs.style.display = 'block';
+	}
 	if (this.params.running_tasks_num)
 		this.element.classList.add('running');
 	else
@@ -139,22 +147,20 @@ BranchNode.prototype.update = function(i_obj) {
 
 	if (cm_IsPadawan())
 	{
-		var jobs = 'Jobs Total:';
+		var jobs = '';
 		if (this.params.jobs_total)
+		{
+			jobs += 'Jobs Total:';
 			jobs += ' <b>' + this.params.jobs_total + '</b>';
+		}
 		else
-			jobs += ' <b>0</b>';
 		if (this.params.running_jobs_num)
 			jobs += ' / <b>' + this.params.running_jobs_num + '</b> Running';
 		this.elJobsCounts.innerHTML = jobs;
 
-		var counts = 'Branches Total:';
+		var counts = '';
 		if (this.params.branches_total)
-			counts += ' <b>' + this.params.branches_total + '</b>';
-		else
-			counts += ' <b>0</b>';
-		if (this.params.running_branches_num)
-			counts += ' / <b>' + this.params.running_branches_num + '</b> Running';
+			counts = 'Branches Total: <b>' + this.params.branches_total + '</b>';
 		this.elBranchedCounts.innerHTML = counts;
 	}
 	else if (cm_IsJedi())
@@ -168,33 +174,25 @@ BranchNode.prototype.update = function(i_obj) {
 			jobs += ' / <b>' + this.params.running_jobs_num + '</b> Run';
 		this.elJobsCounts.innerHTML = jobs;
 
-		var counts = 'Branches:';
+		var counts = '';
 		if (this.params.branches_total)
-			counts += ' <b>' + this.params.branches_total + '</b>';
-		else
-			counts += ' <b>0</b>';
-		if (this.params.running_branches_num)
-			counts += ' / <b>' + this.params.running_branches_num + '</b> Run';
+			counts = 'Branches: <b>' + this.params.branches_total + '</b>';
 		this.elBranchedCounts.innerHTML = counts;
 	}
 	else
 	{
 		var jobs = 'j:';
 		if (this.params.jobs_total)
-			jobs += ' <b>' + this.params.jobs_total + '</b>';
+			jobs += '<b>' + this.params.jobs_total + '</b>';
 		else
-			jobs += ' <b>0</b>';
+			jobs += '<b>0</b>';
 		if (this.params.running_jobs_num)
 			jobs += ' / <b>' + this.params.running_jobs_num + '</b>r';
 		this.elJobsCounts.innerHTML = jobs;
 
-		var counts = 'b:';
+		var counts = '';
 		if (this.params.branches_total)
-			counts += ' <b>' + this.params.branches_total + '</b>';
-		else
-			counts += ' <b>0</b>';
-		if (this.params.running_branches_num)
-			counts += ' / <b>' + this.params.running_branches_num + '</b>r';
+			counts = 'b:<b>' + this.params.branches_total + '</b>';
 		this.elBranchedCounts.innerHTML = counts;
 	}
 
@@ -249,11 +247,6 @@ BranchNode.prototype.update = function(i_obj) {
 		this.elAnnotation.innerHTML = this.params.annotation;
 	else
 		this.elAnnotation.textContent = '';
-
-	var title = '';
-	title += 'Time Created: ' + cm_DateTimeStrFromSec(this.params.time_creation) + '\n';
-	title += 'ID = ' + this.params.id + '\n';
-	this.element.title = title;
 
 	this.refresh();
 };
@@ -328,10 +321,10 @@ BranchNode.createPanels = function(i_monitor) {
 BranchNode.prototype.updatePanels = function() {
 	// Info:
 	var info = '';
-	info += 'Created: ' + cm_DateTimeStrFromSec(this.params.time_creation) + '<br>';
+	info += '<p>ID = ' + this.params.id + '</p>';
+	info += '<p>Created: ' + cm_DateTimeStrFromSec(this.params.time_creation) + '</p>';
 	if ( ! this.params.jobs_total)
-		info += 'Empty since: ' + cm_DateTimeStrFromSec(this.params.time_empty) + '<br>';
-	info += 'ID = ' + this.params.id;
+		info += '<p>Empty since: ' + cm_DateTimeStrFromSec(this.params.time_empty) + '</p>';
 	this.monitor.setPanelInfo(info);
 
 	BranchActiveJob.deselectAll(this.monitor);

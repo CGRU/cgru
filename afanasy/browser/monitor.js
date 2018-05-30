@@ -225,6 +225,7 @@ function Monitor(i_args)
 	var el = document.createElement('div');
 	this.elPanelR.m_elInfo.appendChild(el);
 	this.elPanelR.m_elInfo.m_elBody = el;
+	el.classList.add('info_body');
 
 
 	// Sort&Filter:

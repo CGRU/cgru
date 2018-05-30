@@ -150,7 +150,7 @@ overflow: hidden;
 
 .view {
 position: absolute;
-left: 50px; right: 200px;
+left: 50px; right: 400px;
 top: 0; bottom: 0;
 }
 .panel {
@@ -164,7 +164,7 @@ border-right: 2px solid #575757;
 }
 .panel.right {
 right: 0;
-width: 198px;
+width: 398px;
 border-left: 2px solid #575757;
 overflow-y: auto;
 word-wrap: break-word;
@@ -186,7 +186,7 @@ margin: 4px 8px;
 }
 .panel.right .section .param {
 clear: both;
-padding: 4px;
+padding: 6px 11px;
 border-top: 1px solid #575757;
 }
 .panel.right .section .param .label {
@@ -205,6 +205,9 @@ font-style: italic;
 .panel.right .section.folders .cgru_cmdexec {
 float: left;
 margin-right: 8px;
+}
+.panel.right .info_body {
+padding: 12px;
 }
 
 .monitor .ctrl,.info {

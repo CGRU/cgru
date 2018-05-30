@@ -201,12 +201,6 @@ UserNode.prototype.update = function(i_obj) {
 	else
 		this.elAnnotation.textContent = '';
 
-	var title = '';
-	title += 'Time Registered: ' + cm_DateTimeStrFromSec(this.params.time_register) + '\n';
-	title += 'Last Activity: ' + cm_DateTimeStrFromSec(this.params.time_activity) + '\n';
-	title += 'ID = ' + this.params.id + '\n';
-	this.element.title = title;
-
 	this.refresh();
 };
 
@@ -244,9 +238,9 @@ UserNode.createPanels = function(i_monitor) {
 
 UserNode.prototype.updatePanels = function() {
 	// Info:
-	var info = 'Registered:<br> ' + cm_DateTimeStrFromSec(this.params.time_register);
+	var info = '<p>Registered: ' + cm_DateTimeStrFromSec(this.params.time_register) + '</p>';
 	if (this.params.time_activity)
-		info += '<br>Last Activity:<br> ' + cm_DateTimeStrFromSec(this.params.time_activity);
+		info += '<p>Last Activity: ' + cm_DateTimeStrFromSec(this.params.time_activity) + '</p>';
 	this.monitor.setPanelInfo(info);
 };
 

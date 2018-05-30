@@ -760,33 +760,33 @@ RenderNode.prototype.updatePanels = function() {
 	var r = this.params.host_resources;
 	if (r)
 	{
-		info += r.cpu_mhz + 'x' + r.cpu_num + 'MHz';
+		info += '<p>' + r.cpu_mhz + 'x' + r.cpu_num + 'MHz';
 		info += ' ' + Math.round(r.mem_total_mb / 1024) + 'Gb';
 		info += ' HDD' + r.hdd_total_gb + 'Gb';
-		info += '<br>';
+		info += '</p>';
 	}
 
 	if (this.params.host.nimby_idlefree_time || this.params.host.nimby_busyfree_time)
 	{
-		info += '<br>Auto Nimby:';
+		info += '<p>Auto Nimby:';
 		if (this.params.host.nimby_busyfree_time)
 			info += '<br>Busy time: ' + cm_TimeStringFromSeconds(this.params.host.nimby_busyfree_time) +
 				' CPU > ' + this.params.host.nimby_busy_cpu + '%';
 		if (this.params.host.nimby_idlefree_time)
 			info += '<br>Free time: ' + cm_TimeStringFromSeconds(this.params.host.nimby_idlefree_time) +
 				' CPU: < ' + this.params.host.nimby_idle_cpu + '%';
+		info += '</p>';
 	}
-	info += '<br>';
 
-	info += '<br>Registered:<br> ' + cm_DateTimeStrFromSec(this.params.time_register);
+	info += '<p>Registered: ' + cm_DateTimeStrFromSec(this.params.time_register) + '</p>';
 	if (this.params.time_launch)
-		info += '<br>Launched:<br> ' + cm_DateTimeStrFromSec(this.params.time_launch);
+		info += '<p>Launched: ' + cm_DateTimeStrFromSec(this.params.time_launch) + '</p>';
 	if (this.params.idle_time)
-		info += '<br>Idle since:<br> ' + cm_DateTimeStrFromSec(this.params.idle_time);
+		info += '<p>Idle since: ' + cm_DateTimeStrFromSec(this.params.idle_time) + '</p>';
 	if (this.params.busy_time)
-		info += '<br>Busy since:<br> ' + cm_DateTimeStrFromSec(this.params.busy_time);
+		info += '<p>Busy since: ' + cm_DateTimeStrFromSec(this.params.busy_time) + '</p>';
 	if (this.task_start_finish_time)
-		info += '<br>Task finished at:<br> ' + cm_DateTimeStrFromSec(this.params.task_start_finish_time);
+		info += '<p>Task finished at: ' + cm_DateTimeStrFromSec(this.params.task_start_finish_time) + '</p>';
 
 	this.monitor.setPanelInfo(info);
 };
