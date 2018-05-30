@@ -182,11 +182,12 @@ opacity: .5;
 .panel.right .section.active { opacity: 1.0; }
 .panel.right .section .caption {
 cursor: pointer;
+font-weight: bold;
 margin: 4px 8px;
 }
 .panel.right .section .param {
 clear: both;
-padding: 6px 11px;
+padding: 6px 20px;
 border-top: 1px solid #575757;
 }
 .panel.right .section .param .label {
@@ -207,7 +208,7 @@ float: left;
 margin-right: 8px;
 }
 .panel.right .info_body {
-padding: 12px;
+padding: 0 12px;
 }
 
 .monitor .ctrl,.info {

@@ -109,14 +109,6 @@ MonitorNode.prototype.update = function(i_obj) {
 	else
 		this.elAnnotation.textContent = '';
 
-	var title = '';
-	title += 'Launched at: ' + cm_DateTimeStrFromSec(this.params.time_launch) + '\n';
-	title += 'Registered at: ' + cm_DateTimeStrFromSec(this.params.time_register) + '\n';
-	title += 'Last activity at: ' + cm_DateTimeStrFromSec(this.params.time_activity) + '\n';
-	title += 'ID = ' + this.params.id + '\n';
-	//	this.elName.title = title;
-	this.element.title = title;
-
 	this.refresh();
 };
 
@@ -130,20 +122,21 @@ MonitorNode.prototype.updatePanels = function() {
 	// Info:
 	var info = '';
 
-	info += 'User name: ' + this.params.user_name;
+	info += '<p>User name: ' + this.params.user_name + '</p>';
 
 	if (this.params.address)
 	{
-		info += '<br>IP: ' + this.params.address.ip;
+		info += '<p>IP: ' + this.params.address.ip;
 		if (this.params.address.port)
 			info += ' Port: ' + this.params.address.port;
+		info += '</p>';
 	}
 
-	info += '<br>';
+	info += '<p>Launched at: ' + cm_DateTimeStrFromSec(this.params.time_launch) + '</p>';
+	info += '<p>Registered at: ' + cm_DateTimeStrFromSec(this.params.time_register) + '</p>';
+	info += '<p>Last activity at: ' + cm_DateTimeStrFromSec(this.params.time_activity) + '</p>';
 
-	info += '<br>Launched at:<br>' + cm_DateTimeStrFromSec(this.params.time_launch);
-	info += '<br>Registered at:<br>' + cm_DateTimeStrFromSec(this.params.time_register);
-	info += '<br>Last activity at:<br>' + cm_DateTimeStrFromSec(this.params.time_activity);
+	info += '<p>ID = ' + this.params.id + '</p>'
 
 	this.monitor.setPanelInfo(info);
 };

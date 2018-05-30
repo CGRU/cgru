@@ -322,9 +322,12 @@ BranchNode.prototype.updatePanels = function() {
 	// Info:
 	var info = '';
 	info += '<p>ID = ' + this.params.id + '</p>';
-	info += '<p>Created: ' + cm_DateTimeStrFromSec(this.params.time_creation) + '</p>';
+	info += '<p>Created at: ' + cm_DateTimeStrFromSec(this.params.time_creation) + '</p>';
 	if ( ! this.params.jobs_total)
-		info += '<p>Empty since: ' + cm_DateTimeStrFromSec(this.params.time_empty) + '</p>';
+	{
+		info += '<p>Empty for: ' + cm_TimeStringInterval(this.params.time_empty);
+		info += ', since: ' + cm_DateTimeStrFromSec(this.params.time_empty) + '</p>';
+	}
 	this.monitor.setPanelInfo(info);
 
 	BranchActiveJob.deselectAll(this.monitor);
