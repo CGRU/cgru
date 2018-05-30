@@ -281,7 +281,7 @@ void BranchSrv::jobsinfo(af::MCAfNodes &mcjobs)
 		mcjobs.addNode(node->node());
 }
 
-void BranchSrv::v_refresh(time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
+void BranchSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, MonitorContainer * i_monitoring)
 {
 	bool changed = false;
 
@@ -323,9 +323,13 @@ void BranchSrv::v_refresh(time_t currentTime, AfContainer * pointer, MonitorCont
 	m_jobs_num       = _jobs_num;
 	m_jobs_total     = _jobs_total;
 
+	// Process empty time
+	if ((m_jobs_total > 0) || (m_time_empty == 0))
+		m_time_empty = i_currentTime;
 
-	if (changed && monitoring)
-		monitoring->addEvent(af::Monitor::EVT_branches_change, m_id);
+	// Emit events on changes
+	if (changed && i_monitoring)
+		i_monitoring->addEvent(af::Monitor::EVT_branches_change, m_id);
 }
 
 bool BranchSrv::v_canRun()

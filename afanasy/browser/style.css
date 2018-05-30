@@ -548,7 +548,7 @@ padding: 2px;
 }
 .item.branch .name { font-size: 140%;}
 .item.branch.empty { opacity:.5; font-size: 75%;}
-.item.branch.running { background-color: rgba(120,255,120,.5);}
+.item.branch.running { background-color: rgba(200,255,120,.5);}
 .item.branch.active  { background-color: rgba(255,255,120,.5);}
 .item.branch.selected       { background-color: #DFD;}
 .branch_active_job.selected { background-color: #DFD;}

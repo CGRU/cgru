@@ -327,9 +327,11 @@ BranchNode.createPanels = function(i_monitor) {
 
 BranchNode.prototype.updatePanels = function() {
 	// Info:
-	var info = 'Created: ' + cm_DateTimeStrFromSec(this.params.time_creation);
-	if (this.params.time_activity)
-		info += '<br>Last Activity:<br> ' + cm_DateTimeStrFromSec(this.params.time_activity);
+	var info = '';
+	info += 'Created: ' + cm_DateTimeStrFromSec(this.params.time_creation) + '<br>';
+	if ( ! this.params.jobs_total)
+		info += 'Empty since: ' + cm_DateTimeStrFromSec(this.params.time_empty) + '<br>';
+	info += 'ID = ' + this.params.id;
 	this.monitor.setPanelInfo(info);
 
 	BranchActiveJob.deselectAll(this.monitor);
@@ -371,9 +373,8 @@ function BranchActiveJob(i_branch, i_elParent, i_params)
 	this.elParent.appendChild(this.el);
 	this.el.active_job = this;
 
-	this.elName = document.createElement('span');
-	this.el.appendChild(this.elName);
-	this.elName.textContent = this.params.name;
+	this.elInfo = document.createElement('span');
+	this.el.appendChild(this.elInfo);
 
 	this.elRunningCounts = cm_ElCreateFloatText(this.el, 'right');
 
@@ -393,6 +394,8 @@ BranchActiveJob.prototype.setNotUpdated = function() {
 
 BranchActiveJob.prototype.update = function(i_params) {
 	this.params = i_params;
+
+	this.elInfo.innerHTML = this.params.name + '<small>@' + this.params.user_name + '</small>';
 
 	this.elRunningCounts.innerHTML = work_generateRunningCountsString(this.params, 'branch');
 
@@ -505,12 +508,16 @@ BranchActiveJob.prototype.updatePanels = function() {
 	elName.classList.add('name');
 	elName.textContent = this.params.name;
 
+	var elUserName = document.createElement('div');
+	elActiveJob.appendChild(elUserName);
+	elUserName.textContent = 'User: ' + this.params.user_name;
+
 	var elBranchCtrl = document.createElement('div');
 	elActiveJob.appendChild(elBranchCtrl);
 
 	var elLabel = document.createElement('div');
 	elBranchCtrl.appendChild(elLabel);
-	elLabel.textContent = 'Job Branch:';
+	elLabel.textContent = 'Branch:';
 
 	var elName = document.createElement('div');
 	elBranchCtrl.appendChild(elName);

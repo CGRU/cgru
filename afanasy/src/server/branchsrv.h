@@ -68,7 +68,7 @@ public:
 	
 	bool getJobs(std::ostringstream & o_str);
 
-	void v_refresh(time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
+	void v_refresh(time_t i_current_time, AfContainer * i_container, MonitorContainer * i_monitoring);
 
 	// Perform post solving calculations:
 	void v_postSolve(time_t i_curtime, MonitorContainer * i_monitoring);
