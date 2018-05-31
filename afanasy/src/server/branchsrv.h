@@ -101,8 +101,8 @@ private:
 		int64_t running_capacity_total;
 
 		BranchSrvUserData(JobAf * i_job):
-			running_tasks_num(0),
-			running_capacity_total(0)
+			running_tasks_num(i_job->getRunningTasksNum()),
+			running_capacity_total(i_job->getRunningCapacityTotal())
 		{
 			jobs.add(i_job);
 		}

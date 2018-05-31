@@ -119,23 +119,45 @@ void Work::jsonWrite(std::ostringstream &o_str, int i_type) const
 	if (m_running_capacity_total > 0) o_str << ",\n\"running_capacity_total\":" << m_running_capacity_total;
 }
 
-void Work::addRunTasksCounts(TaskExec *i_exec)
+void Work::addRunTasksCounts(const TaskExec *i_exec)
 {
 	m_running_tasks_num++;
 	m_running_capacity_total += i_exec->getCapResult();
 }
 
-void Work::remRunTasksCounts(TaskExec *i_exec)
+void Work::remRunTasksCounts(const TaskExec *i_exec)
 {
-	if (m_running_tasks_num <= 0)
-		AF_ERR << getName() << "[" << getId() << "]: Tasks counter is zero or negative: " << m_running_tasks_num;
-	else
-		m_running_tasks_num--;
+	m_running_tasks_num--;
+	m_running_capacity_total -= i_exec->getCapResult();
+	checkNegativeRunningCounts();
+}
 
-	if (m_running_capacity_total <= 0)
-		AF_ERR << getName() << "[" << getId() << "]: Tasks capacity counter is zero or negative: " << m_running_capacity_total;
-	else
-		m_running_capacity_total -= i_exec->getCapResult();
+void Work::checkNegativeRunningCounts()
+{
+	if (m_running_tasks_num < 0)
+	{
+		AF_ERR << getName() << "[" << getId() << "]: Tasks counter is negative: " << m_running_tasks_num;
+		m_running_tasks_num = 0;
+	}
+
+	if (m_running_capacity_total < 0)
+	{
+		AF_ERR << getName() << "[" << getId() << "]: Tasks capacity counter is negative: " << m_running_capacity_total;
+		m_running_capacity_total = 0;
+	}
+}
+
+void Work::addRunningCounts(const af::Work & i_other)
+{
+	m_running_tasks_num += i_other.m_running_tasks_num;
+	m_running_capacity_total += i_other.m_running_capacity_total;
+}
+
+void Work::remRunningCounts(const af::Work & i_other)
+{
+	m_running_tasks_num -= i_other.m_running_tasks_num;
+	m_running_capacity_total -= i_other.m_running_capacity_total;
+	checkNegativeRunningCounts();
 }
 
 void Work::generateInfoStream(std::ostringstream &o_str, bool full) const

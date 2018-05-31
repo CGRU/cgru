@@ -82,8 +82,11 @@ public:
 	inline int getRunningTasksNum() const { return m_running_tasks_num; }
 	inline int getRunningCapacityTotal() const { return m_running_capacity_total; }
 
-	void addRunTasksCounts(af::TaskExec *i_exec);
-	void remRunTasksCounts(af::TaskExec *i_exec);
+	void addRunTasksCounts(const af::TaskExec *i_exec);
+	void remRunTasksCounts(const af::TaskExec *i_exec);
+
+	void addRunningCounts(const af::Work & i_other);
+	void remRunningCounts(const af::Work & i_other);
 
 	int calcWeight() const; ///< Calculate and return memory size.
 
@@ -106,5 +109,7 @@ protected:
 
 private:
 	std::map<std::string, int32_t> m_pools;
+
+	void checkNegativeRunningCounts();
 };
 }

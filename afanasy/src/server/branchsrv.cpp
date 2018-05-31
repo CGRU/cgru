@@ -225,12 +225,18 @@ void BranchSrv::addJob(JobAf * i_job, UserAf * i_user)
 
 	i_job->setBranch(this);
 
+	addRunningCounts(*i_job);
+
 	// Add job to user (create new branch user if not exists)
 	std::map<UserAf*, BranchSrvUserData*>::iterator it = m_users.find(i_user);
 	if (it == m_users.end())
 		m_users[i_user] = new BranchSrvUserData(i_job);
 	else
+	{
 		((*it).second)->jobs.add(i_job);
+		((*it).second)->running_tasks_num += i_job->getRunningTasksNum();
+		((*it).second)->running_capacity_total += i_job->getRunningCapacityTotal();
+	}
 
 	m_jobs_num++;
 }
@@ -241,11 +247,15 @@ void BranchSrv::removeJob(JobAf * i_job, UserAf * i_user)
 
 	m_jobs_list.remove(i_job);
 
+	remRunningCounts(*i_job);
+
 	// Remove job from user (and remove user if it has not any more jobs)
 	std::map<UserAf*, BranchSrvUserData*>::iterator it = m_users.find(i_user);
 	if (it != m_users.end())
 	{
-		(*it).second->jobs.remove(i_job);
+		((*it).second)->jobs.remove(i_job);
+		((*it).second)->running_tasks_num -= i_job->getRunningTasksNum();
+		((*it).second)->running_capacity_total -= i_job->getRunningCapacityTotal();
 		 if ((*it).second->jobs.getCount() == 0)
 		 {
 			 delete (*it).second;
