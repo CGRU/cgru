@@ -323,7 +323,7 @@ BranchNode.prototype.updatePanels = function() {
 	var info = '';
 	info += '<p>ID = ' + this.params.id + '</p>';
 	info += '<p>Created at: ' + cm_DateTimeStrFromSec(this.params.time_creation) + '</p>';
-	if ( ! this.params.jobs_total)
+	if (this.params.time_empty)
 	{
 		info += '<p>Empty for: ' + cm_TimeStringInterval(this.params.time_empty);
 		info += ', since: ' + cm_DateTimeStrFromSec(this.params.time_empty) + '</p>';

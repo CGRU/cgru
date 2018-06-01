@@ -103,7 +103,8 @@ void Branch::v_jsonWrite(std::ostringstream &o_str, int i_type) const
 	if (isSolveJobs()) o_str << ",\n\"solve_jobs\":true";
 
 	o_str << ",\n\"time_creation\":" << m_time_creation;
-	o_str << ",\n\"time_empty\":" << m_time_empty;
+	if (m_time_empty)
+		o_str << ",\n\"time_empty\":" << m_time_empty;
 
 	o_str << ",\n\"parent\":\"" << m_parent_path << "\"";
 

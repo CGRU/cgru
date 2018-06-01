@@ -104,7 +104,7 @@ bool BranchSrv::initialize()
 
 	if (isFromStore())
 	{
-		if (m_time_creation == 0 )
+		if (m_time_creation == 0)
 		{
 			m_time_creation = time(NULL);
 			store();
@@ -122,7 +122,6 @@ bool BranchSrv::initialize()
 		}
 
 		m_time_creation = time(NULL);
-		m_time_empty = 0;
 
 		setStoreDir(AFCommon::getStoreDirBranch(*this));
 		store();
@@ -314,11 +313,13 @@ void BranchSrv::jobsinfo(af::MCAfNodes &mcjobs)
 void BranchSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, MonitorContainer * i_monitoring)
 {
 	bool changed = false;
+	bool tostore = false;
 
 	int32_t _branches_num = 0;
 	int32_t _branches_total = 0;
 	int32_t _jobs_num = 0;
 	int32_t _jobs_total = 0;
+	int64_t _time_empty = 0;
 
 	// Iterate branches
 	AfListIt bIt(&m_branches_list);
@@ -340,26 +341,40 @@ void BranchSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, Monit
 		_jobs_total++;
 	}
 
+	// Store empty time total jobs == 0 and was not stored
+	if (_jobs_total == 0)
+	{
+		if (m_time_empty == 0)
+			_time_empty = i_currentTime;
+		else
+			_time_empty = m_time_empty;
+	}
+
 	// Compare changes
 	if ((_branches_num   != m_branches_num  ) ||
 		(_branches_total != m_branches_total) ||
 		(_jobs_num       != m_jobs_num      ) ||
-		(_jobs_total     != m_jobs_total    ))
+		(_jobs_total     != m_jobs_total    ) ||
+		(_time_empty     != m_time_empty    ))
 		changed = true;
+
+	if (_time_empty != m_time_empty)
+		tostore = true;
 
 	// Store new calculations
 	m_branches_num   = _branches_num;
 	m_branches_total = _branches_total;
 	m_jobs_num       = _jobs_num;
 	m_jobs_total     = _jobs_total;
-
-	// Process empty time
-	if ((m_jobs_total > 0) || (m_time_empty == 0))
-		m_time_empty = i_currentTime;
+	m_time_empty     = _time_empty;
 
 	// Emit events on changes
 	if (changed && i_monitoring)
 		i_monitoring->addEvent(af::Monitor::EVT_branches_change, m_id);
+
+	// Store if needed
+	if (tostore)
+		store();
 }
 
 bool BranchSrv::v_canRun()
