@@ -315,11 +315,13 @@ void BranchSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, Monit
 	bool changed = false;
 	bool tostore = false;
 
+	// Init counters:
 	int32_t _branches_num = 0;
 	int32_t _branches_total = 0;
 	int32_t _jobs_num = 0;
 	int32_t _jobs_total = 0;
-	int64_t _time_empty = 0;
+	// Store values:
+	int64_t _time_empty = m_time_empty;
 
 	// Iterate branches
 	AfListIt bIt(&m_branches_list);
@@ -341,13 +343,18 @@ void BranchSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, Monit
 		_jobs_total++;
 	}
 
-	// Store empty time total jobs == 0 and was not stored
+	// Store empty time (total jobs == 0)
 	if (_jobs_total == 0)
 	{
+		// Store only if it was not stored later
 		if (m_time_empty == 0)
 			_time_empty = i_currentTime;
-		else
-			_time_empty = m_time_empty;
+	}
+	else
+	{
+		// If there is some jobs (branch not empty)
+		// time empty should be zero
+		_time_empty = 0;
 	}
 
 	// Compare changes
