@@ -118,6 +118,9 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 		action = new QAction( "Set Max Running Tasks", this);
 		connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunningTasks() ));
 		menu.addAction( action);
+		action = new QAction( "Set Max Run Tasks Per Host", this);
+		connect(action, SIGNAL(triggered() ), this, SLOT(actMaxRunTasksPerHost()));
+		menu.addAction( action);
 		action = new QAction( "Set Hosts Mask", this);
 		connect( action, SIGNAL( triggered() ), this, SLOT( actHostsMask() ));
 		menu.addAction( action);
@@ -322,13 +325,26 @@ void ListUsers::actMaxRunningTasks()
 {
 	ItemUser* useritem = (ItemUser*)getCurrentItem();
 	if( useritem == NULL ) return;
-	int current = useritem->maxrunningtasks;
+	int current = useritem->max_running_tasks;
 
 	bool ok;
 	int max = QInputDialog::getInt(this, "Change Maximum Running Tasks", "Enter Number", current, -1, 9999, 1, &ok);
 	if( !ok) return;
 
 	setParameter("max_running_tasks", max);
+}
+
+void ListUsers::actMaxRunTasksPerHost()
+{
+	ItemUser * useritem = (ItemUser*)getCurrentItem();
+	if (useritem == NULL) return;
+	int current = useritem->max_running_tasks_per_host;
+
+	bool ok;
+	int max = QInputDialog::getInt(this, "Change Max Run Tasks Per Host", "Enter Number", current, -1, 9999, 1, &ok);
+	if( !ok) return;
+
+	setParameter("max_running_tasks_per_host", max);
 }
 
 void ListUsers::actHostsMask()

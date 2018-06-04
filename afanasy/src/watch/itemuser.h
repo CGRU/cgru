@@ -17,7 +17,8 @@ public:
 	int errors_retries;
 	int errors_forgivetime;
 	int jobs_lifetime;
-	int maxrunningtasks;
+	int max_running_tasks;
+	int max_running_tasks_per_host;
 	QString hostsmask;
 	QString hostsmask_exclude;
 
