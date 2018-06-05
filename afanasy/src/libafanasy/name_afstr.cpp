@@ -98,6 +98,40 @@ const std::string af::state2str( int state)
 	return str;
 }
 
+const std::string af::toKMG(long long i_number)
+{
+	static const int labels_size = 5;
+	static const char labels[labels_size] = {'K','M','G','T','P'};
+	static const int base = 1000;
+
+	// Calculate power
+	int pow = 0; long long th = 1;
+	for (; pow < labels_size; pow++)
+	{
+		if (th * base > i_number)
+			break;
+
+		th *= base;
+	}
+
+	// Divide and convert to string
+	double val = double(i_number) / double(th);
+	static char buf[256];
+	sprintf(buf, "%.1f", val);
+
+	// Remove trailing zero (after a dot)
+	size_t len = strlen(buf);
+	if ((len > 2) && ((buf[len-2] == '.') || (buf[len-2] == ',')) && (buf[len-1] == '0'))
+		len -= 2; // Remove zero and a dot
+
+	// Create std::string and add power label
+	std::string str(buf, len);
+	if (pow)
+		str += labels[pow-1];
+
+	return str;
+}
+
 const std::string af::vectToStr( const std::vector<int32_t> & i_vec)
 {
 	std::string o_str;

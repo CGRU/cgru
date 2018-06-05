@@ -46,6 +46,7 @@ public:
 	int p_percentage;
 	int p_tasksready;
 	int p_tasksrunning;
+	int p_capacitytotal;
 	int p_tasksdone;
 	int p_taskserror;
 	int p_tasksskipped;

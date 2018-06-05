@@ -30,6 +30,7 @@ BlockInfo::BlockInfo( Item * qItem, int BlockNumber, int JobId):
 	p_percentage(0),
 	p_tasksready(0),
 	p_tasksrunning(0),
+	p_capacitytotal(0),
 	p_tasksdone(0),
 	p_taskserror(0),
 	p_tasksskipped(0),
@@ -136,6 +137,7 @@ bool BlockInfo::update( const af::BlockData* block, int type)
 		p_percentage      = block->getProgressPercentage();
 		p_tasksready      = block->getProgressTasksReady();
 		p_tasksrunning    = block->getRunningTasksNumber();
+		p_capacitytotal   = block->getRunningCapacityTotal();
 		p_tasksdone       = block->getProgressTasksDone();
 		p_taskserror      = block->getProgressTasksError();
 		p_tasksskipped    = block->getProgressTasksSkipped();
@@ -374,30 +376,33 @@ void BlockInfo::refresh()
 	str_progress = QString::number( p_percentage) + "%";
 	if( Watch::isPadawan())
 	{
-		if( p_tasksrunning ) str_progress += QString(" Running:%1" ).arg( p_tasksrunning);
-		if( p_tasksdone    ) str_progress += QString(" Done:%1").arg( p_tasksdone);
-		if( p_taskserror   ) str_progress += QString(" Errors:%1" ).arg( p_taskserror);
-		if( p_tasksskipped ) str_progress += QString(" Skipped:%1" ).arg( p_tasksskipped);
-		if( p_taskswarning ) str_progress += QString(" Warnings:%1" ).arg( p_taskswarning);
-		if( p_taskswaitrec ) str_progress += QString(" WaitingReconnect:%1" ).arg( p_taskswaitrec);
+		if (p_tasksrunning ) str_progress += QString(" Running:%1"         ).arg(p_tasksrunning);
+		if (p_capacitytotal) str_progress += QString(" Capacity:%1"        ).arg(af::toKMG(p_capacitytotal).c_str());
+		if (p_tasksdone    ) str_progress += QString(" Done:%1"            ).arg(p_tasksdone);
+		if (p_taskserror   ) str_progress += QString(" Errors:%1"          ).arg(p_taskserror);
+		if (p_tasksskipped ) str_progress += QString(" Skipped:%1"         ).arg(p_tasksskipped);
+		if (p_taskswarning ) str_progress += QString(" Warnings:%1"        ).arg(p_taskswarning);
+		if (p_taskswaitrec ) str_progress += QString(" WaitingReconnect:%1").arg(p_taskswaitrec);
 	}
 	else if( Watch::isJedi())
 	{
-		if( p_tasksrunning ) str_progress += QString(" Run:%1" ).arg( p_tasksrunning);
-		if( p_tasksdone    ) str_progress += QString(" Done:%1").arg( p_tasksdone);
-		if( p_taskserror   ) str_progress += QString(" Err:%1" ).arg( p_taskserror);
-		if( p_tasksskipped ) str_progress += QString(" Skp:%1" ).arg( p_tasksskipped);
-		if( p_taskswarning ) str_progress += QString(" Wrn:%1" ).arg( p_taskswarning);
-		if( p_taskswaitrec ) str_progress += QString(" WRC:%1" ).arg( p_taskswaitrec);
+		if (p_tasksrunning ) str_progress += QString(" Run:%1" ).arg(p_tasksrunning);
+		if (p_capacitytotal) str_progress += QString(" Cap:%1" ).arg(p_capacitytotal);
+		if (p_tasksdone    ) str_progress += QString(" Done:%1").arg(p_tasksdone);
+		if (p_taskserror   ) str_progress += QString(" Err:%1" ).arg(p_taskserror);
+		if (p_tasksskipped ) str_progress += QString(" Skp:%1" ).arg(p_tasksskipped);
+		if (p_taskswarning ) str_progress += QString(" Wrn:%1" ).arg(p_taskswarning);
+		if (p_taskswaitrec ) str_progress += QString(" WRC:%1" ).arg(p_taskswaitrec);
 	}
 	else
 	{
-		if( p_tasksrunning ) str_progress += QString(" r%1" ).arg( p_tasksrunning);
-		if( p_tasksdone    ) str_progress += QString(" d%1").arg( p_tasksdone);
-		if( p_taskserror   ) str_progress += QString(" e%1" ).arg( p_taskserror);
-		if( p_tasksskipped ) str_progress += QString(" s%1" ).arg( p_tasksskipped);
-		if( p_taskswarning ) str_progress += QString(" w%1" ).arg( p_taskswarning);
-		if( p_taskswaitrec ) str_progress += QString(" wrc%1" ).arg( p_taskswaitrec);
+		if (p_tasksrunning ) str_progress += QString(" r%1"  ).arg(p_tasksrunning);
+		if (p_capacitytotal) str_progress += QString(" c%1"  ).arg(p_capacitytotal);
+		if (p_tasksdone    ) str_progress += QString(" d%1"  ).arg(p_tasksdone);
+		if (p_taskserror   ) str_progress += QString(" e%1"  ).arg(p_taskserror);
+		if (p_tasksskipped ) str_progress += QString(" s%1"  ).arg(p_tasksskipped);
+		if (p_taskswarning ) str_progress += QString(" w%1"  ).arg(p_taskswarning);
+		if (p_taskswaitrec ) str_progress += QString(" wrc%1").arg(p_taskswaitrec);
 	}
 
 	if( jobid == AFJOB::SYSJOB_ID ) str_progress += QString(" Ready:%1").arg( p_tasksready);
