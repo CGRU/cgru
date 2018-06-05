@@ -387,7 +387,7 @@ void BlockInfo::refresh()
 	else if( Watch::isJedi())
 	{
 		if (p_tasksrunning ) str_progress += QString(" Run:%1" ).arg(p_tasksrunning);
-		if (p_capacitytotal) str_progress += QString(" Cap:%1" ).arg(p_capacitytotal);
+		if (p_capacitytotal) str_progress += QString(" Cap:%1" ).arg(af::toKMG(p_capacitytotal).c_str());
 		if (p_tasksdone    ) str_progress += QString(" Done:%1").arg(p_tasksdone);
 		if (p_taskserror   ) str_progress += QString(" Err:%1" ).arg(p_taskserror);
 		if (p_tasksskipped ) str_progress += QString(" Skp:%1" ).arg(p_tasksskipped);
@@ -397,7 +397,7 @@ void BlockInfo::refresh()
 	else
 	{
 		if (p_tasksrunning ) str_progress += QString(" r%1"  ).arg(p_tasksrunning);
-		if (p_capacitytotal) str_progress += QString(" c%1"  ).arg(p_capacitytotal);
+		if (p_capacitytotal) str_progress += QString(" c%1"  ).arg(af::toKMG(p_capacitytotal).c_str());
 		if (p_tasksdone    ) str_progress += QString(" d%1"  ).arg(p_tasksdone);
 		if (p_taskserror   ) str_progress += QString(" e%1"  ).arg(p_taskserror);
 		if (p_tasksskipped ) str_progress += QString(" s%1"  ).arg(p_tasksskipped);
