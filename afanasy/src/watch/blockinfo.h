@@ -46,7 +46,6 @@ public:
 	int p_percentage;
 	int p_tasksready;
 	int p_tasksrunning;
-	int p_capacitytotal;
 	int p_tasksdone;
 	int p_taskserror;
 	int p_tasksskipped;
@@ -54,6 +53,7 @@ public:
 	int p_taskswaitrec;
 	int p_avoidhosts;
 	int p_errorhosts;
+	long long p_capacitytotal;
 	long long p_taskssumruntime;
 
 private:

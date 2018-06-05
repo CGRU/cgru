@@ -179,7 +179,7 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 		menu.addSeparator();
 
 		action = new QAction( "Delete", this);
-		action->setEnabled( useritem->numjobs == 0 );
+		action->setEnabled(useritem->jobs_num == 0);
 		connect( action, SIGNAL( triggered() ), this, SLOT( actDelete() ));
 		menu.addAction( action);
 	}
@@ -251,7 +251,7 @@ void ListUsers::calcTitle()
 	for( int i = 0; i < total; i++)
 	{
 		ItemUser * itemuser = (ItemUser*)(m_model->item(i));
-		if( itemuser->numrunningtasks > 0 ) running++;
+		if (itemuser->running_tasks_num > 0) running++;
 	}
 	m_parentWindow->setWindowTitle(QString("U[%1]: %2R").arg( total).arg( running));
 }

@@ -94,10 +94,6 @@ void User::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\n\"jobs_num\":" << m_jobs_num;
 	if( m_running_jobs_num > 0 )
 		o_str << ",\n\"running_jobs_num\":" << m_running_jobs_num;
-	if( m_running_tasks_num > 0 )
-		o_str << ",\n\"running_tasks_num\":" << m_running_tasks_num;
-	if( m_running_capacity_total > 0 )
-		o_str << ",\n\"running_capacity_total\":" << m_running_capacity_total;
 
 	o_str << "\n}";
 }

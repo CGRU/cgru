@@ -35,8 +35,9 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 	updateNodeValues( i_node);
 
 	hostname                   = afqt::stoq(user->getHostName());
-	numjobs                    = user->getNumJobs();
-	numrunningtasks            = user->getRunningTasksNum();
+	jobs_num                   = user->getNumJobs();
+	running_tasks_num          = user->getRunningTasksNum();
+	running_capacity_total     = user->getRunningCapacityTotal();
 	max_running_tasks          = user->getMaxRunningTasks();
 	max_running_tasks_per_host = user->getMaxRunTasksPerHost();
 	hostsmask                  = afqt::stoq(user->getHostsMask());
@@ -49,7 +50,7 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 	time_register              = user->getTimeRegister();
 	time_activity              = user->getTimeActivity();
 
-	if( numrunningtasks )
+	if (running_tasks_num)
 		setRunning();
 	else
 		setNotRunning();
@@ -58,7 +59,7 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 	{
 		strLeftTop = m_name;
 
-		strLeftBottom  = QString("Jobs Count: %1 / %2 Running").arg( numjobs).arg( user->getNumRunningJobs());
+		strLeftBottom = QString("Jobs Count: %1 / %2 Running").arg(jobs_num).arg(user->getNumRunningJobs());
 
 		strHCenterTop.clear();
 		strHCenterTop = QString("Priority:%1").arg(m_priority);
@@ -88,7 +89,7 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 	{
 		strLeftTop = m_name;
 
-		strLeftBottom  = QString("Jobs: %1 / %2 Run").arg( numjobs).arg( user->getNumRunningJobs());
+		strLeftBottom = QString("Jobs: %1 / %2 Run").arg(jobs_num).arg(user->getNumRunningJobs());
 
 		strHCenterTop.clear();
 		strHCenterTop = QString("Pri:%1").arg(m_priority);
@@ -118,7 +119,7 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 	{
 		strLeftTop = QString("%1-%2").arg(m_name).arg( m_priority);
 
-		strLeftBottom  = 'j' + QString::number( numjobs) + '/' + QString::number( user->getNumRunningJobs());
+		strLeftBottom  = 'j' + QString::number(jobs_num) + '/' + QString::number(user->getNumRunningJobs());
 
 		strHCenterTop.clear();
 		if (max_running_tasks != -1) strHCenterTop = QString("m%1").arg(max_running_tasks);
@@ -185,7 +186,7 @@ void ItemUser::paint( QPainter *painter, const QStyleOptionViewItem &option) con
 	//
 	// Draw stars:
 	//
-	int numstars = numrunningtasks;
+	int numstars = running_tasks_num;
 	if( numstars <= 0 )
 		return;
 
@@ -216,9 +217,12 @@ void ItemUser::paint( QPainter *painter, const QStyleOptionViewItem &option) con
 		sx += stars_delta;
 	}
 
+	QString running_str = QString("T:%1").arg(running_tasks_num);
+	running_str += QString(" / C:%1").arg(af::toKMG(running_capacity_total).c_str());
+
 	painter->setFont( afqt::QEnvironment::f_name);
 	painter->setPen( afqt::QEnvironment::clr_textstars.c);
-	painter->drawText( x, y, w, HeightUser, Qt::AlignHCenter | Qt::AlignBottom, QString::number(numrunningtasks));
+	painter->drawText( x, y, w, HeightUser, Qt::AlignHCenter | Qt::AlignBottom, running_str);
 }
 
 void ItemUser::setSortType( int i_type1, int i_type2 )
@@ -239,10 +243,10 @@ void ItemUser::setSortType( int i_type1, int i_type2 )
 			m_sort_str1 = hostname;
 			break;
 		case CtrlSortFilter::TNUMJOBS:
-			m_sort_int1 = numjobs;
+			m_sort_int1 = jobs_num;
 			break;
 		case CtrlSortFilter::TNUMRUNNINGTASKS:
-			m_sort_int1 = numrunningtasks;
+			m_sort_int1 = running_tasks_num;
 			break;
 		case CtrlSortFilter::TTIMEREGISTERED:
 			m_sort_int1 = time_register;
@@ -268,10 +272,10 @@ void ItemUser::setSortType( int i_type1, int i_type2 )
 			m_sort_str2 = hostname;
 			break;
 		case CtrlSortFilter::TNUMJOBS:
-			m_sort_int2 = numjobs;
+			m_sort_int2 = jobs_num;
 			break;
 		case CtrlSortFilter::TNUMRUNNINGTASKS:
-			m_sort_int2 = numrunningtasks;
+			m_sort_int2 = running_tasks_num;
 			break;
 		case CtrlSortFilter::TTIMEREGISTERED:
 			m_sort_int2 = time_register;

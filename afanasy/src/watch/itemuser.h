@@ -23,8 +23,9 @@ public:
 	QString hostsmask_exclude;
 
 	QString hostname;
-	int numjobs;
-	int numrunningtasks;
+	int jobs_num;
+	int running_tasks_num;
+	int64_t running_capacity_total;
 
 	int64_t time_register;
 	int64_t time_activity;
