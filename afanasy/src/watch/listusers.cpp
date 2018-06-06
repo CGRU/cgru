@@ -157,13 +157,21 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 
 		submenu = new QMenu("Jobs Solving Method", this);
 
-		action = new QAction("By Order", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actSolveJobsByOrder() ));
-		submenu->addAction( action);
+		action = new QAction("Method By Order", this);
+		connect(action, SIGNAL(triggered()), this, SLOT(actSolveJobsByOrder()));
+		submenu->addAction(action);
 
-		action = new QAction("Parallel", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actSolveJobsByPriority() ));
-		submenu->addAction( action);
+		action = new QAction("Method By Priority", this);
+		connect(action, SIGNAL(triggered()), this, SLOT(actSolveJobsByPriority()));
+		submenu->addAction(action);
+
+		action = new QAction("Need By Capacity", this);
+		connect(action, SIGNAL(triggered()), this, SLOT(actSolveJobsByCapacity()));
+		submenu->addAction(action);
+
+		action = new QAction("Need By Run Tasks", this);
+		connect(action, SIGNAL(triggered()), this, SLOT(actSolveJobsByTasksNum()));
+		submenu->addAction(action);
 
 		menu.addMenu( submenu);
 
