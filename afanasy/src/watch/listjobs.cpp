@@ -106,8 +106,17 @@ ListJobs::ListJobs( QWidget* parent):
 	bp = addButtonPanel("RET","jobs_restart_error_tasks","Restart error tasks.","R");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRestartErrors()));
 
-	bp = addButtonPanel("DEL","jobs_delete","Delete selected jobs.","D", true);
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actDelete()));
+	bp = addButtonPanel("RET","jobs_restart_error_tasks","Restart error tasks.","R");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRestartErrors()));
+
+	bp = addButtonPanel("RST","jobs_restart","Restart selected jobs.","", true);
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRestart()));
+
+	bp = addButtonPanel("RSP","jobs_restart_pause","Restart&Pause selected jobs.","", true);
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRestartPause()));
+
+	bp = addButtonPanel("DEL","jobs_delete","Delete selected jobs.","", true);
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actDelete()));
 
 	bp = addButtonPanel("DDJ","jobs_delete_done","Delete all done jobs.","", true);
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actDeleteDone()));
