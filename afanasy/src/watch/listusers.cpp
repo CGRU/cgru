@@ -57,22 +57,19 @@ ListUsers::ListUsers( QWidget* parent):
 	ButtonPanel * bp;
 
 	bp = addButtonPanel("LOG","users_log","Show user log.");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestLog()));
-
-	bp = addButtonPanel("PRI","users_priority","Set user priority.");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actPriority()));
-
-	bp = addButtonPanel("FOR","users_errors_forgive_time","Set user errors forgive time.");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actErrorsForgiveTime()));
-
-	bp = addButtonPanel("LIFE","users_jobs_life_time","Set jobs life time.");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actJobsLifeTime()));
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRequestLog()));
 
 	bp = addButtonPanel("ORD","users_solve_ordered","Solve jobs by order.");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actSolveJobsByOrder()));
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actSolveJobsByOrder()));
 
-	bp = addButtonPanel("PAR","users_solve_parallel","Solve jobs parallel.");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actSolveJobsParallel()));
+	bp = addButtonPanel("PRI","users_solve_priority","Solve jobs by priority.");
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actSolveJobsByPriority()));
+
+	bp = addButtonPanel("CAP","users_solve_capacity","Solve jobs need by capacity.");
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actSolveJobsByCapacity()));
+
+	bp = addButtonPanel("TSK","users_solve_tasksnum","Solve jobs need by tasks number.");
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actSolveJobsByTasksNum()));
 
 
 	m_parentWindow->setWindowTitle("Users");
@@ -165,7 +162,7 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 		submenu->addAction( action);
 
 		action = new QAction("Parallel", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actSolveJobsParallel() ));
+		connect( action, SIGNAL( triggered() ), this, SLOT( actSolveJobsByPriority() ));
 		submenu->addAction( action);
 
 		menu.addMenu( submenu);
@@ -374,8 +371,10 @@ void ListUsers::actHostsMaskExclude()
 }
 
 void ListUsers::actDelete() { operation("delete"); }
-void ListUsers::actSolveJobsByOrder()  { setParameter("solve_parallel", "false", false); }
-void ListUsers::actSolveJobsParallel() { setParameter("solve_parallel", "true",  false); }
+void ListUsers::actSolveJobsByOrder()    { setParameter("solve_method", "solve_order",    true); }
+void ListUsers::actSolveJobsByPriority() { setParameter("solve_method", "solve_priority", true); }
+void ListUsers::actSolveJobsByCapacity() { setParameter("solve_need",   "solve_capacity", true); }
+void ListUsers::actSolveJobsByTasksNum() { setParameter("solve_need",   "solve_tasksnum", true); }
 
 void ListUsers::actRequestLog() { getItemInfo("log"); }
 

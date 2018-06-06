@@ -83,7 +83,7 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 		if (user->isSolveCapacity())
 			strRightBottom += ", Capacity";
 		else
-			strRightBottom += ", MaxTasks";
+			strRightBottom += ", RunTasks";
 	}
 	else if( Watch::isJedi())
 	{
