@@ -15,6 +15,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 Block::Block( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress):
    m_job( blockJob),
@@ -200,10 +201,7 @@ bool Block::v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorCont
       }
    }
 
-   // Store render pointer:
-   addRenderCounts( render);
-
-   m_tasks[taskexec->getTaskNum()]->v_start( taskexec, render, monitoring, m_data->getRunningTasksCounter(), m_data->getRunningCapacityCounter());
+   m_tasks[taskexec->getTaskNum()]->v_start( taskexec, render, monitoring);
 
    return true;
 }
@@ -211,19 +209,14 @@ bool Block::v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorCont
 void Block::reconnectTask(af::TaskExec *i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring)
 {
 	Task * task = m_tasks[i_taskexec->getTaskNum()];
-	task->reconnect( i_taskexec, &i_render, i_monitoring, m_data->getRunningTasksCounter(), m_data->getRunningCapacityCounter());
-}
-
-void Block::taskFinished( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
-{
-   remRenderCounts( render);
+	task->reconnect( i_taskexec, &i_render, i_monitoring);
 }
 
 bool Block::canRunOn( RenderAf * render)
 {
    // check max running tasks on the same host:
    if(  m_data->getMaxRunTasksPerHost() == 0 ) return false;
-   if(( m_data->getMaxRunTasksPerHost()  > 0 ) && ( getRenderCounts(render) >= m_data->getMaxRunTasksPerHost() )) return false;
+	if((m_data->getMaxRunTasksPerHost() > 0) && (getRenderCount(render) >= m_data->getMaxRunTasksPerHost())) return false;
    // check available capacity:
    if( false == render->hasCapacity( m_data->getCapMinResult())) return false;
    // render services:
@@ -249,47 +242,64 @@ bool Block::canRunOn( RenderAf * render)
    return true;
 }
 
-void Block::addRenderCounts( RenderAf * render)
+void Block::addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
 {
-   m_job->addRenderCounts( render);
-   std::list<RenderAf*>::iterator rit = m_renders_ptrs.begin();
-   std::list<int>::iterator cit = m_renders_counts.begin();
-   for( ; rit != m_renders_ptrs.end(); rit++, cit++)
-      if( render == *rit )
-      {
-         (*cit)++;
-         return;
-      }
-   m_renders_ptrs.push_back( render);
-   m_renders_counts.push_back( 1);
+	addRenderCount(i_render);
+
+	m_data->addSolveCounts(i_exec);
+
+	m_job->addSolveCounts(i_monitoring, i_exec, i_render);
 }
 
-int Block::getRenderCounts( RenderAf * render) const
+void Block::remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
 {
-   std::list<RenderAf*>::const_iterator rit = m_renders_ptrs.begin();
-   std::list<int>::const_iterator cit = m_renders_counts.begin();
-   for( ; rit != m_renders_ptrs.end(); rit++, cit++)
-      if( render == *rit ) return *cit;
-   return 0;
+	remRenderCount(i_render);
+
+	m_data->remSolveCounts(i_exec);
+
+	m_job->remSolveCounts(i_monitoring, i_exec, i_render);
 }
 
-void Block::remRenderCounts( RenderAf * render)
+void Block::addRenderCount(RenderAf * i_render)
 {
-   m_job->remRenderCounts( render);
-   std::list<RenderAf*>::iterator rit = m_renders_ptrs.begin();
-   std::list<int>::iterator cit = m_renders_counts.begin();
-   for( ; rit != m_renders_ptrs.end(); rit++, cit++)
-      if( render == *rit )
-      {
-         if( *cit > 1 )
-            (*cit)--;
-         else
-         {
-			m_renders_ptrs.erase( rit);
-			m_renders_counts.erase( cit);
-         }
-         return;
-      }
+	std::list<RenderAf*>::iterator rit = m_renders_ptrs.begin();
+	std::list<int>::iterator cit = m_renders_counts.begin();
+	for ( ; rit != m_renders_ptrs.end(); rit++, cit++)
+		if (i_render == *rit )
+		{
+			(*cit)++;
+			return;
+		}
+	m_renders_ptrs.push_back(i_render);
+	m_renders_counts.push_back(1);
+}
+
+int Block::getRenderCount(RenderAf * i_render) const
+{
+	std::list<RenderAf*>::const_iterator rit = m_renders_ptrs.begin();
+	std::list<int>::const_iterator cit = m_renders_counts.begin();
+	for ( ; rit != m_renders_ptrs.end(); rit++, cit++)
+		if (i_render == *rit)
+			return *cit;
+	return 0;
+}
+
+void Block::remRenderCount(RenderAf * i_render)
+{
+	std::list<RenderAf*>::iterator rit = m_renders_ptrs.begin();
+	std::list<int>::iterator cit = m_renders_counts.begin();
+	for( ; rit != m_renders_ptrs.end(); rit++, cit++)
+		if (i_render == *rit)
+		{
+			if (*cit > 1)
+				(*cit)--;
+			else
+			{
+				m_renders_ptrs.erase(rit);
+				m_renders_counts.erase(cit);
+			}
+			return;
+		}
 }
 
 bool Block::v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring)
@@ -472,7 +482,7 @@ bool Block::action( Action & i_action)
 	return job_progress_changed;
 }
 
-void Block::skipRestartTasks( bool i_skip, const std::string i_message, const Action & i_action, const JSON & i_operation, uint32_t i_state)
+void Block::skipRestartTasks( bool i_skip, const std::string & i_message, const Action & i_action, const JSON & i_operation, uint32_t i_state)
 {
 	std::vector<int32_t> tasks_vec;
 	af::jr_int32vec("task_ids", tasks_vec, i_operation);
@@ -480,7 +490,7 @@ void Block::skipRestartTasks( bool i_skip, const std::string i_message, const Ac
 	int length = m_data->getTasksNum();
 	if( tasks_vec.size())
 		length = tasks_vec.size();
-//printf("Block::skipRestartTasks: BEGIN:\n");
+
 	for( int i = 0; i < length; i++)
 	{
 		int t = i;
@@ -498,9 +508,12 @@ void Block::skipRestartTasks( bool i_skip, const std::string i_message, const Ac
 		if( i_skip )
 			m_tasks[t]->skip( i_message, i_action.renders, i_action.monitors);
 		else
+		{
+			m_data->setTimeStarted(time(NULL), true);
+			m_data->setTimeDone(0);
 			m_tasks[t]->restart( i_message, i_action.renders, i_action.monitors, i_state);
+		}
 	}
-//printf("Block::skipRestartTasks: END:\n");
 }
 
 void Block::constructDependBlocks()

@@ -147,9 +147,35 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
 				action = new QAction( "Browse Files...", this);
 				connect( action, SIGNAL( triggered() ), this, SLOT( actBrowseFolder() ));
 				o_menu.addAction( action);
-				o_menu.addSeparator();
+				
+				const std::vector<std::string> preview_cmds = af::Environment::getPreviewCmds();
+                if( preview_cmds.size())
+                {
+                    QMenu * submenu_cmd = new QMenu( "Launch", this);
+                    for( int i = 0; i < itemBlock->files.size(); i++)
+                    {
+                        action = new QAction( afqt::stoq(itemBlock->files[i]).right(55), this);
+                        action->setEnabled( false);
+                        QFont f = action->font();
+                        f.setItalic(true);
+                        action->setFont(f);
+                        submenu_cmd->addAction( action);
+                        for( int p = 0; p < preview_cmds.size(); p++)
+                        {
+                            QString cmd = afqt::stoq( preview_cmds[p]);
+                            QStringList cmdSplit = cmd.split("|");
+                                
+                            ActionIdId * actionid = new ActionIdId( p, i, QString("    " + cmdSplit.first()), this);
+                            connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actBlockPreview(int,int) ));
+                            submenu_cmd->addAction( actionid);
+                        }
+                        submenu_cmd->addSeparator();
+                    }
+                    o_menu.addMenu( submenu_cmd);
+                }
+                o_menu.addSeparator();
 			}
-
+            
 			QMenu * submenu = new QMenu( "Change Block", this);
 
 			// Operations on the current block item
@@ -212,34 +238,31 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
 				o_menu.addAction( action);
 
 				const std::vector<std::string> preview_cmds = af::Environment::getPreviewCmds();
-
 				if( preview_cmds.size())
-				{
-					QMenu * submenu_cmd = new QMenu( "Preview", this);
-					for( int p = 0; p < preview_cmds.size(); p++)
-					{
-						QString cmd = afqt::stoq( preview_cmds[p]);
-
-						if( files.size() > 1)
-						{
-							QMenu * submenu_img = new QMenu( cmd, this);
-							for( int i = 0; i < files.size(); i++)
-							{
-								ActionIdId * actionid = new ActionIdId( p, i, afqt::stoq(files[i]).right(55), this);
-								connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
-								submenu_img->addAction( actionid);
-							}
-							submenu_cmd->addMenu( submenu_img);
-						}
-						else
-						{
-							ActionIdId * actionid = new ActionIdId( p, 0, cmd, this);
-							connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
-							submenu_cmd->addAction( actionid);
-						}
-					}
-					o_menu.addMenu( submenu_cmd);
-				}
+                {
+                    QMenu * submenu_cmd = new QMenu( "Launch", this);
+                    for( int i = 0; i < files.size(); i++)
+                    {
+                        action = new QAction( afqt::stoq(files[i]).right(55), this);
+                        action->setEnabled( false);
+                        QFont f = action->font();
+                        f.setItalic(true);
+                        action->setFont(f);
+                        submenu_cmd->addAction( action);
+                        for( int p = 0; p < preview_cmds.size(); p++)
+                        {
+                            QString cmd = afqt::stoq( preview_cmds[p]);
+                            QStringList cmdSplit = cmd.split("|");
+                                
+                            ActionIdId * actionid = new ActionIdId( p, i, QString("    " + cmdSplit.first()), this);
+                            connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
+                            submenu_cmd->addAction( actionid);
+                        }
+                        submenu_cmd->addSeparator();
+                    }
+                    o_menu.addMenu( submenu_cmd);
+                }
+                o_menu.addSeparator();
 			}
 
 			o_menu.addSeparator();
@@ -726,7 +749,7 @@ void ListTasks::actTaskPreview( int num_cmd, int num_img)
 	std::vector<std::string> images = service.getFiles();
 	if( num_img >= images.size())
 	{
-		displayError( "No such image nubmer.");
+		displayError( "No such image number.");
 		return;
 	}
 	QString arg = afqt::stoq( images[num_img]);
@@ -741,8 +764,49 @@ void ListTasks::actTaskPreview( int num_cmd, int num_img)
 
 	QString cmd( afqt::stoq( af::Environment::getPreviewCmds()[num_cmd]));
 	cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, arg);
+	QStringList cmdSplit = cmd.split("|");
 
-	Watch::startProcess( cmd, wdir);
+	Watch::startProcess( cmdSplit.last(), wdir);
+}
+
+void ListTasks::actBlockPreview( int num_cmd, int num_img)
+{
+    Item* item = getCurrentItem();
+    if( item == NULL )
+    {
+        displayError( "No items selected.");
+        return;
+    }
+    if( item->getId() != ItemJobBlock::ItemId)
+    {
+        displayWarning( "This action for block only.");
+        return;
+    }
+
+    ItemJobBlock* blockitem = (ItemJobBlock*)item;
+    af::Service service( blockitem->files, blockitem->workingdir);
+
+    std::vector<std::string> images = service.getFiles();
+    if( num_img >= images.size())
+    {
+        displayError( "No such image number.");
+        return;
+    }
+    QString arg = afqt::stoq( images[num_img]);
+    QString wdir( afqt::stoq( service.getWDir()));
+
+    if( arg.isEmpty()) return;
+    if( num_cmd >= af::Environment::getPreviewCmds().size())
+    {
+        displayError( "No such command number.");
+        return;
+    }
+
+    QString cmd( afqt::stoq( af::Environment::getPreviewCmds()[num_cmd]));
+    cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, arg);
+    QStringList cmdSplit = cmd.split("|");
+
+    Watch::startProcess( cmdSplit.last(), wdir);
 }
 
 void ListTasks::blockAction( int id_block, QString i_action) { blockAction( id_block, i_action, true); }

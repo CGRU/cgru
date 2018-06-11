@@ -26,9 +26,7 @@ TaskRun::TaskRun( Task * runningTask,
                   af::TaskProgress * taskProgress,
                   Block * taskBlock,
                   RenderAf * render,
-                  MonitorContainer * monitoring,
-                  int32_t * i_running_tasks_counter,
-                  int64_t * i_running_capacity_counter
+                  MonitorContainer * monitoring
                   ):
    m_task( runningTask),
    m_block( taskBlock),
@@ -36,14 +34,10 @@ TaskRun::TaskRun( Task * runningTask,
    m_progress( taskProgress),
    m_tasknum( 0),
    m_hostId( 0),
-	m_running_tasks_counter( i_running_tasks_counter),
-	m_running_capacity_counter( i_running_capacity_counter),
    m_stopTime( 0),
    m_zombie( false)
 {
 	AF_DEBUG << "TaskRun::TaskRun: " << m_block->m_job->getName() << "[" << m_block->m_data->getBlockNum() << "][" << m_tasknum << "]:";
-	(*m_running_tasks_counter)++;
-	(*m_running_capacity_counter) += m_exec->getCapResult();
 
    m_progress->percent = -1;
    m_progress->frame = -1;
@@ -53,6 +47,12 @@ TaskRun::TaskRun( Task * runningTask,
 
 	// Skip starting task if executable is not set (multihost task)
 	if( m_exec == NULL) return;
+
+	// Let block increase renders counters.
+	// Needed to max run tasks per host limit.
+	// This block function also adds counts on its job.
+	m_block->addSolveCounts(monitoring, m_exec, render);
+	//^Multihost task will increase capacity counter itself.
 
    m_progress->state = AFJOB::STATE_RUNNING_MASK;
    m_progress->starts_count++;
@@ -80,7 +80,7 @@ AFINFA("TaskRun:: ~ TaskRun: %s[%d][%d]:", m_block->m_job->getName().c_str(), m_
    m_progress->state = AFJOB::STATE_READY_MASK;
 }
 
-void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost)
+void TaskRun::update(const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & o_error_host)
 {
 	if( m_zombie )
 	{
@@ -120,7 +120,7 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
 		//printf("TaskRun::update: case af::TaskExec::UPPercent:\n");
 		int new_percent = taskup.getPercent();
 		if (new_percent != m_progress->percent)
-			m_progress->last_percent_change = time( NULL);
+			m_progress->last_percent_change = m_progress->time_done;
 		m_progress->percent      = new_percent;
 		m_progress->frame        = taskup.getFrame();
 		m_progress->percentframe = taskup.getPercentFrame();
@@ -159,6 +159,31 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
 		{
 			message = "Finished success.";
 		}
+
+		// Check minimum running time:
+		// It should be checked only if task
+		// UPFinishedSuccess (finished itself with a good exit status), or
+		// UPFinishedFailedPost (finished itself with a good exit status, but post task command was failed).
+		// And this check definitely should be skipped in UPSkip (when user skipped running task).
+		// Also it should be skipped on UPFinishedParserSuccess, as in parser we already made a decision that render was good.
+		if ((m_stopTime == 0) && (m_block->m_data->getTaskMinRunTime() > 0))
+		{
+			if ((taskup.getStatus() == af::TaskExec::UPFinishedSuccess) ||
+				(taskup.getStatus() == af::TaskExec::UPFinishedFailedPost))
+			{
+				int run_time = m_progress->time_done - m_progress->time_start;
+				if (run_time < m_block->m_data->getTaskMinRunTime())
+				{
+					m_progress->state = m_progress->state | AFJOB::STATE_ERROR_MASK;
+					m_progress->errors_count++;
+					message = "Task running time (" + af::itos(run_time) + "s) is less than a minimum (" + af::itos(m_block->m_data->getTaskMinRunTime()) + "s)";
+					finish(message, renders, monitoring);
+					o_error_host = true;
+					break;
+				}
+			}
+		}
+
 		m_progress->state = m_progress->state | AFJOB::STATE_DONE_MASK;
 		finish( message, renders, monitoring);
 		break;
@@ -199,7 +224,7 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
          m_progress->errors_count++;
          // In Finish procedure task updates it's progress database (and write there new number of errors)
          finish( message, renders, monitoring);
-         errorHost = true;
+         o_error_host = true;
       }
       break;
    }
@@ -242,10 +267,21 @@ bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
 	//printf("TaskRun::refresh: %s[%d][%d]\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum);
 	bool changed = false;
 
+	// Tasks stop timeout check:
+	if( m_stopTime && ( currentTime - m_stopTime > af::Environment::getTaskStopTimeout()))
+	{
+		finish("Task stop timeout.", renders, monitoring);
+		if( changed == false) changed = true;
+		errorHostId = m_hostId;
+	}
+
+	// Next checks not needed it the task is stopping:
+	if (m_stopTime)
+		return changed;
+	
 	// Max running time check:
-	if(( m_block->m_data->getTasksMaxRunTime() != 0) && // ( If TasksMaxRunTime == 0 it is "infinite" )
-		( m_stopTime == 0 ) && // It can be already reachedd before and task is already stopping
-		( currentTime - m_progress->time_start > m_block->m_data->getTasksMaxRunTime()))
+	if ((m_block->m_data->getTaskMaxRunTime() != 0) && // ( If TasksMaxRunTime == 0 it is "infinite" )
+		(currentTime - m_progress->time_start > m_block->m_data->getTaskMaxRunTime()))
 	{
 		m_progress->state = m_progress->state | AFJOB::STATE_ERROR_MASK;
 		m_progress->errors_count++;
@@ -254,25 +290,17 @@ bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
 	}
 
 	// Tasks update timeout check:
-	if(( m_stopTime == 0) && ( currentTime > m_progress->time_done + af::Environment::getTaskUpdateTimeout()))
+	if (currentTime > (m_progress->time_done + af::Environment::getTaskUpdateTimeout()))
 	{
 		//printf("Task update timeout: %d > %d+%d\n", currentTime, m_progress->time_done, af::Environment::getTaskUpdateTimeout());
 		stop("Task update timeout.", renders, monitoring);
 		errorHostId = m_hostId;
 	}
 
-	// Tasks stop timeout check:
-	if( m_stopTime && ( currentTime - m_stopTime > af::Environment::getTaskStopTimeout()))
-	{
-		finish("Task stop timeout.", renders, monitoring);
-		if( changed == false) changed = true;
-		errorHostId = m_hostId;
-	}
-	
-	// Tasks progress change timeout
+	// Tasks progress change timeout:
 	int timeout = m_block->m_data->getTaskProgressChangeTimeout();
 	int no_progress_for = currentTime - m_progress->last_percent_change;
-	if (timeout > 0 && no_progress_for > timeout)
+	if ((timeout > 0 ) && (no_progress_for > timeout))
 	{
 		m_progress->errors_count++;
 		stop("Task run time without progress reached (no progress for " + af::itos(no_progress_for) + "s).", renders, monitoring);
@@ -306,36 +334,24 @@ void TaskRun::stop( const std::string & message, RenderContainer * renders, Moni
 
 void TaskRun::finish( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
 {
-//printf("TaskRun::finish: %s[%d][%d] HostID=%d\n\t%s\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum, hostId, message.toUtf8().data());
-   if( m_zombie ) return;
+	if( m_zombie ) return;
 
-   m_stopTime = 0;
-   m_progress->state = m_progress->state & (~AFJOB::STATE_RUNNING_MASK);
+	m_stopTime = 0;
+	m_progress->state = m_progress->state & (~AFJOB::STATE_RUNNING_MASK);
 	m_progress->activity.clear();
 
-   if((m_hostId != 0) && m_exec)
-   {
-      RenderContainerIt rendersIt( renders);
-      RenderAf * render = rendersIt.getRender( m_hostId);
-      if( render )
-      {
-         render->taskFinished( m_exec, monitoring);
-         m_block->taskFinished( m_exec, render, monitoring);
-      }
+	if((m_hostId != 0) && m_exec)
+	{
+		RenderContainerIt rendersIt( renders);
+		RenderAf * render = rendersIt.getRender( m_hostId);
+		if( render )
+		{
+			render->taskFinished( m_exec, monitoring);
+			m_block->remSolveCounts(monitoring, m_exec, render);
+		}
 
 	  	// Write database for statistics:
 		AFCommon::DBAddTask( m_exec, m_progress, m_block->m_job, render);
-
-		// Decrement counters:
-		if( *m_running_tasks_counter <= 0)
-			AF_ERR << "Tasks counter is zero or negative: " << *m_running_tasks_counter;
-		else
-			( *m_running_tasks_counter )--;
-
-		if( *m_running_capacity_counter <= 0)
-			AF_ERR << "Tasks capacity counter is zero or negative: " << *m_running_capacity_counter;
-		else
-			( *m_running_capacity_counter ) -= m_exec->getCapResult();
 
 		// Delete task executable:
 		delete m_exec;

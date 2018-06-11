@@ -48,6 +48,7 @@ path/scene.shk          - (R) Scene, which file extension determinate run comman
 -os                     - OS needed mask, "any" to render on any platform
 -hostsmask              - job render hosts mask
 -hostsexcl              - job render hosts to exclude mask
+-lifetime               - job life time in seconds
 -maxruntasks            - maximum number of hosts to use
 -maxruntime             - maximum run time for task in seconds
 -maxtasksperhost        - maximum number of tasks per host
@@ -145,6 +146,7 @@ if __name__ == '__main__':
     mname = ''
     mcodec = ''
     mres = ''
+    lifetime = -1
 
     Verbose = False
     cmd = None
@@ -428,6 +430,12 @@ if __name__ == '__main__':
             Verbose = True
             continue
 
+        if arg == '-lifetime':
+            i += 1
+            if i == argsl:
+                break
+            lifetime = argsv[i]
+            continue
     #
     # command construction:
     cmdextension = os.getenv('AF_CMDEXTENSION', '')
@@ -569,20 +577,22 @@ if __name__ == '__main__':
         cmd += ' -V a -f "%s"' % scene
 
     # Maya (3Delight and Mental Ray):
-    elif (ext == 'mb') or (ext == 'ma'):
+    elif ext in ['ma', 'mb']:
         if blocktype == 'maya_mental':
             scenetype = 'maya_mental'
         elif blocktype == 'maya_delight':
             scenetype = 'maya_delight'
         elif blocktype == 'maya_arnold':
             scenetype = 'maya_arnold'
+        elif blocktype == 'maya_redshift':
+            scenetype = 'maya_redshift'
         else:
             blocktype = 'maya'
             scenetype = 'maya'
         # cmd = 'mayabatch' + cmdextension + ' -file "' + scene + '" -command "afanasyBatch(@#@,@#@,1,1);quit -f;"'
 
         if cmd is None:
-            cmd = 'mayarender' + cmdextension
+            cmd = 'mayarender%s' % cmdextension
 
         if scenetype == 'maya_mental':
             cmd += ' -r mr'
@@ -612,8 +622,14 @@ if __name__ == '__main__':
                 images = afcommon.patternFromPaths(images[0], images[1])
             else:
                 images = afcommon.patternFromFile(images[0])
-        if pwd != '':
-            cmd += ' -proj "%s"' % os.path.normpath(pwd)
+
+        if proj:
+            cmd += ' -proj "%s"' % os.path.normpath(proj)
+        # else:
+        #     if pwd != '':
+        #         cmd += ' -proj "%s"' % os.path.normpath(pwd)
+        #     else:
+        #         cmd += ' -proj "%s"' % os.path.normpath(os.path.dirname(scene))
 
         if output != '':
             cmd += ' -rd "%s"' % os.path.normpath(output)
@@ -705,7 +721,7 @@ if __name__ == '__main__':
         if cmd is None:
             cmd = 'aerender' + cmdextension
         cmd += ' -project "%s"' % scene
-        cmd += ' -mp -s @#@ -e @#@ -i %d -mp' % by
+        cmd += ' -s @#@ -e @#@ -i %d' % by
 
         if node != '':
             cmd += ' -comp "%s"' % node
@@ -792,7 +808,8 @@ if __name__ == '__main__':
             cmd = 'fusion' + cmdextension
 
         cmd += ' "%s"' % scene
-        cmd += ' /render /start @#@ /end @#@ /step %d /verbose /quiet /quietlicense /clean /quit' % by
+        cmd += ' /render /start @#@ /end @#@ /step %d /quiet' % by
+        cmd += ' /quietlicense /clean /quit /log %TEMP%/fusion_render.log'
 
     # Clarisse:
     elif ext == 'render':
@@ -845,8 +862,7 @@ if __name__ == '__main__':
     if len(blockparsers) == 0 and blockparser != '':
         blockparsers.append(blockparser)
 
-    i = 0
-    for cmd in cmds:
+    for i, cmd in enumerate(cmds):
         block = af.Block(blocknames[i], blocktype)
 
         if len(blockparsers):
@@ -855,7 +871,7 @@ if __name__ == '__main__':
         block.setWorkingDirectory(pwd)
         block.setNumeric(s, e, fpt, by)
         if seq != 1:
-            block.setSequential( seq)
+            block.setSequential(seq)
 
         if scenetype == 'max':
             block.setCommand(cmd, False, False)
@@ -875,7 +891,6 @@ if __name__ == '__main__':
             )
 
         blocks.append(block)
-        i += 1
 
     if mname != '' and images != '':
         block = af.Block(mname + '-movie', 'movgen')
@@ -935,6 +950,9 @@ if __name__ == '__main__':
 
     if dependglobal != '':
         job.setDependMaskGlobal(dependglobal)
+
+    if lifetime != -1:
+        job.setTimeLife(integer(lifetime))
 
     if deletescene:
         job.setCmdPost('deletefiles "%s"' % os.path.abspath(scene))

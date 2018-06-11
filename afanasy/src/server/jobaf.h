@@ -7,20 +7,18 @@
 #include "../libafanasy/msgclasses/mctaskpos.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
-#include "afnodesrv.h"
+#include "afnodesolve.h"
 
 class Action;
 class Block;
+class BranchSrv;
 class JobContainer;
-class JobPy;
-class MsgAf;
 class RenderAf;
 class RenderContainer;
-class Task;
 class UserAf;
 
 /// Server side of Afanasy job.
-class JobAf : public af::Job , public AfNodeSrv
+class JobAf : public af::Job , public AfNodeSolve
 {
 public:
 	/// Construct job from JSON.
@@ -68,7 +66,7 @@ public:
 	bool v_canRunOn( RenderAf * i_render);
 
 	/// Solve a job. Job send ready task to Render, if any.
-	virtual bool v_solve( RenderAf *render, MonitorContainer * monitoring);
+	virtual RenderAf * v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring, BranchSrv * i_branch);
 
 	/// Update task state.
 	virtual void v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
@@ -85,7 +83,10 @@ public:
 
 	virtual void v_action( Action & i_action);
 
-	void setUser( UserAf * i_user);
+	void setUser(UserAf * i_user);
+	void setBranch(BranchSrv * i_branch);
+
+	const BranchSrv * getBranchPtr() const { return m_branch_srv;}
 
 	/// Initialize new job, came to Afanasy container.
 	bool initialize();
@@ -101,10 +102,6 @@ public:
 
 	void setUserListOrder( int index, bool updateDtabase);
 
-	void addRenderCounts( RenderAf * render);
-	int  getRenderCounts( RenderAf * render) const;
-	void remRenderCounts( RenderAf * render);
-
 	const std::string & getTasksDir() const { return m_store_dir_tasks; }
 
 	void setThumbnail( const std::string & i_path, int i_size, const char * i_data );
@@ -112,6 +109,9 @@ public:
 
 	/// Just fill in job, block, task and other names:
 	void fillTaskNames( af::MCTask & o_mctask) const;
+
+	void addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
+	void remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
 
 public:
 	/// Set Jobs Container.
@@ -125,8 +125,6 @@ protected:
 	
 	virtual Block * v_newBlock( int numBlock); ///< Virtual function to create system blocks in a system job
 	
-	void v_calcNeed();
-	
 protected:
 	af::JobProgress * m_progress; ///< Tasks progress.
 	Block ** m_blocks; ///< Blocks.
@@ -138,6 +136,7 @@ private:
 	std::list<int> renders_counts;
 
 	UserAf * m_user;
+	BranchSrv * m_branch_srv;
 
 	std::string m_store_dir_tasks; ///< Tasks store directory.
 
@@ -152,6 +151,8 @@ private:
 private:
 	void initializeValues();
 	void initStoreDirs();
+
+	bool solveOnRender( RenderAf * i_render, MonitorContainer * i_monitoring);
 
 	virtual void v_priorityChanged( MonitorContainer * i_monitoring);
 

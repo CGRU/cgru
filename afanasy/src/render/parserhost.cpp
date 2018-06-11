@@ -64,9 +64,9 @@ ParserHost::~ParserHost()
 	if( m_data != NULL) delete [] m_data;
 }
 
-void ParserHost::read( const std::string & i_mode, std::string & output)
+void ParserHost::read( const std::string & i_mode, std::string & output, int pid)
 {
-	parse( i_mode, output);
+	parse( i_mode, output, pid);
 
 	// writing output in buffer:
 	//
@@ -162,14 +162,14 @@ fflush( stdout);
 //printf("end: datasize = %d\n", datasize);
 }
 
-void ParserHost::parse( const std::string & i_mode, std::string & output)
+void ParserHost::parse( const std::string & i_mode, std::string & output, int pid)
 {
 	bool _warning         = false;
 	bool _error           = false;
 	bool _badresult       = false;
 	bool _finishedsuccess = false;
 
-	m_service->parse( i_mode, output, m_percent, m_frame, m_percentframe,
+	m_service->parse( i_mode, output, pid, m_percent, m_frame, m_percentframe,
 		m_activity, m_report,
 		_warning, _error, _badresult, _finishedsuccess);
 

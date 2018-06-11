@@ -5,6 +5,6 @@ parser = 'max'
 
 
 class max(service.service):
-	"""3ds Max
-	"""
-	pass
+    """3ds Max
+    """
+    pass

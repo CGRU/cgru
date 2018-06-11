@@ -26,12 +26,12 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg);
 
 af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 {
-	//i_msg->stdOut();
 	af::Msg * o_msg_response = NULL;
 
 	switch( i_msg->type())
@@ -81,10 +81,8 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	}
 	case af::Msg::TConfirm:
 	{
-		printf("Thread process message: Msg::TConfirm: %d\n", i_msg->int32());
-		i_args->msgQueue->pushMsg( new af::Msg( af::Msg::TConfirm, 1));
-		o_msg_response = new af::Msg( af::Msg::TConfirm, 1 - i_msg->int32());
-		break;
+		AF_LOG << "Thread process message: Msg::TConfirm: " << i_msg->int32();
+		return NULL;
 	}
 
 // ---------------------------------- Monitor ---------------------------------//
@@ -117,14 +115,14 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	}
 	case af::Msg::TRenderUpdate:
 	{
-		af::RenderUpdate render_up( i_msg);
+		af::RenderUpdate * rup = new af::RenderUpdate( i_msg);
 		bool render_found = false;
 
 		{
 			AfContainerLock rlock( i_args->renders, AfContainerLock::WRITELOCK);
 
 			RenderContainerIt rendersIt( i_args->renders);
-			RenderAf * render = rendersIt.getRender( render_up.getId());
+			RenderAf * render = rendersIt.getRender( rup->getId());
 
 			if( NULL == render)
 			{
@@ -144,7 +142,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 			}
 			else
 			{
-				o_msg_response = render->update( render_up);
+				o_msg_response = render->update( *rup);
 				render_found = true;
 			}
 		}
@@ -152,21 +150,23 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 		if( render_found)
 		{
 			// Task outputs received:
-			if( render_up.m_outputs.size())
+			if( rup->m_outputs.size())
 			{
 				AfContainerLock mlock( i_args->monitors, AfContainerLock::WRITELOCK);
 
-				i_args->monitors->outputsReceived( render_up.m_outspos, render_up.m_outputs);
+				i_args->monitors->outputsReceived( rup->m_outspos, rup->m_outputs);
 			}
 
 			// To update tasks (if any) we push message to run thread:
-			if( render_up.m_taskups.size())
+			if( rup->m_taskups.size())
 			{
-				i_args->msgQueue->pushMsg( i_msg);
+				i_args->rupQueue->pushUp( rup);
 				return o_msg_response;
 			}
-
 		}
+
+		delete rup;
+
 		break;
 	}
 	case af::Msg::TRendersResourcesRequestIds:
@@ -194,14 +194,8 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	case af::Msg::TRenderDeregister:
 	case af::Msg::TMonitorDeregister:
 	{
-		// Push message for run cycle thread.
-		i_args->msgQueue->pushMsg( i_msg);
-		// Need to return here to not to delete input message (i_msg) later.
-		o_msg_response = af::jsonMsgInfo("log","Message pushed to run queue.");
-		return o_msg_response;
-		//  ( o_msg_response is NULL in all cases except Msg::TTaskUpdateState,
-		//	 in that case render should recieve an answer to close task
-		//	 and finish sending any updates for the task )
+		// This messages for  run cycle thread.
+		return NULL;
 	}
 
 
@@ -212,9 +206,6 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 		break;
 	}
 	}
-
-	// Deleting input message as it not needed any more.
-	delete i_msg;
 
 	// Returning an answer
 	return o_msg_response;

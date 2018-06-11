@@ -35,7 +35,7 @@ public:
 	SysTask( af::TaskExec * i_taskexec, SysCmd * i_system_command, Block * i_block, int i_task_number);
 	virtual ~SysTask();
 
-	virtual void v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring, int32_t * io_running_tasks_counter, int64_t * io_running_capacity_counter);
+	virtual void v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring);
 	virtual void v_refresh( time_t i_currentTime, RenderContainer * i_renders, MonitorContainer * i_monitoring, int & i_errorHostId);
 	virtual void v_updateState( const af::MCTaskUp & i_taskup, RenderContainer * i_renders, MonitorContainer * i_monitoring, bool & i_errorHost);
 	virtual void v_writeTaskOutput( const char * i_data, int i_size) const;  ///< Write task output in tasksOutputDir.
@@ -117,7 +117,7 @@ public:
 	bool initSystem();
 
 	virtual bool v_canRun();
-	virtual bool v_solve( RenderAf *render, MonitorContainer * monitoring);
+	virtual RenderAf * v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * monitoring, BranchSrv * i_branch);
 	virtual void v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
 	virtual void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
 

@@ -5,6 +5,6 @@ parser = 'mayatomr'
 
 
 class mayatomr(service.service):
-	"""Autodesk Maya to MentalRay Standalone
-	"""
-	pass
+    """Autodesk Maya to MentalRay Standalone
+    """
+    pass

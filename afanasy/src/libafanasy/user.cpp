@@ -1,3 +1,18 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	af::User class represents jobs users.
+ */
 #include "user.h"
 
 #include <stdio.h>
@@ -33,8 +48,9 @@ User::User( Msg * msg)
 
 void User::initDefaultValues()
 {
-	m_priority              = af::Environment::getPriority();
-	m_max_running_tasks     = af::Environment::getMaxRunningTasksNumber();
+	setSolveOrder();
+	setSolveCapacity();
+
 	m_errors_retries        = af::Environment::getTaskErrorRetries();
 	m_errors_avoid_host     = af::Environment::getErrorsAvoidHost();
 	m_errors_task_same_host = af::Environment::getTaskErrorsSameHost();
@@ -43,15 +59,9 @@ void User::initDefaultValues()
 	m_jobs_life_time    = 0;
 	m_jobs_num          = 0;
 	m_running_jobs_num  = 0;
-	m_running_tasks_num = 0;
-	m_running_capacity_total = 0;
 
 	m_time_register = 0;
 	m_time_activity = 0;
-
-	m_hosts_mask.setCaseInsensitive();
-	m_hosts_mask_exclude.setCaseInsensitive();
-	m_hosts_mask_exclude.setExclude();
 }
 
 User::~User()
@@ -65,6 +75,8 @@ void User::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 
 	Node::v_jsonWrite( o_str, i_type);
 
+	Work::jsonWrite( o_str, i_type);
+
 	o_str << ",\n\"time_register\":" << m_time_register;
 	o_str << ",\n\"time_activity\":" << m_time_activity;
 	o_str << ",\n\"errors_retries\":" << int(m_errors_retries);
@@ -72,29 +84,16 @@ void User::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 	o_str << ",\n\"errors_task_same_host\":" << int(m_errors_task_same_host);
 	o_str << ",\n\"errors_forgive_time\":" << m_errors_forgive_time;
 
-	if( solveJobsParallel() )
-		o_str << ",\n\"solve_parallel\":true";
-
-	if( m_max_running_tasks != -1 )
-		o_str << ",\n\"max_running_tasks\":" << m_max_running_tasks;
 	if( m_jobs_life_time > 0 )
 		o_str << ",\n\"jobs_life_time\":" << m_jobs_life_time;
 
 	if( m_host_name.size())
 		o_str << ",\n\"host_name\":\"" << m_host_name << "\"";
-	if( hasHostsMask())
-		o_str << ",\n\"hosts_mask\":\""  << af::strEscape( m_hosts_mask.getPattern() ) << "\"";
-	if( hasHostsMaskExclude())
-		o_str << ",\n\"hosts_mask_exclude\":\""  << af::strEscape( m_hosts_mask_exclude.getPattern() ) << "\"";
 
 	if( m_jobs_num > 0 )
 		o_str << ",\n\"jobs_num\":" << m_jobs_num;
 	if( m_running_jobs_num > 0 )
 		o_str << ",\n\"running_jobs_num\":" << m_running_jobs_num;
-	if( m_running_tasks_num > 0 )
-		o_str << ",\n\"running_tasks_num\":" << m_running_tasks_num;
-	if( m_running_capacity_total > 0 )
-		o_str << ",\n\"running_capacity_total\":" << m_running_capacity_total;
 
 	o_str << "\n}";
 }
@@ -107,23 +106,13 @@ bool User::jsonRead( const JSON &i_object, std::string * io_changes)
 		return false;
 	}
 
-	jr_int32 ("max_running_tasks",     m_max_running_tasks,     i_object, io_changes);
-	jr_regexp("hosts_mask",            m_hosts_mask,            i_object, io_changes);
-	jr_regexp("hosts_mask_exclude",    m_hosts_mask_exclude,    i_object, io_changes);
 	jr_uint8 ("errors_retries",        m_errors_retries,        i_object, io_changes);
 	jr_uint8 ("errors_avoid_host",     m_errors_avoid_host,     i_object, io_changes);
 	jr_uint8 ("errors_task_same_host", m_errors_task_same_host, i_object, io_changes);
 	jr_int32 ("errors_forgive_time",   m_errors_forgive_time,   i_object, io_changes);
 	jr_int32 ("jobs_life_time",        m_jobs_life_time,        i_object, io_changes);
 
-	bool solve_parallel = false;
-	if( jr_bool("solve_parallel", solve_parallel, i_object, io_changes))
-	{
-		if( solve_parallel )
-			setJobsSolveMethod( af::Node::SolveByPriority);
-		else
-			setJobsSolveMethod( af::Node::SolveByOrder);
-	}
+	Work::jsonRead( i_object, io_changes);
 
 	// Paramers below are not editable and read only on creation
 	// When use edit parameters, log provided to store changes
@@ -141,50 +130,31 @@ bool User::jsonRead( const JSON &i_object, std::string * io_changes)
 void User::v_readwrite( Msg * msg)
 {
 	Node::v_readwrite( msg);
+	Work::readwrite( msg);
 
 	rw_int64_t ( m_state,                 msg);
 	rw_int64_t ( m_flags,                 msg);
 	rw_int64_t ( m_time_activity,         msg);
 	rw_String  ( m_host_name,             msg);
-	rw_int32_t ( m_max_running_tasks,     msg);
 	rw_uint8_t ( m_errors_retries,        msg);
 	rw_uint8_t ( m_errors_avoid_host,     msg);
 	rw_uint8_t ( m_errors_task_same_host, msg);
 	rw_int32_t ( m_errors_forgive_time,   msg);
 	rw_int64_t ( m_time_register,         msg);
 	rw_int32_t ( m_jobs_life_time,        msg);
-	rw_int32_t ( m_jobs_num,              msg);
-	rw_int32_t ( m_running_jobs_num,      msg);
-	rw_int32_t ( m_running_tasks_num,     msg);
-	/* NEW VERSION
-	rw_int64_t ( m_running_capacity_total,msg);
-	*/
-	rw_RegExp  ( m_hosts_mask,            msg);
-	rw_RegExp  ( m_hosts_mask_exclude,    msg);
+
 	rw_String  ( m_annotation,            msg);
 	rw_String  ( m_custom_data,           msg);
-}
 
-void User::setJobsSolveMethod( int i_method )
-{
-    switch( i_method)
-    {
-    case af::Node::SolveByOrder:
-		m_state = m_state & (~SolveJobsParallel);
-        break;
-    case af::Node::SolveByPriority:
-		m_state = m_state | SolveJobsParallel;
-        break;
-    }
+	rw_int32_t ( m_jobs_num,              msg);
+	rw_int32_t ( m_running_jobs_num,      msg);
 }
 
 int User::v_calcWeight() const
 {
-	int weight = Node::v_calcWeight();
-	weight += sizeof(User) - sizeof( Node);
+	int weight = Work::calcWeight();
+	weight += sizeof(User) - sizeof( Work);
 	weight += weigh(m_host_name);
-	weight += m_hosts_mask.weigh();
-	weight += m_hosts_mask_exclude.weigh();
 	weight += weigh(m_annotation);
 	return weight;
 }

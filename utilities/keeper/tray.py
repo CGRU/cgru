@@ -141,8 +141,8 @@ class Tray(QtWidgets.QSystemTrayIcon):
         action.triggered.connect( nimby.setNIMBY)
         self.menu['AFANASY'].addAction(action)
 
-        action = QtWidgets.QAction('Set Free', self)
-        action.triggered.connect( nimby.setFree)
+        action = QtWidgets.QAction('Set Free && Unpause', self)
+        action.triggered.connect( nimby.setFreeUnpause)
         self.menu['AFANASY'].addAction(action)
 
         action = QtWidgets.QAction('Eject Tasks', self)
@@ -241,40 +241,29 @@ class Tray(QtWidgets.QSystemTrayIcon):
         self.menu['Configure'].addAction(action)
 
         self.addAction('menu', True,  'Show Info...',         self.cgruInfo, 'info')
-        self.addAction('menu', True,  'Documentation',        cmd.cgruDocs)
+        self.addAction('menu', True,  'Documentation...',     cmd.cgruDocs)
+        self.addAction('menu', False, 'Forum...',             cmd.cgruForum)
         self.addAction('menu', True,  'Restart',              cmd.restart)
         self.addAction('menu', False, 'Quit',                 cmd.quit)
 
         self.setContextMenu(self.menu['menu'])
 
-        # Prepare Icons:
-        self.icons = dict()
+        # Tray tooltip:
+        self.setToolTip('%s Keeper' % cgruconfig.VARS['company'].upper())
+
+        # Tray icon:
         icon_filename = cgruconfig.VARS['tray_icon']
-        if icon_filename is None:
-            icon_filename = 'keeper'
+        if icon_filename is None: icon_filename = 'keeper'
         icon_filename = cgruutils.getIconFileName(icon_filename)
-        self.icon_epmty = QtGui.QPixmap(icon_filename)
-        self.icons['empty'] = QtGui.QIcon(self.icon_epmty)
-        self.makeIcon('offline_free',       online=False, nimby=False, busy=False)
-        self.makeIcon('online_free',        online=True,  nimby=False, busy=False)
-        self.makeIcon('offline_nimby',      online=False, nimby=True,  busy=False)
-        self.makeIcon('online_nimby',       online=True,  nimby=True,  busy=False)
-        self.makeIcon('offline_free_busy',  online=False, nimby=False, busy=True)
-        self.makeIcon('online_free_busy',   online=True,  nimby=False, busy=True)
-        self.makeIcon('offline_nimby_busy', online=False, nimby=True,  busy=True)
-        self.makeIcon('online_nimby_busy',  online=True,  nimby=True,  busy=True)
-
-        # Decorate and show:
+        self.icon_pixmap = QtGui.QPixmap(icon_filename)
+        self.icon_default = QtGui.QIcon(self.icon_pixmap)
         self.showIcon()
-        self.setToolTip(
-            '%s Keeper %s' % (
-                cgruconfig.VARS['company'].upper(),
-                os.getenv('CGRU_VERSION', '')
-            )
-        )
-        self.activated.connect( self.activated_slot)
 
+        # Show:
+        self.activated.connect( self.activated_slot)
         self.show()
+
+    def getIconPixmap( self): return self.icon_pixmap
 
     def addMenu(self, parentmenu, menuname, iconname=None):
         if menuname in self.menu:
@@ -308,76 +297,24 @@ class Tray(QtWidgets.QSystemTrayIcon):
     def showUser(self, i_user_name):
         self.action_user.setText('User: "%s"' % i_user_name)
 
-    def makeIcon(self, name, online, nimby, busy):
-        painting = self.icon_epmty
-        painter = QtGui.QPainter(painting)
-        icon_size = painting.width()
-        text_font = QtGui.QFont('Arial', icon_size / 3)
-        text_font.setBold(True)
-        rect_back = QtCore.QRect(
-            icon_size * 3 / 10,
-            icon_size * 3 / 10,
-            icon_size * 2 / 5,
-            icon_size * 2 / 5
-        )
-        text_color = QtGui.QColor(0, 0, 0)
-        back_color = QtGui.QColor(150, 150, 150)
-        if online:
-            if nimby:
-                if busy:
-                    text_color = QtGui.QColor(255, 0, 0)
-                    back_color = QtGui.QColor(50, 50, 250)
-                else:
-                    text_color = QtGui.QColor(190, 190, 190)
-                    back_color = QtGui.QColor(40, 40, 240)
-            else:
-                if busy:
-                    text_color = QtGui.QColor(255, 0, 0)
-                    back_color = QtGui.QColor(90, 90, 90)
-                else:
-                    text_color = QtGui.QColor(0, 200, 0)
-                    back_color = QtGui.QColor(90, 90, 90)
-        elif nimby:
-            back_color = QtGui.QColor(140, 140, 250)
-        rect_render = QtCore.QRect(
-            icon_size / 4,
-            icon_size / 4,
-            icon_size / 2,
-            icon_size / 2
-        )
-        painter.fillRect(rect_back, back_color)
-        painter.setFont(text_font)
-        painter.setPen(text_color)
-        painter.drawText(rect_render, QtCore.Qt.AlignCenter, 'R')
-        self.icons[name] = QtGui.QIcon(painting)
-
-    def showIcon(self, name='empty'):
-        self.setIcon(self.icons[name])
-        self.parent.setWindowIcon(self.icons[name])
-
-    def showRenderIcon(self, online, nimby, busy):
-        if online:
-            name = 'online'
+    def showIcon(self, i_icon = None):
+        if i_icon is None:
+            self.icon = self.icon_default
         else:
-            name = 'offline'
-        if nimby:
-            name += '_nimby'
-        else:
-            name += '_free'
-        if busy:
-            name += '_busy'
-        self.showIcon(name)
+            self.icon = i_icon
+        self.setIcon( self.icon)
+        self.parent.setWindowIcon( self.icon)
 
     def activated_slot(self, reason):
-        if reason == QtGui.QSystemTrayIcon.Trigger:
+        if reason == QtWidgets.QSystemTrayIcon.Trigger:
             return
-        elif reason == QtGui.QSystemTrayIcon.DoubleClick:
+        elif reason == QtWidgets.QSystemTrayIcon.DoubleClick:
             render.refresh()
-        elif reason == QtGui.QSystemTrayIcon.MiddleClick:
+        elif reason == QtWidgets.QSystemTrayIcon.MiddleClick:
             return
-        elif reason == QtGui.QSystemTrayIcon.Context:
+        elif reason == QtWidgets.QSystemTrayIcon.Context:
             return
-        elif reason == QtGui.QSystemTrayIcon.Unknown:
+        elif reason == QtWidgets.QSystemTrayIcon.Unknown:
             return
 
     def renderInfo(self):

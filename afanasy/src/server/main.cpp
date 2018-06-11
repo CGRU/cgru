@@ -1,3 +1,18 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	Main data structures and threads initialization.
+*/
 #include <memory.h>
 #include <signal.h>
 #include <stdio.h>
@@ -13,8 +28,10 @@
 #include "../libafsql/dbconnection.h"
 
 #include "afcommon.h"
+#include "branchescontainer.h"
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
+#include "socketsprocessing.h"
 #include "sysjob.h"
 #include "rendercontainer.h"
 #include "threadargs.h"
@@ -50,8 +67,8 @@ void sig_alrm(int signum)
 }
 void sig_pipe(int signum)
 {
-	char msg [] = "SIG PIPE\n";
-	int u = ::write( STDERR_FILENO, msg, sizeof(msg)-1);
+//	char msg [] = "SIG PIPE\n";
+//	int u = ::write( STDERR_FILENO, msg, sizeof(msg)-1);
 }
 
 //######################################## main #########################################
@@ -72,6 +89,7 @@ int main(int argc, char *argv[])
 
 	// create directories if it is not exists
 	if( af::pathMakePath( ENV.getStoreFolder(),        af::VerboseOn ) == false) return 1;
+	if( af::pathMakeDir(  ENV.getStoreFolderBranches(),af::VerboseOn ) == false) return 1;
 	if( af::pathMakeDir(  ENV.getStoreFolderJobs(),    af::VerboseOn ) == false) return 1;
 	if( af::pathMakeDir(  ENV.getStoreFolderRenders(), af::VerboseOn ) == false) return 1;
 	if( af::pathMakeDir(  ENV.getStoreFolderUsers(),   af::VerboseOn ) == false) return 1;
@@ -109,7 +127,10 @@ int main(int argc, char *argv[])
 	if( pthread_sigmask( SIG_BLOCK, &sigmask, NULL) != 0) perror("pthread_sigmask:");
 #endif
 
-	// containers initialization
+	// Containers initialization
+	BranchesContainer branches;
+	if( false == branches.isInitialized()) return 1;
+
 	JobContainer jobs;
 	if( false == jobs.isInitialized()) return 1;
 
@@ -122,19 +143,17 @@ int main(int argc, char *argv[])
 	MonitorContainer monitors;
 	if( false == monitors.isInitialized()) return 1;
 	
-	// Message Queue initialization, but without thread start.
-	// Run cycle queue will read this messages itself.
-	af::MsgQueue msgQueue("RunMsgQueue");
-	if( false == msgQueue.isInitialized()) 
-	  return 1;
+	af::RenderUpdatetQueue rupQueue("RenderUpdatetQueue");
+	if( false == rupQueue.isInitialized()) return 1;
 
 	// Thread aruguments.
 	ThreadArgs threadArgs;
+	threadArgs.branches  = &branches;
 	threadArgs.jobs      = &jobs;
 	threadArgs.renders   = &renders;
 	threadArgs.users     = &users;
 	threadArgs.monitors  = &monitors;
-	threadArgs.msgQueue  = &msgQueue;
+	threadArgs.rupQueue  = &rupQueue;
 
 	/*
 	  Creating the afcommon object will actually create many message queues
@@ -198,6 +217,31 @@ int main(int argc, char *argv[])
 	AF_LOG << users.getCount() << " users registered from store.";
 	}
 	//
+	// Get Branches from store:
+	//
+	{
+	AF_LOG << "Getting branches from store...";
+
+	// We need to get branches folders by the way that childs go after parents.
+	// And there is a special function for it:
+	std::vector<std::string> folders = AFCommon::getStoredFoldersBranches();
+	AF_LOG << folders.size() << " branches found.";
+
+	for (int i = 0; i < folders.size(); i++)
+	{
+		BranchSrv * branch = new BranchSrv(folders[i]);
+		if (branch->isStoredOk() != true )
+		{
+			af::removeDir(branch->getStoreDir());
+			delete branch;
+			continue;
+		}
+		if (false == branches.addBranchFromStore(branch))
+			delete branch;
+	}
+	AF_LOG << branches.getCount() << " branches registered from store.";
+	}
+	//
 	// Get Jobs from store:
 	//
 	bool hasSystemJob = false;
@@ -235,7 +279,7 @@ int main(int argc, char *argv[])
 			}
 
 			std::string err;
-			jobs.registerJob( job, err, &users, NULL);
+			jobs.registerJob( job, err, &branches, &users, NULL);
 			if( err.size())
 				AF_ERR << err;
 		}
@@ -262,10 +306,12 @@ int main(int argc, char *argv[])
 		SysJob* job = new SysJob();
 
 		std::string err;
-		jobs.registerJob( job, err, &users, NULL);
+		jobs.registerJob( job, err, &branches, &users, NULL);
 		if( err.size())
 			AF_ERR << err;
 	}
+
+	SocketsProcessing * socketsProcessing = new SocketsProcessing( &threadArgs);
 
 	/*
 	  Start the thread that is responsible of listening to the port
@@ -285,16 +331,19 @@ int main(int argc, char *argv[])
 		DlThread::Self()->Sleep( 1 );
 	}
 
-	//AF_LOG << "Waiting child threads.";
-	//alarm(1);
-	/*FIXME: Why we don`t need to join accent thread? */
-	//ServerAccept.Cancel();
+	AF_LOG << "Waiting child threads to exit...";
+	ServerAccept.Cancel();
+	// TODO: Make accept thread to finish and join it.
+	// Just Cancel(), close listening socket and Join() does not work.
+	//af::socketDisconnect( af::Environment::getServerPort());
+	//AF_LOG << "Waiting accept socket exit...";
 	//ServerAccept.Join();
 
-	//AF_LOG << "Waiting Run.";
 	// No need to chanel run cycle thread as
 	// every new cycle it checks running external valiable
 	RunCycleThread.Join();
+
+	delete socketsProcessing;
 
 	af::destroy();
 

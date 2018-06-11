@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "af.h"
+#include "afqueue.h"
 #include "host.h"
 #include "msgclasses/mctaskpos.h"
 #include "msgclasses/mctaskup.h"
@@ -11,7 +12,7 @@
 namespace af
 {
 
-class RenderUpdate : public Af
+class RenderUpdate : public Af, public AfQueueItem
 {
 public:
 	RenderUpdate();
@@ -53,4 +54,15 @@ private:
 private:
 	void v_readwrite( Msg * msg);
 };
+
+// Needed on server to push tasks updates to run thread:
+class RenderUpdatetQueue: public af::AfQueue
+{
+public:
+	RenderUpdatetQueue( std::string i_name): af::AfQueue( i_name, e_no_thread) {}
+	~RenderUpdatetQueue() {}
+	inline void pushUp( RenderUpdate * i_up) { push( i_up);}
+	inline RenderUpdate * popUp( WaitMode i_block ) { return (RenderUpdate*)(pop( i_block));}
+};
+
 }

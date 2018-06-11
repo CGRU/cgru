@@ -1,0 +1,6 @@
+#!/bin/bash
+
+source $CGRU_LOCATION/software_setup/setup_fusion.sh
+
+"$APP_EXE" "$@"
+

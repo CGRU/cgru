@@ -5,6 +5,6 @@ parser = 'generic'
 
 
 class system(service.service):
-	"""Service for system tasks.
-	"""
-	pass
+    """Service for system tasks.
+    """
+    pass

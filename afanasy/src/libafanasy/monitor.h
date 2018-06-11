@@ -1,3 +1,22 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	monitor.h - Afanasy monitor.
+	Monitor is a class for GUIs, for a system monitoring.
+	Monitor GUI not only get/set changes, it registers on server.
+	Registration needed to get from server changes only.
+	That GUI can ask for changed nodes only, and there is no need to ask/get all nodes.
+*/
 #pragma once
 
 #include "client.h"
@@ -35,6 +54,9 @@ public:
 	/**/EVT_monitors_add/**/,
 	/**/EVT_monitors_change/**/,
 	/**/EVT_monitors_del/**/,
+	/**/EVT_branches_add/**/,
+	/**/EVT_branches_change/**/,
+	/**/EVT_branches_del/**/,
 	/**/EVT_COUNT/**/
 	};
 	static const char * EVT_NAMES[];

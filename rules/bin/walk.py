@@ -172,6 +172,10 @@ def walkdir(i_path, i_subwalk, i_curdepth=0):
                 del fout['folders']
 
                 # Create an empty folder entry if not preset:
+                if not 'folders' in out:
+                    out['folders'] = dict()
+                if not isinstance(out['folders'], dict):
+                    out['folders'] = dict()
                 if not entry in out['folders']:
                     out['folders'][entry] = dict()
 

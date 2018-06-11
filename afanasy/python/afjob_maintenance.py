@@ -19,9 +19,10 @@ Parser.add_option('-D', '--debug',   dest='debug',   action='store_true', defaul
 (Options, Args) = Parser.parse_args()
 
 if len(Args) < 2:
-	Parser.error('Not enough arguments provided.')
+    Parser.error('Not enough arguments provided.')
 
-if Options.debug: Options.verbose = True
+if Options.debug:
+    Options.verbose = True
 
 Renders = Args[:-1]
 Command = Args[-1]
@@ -34,18 +35,18 @@ if Options.verbose:
     print('Renders: %s' % (','.join(Renders)))
     print('Command: %s' % Command)
 
-job = af.Job( JobName)
+job = af.Job(JobName)
 job.setMaintenance()
 
 block = af.Block('Maintenance', Options.service)
-block.setParser( Options.parser)
-block.setCommand( Command)
+block.setParser(Options.parser)
+block.setCommand(Command)
 
 for render in Renders:
-    task = af.Task( render)
-    block.tasks.append( task)
+    task = af.Task(render)
+    block.tasks.append(task)
 
-job.blocks.append( block)
+job.blocks.append(block)
 
 if Options.offline:
     job.offline()
@@ -59,4 +60,3 @@ if Options.verbose:
 
 if not Options.debug:
     job.send()
-

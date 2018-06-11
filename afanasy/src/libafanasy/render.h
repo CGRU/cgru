@@ -58,8 +58,6 @@ public:
 			isOffline() &&
 			isWOLSleeping() &&
 			( false == isWOLWaking()) &&
-			( m_host.m_wol_idlesleep_time > 0 ) &&
-			( false == isNimby()) &&
 			( getCapacity() > 0 ) &&
 			( getMaxTasks() > 0 ) &&
 			( m_priority > 0 )

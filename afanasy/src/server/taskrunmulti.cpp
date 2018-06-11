@@ -23,18 +23,14 @@ TaskRunMulti::TaskRunMulti( Task * i_runningTask,
 						af::TaskProgress * i_taskProgress,
 						Block * i_taskBlock,
 						RenderAf * i_render,
-						MonitorContainer * i_monitoring,
-						int32_t * io_running_tasks_counter,
-						int64_t * io_running_capacity_counter
+						MonitorContainer * i_monitoring
 						):
 	TaskRun( i_runningTask,
 			NULL,    ///< SET NO EXECUTABLE! It will be set before starting master.
 			i_taskProgress,
 			i_taskBlock,
 			i_render,
-			i_monitoring,
-			io_running_tasks_counter,
-			io_running_capacity_counter
+			i_monitoring
 		),
 	m_master_running( false),
 	m_stopping( false),
@@ -48,6 +44,12 @@ TaskRunMulti::TaskRunMulti( Task * i_runningTask,
 			m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum())
 		return;
 	}
+
+	// Let block increase renders counters.
+	// Needed to max run tasks per host limit.
+	// This block function also adds counts on its job.
+	m_block->addSolveCounts(i_monitoring, m_exec, i_render);
+
 	m_has_service = ( m_block->m_data->getMultiHostService().empty() == false);
 	m_tasknum = i_taskExec->getTaskNum();
 	m_task->v_appendLog("Starting to capture hosts:");

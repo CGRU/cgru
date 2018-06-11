@@ -5,6 +5,6 @@ parser = 'generic'
 
 
 class ftp(service.service):
-	"""FTP
-	"""
-	pass
+    """FTP
+    """
+    pass

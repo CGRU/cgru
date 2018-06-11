@@ -200,6 +200,9 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	m_PyObj_FuncGetParsedFiles = getFunction( AFPYNAMES::SERVICE_FUNC_GETPARSEDFILES);
 	if( m_PyObj_FuncGetParsedFiles == NULL ) return;
 
+	m_PyObj_FuncHasParser = getFunction( AFPYNAMES::SERVICE_FUNC_HASPARSER);
+	if( m_PyObj_FuncHasParser == NULL ) return;
+
 	m_PyObj_FuncParse = getFunction( AFPYNAMES::SERVICE_FUNC_PARSE);
 	if( m_PyObj_FuncParse == NULL ) return;
 
@@ -261,14 +264,39 @@ Service::~Service()
 {
 }
 
-void Service::parse( const std::string & i_mode, std::string & i_data,
+bool Service::hasParser() const
+{
+	PyObject * pResult = PyObject_CallObject( m_PyObj_FuncHasParser, NULL);
+
+	if( pResult == NULL)
+	{
+		if( PyErr_Occurred()) PyErr_Print();
+		return false;
+	}
+
+	if( true != PyBool_Check( pResult))
+	{
+		AFERROR("Service::checkExitStatus: Return object type is not a boolean.")
+		Py_DECREF( pResult);
+		return false;
+	}
+
+	bool result = PyObject_IsTrue( pResult);
+
+	Py_DECREF( pResult);
+
+	return result;
+}
+
+void Service::parse( const std::string & i_mode, std::string & i_data, int pid,
 							int & percent, int & frame, int & percentframe,
 							std::string & activity, std::string & report,
 							bool & warning, bool & error, bool & badresult, bool & finishedsuccess) const
 {
-	PyObject * pArgs = PyTuple_New( 2);
+	PyObject * pArgs = PyTuple_New( 3);
 	PyTuple_SetItem( pArgs, 0, PyBytes_FromStringAndSize( i_data.data(), i_data.size()));
 	PyTuple_SetItem( pArgs, 1, PyBytes_FromStringAndSize( i_mode.data(), i_mode.size()));
+	PyTuple_SetItem( pArgs, 2, PyLong_FromLong( pid ));
 
 	PyObject * pClass = PyObject_CallObject( m_PyObj_FuncParse, pArgs);
 	if( pClass != NULL)

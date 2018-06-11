@@ -5,6 +5,6 @@ parser = 'hbatch_prman'
 
 
 class hbatch_prman(service.service):
-	"""Houdini batch executes prman
-	"""
-	pass
+    """Houdini batch executes prman
+    """
+    pass

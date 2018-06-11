@@ -24,4 +24,3 @@ class htracker(service.service):
             return True
 
         return False
-

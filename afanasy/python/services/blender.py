@@ -5,6 +5,6 @@ parser = 'blender'
 
 
 class blender(service.service):
-	"""Blender batch
-	"""
-	pass
+    """Blender batch
+    """
+    pass

@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import json
-import os
 import socket
 import sys
 
@@ -90,12 +89,12 @@ def sendServer(i_data, i_verbose=False):
     data = b''
     msg_len = None
     while True:
-        buffer = s.recv(4096)
+        data_buffer = s.recv(4096)
 
-        if not buffer:
+        if not data_buffer:
             break
 
-        data += buffer
+        data += data_buffer
 
         if msg_len is None:
             dataStr = cgruutils.toStr(data)
@@ -117,7 +116,8 @@ def sendServer(i_data, i_verbose=False):
     try:
         if not isinstance(data, str):
             data = cgruutils.toStr(data)
-        data = data[data.find('JSON') + 4:]
+        if msg_len is not None:
+            data = data[data.find('JSON') + 4:msg_len]
         struct = json.loads(data, strict=False)
     except:  # TODO: Too broad exception clause
         print('afnetwork.py: Received data:')

@@ -42,6 +42,10 @@ do
       fi
    fi
 done
+if [ -z "$NUKE_LOCATION" ]; then
+	echo "Nuke was not found in $NUKE_INSTALL_DIR"
+	exit 1
+fi
 export NUKE_EXEC="${NUKE_LOCATION}/${NUKE_EXEC}"
 #echo "NUKE = '${NUKE_EXEC}'"
 

@@ -23,9 +23,21 @@
 
 	"open_folder_cmd":"open \"@PATH@\"",
 
-	"previewcmds":["nuke -v \"@ARG@\"","imf_disp \"@ARG@\"","mplay \"@ARG@\"","cd `dirname @ARG@` && xterm"],
+	"previewcmds":[
+		"Nuke|nuke -v \"@ARG@\"",
+		"Mplay|mplay \"@ARG@\"",
+        "Mplay *|mplay `dirname \"@ARG@\"`/*",
+        "DJV|djv_view \"@ARG@\"",
+		"IMDisplay|display \"@ARG@\"",
+		"XTerm Folder|cd `dirname @ARG@` && xterm"
+    ],
+    "annotations":[
+        "APPROVED",
+        "FAILED"
+    ],
 
-	"docs_host":"cgru.info",
+	"docs_url":"http://cgru.info",
+	"forum_url":"http://forum.cgru.info",
 
 	"":"Configure SMTP server to send emails from",
 	"email_smtp_server":"localhost",

@@ -17,7 +17,7 @@ CmdFarm::~CmdFarm(){}
 bool CmdFarm::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
 	std::string filename( argv[0]);
-	af::loadFarm( filename,  true);
+	af::loadFarm( filename, af::VerboseOn);
 	return true;
 }
 
@@ -74,7 +74,7 @@ bool CmdFarmCheck::check( const std::string & hostname)
 {
 	if( hostname.empty() ) return false;
 	std::string name, description;
-	if( af::farm()->getHost( hostname, host, name, description))
+	if( af::farm()->getHost( hostname, host, name, description, /*verbose =*/ true))
 	{
 		std::cout << "\"" << name << " - " << description;
 		std::cout << std::endl;

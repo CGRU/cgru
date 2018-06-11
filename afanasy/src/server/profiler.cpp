@@ -60,6 +60,13 @@ Profiler::Profiler()
 
 Profiler::~Profiler(){}
 
+void Profiler::Destroy()
+{
+	DlScopeLocker lock(&ms_mutex);
+	for( int i = 0; i < ms_profiles.size(); i++)
+		delete ms_profiles[i];
+}
+
 void Profiler::processingStarted()
 {
 	clock_gettime( CLOCK_MONOTONIC, &m_tstart);
@@ -72,6 +79,9 @@ void Profiler::processingFinished()
 
 void Profiler::Collect( Profiler * i_prof)
 {
+	if( NULL == i_prof )
+		return;
+
 	clock_gettime( CLOCK_MONOTONIC, &(i_prof->m_tcollect));
 
 	DlScopeLocker lock(&ms_mutex);
@@ -105,11 +115,30 @@ void Profiler::Profile()
 	{
 		prep += toFloat( ms_profiles[i]->m_tstart   ) - toFloat( ms_profiles[i]->m_tinit   );
 		proc += toFloat( ms_profiles[i]->m_tfinish  ) - toFloat( ms_profiles[i]->m_tstart  );
-		proc += toFloat( ms_profiles[i]->m_tcollect ) - toFloat( ms_profiles[i]->m_tfinish );
+		post += toFloat( ms_profiles[i]->m_tcollect ) - toFloat( ms_profiles[i]->m_tfinish );
 	}
 	prep /= double( ms_stat_period ) / 1000.0;
 	proc /= double( ms_stat_period ) / 1000.0;
 	post /= double( ms_stat_period ) / 1000.0;
+
+
+	//
+	// Print:
+	//
+	static const char M[] = "\033[1;36m";
+	static const char C[] = "\033[0m";
+	static char buffer[1024];
+	std::string log;
+	sprintf( buffer,"%sServer load profiling%s:\n", M, C);
+	log += buffer;
+	sprintf( buffer,"Clients per second: %s%4.2f%s, Now: %s%d%s (processed %d connections in last %4.2f seconds).\n",
+			M, per_second, C, M, ms_meter, C, ms_stat_count, seconds);
+	log += buffer;
+	sprintf( buffer,"Prep: %s%4.2f%s, Proc: %s%4.2f%s, Post: %s%4.2f%s, Total: %s%4.2f%s ms.\n",
+			M, prep, C, M, proc, C, M, post, C, M, (prep + proc + post), C);
+	log += buffer;
+
+	AFCommon::QueueLog( log);
 
 
 	//
@@ -122,30 +151,16 @@ void Profiler::Profile()
 	ms_stat_count = 0;
 	ms_stat_time = stat_time;
 
-	if( seconds < 10.0 )
-		ms_stat_period *= 10;
-	else if(( seconds > 100.0 ) && ( ms_stat_period > 100 ))
-		ms_stat_period /= 10;
-
-
-	//
-	// Print:
-	//
-	static char buffer[1024];
-	std::string log;
-	sprintf( buffer,"Server load profiling:\n");
-	log += buffer;
-	sprintf( buffer,"Clients per second: %4.2f, Now: %d\n", per_second, ms_meter);
-	log += buffer;
-	sprintf( buffer,"Prep: %4.2f, Proc: %4.2f, Post: %4.2f, Tolal: %4.2f ms.\n", prep, proc, post, (prep + proc + post));
-	log += buffer;
-
-	AFCommon::QueueLog( log);
+	if( seconds < af::Environment::getServerProfilingSec())
+		ms_stat_period *= 2;
+	else if( seconds > af::Environment::getServerProfilingSec())
+		ms_stat_period /= 2;
 }
 #else
 Profiler::Profiler(){}
 Profiler::~Profiler(){}
 void Profiler::processingStarted(){}
 void Profiler::processingFinished(){}
-void Profiler::Collect( Profiler * i_prof){ delete i_prof;}
+void Profiler::Collect(Profiler * i_prof) { delete i_prof; }
+void Profiler::Destroy() {}
 #endif

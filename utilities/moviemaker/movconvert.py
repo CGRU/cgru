@@ -14,6 +14,8 @@ Parser = OptionParser(
 )
 
 Parser.add_option('-a', '--avcmd',     dest='avcmd',     type  ='string', default='ffmpeg', help='AV convert command')
+Parser.add_option(      '--ipar',      dest='ipar',      type  ='string', default=None,     help='Set input pixel aspect ratio')
+Parser.add_option(      '--opar',      dest='opar',      type  ='string', default=None,     help='Set output pixel aspect ratio')
 Parser.add_option('-r', '--resize',    dest='resize',    type  ='string', default=None,     help='Resize (1280x720)')
 Parser.add_option('-c', '--codec',     dest='codec',     type  ='string', default=None,     help='Movie codec')
 Parser.add_option('-f', '--fps'  ,     dest='fps',       type  ='string', default='24',     help='Movie FPS (24)')
@@ -21,18 +23,35 @@ Parser.add_option('-n', '--container', dest='container', type  ='string', defaul
 Parser.add_option('-t', '--type',      dest='type',      type  ='string', default='png',    help='Images type (png)')
 Parser.add_option('-o', '--output',    dest='output',    type  ='string', default=None,     help='Output movie or images folder (auto)')
 Parser.add_option('-q', '--qscale',    dest='qscale',    type  ='int',    default=5,        help='JPEG compression rate (5)')
-Parser.add_option('-s', '--timestart', dest='timestart', type  ='string', default='',       help='Time start')
-Parser.add_option('-d', '--duration',  dest='duration',  type  ='string', default='',       help='Duration')
+Parser.add_option('-s', '--timestart', dest='timestart', type  ='string', default=None,     help='Time start')
+Parser.add_option('-d', '--duration',  dest='duration',  type  ='string', default=None,     help='Duration')
 Parser.add_option('-p', '--padding',   dest='padding' ,  type  ='int',    default=7,        help='Padding')
 Parser.add_option('-w', '--watermark', dest='watermark', type  ='string', default=None,     help='Add watermark')
 Parser.add_option('-u', '--suffix',    dest='suffix',    type  ='string', default=None,     help='Add suffix to ouput file name')
 Parser.add_option(      '--imgname',   dest='imgname',   type  ='string', default=None,     help='Images files name (frame)')
+Parser.add_option(      '--audio',     dest='audio',     type  ='string', default=None,     help='Add sound from an audio file')
+Parser.add_option(      '--acodec',    dest='acodec',    type  ='string', default='aac',    help='Audio codec')
 
 Options, argv = Parser.parse_args()
 
 if len(argv) < 1:
     print('ERROR: Movie file not specified.')
     sys.exit(0)
+
+# Extract audio track(s) from file to flac if it is not flac already:
+if Options.audio is not None:
+    if not os.path.isfile(Options.audio):
+        print('Audio file "%s" does not exist.' % Options.audio)
+        Options.audio = None
+    else:
+        audio_name, audio_ext = os.path.splitext(Options.audio)
+        if audio_ext != '.flac':
+            audio_flac = '%s.%s' % (audio_name,'flac')
+            print('Executing command to convert audio:')
+            cmd_audio = 'ffmpeg -y -i "%s" -vn -acodec flac "%s"' % (Options.audio,audio_flac)
+            print(cmd_audio)
+            subprocess.call(cmd_audio,shell=True)
+            Options.audio = audio_flac
 
 Input = argv[0]
 Output = Options.output
@@ -74,31 +93,34 @@ CODECSDIR = os.path.join(MOVIEMAKER, 'codecs')
 
 Codec = Options.codec
 
+cmd = ''
+
 if Codec is None:
-    args = [Options.avcmd, '-y']
-    if Options.timestart != '':
-        args.extend(['-ss', Options.timestart])
-    args.extend(['-i', Input])
-    if Options.duration != '':
-        args.extend(['-t', Options.duration])
-    args.extend(['-an', '-f', 'image2'])
+    cmd = Options.avcmd
+    cmd += ' -y'
+    if Options.timestart:
+        cmd += ' -ss "%s"' % Options.timestart
+    cmd += ' -i "%s"' % Input
+    if Options.duration:
+        cmd += ' -t "%s"' % Options.duration
+    cmd += ' -an -f image2'
     if Options.type == 'jpg':
-        args.extend(['-qscale', str(Options.qscale)])
+        cmd += ' -q:v ' + str(Options.qscale)
         Output += '.q' + str(Options.qscale)
     elif Options.type == 'dpx':
-        args.extend(['-pix_fmt','gbrp10be'])
+        cmd += ' -pix_fmt gbrp10be'
     elif Options.type == 'tif' or Options.type == 'tif8':
-        args.extend(['-pix_fmt','rgb24'])
+        cmd += ' -pix_fmt rgb24'
         Options.type = 'tif'
     elif Options.type == 'tif16':
-        args.extend(['-pix_fmt','rgb48le'])
+        cmd += ' -pix_fmt rgb48le'
         Options.type = 'tif'
 
     if Options.resize is not None:
         resize = Options.resize.split('x')
         if len(resize) < 2:
             resize.append('-1')
-        args.extend(['-vf','scale=%s:%s' % (resize[0], resize[1])])
+        cmd += ' -vf "%s"' % ('scale=%s:%s' % (resize[0], resize[1]))
         Output += '.r%s' % Options.resize
 
     # Add images type (extension,format) to output:
@@ -120,10 +142,9 @@ if Codec is None:
         imgname,ext = os.path.splitext( imgname)
     Output = os.path.join(Output, imgname + '.%0' + str(Options.padding) + 'd.' + Options.type)
 
-    args.append(Output)
+    cmd += ' "%s"' % Output
 
 else:
-    args = []
     if Codec.find('.') == -1:
         Codec += '.ffmpeg'
     if os.path.dirname(Codec) == '':
@@ -135,8 +156,8 @@ else:
     with open(Codec) as f:
         lines = f.readlines()
 
-    cmd_enc = lines[len(lines) - 1].strip()
-    if len(cmd_enc) < 2:
+    cmd = lines[len(lines) - 1].strip()
+    if len(cmd) < 2:
         print('Invalid encode file "%s"' % Codec)
         sys.exit(1)
 
@@ -152,10 +173,19 @@ else:
     if Options.suffix is not None:
         Output += '.' + Options.suffix
 
-    auxargs = []
+    auxargs = ''
     if Options.resize is not None or Options.watermark is not None:
         filter_complex = ''
+        if Options.ipar is not None:
+            if len(filter_complex): filter_complex += ','
+            filter_complex += 'scale=iw:ih/%s' % Options.ipar
+            if Options.opar is None:
+                filter_complex += ',setsar=1'
+        if Options.opar is not None:
+            if len(filter_complex): filter_complex += ','
+            filter_complex += 'setsar=%s' % Options.opar
         if Options.resize is not None:
+            if len(filter_complex): filter_complex += ','
             resize = Options.resize.split('x')
             if len(resize) < 2:
                 hresize.append('-1')
@@ -165,43 +195,35 @@ else:
             if not os.path.isfile( Options.watermark):
                 print('ERROR: Watermark file does not exist:\n' + Options.watermark)
                 sys.exit(1)
-            auxargs.extend(['-i',Options.watermark])
+            auxargs += ' -i "%s"' % Options.watermark
             if len(filter_complex): filter_complex += ','
             filter_complex += 'overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2'
-        auxargs.extend(['-filter_complex', filter_complex])
-    if Options.timestart != '':
-        auxargs.extend(['-ss', Options.timestart])
-    if Options.duration != '':
-        auxargs.extend(['-t', Options.duration])
+        auxargs += ' -filter_complex "%s"' % filter_complex
+    if Options.timestart:
+        auxargs += ' -ss "%s"' % Options.timestart
+    if Options.duration:
+        auxargs += ' -t "%s"' % Options.duration
+    if Options.audio is not None:
+        auxargs += ' -i "%s" -shortest -codec:a %s' % (Options.audio,Options.acodec)
 
-    cmd_enc = cmd_enc.split(' ')
-    for arg_enc in cmd_enc:
-        if arg_enc[0] == '"':
-            arg_enc = arg_enc[1:]
-        if arg_enc[-1] == '"':
-            arg_enc = arg_enc[:-1]
+    avcmd = Options.avcmd
+    if StartNumber:
+        avcmd += ' -start_number ' + str(StartNumber)
 
-        arg_enc = arg_enc.replace('@MOVIEMAKER@', MOVIEMAKER)
-        arg_enc = arg_enc.replace('@CODECSDIR@', CODECSDIR)
-        arg_enc = arg_enc.replace('@FPS@', Options.fps)
-        arg_enc = arg_enc.replace('@CONTAINER@', Options.container)
-        arg_enc = arg_enc.replace('@OUTPUT@', Output)
+    cmd = cmd.replace('@AVCMD@', avcmd)
+    cmd = cmd.replace('@INPUT@', Input)
+    cmd = cmd.replace('@MOVIEMAKER@', MOVIEMAKER)
+    cmd = cmd.replace('@CODECSDIR@', CODECSDIR)
+    cmd = cmd.replace('@FPS@', Options.fps)
+    cmd = cmd.replace('@CONTAINER@', Options.container)
+    cmd = cmd.replace('@AUXARGS@', auxargs)
+    cmd = cmd.replace('@OUTPUT@', Output)
 
-        if arg_enc == '@AVCMD@':
-            args.append(Options.avcmd)
-            if StartNumber:
-                args.extend(['-start_number', str(StartNumber)])
-        elif arg_enc == '@INPUT@':
-            args.append( Input)
-        elif arg_enc == '@AUXARGS@':
-            args.extend(auxargs)
-        elif len(arg_enc):
-            args.append(arg_enc)
 
-print(' '.join(args))
+print(cmd)
 
 try:
-    process = subprocess.Popen(args, shell=False, stderr=subprocess.PIPE)
+    process = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE)
 except Exception as e:
     print('Command execution error:')
     print(str(e))

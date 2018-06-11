@@ -443,7 +443,11 @@ int LaunchProgramV(
 		else
 		{
 			if( i_environ )
+#ifdef MACOSX
+				err = execve( i_program, const_cast<char*const*>(Args), i_environ);
+#else
 				err = execvpe( i_program, const_cast<char*const*>(Args), i_environ);
+#endif
 			else
 				err = execvp(  i_program, const_cast<char*const*>(Args));
 		}

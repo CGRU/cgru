@@ -6,6 +6,7 @@ if exist %python% (
    set "CGRU_PYTHONDIR=%python%"
 rem   set "CGRU_PYTHONEXE=%python%\python.exe"
    set "CGRU_PYTHONEXE=python"
+   set "QT_QPA_PLATFORM_PLUGIN_PATH=%python%\Lib\site-packages\PySide2\plugins"
 ) else (
    set "CGRU_PYTHONEXE=python"
 )

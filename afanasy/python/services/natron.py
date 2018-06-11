@@ -5,6 +5,6 @@ parser = 'natron'
 
 
 class natron(service.service):
-	"""Natron
-	"""
-	pass
+    """Natron
+    """
+    pass

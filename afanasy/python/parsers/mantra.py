@@ -11,6 +11,9 @@ IMAGE_RE = re.compile(r'.*Generating Image: (.+) \(\d+x\d+\)')
 
 ErrorsRE = [re.compile(r'Error loading geometry .* from stdin')]
 
+# Will be used in 'mantrafilter.py' to ask parser to stop a process:
+ParserErrorStr = '[ PARSER ERROR ]'
+
 
 class mantra(parser.parser):
     """Houdini mantra with "Alfred Style Progress"
@@ -30,7 +33,8 @@ class mantra(parser.parser):
         self.str_error = [
             'No licenses could be found to run this application',
             'Please check for a valid license server host',
-            'Failed to create file']
+            'Failed to create file',
+            ParserErrorStr]
 
     def do(self, data, mode):
         """Missing DocString

@@ -1,2 +1,2 @@
 ProRes444 10Bit
-@AVCMD@ -y -r @FPS@ -i "@INPUT@" @AUXARGS@ -vcodec prores_ks -profile:v 4444 -pix_fmt yuv444p10le -r @FPS@ "@OUTPUT@.mov"
+@AVCMD@ -y -r @FPS@ -i "@INPUT@" @AUXARGS@ -vcodec prores_ks -profile:v 4444 -pix_fmt yuv444p10le -vf scale=out_color_matrix=bt709 -metadata:s:v encoder="Apple ProRes 4444" -r @FPS@ "@OUTPUT@.mov"

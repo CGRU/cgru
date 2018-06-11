@@ -37,11 +37,13 @@ void AfCmd::RegisterCommands()
 #endif
 
 	addCmd( new CmdText);
-	addCmd( new CmdTest);
 	addCmd( new CmdTextGenerate);
 	addCmd( new CmdConfirm);
 	addCmd( new CmdRegExp);
 	addCmd( new CmdInvalid);
+
+	addCmd( new CmdTestMsg);
+	addCmd( new CmdTestThreads);
 
 	addCmd( new CmdMonitorList);
 	addCmd( new CmdMonitorLog);

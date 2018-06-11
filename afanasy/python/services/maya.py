@@ -5,6 +5,6 @@ parser = ''
 
 
 class maya(service.service):
-	"""Autodesk Maya
-	"""
-	pass
+    """Autodesk Maya
+    """
+    pass

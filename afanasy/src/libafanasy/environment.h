@@ -1,3 +1,20 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	environment.h - CGRU environment.
+	Environment class describes an interface for any environment.
+	This is not only system environment variables, this is all config files, command arguments and all other.
+*/
 #pragma once
 
 #include <map>
@@ -87,7 +104,8 @@ public:
 
 	static inline int            getFileNameSizeMax()  { return filenamesizemax; } ///< Get maximum size for filenames.
 
-	static inline const std::vector<std::string> & getPreviewCmds()     { return previewcmds;} ///< Get preview commands
+	static inline const std::vector<std::string> & getPreviewCmds()     { return previewcmds;} ///< Get launch commands
+	static inline const std::vector<std::string> & getAnnotations()     { return annotations;} ///< Get predefined annotations
 	static inline const std::vector<std::string> & getRenderCmds()      { return rendercmds; } ///< Get render commands
 	static inline const std::vector<std::string> & getRenderCmdsAdmin() { return rendercmds_admin; } ///< Get render commands for admin
 
@@ -96,9 +114,6 @@ public:
 	static inline int getWatchGetEventsSec()           { return watch_get_events_sec;      }
 	static inline int getWatchRefreshGuiSec()          { return watch_refresh_gui_sec;     }
 	static inline int getWatchConnectRetries()         { return watch_connectretries;      }
-	static inline int getWatchWaitForConnected()       { return watch_waitforconnected;    }
-	static inline int getWatchWaitForReadyRead()       { return watch_waitforreadyread;    }
-	static inline int getWatchWaitForBytesWritten()    { return watch_waitforbyteswritten; }
 	static inline int getWatchRenderIdleBarMax()       { return watch_render_idle_bar_max; }
 
 	static inline const char * getTimeFormat()         { return timeformat.c_str();       } ///< Get default time format.
@@ -108,17 +123,11 @@ public:
 	static inline int    getPriority()               { return priority;         } ///< Get default host priority.
 	static inline int    getMaxRunningTasksNumber()  { return maxrunningtasks;  } ///< Get default maximium hosts.
 
-	static inline int getServeTasksSpeed()               { return serve_tasks_speed;            }
 	static inline int getTaskDefaultCapacity()           { return task_default_capacity;        }
 	static inline int getTaskUpdateTimeout()             { return task_update_timeout;          }
 	static inline int getTaskStopTimeout()               { return task_stop_timeout;            }
 	static inline int getTaskLogLinesMax()               { return task_log_linesmax;            }
 	static inline int getTaskProgressChangeTimeout()     { return task_progress_change_timeout; }
-
-	/// Task solving options
-	static inline bool getSolvingUseCapacity()     { return solving_use_capacity;      }
-	static inline bool getSolvingUseUserPriority() { return solving_use_user_priority; }
-	static inline bool getSolvingSimpler()         { return solving_simpler;           }
 
 	static inline int getErrorsForgiveTime()             { return errors_forgivetime;           }
 	static inline int getErrorsAvoidHost()               { return errors_avoid_host;            }
@@ -131,6 +140,8 @@ public:
 	static inline const std::string & getSysPostCmdService() { return sysjob_postcmd_service;    }
 	static inline const std::string & getSysEventsService()  { return sysjob_events_service;     }
 
+	static inline int getWOLWakeInterval() { return wolwake_interval; }
+
 	static inline int getRenderDefaultCapacity()       { return render_default_capacity;     }
 	static inline int getRenderDefaultMaxTasks()       { return render_default_maxtasks;     }
 	static inline std::string & getCmdShell()          { return cmd_shell;}
@@ -139,6 +150,7 @@ public:
 	static inline int getRenderUpResourcesPeriod()  { return render_up_resources_period;  }
 	static inline int getRenderNice()               { return render_nice;                 }
 	static inline int getRenderZombieTime()         { return render_zombietime;           }
+	static inline int getRenderExitNoTaskTime()     { return render_exit_no_task_time;    }
 	static inline int getRenderConnectRetries()     { return render_connectretries;       }
 
 	static inline bool hasRULES() { return rules_url.size(); }
@@ -157,6 +169,7 @@ public:
 	static inline int getAfNodeLogLinesMax() { return afnode_log_lines_max; }
 
 	static inline const std::string & getStoreFolder()        { return store_folder;         }
+	static inline const std::string & getStoreFolderBranches(){ return store_folder_branches;}
 	static inline const std::string & getStoreFolderJobs()    { return store_folder_jobs;    }
 	static inline const std::string & getStoreFolderRenders() { return store_folder_renders; }
 	static inline const std::string & getStoreFolderUsers()   { return store_folder_users;   }
@@ -166,6 +179,16 @@ public:
 	static inline int                 get_DB_StringNameLen()   { return db_stringnamelen;} ///< Get database string name length.
 	static inline int                 get_DB_StringExprLen()   { return db_stringexprlen;} ///< Get database string expression length.
 
+	static inline int getServerSocketsReadWriteThreadsNum()    { return server_sockets_readwrite_threads_num;    }
+	static inline int getServerSocketsReadWriteThreadsStack()  { return server_sockets_readwrite_threads_stack;  }
+	static inline int getServerSocketsProcessingThreadsNum()   { return server_sockets_processing_threads_num;   }
+	static inline int getServerSocketsProcessingThreadsStack() { return server_sockets_processing_threads_stack; }
+
+	static inline int getServerLinuxEpoll() { return server_linux_epoll; }
+
+	static inline int getServerHTTPWaitClose() { return server_http_wait_close; }
+
+	static inline int getServerProfilingSec() { return server_profiling_sec; }
 
 	/// Socket Options:
 	static inline int getSO_LINGER()       { return m_server ? so_server_LINGER       : so_client_LINGER       ;}
@@ -221,6 +244,7 @@ private:
 
 	static std::string version_revision;///< Sources version, will be compiled in binaries
 	static std::string version_cgru;    ///< CGRU version, will be get from environment on applications startup
+	static std::string version_compiled;///< CGRU version, that libafanasy was compiled
 	static std::string version_python;  ///< Compiled Python version
 	static std::string version_gcc;     ///< GCC version
 	static std::string build_date;      ///< Build date
@@ -257,32 +281,24 @@ private:
 	static bool perm_user_mod_his_priority;
 	static bool perm_user_mod_job_priority;
 
-	static std::vector<std::string> previewcmds;      ///< Preview commannds, separated by AFWATCH::CMDS_SEPARATOR
-	static std::vector<std::string> rendercmds;       ///< Render commannds, separated by AFWATCH::CMDS_SEPARATOR
+	static std::vector<std::string> previewcmds;      ///< Launch commannds
+	static std::vector<std::string> annotations;      ///< Predefined annotations
+	static std::vector<std::string> rendercmds;       ///< Render commannds
 	static std::vector<std::string> rendercmds_admin; ///< Render commannds for admin only
 	static int watch_get_events_sec;
 	static int watch_refresh_gui_sec;
 	static int watch_connectretries;
-	static int watch_waitforconnected;
-	static int watch_waitforreadyread;
-	static int watch_waitforbyteswritten;
 	static int watch_render_idle_bar_max;
 
 	static int monitor_zombietime;
 
 	static std::string timeformat;    ///< Default time format.
 
-	static int serve_tasks_speed;
 	static int task_update_timeout;
 	static int task_stop_timeout;
 	static int task_default_capacity;
 	static int task_log_linesmax;
 	static int task_progress_change_timeout; ///< If task progress did not change within this time, consider that it is erroneous
-
-	/// Task solving options
-	static bool solving_use_capacity;       ///< Use running tasks total capacity or simpe running tasks number to calculate "Need"
-	static bool solving_use_user_priority;  ///< Whether task solving takes user priority into account or not
-	static bool solving_simpler;            ///< Sort jobs by priority and creation time instead of using the "Need"
 
 	static int render_heartbeat_sec;
 	static int render_up_resources_period;
@@ -290,6 +306,7 @@ private:
 	static int render_default_maxtasks;
 	static int render_nice;       ///< Render task process nice factor.
 	static int render_zombietime;
+	static int render_exit_no_task_time;
 	static int render_connectretries;
 	static std::vector<std::string> render_windowsmustdie;
 
@@ -314,9 +331,11 @@ private:
 	static std::string sysjob_postcmd_service;
 	static std::string sysjob_events_service;
 
+	static int wolwake_interval;
 
-	/// Temp directory
+	/// Store folders:
 	static std::string store_folder;
+	static std::string store_folder_branches;
 	static std::string store_folder_jobs;
 	static std::string store_folder_renders;
 	static std::string store_folder_users;
@@ -326,6 +345,15 @@ private:
 	static int         db_stringnamelen;  ///< Database string name length
 	static int         db_stringexprlen;  ///< Database string expression length
 
+	// Server incoming connections:
+	static int server_sockets_readwrite_threads_num;
+	static int server_sockets_readwrite_threads_stack;
+	static int server_sockets_processing_threads_num;
+	static int server_sockets_processing_threads_stack;
+
+	static int server_linux_epoll;
+	static int server_http_wait_close;
+	static int server_profiling_sec;
 
 	/// Socket Options:
 	static int so_server_LINGER;

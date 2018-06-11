@@ -14,6 +14,8 @@ parser.add_option('-s', '--start',         dest='start',         type='float',  
 parser.add_option('-e', '--end',           dest='end',           type='float',  help='End frame number.')
 parser.add_option('-b', '--by',            dest='by',            type='float',  help='Frame increment.')
 parser.add_option('-t', '--take',          dest='take',          type='string', help='Take name.')
+parser.add_option(      '--wedge',         dest='wedge',         type='string', help='Wedge path.')
+parser.add_option(      '--wedgenum',      dest='wedgenum',      type='int',    help='Wedge number.')
 parser.add_option('-o', '--out',           dest='output',        type='string', help='Output file.')
 parser.add_option(      '--diskfile',      dest='diskfile',      type='string', help='Set to generate this file only.')
 parser.add_option(      '--numcpus',       dest='numcpus',       type='int',    help='Number of CPUs.')
@@ -39,6 +41,8 @@ start        = options.start
 end          = options.end
 by           = options.by
 take         = options.take
+wedge        = options.wedge
+wedgenum     = options.wedgenum
 diskfile     = options.diskfile
 numcpus      = options.numcpus
 output       = options.output
@@ -92,6 +96,20 @@ if ropnode is None:
 # block.set( 1)
 # except:
 # print 'Failed to set node blocking.'
+
+print wedge, wedgenum
+
+if wedge:
+    print 'working with wedges'
+    wedgenode = hou.node(wedge)
+
+    # below code use use script from wedge node definition
+    allwedge, stashedparms, errormsg = wedgenode.hdaModule().getwedges(wedgenode)
+
+    # apply wedge
+    wedgenode.hdaModule().setenvvariable("WEDGENUM", str(wedgenum))
+    wedgenode.hdaModule().applyspecificwedge(wedgenode, allwedge[wedgenum])
+
 
 drivertypename = ropnode.type().name()
 
@@ -160,17 +178,17 @@ elif drivertypename == 'rib':
                 except:
                     print('Failed, frame progress not available.')
 
-elif drivertypename == "wedge":
-
-    ropnode.parm('wrange').set(1)
-    ropnode.parm('wedgenum').set(start)
-    driverpath = ropnode.parm('driver').eval()
-    driver = ropnode.node(driverpath)
-    if driver:
-        for parmName in ["vm_alfprogress", "alfprogress"]:
-            progress = driver.parm(parmName)
-            if progress:
-                progress.set(1)
+#elif drivertypename == "wedge":
+#
+#    ropnode.parm('wrange').set(1)
+#    ropnode.parm('wedgenum').set(start)
+#    driverpath = ropnode.parm('driver').eval()
+#    driver = ropnode.node(driverpath)
+#    if driver:
+#        for parmName in ["vm_alfprogress", "alfprogress"]:
+#            progress = driver.parm(parmName)
+#            if progress:
+#                progress.set(1)
 
 
 elif drivertypename == "arnold":
@@ -185,6 +203,27 @@ elif drivertypename == "arnold":
             except:
                 print('Failed, frame progress not available.')
 
+elif drivertypename == "alembic":
+    ropnode.parm('lpostframe').set('python')
+    expr = r'''import sys
+    
+elif drivertypename == "Redshift_ROP":
+    # Trying to set ROP to output progress
+    print('Trying to set Redshift log level to "Debug"')
+    try:
+        hou.hscript("Redshift_setLogLevel -L 5")
+    except:
+        print('Failed, frame progress not available.')
+    
+f = hou.parmTuple('f').eval()
+percent = int(100*(hou.frame()-f[0])/(f[1]-f[0]))
+
+out = 'ABC_PROGRESS ' + str(percent) + '%\n'
+
+sys.stdout.write(out)
+sys.stdout.flush()'''
+    ropnode.parm('postframe').set(expr)
+
 #
 # Distribute simulation:
 #
@@ -198,9 +237,21 @@ if ds_node is not None:
     print('Tracker: %s:%d' % ( tracker_address, tracker_port))
     print('Simulation slice = %d' % sim_slice)
 
-    ds_node.parm('address').set( tracker_address)
+    ds_node.parm('visaddress').set( tracker_address)
     ds_node.parm('port'   ).set( tracker_port   )
-    ds_node.parm('slice'  ).set( sim_slice      )
+    # ds_node.parm('slice'  ).set( sim_slice      ) default value is $SLICE and can't be set with this
+
+    # Setting $SLICE environment variable
+    sli_var = "SLICE"
+
+    try:
+        hou.allowEnvironmentVariableToOverwriteVariable(sli_var, True)
+    except AttributeError:
+        # should be Houdini 12
+        hou.allowEnvironmentToOverwriteVariable(sli_var, True)
+
+    hscript_command = "set -g %s = '%s'" % (sli_var, sim_slice)
+    hou.hscript(str(hscript_command))
 
     print('ACTIVITY: %s:%d/%d' % (tracker_address, tracker_port, sim_slice))
 

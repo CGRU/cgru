@@ -163,6 +163,17 @@ bool AfQueue::push( AfQueueItem* item, bool i_front )
    return true;
 }
 
+void AfQueue::releaseNull()
+{
+#ifdef WINNT
+    if( ReleaseSemaphore( semaphore, 1, NULL) == 0 )
+        AFERRAR("AfQueue::push: ReleaseSemaphore() failed in '%s'", name.c_str())
+#else
+    if( sem_post(semcount_ptr) == -1 )
+        AFERRPE("AfQueue::push: sem_post() failed")
+#endif
+}
+
 AfQueueItem* AfQueue::pop( WaitMode i_mode )
 {
    AfQueueItem* item = NULL;

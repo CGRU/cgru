@@ -6,28 +6,10 @@
 
 namespace afqt
 {
-/// Init environment variables.
-   void init( int waitforconnected, int waitforreadyread, int waitforbyteswritten);
-
    class QEnvironment;
-
-/// Connect to Afanasy server.
-   bool connectAfanasy( QTcpSocket * qSocket);
 
 /// Construct QHostAddress from af::Address.
    const QHostAddress toQAddress( const af::Address & address);
-
-/// Connect to some adress.
-   bool connect( const af::Address & address, QTcpSocket * qSocket);
-
-/// Sent message.
-   bool sendMessage( QTcpSocket * qSocket, const af::Msg * msg);
-
-/// Recieve message.
-   bool recvMessage( QTcpSocket * qSocket, af::Msg * msg);
-
-/// Try to read data with given length \c len to buffer \c data .
-   int readdata( QTcpSocket * qSocket, char* data, int len_min, int len_max);
 
    class Attr;
    class AttrNumber;
@@ -36,12 +18,8 @@ namespace afqt
 
    class QMsgQueue;
 
-   class QThreadClient;
-   class QThreadClientSend;
-   class QThreadClientUp;
-
-   class QServer;
-   class QServerThread;
+	class QAfSocket;
+	class QAfClient;
 
    const QString stoq( const std::string & str);
    const QString dtoq( const char * data, int size = -1);

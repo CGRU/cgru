@@ -1,11 +1,27 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	Afanasy job.
+*/
 #include "job.h"
 
 #include "../include/afanasy.h"
 
 #include "blockdata.h"
+#include "branch.h"
 #include "environment.h"
-#include "msg.h"
 #include "jobprogress.h"
+#include "msg.h"
 
 using namespace af;
 
@@ -50,19 +66,18 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 		jr_string("command_post", m_command_post, i_object, io_changes);
 	}
 
-	jr_int32 ("max_running_tasks",          m_max_running_tasks,          i_object, io_changes);
-	jr_int32 ("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object, io_changes);
 	jr_int32 ("time_life",          m_time_life,           i_object, io_changes);
 	jr_int64 ("time_wait",          m_time_wait,           i_object, io_changes);
 
-	jr_regexp("hosts_mask",         m_hosts_mask,          i_object, io_changes);
-	jr_regexp("hosts_mask_exclude", m_hosts_mask_exclude,  i_object, io_changes);
 	jr_regexp("depend_mask",        m_depend_mask,         i_object, io_changes);
 	jr_regexp("depend_mask_global", m_depend_mask_global,  i_object, io_changes);
 	jr_regexp("need_os",            m_need_os,             i_object, io_changes);
 	jr_regexp("need_properties",    m_need_properties,     i_object, io_changes);
 
 	jr_string("user_name",     m_user_name,     i_object, io_changes);
+
+	jr_string("branch", m_branch, i_object, io_changes);
+	m_branch = Branch::FilterPath(m_branch);
 
 	jr_stringmap("folders", m_folders, i_object, io_changes);
 
@@ -86,6 +101,8 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	bool ignorepaused = false;
 	if( jr_bool("ignorepaused", ignorepaused, i_object, io_changes))
 		setIgnorePausedFlag( ignorepaused);
+
+	Work::jsonRead( i_object, io_changes);
 
 	// Paramers below are not editable and read only on creation
 	// When use edit parameters, log provided to store changes
@@ -143,13 +160,12 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 
 	Node::v_jsonWrite( o_str, i_type);
 
+	Work::jsonWrite( o_str, i_type);
+
 	o_str << ",\n\"serial\":" << m_serial;
 
 	o_str << ",\n\"user_name\":\"" << m_user_name << "\"";
 	o_str << ",\n\"host_name\":\"" << m_host_name << "\"";
-
-/*	if( m_flags != 0 )
-		o_str << ",\n\"flags\":"                      << m_flags;*/
 
 	o_str << ",\n\"st\":" << m_state;
 	if( m_state != 0 )
@@ -184,14 +200,12 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\n\"project\":\""      << af::strEscape( m_project      ) << "\"";
 	if( m_department.size())
 		o_str << ",\n\"department\":\""   << af::strEscape( m_department   ) << "\"";
+	if( m_branch.size())
+		o_str << ",\n\"branch\":\"" << m_branch << "\"";
 
 	if( m_user_list_order != -1 )
 		o_str << ",\n\"user_list_order\":"            << m_user_list_order;
 	o_str << ",\n\"time_creation\":"                  << m_time_creation;
-	if( m_max_running_tasks != -1 )
-		o_str << ",\n\"max_running_tasks\":"          << m_max_running_tasks;
-	if( m_max_running_tasks_per_host != -1 )
-		o_str << ",\n\"max_running_tasks_per_host\":" << m_max_running_tasks_per_host;
 	if( m_time_wait != 0 )
 		o_str << ",\n\"time_wait\":"                  << m_time_wait;
 	if( m_time_started != 0 )
@@ -204,10 +218,6 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 	if( m_folders.size())
 		af::jw_stringmap("folders", m_folders, o_str);
 
-	if( hasHostsMask())
-		o_str << ",\n\"hosts_mask\":\""         << af::strEscape( m_hosts_mask.getPattern()         ) << "\"";
-	if( hasHostsMaskExclude())
-		o_str << ",\n\"hosts_mask_exclude\":\"" << af::strEscape( m_hosts_mask_exclude.getPattern() ) << "\"";
 	if( hasDependMask())
 		o_str << ",\n\"depend_mask\":\""        << af::strEscape( m_depend_mask.getPattern()        ) << "\"";
 	if( hasDependMaskGlobal())
@@ -238,21 +248,18 @@ void Job::initDefaultValues()
 	m_id = 0;
 	m_serial = 0;
 	m_blocks_num = 0;
-	m_max_running_tasks = -1;
-	m_max_running_tasks_per_host = -1;
 	m_time_wait = 0;
 	m_time_started = 0;
 	m_time_done = 0;
 	m_user_list_order = -1; // On update, if old index == -1 storing is skipped (new job registration)
 	m_time_life = -1;
 
+	m_branch = "/";
+
 	m_thumb_size = 0;
 	m_thumb_data = NULL;
 	m_blocks_data = NULL;
 
-	m_hosts_mask.setCaseInsensitive();
-	m_hosts_mask_exclude.setCaseInsensitive();
-	m_hosts_mask_exclude.setExclude();
 	m_depend_mask.setCaseSensitive();
 	m_depend_mask_global.setCaseSensitive();
 	m_need_os.setCaseInsensitive();
@@ -310,44 +317,42 @@ Job::~Job()
 void Job::v_readwrite( Msg * msg)
 {
 	Node::v_readwrite( msg);
-	/* NEW VERSON
-	rw_int64_t ( m_serial, msg);
-	*/
+	Work::readwrite(   msg);
 
-	rw_int32_t ( m_blocks_num,                 msg);
-	rw_int64_t ( m_flags,                      msg);
-	rw_int64_t ( m_state,                      msg);
-	rw_int32_t ( m_max_running_tasks,          msg);
-	rw_int32_t ( m_max_running_tasks_per_host, msg);
-	rw_int32_t ( m_user_list_order,            msg);
-	rw_int64_t ( m_time_creation,              msg);
-	rw_int64_t ( m_time_wait,                  msg);
-	rw_int64_t ( m_time_started,               msg);
-	rw_int64_t ( m_time_done,                  msg);
-	rw_int32_t ( m_time_life,                  msg);
+	rw_int64_t(m_serial,     msg);
+	rw_int64_t(m_flags,      msg);
+	rw_int64_t(m_state,      msg);
 
-	rw_String ( m_user_name,    msg);
-	rw_String ( m_host_name,    msg);
-	rw_String ( m_command_pre,  msg);
-	rw_String ( m_command_post, msg);
-	rw_String ( m_annotation,   msg);
-	rw_String ( m_report,       msg);
-	rw_String ( m_description,  msg);
-	rw_String ( m_custom_data,  msg);
-	rw_String ( m_thumb_path,   msg);
-	rw_String ( m_project,      msg);
-	rw_String ( m_department,   msg);
+	rw_int32_t(m_blocks_num,      msg);
+	rw_int32_t(m_user_list_order, msg);
 
-	rw_RegExp ( m_hosts_mask,         msg);
-	rw_RegExp ( m_hosts_mask_exclude, msg);
-	rw_RegExp ( m_depend_mask,        msg);
-	rw_RegExp ( m_depend_mask_global, msg);
-	rw_RegExp ( m_need_os,            msg);
-	rw_RegExp ( m_need_properties,    msg);
+	rw_int64_t(m_time_creation, msg);
+	rw_int64_t(m_time_wait,     msg);
+	rw_int64_t(m_time_started,  msg);
+	rw_int64_t(m_time_done,     msg);
+	rw_int32_t(m_time_life,     msg);
 
-	rw_StringMap( m_folders, msg);
+	rw_String(m_user_name,    msg);
+	rw_String(m_host_name,    msg);
+	rw_String(m_command_pre,  msg);
+	rw_String(m_command_post, msg);
+	rw_String(m_annotation,   msg);
+	rw_String(m_report,       msg);
+	rw_String(m_description,  msg);
+	rw_String(m_custom_data,  msg);
+	rw_String(m_thumb_path,   msg);
+	rw_String(m_project,      msg);
+	rw_String(m_department,   msg);
+	rw_String(m_branch,       msg);
 
-	rw_blocks(  msg);
+	rw_RegExp(m_depend_mask,        msg);
+	rw_RegExp(m_depend_mask_global, msg);
+	rw_RegExp(m_need_os,            msg);
+	rw_RegExp(m_need_properties,    msg);
+
+	rw_StringMap(m_folders, msg);
+
+	rw_blocks(msg);
 }
 
 void Job::rw_blocks( Msg * msg)
@@ -401,7 +406,7 @@ const std::string Job::getFolder() const
 	std::map<std::string,std::string>::const_iterator it = m_folders.begin();
 
 	if( it == m_folders.end())
-		return folder;
+		return m_branch;
 
 	folder = (*it).second;
 
@@ -410,7 +415,7 @@ const std::string Job::getFolder() const
 
 int Job::v_calcWeight() const
 {
-	int weight = Node::v_calcWeight();
+	int weight = Work::calcWeight();
 	weight += sizeof(Job) - sizeof( Node);
 	for( int b = 0; b < m_blocks_num; b++) weight += m_blocks_data[b]->calcWeight();
 	weight += weigh( m_description);
@@ -419,8 +424,6 @@ int Job::v_calcWeight() const
 	weight += weigh( m_project);
 	weight += weigh( m_department);
 	weight += weigh( m_folders);
-	weight += m_hosts_mask.weigh();
-	weight += m_hosts_mask_exclude.weigh();
 	weight += m_depend_mask.weigh();
 	weight += m_depend_mask_global.weigh();
 	weight += m_need_os.weigh();
@@ -464,6 +467,8 @@ void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
    o_str << "[" << m_user_list_order << "]";
 	if( isHidden()) o_str << " (hidden)";
 
+	Work::generateInfoStream( o_str, full);
+
 	bool display_blocks = true;
 	if( m_blocks_num == 0)
 	{
@@ -491,6 +496,7 @@ void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
       return;
    }
 
+	if (m_branch.size()) o_str << "\n Branch = " << m_branch;
    if( m_annotation.size())  o_str << "\n    " << m_annotation;
    if( m_report.size())      o_str << "\n    " << m_report;
    if( m_description.size()) o_str << "\n    " << m_description;
@@ -527,8 +533,7 @@ void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
 	if( m_folders.size())
 	{
 		o_str << "\nFolders:";
-		int i = 0;
-		for( std::map<std::string,std::string>::const_iterator it = m_folders.begin(); it != m_folders.end(); it++, i++)
+		for( std::map<std::string,std::string>::const_iterator it = m_folders.begin(); it != m_folders.end(); it++)
 		{
 			o_str << "\n\"" << (*it).first << "\":\""<< af::strEscape((*it).second) << "\"";
 		}

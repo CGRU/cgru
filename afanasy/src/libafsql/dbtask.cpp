@@ -27,6 +27,7 @@ DBTask::DBTask()
 	dbAddAttr( new DBAttrInt64 ( DBAttr::_time_done,    &m_time_done    ));
 	dbAddAttr( new DBAttrInt64 ( DBAttr::_time_started, &m_time_start   ));
 	dbAddAttr( new DBAttrString( DBAttr::_username,     &m_username     ));
+	dbAddAttr( new DBAttrInt32 ( DBAttr::_frame_pertask, &m_frame_pertask ));
 }
 
 DBTask::~DBTask()
@@ -47,6 +48,7 @@ void DBTask::add(
 	m_blockname = i_exec->getBlockName();
 	m_service   = i_exec->getServiceType();
 	m_capacity  = i_exec->getCapacity();
+	m_frame_pertask = i_exec->getFramesNumber();
 
 	m_starts_count = i_progress->starts_count;
 	m_errors_count = i_progress->errors_count;

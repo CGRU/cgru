@@ -5,6 +5,6 @@ parser = 'generic'
 
 
 class walk(service.service):
-	"""RULES filesystem Walk service
-	"""
-	pass
+    """RULES filesystem Walk service
+    """
+    pass

@@ -2,4 +2,8 @@
 
 call %CGRU_LOCATION%\software_setup\setup_clarisse.cmd
 
-"%APP_DIR%\%APP_EXE%" %*
+if [%1] == [] (
+   start "Clarisse" "%APP_EXE%" %*
+) else (
+"%APP_EXE%" %*
+)

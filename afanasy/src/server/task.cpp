@@ -96,14 +96,14 @@ af::TaskExec * Task::genExec() const
 	return exec;
 }
 
-void Task::v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring, int32_t * io_running_tasks_counter, int64_t * io_running_capacity_counter)
+void Task::v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring)
 {
    if( m_block->m_data->isMultiHost())
    {
       if( m_run )
          ((TaskRunMulti*)(m_run))->addHost( i_taskexec, i_render, i_monitoring);
       else
-         m_run = new TaskRunMulti( this, i_taskexec, m_progress, m_block, i_render, i_monitoring, io_running_tasks_counter, io_running_capacity_counter);
+         m_run = new TaskRunMulti( this, i_taskexec, m_progress, m_block, i_render, i_monitoring);
       return;
    }
 
@@ -116,16 +116,16 @@ void Task::v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorConta
 
 	i_taskexec->listenOutput( m_listen_count > 0);
 
-	m_run = new TaskRun( this, i_taskexec, m_progress, m_block, i_render, i_monitoring, io_running_tasks_counter, io_running_capacity_counter);
+	m_run = new TaskRun( this, i_taskexec, m_progress, m_block, i_render, i_monitoring);
 }
 
-void Task::reconnect( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring, int32_t * io_running_tasks_counter, int64_t * io_running_capacity_counter)
+void Task::reconnect( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring)
 {
 	if( m_progress->state & AFJOB::STATE_WAITRECONNECT_MASK )
 	{
 		v_appendLog("Reconnecting previously run...");
 		AF_LOG << "Reconnecting task: \"" << *i_taskexec << "\" with\nRender: " << *i_render;
-		v_start( i_taskexec, i_render, i_monitoring, io_running_tasks_counter, io_running_capacity_counter);
+		v_start( i_taskexec, i_render, i_monitoring);
 	}
 	else
 	{
@@ -460,25 +460,7 @@ void Task::getStoredFiles( std::ostringstream & i_str) const
 		
 		std::string filename = m_store_dir_files + AFGENERAL::PATH_SEPARATOR + m_stored_files[i];
 
-		i_str << "\n{\"name\":\"" << filename << "\"";
-/*
-		int readsize = -1;
-		char * data = af::fileRead( filename, &readsize, af::Msg::SizeDataMax, &error);
-		if( data )
-		{
-			i_str << ",\n\"data\":\"";
-			i_str << af::base64encode( data, readsize);
-			i_str << "\"";
-			delete [] data;
-		}
-		else
-		{
-			i_str << "\n,\"error\":\"" << af::strEscape( error) << "\"";
-		}
-
-		i_str << ",\n\"size\":" << readsize;
-*/
-		i_str << "}";
+		i_str << "\n{\"name\":\"" << af::strEscape(filename) << "\"}";
 	}
 
 	i_str << "\n]}";

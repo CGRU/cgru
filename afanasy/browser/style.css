@@ -77,6 +77,15 @@ border: 2px solid #575757;
 cursor: pointer;
 text-align: center;
 }
+#header_panel_right {
+	float: right;
+	margin-right: 12px;
+}
+#header_panel_right > div {
+	margin: 2px;
+	padding: 4px 8px;
+	float: left;
+}
 #footeropenbutton, #headeropenbutton {
 border: 1px solid #575757;
 border-radius: 2px;
@@ -141,7 +150,7 @@ overflow: hidden;
 
 .view {
 position: absolute;
-left: 50px; right: 200px;
+left: 50px; right: 400px;
 top: 0; bottom: 0;
 }
 .panel {
@@ -155,7 +164,7 @@ border-right: 2px solid #575757;
 }
 .panel.right {
 right: 0;
-width: 198px;
+width: 398px;
 border-left: 2px solid #575757;
 overflow-y: auto;
 word-wrap: break-word;
@@ -173,11 +182,12 @@ opacity: .5;
 .panel.right .section.active { opacity: 1.0; }
 .panel.right .section .caption {
 cursor: pointer;
+font-weight: bold;
 margin: 4px 8px;
 }
 .panel.right .section .param {
 clear: both;
-padding: 4px;
+padding: 6px 20px;
 border-top: 1px solid #575757;
 }
 .panel.right .section .param .label {
@@ -196,6 +206,9 @@ font-style: italic;
 .panel.right .section.folders .cgru_cmdexec {
 float: left;
 margin-right: 8px;
+}
+.panel.right .info_body {
+padding: 0 12px;
 }
 
 .monitor .ctrl,.info {
@@ -312,6 +325,13 @@ cursor: default;
 .item.selected, .item.task.selected {
 background: #DFD;
 color: #000;
+}
+
+.item .annotation {
+clear: both;
+text-align: center;
+font-weight: bold;
+font-style: italic;
 }
 
 .lowercase {
@@ -523,6 +543,19 @@ text-shadow: 0px 0px 1px #000, 0px 0px 2px #000, 0px 0px 4px #000;
 .cgru_window_window.tasks {
 top: 150px; bottom: 50px; left: 10%; right: 10%;
 }
+
+.item.branch .active_jobs_div {
+clear: both;
+border-top: 1px solid #555;
+margin: 2px;
+padding: 2px;
+}
+.item.branch .name { font-size: 140%;}
+.item.branch.empty { opacity:.5; font-size: 75%;}
+.item.branch.running { background-color: rgba(200,255,120,.5);}
+.item.branch.active  { background-color: rgba(255,255,120,.5);}
+.item.branch.selected       { background-color: #DFD;}
+.branch_active_job.selected { background-color: #DFD;}
 
 /*####################### Task Window: ################## */
 .wnd_task > div {

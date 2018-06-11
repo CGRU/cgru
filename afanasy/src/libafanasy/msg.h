@@ -134,6 +134,9 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TUsersList/**/,                 ///< Active users information.
 /**/TUserJobsOrder/**/,             ///< Jobs ids in server list order.
 
+/*- Branches messages -*/
+/**/TBranchesList/**/,              ///< Branches nodes list.
+
 /*- Job messages -*/
 /**/TJobsList/**/,                  ///< Jobs list information.
 /**/TJobProgress/**/,               ///< Jobs progress.

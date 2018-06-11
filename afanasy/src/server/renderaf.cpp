@@ -1,3 +1,18 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	This is a server side of an Afanasy render.
+*/
 #include "renderaf.h"
 
 #include "../libafanasy/environment.h"
@@ -31,9 +46,6 @@ RenderAf::RenderAf( const std::string & i_store_dir):
 	af::Render(),
 	AfNodeSrv( this, i_store_dir)
 {
-//printf("RenderAf::RenderAf:\n");
-//printf("this = %p\n", this);
-//	setNode( this);
 	AFINFA("RenderAf::RenderAf(%d)", m_id);
 	initDefaultValues();
 
@@ -87,10 +99,23 @@ void RenderAf::setRegistered()
 	}
 	else
 	{
-		m_time_register = time( NULL);
+		std::string log = "Registered";
+
+		if( m_host.m_register_nimby > 0 )
+		{
+			setNimby();
+			log += " nimby";
+		}
+		if( m_host.m_register_paused > 0 )
+		{
+			setPaused( true);
+			log += " paused";
+		}
+
 		setStoreDir( AFCommon::getStoreDirRender( *this));
 		store();
-		appendLog("Registered.");
+
+		appendLog( log + ".");
 	}
 
 	af::Client::setRegisterTime();
@@ -99,9 +124,6 @@ void RenderAf::setRegistered()
 	m_wol_operation_time = 0;
 	m_idle_time = time(NULL);
 	m_busy_time = m_idle_time;
-
-	if( isOnline()) appendLog("Registered online.");
-	else appendLog("Registered offline.");
 }
 
 void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorContainer * monitoring, bool toZombie )
@@ -127,7 +149,6 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
 		AFCommon::QueueLog("Render Deleting: " + v_generateInfoString( false));
 		appendLog("Waiting for deletion.");
 		setZombie();
-//		AFCommon::saveLog( getLog(), af::Environment::getRendersDir(), m_name);
 		if( monitoring ) monitoring->addEvent( af::Monitor::EVT_renders_del, m_id);
 	}
 	else
@@ -284,8 +305,6 @@ void RenderAf::startTask( af::TaskExec *taskexec)
 	taskexec->v_stdOut( false);
 }
 
-void RenderAf::v_priorityChanged( MonitorContainer * i_monitoring) { ms_renders->sortPriority( this);}
-
 void RenderAf::v_action( Action & i_action)
 {
 	const JSON & operation = (*i_action.data)["operation"];
@@ -339,7 +358,6 @@ void RenderAf::v_action( Action & i_action)
 			if( isOnline() ) return;
 			appendLog( std::string("Deleted by ") + i_action.author);
 			offline( NULL, 0, i_action.monitors, true);
-//AFCommon::QueueDBDelItem( this);
 			return;
 		}
 		else if( type == "reboot")
@@ -445,8 +463,6 @@ void RenderAf::exitClient( const std::string & i_type, JobContainer * i_jobs, Mo
 	if( false == isOnline() ) return;
 
 	m_re.m_instruction = i_type;
-
-//	offline( i_jobs, af::TaskExec::UPRenderExit, i_monitoring);
 }
 
 void RenderAf::launchAndExit( const std::string & i_cmd, bool i_exit, JobContainer * i_jobs, MonitorContainer * i_monitoring)
@@ -455,9 +471,6 @@ void RenderAf::launchAndExit( const std::string & i_cmd, bool i_exit, JobContain
 
 	m_re.m_instruction = ( i_exit ? "launch_exit" : "launch");
 	m_re.m_command = i_cmd;
-
-//	if( i_exit )
-//		offline( i_jobs, af::TaskExec::UPRenderExit, i_monitoring);
 }
 
 void RenderAf::wolSleep( MonitorContainer * monitoring)
@@ -624,11 +637,6 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 	{
 		appendLog( std::string("ZOMBIETIME: ") + af::itos(af::Environment::getRenderZombieTime()) + " seconds.");
 		AFCommon::QueueLog( std::string("Render: \"") + getName() + "\" - ZOMBIETIME");
-/*		if( isBusy())
-		{
-			printf("Was busy:\n");
-			for( std::list<af::TaskExec*>::iterator it = tasks.begin(); it != tasks.end(); it++) (*it)->stdOut();
-		}*/
 		offline( jobs, af::TaskExec::UPRenderZombie, monitoring);
 		return;
 	}
@@ -696,7 +704,6 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 			monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
 			store();
 		}
-		//printf("BUSY: %li-%li=%li\n", currentTime, m_busy_time, currentTime-m_busy_time);
 	}
 
 	// Update idle time:
@@ -767,7 +774,7 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 			}
 
 			// Automatic Nimby Free:
-			if(( m_host.m_nimby_idlefree_time > 0 ) && isOnline() && ( isFree() == false)
+			if(( m_host.m_nimby_idlefree_time > 0 ) && isOnline() && ( isNimby() || isNIMBY())
 				&& ( currentTime - m_idle_time > m_host.m_nimby_idlefree_time ))
 			{
 				std::string log("Automatic Nimby Free: ");
@@ -779,20 +786,27 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 				store();
 			}
 		}
-		//printf("IDLE: %li-%li=%li\n", currentTime, m_idle_time, currentTime-m_idle_time);
 	}
 }
 
-void RenderAf::notSolved()
+void RenderAf::v_postSolve(time_t i_curtime, MonitorContainer * i_monitoring)
 {
+	bool changed = false;
+
 	// If render was busy but has no tasks after solve it is not busy now
 	// Needed not to reset busy render status if it run one task after other
-
-	if( isBusy() && ( m_tasks.size() == 0))
+	if (isBusy() && (m_tasks.size() == 0))
 	{
-		setBusy( false);
-		m_task_start_finish_time = time( NULL);
+		setBusy(false);
+		m_task_start_finish_time = i_curtime;
+		changed = true;
+	}
+
+	if (changed)
+	{
 		store();
+		if (i_monitoring)
+			i_monitoring->addEvent(af::Monitor::EVT_renders_change, m_id);
 	}
 }
 
@@ -884,7 +898,6 @@ void RenderAf::disableServices()
 
 void RenderAf::setService( const std::string & srvname, bool enable)
 {
-//printf("RenderAf::setService: %s %d\n", srvname.c_str(), enable);
 	std::vector<std::string> m_services_disabled_old = m_services_disabled;
 	m_services_disabled.clear();
 
@@ -1074,8 +1087,6 @@ af::Msg * RenderAf::writeFullInfo( bool i_binary) const
 int RenderAf::v_calcWeight() const
 {
 	int weight = Render::v_calcWeight();
-//printf("RenderAf::calcWeight: Render::calcWeight: %d bytes\n", weight);
 	weight += sizeof(RenderAf) - sizeof( Render);
-//printf("RenderAf::calcWeight: %d bytes ( sizeof RenderAf = %d)\n", weight, sizeof( Render));
 	return weight;
 }

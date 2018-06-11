@@ -43,6 +43,11 @@ bool CmdString::v_processArguments( int argc, char** argv, af::Msg &msg)
       int number = atoi( str.c_str());
       std::cout << "\"" << af::itos( number) << "\"" << std::endl;
    }
+	else if( operation == "toKMG")
+	{
+		long long number = atoll(str.c_str());
+		std::cout << "\"" << af::toKMG(number) << "\"" << std::endl;
+	}
    else
    {
       std::cerr << "Unknown operation \"" << operation << "\"" << std::endl;

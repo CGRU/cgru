@@ -115,10 +115,7 @@ void ServiceLimit::getLimits( const ServiceLimit & i_other)
 //############################################## Farm ########################################
 
 Farm::Farm( const std::string & File, bool Verbose ):
-	m_count( 0),
 	m_filename( File),
-	m_ptr_first( NULL),
-	m_ptr_last( NULL),
 	m_valid( false)
 {
 	if( false == pathFileExists( m_filename))
@@ -176,7 +173,7 @@ bool Farm::getFarm( const JSON & i_obj)
 	{
 		if( false == patterns[i].IsObject() )
 		{
-			AFERRAR("Farm: Pattern[%d] is not an object.", i)
+			AFERRAR("Farm: FarmPattern[%d] is not an object.", i)
 			return false;
 		}
 
@@ -189,12 +186,12 @@ bool Farm::getFarm( const JSON & i_obj)
 
 		if( name.empty())
 		{
-			AFERRAR("Pattern[%d] has no name.", i)
+			AFERRAR("FarmPattern[%d] has no name.", i)
 			return false;
 		}
 		if( mask.empty())
 		{
-			AFERRAR("Pattern '%s' has an empty hosts name mask.", name.c_str())
+			AFERRAR("FarmPattern '%s' has an empty hosts name mask.", name.c_str())
 			return false;
 		}
 
@@ -208,6 +205,8 @@ bool Farm::getFarm( const JSON & i_obj)
 		jr_int32("maxtasks", host.m_max_tasks, patterns[i]);
 		jr_int32("wol_idlesleep_time", host.m_wol_idlesleep_time, patterns[i]);
 
+		jr_int32("register_nimby",  host.m_register_nimby,  patterns[i]);
+		jr_int32("register_paused", host.m_register_paused, patterns[i]);
 
 		jr_int32("nimby_idlefree_time", host.m_nimby_idlefree_time, patterns[i]);
 		jr_int32("nimby_busyfree_time", host.m_nimby_busyfree_time, patterns[i]);
@@ -246,7 +245,7 @@ bool Farm::getFarm( const JSON & i_obj)
 				jr_string("name", service_name, services[j]);
 				if( name.empty())
 				{
-					AFERRAR("Farm: Pattern['%s'] service[%d] has no name.", name.c_str(), j)
+					AFERRAR("Farm: FarmPattern['%s'] service[%d] has no name.", name.c_str(), j)
 					return false;
 				}
 
@@ -256,7 +255,7 @@ bool Farm::getFarm( const JSON & i_obj)
 			}
 		}
 
-		Pattern * pat = new Pattern( name);
+		FarmPattern * pat = new FarmPattern( name);
 		pat->setMask( mask);
 		pat->setDescription( description);
 		if( clear_services )
@@ -313,12 +312,9 @@ bool Farm::getFarm( const JSON & i_obj)
 
 Farm::~Farm()
 {
-	while( m_ptr_first != NULL)
-	{
-		m_ptr_last = m_ptr_first;
-		m_ptr_first = m_ptr_first->ptr_next;
-		delete m_ptr_last;
-	}
+	for( int i = 0; i < m_patterns.size(); i++)
+		delete m_patterns[i];
+
 	for( std::map<std::string, ServiceLimit*>::const_iterator it = m_servicelimits.begin(); it != m_servicelimits.end(); it++)
 		delete (*it).second;
 }
@@ -348,39 +344,31 @@ void Farm::addServiceLimit( const std::string & name, int maxcount, int maxhosts
 	m_servicelimits[name] = new ServiceLimit( maxcount, maxhosts);
 }
 
-bool Farm::addPattern( Pattern * pattern)
+bool Farm::addPattern( FarmPattern * i_pattern)
 {
-	if( pattern->isValid() == false)
+	if( i_pattern->isValid() == false)
 	{
-		AFERRAR("Farm::addPattern: invalid pattern \"%s\"", pattern->getName().c_str())
+		AFERRAR("Farm::addPattern: invalid pattern \"%s\"", i_pattern->getName().c_str())
 		return false;
 	}
-	if( m_ptr_first == NULL)
-	{
-		m_ptr_first = pattern;
-	}
-	else
-	{
-		m_ptr_last->ptr_next = pattern;
-	}
-	m_ptr_last = pattern;
-	m_count++;
+
+	m_patterns.push_back( i_pattern);
+
 	return true;
 }
 
 void Farm::generateInfoStream( std::ostringstream & stream, bool full) const
 {
 	stream << "Farm filename = \"" << m_filename << "\":";
-	Pattern * pattern = m_ptr_first;
-	while( pattern != NULL)
+
+	for( int i = 0; i < m_patterns.size(); i++)
 	{
 		stream << std::endl;
-		pattern->generateInfoStream( stream, full);
-		pattern = pattern->ptr_next;
+		m_patterns[i]->generateInfoStream( stream, full);
 	}
 
 	if( m_servicelimits.empty()) return;
-
+	
 	if( full ) stream << "\n\nServices Limits:";
 	else stream << " limits:";
 	for( std::map<std::string, ServiceLimit*>::const_iterator it = m_servicelimits.begin(); it != m_servicelimits.end(); it++)
@@ -399,19 +387,42 @@ void Farm::stdOut( bool full) const
 	std::cout << stream.str() << std::endl;
 }
 
-bool Farm::getHost( const std::string & hostname, Host & host, std::string & name, std::string & description) const
+bool Farm::getHost( const std::string & hostname, Host & host, std::string & name, std::string & description, bool i_verbose) const
 {
-	Pattern * ptr = NULL;
-	for( Pattern * p = m_ptr_first; p != NULL; p = p->ptr_next)
+	bool found = false;
+
+	int index = 0;
+	for( int i = 0; i < m_patterns.size(); i++)
 	{
-		if( p->match( hostname)) ptr = p;
-		if( ptr == NULL) continue;
-		ptr->getHost( host);
+		if( i_verbose )
+			printf("Checking '%s' and '%s': ", hostname.c_str(), m_patterns[i]->getMask().c_str());
+
+		if( false == m_patterns[i]->match( hostname))
+		{
+			if( i_verbose )
+				printf("Not match.\n");
+
+			continue;
+		}
+
+		if( i_verbose )
+			printf("MATCH.\n");
+
+		found = true;
+		index = i;
+
+		// We should get (update) host on each next match.
+		// As next pattern can be based on previous.
+		m_patterns[index]->getHost( host);
 	}
-	if( ptr == NULL ) return false;
-	name = ptr->getName();
-	description = ptr->getDescription();
-	return true;
+
+	if( found )
+	{
+		name = m_patterns[index]->getName();
+		description = m_patterns[index]->getDescription();
+	}
+
+	return found;
 }
 
 bool Farm::serviceLimitCheck( const std::string & service, const std::string & hostname) const
@@ -491,5 +502,20 @@ void Farm::jsonWriteLimits( std::ostringstream & o_str) const
 	}
 
 	o_str << "}";
+}
+const std::string Farm::jsonWriteLimits() const
+{
+    std::ostringstream stream;
+    stream << "{\"services_limits\":{";
+
+    for( std::map<std::string, ServiceLimit*>::const_iterator it = m_servicelimits.begin(); it != m_servicelimits.end(); it++)
+    {
+        if( it != m_servicelimits.begin()) stream << ",";
+        stream << "\"" << (*it).first << "\":";
+        (*it).second->jsonWrite( stream);
+    }
+
+    stream << "}}";
+    return stream.str();
 }
 

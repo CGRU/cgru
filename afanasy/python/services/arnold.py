@@ -5,6 +5,6 @@ parser = 'arnold'
 
 
 class arnold(service.service):
-	"""Arnold Standalone
-	"""
-	pass
+    """Arnold Standalone
+    """
+    pass

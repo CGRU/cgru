@@ -54,6 +54,7 @@ public:
 	QString thumb_path;
 	QString report;
 	QString project;
+	QString department;
 	QMap<QString,QString> folders;
 
 	const QString getRulesFolder();

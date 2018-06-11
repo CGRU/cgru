@@ -35,6 +35,7 @@ af::Farm* ferma = NULL;
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "logger.h"
 
 #ifdef WINNT
 bool LaunchProgramV(
@@ -203,8 +204,10 @@ bool af::init( uint32_t flags)
    AFINFO("af::init:\n");
    if( flags & InitFarm)
    {
-      AFINFO("af::init: trying to load farm\n");
-      if( loadFarm( flags & InitVerbose) == false)  return false;
+      AFINFO("af::init: trying to load farm.");
+
+      if( loadFarm( flags & InitVerbose ? VerboseOn : VerboseOff) == false)
+		  return false;
    }
    return true;
 }
@@ -214,42 +217,43 @@ af::Farm * af::farm()
    return ferma;
 }
 
-bool af::loadFarm( bool verbose)
+bool af::loadFarm( VerboseMode i_verbose)
 {
 	std::string filename = af::Environment::getAfRoot() + "/farm.json";
-	if( loadFarm( filename,  verbose) == false)
+	if( loadFarm( filename, i_verbose) == false)
 	{
 		filename = af::Environment::getAfRoot() + "/farm_example.json";
-		if( loadFarm( filename,  verbose) == false)
+		if( loadFarm( filename, i_verbose) == false)
 		{
-			AFERRAR("Can't load default farm settings file:\n%s\n", filename.c_str());
+			AF_ERR << "Can't load default farm settings file:\n" << filename;
 			return false;
 		}
 	}
 	return true;
 }
 
-bool af::loadFarm( const std::string & filename, bool verbose )
+bool af::loadFarm( const std::string & filename, VerboseMode i_verbose)
 {
-   af::Farm * new_farm = new Farm( filename);//, verbose);
-   if( new_farm == NULL)
-   {
-      AFERROR("af::loadServices: Can't allocate memory for farm settings")
-      return false;
-   }
-   if( false == new_farm->isValid())
-   {
-      delete new_farm;
-      return false;
-   }
-   if( ferma != NULL)
-   {
-      new_farm->servicesLimitsGetUsage( *ferma);
-      delete ferma;
-   }
-   ferma = new_farm;
-   if( verbose) ferma->stdOut( true);
-   return true;
+	af::Farm * new_farm = new Farm( filename);
+
+	if( false == new_farm->isValid())
+	{
+		delete new_farm;
+		return false;
+	}
+
+	if( ferma != NULL)
+	{
+		new_farm->servicesLimitsGetUsage( *ferma);
+		delete ferma;
+	}
+
+	ferma = new_farm;
+
+	if( i_verbose == VerboseOn)
+		ferma->stdOut( true);
+
+	return true;
 }
 
 void af::destroy()
@@ -280,39 +284,42 @@ void af::printTime( time_t time_sec, const char * time_format)
    std::cout << time2str( time_sec, time_format);
 }
 
-void af::printAddress( struct sockaddr_storage * i_ss )
+const std::string af::sockAddrToStr( const struct sockaddr_storage * i_ss )
 {
-   static const int buffer_len = 256;
-   char buffer[buffer_len];
-   const char * addr_str = NULL;
-   uint16_t port = 0;
-   printf("Address = ");
-   switch( i_ss->ss_family)
-   {
-   case AF_INET:
-   {
-      struct sockaddr_in * sa = (struct sockaddr_in*)(i_ss);
-      port = sa->sin_port;
-      addr_str = inet_ntoa( sa->sin_addr );
-      break;
-   }
-   case AF_INET6:
-   {
-      struct sockaddr_in6 * sa = (struct sockaddr_in6*)(i_ss);
-      port = sa->sin6_port;
-      addr_str = inet_ntop( AF_INET6, &(sa->sin6_addr), buffer, buffer_len);
-      break;
-   }
-   default:
-      printf("Unknown protocol");
-      return;
-   }
-   if( addr_str )
-   {
-      printf("%s", addr_str);
-      printf(" Port = %d", ntohs(port));
-   }
-   printf("\n");
+	std::ostringstream str;
+	af::sockAddrToStr( str, i_ss);
+	return str.str();
+}
+void af::sockAddrToStr( std::ostringstream & o_str, const struct sockaddr_storage * i_ss )
+{
+	static const int buffer_len = 256;
+	char buffer[buffer_len];
+	const char * addr_str = NULL;
+	uint16_t port = 0;
+	switch( i_ss->ss_family)
+	{
+	case AF_INET:
+	{
+		const struct sockaddr_in * sa = (const struct sockaddr_in*)(i_ss);
+		port = sa->sin_port;
+		addr_str = inet_ntoa( sa->sin_addr );
+		break;
+	}
+	case AF_INET6:
+	{
+		const struct sockaddr_in6 * sa = (const struct sockaddr_in6*)(i_ss);
+		port = sa->sin6_port;
+		addr_str = inet_ntop( AF_INET6, &(sa->sin6_addr), buffer, buffer_len);
+		break;
+	}
+	default:
+		o_str << "Unknown protocol";
+	}
+	if( addr_str ) o_str << addr_str << ":" << port;
+}
+void af::printAddress( const struct sockaddr_storage * i_ss )
+{
+	printf("Address = %s\n", af::sockAddrToStr( i_ss).c_str());
 }
 
 bool af::setRegExp( RegExp & regexp, const std::string & str, const std::string & name, std::string * errOutput)
@@ -538,6 +545,14 @@ int af::weigh( const std::map<std::string, std::string> & i_map)
 	int w = 0;
 	for( std::map<std::string,std::string>::const_iterator it = i_map.begin(); it != i_map.end(); it++)
 		w += weigh(it->first) + weigh(it->second);
+	return w;
+}
+
+int af::weigh( const std::map<std::string, int32_t> & i_map)
+{
+	int w = 0;
+	for( std::map<std::string,int32_t>::const_iterator it = i_map.begin(); it != i_map.end(); it++)
+		w += weigh(it->first) + sizeof(it->second);
 	return w;
 }
 

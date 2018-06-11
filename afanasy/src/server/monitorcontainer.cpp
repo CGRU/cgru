@@ -17,6 +17,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 MonitorContainer::MonitorContainer():
 	AfContainer( "Monitors", AFMONITOR::MAXCOUNT),
@@ -361,6 +362,7 @@ void MonitorContainer::addUser( UserAf * i_user)
 		if( *(uIt++) == i_user)
 			return;
 	m_usersJobOrderChanged.push_back( i_user);
+	AF_DEBUG << "m_usersJobOrderChanged.push_back( i_user)";
 }
 
 //##############################################################################

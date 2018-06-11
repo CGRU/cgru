@@ -73,6 +73,9 @@ struct DlThread::ThreadData
 	/* true when signaled with Cancel() */
 	bool m_must_cancel;
 
+	/* new thread stack size */
+	int m_stack_size;
+
 	/* true if the thread is to be started in a detached state. */
 	bool m_start_detached;
 
@@ -109,6 +112,7 @@ DlThread::DlThread()
 	m_data = new ThreadData;
 
 	m_data->m_must_cancel = false;
+	m_data->m_stack_size = 0;
 	m_data->m_start_detached = false;
 	m_data->m_handle = 0;
 
@@ -156,6 +160,12 @@ void DlThread::SetDetached()
 	m_data->m_start_detached = true;
 }
 
+/* Set stack size of a new thread */
+void DlThread::SetStackSize( int i_size)
+{
+	m_data->m_stack_size = i_size;
+}
+
 /*
 	thread_routine
 	Start
@@ -197,7 +207,7 @@ void* DlThread::thread_routine(void *i_params)
 	return 0;
 }
 
-void DlThread::Start(void (*i_thread_func)(void*), void *i_arg)
+int DlThread::Start(void (*i_thread_func)(void*), void *i_arg)
 {
 	assert(!m_data->m_handle);
 
@@ -227,12 +237,18 @@ void DlThread::Start(void (*i_thread_func)(void*), void *i_arg)
 	   Right now, there isn't so we don't bother.
 	*/
 	unsigned thread_id;
+	unsigned initflag = 0;
+
+	if( m_data->m_stack_size )
+	{
+		initflag = STACK_SIZE_PARAM_IS_A_RESERVATION;
+	}
 	
 	HANDLE handle = (HANDLE) _beginthreadex(
 		0x0,
-		0,
+		m_data->m_stack_size,
 		&thread_routine, this,
-		0,
+		initflag,
 		&thread_id);
 
 	if( detached )
@@ -243,16 +259,24 @@ void DlThread::Start(void (*i_thread_func)(void*), void *i_arg)
 	{
 		m_data->m_handle = handle;
 	}
+
+	return 0;
 #else
 	pthread_attr_t attr;
 	pthread_attr_init( &attr );
+
+	if( m_data->m_stack_size )
+	{
+		pthread_attr_setstacksize( &attr, m_data->m_stack_size);
+	}
+
 	if( detached )
 	{
 		pthread_attr_setdetachstate( &attr, PTHREAD_CREATE_DETACHED );
 	}
 
 	pthread_t handle = 0;
-	pthread_create( &handle, &attr, &thread_routine, this );
+	int value = pthread_create( &handle, &attr, &thread_routine, this );
 
 	pthread_attr_destroy( &attr );
 
@@ -260,6 +284,8 @@ void DlThread::Start(void (*i_thread_func)(void*), void *i_arg)
 	{
 		m_data->m_handle = handle;
 	}
+
+	return value;
 #endif
 }
 

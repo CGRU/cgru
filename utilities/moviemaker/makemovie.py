@@ -42,7 +42,7 @@ Parser = OptionParser(
 )
 
 Parser.add_option('-a', '--avcmd',      dest='avcmd',       type  ='string',     default='ffmpeg',    help='AV tool command')
-Parser.add_option('-c', '--codec',      dest='codec',       type  ='string',     default='photojpg_best', help='Encode command file')
+Parser.add_option('-c', '--codec',      dest='codec',       type  ='string',     default='h264_mid',  help='Encode command file')
 Parser.add_option('-f', '--fps',        dest='fps',         type  ='string',     default='25',        help='Frames per second')
 Parser.add_option('-t', '--template',   dest='template',    type  ='string',     default='',          help='Specify frame template to use')
 Parser.add_option('-s', '--slate',      dest='slate',       type  ='string',     default='',          help='Specify slate frame template')
@@ -65,9 +65,7 @@ Parser.add_option('--tmpdir',           dest='tmpdir',      type  ='string',    
 Parser.add_option('--tmpformat',        dest='tmpformat',   type  ='string',     default='tga',       help='Temporary images format')
 Parser.add_option('--tmpquality',       dest='tmpquality',  type  ='string',     default='',          help='Temporary image quality, or format options')
 Parser.add_option('--audio',            dest='audio',       type  ='string',     default=None,        help='Add sound from audio file')
-Parser.add_option('--afreq',            dest='afreq',       type  ='int',        default=22000,       help='Audio frequency')
-Parser.add_option('--akbits',           dest='akbits',      type  ='int',        default=128,         help='Audio kilo bits rate')
-Parser.add_option('--acodec',           dest='acodec',      type  ='string',     default='libmp3lame',help='Audio codec')
+Parser.add_option('--acodec',           dest='acodec',      type  ='string',     default='aac',       help='Audio codec')
 
 # Options to makeframe:
 Parser.add_option('-r', '--resolution', dest='resolution',     type  ='string',     default='',          help='Format: 768x576, if empty images format used')
@@ -535,17 +533,16 @@ name_precomp = []
 
 # Extract audio track(s) from file to flac if it is not flac already:
 if Audio is not None:
-	if not os.path.isfile(Audio):
-		print('Audio file "%s" does not exist.' % Audio)
-		Audio = None
-	elif len(Audio) >= 5:
-		if Audio[-5:] != '.flac':
-			cmd_precomp.append(
-				'ffmpeg -y -i "%(audio)s" -vn -acodec flac "%(audio)s.flac"' %
-				{'audio': Audio}
-			)
-			name_precomp.append('Audio "%s"' % os.path.basename(Audio))
-			Audio += '.flac'
+    if not os.path.isfile(Audio):
+        print('Audio file "%s" does not exist.' % Audio)
+        Audio = None
+    else:
+        audio_name, audio_ext = os.path.splitext(Audio)
+        if audio_ext != '.flac':
+            audio_flac = '%s.%s' % (audio_name,'flac')
+            cmd_precomp.append('ffmpeg -y -i "%s" -vn -acodec flac "%s"' % (Audio,audio_flac))
+            name_precomp.append('Audio "%s"' % os.path.basename(Audio))
+            Audio = audio_flac
 
 # Reformat logo:
 logopath = [Options.lgspath, Options.lgfpath]
@@ -664,8 +661,6 @@ if Audio is not None and EncType == 'ffmpeg':
 	inputmask += ' -itsoffset %.3f' % ( 1.0 / float(Options.fps))
 	inputmask += ' -i "%s"' % Audio
 	inputmask += ' -shortest'
-	inputmask += ' -ar %d' % Options.afreq
-	inputmask += ' -ab %dk' % Options.akbits
 	inputmask += ' -acodec "%s' % Options.acodec
 
 # Process avcmd:

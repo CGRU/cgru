@@ -116,8 +116,8 @@ if Options.ftppass is not None: CmdFtp.extend(['-p',Options.ftppass])
 CmdFtp.extend([Options.ftp, Options.dest, Options.source])
 
 
-CmdCPFile = 'cp -p "%s" "%s"'
-CmdCPDir = 'cp -rp "%s" "%s"'
+CmdCPFile = 'cp "%s" "%s"'
+CmdCPDir = 'cp -r "%s" "%s"'
 if sys.platform.find('win') == 0:
 	CmdCPFile = 'COPY "%s" "%s"'
 	CmdCPDir = 'XCOPY "%s" "%s" /YSIR'

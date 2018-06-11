@@ -59,6 +59,11 @@ public:
 
    bool isInitialized( void ) const { return true; }
 
+   // Will just increase semaphore count, with no item push.
+   // It will cause waking pop() with a NULL item pointer.
+   // Needed to wake up waiting threads to join them on application exit.
+   void releaseNull();
+
 protected:
 
 /// Return first item from queue. BLOCKING FUNCTION if \c block==e_wait .

@@ -26,9 +26,7 @@ public:
             af::TaskProgress * taskProgress,
             Block * taskBlock,
             RenderAf * render,
-            MonitorContainer * monitoring,
-            int32_t * i_running_tasks_counter,
-            int64_t * i_running_capacity_counter
+            MonitorContainer * monitoring
             );
 
    virtual ~TaskRun();
@@ -38,7 +36,7 @@ public:
 	inline bool notZombie() const { return m_zombie == false;}
 
 /// Update task state by sent message, almost often from remote render host
-   virtual void update( const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost);
+	virtual void update(const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & o_error_host);
 
 /// Do some work every period of time. Return true if there are some changes for database and monitoring.
    virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId);
@@ -76,10 +74,10 @@ protected:
    af::TaskProgress * m_progress;
    int m_tasknum;
    int m_hostId;       ///< Task Host Id
+	int64_t * m_running_capacity_counter;
 
 private:
 	int32_t * m_running_tasks_counter;
-	int64_t * m_running_capacity_counter;
 
    uint32_t m_stopTime;         ///< Time, when running task was asked to stop.
    bool m_zombie;

@@ -5,6 +5,6 @@ parser = 'maya_arnold'
 
 
 class maya_arnold(service.service):
-	"""Maya To Arnold
-	"""
-	pass
+    """Maya To Arnold
+    """
+    pass

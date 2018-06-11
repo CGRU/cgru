@@ -52,8 +52,6 @@ public:
 	/// This method taks the ownership of `i_taskexec`
 	void reconnectTask( af::TaskExec * i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring);
 
-	void taskFinished( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
-
 	/// Refresh block. Retrun true if block progress changed, needed for jobs monitoring (watch jobs list).
 	virtual bool v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
 
@@ -63,6 +61,9 @@ public:
 	bool action( Action & i_action);
 
 	bool tasksDependsOn( int block);
+
+	void addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
+	void remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
 
 public:
 	JobAf * m_job;
@@ -93,9 +94,11 @@ private:
 
 	const std::string getStoreTasksFileName() const;
 
-	void skipRestartTasks( bool i_skip, const std::string i_message, const Action & i_action, const JSON & i_operation, uint32_t i_state = 0);
+	void skipRestartTasks( bool i_skip, const std::string & i_message, const Action & i_action, const JSON & i_operation, uint32_t i_state = 0);
 
-	void addRenderCounts( RenderAf * render);
-	int  getRenderCounts( RenderAf * render) const;
-	void remRenderCounts( RenderAf * render);
+	void addRenderCount(RenderAf * i_render);
+	int  getRenderCount(RenderAf * i_render) const;
+	void remRenderCount(RenderAf * i_render);
+
 };
+

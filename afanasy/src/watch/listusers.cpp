@@ -57,22 +57,19 @@ ListUsers::ListUsers( QWidget* parent):
 	ButtonPanel * bp;
 
 	bp = addButtonPanel("LOG","users_log","Show user log.");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestLog()));
-
-	bp = addButtonPanel("PRI","users_priority","Set user priority.");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actPriority()));
-
-	bp = addButtonPanel("FOR","users_errors_forgive_time","Set user errors forgive time.");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actErrorsForgiveTime()));
-
-	bp = addButtonPanel("LIFE","users_jobs_life_time","Set jobs life time.");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actJobsLifeTime()));
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRequestLog()));
 
 	bp = addButtonPanel("ORD","users_solve_ordered","Solve jobs by order.");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actSolveJobsByOrder()));
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actSolveJobsByOrder()));
 
-	bp = addButtonPanel("PAR","users_solve_parallel","Solve jobs parallel.");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actSolveJobsParallel()));
+	bp = addButtonPanel("PRI","users_solve_priority","Solve jobs by priority.");
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actSolveJobsByPriority()));
+
+	bp = addButtonPanel("CAP","users_solve_capacity","Solve jobs need by capacity.");
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actSolveJobsByCapacity()));
+
+	bp = addButtonPanel("TSK","users_solve_tasksnum","Solve jobs need by tasks number.");
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actSolveJobsByTasksNum()));
 
 
 	m_parentWindow->setWindowTitle("Users");
@@ -118,6 +115,9 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 		action = new QAction( "Set Max Running Tasks", this);
 		connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunningTasks() ));
 		menu.addAction( action);
+		action = new QAction( "Set Max Run Tasks Per Host", this);
+		connect(action, SIGNAL(triggered() ), this, SLOT(actMaxRunTasksPerHost()));
+		menu.addAction( action);
 		action = new QAction( "Set Hosts Mask", this);
 		connect( action, SIGNAL( triggered() ), this, SLOT( actHostsMask() ));
 		menu.addAction( action);
@@ -157,13 +157,21 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 
 		submenu = new QMenu("Jobs Solving Method", this);
 
-		action = new QAction("By Order", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actSolveJobsByOrder() ));
-		submenu->addAction( action);
+		action = new QAction("Method By Order", this);
+		connect(action, SIGNAL(triggered()), this, SLOT(actSolveJobsByOrder()));
+		submenu->addAction(action);
 
-		action = new QAction("Parallel", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actSolveJobsParallel() ));
-		submenu->addAction( action);
+		action = new QAction("Method By Priority", this);
+		connect(action, SIGNAL(triggered()), this, SLOT(actSolveJobsByPriority()));
+		submenu->addAction(action);
+
+		action = new QAction("Need By Capacity", this);
+		connect(action, SIGNAL(triggered()), this, SLOT(actSolveJobsByCapacity()));
+		submenu->addAction(action);
+
+		action = new QAction("Need By Run Tasks", this);
+		connect(action, SIGNAL(triggered()), this, SLOT(actSolveJobsByTasksNum()));
+		submenu->addAction(action);
 
 		menu.addMenu( submenu);
 
@@ -176,7 +184,7 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 		menu.addSeparator();
 
 		action = new QAction( "Delete", this);
-		action->setEnabled( useritem->numjobs == 0 );
+		action->setEnabled(useritem->jobs_num == 0);
 		connect( action, SIGNAL( triggered() ), this, SLOT( actDelete() ));
 		menu.addAction( action);
 	}
@@ -248,7 +256,7 @@ void ListUsers::calcTitle()
 	for( int i = 0; i < total; i++)
 	{
 		ItemUser * itemuser = (ItemUser*)(m_model->item(i));
-		if( itemuser->numrunningtasks > 0 ) running++;
+		if (itemuser->running_tasks_num > 0) running++;
 	}
 	m_parentWindow->setWindowTitle(QString("U[%1]: %2R").arg( total).arg( running));
 }
@@ -322,13 +330,26 @@ void ListUsers::actMaxRunningTasks()
 {
 	ItemUser* useritem = (ItemUser*)getCurrentItem();
 	if( useritem == NULL ) return;
-	int current = useritem->maxrunningtasks;
+	int current = useritem->max_running_tasks;
 
 	bool ok;
 	int max = QInputDialog::getInt(this, "Change Maximum Running Tasks", "Enter Number", current, -1, 9999, 1, &ok);
 	if( !ok) return;
 
 	setParameter("max_running_tasks", max);
+}
+
+void ListUsers::actMaxRunTasksPerHost()
+{
+	ItemUser * useritem = (ItemUser*)getCurrentItem();
+	if (useritem == NULL) return;
+	int current = useritem->max_running_tasks_per_host;
+
+	bool ok;
+	int max = QInputDialog::getInt(this, "Change Max Run Tasks Per Host", "Enter Number", current, -1, 9999, 1, &ok);
+	if( !ok) return;
+
+	setParameter("max_running_tasks_per_host", max);
 }
 
 void ListUsers::actHostsMask()
@@ -358,8 +379,10 @@ void ListUsers::actHostsMaskExclude()
 }
 
 void ListUsers::actDelete() { operation("delete"); }
-void ListUsers::actSolveJobsByOrder()  { setParameter("solve_parallel", "false", false); }
-void ListUsers::actSolveJobsParallel() { setParameter("solve_parallel", "true",  false); }
+void ListUsers::actSolveJobsByOrder()    { setParameter("solve_method", "solve_order",    true); }
+void ListUsers::actSolveJobsByPriority() { setParameter("solve_method", "solve_priority", true); }
+void ListUsers::actSolveJobsByCapacity() { setParameter("solve_need",   "solve_capacity", true); }
+void ListUsers::actSolveJobsByTasksNum() { setParameter("solve_need",   "solve_tasksnum", true); }
 
 void ListUsers::actRequestLog() { getItemInfo("log"); }
 

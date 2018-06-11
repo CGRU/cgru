@@ -1,3 +1,18 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	This is a server side of an Afanasy job.
+*/
 #include "jobaf.h"
 
 #include "../include/afanasy.h"
@@ -9,8 +24,9 @@
 
 #include "action.h"
 #include "afcommon.h"
-#include "aflistit.h"
 #include "block.h"
+#include "branchescontainer.h"
+#include "branchsrv.h"
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
 #include "renderaf.h"
@@ -29,7 +45,7 @@ JobContainer *JobAf::ms_jobs  = NULL;
 
 JobAf::JobAf( JSON & i_object):
 	af::Job(),
-	AfNodeSrv( this)
+	AfNodeSolve( this)
 {
 	initializeValues();
 	
@@ -45,7 +61,7 @@ JobAf::JobAf( JSON & i_object):
 
 JobAf::JobAf( const std::string & i_store_dir, bool i_system):
 	af::Job(),
-	AfNodeSrv( this, i_store_dir)
+	AfNodeSolve( this, i_store_dir)
 {
 	AF_DEBUG << "store dir = " << i_store_dir;
 	
@@ -99,6 +115,7 @@ void JobAf::readStore()
 
 void JobAf::initializeValues()
 {
+	m_branch_srv       = NULL;
 	m_user             = NULL;
 	m_blocks           = NULL;
 	m_progress         = NULL;
@@ -199,6 +216,12 @@ void JobAf::setUser( UserAf * i_user)
 		m_blocks[b]->setUser( i_user);
 	}
 	m_user_name = i_user->getName();
+}
+
+void JobAf::setBranch(BranchSrv * i_branch)
+{
+	m_branch_srv = i_branch;
+	m_branch = m_branch_srv->getName();
 }
 
 bool JobAf::initialize()
@@ -318,16 +341,16 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 			emitEvents(events);
 		}
 		
-		if( getRunningTasksNumber() && (renders != NULL) && (monitoring != NULL))
+		if (getRunningTasksNum() && (renders != NULL) && (monitoring != NULL))
 		{
 			restartAllTasks("Job deletion.", renders, monitoring, AFJOB::STATE_RUNNING_MASK);
 			if( monitoring ) monitoring->addJobEvent( af::Monitor::EVT_jobs_change, getId(), getUid());
 			return;
 		}
 	}
-	if( getRunningTasksNumber() )
+	if (getRunningTasksNum())
 	{
-		AF_ERR << "runningtaskscounter = " << getRunningTasksNumber();
+		AF_ERR << "runningtaskscounter = " << getRunningTasksNum();
 		return;
 	}
 	
@@ -348,8 +371,15 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 	setZombie();
 	
 	AFCommon::DBAddJob( this);
+
+	m_branch_srv->removeJob(this, m_user);
 	
-	if( monitoring ) monitoring->addJobEvent( af::Monitor::EVT_jobs_del, getId(), getUid());
+	if(monitoring)
+	{
+		monitoring->addJobEvent(af::Monitor::EVT_jobs_del, getId(), getUid());
+		monitoring->addEvent(af::Monitor::EVT_branches_change, m_branch_srv->getId());
+	}
+
 	AFCommon::QueueLog("Deleting a job: " + v_generateInfoString());
 	unLock();
 }
@@ -450,17 +480,21 @@ void JobAf::v_action( Action & i_action)
 		   restartAllTasks("Job stopped by " + i_action.author, i_action.renders, i_action.monitors, AFJOB::STATE_RUNNING_MASK);
 		   m_state = m_state | AFJOB::STATE_OFFLINE_MASK;
 		}
+		else if( type == "restart_warnings")
+		{
+			restartAllTasks("Job restart warnings by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_WARNING_MASK);
+		}
 		else if( type == "restart_running")
 		{
-			restartAllTasks("Job restarted running by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_RUNNING_MASK);
+			restartAllTasks("Job restart running by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_RUNNING_MASK);
 		}
 		else if( type == "restart_skipped")
 		{
-			restartAllTasks("Job restarted skipped by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_SKIPPED_MASK);
+			restartAllTasks("Job restart skipped by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_SKIPPED_MASK);
 		}
 		else if( type == "restart_done")
 		{
-			restartAllTasks("Job restarted done by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_DONE_MASK);
+			restartAllTasks("Job restart done by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_DONE_MASK);
 		}
 		else if( type == "reset_error_hosts")
 		{
@@ -469,9 +503,7 @@ void JobAf::v_action( Action & i_action)
 		}
 		else if( type == "restart")
 		{
-			//printf("Msg::TJobRestart:\n");
 			restartAllTasks("Job restarted by " + i_action.author,  i_action.renders, i_action.monitors);
-			//printf("Msg::TJobRestart: tasks restarted.\n");
 			checkDepends();
 			m_time_started = 0;
 		}
@@ -489,6 +521,7 @@ void JobAf::v_action( Action & i_action)
 		else
 		{
 			appendLog("Unknown operation \"" + type + "\" by " + i_action.author);
+			i_action.answer = "Unknown operation '" + type + "\"";
 			return;
 		}
 		appendLog("Operation \"" + type + "\" by " + i_action.author);
@@ -497,38 +530,62 @@ void JobAf::v_action( Action & i_action)
 		return;
 	}
 
-	// Store user name before parameters read, to check whether it changed
-	const std::string user_name = m_user_name;
+	// Store some parameters before read, to check whether it changed
+	const std::string _user_name = m_user_name;
+	const std::string _branch = m_branch;
 
 	const JSON & params = (*i_action.data)["params"];
 	if( params.IsObject())
 		jsonRead( params, &i_action.log);
 
-	if( m_user_name != user_name )
+	if( m_user_name != _user_name )
 	{
 		// User name was changed
+
 		UserAf * user = i_action.users->getUser( m_user_name);
 		if( user == NULL )
 		{
+			i_action.answer = "User does not exist: '" + m_user_name + "'";
+			m_user_name = _user_name;
 			return;
 		}
-		
+
 		i_action.monitors->addEvent(    af::Monitor::EVT_users_change, m_user->getId());
 		i_action.monitors->addJobEvent( af::Monitor::EVT_jobs_del, getId(), m_user->getId());
-		
+
 		m_user->removeJob( this);
-		user->addJob( this);
-		
+		user->addJob( this);  //< UserAf::addJob() updates JobAf::m_user
+
 		i_action.monitors->addEvent(    af::Monitor::EVT_users_change, m_user->getId());
 		i_action.monitors->addJobEvent( af::Monitor::EVT_jobs_add, getId(), m_user->getId());
-		
+
 		store();
 
 		return;
 	}
 
-	if( i_action.log.size() )
+	if (m_branch != _branch)
 	{
+		// Branch was changed
+
+		BranchSrv * new_branch_srv = i_action.branches->getBranch(m_branch);
+		if (new_branch_srv == NULL)
+		{
+			i_action.answer = "New job branch not found: '" + m_branch + "'";
+			m_branch = _branch;
+			return;
+		}
+
+		m_branch_srv->removeJob(this, m_user);
+		i_action.monitors->addEvent(af::Monitor::EVT_branches_change, m_branch_srv->getId());
+
+		new_branch_srv->addJob(this, m_user);
+		i_action.monitors->addEvent(af::Monitor::EVT_branches_change, m_branch_srv->getId());
+	}
+
+	if (i_action.log.size())
+	{
+		// Not empty log means some parameter change:
 		store();
 		i_action.monitors->addJobEvent( af::Monitor::EVT_jobs_change, getId(), getUid());
 	}
@@ -536,8 +593,7 @@ void JobAf::v_action( Action & i_action)
 
 void JobAf::v_priorityChanged( MonitorContainer * i_monitoring)
 {
-	if( i_monitoring ) i_monitoring->addUser( m_user);
-	ms_jobs->sortPriority( this);
+	m_user->jobPriorityChanged( this, i_monitoring);
 }
 
 void JobAf::setUserListOrder( int index, bool updateDtabase)
@@ -588,47 +644,6 @@ void JobAf::checkDepends()
 	}
 	
 	if( depend_local || depend_global ) m_state = m_state | AFJOB::STATE_WAITDEP_MASK;
-}
-
-void JobAf::addRenderCounts( RenderAf * render)
-{
-	std::list<RenderAf*>::iterator rit = renders_ptrs.begin();
-	std::list<int>::iterator cit = renders_counts.begin();
-	for( ; rit != renders_ptrs.end(); rit++, cit++)
-		if( render == *rit )
-		{
-			(*cit)++;
-			return;
-		}
-	renders_ptrs.push_back( render);
-	renders_counts.push_back( 1);
-}
-
-int JobAf::getRenderCounts( RenderAf * render) const
-{
-	std::list<RenderAf*>::const_iterator rit = renders_ptrs.begin();
-	std::list<int>::const_iterator cit = renders_counts.begin();
-	for( ; rit != renders_ptrs.end(); rit++, cit++)
-		if( render == *rit ) return *cit;
-	return 0;
-}
-
-void JobAf::remRenderCounts( RenderAf * render)
-{
-	std::list<RenderAf*>::iterator rit = renders_ptrs.begin();
-	std::list<int>::iterator cit = renders_counts.begin();
-	for( ; rit != renders_ptrs.end(); rit++, cit++)
-		if( render == *rit )
-		{
-			if( *cit > 1 )
-				(*cit)--;
-			else
-			{
-				renders_ptrs.erase( rit);
-				renders_counts.erase( cit);
-			}
-			return;
-		}
 }
 
 af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<int> * blocksIds, MonitorContainer * monitoring)
@@ -782,35 +797,11 @@ bool JobAf::v_canRun()
 		return false;
 	}
 	
-	// Zero priority turns job off:
-	if( m_priority == 0 )
-	{
-		return false;
-	}
-	
-	// check maximum running tasks:
-	if(( m_max_running_tasks >= 0 ) && ( getRunningTasksNumber() >= m_max_running_tasks ))
-	{
-		return false;
-	}
-	
-	// check maximum running tasks per host:
-	if(  m_max_running_tasks_per_host == 0 )
-	{
-		return false;
-	}
-	
 	return true;
 }
 
 bool JobAf::v_canRunOn( RenderAf * i_render)
 {
-	if( false == v_canRun())
-	{
-		// Unable to run at all
-		return false;
-	}
-	
 	// Check Render Nimby:
 	if( false == isIgnoreNimbyFlag())
 	{
@@ -829,12 +820,6 @@ bool JobAf::v_canRunOn( RenderAf * i_render)
 			return false;
 	}
 
-	// check maximum running tasks per host:
-	if(( m_max_running_tasks_per_host  > 0 ) && ( getRenderCounts(i_render) >= m_max_running_tasks_per_host ))
-	{
-		return false;
-	}
-	
 	// check at least one block can run on render
 	bool blockCanRunOn = false;
 	for( int b = 0; b < m_blocks_num; b++)
@@ -847,18 +832,6 @@ bool JobAf::v_canRunOn( RenderAf * i_render)
 	}
 	if( false == blockCanRunOn )
 		return false;
-	
-	// check hosts mask:
-	if( false == checkHostsMask( i_render->getName()))
-	{
-		return false;
-	}
-	
-	// check exclude hosts mask:
-	if( false == checkHostsMaskExclude( i_render->getName()))
-	{
-		return false;
-	}
 	
 	// check needed os:
 	if( false == checkNeedOS( i_render->getHost().m_os))
@@ -875,7 +848,36 @@ bool JobAf::v_canRunOn( RenderAf * i_render)
 	return true;
 }
 
-bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
+void JobAf::addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
+{
+	m_user->addSolveCounts(i_monitoring, i_exec, i_render);
+	m_branch_srv->addSolveCounts(i_monitoring, i_exec, i_render, m_user);
+
+	AfNodeSolve::addSolveCounts(i_exec, i_render);
+	i_monitoring->addJobEvent(af::Monitor::EVT_jobs_change, getId(), m_user->getId());
+}
+
+void JobAf::remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
+{
+	m_user->remSolveCounts(i_monitoring, i_exec, i_render);
+	m_branch_srv->remSolveCounts(i_monitoring, i_exec, i_render, m_user);
+
+	AfNodeSolve::remSolveCounts(i_exec, i_render);
+	i_monitoring->addJobEvent(af::Monitor::EVT_jobs_change, getId(), m_user->getId());
+}
+
+RenderAf * JobAf::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring, BranchSrv * i_branch)
+{
+	for( std::list<RenderAf*>::iterator rIt = i_renders_list.begin(); rIt != i_renders_list.end(); rIt++)
+	{
+		if( solveOnRender( *rIt, i_monitoring))
+			return *rIt;
+	}
+
+	return NULL;
+}
+
+bool JobAf::solveOnRender( RenderAf * i_render, MonitorContainer * i_monitoring)
 {
 	// Prepare for the new solving (reset previous solvind stored data):
 	for( int b = 0; b < m_blocks_num; b++)
@@ -895,7 +897,7 @@ bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
 	{
 		if( false == ( m_blocks_data[b]->getState() & AFJOB::STATE_READY_MASK )) continue;
 		
-		int task_num = m_blocks_data[b]->getReadyTaskNumber( m_progress->tp[b], m_flags, render);
+		int task_num = m_blocks_data[b]->getReadyTaskNumber( m_progress->tp[b], m_flags, i_render);
 		
 		if( task_num == AFJOB::TASK_NUM_NO_TASK )
 		{
@@ -920,7 +922,7 @@ bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
 		}
 		
 		std::list<int> blocksIds;
-		af::TaskExec *task_exec = genTask( render, b, task_num, &blocksIds, monitoring);
+		af::TaskExec *task_exec = genTask( i_render, b, task_num, &blocksIds, i_monitoring);
 		
 		// Job may became paused, if recursion during task generation detected:
 		if( m_state & AFJOB::STATE_OFFLINE_MASK )
@@ -931,7 +933,7 @@ bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
 		
 		// Check if render is online
 		// It can be solved with offline render to check whether to WOL wake it
-		if( task_exec && render->isOffline())
+		if( task_exec && i_render->isOffline())
 		{
 			delete task_exec;
 			return true;
@@ -947,11 +949,13 @@ bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
 		// Job was not able to start a task.
 		// This should not happen.
 		// This is some error situation (probably system job), see server log.
-		if( false == m_blocks[task_exec->getBlockNum()]->v_startTask( task_exec, render, monitoring))
+		if( false == m_blocks[task_exec->getBlockNum()]->v_startTask( task_exec, i_render, i_monitoring))
 		{
 			delete task_exec;
 			continue;
 		}
+
+		m_blocks[task_exec->getBlockNum()]->m_data->setTimeStarted( time(NULL) );
 		
 		// If job was not started it became started
 		if( m_time_started == 0 )
@@ -960,6 +964,10 @@ bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
 			appendLog("Started.");
 			store();
 		}
+
+		// Set RUNNING state if it was not:
+		if( false == ( m_state & AFJOB::STATE_RUNNING_MASK ))
+			m_state |= AFJOB::STATE_RUNNING_MASK;
 		
 		return true;
 	}
@@ -1001,7 +1009,7 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 	{
 		for( int b = 0; b < m_blocks_num; b++)
 			m_blocks[b]->v_refresh( currentTime, renders, monitoring);
-		if( getRunningTasksNumber() == 0 ) deleteNode( NULL, monitoring);
+		if( getRunningTasksNum() == 0 ) deleteNode( NULL, monitoring);
 	}
 	if( isLocked() ) return;
 	
@@ -1143,9 +1151,6 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 	}
 	
 	if(( monitoring ) &&  ( jobchanged )) monitoring->addJobEvent( jobchanged, getId(), getUid());
-	
-	// Update solving parameters:
-	v_calcNeed();
 }
 
 void JobAf::emitEvents(std::vector<std::string> events)
@@ -1177,14 +1182,6 @@ void JobAf::emitEvents(std::vector<std::string> events)
 		m_user_name, m_name, events[0]);
 }
 
-void JobAf::v_calcNeed()
-{
-	// Need calculation based on running tasks number
-	if( af::Environment::getSolvingUseCapacity())
-		calcNeedResouces( getRunningCapacityTotal());
-	else
-		calcNeedResouces( getRunningTasksNumber());
-}
 void JobAf::restartAllTasks( const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state)
 {
 	for( int b = 0; b < m_blocks_num; b++)

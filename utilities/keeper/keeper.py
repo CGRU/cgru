@@ -22,6 +22,15 @@ if sys.platform.find('win') == 0:
 	qtconf_file.write('Binaries = ' + pyqt4dir + '\n')
 	qtconf_file.close()
 
+if sys.platform.find('darwin') == 0:
+    try:
+        import AppKit
+        info = AppKit.NSBundle.mainBundle().infoDictionary()
+        info["LSBackgroundOnly"] = "1"
+    except:
+        print("WARNING: pyobjc-framework-Cocoa is not installed, can't hide dock icon.")
+
+
 from Qt import QtWidgets
 
 import cgruconfig

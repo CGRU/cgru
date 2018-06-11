@@ -448,9 +448,11 @@ void Msg::setInvalid()
 
 void Msg::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
-	if( m_type <= Msg::TLAST) stream << Msg::TNAMES[m_type];
-	else stream << "!UNKNOWN!";
-	stream << ": Length=" << writeSize() << ", type=" << m_type;
+	if( m_type <= Msg::TLAST)
+		stream << Msg::TNAMES[m_type];
+	else
+		stream << "!UNKNOWN!(" << m_type << ")";
+	stream << "[" << writeSize() << "]";
 }
 
 void Msg::stdOutData( bool withHeader)
@@ -572,6 +574,9 @@ const char * Msg::TNAMES[]=
 	/*- Users messages -*/
 	"TUsersList",                 ///< Active users information.
 	"TUserJobsOrder",             ///< Jobs ids in server list order.
+
+	/*- Branches messages -*/
+	"TBranchesList",              ///< Branches nodes list.
 
 	/*- Job messages -*/
 	"TJobsList",                  ///< Jobs list information.

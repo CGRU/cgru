@@ -17,13 +17,15 @@ public:
 	int errors_retries;
 	int errors_forgivetime;
 	int jobs_lifetime;
-	int maxrunningtasks;
+	int max_running_tasks;
+	int max_running_tasks_per_host;
 	QString hostsmask;
 	QString hostsmask_exclude;
 
 	QString hostname;
-	int numjobs;
-	int numrunningtasks;
+	int jobs_num;
+	int running_tasks_num;
+	int64_t running_capacity_total;
 
 	int64_t time_register;
 	int64_t time_activity;

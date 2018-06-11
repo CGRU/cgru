@@ -5,6 +5,6 @@ parser = 'hbatch_mantra'
 
 
 class hbatch_mantra(service.service):
-	"""Houdini batch execute mantra
-	"""
-	pass
+    """Houdini batch execute mantra
+    """
+    pass

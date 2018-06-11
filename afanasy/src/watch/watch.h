@@ -81,6 +81,9 @@ public:
 	static void displayWarning( const QString &message);
 	static void displayError(   const QString &message);
 
+	static void showDocs();
+	static void showForum();
+
 	static bool openMonitor( int type, bool open);
 
 	static void listenJob(  int id, const QString & name);
@@ -126,9 +129,6 @@ private:
 
 	static QLinkedList<Wnd*> ms_windows;
 	static QLinkedList<Receiver*> ms_receivers;
-
-	static QStringList ms_previewcmds;
-	static QStringList ms_rendercmds;
 
 	static QLinkedList<int> ms_listenjobids;
 	static QLinkedList<int> ms_watchtasksjobids;

@@ -34,21 +34,23 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 
 	updateNodeValues( i_node);
 
-	hostname             = afqt::stoq( user->getHostName());
-	numjobs              = user->getNumJobs();
-	numrunningtasks      = user->getRunningTasksNumber();
-	maxrunningtasks      = user->getMaxRunningTasks();
-	hostsmask            = afqt::stoq( user->getHostsMask());
-	hostsmask_exclude    = afqt::stoq( user->getHostsMaskExclude());
-	errors_avoidhost     = user->getErrorsAvoidHost();
-	errors_tasksamehost  = user->getErrorsTaskSameHost();
-	errors_retries       = user->getErrorsRetries();
-	errors_forgivetime   = user->getErrorsForgiveTime();
-	jobs_lifetime        = user->getJobsLifeTime();
-	time_register        = user->getTimeRegister();
-	time_activity        = user->getTimeActivity();
+	hostname                   = afqt::stoq(user->getHostName());
+	jobs_num                   = user->getNumJobs();
+	running_tasks_num          = user->getRunningTasksNum();
+	running_capacity_total     = user->getRunningCapacityTotal();
+	max_running_tasks          = user->getMaxRunningTasks();
+	max_running_tasks_per_host = user->getMaxRunTasksPerHost();
+	hostsmask                  = afqt::stoq(user->getHostsMask());
+	hostsmask_exclude          = afqt::stoq(user->getHostsMaskExclude());
+	errors_avoidhost           = user->getErrorsAvoidHost();
+	errors_tasksamehost        = user->getErrorsTaskSameHost();
+	errors_retries             = user->getErrorsRetries();
+	errors_forgivetime         = user->getErrorsForgiveTime();
+	jobs_lifetime              = user->getJobsLifeTime();
+	time_register              = user->getTimeRegister();
+	time_activity              = user->getTimeActivity();
 
-	if( numrunningtasks )
+	if (running_tasks_num)
 		setRunning();
 	else
 		setNotRunning();
@@ -57,11 +59,12 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 	{
 		strLeftTop = m_name;
 
-		strLeftBottom  = QString("Jobs Count: %1 / %2 Running").arg( numjobs).arg( user->getNumRunningJobs());
+		strLeftBottom = QString("Jobs Count: %1 / %2 Running").arg(jobs_num).arg(user->getNumRunningJobs());
 
 		strHCenterTop.clear();
-		strHCenterTop = QString("Priority:%1").arg( m_priority);
-		if( maxrunningtasks != -1) strHCenterTop  = QString("MaxRuningTasks:%1").arg( maxrunningtasks);
+		strHCenterTop = QString("Priority:%1").arg(m_priority);
+		if (max_running_tasks != -1) strHCenterTop += QString(" MaxRuningTasks:%1").arg(max_running_tasks);
+		if (max_running_tasks_per_host != -1) strHCenterTop = QString(" MaxRunTasksPerHost:%1").arg(max_running_tasks_per_host);
 		if( false == hostsmask.isEmpty()) strHCenterTop += QString(" HostsMask(%1)").arg( hostsmask);
 		if( false == hostsmask_exclude.isEmpty()) strHCenterTop += QString(" ExcludeHosts(%1)").arg( hostsmask_exclude);
 		strHCenterTop += Item::generateErrorsSolvingInfo( errors_avoidhost, errors_tasksamehost, errors_retries);
@@ -72,20 +75,26 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 		if( hostname.size())
 			strRightTop = QString("Latest Activity Host: %1").arg( hostname);
 
-		if( user->solveJobsParallel())
-			strRightBottom = "Parallel Jobs Solving";
+		if (user->isSolvePriority())
+			strRightBottom = "Solving: Priority";
 		else
-			strRightBottom = "Ordered Jobs Solving";
+			strRightBottom = "Solving: Ordered";
+
+		if (user->isSolveCapacity())
+			strRightBottom += ", Capacity";
+		else
+			strRightBottom += ", RunTasks";
 	}
 	else if( Watch::isJedi())
 	{
 		strLeftTop = m_name;
 
-		strLeftBottom  = QString("Jobs: %1 / %2 Run").arg( numjobs).arg( user->getNumRunningJobs());
+		strLeftBottom = QString("Jobs: %1 / %2 Run").arg(jobs_num).arg(user->getNumRunningJobs());
 
 		strHCenterTop.clear();
-		strHCenterTop = QString("Pri:%1").arg( m_priority);
-		if( maxrunningtasks != -1) strHCenterTop  = QString("MaxTasks%1").arg( maxrunningtasks);
+		strHCenterTop = QString("Pri:%1").arg(m_priority);
+		if (max_running_tasks != -1) strHCenterTop += QString(" MaxTasks:%1").arg(max_running_tasks);
+		if (max_running_tasks_per_host != -1) strHCenterTop = QString(" MaxPerHost:%1").arg(max_running_tasks_per_host);
 		if( false == hostsmask.isEmpty()) strHCenterTop += QString(" Hosts(%1)").arg( hostsmask);
 		if( false == hostsmask_exclude.isEmpty()) strHCenterTop += QString(" Exclude(%1)").arg( hostsmask_exclude);
 		strHCenterTop += Item::generateErrorsSolvingInfo( errors_avoidhost, errors_tasksamehost, errors_retries);
@@ -96,19 +105,25 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 		if( hostname.size())
 			strRightTop = QString("Host:%1").arg( hostname);
 
-		if( user->solveJobsParallel())
-			strRightBottom = "Parallel";
+		if (user->isSolvePriority())
+			strRightBottom = "Priority";
 		else
 			strRightBottom = "Ordered";
+
+		if (user->isSolveCapacity())
+			strRightBottom += " Capacity";
+		else
+			strRightBottom += " MaxTasks";
 	}
 	else
 	{
 		strLeftTop = QString("%1-%2").arg(m_name).arg( m_priority);
 
-		strLeftBottom  = 'j' + QString::number( numjobs) + '/' + QString::number( user->getNumRunningJobs());
+		strLeftBottom  = 'j' + QString::number(jobs_num) + '/' + QString::number(user->getNumRunningJobs());
 
 		strHCenterTop.clear();
-		if( maxrunningtasks != -1) strHCenterTop  = QString("m%1").arg( maxrunningtasks);
+		if (max_running_tasks != -1) strHCenterTop = QString("m%1").arg(max_running_tasks);
+		if (max_running_tasks_per_host != -1) strHCenterTop = QString(" mph%1").arg(max_running_tasks_per_host);
 		if( false == hostsmask.isEmpty()) strHCenterTop += QString(" h(%1)").arg( hostsmask);
 		if( false == hostsmask_exclude.isEmpty()) strHCenterTop += QString(" e(%1)").arg( hostsmask_exclude);
 		strHCenterTop += Item::generateErrorsSolvingInfo( errors_avoidhost, errors_tasksamehost, errors_retries);
@@ -117,10 +132,16 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 
 		strRightTop = hostname;
 
-		if( user->solveJobsParallel())
-			strRightBottom = "par";
+
+		if (user->isSolvePriority())
+			strRightBottom = "pri";
 		else
 			strRightBottom = "ord";
+
+		if (user->isSolveCapacity())
+			strRightBottom += " cap";
+		else
+			strRightBottom += " mt";
 	}
 
 	if( isLocked()) strLeftTop = "(LOCK) " + strLeftTop;
@@ -165,7 +186,7 @@ void ItemUser::paint( QPainter *painter, const QStyleOptionViewItem &option) con
 	//
 	// Draw stars:
 	//
-	int numstars = numrunningtasks;
+	int numstars = running_tasks_num;
 	if( numstars <= 0 )
 		return;
 
@@ -196,9 +217,12 @@ void ItemUser::paint( QPainter *painter, const QStyleOptionViewItem &option) con
 		sx += stars_delta;
 	}
 
+	QString running_str = QString("T:%1").arg(running_tasks_num);
+	running_str += QString(" / C:%1").arg(af::toKMG(running_capacity_total).c_str());
+
 	painter->setFont( afqt::QEnvironment::f_name);
 	painter->setPen( afqt::QEnvironment::clr_textstars.c);
-	painter->drawText( x, y, w, HeightUser, Qt::AlignHCenter | Qt::AlignBottom, QString::number(numrunningtasks));
+	painter->drawText( x, y, w, HeightUser, Qt::AlignHCenter | Qt::AlignBottom, running_str);
 }
 
 void ItemUser::setSortType( int i_type1, int i_type2 )
@@ -219,10 +243,10 @@ void ItemUser::setSortType( int i_type1, int i_type2 )
 			m_sort_str1 = hostname;
 			break;
 		case CtrlSortFilter::TNUMJOBS:
-			m_sort_int1 = numjobs;
+			m_sort_int1 = jobs_num;
 			break;
 		case CtrlSortFilter::TNUMRUNNINGTASKS:
-			m_sort_int1 = numrunningtasks;
+			m_sort_int1 = running_tasks_num;
 			break;
 		case CtrlSortFilter::TTIMEREGISTERED:
 			m_sort_int1 = time_register;
@@ -248,10 +272,10 @@ void ItemUser::setSortType( int i_type1, int i_type2 )
 			m_sort_str2 = hostname;
 			break;
 		case CtrlSortFilter::TNUMJOBS:
-			m_sort_int2 = numjobs;
+			m_sort_int2 = jobs_num;
 			break;
 		case CtrlSortFilter::TNUMRUNNINGTASKS:
-			m_sort_int2 = numrunningtasks;
+			m_sort_int2 = running_tasks_num;
 			break;
 		case CtrlSortFilter::TTIMEREGISTERED:
 			m_sort_int2 = time_register;

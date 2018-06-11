@@ -112,10 +112,9 @@ while frame <= frame_end:
             while afile.find('%') != -1:
                 afile = afile % frame
 
-            fobj = open( afile,'w')
-            for i in range(0,10):
-                fobj.write('0123456789')
-            fobj.close()
+            cmd = 'convert -verbose -size 640x480 xc:Black -gravity West -fill White -pointsize 100 -annotate +0+0 "%s" "%s"'
+            cmd = cmd % ( "Frame: %d" % frame, afile)
+            os.system( cmd)
 
             print('@IMAGE@' + afile)
 

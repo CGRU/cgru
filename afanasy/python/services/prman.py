@@ -5,6 +5,6 @@ parser = 'prman'
 
 
 class prman(service.service):
-	"""PIXAR's RenderMan
-	"""
-	pass
+    """PIXAR's RenderMan
+    """
+    pass

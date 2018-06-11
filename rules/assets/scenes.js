@@ -40,7 +40,7 @@ function sc_InitHTML( i_data)
 	$('asset').innerHTML = i_data;
 
 	gui_Create( $('scenes_make_thumbnails'), sc_thumb_params);
-	gui_CreateChoises({"wnd":$('scenes_make_thumbnails'),"name":'colorspace',"value":RULES.thumbnail.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
+	gui_CreateChoices({"wnd":$('scenes_make_thumbnails'),"name":'colorspace',"value":RULES.thumbnail.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
 
 	if( sc_scenes )
 	{
@@ -64,7 +64,7 @@ function scene_Show()
 	var folders = g_elCurFolder.m_dir.folders;
 	for( var f = 0; f < folders.length; f++ )
 	{
-		if( c_AuxFolder( folders[f].name)) continue;
+		if( c_AuxFolder( folders[f])) continue;
 
 		var path = g_elCurFolder.m_path + '/' + folders[f].name;
 
@@ -257,7 +257,7 @@ function scenes_Received( i_data, i_args)
 	for( var sc = 0; sc < walk.folders.length; sc++)
 	{
 		var fobj = walk.folders[sc];
-		if( c_AuxFolder( fobj.name)) continue;
+		if( c_AuxFolder( fobj)) continue;
 
 		var elScene = document.createElement('div');
 		sc_elScenes.push( elScene);
@@ -288,7 +288,7 @@ function scenes_Received( i_data, i_args)
 		for( var s = 0; s < walk.folders[sc].folders.length; s++)
 		{
 			var fobj = walk.folders[sc].folders[s];
-			if( c_AuxFolder( fobj.name)) continue;
+			if( c_AuxFolder( fobj)) continue;
 
 			var elShot = document.createElement('div');
 			sc_elShots.push( elShot);
@@ -989,6 +989,9 @@ function scenes_ExportTable()
 
 	for( var i = 0; i < elShots.length; i++)
 	{
+		if( elShots[i].m_filtered )
+			continue;
+
 		var shot = {};
 		shot.path = elShots[i].m_path;
 		shot.status = elShots[i].m_status.obj;

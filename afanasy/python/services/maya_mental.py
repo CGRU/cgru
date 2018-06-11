@@ -5,6 +5,6 @@ parser = 'maya_mental'
 
 
 class maya_mental(service.service):
-	"""Maya To Mental Ray
-	"""
-	pass
+    """Maya To Mental Ray
+    """
+    pass

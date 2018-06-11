@@ -8,7 +8,7 @@ if( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
 endif( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
 
 if(WIN32)
-   target_link_libraries(afrender Ws2_32.lib Iphlpapi.lib)
+   target_link_libraries(afrender Ws2_32.lib Iphlpapi.lib PowrProf.lib)
 endif(WIN32)
 
 if(APPLE)

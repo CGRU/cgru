@@ -18,50 +18,58 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-void threadRunJSON( ThreadArgs * i_args, const af::Msg * i_msg);
+af::Msg * threadRunJSON( ThreadArgs * i_args, const af::Msg * i_msg);
 
-void threadRunCycleCase( ThreadArgs * i_args, af::Msg * i_msg)
+af::Msg * threadRunCycleCase( ThreadArgs * i_args, af::Msg * i_msg)
 {
-switch ( i_msg->type())
-{
+	switch ( i_msg->type())
+	{
 	case af::Msg::THTTP:
 	case af::Msg::TJSON:
 	case af::Msg::TJSONBIN:
 	{
-		threadRunJSON( i_args, i_msg);
-		break;
-	}
-	case af::Msg::TRenderUpdate:
-	{
-		af::RenderUpdate rup( i_msg);
-		for( int i = 0; i < rup.m_taskups.size(); i++)
-			i_args->jobs->updateTaskState( *rup.m_taskups[i], i_args->renders, i_args->monitors);
-		break;
+		return threadRunJSON( i_args, i_msg);
 	}
 	case af::Msg::TMonitorDeregister:
 	{
 		MonitorContainerIt it( i_args->monitors);
 		MonitorAf* node = it.getMonitor( i_msg->int32());
-		if( node ) node->deregister();
-		break;
+		if( node )
+		{
+			node->deregister();
+			return af::jsonMsgInfo("log", "Deregistered.");
+		}
+		else
+			return af::jsonMsgError("No monitor with provided ID found.");
 	}
 	case af::Msg::TRenderDeregister:
 	{
 		RenderContainerIt rendersIt( i_args->renders);
 		RenderAf* render = rendersIt.getRender( i_msg->int32());
-		if( render != NULL) render->deregister( i_args->jobs, i_args->monitors);
-		break;
+		if( render )
+		{
+			render->deregister( i_args->jobs, i_args->monitors);
+			return af::jsonMsgInfo("log", "Deregistered.");
+		}
+		else
+			return af::jsonMsgError("No render with provided ID found.");
 	}
 	case af::Msg::TConfirm:
 	{
-		AFCommon::QueueLog( std::string("af::Msg::TConfirm: ") + af::itos( i_msg->int32()));
-		break;
+		std::string confirm = "af::Msg::TConfirm: ";
+		confirm += af::itos( i_msg->int32());
+		AFCommon::QueueLog( confirm);
+		return af::jsonMsgInfo("log", confirm);
 	}
 	default:
 	{
-		AFCommon::QueueLogError( std::string("Run: Unknown message recieved: ") + i_msg->v_generateInfoString( false));
-		break;
+		std::string errlog = "Unknown message was received by run thread: ";
+		errlog += i_msg->v_generateInfoString( false);
+		AFCommon::QueueLogError( errlog);
+		return af::jsonMsgError( errlog);
 	}
+	}
+
+	return af::jsonMsgInfo("log","Message was processed by Run thread with no details.");
 }
-delete i_msg;
-}
+

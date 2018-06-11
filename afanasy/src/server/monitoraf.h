@@ -32,7 +32,7 @@ public:
 
 	static void setMonitorContainer( MonitorContainer * i_monitors) { m_monitors = i_monitors;}
 
-	void addEvents( int i_type, const std::list<int32_t> i_ids);
+	void addEvents( int i_type, const std::list<int32_t> & i_ids);
 
 	af::Msg * getEventsBin();
 	af::Msg * getEventsJSON();

@@ -8,7 +8,7 @@ from Qt import QtCore
 
 # Set a default refresh interval in seconds:
 if 'keeper_refresh' not in cgruconfig.VARS:
-    cgruconfig.VARS['keeper_refresh'] = '36'
+    cgruconfig.VARS['keeper_refresh'] = '10'
 
 
 class Refresh:

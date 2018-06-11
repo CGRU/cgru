@@ -1,3 +1,18 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	name_af.h - Header for functions that are common for an entire project (afserver, afrender, afwatch, afcmd).
+*/
 #pragma once
 
 #include <algorithm>
@@ -128,6 +143,7 @@ namespace af
 	const std::string getenv( const std::string & i_name);
 	const std::string getenv( const char * i_name);
 	const std::string state2str( int state);
+	const std::string toKMG(long long i_number);
 	const std::string strStrip( const std::string & i_str, const std::string & i_characters = " \n");
 	const std::string strStripLeft( const std::string & i_str, const std::string & i_characters = " \n");
 	const std::string strStripRight( const std::string & i_str, const std::string & i_characters = " \n");
@@ -154,7 +170,9 @@ namespace af
 
 	void printTime( time_t time_sec = time( NULL), const char * time_format = NULL);
 
-	void printAddress( struct sockaddr_storage * i_ss );
+	void sockAddrToStr( std::ostringstream & o_str, const struct sockaddr_storage * i_ss );
+	const std::string sockAddrToStr( const struct sockaddr_storage * i_ss );
+	void printAddress( const struct sockaddr_storage * i_ss );
 
 	bool setRegExp( RegExp & regexp, const std::string & str, const std::string & name, std::string * errOutput = NULL);
 
@@ -164,14 +182,15 @@ namespace af
 	int weigh( const std::string & str);
 	int weigh( const std::list<std::string> & strlist);
 	int weigh( const std::vector<std::string> & i_list);
+	int weigh( const std::map<std::string, int32_t> & i_map);
 	int weigh( const std::map<std::string, std::string> & i_map);
 
 
 	bool  init( uint32_t flags );
 	void  destroy();
 
-	bool  loadFarm( bool verbose = false);
-	bool  loadFarm( const std::string & filename, bool verbose = false);
+	bool  loadFarm( VerboseMode i_verbose = VerboseOff);
+	bool  loadFarm( const std::string & filename, VerboseMode i_verbose = VerboseOff);
 	Farm * farm();
 
 
@@ -188,9 +207,11 @@ namespace af
 
 	bool pathIsFolder( const std::string & path);
 
-	const std::string pathAbsolute( const std::string & path);
+	const std::string pathCurrent();
 
-	const std::string pathUp( const std::string & path);
+	const std::string pathAbsolute(const std::string & i_path);
+
+	const std::string pathUp(const std::string & i_path, bool i_use_cwd = false);
 
 	const std::string pathHome();
 
@@ -253,11 +274,11 @@ namespace af
 	/** Return true if success.**/
 	bool msgwrite( int i_desc, const af::Msg * i_msg);
 
+	std::string msgMakeWriteHeader( const af::Msg * i_msg);
+	std::string getHttpHeader(int file_size, const std::string &mimeType, const std::string &status);
+
 	/// Send a message to all its addresses and receive an answer if needed
 	Msg * sendToServer( Msg * i_msg, bool & o_ok, VerboseMode i_verbose);
-
-	/// Close socket
-	void socketDisconnect( int i_sd, uint32_t i_response_type = -1);
 
 
 	// Python:
@@ -287,7 +308,9 @@ namespace af
 	bool jr_int64vec(  const char * i_name, std::vector<int64_t>     & o_attr, const JSON & i_object);
 	bool jr_stringvec( const char * i_name, std::vector<std::string> & o_attr, const JSON & i_object);
 	bool jr_stringmap( const char * i_name, std::map<std::string,std::string> & o_attr, const JSON & i_object, std::string * o_str = NULL);
+	bool jr_intmap( const char * i_name, std::map<std::string,int32_t> & o_map, const JSON & i_object, std::string * o_str = NULL);
 
+	void jw_intmap( const char * i_name, const std::map<std::string,int32_t> & i_map, std::ostringstream & o_str);
 	void jw_stringmap( const char * i_name, const std::map<std::string,std::string> & i_map, std::ostringstream & o_str);
 	void jw_int32list( const char * i_name, const std::list<int32_t> & i_list, std::ostringstream & o_str);
 	void jw_int32vec( const char * i_name, const std::vector<int32_t> & i_vec, std::ostringstream & o_str);

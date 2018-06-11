@@ -49,8 +49,7 @@ int Dialog::ms_size_border_right = 75;
 Dialog::Dialog():
     m_connected(false),
     m_monitorType( Watch::WNONE),
-    m_qThreadClientUpdate( this, af::Environment::getWatchGetEventsSec(), af::Environment::getWatchConnectRetries()),
-    m_qThreadSend( this, af::Environment::getWatchConnectRetries()),
+	m_qafclient( this, af::Environment::getWatchConnectRetries()),
     m_listitems( NULL),
     m_offlinescreen( NULL),
     m_repaintTimer( this),
@@ -105,11 +104,10 @@ Dialog::Dialog():
     m_btnMonitor[Watch::WUsers]   = new ButtonMonitor( Watch::WUsers,   this);
     m_hlayout_b->addWidget( m_btnMonitor[Watch::WUsers   ]);
     m_hlayout_b->addWidget( m_topright);
-
-    connect( &m_qThreadSend,           SIGNAL( newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
-    connect( &m_qThreadClientUpdate,   SIGNAL( newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
-    connect( &m_qThreadClientUpdate,   SIGNAL( connectionLost()),  this, SLOT( connectionLost()));
-    connect( &m_qThreadSend,           SIGNAL( connectionLost()),  this, SLOT( connectionLost()));
+	
+	connect( &m_qafclient, SIGNAL( sig_newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
+	connect( &m_qafclient, SIGNAL( sig_connectionLost()),  this, SLOT( connectionLost()));
+	connect( &m_qafclient, SIGNAL( sig_finished()),        this, SLOT( close()));
 
     connectionLost();
 
@@ -131,26 +129,41 @@ Dialog::Dialog():
     Watch::refreshGui();
 }
 
-void Dialog::closeEvent( QCloseEvent * event) { afqt::QEnvironment::setRect( "Main", geometry());}
+void Dialog::closeEvent( QCloseEvent * event)
+{
+	static bool s_closing = false;
+	if( s_closing ) return;
+	s_closing = true;
+
+	// Ignore event to not exit Qt event loop,
+	// as it needed for signal -> slot events processing.
+	event->ignore();
+
+	if( m_connected )
+	{
+		AF_LOG << "Sending deregister request.";
+		m_qafclient.sendMsg( new af::Msg( af::Msg::TMonitorDeregister, MonitorHost::id()));
+		m_qafclient.setClosing();
+	}
+
+	afqt::QEnvironment::setRect( "Main", geometry());
+}
 
 Dialog::~Dialog()
 {
-    AFINFO("Dialog::~Dialog:")
-    Watch::destroy();
-	if( m_connected )
-		m_qThreadSend.send( new af::Msg( af::Msg::TMonitorDeregister, MonitorHost::id()));
+	AF_DEBUG;
 }
 
 void Dialog::repaintStart( int mseconds) { m_repaintTimer.start( mseconds);}
 void Dialog::repaintFinish()             { m_repaintTimer.stop();}
 void Dialog::setDefaultWindowTitle() { setWindowTitle( QString("Watch - ") + afqt::stoq( af::Environment::getUserName()) + "@" + afqt::stoq( af::Environment::getServerName()) );}
-void Dialog::sendRegister(){ m_qThreadClientUpdate.setUpMsg( MonitorHost::genRegisterMsg());}
+void Dialog::sendRegister(){ m_qafclient.setUpMsg( MonitorHost::genRegisterMsg(), af::Environment::getWatchGetEventsSec());}
 void Dialog::sendMsg( af::Msg * msg)
 {
 #ifdef AFOUTPUT
 printf(" <<< Dialog::sendMsg: ");msg->v_stdOut();
 #endif
-    m_qThreadSend.send( msg);
+    m_qafclient.sendMsg( msg);
 }
 
 void Dialog::createMenus()
@@ -192,6 +205,11 @@ void Dialog::createMenus()
     connect( action, SIGNAL( triggered() ), this, SLOT( actSavePreferences() ));
     editMenu->addAction( action);
 	m_contextMenu->addAction( action);
+
+	m_helpMenu = new QMenu("&Help", this);
+	menuBar()->addMenu( m_helpMenu);
+	m_contextMenu->addMenu( m_helpMenu);
+	connect( m_helpMenu, SIGNAL( aboutToShow()), this, SLOT( showMenuHelp()));
 }
 
 void Dialog::showMenuLevel()
@@ -265,6 +283,20 @@ void Dialog::showMenuPrefs()
     m_prefsMenu->addAction( action);
 }
 
+void Dialog::showMenuHelp()
+{
+	m_helpMenu->clear();
+	QAction * action;
+
+    action = new QAction("Documentation...", m_helpMenu);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actShowDocs() ));
+    m_helpMenu->addAction( action);
+
+    action = new QAction("Forum...", m_helpMenu);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actShowForum() ));
+    m_helpMenu->addAction( action);
+}
+
 void Dialog::contextMenuEvent(QContextMenuEvent *event)
 {
 	if( Watch::isPadawan())
@@ -307,7 +339,7 @@ void Dialog::connectionEstablished()
     displayInfo("Connection established.");
     m_connected = true;
     setDefaultWindowTitle();
-//    m_qThreadSend.send( new af::Msg( af::Msg::TUserIdRequest, &m_mcuserhost, true));
+//	m_qafclient.sendMsg( new af::Msg( af::Msg::TUserIdRequest, &m_mcuserhost, true));
 }
 
 void Dialog::newMessage( af::Msg *msg)
@@ -324,6 +356,7 @@ void Dialog::newMessage( af::Msg *msg)
     {
     case af::Msg::TVersionMismatch:
     {
+		AF_WARN << "Server version mismatch, exiting.";
         emit stop();
         break;
     }
@@ -427,11 +460,12 @@ void Dialog::idReceived( int i_id, int i_uid)
 					ButtonMonitor::unset();
 					closeList();
 				}
-				displayWarning("You are not exist.");
+				displayWarning("You do not exist.");
 			}
 			else
 			{
 				displayInfo("You have registered.");
+				AF_LOG << "Registered, ID=" << i_id;
 				if( m_monitorType == Watch::WNONE )
 				{
 					ButtonMonitor::pushButton( Watch::WJobs);
@@ -439,7 +473,7 @@ void Dialog::idReceived( int i_id, int i_uid)
 			}
 
 			af::Msg * msg = new af::Msg( af::Msg::TMonitorUpdateId, i_id);
-			m_qThreadClientUpdate.setUpMsg( msg);
+			m_qafclient.setUpMsg( msg, af::Environment::getWatchGetEventsSec());
 		}
 	}
 }
@@ -467,7 +501,7 @@ bool Dialog::openMonitor( int type, bool open)
    {
       ButtonMonitor::unset();
       displayWarning("You are not registered (have no jobs).");
-//      m_qThreadSend.send( new af::Msg( af::Msg::TUserIdRequest, &m_mcuserhost, true));
+//		m_qafclient.sendMsg( new af::Msg( af::Msg::TUserIdRequest, &m_mcuserhost, true));
       return false;
    }
 
@@ -589,6 +623,8 @@ void Dialog::actSaveGUIOnExit()           { afqt::QEnvironment::saveGUIOnExit.n 
 void Dialog::actSaveHotkeysOnExit()       { afqt::QEnvironment::saveHotkeysOnExit.n  = 1 - afqt::QEnvironment::saveHotkeysOnExit.n;   }
 void Dialog::actSaveWndRectsOnExit()      { afqt::QEnvironment::saveWndRectsOnExit.n = 1 - afqt::QEnvironment::saveWndRectsOnExit.n;  }
 void Dialog::actShowOfflineNoise()        { afqt::QEnvironment::showOfflineNoise.n   = 1 - afqt::QEnvironment::showOfflineNoise.n;    }
+void Dialog::actShowDocs()  { Watch::showDocs();  }
+void Dialog::actShowForum() { Watch::showForum(); }
 
 void Dialog::actSavePreferences()
 {

@@ -370,6 +370,11 @@ void ListNodes::actAnnotate()
 	setParameter("annotation", afqt::qtos( text));
 }
 
+void ListNodes::actAnnotate(QString text)
+{
+	setParameter("annotation", afqt::qtos( text));
+}
+
 void ListNodes::actCustomData()
 {
 	ItemNode * item = (ItemNode*)getCurrentItem();

@@ -40,8 +40,11 @@ public:
 	const std::vector<std::string> getFiles() const;
 	const std::vector<std::string> getParsedFiles() const;
 
+	bool hasParser() const;
+
 	void parse( const std::string & i_mode,
 				std::string & data,
+				int pid,
 				int & percent, int & frame, int & percentframe,
 				std::string & activity, std::string & report,
 				bool & warning, bool & error, bool & badresult, bool & finishedsuccess) const;
@@ -67,6 +70,7 @@ private:
 	PyObject * m_PyObj_FuncGetCommand;
 	PyObject * m_PyObj_FuncGetFiles;
 	PyObject * m_PyObj_FuncGetParsedFiles;
+	PyObject * m_PyObj_FuncHasParser;
 	PyObject * m_PyObj_FuncParse;
 	PyObject * m_PyObj_FuncToHTML;
 	PyObject * m_PyObj_FuncGetLog;

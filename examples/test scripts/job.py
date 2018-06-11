@@ -1,6 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+'''
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
 
+This is testing job.
+
+'''
 import json
 import os
 import random
@@ -23,7 +38,7 @@ parser.add_option('-t', '--time',         dest='timesec',      type='float',  de
 parser.add_option('-r', '--randtime',     dest='randtime',     type='float',  default=2,  help='random time per frame in seconds')
 parser.add_option('-b', '--numblocks',    dest='numblocks',    type='int',    default=1,  help='number of blocks')
 parser.add_option('-n', '--numtasks',     dest='numtasks',     type='int',    default=10, help='number of tasks')
-parser.add_option('-f', '--frames',       dest='frames',       type='string', default='', help='frames "1/20/2/3,1/20/2/3"')
+parser.add_option(      '--frames',       dest='frames',       type='string', default='', help='frames "1/20/2/3,1/20/2/3"')
 parser.add_option('-i', '--increment',    dest='increment',    type='int',    default=1,  help='tasks "frame increment" parameter')
 parser.add_option('-p', '--pertask',      dest='pertask',      type='int',    default=1,  help='number of tasks per task')
 parser.add_option('-m', '--maxtime',      dest='maxtime',      type='int',    default=0,  help='tasks maximum run time in seconds')
@@ -33,7 +48,7 @@ parser.add_option('-w', '--waittime',     dest='waittime',     type='int',    de
 parser.add_option('-c', '--capacity',     dest='capacity',     type='int',    default=0,  help='tasks capacity')
 parser.add_option(      '--capmin',       dest='capmin',       type='int',    default=-1, help='tasks variable capacity coeff min')
 parser.add_option(      '--capmax',       dest='capmax',       type='int',    default=-1, help='tasks variable capacity coeff max')
-parser.add_option(      '--filesout',     dest='filesout',     type='string', default=None, help='Tasks out file')
+parser.add_option('-f', '--filesout',     dest='filesout',     type='string', default=None, help='Tasks out file')
 parser.add_option(      '--filemin',      dest='filemin',      type='int',    default=-1, help='tasks output file size min')
 parser.add_option(      '--filemax',      dest='filemax',      type='int',    default=-1, help='tasks output file size max')
 parser.add_option(      '--mhmin',        dest='mhmin',        type='int',    default=-1, help='multi host tasks min hosts')
@@ -49,6 +64,8 @@ parser.add_option(      '--parser',       dest='parser',       type='string', de
 parser.add_option(      '--env',          dest='environment',  type='string', default="CG_VAR=somevalue", help='add an evironment')
 parser.add_option(      '--folder',       dest='folder',       type='string', default=None, help='add a folder')
 parser.add_option(      '--nofolder',     dest='nofolder',     action='store_true', default=False, help='do not set any folders')
+parser.add_option(      '--pools',        dest='pools',        type='string', default=None, help='Set job render pools [/local/blender:90,/local/natron:10].')
+parser.add_option(      '--branch',       dest='branch',       type='string', default=None, help='Set job branch.')
 parser.add_option(      '--seq',          dest='sequential',   type='int',    default=None, help='Sequential running')
 parser.add_option(      '--ppa',          dest='ppapproval',   action='store_true', default=False, help='Preview pending approval')
 parser.add_option('-e', '--exitstatus',   dest='exitstatus',   type='int',    default=0,  help='good exit status')
@@ -89,6 +106,18 @@ if Options.folder is not None:
     job.setFolder('folder', Options.folder)
 if not Options.nofolder:
     job.setFolder('pwd', os.getcwd())
+
+if Options.pools is not None:
+    pools = dict()
+    for pool in Options.pools.split(','):
+        pool = pool.split(':')
+        pools[pool[0]] = int(pool[1])
+    job.setPools( pools)
+
+if Options.branch is not None:
+    job.setBranch( Options.branch)
+else:
+    job.setBranch( os.getcwd())
 
 blocknames = []
 if Options.labels != '':
@@ -178,14 +207,14 @@ for b in range(numblocks):
 
     if not Options.stringtype and not negative_pertask:
         cmd = 'task.py'
-        cmd = os.path.join(os.getcwd(), cmd)
-        cmd = 'python "%s"' % cmd
+        cmd = "\"%s\"" % os.path.join(os.getcwd(), cmd)
+        cmd = "%s %s" % (os.getenv('CGRU_PYTHONEXE','python'), cmd)
         cmd += ' --exitstatus %d ' % Options.exitstatus
 
         if Options.filesout:
             cmd += ' --filesout "%s"' % Options.filesout
             block.skipExistingFiles()
-            block.checkRenderedFiles( 10, 1000000)
+            block.checkRenderedFiles( 100)
             block.setFiles(Options.filesout.split(';'))
 
         cmd += '%(str_capacity)s%(str_hosts)s -s @#@ -e @#@ ' \
@@ -201,10 +230,9 @@ for b in range(numblocks):
             block.setNumeric(1, numtasks, Options.pertask, increment)
 
     else:
-        block.setCommand(
-            'python task.py%(str_capacity)s @#@ -v %(verbose)d' % vars(),
-            False
-        )
+        cmd = 'task.py%(str_capacity)s @#@ -v %(verbose)d' % vars(),
+        cmd = "%s %s" % (os.getenv('CGRU_PYTHONEXE','python'), cmd)
+        block.setCommand( cmd, False)
 
         block.setTasksName('task @#@')
 

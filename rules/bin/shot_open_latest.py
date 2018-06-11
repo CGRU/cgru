@@ -9,9 +9,6 @@ import sys
 
 from optparse import OptionParser
 
-ImgTypes = ['jpg','png','exr','dpx','tif','tiff','cin','tga']
-MovTypes = ['mov','avi','mpg','mpeg','mp4']
-
 Parser = OptionParser(
 	usage="%prog [options]\n\tType \"%prog -h\" for help",
 	version="%prog 1.0"

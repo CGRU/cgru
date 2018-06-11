@@ -51,6 +51,8 @@ export MAYA_PLUG_IN_PATH="${MAYA_CGRU_LOCATION}/mll/${MAYA_VERSION}:${MAYA_PLUG_
 # Add Afanasy scripts to Maya:
 export MAYA_SCRIPT_PATH="${MAYA_CGRU_LOCATION}/afanasy:${MAYA_SCRIPT_PATH}"
 
+# Disable the Customer Improvement Program
+export MAYA_DISABLE_CIP=1
 
 export APP_DIR="${MAYA_LOCATION}"
 export APP_EXE="${MAYA_EXEC}"

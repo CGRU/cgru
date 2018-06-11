@@ -1,3 +1,20 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	Afanasy server system job.
+	It is designed for afsever to execute special commands on afrenders:
+	Post Commannds, Events, Wake-On-Lan.
+*/
 #include "sysjob.h"
 
 #include "../include/afanasy.h"
@@ -15,6 +32,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////   COMMAND    ///////////////////////////////////////////////////////
@@ -88,7 +106,7 @@ void SysTask::appendSysJobLog( const std::string & message)
 	    + m_syscmd->command);
 }
 
-void SysTask::v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring, int32_t * io_running_tasks_counter, int64_t * io_running_capacity_counter)
+void SysTask::v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring)
 {
 	i_taskexec->setName(         m_syscmd->task_name        );
 	i_taskexec->setCommand(      m_syscmd->command          );
@@ -97,7 +115,7 @@ void SysTask::v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorCo
 	i_taskexec->setWDir(         m_syscmd->working_directory);
 	i_taskexec->setTaskNumber(   getNumber()                );
 
-	Task::v_start( i_taskexec, i_render, i_monitoring, io_running_tasks_counter, io_running_capacity_counter);
+	Task::v_start( i_taskexec, i_render, i_monitoring);
 }
 
 void SysTask::v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId)
@@ -232,7 +250,7 @@ bool SysBlock::v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorC
 		return false;
 	}
 
-	systask->v_start( taskexec, render, monitoring, m_data->getRunningTasksCounter(), m_data->getRunningCapacityCounter());
+	systask->v_start( taskexec, render, monitoring);
 
 	m_taskprogress->state |= AFJOB::STATE_RUNNING_MASK;
 	m_taskprogress->starts_count++;
@@ -477,7 +495,7 @@ AFINFA("SysJob::SysJob: folder = '%s'", i_folder.c_str())
 	if( isFromStore())
 	{
 		readStore();
-		printf("System job retrieved from store.\n");
+		AF_LOG << "System job retrieved from store.";
 		return;
 	}
 
@@ -561,13 +579,13 @@ bool SysJob::v_canRun()
 	return JobAf::v_canRun();
 }
 
-bool SysJob::v_solve( RenderAf *render, MonitorContainer * monitoring)
+RenderAf * SysJob::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * monitoring, BranchSrv * i_branch)
 {
 //printf("SysJob::solve():\n");
 	if( isReady())
-		return JobAf::v_solve( render, monitoring);
+		return JobAf::v_solve( i_renders_list, monitoring, i_branch);
 
-	return false;
+	return NULL;
 }
 
 void SysJob::v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring)

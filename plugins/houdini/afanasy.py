@@ -147,6 +147,10 @@ class BlockParameters:
             roptype = ropnode.type().name()
 
             if roptype == 'ifd':
+                if ropnode.node(ropnode.parm('camera').eval())==None:
+                    hou.ui.displayMessage("Camera in "+ropnode.name()+" is not valid",severity = hou.severityType.Error)
+                    return
+
                 if not ropnode.parm('soho_outputmode').eval():
                     self.service = 'hbatch_mantra'
 
@@ -174,6 +178,25 @@ class BlockParameters:
                             ar_picture.evalAsStringAtFrame(self.frame_last)
                         )
 
+            elif roptype == 'alembic':
+                self.numeric = False
+                taskname = ropnode.name()
+                taskname += ' ' + str(self.frame_first)
+                taskname += '-' + str(self.frame_last)
+                self.tasks_names.append(taskname)
+                self.tasks_cmds.append(self.frame_first)
+                
+            elif roptype == 'Redshift_ROP':
+                self.service = 'hbatch_redshift'
+                rs_picture = ropnode.parm('RS_outputFileNamePrefix')
+
+                if rs_picture is not None:
+                    self.preview = \
+                        afcommon.patternFromPaths(
+                            rs_picture.evalAsStringAtFrame(self.frame_first),
+                            rs_picture.evalAsStringAtFrame(self.frame_last)
+                        )
+
             # Block command:
             self.cmd = 'hrender_af'
             if afnode.parm('ignore_inputs').eval():
@@ -186,13 +209,13 @@ class BlockParameters:
                 self.frame_inc, afnode.parm('take').eval()
             )
 
-            numWedges = computeWedge(ropnode, roptype)
-            if numWedges:
-                self.frame_first = 0
-                self.frame_last = numWedges - 1
-                self.frame_inc = 1
-                self.frame_pertask = 1
-                self.parser = "mantra"
+#            numWedges = computeWedge(ropnode, roptype)
+#            if numWedges:
+#                self.frame_first = 0
+#                self.frame_last = numWedges - 1
+#                self.frame_inc = 1
+#                self.frame_pertask = 1
+#                self.parser = "mantra"
 
             self.cmd += '%(auxargs)s'
             self.cmd += ' "%(hipfilename)s"'
@@ -368,13 +391,36 @@ class BlockParameters:
                   self.afnode.name())
             return
 
-        renderhip = hou.hipFile.name()
+        job = af.Job()
+        job.setName(self.job_name)
 
+        if self.afnode.parm('wait_time').eval():
+            hours = int(self.afnode.parm('wait_time_hours').eval())
+            minutes = int(self.afnode.parm('wait_time_minutes').eval())
+            hours = max(0,min(hours,23))
+            minutes = max(0,min(minutes,59))
+            now_sec = int(time.time())
+            now_day = int((now_sec - time.timezone) / (24*3600)) * (24*3600) + time.timezone
+            sec = now_sec % 60
+            wait_sec = now_day + (hours * 3600) + (minutes * 60) + sec
+            if wait_sec <= now_sec:
+                if hou.ui.displayMessage(
+                            ('Now is greater than %d:%d\nOffset by 1 day?' % (hours,minutes)),
+                            buttons=('Offset', 'Abort'),
+                            default_choice=0, close_choice=1,
+                            title=('Wait Time')
+                        ) == 0:
+                    wait_sec += (24*3600)
+                else:
+                    return
+            job.setWaitTime(wait_sec)
+
+        renderhip = hou.hipFile.name()
         if self.afnode.parm('render_temp_hip').eval():
             # Calculate temporary hip name:
             ftime = time.time()
-            renderhip = '%s_%s%s%s.hip' % (
-                renderhip,
+            renderhip = '%s/%s%s%s.hip' % (
+                os.path.dirname(renderhip),
                 afcommon.filterFileName(self.job_name),
                 time.strftime('.%m%d-%H%M%S-'),
                 str(ftime - int(ftime))[2:5]
@@ -384,9 +430,6 @@ class BlockParameters:
             # changes current scene file name to renderhip,
             # at least in version 9.1.115
             hou.hscript('mwrite -n "%s"' % renderhip)
-
-        job = af.Job()
-        job.setName(self.job_name)
 
         if self.start_paused:
             job.offLine()
@@ -477,6 +520,7 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
         block_generate.name += '-G'
 
         if not block_generate.valid:
+            block_generate.doPost()
             return None
 
         run_rop = afnode.parm('sep_run_rop').eval()
@@ -515,24 +559,19 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
                 )
 
         if read_rop:
-            images = ropnode.parm('vm_picture')
-            files = ropnode.parm('soho_diskfile')
-            afnode.parm('sep_images').set(images.unexpandedString())
-            afnode.parm('sep_files').set(files.unexpandedString())
+            parm_images = ropnode.parm('vm_picture')
+            parm_files  = ropnode.parm('soho_diskfile')
+        else:
+            parm_images = afnode.parm('sep_images')
+            parm_files  = afnode.parm('sep_files')
 
         images = afcommon.patternFromPaths(
-            afnode.parm('sep_images').evalAsStringAtFrame(
-                block_generate.frame_first),
-            afnode.parm('sep_images').evalAsStringAtFrame(
-                block_generate.frame_last)
-        )
+            parm_images.evalAsStringAtFrame( block_generate.frame_first),
+            parm_images.evalAsStringAtFrame( block_generate.frame_last))
 
         files = afcommon.patternFromPaths(
-            afnode.parm('sep_files').evalAsStringAtFrame(
-                block_generate.frame_first),
-            afnode.parm('sep_files').evalAsStringAtFrame(
-                block_generate.frame_last)
-        )
+            parm_files.evalAsStringAtFrame( block_generate.frame_first),
+            parm_files.evalAsStringAtFrame( block_generate.frame_last))
 
         if run_rop:
             if join_render:
@@ -578,6 +617,9 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
                                    block_generate.frame_inc):
                     arguments = afnode.parm(
                         'sep_render_arguments').evalAsStringAtFrame(frame)
+                    arguments = arguments.replace(
+                        '@FILES@', parm_files.evalAsStringAtFrame( frame))
+
                     for tile in range(0, tiles):
                         block_render.tasks_names.append(
                             '%d tile %d' % (frame, tile))
@@ -591,7 +633,7 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
                 block_render.cmd += afcommon.patternFromPaths(
                     afnode.parm('sep_render_arguments').evalAsStringAtFrame(block_generate.frame_first),
                     afnode.parm('sep_render_arguments').evalAsStringAtFrame(block_generate.frame_last)
-                )
+                ).replace('@FILES@', files)
                 block_render.preview = images
 
         if tile_render:
@@ -607,10 +649,6 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
             block_join.cmd = cmd
             block_join.cmd_useprefix = False
             block_join.preview = images
-
-        if read_rop:
-            afnode.parm('sep_images').set('')
-            afnode.parm('sep_files').set('')
 
         if tile_render:
             params.append(block_join)
@@ -704,7 +742,7 @@ def getJobParameters(afnode, subblock=False, frame_range=None, prefix=''):
 
     # Process frame range:
     if frame_range is None:
-        frame_first = hou.frame()
+        frame_first = int(hou.frame())
         frame_last = frame_first
         frame_inc = 1
     else:
@@ -759,6 +797,32 @@ def getJobParameters(afnode, subblock=False, frame_range=None, prefix=''):
 
             if newparams is None:
                 return None
+
+        elif node and node.type().name() == "wedge":
+            wedgednode = None
+            if node.inputs():
+                wedgednode = node.inputs()[0]
+            else:
+                wedgednode = node.node(node.parm("driver").eval())
+            if wedgednode == None:
+                return None
+
+            numWedges = computeWedge( node, node.type().name()) # we can remove nodetype check
+            names = node.hdaModule().getwedgenames(node)
+            for wedge in range(numWedges):
+                # switching wedges like houdini do to get valid filenames
+                hou.hscript('set WEDGE = ' + names[wedge])
+                hou.hscript('set WEDGENUM = ' + str(wedge))
+                hou.hscript('varchange')
+                #add wedged node to next block
+                block = getBlockParameters(afnode, wedgednode, subblock, "{}_{}".format(node.name(),wedge), frame_range)[0]
+                block.auxargs += " --wedge " + node.path() + " --wedgenum " + str(wedge)
+                newparams.append(block)
+            # clear environment
+            hou.hscript('set WEDGE = ')
+            hou.hscript('set WEDGENUM = ')
+            hou.hscript('varchange')
+
         else:
             newparams = \
                 getBlockParameters(afnode, node, subblock, prefix, frame_range)
@@ -769,6 +833,7 @@ def getJobParameters(afnode, subblock=False, frame_range=None, prefix=''):
             dependmask = newparams[0].name
             for param in newparams:
                 if not param.valid:
+                    param.doPost()
                     return None
 
         if len(newparams):

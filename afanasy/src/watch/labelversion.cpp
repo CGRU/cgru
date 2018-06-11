@@ -4,6 +4,7 @@
 #include "wndtext.h"
 
 #include <QtCore/QFile>
+#include <QtGui/QImageReader>
 #include <QtGui/QPainter>
 #include <QTextEdit>
 
@@ -37,6 +38,10 @@ LabelVersion::LabelVersion( QWidget *parent):
          .arg( af::Environment::getHomeAfanasy().c_str())
          .arg( af::Environment::getServerName().c_str());
 
+	QList<QByteArray> qList(QImageReader::supportedImageFormats());
+	tooltip += "\nSupported image formats:\n";
+	for (int i = 0; i < qList.size(); i++)
+		tooltip += " " + qList[i];
 /*
 // Try to load user's custom logo
    QString filename = af::Environment::getHomeAfanasy() + "/logo.png";

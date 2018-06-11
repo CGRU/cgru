@@ -22,7 +22,7 @@ namespace Color
 	const std::string bold_lightblue = "";
 	const std::string bold_white     = "";
 
-	const std::string grey      = "";
+	const std::string black     = "";
 	const std::string red       = "";
 	const std::string green     = "";
 	const std::string yellow    = "";
@@ -44,7 +44,7 @@ namespace Color
 	const std::string bold_lightblue = "\033[1;36m";
 	const std::string bold_white     = "\033[1;37m";
 
-	const std::string grey      = "\033[0;30m";
+	const std::string black     = "\033[0;30m";
 	const std::string red       = "\033[0;31m";
 	const std::string green     = "\033[0;32m";
 	const std::string yellow    = "\033[0;33m";
@@ -90,7 +90,7 @@ Logger::Logger(const char *func, const char *file, int line, Logger::Level level
 		std::stringstream pos;
 		pos << " (" << func << "():" << Logger::shorterFilename(file) << ":" << line << ")";
 		Logger::align(pos);
-		m_ss << Color::grey << pos.str() << Color::nocolor;
+		m_ss << Color::blue << pos.str() << Color::nocolor;
 	}
 	
 	m_ss << " ";

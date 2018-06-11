@@ -47,6 +47,17 @@ else
 	exit 1
 fi
 
+case ${DISTRIBUTIVE} in
+	Fedora|CentOS|RedHat)
+		install_cmd="${PACKAGE_INSTALL}"
+		;;
+	*)
+		;;
+esac
+
+echo Packages install command: "$install_cmd"
+echo Packages uninstall command: "$uninstall_cmd"
+
 curdir=$PWD
 cd "${output}"
 

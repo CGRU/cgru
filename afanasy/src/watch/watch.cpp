@@ -41,9 +41,6 @@ QLinkedList<int>       Watch::ms_listenjobids;
 QLinkedList<int>       Watch::ms_watchtasksjobids;
 QLinkedList<QWidget*>  Watch::ms_watchtaskswindows;
 
-QStringList Watch::ms_previewcmds;
-QStringList Watch::ms_rendercmds;
-
 QMap<QString, QPixmap *> Watch::ms_services_icons_large;
 QMap<QString, QPixmap *> Watch::ms_services_icons_small;
 
@@ -506,3 +503,7 @@ void Watch::notify( const QString & i_title, const QString & i_msg, uint32_t i_s
 {
 	new Popup( i_title, i_msg, i_state);
 }
+
+void Watch::showDocs() { Watch::startProcess("documentation \"afanasy/gui#watch\""); }
+void Watch::showForum() { Watch::startProcess("forum \"watch\""); }
+

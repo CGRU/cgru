@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from parsers import parser
+import re
 
+p = re.compile(".*(?:ABC_PROGRESS (\d+))", re.S)
 keyframe = 'RopNode.render: frame '
 
 
@@ -13,14 +15,6 @@ class hbatch(parser.parser):
         parser.parser.__init__(self)
         self.firstframe = True
 
-    def do(self, data, mode):
-        """Missing DocString
-
-        :param data:
-        :param mode:
-        :return:
-        """
-
         self.str_error = [
             'No licenses could be found to run this application',
             'Please check for a valid license server host']  
@@ -28,6 +22,14 @@ class hbatch(parser.parser):
         self.str_warning = [
             'OpenCL Exception',
             'Failed to create']
+
+    def do(self, data, mode):
+        """Missing DocString
+
+        :param data:
+        :param mode:
+        :return:
+        """
 
         count = data.count(keyframe)
         if count > 0:
@@ -40,3 +42,7 @@ class hbatch(parser.parser):
                 self.percentframe = 0
                 self.calculate()
 
+        m = p.match(data)
+        if m:
+            self.percentframe = int(m.group(1))
+            self.calculate()

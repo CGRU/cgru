@@ -26,7 +26,9 @@ xcopy start %dest%\start\ /ys
 
 xcopy afanasy %dest%\afanasy\ /y
 xcopy afanasy\bin %dest%\afanasy\bin\ /y
+xcopy afanasy\bin\imageformats %dest%\afanasy\bin\imageformats\ /y
 xcopy afanasy\bin\platforms %dest%\afanasy\bin\platforms\ /y
+xcopy afanasy\bin\qml %dest%\afanasy\bin\qml\ /y
 xcopy afanasy\browser %dest%\afanasy\browser\ /y
 xcopy afanasy\icons %dest%\afanasy\icons\ /ys
 xcopy afanasy\python %dest%\afanasy\python\ /ys
@@ -40,6 +42,7 @@ xcopy utilities\regexp %dest%\utilities\regexp\ /ys
 
 xcopy plugins %dest%\plugins\ /y
 xcopy plugins\afterfx %dest%\plugins\afterfx\ /ys
+xcopy plugins\clarisse %dest%\plugins\clarisse\ /ys
 xcopy plugins\c4d %dest%\plugins\c4d\ /ys
 xcopy plugins\blender %dest%\plugins\blender\ /ys
 xcopy plugins\fusion %dest%\plugins\fusion\ /ys

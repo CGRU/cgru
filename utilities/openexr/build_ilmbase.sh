@@ -4,7 +4,7 @@ prefix=$PWD
 
 export CPPFLAGS="-fPIC"
 
-cd ilmbase*
+cd ilmbase*/
 
 if [ ! -z $1 ] ; then
    ./configure -h; exit

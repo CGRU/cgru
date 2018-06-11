@@ -5,6 +5,6 @@ parser = 'xsi'
 
 
 class xsi(service.service):
-	"""Softimage
-	"""
-	pass
+    """Softimage
+    """
+    pass

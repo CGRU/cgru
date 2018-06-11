@@ -45,6 +45,48 @@ def sepThousands(i_int):
     return s
 
 
+def timecodeToFrame( i_tc, i_fps = 24):
+    tc = re.findall('\d.*\d', i_tc)
+    if len( tc) == 0:
+        return None
+
+    tc = re.findall('\d+', tc[0])
+    if len( tc) == 0:
+        return None
+
+    frame = 0
+    counts = [1,i_fps,i_fps*60,i_fps*3600]
+    for i in range(0,len(tc)):
+        if i >= len(counts): break
+        frame += int(tc[-i-1])*counts[i]
+
+    return frame
+
+
+def timecodesToFrameRange( i_tc, i_fps = 24):
+    tc = i_tc.split('-')
+    if len(tc) != 2:
+        return None
+
+    return timecodeToFrame( tc[0]), timecodeToFrame( tc[1])
+
+
+def timecodeFromFrame( i_frame, i_fps = 24):
+    h = i_frame / (i_fps * 3600)
+    f = i_frame - (i_fps * 3600) * h
+    m = f / (i_fps * 60)
+    f = f - (i_fps * 60 * m)
+    s = f / (i_fps)
+    f = f - (i_fps * s)
+    return '%02d:%02d:%02d:%02d' % (h,m,s,f)
+
+
+def timecodesFromFrameRange( i_ffirst, i_flast, i_fps = 24):
+    tc_first = timecodeFromFrame( i_ffirst, i_fps)
+    tc_last  = timecodeFromFrame( i_flast,  i_fps)
+    return '%s - %s' % (tc_first,tc_last)
+
+
 def copy_file(source_file, destination_file, delete_original=False, debug=False):
     """Missing DocString
 
@@ -96,9 +138,9 @@ def copy_file(source_file, destination_file, delete_original=False, debug=False)
                 os.remove(source_file)
             except Exception as err:
                 if err.errno is errno.ENOENT:
-                     if debug:
-                         print('Debug: %s was already removed.' % source_file)
-                     return True
+                    if debug:
+                        print('Debug: %s was already removed.' % source_file)
+                    return True
                 elif err.errno is errno.EPERM or err.errno is errno.EACCES:
                     print('Warning! Could not remove %s, permission denied' % source_file)
                     return False
@@ -314,28 +356,28 @@ def copyJobFile(fileName, jobName='', fileExtension=''):
             shutil.copyfile(fileName, copyFile)
         except Exception as err:
             if err.errno is errno.EPERM or err.errno is errno.EACCES:
-                print('Warning! Could not copy %s to %s, permission denied.' % (source_file, destination_file))
+                print('Warning! Could not copy %s to %s, permission denied.' % (fileName, copyFile))
             elif err.errno is errno.ENOSPC:
-                print('Warning! Could not copy %s to %s, no space left on device.' % (source_file, destination_file))
+                print('Warning! Could not copy %s to %s, no space left on device.' % (fileName, copyFile))
             elif err.errno is errno.ENOENT:
-                print('Warning! Could not copy %s to %s, folder not found.' % (source_file, destination_file))
-                print('Trying to create folder %s. ' % os.path.dirname(destination_file))
+                print('Warning! Could not copy %s to %s, folder not found.' % (fileName, copyFile))
+                print('Trying to create folder %s. ' % os.path.dirname(copyFile))
                 try:
-                    os.makedirs(os.path.dirname(destination_file))
+                    os.makedirs(os.path.dirname(copyFile))
                     print('Directory created, trying to copy file again.')
-                    copy_file(source_file, destination_file, delete_original, debug)
-                    return copyfile
+                    copyJobFile(fileName, jobName, fileExtension)
+                    return copyFile
                 except Exception as err:
                     if err.errno is errno.EPERM or err.errno is errno.EACCES:
-                        print('Warning! Could not create directory %s, permission denied' % os.path.dirname(destination_file))
+                        print('Warning! Could not create directory %s, permission denied' % os.path.dirname(copyFile))
                     elif err.errno is errno.ENOSPC:
-                        print('Warning! Could not create direcotry %s, no space left on device.' % os.path.dirname(destination_file))
+                        print('Warning! Could not create direcotry %s, no space left on device.' % os.path.dirname(copyFile))
                     elif err.errno is errno.EROFS:
-                        print('Warning! Could not create direcotry %s, read-only file system.' % os.path.dirname(destination_file))
+                        print('Warning! Could not create direcotry %s, read-only file system.' % os.path.dirname(copyFile))
                     else:
-                        print('Warning! Unexpected error while trying to remove %s' % source_file)
+                        print('Warning! Unexpected error while trying to remove %s' % fileName)
                         print('Error: %s' % err)
-                    copyfile = ''
+                    copyFile = ''
             copyFile = ''
     return copyFile
 

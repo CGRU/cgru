@@ -4,7 +4,7 @@ $Out = array();
 $Recv = array();
 
 # Decode input:
-$Recv = json_decode( $HTTP_RAW_POST_DATA, true);
+$Recv = json_decode(file_get_contents('php://input'), true);
 if( is_null( $Recv ))
 {
 	$Recv = array();

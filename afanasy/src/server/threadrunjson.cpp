@@ -1,5 +1,22 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	Process JSON message in the main(run) thread.
+*/
+
 #include "action.h"
 #include "afcommon.h"
+#include "branchescontainer.h"
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
 #include "rendercontainer.h"
@@ -10,21 +27,16 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-void threadRunJSON( ThreadArgs * i_args, const af::Msg * i_msg)
+af::Msg *threadRunJSON(ThreadArgs *i_args, const af::Msg *i_msg)
 {
-//write(1,i_msg->data(),i_msg->dataLen());write(1,"\n",1);
-	Action action( i_msg, i_args);
-	if( action.isInvalid())
-		return;
+	Action action(i_msg, i_args);
+	if (action.isInvalid()) return af::jsonMsgError("Invalid action.");
 
-	if( action.type == "monitors")
-		i_args->monitors->action( action);
-	else if( action.type == "jobs")
-		i_args->jobs->action( action);
-	else if( action.type == "renders")
-		i_args->renders->action( action);
-	else if( action.type == "users")
-		i_args->users->action( action);
-	else
-		AFCommon::QueueLogError(std::string("JSON action has unknown type - \"") + action.type + "\"");
+	if (action.type == "branches") return i_args->branches->action(action);
+	if (action.type == "monitors") return i_args->monitors->action(action);
+	if (action.type == "jobs") return i_args->jobs->action(action);
+	if (action.type == "renders") return i_args->renders->action(action);
+	if (action.type == "users") return i_args->users->action(action);
+
+	return af::jsonMsgError(std::string("Action has unknown type: '") + action.type + "'");
 }
