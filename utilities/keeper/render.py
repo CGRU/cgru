@@ -163,7 +163,7 @@ def drawIconState( i_painter):
 
 def setUserDialog():
     name, ok = QtWidgets.QInputDialog.getText(
-        None, 'Set Render User', 'Ender New Name:', text=cgruconfig.VARS['USERNAME']
+        None, 'Set Render User', 'Enter New Name:', text=cgruconfig.VARS['USERNAME']
     )
 
     if not ok:
