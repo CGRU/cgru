@@ -87,8 +87,6 @@ function Monitor(i_args)
 		this.sortDirection = true;
 	else
 		this.sortDirection = false;
-	if (this.sortParm == 'order')
-		this.sortDirection = true;
 
 
 	// Here we launch node specific function.
@@ -332,6 +330,8 @@ function Monitor(i_args)
 		else
 			this.sortParm = this.nodeConstructor.sort[0];
 	}
+	if (this.sortParm == 'order')
+		this.sortDirection = true;
 
 	for (var i = 0; i < cm_Attrs.length; i++)
 		if (cm_Attrs[i][0] == this.sortParm)
@@ -468,8 +468,14 @@ Monitor.prototype.processMsg = function(obj) {
 		if (ids.length > 0)
 			nw_GetNodes(this.type, ids);
 
-		if ((this.type == 'jobs') && obj.events.jobs_order_ids && obj.events.jobs_order_ids.length)
-			this.sortByIds(obj.events.jobs_order_ids);
+		// Jobs order:
+		if (this.type == 'jobs')
+		{
+			if (obj.events.jobs_order_ids && obj.events.jobs_order_ids.length)
+				this.sortByIds(obj.events.jobs_order_ids);
+			if (obj.events.jobs_order && obj.events.jobs_order.jids[0].length)
+				this.sortByIds(obj.events.jobs_order.jids[0]);
+		}
 
 		return;
 	}
@@ -677,26 +683,24 @@ Monitor.prototype.addItemSorted = function(i_item) {
 	var index = this.items.length;
 	var nodeBefore = null;
 
-	// window.console.log('addItemSorted='+i_item.params.name+' (len='+this.items.length+')');
+	//console.log('addItemSorted='+i_item.params.name+' (len='+this.items.length+')');
 	if (this.sortParm)
 		for (var i = 0; i < this.items.length; i++)
 		{
-			// var log = i_item.params.name+'['+this.sortParm+']='+i_item.params[this.sortParm]+' <>
-			// '+this.items[i].params[this.sortParm]+'=['+this.sortParm+']'+this.items[i].params.name;
+		//var log = i_item.params.name+'['+this.sortParm+']='+i_item.params[this.sortParm]+' <> '+this.items[i].params[this.sortParm]+'=['+this.sortParm+']'+this.items[i].params.name + ' (' + this.sortDirection + '): ';
 			if (cm_CompareItems(i_item, this.items[i], this.sortParm, false == this.sortDirection))
 			{
-				// log += ' TRUE index='+index;window.console.log(log);
+			//log += 'TRUE index='+index;console.log(log);
 				index = i;
 				break;
 			}
-			// else log += ' FALSE'; window.console.log(log);
+			//else log += 'FALSE'; console.log(log);
 		}
 
 	if (index < this.items.length)
 		nodeBefore = this.items[index].element;
 
-	// if( index < this.items.length ) g_Info('Monitor.prototype.addItemSorted =
-	// '+i_item.params.name+'['+index+']');
+	//if (index < this.items.length) console.log('Monitor.prototype.addItemSorted = '+i_item.params.name+'['+index+']');
 	this.items.splice(index, 0, i_item);
 	this.elList.insertBefore(i_item.element, nodeBefore);
 };
@@ -1246,6 +1250,7 @@ Monitor.prototype.sortByIds = function(i_ids) {
 		return;
 	}
 
+	//console.log('sortByIds: ');console.log(i_ids);
 	var items = this.items.slice();
 
 	for (var i = 0; i < this.items.length; i++)
