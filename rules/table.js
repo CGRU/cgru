@@ -18,6 +18,7 @@
 
 var table_columns = {
 	name /******/: {'label': 'Name'},
+	frames_num   : {'label': 'Frames'},
 	picture /***/: {'label': 'Picture'},
 	status /****/: {'label': 'Status'},
 	info /******/: {'label': 'Info'},
@@ -42,6 +43,7 @@ var table_params = {
 	comments /**/: {'type': 'bool', 'default': false, 'width': '25%'},
 	price /*****/: {'type': 'bool', 'default': true, 'width': '25%'},
 	timecode /**/: {'type': 'bool', 'default': false, 'width': '25%'},
+	frames_num   : {'type': 'bool', 'default': false, 'width': '25%'},
 	duration /**/: {'type': 'bool', 'default': true, 'width': '25%'},
 	tasks /*****/: {'type': 'bool', 'default': false, 'width': '25%'}
 };
@@ -159,6 +161,7 @@ function table_Start(i_args)
 	var progress = 0;
 	var omits = 0;
 	var duration = 0;
+	var frames_num = 0;
 	var price = 0;
 	for (var s = 0; s < table_shots.length; s++)
 	{
@@ -173,6 +176,9 @@ function table_Start(i_args)
 		if (shot.status.progress && (shot.status.progress > 0))
 			progress += shot.status.progress;
 
+		if (shot.status.frames_num && (shot.status.frames_num > 0))
+			frames_num += shot.status.frames_num;
+
 		if (shot.status.duration && (shot.status.duration > 0))
 			duration += shot.status.duration;
 
@@ -182,16 +188,20 @@ function table_Start(i_args)
 	progress = Math.floor(progress / (table_shots.length - omits));
 	if (price == 0)
 		table_show.price = false;
+	if (frames_num == 0)
+		table_show.frames_num = false;
 	if (duration == 0)
 		table_show.duration = false;
 
 	var lines = [
 		'<table>', '<tr>', '<th>Count</th>',
 		'<th style="' + (progress ? '' : 'display:none') + '">Progress</th>',
+		'<th style="' + (frames_num ? '' : 'display:none') + '">Frames</th>',
 		'<th style="' + (duration ? '' : 'display:none') + '">Duration</th>',
 		'<th style="' + (price ? '' : 'display:none') + '">Price</th>', '</tr>', '<tr>',
 		'<td>' + (table_shots.length - omits) + (omits ? (' ( +' + omits + ' omits)') : '') + '</td>',
 		'<td style="' + (progress ? '' : 'display:none') + '">' + progress + '%</td>',
+		'<td style="' + (frames_num ? '' : 'display:none') + '">' + frames_num + '</td>',
 		'<td style="' + (duration ? '' : 'display:none') + '">' + duration + '</td>',
 		'<td style="' + (price ? '' : 'display:none') + '">' + price + '</td>', '</tr>', '</table>'
 	];
@@ -479,6 +489,17 @@ function table_Gen_duration(i_shot)
 		dur += i_shot.status.duration;
 
 	table_WriteTD({'data': dur, 'status': i_shot.status});
+
+	table_Function();
+}
+
+function table_Gen_frames_num(i_shot)
+{
+	var frames_num = '';
+	if (i_shot.status.frames_num)
+		frames_num += i_shot.status.frames_num;
+
+	table_WriteTD({'data': frames_num, 'status': i_shot.status});
 
 	table_Function();
 }
