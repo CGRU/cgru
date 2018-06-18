@@ -39,11 +39,6 @@ public:
 
 	BranchSrv * getBranch(const std::string & i_path);
 
-	/// Generate MCJobs message for user with \c id , return NULL if no such \c id exists.
-	af::Msg * generateJobsList(int id);
-	/// Generate MCJobs message for users with provided ids:
-	af::Msg * generateJobsList(const std::vector<int32_t> & ids, const std::string & i_type_name, bool i_json = false);
-
 	BranchSrv * getRootBranch() {return m_root_branch;}
 
 private:

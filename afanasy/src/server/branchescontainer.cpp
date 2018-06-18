@@ -146,59 +146,6 @@ BranchSrv * BranchesContainer::getBranch(const std::string & i_path)
 	return NULL;
 }
 
-af::Msg* BranchesContainer::generateJobsList(int id)
-{
-	BranchesContainerIt it(this);
-	BranchSrv* branch = it.getBranch(id);
-	if (branch == NULL)
-		return af::jsonMsgError("Branch with such ID does not exist.");
-
-	af::MCAfNodes mcjobs;
-	branch->jobsinfo(mcjobs);
-
-	return new af::Msg(af::Msg::TJobsList, &mcjobs);
-}
-
-af::Msg * BranchesContainer::generateJobsList(const std::vector<int32_t> & ids, const std::string & i_type_name, bool i_json)
-{
-	af::MCAfNodes mcjobs;
-	std::ostringstream stream;
-	bool has_jobs = false;
-
-	if (i_json)
-	{
-		stream << "{\"" << i_type_name << "\":[\n";
-	}
-
-	BranchesContainerIt it(this);
-	std::vector<BranchSrv*> branches;
-	for (int i = 0; i < ids.size(); i++)
-		branches.push_back(it.getBranch(ids[i]));
-
-	for (int i = 0; i < branches.size(); i++)
-	{
-		if (branches[i] == NULL) continue;
-		if (i_json)
-		{
-			if ((i != 0) && (has_jobs))
-				stream << ",\n";
-			has_jobs = branches[i]->getJobs(stream);
-		}
-		else
-			branches[i]->jobsinfo(mcjobs);
-	}
-
-	if (i_json)
-	{
-		stream << "\n]}";
-		return af::jsonMsg(stream);
-	}
-
-	af::Msg * msg = new af::Msg();
-	msg->set(af::Msg::TJobsList, &mcjobs);
-	return msg;
-}
-
 //############################################################################
 //                               BranchesContainerIt
 //############################################################################

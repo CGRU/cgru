@@ -287,29 +287,6 @@ void BranchSrv::removeJob(JobAf * i_job, UserAf * i_user)
 	m_jobs_num--;
 }
 
-bool BranchSrv::getJobs(std::ostringstream & o_str)
-{
-	AfListIt jobsListIt(&m_jobs_list);
-	bool first = true;
-	bool has_jobs = false;
-	for (AfNodeSrv * node = jobsListIt.node(); node != NULL; jobsListIt.next(), node = jobsListIt.node())
-	{
-		if (false == first)
-			o_str << ",\n";
-		first = false;
-		static_cast<JobAf*>(node)->v_jsonWrite(o_str, af::Msg::TJobsList);
-		has_jobs = true;
-	}
-	return has_jobs;
-}
-
-void BranchSrv::jobsinfo(af::MCAfNodes &mcjobs)
-{
-	AfListIt jobsListIt(&m_jobs_list);
-	for (AfNodeSrv *node = jobsListIt.node(); node != NULL; jobsListIt.next(), node = jobsListIt.node())
-		mcjobs.addNode(node->node());
-}
-
 void BranchSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, MonitorContainer * i_monitoring)
 {
 	bool changed = false;
