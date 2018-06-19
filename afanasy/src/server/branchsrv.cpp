@@ -441,7 +441,7 @@ void BranchSrv::v_postSolve(time_t i_curtime, MonitorContainer * i_monitoring)
 	for (AfNodeSrv * node = jIt.node(); node != NULL; jIt.next(), node = jIt.node())
 	{
 		JobAf * job = (JobAf*)node;
-		if(job->getRunningTasksNum() == 0)
+		if(job->isDone())
 			continue;
 		m_active_jobs_list.push_back(job);
 	}

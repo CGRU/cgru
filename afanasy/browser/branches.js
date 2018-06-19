@@ -380,6 +380,8 @@ function BranchActiveJob(i_branch, i_elParent, i_params)
 		return false;
 	};
 
+	this.state = {};
+
 	this.update(i_params);
 };
 
@@ -391,9 +393,11 @@ BranchActiveJob.prototype.setNotUpdated = function() {
 BranchActiveJob.prototype.update = function(i_params) {
 	this.params = i_params;
 
+	cm_GetState(this.params.state, this.state, this.el);
+
 	this.elInfo.innerHTML = this.params.name + '<small>@' + this.params.user_name + '</small>';
 
-	this.elRunningCounts.innerHTML = work_generateRunningCountsString(this.params, 'branch');
+	this.elRunningCounts.innerHTML = '<b>' + this.params.state + '</b> ' + work_generateRunningCountsString(this.params, 'branch');
 
 	this.el.style.display = 'block';
 	this.updated = true;
