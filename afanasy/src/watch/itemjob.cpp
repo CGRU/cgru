@@ -304,9 +304,9 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 				{
 					QString etas = afqt::stoq( af::time2strHMS( eta)) + " " + user_eta;
 					if( Watch::isPadawan() || Watch::isJedi())
-						user_time = QString::fromUtf8("ETA≈") + etas;
+						user_time = QString::fromUtf8("ETA: ~") + etas;
 					else
-						user_time = QString::fromUtf8("eta≈") + etas;
+						user_time = QString::fromUtf8("eta: ~") + etas;
 				}
 			}
 		}
