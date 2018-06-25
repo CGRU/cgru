@@ -106,9 +106,6 @@ ListJobs::ListJobs( QWidget* parent):
 	bp = addButtonPanel("RET","jobs_restart_error_tasks","Restart error tasks.","R");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRestartErrors()));
 
-	bp = addButtonPanel("RET","jobs_restart_error_tasks","Restart error tasks.","R");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRestartErrors()));
-
 	bp = addButtonPanel("RST","jobs_restart","Restart selected jobs.","", true);
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRestart()));
 
