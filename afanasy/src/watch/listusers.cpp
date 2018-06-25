@@ -106,7 +106,7 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 	{
 		menu.addSeparator();
 
-		action = new QAction( "Annonate", this);
+		action = new QAction( "Annotate", this);
 		connect( action, SIGNAL( triggered() ), this, SLOT( actAnnotate() ));
 		menu.addAction( action);
 
