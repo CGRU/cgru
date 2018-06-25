@@ -64,10 +64,6 @@ public:
 	void addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render, UserAf * i_user);
 	void remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render, UserAf * i_user);
 
-	void jobsinfo(af::MCAfNodes &mcjobs); ///< Generate all branch jobs information.
-	
-	bool getJobs(std::ostringstream & o_str);
-
 	void v_refresh(time_t i_current_time, AfContainer * i_container, MonitorContainer * i_monitoring);
 
 	// Perform post solving calculations:

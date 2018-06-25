@@ -305,21 +305,21 @@ padding: 1px 7px;
 border-radius: 4px;
 cursor: default;
 }
-.item.ONL { background: #787;}
-.item.NbY { background: #88F;}
-.item.NBY { background: #77F;}
-.item.PAU { background: #888;}
-.item.DON { background: #486;}
-.item.WRN { background: #292;}
-.item.WDP { background: #969;}
-.item.PPA { background: #CC6;}
-.item.WTM { background: #599;}
-.item.RUN { background: #8A6;}
-.item.ERR { background: #965;}
-.item.RER { background: #F77;}
-.item.WRC { background: #4AC;}
-.item.OFF, .item.task.SKP { background: #777;}
-.item.DRT { border: 1px solid #955;}
+.ONL { background: #787;}
+.NbY { background: #88F;}
+.NBY { background: #77F;}
+.PAU { background: #888;}
+.DON { background: #486;}
+.WRN { background: #292;}
+.WDP { background: #969;}
+.PPA { background: #CC6;}
+.WTM { background: #599;}
+.RUN { background: #8A6;}
+.ERR { background: #965;}
+.RER { background: #F77;}
+.WRC { background: #4AC;}
+.OFF, .item.task.SKP { background: #777;}
+.DRT { border: 1px solid #955;}
 .item.hidden { display: none;}
 .monitor.show_hidden .item.hidden { display: block; opacity: .5;}
 .item.selected, .item.task.selected {
@@ -451,9 +451,9 @@ margin: 2px;
 border-radius: 2px;
 }
 .jobblock .progress .bar {}
-.DON { background: #363;}
-.RUN { background: #FF0;}
-.ERR { background: #F00;}
+.jobblock .progress .DON { background: #363;}
+.jobblock .progress .RUN { background: #FF0;}
+.jobblock .progress .ERR { background: #F00;}
 .text.ERR { border-radius: 4px; padding: 0px 5px; }
 
 .item .name {
@@ -552,10 +552,11 @@ padding: 2px;
 }
 .item.branch .name { font-size: 140%;}
 .item.branch.empty { opacity:.5; font-size: 75%;}
-.item.branch.running { background-color: rgba(200,255,120,.5);}
-.item.branch.active  { background-color: rgba(255,255,120,.5);}
+.item.branch.running { background-color: rgba(170,255,100,.5);}
+.item.branch.active  { background-color: rgba(230,255,160,.5);}
 .item.branch.selected       { background-color: #DFD;}
 .branch_active_job.selected { background-color: #DFD;}
+.branch_active_job.RUN { background: #DD8;}
 
 /*####################### Task Window: ################## */
 .wnd_task > div {
