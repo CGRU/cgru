@@ -69,7 +69,7 @@ WndCustomizeGUI::WndCustomizeGUI():
 	vlayout->setSpacing( 2);
 	hlayout->addLayout( vlayout);
 
-	label = new QLabel("QT standart GUI pallete:", this);
+	label = new QLabel("QT standard GUI palette:", this);
 	label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
 	vlayout->addWidget( label);
 
