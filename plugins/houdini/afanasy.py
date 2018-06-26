@@ -57,6 +57,7 @@ class BlockParameters:
         self.frame_pertask = int(afnode.parm('frame_pertask').eval())
         self.frame_sequential = int(afnode.parm('frame_sequential').eval())
         self.job_name = str(afnode.parm('job_name').eval())
+        self.job_branch = ''
         self.start_paused = int(afnode.parm('start_paused').eval())
         self.platform = str(afnode.parm('platform').eval())
         self.subtaskdepend = int(afnode.parm('subtaskdepend').eval())
@@ -64,6 +65,7 @@ class BlockParameters:
         self.max_runtasks = -1
         self.maxperhost = -1
         self.maxruntime = -1
+        self.minruntime = -1
         self.capacity = -1
         self.capacity_min = -1
         self.capacity_max = -1
@@ -75,11 +77,13 @@ class BlockParameters:
         self.preview_approval = afnode.parm('preview_approval').eval()
 
         if afnode.parm('enable_extended_parameters').eval():
+            self.job_branch = self.afnode.parm('job_branch').eval()
             self.parser = self.afnode.parm('override_parser').eval()
             self.priority = int(afnode.parm('priority').eval())
             self.max_runtasks = int(afnode.parm('max_runtasks').eval())
             self.maxperhost = int(afnode.parm('maxperhost').eval())
             self.maxruntime = int(afnode.parm('maxruntime').eval())
+            self.minruntime = int(afnode.parm('minruntime').eval())
             self.min_memory = int(afnode.parm('min_memory').eval())
             self.capacity = int(afnode.parm('capacity').eval())
             self.capacity_min = int(
@@ -352,7 +356,8 @@ class BlockParameters:
         if self.capacity_min != -1 or self.capacity_max != -1:
             block.setVariableCapacity(self.capacity_min, self.capacity_max)
 
-        block.setTasksMaxRunTime(self.maxruntime)
+        block.setTaskMaxRunTime(self.maxruntime)
+        block.setTaskMinRunTime(self.minruntime)
 
         # Delete files in a block post command:
         if len(self.delete_files):
@@ -442,6 +447,9 @@ class BlockParameters:
                 job.setNeedOS('')
             else:
                 job.setNeedOS(self.platform)
+
+        if self.job_branch != '':
+            job.setBranch(self.job_branch)
 
         if self.priority != -1:
             job.setPriority(self.priority)
