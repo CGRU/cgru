@@ -106,7 +106,7 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 	{
 		menu.addSeparator();
 
-		action = new QAction( "Annonate", this);
+		action = new QAction( "Annotate", this);
 		connect( action, SIGNAL( triggered() ), this, SLOT( actAnnotate() ));
 		menu.addAction( action);
 
@@ -127,7 +127,7 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 
 		if(( af::Environment::VISOR()) || ( af::Environment::getPermUserModHisPriority()))
 		{
-			action = new QAction( "Set Prority", this);
+			action = new QAction( "Set Priority", this);
 			connect( action, SIGNAL( triggered() ), this, SLOT( actPriority() ));
 			menu.addAction( action);
 		}
