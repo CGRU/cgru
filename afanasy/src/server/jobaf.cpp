@@ -322,19 +322,19 @@ int JobAf::getUid() const { return m_user->getId(); }
 
 void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring)
 {
-	if( m_id == AFJOB::SYSJOB_ID )
+	if (m_id == AFJOB::SYSJOB_ID)
 	{
-		AFCommon::QueueLogError("System job can't be zombie");
+		AF_ERR << "An attempt to delete a system job.";
 		return;
 	}
 	
-	if( m_deletion == false )
+	if (false == m_deletion)
 	{
 		m_state = AFJOB::STATE_OFFLINE_MASK;
 		lock();
 		m_deletion = true;
 		
-		if( m_custom_data.size() || m_user->getCustomData().size())
+		if (m_custom_data.size() || m_user->getCustomData().size())
 		{
 			std::vector<std::string> events;
 			events.push_back("JOB_DELETED");
@@ -348,20 +348,23 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 			return;
 		}
 	}
+
+	// Wait for all running tasks stop:
 	if (getRunningTasksNum())
 	{
-		AF_ERR << "runningtaskscounter = " << getRunningTasksNum();
 		return;
 	}
-	
-	if( false == m_command_post.empty())
+
+	// Process job post command:
+	if (false == m_command_post.empty())
 	{
 		SysJob::AddPostCommand( m_command_post, m_blocks_num > 0 ? m_blocks_data[0]->getWDir(): "", m_user_name, m_name);
 		appendLog( std::string("Executing job post command:\n") + m_command_post);
 	}
-	for( int b = 0; b < m_blocks_num; b++)
+	// Process blocks post commands:
+	for (int b = 0; b < m_blocks_num; b++)
 	{
-		if( m_blocks_data[b]->hasCmdPost())
+		if (m_blocks_data[b]->hasCmdPost())
 		{
 			SysJob::AddPostCommand( m_blocks_data[b]->getCmdPost(), m_blocks_data[b]->getWDir(), m_user_name, m_name);
 			appendLog( std::string("Executing block[") + m_blocks_data[b]->getName() + "] post command:\n" + m_blocks_data[b]->getCmdPost());
@@ -374,7 +377,7 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 
 	m_branch_srv->removeJob(this, m_user);
 	
-	if(monitoring)
+	if (monitoring)
 	{
 		monitoring->addJobEvent(af::Monitor::EVT_jobs_del, getId(), getUid());
 		monitoring->addEvent(af::Monitor::EVT_branches_change, m_branch_srv->getId());
@@ -464,7 +467,6 @@ void JobAf::v_action( Action & i_action)
 			appendLog("Deleted by " + i_action.author);
 			m_user->appendLog( "Job \"" + m_name + "\" deleted by " + i_action.author);
 			deleteNode( i_action.renders, i_action.monitors);
-			i_action.monitors->addJobEvent( af::Monitor::EVT_jobs_del, getId(), getUid());
 			return;
 		}
 		else if( type == "start")
@@ -1005,13 +1007,18 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 {
 	RenderContainer * renders = (RenderContainer*)pointer;
 	
-	if( m_deletion )
+	if (m_deletion)
 	{
-		for( int b = 0; b < m_blocks_num; b++)
-			m_blocks[b]->v_refresh( currentTime, renders, monitoring);
-		if( getRunningTasksNum() == 0 ) deleteNode( NULL, monitoring);
+		for (int b = 0; b < m_blocks_num; b++)
+			m_blocks[b]->v_refresh(currentTime, renders, monitoring);
+
+		if (getRunningTasksNum() == 0)
+			deleteNode(NULL, monitoring);
 	}
-	if( isLocked() ) return;
+
+	// No more calculations needed for a locked job:
+	if (isLocked())
+		return;
 	
 	// for database and monitoring
 	uint32_t old_state = m_state;
@@ -1034,6 +1041,7 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 	for( int b = 0; b < m_blocks_num; b++)
 		if( m_blocks[b]->v_refresh( currentTime, renders, monitoring))
 			jobchanged = af::Monitor::EVT_jobs_change;
+
 	// Check block depends after all block refreshed,
 	// as states can be changed during refresh.
 	// ( some block can be DONE after refresh )
@@ -1049,7 +1057,7 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 	m_state = m_state & (~AFJOB::STATE_ERROR_MASK);
 	m_state = m_state & (~AFJOB::STATE_READY_MASK);
 	m_state = m_state & (~AFJOB::STATE_SKIPPED_MASK);
-	
+
 	for( int b = 0; b < m_blocks_num; b++)
 	{
 		uint32_t state_block = m_blocks_data[b]->getState();

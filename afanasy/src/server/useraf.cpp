@@ -262,35 +262,20 @@ bool UserAf::refreshCounters()
 {
 	int _numjobs = m_jobs_list.getCount();
 	int _numrunningjobs = 0;
-	int _runningtasksnumber = 0;
-	int _runningcapacitytotal = 0;
 
-	{
-		AfListIt jobsListIt( &m_jobs_list);
-		for( AfNodeSrv *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
-		{
-			if( ((JobAf*)job)->isRunning())
-			{
-				_numrunningjobs++;
-				_runningtasksnumber += ((JobAf*)job)->getRunningTasksNum();
-				_runningcapacitytotal += ((JobAf*)job)->getRunningCapacityTotal();
-			}
-		}
-	}
+	AfListIt jobsListIt(&m_jobs_list);
+	for (AfNodeSrv *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
+		if (((JobAf*)job)->isRunning())
+			_numrunningjobs++;
 
 	bool changed = false;
 
-	if(
-		( _numjobs              != m_jobs_num               ) ||
-		( _numrunningjobs       != m_running_jobs_num       ) ||
-		( _runningtasksnumber   != m_running_tasks_num      ) ||
-		( _runningcapacitytotal != m_running_capacity_total ) )
+	if (( _numjobs              != m_jobs_num               ) ||
+		( _numrunningjobs       != m_running_jobs_num       ))
 			changed = true;
 
 	m_jobs_num = _numjobs;
 	m_running_jobs_num = _numrunningjobs;
-	m_running_tasks_num = _runningtasksnumber;
-	m_running_capacity_total = _runningcapacitytotal;
 
 	return changed;
 }
