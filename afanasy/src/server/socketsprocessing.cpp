@@ -577,10 +577,12 @@ void SocketItem::closeSocket()
 
 	closesocket( m_sfd);
 
-	Profiler::Collect( m_profiler);
-	// Now Profiler takes ownership of this pointer in Collect().
+	Profiler * _profiler = m_profiler;
 	// We should set member to NULL to not to delete it in dtor.
 	m_profiler = NULL;
+
+	// Now Profiler takes ownership of this pointer in Collect().
+	Profiler::Collect(_profiler);
 
 	m_zombie = true;
 }
