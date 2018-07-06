@@ -10,12 +10,13 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 CmdJSON::CmdJSON()
 {
 	setCmd("json");
 	setInfo("JSON file or stdin.");
-	setHelp("json [send] [file] JSON file, send or not.");
+	setHelp("json [send|force_send] [file] JSON file, send or not, force send even error JSON.");
 	setMsgType( af::Msg::TJSON);
 }
 
@@ -69,12 +70,19 @@ bool CmdJSON::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
 	char * data = NULL;
 	bool send = false;
+	bool force = false;
 	int datalen;
 
-	if( argc > 1 )
+	if (argc > 1)
 	{
-		if( strcmp( argv[0], "send") == 0 )
+		if (strcmp(argv[0],"send") == 0)
 			send = true;
+
+		if (strcmp(argv[0],"force_send") == 0)
+		{
+			send = true;
+			force = true;
+		}
 	}
 
 	if( argc > 0 )
@@ -116,7 +124,7 @@ bool CmdJSON::v_processArguments( int argc, char** argv, af::Msg &msg)
 
 	rapidjson::Document document;
 	char * data_copy = af::jsonParseData( document, data, datalen);
-	if( data_copy == NULL )
+	if ((data_copy == NULL) && (false == force))
 	{
 		delete [] data;
 		return false;
@@ -132,8 +140,10 @@ bool CmdJSON::v_processArguments( int argc, char** argv, af::Msg &msg)
 	}
 	else
 	{
-		AFERROR("Can't find root object.")
-		return true;
+		AF_ERR << "Can't find root object.";
+
+		if (false == force)
+			return true;
 	}
 	
 	std::ostringstream stream;
@@ -141,7 +151,7 @@ bool CmdJSON::v_processArguments( int argc, char** argv, af::Msg &msg)
 
 	bool send_stream = false;
 
-	if( document.HasMember("job"))
+	if ((false == force) && (document.HasMember("job")))
 	{
 		af::Job job( document["job"]);
 		if( Verbose )
