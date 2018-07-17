@@ -522,7 +522,7 @@ padding: 2px 0px 2px 8px;
 margin: 1px;
 }
 #playlist .item .button.delete {
-float: right; width: 12px; height: 12px;
+float: right; width: 10px; height: 10px; opacity: .7;
 }
 #playlist .location { font-size: 14px; padding: 0px 0px 0px 8px; border-top: 1px solid rgba(100,100,100,.5); }
 #playlist .location.cur_path { background: rgba( 100, 255, 255, .2 ); }
