@@ -521,6 +521,9 @@ font-size: 16px;
 padding: 2px 0px 2px 8px;
 margin: 1px;
 }
+#playlist .item .button.delete {
+float: right; width: 12px; height: 12px;
+}
 #playlist .location { font-size: 14px; padding: 0px 0px 0px 8px; border-top: 1px solid rgba(100,100,100,.5); }
 #playlist .location.cur_path { background: rgba( 100, 255, 255, .2 ); }
 #playlist .location a { display: block; }
@@ -531,7 +534,6 @@ margin: 1px;
 #playlist .folder.opened > .folder, #playlist .folder.opened > .location { display: block;}
 #playlist .current {font-weight: bold;}
 #playlist .folder:hover { border: 1px solid #555;}
-/*#playlist .link:hover { box-shadow: 0 0 2px rgba(0,0,0,.5) inset, 0 0 2px rgba(200,255,255,1.0); }*/
 
 /* ======= PERMISSIONS: ======== */
 #sidepanel_permissions { display:none; background-color: rgba(200,0,0,.2); }

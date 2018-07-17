@@ -219,20 +219,11 @@ function p_FolderOnClick(i_evt)
 	}
 }
 
-/*function p_FolderOnDblClick( i_evt)
-{
-	i_evt.stopPropagation();
-	p_FolderOpenClose( i_evt.currentTarget);
-}*/
-
 function p_FolderOpenClose(i_el)
 {
-	// if( el == p_elCurItem )
-	//{
 	if (i_el.classList.contains('opened'))
 	{
 		i_el.classList.remove('opened');
-		//		p_elCurFolder = i_el.parentNode;
 		p_elCurFolder = i_el.m_elParent;
 		var folders = localStorage.playlist_opened_folders.split(' ');
 		folders.splice(folders.indexOf(i_el.m_obj.id), 1);
@@ -246,23 +237,14 @@ function p_FolderOpenClose(i_el)
 		folders.push(i_el.m_obj.id);
 		localStorage.playlist_opened_folders = folders.join(' ');
 	}
-	//}
+
 	p_SetCurItem(p_elCurFolder);
 }
 function p_LinkOnClick(i_evt)
 {
 	i_evt.stopPropagation();
 	p_SetCurItem(i_evt.currentTarget);
-	//	p_elCurFolder = p_elCurItem.parentNode;
 	p_elCurFolder = p_elCurItem.m_elParent;
-	//	g_GO( p_elCurItem.m_path );
-	// g_elCurFolder.scrollIntoView(false);
-}
-function p_DelOnClick()
-{
-	if (p_elCurItem == null)
-		return;
-	p_Action([{"id": p_elCurItem.m_obj.id}], 'del');
 }
 function p_MoveUp()
 {
@@ -393,8 +375,6 @@ function p_Read(i_playlist, i_params, i_elParent)
 	if (i_playlist.length == null)
 		return;
 
-	//	i_playlist.sort( function(a,b){if( a['label']<b['label'])return -1;return 1});
-
 	for (var i = 0; i < i_playlist.length; i++)
 	{
 		if (i_playlist[i] == null)
@@ -428,9 +408,7 @@ function p_CreateFolder(i_obj, i_elParent)
 {
 	var el = p_CreateElement(i_obj, i_elParent);
 	el.classList.add('folder');
-	el.textContent = i_obj.label;
 	el.onclick = p_FolderOnClick;
-	//	el.ondblclick = p_FolderOnDblClick;
 	return el;
 }
 function p_CreateLink(i_obj, i_elParent)
@@ -442,7 +420,7 @@ function p_CreateLink(i_obj, i_elParent)
 	p_elLinks.push(el);
 	return el;
 }
-function p_CreateElement(i_obj, i_elParent, i_type)
+function p_CreateElement(i_obj, i_elParent)
 {
 	var el = document.createElement('div');
 	el.classList.add('item');
@@ -464,8 +442,10 @@ function p_CreateElement(i_obj, i_elParent, i_type)
 		title = c_GetUserTitle(i_obj.user);
 	if (i_obj.time)
 		title += '\n' + c_DT_StrFromSec(i_obj.time);
+
 	if (i_obj.path)
 	{
+		// This is a link:
 		var path = i_obj.path.split('?')[0];
 		title += '\n' + path;
 
@@ -486,12 +466,31 @@ function p_CreateElement(i_obj, i_elParent, i_type)
 			elAnchor.target = '_blank';
 		}
 	}
+	else
+	{
+		// This is a folder:
+		el.textContent = i_obj.label;
+	}
+
+	var elDel = document.createElement('div');
+	el.appendChild(elDel);
+	elDel.m_obj = i_obj;
+	elDel.classList.add('button');
+	elDel.classList.add('delete');
+	elDel.title = 'Double click to remove this item.';
+	elDel.ondblclick = p_ItemDelOnClick;
 
 	el.m_title = title;
 	if (title != '')
 		el.title = title;
 
 	return el;
+}
+
+function p_ItemDelOnClick(i_evt)
+{
+	var obj = i_evt.currentTarget.m_obj;
+	p_Action([{"id": obj.id}], 'del');
 }
 
 function p_GetCurrentShots()
