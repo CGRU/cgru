@@ -58,23 +58,23 @@ void AfNodeSolve::setZombie()
 void AfNodeSolve::addSolveCounts(af::TaskExec *i_exec, RenderAf *i_render)
 {
 	m_work->addRunTasksCounts(i_exec);
-	addRenderCount(i_render);
+	addRenderCount(i_render->getId());
 }
 
 void AfNodeSolve::remSolveCounts(af::TaskExec *i_exec, RenderAf *i_render)
 {
 	m_work->remRunTasksCounts(i_exec);
-	remRenderCount(i_render);
+	remRenderCount(i_render->getId());
 }
 
-void AfNodeSolve::addRenderCount(RenderAf *i_render)
+void AfNodeSolve::addRenderCount(int i_render_id, int i_count)
 {
 	// Add render count, on task start:
-	std::map<int, int>::iterator it = m_renders_counts.find(i_render->getId());
+	std::map<int, int>::iterator it = m_renders_counts.find(i_render_id);
 	if (it != m_renders_counts.end())
-		(*it).second++;
+		(*it).second += i_count;
 	else
-		m_renders_counts[i_render->getId()] = 1;
+		m_renders_counts[i_render_id] = i_count;
 }
 
 int AfNodeSolve::getRenderCount(RenderAf *i_render) const
@@ -85,17 +85,37 @@ int AfNodeSolve::getRenderCount(RenderAf *i_render) const
 	return 0;
 }
 
-void AfNodeSolve::remRenderCount(RenderAf *i_render)
+void AfNodeSolve::remRenderCount(int i_render_id, int i_count)
 {
 	// Remove one render count, on task finish:
-	std::map<int, int>::iterator it = m_renders_counts.find(i_render->getId());
+	std::map<int, int>::iterator it = m_renders_counts.find(i_render_id);
 	if (it != m_renders_counts.end())
 	{
-		if ((*it).second > 1)
-			(*it).second--;
-		else
+		(*it).second -= i_count;
+
+		if ((*it).second < 0)
+		{
+			AF_ERR << "AfNodeSolve::remRenderCount[" << m_node->getName() << "]: Render[" << i_render_id << "] count is negative: " << (*it).second;
+			(*it).second = 0;
+		}
+
+		if ((*it).second == 0)
 			m_renders_counts.erase(it);
 	}
+}
+
+void AfNodeSolve::addRendersCounts(const AfNodeSolve & i_other)
+{
+	std::map<int, int>::const_iterator it = i_other.m_renders_counts.begin();
+	for (; it != i_other.m_renders_counts.end(); it++)
+		addRenderCount((*it).first, (*it).second);
+}
+
+void AfNodeSolve::remRendersCounts(const AfNodeSolve & i_other)
+{
+	std::map<int, int>::const_iterator it = i_other.m_renders_counts.begin();
+	for (; it != i_other.m_renders_counts.end(); it++)
+		remRenderCount((*it).first, (*it).second);
 }
 
 void AfNodeSolve::v_preSolve(time_t i_curtime, MonitorContainer * i_monitors)
@@ -107,7 +127,7 @@ void AfNodeSolve::v_preSolve(time_t i_curtime, MonitorContainer * i_monitors)
 /// Solving function should be implemented in child classes (if solving needed):
 RenderAf *AfNodeSolve::v_solve(std::list<RenderAf *> &i_renders_list, MonitorContainer *i_monitoring, BranchSrv * i_branch)
 {
-	AF_ERR << "AfNodeSrv::solve(): Not implemented: " << m_node->getName().c_str();
+	AF_ERR << "AfNodeSrv::solve(): Not implemented: " << m_node->getName();
 	return NULL;
 }
 void AfNodeSolve::calcNeed(int i_flags, int i_resourcesquantity)

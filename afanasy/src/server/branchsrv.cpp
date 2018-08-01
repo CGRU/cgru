@@ -224,7 +224,9 @@ void BranchSrv::addJob(JobAf * i_job, UserAf * i_user)
 
 	i_job->setBranch(this);
 
-	addRunningCounts(*i_job);
+	// Add solve counts, this function will add it to all parents
+	// (running tasts number, capacity total, renders counts for max tasks per host)
+	addSolveCounts(*i_job);
 
 	// Add job to user (create new branch user if not exists)
 	std::map<UserAf*, BranchSrvUserData*>::iterator it = m_users.find(i_user);
@@ -247,7 +249,9 @@ void BranchSrv::removeJob(JobAf * i_job, UserAf * i_user)
 
 	m_jobs_list.remove(i_job);
 
-	remRunningCounts(*i_job);
+	// Remove solve counts, this function will remove it to all parents
+	// (running tasts number, capacity total, renders counts for max tasks per host)
+	remSolveCounts(*i_job);
 
 	// Remove job from user (and remove user if it has not any more jobs)
 	std::map<UserAf*, BranchSrvUserData*>::iterator it = m_users.find(i_user);
@@ -285,6 +289,32 @@ void BranchSrv::removeJob(JobAf * i_job, UserAf * i_user)
 		AF_ERR << "Branch[" << getName() << "] has no user[" << i_user->getName() << "]";
 
 	m_jobs_num--;
+}
+
+void BranchSrv::addSolveCounts(const JobAf & i_job)
+{
+	// Add running counts (runnig tasks num and capacity total) to Af::Work
+	addRunningCounts(i_job);
+
+	// Add renders counts (for max tasks per host) to AfNodeSolve
+	addRendersCounts(i_job);
+
+	// Add solve counts to the parent (if any, branch can be the root)
+	if (m_parent)
+		m_parent->addSolveCounts(i_job);
+}
+
+void BranchSrv::remSolveCounts(const JobAf & i_job)
+{
+	// Remove running counts (runnig tasks num and capacity total) from Af::Work
+	remRunningCounts(i_job);
+
+	// Remove renders counts (for max tasks per host) from AfNodeSolve
+	remRendersCounts(i_job);
+
+	// Remove solve counts to the parent (if any, branch can be the root)
+	if (m_parent)
+		m_parent->remSolveCounts(i_job);
 }
 
 void BranchSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, MonitorContainer * i_monitoring)

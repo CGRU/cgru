@@ -105,6 +105,9 @@ private:
 	};
 	std::map<UserAf*, BranchSrvUserData*> m_users;
 
+	void addSolveCounts(const JobAf & i_job);
+	void remSolveCounts(const JobAf & i_job);
+
 private:
-   static BranchesContainer * ms_branches;
+	static BranchesContainer * ms_branches;
 };
