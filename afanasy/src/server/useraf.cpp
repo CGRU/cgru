@@ -174,6 +174,11 @@ void UserAf::addJob( JobAf * i_job)
 
 	updateTimeActivity();
 
+	// Add running counts (runnig tasks num and capacity total) to Af::Work
+	addRunningCounts(*i_job);
+	// Add renders counts (for max tasks per host) to AfNodeSolve
+	addRendersCounts(*i_job);
+
 	m_jobs_list.add( i_job );
 
 	m_jobs_num++;
@@ -186,6 +191,11 @@ void UserAf::addJob( JobAf * i_job)
 void UserAf::removeJob( JobAf * i_job)
 {
 	appendLog( std::string("Removing a job: ") + i_job->getName());
+
+	// Remove running counts (runnig tasks num and capacity total) from Af::Work
+	remRunningCounts(*i_job);
+	// Remove renders counts (for max tasks per host) from AfNodeSolve
+	remRendersCounts(*i_job);
 
 	m_jobs_list.remove( i_job );
 

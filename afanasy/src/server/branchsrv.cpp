@@ -229,6 +229,13 @@ void BranchSrv::addJob(JobAf * i_job, UserAf * i_user)
 	addSolveCounts(*i_job);
 
 	// Add job to user (create new branch user if not exists)
+	addUserJob(i_job, i_user);
+
+	m_jobs_num++;
+}
+
+void BranchSrv::addUserJob(JobAf * i_job, UserAf * i_user)
+{
 	std::map<UserAf*, BranchSrvUserData*>::iterator it = m_users.find(i_user);
 	if (it == m_users.end())
 		m_users[i_user] = new BranchSrvUserData(i_job);
@@ -240,7 +247,6 @@ void BranchSrv::addJob(JobAf * i_job, UserAf * i_user)
 		udata->running_capacity_total += i_job->getRunningCapacityTotal();
 	}
 
-	m_jobs_num++;
 }
 
 void BranchSrv::removeJob(JobAf * i_job, UserAf * i_user)
@@ -253,42 +259,55 @@ void BranchSrv::removeJob(JobAf * i_job, UserAf * i_user)
 	// (running tasts number, capacity total, renders counts for max tasks per host)
 	remSolveCounts(*i_job);
 
-	// Remove job from user (and remove user if it has not any more jobs)
-	std::map<UserAf*, BranchSrvUserData*>::iterator it = m_users.find(i_user);
-	if (it != m_users.end())
-	{
-		BranchSrvUserData * udata = (*it).second;
-
-		// Decrement running counts:
-		udata->jobs.remove(i_job);
-		udata->running_tasks_num -= i_job->getRunningTasksNum();
-		udata->running_capacity_total -= i_job->getRunningCapacityTotal();
-
-		// Check negative running counts:
-		if (udata->running_tasks_num < 0)
-		{
-			AF_WARN << "Branch [" << getName() << "] user[" << (*it).first->getName()
-				<< "] has running_tasks_num = " << udata->running_tasks_num;
-			udata->running_tasks_num = 0;
-		}
-		if (udata->running_capacity_total < 0)
-		{
-			AF_WARN << "Branch [" << getName() << "] user[" << (*it).first->getName()
-				<< "] has running_capacity_total = " << udata->running_capacity_total;
-			udata->running_capacity_total = 0;
-		}
-
-		// Remove user data if it has no more jobs:
-		if (udata->jobs.getCount() == 0)
-		{
-			delete udata;
-			m_users.erase(it);
-		}
-	}
-	else
-		AF_ERR << "Branch[" << getName() << "] has no user[" << i_user->getName() << "]";
+	// Remove job from m_users
+	remUserJob(i_job, i_user);
 
 	m_jobs_num--;
+}
+
+void BranchSrv::remUserJob(JobAf * i_job, UserAf * i_user)
+{
+	// Remove job from user (and remove user if it has not any more jobs)
+	std::map<UserAf*, BranchSrvUserData*>::iterator it = m_users.find(i_user);
+	if (it == m_users.end())
+	{
+		AF_ERR << "Branch[" << getName() << "] has no user[" << i_user->getName() << "]";
+		return;
+	}
+
+	BranchSrvUserData * udata = (*it).second;
+
+	// Decrement running counts:
+	udata->jobs.remove(i_job);
+	udata->running_tasks_num -= i_job->getRunningTasksNum();
+	udata->running_capacity_total -= i_job->getRunningCapacityTotal();
+
+	// Check negative running counts:
+	if (udata->running_tasks_num < 0)
+	{
+		AF_WARN << "Branch [" << getName() << "] user[" << (*it).first->getName()
+			<< "] has running_tasks_num = " << udata->running_tasks_num;
+		udata->running_tasks_num = 0;
+	}
+	if (udata->running_capacity_total < 0)
+	{
+		AF_WARN << "Branch [" << getName() << "] user[" << (*it).first->getName()
+			<< "] has running_capacity_total = " << udata->running_capacity_total;
+		udata->running_capacity_total = 0;
+	}
+
+	// Remove user data if it has no more jobs:
+	if (udata->jobs.getCount() == 0)
+	{
+		delete udata;
+		m_users.erase(it);
+	}
+}
+
+void BranchSrv::changeJobUser(UserAf * i_old_user, JobAf * i_job, UserAf * i_new_user)
+{
+	remUserJob(i_job, i_old_user);
+	addUserJob(i_job, i_new_user);
 }
 
 void BranchSrv::addSolveCounts(const JobAf & i_job)

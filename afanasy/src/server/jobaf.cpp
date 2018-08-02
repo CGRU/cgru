@@ -555,6 +555,7 @@ void JobAf::v_action( Action & i_action)
 		i_action.monitors->addEvent(    af::Monitor::EVT_users_change, m_user->getId());
 		i_action.monitors->addJobEvent( af::Monitor::EVT_jobs_del, getId(), m_user->getId());
 
+		m_branch_srv->changeJobUser(m_user, this, user);
 		m_user->removeJob( this);
 		user->addJob( this);  //< UserAf::addJob() updates JobAf::m_user
 
