@@ -97,7 +97,7 @@ for packages_dir in $packages_dirs; do
 
 #continue
 		# count package size:
-		for i in `du -sk0 ${tmpdir}/${package}`; do size=$i; break; done
+		for i in `du -sk ${tmpdir}/${package}`; do size=$i; break; done
 		[ -z $size ] || export SIZE=$size
 
 		# perform package manager specific operations:
