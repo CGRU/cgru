@@ -813,7 +813,7 @@ bool BlockInfo::blockAction( std::ostringstream & i_str, int id_block, const QSt
 	else if( i_action == "sequential" )
 	{
 		if( id_block == blocknum ) cur_number = sequential;
-		set_number = QInputDialog::getInt( listitems, "Change Sequential", "Enter Sequential", cur_number, -1, INT_MAX, 1, &ok);
+		set_number = QInputDialog::getInt( listitems, "Change Sequential", "Enter Sequential", cur_number, INT_MIN, INT_MAX, 1, &ok);
 	}
 	else if( i_action == "errors_retries" )
 	{
