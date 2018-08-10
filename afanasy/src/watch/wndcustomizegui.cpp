@@ -63,9 +63,7 @@ WndCustomizeGUI::WndCustomizeGUI():
 	hlayout = new QHBoxLayout( colorsWidget);
 
 	vlayout = new QVBoxLayout();
-	#if QT_VERSION >= 0x040300
 	vlayout->setContentsMargins( 1, 1, 1, 1);
-	#endif
 	vlayout->setSpacing( 2);
 	hlayout->addLayout( vlayout);
 
@@ -107,9 +105,7 @@ WndCustomizeGUI::WndCustomizeGUI():
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_starline ));
 
 	vlayout = new QVBoxLayout();
-	#if QT_VERSION >= 0x040300
 	vlayout->setContentsMargins( 1, 1, 1, 1);
-	#endif
 	vlayout->setSpacing( 2);
 	hlayout->addLayout( vlayout);
 

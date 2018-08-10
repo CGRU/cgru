@@ -39,18 +39,6 @@ void ColorWidget::paintEvent( QPaintEvent * event)
    painter.fillRect( r.x()+r.width()-offset, r.y()+margin, offset-margin, r.height()-margin-margin, clr->c);
 }
 
-#if QT_VERSION < 0x040500
-void ColorWidget::mouseDoubleClickEvent( QMouseEvent * event)
-{
-   QColor color = QColorDialog::getColor ( clr->c, this );
-   currentColorChanged( color);
-}
-void ColorWidget::currentColorChanged( const QColor & color)
-{
-   clr->c = color;
-   Watch::repaint();
-}
-#else
 void ColorWidget::mouseDoubleClickEvent( QMouseEvent * event)
 {
 //printf("ColorWidget::mouseDoubleClickEvent:\n");
@@ -68,7 +56,6 @@ void ColorWidget::currentColorChanged( const QColor & color)
    clr->c = color;
    repaint();
 }
-#endif
 
 void ColorWidget::finished( int)
 {

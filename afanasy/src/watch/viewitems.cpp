@@ -33,9 +33,7 @@ QSize ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInd
 
 void ItemDelegate::emitSizeHintChanged( const QModelIndex &index)
 {
-    #if QT_VERSION >= 0x040400
     emit sizeHintChanged( index);
-    #endif
 }
 
 ViewItems::ViewItems( ListItems * parent):
@@ -48,9 +46,7 @@ ViewItems::ViewItems( ListItems * parent):
     setHorizontalScrollMode(ScrollPerPixel);
     setVerticalScrollMode(ScrollPerPixel);
 
-    #if QT_VERSION >= 0x040300
     setSelectionRectVisible( true);
-    #endif
     setSelectionMode( QAbstractItemView::ExtendedSelection);
 
     viewport()->setBackgroundRole( QPalette::Mid);
