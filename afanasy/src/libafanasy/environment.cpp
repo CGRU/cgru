@@ -48,8 +48,10 @@ bool Environment::perm_user_mod_his_priority = AFGENERAL::PERM_USER_MOD_HIS_PRIO
 bool Environment::perm_user_mod_job_priority = AFGENERAL::PERM_USER_MOD_JOB_PRIORITY;
 
 int     Environment::priority =                        AFGENERAL::DEFAULT_PRIORITY;
-int     Environment::maxrunningtasks =                 AFGENERAL::MAXRUNNINGTASKS;
-int     Environment::filenamesizemax =                 AFGENERAL::FILENAMESIZEMAX;
+int     Environment::jobs_life_time =                  AFGENERAL::JOBS_LIFE_TIME;
+int     Environment::max_running_tasks =               AFGENERAL::MAX_RUNNING_TASKS;
+int     Environment::max_run_tasks_per_host =          AFGENERAL::MAX_RUN_TASKS_PER_HOST;
+int     Environment::file_name_size_max =              AFGENERAL::FILE_NAME_SIZE_MAX;
 
 int     Environment::task_default_capacity =           AFJOB::TASK_DEFAULT_CAPACITY;
 int     Environment::task_update_timeout =             AFJOB::TASK_UPDATE_TIMEOUT;
@@ -219,7 +221,7 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, perm_user_mod_his_priority,        "af_perm_user_mod_his_priority"        );
 	getVar( i_obj, perm_user_mod_job_priority,        "af_perm_user_mod_job_priority"        );
 
-	getVar( i_obj, filenamesizemax,                   "filenamesizemax"                      );
+	getVar( i_obj, file_name_size_max,                "file_name_size_max"                   );
 	getVar( i_obj, timeformat,                        "timeformat"                           );
 	getVar( i_obj, previewcmds,                       "previewcmds"                          );
 	getVar( i_obj, annotations,                       "annotations"                          );
@@ -227,7 +229,9 @@ void Environment::getVars( const JSON * i_obj)
 
 	getVar( i_obj, afnode_log_lines_max,              "af_node_log_lines_max"                );
 	getVar( i_obj, priority,                          "af_priority"                          );
-	getVar( i_obj, maxrunningtasks,                   "af_maxrunningtasks"                   );
+	getVar( i_obj, jobs_life_time,                    "af_jobs_life_time"                    );
+	getVar( i_obj, max_running_tasks,                 "af_max_running_tasks"                 );
+	getVar( i_obj, max_run_tasks_per_host,            "af_max_run_tasks_per_host"            );
 
 	getVar( i_obj, store_folder,                      "af_store_folder"                      );
 
