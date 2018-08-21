@@ -230,7 +230,7 @@ for b in range(numblocks):
             block.setNumeric(1, numtasks, Options.pertask, increment)
 
     else:
-        cmd = 'task.py%(str_capacity)s @#@ -v %(verbose)d' % vars(),
+        cmd = 'task.py%(str_capacity)s @#@ -v %(verbose)d' % vars()
         cmd = "%s %s" % (os.getenv('CGRU_PYTHONEXE','python'), cmd)
         block.setCommand( cmd, False)
 
@@ -268,7 +268,7 @@ if Options.pause:
     job.offLine()
 
 if Options.output:
-    job.output(1)
+    job.output()
 
 job.setNeedOS('')
 
