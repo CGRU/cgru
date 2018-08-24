@@ -10,17 +10,19 @@ if sys.platform.find('win') == 0 and sys.executable.find('pythonw') != -1:
 	except:
 		pass
 
-# Write qt.conf file on MS Windows before importing PyQt:
+# Write qt.conf file on MS Windows:
 if sys.platform.find('win') == 0:
-	qtconf = sys.prefix + '/qt.conf'
-	pyqt4dir = sys.prefix.replace('\\', '/') + '/Lib/site-packages/PyQt4'
-	if os.path.isfile(qtconf):
-		os.remove(qtconf)
-	qtconf_file = open(qtconf, mode='w')
-	qtconf_file.write('[Paths]\n')
-	qtconf_file.write('Prefix = ' + pyqt4dir + '\n')
-	qtconf_file.write('Binaries = ' + pyqt4dir + '\n')
-	qtconf_file.close()
+	qtconfs = []
+	qtconfs.append(sys.prefix + '/qt.conf')
+	qtconfs.append(os.getenv('AF_ROOT') + '/bin/qt.conf')
+	qtdll = os.getenv('CGRU_LOCATION').replace('\\', '/') + '/dll'
+	qtconf_txt = '[Paths]\nPrefix = ' + qtdll + '\n'
+	for qtconf in qtconfs:
+		if os.path.isfile(qtconf):
+			os.remove(qtconf)
+		qtconf_file = open(qtconf, mode='w')
+		qtconf_file.write(qtconf_txt)
+		qtconf_file.close()
 
 if sys.platform.find('darwin') == 0:
     try:
