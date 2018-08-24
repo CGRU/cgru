@@ -43,7 +43,8 @@ BlockInfo::BlockInfo( Item * qItem, int BlockNumber, int JobId):
 	errors_retries(-1),
 	errors_avoidhost(-1),
 	errors_tasksamehost(-1),
-	task_max_run_time( 0),
+	task_max_run_time(0),
+	task_min_run_time(0),
 
 	item( qItem),
 	blocknum( BlockNumber),
@@ -78,7 +79,8 @@ bool BlockInfo::update( const af::BlockData* block, int type)
 		sequential                   = block->getSequential();
 
 		tasksnum                     = block->getTasksNum();
-		task_max_run_time               = block->getTaskMaxRunTime();
+		task_max_run_time            = block->getTaskMaxRunTime();
+		task_min_run_time            = block->getTaskMinRunTime();
 		task_progress_change_timeout = block->getTaskProgressChangeTimeout();
 		errors_retries               = block->getErrorsRetries();
 		errors_avoidhost             = block->getErrorsAvoidHost();
@@ -272,7 +274,8 @@ void BlockInfo::refresh()
 			str_params += Item::generateErrorsSolvingInfo( errors_avoidhost, errors_tasksamehost, errors_retries);
 		if( errors_forgivetime >= 0 ) str_params += QString(" ErrorsForgiveTime:%1").arg( af::time2strHMS( errors_forgivetime, true).c_str());
 
-		if( task_max_run_time) str_params += QString(" MaxRunTime:%1").arg( af::time2strHMS( task_max_run_time, true).c_str());
+		if(task_max_run_time > 0) str_params += QString(" MaxRunTime:%1").arg(af::time2strHMS(task_max_run_time, true).c_str());
+		if(task_min_run_time > 0) str_params += QString(" MinRunTime:%1").arg(af::time2strHMS(task_min_run_time, true).c_str());
 
 		if( maxrunningtasks    != -1 ) str_params += QString(" MaxRunTasks:%1").arg( maxrunningtasks);
 		if( maxruntasksperhost != -1 ) str_params += QString(" MaxPerHost:%1").arg( maxruntasksperhost);
@@ -308,7 +311,8 @@ void BlockInfo::refresh()
 			str_params += Item::generateErrorsSolvingInfo( errors_avoidhost, errors_tasksamehost, errors_retries);
 		if( errors_forgivetime >= 0 ) str_params += QString(" Forgive:%1").arg( af::time2strHMS( errors_forgivetime, true).c_str());
 
-		if( task_max_run_time) str_params += QString(" MaxTime:%1").arg( af::time2strHMS( task_max_run_time, true).c_str());
+		if(task_max_run_time > 0) str_params += QString(" MaxTime:%1").arg(af::time2strHMS(task_max_run_time, true).c_str());
+		if(task_min_run_time > 0) str_params += QString(" MinTime:%1").arg(af::time2strHMS(task_min_run_time, true).c_str());
 
 		if( maxrunningtasks    != -1 ) str_params += QString(" Max:%1").arg( maxrunningtasks);
 		if( maxruntasksperhost != -1 ) str_params += QString(" PerHost:%1").arg( maxruntasksperhost);
@@ -344,7 +348,8 @@ void BlockInfo::refresh()
 			str_params += Item::generateErrorsSolvingInfo( errors_avoidhost, errors_tasksamehost, errors_retries);
 		if( errors_forgivetime >= 0 ) str_params += QString(" f%1").arg( af::time2strHMS( errors_forgivetime, true).c_str());
 
-		if( task_max_run_time) str_params += QString(" mrt%1").arg( af::time2strHMS( task_max_run_time, true).c_str());
+		if(task_max_run_time > 0) str_params += QString(" Mrt%1").arg(af::time2strHMS(task_max_run_time, true).c_str());
+		if(task_min_run_time > 0) str_params += QString(" mrt%1").arg(af::time2strHMS(task_min_run_time, true).c_str());
 
 		if( maxrunningtasks    != -1 ) str_params += QString(" m%1").arg( maxrunningtasks);
 		if( maxruntasksperhost != -1 ) str_params += QString(" mph%1").arg( maxruntasksperhost);
@@ -682,9 +687,13 @@ void BlockInfo::generateMenu( int id_block, QMenu * menu, QWidget * qwidget, QMe
 	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
 	menu->addAction( action);
 
-	action = new ActionIdString( id_block, "task_max_run_time", "Set Tasks MaxRunTime", qwidget);
-	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-	menu->addAction( action);
+	action = new ActionIdString(id_block, "task_max_run_time", "Set Task MaxRunTime", qwidget);
+	QObject::connect(action, SIGNAL(triggeredId(int, QString)), qwidget, SLOT(blockAction(int, QString)));
+	menu->addAction(action);
+
+	action = new ActionIdString(id_block, "task_min_run_time", "Set Task MinRunTime", qwidget);
+	QObject::connect(action, SIGNAL(triggeredId(int, QString)), qwidget, SLOT(blockAction(int, QString)));
+	menu->addAction(action);
 
 	action = new ActionIdString( id_block, "errors_forgive_time", "Set Errors Forgive time", qwidget);
 	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
@@ -813,7 +822,7 @@ bool BlockInfo::blockAction( std::ostringstream & i_str, int id_block, const QSt
 	else if( i_action == "sequential" )
 	{
 		if( id_block == blocknum ) cur_number = sequential;
-		set_number = QInputDialog::getInt( listitems, "Change Sequential", "Enter Sequential", cur_number, -1, INT_MAX, 1, &ok);
+		set_number = QInputDialog::getInt( listitems, "Change Sequential", "Enter Sequential", cur_number, INT_MIN, INT_MAX, 1, &ok);
 	}
 	else if( i_action == "errors_retries" )
 	{
@@ -851,6 +860,11 @@ bool BlockInfo::blockAction( std::ostringstream & i_str, int id_block, const QSt
 		if( id_block == blocknum ) cur = double(task_max_run_time) / (60*60);
 		double hours = QInputDialog::getDouble( listitems, "Task Maximum Run Time", "Enter number of hours (0=infinite)", cur, 0, 365*24, 4, &ok);
 		set_number = int( hours * 60*60 );
+	}
+	else if(i_action == "task_min_run_time")
+	{
+		if(id_block == blocknum) cur_number = task_min_run_time;
+		set_number = QInputDialog::getInt(listitems, "Task Minimum Run Time", "Enter number of seconds (0=infinite)", cur_number, 0, INT_MAX, 1, &ok);
 	}
 	else if( i_action == "max_running_tasks" )
 	{

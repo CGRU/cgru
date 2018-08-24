@@ -13,9 +13,7 @@ NumberWidget::NumberWidget( QWidget * parent, afqt::AttrNumber * attrNumber):
     num( attrNumber)
 {
     QHBoxLayout * layout = new QHBoxLayout(this);
-    #if QT_VERSION >= 0x040300
     layout->setContentsMargins( 1, 1, 1, 1);
-    #endif
     layout->setSpacing( 2);
     QLabel * label = new QLabel( attrNumber->getLabel(), this);
     QSpinBox * spinbox = new QSpinBox( this);

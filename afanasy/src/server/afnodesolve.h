@@ -64,15 +64,18 @@ public:
 	void addSolveCounts(af::TaskExec *i_exec, RenderAf *i_render);
 	void remSolveCounts(af::TaskExec *i_exec, RenderAf *i_render);
 
+	void addRendersCounts(const AfNodeSolve & i_other);
+	void remRendersCounts(const AfNodeSolve & i_other);
+
 	void setZombie();
 
 	friend class AfList;
 
 private:
 	/// Renders counts manipulations (for max run tasks per host)
-	void addRenderCount(RenderAf *i_render);
+	void addRenderCount(int i_render_id, int i_count = 1);
+	void remRenderCount(int i_render_id, int i_count = 1);
 	int getRenderCount(RenderAf *i_render) const;
-	void remRenderCount(RenderAf *i_render);
 
 private:
 	af::Work *m_work;

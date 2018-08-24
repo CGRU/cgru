@@ -42,9 +42,7 @@ void WndText::construct()
 	qTextEdit->setReadOnly( true);
 
 	layout = new QVBoxLayout( this);
-#if QT_VERSION >= 0x040300
 	layout->setContentsMargins( 1, 1, 1, 1);
-#endif
 	layout->addWidget( qTextEdit);
 }
 

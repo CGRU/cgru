@@ -527,9 +527,7 @@ void WndTask::showExec( af::MCTask & i_mctask)
 	splitter->setSizes( QList<int>() << 300 << ( files.size() > 10 ? 300 : files.size() * 30 ));
 	scroll->setWidgetResizable( true);
 	layout->setSpacing(0);
-	#if QT_VERSION >= 0x040300
 	layout->setContentsMargins( 1, 1, 1, 1);
-	#endif
 
 	if( parsed_files.size())
 		layout->addWidget( new QLabel("Files (parsed):", m_tab_exec));

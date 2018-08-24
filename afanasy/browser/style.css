@@ -313,8 +313,8 @@ cursor: default;
 .WRN { background: #292;}
 .WDP { background: #969;}
 .PPA { background: #CC6;}
-.WTM { background: #599;}
 .RUN { background: #8A6;}
+.WTM { background: #599;}
 .ERR { background: #965;}
 .RER { background: #F77;}
 .WRC { background: #4AC;}
@@ -554,9 +554,9 @@ padding: 2px;
 .item.branch.empty { opacity:.5; font-size: 75%;}
 .item.branch.running { background-color: rgba(170,255,100,.5);}
 .item.branch.active  { background-color: rgba(230,255,160,.5);}
-.item.branch.selected       { background-color: #DFD;}
-.branch_active_job.selected { background-color: #DFD;}
+.item.branch.selected { background-color: #DFD;}
 .branch_active_job.RUN { background: #DD8;}
+.branch_active_job.selected { background-color: #DFD;}
 
 /*####################### Task Window: ################## */
 .wnd_task > div {

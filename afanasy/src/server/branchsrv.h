@@ -50,6 +50,8 @@ public:
 	void addJob(JobAf * i_job, UserAf * i_user);
 	void removeJob(JobAf * i_job, UserAf * i_user);
 
+	void changeJobUser(UserAf * i_old_user, JobAf * i_job, UserAf * i_new_user);
+
 	/// Whether the branch can produce a task
 	/** Used to limit nodes for heavy solve algorithm **/
 	bool v_canRun();
@@ -105,6 +107,12 @@ private:
 	};
 	std::map<UserAf*, BranchSrvUserData*> m_users;
 
+	void remUserJob(JobAf * i_job, UserAf * i_user);
+	void addUserJob(JobAf * i_job, UserAf * i_user);
+
+	void addSolveCounts(const JobAf & i_job);
+	void remSolveCounts(const JobAf & i_job);
+
 private:
-   static BranchesContainer * ms_branches;
+	static BranchesContainer * ms_branches;
 };

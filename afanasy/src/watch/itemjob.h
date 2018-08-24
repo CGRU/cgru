@@ -21,8 +21,11 @@ public:
 		{if(block<m_blocks_num )return m_blockinfo[ block].getErrorsAvoidHost();     else return 0; }
 	inline int getErrorsTaskSameHost(   int block = 0 ) const
 		{if(block<m_blocks_num )return m_blockinfo[ block].getErrorsTaskSameHost();  else return 0; }
-	inline uint32_t getTasksMaxRunTime( int block = 0 ) const
-		{if(block<m_blocks_num )return m_blockinfo[ block].getTasksMaxRunTime();     else return 0; }
+
+	inline uint32_t getTaskMaxRunTime(int block = 0) const
+		{if(block<m_blocks_num )return m_blockinfo[block].getTaskMaxRunTime(); else return 0; }
+	inline uint32_t getTaskMinRunTime(int block = 0) const
+		{if(block<m_blocks_num )return m_blockinfo[block].getTaskMinRunTime(); else return 0; }
 
 	int maxrunningtasks;
 	int maxruntasksperhost;

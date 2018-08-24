@@ -502,7 +502,7 @@ AFINFA("SysJob::SysJob: folder = '%s'", i_folder.c_str())
 	m_name              = AFJOB::SYSJOB_NAME;
 	m_user_name         = AFJOB::SYSJOB_USERNAME;
 	m_priority          = AFGENERAL::DEFAULT_PRIORITY;
-	m_max_running_tasks = AFGENERAL::MAXRUNNINGTASKS;
+	m_max_running_tasks = AFGENERAL::MAX_RUNNING_TASKS;
 
 	m_blocks_num = BlockLastIndex;
 	m_blocks_data = new af::BlockData*[m_blocks_num];

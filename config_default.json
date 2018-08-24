@@ -55,7 +55,7 @@
 	"timeformat":"%a %d %b %H:%M.%S",
 		"":"'strftime' function format http://www.cplusplus.com/reference/clibrary/ctime/strftime",
 
-	"filenamesizemax":250,
+	"file_name_size_max":250,
 
 	"platforms":["linux","mac","windows"],
 

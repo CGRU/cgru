@@ -56,7 +56,10 @@ void User::initDefaultValues()
 	m_errors_task_same_host = af::Environment::getTaskErrorsSameHost();
 	m_errors_forgive_time   = af::Environment::getErrorsForgiveTime();
 
-	m_jobs_life_time    = 0;
+	m_max_running_tasks_per_host = af::Environment::getMaxRunningTasksPerHost();
+
+	m_jobs_life_time = af::Environment::getJobsLifeTime();
+
 	m_jobs_num          = 0;
 	m_running_jobs_num  = 0;
 

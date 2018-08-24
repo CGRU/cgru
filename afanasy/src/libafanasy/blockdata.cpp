@@ -583,9 +583,7 @@ void BlockData::v_readwrite(Msg *msg)
 			rw_int32_t(m_errors_forgive_time, msg);
 			rw_int32_t(m_task_progress_change_timeout, msg);
 			rw_int32_t(m_task_max_run_time, msg);
-
-			// NEW VERSION
-			//rw_int32_t(m_task_min_run_time, msg);
+			rw_int32_t(m_task_min_run_time, msg);
 
 		case Msg::TBlocksProgress:
 
