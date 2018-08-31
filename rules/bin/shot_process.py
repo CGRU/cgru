@@ -228,24 +228,13 @@ def processNuke( io_shot):
             x = 0
         src = root
 
-        colorspace = None
-        if Options.clrsp_in is not None:
-            if Options.clrsp_in != 'extension' and Options.clrsp_in != 'auto':
-                colorspace = Options.clrsp_in
-        else:
-            name, ext = os.path.splitext(filename)
-            if len(ext):
-                ext = ext[1:]
-                if ext == 'dpx':
-                    colorspace = 'Cineon'
-
         read = 'Read {'
         read += '\ninputs 0'
         read += '\nfile "%s"' % filename
         read += '\nfirst %d' % seq['first']
         read += '\nlast %d' % seq['last']
-        if colorspace is not None:
-            read += '\ncolorspace %s' % colorspace
+        if Options.clrsp_in is not None:
+            read += '\ncolorspace %s' % Options.clrsp_in
         read += '\norigset true'
         read += '\nversion 4'
         read += '\nframe_mode "start at"'
