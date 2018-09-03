@@ -21,14 +21,20 @@ public:
 			const std::string & i_name,
 			const std::string & i_service_type,
 			const std::string & i_parser_type,
-			const std::string & i_command,
+
 			int i_capacity,
 			int i_file_size_min,
 			int i_file_size_max,
-			const std::vector<std::string> & i_files,
 
-			long long i_start_frame,
-			long long i_end_frame,
+//			const std::string & i_command,
+			const std::string & i_command_block,
+
+//			const std::vector<std::string> & i_files,
+			const std::vector<std::string> & i_files_block,
+
+			long long i_frame_start,
+			long long i_frame_end,
+			long long i_frames_inc,
 			long long i_frames_num,
 
 			const std::string & i_working_directory,
@@ -54,7 +60,7 @@ public:
 
 	inline int  getCapacity()      const { return m_capacity;   }///< Get task capacity.
 	inline int  getCapCoeff()      const { return m_capacity_coeff;   }///< Get task capacity koeff.
-	inline void setCapCoeff( int value ) { m_capacity_coeff = value;  }///< Set task capacity koeff.
+	inline void setCapCoeff(int i_value) { m_capacity_coeff = i_value;}///< Set task capacity koeff.
 	inline int  getCapResult()     const { return m_capacity_coeff ? m_capacity*m_capacity_coeff : m_capacity;}
 
 	// Get task data:
@@ -79,27 +85,29 @@ public:
 	// Get render data:
 	inline int64_t getRenderFlags() const { return m_render_flags; }
 
-	inline bool hasCommand()   const { return m_command.size(); } ///< Whether command exists.
-	inline bool hasWDir()      const { return m_working_directory.size();    } ///< Whether working directory exists.
-	inline bool hasEnv()       const { return m_environment.size();     } ///< Whether extra environment.
-	inline bool hasFiles()     const { return m_files.size();   } ///< Whether files exist.
+	inline const std::string & getCommandBlock() const { return m_command_block; }
+	inline const std::string & getCommandTask() const { return m_command_task; }
 
-	inline const std::string & getCommand()  const { return m_command; } ///< Get command.
-	inline const std::string & getWDir()     const { return m_working_directory;    } ///< Get working directory.
-	inline const std::vector<std::string> & getFiles() const { return m_files;   } ///< Get files.
-	inline const std::map<std::string, std::string> & getEnv() const { return m_environment; } ///< Get extra environment.
+	inline const std::vector<std::string> & getFilesBlock() const { return m_files_block; }
+	inline const std::vector<std::string> & getFilesTask() const { return m_files_task; }
+
+	inline const std::string & getWDir() const { return m_working_directory; }
+
+	inline const std::map<std::string, std::string> & getEnv() const { return m_environment; }
 
 	inline void setParsedFiles( const std::vector<std::string> & i_files) { m_parsed_files = i_files; }
 	inline const std::vector<std::string> & getParsedFiles() const { return m_parsed_files; }
 
+	inline bool hasEnv() const {return m_environment.size();} ///< Whether extra environment.
 	inline bool hasFileSizeCheck() const { return m_block_flags & af::BlockData::FCheckRenderedFiles ;}
 
 	inline long long getFileSizeMin()   const { return m_file_size_min;}
 	inline long long getFileSizeMax()   const { return m_file_size_max;}
 
-	inline long long getFramesNum()   const { return m_frames_num;   } ///< Get frames number.
 	inline long long getFrameStart()  const { return m_frame_start;  } ///< Get first frame.
 	inline long long getFrameFinish() const { return m_frame_finish; } ///< Get last frame.
+	inline long long getFrameInc()    const { return m_frames_inc;   } ///< Get last frame.
+	inline long long getFramesNum()   const { return m_frames_num;   } ///< Get frames number.
 
 	inline long long getTimeStart()  const { return m_time_start;   } ///< Get task started time.
 
@@ -155,14 +163,16 @@ public:
 	void listenOutput( bool i_subscribe);
 
 
-	inline void setName(      const std::string & str) { m_name      = str;}   ///< Set task name.
-	inline void setBlockName( const std::string & str) { m_block_name = str;}   ///< Set task block name.
-	inline void setJobName(   const std::string & str) { m_job_name   = str;}   ///< Set task job name.
-	inline void setUserName(  const std::string & str) { m_user_name  = str;}   ///< Set task user name.
-	inline void setCommand(   const std::string & str) { m_command   = str;}   ///< Set task command.
-	inline void setWDir(      const std::string & str) { m_working_directory      = str;}   ///< Set working directory.
-	inline void setTaskNumber(      int           num) { m_task_num   = num;}   ///< Set task number.
-	inline void setNumber(          int           num) { m_number    = num;}   ///< Set task aux number.
+	inline void setName(      const std::string & i_str) {m_name              = i_str;}
+	inline void setBlockName( const std::string & i_str) {m_block_name        = i_str;}
+	inline void setJobName(   const std::string & i_str) {m_job_name          = i_str;}
+	inline void setUserName(  const std::string & i_str) {m_user_name         = i_str;}
+	inline void setWDir(      const std::string & i_str) {m_working_directory = i_str;}
+	inline void setTaskNumber(int i_num) {m_task_num = i_num;}
+	inline void setNumber(    int i_num) {m_number   = i_num;}
+
+	inline void setTaskCommand(const std::string & i_str             ) {m_command_task = i_str;}
+	inline void setTaskFiles(  const std::vector<std::string> & i_vec) {m_files_task   = i_vec;}
 
 	inline void setHostNames( const std::list<std::string> & names)  { m_multihost_names = names;}
 	inline const std::list<std::string> & getMultiHostsNames() const { return m_multihost_names; }
@@ -193,15 +203,17 @@ private:
 	std::string m_user_name;          ///< Task user name.
 
 	std::string m_working_directory;  ///< Working directory.
-	std::string m_command;            ///< Command.
+	std::string m_command_block;      ///< Block command.
+	std::string m_command_task;       ///< Task command.
 	std::string m_service;            ///< Task service type.
 	std::string m_parser;             ///< Task parser type.
 	int32_t     m_parser_coeff;       ///< Parser koefficient.
 
 	std::map<std::string, std::string> m_environment; ///< Extra environment.
 
-	std::vector<std::string> m_files; ///< File(s).
-	std::vector<std::string> m_parsed_files; ///< File(s).
+	std::vector<std::string> m_files_block;  ///< Block files.
+	std::vector<std::string> m_files_task;   ///< Block files.
+	std::vector<std::string> m_parsed_files; ///< Files.
 
 	int32_t m_capacity;
 	int32_t m_capacity_coeff;
@@ -222,6 +234,7 @@ private:
 
 	int64_t m_frame_start;   ///< First frame.
 	int64_t m_frame_finish;  ///< Last frame.
+	int64_t m_frames_inc;     ///< Frame increment.
 	int64_t m_frames_num;    ///< Number of frames.
 
 	int64_t m_time_start;
@@ -234,7 +247,5 @@ private:
 private:
 	/// Needed for af::Render to write running tasks percents:
 	const TaskProgress * m_progress;
-
-	bool m_on_client;
 };
 }

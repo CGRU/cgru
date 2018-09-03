@@ -49,8 +49,6 @@ public:
 	/// Get \c task task from \c block log.
 	const std::list<std::string> & getTaskLog( int block, int task) const;
 	
-	af::TaskExec * generateTask( int block, int task) const;
-	
 	/// Construct MCTaskOutput with render ID
 	/// for retrieveing output from running remote host
 	/// or filename if task is not running.
@@ -164,6 +162,8 @@ private:
 	void restartAllTasks( const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state = 0);
 
 	af::TaskExec *genTask( RenderAf *render, int block, int task, std::list<int> * blocksIds, MonitorContainer * monitoring);
+	
+	af::TaskExec * generateTask( int block, int task) const;
 	
 	/**
 	 * @brief Emit events and submit them to the wall job

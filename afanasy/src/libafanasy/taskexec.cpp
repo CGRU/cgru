@@ -13,14 +13,17 @@ TaskExec::TaskExec(
 		const std::string & i_name,
 		const std::string & i_service_type,
 		const std::string & i_parser_type,
-		const std::string & i_command,
+
 		int i_capacity,
 		int i_file_size_min,
 		int i_file_size_max,
-		const std::vector<std::string> & i_files,
 
-		long long i_start_frame,
-		long long i_end_frame,
+		const std::string & i_command_block,
+		const std::vector<std::string> & i_files_block,
+
+		long long i_frame_start,
+		long long i_frame_end,
+		long long i_frames_inc,
 		long long i_frames_num,
 
 		const std::string & i_working_directory,
@@ -34,28 +37,32 @@ TaskExec::TaskExec(
 		int i_parser_coeff
 	):
 
-	m_name( i_name),
-	m_working_directory( i_working_directory),
-	m_environment(  i_environment),
-	m_command( i_command),
-	m_files( i_files),
+	m_name(    i_name),
 	m_service( i_service_type),
-	m_parser( i_parser_type),
-	m_parser_coeff( i_parser_coeff),
-	m_capacity( i_capacity),
+	m_parser(  i_parser_type),
+
+	m_capacity(      i_capacity),
 	m_file_size_min( i_file_size_min),
 	m_file_size_max( i_file_size_max),
 
-	m_job_id( i_job_id),
-	m_block_num( i_block_number),
+	m_command_block( i_command_block),
+	m_files_block(   i_files_block),
+
+	m_working_directory( i_working_directory),
+	m_environment(       i_environment),
+
+	m_frame_start(  i_frame_start),
+	m_frame_finish( i_frame_end),
+	m_frames_inc(   i_frames_inc),
+	m_frames_num(   i_frames_num),
+
+	m_job_id(      i_job_id),
+	m_block_num(   i_block_number),
 	m_block_flags( i_block_flags),
-	m_task_num(  i_task_number),
+	m_task_num(    i_task_number),
 
-	m_frame_start(   i_start_frame),
-	m_frame_finish(  i_end_frame),
-	m_frames_num(    i_frames_num),
+	m_parser_coeff( i_parser_coeff)
 
-	m_on_client( false)
 {
 	m_time_start = time(NULL);
 	initDefaults();
@@ -75,8 +82,7 @@ TaskExec::~TaskExec()
 AFINFA("TaskExec:: ~ TaskExec: %s:\n", m_job_name.toUtf8().data(), m_block_name.toUtf8().data(), m_name.toUtf8().data());
 }
 
-TaskExec::TaskExec( Msg * msg):
-	m_on_client( true)
+TaskExec::TaskExec(Msg * msg)
 {
 	initDefaults();
 	read( msg);
@@ -108,11 +114,13 @@ void TaskExec::jsonWrite( std::ostringstream & o_str, int i_type) const
 
 	if( i_type != Msg::TRendersList )
 	{
-		o_str << ",\"command\":\"" << af::strEscape( m_command  ) << "\"";
+		o_str << ",\"command_block\":\"" << af::strEscape(m_command_block) << "\"";
+		o_str << ",\"command_task\":\"" << af::strEscape(m_command_task) << "\"";
 
-		o_str << ",\"frames_num\":"   << m_frames_num;
 		o_str << ",\"frame_start\":"  << m_frame_start;
 		o_str << ",\"frame_finish\":" << m_frame_finish;
+		o_str << ",\"frames_inc\":"   << m_frames_inc;
+		o_str << ",\"frames_num\":"   << m_frames_num;
 
 		if( m_parser_coeff > 1 )
 			o_str << ",\"parser_coeff\":"  << m_parser_coeff;
@@ -138,27 +146,12 @@ void TaskExec::jsonWrite( std::ostringstream & o_str, int i_type) const
 		if( m_environment.size())
 			af::jw_stringmap("environment", m_environment, o_str );
 
-		if( m_files.size())
-		{
-			o_str << ",\"files\":[";
-			for( int i = 0; i < m_files.size(); i++)
-			{
-				if( i ) o_str << ",";
-				o_str << "\"" << af::strEscape( m_files[i]) << "\"";
-			}
-			o_str << "]";
-		}
-
+		if( m_files_block.size())
+			af::jw_stringvec("files_block", m_files_block, o_str);
+		if( m_files_task.size())
+			af::jw_stringvec("files_task", m_files_task, o_str);
 		if( m_parsed_files.size())
-		{
-			o_str << ",\"parsed_files\":[";
-			for( int i = 0; i < m_parsed_files.size(); i++)
-			{
-				if( i ) o_str << ",";
-				o_str << "\"" << af::strEscape( m_parsed_files[i]) << "\"";
-			}
-			o_str << "]";
-		}
+			af::jw_stringvec("parsed_files", m_parsed_files, o_str);
 	}
 
 	o_str << "}";
@@ -177,17 +170,20 @@ void TaskExec::v_readwrite( Msg * msg)
 		rw_int64_t ( m_user_flags,        msg);
 		rw_int64_t ( m_render_flags,      msg);
 		rw_int64_t ( m_frames_num,        msg);
+		rw_int64_t ( m_frames_inc,        msg);
 		rw_int64_t ( m_frame_start,       msg);
 		rw_int64_t ( m_frame_finish,      msg);
 		rw_int32_t ( m_parser_coeff,      msg);
 		rw_int64_t ( m_file_size_min,     msg);
 		rw_int64_t ( m_file_size_max,     msg);
-		rw_String  ( m_command,           msg);
+		rw_String  ( m_command_block,     msg);
+		rw_String  ( m_command_task,      msg);
 		rw_String  ( m_working_directory, msg);
 		rw_String  ( m_parser,            msg);
 
 		rw_StringMap ( m_environment,     msg);
-		rw_StringVect( m_files,           msg);
+		rw_StringVect( m_files_block,     msg);
+		rw_StringVect( m_files_task,      msg);
 		rw_StringVect( m_parsed_files,    msg);
 
 		rw_String( m_custom_data_task,    msg);
@@ -245,41 +241,52 @@ void TaskExec::v_generateInfoStream( std::ostringstream & stream, bool full) con
 	if(full)
 	{
 		stream << std::endl;
-		stream << m_command;
+		if (m_command_block.size())
+			stream << "Command block:\n" << m_command_block << "\n";
+		if (m_command_task.size())
+			stream << "Command task:\n" << m_command_task << "\n";
 		if( m_working_directory.size())
 			stream << "   Working directory = \"" << m_working_directory << "\".\n";
 		if( m_environment.size())
 			stream << "   Environment = \"" << af::strJoin(m_environment) << "\".\n";
-		if( m_files.size())
+		if( m_files_block.size())
 		{
-			stream << "Files:\n";
-			for( int i = 0; i < m_files.size(); i++ )
-				stream << m_files[i] << "\n";
+			stream << "Files block:\n";
+			for( int i = 0; i < m_files_block.size(); i++ )
+				stream << "   " << m_files_block[i] << "\n";
+		}
+		if( m_files_task.size())
+		{
+			stream << "Files task:\n";
+			for( int i = 0; i < m_files_task.size(); i++ )
+				stream << "   " << m_files_task[i] << "\n";
 		}
 		if( m_parsed_files.size())
 		{
 			stream << "Parsed Files:\n";
 			for( int i = 0; i < m_parsed_files.size(); i++ )
-				stream << m_parsed_files[i] << "\n";
+				stream << "   " << m_parsed_files[i] << "\n";
 		}
 	}
 }
 
 int TaskExec::calcWeight() const
 {
-	int weight = sizeof( TaskExec);
-	weight += weigh( m_name);
-	weight += weigh( m_block_name);
-	weight += weigh( m_job_name);
-	weight += weigh( m_user_name);
-	weight += weigh( m_working_directory);
-	weight += weigh( m_environment);
-	weight += weigh( m_command);
-	weight += weigh( m_files);
-	weight += weigh( m_service);
-	weight += weigh( m_parser);
-	weight += weigh( m_custom_data_block);
-	weight += weigh( m_custom_data_task);
+	int weight = sizeof(TaskExec);
+	weight += weigh(m_name);
+	weight += weigh(m_block_name);
+	weight += weigh(m_job_name);
+	weight += weigh(m_user_name);
+	weight += weigh(m_working_directory);
+	weight += weigh(m_environment);
+	weight += weigh(m_command_block);
+	weight += weigh(m_command_task);
+	weight += weigh(m_files_block);
+	weight += weigh(m_files_task);
+	weight += weigh(m_service);
+	weight += weigh(m_parser);
+	weight += weigh(m_custom_data_block);
+	weight += weigh(m_custom_data_task);
 	return weight;
 }
 

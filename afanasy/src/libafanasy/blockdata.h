@@ -121,107 +121,17 @@ public:
 		return m_flags & FDependSubTask;
 	} ///< Other block can depend this block sub task
 
-	inline void setDependSubTask(bool value = true)
-	{
-		if (value)
-			m_flags |= FDependSubTask;
-		else
-			m_flags &= (~FDependSubTask);
-	}
-
 	inline bool isSequential() const { return m_sequential == 1; }
 	inline bool notSequential() const { return m_sequential != 1; }
-	inline void setSequential(int64_t i_value) { m_sequential = i_value; }
+	inline void setSequential(int64_t i_value) { m_sequential = i_value; } ///< Used in afcmd cmd_numeric
 	inline int64_t getSequential() const { return m_sequential; }
 
 	inline void setParserCoeff(int value) { m_parser_coeff = value; }
 
-	inline void setName(const std::string &str) { m_name = str; }
-	inline void setTasksName(const std::string &str) { m_tasks_name = str; }
-
-	/// Set block tasks type.
-	inline void setService(const std::string &str) { m_service = str; }
-	/// Set block tasks parser type.
-	inline void setParser(const std::string &str) { m_parser = str; }
-	/// Set block tasks working directory.
-	inline void setWDir(const std::string &str) { m_working_directory = str; }
-	/// Set block tasks command.
+    /// Set block tasks command. Used in system job.
 	inline void setCommand(const std::string &str) { m_command = str; }
-	/// Set block tasks veiw result command.
-	//	inline void setFiles(            const std::string & str    ) { m_files            = str;   }
-	/// Set block pre commnand.
-	inline void setCmdPre(const std::string &str) { m_command_pre = str; }
-	/// Set block post commnand.
-	inline void setCmdPost(const std::string &str) { m_command_post = str; }
-	/// Set tasks maximum run time, after this time task will be restart as error task
-//	inline void setTasksMaxRunTime(const int secs) { m_tasks_max_run_time = secs; }
-	/// Set maximum running tasks
-	inline void setMaxRunningTasks(const int value) { m_max_running_tasks = value; }
-	/// Set maximum running tasks on the same host
-	inline void setMaxRunTasksPerHost(const int value) { m_max_running_tasks_per_host = value; }
-	/// Set block tasks extra environment.
-	inline void setEnv(const std::string &i_name, const std::string &i_value)
-	{
-		m_environment[i_name] = i_value;
-	}
 
-	/// Set block tasks capacity.
-	bool setCapacity(int value);
-	bool setCapacityCoeffMin(int value);
-	bool setCapacityCoeffMax(int value);
-
-	bool setMultiHostMin(int value);
-	bool setMultiHostMax(int value);
-	inline void setMultiHostWaitSrv(int value) { m_multihost_service_wait = value; }
-	inline void setMultiHostWaitMax(int value) { m_multihost_max_wait = value; }
-
-	/// Set block depend mask.
-	bool setDependMask(const std::string &str, std::string *errOutput = NULL)
-	{
-		return setRegExp(m_depend_mask, str, "block depend mask", errOutput);
-	}
-	/// Set block hosts mask.
-	bool setHostsMask(const std::string &str, std::string *errOutput = NULL)
-	{
-		return setRegExp(m_hosts_mask, str, "block hosts mask", errOutput);
-	}
-	/// Set block hosts to exclude mask.
-	bool setHostsMaskExclude(const std::string &str, std::string *errOutput = NULL)
-	{
-		return setRegExp(m_hosts_mask_exclude, str, "block exclude hosts mask", errOutput);
-	}
-	/// Set block tasks depend mask.
-	bool setTasksDependMask(const std::string &str, std::string *errOutput = NULL)
-	{
-		return setRegExp(m_tasks_depend_mask, str, "block tasks depend mask", errOutput);
-	}
-
-	bool setNeedProperties(const std::string &str, std::string *errOutput = NULL)
-	{
-		return setRegExp(m_need_properties, str, "block host properties needed", errOutput);
-	}
-
-	inline void setNeedMemory(int memory) { m_need_memory = memory; }
-	inline void setNeedPower(int power) { m_need_power = power; }
-	inline void setNeedHDD(int hdd) { m_need_hdd = hdd; }
-
-	inline void setCustomData(const std::string &str) { m_custom_data = str; }
-	inline void setFileSizeCheck(long long min, long long max)
-	{
-		m_file_size_min = min;
-		m_file_size_max = max;
-	}
-
-	/// Set maximum number or errors on same host for job NOT to avoid host
-	inline void setErrorsAvoidHost(int8_t value) { m_errors_avoid_host = value; }
-	/// Set maximum number of errors in task to retry it automatically
-	inline void setErrorsRetries(int8_t value) { m_errors_retries = value; }
-	/// Set maximum number or errors on same host for task NOT to avoid host
-	inline void setErrorsTaskSameHost(int8_t value) { m_errors_task_same_host = value; }
-	/// Set time to forgive error host
-	inline void setErrorsForgiveTime(int value) { m_errors_forgive_time = value; }
-
-	bool setNumeric(long long start, long long end, long long perTask = 1, long long increment = 1);
+    bool setNumeric(long long start, long long end, long long perTask = 1, long long increment = 1);
 	void setFramesPerTask(long long perTask); ///< For string tasks and per tasr dependency solve
 
 	inline const std::string &getName() const { return m_name; }			  ///< Get name.
@@ -300,9 +210,9 @@ public:
 	inline int getMaxRunTasksPerHost()              const { return m_max_running_tasks_per_host;   }
 	inline const std::string &getMultiHostService() const { return m_multihost_service;            }
 
-	inline long long getFrameFirst() const { return m_frame_first; } ///< Get first task frame ( if numeric).
-	inline long long getFrameLast() const { return m_frame_last; }   ///< Get last task frame  ( if numeric).
-	inline long long getFrameInc() const { return m_frames_inc; }	///< Get frame increment  ( if numeric).
+	inline long long getFrameFirst()   const { return m_frame_first;     } ///< Get first task frame ( if numeric).
+	inline long long getFrameLast()    const { return m_frame_last;      } ///< Get last task frame  ( if numeric).
+	inline long long getFrameInc()     const { return m_frames_inc;      } ///< Get frame increment  ( if numeric).
 	inline long long getFramePerTask() const { return m_frames_per_task; } ///< Get frames per task.
 
 	inline long long getFileSizeMin() const { return m_file_size_min; }

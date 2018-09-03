@@ -19,8 +19,7 @@ using namespace af;
 Service::Service( const TaskExec * i_task_exec, const std::string & i_store_dir):
 	m_name( i_task_exec->getServiceType()),
 	m_parser_type( i_task_exec->getParserType()),
-	m_wdir( i_task_exec->getWDir()),
-	m_command( i_task_exec->getCommand())
+	m_wdir( i_task_exec->getWDir())
 {
 	initialize( i_task_exec, i_store_dir);
 }
@@ -28,18 +27,18 @@ Service::Service( const TaskExec * i_task_exec, const std::string & i_store_dir)
 Service::Service(
 	const std::string & i_type,
 	const std::string & i_wdir,
-	const std::string & i_command
+	const std::string & i_command_task
 ):
 	m_name( i_type),
 	m_parser_type("generic"),
-	m_wdir( i_wdir),
-	m_command( i_command)
+	m_wdir( i_wdir)
 {
 	TaskExec * i_task_exec = new TaskExec(
-			"name",m_name, m_parser_type, m_command,
+			"name",m_name, m_parser_type,
 			1, -1, -1,
+            i_command_task,
 			std::vector<std::string>(),
-			1, 1, 1,
+			1, 1, 1, 1,
 			m_wdir,
 			std::map<std::string,std::string>(),
 			1, 0, 0, 1
@@ -56,10 +55,11 @@ Service::Service(
 	m_parser_type( i_parser_type)
 {
 	TaskExec * i_task_exec = new TaskExec(
-			"name", m_name, m_parser_type, "",
+			"name", m_name, m_parser_type,
 			1, -1, -1,
-			std::vector<std::string>(),
-			1, 1, 1,
+			"",
+            std::vector<std::string>(),
+			1, 1, 1, 1,
 			m_wdir,
 			std::map<std::string,std::string>(),
 			1, 0, 0, 1
@@ -76,10 +76,11 @@ Service::Service(
 	m_wdir( i_wdir)
 {
 	TaskExec * i_task_exec = new TaskExec(
-			"name", m_name, m_parser_type, "",
+			"name", m_name, m_parser_type,
 			1, -1, -1,
-			std::vector<std::string>(),
-			1, 1, 1,
+			"",
+            std::vector<std::string>(),
+			1, 1, 1, 1,
 			m_wdir,
 			std::map<std::string,std::string>(),
 			1, 0, 0, 1
@@ -97,13 +98,36 @@ Service::Service(
 	m_wdir( i_wdir)
 {
 	TaskExec * i_task_exec = new TaskExec(
-			"name", m_name, m_parser_type, "",
+			"name", m_name, m_parser_type,
 			1, -1, -1,
+            "",
 			i_files,
-			1, 1, 1,
+			1, 1, 1, 1,
 			m_wdir,
 			std::map<std::string,std::string>(),
 			1, 0, 0, 1
+		);
+	initialize( i_task_exec, "");
+	delete i_task_exec;
+}
+
+Service::Service(
+	const std::string & i_type,
+	const std::string & i_command_block,
+	int i_frame_start, int i_frame_end
+):
+	m_name(i_type),
+	m_parser_type("generic")
+{
+	TaskExec * i_task_exec = new TaskExec(
+			"name", m_name, m_parser_type,
+			1, -1, -1,
+			i_command_block,
+            std::vector<std::string>(),
+			i_frame_start, i_frame_end, 1, 1,
+			m_wdir,
+			std::map<std::string,std::string>(),
+			1, 0, BlockData::FNumeric, 1
 		);
 	initialize( i_task_exec, "");
 	delete i_task_exec;
@@ -121,9 +145,12 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	m_PyObj_FuncDoPost = NULL;
 	m_initialized = false;
 
-	PyObject * pFilesList = PyList_New(0);
-	for( int i = 0; i < i_task_exec->getFiles().size(); i++)
-		PyList_Append( pFilesList, PyBytes_FromString( i_task_exec->getFiles()[i].c_str() ));
+	PyObject * pFilesBlockList = PyList_New(0);
+	for (int i = 0; i < i_task_exec->getFilesBlock().size(); i++)
+		PyList_Append(pFilesBlockList, PyBytes_FromString(i_task_exec->getFilesBlock()[i].c_str() ));
+	PyObject * pFilesTaskList = PyList_New(0);
+	for (int i = 0; i < i_task_exec->getFilesTask().size(); i++)
+		PyList_Append(pFilesTaskList, PyBytes_FromString(i_task_exec->getFilesTask()[i].c_str() ));
 
 	PyObject * pParsedFilesList = PyList_New(0);
 	for( int i = 0; i < i_task_exec->getParsedFiles().size(); i++)
@@ -142,16 +169,21 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	task_info = PyDict_New();
 
 	PyDict_SetItemString( task_info, "wdir",          PyBytes_FromString( i_task_exec->getWDir().c_str()));
-	PyDict_SetItemString( task_info, "command",       PyBytes_FromString( i_task_exec->getCommand().c_str()));
+	PyDict_SetItemString( task_info, "parser",        PyBytes_FromString( m_parser_type.c_str()));
+	PyDict_SetItemString(task_info, "command_block",  PyBytes_FromString(i_task_exec->getCommandBlock().c_str()));
+	PyDict_SetItemString(task_info, "command_task",   PyBytes_FromString(i_task_exec->getCommandTask().c_str()));
 	PyDict_SetItemString( task_info, "capacity",      PyLong_FromLong( i_task_exec->getCapCoeff()));
-	PyDict_SetItemString( task_info, "files",         pFilesList);
+	PyDict_SetItemString(task_info, "files_block",    pFilesBlockList);
+	PyDict_SetItemString(task_info, "files_task",     pFilesTaskList);
 	PyDict_SetItemString( task_info, "file_size_min", PyLong_FromLong( i_task_exec->getFileSizeMin()));
 	PyDict_SetItemString( task_info, "file_size_max", PyLong_FromLong( i_task_exec->getFileSizeMax()));
 	PyDict_SetItemString( task_info, "hosts",         pHostsList);
 	PyDict_SetItemString( task_info, "parsed_files",  pParsedFilesList);
 
-	PyDict_SetItemString( task_info, "parser",     PyBytes_FromString( m_parser_type.c_str()));
-	PyDict_SetItemString( task_info, "frames_num", PyLong_FromLong(    i_task_exec->getFramesNum()));
+    PyDict_SetItemString( task_info, "frame_start",  PyLong_FromLong(i_task_exec->getFrameStart()));
+    PyDict_SetItemString( task_info, "frame_finish", PyLong_FromLong(i_task_exec->getFrameFinish()));
+    PyDict_SetItemString( task_info, "frame_inc",    PyLong_FromLong(i_task_exec->getFrameInc()));
+    PyDict_SetItemString( task_info, "frames_num",   PyLong_FromLong(i_task_exec->getFramesNum()));
 
 	PyDict_SetItemString( task_info, "task_id",          PyLong_FromLong( i_task_exec->getTaskNum()));
 	PyDict_SetItemString( task_info, "task_name",        PyBytes_FromString( i_task_exec->getName().c_str()));
@@ -238,10 +270,8 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 		return;
 	}
 	Py_DECREF( pResult);
-	AFINFA("Service::initialize: Working dirctory:\n%s", m_wdir.c_str())
 
 	// Process command:
-	AFINFA("Service::initialize: Processing command:\n%s", m_command.c_str())
 	pResult = PyObject_CallObject( m_PyObj_FuncGetCommand, NULL);
 	if( pResult == NULL)
 	{
@@ -255,7 +285,6 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 		return;
 	}
 	Py_DECREF( pResult);
-	AFINFA("Service::initialize: Command:\n%s", m_command.c_str())
 
 	m_initialized = true;
 }

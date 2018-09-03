@@ -27,7 +27,7 @@
 #include <QTextEdit>
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
@@ -377,7 +377,7 @@ void WndTask::slot_outputChanged( int i_index)
 
 bool WndTask::show( af::MCTask & i_mctask)
 {
-	//AF_LOG << i_mctask;
+	AF_DEBUG << i_mctask;
 
 	if( false == i_mctask.isSameTask( m_pos))
 		return false;
@@ -427,6 +427,9 @@ bool WndTask::show( af::MCTask & i_mctask)
 void WndTask::showExec( af::MCTask & i_mctask)
 {
 	af::TaskExec * exec = i_mctask.getExec();
+	#ifdef AFOUTPUT
+	exec->v_stdOut(true);
+	#endif
 
 	m_tab_widget->setCurrentWidget( m_tab_exec);
 

@@ -342,6 +342,17 @@ void af::jw_intmap( const char * i_name, const std::map<std::string,int32_t> & i
 	o_str << "\n}";
 }
 
+void af::jw_stringvec( const char * i_name, const std::vector<std::string> & i_vec, std::ostringstream & o_str)
+{
+	o_str << ",\n\"" << i_name << "\":[";
+	for (int i = 0; i < i_vec.size(); i++)
+	{
+		if (i) o_str << ",";
+		o_str << "\n\"" << af::strEscape(i_vec[i]) << "\"";
+	}
+	o_str << "\n]";
+}
+
 void af::jw_stringmap( const char * i_name, const std::map<std::string,std::string> & i_map, std::ostringstream & o_str)
 {
 	o_str << ",\n\"" << i_name << "\":{";
