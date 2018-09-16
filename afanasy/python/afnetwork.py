@@ -19,7 +19,7 @@ def genHeader(i_data_size):
     return bytearray(data, 'utf-8')
 
 
-def sendServer(i_data, i_verbose=False):
+def sendServer(i_data, i_verbose=False, i_without_answer=False):
     """Missing DocString
 
     :param i_verbose:
@@ -112,6 +112,9 @@ def sendServer(i_data, i_verbose=False):
     disconnectSocket(s)
 
     struct = None
+
+    if i_without_answer is True:
+        return True, struct
 
     try:
         if not isinstance(data, str):
