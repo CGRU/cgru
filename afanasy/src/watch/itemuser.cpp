@@ -64,7 +64,7 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 		strHCenterTop.clear();
 		strHCenterTop = QString("Priority:%1").arg(m_priority);
 		if (max_running_tasks != -1) strHCenterTop += QString(" MaxRuningTasks:%1").arg(max_running_tasks);
-		if (max_running_tasks_per_host != -1) strHCenterTop = QString(" MaxRunTasksPerHost:%1").arg(max_running_tasks_per_host);
+		if (max_running_tasks_per_host != -1) strHCenterTop += QString(" MaxRunTasksPerHost:%1").arg(max_running_tasks_per_host);
 		if( false == hostsmask.isEmpty()) strHCenterTop += QString(" HostsMask(%1)").arg( hostsmask);
 		if( false == hostsmask_exclude.isEmpty()) strHCenterTop += QString(" ExcludeHosts(%1)").arg( hostsmask_exclude);
 		strHCenterTop += Item::generateErrorsSolvingInfo( errors_avoidhost, errors_tasksamehost, errors_retries);
@@ -94,7 +94,7 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 		strHCenterTop.clear();
 		strHCenterTop = QString("Pri:%1").arg(m_priority);
 		if (max_running_tasks != -1) strHCenterTop += QString(" MaxTasks:%1").arg(max_running_tasks);
-		if (max_running_tasks_per_host != -1) strHCenterTop = QString(" MaxPerHost:%1").arg(max_running_tasks_per_host);
+		if (max_running_tasks_per_host != -1) strHCenterTop += QString(" MaxPerHost:%1").arg(max_running_tasks_per_host);
 		if( false == hostsmask.isEmpty()) strHCenterTop += QString(" Hosts(%1)").arg( hostsmask);
 		if( false == hostsmask_exclude.isEmpty()) strHCenterTop += QString(" Exclude(%1)").arg( hostsmask_exclude);
 		strHCenterTop += Item::generateErrorsSolvingInfo( errors_avoidhost, errors_tasksamehost, errors_retries);
@@ -122,8 +122,8 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 		strLeftBottom  = 'j' + QString::number(jobs_num) + '/' + QString::number(user->getNumRunningJobs());
 
 		strHCenterTop.clear();
-		if (max_running_tasks != -1) strHCenterTop = QString("m%1").arg(max_running_tasks);
-		if (max_running_tasks_per_host != -1) strHCenterTop = QString(" mph%1").arg(max_running_tasks_per_host);
+		if (max_running_tasks != -1) strHCenterTop += QString("m%1").arg(max_running_tasks);
+		if (max_running_tasks_per_host != -1) strHCenterTop += QString(" mph%1").arg(max_running_tasks_per_host);
 		if( false == hostsmask.isEmpty()) strHCenterTop += QString(" h(%1)").arg( hostsmask);
 		if( false == hostsmask_exclude.isEmpty()) strHCenterTop += QString(" e(%1)").arg( hostsmask_exclude);
 		strHCenterTop += Item::generateErrorsSolvingInfo( errors_avoidhost, errors_tasksamehost, errors_retries);
