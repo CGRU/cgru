@@ -92,8 +92,6 @@ public:
 	int calcTaskNumber(long long i_frame, bool &o_valid_range) const;
 	int getReadyTaskNumber(TaskProgress **i_tp, const int64_t &i_job_flags, const Render *i_render);
 	const std::string genTaskName(int num, long long *fstart = NULL, long long *fend = NULL) const;
-	const std::string genCommand(int num, long long *fstart = NULL, long long *fend = NULL) const;
-	const std::vector<std::string> genFiles(int num, long long *fstart = NULL, long long *fend = NULL) const;
 
 	inline bool isNumeric() const { return m_flags & FNumeric; } ///< Whether the block is numeric.
 	inline bool isNotNumeric() const
@@ -282,6 +280,8 @@ public:
 
 	void setTimeStarted(long long value, bool reset = false);
 	void setTimeDone(long long value);
+
+	const TaskData * getTaskData(int i_num_task) const;
 
 protected:
 	/// Read or write block.

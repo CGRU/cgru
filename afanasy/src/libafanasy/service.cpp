@@ -16,7 +16,10 @@ using namespace af;
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-Service::Service( const TaskExec * i_task_exec, const std::string & i_store_dir):
+Service::Service(
+	const TaskExec * i_task_exec,
+	const std::string & i_store_dir
+):
 	m_name( i_task_exec->getServiceType()),
 	m_parser_type( i_task_exec->getParserType()),
 	m_wdir( i_task_exec->getWDir())
@@ -90,31 +93,38 @@ Service::Service(
 }
 
 Service::Service(
-	const std::vector<std::string> & i_files,
-	const std::string & i_wdir
+	const std::vector<std::string> & i_files_block,
+	long long i_frame_start, long long i_frame_end, long long i_frame_inc,
+	const std::vector<std::string> & i_files_task
 ):
 	m_name("generic"),
-	m_parser_type("generic"),
-	m_wdir( i_wdir)
+	m_parser_type("generic")
 {
-	TaskExec * i_task_exec = new TaskExec(
+	long long block_flags = 0;
+	if(i_files_task.size() == 0)
+		block_flags |= BlockData::FNumeric;
+
+	TaskExec * task_exec = new TaskExec(
 			"name", m_name, m_parser_type,
 			1, -1, -1,
             "",
-			i_files,
-			1, 1, 1, 1,
+			i_files_block,
+			i_frame_start, i_frame_end, i_frame_inc, 1,
 			m_wdir,
 			std::map<std::string,std::string>(),
-			1, 0, 0, 1
+			1, 0, block_flags, 1
 		);
-	initialize( i_task_exec, "");
-	delete i_task_exec;
+
+	task_exec->setTaskFiles(i_files_task);
+	initialize(task_exec,"");
+
+	delete task_exec;
 }
 
 Service::Service(
 	const std::string & i_type,
 	const std::string & i_command_block,
-	int i_frame_start, int i_frame_end
+	long long i_frame_start, long long i_frame_end
 ):
 	m_name(i_type),
 	m_parser_type("generic")

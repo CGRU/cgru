@@ -1,9 +1,11 @@
 #include "itemjobtask.h"
 
+#include "../include/afanasy.h"
+
 #include "../libafanasy/msgclasses/mctaskup.h"
 #include "../libafanasy/environment.h"
 #include "../libafanasy/service.h"
-#include "../include/afanasy.h"
+#include "../libafanasy/taskdata.h"
 
 #include "../libafqt/qenvironment.h"
 
@@ -22,24 +24,46 @@
 
 const int ItemJobTask::WidthInfo = 98;
 
-ItemJobTask::ItemJobTask( ListTasks * i_list, const ItemJobBlock * i_block, int i_numtask, const af::BlockData * i_bdata):
+ItemJobTask::ItemJobTask( ListTasks * i_list, ItemJobBlock * i_block, int i_numtask, const af::BlockData * i_bdata):
 	Item( afqt::stoq( i_bdata->genTaskName( i_numtask)), ItemId),
 	m_list( i_list),
 	m_job_id( i_block->job_id),
 	m_blocknum( i_bdata->getBlockNum()),
 	m_tasknum( i_numtask),
 	m_block( i_block),
+	m_files_ready(false),
 	m_thumbs_num( 0),
 	m_thumbs_imgs( NULL)
 {
-	i_bdata->genNumbers( m_frame_last, m_frame_first, m_tasknum, &m_frames_num);
-	m_files = i_bdata->genFiles( m_tasknum);
+	i_bdata->genNumbers(m_frame_first, m_frame_last, m_tasknum, &m_frames_num);
+
+	if (i_bdata->isNotNumeric())
+		return;
+
+	const af::TaskData * tdata = i_bdata->getTaskData(m_tasknum);
+	if (NULL == tdata)
+		return;
+
+	m_files = tdata->getFiles();
 }
 
 ItemJobTask::~ItemJobTask()
 {
 }
 
+void ItemJobTask::processFiles()
+{
+	if (m_files_ready)
+		return;
+
+	long long inc = m_frame_last - m_frame_first;
+	if (inc == 0) inc = 1;
+	af::Service srv(m_block->getFilesOriginal(), m_frame_first, m_frame_last, inc, m_files);
+
+	m_files = srv.getFiles();
+
+	m_files_ready = true;
+}
 
 bool ItemJobTask::calcHeight()
 {
@@ -70,8 +94,6 @@ const QString ItemJobTask::getSelectString() const
 {
 	return m_name;
 }
-
-const std::string & ItemJobTask::getWDir() const { return m_block->workingdir; }
 
 void ItemJobTask::upProgress( const af::TaskProgress &tp){ taskprogress = tp;}
 
