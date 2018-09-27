@@ -21,6 +21,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 const int ItemJobTask::WidthInfo = 98;
 
@@ -37,7 +38,7 @@ ItemJobTask::ItemJobTask( ListTasks * i_list, ItemJobBlock * i_block, int i_numt
 {
 	i_bdata->genNumbers(m_frame_first, m_frame_last, m_tasknum, &m_frames_num);
 
-	if (i_bdata->isNotNumeric())
+	if (i_bdata->isNumeric())
 		return;
 
 	const af::TaskData * tdata = i_bdata->getTaskData(m_tasknum);
