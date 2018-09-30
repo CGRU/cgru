@@ -1324,9 +1324,6 @@ const std::list<std::string> & JobAf::getTaskLog( int block, int task) const
 	return m_blocks[block]->m_tasks[task]->getLog();
 }
 
-af::TaskExec * JobAf::generateTask( int block, int task) const
-{
-}
 af::Msg * JobAf::writeErrorHosts( bool i_binary) const
 {
 	std::list<std::string> list;
