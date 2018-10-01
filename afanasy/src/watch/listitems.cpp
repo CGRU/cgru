@@ -42,10 +42,8 @@ AFINFO("ListItems::ListItems.\n");
 
 	m_hlayout->setSpacing( 0);
 	m_vlayout->setSpacing( 0);
-#if QT_VERSION >= 0x040300
 	m_hlayout->setContentsMargins( 0, 0, 0, 0);
 	m_vlayout->setContentsMargins( 0, 0, 0, 0);
-#endif
 	m_infoline = new InfoLine( this);
 
 //	if( m_parentWindow != (QWidget*)(Watch::getDialog())) setFocusPolicy(Qt::StrongFocus);

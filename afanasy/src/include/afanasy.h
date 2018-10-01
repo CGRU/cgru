@@ -31,9 +31,11 @@ const char STORE_FOLDER[] = "/var/tmp/afanasy";
 const char TIME_FORMAT[] = "%a %d %b %H:%M.%S"; ///< Default time output format.
 const bool PERM_USER_MOD_HIS_PRIORITY = true;
 const bool PERM_USER_MOD_JOB_PRIORITY = true;
-const int DEFAULT_PRIORITY /**/ = 99;  ///< Default priority for user, jobs and hosts.
-const int MAXRUNNINGTASKS /***/ = -1;  ///< Default maximum running tasks number.
-const int FILENAMESIZEMAX /***/ = 250; ///< Maximum filename size.
+const int DEFAULT_PRIORITY       = 99;  ///< Default priority for user, jobs and hosts.
+const int MAX_RUNNING_TASKS      = -1;  ///< Default maximum running tasks number.
+const int MAX_RUN_TASKS_PER_HOST = -1;  ///< Default maximum running tasks per host.
+const int JOBS_LIFE_TIME         = -1;  ///< Default user jobs life time.
+const int FILE_NAME_SIZE_MAX     = 250; ///< Maximum filename size.
 #ifdef WINNT
 const char PATH_SEPARATOR = '\\';
 #else

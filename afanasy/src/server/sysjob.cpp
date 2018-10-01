@@ -109,7 +109,7 @@ void SysTask::appendSysJobLog( const std::string & message)
 void SysTask::v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring)
 {
 	i_taskexec->setName(         m_syscmd->task_name        );
-	i_taskexec->setCommand(      m_syscmd->command          );
+	i_taskexec->setTaskCommand(  m_syscmd->command          );
 	i_taskexec->setUserName(     m_syscmd->user_name        );
 	i_taskexec->setJobName(      m_syscmd->job_name         );
 	i_taskexec->setWDir(         m_syscmd->working_directory);
@@ -502,7 +502,7 @@ AFINFA("SysJob::SysJob: folder = '%s'", i_folder.c_str())
 	m_name              = AFJOB::SYSJOB_NAME;
 	m_user_name         = AFJOB::SYSJOB_USERNAME;
 	m_priority          = AFGENERAL::DEFAULT_PRIORITY;
-	m_max_running_tasks = AFGENERAL::MAXRUNNINGTASKS;
+	m_max_running_tasks = AFGENERAL::MAX_RUNNING_TASKS;
 
 	m_blocks_num = BlockLastIndex;
 	m_blocks_data = new af::BlockData*[m_blocks_num];

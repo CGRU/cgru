@@ -97,13 +97,9 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec, RenderHost * i_render):
 	if( m_cmd.size() == 0 )
 	{
 		m_update_status = af::TaskExec::UPSkip;
-		printf("Skipping: ");
-		m_taskexec->v_stdOut( af::Environment::isVerboseMode());
 		sendTaskSate();
 		return;
 	}
-	m_taskexec->setCommand( m_cmd);
-
 
 	// Process task working directory:
 	m_wdir = m_service->getWDir();
@@ -127,13 +123,10 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec, RenderHost * i_render):
 	}
 	if( m_wdir.empty())
 		m_wdir = af::Environment::getStoreFolder();
-	m_taskexec->setWDir( m_wdir);
 
 	// Process environment:
 	if( m_taskexec->hasEnv())
 		m_environ = af::processEnviron( m_taskexec->getEnv());
-
-	if( af::Environment::isVerboseMode()) printf("%s\n", m_cmd.c_str());
 
 	launchCommand();
 

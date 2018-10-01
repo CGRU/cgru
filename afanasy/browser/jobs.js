@@ -1051,7 +1051,7 @@ JobBlock.prototype.update = function(i_displayFull) {
 
 			if (this.params.task_max_run_time != null)
 				this.elMaxRunTime.innerHTML =
-					'mrt<b>' + cm_TimeStringFromSeconds(this.params.task_max_run_time) + '</b>';
+					'Mrt<b>' + cm_TimeStringFromSeconds(this.params.task_max_run_time) + '</b>';
 			else
 				this.elMaxRunTime.textContent = '';
 

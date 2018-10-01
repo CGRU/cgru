@@ -17,9 +17,7 @@ FileWidget::FileWidget( QWidget * i_parent, afqt::Attr * i_attr,
     m_filesmask( i_filesmask)
 {
     QHBoxLayout * layout = new QHBoxLayout(this);
-#if QT_VERSION >= 0x040300
    layout->setContentsMargins( 1, 1, 1, 1);
-#endif
     layout->setSpacing( 2);
     QSizePolicy policy;
     policy.setHorizontalPolicy( QSizePolicy::Minimum);

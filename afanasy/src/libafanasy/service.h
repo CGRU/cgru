@@ -14,7 +14,7 @@ public:
 	Service( /* For afrender to generate WOL sleep command */
 			const std::string & i_type,
 			const std::string & i_wdir,
-			const std::string & i_command
+			const std::string & i_command_task
 		);
 
 	Service( /* For afwatch to parse task output: */
@@ -24,12 +24,19 @@ public:
 
 	Service( /* For afwatch to paths map folder: */
 			const std::string & i_wdir
-	);
+		);
 
-	Service( /* For afwatch to paths map files: */
-			const std::vector<std::string> & i_files,
-			const std::string & i_wdir = std::string()
-	);
+	Service( /* For afwatch to generate and paths map files: */
+			const std::vector<std::string> & i_files_block,
+			long long i_frame_start, long long i_frame_end, long long i_frame_inc,
+			const std::vector<std::string> & i_files_task = std::vector<std::string>()
+		);
+
+	Service( /* For afcmd to test service on a numeric command: */
+			const std::string & i_type,
+			const std::string & i_command_block,
+			long long i_frame_start, long long i_frame_end
+		);
 
 	~Service();
 

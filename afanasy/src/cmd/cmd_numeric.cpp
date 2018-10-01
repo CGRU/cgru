@@ -1,6 +1,7 @@
 #include "cmd_numeric.h"
 
 #include "../libafanasy/blockdata.h"
+#include "../libafanasy/service.h"
 #include "../libafanasy/taskexec.h"
 #include "../libafanasy/taskprogress.h"
 
@@ -11,41 +12,40 @@
 CmdNumericCmd::CmdNumericCmd()
 {
 	setCmd("numcmd");
-	setArgsCount(3);
+	setArgsCount(4);
 	setInfo("Test numeric command fill with numbers.");
-	setHelp("numcmd [command] [number1] [number2] Fill numeric command with two provided numbers.");
+	setHelp("numcmd [service] [frame_start] [frame_end] [command] Fill service numeric command with start and end frames.");
 }
 CmdNumericCmd::~CmdNumericCmd(){}
 bool CmdNumericCmd::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
-	std::string command = argv[0];
-	int number1 = atoi(argv[1]);
-	int number2 = atoi(argv[2]);
+	std::string type        =      argv[0];
+	int         frame_start = atoi(argv[1]);
+	int         frame_end   = atoi(argv[2]);
+	std::string command     =      argv[3];
 
-	std::cout << af::fillNumbers( command, number1, number2);
-	std::cout << std::endl;
+	af::Service service(type, command, frame_start, frame_end);
+	printf("\"%s\"\n", service.getCommand().c_str());
 	return true;
 }
 
 
 CmdNumeric::CmdNumeric()
 {
-	setCmd("num");
+	setCmd("numeric");
 	setArgsCount(6);
 	setInfo("Generate numeric tasks, find task by frame.");
-	setHelp("num [command] [start] [end] [pertask] [increment(by)] [sequential] [frame to find] Generate numeric tasks, find task by frame.");
+	setHelp("numeric [start] [end] [pertask] [increment(by)] [sequential] [frame to find] Generate numeric tasks, find task by frame.");
 }
 CmdNumeric::~CmdNumeric(){}
 bool CmdNumeric::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
 	// Get arguments:
-	std::string command = argv[0];
-
-	long long start = af::stoi(argv[1]);
-	long long end   = af::stoi(argv[2]);
+	long long start = af::stoi(argv[0]);
+	long long end   = af::stoi(argv[1]);
+	long long inc   = af::stoi(argv[2]);
 	long long fpt   = af::stoi(argv[3]);
-	long long inc   = af::stoi(argv[4]);
-	long long seq   = af::stoi(argv[5]);
+	long long seq   = af::stoi(argv[4]);
 
 	bool find_frame_on = argc > 6;
 	long long find_frame = 0;
@@ -60,7 +60,6 @@ bool CmdNumeric::v_processArguments( int argc, char** argv, af::Msg &msg)
 
 	// Create block:
 	af::BlockData block;
-	block.setCommand( command);
 	block.setNumeric( start, end, fpt, inc);
 	block.setSequential( seq);
 
@@ -101,7 +100,7 @@ bool CmdNumeric::v_processArguments( int argc, char** argv, af::Msg &msg)
 	{
 		af::TaskExec * taskexec = block.genTask( t);
 		std::cout << t << ":\t";
-		std::cout << "\"" << taskexec->getCommand() << "\"";
+		std::cout << taskexec->getFrameStart() << "-" << taskexec->getFrameFinish();
 		std::cout << " - " << taskexec->getFramesNum() << " frames";
 		std::cout << ", order=" << tasks_order[t];
 		if( find_frame_on && ( founded_task == t ))

@@ -144,7 +144,7 @@ void TaskRunMulti::startServices( RenderContainer * renders)
 		RenderAf * render = rendersIt.getRender( *hIt);
 		if( render == NULL) continue;
 
-		(*tIt)->setCommand( m_block->m_data->getMultiHostService());
+		(*tIt)->setTaskCommand( m_block->m_data->getMultiHostService());
 		render->startTask(*tIt);
 	}
 }

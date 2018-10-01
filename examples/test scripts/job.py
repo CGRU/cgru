@@ -48,7 +48,7 @@ parser.add_option('-w', '--waittime',     dest='waittime',     type='int',    de
 parser.add_option('-c', '--capacity',     dest='capacity',     type='int',    default=0,  help='tasks capacity')
 parser.add_option(      '--capmin',       dest='capmin',       type='int',    default=-1, help='tasks variable capacity coeff min')
 parser.add_option(      '--capmax',       dest='capmax',       type='int',    default=-1, help='tasks variable capacity coeff max')
-parser.add_option('-f', '--filesout',     dest='filesout',     type='string', default=None, help='Tasks out file')
+parser.add_option('-f', '--filesout',     dest='filesout',     type='string', default=None, help='Tasks out file [render/img.%04d.jpg]')
 parser.add_option(      '--filemin',      dest='filemin',      type='int',    default=-1, help='tasks output file size min')
 parser.add_option(      '--filemax',      dest='filemax',      type='int',    default=-1, help='tasks output file size max')
 parser.add_option(      '--mhmin',        dest='mhmin',        type='int',    default=-1, help='multi host tasks min hosts')
@@ -214,8 +214,11 @@ for b in range(numblocks):
         if Options.filesout:
             cmd += ' --filesout "%s"' % Options.filesout
             block.skipExistingFiles()
-            block.checkRenderedFiles( 100)
-            block.setFiles(Options.filesout.split(';'))
+            block.checkRenderedFiles(100)
+            files = []
+            for afile in Options.filesout.split(';'):
+                files.append(afcommon.patternFromStdC(afile))
+            block.setFiles(files)
 
         cmd += '%(str_capacity)s%(str_hosts)s -s @#@ -e @#@ ' \
                '-i %(increment)d -t %(timesec)g -r %(randtime)g --pkp %(pkp)d ' \
@@ -230,19 +233,27 @@ for b in range(numblocks):
             block.setNumeric(1, numtasks, Options.pertask, increment)
 
     else:
-        cmd = 'task.py%(str_capacity)s @#@ -v %(verbose)d' % vars(),
+        cmd = 'task.py%(str_capacity)s @#@ -v %(verbose)d' % vars()
         cmd = "%s %s" % (os.getenv('CGRU_PYTHONEXE','python'), cmd)
-        block.setCommand( cmd, False)
 
         block.setTasksName('task @#@')
 
         if Options.filesout:
-            block.setFiles(Options.filesout.split(';'))
+            cmd += ' --filesout "%s"' % Options.filesout
+            files = []
+            for afile in Options.filesout.split(';'):
+                files.append(afile.replace('%04d','@#@'))
+            block.setFiles(files)
+            block.skipExistingFiles()
+            block.checkRenderedFiles(100)
+
+        block.setCommand( cmd, False)
 
         if Options.frames != '':
             fr = frames[b].split('/')
             block.setFramesPerTask(int(fr[2]))
             numtasks = int(fr[1]) - int(fr[0]) + 1
+
         for t in range(numtasks):
             timesec_task = timesec + randtime * random.random()
             task = af.Task('#' + str(t))
@@ -268,7 +279,7 @@ if Options.pause:
     job.offLine()
 
 if Options.output:
-    job.output(1)
+    job.output()
 
 job.setNeedOS('')
 

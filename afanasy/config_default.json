@@ -68,7 +68,7 @@
 		"":"Log history for any afnode (job, render, user)",
 
 	"af_priority":99,
-	"af_maxrunningtasks":-1,
+	"af_max_running_tasks":-1,
 
 "":"Job:",
 	"af_task_default_capacity":1000,
@@ -164,6 +164,8 @@
 	"af_task_error_retries":3,
 	"af_task_errors_same_host":3,
 	"af_errors_forgivetime":18000,
+	"af_max_run_tasks_per_host":-1,
+	"af_jobs_life_time":0,
 
 "":"Monitor: (server side - any gui)",
 	"af_monitor_zombietime":40,

@@ -8,7 +8,7 @@ popd
 setlocal EnableDelayedExpansion
 
 rem Cmake finds 'Qt' by searching for 'qmake' in 'PATH'
-SET "cgru_qt=C:\Qt\5.10.1\msvc2017_64"
+SET "cgru_qt=C:\Qt\5.9.5\msvc2017_64"
 if exist !cgru_qt! (
 	echo Adding "!cgru_qt!\bin" to PATH
 	SET "PATH=!cgru_qt!\bin;%PATH%"
@@ -21,7 +21,7 @@ if exist %CGRU_LOCATION%\python-devel set CGRU_PYTHONDIR=%CGRU_LOCATION%\python-
 if defined CGRU_PYTHONDIR (
    echo Building with CGRU Python: "!CGRU_PYTHONDIR!"
    SET "AF_PYTHON_INCLUDE_PATH=!CGRU_PYTHONDIR!\include"
-   SET "AF_PYTHON_LIBRARIES=!CGRU_PYTHONDIR!\libs\python34.lib"
+   SET "AF_PYTHON_LIBRARIES=!CGRU_PYTHONDIR!\libs\python36.lib"
 )
 
 rem Boost:

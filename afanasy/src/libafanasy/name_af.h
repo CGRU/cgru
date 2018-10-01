@@ -311,6 +311,7 @@ namespace af
 	bool jr_intmap( const char * i_name, std::map<std::string,int32_t> & o_map, const JSON & i_object, std::string * o_str = NULL);
 
 	void jw_intmap( const char * i_name, const std::map<std::string,int32_t> & i_map, std::ostringstream & o_str);
+	void jw_stringvec( const char * i_name, const std::vector<std::string> & i_vec, std::ostringstream & o_str);
 	void jw_stringmap( const char * i_name, const std::map<std::string,std::string> & i_map, std::ostringstream & o_str);
 	void jw_int32list( const char * i_name, const std::list<int32_t> & i_list, std::ostringstream & o_str);
 	void jw_int32vec( const char * i_name, const std::vector<int32_t> & i_vec, std::ostringstream & o_str);

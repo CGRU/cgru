@@ -22,10 +22,15 @@ public:
 
    virtual inline const QVariant getToolTip()      const { return tooltip;      }
 
+	const std::string & getWDir();
+	const std::string & getWDirOriginal() const {return m_wdir_orig;}
+
+	inline bool hasFiles() const {return m_files_orig.size();}
+	const std::vector<std::string> & getFiles();
+	const std::vector<std::string> & getFilesOriginal() const {return m_files_orig;}
+
    uint32_t state;
    QString  command;
-   std::string workingdir;
-   std::vector<std::string> files;
    QString  cmdpre;
    QString  cmdpost;
    QString  tasksname;
@@ -90,6 +95,13 @@ private:
 
 private:
    QString tooltip;
+
+	std::string m_wdir_orig;
+	std::string m_wdir;
+	bool m_wdir_ready;
+	std::vector<std::string> m_files_orig;
+	std::vector<std::string> m_files;
+	bool m_files_ready;
 
    std::string tooltip_base;
    std::string tooltip_properties;

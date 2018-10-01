@@ -16,9 +16,7 @@ WndList::WndList( const QString & Name, int monType ):
    type( monType)
 {
    layout = new QVBoxLayout( this);
-#if QT_VERSION >= 0x040300
    layout->setContentsMargins( 1, 1, 1, 1);
-#endif
 
    Watch::opened[type] = this;
 }

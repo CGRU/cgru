@@ -1274,13 +1274,17 @@ af::Msg * JobAf::writeTask( int i_b, int i_t, const std::string & i_mode, bool i
 	af::MCTask mctask( m_id, i_b, i_t);
 	fillTaskNames( mctask);
 
-	if( i_mode == "info" )
+	if (i_mode == "info")
 	{
-		af::TaskExec * exec = generateTask( i_b, i_t);
-		if( exec )
+		af::TaskExec * exec = m_blocks[i_b]->m_tasks[i_t]->genExec();
+		if (exec)
 		{
-			mctask.setExec( exec);
-			return mctask.generateMessage( i_binary);
+			mctask.setExec(exec);
+			return mctask.generateMessage(i_binary);
+		}
+		else
+		{
+			return af::jsonMsgError("af::TaskExec generation error on server.");
 		}
 	}
 	else if( i_mode == "log" )
@@ -1320,11 +1324,6 @@ const std::list<std::string> & JobAf::getTaskLog( int block, int task) const
 	return m_blocks[block]->m_tasks[task]->getLog();
 }
 
-af::TaskExec * JobAf::generateTask( int block, int task) const
-{
-	if( false == checkBlockTaskNumbers( block, task, "generateTask")) return NULL;
-	return m_blocks[block]->m_tasks[task]->genExec();
-}
 af::Msg * JobAf::writeErrorHosts( bool i_binary) const
 {
 	std::list<std::string> list;

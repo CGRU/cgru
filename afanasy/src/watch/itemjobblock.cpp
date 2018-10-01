@@ -17,6 +17,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 const int ItemJobBlock::HeightHeader = 23;
 const int ItemJobBlock::HeightFooter = 14;
@@ -26,7 +27,9 @@ ItemJobBlock::ItemJobBlock( const af::BlockData* block, ListTasks * list):
 	job_id( block->getJobId()),
    numblock( block->getBlockNum()),
    info( this, block->getBlockNum(), block->getJobId()),
-   listtasks( list)
+   listtasks( list),
+	m_wdir_ready(false),
+	m_files_ready(false)
 {
    info.setName( m_name);
    resetSortingParameters();
@@ -60,8 +63,8 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
    case af::Msg::TBlocksProperties:
 //printf("Changing block properties.\n");
       command           = afqt::stoq( block->getCmd());
-      workingdir        = block->getWDir();
-      files             = block->getFiles();
+		m_wdir_orig     = block->getWDir();
+		m_files_orig    = block->getFiles();
       cmdpre            = afqt::stoq( block->getCmdPre());
       cmdpost           = afqt::stoq( block->getCmdPost());
       service           = afqt::stoq( block->getService());
@@ -99,6 +102,28 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
 ItemJobBlock::~ItemJobBlock()
 {
 //printf("ItemJobBlock::~ItemJobBlock:\n");
+}
+
+const std::string & ItemJobBlock::getWDir()
+{
+	if (false == m_wdir_ready)
+	{
+		m_wdir = af::Service(m_wdir_orig).getWDir();
+		m_wdir_ready = true;
+	}
+
+	return m_wdir;
+}
+
+const std::vector<std::string> & ItemJobBlock::getFiles()
+{
+	if (false == m_files_ready)
+	{
+		m_files = af::Service(m_files_orig, first, first, 1).getFiles();
+		m_files_ready = true;
+	}
+
+	return m_files;
 }
 
 void ItemJobBlock::paint( QPainter *painter, const QStyleOptionViewItem &option) const

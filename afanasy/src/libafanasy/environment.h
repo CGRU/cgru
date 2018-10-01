@@ -102,7 +102,7 @@ public:
 
 	static inline const Address & getServerAddress() { return serveraddress; }
 
-	static inline int            getFileNameSizeMax()  { return filenamesizemax; } ///< Get maximum size for filenames.
+	static inline int getFileNameSizeMax()  { return file_name_size_max; } ///< Get maximum size for filenames.
 
 	static inline const std::vector<std::string> & getPreviewCmds()     { return previewcmds;} ///< Get launch commands
 	static inline const std::vector<std::string> & getAnnotations()     { return annotations;} ///< Get predefined annotations
@@ -120,8 +120,12 @@ public:
 
 	static inline int            getServerPort()   { return serverport;      } ///< Get afanasy server port.
 
-	static inline int    getPriority()               { return priority;         } ///< Get default host priority.
-	static inline int    getMaxRunningTasksNumber()  { return maxrunningtasks;  } ///< Get default maximium hosts.
+	static inline int getPriority() { return priority; } ///< Get default host priority.
+
+	static inline int getJobsLifeTime() { return jobs_life_time; }
+
+	static inline int getMaxRunningTasksNumber()  { return max_running_tasks;      } ///< Get default maximium running tasks.
+	static inline int getMaxRunningTasksPerHost() { return max_run_tasks_per_host; } ///< Get default maximium running tasks per host.
 
 	static inline int getTaskDefaultCapacity()           { return task_default_capacity;        }
 	static inline int getTaskUpdateTimeout()             { return task_update_timeout;          }
@@ -267,11 +271,15 @@ private:
 /// Platform:
 	static std::vector<std::string> platform;
 
-	static int filenamesizemax;
+	static int file_name_size_max;
 	static int afnode_log_lines_max;
 
-	static int priority;          ///< Default priority
-	static int maxrunningtasks;   ///< Default maximum running tasks number
+	static int priority; ///< Default priority
+
+	static int jobs_life_time;
+
+	static int max_running_tasks;      ///< Default maximum running tasks number
+	static int max_run_tasks_per_host; ///< Default maximum running tasks per host
 
 /// Afanasy server port number
 /** Try to get \c AF_SERVER_PORT environment variable at first.

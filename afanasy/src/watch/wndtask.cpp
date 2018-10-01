@@ -377,7 +377,7 @@ void WndTask::slot_outputChanged( int i_index)
 
 bool WndTask::show( af::MCTask & i_mctask)
 {
-	//AF_LOG << i_mctask;
+	AF_DEBUG << i_mctask;
 
 	if( false == i_mctask.isSameTask( m_pos))
 		return false;
@@ -427,6 +427,9 @@ bool WndTask::show( af::MCTask & i_mctask)
 void WndTask::showExec( af::MCTask & i_mctask)
 {
 	af::TaskExec * exec = i_mctask.getExec();
+	#ifdef AFOUTPUT
+	exec->v_stdOut(true);
+	#endif
 
 	m_tab_widget->setCurrentWidget( m_tab_exec);
 
@@ -527,9 +530,7 @@ void WndTask::showExec( af::MCTask & i_mctask)
 	splitter->setSizes( QList<int>() << 300 << ( files.size() > 10 ? 300 : files.size() * 30 ));
 	scroll->setWidgetResizable( true);
 	layout->setSpacing(0);
-	#if QT_VERSION >= 0x040300
 	layout->setContentsMargins( 1, 1, 1, 1);
-	#endif
 
 	if( parsed_files.size())
 		layout->addWidget( new QLabel("Files (parsed):", m_tab_exec));

@@ -70,6 +70,7 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
     int return_value = 0;
 //
 // initialize command class
+	Py_InitializeEx(0);
     AfCmd afcmd;
 //
 // generate message from command line arguments
@@ -96,6 +97,7 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
     else return_value = 1;
 
     af::destroy();
+	Py_Finalize();
 
     AFINFA("afcmd main: return value = %d\n", return_value)
 
