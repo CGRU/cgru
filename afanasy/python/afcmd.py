@@ -39,8 +39,8 @@ class Block:
         '''
         Constructor
         '''
-        self.p_percentage = data.get('p_percentage')
-        self.capacity = data.get('capacity')
+        self.p_percentage = data.get('p_percentage', 0)
+        self.capacity = data.get('capacity', 0)
         self.name = data.get('name')
         self.service = data.get('service')
         self.frames_per_task = data.get('frames_per_task')
@@ -50,7 +50,7 @@ class Block:
         self.block_num = data.get('block_num')
         self.p_progressbar = data.get('p_progressbar')
         self.p_tasks_run_time = data.get('p_tasks_run_time')
-        self.state = data.get('state')
+        self.state = data.get('state', '')
         self.flags = data.get('flags')
         self.p_tasks_skipped = data.get('p_tasks_skipped')
         self.frame_first = data.get('frame_first')
@@ -95,8 +95,10 @@ class Job:
     time_started = None
     serial = None
     user_name = None
+    max_running_tasks = None
     max_running_tasks_per_host = None
-    depend_mask = None
+    depend_mask = ''
+    p_percentage = 0
 
     class State:
         restart = 'restart'
@@ -111,6 +113,7 @@ class Job:
         Constructor
         '''
         self.id = jobId
+        self.blocks = []
         if data is not None:
             self.fillInfo(data)
 
@@ -127,14 +130,19 @@ class Job:
         self.time_started = data.get('time_started')
         self.serial = data.get('serial')
         self.user_name = data.get('user_name')
-        self.max_running_tasks_per_host = data.get('max_running_tasks_per_host')
-        self.depend_mask = data.get('depend_mask')
+        self.max_running_tasks = data.get('max_running_tasks', -1)
+        self.max_running_tasks_per_host = data.get('max_running_tasks_per_host', -1)
+        self.depend_mask = data.get('depend_mask', '')
         self.fillBlocks(data['blocks'])
 
     def fillBlocks(self, blocksData):
+        blocksProgress = 0
         for blockData in blocksData:
             block = Block(blockData)
+            if block.p_percentage is not None:
+                blocksProgress += block.p_percentage
             self.blocks.append(block)
+        self.p_percentage = blocksProgress / len(blocksData)
 
     def setState(self, jobState, verbose=False):
         action = 'action'
