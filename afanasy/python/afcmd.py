@@ -382,11 +382,13 @@ def getJob(jobId, full=False, verbose=False):
         return None
 
 
-def getRenderList(mask=None, verbose=False):
+def getRenderList(mask=None, ids=None, verbose=False):
     action = 'get'
     data = {'type': 'renders'}
     if mask is not None:
         data['mask'] = mask
+    if ids is not None:
+        data['ids'] = ids
     output = _sendRequest(action, data, verbose)
     renders = []
     if output is not None:
