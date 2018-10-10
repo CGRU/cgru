@@ -72,7 +72,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER "_generated")
 
 if(POLICY CMP0020)
-	cmake_policy(SET CMP0020 OLD)
+	cmake_policy(SET CMP0020 NEW)
 endif()
 
 add_subdirectory(libafanasy)

@@ -163,8 +163,6 @@ private:
 
 	af::TaskExec *genTask( RenderAf *render, int block, int task, std::list<int> * blocksIds, MonitorContainer * monitoring);
 	
-	af::TaskExec * generateTask( int block, int task) const;
-	
 	/**
 	 * @brief Emit events and submit them to the wall job
 	 * @param events: event types, e.g. JOB_DONE, JOB_ERROR or JOB_DELETED

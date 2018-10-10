@@ -17,7 +17,7 @@ class ItemJobTask : public Item
 public:
 
 	/// main ctor, used when adding a task to a ListTask
-	ItemJobTask( ListTasks * i_list, const ItemJobBlock * i_block, int i_numtask, const af::BlockData * i_bdata);
+	ItemJobTask( ListTasks * i_list, ItemJobBlock * i_block, int i_numtask, const af::BlockData * i_bdata);
 
 	~ItemJobTask();
 
@@ -30,10 +30,12 @@ public:
 	inline int getBlockNum() const { return m_blocknum; }
 	inline int getTaskNum()  const { return m_tasknum;  }
 
-	const std::string & getWDir() const;
+	inline const std::string & getWDir() { return m_block->getWDir();}
 
-	inline bool hasFiles() const { return m_files.size(); }
-	inline const std::vector<std::string> & getFiles() const { return m_files; }
+	inline bool hasFiles() {
+		processFiles(); return m_files.size();}
+	inline const std::vector<std::string> & getFiles() {
+		processFiles();return m_files;}
 
 	inline const long long getFramesNum() const { return m_frames_num; }
 
@@ -60,6 +62,7 @@ protected:
 	virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
 
 private:
+	void processFiles();
 	void thumbsCLear();
 
 private:
@@ -72,12 +75,14 @@ private:
 	int m_job_id;
 	int m_blocknum;
 	int m_tasknum;
-	const ItemJobBlock * m_block;
+	ItemJobBlock * m_block;
 
 	long long m_frame_first;
 	long long m_frame_last;
 	long long m_frames_num;
+
 	std::vector<std::string> m_files;
+	bool m_files_ready;
 
 	int m_thumbs_num;
 	QImage ** m_thumbs_imgs;
