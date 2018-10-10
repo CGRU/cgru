@@ -81,6 +81,8 @@ public:
 
 	inline void appendTaskLog( const std::string & message) const { m_tasks[0]->v_appendLog( message);}
 
+	bool initSystem();
+
 private:
 	SysTask * addTask( af::TaskExec * taskexec);
 	SysTask * getTask( int tasknum, const char * errorMessage = NULL);
@@ -144,6 +146,8 @@ class SysBlockData : public af::BlockData
 public:
 	SysBlockData ( int BlockNum, int JobId);
 	virtual ~SysBlockData ();
+
+	bool initSystem();
 };
 
 /// System job task data:
