@@ -107,11 +107,13 @@ const std::string af::pathUp(const std::string & i_path, bool i_use_cwd)
 			return "\\";
 	}
 
-	// Remove slash from the end if exists
-	if (up_path.back() == '/')
-		up_path.pop_back();
-	if (up_path.back() == '\\')
-		up_path.pop_back();
+	// Remove slashes from the end if exist
+	while (up_path.size() && ((up_path[up_path.size()-1] == '/') || (up_path[up_path.size()-1] == '\\')))
+		up_path = up_path.substr(0, up_path.size()-1);
+
+	// Null path is considered as root
+	if (up_path.size() == 0)
+		return "/";
 
 	// It is can be link to the current folder
 	if (up_path == ".")
