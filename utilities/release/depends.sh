@@ -21,7 +21,8 @@ case ${DISTRIBUTIVE} in
 		export DEPENDS_CGRU="python3-pyside openexr imagemagick"
 		;;
 	Fedora )
-		export DEPENDS_AFANASY="libpqxx qt5-multimedia"
+		export DEPENDS_AFANASY="libpqxx"
+		export DEPENDS_QTGUI="qt5-qtmultimedia"
 		export DEPENDS_CGRU="python3-PyQt4 OpenEXR ImageMagick"
 		;;
 	openSUSE )
