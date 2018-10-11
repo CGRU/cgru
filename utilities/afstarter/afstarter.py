@@ -3,7 +3,7 @@ import os
 import sys
 import time
 
-from Qt import QtCore, QtGui, QtWidgets
+from Qt import QtCore, QtGui, QtWidgets, QtCompat
 
 import cgruconfig
 import cgruutils
@@ -483,7 +483,7 @@ class Dialog(QtWidgets.QWidget):
             self.evaluate()
 
     def browseScene(self):
-        path, fltr = QtWidgets.QFileDialog.getOpenFileName(
+        path, fltr = QtCompat.QFileDialog.getOpenFileName(
             self, 'Choose a file',
             self.fields['scenefile'].text()
         )
@@ -493,7 +493,7 @@ class Dialog(QtWidgets.QWidget):
         self.evaluate()
 
     def browseOutImages(self):
-        path, fltr = QtWidgets.QFileDialog.getSaveFileName(
+        path, fltr = QtCompat.QFileDialog.getSaveFileName(
             self,
             'Choose a file',
             self.fields['outimages'].text()
@@ -513,7 +513,7 @@ class Dialog(QtWidgets.QWidget):
         self.evaluate()
 
     def browseExec(self):
-        path, fltr = QtWidgets.QFileDialog.getOpenFileName(
+        path, fltr = QtCompat.QFileDialog.getOpenFileName(
             self,
             'Choose a file',
             self.fields['exec'].text()
@@ -763,7 +763,7 @@ class Dialog(QtWidgets.QWidget):
         return True
 
     def browseLoad(self):
-        path, fltr = QtWidgets.QFileDialog.getOpenFileName(
+        path, fltr = QtCompat.QFileDialog.getOpenFileName(
                 self,
                 'Choose afstarter file',
                 cgruconfig.VARS['HOME_CGRU']
@@ -772,7 +772,7 @@ class Dialog(QtWidgets.QWidget):
         self.load(path, True)
 
     def browseSave(self):
-        path, fltr = QtWidgets.QFileDialog.getSaveFileName(
+        path, fltr = QtCompat.QFileDialog.getSaveFileName(
                 self,
                 'Choose afstarter file',
                 cgruconfig.VARS['HOME_CGRU']
