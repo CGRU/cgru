@@ -94,16 +94,16 @@ function suseArch(){
 # Packages for AltLinux distributions:
 function altArch(){
 	packages="$packages vim-console"
-	packages="$packages gcc4.5-c++"
+	packages="$packages gcc5-c++"
 	packages="$packages git-core"
 	packages="$packages python3-dev"
-	packages="$packages python3-module-PySide"
+	packages="$packages python3-module-PyQt5"
 	packages="$packages postgresql-devel"
-	packages="$packages qt4-devel"
 	packages="$packages qt5-base-devel"
 	packages="$packages libEGL-devel"
 	packages="$packages qt5-multimedia-devel"
-	packages="$packages libzip libzip-devel"
+	packages="$packages libzip5 libzip-devel"
+	packages="$packages openexr-devel"
 	packages="$packages rpm-build"
 
 	pkg_manager_cmd="apt-get install"

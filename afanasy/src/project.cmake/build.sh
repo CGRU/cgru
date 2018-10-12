@@ -78,7 +78,7 @@ case ${DISTRIBUTIVE} in
     AltLinux)
         export ADD_CMAKE_MODULE_PATH="$PWD"
         export AF_EXTRA_LIBS="pthread"
-		export AF_QT_VER="4"
+		export AF_QT_VER="5"
         ;;
     CentOS)
         export ADD_CMAKE_MODULE_PATH="$PWD"
