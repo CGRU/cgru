@@ -31,49 +31,49 @@ function Monitor(i_args)
 	this.document = this.window.document;
 
 	this.nodeConstructor = null;
-	if (this.type == 'jobs')
+	if (this.type === "jobs")
 		this.nodeConstructor = JobNode;
-	else if (this.type == 'renders')
+	else if (this.type === "renders")
 		this.nodeConstructor = RenderNode;
-	else if (this.type == 'users')
+	else if (this.type === "users")
 		this.nodeConstructor = UserNode;
-	else if (this.type == 'tasks')
+	else if (this.type === "tasks")
 		this.nodeConstructor = TaskItem;
-	else if (this.type == 'branches')
+	else if (this.type === "branches")
 		this.nodeConstructor = BranchNode;
-	else if (this.type == 'monitors')
+	else if (this.type === "monitors")
 		this.nodeConstructor = MonitorNode;
 
-	this.elMonitor = this.document.createElement('div');
+	this.elMonitor = this.document.createElement("div");
 	this.elParent.appendChild(this.elMonitor);
-	this.elMonitor.classList.add('monitor');
+	this.elMonitor.classList.add("monitor");
 	this.elMonitor.classList.add(this.type);
 	this.elMonitor.monitor = this;
 
-	this.elView = this.document.createElement('div');
-	this.elView.classList.add('view');
+	this.elView = this.document.createElement("div");
+	this.elView.classList.add("view");
 	this.elMonitor.appendChild(this.elView);
 
-	this.elPanelL = this.document.createElement('div');
+	this.elPanelL = this.document.createElement("div");
 	this.elMonitor.appendChild(this.elPanelL);
-	this.elPanelL.classList.add('panel');
-	this.elPanelL.classList.add('left');
+	this.elPanelL.classList.add("panel");
+	this.elPanelL.classList.add("left");
 
-	this.elPanelR = this.document.createElement('div');
+	this.elPanelR = this.document.createElement("div");
 	this.elMonitor.appendChild(this.elPanelR);
-	this.elPanelR.classList.add('panel');
-	this.elPanelR.classList.add('right');
-	this.elPanelR.classList.add('text_selectable');
+	this.elPanelR.classList.add("panel");
+	this.elPanelR.classList.add("right");
+	this.elPanelR.classList.add("text_selectable");
 
-	this.elList = this.document.createElement('div');
-	this.elCtrl = this.document.createElement('div');
-	this.elInfo = this.document.createElement('div');
+	this.elList = this.document.createElement("div");
+	this.elCtrl = this.document.createElement("div");
+	this.elInfo = this.document.createElement("div");
 	this.elView.appendChild(this.elList);
 	this.elView.appendChild(this.elCtrl);
 	this.elView.appendChild(this.elInfo);
-	this.elList.classList.add('list');
-	this.elCtrl.classList.add('ctrl');
-	this.elInfo.classList.add('info');
+	this.elList.classList.add("list");
+	this.elCtrl.classList.add("ctrl");
+	this.elInfo.classList.add("info");
 	this.elementsSU.push(this.elCtrl);
 	this.elementsSU.push(this.elInfo);
 
@@ -82,8 +82,8 @@ function Monitor(i_args)
 	this.elList.onmousedown = function(e) { return e.currentTarget.monitor.noneSelected(e); };
 
 
-	// Sorting direction (can be overriden later in onMonitorCreate function):
-	if (localStorage[this.type + '_sort_dir'] == 'ON')
+	// Sorting direction (can be overridden later in onMonitorCreate function):
+	if (localStorage[this.type + "_sort_dir"] === "ON")
 		this.sortDirection = true;
 	else
 		this.sortDirection = false;
@@ -105,9 +105,9 @@ function Monitor(i_args)
 			var view_opt = this.nodeConstructor.view_opts[opt];
 
 			// Get value from a browser storage or use default:
-			if (localStorage[opt] != null)
+			if (localStorage[opt] !== null)
 			{
-				if (view_opt.type == 'num')
+				if (view_opt.type === 'num')
 					this.view_opts[opt] = parseInt(localStorage[opt]);
 				else
 					this.view_opts[opt] = localStorage[opt];
@@ -126,7 +126,7 @@ function Monitor(i_args)
 		});
 	}
 
-	if (this.type != 'tasks')
+	if (this.type !== 'tasks')
 		this.createCtrlBtn({"name": 'log', "label": 'LOG', "tooltip": 'Show node log.', "handle": 'mh_Get'});
 
 	var el = document.createElement('div');
@@ -161,9 +161,9 @@ function Monitor(i_args)
 	el.m_elParams = this.elPanelR.m_elParams;
 	el.onclick = function(e) {
 		var el = e.currentTarget;
-		if (el.m_elParams.classList.contains('active') != true)
+		if (el.m_elParams.classList.contains('active') !== true)
 			return false;
-		if (el.m_elParams.m_all_shown == true)
+		if (el.m_elParams.m_all_shown === true)
 			return;
 		el.m_elParams.m_all_shown = true;
 		var elParams = el.m_elParams.m_elPMap;
@@ -177,7 +177,7 @@ function Monitor(i_args)
 		for (var p in this.nodeConstructor.params)
 		{
 			var param = this.nodeConstructor.params[p];
-			if (false == cm_CheckPermissions(param.permissions))
+			if(false === cm_CheckPermissions(param.permissions))
 				continue;
 
 			var elDiv = document.createElement('div');
@@ -202,9 +202,9 @@ function Monitor(i_args)
 			el.monitor = this;
 			el.name = p;
 			el.param = param;
-			el.ondblclick = function(e) {
+			el.ondblclick = function(e){
 				var el = e.currentTarget;
-				el.monitor.mh_Dialog({'name': el.name, 'type': el.param.type});
+				el.monitor.mh_Dialog({'name':el.name, 'type':el.param.type});
 			}
 		}
 
@@ -214,13 +214,13 @@ function Monitor(i_args)
 	this.elPanelR.m_elInfo = el;
 	el.classList.add('section');
 	// Label:
-	var el = document.createElement('div');
+	el = document.createElement('div');
 	this.elPanelR.m_elInfo.appendChild(el);
 	el.textContent = 'Info';
 	el.classList.add('caption');
 	el.title = 'Node information.';
 	// Body:
-	var el = document.createElement('div');
+	el = document.createElement('div');
 	this.elPanelR.m_elInfo.appendChild(el);
 	this.elPanelR.m_elInfo.m_elBody = el;
 	el.classList.add('info_body');
@@ -302,7 +302,7 @@ function Monitor(i_args)
 
 	for (var i = 0; i < g_receivers.length; i++)
 	{
-		if (g_receivers[i].name == this.name)
+		if (g_receivers[i].name === this.name)
 		{
 			g_Info('ERROR: Monitor[' + this.name + '] list already exists.');
 			return;
@@ -330,11 +330,11 @@ function Monitor(i_args)
 		else
 			this.sortParm = this.nodeConstructor.sort[0];
 	}
-	if (this.sortParm == 'order')
+	if (this.sortParm === 'order')
 		this.sortDirection = true;
 
 	for (var i = 0; i < cm_Attrs.length; i++)
-		if (cm_Attrs[i][0] == this.sortParm)
+		if (cm_Attrs[i][0] === this.sortParm)
 			this.elCtrlSortParam.textContent = cm_Attrs[i][1];
 
 	if (this.nodeConstructor.filterVisor && g_VISOR())
@@ -352,13 +352,13 @@ function Monitor(i_args)
 			this.filterParm = this.nodeConstructor.filter[0];
 	}
 
-	if (localStorage[this.type + '_filter_exclude'] == 'ON')
+	if (localStorage[this.type + '_filter_exclude'] === 'ON')
 		this.filterExclude = true;
 	else
 		this.filterExclude = false;
 
 	for (var i = 0; i < cm_Attrs.length; i++)
-		if (cm_Attrs[i][0] == this.filterParm)
+		if (cm_Attrs[i][0] === this.filterParm)
 			this.elCtrlFilterParam.textContent = cm_Attrs[i][1];
 
 	this.items = [];
@@ -372,7 +372,7 @@ function Monitor(i_args)
 	this.menu = null;
 	this.cycle = 0;
 
-	if (this.type == 'tasks')
+	if (this.type === 'tasks')
 	{
 		this.job_id = i_args.id;
 		nw_GetNodes('jobs', [this.job_id], 'full');
@@ -388,12 +388,12 @@ function Monitor(i_args)
 Monitor.prototype.destroy = function() {
 	if (this.menu)
 		this.menu.destroy();
-	if (g_cur_monitor == this)
+	if (g_cur_monitor === this)
 		g_cur_monitor = null;
 	cm_ArrayRemove(g_receivers, this);
 	cm_ArrayRemove(g_refreshers, this);
 	cm_ArrayRemove(g_monitors, this);
-	if (this.type == 'tasks')
+	if (this.type === 'tasks')
 		nw_Subscribe(this.type, false, [this.job_id]);
 	else
 		nw_Subscribe(this.type, false);
@@ -421,7 +421,7 @@ Monitor.prototype.destroy = function() {
 };
 
 Monitor.prototype.refresh = function() {
-	if (this.type == 'users')
+	if (this.type === 'users')
 	{
 		this.max_tasks = 0;
 		for (var i = 0; i < this.items.length; i++)
@@ -429,7 +429,7 @@ Monitor.prototype.refresh = function() {
 				if (this.items[i].params.running_tasks_num > this.max_tasks)
 					this.max_tasks = this.items[i].params.running_tasks_num;
 	}
-	else if ((this.type == 'renders') && (this.cycle % 5 == 0))
+	else if ((this.type === 'renders') && (this.cycle % 5 === 0))
 	{
 		// Get resources of online renders:
 		var ids = [];
@@ -448,15 +448,15 @@ Monitor.prototype.refresh = function() {
 
 Monitor.prototype.processMsg = function(obj) {
 	// this.info('New message '+this.cycle+':'+JSON.stringify(obj));
-	if (obj.events != null)
+	if (obj.events !== null)
 	{
-		if (this.type == 'tasks')
+		if (this.type === 'tasks')
 		{
-			if (obj.events.tasks_progress != null)
+			if (obj.events.tasks_progress !== null)
 			{
 				this.tasksProgress(obj.events.tasks_progress);
 			}
-			if (obj.events.block_ids != null)
+			if (obj.events.block_ids !== null)
 			{
 				this.getBlocks(obj.events.block_ids);
 			}
@@ -469,7 +469,7 @@ Monitor.prototype.processMsg = function(obj) {
 			nw_GetNodes(this.type, ids);
 
 		// Jobs order:
-		if (this.type == 'jobs')
+		if (this.type === 'jobs')
 		{
 			if (obj.events.jobs_order_ids && obj.events.jobs_order_ids.length)
 				this.sortByIds(obj.events.jobs_order_ids);
@@ -480,20 +480,20 @@ Monitor.prototype.processMsg = function(obj) {
 		return;
 	}
 
-	if (this.type == 'tasks')
+	if (this.type === 'tasks')
 	{
-		if (this.job == null)
+		if (this.job === null)
 		{
-			if (obj.jobs != null)
-				if (obj.jobs.length == 1)
+			if (obj.jobs !== null)
+				if (obj.jobs.length === 1)
 					this.jobConstruct(obj.jobs[0]);
 		}
-		else if (obj.job_progress != null)
+		else if (obj.job_progress !== null)
 		{
-			if (obj.job_progress.id == this.job_id)
+			if (obj.job_progress.id === this.job_id)
 				this.jobProgress(obj.job_progress.progress);
 		}
-		else if (obj.blocks != null)
+		else if (obj.blocks !== null)
 		{
 			this.updateBlocks(obj.blocks);
 		}
@@ -501,7 +501,7 @@ Monitor.prototype.processMsg = function(obj) {
 	}
 
 	var nodes = eval('obj.' + this.type);
-	if (nodes == null)
+	if (nodes === null)
 		return;
 
 	var new_ids = [];
@@ -512,15 +512,15 @@ Monitor.prototype.processMsg = function(obj) {
 		var found = false;
 		for (var i = 0; i < this.items.length; i++)
 		{
-			if (this.items[i].params.id == nodes[j].id)
+			if (this.items[i].params.id === nodes[j].id)
 			{
 				this.items[i].update(nodes[j]);
 
-				if (this.panel_item == this.items[i])
+				if (this.panel_item === this.items[i])
 					this.updatePanels(this.items[i]);
 
-				if ((this.type == 'jobs') && this.elPanelR.m_elBlocks.m_cur_block)
-					if (this.elPanelR.m_elBlocks.m_cur_block.job.params.id == this.items[i].params.id)
+				if ((this.type === 'jobs') && this.elPanelR.m_elBlocks.m_cur_block)
+					if (this.elPanelR.m_elBlocks.m_cur_block.job.params.id === this.items[i].params.id)
 						this.elPanelR.m_elBlocks.m_cur_block.updatePanels();
 
 				updated.push(this.items[i]);
@@ -530,11 +530,11 @@ Monitor.prototype.processMsg = function(obj) {
 				break;
 			}
 		}
-		if (found == false)
+		if (found === false)
 			new_ids.push(j);
 	}
 
-	if (this.sortParm != 'order')
+	if (this.sortParm !== 'order')
 		for (var i = 0; i < updated.length; i++)
 			this.sortItem(updated[i]);
 
@@ -542,11 +542,11 @@ Monitor.prototype.processMsg = function(obj) {
 	for (var i = 0; i < new_ids.length; i++)
 		new_nodes.push(this.createNode(nodes[new_ids[i]]));
 
-	if ((this.type == 'jobs') && (this.sortParm == 'order'))
+	if ((this.type === 'jobs') && (this.sortParm === 'order'))
 		if (new_ids.length)  //|| updated.length )
 			nw_GetNodes('users', [g_uid], 'jobs_order');
 
-	if (false == this.hasSelection())
+	if (false === this.hasSelection())
 	{
 		if (new_nodes.length)
 			this.cur_item = new_nodes[new_nodes.length - 1];
@@ -554,7 +554,7 @@ Monitor.prototype.processMsg = function(obj) {
 			this.cur_item = updated[updated.length - 1];
 	}
 
-	if ((this.firstNodesReceived != true) && new_nodes.length && (g_VISOR() != true))
+	if ((this.firstNodesReceived !== true) && new_nodes.length && (g_VISOR() !== true))
 	{
 		this.items[this.items.length - 1].element.scrollIntoView();
 		this.firstNodesReceived = true;
@@ -570,50 +570,79 @@ Monitor.prototype.processMsg = function(obj) {
 
 Monitor.prototype.setWindowTitle = function() {
 	var title = null;
-	if (this.type == 'jobs')
+	var i, tasks;
+	if (this.type === 'jobs')
 	{
-		title = 'AJ';
-		var tasks = 0;
-		for (var i = 0; i < this.items.length; i++)
-			if (this.items[i].state.RUN)
+		title = 'AJ:';
+		tasks = 0;
+		var in_queue_tasks = 0;
+
+		var total_frames_to_be_rendered = 0;
+		for ( i = 0; i < this.items.length; i++){
+			if(this.items[i].state.RUN){
 				tasks += this.items[i].running_tasks;
-		if (tasks > 0)
+			}
+
+			if( this.items[i].state.DON === false && this.items[i].params.name !== "afanasy"){
+				in_queue_tasks += this.items[i].blocks.length;
+
+				var current_block;
+				var block_start_frame, block_end_frame;
+				var percentage_done = this.items[i].percentage;
+				for( var j=0; j < this.items[i].blocks.length; j++){
+					current_block = this.items[i].blocks[j];
+					block_start_frame = current_block.params.frame_first;
+					block_end_frame = current_block.params.frame_last;
+					total_frames_to_be_rendered += Math.ceil((block_end_frame - block_start_frame) * (100 - percentage_done) / 100);
+				 }
+			}
+		}
+
+		if( tasks > 0 )
+		{
 			title += ' ' + tasks;
+		} else {
+			title += ' 0';
+		}
+		title +=  '/' + in_queue_tasks + ' | F: ' + total_frames_to_be_rendered;
+
 		if (this.cur_item)
 		{
 			if (this.cur_item.state.RUN)
+			{
 				title += ' ' + this.cur_item.percentage + '%';
-			title += this.cur_item.params.state;
+			}
+			title += ' | ' + this.cur_item.params.state;
 		}
 	}
-	else if (this.type == 'renders')
+	else if (this.type === 'renders')
 	{
-		title = 'AR';
-		var tasks = 0;
-		for (var i = 0; i < this.items.length; i++)
+		title = 'AR:';
+		tasks = 0;
+		for ( i = 0; i < this.items.length; i++)
 			if (this.items[i].state.RUN)
 				tasks += this.items[i].params.tasks.length;
 		if (tasks > 0)
 			title += ' ' + tasks;
 	}
-	else if (this.type == 'users')
+	else if (this.type === 'users')
 	{
-		title = 'AU';
-		var tasks = 0;
-		for (var i = 0; i < this.items.length; i++)
+		title = 'AU:';
+		tasks = 0;
+		for ( i = 0; i < this.items.length; i++)
 			if (this.items[i].params.running_tasks_num)
 				tasks += this.items[i].params.running_tasks_num;
 		if (tasks > 0)
 			title += ' ' + tasks;
 	}
-	else if (this.type == 'tasks' && this.job)
+	else if (this.type === 'tasks' && this.job)
 	{
 		var count = 0;
 		var percent = 0;
 		var run = 0;
 		var error = 0;
-		for (var i = 0; i < this.items.length; i++)
-			if (this.items[i].task_num)
+		for(i = 0; i < this.items.length; i++)
+			if(this.items[i].task_num)
 			{
 				if (this.items[i].state.DON)
 					percent += 100;
@@ -627,12 +656,12 @@ Monitor.prototype.setWindowTitle = function() {
 					error++;
 				count++;
 			}
-		if (count)
+		if(count)
 		{
 			title = '';
-			if (error)
+			if(error)
 				title += 'E' + error + ' ';
-			if (run)
+			if(run)
 				title += 'R' + run + ' ';
 			percent = Math.round(percent / count);
 			title += percent + '%';
@@ -640,25 +669,25 @@ Monitor.prototype.setWindowTitle = function() {
 		}
 	}
 
-	if (title)
+	if(title)
 		this.document.title = title;
 };
 
 Monitor.prototype.delNodes = function(i_ids) {
-	if (i_ids == null)
+	if (i_ids === null)
 		return;
-	if (i_ids.length == null)
+	if (i_ids.length === null)
 		return;
-	if (i_ids.length == 0)
+	if (i_ids.length === 0)
 		return;
-	if (this.items.length == 0)
+	if (this.items.length === 0)
 		return;
 
 	for (var d = 0; d < i_ids.length; d++)
 		for (var i = 0; i < this.items.length; i++)
-			if (this.items[i].params.id == i_ids[d])
+			if (this.items[i].params.id === i_ids[d])
 			{
-				if (this.panel_item == this.items[i])
+				if (this.panel_item === this.items[i])
 					this.resetPanels({'hide_params': true});
 
 				if (this.items[i].selected)
@@ -687,10 +716,10 @@ Monitor.prototype.addItemSorted = function(i_item) {
 	if (this.sortParm)
 		for (var i = 0; i < this.items.length; i++)
 		{
-		//var log = i_item.params.name+'['+this.sortParm+']='+i_item.params[this.sortParm]+' <> '+this.items[i].params[this.sortParm]+'=['+this.sortParm+']'+this.items[i].params.name + ' (' + this.sortDirection + '): ';
-			if (cm_CompareItems(i_item, this.items[i], this.sortParm, false == this.sortDirection))
+			//var log = i_item.params.name+'['+this.sortParm+']='+i_item.params[this.sortParm]+' <> '+this.items[i].params[this.sortParm]+'=['+this.sortParm+']'+this.items[i].params.name + ' (' + this.sortDirection + '): ';
+			if (cm_CompareItems(i_item, this.items[i], this.sortParm, false === this.sortDirection))
 			{
-			//log += 'TRUE index='+index;console.log(log);
+				//log += 'TRUE index='+index;console.log(log);
 				index = i;
 				break;
 			}
@@ -708,7 +737,7 @@ Monitor.prototype.addItemSorted = function(i_item) {
 Monitor.prototype.createItem = function(i_item, i_obj, i_appendChild) {
 	i_item.element = this.document.createElement('div');
 	i_item.element.className = 'item';
-	if (i_appendChild == true)
+	if (i_appendChild === true)
 		this.elList.appendChild(i_item.element);
 
 	i_item.params = i_obj;
@@ -716,11 +745,11 @@ Monitor.prototype.createItem = function(i_item, i_obj, i_appendChild) {
 	i_item.element.monitor = this;
 	i_item.element.item = i_item;
 	i_item.element.onmousedown = function(e) {
-		if (e.button == 0)
+		if (e.button === 0)
 			return e.currentTarget.monitor.onMouseDown(e, e.currentTarget);
 	};
 	i_item.element.onmouseover = function(e) {
-		if (e.button == 0)
+		if (e.button === 0)
 			return e.currentTarget.monitor.onMouseOver(e, e.currentTarget);
 	};
 	i_item.element.ondblclick = function(e) { return e.currentTarget.item.onDoubleClick(e); };
@@ -753,13 +782,13 @@ Monitor.prototype.onMouseDown = function(i_evt, i_el) {
 	{
 		var i = this.items.indexOf(this.cur_item);
 		var ci = this.items.indexOf(i_el.item);
-		if ((i != ci) && (i != -1) && (ci != -1))
+		if ((i !== ci) && (i !== -1) && (ci !== -1))
 		{
 			this.setSelected(i_el.item, true);
 			var d = 1;
 			if (i > ci)
 				d = -1;
-			while (i != ci)
+			while (i !== ci)
 			{
 				this.setSelected(this.items[i], true);
 				i += d;
@@ -775,9 +804,9 @@ Monitor.prototype.onMouseDown = function(i_evt, i_el) {
 };
 
 Monitor.prototype.onMouseOver = function(i_evt, i_el) {
-	if (i_evt.buttons != 1)
+	if (i_evt.buttons !== 1)
 		return;
-	this.setSelected(i_evt.currentTarget.item, i_evt.ctrlKey == false);
+	this.setSelected(i_evt.currentTarget.item, i_evt.ctrlKey === false);
 };
 
 Monitor.prototype.setSelected = function(i_item, on) {
@@ -785,7 +814,7 @@ Monitor.prototype.setSelected = function(i_item, on) {
 
 	if (on)
 	{
-		if ((this.show_hidden != true) && (i_item.hidden))
+		if ((this.show_hidden !== true) && (i_item.hidden))
 			return;
 
 		this.cur_item = i_item;
@@ -801,7 +830,7 @@ Monitor.prototype.setSelected = function(i_item, on) {
 		i_item.element.classList.add('selected');
 		this.selected_items.push(i_item);
 
-		if (this.type == 'jobs')
+		if (this.type === 'jobs')
 			this.setWindowTitle();
 
 		if (this.cur_item.element.offsetTop < this.elList.scrollTop)
@@ -843,22 +872,22 @@ Monitor.prototype.selectToggle = function(i_item) {
 Monitor.prototype.selectAll = function(on) {
 	for (var i = 0; i < this.items.length; i++)
 	{
-		if (on && (this.items[i].show_hidden != true) && (this.items[i].hidden))
+		if (on && (this.items[i].show_hidden !== true) && (this.items[i].hidden))
 			continue;
 
 		this.setSelected(this.items[i], on);
 	}
 
 	// Deselecting sub-items:
-	if (this.type == 'jobs')
+	if (this.type === 'jobs')
 		JobBlock.deselectAll(this);
 
-	if (this.type == 'branches')
+	if (this.type === 'branches')
 		BranchActiveJob.deselectAll(this);
 };
 
 Monitor.prototype.selectNext = function(i_evt, previous) {
-	if (this.items.length == 0)
+	if (this.items.length === 0)
 		return;
 
 	var next_index = 0;
@@ -873,7 +902,7 @@ Monitor.prototype.selectNext = function(i_evt, previous) {
 					next_index--;
 				else
 					next_index++;
-				if (this.show_hidden || (this.items[next_index] && (this.items[next_index].hidden != true)))
+				if (this.show_hidden || (this.items[next_index] && (this.items[next_index].hidden !== true)))
 					break;
 			}
 		}
@@ -884,24 +913,24 @@ Monitor.prototype.selectNext = function(i_evt, previous) {
 	if (next_index >= this.items.length)
 		return;
 
-	if (false == i_evt.shiftKey)
+	if (false === i_evt.shiftKey)
 		this.selectAll(false);
 
 	this.setSelected(this.items[next_index], true);
 };
 
 Monitor.prototype.showObject = function(i_act, i_evt) {
-	if (this.hasSelection() == false)
+	if (this.hasSelection() === false)
 		return false;
 	if (this.cur_item && this.cur_item.params)
 		g_ShowObject({"object": this.cur_item.params}, {"evt": i_evt, "wnd": this.window});
 };
 
 Monitor.prototype.resetPanels = function(i_args) {
-	if (this.panel_item == null)
+	if (this.panel_item === null)
 		return;
 
-	if (i_args == null)
+	if (i_args === null)
 		i_args = {};
 
 	this.elPanelR.m_elName.style.display = 'none';
@@ -909,11 +938,11 @@ Monitor.prototype.resetPanels = function(i_args) {
 
 	var els = this.elPanelL.getElementsByClassName('ctrl_button');
 	for (var i = 0; i < els.length; i++)
-		if (els[i].m_always_active != true)
+		if (els[i].m_always_active !== true)
 			els[i].classList.remove('active');
 	var els = this.elPanelR.getElementsByClassName('section');
 	for (var i = 0; i < els.length; i++)
-		if (els[i].m_always_active != true)
+		if (els[i].m_always_active !== true)
 			els[i].classList.remove('active');
 
 	if (i_args.hide_params)
@@ -933,9 +962,9 @@ Monitor.prototype.resetPanels = function(i_args) {
 Monitor.prototype.updatePanels = function(i_item, i_args) {
 	this.resetPanels(i_args);
 
-	if (i_item == null)
+	if (i_item === null)
 		i_item = this.cur_item;
-	if (i_item == null)
+	if (i_item === null)
 		return;
 
 	this.panel_item = i_item;
@@ -954,18 +983,18 @@ Monitor.prototype.updatePanels = function(i_item, i_args) {
 	var elParams = this.elPanelR.m_elParams.m_elPMap;
 	for (var p in elParams)
 	{
-		if (i_item.params[p] == null)
+		if (i_item.params[p] === null)
 		{
-			if (this.elPanelR.m_elParams.m_all_shown != true)
+			if (this.elPanelR.m_elParams.m_all_shown !== true)
 				elParams[p].style.display = 'none';
 			elParams[p].m_elValue.textContent = '';
 			continue;
 		}
 
 		var value = i_item.params[p];
-		if (this.nodeConstructor.params[p].type == 'hrs')
+		if (this.nodeConstructor.params[p].type === 'hrs')
 			value = cm_TimeStringFromSeconds(value, true);
-		else if ((typeof value) == 'string')
+		else if ((typeof value) === 'string')
 		{
 			// word-wrap long regular expressions:
 			value = value.replace(/\./g, '.&shy;');
@@ -991,7 +1020,7 @@ Monitor.prototype.onContextMenu = function(i_evt, i_el) {
 	i_evt.stopPropagation();
 	g_cur_monitor = this;
 
-	if (i_el.item.selected != true)
+	if (i_el.item.selected !== true)
 		this.selectAll(false);
 	this.setSelected(i_el.item, true);
 
@@ -1010,7 +1039,7 @@ Monitor.prototype.onMenuDestroy = function() {
 };
 
 Monitor.prototype.addMenuItem = function(i_menu, i_action) {
-	if (i_action.name == null)
+	if (i_action.name === null)
 	{
 		i_menu.addItem();
 		return;
@@ -1028,25 +1057,25 @@ Monitor.prototype.addMenuItem = function(i_menu, i_action) {
 	{
 		if (g_VISOR())
 		{
-			if (item.permissions == 'user')
+			if (item.permissions === 'user')
 				return;
 			if (g_GOD())
 			{
-				if (false == ((item.permissions == 'visor') || (item.permissions == 'god')))
+				if (false === ((item.permissions === 'visor') || (item.permissions === 'god')))
 					return;
 			}
-			else if (item.permissions != 'visor')
+			else if (item.permissions !== 'visor')
 				return;
 		}
-		else if (item.permissions != 'user')
+		else if (item.permissions !== 'user')
 			return;
 	}
 
-	if (i_action.mode == 'cgru_cmdexec')
+	if (i_action.mode === 'cgru_cmdexec')
 	{
 		var cmds = [];
 		for (var i = 0; i < this.items.length; i++)
-			if (this.items[i].selected == true)
+			if (this.items[i].selected === true)
 			{
 				var cmd = i_action.handle;
 				cmd = cmd.replace(/@ARG@/g, this.items[i].params.name);
@@ -1068,21 +1097,21 @@ Monitor.prototype.addMenuItem = function(i_menu, i_action) {
 Monitor.prototype.showMenu = function(i_evt, i_name, i_need_selection) {
 	if (i_need_selection !== false)
 	{
-		if (this.cur_item == null)
+		if (this.cur_item === null)
 			return;
-		if (this.hasSelection() == false)
+		if (this.hasSelection() === false)
 			return;
 	}
 
-	if (i_name == null)
+	if (i_name === null)
 		i_name = 'set';
 
 	var menu = this.createMenu(i_evt, 'set');
 	var actions = this.nodeConstructor.actions;
-	if (actions == null)
+	if (actions === null)
 		return;
 	for (var i = 0; i < actions.length; i++)
-		if (actions[i].mode == i_name)
+		if (actions[i].mode === i_name)
 			this.addMenuItem(menu, actions[i]);
 	menu.show();
 };
@@ -1121,7 +1150,7 @@ Monitor.prototype.mh_Oper = function(i_param) {
 
 Monitor.prototype.mh_Get = function(i_param, i_evt) {
 	// this.info('Get = ' + i_param.name);
-	if ((this.hasSelection() == false) || (this.cur_item == null))
+	if ((this.hasSelection() === false) || (this.cur_item === null))
 	{
 		g_Info('No object selected.');
 		return;
@@ -1187,7 +1216,7 @@ Monitor.prototype.noneSelected = function(i_evt) {  // return false;
 Monitor.prototype.sortItems = function() {
 	// this.info('Sort '+(this.sortDirection ? 'ascending':'descending')+': '+this.sortParm);
 	this.elCtrlSort.classList.add('sorting');
-	if (this.type == 'tasks')
+	if (this.type === 'tasks')
 	{
 		var pos = 0;
 		for (var b = 0; b < this.job.blocks.length; b++)
@@ -1228,13 +1257,13 @@ Monitor.prototype.sortItem = function(i_item) {
 	var i = this.items.indexOf(i_item);
 	var needsort = false;
 	if (i > 0)
-		if (cm_CompareItems(i_item, this.items[i - 1], this.sortParm, this.sortDirection) == false)
+		if (cm_CompareItems(i_item, this.items[i - 1], this.sortParm, this.sortDirection) === false)
 			needsort = true;
 	if (i < (this.items.length - 1))
-		if (cm_CompareItems(i_item, this.items[i + 1], this.sortParm, this.sortDirection) == true)
+		if (cm_CompareItems(i_item, this.items[i + 1], this.sortParm, this.sortDirection) === true)
 			needsort = true;
 
-	if (false == needsort)
+	if (false === needsort)
 		return;
 
 	this.elList.removeChild(i_item.element);
@@ -1244,7 +1273,7 @@ Monitor.prototype.sortItem = function(i_item) {
 };
 
 Monitor.prototype.sortByIds = function(i_ids) {
-	if (i_ids.length != this.items.length)
+	if (i_ids.length !== this.items.length)
 	{
 		g_Error('Order Ids and items size mismatch.');
 		return;
@@ -1261,7 +1290,7 @@ Monitor.prototype.sortByIds = function(i_ids) {
 	{
 		for (var j = 0; j < items.length; j++)
 		{
-			if (i_ids[i] == items[j].params.id)
+			if (i_ids[i] === items[j].params.id)
 			{
 				if (items[j].params['order'])
 					items[j].params['order'] = i;
@@ -1291,14 +1320,14 @@ Monitor.prototype.createMenu = function(i_evt, i_name) {
 Monitor.prototype.createCtrlBtns = function(i_acts) {
 	for (var a in i_acts)
 	{
-		if (i_acts[a].name == null)
+		if (i_acts[a].name === null)
 			i_acts[a].name = a;
 		this.createCtrlBtn(i_acts[a]);
 	}
 };
 
 Monitor.prototype.createCtrlBtn = function(i_args) {
-	if (this.ctrl_btns == null)
+	if (this.ctrl_btns === null)
 		this.ctrl_btns = {};
 
 	var elBtn = document.createElement('div');
@@ -1339,10 +1368,10 @@ Monitor.prototype.createCtrlBtn = function(i_args) {
 		for (var a in acts)
 		{
 			acts[a].sub_button = true;
-			if (acts[a].name == null)
+			if (acts[a].name === null)
 				acts[a].name = a;
 			acts[a].elParent = elBtn;
-			if (acts[a].handle == null)
+			if (acts[a].handle === null)
 				acts[a].handle = i_args.handle;
 			var el = this.createCtrlBtn(acts[a]);
 			el.m_elBtn = elBtn;
@@ -1368,14 +1397,14 @@ Monitor.ctrlBtnClicked = function(e) {
 	var elBtn = el;
 	if (el.m_elBtn)
 		elBtn = el.m_elBtn;  // <-- this is sub-button in this case
-	if (elBtn.classList.contains('active') != true)
+	if (elBtn.classList.contains('active') !== true)
 		return false;
 
 	var args =
 		{'name': el.m_act.name, 'type': el.m_act.type, 'value': el.m_act.value, 'monitor': el.m_monitor};
 
 	var handle = el.m_act.handle;
-	if (handle == null)
+	if (handle === null)
 		handle = 'mh_Oper';
 
 	var action_accepted = true;
@@ -1400,7 +1429,7 @@ Monitor.ctrlBtnRelease = function(i_el) {
 /* ---------------- [ Sorting functions ] ---------------------------------------------------------------- */
 
 Monitor.prototype.sortDirChanged = function(i_evt) {
-	if (this.sortParm == 'order')
+	if (this.sortParm === 'order')
 		return;
 	if (this.sortDirection)
 		this.sortDirection = false;
@@ -1426,7 +1455,7 @@ Monitor.prototype.sortFilterParmMenu = function(i_evt, i_type) {
 		// to find a better name and label
 		for (var j = 0; j < cm_Attrs.length; j++)
 		{
-			if (parm == cm_Attrs[j][0])
+			if (parm === cm_Attrs[j][0])
 			{
 				item.name = cm_Attrs[j][0];
 				item.label = cm_Attrs[j][2];
@@ -1442,10 +1471,10 @@ Monitor.prototype.sortFilterParmMenu = function(i_evt, i_type) {
 Monitor.prototype.sortParmChanged = function(i_name) {
 	this.elCtrlSortParam.textContent = i_name;
 	for (var i = 0; i < cm_Attrs.length; i++)
-		if (cm_Attrs[i][0] == i_name)
+		if (cm_Attrs[i][0] === i_name)
 			this.elCtrlSortParam.textContent = cm_Attrs[i][1];
 	this.sortParm = i_name;
-	if (this.sortParm == 'order')
+	if (this.sortParm === 'order')
 		this.sortDirection = true;
 
 	// Store:
@@ -1471,7 +1500,7 @@ Monitor.prototype.filterExcludeChanged = function(i_evt) {
 Monitor.prototype.filterParmChanged = function(i_name) {
 	this.elCtrlFilterParam.textContent = i_name;
 	for (var i = 0; i < cm_Attrs.length; i++)
-		if (cm_Attrs[i][0] == i_name)
+		if (cm_Attrs[i][0] === i_name)
 			this.elCtrlFilterParam.textContent = cm_Attrs[i][1];
 	this.filterParm = i_name;
 
@@ -1486,7 +1515,7 @@ Monitor.prototype.filterParmChanged = function(i_name) {
 };
 
 Monitor.prototype.filterKeyUp = function(i_evt) {
-	if (i_evt.keyCode == 13 || i_evt.keyCode == 27) /* ENTER or ESC */
+	if (i_evt.keyCode === 13 || i_evt.keyCode === 27) /* ENTER or ESC */
 	{
 		i_evt.currentTarget.blur();
 		i_evt.stopPropagation();
@@ -1516,7 +1545,7 @@ Monitor.prototype.filterItem = function(i_item) {
 		hide = true;
 	else if (this.filterExpr && this.filterParm && i_item.params[this.filterParm])
 	{
-		if (false == this.filterExpr.test(i_item.params[this.filterParm]))
+		if (false === this.filterExpr.test(i_item.params[this.filterParm]))
 			hide = (this.filterExclude ? false : true);
 		else
 			hide = (this.filterExclude ? true : false);
@@ -1574,7 +1603,7 @@ Monitor.prototype.jobConstruct = function(job) {
 };
 
 Monitor.prototype.jobProgress = function(progress) {
-	if (this.blocks.length != progress.length)
+	if (this.blocks.length !== progress.length)
 	{
 		g_Error(
 			'Job progress bocks length mismatch: job_id=' + this.job_id + ' ' + this.blocks.length + '!=' +
@@ -1584,7 +1613,7 @@ Monitor.prototype.jobProgress = function(progress) {
 
 	for (var b = 0; b < this.blocks.length; b++)
 	{
-		if (this.blocks[b].tasks.length != progress[b].length)
+		if (this.blocks[b].tasks.length !== progress[b].length)
 		{
 			g_Error(
 				'Job progress tasks length mismatch: job_id=' + this.job_id + ' block=' + b + ' ' +
@@ -1607,14 +1636,14 @@ Monitor.prototype.tasksProgress = function(tasks_progress) {
 	for (var i = 0; i < tasks_progress.length; i++)
 	{
 		// g_Info(' jid='+tasks_progress[i].job_id+' this='+this.job_id);
-		if (tasks_progress[i].job_id == this.job_id)
+		if (tasks_progress[i].job_id === this.job_id)
 		{
 			j = i;
 			break;
 		}
 	}
 
-	if (j == -1)
+	if (j === -1)
 		return;
 
 	for (var i = 0; i < tasks_progress[j].progress.length; i++)
@@ -1636,7 +1665,7 @@ Monitor.prototype.getBlocks = function(i_block_ids) {
 
 	for (var i = 0; i < i_block_ids.job_id.length; i++)
 	{
-		if (this.job_id != i_block_ids.job_id[i])
+		if (this.job_id !== i_block_ids.job_id[i])
 			continue;
 		// test += ' n' + i_block_ids.block_num[i];
 		// test += ' m' + i_block_ids.mode[i];
@@ -1646,7 +1675,7 @@ Monitor.prototype.getBlocks = function(i_block_ids) {
 
 	// this.document.getElementById('test').textContent = test;
 
-	if (blocks.length == 0)
+	if (blocks.length === 0)
 		return;
 
 	nw_GetBlocks(this.job_id, blocks, modes);
@@ -1655,12 +1684,12 @@ Monitor.prototype.getBlocks = function(i_block_ids) {
 Monitor.prototype.updateBlocks = function(i_blocks) {
 	for (var i = 0; i < i_blocks.length; i++)
 	{
-		if (i_blocks[i].job_id != this.job_id)
+		if (i_blocks[i].job_id !== this.job_id)
 			continue;
 
 		for (var b = 0; b < this.blocks.length; b++)
 		{
-			if (i_blocks[i].block_num != b)
+			if (i_blocks[i].block_num !== b)
 				continue;
 
 			//			this.blocks[b].getData( i_blocks[i]);
