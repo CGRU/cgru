@@ -43,8 +43,9 @@ function redhatArch(){
 	packages="$packages qt-devel"
 	packages="$packages qt5-qtbase-devel"
 	packages="$packages qt5-qtmultimedia-devel"
-	packages="$packages rpm-build"
 	packages="$packages libzip libzip-devel"
+	packages="$packages OpenEXR-devel"
+	packages="$packages rpm-build"
 
 	pkg_manager_cmd="yum install"
 	pkg_extension=".$ARCHITECTURE"

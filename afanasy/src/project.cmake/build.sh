@@ -75,6 +75,12 @@ case ${DISTRIBUTIVE} in
         export AF_EXTRA_LIBS="pthread"
 		if [[ "$DISTRIBUTIVE_VERSION" < "7" ]]; then
 			export AF_QT_VER="4"
+<<<<<<< HEAD
+=======
+		else
+			export AF_QT_VER="5"
+			export AF_ADD_CFLAGS="$AF_ADD_CFLAGS -std=c++11"
+>>>>>>> 3189caa42d83bd4a4b13df7fcd0521ba94e1ed48
 		fi
         ;;
     RedHat)
