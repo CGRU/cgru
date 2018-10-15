@@ -87,6 +87,7 @@ case ${DISTRIBUTIVE} in
 			export AF_QT_VER="4"
 		else
 			export AF_QT_VER="5"
+			export AF_ADD_CFLAGS="$AF_ADD_CFLAGS -std=c++11"
 		fi
         ;;
     RedHat)
