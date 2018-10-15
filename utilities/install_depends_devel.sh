@@ -15,13 +15,10 @@ function debianArch(){
 	packages="$packages g++"
 	packages="$packages git-core"
 	packages="$packages python3-dev"
-	packages="$packages python3-pyside"
+	packages="$packages python3-pyqt5"
 	packages="$packages libpq-dev"
 	packages="$packages p7zip-full"
 	packages="$packages libzip-dev"
-	# Qt4:
-	packages="$packages qt4-dev-tools"
-	packages="$packages qt4-qmake"
 	# Qt5:
 	packages="$packages qt5-default"
 	packages="$packages qtmultimedia5-dev"
@@ -30,12 +27,6 @@ function debianArch(){
 	packages="$packages qtdeclarative5-dev"
 	# EXRJoin:
 	packages="$packages libopenexr-dev"
-	# ImageMagick:
-	#packages="$packages libjpeg62 libjpeg62-dev"
-	#packages="$packages libtiff5 libtiff5-dev"
-	#packages="$packages libpng12-0 libpng12-dev"
-	#packages="$packages libfreetype6 libfreetype6-dev"
-	#packages="$packages libfontconfig1 libfontconfig1-dev"
 
 	pkg_manager_cmd="apt-get install"
 	pkg_extension=""

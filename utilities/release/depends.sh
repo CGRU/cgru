@@ -13,12 +13,8 @@ case ${DISTRIBUTIVE} in
 		;;
 	Debian )
 		export DEPENDS_AFANASY="libpq5"
-		if [[ "$DISTRIBUTIVE_VERSION" < "8" ]]; then
-			export DEPENDS_QTGUI="libqt4-core libqt4-gui libqt4-network"
-		else
-			export DEPENDS_QTGUI="libqt5network5 libqt5widgets5 libqt5multimedia5"
-		fi
-		export DEPENDS_CGRU="python3-pyside openexr imagemagick"
+		export DEPENDS_QTGUI="libqt5network5 libqt5widgets5 libqt5multimedia5"
+		export DEPENDS_CGRU="python3-pyqt5 openexr imagemagick"
 		;;
 	Fedora )
 		export DEPENDS_AFANASY="libpqxx"
