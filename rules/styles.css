@@ -52,13 +52,37 @@ position: absolute;
 left: 40px; right: 10px; bottom: 0px; height: 30px;
 padding-bottom: 5px;
 }
-#header .panel .button {
+#navigation_buttons {
+float: left;
+margin: 0px 10px;
+}
+#navigation_buttons .button {
 background-size: 50%;
 width: 40px; height: 20px;
 margin: 3px 4px;
 float: left;
 }
-
+#profile_settings {
+display: none;
+float: right;
+margin: 0px 16px;
+cursor: pointer;
+}
+#profile_settings:hover {
+text-shadow: 0 0 4px rgba(55,255,255,.9);
+}
+#profile_settings:hover #profile_settings_avatar {
+box-shadow: 0px 0px 4px rgba(55,255,255,.9);
+}
+#profile_settings_avatar {
+width: 22px; height: 22px;
+margin: 5px;
+border-radius: 4px;
+}
+#profile_settings_name {
+margin: 8px;
+float: right;
+}
 #footer #info {
 background: rgba(255,255,255,0.2);
 border: 1px solid rgba(98,98,98,.5);
@@ -114,6 +138,7 @@ font-size: 12px;
 
 #panel_logo {
 float: right;
+margin: 2px 10px;
 }
 
 #navig_div, #sidepanel_div {
@@ -657,10 +682,10 @@ background: rgba(200,255,200,.1);
 border: 1px solid rgba(98,98,98,.5);
 border-radius: 12px;
 height: 28px;
-left: 240px;
-right: 120px;
-position: absolute;
-/*margin: 0px 10px;*/
+_left: 240px;
+_right: 120px;
+_position: absolute;
+margin: 0px 100px;
 padding: 0px 10px;
 }
 #assets .asset {

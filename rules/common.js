@@ -475,6 +475,11 @@ function c_CanEditBody(i_user)
 	return c_IsUserStateSet(i_user, 'editbody');
 }
 
+function c_CanSetPassword(i_user)
+{
+	return c_IsUserStateSet(i_user, 'passwd');
+}
+
 function c_IsUserStateSet(i_user, i_state)
 {
 	if (i_user == null)

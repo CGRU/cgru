@@ -545,9 +545,6 @@ Hidden folders increase system speed.">
 				style="display:none; background: rgba(200,0,0,.2)"
 				title="Administrate all users"
 				onclick="ad_OpenWindow()">Administrate</div>
-			<div class="button" id="profile_button" style="display:none"
-				title="Edit my profile settings"
-				onclick="ad_ProfileOpen()">My Profile</div>
 			<div style="text-align:center; padding: 10px 0 0 0;">
 				<a href="http://cgru.info/rules/general" target="_blank" onclick="u_OpenCloseHeader()">
 					Documentation</a></div>
@@ -561,15 +558,21 @@ Hidden folders increase system speed.">
 	<div id="headeropenbtn" class="headeropenbtn button" onclick="u_OpenCloseHeader()"
 		title="Open/close settings"></div>
 	<div class="panel">
-		<a class="button" id="navigate_root" title="Navigate RULES root and refresh"
-			style="background-image:url(rules/icons/top.png);"></a>
-		<a class="button" id="navigate_up" title="Navigate up"
-			style="background-image:url(rules/icons/up.png);"></a>
-		<a class="button" id="navigate_prev" title="Navigate to the previous folder (shot)"
-			style="background-image:url(rules/icons/previous.png);"></a>
-		<a class="button" id="navigate_next" title="Navigate to the next folder (shot)"
-			style="background-image:url(rules/icons/next.png);"></a>
+		<div id="navigation_buttons">
+			<a class="button" id="navigate_root" title="Navigate RULES root and refresh"
+				style="background-image:url(rules/icons/top.png);"></a>
+			<a class="button" id="navigate_up" title="Navigate up"
+				style="background-image:url(rules/icons/up.png);"></a>
+			<a class="button" id="navigate_prev" title="Navigate to the previous folder (shot)"
+				style="background-image:url(rules/icons/previous.png);"></a>
+			<a class="button" id="navigate_next" title="Navigate to the next folder (shot)"
+				style="background-image:url(rules/icons/next.png);"></a>
+		</div>
 		<div id="panel_logo"><img id="panel_logo_img" src="rules/icons/rules.png" width="90px" height="30px"></div>
+		<div id="profile_settings" title="Edit Profile Settings" onclick="ad_ProfileOpen()">
+			<img id="profile_settings_avatar"></img>
+			<div id="profile_settings_name">Guest</div>
+		</div>
 		<div id="assets"></div>
 	</div>
 </div>

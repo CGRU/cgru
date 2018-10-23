@@ -35,8 +35,8 @@ var ad_states = {
 
 var ad_prof_props = {
 	id /**********/: {"disabled": true, "lwidth": '170px', "label": 'ID'},
-	title /*******/: {"disabled": true, "lwidth": '170px'},
 	role /********/: {"disabled": true, "lwidth": '170px'},
+	title /*******/: {"lwidth": '170px'},
 	avatar /******/: {},
 	news_limit /**/: {},
 	email /*******/: {"width": '70%'},
@@ -49,7 +49,9 @@ function ad_Init()
 	if (g_auth_user == null)
 		return;
 
-	$('profile_button').style.display = 'block';
+	$('profile_settings').style.display = 'block';
+	ad_UpdateProfileSettings();
+
 	$('ad_logout').style.display = 'block';
 	$('ad_login').style.display = 'none';
 
@@ -66,6 +68,18 @@ function ad_Init()
 
 	ad_initialized = true;
 }
+
+function ad_UpdateProfileSettings()
+{
+	$('profile_settings_name').textContent = c_GetUserTitle();
+
+	let avatar = c_GetAvatar();
+	if (avatar)
+		$('profile_settings_avatar').src = avatar;
+	else
+		$('profile_settings_avatar').src = null;
+}
+
 
 function ad_Login()
 {
@@ -1454,8 +1468,6 @@ function ad_ProfileOpen()
 		return;
 	}
 
-	u_OpenCloseHeader();
-
 	var wnd = new cgru_Window({"name": 'profile', "title": 'My Profile'});
 	wnd.elContent.classList.add('profile');
 
@@ -1474,6 +1486,12 @@ function ad_ProfileOpen()
 	wnd.elContent.appendChild(elBtns);
 	elBtns.style.clear = 'both';
 
+	wnd.elContent.m_wnd = wnd;
+	wnd.elContent.onkeydown = function(e) {
+		if (e.keyCode == 13) // Enter
+			ad_ProfileSave(e.currentTarget.m_wnd);
+	}
+
 	var el = document.createElement('div');
 	elBtns.appendChild(el);
 	el.textContent = 'Save';
@@ -1488,7 +1506,7 @@ function ad_ProfileOpen()
 	el.onclick = function(e) { e.currentTarget.m_wnd.destroy(); };
 	el.m_wnd = wnd;
 
-	//	if( g_auth_user.states.indexOf('passwd') != -1 )
+	if (c_CanSetPassword())
 	{
 		var el = document.createElement('div');
 		elBtns.appendChild(el);
@@ -1514,7 +1532,12 @@ function ad_ProfileSave(i_wnd)
 	}
 
 	for (var p in params)
+	{
 		g_auth_user[p] = params[p];
+	}
+	g_users[g_auth_user.id] = g_auth_user;
+
 	ad_SaveUser();
+	ad_UpdateProfileSettings();
 	i_wnd.destroy();
 }
