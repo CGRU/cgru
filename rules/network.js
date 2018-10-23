@@ -241,6 +241,10 @@ function n_XHRHandler()
 			{
 				log += ': ' + this.responseText.replace(/[<>]/g, '*');
 			}
+			else
+			{
+				log += ': received';
+			}
 
 			c_Log(log);
 
