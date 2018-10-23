@@ -73,6 +73,8 @@ function n_WalkDir(i_args)
 		i_args.func = n_WalkDirProcess;
 		i_args.parse = true;
 		i_args.wait = false;
+		if (i_args.local !== false)
+			i_args.local = true;
 		n_Request(i_args);
 		return;
 	}
@@ -252,7 +254,10 @@ function n_XHRHandler()
 			{
 				if (p_PLAYER != true)
 					if (this.m_args.local && (this.m_args.path != g_CurPath()))
+					{
+						c_Log('Response location: "' + this.m_args.path + '" != "' + g_CurPath() + '"');
 						return;
+					}
 
 				var data = this.responseText;
 				if (this.m_args.parse)
