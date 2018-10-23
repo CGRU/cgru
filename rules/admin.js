@@ -74,10 +74,15 @@ function ad_UpdateProfileSettings()
 	$('profile_settings_name').textContent = c_GetUserTitle();
 
 	let avatar = c_GetAvatar();
-	if (avatar)
+	if (avatar && avatar.length)
+	{
 		$('profile_settings_avatar').src = avatar;
+		$('profile_settings_avatar').style.display = 'block';
+	}
 	else
-		$('profile_settings_avatar').src = null;
+	{
+		$('profile_settings_avatar').style.display = 'none';
+	}
 }
 
 
