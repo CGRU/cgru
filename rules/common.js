@@ -249,6 +249,16 @@ function c_Log(i_msg)
 	c_logCount++;
 }
 
+function c_LogClear()
+{
+	c_logCount = 0;
+	c_elLogs = [];
+	c_lastLog = null;
+	c_lastLogCount = 1;
+
+	u_el.log.innerHTML = '';
+}
+
 function c_AuxFolder(i_folder)
 {
 	if (i_folder.status)

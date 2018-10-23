@@ -375,6 +375,7 @@ function u_OpenCloseHeaderFooter(i_elBtn, i_id, i_closed, i_opened)
 			localStorage.footer_opened = 'false';
 			document.getElementById('footer').style.height = i_closed + 'px';
 			document.getElementById('log').style.display = 'none';
+			$('log_ctrl').style.display = 'none';
 		}
 	}
 	else
@@ -390,6 +391,7 @@ function u_OpenCloseHeaderFooter(i_elBtn, i_id, i_closed, i_opened)
 			localStorage.footer_opened = 'true';
 			document.getElementById('footer').style.height = i_opened + 'px';
 			document.getElementById('log').style.display = 'block';
+			$('log_ctrl').style.display = 'block';
 		}
 	}
 }

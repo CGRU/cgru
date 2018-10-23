@@ -26,6 +26,8 @@ var n_conn_count = 0;
 var n_walks = {};
 var n_gets = {};
 
+var n_log_walk_results = false;
+
 function n_WalkDir(i_args)
 {
 	// i_args.cache_time = null;
@@ -234,9 +236,13 @@ function n_XHRHandler()
 
 		if (this.status == 200)
 		{
-			c_Log(
-				'<b><i style="color:#048">recv ' + this.m_args.id + ' (' + n_conn_count + ')</i> ' +
-				this.m_args.info + ':</b> ' + this.responseText.replace(/[<>]/g, '*'));
+			let log = '<b><i style="color:#048">recv ' + this.m_args.id + ' (' + n_conn_count + ')</i> ' + this.m_args.info + '</b> ';
+			if ((this.m_args.info.indexOf('walk') != 0) || (n_log_walk_results))
+			{
+				log += ': ' + this.responseText.replace(/[<>]/g, '*');
+			}
+
+			c_Log(log);
 
 			if (this.m_args.func)
 			{
@@ -251,6 +257,20 @@ function n_XHRHandler()
 				this.m_args.func(data, this.m_args);
 			}
 		}
+	}
+}
+
+function n_LogWalkResults()
+{
+	if (n_log_walk_results)
+	{
+		n_log_walk_results = false;
+		$('log_walk_results').classList.remove('pushed');
+	}
+	else
+	{
+		n_log_walk_results = true;
+		$('log_walk_results').classList.add('pushed');
 	}
 }
 

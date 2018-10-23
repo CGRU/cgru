@@ -97,6 +97,20 @@ box-shadow: 0px 0px 5px #FA6;
 -moz-transition: all 1s ease-out;
 -webkit-transition: all 1s ease-out;
 }
+#footer #log_ctrl {
+display: none;
+float: right;
+border: 1px solid rgba(0,0,0,.2);
+border-bottom: 0px;
+border-top-left-radius: 8px;
+border-top-right-radius: 8px;
+margin: 10px;
+padding: 5px 8px 0px 8px;
+}
+#footer #log_ctrl .button {
+float: left;
+font-size: 12px;
+}
 
 #panel_logo {
 float: right;

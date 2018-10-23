@@ -27,6 +27,7 @@ var g_elCurFolder = null;
 var g_elFolders = {};
 
 var g_nav_clicked = false;
+var g_navigating_path = null;
 var g_arguments = null;
 
 var g_navig_infos = {
@@ -250,6 +251,7 @@ function g_NavigatePost()
 		$('navigate_prev').href = '#' + g_elCurFolder.m_path;
 
 	g_POST('navig');
+	g_navigating_path = null;
 }
 
 function g_POST(i_msg)
@@ -285,7 +287,15 @@ function g_PostLaunchFunc(i_msg)
 
 function g_Navigate(i_path)
 {
+	if (g_navigating_path != null)
+	{
+		c_Error('Already navigating to ' + g_navigating_path);
+		return;
+	}
+
+	g_navigating_path = i_path;
 	g_WaitingSet();
+
 	if (g_elCurFolder)
 		g_elCurFolder.classList.remove('current');
 	g_elCurFolder = u_el.navig;
@@ -296,7 +306,7 @@ function g_Navigate(i_path)
 
 	RULES = c_CloneObj(RULES_TOP);
 
-	c_Log('Navigating to: ' + i_path);
+	c_Info('Navigating to: ' + i_path);
 
 	var folders = i_path.split('/');
 	// window.console.log( folders);
