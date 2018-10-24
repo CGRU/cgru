@@ -134,19 +134,18 @@
 		},
 		"template":"rules/assets/shot",
 
-		"shot_process":{
-			"nuke_new":{
+		"shot_process":[
+			{
 				"label":"Nk New",
 				"title":"Create and open new Nuke scene.",
 				"cmd":"/cgru/rules/bin/shot_process -s nuke -r nuke @template@ @fps@ @colorspace@",
 				"template":"/cgru/plugins/nuke/_template.nk"
-			},
-			"nuke_latest":{
+			},{
 				"label":"Nk Latest",
 				"title":"Open the latest Nuke scene.",
 				"cmd":"/cgru/rules/bin/shot_open_latest -s nuke -e .nk -r nuke"
 			}
-		}
+		]
 	}
 },
 

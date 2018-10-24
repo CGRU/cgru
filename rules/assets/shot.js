@@ -85,9 +85,9 @@ function shot_InitHTML( i_data)
 
 
 	// Create shot process buttons:
-	for (let name in ASSET.shot_process)
+	for (let n = 0; n < ASSET.shot_process.length; n++)
 	{
-		let action = ASSET.shot_process[name];
+		let action = ASSET.shot_process[n];
 		let el = document.createElement('div');
 		el.textContent = action.label;
 		el.title = action.title;
