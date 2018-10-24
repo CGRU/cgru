@@ -83,35 +83,40 @@ function shot_InitHTML( i_data)
 		el.onclick = shot_Rename;
 	}
 
-	// Set process buttons commands:
-	var path = c_PathPM_Rules2Client( g_CurPath());
 
-	cmd = c_PathPM_Server2Client('/cgru/rules/bin/shot_process');
-	if( ASSET.process )
-		cmd = c_PathPM_Server2Client( ASSET.process);
+	// Create shot process buttons:
+	for (let name in ASSET.shot_process)
+	{
+		let action = ASSET.shot_process[name];
+		let el = document.createElement('div');
+		el.textContent = action.label;
+		el.title = action.title;
+		$('shot_process_div').appendChild(el);
 
-	cmd = cmd + ' -s nuke -r nuke -f ' + RULES.fps;
-	if( ASSET.nuke_template )
-		cmd += ' -t ' + c_PathPM_Server2Client(ASSET.nuke_template);
+		// Process command:
+		let cmd = action.cmd;
+		// '@arg@' will be replaced with '--arg [arg value]'
+		// Value will be the first defined in action, ASSET, RULES
+		// For example: '@fps' will be replaces with '--fps 24'
+		let matches = cmd.match(/@\w*@/g);
+		if (matches && matches.length)
+			for (let i = 0; i < matches.length; i++)
+			{
+				let match = matches[i];
+				let arg = match.replace(/@/g,'');
+				let val = action[arg];
+				if (null == val) val = ASSET[arg];
+				if (null == val) val = RULES[arg];
+				if (val) val = '--' + arg + ' ' + val;
+				else val = '';
+				cmd = cmd.replace(match, val);
+			}
+		cmd += ' ' + c_PathPM_Rules2Client(g_CurPath());
+		//console.log(cmd);
 
-	if( RULES.colorspace )
-		cmd += ' -c ' + RULES.colorspace
+		cgru_CmdExecProcess({'element':el,'cmd':cmd});
+	}
 
-	cmd += ' ' + path;
-
-//console.log( cmd);
-	cgru_CmdExecProcess({"element":$('shot_nuke_new_btn'),"cmd":cmd});
-
-	cmd = c_PathPM_Server2Client('/cgru/rules/bin/shot_open_latest');
-	if( ASSET.open_latest )
-		cmd = c_PathPM_Server2Client( ASSET.open_latest);
-
-	cmd = cmd + ' -s nuke -e .nk -r nuke';
-
-	cmd += ' ' + path;
-//console.log( cmd);
-
-	cgru_CmdExecProcess({"element":$('shot_nuke_latest_btn'),"cmd":cmd});
 
 	shot_ResultsRead( true);
 }
