@@ -111,9 +111,11 @@ function shot_InitHTML( i_data)
 				else val = '';
 				cmd = cmd.replace(match, val);
 			}
-		cmd += ' ' + c_PathPM_Rules2Client(g_CurPath());
-		//console.log(cmd);
 
+		// Transfer command to client and add current path to the end:
+		cmd = c_PathPM_Server2Client(cmd) + ' ' + c_PathPM_Rules2Client(g_CurPath());
+
+		// Make an executable button:
 		cgru_CmdExecProcess({'element':el,'cmd':cmd});
 	}
 
