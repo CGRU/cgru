@@ -136,6 +136,7 @@ padding: 5px 8px 0px 8px;
 #footer #log_ctrl .button {
 float: left;
 font-size: 12px;
+padding: 2px 8px;
 }
 
 #panel_logo {
@@ -397,7 +398,6 @@ background-position: left;
 #sidepanel.opened #sidepanel_hide { display: block;}
 #sidepanel .label {
 font-size: 14px;
-font-family: Verdana, serif;
 width: 13px;
 word-wrap: break-word;
 letter-spacing: 4px;
@@ -405,7 +405,6 @@ text-transform: uppercase;
 }
 #sidepanel.opened .label {
 font-size: 16px;
-font-family: inherit;
 width: auto;
 letter-spacing: 1px;
 text-transform: none;

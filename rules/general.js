@@ -66,6 +66,7 @@ function g_Init_Server(i_data)
 
 	var url = decodeURI(document.location.href);
 
+	n_log_responses = false;
 	n_Request({"send": {"initialize": {'url': url}}, "func": g_Init_Config, "info": 'init'});
 }
 

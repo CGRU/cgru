@@ -26,7 +26,7 @@ var n_conn_count = 0;
 var n_walks = {};
 var n_gets = {};
 
-var n_log_walk_results = false;
+var n_log_responses = true;
 
 function n_WalkDir(i_args)
 {
@@ -239,7 +239,7 @@ function n_XHRHandler()
 		if (this.status == 200)
 		{
 			let log = '<b><i style="color:#048">recv ' + this.m_args.id + ' (' + n_conn_count + ')</i> ' + this.m_args.info + '</b> ';
-			if ((this.m_args.info.indexOf('walk') != 0) || (n_log_walk_results))
+			if (n_log_responses)
 			{
 				log += ': ' + this.responseText.replace(/[<>]/g, '*');
 			}
@@ -269,17 +269,17 @@ function n_XHRHandler()
 	}
 }
 
-function n_LogWalkResults()
+function n_LogResponses()
 {
-	if (n_log_walk_results)
+	if (n_log_responses)
 	{
-		n_log_walk_results = false;
-		$('log_walk_results').classList.remove('pushed');
+		n_log_responses = false;
+		$('log_responses').classList.remove('pushed');
 	}
 	else
 	{
-		n_log_walk_results = true;
-		$('log_walk_results').classList.add('pushed');
+		n_log_responses = true;
+		$('log_responses').classList.add('pushed');
 	}
 }
 
