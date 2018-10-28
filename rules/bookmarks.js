@@ -255,6 +255,14 @@ function bm_CreateElements(i_bm)
 	var el = document.createElement('div');
 	el.classList.add('bookmark');
 
+	var elDel = document.createElement('div');
+	el.appendChild(elDel);
+	elDel.classList.add('button');
+	elDel.classList.add('delete');
+	elDel.m_path = i_bm.path;
+	elDel.ondblclick = function(e) { bm_Delete([e.currentTarget.m_path]); };
+	elDel.title = 'Double click to delete.';
+
 	// Display status:
 	if (i_bm.status)
 	{
@@ -280,14 +288,6 @@ function bm_CreateElements(i_bm)
 			st_SetElProgress(i_bm.status, elBar);
 		}
 	}
-
-	var elDel = document.createElement('div');
-	el.appendChild(elDel);
-	elDel.classList.add('button');
-	elDel.classList.add('delete');
-	elDel.m_path = i_bm.path;
-	elDel.ondblclick = function(e) { bm_Delete([e.currentTarget.m_path]); };
-	elDel.title = 'Double click to delete.';
 
 	var elPath = document.createElement('a');
 	el.appendChild(elPath);
