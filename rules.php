@@ -217,7 +217,7 @@ function jsf_initialize($i_arg, &$o_out)
 		if (isset($obj['avatar']) && strlen($obj['avatar']))
 			$user['avatar'] = $obj['avatar'];
 		else if (isset($obj['email']) && strlen($obj['email']))
-			$user['avatar'] = 'http://www.gravatar.com/avatar/' . md5(strtolower(trim($obj['email'])));
+			$user['avatar'] = 'https://gravatar.com/avatar/' . md5(strtolower(trim($obj['email'])));
 
 		$o_out['users'][$obj['id']] = $user;
 	}
