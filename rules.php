@@ -1360,15 +1360,17 @@ function makenews($i_args, &$io_users, &$o_out)
 				continue;
 		}
 
-		if (array_key_exists('artists', $news))
-			if (in_array($user['id'], $news['artists']))
-			{
-				if (false == in_array($user['id'], $sub_users))
-					array_push($sub_users, $user['id']);
-				continue;
-			}
+		// If user is assigned, it should receive news:
+		if (array_key_exists('status', $news))
+			if (array_key_exists('artists', $news['status']))
+				if (in_array($user['id'], $news['status']['artists']))
+				{
+					if (false == in_array($user['id'], $sub_users))
+						array_push($sub_users, $user['id']);
+					continue;
+				}
 
-
+		// Check user subscriptions:
 		if (array_key_exists('channels', $user))
 			foreach ($user['channels'] as $channel)
 				if (strpos($news['path'], $channel['id']) === 0)
