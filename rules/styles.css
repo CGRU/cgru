@@ -438,11 +438,24 @@ display: none;
 .news_filter { margin: 2px; padding: 0px 3px; border-top: 1px solid rgba(98,98,98,.5); }
 .news_filter .button { float: left; margin: 1px 1px; padding: 1px 2px; }
 #news { }
-#news .news { border-top: 1px solid rgba(98,98,98,.5); }
+#news .news {
+position: relative;
+border-top: 1px solid rgba(98,98,98,.5);
+padding: 2px;
+}
 #news .news.assigned          { background: rgba(   0, 255,   0, .2); }
 #news .news.cur_path          { background: rgba( 100, 255, 255, .2); }
 #news .news.assigned.cur_path { background: rgba(   0, 255, 150, .2); }
 #news .news_label { font-size: 12px; margin: 4px 0 0 0; }
+#news .news .status {float: right; font-size: 10px;}
+#news .news .bar {
+position: absolute;
+bottom: 4px;
+left: 0px;
+height: 4px;
+background-color: rgba(0,200,0,.5);
+opacity: 0.5;
+}
 #news .news .button.delete {
 float: left;
 width: 14px;
@@ -506,6 +519,10 @@ padding: 0 4px;
 #bookmarks .bookmark img {
 width: 100%;
 }
+#bookmarks .bookmark .status {
+float: right;
+font-size: 10px;
+}
 #bookmarks .bookmark .bar {
 position: absolute;
 bottom: 1px;
@@ -528,8 +545,22 @@ display: block;
 
 /* ============= RECENT: =============== */
 #recent { }
-#recent .recent { font-size: 12px; border-top: 1px solid rgba(98,98,98,.5); position: relative; }
+#recent .recent {
+font-size: 12px;
+border-top: 1px solid rgba(98,98,98,.5);
+padding: 4px;
+position: relative;
+}
 #recent .recent > div { margin: 2px 4px; }
+#recent .recent .status {float: right; font-size: 10px;}
+#recent .recent .bar {
+position: absolute;
+bottom: 0px;
+left: 0px;
+height: 4px;
+background-color: rgba(0,200,0,.5);
+opacity: 0.5;
+}
 #recent img {
 float: right;
 width: 32px;

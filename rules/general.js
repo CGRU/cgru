@@ -843,22 +843,13 @@ function g_CloseFolder(i_elFolder)
 	i_elFolder.classList.remove('opened');
 }
 
-// g_clicked_folder = null;
 function g_FolderOnClick(i_evt, i_double)
 {
-	// if( i_double !== true ) window.console.log('Clicked');
-
 	i_evt.stopPropagation();
 	var elFolder = i_evt.currentTarget;
 	if (elFolder.classList.contains('dummy'))
 		return;
-	/*	g_clicked_folder = elFolder;
-		setTimeout( g_FolderClicked, 100);
-	}
 
-	function g_FolderClicked()
-	{
-		elFolder = g_clicked_folder;*/
 	if (elFolder.classList.contains('current'))
 	{
 		if (elFolder.classList.contains('opened'))

@@ -255,12 +255,30 @@ function bm_CreateElements(i_bm)
 	var el = document.createElement('div');
 	el.classList.add('bookmark');
 
-	if (i_bm.status && i_bm.status.progress && (i_bm.status.progress > 0))
+	// Display status:
+	if (i_bm.status)
 	{
-		var elBar = document.createElement('div');
-		el.appendChild(elBar);
-		elBar.classList.add('bar');
-		st_SetElProgress(i_bm.status, elBar);
+		let elStatus = document.createElement('div');
+		el.appendChild(elStatus);
+		elStatus.classList.add('status');
+
+		// Flags:
+		if (i_bm.status.flags && i_bm.status.flags.length)
+		{
+			let elFlags = document.createElement('div');
+			elStatus.appendChild(elFlags);
+			elFlags.classList.add('flags');
+			st_SetElFlags(i_bm.status, elFlags);
+		}
+
+		// Show progress bar:
+		if (i_bm.status.progress)
+		{
+			let elBar = document.createElement('div');
+			el.appendChild(elBar);
+			elBar.classList.add('bar');
+			st_SetElProgress(i_bm.status, elBar);
+		}
 	}
 
 	var elDel = document.createElement('div');
