@@ -688,11 +688,7 @@ function nw_NewsShow(i_update_folders)
 	// Update folders statuses:
 	if (i_update_folders !== false)
 	{
-		let walk = {};
-		walk.paths = []
-		walk.rufiles = ['status'];
-
-		// Store path only if news status mtime > folder status mtime
+		// Update only if news status mtime > folder status mtime
 		for (let i = 0; i < g_auth_user.news.length; i++)
 		{
 			let news = g_auth_user.news[i];
@@ -702,44 +698,18 @@ function nw_NewsShow(i_update_folders)
 			let el = g_elFolders[news.path];
 			if (el == null) continue;
 
-			let stat = el.m_fobject.status;
-			if (stat == null) continue;
+			let fstat = el.m_fobject.status;
+			if (fstat == null) continue;
+			if (fstat.mtime >= news.status.mtime) continue;
 
-			if (news.status.mtime > stat.mtime)
-				walk.paths.push(news.path);
-		}
-
-		if (walk.paths.length)
-		{
-			walk.wfunc = nw_UpdateFolders;;
-			walk.info = 'walk update from news';
-			n_WalkDir(walk);
+			g_FolderSetStatus(news.status, el)
+			if ((news.path == g_CurPath()) && st_Status)
+				st_Status.show(news.status);
 		}
 	}
 
 	nw_HighlightCurrent();
 	nw_Filter();
-}
-
-function nw_UpdateFolders(i_data, i_args)
-{
-	//console.log(JSON.stringify(i_data));
-	for (let i = 0; i < i_data.length; i++)
-	{
-		let walk = i_data[i];
-		let path = i_args.paths[i];
-		let stat = walk.rules;
-		if (stat) stat = stat['status.json'];
-		if (stat) stat = stat.status;
-
-		if (stat == null)
-			continue;
-
-		g_FolderSetStatusPath(stat, path);
-
-		if ((path == g_CurPath()) && st_Status)
-			st_Status.show(stat);
-	}
 }
 
 function nw_NavigatePost()
