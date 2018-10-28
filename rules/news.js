@@ -598,6 +598,19 @@ function nw_NewsShow(i_update_folders)
 			if (news.status && news.status.artists && (news.status.artists.indexOf(g_auth_user.id) != -1))
 				el.classList.add('assigned');
 
+		let avatar = c_GetAvatar(news.user, news.guest);
+		if (avatar)
+		{
+			let elAvatar = document.createElement('img');
+			el.appendChild(elAvatar);
+			elAvatar.classList.add('avatar');
+			elAvatar.src = avatar;
+			elAvatar.title =
+				c_GetUserTitle(news.user, news.guest) + '\nDouble click to delete all news from this user.';
+			elAvatar.m_news = news;
+			elAvatar.ondblclick = function(e) { nw_DeleteNewsUser(e.currentTarget.m_news); };
+		}
+
 		// Display news status:
 		if (news.status)
 		{
@@ -631,19 +644,6 @@ function nw_NewsShow(i_update_folders)
 		elBtn.m_id = news.id;
 		elBtn.ondblclick = function(e) { nw_DeleteNews([e.currentTarget.m_id]); };
 		elBtn.title = 'Double click to remove link';
-
-		let avatar = c_GetAvatar(news.user, news.guest);
-		if (avatar)
-		{
-			let elAvatar = document.createElement('img');
-			el.appendChild(elAvatar);
-			elAvatar.classList.add('avatar');
-			elAvatar.src = avatar;
-			elAvatar.title =
-				c_GetUserTitle(news.user, news.guest) + '\nDouble click to delete all news from this user.';
-			elAvatar.m_news = news;
-			elAvatar.ondblclick = function(e) { nw_DeleteNewsUser(e.currentTarget.m_news); };
-		}
 
 		let elLabel = document.createElement('div');
 		el.appendChild(elLabel);
@@ -958,6 +958,15 @@ function nw_RecentReceived(i_data, i_args)
 		$('recent').appendChild(el);
 		el.classList.add('recent');
 
+		var avatar = c_GetAvatar(news.user, news.guest);
+		if (avatar)
+		{
+			var elAvatar = document.createElement('img');
+			el.appendChild(elAvatar);
+			elAvatar.classList.add('avatar');
+			elAvatar.src = avatar;
+		}
+
 		// Display status:
 		if (news.status)
 		{
@@ -982,15 +991,6 @@ function nw_RecentReceived(i_data, i_args)
 				elBar.classList.add('bar');
 				st_SetElProgress(news.status, elBar);
 			}
-		}
-
-		var avatar = c_GetAvatar(news.user, news.guest);
-		if (avatar)
-		{
-			var elAvatar = document.createElement('img');
-			el.appendChild(elAvatar);
-			elAvatar.classList.add('avatar');
-			elAvatar.src = avatar;
 		}
 
 		var elUser = document.createElement('div');

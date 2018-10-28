@@ -441,13 +441,14 @@ display: none;
 #news .news {
 position: relative;
 border-top: 1px solid rgba(98,98,98,.5);
-padding: 2px;
+padding-bottom: 2px;
 }
 #news .news.assigned          { background: rgba(   0, 255,   0, .2); }
 #news .news.cur_path          { background: rgba( 100, 255, 255, .2); }
 #news .news.assigned.cur_path { background: rgba(   0, 255, 150, .2); }
 #news .news_label { font-size: 12px; margin: 4px 0 0 0; }
 #news .news .status {float: right; font-size: 10px;}
+#news .news .status .flag {float: none;}
 #news .news .bar {
 position: absolute;
 bottom: 4px;
@@ -548,11 +549,12 @@ display: block;
 #recent .recent {
 font-size: 12px;
 border-top: 1px solid rgba(98,98,98,.5);
-padding: 4px;
+padding-bottom: 4px;
 position: relative;
 }
 #recent .recent > div { margin: 2px 4px; }
 #recent .recent .status {float: right; font-size: 10px;}
+#recent .recent .status .flag {float: none;}
 #recent .recent .bar {
 position: absolute;
 bottom: 0px;
