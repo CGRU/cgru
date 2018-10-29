@@ -964,7 +964,13 @@ Monitor.prototype.updatePanels = function(i_item, i_args) {
 
 		var value = i_item.params[p];
 		if (this.nodeConstructor.params[p].type == 'hrs')
+		{
 			value = cm_TimeStringFromSeconds(value, true);
+		}
+		else if (this.nodeConstructor.params[p].type == 'tim')
+		{
+			value = cm_DateTimeStrFromSec(value);
+		}
 		else if ((typeof value) == 'string')
 		{
 			// word-wrap long regular expressions:
@@ -972,6 +978,7 @@ Monitor.prototype.updatePanels = function(i_item, i_args) {
 			value = value.replace(/\|/g, '|&shy;');
 			value = value.replace(/\)/g, ')&shy;');
 		}
+
 		elParams[p].m_elValue.innerHTML = value;
 		elParams[p].style.display = 'block';
 	}
