@@ -702,9 +702,16 @@ function nw_NewsShow(i_update_folders)
 			if (fstat == null) continue;
 			if (fstat.mtime >= news.status.mtime) continue;
 
-			g_FolderSetStatus(news.status, el)
+			// Update folder status:
+			g_FolderSetStatus(news.status, el);
+
+			// Update current location status:
 			if ((news.path == g_CurPath()) && st_Status)
 				st_Status.show(news.status);
+
+			// Remove walk cache:
+			if (n_walks[news.path])
+				n_walks[news.path] = null;
 		}
 	}
 
