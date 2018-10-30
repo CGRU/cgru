@@ -1888,7 +1888,6 @@ function permissionsGet($i_args, &$o_out)
 	_flock_($fHandle, LOCK_UN);
 	fclose($fHandle);
 
-	$found = false;
 	$lines = explode("\n", $data);
 	foreach ($lines as $line)
 	{
@@ -1897,32 +1896,22 @@ function permissionsGet($i_args, &$o_out)
 		if ($words[0] != 'Require') continue;
 
 		unset($words[0]);
-//error_log( implode(' ',$words));
+		//error_log( implode(' ',$words));
 		if ($words[1] == 'group')
 		{
 			unset($words[1]);
 			foreach ($words as $group) array_push($o_out['groups'], $group);
-			$found = true;
 		}
 		else if ($words[1] == 'user')
 		{
 			unset($words[1]);
 			foreach ($words as $user) array_push($o_out['users'], $user);
-			$found = true;
 		}
 		else if ($words[1] == 'valid-user')
 		{
 			$o_out['valid_user'] = true;
-			$found = true;
 		}
 	}
-	/*	if( false == $found )
-		{
-			$o_out['error'] = 'Unable to find users or groups in the file.';
-			error_log( $htaccess);
-			error_log( $data);
-			return;
-		}*/
 }
 
 function jsf_search($i_args, &$o_out)

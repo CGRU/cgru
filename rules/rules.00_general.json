@@ -294,6 +294,10 @@
 	"af_capacity":500
 },
 
+"permissions":{
+	"default_groups":["admins","users"]
+},
+
 "cut":{
 	"input":"RESULT/JPG,RESULT/PNG,RESULT/TIF,RESULT/DPX",
 	"output":"COMMON/_cut",

@@ -271,7 +271,6 @@ function ad_PermissionsLoad()
 function ad_PermissionsReceived(i_data)
 {
 	ad_permissions = i_data;
-
 	if (ad_permissions == null)
 		return;
 	if (ad_permissions.error)
@@ -381,7 +380,15 @@ function ad_PermissionsAdd(i_id, i_type)
 		c_Error(i_id + ' is already in ' + i_type);
 		return;
 	}
-	ad_permissions[i_type].push(i_id);
+
+	// Set default minimal permissions:
+	if (RULES.permissions.default_groups)
+		if ((ad_permissions.groups.length == 0) && (ad_permissions.users.length == 0))
+			ad_permissions.groups = RULES.permissions.default_groups;
+
+	if (ad_permissions[i_type].indexOf(i_id) == -1)
+		ad_permissions[i_type].push(i_id);
+
 	n_Request({
 		"send": {"permissionsset": ad_permissions},
 		"func": ad_ChangesFinished,
