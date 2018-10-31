@@ -81,9 +81,9 @@ function u_Init()
 		return;
 
 	if (localStorage.navig_width == null)
-		localStorage.navig_width = 300;
+		localStorage.navig_width = 360;
 	if (localStorage.sidepanel_width == null)
-		localStorage.sidepanel_width = 200;
+		localStorage.sidepanel_width = 260;
 	if (localStorage.sidepanel_closed_width == null)
 		localStorage.sidepanel_closed_width = 20;
 
@@ -318,9 +318,9 @@ function u_ResizeGUI(i_e)
 	var size = parseInt(localStorage[u_resizing_name]);
 	var delta = i_e.screenX - u_resizing_x;
 	var size = size + delta * u_resizing_koeff;
-	if (size < 50)
+	if (size < 128)
 		return;
-	if (size > 500)
+	if (size > 768)
 		return;
 	u_resizing_x = i_e.screenX;
 	// console.log( size+'+'+i_e.screenX+'-'+u_resizing_x+'='+size);
