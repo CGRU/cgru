@@ -24,7 +24,7 @@ border-radius: 4px;
 box-shadow: 0 0 2px #000 inset, 0 0 4px #555;
 }
 
-#panel .button { float:left; }
+.panel .button { float:left; }
 #paint_size { float:left; }
 #paint_size > div { float:left; margin: 3px; padding: 2px; text-align: center; }
 #paint_size .button { width: 12px; }
