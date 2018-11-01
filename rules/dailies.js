@@ -411,7 +411,7 @@ function d_Convert(i_args)
 	gui_CreateChoices({
 		"wnd": wnd.elContent,
 		"name": 'format',
-		"value": 'asis',
+		"value": '1280x720',
 		"label": 'Formats:',
 		"keys": RULES.dailies.formats
 	});
