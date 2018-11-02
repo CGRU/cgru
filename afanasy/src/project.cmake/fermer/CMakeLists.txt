@@ -68,6 +68,8 @@ set (watch_cpp_src
 		"../..//watch/receiver.cpp"
 		"../..//watch/ctrlsortfiltermenu.cpp"
 		"../..//watch/offlinescreen.cpp"
+		"../../watch/buttondblclick.cpp"
+		"../../watch/qaftextwidget.cpp"
 		 )
 
 if(WIN32)
