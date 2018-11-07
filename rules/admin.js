@@ -1115,7 +1115,7 @@ function ad_ChangeAvatarOnClick(i_user_id)
 		"value": g_users[i_user_id].avatar,
 		"name": 'users',
 		"title": 'Change Avatar',
-		"info": 'Enter new avatar link for ' + c_GetUserTitle(i_user_id)
+		"info": 'Enter new avatar link for ' + c_GetUserTitle(i_user_id) + ' [' + i_user_id + ']'
 	});
 }
 
