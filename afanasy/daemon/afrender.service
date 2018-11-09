@@ -1,0 +1,14 @@
+[Unit]
+Description=Afanasy render daemon
+After=syslog.target network.target remote-fs.target
+
+[Service]
+Type=forking
+WorkingDirectory=/opt/cgru
+PIDFile=/var/tmp/afanasy/afrender.pid
+ExecStart=/opt/cgru/afanasy/daemon/afdaemon.sh start afrender
+ExecStop=/opt/cgru/afanasy/daemon/afdaemon.sh stop afrender
+
+[Install]
+WantedBy=multi-user.target
+
