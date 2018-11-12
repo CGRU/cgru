@@ -113,7 +113,7 @@ function mageiaArch(){
 	packages="$packages lib64qt5base5-devel"
 	packages="$packages lib64qt5multimedia-devel"
 	packages="$packages qtmultimedia5"
-	packages="$packages lib64OpenEXR-devel"
+	packages="$packages lib64openexr-devel"
 	packages="$packages rpm-build"
 	packages="$packages libzip libzip-devel"
 
