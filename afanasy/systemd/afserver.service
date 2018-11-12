@@ -10,6 +10,7 @@ WorkingDirectory=/var/tmp/afanasy
 ExecStart=/opt/cgru/start/AFANASY/_afserver.sh
 KillMode=control-group
 TimeoutStopSec=30
+LimitNOFILE=16384
 
 [Install]
 WantedBy=remote-fs.target
