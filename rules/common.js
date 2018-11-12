@@ -684,9 +684,10 @@ function c_FileDragStart(i_evt, i_path)
 	if (cgru_Platform.indexOf('windows') == -1)
 		path = 'file://' + path;
 	var dt = i_evt.dataTransfer;
+	dt.clearData()
 	dt.setData('text/plain', path);
 	dt.setData('text/uri-list', path);
-	// console.log(path);
+	//console.log(i_evt.dataTransfer);
 }
 
 /* ---------------- [ RU file functions ] ---------------------------------------------------------------- */
