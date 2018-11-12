@@ -63,7 +63,7 @@ copy afanasy $dest/afanasy
 rcopy afanasy/bin $dest/afanasy
 rcopy afanasy/browser $dest/afanasy
 rcopy afanasy/icons $dest/afanasy
-rcopy afanasy/daemon $dest/afanasy
+rcopy afanasy/systemd $dest/afanasy
 rcopy afanasy/python $dest/afanasy
 rcopy afanasy/statistics $dest/afanasy
 

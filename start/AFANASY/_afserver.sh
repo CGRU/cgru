@@ -1,3 +1,4 @@
 #!/bin/bash
 source "`dirname "$0"`/_setup.sh"
-"$AF_ROOT/bin/afserver" "$@"
+exec "$AF_ROOT/bin/afserver" "$@"
+

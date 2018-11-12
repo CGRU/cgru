@@ -4,7 +4,7 @@ echo "Afanasy render POST INSTALL"
 
 id render || useradd render -m
 
-systemctl enable /opt/cgru/afanasy/daemon/afrender.service || true
+systemctl enable /opt/cgru/afanasy/systemd/afrender.service || true
 systemctl daemon-reload || true
 systemctl start afrender.service || true
 

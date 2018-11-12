@@ -1,0 +1,16 @@
+[Unit]
+Description=Afanasy server daemon
+After=syslog.target network.target remote-fs.target
+
+[Service]
+Type=simple
+User=render
+Group=render
+WorkingDirectory=/var/tmp/afanasy
+ExecStart=/opt/cgru/start/AFANASY/_afserver.sh
+KillMode=control-group
+TimeoutStopSec=30
+
+[Install]
+WantedBy=remote-fs.target
+
