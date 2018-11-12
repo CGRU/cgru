@@ -1,6 +1,6 @@
 [Unit]
 Description=Afanasy server daemon
-After=syslog.target network.target remote-fs.target
+After=syslog.target network.target remote-fs.target postgresql.service
 
 [Service]
 Type=simple
