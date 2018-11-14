@@ -7,6 +7,8 @@
 
 char * ServiceName;
 
+HANDLE OutputHandle = NULL;
+
 SERVICE_STATUS ServiceStatus;
 SERVICE_STATUS_HANDLE ServiceStatusHandle;
 
@@ -16,7 +18,7 @@ extern bool AFRunning;
 #include <signal.h>
 void sig_pipe(int signum)
 {
-	AFERROR("AFRender SIGPIPE");
+	AF_ERR << "SIGPIPE";
 }
 void sig_int(int signum)
 {
@@ -53,6 +55,32 @@ std::string GetLastErrorStdStr()
 		}
 	}
 	return std::string();
+}
+
+bool redirectOutput()
+{
+	SECURITY_ATTRIBUTES sAttrs;
+	sAttrs.nLength = sizeof(SECURITY_ATTRIBUTES);
+	sAttrs.bInheritHandle = true;
+	sAttrs.lpSecurityDescriptor = NULL;
+
+	OutputHandle = CreateFile(
+		"c:\\temp\\afservice-log-0.txt",
+		GENERIC_WRITE,
+		0,
+		&sAttrs,
+		CREATE_ALWAYS,
+		FILE_ATTRIBUTE_NORMAL,
+		NULL);
+
+	if (OutputHandle == INVALID_HANDLE_VALUE)
+	{
+		AF_ERR << GetLastErrorStdStr();
+		OutputHandle = NULL;
+		return false;
+	}
+
+	return true;
 }
 
 void WINAPI ServiceControl(DWORD request)
@@ -146,6 +174,8 @@ int main(int argc, char *argv[])
 	signal( SIGTERM, sig_int);
 	signal( SIGSEGV, sig_int);
 	*/
+	redirectOutput();
+
 	if (argc == 1)
 	{
 		AF_LOG << "Interactive mode";
