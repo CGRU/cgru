@@ -8,11 +8,14 @@ popd
 setlocal EnableDelayedExpansion
 
 rem Cmake finds 'Qt' by searching for 'qmake' in 'PATH'
-SET "cgru_qt=C:\Qt\5.9.5\msvc2017_64"
+set "cgru_qt=C:\Qt"
+For /F "Tokens=*" %%I in ('dir /b "%cgru_qt%\5.*"') Do set "cgru_qt=%cgru_qt%\%%I"
+set "cgru_qt=%cgru_qt%\msvc2017_64"
 if exist !cgru_qt! (
 	echo Adding "!cgru_qt!\bin" to PATH
 	SET "PATH=!cgru_qt!\bin;%PATH%"
 )
+
 set "AF_GUI=YES"
 set "AF_QT_VER=5"
 

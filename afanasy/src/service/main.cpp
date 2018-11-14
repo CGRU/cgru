@@ -1,29 +1,30 @@
-#include "../libafanasy/environment.h"
+#include <errno.h>
+#include <io.h>
+#include <iostream>
+#include <shlwapi.h>
+#include <signal.h>
+#include <sstream>
+#include <stdio.h>
+#include <Windows.h>
 
-#define AFOUTPUT
-#undef AFOUTPUT
-#include "../include/macrooutput.h"
-#include "../libafanasy/logger.h"
-
-char * ServiceName;
+//char * ServiceName = "afrender";
+char * ServiceName = "afrender";
 
 HANDLE OutputHandle = NULL;
+PROCESS_INFORMATION ProcessInformation;
+HANDLE JobHandle;
 
 SERVICE_STATUS ServiceStatus;
 SERVICE_STATUS_HANDLE ServiceStatusHandle;
 
-extern bool AFRunning;
+bool AFRunning;
 
 //####################### interrupt signal handler ####################################
-#include <signal.h>
-void sig_pipe(int signum)
-{
-	AF_ERR << "SIGPIPE";
-}
 void sig_int(int signum)
 {
 	if (AFRunning)
-		fprintf( stderr,"\nAFService: Interrupt signal catched.\n");
+		std::cerr << "\nInterrupt signal catched.\n";
+
 	AFRunning = false;
 }
 //#####################################################################################
@@ -57,28 +58,144 @@ std::string GetLastErrorStdStr()
 	return std::string();
 }
 
-bool redirectOutput()
+std::string getLogFilename(const std::string & i_base)
 {
+	// Log file name
+	char lpFilename[1024]; int nSize = 1024;
+	nSize = GetModuleFileName(NULL, lpFilename, nSize);
+	std::string name_base(lpFilename, nSize);
+	// Cut executable (get dirname from full path)
+	size_t spos = name_base.rfind("\\");
+	if (spos != std::string::npos) name_base.resize(spos);
+	// Add service name and log
+	name_base = name_base + "\\" + i_base;
+
+	// Log rotation:
+	std::string filename, prevFilename;
+	for (int i = 9; i >= 0; i--)
+	{
+		filename = name_base + "-" + std::to_string(i) + ".txt";
+		if (PathFileExists(filename.c_str()))
+		{
+			if (prevFilename.size())
+				MoveFile(filename.c_str(), prevFilename.c_str());
+			else
+				DeleteFile(filename.c_str());
+		}
+		prevFilename = filename;
+	}
+
+	return filename;
+}
+
+bool redirectServiceOutput()
+{
+	std::string logFilename = getLogFilename(std::string(ServiceName) + "-srv");
+//	freopen(logFilename.c_str(), "w", stdout);
+
+	// Create log file:
 	SECURITY_ATTRIBUTES sAttrs;
 	sAttrs.nLength = sizeof(SECURITY_ATTRIBUTES);
 	sAttrs.bInheritHandle = true;
 	sAttrs.lpSecurityDescriptor = NULL;
-
+	
 	OutputHandle = CreateFile(
-		"c:\\temp\\afservice-log-0.txt",
+		logFilename.c_str(),
 		GENERIC_WRITE,
 		0,
 		&sAttrs,
 		CREATE_ALWAYS,
 		FILE_ATTRIBUTE_NORMAL,
 		NULL);
-
 	if (OutputHandle == INVALID_HANDLE_VALUE)
 	{
-		AF_ERR << GetLastErrorStdStr();
+		std::cerr << "Unable to create log file:\n" << logFilename << "\n" << GetLastErrorStdStr() << "\n";
 		OutputHandle = NULL;
 		return false;
 	}
+	else
+	{
+		std::cout << "Log file created:\n" << logFilename << "\n";
+	}
+
+	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	CloseHandle(hOut);
+
+	if (false == SetStdHandle(STD_OUTPUT_HANDLE, OutputHandle))
+	{
+		std::cerr << "Unable to redirect output: " << GetLastErrorStdStr() << "\n";
+		return false;
+	}
+	if (false == SetStdHandle(STD_ERROR_HANDLE, OutputHandle))
+	{
+		std::cerr << "Unable to redirect error: " << GetLastErrorStdStr() << "\n";
+		return false;
+	}
+
+	int writablePipeEndFileStream = _open_osfhandle((long)OutputHandle, 0);
+	FILE* writablePipeEndFile = NULL;
+	writablePipeEndFile = _fdopen(writablePipeEndFileStream,"wt");
+	_dup2(_fileno(writablePipeEndFile), 1);
+	_dup2(_fileno(writablePipeEndFile), 2);
+
+	return true;
+}
+
+bool startCmd()
+{
+	// Construct command
+	// Get current executable path
+	char lpFilename[1024]; int nSize = 1024;
+	nSize = GetModuleFileName(NULL, lpFilename, nSize);
+	std::string cgru(lpFilename, nSize);
+	// Get dirname from executable path 3 times:
+	for (int i = 0; i < 3; i++)
+	{
+		size_t spos = cgru.rfind("\\");
+		if (spos != std::string::npos) cgru.resize(spos);
+	}
+	// Add command
+	std::string cmd = cgru + "\\start\\AFANASY\\render.cmd";
+	if (strcmp(ServiceName,"afserver"))
+		std::string cmd = cgru + "\\start\\AFANASY\\_afserver.cmd";
+	//cmd = std::string("cmd.exe /c ") + cmd;
+	std::cout << "Starting command:\n" << cmd << "\n";
+
+	// Create Process
+	STARTUPINFO startInfo;
+	memset(&startInfo, 0, sizeof(STARTUPINFO));
+	startInfo.cb = sizeof(STARTUPINFO);
+	char cmd_buf[4096];
+	sprintf_s(cmd_buf, "%s", cmd.c_str());
+	BOOL processCreated = CreateProcess(
+		NULL,               /* Application name */
+		cmd_buf,            /* Command line */
+		NULL,               /* Proccess attributes */
+		NULL,               /* Thread attributes */
+		true,               /* Inherit Handles */
+		CREATE_SUSPENDED,   /* Creation flags */
+		NULL,               /* Environment */
+		cgru.c_str(),       /* Wolring directory */
+		&startInfo,         /* Startup information */
+		&ProcessInformation /* Process information */
+	);
+	if (false == processCreated)
+	{
+		std::cerr << "Failed to create " << ServiceName << " process:\n" << GetLastErrorStdStr() << "\n";
+		return false;
+	}
+
+	/*
+	JobHandle = CreateJobObject(NULL, NULL);
+	JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = { 0 };
+	jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+	if (SetInformationJobObject(JobHandle, JobObjectExtendedLimitInformation, &jeli, sizeof(jeli)) == 0)
+		std::cerr << "SetInformationJobObject failed: " << GetLastErrorStdStr() << "\n";
+	if (AssignProcessToJobObject(JobHandle, ProcessInformation.hProcess) == false)
+		std::cerr << "AssignProcessToJobObject failed: " << GetLastErrorStdStr() << "\n";
+	*/
+	if (ResumeThread(ProcessInformation.hThread) == -1)
+		std::cerr << "ResumeThread failed: " << GetLastErrorStdStr() << "\n";
 
 	return true;
 }
@@ -88,7 +205,7 @@ void WINAPI ServiceControl(DWORD request)
 	switch (request)
 	{
 	case SERVICE_CONTROL_STOP:
-		AF_LOG << "Service Stop.";
+		std::cout << "Service Stop.\n";
 
 		AFRunning = false;
 
@@ -99,7 +216,7 @@ void WINAPI ServiceControl(DWORD request)
 		return;
 
 	case SERVICE_CONTROL_SHUTDOWN:
-		AF_LOG << "Service Shutdown.";
+		std::cout << "Service Shutdown.\n";
 
 		AFRunning = false;
 
@@ -131,7 +248,7 @@ void WINAPI ServiceMain(int argc, char *argv[])
 	ServiceStatusHandle = RegisterServiceCtrlHandler(ServiceName, (LPHANDLER_FUNCTION)ServiceControl);
 	if (ServiceStatusHandle == (SERVICE_STATUS_HANDLE)0)
 	{
-		AF_ERR << GetLastErrorStdStr();
+		std::cerr << GetLastErrorStdStr() << "\n";
 		return;
 	}
 
@@ -141,11 +258,11 @@ void WINAPI ServiceMain(int argc, char *argv[])
 	AFRunning = true;
 	while (AFRunning)
 	{
-		AF_LOG << "Service is running...";
+		std::cout << "Service is running...\n";
 
 		// Sleep till the next heartbeat:
 		if (AFRunning)
-			af::sleep_sec(1);
+			Sleep(1000);
 	}
 }
 
@@ -159,26 +276,77 @@ int startService()
 
 	if (false == StartServiceCtrlDispatcher(ServiceTable))
 	{
-		AF_ERR << GetLastErrorStdStr();
+		std::cerr << GetLastErrorStdStr() << "\n";
 		return 1;
 	}
 
 	return 0;
 }
 
+void stopService()
+{
+	Sleep(10000);
+//	CloseHandle(JobHandle);
+}
+
+void serviceStopped()
+{
+}
+
+void runLoop()
+{
+	DWORD cycle = 0;
+	AFRunning = true;
+	while (AFRunning)
+	{
+		cycle++;
+
+		std::cout << "Service is running...\n";
+
+		DWORD result = WaitForSingleObject(ProcessInformation.hProcess, 0);
+		if (WAIT_OBJECT_0 == result)
+		{
+			AFRunning = false;
+			serviceStopped();
+			//Sleep(1000);
+		}
+		else if (WAIT_FAILED == result)
+		{
+			std::cerr << "WaitForSingleObject falied: " << GetLastErrorStdStr() << "\n";
+		}
+
+		// Sleep till the next heartbeat:
+		if (AFRunning)
+			Sleep(1000);
+
+		if (cycle == 10)
+		{
+			std::cout << "PostThreadMessage...\n";
+			if (false == PostThreadMessage(ProcessInformation.dwProcessId, SIGTERM, 0, 0))
+				std::cerr << "PostThreadMessage: " << GetLastErrorStdStr() << "\n";
+		}
+	}
+
+//	CloseHandle(JobHandle);
+}
+
 int main(int argc, char *argv[])
 {
-   // Set signals handlers:
-	/*
+    // Set signals handlers:
 	signal( SIGINT,  sig_int);
 	signal( SIGTERM, sig_int);
 	signal( SIGSEGV, sig_int);
-	*/
-	redirectOutput();
+	
 
 	if (argc == 1)
 	{
-		AF_LOG << "Interactive mode";
+		//redirectServiceOutput();
+		std::cout << "Interactive mode.\r\n";
+		printf("printf asdf\r\n");
+		std::cerr << "std::cerr.\r\n";
+		fprintf(stderr, "fprintf stderr\r\n");
+		startCmd();
+		runLoop();
 		return 0;
 	}
 	if (strcmp("render", argv[1]))
@@ -192,7 +360,7 @@ int main(int argc, char *argv[])
 		return startService();
 	}
 
-	AF_ERR << "Invalid arguments.";
+	std::cerr << "Invalid arguments.\n";
 
 	return 1;
 }

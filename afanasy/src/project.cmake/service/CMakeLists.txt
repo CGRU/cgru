@@ -12,9 +12,7 @@ if( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
    set_target_properties(afservice PROPERTIES COMPILE_FLAGS $ENV{AF_ADD_CFLAGS})
 endif( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
 
-target_link_libraries(afservice Ws2_32.lib Iphlpapi.lib PowrProf.lib)
-
-target_link_libraries(afservice afanasy ${EXTRA_LIBS} $ENV{AF_EXTRA_LIBS} )
+target_link_libraries(afservice Iphlpapi.lib Shlwapi.lib ${EXTRA_LIBS} $ENV{AF_EXTRA_LIBS})
 
 if( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
    set_target_properties(afservice PROPERTIES LINK_FLAGS $ENV{AF_ADD_LFLAGS})
