@@ -1,5 +1,5 @@
 call setup.cmd
 
-sc delete afserver
+sc delete afservice_server
 
 pause

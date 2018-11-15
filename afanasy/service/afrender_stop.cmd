@@ -1,5 +1,5 @@
 call setup.cmd
 
-sc stop afrender
+sc stop afservice_render
 
 pause

@@ -1,5 +1,5 @@
 call setup.cmd
 
-sc start afserver
+sc start afservice_server
 
 pause
