@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <Windows.h>
 
-//char * ServiceName = "afrender";
 char * ServiceName = "afrender";
 
 HANDLE OutputHandle = NULL;
@@ -173,7 +172,9 @@ bool startCmd()
 		NULL,               /* Proccess attributes */
 		NULL,               /* Thread attributes */
 		true,               /* Inherit Handles */
-		CREATE_SUSPENDED,   /* Creation flags */
+		/*CREATE_NO_WINDOW |/* Creation flags */
+		CREATE_SUSPENDED |
+		CREATE_NEW_PROCESS_GROUP,
 		NULL,               /* Environment */
 		cgru.c_str(),       /* Wolring directory */
 		&startInfo,         /* Startup information */
@@ -198,6 +199,55 @@ bool startCmd()
 		std::cerr << "ResumeThread failed: " << GetLastErrorStdStr() << "\n";
 
 	return true;
+}
+
+void stopService()
+{
+	std::cout << "Stopping serivce...\n";
+
+	if (false == GenerateConsoleCtrlEvent(CTRL_C_EVENT, ProcessInformation.dwProcessId))
+		std::cerr << "GenerateConsoleCtrlEvent: " << GetLastErrorStdStr() << "\n";
+
+	//TerminateJobObject(JobHandle, 0);
+	//CloseHandle(JobHandle);
+}
+
+void serviceStopped()
+{
+	AFRunning = false;
+}
+
+void runLoop()
+{
+	DWORD cycle = 0;
+	AFRunning = true;
+	while (AFRunning)
+	{
+		cycle++;
+
+		std::cout << "Service is running...\n";
+
+		DWORD result = WaitForSingleObject(ProcessInformation.hProcess, 0);
+		if (WAIT_OBJECT_0 == result)
+		{
+			serviceStopped();
+		}
+		else if (WAIT_FAILED == result)
+		{
+			std::cerr << "WaitForSingleObject falied: " << GetLastErrorStdStr() << "\n";
+		}
+
+		// Sleep till the next heartbeat:
+		if (AFRunning)
+			Sleep(1000);
+
+		if (cycle == 10)
+		{
+			stopService();
+		}
+	}
+
+	//	CloseHandle(JobHandle);
 }
 
 void WINAPI ServiceControl(DWORD request)
@@ -281,53 +331,6 @@ int startService()
 	}
 
 	return 0;
-}
-
-void stopService()
-{
-	Sleep(10000);
-//	CloseHandle(JobHandle);
-}
-
-void serviceStopped()
-{
-}
-
-void runLoop()
-{
-	DWORD cycle = 0;
-	AFRunning = true;
-	while (AFRunning)
-	{
-		cycle++;
-
-		std::cout << "Service is running...\n";
-
-		DWORD result = WaitForSingleObject(ProcessInformation.hProcess, 0);
-		if (WAIT_OBJECT_0 == result)
-		{
-			AFRunning = false;
-			serviceStopped();
-			//Sleep(1000);
-		}
-		else if (WAIT_FAILED == result)
-		{
-			std::cerr << "WaitForSingleObject falied: " << GetLastErrorStdStr() << "\n";
-		}
-
-		// Sleep till the next heartbeat:
-		if (AFRunning)
-			Sleep(1000);
-
-		if (cycle == 10)
-		{
-			std::cout << "PostThreadMessage...\n";
-			if (false == PostThreadMessage(ProcessInformation.dwProcessId, SIGTERM, 0, 0))
-				std::cerr << "PostThreadMessage: " << GetLastErrorStdStr() << "\n";
-		}
-	}
-
-//	CloseHandle(JobHandle);
 }
 
 int main(int argc, char *argv[])
