@@ -81,7 +81,7 @@ std::string getLogFilename(const std::string & i_base)
 bool redirectServiceOutput()
 {
 	std::string logFilename = getLogFilename(std::string(ServiceName) + "-log");
-	freopen(logFilename.c_str(), "w", stdout); return true;
+	//freopen(logFilename.c_str(), "w", stdout); return true;
 
 	// Create log file:
 	SECURITY_ATTRIBUTES sAttrs;
@@ -99,7 +99,7 @@ bool redirectServiceOutput()
 		NULL);
 	if (OutputHandle == INVALID_HANDLE_VALUE)
 	{
-		std::cerr << "Unable to create log file: " << GetLastErrorStdStr() << "\r\n" << logFilename << "\r\n";
+		std::cout << "Unable to create log file: " << GetLastErrorStdStr() << "\r\n" << logFilename << "\r\n";
 		OutputHandle = NULL;
 		return false;
 	}
@@ -113,26 +113,26 @@ bool redirectServiceOutput()
 
 	if (false == SetStdHandle(STD_OUTPUT_HANDLE, OutputHandle))
 	{
-		std::cerr << "Unable to redirect output: " << GetLastErrorStdStr() << "\r\n";
+		std::cout << "Unable to redirect output: " << GetLastErrorStdStr() << "\r\n";
 		return false;
 	}
 	if (false == SetStdHandle(STD_ERROR_HANDLE, OutputHandle))
 	{
-		std::cerr << "Unable to redirect error: " << GetLastErrorStdStr() << "\r\n";
+		std::cout << "Unable to redirect error: " << GetLastErrorStdStr() << "\r\n";
 		return false;
 	}
-	
+/*	
 	int writablePipeEndFileStream = _open_osfhandle((long)OutputHandle, 0);
 	FILE* writablePipeEndFile = NULL;
 	writablePipeEndFile = _fdopen(writablePipeEndFileStream,"w");
 	_dup2(_fileno(writablePipeEndFile), 1);
 	_dup2(_fileno(writablePipeEndFile), 2);
-	
+*/
 	return true;
 }
 
 bool startCmd()
-{
+{	
 	// Construct command
 	// Get current executable path
 	char lpFilename[1024]; int nSize = 1024;
@@ -172,21 +172,19 @@ bool startCmd()
 	);
 	if (false == processCreated)
 	{
-		std::cerr << "Failed to create " << ServiceName << " process:\r\n" << GetLastErrorStdStr() << "\r\n";
+		std::cout << "Failed to create " << ServiceName << " process:\r\n" << GetLastErrorStdStr() << "\r\n";
 		return false;
 	}
 
-	//*
 	JobHandle = CreateJobObject(NULL, NULL);
 	JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = { 0 };
 	jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
 	if (SetInformationJobObject(JobHandle, JobObjectExtendedLimitInformation, &jeli, sizeof(jeli)) == 0)
-		std::cerr << "SetInformationJobObject failed: " << GetLastErrorStdStr() << "\n";
+		std::cout << "SetInformationJobObject failed: " << GetLastErrorStdStr() << "\n";
 	if (AssignProcessToJobObject(JobHandle, ProcessInformation.hProcess) == false)
-		std::cerr << "AssignProcessToJobObject failed: " << GetLastErrorStdStr() << "\n";
-	//*/
+		std::cout << "AssignProcessToJobObject failed: " << GetLastErrorStdStr() << "\n";
 	if (ResumeThread(ProcessInformation.hThread) == -1)
-		std::cerr << "ResumeThread failed: " << GetLastErrorStdStr() << "\r\n";
+		std::cout << "ResumeThread failed: " << GetLastErrorStdStr() << "\r\n";
 
 	return true;
 }
@@ -200,15 +198,11 @@ void stopService()
 	SetServiceStatus(ServiceStatusHandle, &ServiceStatus);
 
 	if (false == GenerateConsoleCtrlEvent(CTRL_C_EVENT, ProcessInformation.dwProcessId))
-		std::cerr << "GenerateConsoleCtrlEvent(CTRL_C_EVENT): " << GetLastErrorStdStr() << "\r\n";
+		std::cout << "GenerateConsoleCtrlEvent(CTRL_C_EVENT): " << GetLastErrorStdStr() << "\r\n";
 	if (false == GenerateConsoleCtrlEvent(CTRL_CLOSE_EVENT, ProcessInformation.dwProcessId))
-		std::cerr << "GenerateConsoleCtrlEvent(CTRL_CLOSE_EVENT): " << GetLastErrorStdStr() << "\r\n";
+		std::cout << "GenerateConsoleCtrlEvent(CTRL_CLOSE_EVENT): " << GetLastErrorStdStr() << "\r\n";
 	if (false == GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, ProcessInformation.dwProcessId))
-		std::cerr << "GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT): " << GetLastErrorStdStr() << "\r\n";
-
-	//TerminateProcess(ProcessInformation.hProcess, 0);	
-	//TerminateJobObject(JobHandle, 0);
-	//CloseHandle(JobHandle);
+		std::cout << "GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT): " << GetLastErrorStdStr() << "\r\n";
 }
 
 void serviceStopped()
@@ -242,33 +236,40 @@ void runLoop()
 	AFRunning = true;
 	while (AFRunning)
 	{
-		cycle++;
-
-		std::cout << "Service is running...\r\n";
-
 		DWORD result = WaitForSingleObject(ProcessInformation.hProcess, 0);
 		if (WAIT_OBJECT_0 == result)
 		{
 			serviceStopped();
-			return;
+			break;
+		}
+		else if (WAIT_ABANDONED == result)
+		{
+			std::cout << "WaitForSingleObject falied:WAIT_ABANDONED" << GetLastErrorStdStr() << "\r\n";
+		}
+		else if (WAIT_TIMEOUT == result)
+		{
+			std::cout << "Afservice running PID = " << ProcessInformation.dwProcessId << "\r\n";
 		}
 		else if (WAIT_FAILED == result)
 		{
-			std::cerr << "WaitForSingleObject falied: " << GetLastErrorStdStr() << "\r\n";
+			std::cout << "WaitForSingleObject:WAIT_FAILED: " << GetLastErrorStdStr() << "\r\n";
 		}
+		else
+		{
+			std::cout << "WaitForSingleObject:unknown: " << GetLastErrorStdStr() << "\r\n";
+		}
+
 
 		// Sleep till the next heartbeat:
 		if (AFRunning)
 			Sleep(1000);
 
-		if (cycle == 3)
-		{
-			//stopService();
-		}
+		cycle++;
 	}
 
-	//TerminateJobObject(JobHandle, 0);
-	//CloseHandle(JobHandle);
+	TerminateProcess(ProcessInformation.hProcess, 0);	
+	TerminateJobObject(JobHandle, 0);
+	CloseHandle(JobHandle);
 }
 
 void WINAPI ServiceControl(DWORD request)
@@ -294,6 +295,11 @@ void WINAPI ServiceControl(DWORD request)
 
 void WINAPI ServiceMain(int argc, char *argv[])
 {
+	if (false == AllocConsole())
+		std::cout << GetLastErrorStdStr() << "\r\n";
+
+	redirectServiceOutput();
+
 	ServiceStatus.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
 	ServiceStatus.dwCurrentState = SERVICE_START_PENDING;
 	ServiceStatus.dwControlsAccepted = SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN;
@@ -305,7 +311,7 @@ void WINAPI ServiceMain(int argc, char *argv[])
 	ServiceStatusHandle = RegisterServiceCtrlHandler(ServiceName, (LPHANDLER_FUNCTION)ServiceControl);
 	if (ServiceStatusHandle == (SERVICE_STATUS_HANDLE)0)
 	{
-		std::cerr << GetLastErrorStdStr() << "\r\n";
+		std::cout << GetLastErrorStdStr() << "\r\n";
 		return;
 	}
 
@@ -320,8 +326,6 @@ int startService(int argc, char *argv[])
 {
 	sprintf(ServiceName,"afservice_%s", ServiceType.c_str());
 
-	redirectServiceOutput();
-
 	SERVICE_TABLE_ENTRY ServiceTable[] =
 	{
 		{ ServiceName, (LPSERVICE_MAIN_FUNCTION)ServiceMain },
@@ -330,7 +334,7 @@ int startService(int argc, char *argv[])
 
 	if (false == StartServiceCtrlDispatcher(ServiceTable))
 	{
-		std::cerr << GetLastErrorStdStr() << "\r\n";
+		std::cout << GetLastErrorStdStr() << "\r\n";
 		return 1;
 	}
 
@@ -340,7 +344,7 @@ int startService(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	if (false == SetConsoleCtrlHandler(CtrlHandler, TRUE))
-		std::cerr << "SetConsoleCtrlHandler: " << GetLastErrorStdStr() << "\r\n";
+		std::cout << "SetConsoleCtrlHandler: " << GetLastErrorStdStr() << "\r\n";
 
 	if (argc == 1)
 	{
@@ -360,7 +364,7 @@ int main(int argc, char *argv[])
 		return startService(argc, argv);
 	}
 
-	std::cerr << "Invalid arguments.\r\n";
+	std::cout << "Invalid arguments.\r\n";
 
 	return 1;
 }
