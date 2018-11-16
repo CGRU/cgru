@@ -1,10 +1,7 @@
-#include <errno.h>
 #include <io.h>
-#include <iostream>
 #include <shlwapi.h>
-#include <signal.h>
 #include <sstream>
-#include <stdio.h>
+#include <time.h>
 #include <Windows.h>
 
 std::string ServiceType = "render";
@@ -48,6 +45,33 @@ std::string GetLastErrorStdStr()
 	return std::string();
 }
 
+void OutLog(const std::string & i_log)
+{
+	std::string log("SERVICE: ");
+
+	static const int timeLen = 64;
+	char timeBuf[timeLen];
+	struct tm time_struct;
+	time_t time_sec = time(NULL);
+	if (localtime_s(&time_struct, &time_sec) == 0)
+	{
+		strftime(timeBuf, timeLen, "%a %d %b %H:%M.%S", &time_struct);
+		log += std::string(timeBuf) + ": ";
+	}
+
+	log += i_log + "\r\n";
+
+	if (OutputHandle)
+		WriteFile(OutputHandle, log.c_str(), log.size(), NULL, NULL);
+	else
+		_write( 1, log.c_str(), log.size());
+}
+
+void LogErr(const std::string & i_log)
+{
+	OutLog(std::string("ERROR: ") + i_log + ": " + GetLastErrorStdStr());
+}
+
 std::string getLogFilename(const std::string & i_base)
 {
 	// Log file name
@@ -81,14 +105,12 @@ std::string getLogFilename(const std::string & i_base)
 bool redirectServiceOutput()
 {
 	std::string logFilename = getLogFilename(std::string(ServiceName) + "-log");
-	//freopen(logFilename.c_str(), "w", stdout); return true;
 
 	// Create log file:
 	SECURITY_ATTRIBUTES sAttrs;
 	sAttrs.nLength = sizeof(SECURITY_ATTRIBUTES);
 	sAttrs.bInheritHandle = true;
 	sAttrs.lpSecurityDescriptor = NULL;
-	
 	OutputHandle = CreateFile(
 		logFilename.c_str(),
 		GENERIC_WRITE,
@@ -99,35 +121,42 @@ bool redirectServiceOutput()
 		NULL);
 	if (OutputHandle == INVALID_HANDLE_VALUE)
 	{
-		std::cout << "Unable to create log file: " << GetLastErrorStdStr() << "\r\n" << logFilename << "\r\n";
+		LogErr(std::string("Unable to create log file: ") + logFilename);
 		OutputHandle = NULL;
 		return false;
 	}
 	else
 	{
-		std::cout << "Log file created: " << logFilename << "\r\n";
+		OutLog(std::string("Log file created: ") + logFilename);
 	}
 
-	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-	CloseHandle(hOut);
-
+	// Set standard handles to new one
 	if (false == SetStdHandle(STD_OUTPUT_HANDLE, OutputHandle))
 	{
-		std::cout << "Unable to redirect output: " << GetLastErrorStdStr() << "\r\n";
+		LogErr("Unable to redirect output");
 		return false;
 	}
 	if (false == SetStdHandle(STD_ERROR_HANDLE, OutputHandle))
 	{
-		std::cout << "Unable to redirect error: " << GetLastErrorStdStr() << "\r\n";
+		LogErr("Unable to redirect error");
 		return false;
 	}
-/*	
-	int writablePipeEndFileStream = _open_osfhandle((long)OutputHandle, 0);
-	FILE* writablePipeEndFile = NULL;
-	writablePipeEndFile = _fdopen(writablePipeEndFileStream,"w");
-	_dup2(_fileno(writablePipeEndFile), 1);
-	_dup2(_fileno(writablePipeEndFile), 2);
-*/
+
+	// Close stdin as nobody will write to it,
+	// but cmd.exe can ask "Terminate batch job (Y/N)?" at the end.
+	HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
+	if (INVALID_HANDLE_VALUE == hIn)
+		LogErr("GetStdHandle:STD_INPUT_HANDLE");
+	else if (NULL == hIn)
+	{
+		LogErr("GetStdHandle:STD_INPUT_HANDLE: NULL");
+	}
+	else
+	{
+		if( false == CloseHandle(hIn))
+			LogErr("CloseHandle:STD_INPUT_HANDLE");
+	}
+
 	return true;
 }
 
@@ -149,7 +178,7 @@ bool startCmd()
 	if (strcmp(ServiceName,"afserver"))
 		std::string cmd = cgru + "\\start\\AFANASY\\_afserver.cmd";
 	//cmd = std::string("cmd.exe /c ") + cmd;
-	std::cout << "Starting command:\r\n" << cmd << "\r\n";
+	OutLog(std::string("Starting command: ") + cmd);
 
 	// Create Process
 	STARTUPINFO startInfo;
@@ -172,7 +201,7 @@ bool startCmd()
 	);
 	if (false == processCreated)
 	{
-		std::cout << "Failed to create " << ServiceName << " process:\r\n" << GetLastErrorStdStr() << "\r\n";
+		LogErr(std::string("Failed to create ") + ServiceName + " process");
 		return false;
 	}
 
@@ -180,29 +209,27 @@ bool startCmd()
 	JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = { 0 };
 	jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
 	if (SetInformationJobObject(JobHandle, JobObjectExtendedLimitInformation, &jeli, sizeof(jeli)) == 0)
-		std::cout << "SetInformationJobObject failed: " << GetLastErrorStdStr() << "\n";
+		LogErr("SetInformationJobObject failed");
 	if (AssignProcessToJobObject(JobHandle, ProcessInformation.hProcess) == false)
-		std::cout << "AssignProcessToJobObject failed: " << GetLastErrorStdStr() << "\n";
+		LogErr("AssignProcessToJobObject failed");
 	if (ResumeThread(ProcessInformation.hThread) == -1)
-		std::cout << "ResumeThread failed: " << GetLastErrorStdStr() << "\r\n";
+		LogErr("ResumeThread failed");
 
 	return true;
 }
 
 void stopService()
 {
-	std::cout << "Stopping serivce...\r\n";
+	OutLog("Stopping serivce...");
 
 	ServiceStatus.dwWin32ExitCode = 0;
 	ServiceStatus.dwCurrentState = SERVICE_STOP_PENDING;
 	SetServiceStatus(ServiceStatusHandle, &ServiceStatus);
 
 	if (false == GenerateConsoleCtrlEvent(CTRL_C_EVENT, ProcessInformation.dwProcessId))
-		std::cout << "GenerateConsoleCtrlEvent(CTRL_C_EVENT): " << GetLastErrorStdStr() << "\r\n";
-	if (false == GenerateConsoleCtrlEvent(CTRL_CLOSE_EVENT, ProcessInformation.dwProcessId))
-		std::cout << "GenerateConsoleCtrlEvent(CTRL_CLOSE_EVENT): " << GetLastErrorStdStr() << "\r\n";
+		LogErr("GenerateConsoleCtrlEvent(CTRL_C_EVENT)");
 	if (false == GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, ProcessInformation.dwProcessId))
-		std::cout << "GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT): " << GetLastErrorStdStr() << "\r\n";
+		LogErr("GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT)");
 }
 
 void serviceStopped()
@@ -218,12 +245,12 @@ BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
 {
 	switch (fdwCtrlType)
 	{
-	case CTRL_C_EVENT:        std::cout << "Ctrl-C event\r\n";        break;
-	case CTRL_CLOSE_EVENT:    std::cout << "Ctrl-Close event\r\n";    break;
-	case CTRL_BREAK_EVENT:    std::cout << "Ctrl-Break event\r\n";    break;
-	case CTRL_LOGOFF_EVENT:   std::cout << "Ctrl-Logoff event\r\n";   break;
-	case CTRL_SHUTDOWN_EVENT: std::cout << "Ctrl-Shutdown event\r\n"; break;
-	default:                  std::cout << "Ctrl-UNKNOWN event\r\n";  return FALSE;
+	case CTRL_C_EVENT:        OutLog("Ctrl-C event");        break;
+	case CTRL_CLOSE_EVENT:    OutLog("Ctrl-Close event");    break;
+	case CTRL_BREAK_EVENT:    OutLog("Ctrl-Break event");    break;
+	case CTRL_LOGOFF_EVENT:   OutLog("Ctrl-Logoff event");   break;
+	case CTRL_SHUTDOWN_EVENT: OutLog("Ctrl-Shutdown event"); break;
+	default:                  OutLog("Ctrl-UNKNOWN event");  return FALSE;
 	}
 
 	stopService();
@@ -244,27 +271,26 @@ void runLoop()
 		}
 		else if (WAIT_ABANDONED == result)
 		{
-			std::cout << "WaitForSingleObject falied:WAIT_ABANDONED" << GetLastErrorStdStr() << "\r\n";
+			LogErr("WaitForSingleObject:WAIT_ABANDONED");
 		}
 		else if (WAIT_TIMEOUT == result)
 		{
-			std::cout << "Afservice running PID = " << ProcessInformation.dwProcessId << "\r\n";
+			if (cycle == 0)
+				OutLog(std::string("Afservice running PID = ") + std::to_string(ProcessInformation.dwProcessId));
+			cycle++;
 		}
 		else if (WAIT_FAILED == result)
 		{
-			std::cout << "WaitForSingleObject:WAIT_FAILED: " << GetLastErrorStdStr() << "\r\n";
+			OutLog("WaitForSingleObject:WAIT_FAILED: ");
 		}
 		else
 		{
-			std::cout << "WaitForSingleObject:unknown: " << GetLastErrorStdStr() << "\r\n";
+			OutLog("WaitForSingleObject:unknown: ");
 		}
-
 
 		// Sleep till the next heartbeat:
 		if (AFRunning)
 			Sleep(1000);
-
-		cycle++;
 	}
 
 	TerminateProcess(ProcessInformation.hProcess, 0);	
@@ -277,12 +303,12 @@ void WINAPI ServiceControl(DWORD request)
 	switch (request)
 	{
 	case SERVICE_CONTROL_STOP:
-		std::cout << "\r\nSERVICE_CONTROL_STOP\r\n";
+		OutLog("SERVICE_CONTROL_STOP");
 		stopService();
 		break;
 
 	case SERVICE_CONTROL_SHUTDOWN:
-		std::cout << "\r\nSERVICE_CONTROL_SHUTDOWN\r\n";
+		OutLog("SERVICE_CONTROL_SHUTDOWN");
 		stopService();
 		break;
 
@@ -296,11 +322,11 @@ void WINAPI ServiceControl(DWORD request)
 void WINAPI ServiceMain(int argc, char *argv[])
 {
 	if (false == AllocConsole())
-		std::cout << GetLastErrorStdStr() << "\r\n";
+		LogErr("AllocConsole");
 
 	redirectServiceOutput();
 
-	ServiceStatus.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
+	ServiceStatus.dwServiceType = SERVICE_USER_OWN_PROCESS;
 	ServiceStatus.dwCurrentState = SERVICE_START_PENDING;
 	ServiceStatus.dwControlsAccepted = SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN;
 	ServiceStatus.dwWin32ExitCode = 0;
@@ -311,7 +337,7 @@ void WINAPI ServiceMain(int argc, char *argv[])
 	ServiceStatusHandle = RegisterServiceCtrlHandler(ServiceName, (LPHANDLER_FUNCTION)ServiceControl);
 	if (ServiceStatusHandle == (SERVICE_STATUS_HANDLE)0)
 	{
-		std::cout << GetLastErrorStdStr() << "\r\n";
+		OutLog("RegisterServiceCtrlHandler");
 		return;
 	}
 
@@ -334,7 +360,7 @@ int startService(int argc, char *argv[])
 
 	if (false == StartServiceCtrlDispatcher(ServiceTable))
 	{
-		std::cout << GetLastErrorStdStr() << "\r\n";
+		OutLog("StartServiceCtrlDispatcher");
 		return 1;
 	}
 
@@ -344,11 +370,10 @@ int startService(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	if (false == SetConsoleCtrlHandler(CtrlHandler, TRUE))
-		std::cout << "SetConsoleCtrlHandler: " << GetLastErrorStdStr() << "\r\n";
+		LogErr("SetConsoleCtrlHandler");
 
 	if (argc == 1)
 	{
-		//redirectServiceOutput();
 		startCmd();
 		runLoop();
 		exit(0);
@@ -364,7 +389,7 @@ int main(int argc, char *argv[])
 		return startService(argc, argv);
 	}
 
-	std::cout << "Invalid arguments.\r\n";
+	OutLog("Invalid arguments.");
 
 	return 1;
 }
