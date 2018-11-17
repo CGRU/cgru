@@ -47,8 +47,10 @@ std::string GetLastErrorStdStr()
 
 void OutLog(const std::string & i_log)
 {
-	std::string log("SERVICE: ");
+	// Prefix
+	std::string log("SERVICE");
 
+	// Date and time
 	static const int timeLen = 64;
 	char timeBuf[timeLen];
 	struct tm time_struct;
@@ -56,11 +58,16 @@ void OutLog(const std::string & i_log)
 	if (localtime_s(&time_struct, &time_sec) == 0)
 	{
 		strftime(timeBuf, timeLen, "%a %d %b %H:%M.%S", &time_struct);
-		log += std::string(timeBuf) + ": ";
+		log += std::string(": ") + timeBuf;
 	}
 
-	log += i_log + "\r\n";
+	// Construct input message
+	log = log + ": " + i_log;
 
+	// End of lines
+	log = std::string("\r\n") + log + "\r\n";
+
+	// Write to handle if created, or to stdout (1)
 	if (OutputHandle)
 		WriteFile(OutputHandle, log.c_str(), log.size(), NULL, NULL);
 	else
@@ -175,9 +182,8 @@ bool startCmd()
 	}
 	// Add command
 	std::string cmd = cgru + "\\start\\AFANASY\\render.cmd";
-	if (strcmp(ServiceName,"afserver"))
-		std::string cmd = cgru + "\\start\\AFANASY\\_afserver.cmd";
-	//cmd = std::string("cmd.exe /c ") + cmd;
+	if (ServiceType == "server")
+		cmd = cgru + "\\start\\AFANASY\\_afserver.cmd";
 	OutLog(std::string("Starting command: ") + cmd);
 
 	// Create Process
@@ -201,7 +207,7 @@ bool startCmd()
 	);
 	if (false == processCreated)
 	{
-		LogErr(std::string("Failed to create ") + ServiceName + " process");
+		LogErr(std::string("Failed to create ") + ServiceType + " process");
 		return false;
 	}
 
