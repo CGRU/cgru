@@ -272,6 +272,7 @@ void runLoop()
 		DWORD result = WaitForSingleObject(ProcessInformation.hProcess, 0);
 		if (WAIT_OBJECT_0 == result)
 		{
+			OutLog(ServiceType + " process finished.");
 			serviceStopped();
 			break;
 		}
