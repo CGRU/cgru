@@ -11,7 +11,7 @@ import re
 re_percent = re.compile(
     r'(Block*)(\s*)(\d*)(\/)(\d*)(\s*)(\S*)(\s*)(rendered by GPU.*)'
 )
-re_frame = re.compile(r'.*Rendering.*frame [0-9]+ \(')
+re_frame = re.compile(r'.*Rendering.*frame [0-9]+\.\.\.')
 
 
 class maya_redshift(parser.parser):
