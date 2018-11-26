@@ -636,8 +636,8 @@ overflow-y: scroll;
 { margin: 0px 5px; float:left;}
 #status_progress { clear: both; border-radius: 2px; }
 #status_progressbar { height: 10px; /*border-radius: 4px;*/ }
-#status_modified { clear: both; float:right; font-style:italic; font-size: 14px; }
-#status_framesnum_div { margin: 1px 6px; border: 1px solid rgba(98,98,98,.5); border-radius: 2px; float: left; }
+#status_modified { float:right; font-style:italic; font-size: 14px; }
+#status_framesnum_div { float:left; margin: 1px 6px; border: 1px solid rgba(98,98,98,.5); border-radius: 2px; float: left; }
 #status_framesnum_div.updated { border: 1px solid #FFFF00; }
 #status_framesnum { font: 16px monospace; padding: 1px 6px; float: left; }
 
@@ -709,6 +709,13 @@ table.statistics .duration { text-align: center; border-left-width: 0; }
 #search_artists_div.show_disabled .disabled { display: block; }
 #search_artists_div .notartist { display: none; }
 #search_artists_div.show_notartist .notartist { display: block; }
+
+#execute_div {}
+#execute_btn { font-size: 10px;}
+#execute_body > div {
+float: left;
+font-size: 10px;
+}
 
 #assets {
 background: rgba(200,255,200,.1);

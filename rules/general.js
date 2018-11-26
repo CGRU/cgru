@@ -116,6 +116,7 @@ function g_Init_Rules(i_data)
 
 	RULES = RULES_TOP;
 	p_Init();
+	u_InitConfigured();
 	nw_InitConfigured();
 	bm_InitConfigured();
 

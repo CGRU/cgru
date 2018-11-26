@@ -63,6 +63,14 @@
 
 "aux_folders":[".","_","-","tmp","temp","tmp","common"],
 
+"execute":[
+	{
+		"label":"XTerm",
+		"title":"Open terminal in this location.",
+		"cmd":"xterm -c "
+	}
+],
+
 "assets":{
 	"projects_root":{
 		"play_folders":false,

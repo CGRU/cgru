@@ -131,6 +131,10 @@ function u_InitAuth()
 	$('auth_user').textContent = c_GetUserTitle() + ' [' + g_auth_user.id + ']';
 }
 
+function u_InitConfigured()
+{
+}
+
 function u_Process()
 {
 	if (RULES.annotations)
@@ -206,6 +210,7 @@ function u_Finish()
 	cm_Finish();
 
 	u_ViewsFuncsClose();
+	u_ExecuteShow(false);
 
 	$('body_avatar_c').style.display = 'none';
 	$('body_avatar_m').style.display = 'none';
@@ -1007,5 +1012,67 @@ function u_ThumbnailShow(i_data)
 			g_elCurFolder.m_dir.rufiles = [];
 		if (g_elCurFolder.m_dir.rufiles.indexOf(RULES.thumbnail.filename) == -1)
 			g_elCurFolder.m_dir.rufiles.push(RULES.thumbnail.filename);
+	}
+}
+
+function u_ExecuteShow(i_show)
+{
+	let elBtn = $('execute_btn');
+	if (i_show == null)
+	{
+		if (elBtn.classList.contains('pushed'))
+			i_show = false;
+		else
+			i_show = true;
+	}
+
+	let elBody = $('execute_body');
+	elBody.textContent = '';
+
+	if (i_show)
+	{
+		elBtn.classList.add('pushed');
+		u_CreateActions(RULES.execute, elBody);
+	}
+	else
+	{
+		elBtn.classList.remove('pushed');
+	}
+}
+
+function u_CreateActions(i_actions, i_el)
+{
+	for (let n = 0; n < i_actions.length; n++)
+	{
+		let action = i_actions[n];
+		let el = document.createElement('div');
+		el.textContent = action.label;
+		el.title = action.title;
+		i_el.appendChild(el);
+
+		// Process command:
+		let cmd = action.cmd;
+		// '@arg@' will be replaced with '--arg [arg value]'
+		// Value will be the first defined in action, ASSET, RULES
+		// For example: '@fps@' will be replaces with '--fps 24'
+		let matches = cmd.match(/@\w*@/g);
+		if (matches && matches.length)
+			for (let i = 0; i < matches.length; i++)
+			{
+				let match = matches[i];
+				let arg = match.replace(/@/g,'');
+				let val = action[arg];
+				if (null == val) val = ASSET[arg];
+				if (null == val) val = RULES[arg];
+				if (val) val = '--' + arg + ' ' + val;
+				else val = '';
+				cmd = cmd.replace(match, val);
+			}
+
+		// Transfer command to client and add current path to the end:
+		cmd = c_PathPM_Server2Client(cmd) + ' ' + c_PathPM_Rules2Client(g_CurPath());
+
+		// Make an executable button:
+		cgru_CmdExecProcess({'element':el,'cmd':cmd});
 	}
 }

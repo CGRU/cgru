@@ -178,12 +178,13 @@ Supervisor can assign artist by creating a task."
 			<div id="status_tags" class="tags"></div>
 			<div id="status_finish" class="finish"></div>
 			<div id="status_progress" class="progress"><div id="status_progressbar" class="progressbar"></div></div>
-			<div id="status_modified"></div>
+			<div style="clear:both"></div>
 			<div id="status_framesnum_div">
 				<div id="status_framesnum"
 					style="font: 16px monospace; padding: 1px 6px; float: left;"></div>
 				<div style="padding: 1px 6px; float: right;">Frames</div>
 			</div>
+			<div id="status_modified"></div>
 			<div id="status_adinfo" style="clear:both; display: none;"></div>
 			<div style="clear:both;">
 				<div id="status_reports_div">
@@ -196,6 +197,10 @@ Supervisor can assign artist by creating a task."
 				</div>
 			</div>
 		</div>
+	</div>
+	<div id="execute_div" class="_view">
+		<div id="execute_btn" onclick="u_ExecuteShow()" class="button">EXECUTE</div>
+		<div id="execute_body"></div>
 	</div>
 	<div id="asset_div" class="view">
 		<div class="button show" onclick="u_OpenCloseView('asset')"

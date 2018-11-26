@@ -83,42 +83,8 @@ function shot_InitHTML( i_data)
 		el.onclick = shot_Rename;
 	}
 
-
 	// Create shot process buttons:
-	for (let n = 0; n < ASSET.shot_process.length; n++)
-	{
-		let action = ASSET.shot_process[n];
-		let el = document.createElement('div');
-		el.textContent = action.label;
-		el.title = action.title;
-		$('shot_process_div').appendChild(el);
-
-		// Process command:
-		let cmd = action.cmd;
-		// '@arg@' will be replaced with '--arg [arg value]'
-		// Value will be the first defined in action, ASSET, RULES
-		// For example: '@fps' will be replaces with '--fps 24'
-		let matches = cmd.match(/@\w*@/g);
-		if (matches && matches.length)
-			for (let i = 0; i < matches.length; i++)
-			{
-				let match = matches[i];
-				let arg = match.replace(/@/g,'');
-				let val = action[arg];
-				if (null == val) val = ASSET[arg];
-				if (null == val) val = RULES[arg];
-				if (val) val = '--' + arg + ' ' + val;
-				else val = '';
-				cmd = cmd.replace(match, val);
-			}
-
-		// Transfer command to client and add current path to the end:
-		cmd = c_PathPM_Server2Client(cmd) + ' ' + c_PathPM_Rules2Client(g_CurPath());
-
-		// Make an executable button:
-		cgru_CmdExecProcess({'element':el,'cmd':cmd});
-	}
-
+	u_CreateActions(ASSET.shot_process, $('shot_process_div')); 
 
 	shot_ResultsRead( true);
 }
