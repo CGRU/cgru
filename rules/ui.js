@@ -103,6 +103,10 @@ function u_Init()
 		localStorage.show_hidden = 'OFF';
 	$('show_hidden').textContent = localStorage.show_hidden;
 
+	if (localStorage.has_filesystem == null)
+		localStorage.has_filesystem = 'OFF';
+	$('has_filesystem').textContent = localStorage.has_filesystem;
+
 	u_CalcGUI();
 
 	$('body_panel_edit').m_panel_edit = u_EditPanelCreate($('body_panel_edit'));
@@ -129,6 +133,9 @@ function u_InitAuth()
 	$('body_edit').style.display = 'block';
 	$('search_artists_div').style.display = 'block';
 	$('auth_user').textContent = c_GetUserTitle() + ' [' + g_auth_user.id + ']';
+
+	if (c_CanExecuteSoft())
+		$('execute_div').style.display = 'block';
 }
 
 function u_InitConfigured()
@@ -1015,8 +1022,23 @@ function u_ThumbnailShow(i_data)
 	}
 }
 
+function u_HasFilesystem()
+{
+	if (localStorage.has_filesystem == 'OFF')
+		localStorage.has_filesystem = 'ON';
+	else
+		localStorage.has_filesystem = 'OFF';
+	$('has_filesystem').textContent = localStorage.has_filesystem;
+}
+
 function u_ExecuteShow(i_show)
 {
+	let elBody = $('execute_body');
+	elBody.textContent = '';
+
+	if (false == c_CanExecuteSoft())
+		return;
+
 	let elBtn = $('execute_btn');
 	if (i_show == null)
 	{
@@ -1025,9 +1047,6 @@ function u_ExecuteShow(i_show)
 		else
 			i_show = true;
 	}
-
-	let elBody = $('execute_body');
-	elBody.textContent = '';
 
 	if (i_show)
 	{
@@ -1046,12 +1065,22 @@ function u_CreateActions(i_actions, i_el)
 	{
 		let action = i_actions[n];
 		let el = document.createElement('div');
-		el.textContent = action.label;
-		el.title = action.title;
 		i_el.appendChild(el);
+		el.textContent = action.label;
+		if (action.title)
+			el.title = action.title;
+
+		// Process icon:
+		let icon = action.icon;
+		if (icon)
+		{
+			el.style.backgroundImage = 'url(' + icon + ')';
+			el.style.paddingLeft = '28px';
+		}
 
 		// Process command:
-		let cmd = action.cmd;
+		let cmd = c_PathPM_Server2Client(action.cmd);
+		cmd = cmd.replace(/@PATH@/g, c_PathPM_Rules2Client(g_CurPath()));
 		// '@arg@' will be replaced with '--arg [arg value]'
 		// Value will be the first defined in action, ASSET, RULES
 		// For example: '@fps@' will be replaces with '--fps 24'
@@ -1068,9 +1097,6 @@ function u_CreateActions(i_actions, i_el)
 				else val = '';
 				cmd = cmd.replace(match, val);
 			}
-
-		// Transfer command to client and add current path to the end:
-		cmd = c_PathPM_Server2Client(cmd) + ' ' + c_PathPM_Rules2Client(g_CurPath());
 
 		// Make an executable button:
 		cgru_CmdExecProcess({'element':el,'cmd':cmd});

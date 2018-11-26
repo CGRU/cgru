@@ -1,3 +1,6 @@
+# Any custom folder
+/_*
+
 # Settings
 config.json
 farm.json

@@ -84,7 +84,8 @@ function shot_InitHTML( i_data)
 	}
 
 	// Create shot process buttons:
-	u_CreateActions(ASSET.shot_process, $('shot_process_div')); 
+    if (c_CanExecuteSoft())
+    	u_CreateActions(ASSET.shot_process, $('shot_process_div')); 
 
 	shot_ResultsRead( true);
 }

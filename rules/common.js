@@ -511,6 +511,26 @@ function c_CanCreateShot(i_user)
 	return false;
 }
 
+function c_HasFileSystem()
+{
+	return localStorage.has_filesystem == 'ON';
+}
+
+function c_CanExecuteSoft(i_user)
+{
+	if (localStorage.has_filesystem != 'ON')
+		return false;
+
+	if (i_user == null)
+		i_user = g_auth_user;
+	if (i_user == null)
+		return false;
+
+	if ((['admin', 'coord', 'user']).indexOf(i_user.role) != -1)
+		return true;
+
+	return false;
+}
 
 // Construct from g_users sorted roles with sorted artists:
 // Provide i_users to show specified users even if he is disabled or not an artist
