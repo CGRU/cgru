@@ -47,6 +47,11 @@ font-size: 12px;
 #footeropenbtn { top: 8px; background-image:url(icons/arrow_up.png); }
 #footeropenbtn.opened { top: 8px; background-image:url(icons/arrow_down.png); }
 
+#header_params .rules_parameters .cgru_parameter .button {
+left:120px;
+right:15px;
+cursor:pointer
+}
 #header .panel {
 position: absolute;
 left: 40px; right: 10px; bottom: 0px; height: 30px;

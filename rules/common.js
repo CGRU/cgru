@@ -521,6 +521,9 @@ function c_CanExecuteSoft(i_user)
 	if (localStorage.has_filesystem != 'ON')
 		return false;
 
+	if (localStorage.execute_soft != 'ON')
+		return false;
+
 	if (i_user == null)
 		i_user = g_auth_user;
 	if (i_user == null)
@@ -882,7 +885,7 @@ function c_PathPM_Server2Client(i_path)
 
 function c_CreateOpenButton(i_args)
 {
-	if (RULES.has_filesystem === false)
+	if (false == c_HasFileSystem())
 		return null;
 
 	i_args.path = c_PathPM_Rules2Client(i_args.path);

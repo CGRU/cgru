@@ -531,22 +531,29 @@ So folder will appear on unpack.
 			</div>
 		</div>
 		<div id="cgru_parameters" style="position:absolute; left: 250px; width: 250px; top:0;bottom:0; /*border: 1px solid #000;*/"></div>
-		<div style="position:absolute; left: 500px; width: 200px; top:0px;bottom:0; /*border: 1px solid #000;*/">
+		<div class="rules_parameters" style="position:absolute; left: 500px; width: 200px; top:0px;bottom:0; /*border: 1px solid #000;*/">
+			<div class="cgru_parameter" title="Store Header/Footer opened state.">
+				<div class="label">Header Opened:</div>
+				<div class="variable button" id="store_opened" onclick="u_StoreOpened()">unknown</div>
+			</div>
 			<div class="cgru_parameter" title="Show Hidden Folders.
 Need restart (F5).
 Create '.hidden' in folder to hide.
-Link with hidden folder will not works.
-Showing less folders increases system speed.">
+Link with hidden folder will not works.">
 				<div class="label">Show Hidden:</div>
-				<div class="variable button" id="show_hidden" style="left:110px;right:15px;cursor:pointer" onclick="u_ShowHiddenToggle()">unknown</div>
+				<div class="variable button" id="show_hidden" onclick="u_ShowHiddenToggle()">unknown</div>
 			</div>
 			<div class="cgru_parameter">
 				<div class="label">Hide ScrollBars:</div>
-				<div class="variable button" id="hide_scrollbars" style="left:110px;right:15px;cursor:pointer" onclick="u_CalcGUI(true)">unknown</div>
+				<div class="variable button" id="hide_scrollbars" onclick="u_CalcGUI(true)">unknown</div>
 			</div>
 			<div class="cgru_parameter" title="Refresh required.">
 				<div class="label">Has Filesystem:</div>
-				<div class="variable button" id="has_filesystem" style="left:110px;right:15px;cursor:pointer" onclick="u_HasFilesystem()">unknown</div>
+				<div class="variable button" id="has_filesystem" onclick="u_HasFilesystem()">unknown</div>
+			</div>
+			<div class="cgru_parameter" title="Refresh required.">
+				<div class="label">Execute Soft:</div>
+				<div class="variable button" id="execute_soft" onclick="u_ExecuteSoft()">unknown</div>
 			</div>
 		</div>
 		<div style="position:absolute; left: 700px; width: 200px; top:5px;bottom:0; /*border: 1px solid #000;*/">
@@ -595,7 +602,7 @@ Showing less folders increases system speed.">
 		<div class="button" onclick="n_LogResponses()" title ="Log Responses" id="log_responses">Responses</div>
 		<div class="button" onclick="c_LogClear()" title ="Clear Log">Clear</div>
 	</div>
-	<div id="open" class="open" style="height: 26px; float:right; margin:8px;" title="Open location a file browser.
+	<div id="open" class="open" style="height: 26px; float:right; margin:8px; display: none;" title="Open location in a file browser.
 Double click to launch."></div>
 	<div id="info"></div>
 	<div id="log"></div>

@@ -885,7 +885,7 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 	}
 
 	// Folder play sequence button:
-	if (i_isFolder && RULES.has_filesystem !== false)
+	if (i_isFolder && c_HasFileSystem())
 	{
 		var cmds = RULES.cmdexec.play_sequence;
 		if (cmds)
@@ -940,7 +940,7 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 	if (c_FileIsMovie(i_obj.name))
 	{
 		var cmds = RULES.cmdexec.play_movie;
-		if (cmds && (RULES.has_filesystem !== false))
+		if (cmds && c_HasFileSystem())
 			for (var c = 0; c < cmds.length; c++)
 			{
 				var cmd = cmds[c].cmd;

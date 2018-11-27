@@ -72,10 +72,13 @@ function u_Init()
 	for (var i = 0; i < u_elements.length; i++)
 		u_el[u_elements[i]] = document.getElementById(u_elements[i]);
 
-	if ( localStorage.header_opened == 'true' )
-		 u_OpenCloseHeader();
-	if ( localStorage.footer_opened == 'true' )
-		 u_OpenCloseFooter();
+	if (localStorage.store_opened == 'ON')
+	{
+		if (localStorage.header_opened == 'true')
+			 u_OpenCloseHeader();
+		if (localStorage.footer_opened == 'true')
+			 u_OpenCloseFooter();
+	}
 
 	if (p_PLAYER)
 		return;
@@ -99,6 +102,10 @@ function u_Init()
 	if (localStorage.thumb_file_crop == null)
 		localStorage.thumb_file_crop = 'false';
 
+	if (localStorage.store_opened == null)
+		localStorage.store_opened = 'OFF';
+	$('store_opened').textContent = localStorage.store_opened;
+
 	if (localStorage.show_hidden == null)
 		localStorage.show_hidden = 'OFF';
 	$('show_hidden').textContent = localStorage.show_hidden;
@@ -106,6 +113,10 @@ function u_Init()
 	if (localStorage.has_filesystem == null)
 		localStorage.has_filesystem = 'OFF';
 	$('has_filesystem').textContent = localStorage.has_filesystem;
+
+	if (localStorage.execute_soft == null)
+		localStorage.execute_soft = 'OFF';
+	$('execute_soft').textContent = localStorage.execute_soft;
 
 	u_CalcGUI();
 
@@ -193,7 +204,7 @@ function u_Process()
 	var path = c_PathPM_Rules2Client(g_elCurFolder.m_path);
 	c_Info(path);
 
-	if (RULES.has_filesystem !== false)
+	if (c_HasFileSystem())
 	{
 		$('open').style.display = 'block';
 		cgru_CmdExecProcess({"element": $('open'), "open": path});
@@ -223,6 +234,14 @@ function u_Finish()
 	$('body_avatar_m').style.display = 'none';
 }
 
+function u_StoreOpened()
+{
+	if (localStorage.store_opened == 'ON')
+		localStorage.store_opened = 'OFF';
+	else
+		localStorage.store_opened = 'ON';
+	$('store_opened').textContent = localStorage.store_opened;
+}
 function u_OpenCloseHeader()
 {
 	u_OpenCloseHeaderFooter($('headeropenbtn'), 'header', -200, 0);
@@ -1029,6 +1048,15 @@ function u_HasFilesystem()
 	else
 		localStorage.has_filesystem = 'OFF';
 	$('has_filesystem').textContent = localStorage.has_filesystem;
+}
+
+function u_ExecuteSoft()
+{
+	if (localStorage.execute_soft == 'OFF')
+		localStorage.execute_soft = 'ON';
+	else
+		localStorage.execute_soft = 'OFF';
+	$('execute_soft').textContent = localStorage.execute_soft;
 }
 
 function u_ExecuteShow(i_show)
