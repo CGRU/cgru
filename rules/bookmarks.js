@@ -181,22 +181,21 @@ function bm_Show()
 	g_auth_user.bookmarks.sort(bm_Compare);
 
 	// Collect projects:
-	var project = null;
-	for (var i = 0; i < g_auth_user.bookmarks.length; i++)
+	let project = null;
+	for (let i = 0; i < g_auth_user.bookmarks.length; i++)
 	{
-		var bm = g_auth_user.bookmarks[i];
+		let bm = g_auth_user.bookmarks[i];
 
 		if (bm == null)
 			continue;
 
-		var names = bm.path.split('/');
+		let names = bm.path.split('/');
 
 		if ((project == null) || (project.name != names[1]))
 		{
 			project = {};
 			project.name = names[1];
 			project.bms = [];
-			project.elBMs = [];
 
 			bm_projects.push(project);
 		}
@@ -205,10 +204,10 @@ function bm_Show()
 	}
 
 	// Construct elements:
-	var opened = localStorage.bookmarks_projects_opened.split('|');
-	for (var p = 0; p < bm_projects.length; p++)
+	let opened = localStorage.bookmarks_projects_opened.split('|');
+	for (let p = 0; p < bm_projects.length; p++)
 	{
-		var project = bm_projects[p];
+		let project = bm_projects[p];
 
 		// Project element:
 		project.el = document.createElement('div');
@@ -220,7 +219,7 @@ function bm_Show()
 			project.el.classList.add('closed');
 
 		// Project label:
-		var el = document.createElement('div');
+		let el = document.createElement('div');
 		project.elLabel = el;
 		project.el.appendChild(el);
 		el.classList.add('label');
@@ -229,11 +228,28 @@ function bm_Show()
 		el.textContent = project.name + ' - ' + project.bms.length;
 
 		// Project bookmarks:
-		for (var b = 0; b < project.bms.length; b++)
+		let folder_label = null;
+		for (let b = 0; b < project.bms.length; b++)
 		{
-			var el = bm_CreateElements(project.bms[b]);
+			let bm = project.bms[b];
+
+			// Folder label:
+			let label = bm.path.split('/');
+			if (label.length > 3)
+				label = label.slice(3,-1);
+			label = label.join(' / ');
+			if (label != folder_label)
+			{
+				let el = document.createElement('div');
+				project.el.appendChild(el);
+				el.classList.add('bm_folder_label');
+				el.textContent = label;
+				folder_label = label;
+			}
+
+			// Bookmark element:
+			let el = bm_CreateBookmark(bm);
 			bm_elements.push(el);
-			project.elBMs.push(el);
 			project.el.appendChild(el);
 		}
 	}
@@ -242,20 +258,15 @@ function bm_Show()
 	bm_ThumbnailsShowHide();
 }
 
-function bm_CreateElements(i_bm)
+function bm_CreateBookmark(i_bm)
 {
-	var name = i_bm.path.split('/');
-	var cuts = 4;
-	if (cuts > name.length)
-		cuts = 0;
-	if (cuts)
-		name = name.splice(cuts);
-	name = name.join('/');
+	let name = i_bm.path.split('/');
+	name = name[name.length-1];
 
-	var el = document.createElement('div');
+	let el = document.createElement('div');
 	el.classList.add('bookmark');
 
-	var elDel = document.createElement('div');
+	let elDel = document.createElement('div');
 	el.appendChild(elDel);
 	elDel.classList.add('button');
 	elDel.classList.add('delete');

@@ -513,6 +513,15 @@ text-shadow: 0 0 2px rgba( 100, 255, 255, .5);
 #bookmarks .project.closed .label {
 font-style: italic;
 }
+#bookmarks .project .bm_folder_label {
+font-size: 10px;
+padding: 6px 4px 0px 4px;
+font-weight: bold;
+opacity: .7;
+}
+#bookmarks .project.closed .bm_folder_label {
+display: none;
+}
 #bookmarks .bookmark {
 position: relative;
 border-top: 1px solid rgba(98,98,98,.5);
@@ -520,7 +529,7 @@ font-size: 12px;
 padding: 4px 0;
 }
 #bookmarks .bookmark a {
-padding: 0 4px;
+padding: 0 12px;
 }
 #bookmarks .bookmark img {
 width: 100%;
