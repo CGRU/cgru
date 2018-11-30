@@ -217,7 +217,7 @@ function jsf_initialize($i_arg, &$o_out)
 		if (isset($obj['avatar']) && strlen($obj['avatar']))
 			$user['avatar'] = $obj['avatar'];
 		else if (isset($obj['email']) && strlen($obj['email']))
-			$user['avatar'] = 'http://www.gravatar.com/avatar/' . md5(strtolower(trim($obj['email'])));
+			$user['avatar'] = 'https://gravatar.com/avatar/' . md5(strtolower(trim($obj['email'])));
 
 		$o_out['users'][$obj['id']] = $user;
 	}
@@ -1360,15 +1360,17 @@ function makenews($i_args, &$io_users, &$o_out)
 				continue;
 		}
 
-		if (array_key_exists('artists', $news))
-			if (in_array($user['id'], $news['artists']))
-			{
-				if (false == in_array($user['id'], $sub_users))
-					array_push($sub_users, $user['id']);
-				continue;
-			}
+		// If user is assigned, it should receive news:
+		if (array_key_exists('status', $news))
+			if (array_key_exists('artists', $news['status']))
+				if (in_array($user['id'], $news['status']['artists']))
+				{
+					if (false == in_array($user['id'], $sub_users))
+						array_push($sub_users, $user['id']);
+					continue;
+				}
 
-
+		// Check user subscriptions:
 		if (array_key_exists('channels', $user))
 			foreach ($user['channels'] as $channel)
 				if (strpos($news['path'], $channel['id']) === 0)
@@ -1886,7 +1888,6 @@ function permissionsGet($i_args, &$o_out)
 	_flock_($fHandle, LOCK_UN);
 	fclose($fHandle);
 
-	$found = false;
 	$lines = explode("\n", $data);
 	foreach ($lines as $line)
 	{
@@ -1895,32 +1896,22 @@ function permissionsGet($i_args, &$o_out)
 		if ($words[0] != 'Require') continue;
 
 		unset($words[0]);
-//error_log( implode(' ',$words));
+		//error_log( implode(' ',$words));
 		if ($words[1] == 'group')
 		{
 			unset($words[1]);
 			foreach ($words as $group) array_push($o_out['groups'], $group);
-			$found = true;
 		}
 		else if ($words[1] == 'user')
 		{
 			unset($words[1]);
 			foreach ($words as $user) array_push($o_out['users'], $user);
-			$found = true;
 		}
 		else if ($words[1] == 'valid-user')
 		{
 			$o_out['valid_user'] = true;
-			$found = true;
 		}
 	}
-	/*	if( false == $found )
-		{
-			$o_out['error'] = 'Unable to find users or groups in the file.';
-			error_log( $htaccess);
-			error_log( $data);
-			return;
-		}*/
 }
 
 function jsf_search($i_args, &$o_out)

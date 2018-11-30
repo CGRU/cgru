@@ -249,6 +249,16 @@ function c_Log(i_msg)
 	c_logCount++;
 }
 
+function c_LogClear()
+{
+	c_logCount = 0;
+	c_elLogs = [];
+	c_lastLog = null;
+	c_lastLogCount = 1;
+
+	u_el.log.innerHTML = '';
+}
+
 function c_AuxFolder(i_folder)
 {
 	if (i_folder.status)
@@ -465,6 +475,11 @@ function c_CanEditBody(i_user)
 	return c_IsUserStateSet(i_user, 'editbody');
 }
 
+function c_CanSetPassword(i_user)
+{
+	return c_IsUserStateSet(i_user, 'passwd');
+}
+
 function c_IsUserStateSet(i_user, i_state)
 {
 	if (i_user == null)
@@ -496,6 +511,29 @@ function c_CanCreateShot(i_user)
 	return false;
 }
 
+function c_HasFileSystem()
+{
+	return localStorage.has_filesystem == 'ON';
+}
+
+function c_CanExecuteSoft(i_user)
+{
+	if (localStorage.has_filesystem != 'ON')
+		return false;
+
+	if (localStorage.execute_soft != 'ON')
+		return false;
+
+	if (i_user == null)
+		i_user = g_auth_user;
+	if (i_user == null)
+		return false;
+
+	if ((['admin', 'coord', 'user']).indexOf(i_user.role) != -1)
+		return true;
+
+	return false;
+}
 
 // Construct from g_users sorted roles with sorted artists:
 // Provide i_users to show specified users even if he is disabled or not an artist
@@ -669,9 +707,10 @@ function c_FileDragStart(i_evt, i_path)
 	if (cgru_Platform.indexOf('windows') == -1)
 		path = 'file://' + path;
 	var dt = i_evt.dataTransfer;
+	dt.clearData()
 	dt.setData('text/plain', path);
 	dt.setData('text/uri-list', path);
-	// console.log(path);
+	//console.log(i_evt.dataTransfer);
 }
 
 /* ---------------- [ RU file functions ] ---------------------------------------------------------------- */
@@ -846,7 +885,7 @@ function c_PathPM_Server2Client(i_path)
 
 function c_CreateOpenButton(i_args)
 {
-	if (RULES.has_filesystem === false)
+	if (false == c_HasFileSystem())
 		return null;
 
 	i_args.path = c_PathPM_Rules2Client(i_args.path);
@@ -926,7 +965,7 @@ function c_GetAvatar(i_user_id, i_guest)
 		if (i_guest)
 			avatar = c_EmailDecode(avatar);
 		avatar = c_MD5(avatar.toLowerCase());
-		avatar = 'https://www.gravatar.com/avatar/' + avatar;
+		avatar = 'https://gravatar.com/avatar/' + avatar;
 	}
 
 	if (avatar && avatar.length)

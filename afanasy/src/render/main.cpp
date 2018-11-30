@@ -1,6 +1,5 @@
-//#include "../libafanasy/common/dlThread.h"
-
 #ifndef WINNT
+#include <signal.h>
 #include <sys/wait.h>
 #endif
 
@@ -19,11 +18,26 @@
 
 extern bool AFRunning;
 
-//####################### interrupt signal handler ####################################
-#include <signal.h>
+//######################### Signal handlers ############################################
+#ifdef WINNT
+BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
+{
+	switch (fdwCtrlType)
+	{
+	case CTRL_C_EVENT:        AF_LOG << "Ctrl-C event\n";        break;
+	case CTRL_CLOSE_EVENT:    AF_LOG << "Ctrl-Close event\n";    break;
+	case CTRL_BREAK_EVENT:    AF_LOG << "Ctrl-Break event\n";    break;
+	case CTRL_LOGOFF_EVENT:   AF_LOG << "Ctrl-Logoff event\n";   break;
+	case CTRL_SHUTDOWN_EVENT: AF_LOG << "Ctrl-Shutdown event\n"; break;
+	default:                  AF_LOG << "Ctrl-UNKNOWN event\n";  return FALSE;
+	}
+	AFRunning = false;
+	return TRUE;
+}
+#else
 void sig_pipe(int signum)
 {
-	AFERROR("AFRender SIGPIPE");
+	AF_ERR << "SIGPIPE";
 }
 void sig_int(int signum)
 {
@@ -31,6 +45,7 @@ void sig_int(int signum)
 		fprintf( stderr,"\nAFRender: Interrupt signal catched.\n");
 	AFRunning = false;
 }
+#endif
 //#####################################################################################
 
 // Functions:
@@ -45,9 +60,8 @@ int main(int argc, char *argv[])
 
    // Set signals handlers:
 #ifdef WINNT
-	signal( SIGINT,  sig_int);
-	signal( SIGTERM, sig_int);
-	signal( SIGSEGV, sig_int);
+	if (false == SetConsoleCtrlHandler(CtrlHandler, TRUE))
+		AF_ERR << "SetConsoleCtrlHandler: " << af::GetLastErrorStdStr() << "\n";
 #else
 	struct sigaction actint;
 	bzero( &actint, sizeof(actint));

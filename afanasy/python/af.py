@@ -283,7 +283,7 @@ class Block:
         :param i_value:
         :return:
         """
-        if self.data not in ["environment"]:
+        if "environment" not in self.data:
             self.data["environment"] = dict()
 
         self.data["environment"][i_name] = i_value

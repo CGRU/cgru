@@ -15,13 +15,10 @@ function debianArch(){
 	packages="$packages g++"
 	packages="$packages git-core"
 	packages="$packages python3-dev"
-	packages="$packages python3-pyside"
+	packages="$packages python3-pyqt5"
 	packages="$packages libpq-dev"
 	packages="$packages p7zip-full"
 	packages="$packages libzip-dev"
-	# Qt4:
-	packages="$packages qt4-dev-tools"
-	packages="$packages qt4-qmake"
 	# Qt5:
 	packages="$packages qt5-default"
 	packages="$packages qtmultimedia5-dev"
@@ -30,12 +27,6 @@ function debianArch(){
 	packages="$packages qtdeclarative5-dev"
 	# EXRJoin:
 	packages="$packages libopenexr-dev"
-	# ImageMagick:
-	#packages="$packages libjpeg62 libjpeg62-dev"
-	#packages="$packages libtiff5 libtiff5-dev"
-	#packages="$packages libpng12-0 libpng12-dev"
-	#packages="$packages libfreetype6 libfreetype6-dev"
-	#packages="$packages libfontconfig1 libfontconfig1-dev"
 
 	pkg_manager_cmd="apt-get install"
 	pkg_extension=""
@@ -52,8 +43,9 @@ function redhatArch(){
 	packages="$packages qt-devel"
 	packages="$packages qt5-qtbase-devel"
 	packages="$packages qt5-qtmultimedia-devel"
-	packages="$packages rpm-build"
 	packages="$packages libzip libzip-devel"
+	packages="$packages OpenEXR-devel"
+	packages="$packages rpm-build"
 
 	pkg_manager_cmd="yum install"
 	pkg_extension=".$ARCHITECTURE"
@@ -121,7 +113,7 @@ function mageiaArch(){
 	packages="$packages lib64qt5base5-devel"
 	packages="$packages lib64qt5multimedia-devel"
 	packages="$packages qtmultimedia5"
-	packages="$packages lib64OpenEXR-devel"
+	packages="$packages lib64openexr-devel"
 	packages="$packages rpm-build"
 	packages="$packages libzip libzip-devel"
 

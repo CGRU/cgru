@@ -63,6 +63,15 @@
 
 "aux_folders":[".","_","-","tmp","temp","tmp","common"],
 
+"execute":[
+	{
+		"label":"XTerm",
+		"icon":"icons/terminal.png",
+		"title":"Open terminal in this location.",
+		"cmd":"cd \"@PATH@\"; xterm"
+	}
+],
+
 "assets":{
 	"projects_root":{
 		"play_folders":false,
@@ -133,7 +142,19 @@
 			"path":["RESULT/DAILIES"]
 		},
 		"template":"rules/assets/shot",
-		"nuke_template":"/cgru/plugins/nuke/_template.nk"
+
+		"shot_process":[
+			{
+				"label":"Nk New",
+				"title":"Create and open new Nuke scene.",
+				"cmd":"/cgru/rules/bin/shot_process -s nuke -r nuke @template@ @fps@ @colorspace@",
+				"template":"/cgru/plugins/nuke/_template.nk"
+			},{
+				"label":"Nk Latest",
+				"title":"Open the latest Nuke scene.",
+				"cmd":"/cgru/rules/bin/shot_open_latest -s nuke -e .nk -r nuke"
+			}
+		]
 	}
 },
 
@@ -280,6 +301,10 @@
 	},
 
 	"af_capacity":500
+},
+
+"permissions":{
+	"default_groups":["admins","users"]
 },
 
 "cut":{
