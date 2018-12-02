@@ -224,7 +224,7 @@ AF_LOG << " >>> " << i_msg;
 		// Server sends back zero id on any error
 		else if ( new_id == 0 )
 		{
-			AF_ERR << "Zero ID recieved, no such online render, re-connecting...";
+			AF_ERR << "Zero ID received, no such online render, re-connecting...";
 			i_render.connectionLost( true);
 		}
 		// Bad case, should not ever happen, try to re-register.
@@ -255,7 +255,7 @@ AF_LOG << " >>> " << i_msg;
 	}
 	default:
 	{
-        AF_ERR << "Unknown message recieved: " << *i_msg;
+        AF_ERR << "Unknown message received: " << *i_msg;
 		break;
 	}
 	}

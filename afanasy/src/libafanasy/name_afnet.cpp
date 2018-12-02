@@ -27,7 +27,7 @@ af::MsgStat mgstat;
 /// Read data from file descriptor. Return bytes than was written or -1 on any error and prints an error in \c stderr.
 int readdata( int fd, char* data, int data_len, int buffer_maxlen)
 {
-	AFINFA("readdata: trying to recieve %d bytes.\n", data_len);
+	AFINFA("readdata: trying to receive %d bytes.\n", data_len);
 	int bytes = 0;
 	while( bytes < data_len )
 	{

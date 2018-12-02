@@ -444,7 +444,6 @@ void TaskProcess::sendTaskSate()
 
 	AF_DEBUG << this;
 
-	bool   toRecieve = false;
 	char * stdout_data = NULL;
 	int    stdout_size = 0;
 	std::string log;
@@ -452,7 +451,6 @@ void TaskProcess::sendTaskSate()
 	if(( m_update_status != af::TaskExec::UPPercent ) &&
 		( m_update_status != af::TaskExec::UPWarning ))
 	{
-		toRecieve = true;
 		stdout_data = m_parser->getData( &stdout_size);
 		log = m_service->getLog();
 	}

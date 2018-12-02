@@ -160,7 +160,7 @@ void Watch::addReceiver( Receiver * receiver)
 {
    if( ms_receivers.contains( receiver))
    {
-      AFERROR("Watch::addReciever: Receiver already exists.")
+      AFERROR("Watch::addReceiver: Receiver already exists.")
    }
    else ms_receivers.append( receiver);
 }
