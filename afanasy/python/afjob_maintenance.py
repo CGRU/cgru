@@ -9,13 +9,14 @@ Parser = OptionParser(
     usage="%prog render1 render2 ... command\ntype \"%prog -h\" for "
     "help", version="%prog 1.  0"
 )
-Parser.add_option('-n', '--jobname', dest='jobname', type='string',       default=None,      help='Job name')
-Parser.add_option('-s', '--service', dest='service', type='string',       default='generic', help='Service type')
-Parser.add_option('-p', '--parser',  dest='parser',  type='string',       default='generic', help='Parser type')
-Parser.add_option('-o', '--offline', dest='offline', action='store_true', default=False,     help='Send job offline (paused)')
-Parser.add_option('-i', '--ignore',  dest='ignore',  action='store_true', default=False,     help='Ignore render Nimby and Paused states')
-Parser.add_option('-V', '--verbose', dest='verbose', action='store_true', default=False,     help='Verbose mode')
-Parser.add_option('-D', '--debug',   dest='debug',   action='store_true', default=False,     help='Debug mode (verbose mode, no commands execution)')
+Parser.add_option('-n', '--jobname',     dest='jobname',     type='string',       default=None,      help='Job name')
+Parser.add_option('-s', '--service',     dest='service',     type='string',       default='generic', help='Service type')
+Parser.add_option('-p', '--parser',      dest='parser',      type='string',       default='generic', help='Parser type')
+Parser.add_option('-m', '--maxruntasks', dest='maxruntasks', type='int',          default=5,         help='Maximum running tasks')
+Parser.add_option('-o', '--offline',     dest='offline',     action='store_true', default=False,     help='Send job offline (paused)')
+Parser.add_option('-i', '--ignore',      dest='ignore',      action='store_true', default=False,     help='Ignore render Nimby and Paused states')
+Parser.add_option('-V', '--verbose',     dest='verbose',     action='store_true', default=False,     help='Verbose mode')
+Parser.add_option('-D', '--debug',       dest='debug',       action='store_true', default=False,     help='Debug mode (verbose mode, no commands execution)')
 (Options, Args) = Parser.parse_args()
 
 if len(Args) < 2:
@@ -47,6 +48,9 @@ for render in Renders:
     block.tasks.append(task)
 
 job.blocks.append(block)
+
+if Options.maxruntasks:
+    job.setMaxRunningTasks(Options.maxruntasks)
 
 if Options.offline:
     job.offline()
