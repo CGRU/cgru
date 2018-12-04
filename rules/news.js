@@ -400,9 +400,14 @@ function nw_CreateNews(i_news)
 	if (news.user_id == null)
 	{
 		if (g_auth_user)
+		{
 			news.user = g_auth_user.id;
+		}
 		else
+		{
 			c_Error('Can`t make news with no user.');
+			return;
+		}
 	}
 
 	if (news.path == null)
