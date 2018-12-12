@@ -221,9 +221,6 @@ void ListItems::setParameter( const std::string & i_name, const std::string & i_
 	af::jsonActionParamsStart( str, m_type, "", getSelectedIds());
 
 	str << "\n\"" << i_name << "\":";
-	/*if( i_quoted ) str << "\"";
-	str << i_value;
-	if( i_quoted ) str << "\"";*/
 	if (i_quoted)
 		str << "\"" << af::strEscape(i_value) << "\"";
 	else
