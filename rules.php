@@ -123,7 +123,7 @@ function jsonEncode(&$i_obj)
 
 function _flock_(&$i_handle, $i_type)
 {
-//	flock( $i_handle, $i_type);
+	flock( $i_handle, $i_type);
 }
 
 function fileRead($i_filename, $i_lock = true, $i_verbose = false)
@@ -134,9 +134,9 @@ function fileRead($i_filename, $i_lock = true, $i_verbose = false)
 
 	if ($i_verbose) error_log('fileRead: Opened: '.$i_filename);
 
-	//if ($i_lock) flock($fHandle, LOCK_SH);
+	if ($i_lock) flock($fHandle, LOCK_SH);
 	$data = fread($fHandle, FILE_MAX_LENGTH);
-	//if ($i_lock) flock($fHandle, LOCK_UN);
+	if ($i_lock) flock($fHandle, LOCK_UN);
 	fclose($fHandle);
 
 	if ($i_verbose) error_log('fileRead: Read '.strlen($data).' bytes from: '.$i_filename);
@@ -957,14 +957,6 @@ function replaceObject(&$o_obj, $i_obj)
 		foreach ($i_obj as $key => $val)
 			if ($key != 'id')
 				$o_obj[$key] = $val;
-
-//static $replaceObjectCount = 0;
-//error_log('replace:'.$replaceObjectCount.' '.json_encode( $o_obj));
-//$replaceObjectCount++;
-//if( $replaceObjectCount > 5 ) return;
-
-//	if( array_key_exists( $i_attr, $o_obj))
-//		$o_obj[$i_attr] = $i_obj;
 }
 
 function jsf_editobj($i_edit, &$o_out)
