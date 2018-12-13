@@ -126,6 +126,24 @@ function _flock_(&$i_handle, $i_type)
 //	flock( $i_handle, $i_type);
 }
 
+function fileRead($i_filename, $i_lock = true, $i_verbose = false)
+{
+	$fHandle = fopen($i_filename, 'r');
+	if ($fHandle === false)
+		return null;
+
+	if ($i_verbose) error_log('fileRead: Opened: '.$i_filename);
+
+	//if ($i_lock) flock($fHandle, LOCK_SH);
+	$data = fread($fHandle, FILE_MAX_LENGTH);
+	//if ($i_lock) flock($fHandle, LOCK_UN);
+	fclose($fHandle);
+
+	if ($i_verbose) error_log('fileRead: Read '.strlen($data).' bytes from: '.$i_filename);
+
+	return $data;
+}
+
 function jsf_start($i_arg, &$o_out)
 {
 	global $CONF;
@@ -134,11 +152,7 @@ function jsf_start($i_arg, &$o_out)
 	$o_out['memory_limit'] = ini_get('memory_limit');
 	$o_out['max_input_time'] = ini_get('max_input_time');
 	$o_out['max_execution_time'] = ini_get('max_execution_time');
-	if ($fHandle = fopen('version.txt', 'r'))
-	{
-		$o_out['version'] = fread($fHandle, FILE_MAX_LENGTH);
-		fclose($fHandle);
-	}
+	$o_out['version'] = fileRead('version.txt');
 	$o_out['name'] = $_SERVER['SERVER_NAME'];
 	$o_out['software'] = $_SERVER['SERVER_SOFTWARE'];
 	$o_out['php_version'] = phpversion();
@@ -339,15 +353,8 @@ function http_digest_validate(&$o_out)
 		return false;
 	}
 
-	$data = null;
-	if ($fHandle = fopen(HT_DIGEST_FILE_NAME, 'r'))
-	{
-		flock($fHandle, LOCK_SH);
-		$data = fread($fHandle, FILE_MAX_LENGTH);
-		flock($fHandle, LOCK_UN);
-		fclose($fHandle);
-	}
-	else
+	$data = fileRead(HT_DIGEST_FILE_NAME);
+	if ($data === null)
 	{
 		$o_out['error'] = 'Can`t open HT digest file.';
 		error_log($o_out['error']);
@@ -574,14 +581,8 @@ function walkDir($i_recv, $i_dir, &$o_out, $i_depth)
 		$walk = null;
 		$walk_file = $i_dir . '/' . $rufolder . '/walk.json';
 		if (is_file($walk_file))
-			if ($wHandle = fopen($walk_file, 'r'))
-			{
-//error_log($path);
-				$wdata = fread($wHandle, FILE_MAX_LENGTH);
-//error_log($wdata);
+			if ($wdata = fileRead($walk_file, false))
 				$walk = json_decode($wdata, true);
-				fclose($wHandle);
-			}
 
 		while (false !== ($entry = readdir($handle)))
 		{
@@ -632,13 +633,8 @@ function walkDir($i_recv, $i_dir, &$o_out, $i_depth)
 							}
 						if (false == $found) continue;
 
-						if ($fHandle = fopen($path . '/' . $ruentry, 'r'))
-						{
-							$rudata = fread($fHandle, FILE_MAX_LENGTH);
-							$ruobj = json_decode($rudata, true);
-							$o_out['rules'][$ruentry] = $ruobj;
-							fclose($fHandle);
-						}
+						if ($rudata = fileRead($path . '/' . $ruentry, false))
+							$o_out['rules'][$ruentry] = json_decode($rudata, true);
 					}
 					closedir($rHandle);
 					sort($o_out['rufiles']);
@@ -666,14 +662,8 @@ function walkDir($i_recv, $i_dir, &$o_out, $i_depth)
 				{
 					$sfilepath = $path . '/' . $rufolder . '/' . $sfile . '.json';
 					if (is_file($sfilepath))
-					{
-						if ($fHandle = fopen($sfilepath, 'r'))
-						{
-							$data = fread($fHandle, FILE_MAX_LENGTH);
-							fclose($fHandle);
+						if ($data = fileRead($sfilepath, false))
 							mergeObjs($folderObj, json_decode($data, true));
-						}
-					}
 				}
 
 			if ($i_depth < $i_recv['depth'])
@@ -691,10 +681,8 @@ function readConfig($i_file, &$o_out)
 	if (false == is_file($i_file))
 		return;
 
-	if ($fHandle = fopen($i_file, 'r'))
+	if ($data = fileRead($i_file, false))
 	{
-		$data = fread($fHandle, FILE_MAX_LENGTH);
-		fclose($fHandle);
 		$o_out[$i_file] = json_decode($data, true);
 		if (array_key_exists('include', $o_out[$i_file]['cgru_config']))
 			foreach ($o_out[$i_file]['cgru_config']['include'] as $file)
@@ -717,9 +705,7 @@ function jsf_getfile($i_file, &$o_out)
 
 	if ($fHandle = fopen($i_file, 'r'))
 	{
-		_flock_($fHandle, LOCK_SH);
 		echo fread($fHandle, FILE_MAX_LENGTH);
-		_flock_($fHandle, LOCK_UN);
 		fclose($fHandle);
 		$o_out = null;
 	}
@@ -754,11 +740,9 @@ function jsf_getobjects($i_args, &$o_out)
 		return;
 	}
 
-	if ($fHandle = fopen($file, 'r'))
+	if ($data = fileRead($file, true))
 	{
-		_flock_($fHandle, LOCK_SH);
-
-		$data = json_decode(fread($fHandle, FILE_MAX_LENGTH), true);
+		$data = json_decode($data, true);
 		foreach ($objects as $object)
 		{
 			if (false == is_null($data) && isset($data[$object]))
@@ -766,9 +750,6 @@ function jsf_getobjects($i_args, &$o_out)
 			else
 				$o_out[$object] = null;
 		}
-
-		_flock_($fHandle, LOCK_UN);
-		fclose($fHandle);
 	}
 	else
 		$o_out['error'] = 'Unable to load file ' . $file;
@@ -809,32 +790,19 @@ function readObj($i_file, &$o_out)
 		return;
 	}
 
-	if ($fHandle = fopen($i_file, 'r'))
-	{
-		_flock_($fHandle, LOCK_SH);
-		$data = fread($fHandle, FILE_MAX_LENGTH);
-		_flock_($fHandle, LOCK_UN);
-		fclose($fHandle);
+	if ($data = fileRead($i_file, true))
 		$o_out = json_decode($data, true);
-	}
 	else
 		$o_out['error'] = 'Unable to load file ' . $i_file;
 }
 
 function mergeObjs(&$o_obj, $i_obj)
 {
-//error_log('mergeObjs: i='.json_encode($i_obj));
 	if (is_null($i_obj) || is_null($o_obj)) return;
 	foreach ($i_obj as $key => $val)
 	{
 		if (array_key_exists($key, $o_obj) && is_array($val) && is_array($o_obj[$key]))
 		{
-			/*			if( is_int( key($o_obj[$key])) && is_int( key($val)))
-						{
-							foreach( $val as $v )
-								array_push( $o_obj[$key], $v);
-							continue;
-						}*/
 			if (is_string(key($o_obj[$key])) && is_string(key($val)))
 			{
 				mergeObjs($o_obj[$key], $val);
@@ -1253,7 +1221,7 @@ function makenews($i_args, &$io_users, &$o_out)
 		$path = '/' . $path;
 
 	// Ensure that path last character is not '/' (if path is not just '/' root):
-	if (($path != '/') && ($path[strlen($path - 1)] == '/'))
+	if (($path != '/') && ($path[strlen($path) - 1] == '/'))
 		$path = substr($path, 0, strlen($path) - 1);
 
 	// Process recent for current and each parent folder till root:
@@ -1266,18 +1234,13 @@ function makenews($i_args, &$io_users, &$o_out)
 			break;
 		}
 
-//error_log('path='.$path);
 		$rarray = array();
 
 		// Get existing recent:
 		$rfile = $i_args['root'] . $path . '/' . $i_args['rufolder'] . '/' . $i_args['recent_file'];
 		if (is_file($rfile))
-			if ($rhandle = fopen($rfile, 'r'))
+			if ($rdata = fileRead($rfile, false))
 			{
-				_flock_($rhandle, LOCK_SH);
-				$rdata = fread($rhandle, FILE_MAX_LENGTH);
-				_flock_($rhandle, LOCK_UN);
-				fclose($rhandle);
 				$rarray = json_decode($rdata, true);
 				if (is_null($rarray))
 					$rarray = array();
@@ -1570,14 +1533,9 @@ function jsf_htdigest($i_recv, &$o_out)
 		}
 	}
 
-	$data = '';
-	if ($fHandle = fopen(HT_DIGEST_FILE_NAME, 'r'))
-	{
-		_flock_($fHandle, LOCK_SH);
-		$data = fread($fHandle, FILE_MAX_LENGTH);
-		_flock_($fHandle, LOCK_UN);
-		fclose($fHandle);
-	}
+	$data = fileRead(HT_DIGEST_FILE_NAME, true);
+	if (is_null($data))
+		$data = '';
 
 	// Construct new lines w/o our user (if it exists):
 	$o_out['status'] = 'User "' . $user . '" set.';
@@ -1641,14 +1599,8 @@ function jsf_disableuser($i_args, &$o_out)
 		// This needed to just disable user and not to loose its settings.
 		if (array_key_exists('uobj', $i_args))
 		{
-			if ($fHandle = fopen("users/$uid.json", 'w'))
-			{
-				flock($fHandle, LOCK_EX);
-				fwrite($fHandle, jsonEncode($i_args['uobj']));
-				flock($fHandle, LOCK_UN);
-				fclose($fHandle);
+			if (writeUser($i_args['uobj']))
 				$o_out['status'] = 'success';
-			}
 			else
 				$out['error'] = 'Unable to write "' . $uid . '" user file';
 		}
@@ -1661,19 +1613,13 @@ function jsf_disableuser($i_args, &$o_out)
 	}
 	closedir($dHandle);
 
-	$data = '';
-	if ($fHandle = fopen(HT_DIGEST_FILE_NAME, 'r'))
-	{
-		flock($fHandle, LOCK_SH);
-		$data = fread($fHandle, FILE_MAX_LENGTH);
-		flock($fHandle, LOCK_UN);
-		fclose($fHandle);
-	}
-	else
+	$data = fileRead(HT_DIGEST_FILE_NAME, true);
+	if (is_null($data))
 	{
 		$o_out['error'] = 'Unable to read the file.';
 		return;
 	}
+
 	$old_lines = explode("\n", $data);
 	$new_lines = array();
 	foreach ($old_lines as $line)
@@ -1719,15 +1665,8 @@ function getallusers(&$o_out)
 		if (false === is_file("users/$entry")) continue;
 		if (strrpos($entry, '.json') !== (strlen($entry) - 5)) continue;
 
-		if ($fHandle = fopen("users/$entry", 'r'))
-		{
-			flock($fHandle, LOCK_SH);
-			$user = json_decode(fread($fHandle, FILE_MAX_LENGTH), true);
-			flock($fHandle, LOCK_UN);
-			if (false == is_null($user))
-				$o_out['users'][$user['id']] = $user;
-			fclose($fHandle);
-		}
+		if ($user = json_decode(fileRead("users/$entry", true), true))
+			$o_out['users'][$user['id']] = $user;
 	}
 	closedir($dHandle);
 }
@@ -1749,19 +1688,15 @@ function readGroups(&$o_out)
 		$o_out['error'] = 'HT Groups file does not exist.';
 		return;
 	}
-	$fHandle = fopen(HT_GROUPS_FILE_NAME, 'r');
-	if ($fHandle === false)
+
+	$data = fileRead(HT_GROUPS_FILE_NAME, true);
+	if (null == $data)
 	{
 		$o_out['error'] = 'Unable to open groups file.';
 		return;
 	}
 
 	$Groups = array();
-
-	flock($fHandle, LOCK_SH);
-	$data = fread($fHandle, FILE_MAX_LENGTH);
-	flock($fHandle, LOCK_UN);
-	fclose($fHandle);
 
 	$lines = explode("\n", $data);
 	foreach ($lines as $line)
@@ -1877,16 +1812,12 @@ function permissionsGet($i_args, &$o_out)
 	$htaccess = $i_args['path'] . '/' . HT_ACCESS_FILE_NAME;
 	if (false === is_file($htaccess)) return;
 
-	$fHandle = fopen($htaccess, 'r');
-	if ($fHandle === false)
+	$data = fileRead($htaccess, true);
+	if (null === $data)
 	{
 		$o_out['error'] = 'Can`t open the file.';
 		return;
 	}
-	_flock_($fHandle, LOCK_SH);
-	$data = fread($fHandle, FILE_MAX_LENGTH);
-	_flock_($fHandle, LOCK_UN);
-	fclose($fHandle);
 
 	$lines = explode("\n", $data);
 	foreach ($lines as $line)
@@ -1967,15 +1898,9 @@ function searchFolder(&$i_args, &$o_out, $i_path, $i_depth)
 			$found = false;
 			$rufile = "$rufolder/status.json";
 			if (is_file($rufile))
-			{
-				if ($fHandle = fopen($rufile, 'r'))
-				{
-					$obj = json_decode(fread($fHandle, FILE_MAX_LENGTH), true);
+				if ($obj = json_decode(fileRead($rufile, true), true))
 					if (searchStatus($i_args['status'], $obj))
 						$found = true;
-					fclose($fHandle);
-				}
-			}
 		}
 
 		if ($found && array_key_exists('body', $i_args))
@@ -1983,15 +1908,9 @@ function searchFolder(&$i_args, &$o_out, $i_path, $i_depth)
 			$found = false;
 			$rufile = "$rufolder/body.html";
 			if (is_file($rufile))
-			{
-				if ($fHandle = fopen($rufile, 'r'))
-				{
-					$data = fread($fHandle, FILE_MAX_LENGTH);
-					fclose($fHandle);
+				if ($data = fileRead($rufile, true))
 					if (mb_stripos($data, $i_args['body'], 0, 'utf-8') !== false)
 						$found = true;
-				}
-			}
 		}
 
 		if ($found && array_key_exists('comment', $i_args))
@@ -1999,15 +1918,9 @@ function searchFolder(&$i_args, &$o_out, $i_path, $i_depth)
 			$found = false;
 			$rufile = "$rufolder/comments.json";
 			if (is_file($rufile))
-			{
-				if ($fHandle = fopen($rufile, 'r'))
-				{
-					$obj = json_decode(fread($fHandle, FILE_MAX_LENGTH), true);
+				if ($obj = json_decode(fileRead($rufile, true), true))
 					if (searchComment($i_args['comment'], $obj))
 						$found = true;
-					fclose($fHandle);
-				}
-			}
 		}
 
 		if ($found)

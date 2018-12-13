@@ -11,8 +11,8 @@ AuthUserFile /cgru/.htdigest
 # Needed modules:
 # sudo a2enmod ssl auth_digest authz_groupfile
 
-# Needed utils: (htdigest)
-# sudo apt-get install apache2-utils
+# Needed utils: htdigest, php multibyte string (utf-8 search)
+# sudo apt-get install apache2-utils php php-mbstring
 # # Usage: htdigest [-c] passwordfile realm username
 # # The -c flag creates a new file.
 # htdigest -c .htdigest CGRU admin
