@@ -166,10 +166,10 @@ void ListRenders::actChangeSize( int i_size)
 void ListRenders::renderAdded( ItemNode * node, const QModelIndex & index)
 {
 	ItemRender * render = (ItemRender*)node;
-	if( af::Environment::VISOR() == false)
+	if (af::Environment::VISOR() == false)
 	{
-	   if(( render->getName() == QString::fromUtf8( af::Environment::getComputerName().c_str())) || (render->getUserName() == QString::fromUtf8( af::Environment::getUserName().c_str())))
-			m_view->selectionModel()->select( index, QItemSelectionModel::Select);
+	   if (render->getName() == QString::fromUtf8(af::Environment::getComputerName().c_str()))
+			m_view->selectionModel()->select(index, QItemSelectionModel::Select);
 	}
 }
 
