@@ -249,10 +249,14 @@ void ListItems::operation( const std::string & i_operation)
 const std::vector<int> ListItems::getSelectedIds() const
 {
 	std::vector<int> ids;
-	QModelIndexList indexes( m_view->selectionModel()->selectedIndexes());
-	for( int i = 0; i < indexes.count(); i++)
-		if( Item::isItemP( indexes[i].data()))
-			ids.push_back( Item::toItemP( indexes[i].data())->getId());
+	QModelIndexList indexes(m_view->selectionModel()->selectedIndexes());
+	for (int i = 0; i < indexes.count(); i++)
+		if (Item::isItemP(indexes[i].data()))
+		{
+			Item * item = Item::toItemP(indexes[i].data());
+			if (false == item->isHidden())
+				ids.push_back(item->getId());
+		}
 	return ids;
 }
 

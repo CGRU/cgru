@@ -272,19 +272,19 @@ void ListNodes::sort()
 
 void ListNodes::processHidden()
 {
-	for( int i = 0; i < m_model->count(); i++)
+	for (int i = 0; i < m_model->count(); i++)
 	{
 		ItemNode * item = (ItemNode*)(m_model->item(i));
 
 		bool hidden = item->filter();
 
-		if( hidden == false )
-			hidden = item->getHidden( ms_flagsHideShow);
+		if (false == hidden)
+			hidden = item->getHiddenFlags(ms_flagsHideShow);
 
-		if( hidden != m_view->isRowHidden( i))
-			m_view->setRowHidden( i, hidden);
+		item->setHidded(hidden);
 
-//if(hidden) printf("Hidding node '%s'\n", item->getName().toUtf8().data()); else printf("Showing node '%s'\n", item->getName().toUtf8().data());
+		if (hidden != m_view->isRowHidden(i))
+			m_view->setRowHidden(i, hidden);
 	}
 }
 

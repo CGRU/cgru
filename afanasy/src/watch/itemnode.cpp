@@ -112,11 +112,11 @@ bool ItemNode::filter()
 	return ( false == m_ctrl_sf->getFilterRE().match( m_filter_str));
 }
 
-bool ItemNode::getHidden( int32_t i_flags) const
+bool ItemNode::getHiddenFlags(int32_t i_flags) const
 {
 	bool result = m_flagshidden & i_flags;
 
-	if( i_flags & ListNodes::e_HideInvert)
+	if (i_flags & ListNodes::e_HideInvert)
 		result = !result;
 
 	return result;

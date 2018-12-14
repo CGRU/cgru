@@ -44,7 +44,7 @@ public:
 	inline void setError(   bool i_value)
 		{ if( i_value ) m_flagshidden |= ListNodes::e_HideError;   else m_flagshidden &= ~ListNodes::e_HideError;   }
 
-	bool getHidden( int32_t i_flags) const;
+	bool getHiddenFlags(int32_t i_flags) const;
 
 	int m_priority;
 	QString m_annotation;
