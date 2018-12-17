@@ -144,6 +144,27 @@ function fileRead($i_filename, $i_lock = true, $i_verbose = false)
 	return $data;
 }
 
+function fileWrite($i_filename, &$i_data, $i_lock = true, $i_verbose = false)
+{
+	$fHandle = fopen($i_filename, 'w');
+	if ($fHandle === false)
+	{
+		if ($i_verbose)
+			error_log('fileWrite: Unable open for writing: '.$i_filename);
+		return false;
+	}
+
+	if ($i_lock) flock($fHandle, LOCK_EX);
+	fwrite($fHandle, $i_data);
+	if ($i_lock) flock($fHandle, LOCK_UN);
+	fclose($fHandle);
+
+	if ($i_verbose)
+		error_log('fileWrite: Written '.strlen($i_data).' bytes to: '.$i_filename);
+
+	return true;
+}
+
 function jsf_start($i_arg, &$o_out)
 {
 	global $CONF;
@@ -681,7 +702,7 @@ function readConfig($i_file, &$o_out)
 	if (false == is_file($i_file))
 		return;
 
-	if ($data = fileRead($i_file, false))
+	if ($data = fileRead($i_file))
 	{
 		$o_out[$i_file] = json_decode($data, true);
 		if (array_key_exists('include', $o_out[$i_file]['cgru_config']))
@@ -703,10 +724,9 @@ function jsf_getfile($i_file, &$o_out)
 		return;
 	}
 
-	if ($fHandle = fopen($i_file, 'r'))
+	if ($data = fileRead($i_file))
 	{
-		echo fread($fHandle, FILE_MAX_LENGTH);
-		fclose($fHandle);
+		echo $data;
 		$o_out = null;
 	}
 	else
@@ -740,7 +760,7 @@ function jsf_getobjects($i_args, &$o_out)
 		return;
 	}
 
-	if ($data = fileRead($file, true))
+	if ($data = fileRead($file))
 	{
 		$data = json_decode($data, true);
 		foreach ($objects as $object)
@@ -790,7 +810,7 @@ function readObj($i_file, &$o_out)
 		return;
 	}
 
-	if ($data = fileRead($i_file, true))
+	if ($data = fileRead($i_file))
 		$o_out = json_decode($data, true);
 	else
 		$o_out['error'] = 'Unable to load file ' . $i_file;
@@ -983,35 +1003,50 @@ function jsf_editobj($i_edit, &$o_out)
 		}
 	}
 
-	$mode = 'w+';
-	if (is_file($i_edit['file'])) $mode = 'r+';
-	if (false == is_dir(dirname($i_edit['file'])))
-		mkdir(dirname($i_edit['file']), 0777, true);
-	if ($fHandle = fopen($i_edit['file'], $mode))
+	// Read object:
+	$obj = json_decode(fileRead($i_edit['file']), true);
+
+	// Edit object:
+	if (array_key_exists('add', $i_edit) && ($i_edit['add'] == true))
 	{
-		_flock_($fHandle, LOCK_EX);
-		$data = fread($fHandle, FILE_MAX_LENGTH);
-		$obj = json_decode($data, true);
-
 		if (is_null($obj))
+		{
+			// This is a new object creation
 			$obj = array();
+			// Create folder if does not exist
+			if (false == is_dir(dirname($i_edit['file'])))
+				mkdir(dirname($i_edit['file']), 0777, true);
+		}
+		mergeObjs($obj, $i_edit['object']);
+	}
+	else
+	{
+		if (is_null($obj))
+		{
+			// Object to edit does not exists
+			$o_out['status'] = 'error';
+			$o_out['error'] = 'Can`t edit null object: ' . $i_edit['file'];
+			return;
+		}
 
-		if (array_key_exists('add', $i_edit) && ($i_edit['add'] == true))
-			mergeObjs($obj, $i_edit['object']);
-		else if (array_key_exists('pusharray', $i_edit))
+		if (array_key_exists('pusharray', $i_edit))
 			pushArray($obj, $i_edit);
 		else if (array_key_exists('replace', $i_edit) && ($i_edit['replace'] == true))
 			foreach ($i_edit['objects'] as $newobj)
 				replaceObject($obj, $newobj);
 		else if (array_key_exists('delarray', $i_edit))
 			delArray($obj, $i_edit);
+		else
+		{
+			$o_out['status'] = 'error';
+			$o_out['error'] = 'Unknown edit object operation: ' . $i_edit['file'];
+			return;
+		}
+	}
 
-//error_log('obj:'.json_encode($obj));
-		rewind($fHandle);
-		ftruncate($fHandle, 0);
-		fwrite($fHandle, jsonEncode($obj));
-		_flock_($fHandle, LOCK_UN);
-		fclose($fHandle);
+	// Write object:
+	if (fileWrite($i_edit['file'], jsonEncode($obj)))
+	{
 		$o_out['status'] = 'success';
 		$o_out['object'] = $obj;
 	}
@@ -1231,7 +1266,7 @@ function makenews($i_args, &$io_users, &$o_out)
 		// Get existing recent:
 		$rfile = $i_args['root'] . $path . '/' . $i_args['rufolder'] . '/' . $i_args['recent_file'];
 		if (is_file($rfile))
-			if ($rdata = fileRead($rfile, false))
+			if ($rdata = fileRead($rfile))
 			{
 				$rarray = json_decode($rdata, true);
 				if (is_null($rarray))
@@ -1890,7 +1925,7 @@ function searchFolder(&$i_args, &$o_out, $i_path, $i_depth)
 			$found = false;
 			$rufile = "$rufolder/status.json";
 			if (is_file($rufile))
-				if ($obj = json_decode(fileRead($rufile, true), true))
+				if ($obj = json_decode(fileRead($rufile), true))
 					if (searchStatus($i_args['status'], $obj))
 						$found = true;
 		}
@@ -1900,7 +1935,7 @@ function searchFolder(&$i_args, &$o_out, $i_path, $i_depth)
 			$found = false;
 			$rufile = "$rufolder/body.html";
 			if (is_file($rufile))
-				if ($data = fileRead($rufile, true))
+				if ($data = fileRead($rufile))
 					if (mb_stripos($data, $i_args['body'], 0, 'utf-8') !== false)
 						$found = true;
 		}
@@ -1910,7 +1945,7 @@ function searchFolder(&$i_args, &$o_out, $i_path, $i_depth)
 			$found = false;
 			$rufile = "$rufolder/comments.json";
 			if (is_file($rufile))
-				if ($obj = json_decode(fileRead($rufile, true), true))
+				if ($obj = json_decode(fileRead($rufile), true))
 					if (searchComment($i_args['comment'], $obj))
 						$found = true;
 		}
