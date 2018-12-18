@@ -144,7 +144,7 @@ function fileRead($i_filename, $i_lock = true, $i_verbose = false)
 	return $data;
 }
 
-function fileWrite($i_filename, &$i_data, $i_lock = true, $i_verbose = false)
+function fileWrite($i_filename, $i_data, $i_lock = true, $i_verbose = false)
 {
 	$fHandle = fopen($i_filename, 'w');
 	if ($fHandle === false)
