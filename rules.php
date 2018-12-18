@@ -328,14 +328,8 @@ function writeUser(&$i_user)
 {
 	$filename = 'users/' . $i_user['id'] . '.json';
 
-	if ($fHandle = fopen($filename, 'w'))
-	{
-		flock($fHandle, LOCK_EX);
-		fwrite($fHandle, jsonEncode($i_user));
-		flock($fHandle, LOCK_UN);
-		fclose($fHandle);
+	if (fileWrite($filename, jsonEncode($i_user)))
 		return true;
-	}
 
 	return false;
 }
@@ -1155,23 +1149,14 @@ function jsf_save($i_save, &$o_out)
 		}
 	}
 
-	$fHandle = fopen($filename, 'wb');
-	if (false === $fHandle)
-	{
-		$o_out['error'] = 'Unable to open file for writing ' . $filename;
-		return;
-	}
-
 	$data = $i_save['data'];
 	if (array_key_exists('type', $i_save))
 	{
 		if ($i_save['type'] == 'base64') $data = base64_decode($data);
 	}
 
-	_flock_($fHandle, LOCK_EX);
-	fwrite($fHandle, $data);
-	_flock_($fHandle, LOCK_UN);
-	fclose($fHandle);
+	if (false === fileWrite($filename, $data))
+		$o_out['error'] = 'Unable to open save file: ' . $filename;
 }
 
 function jsf_makenews($i_args, &$o_out)
@@ -1306,13 +1291,7 @@ function makenews($i_args, &$io_users, &$o_out)
 		// Save recent:
 		if (false == is_dir(dirname($rfile)))
 			mkdir(dirname($rfile));
-		if ($rhandle = fopen($rfile, 'w'))
-		{
-			_flock_($rhandle, LOCK_EX);
-			fwrite($rhandle, jsonEncode($rarray));
-			_flock_($rhandle, LOCK_UN);
-			fclose($rhandle);
-		}
+		fileWrite($rfile, jsonEncode($rarray));
 
 		// Exit cycle if path is root:
 		if (strlen($path) == 0) break;
@@ -1518,7 +1497,7 @@ function isAdmin(&$o_out)
 
 function jsf_htdigest($i_recv, &$o_out)
 {
-		$user = $i_recv['user'];
+	$user = $i_recv['user'];
 
 	// Not admin can change only own password,
 	//    if he has special state "passwd".
@@ -1590,19 +1569,8 @@ function jsf_htdigest($i_recv, &$o_out)
 	array_push($new_lines, $i_recv['digest']);
 
 	$data = implode("\n", $new_lines) . "\n";
-
-	if ($fHandle = fopen(HT_DIGEST_FILE_NAME, 'w'))
-	{
-		_flock_($fHandle, LOCK_EX);
-		fwrite($fHandle, $data);
-		_flock_($fHandle, LOCK_UN);
-		fclose($fHandle);
-	}
-	else
-	{
+	if (false === fileWrite(HT_DIGEST_FILE_NAME, $data))
 		$o_out['error'] = 'Unable to write into the file.';
-	}
-//error_log($data);
 }
 
 function jsf_disableuser($i_args, &$o_out)
@@ -1658,16 +1626,11 @@ function jsf_disableuser($i_args, &$o_out)
 				array_push($new_lines, $line);
 		}
 	}
+
 	$data = implode("\n", $new_lines) . "\n";
 
-	if ($fHandle = fopen(HT_DIGEST_FILE_NAME, 'w'))
-	{
-		flock($fHandle, LOCK_EX);
-		fwrite($fHandle, $data);
-		flock($fHandle, LOCK_UN);
-		fclose($fHandle);
-	}
-	else $o_out['error'] = 'Unable to write into the file.';
+	if (false === fileWrite(HT_DIGEST_FILE_NAME, $data))
+		$o_out['error'] = 'Unable to write into the file.';
 }
 
 function jsf_getallusers($i_args, &$o_out)
@@ -1748,29 +1711,12 @@ function jsf_writegroups($i_groups, &$o_out)
 	global $Groups;
 
 	$Groups = $i_groups;
-	/*
-		if( false == is_file( HT_GROUPS_FILE_NAME))
-		{
-			$o_out['error'] = 'HT Groups file does not exist.';
-			return;
-		}
-	*/
 	$data = '';
 	foreach ($i_groups as $group => $users)
 		$data = $data . "$group:" . implode(' ', $users) . "\n";
 
-	if ($fHandle = fopen(HT_GROUPS_FILE_NAME, 'w'))
-	{
-		flock($fHandle, LOCK_EX);
-		fwrite($fHandle, $data);
-		flock($fHandle, LOCK_UN);
-		fclose($fHandle);
-	}
-	else
-	{
+	if (false === fileWrite(HT_GROUPS_FILE_NAME, $data))
 		$o_out['error'] = 'Unable to write in groups file.';
-		return;
-	}
 }
 
 function jsf_permissionsset($i_args, &$o_out)
@@ -1788,17 +1734,9 @@ function jsf_permissionsset($i_args, &$o_out)
 	}
 
 	$data = implode("\n", $lines) . "\n";
-//error_log($data);return;
 
 	$htaccess = $i_args['path'] . '/' . HT_ACCESS_FILE_NAME;
-	if ($fHandle = fopen($htaccess, 'w'))
-	{
-		_flock_($fHandle, LOCK_EX);
-		fwrite($fHandle, $data);
-		_flock_($fHandle, LOCK_UN);
-		fclose($fHandle);
-	}
-	else
+	if (false === fileWrite($htaccess, $data))
 		$o_out['error'] = 'Unable to write into the file.';
 }
 
