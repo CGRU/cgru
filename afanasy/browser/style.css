@@ -377,7 +377,7 @@ top: 1px; left: 0; right: 0;
 .item.job { /*height: 24px;*/}
 .item.job .thumbnails { /*border-radius: 3px; border: 1px solid #575757;*/ }
 .item.job .thumbnails > div { margin: 1px 1px; border-radius: 2px; /*border: 1px solid #575757;*/ float: left; position: relative; }
-.item.job .thumbnails > div > div { font-size: 9px; position: absolute; right: 0px; padding-right: 4px; }
+.item.job .thumbnails > div > div { font-size: 9px; position: absolute; right: 0px; padding-right: 4px; word-break: keep-all; }
 .item.job .thumbnails > div > img { display: block; margin-top: 12px; border-radius: 2px; }
 
 .jobblock {
