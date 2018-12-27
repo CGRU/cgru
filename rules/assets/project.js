@@ -16,12 +16,12 @@ function prj_InitHTML( i_data)
 prj_deploy_shots_params = {};
 prj_deploy_shots_params.sources = {};
 prj_deploy_shots_params.references = {};
-prj_deploy_shots_params.template = {};
 prj_deploy_shots_params.destination = {};
+prj_deploy_shots_params.template = {};
 prj_deploy_shots_params.prefix    = {"width":'33%',"tooltip":'Add a prefix to each shot name.'};
 prj_deploy_shots_params.regexp    = {"width":'33%',"tooltip":'Perform a regular expression replace.'};
 prj_deploy_shots_params.substr    = {"width":'33%',"tooltip":'Perform a regular expression replace.'};
-prj_deploy_shots_params.sameshot  = {"width":'25%','type':"bool",'default':false,"tooltip":'Example: "NAME" and "NAME-1" will be one shot.'};
+prj_deploy_shots_params.sameshot  = {"width":'25%','type':"bool",'default':true,"tooltip":'Example: "NAME" and "NAME-1" will be one shot.'};
 prj_deploy_shots_params.extract   = {"width":'25%','type':"bool",'default':false,"tooltip":'Extract sources folder.'};
 prj_deploy_shots_params.uppercase = {"width":'25%','type':"bool",'default':false,"tooltip":'Convert shot names to upper case.'};
 prj_deploy_shots_params.padding   = {"width":'25%',"tooltip":'Example: "432" - first number will have 4 padding, next 3 and so on.'};
