@@ -28,7 +28,8 @@ Item::Item( const QString &itemname, int itemid):
 	m_height( Height),
 	m_locked( false),
 	m_running( false),
-	m_id( itemid)
+	m_id(itemid),
+	m_hidden(false)
 {
 }
 

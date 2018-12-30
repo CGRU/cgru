@@ -65,6 +65,9 @@ public:
 	virtual void v_filesReceived( const af::MCTaskUp & i_taskup);
 
 	virtual bool calcHeight();
+
+	inline void setHidded(bool i_hidden) {m_hidden = i_hidden;}
+	inline bool isHidden() const {return m_hidden;}
 	
 protected:
 	void drawBack( QPainter *painter, const QStyleOptionViewItem &option, const QColor * i_clrItem = NULL, const QColor * i_clrBorder = NULL) const;
@@ -95,6 +98,8 @@ private:
 
 	/// Points used to offset and scale default star coordinates.
 	static QPolygonF ms_star_pointsDraw;
+
+	bool m_hidden;
 
 	int m_id;
 };

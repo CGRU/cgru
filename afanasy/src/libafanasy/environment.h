@@ -84,9 +84,12 @@ public:
 	/// Get versions:
 	static inline const std::string & getVersionRevision(){ return version_revision; }
 	static inline const std::string & getVersionCGRU()    { return version_cgru;     }
+	static inline const std::string & getVersionCompiled(){ return version_compiled; }
 	static inline const std::string & getVersionPython()  { return version_python;   }
 	static inline const std::string & getVersionGCC()     { return version_gcc;      }
 	static inline const std::string & getBuildDate()      { return build_date;       }
+
+	static inline const std::string & getExecutablePath() { return executable_path; }
 
 	static inline const std::string & getHome()        { return home;          }
 	static inline const std::string & getHomeAfanasy() { return home_afanasy;  }
@@ -240,6 +243,7 @@ private:
 	static std::string digest_realm;
 	static std::map<std::string, std::string> digest_map;
 
+	static std::string executable_path;
 	static std::string cgrulocation;    ///< CGRU root directory.
 	static std::string afroot;          ///< Afanasy root directory.
 	static std::string home;            ///< User home directory.

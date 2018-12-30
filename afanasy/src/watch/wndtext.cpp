@@ -63,7 +63,7 @@ void WndText::caseMsg( af::Msg * i_msg)
 		{
 			std::string str;
 			i_msg->getString( str);
-			if( str.size() == 0) str = "An empty string recieved.";
+			if( str.size() == 0) str = "An empty string received.";
 			qTextEdit->setPlainText( afqt::stoq( str));
 			break;
 		}
@@ -71,7 +71,7 @@ void WndText::caseMsg( af::Msg * i_msg)
 		{
 			std::list<std::string> strlist;
 			i_msg->getStringList( strlist);
-			if( strlist.size() == 0) strlist.push_back("An empty list recieved.");
+			if( strlist.size() == 0) strlist.push_back("An empty list received.");
 			for( std::list<std::string>::const_iterator it = strlist.begin(); it != strlist.end(); it++)
 			   qTextEdit->append( afqt::stoq(*it));
 			break;

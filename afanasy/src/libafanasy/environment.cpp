@@ -156,6 +156,8 @@ int Environment::ipv6_disable = 0;
 std::string Environment::username;
 std::string Environment::computername;
 std::string Environment::hostname;
+
+std::string Environment::executable_path;
 std::string Environment::cgrulocation;
 std::string Environment::afroot;
 std::string Environment::home;
@@ -423,12 +425,38 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 // Init command arguments:
 	initCommandArguments( argc, argv);
 
+	// Executable path:
+	#ifdef LINUX
+	{
+		static const char * link = "/proc/self/exe";
+		static char buf[PATH_MAX];
+		int size = readlink(link, buf, PATH_MAX);
+		if (size)
+			executable_path = std::string(buf, size);
+		else
+			AF_ERR << "Unable to read '" << link << "': " << strerror(errno);
+	}
+	#endif
+	#ifdef WINNT
+	{
+		static char buf[MAX_PATH];
+		int size = GetModuleFileName( NULL, buf, MAX_PATH);
+		if (size)
+			executable_path = std::string(buf, size);
+		else
+			AF_ERR << "GetModuleFileName: " << af::GetLastErrorStdStr();
+	}
+	#endif
+	if (executable_path.size() == 0)
+		executable_path = argv[0];
+	QUIET("Executable path: %s\n", executable_path.c_str());
+
 //
 //############ afanasy root directory:
 	afroot = af::getenv("AF_ROOT");
 	if( afroot.size() == 0 )
 	{
-		 afroot = argv[0];
+		 afroot = executable_path;
 		 afroot = af::pathAbsolute( afroot);
 		 afroot = af::pathUp(afroot, true);
 		 afroot = af::pathUp(afroot, true);
@@ -590,6 +618,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 	}
 	}
 	PRINT("Platform: '%s'\n", af::strJoin( platform).c_str());
+
 //
 //############ Versions: ########################
 	#define STRINGIFY(x) #x
