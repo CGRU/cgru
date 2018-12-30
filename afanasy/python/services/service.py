@@ -28,7 +28,9 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
         self.verbose = i_verbose
         self.log = None
 
-        self.numeric = afcommon.checkBlockFlag(taskInfo['block_flags'],'numeric')
+        self.numeric = afcommon.checkBlockFlag(
+            taskInfo['block_flags'], 'numeric'
+        )
         if self.verbose: print(taskInfo)
 
         self.pm = cgrupathmap.PathMap()
@@ -56,7 +58,8 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
             command = self.applyCmdHosts(command)
 
         taskInfo['command'] = command
-        if self.verbose: print('Processed task command:\n' + command)
+        if self.verbose:
+            print('Processed task command:\n' + command)
 
         # Process files:
         taskInfo['files'] = self.processFilesPattern()
