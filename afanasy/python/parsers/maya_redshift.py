@@ -11,7 +11,8 @@ import re
 re_percent = re.compile(
     r'(Block*)(\s*)(\d*)(\/)(\d*)(\s*)(\S*)(\s*)(rendered by GPU.*)'
 )
-re_frame = re.compile(r'.*Rendering.*frame [0-9]+\.\.\.')
+re_frame_start = re.compile(r'.*Rendering.*frame [0-9]+\.\.\.')
+re_frame_skip = re.compile(r'.*Skipping frame.*')
 
 
 class maya_redshift(parser.parser):
@@ -40,7 +41,8 @@ class maya_redshift(parser.parser):
         if len(data) < 1:
             return
 
-        match = re_frame.search(data)
+        # catch new frame start
+        match = re_frame_start.search(data)
         if match is not None:
             if not self.first_frame:
                 self.frame += 1
@@ -50,6 +52,7 @@ class maya_redshift(parser.parser):
             self.block_count = 0
             self.percentframe = 0
 
+        # catch frame block progress
         match = re_percent.findall(data)
         if match:
             # get current block
@@ -63,5 +66,11 @@ class maya_redshift(parser.parser):
             # calculate percentage
             self.percentframe = \
                 int(100.0 * self.block / float(self.block_count))
+
+        # catch skipped frames
+        match = re_frame_skip.findall(data)
+        if match:
+            self.percentframe = 100
+            self.frame += len(match)
 
         self.calculate()
