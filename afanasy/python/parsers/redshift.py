@@ -67,11 +67,11 @@ class redshift(parser.parser):
             match = re_percent.search(line)
             if match:
                 # get current block
-                matched_block = float(match[0][2])
+                matched_block = float(match.group(3))
                 self.block = max(self.block, matched_block)
 
                 # get block_count
-                found_block_count = float(match[0][4])
+                found_block_count = float(match.group(5))
                 self.block_count = max(self.block_count, found_block_count)
 
                 # calculate percentage
