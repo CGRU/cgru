@@ -16,6 +16,7 @@ re_percent = re.compile(
 )
 re_frame_start = re.compile(r'.*Rendering.*frame [0-9]+\.\.\.')
 re_frame_skip = re.compile(r'.*Skipping frame.*')
+re_frame_done = re.compile(r'.*Frame rendering done.*')
 
 
 class redshift(parser.parser):
@@ -31,6 +32,7 @@ class redshift(parser.parser):
             'Frame rendering aborted',
             'Bad node type found: Redshift_ROP',
             'Bad node type found: redshift_vopnet',
+            'Fatal Error'
         ]
         self.str_badresult = ['License error']
         self.str_warning = []
@@ -83,6 +85,11 @@ class redshift(parser.parser):
 
         # catch skipped frames
         match = re_frame_skip.findall(data)
+        if match:
+            self.percentframe = 100
+            self.frame += len(match)
+
+        match = re_frame_done.findall(data)
         if match:
             self.percentframe = 100
             self.frame += len(match)
