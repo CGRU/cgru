@@ -16,7 +16,7 @@ re_percent = re.compile(
 )
 re_frame_start = re.compile(r'.*Rendering.*frame [0-9]+\.\.\.')
 re_frame_skip = re.compile(r'.*Skipping frame.*')
-re_frame_done = re.compile(r'.*Frame rendering done.*')
+re_frame_done = re.compile(r'.*Frame.*done.*')
 
 
 class redshift(parser.parser):
