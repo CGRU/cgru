@@ -457,6 +457,7 @@ function s_Found(i_args)
 	{
 		let el = elArtists[e];
 		let artist = el.m_user;
+		if (artist == '_null_') continue;
 
 		if (artists.indexOf(artist) == -1)
 			el.classList.add('notfound');
@@ -468,6 +469,7 @@ function s_Found(i_args)
 	{
 		let el = elFlags[e];
 		let flag = el.m_flag;
+		if (flag == '_null_') continue;
 
 		if (flags.indexOf(flag) == -1)
 			el.classList.add('notfound');
@@ -479,6 +481,7 @@ function s_Found(i_args)
 	{
 		let el = elTags[e];
 		let tag = el.m_tag;
+		if (tag == '_null_') continue;
 
 		if (tags.indexOf(tag) == -1)
 			el.classList.add('notfound');

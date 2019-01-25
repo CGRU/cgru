@@ -487,6 +487,7 @@ function c_IsUserStateSet(i_user, i_state)
 	if (i_user == null)
 		return false;
 
+	// Some states are always on for some roles:
 	if ((['playlist', 'assignart', 'edittasks', 'editbody']).indexOf(i_state) != -1)
 		if ((['admin', 'coord', 'user']).indexOf(i_user.role) != -1)
 			return true;
