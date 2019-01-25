@@ -62,6 +62,9 @@ function s_SearchOnClick()
 				el.classList.add('tag');
 				el.classList.add('artist');
 
+				if (artist.id == g_auth_user.id)
+					el.classList.add('me');
+
 				if (artist.disabled)
 					el.classList.add('disabled');
 				else
@@ -129,18 +132,27 @@ function s_SearchOnClick()
 		$('search_btn_process').style.display = 'block';
 
 		// Flags:
+		// Remove old:
 		if ($('search_flags').m_elFlags)
 			for (var i = 0; i < $('search_flags').m_elFlags.length; i++)
 				$('search_flags').removeChild($('search_flags').m_elFlags[i]);
 		$('search_flags').m_elFlags = [];
+
+		// Create new:
 		for (var flag in RULES.flags)
 		{
 			el = document.createElement('div');
 			$('search_flags').appendChild(el);
 			el.style.cssFloat = 'left';
 			el.textContent = c_GetFlagTitle(flag);
+			el.title = c_GetFlagTip(flag);
 			el.m_flag = flag;
 			el.classList.add('flag');
+			if (RULES.flags[flag].clr)
+			{
+				var c = RULES.flags[flag].clr;
+				el.style.borderColor = 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
+			}
 			el.onclick = function(e) {
 				c_ElToggleSelected(e);
 				if (ASSET && ASSET.filter)

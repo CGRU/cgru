@@ -724,6 +724,8 @@ table.statistics .duration { text-align: center; border-left-width: 0; }
 #search_artists_div .notartist { display: none; }
 #search_artists_div.show_notartist .notartist { display: block; }
 
+#search_flags .flag { border-width: 4px; }
+
 #execute_div { display: none;}
 #execute_btn { font-size: 10px;}
 #execute_btn.pushed { float: left;}
