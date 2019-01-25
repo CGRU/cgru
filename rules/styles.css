@@ -705,6 +705,7 @@ table.statistics .duration { text-align: center; border-left-width: 0; }
 	padding: 4px;
 }
 #search div { margin: 1px 4px; }
+#search .notfound { opacity: .5; }
 .search_grp {
 	border-top: 1px solid rgba(98,98,98,.5);
 	margin: 4px;
@@ -723,7 +724,6 @@ table.statistics .duration { text-align: center; border-left-width: 0; }
 #search_artists_div.show_disabled .disabled { display: block; }
 #search_artists_div .notartist { display: none; }
 #search_artists_div.show_notartist .notartist { display: block; }
-
 #search_flags .flag { border-width: 4px; }
 
 #execute_div { display: none;}

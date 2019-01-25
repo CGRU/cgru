@@ -121,7 +121,7 @@ function s_SearchOnClick()
 		$('search_btn_process').style.display = 'none';
 		g_ClearLocationArgs();
 		if (ASSET && window[ASSET.filter])
-			window[ASSET.filter]();
+			s_Found(window[ASSET.filter]());
 		$('search').m_path = null;
 	}
 	else
@@ -203,6 +203,9 @@ function s_SearchOnClick()
 		else
 			$('search_comment_div').style.display = 'block';
 	}
+
+	if (ASSET && window[ASSET.filter])
+		s_Found(window[ASSET.filter]());
 }
 
 function s_ShowDisabledArtists(i_el)
@@ -361,7 +364,7 @@ function s_Search(i_args)
 	if (ASSET && ASSET.filter)
 	{
 		if (window[ASSET.filter])
-			window[ASSET.filter](i_args);
+			s_Found(window[ASSET.filter](i_args));
 		return;
 	}
 
@@ -436,3 +439,51 @@ function s_ResultReceived(i_data)
 		elLink.textContent = path;
 	}
 }
+
+function s_Found(i_args)
+{
+	if (i_args.found == null)
+		return;
+
+	var artists = i_args.found.artists;
+	var   flags = i_args.found.flags;
+	var    tags = i_args.found.tags;
+
+	var elArtists = $('search_artists').m_elArtists;
+	var elFlags   = $('search_flags').m_elFlags;
+	var elTags    = $('search_tags').m_elTags;
+
+	for (let e = 0; e < elArtists.length; e++)
+	{
+		let el = elArtists[e];
+		let artist = el.m_user;
+
+		if (artists.indexOf(artist) == -1)
+			el.classList.add('notfound');
+		else
+			el.classList.remove('notfound');
+	}
+
+	for (let e = 0; e < elFlags.length; e++)
+	{
+		let el = elFlags[e];
+		let flag = el.m_flag;
+
+		if (flags.indexOf(flag) == -1)
+			el.classList.add('notfound');
+		else
+			el.classList.remove('notfound');
+	}
+
+	for (let e = 0; e < elTags.length; e++)
+	{
+		let el = elTags[e];
+		let tag = el.m_tag;
+
+		if (tags.indexOf(tag) == -1)
+			el.classList.add('notfound');
+		else
+			el.classList.remove('notfound');
+	}
+}
+
