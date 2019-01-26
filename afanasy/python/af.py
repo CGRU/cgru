@@ -730,7 +730,7 @@ class Job:
         :return:
         """
         if value > time.time():
-            self.data["time_wait"] = value
+            self.data["time_wait"] = int(value)
 
     def setMaxRunningTasks(self, value):
         """Missing DocString

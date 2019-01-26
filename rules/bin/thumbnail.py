@@ -181,6 +181,19 @@ if Movie is not None:
     # Try to get movie frames count:
     frame_count = 3 # < this will be the default value
     inf_obj = mediainfo.processMovie( Movie)
+
+    if 'error' in inf_obj:
+        if Options.verbose: print(inf_obj)
+        if 'data' in inf_obj:
+            data = inf_obj['data']
+            if Options.verbose: print(data)
+            data = re.findall('frame_count:\d*',data)
+            if len(data):
+                frame_count = int(data[0].split(':')[1])
+                print('frame_count:%d' % frame_count)
+        print(inf_obj['error'])
+        inf_obj = None
+
     if inf_obj and 'mediainfo' in inf_obj and 'video' in inf_obj['mediainfo']:
         frame_count = inf_obj['mediainfo']['video']['frame_count']
 

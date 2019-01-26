@@ -373,8 +373,13 @@ class UI(object):
 
         project_path = pm.workspace(q=1, rootDirectory=1)
 
+        # get output paths, set the RenderPass token to Beauty,
+        # this will at least guarantee to get something
         outputs = \
-            pm.renderSettings(fullPath=1, firstImageName=1, lastImageName=1)
+            pm.renderSettings(
+                fullPath=1, firstImageName=1, lastImageName=1,
+                leaveUnmatchedTokens=1, customTokenString="RenderPass=Beauty"
+            )
 
         job_name = os.path.basename(scene_name)
 
