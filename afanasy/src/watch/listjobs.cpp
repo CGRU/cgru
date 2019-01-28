@@ -404,13 +404,16 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	// System job ID is 1, and can not be deleted
 	if( jobitem->getId() != 1 )
 	{
+		submenu = new QMenu( "Delete", this);
+
 		action = new QAction( "Delete All Done", this);
 		connect( action, SIGNAL( triggered() ), this, SLOT( actDeleteDone()));
-		menu.addAction( action);
+		submenu->addAction( action);
 
-		action = new QAction( "Delete", this);
+		action = new QAction( "Delete Selected", this);
 		connect( action, SIGNAL( triggered() ), this, SLOT( actDelete()));
-		menu.addAction( action);
+		submenu->addAction( action);
+		menu.addMenu( submenu);
 	}
 
 	menu.exec(event->globalPos());
