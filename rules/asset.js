@@ -135,13 +135,13 @@ function a_Append(i_path, i_rules)
 function a_AutoSeek()
 {
 	var log_console = false;
-	// log_console = true;
+	//log_console = true;
 	if (log_console)
 		console.log('a_AutoSeek(): "' + g_CurPath() + '"');
 
 	var folders = g_elCurFolder.m_path.split('/');
 	var path = '';
-	for (var i = 0; i < folders.length; i++)
+	for (let i = 0; i < folders.length; i++)
 	{
 		// Skip "" folder if last is "/".
 		// "/temp/" should be two "" and "temp", but not three with "" at the end.
@@ -156,31 +156,34 @@ function a_AutoSeek()
 		if (log_console)
 			console.log('Asset seeking path: "' + path + '"');
 
-		for (var asset_type in RULES.assets)
+		for (let asset_type in RULES.assets)
 		{
+			// If such asset type already exists, we skip it.
+			// ( It can't be two projects )
 			if (ASSETS[asset_type])
 				continue;
+
 			if (log_console)
 				console.log('Asset seeking: ' + asset_type);
 
-			var seekpaths = RULES.assets[asset_type].seek;
+			let seekpaths = RULES.assets[asset_type].seek;
 			if (seekpaths == null)
 				continue;
 
-			for (var l = 0; l < seekpaths.length; l++)
+			for (let l = 0; l < seekpaths.length; l++)
 			{
-				var seekpath = seekpaths[l];
+				let seekpath = seekpaths[l];
 
 				// Replace parent asset name on its path:
 				// ("[project]/SHOTS" -> "/PRJNAME/SHOTS")
 				if (seekpath.indexOf('[') !== -1)
 				{
-					var replaced = false;
-					for (var a_type in ASSETS)
+					let replaced = false;
+					for (let a_type in ASSETS)
 					{
-						if (seekpath.indexOf(a_type) !== -1)
+						if (seekpath.indexOf('[' + a_type + ']') !== -1)
 						{
-							var seekpath_orig = seekpath;
+							let seekpath_orig = seekpath;
 							seekpath = seekpath.replace('[' + a_type + ']', ASSETS[a_type].path);
 							replaced = true;
 							if (log_console)
@@ -205,14 +208,15 @@ function a_AutoSeek()
 					seekpath += folders[i];
 				}
 
-				if (path == seekpath)
+				if (log_console)
+					console.log(path + ' <> ' + seekpath);
+				let re = new RegExp('^' + seekpath + '$','i');
+				if (path.match(re) != null)
 				{
-					// console.log( path + ' == ' + seekpath);
-
 					// Verify whether an asset with the same path exists.
 					// Prevent adding new asset with the same path.
-					var exists = false;
-					for (var asset in ASSETS)
+					let exists = false;
+					for (let asset in ASSETS)
 					{
 						if (ASSETS[asset].path == path)
 						{

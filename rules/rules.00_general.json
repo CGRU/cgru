@@ -85,7 +85,7 @@
 		"show_files":true
 	},
 	"scenes":{
-		"seek":["[project]/SCENES","[project]/SHOTS"],
+		"seek":["[project]/SCENE.*","[project]/SHOT.*","[project]/ANIM.*","[project]/RND.*"],
 		"uploads":{
 			"upload":{
 				"masks":[".*"],
