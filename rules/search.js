@@ -22,43 +22,49 @@ function s_SearchOnClick()
 	if ($('search').m_constcted != true)
 	{
 		$('search').m_constcted = true;
+		$('search_artists').m_elRoles = [];
 		$('search_artists').m_elArtists = [];
+		$('search_artists').m_show_disabled = false;
+		$('search_artists').m_show_not_artists = false;
 
 		// Construct artists just once, as they are not depending on location:
 		var roles = c_GetRolesArtists(g_users);
 
-		for (var r = 0; r < roles.length; r++)
+		for (let r = 0; r < roles.length; r++)
 		{
-			var elRole = document.createElement('div');
+			let elRole = document.createElement('div');
 			$('search_artists').appendChild(elRole);
+			$('search_artists').m_elRoles.push(elRole);
 			elRole.classList.add('role');
+			elRole.m_elArtists = [];
 
-			var elLabel = document.createElement('div');
+			let elLabel = document.createElement('div');
 			elRole.appendChild(elLabel);
+			elLabel.m_elRole = elRole;
 			elLabel.classList.add('label');
 			elLabel.textContent = roles[r].role + ':';
 			elLabel.title = 'Click to (un)select all role artists.';
-			elLabel.m_elArtists = [];
 			elLabel.onclick = function(e) {
-				var el = e.currentTarget;
-				for (var a = 0; a < el.m_elArtists.length; a++)
-					c_ElToggleSelected(el.m_elArtists[a]);
+				let el = e.currentTarget.m_elRole;
+				for (let a = 0; a < el.m_elArtists.length; a++)
+					if (false == el.m_elArtists[a].m_hidden)
+						c_ElToggleSelected(el.m_elArtists[a]);
 				if (ASSET && ASSET.filter)
 					s_ProcessGUI();
 			};
 
-			var role_has_one_artist = false;
-			var role_has_enabled = false;
-			for (var a = 0; a < roles[r].artists.length; a++)
+			for (let a = 0; a < roles[r].artists.length; a++)
 			{
-				var artist = roles[r].artists[a];
+				let artist = roles[r].artists[a];
 
 				el = document.createElement('div');
+				el.m_hidden = false;
 				elRole.appendChild(el);
+				elRole.m_elArtists.push(el);
 				$('search_artists').m_elArtists.push(el);
 				el.style.cssFloat = 'left';
 				el.textContent = c_GetUserTitle(artist.id);
-				el.m_user = artist.id;
+				el.m_user = artist
 				el.classList.add('tag');
 				el.classList.add('artist');
 
@@ -67,13 +73,9 @@ function s_SearchOnClick()
 
 				if (artist.disabled)
 					el.classList.add('disabled');
-				else
-					role_has_enabled = true;
 
 				if (c_IsNotAnArtist(artist))
 					el.classList.add('notartist');
-				else
-					role_has_one_artist = true;
 
 				var avatar = c_GetAvatar(artist.id);
 				if (avatar)
@@ -87,19 +89,14 @@ function s_SearchOnClick()
 					if (ASSET && ASSET.filter)
 						s_ProcessGUI();
 				};
-
-				elLabel.m_elArtists.push(el);
 			}
 
-			if (role_has_one_artist != true)
-				elRole.classList.add('notartist');
-			if (role_has_enabled != true)
-				elRole.classList.add('disabled');
+			s_ShowHideRoles();
 		}
 
 		var el = $('search_artists_notassigned');
 		$('search_artists').m_elArtists.push(el);
-		el.m_user = '_null_';
+		el.m_user = {'id':'_null_'};
 		el.classList.add('tag');
 		el.classList.add('artist');
 		el.onclick = function(e) {
@@ -208,16 +205,65 @@ function s_SearchOnClick()
 		s_Found(window[ASSET.filter]());
 }
 
+function s_ShowHideRoles()
+{
+	var show_disabled    = $('search_artists').m_show_disabled;
+	var show_not_artists = $('search_artists').m_show_not_artists;
+	var elRoles          = $('search_artists').m_elRoles;
+
+	for (let r = 0; r < elRoles.length; r++)
+	{
+		let role_hidden = true;
+
+		for (let a = 0; a < elRoles[r].m_elArtists.length; a++)
+		{
+			let el = elRoles[r].m_elArtists[a];
+			el.m_hidden = false;
+
+			if (el.m_user.disabled && (false == show_disabled))
+				el.m_hidden = true;
+
+			if (c_IsNotAnArtist(el.m_user) && (false == show_not_artists))
+				el.m_hidden = true;
+
+			if (el.m_hidden)
+				el.style.display = 'none';
+			else
+			{
+				el.style.display = 'block';
+				role_hidden = false;
+			}
+		}
+
+		if (role_hidden)
+			elRoles[r].style.display = 'none';
+		else
+			elRoles[r].style.display = 'block';
+	}
+}
+
 function s_ShowDisabledArtists(i_el)
 {
 	i_el.classList.toggle('pushed');
-	$('search_artists_div').classList.toggle('show_disabled');
+
+	if (i_el.classList.contains('pushed'))
+		$('search_artists').m_show_disabled = true;
+	else
+		$('search_artists').m_show_disabled = false;
+
+	s_ShowHideRoles();
 }
 
 function s_ShowNotArtists(i_el)
 {
 	i_el.classList.toggle('pushed');
-	$('search_artists_div').classList.toggle('show_notartist');
+
+	if (i_el.classList.contains('pushed'))
+		$('search_artists').m_show_not_artists = true;
+	else
+		$('search_artists').m_show_not_artists = false;
+
+	s_ShowHideRoles();
 }
 
 function s_ProcessGUI()
@@ -243,7 +289,7 @@ function s_ProcessGUI()
 			c_ElSetSelected($('search_artists').m_elArtists[i], false);
 		c_ElSetSelected($('search_artists_notassigned'), true);
 
-		args.artists.push($('search_artists_notassigned').m_user);
+		args.artists.push($('search_artists_notassigned').m_user.id);
 	}
 	else
 		for (var i = 0; i < $('search_artists').m_elArtists.length; i++)
@@ -251,7 +297,8 @@ function s_ProcessGUI()
 			{
 				if (args.artists == null)
 					args.artists = [];
-				args.artists.push($('search_artists').m_elArtists[i].m_user);
+				if (false == $('search_artists').m_elArtists[i].m_hidden)
+					args.artists.push($('search_artists').m_elArtists[i].m_user.id);
 			}
 
 	// Flags:
@@ -330,7 +377,7 @@ function s_Search(i_args)
 		for (i = 0; i < $('search_artists').m_elArtists.length; i++)
 			c_ElSetSelected(
 				$('search_artists').m_elArtists[i],
-				i_args.artists.indexOf($('search_artists').m_elArtists[i].m_user) != -1);
+				i_args.artists.indexOf($('search_artists').m_elArtists[i].m_user.id) != -1);
 	if (i_args.flags)
 		for (i = 0; i < $('search_flags').m_elFlags.length; i++)
 			c_ElSetSelected(
@@ -456,7 +503,7 @@ function s_Found(i_args)
 	for (let e = 0; e < elArtists.length; e++)
 	{
 		let el = elArtists[e];
-		let artist = el.m_user;
+		let artist = el.m_user.id;
 		if (artist == '_null_') continue;
 
 		if (artists.indexOf(artist) == -1)

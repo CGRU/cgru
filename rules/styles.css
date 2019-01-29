@@ -720,10 +720,9 @@ table.statistics .duration { text-align: center; border-left-width: 0; }
 	width: 40px;
 	padding: 1px 2px;
 }
-#search_artists_div .disabled { display: none; }
-#search_artists_div.show_disabled .disabled { display: block; }
-#search_artists_div .notartist { display: none; }
-#search_artists_div.show_notartist .notartist { display: block; }
+
+#search_artists_div .notartist { font-style: italic; border-style: dashed }
+
 #search_flags .flag { border-width: 4px; }
 
 #execute_div { display: none;}
