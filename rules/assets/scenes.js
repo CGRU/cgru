@@ -131,6 +131,7 @@ function scene_Show()
 		}
 
 		elShot.m_elBody = document.createElement('div');
+		elShot.m_elBody.onclick = function(i_e){i_e.stopPropagation();}
 		elDiv.appendChild( elShot.m_elBody);
 		elShot.m_elBody.classList.add('body');
 		elShot.m_elBody.m_elShot = elShot;
