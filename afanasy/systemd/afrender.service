@@ -5,7 +5,7 @@ After=syslog.target network.target remote-fs.target
 [Service]
 Type=simple
 User=render
-Group=render
+#Group=render
 WorkingDirectory=/opt/cgru
 ExecStart=/opt/cgru/start/AFANASY/_afrender.sh
 KillMode=control-group
