@@ -73,6 +73,7 @@ function suseArch(){
 	packages="$packages gcc-c++"
 	packages="$packages python3-devel"
 	packages="$packages postgresql-devel"
+	packages="$packages openexr-devel"
 	packages="$packages libqt5-qtbase-devel"
 	packages="$packages libqt5-qtmultimedia-devel"
 	packages="$packages python3-qt5"
@@ -80,7 +81,7 @@ function suseArch(){
 	packages="$packages rpm-build"
 
 	pkg_manager_cmd="zypper install"
-	pkg_extension=".$ARCHITECTURE"
+	pkg_extension=""
 }
 
 # Packages for AltLinux distributions:
