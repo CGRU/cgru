@@ -16,7 +16,7 @@ osreleasefile="/etc/os-release"
 if [ -z "${DISTRIBUTIVE}" ] && [ -f "${osreleasefile}" ]; then
 	source "${osreleasefile}"
 	for distr in $distskeys; do
-		if [[ "${ID,,}" == "${distr,,}" ]]; then
+		if [ `eval "echo \"${ID}\" | awk '{ print match(\\$0,tolower(\"${distr}\"))}'"` != "0" ]; then
 			export DISTRIBUTIVE="${distr}"
 			export DISTRIBUTIVE_VERSION="${VERSION_ID}"
 			break
