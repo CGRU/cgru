@@ -37,8 +37,11 @@ AFINFO("ListItems::ListItems.\n");
 	m_panel_l->setContentsMargins( 5, 5, 5, 5);
 	m_panel_l->setSpacing( 5);
 
-//m_panel_l->addWidget(new QLabel("left"));
-//m_panel_r->addWidget(new QLabel("right"));
+	m_panel_r->setAlignment( Qt::AlignTop);
+	m_panel_r->setContentsMargins( 5, 5, 5, 5);
+	m_panel_r->setSpacing( 5);
+	//m_panel_r->setFiltedWidth(400);
+	//m_panel_r->addWidget(new QLabel("right"));
 
 	m_hlayout->setSpacing( 0);
 	m_vlayout->setSpacing( 0);
