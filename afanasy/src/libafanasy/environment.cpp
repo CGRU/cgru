@@ -168,12 +168,13 @@ Address Environment::serveraddress;
 
 bool Environment::god_mode       = false;
 bool Environment::visor_mode     = false;
-bool Environment::help_mode      = false;
-bool Environment::demo_mode      = false;
+bool Environment::m_help_mode    = false;
+bool Environment::m_demo_mode    = false;
 bool Environment::m_valid        = false;
 bool Environment::m_verbose_init = false;
 bool Environment::m_quiet_init   = false;
 bool Environment::m_verbose_mode = false;
+bool Environment::m_log_nodate   = false;
 bool Environment::m_solveservername = false;
 bool Environment::m_server          = false;
 std::vector<std::string> Environment::m_config_files;
@@ -188,8 +189,8 @@ std::vector<std::string> Environment::rendercmds;
 std::vector<std::string> Environment::rendercmds_admin;
 std::vector<std::string> Environment::ip_trust;
 std::vector<std::string> Environment::render_resclasses;
-std::vector<std::string> Environment::cmdarguments;
-std::map<std::string,std::string> Environment::cmdarguments_usage;
+std::vector<std::string> Environment::m_cmdarguments;
+std::map<std::string,std::string> Environment::m_cmdarguments_usage;
 
 std::string Environment::version_revision;
 std::string Environment::version_compiled;
@@ -666,6 +667,9 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 	#endif
 //###################################################
 
+	// Log options:
+	m_log_nodate = hasArgument("-log_nodate");
+
 	load();
 	m_valid = initAfterLoad();
 }
@@ -863,54 +867,54 @@ void Environment::initCommandArguments( int argc, char** argv)
 
 	for( int i = 0; i < argc; i++)
 	{
-		cmdarguments.push_back(argv[i]);
+		m_cmdarguments.push_back(argv[i]);
 
-		if( false == m_verbose_mode)
-		if(( cmdarguments.back() == "-V"    ) ||
-			( cmdarguments.back() == "--Verbose")
-			)
+		if (false == m_verbose_mode)
+		if ((m_cmdarguments.back() == "-V"    ) ||
+			(m_cmdarguments.back() == "--Verbose"))
 		{
 			printf("Verbose is on.\n");
 			m_verbose_mode = true;
 		}
 
-		if( false == help_mode)
-		if(( cmdarguments.back() == "-"     ) ||
-			( cmdarguments.back() == "--"    ) ||
-			( cmdarguments.back() == "-?"    ) ||
-			( cmdarguments.back() == "?"     ) ||
-			( cmdarguments.back() == "/?"    ) ||
-			( cmdarguments.back() == "-h"    ) ||
-			( cmdarguments.back() == "--help")
-			)
+		if (false == m_help_mode)
+		if ((m_cmdarguments.back() == "-"     ) ||
+			(m_cmdarguments.back() == "--"    ) ||
+			(m_cmdarguments.back() == "-?"    ) ||
+			(m_cmdarguments.back() == "?"     ) ||
+			(m_cmdarguments.back() == "/?"    ) ||
+			(m_cmdarguments.back() == "-h"    ) ||
+			(m_cmdarguments.back() == "--help"))
 		{
-			help_mode = true;
+			m_help_mode = true;
 		}
 	}
+
 	addUsage("-username", "Override user name.");
 	addUsage("-hostname", "Override host name.");
+	addUsage("-log_nodate", "Do not output date in each line log.");
 	addUsage("-h --help", "Display this help.");
 	addUsage("-V --Verbose", "Verbose mode.");
 }
 
 bool Environment::hasArgument( const std::string & argument)
 {
-	for( std::vector<std::string>::const_iterator it = cmdarguments.begin(); it != cmdarguments.end(); it++)
-		if( *it == argument )
+	for (std::vector<std::string>::const_iterator it = m_cmdarguments.begin(); it != m_cmdarguments.end(); it++)
+		if (*it == argument )
 			return true;
 	return false;
 }
 
 bool Environment::getArgument( const std::string & argument, std::string & value)
 {
-	for( std::vector<std::string>::const_iterator it = cmdarguments.begin(); it != cmdarguments.end(); it++)
+	for (std::vector<std::string>::const_iterator it = m_cmdarguments.begin(); it != m_cmdarguments.end(); it++)
 	{
-		if( *it == argument )
+		if (*it == argument)
 		{
 			// check for the next argument:
 			it++;
 
-			if( it != cmdarguments.end())
+			if (it != m_cmdarguments.end())
 				value = *it;
 
 			return true;
@@ -930,11 +934,15 @@ const std::string Environment::getDigest( const std::string & i_user_name)
 
 void Environment::printUsage()
 {
-	if( false == help_mode ) return;
-	if( cmdarguments_usage.empty() ) return;
-	printf("USAGE: %s [arguments]\n", cmdarguments.front().c_str());
-	std::map<std::string,std::string>::const_iterator it = cmdarguments_usage.begin();
-	for( ; it != cmdarguments_usage.end(); it++)
+	if (false == m_help_mode)
+		return;
+
+	if (m_cmdarguments_usage.empty())
+		return;
+
+	printf("USAGE: %s [arguments]\n", m_cmdarguments.front().c_str());
+	std::map<std::string,std::string>::const_iterator it = m_cmdarguments_usage.begin();
+	for (; it != m_cmdarguments_usage.end(); it++)
 	{
 		printf("   %s:\n      %s\n",
 			(it->first).c_str(),

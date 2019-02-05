@@ -55,13 +55,14 @@ public:
 	/// Return \c true if argument exists and return its value if it has any:
 	static bool getArgument( const std::string & argument, std::string & value);
 
-	static inline bool isHelpMode()    { return help_mode;   }
+	static inline bool isHelpMode()    { return m_help_mode;   }
 	static inline bool isVerboseMode() { return m_verbose_mode;}
-	static inline void addUsage( const std::string & i_arg, const std::string & i_help) { cmdarguments_usage[i_arg] = i_help; }
+	static inline bool logNoDate()     { return m_log_nodate;  }
+	static inline void addUsage(const std::string & i_arg, const std::string & i_help) { m_cmdarguments_usage[i_arg] = i_help; }
 
-	static inline bool isDemoMode()  { return demo_mode; }
-	static inline bool notDemoMode() { return false == demo_mode; }
-	static inline void setDemoMode() { demo_mode = true; }
+	static inline bool isDemoMode()  { return m_demo_mode; }
+	static inline bool notDemoMode() { return false == m_demo_mode; }
+	static inline void setDemoMode() { m_demo_mode = true; }
 
 	static bool reload();
 
@@ -217,15 +218,16 @@ private:
 	static bool m_verbose_init;     ///< Verbose environment initialization
 	static bool m_quiet_init;       ///< Quiet environment initialization
 	static bool m_verbose_mode;     ///< Application verbose mode
+	static bool m_log_nodate;
 	static bool m_solveservername;  ///< Whether to solve server name
 	static bool m_server;           ///< Whether the it is a server
 	static std::vector<std::string> m_config_files;
 	static std::string m_config_data;
 
-	static std::vector<std::string> cmdarguments;
-	static std::map<std::string,std::string> cmdarguments_usage;
-	static bool help_mode;
-	static bool demo_mode;
+	static std::vector<std::string> m_cmdarguments;
+	static std::map<std::string,std::string> m_cmdarguments_usage;
+	static bool m_help_mode;
+	static bool m_demo_mode;
 
 	static void initCommandArguments( int argc = 0, char** argv = NULL); ///< Initialize command arguments
 	static void printUsage(); ///< Output command usage
