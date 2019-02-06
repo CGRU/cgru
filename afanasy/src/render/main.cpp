@@ -222,10 +222,10 @@ AF_LOG << " >>> " << i_msg;
 			i_render.setRegistered( new_id);
 		}
 		// Server sends back zero id on any error
-		else if ( new_id == 0 )
+		else if (new_id == 0)
 		{
-			AF_ERR << "Zero ID received, no such online render, re-connecting...";
-			i_render.connectionLost( true);
+			AF_WARN << "Zero ID received, no such online render, re-connecting...";
+			i_render.connectionLost(true);
 		}
 		// Bad case, should not ever happen, try to re-register.
 		else if ( i_render.getId() != new_id )
