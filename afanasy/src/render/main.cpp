@@ -215,8 +215,7 @@ AF_LOG << " >>> " << i_msg;
 			AFRunning = false;
 		}
 		// Render was trying to register (its id==0) and server has send id>0
-		// This is the situation when client was sucessfully registered
-//		else if((new_id > 0) && (i_render.getId() == 0))
+		// This is the situation when client was successfully registered
 		else if((new_id > 0) && i_render.notConnected())
 		{
 			i_render.setRegistered( new_id);
@@ -230,7 +229,7 @@ AF_LOG << " >>> " << i_msg;
 		// Bad case, should not ever happen, try to re-register.
 		else if ( i_render.getId() != new_id )
 		{
-			AF_ERR << "IDs mistatch: this " << i_render.getId() << " != " << new_id << " new, re-connecting...";
+			AF_ERR << "IDs mismatch: this " << i_render.getId() << " != " << new_id << " new, re-connecting...";
 			i_render.connectionLost( true);
 		}
 		// Id, that returns from server is equals to stored on client.
