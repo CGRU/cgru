@@ -7,7 +7,7 @@ Type=simple
 User=render
 #Group=render
 WorkingDirectory=/opt/cgru
-ExecStart=/opt/cgru/start/AFANASY/_afrender.sh
+ExecStart=/opt/cgru/start/AFANASY/_afrender.sh -log_nodate
 KillMode=control-group
 TimeoutStopSec=3
 

@@ -72,6 +72,11 @@
 
 "":"Job:",
 	"af_task_default_capacity":1000,
+	"af_task_progress_change_timeout":-1,
+		"":"This is a default value for a job block.",
+		"":"If task progress did not change within this time, consider that it is erroneous.",
+		"":"A value of -1 means not to check timeout.",
+
 	"af_task_default_service":"generic",
 	"af_task_log_linesmax":100,
 
@@ -138,10 +143,6 @@
 	"af_task_stop_timeout":30,
 		"":"If render was asked to stop a task, but it did not send task finish message,",
 		"":"it wiil be considered as not running any way.",
-
-	"af_task_progress_change_timeout":-1,
-		"":"If task progress did not change within this time, consider that it is erroneous.",
-		"":"A value of -1 will disable this feature.",
 
 	"af_render_connectretries":3,
 		"":"Connection fails number to consider that render can`t connect to server.",

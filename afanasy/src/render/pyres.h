@@ -5,19 +5,19 @@
 class PyRes: public af::PyClass
 {
 public:
-   PyRes( const std::string & className, af::HostRes * hostRes);
-   ~PyRes();
+	PyRes(const std::string & i_className, af::HostRes * i_hostRes);
+	~PyRes();
 
-   inline bool isInitialized() const { return initialized;}
+	inline bool isInitialized() const {return m_initialized;}
 
-   void update();
+	void update();
 
 private:
-   std::string name;
-   af::HostRes * hres;
-   int index;
+	std::string m_name;
+	af::HostRes * m_hres;
+	int m_index;
 
-   PyObject* PyObj_FuncUpdate;
+	PyObject * m_PyObj_FuncUpdate;
 
-   bool initialized;
+	bool m_initialized;
 };

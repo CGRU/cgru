@@ -47,10 +47,7 @@ class resbase:  # TODO: Class names should follow CamelCase naming convention
             print('Error updating resources:')
             print(str(sys.exc_info()[1]))
             self.label = 'Error'
-        return self.value, self.valuemax, self.width, self.height, \
-            self.graphr, self.graphg, self.graphb, self.label, \
-            self.labelsize, self.labelr, self.labelg, self.labelb, \
-            self.bgcolorr, self.bgcolorg, self.bgcolorb, self.tooltip
+        return self
 
     def output(self):
         """Missing DocString

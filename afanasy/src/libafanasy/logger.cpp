@@ -1,5 +1,7 @@
 #include "logger.h"
+
 #include "../libafanasy/af.h"
+#include "../libafanasy/environment.h"
 
 #include <sstream>
 #include <iomanip>
@@ -60,7 +62,9 @@ namespace Color
 
 Logger::Logger(const char *func, const char *file, int line, Logger::Level level, bool display_pid)
 {
-	m_ss << af::time2str() << ": ";
+	if (false == af::Environment::logNoDate())
+		m_ss << af::time2str() << ": ";
+
 	switch( level)
 	{
 	case Logger::LDEBUG:
