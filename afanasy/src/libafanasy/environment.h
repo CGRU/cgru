@@ -117,7 +117,7 @@ public:
 
 	static inline int getWatchGetEventsSec()           { return watch_get_events_sec;      }
 	static inline int getWatchRefreshGuiSec()          { return watch_refresh_gui_sec;     }
-	static inline int getWatchConnectRetries()         { return watch_connectretries;      }
+	static inline int getWatchConnectionLostTime()     { return watch_connection_lost_time;}
 	static inline int getWatchRenderIdleBarMax()       { return watch_render_idle_bar_max; }
 
 	static inline const char * getTimeFormat()         { return timeformat.c_str();       } ///< Get default time format.
@@ -159,7 +159,7 @@ public:
 	static inline int getRenderNice()               { return render_nice;                 }
 	static inline int getRenderZombieTime()         { return render_zombietime;           }
 	static inline int getRenderExitNoTaskTime()     { return render_exit_no_task_time;    }
-	static inline int getRenderConnectRetries()     { return render_connectretries;       }
+	static inline int getRenderConnectionLostTime() { return render_connection_lost_time; }
 
 	static inline bool hasRULES() { return rules_url.size(); }
 	static inline std::vector<std::string> & getRenderWindowsMustDie() { return render_windowsmustdie; }
@@ -301,7 +301,7 @@ private:
 	static std::vector<std::string> rendercmds_admin; ///< Render commannds for admin only
 	static int watch_get_events_sec;
 	static int watch_refresh_gui_sec;
-	static int watch_connectretries;
+	static int watch_connection_lost_time;
 	static int watch_render_idle_bar_max;
 
 	static int monitor_zombietime;
@@ -321,7 +321,7 @@ private:
 	static int render_nice;       ///< Render task process nice factor.
 	static int render_zombietime;
 	static int render_exit_no_task_time;
-	static int render_connectretries;
+	static int render_connection_lost_time;
 	static std::vector<std::string> render_windowsmustdie;
 
 	static std::string cmd_shell;

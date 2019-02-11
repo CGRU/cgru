@@ -132,6 +132,9 @@
 		"":"If render will not send update its resources for this time(seconds),",
 		"":"server will put it in 'OFFLINE' state.",
 
+	"af_render_connection_lost_time":10,
+		"":"If render can`t update server for this time, it considers that server connection lost and tries to register again.",
+
 	"af_render_exit_no_task_time":-1,
 		"":"Program will exit if there will be no tasks for this time(seconds),",
 		"":"Negative value disables this feature",
@@ -143,9 +146,6 @@
 	"af_task_stop_timeout":30,
 		"":"If render was asked to stop a task, but it did not send task finish message,",
 		"":"it wiil be considered as not running any way.",
-
-	"af_render_connectretries":3,
-		"":"Connection fails number to consider that render can`t connect to server.",
 
 	"af_render_exec":"afrender",
 		"":"Was used, will be needed, but not used for now",
@@ -174,7 +174,8 @@
 "":"Watch: (qt gui - client side)",
 	"af_watch_get_events_sec":1,
 	"af_watch_refresh_gui_sec":5,
-	"af_watch_connectretries":3,
+	"af_watch_connection_lost_time":10,
+		"":"If watch can`t update server for this time, it considers that server connection lost and tries to register again.",
 	"af_watch_render_idle_bar_max":3600,
 
 "":"Database:",

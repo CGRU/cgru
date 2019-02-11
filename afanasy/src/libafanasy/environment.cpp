@@ -64,7 +64,7 @@ int     Environment::serverport =                      AFADDR::SERVER_PORT;
 int     Environment::monitor_zombietime =              AFMONITOR::ZOMBIETIME;
 
 int     Environment::watch_get_events_sec =            AFWATCH::GET_EVENTS_SEC;
-int     Environment::watch_connectretries =            AFWATCH::CONNECTRETRIES;
+int     Environment::watch_connection_lost_time =      AFWATCH::CONNECTION_LOST_TIME;
 int     Environment::watch_refresh_gui_sec =           AFWATCH::REFRESH_GUI_SEC;
 int     Environment::watch_render_idle_bar_max =       AFWATCH::RENDER_IDLE_BAR_MAX;
 
@@ -75,7 +75,7 @@ int     Environment::render_default_maxtasks =         AFRENDER::DEFAULTMAXTASKS
 int     Environment::render_nice =                     AFRENDER::TASKPROCESSNICE;
 int     Environment::render_zombietime =               AFRENDER::ZOMBIETIME;
 int     Environment::render_exit_no_task_time =        AFRENDER::EXIT_NO_TASK_TIME;
-int     Environment::render_connectretries =           AFRENDER::CONNECTRETRIES;
+int     Environment::render_connection_lost_time =     AFRENDER::CONNECTION_LOST_TIME;
 
 
 std::string Environment::rules_url;
@@ -289,14 +289,14 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, render_nice,                       "af_render_nice"                       );
 	getVar( i_obj, render_zombietime,                 "af_render_zombietime"                 );
 	getVar( i_obj, render_exit_no_task_time,          "af_render_exit_no_task_time"          );
-	getVar( i_obj, render_connectretries,             "af_render_connectretries"             );
+	getVar( i_obj, render_connection_lost_time,       "af_render_connection_lost_time"       );
 	getVar( i_obj, render_windowsmustdie,             "af_render_windowsmustdie"             );
 
 	getVar( i_obj, rendercmds,                        "af_rendercmds"                        );
 	getVar( i_obj, rendercmds_admin,                  "af_rendercmds_admin"                  );
 	getVar( i_obj, watch_get_events_sec,              "af_watch_get_events_sec"              );
 	getVar( i_obj, watch_refresh_gui_sec,             "af_watch_refresh_gui_sec"             );
-	getVar( i_obj, watch_connectretries,              "af_watch_connectretries"              );
+	getVar( i_obj, watch_connection_lost_time,        "af_watch_connection_lost_time"        );
 	getVar( i_obj, watch_render_idle_bar_max,         "af_watch_render_idle_bar_max"         );
 
 	getVar( i_obj, monitor_zombietime,                "af_monitor_zombietime"                );

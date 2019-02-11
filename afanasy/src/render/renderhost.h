@@ -31,12 +31,9 @@ public:
 	inline bool notConnected() const { return false == m_connected; }
 
 	/**
-	* @brief Some message was failed to send.
-	* At first it counts this function call.
-	* If count > af_render_connectretries connection is lost.
-	* @param i_any_case Do not count, connection os lost in any case.
+	* @brief Render lost connection with server and will try to re-register.
 	*/
-	void connectionLost( bool i_any_case = false);
+	void connectionLost();
 
 	/**
 	* @brief Render was successfuly registered on server and got good (>0) id.
@@ -123,6 +120,11 @@ private:
 	*/
 	void setUpdateMsgType( int i_type);
 
+	/**
+	* @brief Update message was failed to send to server.
+	*/
+	void serverUpdateFailed();
+
 private:
 	/// Windows to kill on windows
 	/// Bad mswin applications like to raise a gui window with an error and waits for some 'Ok' button.
@@ -133,8 +135,8 @@ private:
 
 	/// Whether the render is connected or not
     bool m_connected;
-	/// Count times render failed to send update message to server
-	int  m_connection_lost_count;
+	/// Times when render send last update message to server
+	time_t m_server_update_time;
 
 	/// Heartbeat message to sent at each update.
 	/// It is initially a `TRenderRegister` and as soon as the server

@@ -138,13 +138,14 @@ QAfSocket::~QAfSocket()
 		delete m_msg_ans;
 }
 
-QAfClient::QAfClient( QObject * i_qparent, int i_num_conn_lost):
+QAfClient::QAfClient( QObject * i_qparent, int i_conn_lost_time):
 	QObject( i_qparent),
 	m_up_timer( NULL),
 	m_up_msg( NULL),
 	m_up_processing( false),
-	m_numconnlost( i_num_conn_lost),
-	m_connlostcount( 0),
+	m_conn_lost_time(i_conn_lost_time),
+	m_last_conn_time(0),
+	m_connected(false),
 	m_closing( false)
 {
 }
@@ -177,25 +178,30 @@ void QAfClient::sendMsg( af::Msg * i_msg, bool i_updater)
 
 void QAfClient::slot_newMsg( af::Msg * i_msg)
 {
-	m_connlostcount = 0;
+	m_last_conn_time = time(NULL);
+
+	m_connected = true;
 
 	emit sig_newMsg( i_msg);
 }
 
 void QAfClient::slot_sendError( QAfSocket * i_qas)
 {
-	if(( m_numconnlost != 0 ) && ( m_connlostcount <= m_numconnlost ))
-		m_connlostcount++;
+	if (m_last_conn_time == 0)
+		return;
 
-	if(( m_numconnlost  > 1 ) && ( m_connlostcount <= m_numconnlost ))
+	if (m_connected)
 	{
-		AF_ERR << "SocketError: " << i_qas->getSocketErrorStr();
-		AF_ERR << "Connection lost count: " << m_connlostcount << " of " << m_numconnlost;
+		AF_LOG << "Failed to connect to server."
+				<< " Last success connect time: " << af::time2str(m_last_conn_time);
+		AF_LOG << "Last connect was: " << (time(NULL) - m_last_conn_time) << " seconds ago"
+				<< ", Connection lost time: " << m_conn_lost_time << "s"
+				<< ", Zombie time: " << af::Environment::getMonitorZombieTime() << "s";
 	}
 
-	if( m_connlostcount == m_numconnlost )
+	if (time(NULL) >= (m_last_conn_time + m_conn_lost_time))
 	{
-		AF_ERR << "Connection Lost!";
+		m_connected = false;
 		emit sig_connectionLost();
 	}
 }
