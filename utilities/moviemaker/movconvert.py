@@ -174,31 +174,34 @@ else:
         Output += '.' + Options.suffix
 
     auxargs = ''
-    if Options.resize is not None or Options.watermark is not None:
-        filter_complex = ''
-        if Options.ipar is not None:
-            if len(filter_complex): filter_complex += ','
-            filter_complex += 'scale=iw:ih/%s' % Options.ipar
-            if Options.opar is None:
-                filter_complex += ',setsar=1'
-        if Options.opar is not None:
-            if len(filter_complex): filter_complex += ','
-            filter_complex += 'setsar=%s' % Options.opar
-        if Options.resize is not None:
-            if len(filter_complex): filter_complex += ','
-            resize = Options.resize.split('x')
-            if len(resize) < 2:
-                hresize.append('-1')
-            filter_complex += 'scale=%s:-1,crop=%s:min(%s\\,ih),pad=%s:%s:0:max((%s-ih)/2\\,0)' % (resize[0], resize[0],resize[1], resize[0],resize[1],resize[1])
-            Output += '.r%s' % Options.resize
-        if Options.watermark is not None:
-            if not os.path.isfile( Options.watermark):
-                print('ERROR: Watermark file does not exist:\n' + Options.watermark)
-                sys.exit(1)
-            auxargs += ' -i "%s"' % Options.watermark
-            if len(filter_complex): filter_complex += ','
-            filter_complex += 'overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2'
-        auxargs += ' -filter_complex "%s"' % filter_complex
+    filter_complex = []
+    filter_complex_scale = []
+    if Options.codec.find('prores') == 0:
+        filter_complex_scale.append('out_color_matrix=bt709')
+    if Options.ipar is not None:
+        filter_complex_scale.append('w=iw:h=ih/%s' % Options.ipar)
+        if Options.opar is None:
+            filter_complex.append('setsar=1')
+    if Options.opar is not None:
+        filter_complex.append('setsar=%s' % Options.opar)
+    if Options.resize is not None:
+        resize = Options.resize.split('x')
+        if len(resize) < 2: resize.append('-1')
+        filter_complex_scale.append('w=%s:h=-1' % resize[0])
+        filter_complex.append('crop=%s:min(%s\\,ih)' % (resize[0],resize[1]))
+        filter_complex.append('pad=%s:%s:0:max((%s-ih)/2\\,0)' % (resize[0],resize[1],resize[1]))
+        Output += '.r%s' % Options.resize
+    if Options.watermark is not None:
+        if not os.path.isfile( Options.watermark):
+            print('ERROR: Watermark file does not exist:\n' + Options.watermark)
+            sys.exit(1)
+        auxargs += ' -i "%s"' % Options.watermark
+        filter_complex.append('overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2')
+    if len(filter_complex_scale):
+        filter_complex_scale = "scale=%s" % (':'.join(filter_complex_scale))
+        filter_complex = [filter_complex_scale] + filter_complex
+    if len(filter_complex):
+        auxargs += ' -filter_complex "%s"' % (','.join(filter_complex))
     if Options.timestart:
         auxargs += ' -ss "%s"' % Options.timestart
     if Options.duration:
