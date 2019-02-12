@@ -308,7 +308,7 @@
 },
 
 "cut":{
-	"input":"RESULT/JPG,RESULT/PNG,RESULT/TIF,RESULT/DPX",
+	"input":"RESULT/ANIM,RESULT/PNG,RESULT/JPG,RESULT/TIF,RESULT/DPX",
 	"output":"COMMON/_cut",
 	"af_capacity":500,
 	"af_maxtasks":10,
