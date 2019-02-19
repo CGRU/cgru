@@ -100,6 +100,7 @@ class nvidia_smi(resbase.resbase):
             if tpr_max > gpu_tpr_max: tpr_max = gpu_tpr_max
 
             # Collect processes and progs (processes with the same name)
+            if not 'process_info' in gpu['processes']: continue
             processes = []
             progs = {}
             for prc in gpu['processes']['process_info']:
