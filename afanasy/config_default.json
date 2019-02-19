@@ -108,7 +108,7 @@
 		"":"Device to measure disk IO statistics.",
 		"":"For MS Windows - statistics only for first disk available.",
 
-	"-af_render_resclasses":["example","iostat"],
+	"-af_render_resclasses":["example","iostat","nvidia_smi"],
 		"":"Custom resources meters:",
 			"":"example - simple resource meter for an example only",
 			"":"iostat - parse output of linux 'iostat' command",

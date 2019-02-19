@@ -16,7 +16,7 @@ if len(sys.argv) > 2:
 
 print("Class = '%s', period = %d" % (resclass, period))
 
-mod = __import__('resources.%s' % resclass, globals(), locals(), [], -1)
+mod = __import__('resources.%s' % resclass, globals(), locals(), [])
 res = eval('mod.%s.%s()' % (resclass, resclass))
 
 for cycle in range(0, 100):
