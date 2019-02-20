@@ -774,6 +774,7 @@ function fu_WalkProcessGUI(i_wnd)
 	block.tasks = [task];
 
 	var cmd = c_PathPM_Client2Server(RULES.walk.cmd);
+	cmd += ' -p';
 	cmd += ' --thumb 128';
 	cmd += ' --report 256';
 	if (params.upparents == false)
