@@ -708,10 +708,6 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 	}
 	elItem.classList.add(type);
 
-	// Drag&Drop:
-	elItem.draggable = 'true';
-	elItem.ondragstart = function(e) { c_FileDragStart(e, e.currentTarget.m_path); };
-
 	// Anchor Icon:
 	var elAnchor = null;
 	if (i_isFolder)
@@ -733,9 +729,6 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 			elAnchor.textContent = '@';
 	}
 	elAnchor.href = g_GetLocationArgs({"fv_Goto": path});
-	//	elAnchor.m_path = path;
-	//	elAnchor.draggable = 'true';
-	//	elAnchor.ondragstart = function(e){ c_FileDragStart( e, e.currentTarget.m_path);}
 
 	// Thumbnail:
 	if (this.has_thumbs)
@@ -745,6 +738,10 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 	elBody.classList.add('fbody');
 	elItem.appendChild(elBody);
 	elItem.m_elBody = elBody;
+	// Drag&Drop:
+	elBody.m_path = path;
+	elBody.draggable = 'true';
+	elBody.ondragstart = function(e){ c_FileDragStart( e, e.currentTarget.m_path);}
 
 	elItem.m_elName = document.createElement('a');
 	elBody.appendChild(elItem.m_elName);
