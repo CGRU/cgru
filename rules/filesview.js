@@ -1111,11 +1111,7 @@ FilesView.prototype.countFiles = function(i_path, i_args) {
 };
 
 FilesView.prototype.countFilesFinished = function(i_data, i_args) {
-	i_args.this.countFilesUpdate(i_data, i_args);
-};
-
-FilesView.prototype.countFilesUpdate = function(i_data, i_args) {
-	c_LoadingElReset(this.elRoot);
+	c_LoadingElReset(i_args.this.elRoot);
 
 	if (i_data.error)
 		c_Error(i_data.error);
@@ -1126,12 +1122,7 @@ FilesView.prototype.countFilesUpdate = function(i_data, i_args) {
 		return;
 	}
 
-	var data = i_data.cmdexec[0].walk;
-
-	for (key in data)
-		if (key != 'walk')
-			if (key.indexOf('error') != -1)
-				c_Error('Walk[' + key + ']: ' + data[key]);
+	let data = i_data.cmdexec[0].walk;
 
 	if (data.error)
 	{
@@ -1145,35 +1136,41 @@ FilesView.prototype.countFilesUpdate = function(i_data, i_args) {
 		return;
 	}
 
+	i_args.this.updateFromWalk(data, i_args.wpath);
+
+	if (i_args.post_args && i_args.post_args.func)
+		i_args.post_args.func(i_args.post_args, data.walk);
+};
+
+FilesView.prototype.updateFromWalk = function(i_data, i_path) {
+	//console.log(i_path);
+	//console.log(JSON.stringify(i_data));
 	// Update folder item attrs:
 	for (var i = 0; i < this.elItems.length; i++)
 	{
-		if (this.elItems[i].m_path != i_args.wpath)
+		if (this.elItems[i].m_path != i_path)
 			continue;
 
-		this.showAttrs(this.elItems[i], data.walk);
+		this.showAttrs(this.elItems[i], i_data.walk);
 
 		break;
 	}
 
 	// Update this class instance walk object,
 	// as it can be shown next time from cache:
-	var name = c_PathBase(i_args.wpath);
+	var name = c_PathBase(i_path);
 	for (var i = 0; i < this.walk.folders.length; i++)
 	{
 		if (this.walk.folders[i].name != name)
 			continue;
 
-		for (var key in data.walk)
-			this.walk.folders[i][key] = data.walk[key]
+		for (var key in i_data.walk)
+			this.walk.folders[i][key] = i_data.walk[key]
 
 		break;
 	}
 
 	this.showCounts();
-
-	if (i_args.post_args && i_args.post_args.func)
-		i_args.post_args.func(i_args.post_args, data.walk);
 };
 
 FilesView.prototype.put = function() {
@@ -1807,42 +1804,47 @@ function fv_SkipFile(i_filename)
 
 function fv_ReloadAll()
 {
-	for (var i = 0; i < fv_views.length; i++)
+	for (let i = 0; i < fv_views.length; i++)
 		fv_views[i].refresh();
 }
 function fv_refreshAttrs()
 {
-	for (var i = 0; i < fv_views.length; i++)
+	for (let i = 0; i < fv_views.length; i++)
 		fv_views[i].refreshAttrs();
 }
 function fv_SelectNone()
 {
-	for (var v = 0; v < fv_views.length; v++)
+	for (let v = 0; v < fv_views.length; v++)
 		fv_views[v].selectNone();
 }
 function fv_BufferAdded()
 {
-	for (var v = 0; v < fv_views.length; v++)
+	for (let v = 0; v < fv_views.length; v++)
 		fv_views[v].bufferAdded();
 }
 function fv_BufferEmpty()
 {
-	for (var v = 0; v < fv_views.length; v++)
+	for (let v = 0; v < fv_views.length; v++)
 		fv_views[v].bufferEmpty();
 }
 function fv_RefreshPath(i_path)
 {
 	// console.log('fv_RefreshPath: ' + i_path);
-	for (var i = 0; i < fv_views.length; i++)
+	for (let i = 0; i < fv_views.length; i++)
 		if (fv_views[i].path == i_path)
 			fv_views[i].refresh();
+}
+function fv_UpdateFromWalk(i_data, i_path)
+{
+	for (let i = 0; i < fv_views.length; i++)
+		fv_views[i].updateFromWalk(i_data, i_path);
 }
 function fv_Goto(i_path)
 {
 	fv_SelectNone();
-	for (var v = 0; v < fv_views.length; v++)
+	for (let v = 0; v < fv_views.length; v++)
 	{
-		var el = fv_views[v].getItemPath(i_path);
+		let el = fv_views[v].getItemPath(i_path);
 		if (el)
 		{
 			fv_views[v].selectItem(el);

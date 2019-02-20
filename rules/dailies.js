@@ -118,6 +118,7 @@ function d_Make(i_path, i_outfolder)
 		"send": {"cmdexec": {"cmds": [cmd]}},
 		"func": d_DailiesWalkReceived,
 		"info": 'walk dailies',
+		"wpath": i_path,
 		"d_params": params,
 		"d_wnd": wnd
 	});
@@ -125,14 +126,19 @@ function d_Make(i_path, i_outfolder)
 
 function d_DailiesWalkReceived(i_data, i_args)
 {
+	//console.log(JSON.stringify(i_data));
 	var wnd = i_args.d_wnd;
 	var params = i_args.d_params;
-	var walk = i_data.cmdexec[0];
 
-	//console.log(JSON.stringify(walk.walk.walk.exif));
-	if (walk && walk.walk && walk.walk.walk && walk.walk.walk.exif)
+	var data = null;
+	if (i_data.cmdexec && i_data.cmdexec[0].walk)
+		data = i_data.cmdexec[0].walk;
+
+	//console.log(JSON.stringify(data));
+	// Get files sequence pattern and comments:
+	if (data && data.walk && data.walk.exif)
 	{
-		var exif = walk.walk.walk.exif;
+		var exif = data.walk.exif;
 
 		// Get files pattern (from one file):
 		var file = exif.file;
@@ -152,6 +158,10 @@ function d_DailiesWalkReceived(i_data, i_args)
 		if (exif.comments)
 			params.comments = exif.comments;
 	}
+
+	// Update filesviews
+	if (data)
+		fv_UpdateFromWalk(data, i_args.wpath);
 
 	wnd.elTabs =
 		gui_CreateTabs({"tabs": d_params_types, "elParent": wnd.elContent, "name": 'd_params_types'});
