@@ -3,6 +3,7 @@
 import json
 import subprocess
 import re
+import traceback
 
 import cgruutils
 
@@ -43,27 +44,50 @@ class nvidia_smi(resbase.resbase):
         self.tpr_clr_min = 70
         self.tpr_clr_max = 95
 
-    def update(self):
-        """Missing DocString
-        :return:
-        """
 
-        if self.process is None:
-            self.runProcess()
+    def update(self):
+        """ This function is launched periodically from a base class:
+        """
+        if self.process:
+             self.readProcessOuput()
+
+        self.runProcess()
+
+
+    def readProcessOuput(self):
+        """ Read process stdout
+        """
+        self.data = None
+        obj = dict()
+
+        # Communicate process
+        try:
+            self.data, err = self.process.communicate()
+            if err and len(err):
+                print(err)
+        except:
+            setError('Can`t communicate process.', traceback.format_exc())
             return
 
-        obj = dict()
-        self.data, err = self.process.communicate()
+        # Validate and prepare output data    
         self.data = cgruutils.toStr(self.data)
-
         self.data = self.data.splitlines()
         self.line = 0
-        while self.data[self.line].find('nvidia_smi_log') == -1: self.line += 1
-        self.line += 2
-        self.getLineObj(obj)
+        found = False
+        while self.line < len(self.data):
+            if self.data[self.line].count('<nvidia_smi_log>'):
+                found = True
+                break
+            self.line += 1
+        if not found:
+            self.setError('Ouput does not contain <nvidia_smi_log>.', '\n'.join(self.data))
+            return
 
+        # Recursive function to parse XML data and construct dict object:
+        self.getLineObj(obj)
         #print(json.dumps(obj, sort_keys=True, indent=4))
 
+        # Process dict object
         mem_total = 0
         mem_used  = 0
         mem_free  = 0
@@ -150,10 +174,12 @@ class nvidia_smi(resbase.resbase):
             clr = getClr(tpr_val, tpr_max, self.tpr_clr_min, self.tpr_clr_max)
             self.bgcolorb = int(255*clr)
 
-        self.runProcess()
 
     def getLineObj(self, obj):
-
+        """ Parse XML line.
+            Function assumes that each object is in a new line.
+            This significally simplifies parsing.
+        """
         if self.line >= len(self.data):
             return
 
@@ -205,10 +231,30 @@ class nvidia_smi(resbase.resbase):
 
 
     def runProcess(self):
-        self.process = subprocess.Popen(['nvidia-smi','-q','-x'], stdout=subprocess.PIPE)
+        try:
+            self.process = subprocess.Popen(['nvidia-smi','-q','-x'], stdout=subprocess.PIPE)
+            #self.process = subprocess.Popen(['bash','-c','nvidia-smi -q -x'], stdout=subprocess.PIPE)
+        except:
+            self.process = None
+            self.setError('Failed to launch nvidia-smi', traceback.format_exc())
+            return
+
+
+    def setError(self, i_msg, i_tip = None):
+        """ Set error label and tooltip
+        """
+        self.label = 'ERROR: ' + i_msg
+        self.labelr = 255
+        self.labelg = 0
+        self.labelb = 0
+        if i_tip is None:
+            i_tip = self.label
+        self.tooltip = i_tip
+        print(self.tooltip)
+
 
 def getClr(i_val, i_total, i_min, i_max):
-    """Get a value from 0.0 to 1.0
+    """ Get a value from 0.0 to 1.0 from inputs
     """
     clr = 100.0 * i_val / i_total
     clr = clr - i_min
