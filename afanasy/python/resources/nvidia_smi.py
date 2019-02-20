@@ -147,7 +147,7 @@ class nvidia_smi(resbase.resbase):
             label += '\n'
             for name, mem in sorted(progs.items(), key=lambda kv: kv[1], reverse=True):
                 label += ' ' + name
-                label += ':%d' % mem
+                label += ':%dM' % mem
 
             # constuct tip strings (sorted by mem):
             processes.sort(key=lambda k: k['mem'], reverse=True)
