@@ -1148,7 +1148,7 @@ FilesView.prototype.countFilesUpdate = function(i_data, i_args) {
 		for (var key in data.walk)
 			this.walk.folders[i][key] = data.walk[key]
 
-										break;
+		break;
 	}
 
 	this.showCounts();

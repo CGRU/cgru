@@ -27,15 +27,16 @@ var d_params_types = {
 
 var d_params = {"general": {}, "settings": {}};
 d_params.general = {
-	project /***/: {"width": '50%'},
-	shot /******/: {"width": '50%', "lwidth": '70px'},
-	artist /****/: {"width": '50%'},
-	activity /**/: {"width": '25%', "lwidth": '70px'},
-	version /***/: {"width": '25%', "lwidth": '70px'},
-	input /*****/: {},
-	output /****/: {},
-	filename /**/: {"width": '75%'},
-	fps /*******/: {"label": 'FPS', "width": '25%', "lwidth": '70px'}
+	project  : {"width": '50%'},
+	shot     : {"width": '50%', "lwidth": '70px'},
+	artist   : {"width": '50%'},
+	activity : {"width": '25%', "lwidth": '70px'},
+	version  : {"width": '25%', "lwidth": '70px'},
+	input    : {},
+	output   : {},
+	filename : {"width": '75%'},
+	fps      : {"label": 'FPS', "width": '25%', "lwidth": '70px'},
+	comments : {}
 };
 d_params.settings = {
 	audio_file /******/: {"label": 'Audio', "default": "REF/sound.flac", "tooltip": 'Sound file'},
@@ -288,6 +289,8 @@ function d_MakeCmd(i_params)
 	cmd += ' -r ' + params.format;
 	cmd += ' -s ' + params.slate;
 	cmd += ' -t ' + params.template;
+	if (params.comments != '')
+		cmd += ' --comments "' + params.comments + '"';
 
 	if (RULES.dailies.font)
 		cmd += ' --font "' + RULES.dailies.font + '"';
