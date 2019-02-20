@@ -48,6 +48,10 @@ class nvidia_smi(resbase.resbase):
     def update(self):
         """ This function is launched periodically from a base class:
         """
+        self.labelr = 255
+        self.labelg = 255
+        self.labelb = 0
+
         if self.process:
              self.readProcessOuput()
 
@@ -129,8 +133,16 @@ class nvidia_smi(resbase.resbase):
             processes = []
             progs = {}
             for prc in gpu['processes']['process_info']:
-                name = prc['process_name']
-                mem = int(prc['used_memory'].split(' ')[0])
+                if isinstance(prc, dict):
+                    name = prc['process_name']
+                    mem = int(prc['used_memory'].split(' ')[0])
+                else:
+                    name = str(prc)
+                    mem = 0
+                    self.labelr = 255
+                    self.labelg = 0
+                    self.labelb = 0
+
                 # append processes:
                 pc = dict()
                 pc['name'] = name
