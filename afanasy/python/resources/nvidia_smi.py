@@ -153,7 +153,7 @@ class nvidia_smi(resbase.resbase):
             processes.sort(key=lambda k: k['mem'], reverse=True)
             for prc in processes:
                 tip += '\n' + prc['name']
-                tip += ': %d' % prc['mem']
+                tip += ': %d MiB' % prc['mem']
 
 
         self.label = 'v' + obj['driver_version'] + ' ' + label
