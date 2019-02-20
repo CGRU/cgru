@@ -81,7 +81,7 @@ def processExif(i_file):
     params['ImageWidth'] = 'width'
     params['ImageHeight'] = 'height'
     params['Artist'] = 'artist'
-    params['Comment'] = 'comment'
+    params['Comment'] = 'comments'
 
     cmd_args = ['exiftool','-S','-fast2']
     for key in params:

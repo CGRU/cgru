@@ -660,8 +660,8 @@ FilesView.prototype.showAttrs = function(i_el, i_obj) {
 		//if (exif.compression) info += ' ' + exif.compression;
 		if (exif.artist)
 			info += ' ' + exif.artist;
-		if (exif.comment)
-			info += ' ' + exif.comment;
+		if (exif.comments)
+			info += ' ' + exif.comments;
 		i_el.m_el_mediainfo.textContent = info;
 	}
 

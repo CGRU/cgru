@@ -113,9 +113,10 @@ function d_Make(i_path, i_outfolder)
 
 	var wnd = new cgru_Window({"name": 'dailies', "title": 'Make Dailies'});
 
-	n_WalkDir({
-		"paths": [i_path],
-		"wfunc": d_DailiesWalkReceived,
+	var cmd = 'rules/bin/walk.sh -m "' + RULES.root + i_path + '"';
+	n_Request({
+		"send": {"cmdexec": {"cmds": [cmd]}},
+		"func": d_DailiesWalkReceived,
 		"info": 'walk dailies',
 		"d_params": params,
 		"d_wnd": wnd
@@ -126,26 +127,31 @@ function d_DailiesWalkReceived(i_data, i_args)
 {
 	var wnd = i_args.d_wnd;
 	var params = i_args.d_params;
-	var walk = i_data[0];
+	var walk = i_data.cmdexec[0];
 
-	if (walk && walk.files && walk.files.length)
-		for (var f = 0; f < walk.files.length; f++)
+	//console.log(JSON.stringify(walk.walk.walk.exif));
+	if (walk && walk.walk && walk.walk.walk && walk.walk.walk.exif)
+	{
+		var exif = walk.walk.walk.exif;
+
+		// Get files pattern (from one file):
+		var file = exif.file;
+		var match = file.match(/\d+\./g);
+		if (match)
 		{
-			var file = walk.files[f].name;
-			var match = file.match(/\d+\./g);
-			if (match)
-			{
-				match = match[match.length - 1];
-				var pos = file.lastIndexOf(match);
-				var pattern = file.substr(0, pos);
-				for (var d = 0; d < match.length - 1; d++)
-					pattern += '#';
-				pattern += file.substr(pos - 1 + match.length);
-				params.input = c_PathPM_Rules2Client(params.input + '/' + pattern);
-				break;
-			}
-			// window.console.log( match);
+			match = match[match.length - 1];
+			var pos = file.lastIndexOf(match);
+			var pattern = file.substr(0, pos);
+			for (var d = 0; d < match.length - 1; d++)
+				pattern += '#';
+			pattern += file.substr(pos - 1 + match.length);
+			params.input = c_PathPM_Rules2Client(params.input + '/' + pattern);
 		}
+
+		// Get comments (came from image EXIF metadata):
+		if (exif.comments)
+			params.comments = exif.comments;
+	}
 
 	wnd.elTabs =
 		gui_CreateTabs({"tabs": d_params_types, "elParent": wnd.elContent, "name": 'd_params_types'});
