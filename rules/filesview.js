@@ -618,13 +618,13 @@ FilesView.prototype.showAttrs = function(i_el, i_obj) {
 	var video = i_el.m_obj.video;
 	if (video)
 	{
-		if (i_el.m_el_videoinfo == null)
+		if (i_el.m_el_mediainfo == null)
 		{
-			i_el.m_el_videoinfo = document.createElement('div');
-			i_el.m_elBody.appendChild(i_el.m_el_videoinfo);
-			i_el.m_el_videoinfo.classList.add('videoinfo');
+			i_el.m_el_mediainfo = document.createElement('div');
+			i_el.m_elBody.appendChild(i_el.m_el_mediainfo);
+			i_el.m_el_mediainfo.classList.add('mediainfo');
 		}
-		var info = 'Video:';
+		var info = '';
 		if (video.width && video.height)
 			info += ' ' + video.width + 'x' + video.height;
 		if (video.frame_count && video.fps)
@@ -641,7 +641,28 @@ FilesView.prototype.showAttrs = function(i_el, i_obj) {
 			info += '/' + video.bitdepth;
 		if (video.frame_count)
 			info += ' ' + video.frame_count + 'f';
-		i_el.m_el_videoinfo.textContent = info;
+		i_el.m_el_mediainfo.textContent = info;
+	}
+
+	var exif = i_el.m_obj.exif;
+	if (exif)
+	{
+		if (i_el.m_el_mediainfo == null)
+		{
+			i_el.m_el_mediainfo = document.createElement('div');
+			i_el.m_elBody.appendChild(i_el.m_el_mediainfo);
+			i_el.m_el_mediainfo.classList.add('mediainfo');
+		}
+		var info = '';
+		if (exif.width && exif.height) info += ' ' + exif.width + 'x' + exif.height;
+		//if (exif.bitdepth) info += ' ' + exif.bitdepth;
+		//if (exif.colortype) info += ' ' + exif.colortype;
+		//if (exif.compression) info += ' ' + exif.compression;
+		if (exif.artist)
+			info += ' ' + exif.artist;
+		if (exif.comment)
+			info += ' ' + exif.comment;
+		i_el.m_el_mediainfo.textContent = info;
 	}
 
 	if (i_el.m_obj.annotation)
@@ -738,11 +759,8 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 	elBody.classList.add('fbody');
 	elItem.appendChild(elBody);
 	elItem.m_elBody = elBody;
-	// Drag&Drop:
-	elBody.m_path = path;
-	elBody.draggable = 'true';
-	elBody.ondragstart = function(e){ c_FileDragStart( e, e.currentTarget.m_path);}
 
+	// Name (Link)
 	elItem.m_elName = document.createElement('a');
 	elBody.appendChild(elItem.m_elName);
 	elItem.m_elName.classList.add('name');
@@ -754,6 +772,10 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 		elItem.m_elName.href = RULES.root + path;
 		elItem.m_elName.target = '_blank';
 	}
+	// Drag&Drop:
+	elItem.m_elName.m_path = path;
+	elItem.m_elName.draggable = 'true';
+	elItem.m_elName.ondragstart = function(e){ c_FileDragStart( e, e.currentTarget.m_path);}
 
 	// Menu show/hide button:
 	var el = document.createElement('div');
@@ -1078,7 +1100,7 @@ FilesView.prototype.getSelected = function() {
 
 FilesView.prototype.countFiles = function(i_path, i_args) {
 	c_LoadingElSet(this.elRoot);
-	var cmd = 'rules/bin/walk.sh "' + RULES.root + i_path + '"';
+	var cmd = 'rules/bin/walk.sh -m "' + RULES.root + i_path + '"';
 	n_Request({
 		"send": {"cmdexec": {"cmds": [cmd]}},
 		"func": this.countFilesFinished,
