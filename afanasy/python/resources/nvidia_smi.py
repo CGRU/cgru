@@ -66,7 +66,7 @@ class nvidia_smi(resbase.resbase):
             if err and len(err):
                 print(err)
         except:
-            setError('Can`t communicate process.', traceback.format_exc())
+            self.setError('Can`t communicate process.', traceback.format_exc())
             return
 
         # Validate and prepare output data    
@@ -77,6 +77,7 @@ class nvidia_smi(resbase.resbase):
         while self.line < len(self.data):
             if self.data[self.line].count('<nvidia_smi_log>'):
                 found = True
+                self.line += 1
                 break
             self.line += 1
         if not found:
