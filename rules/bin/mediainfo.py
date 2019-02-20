@@ -5,6 +5,7 @@ import json
 import os
 import sys
 import subprocess
+import traceback
 
 import cgruutils
 
@@ -31,7 +32,7 @@ def processMovie( i_file):
     inform = ''
     for key in params:
         if len( inform): inform += ','
-        inform += '"%s":"%%%s%%"' % ( key, params[key])
+        inform += '""%s"":""%%%s%%""' % ( key, params[key])
     inform = '--inform=Video;{' + inform + '}'
 
     data = subprocess.check_output(['mediainfo', inform, out['infile']])
@@ -44,6 +45,7 @@ def processMovie( i_file):
         inform = None
         out['data'] = data
         out['error'] = 'JSON load error'
+        print(traceback.format_exc())
         return out
 
     for key in inform:
