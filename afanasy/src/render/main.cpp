@@ -224,13 +224,13 @@ AF_LOG << " >>> " << i_msg;
 		else if (new_id == 0)
 		{
 			AF_WARN << "Zero ID received, no such online render, re-connecting...";
-			i_render.connectionLost(true);
+			i_render.connectionLost();
 		}
 		// Bad case, should not ever happen, try to re-register.
-		else if ( i_render.getId() != new_id )
+		else if (i_render.getId() != new_id)
 		{
 			AF_ERR << "IDs mismatch: this " << i_render.getId() << " != " << new_id << " new, re-connecting...";
-			i_render.connectionLost( true);
+			i_render.connectionLost();
 		}
 		// Id, that returns from server is equals to stored on client.
 		// This is a normal case.

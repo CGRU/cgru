@@ -618,13 +618,13 @@ FilesView.prototype.showAttrs = function(i_el, i_obj) {
 	var video = i_el.m_obj.video;
 	if (video)
 	{
-		if (i_el.m_el_videoinfo == null)
+		if (i_el.m_el_mediainfo == null)
 		{
-			i_el.m_el_videoinfo = document.createElement('div');
-			i_el.m_elBody.appendChild(i_el.m_el_videoinfo);
-			i_el.m_el_videoinfo.classList.add('videoinfo');
+			i_el.m_el_mediainfo = document.createElement('div');
+			i_el.m_elBody.appendChild(i_el.m_el_mediainfo);
+			i_el.m_el_mediainfo.classList.add('mediainfo');
 		}
-		var info = 'Video:';
+		var info = '';
 		if (video.width && video.height)
 			info += ' ' + video.width + 'x' + video.height;
 		if (video.frame_count && video.fps)
@@ -641,7 +641,28 @@ FilesView.prototype.showAttrs = function(i_el, i_obj) {
 			info += '/' + video.bitdepth;
 		if (video.frame_count)
 			info += ' ' + video.frame_count + 'f';
-		i_el.m_el_videoinfo.textContent = info;
+		i_el.m_el_mediainfo.textContent = info;
+	}
+
+	var exif = i_el.m_obj.exif;
+	if (exif)
+	{
+		if (i_el.m_el_mediainfo == null)
+		{
+			i_el.m_el_mediainfo = document.createElement('div');
+			i_el.m_elBody.appendChild(i_el.m_el_mediainfo);
+			i_el.m_el_mediainfo.classList.add('mediainfo');
+		}
+		var info = '';
+		if (exif.width && exif.height) info += ' ' + exif.width + 'x' + exif.height;
+		//if (exif.bitdepth) info += ' ' + exif.bitdepth;
+		//if (exif.colortype) info += ' ' + exif.colortype;
+		//if (exif.compression) info += ' ' + exif.compression;
+		if (exif.artist)
+			info += ' ' + exif.artist;
+		if (exif.comments)
+			info += ' ' + exif.comments;
+		i_el.m_el_mediainfo.textContent = info;
 	}
 
 	if (i_el.m_obj.annotation)
@@ -708,10 +729,6 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 	}
 	elItem.classList.add(type);
 
-	// Drag&Drop:
-	elItem.draggable = 'true';
-	elItem.ondragstart = function(e) { c_FileDragStart(e, e.currentTarget.m_path); };
-
 	// Anchor Icon:
 	var elAnchor = null;
 	if (i_isFolder)
@@ -733,9 +750,6 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 			elAnchor.textContent = '@';
 	}
 	elAnchor.href = g_GetLocationArgs({"fv_Goto": path});
-	//	elAnchor.m_path = path;
-	//	elAnchor.draggable = 'true';
-	//	elAnchor.ondragstart = function(e){ c_FileDragStart( e, e.currentTarget.m_path);}
 
 	// Thumbnail:
 	if (this.has_thumbs)
@@ -746,6 +760,7 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 	elItem.appendChild(elBody);
 	elItem.m_elBody = elBody;
 
+	// Name (Link)
 	elItem.m_elName = document.createElement('a');
 	elBody.appendChild(elItem.m_elName);
 	elItem.m_elName.classList.add('name');
@@ -757,6 +772,10 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 		elItem.m_elName.href = RULES.root + path;
 		elItem.m_elName.target = '_blank';
 	}
+	// Drag&Drop:
+	elItem.m_elName.m_path = path;
+	elItem.m_elName.draggable = 'true';
+	elItem.m_elName.ondragstart = function(e){ c_FileDragStart( e, e.currentTarget.m_path);}
 
 	// Menu show/hide button:
 	var el = document.createElement('div');
@@ -1081,7 +1100,7 @@ FilesView.prototype.getSelected = function() {
 
 FilesView.prototype.countFiles = function(i_path, i_args) {
 	c_LoadingElSet(this.elRoot);
-	var cmd = 'rules/bin/walk.sh "' + RULES.root + i_path + '"';
+	var cmd = 'rules/bin/walk.sh -m "' + RULES.root + i_path + '"';
 	n_Request({
 		"send": {"cmdexec": {"cmds": [cmd]}},
 		"func": this.countFilesFinished,
@@ -1092,11 +1111,7 @@ FilesView.prototype.countFiles = function(i_path, i_args) {
 };
 
 FilesView.prototype.countFilesFinished = function(i_data, i_args) {
-	i_args.this.countFilesUpdate(i_data, i_args);
-};
-
-FilesView.prototype.countFilesUpdate = function(i_data, i_args) {
-	c_LoadingElReset(this.elRoot);
+	c_LoadingElReset(i_args.this.elRoot);
 
 	if (i_data.error)
 		c_Error(i_data.error);
@@ -1107,12 +1122,7 @@ FilesView.prototype.countFilesUpdate = function(i_data, i_args) {
 		return;
 	}
 
-	var data = i_data.cmdexec[0].walk;
-
-	for (key in data)
-		if (key != 'walk')
-			if (key.indexOf('error') != -1)
-				c_Error('Walk[' + key + ']: ' + data[key]);
+	let data = i_data.cmdexec[0].walk;
 
 	if (data.error)
 	{
@@ -1126,35 +1136,41 @@ FilesView.prototype.countFilesUpdate = function(i_data, i_args) {
 		return;
 	}
 
+	i_args.this.updateFromWalk(data, i_args.wpath);
+
+	if (i_args.post_args && i_args.post_args.func)
+		i_args.post_args.func(i_args.post_args, data.walk);
+};
+
+FilesView.prototype.updateFromWalk = function(i_data, i_path) {
+	//console.log(i_path);
+	//console.log(JSON.stringify(i_data));
 	// Update folder item attrs:
 	for (var i = 0; i < this.elItems.length; i++)
 	{
-		if (this.elItems[i].m_path != i_args.wpath)
+		if (this.elItems[i].m_path != i_path)
 			continue;
 
-		this.showAttrs(this.elItems[i], data.walk);
+		this.showAttrs(this.elItems[i], i_data.walk);
 
 		break;
 	}
 
 	// Update this class instance walk object,
 	// as it can be shown next time from cache:
-	var name = c_PathBase(i_args.wpath);
+	var name = c_PathBase(i_path);
 	for (var i = 0; i < this.walk.folders.length; i++)
 	{
 		if (this.walk.folders[i].name != name)
 			continue;
 
-		for (var key in data.walk)
-			this.walk.folders[i][key] = data.walk[key]
+		for (var key in i_data.walk)
+			this.walk.folders[i][key] = i_data.walk[key]
 
-										break;
+		break;
 	}
 
 	this.showCounts();
-
-	if (i_args.post_args && i_args.post_args.func)
-		i_args.post_args.func(i_args.post_args, data.walk);
 };
 
 FilesView.prototype.put = function() {
@@ -1788,42 +1804,47 @@ function fv_SkipFile(i_filename)
 
 function fv_ReloadAll()
 {
-	for (var i = 0; i < fv_views.length; i++)
+	for (let i = 0; i < fv_views.length; i++)
 		fv_views[i].refresh();
 }
 function fv_refreshAttrs()
 {
-	for (var i = 0; i < fv_views.length; i++)
+	for (let i = 0; i < fv_views.length; i++)
 		fv_views[i].refreshAttrs();
 }
 function fv_SelectNone()
 {
-	for (var v = 0; v < fv_views.length; v++)
+	for (let v = 0; v < fv_views.length; v++)
 		fv_views[v].selectNone();
 }
 function fv_BufferAdded()
 {
-	for (var v = 0; v < fv_views.length; v++)
+	for (let v = 0; v < fv_views.length; v++)
 		fv_views[v].bufferAdded();
 }
 function fv_BufferEmpty()
 {
-	for (var v = 0; v < fv_views.length; v++)
+	for (let v = 0; v < fv_views.length; v++)
 		fv_views[v].bufferEmpty();
 }
 function fv_RefreshPath(i_path)
 {
 	// console.log('fv_RefreshPath: ' + i_path);
-	for (var i = 0; i < fv_views.length; i++)
+	for (let i = 0; i < fv_views.length; i++)
 		if (fv_views[i].path == i_path)
 			fv_views[i].refresh();
+}
+function fv_UpdateFromWalk(i_data, i_path)
+{
+	for (let i = 0; i < fv_views.length; i++)
+		fv_views[i].updateFromWalk(i_data, i_path);
 }
 function fv_Goto(i_path)
 {
 	fv_SelectNone();
-	for (var v = 0; v < fv_views.length; v++)
+	for (let v = 0; v < fv_views.length; v++)
 	{
-		var el = fv_views[v].getItemPath(i_path);
+		let el = fv_views[v].getItemPath(i_path);
 		if (el)
 		{
 			fv_views[v].selectItem(el);

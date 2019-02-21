@@ -851,7 +851,7 @@ margin-bottom: -4px;
 .filesview .item .fbody .filesnum.error { background-color: #FF3333; box-shadow: 0 0 4px #FF0000; }
 .filesview .item .fbody .filesnum.error.greater { background-color: #FF33FF; }
 .filesview .item .fbody .checksum { font: 12px monospace; }
-.filesview .item .fbody .videoinfo { font: 10px monospace; clear: both; }
+.filesview .item .fbody .mediainfo { font: 10px monospace; float: right; padding: 4px 12px;}
 .filesview .item .preview { clear: both; margin: 4px; float: none; text-align: center; border-radius: 8px; border: 2px solid #000; background: #222; }
 .filesview .item .preview .video { border-radius: 6px; border: 2px solid #000; }
 .filesview .item .preview .close { background-color: #555; color: #000; }

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import traceback
 
 
 class resbase:  # TODO: Class names should follow CamelCase naming convention
@@ -45,7 +46,7 @@ class resbase:  # TODO: Class names should follow CamelCase naming convention
             self.update()
         except:  # TODO: too broad exception clause
             print('Error updating resources:')
-            print(str(sys.exc_info()[1]))
+            traceback.print_exc(file=sys.stdout)
             self.label = 'Error'
         return self
 

@@ -8,7 +8,7 @@ User=render
 #Group=render
 WorkingDirectory=/opt/cgru
 ExecStart=/opt/cgru/start/AFANASY/_afrender.sh -log_nodate
-KillMode=control-group
+KillMode=process
 TimeoutStopSec=3
 
 [Install]

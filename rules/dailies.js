@@ -27,15 +27,16 @@ var d_params_types = {
 
 var d_params = {"general": {}, "settings": {}};
 d_params.general = {
-	project /***/: {"width": '50%'},
-	shot /******/: {"width": '50%', "lwidth": '70px'},
-	artist /****/: {"width": '50%'},
-	activity /**/: {"width": '25%', "lwidth": '70px'},
-	version /***/: {"width": '25%', "lwidth": '70px'},
-	input /*****/: {},
-	output /****/: {},
-	filename /**/: {"width": '75%'},
-	fps /*******/: {"label": 'FPS', "width": '25%', "lwidth": '70px'}
+	project  : {"width": '50%'},
+	shot     : {"width": '50%', "lwidth": '70px'},
+	artist   : {"width": '50%'},
+	activity : {"width": '25%', "lwidth": '70px'},
+	version  : {"width": '25%', "lwidth": '70px'},
+	input    : {},
+	output   : {},
+	filename : {"width": '75%'},
+	fps      : {"label": 'FPS', "width": '25%', "lwidth": '70px'},
+	comments : {}
 };
 d_params.settings = {
 	audio_file /******/: {"label": 'Audio', "default": "REF/sound.flac", "tooltip": 'Sound file'},
@@ -112,10 +113,12 @@ function d_Make(i_path, i_outfolder)
 
 	var wnd = new cgru_Window({"name": 'dailies', "title": 'Make Dailies'});
 
-	n_WalkDir({
-		"paths": [i_path],
-		"wfunc": d_DailiesWalkReceived,
+	var cmd = 'rules/bin/walk.sh -m "' + RULES.root + i_path + '"';
+	n_Request({
+		"send": {"cmdexec": {"cmds": [cmd]}},
+		"func": d_DailiesWalkReceived,
 		"info": 'walk dailies',
+		"wpath": i_path,
 		"d_params": params,
 		"d_wnd": wnd
 	});
@@ -123,28 +126,42 @@ function d_Make(i_path, i_outfolder)
 
 function d_DailiesWalkReceived(i_data, i_args)
 {
+	//console.log(JSON.stringify(i_data));
 	var wnd = i_args.d_wnd;
 	var params = i_args.d_params;
-	var walk = i_data[0];
 
-	if (walk && walk.files && walk.files.length)
-		for (var f = 0; f < walk.files.length; f++)
+	var data = null;
+	if (i_data.cmdexec && i_data.cmdexec[0].walk)
+		data = i_data.cmdexec[0].walk;
+
+	//console.log(JSON.stringify(data));
+	// Get files sequence pattern and comments:
+	if (data && data.walk && data.walk.exif)
+	{
+		var exif = data.walk.exif;
+
+		// Get files pattern (from one file):
+		var file = exif.file;
+		var match = file.match(/\d+\./g);
+		if (match)
 		{
-			var file = walk.files[f].name;
-			var match = file.match(/\d+\./g);
-			if (match)
-			{
-				match = match[match.length - 1];
-				var pos = file.lastIndexOf(match);
-				var pattern = file.substr(0, pos);
-				for (var d = 0; d < match.length - 1; d++)
-					pattern += '#';
-				pattern += file.substr(pos - 1 + match.length);
-				params.input = c_PathPM_Rules2Client(params.input + '/' + pattern);
-				break;
-			}
-			// window.console.log( match);
+			match = match[match.length - 1];
+			var pos = file.lastIndexOf(match);
+			var pattern = file.substr(0, pos);
+			for (var d = 0; d < match.length - 1; d++)
+				pattern += '#';
+			pattern += file.substr(pos - 1 + match.length);
+			params.input = c_PathPM_Rules2Client(params.input + '/' + pattern);
 		}
+
+		// Get comments (came from image EXIF metadata):
+		if (exif.comments)
+			params.comments = exif.comments;
+	}
+
+	// Update filesviews
+	if (data)
+		fv_UpdateFromWalk(data, i_args.wpath);
 
 	wnd.elTabs =
 		gui_CreateTabs({"tabs": d_params_types, "elParent": wnd.elContent, "name": 'd_params_types'});
@@ -288,6 +305,8 @@ function d_MakeCmd(i_params)
 	cmd += ' -r ' + params.format;
 	cmd += ' -s ' + params.slate;
 	cmd += ' -t ' + params.template;
+	if (params.comments != '')
+		cmd += ' --comments "' + params.comments + '"';
 
 	if (RULES.dailies.font)
 		cmd += ' --font "' + RULES.dailies.font + '"';
