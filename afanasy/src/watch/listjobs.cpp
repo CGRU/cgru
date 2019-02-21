@@ -406,13 +406,14 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	{
 		submenu = new QMenu( "Delete", this);
 
+		action = new QAction( "Delete Selected", this);
+		connect( action, SIGNAL( triggered() ), this, SLOT( actDelete()));
+		submenu->addAction( action);
+
 		action = new QAction( "Delete All Done", this);
 		connect( action, SIGNAL( triggered() ), this, SLOT( actDeleteDone()));
 		submenu->addAction( action);
 
-		action = new QAction( "Delete Selected", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actDelete()));
-		submenu->addAction( action);
 		menu.addMenu( submenu);
 	}
 
