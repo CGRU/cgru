@@ -48,8 +48,8 @@ class nvidia_smi(resbase.resbase):
     def update(self):
         """ This function is launched periodically from a base class:
         """
-        self.labelr = 255
-        self.labelg = 255
+        self.labelr = 100
+        self.labelg = 200
         self.labelb = 0
 
         if self.process:
@@ -130,13 +130,23 @@ class nvidia_smi(resbase.resbase):
 
             # Collect processes and progs (processes with the same name)
             if not 'process_info' in gpu['processes']: continue
+            self.labelg = 255
             processes = []
             progs = {}
+
             for prc in gpu['processes']['process_info']:
-                if isinstance(prc, dict):
-                    name = prc['process_name']
-                    mem = int(prc['used_memory'].split(' ')[0])
-                else:
+                iterate = False
+                try:
+                    if isinstance(prc, dict):
+                        name = prc['process_name']
+                        mem = int(prc['used_memory'].split(' ')[0])
+                        iterate = True
+                    else:
+                        name = gpu['processes']['process_info']['process_name']
+                        mem = int(gpu['processes']['process_info']['used_memory'].split(' ')[0])
+                except:
+                    print(str(gpu['processes']['process_info']))
+                    print(traceback.format_exc())
                     name = str(prc)
                     mem = 0
                     self.labelr = 255
@@ -155,6 +165,9 @@ class nvidia_smi(resbase.resbase):
                 else:
                     progs[name] = mem
 
+                if not iterate:
+                    break
+
             # constuct label string (sorted by mem):
             label += '\n'
             for name, mem in sorted(progs.items(), key=lambda kv: kv[1], reverse=True):
@@ -170,6 +183,9 @@ class nvidia_smi(resbase.resbase):
 
         self.label = 'v' + obj['driver_version'] + ' ' + label
         self.tooltip = 'NVIDIA Driver Verion: ' + obj['driver_version'] + '\n' + tip
+
+        if mem_used:
+            self.labelr = 255
 
         if mem_total:
             self.valuemax = mem_total
