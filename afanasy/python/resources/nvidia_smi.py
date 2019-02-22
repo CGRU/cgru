@@ -113,7 +113,7 @@ class nvidia_smi(resbase.resbase):
             total = int(mem['total'].split(' ')[0])
             used  = int(mem['used' ].split(' ')[0])
             free  = int(mem['free' ].split(' ')[0])
-            label += ' %dG (%dM Used / %dM Free)' % (total/1000,used,free)
+            label += ' %.0fG (%dM Used / %dM Free)' % (float(total)/1000.0,used,free)
             tip += ' Memory: Total %dM, Used %dM, Free %dM' % (total,used,free)
             mem_total += total
             mem_used  += used
