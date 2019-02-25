@@ -303,7 +303,8 @@ function d_MakeCmd(i_params)
 	cmd += ' -c "' + params.codec + '"';
 	cmd += ' -f ' + params.fps;
 	cmd += ' -r ' + params.format;
-	cmd += ' -s ' + params.slate;
+	if (params.slate && params.slate.length)
+		cmd += ' -s ' + params.slate;
 	cmd += ' -t ' + params.template;
 	if (params.comments != '')
 		cmd += ' --comments "' + params.comments + '"';
