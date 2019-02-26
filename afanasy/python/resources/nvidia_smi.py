@@ -170,9 +170,10 @@ class nvidia_smi(resbase.resbase):
                 pc['name'] = name
                 pc['mem'] = mem
                 processes.append(pc)
+                # Cut command arguments:
+                name = name.strip().split(' ')[0]
                 # Use base name for progs:
                 name = name.split('/')[-1].split('\\')[-1]
-                name = name.strip().split(' ')[0]
                 if name in progs:
                     progs[name] += mem
                 else:
