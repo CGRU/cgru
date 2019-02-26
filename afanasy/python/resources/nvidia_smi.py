@@ -124,9 +124,21 @@ class nvidia_smi(resbase.resbase):
             gpu_tpr = int(tpr['gpu_temp'].split(' ')[0])
             gpu_tpr_max = int(tpr['gpu_temp_slow_threshold'].split(' ')[0])
             label += ' %dC(%dC Max)' % (gpu_tpr, gpu_tpr_max)
-            tip += ' Temperature: GPU %dC, Max %dC' % (gpu_tpr, gpu_tpr_max)
+            tip += '; Temperature: GPU %dC, Max %dC' % (gpu_tpr, gpu_tpr_max)
             if tpr_val < gpu_tpr: tpr_val = gpu_tpr
             if tpr_max > gpu_tpr_max: tpr_max = gpu_tpr_max
+
+            # Utilization:
+            util = gpu['utilization']
+            util_gpu = int(util['gpu_util'].split(' ')[0])
+            util_mem = int(util['memory_util'].split(' ')[0])
+            util_enc = int(util['encoder_util'].split(' ')[0])
+            util_dec = int(util['decoder_util'].split(' ')[0])
+            if util_gpu: label += ' G%d%%' % util_gpu
+            if util_mem: label += ' M%d%%' % util_mem
+            if util_enc: label += ' E%d%%' % util_enc
+            if util_dec: label += ' D%d%%' % util_dec
+            tip += '; Utilization: GPU:%d%% MEM:%d%% Encoder:%d%% Decoder:%d%%' % (util_gpu, util_mem, util_enc, util_dec)
 
             # Collect processes and progs (processes with the same name)
             if not 'process_info' in gpu['processes']: continue
@@ -160,6 +172,7 @@ class nvidia_smi(resbase.resbase):
                 processes.append(pc)
                 # Use base name for progs:
                 name = name.split('/')[-1].split('\\')[-1]
+                name = name.strip().split(' ')[0]
                 if name in progs:
                     progs[name] += mem
                 else:
