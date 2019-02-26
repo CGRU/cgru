@@ -134,6 +134,10 @@ function d_DailiesWalkReceived(i_data, i_args)
 	if (i_data.cmdexec && i_data.cmdexec[0].walk)
 		data = i_data.cmdexec[0].walk;
 
+	params.comments = '';
+	if (RULES.status.annotation && RULES.status.annotation.length)
+		params.comments = RULES.status.annotation.trim();
+
 	//console.log(JSON.stringify(data));
 	// Get files sequence pattern and comments:
 	if (data && data.walk && data.walk.exif)
@@ -156,8 +160,10 @@ function d_DailiesWalkReceived(i_data, i_args)
 
 		// Get comments (came from image EXIF metadata):
 		if (exif.comments)
-			params.comments = exif.comments;
+			params.comments += ' ' + exif.comments.trim();
 	}
+
+	params.comments = params.comments.trim();
 
 	// Update filesviews
 	if (data)
@@ -303,9 +309,13 @@ function d_MakeCmd(i_params)
 	cmd += ' -c "' + params.codec + '"';
 	cmd += ' -f ' + params.fps;
 	cmd += ' -r ' + params.format;
+
 	if (params.slate && params.slate.length)
 		cmd += ' -s ' + params.slate;
+
 	cmd += ' -t ' + params.template;
+
+	params.comments = params.comments.trim();
 	if (params.comments != '')
 		cmd += ' --comments "' + params.comments + '"';
 
