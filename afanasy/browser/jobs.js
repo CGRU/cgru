@@ -1328,10 +1328,6 @@ JobNode.prototype.updatePanels = function() {
 
 	work_UpdatePanels(this.monitor, this);
 
-	// Admin can't move jobs:
-	if (g_VISOR())
-		this.monitor.ctrl_btns.move_jobs.classList.remove('active');
-
 
 	// Blocks:
 	JobBlock.deselectAll(this.monitor);
@@ -1460,18 +1456,21 @@ JobNode.createPanels = function(i_monitor) {
 
 
 	// Move:
-	var acts = {};
-	acts.move_jobs_top /*****/ = {'label': 'TOP', 'tooltip': 'Move jobs top.'};
-	acts.move_jobs_up /******/ = {'label': 'UP', 'tooltip': 'Move jobs up.'};
-	acts.move_jobs_down /****/ = {'label': 'DWN', 'tooltip': 'Move jobs down.'};
-	acts.move_jobs_bottom /**/ = {'label': 'BOT', 'tooltip': 'Move jobs bottom.'};
-	i_monitor.createCtrlBtn({
-		'name': 'move_jobs',
-		'label': 'MOV',
-		'tooltip': 'Move jobs.',
-		'sub_menu': acts,
-		'handle': 'moveJobs'
-	});
+	if(false == g_VISOR())
+	{
+		var acts = {};
+		acts.move_jobs_top /*****/ = {'label': 'TOP', 'tooltip': 'Move jobs top.'};
+		acts.move_jobs_up /******/ = {'label': 'UP', 'tooltip': 'Move jobs up.'};
+		acts.move_jobs_down /****/ = {'label': 'DWN', 'tooltip': 'Move jobs down.'};
+		acts.move_jobs_bottom /**/ = {'label': 'BOT', 'tooltip': 'Move jobs bottom.'};
+		i_monitor.createCtrlBtn({
+			'name': 'move_jobs',
+			'label': 'MOV',
+			'tooltip': 'Move jobs.',
+			'sub_menu': acts,
+			'handle': 'moveJobs'
+		});
+	}
 
 	// Actions:
 	var acts = {};
@@ -1481,13 +1480,16 @@ JobNode.createPanels = function(i_monitor) {
 	acts.listen =
 		{"label": "LIS", "tooltip": 'Double click to listen job.', "ondblclick": true, "handle": 'listen'};
 	acts.delete = {"label": "DEL", "tooltip": 'Double click to delete job(s).', "ondblclick": true};
-	acts.deldone = {
-		"label": "DDJ",
-		"tooltip": 'Double click to delete all done jobs.',
-		"ondblclick": true,
-		"always_active": true,
-		"handle": 'delDoneJobs'
-	};
+	if(false == g_VISOR())
+	{
+		acts.deldone = {
+			"label": "DDJ",
+			"tooltip": 'Double click to delete all done jobs.',
+			"ondblclick": true,
+			"always_active": true,
+			"handle": 'delDoneJobs'
+		};
+	}
 	i_monitor.createCtrlBtns(acts);
 
 
