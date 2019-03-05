@@ -77,11 +77,11 @@ bool AfCmd::processCommand( int argc, char** argv, af::Msg &msg)
 
 	if( command_found && (Help == false)) return true;
 
-	printf("Usage: afcmd type options\n");
-	for( CmdList::iterator it = commands.begin(); it != commands.end(); it++)
+	printf("Usage: afcmd command [options] [node_name|nodes_mask]\n");
+	for (CmdList::iterator it = commands.begin(); it != commands.end(); it++)
 		(*it)->v_printInfo();
 
-	printf("Type \"afcmd h [command]\" for command help.\n");
+	printf("Type \"afcmd h [command]\" for a more detailed help.\n");
 
 	return false;
 }
