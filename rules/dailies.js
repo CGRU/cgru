@@ -54,6 +54,10 @@ function d_Make(i_path, i_outfolder)
 
 	var params = {};
 
+	params.fps = RULES.fps;
+	if (RULES.dailies.fps)
+		params = RULES.dailies.fps;
+
 	params.project = 'project';
 	if (ASSETS.project)
 		params.project = ASSETS.project.name;

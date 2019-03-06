@@ -235,7 +235,7 @@
 "dailies":
 {
 	"format":"1280x720",
-	"fps":"25",
+	"-fps":24,
 	"codec":"h264_mid",
 	"container":"DEFAULT",
 	"colorspace":"auto",
