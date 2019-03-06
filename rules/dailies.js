@@ -418,6 +418,9 @@ var d_cvtmulti_params = {
 function d_Convert(i_args)
 {
 	var params = {};
+	params.fps = RULES.fps;
+	if (RULES.dailies.fps)
+		params.fps = RULES.dailies.fps;
 
 	var title = 'Convert ';
 	if (i_args.images)
@@ -1009,6 +1012,9 @@ function d_MakeCut(i_args)
 	params.cut_name = i_args.cut_name;
 	params.output = c_PathPM_Rules2Client(i_args.output);
 	params.input = RULES.assets.shot.result.path.join(',');
+	params.fps = RULES.fps;
+	if (RULES.dailies.fps)
+		params.fps = RULES.dailies.fps;
 	if (RULES.cut.input)
 		params.input = RULES.cut.input;
 
