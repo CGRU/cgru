@@ -13,9 +13,13 @@ if( app.project.af == null )
 	af.exclude_hosts = '';
 	af.mov_enable = false;
 	af.mov_name = '';
-	af.mov_codec = 'h264_good';
-	af.mov_res = '1280x720';
+	af.mov_codec = 'h264_best';
+	af.mov_res = '1920x1080';
 	app.project.af = af;
+	//Capacity for two tasks per host:
+	af.capacity = 500;
+	af.settings = '-mem_usage 40 50'
+	af.mp = false;
 }
 else
 	af = app.project.af;
@@ -84,6 +88,11 @@ function af_StartRender( i_execute)
 			af.frame_start = frame_startL;
 			af.frame_end = frame_endL;
 			af.mov_name = af.comp_name;
+			//Check single-machine rendering:
+			if (output_path.match(/.*(mov|avi|mp3|wav|aiff|mp4|mxf)/gi))
+			{
+				af.frame_per_task = af.frame_end - af.frame_start + 1
+			}
 			return;
 		}
 		
@@ -121,6 +130,14 @@ function af_StartRender( i_execute)
 			if( af.mov_res != '' )
 				cmd += ' -mres "' + af.mov_res + '"';
 		}
+		
+		cmd += ' -capacity "' + af.capacity + '"';
+
+		var extrargs = ' ' + af.settings;
+		if ( af.mp )
+			extrargs += ' -mp'
+
+		cmd += ' -extrargs "' + extrargs + '"';
 		
 		if ( system.osName == "MacOS")
 		{
@@ -231,14 +248,29 @@ function af_DrawWindow()
 	generalTab.add('statictext', undefined, 'Frames Per Task');
 	var elFpt = generalTab.add('edittext', undefined, af.frame_per_task);
     elFpt.alignment = ['fill','center'];
+	
+	generalTab.add('statictext', undefined, 'Capacity');
+	var elCap = generalTab.add('edittext', undefined, af.capacity);
+    elCap.alignment = ['fill','center'];
+
+	generalTab.add('statictext', undefined, 'Render Settings');
+	var elSet = generalTab.add('edittext', undefined, af.settings);
+    elSet.alignment = ['fill','center'];
 
 	elStart.onChange = function(){ if( isNaN(this.text)) this.text = af.frame_start;    af.frame_start    = parseInt(this.text);};
 	elEnd.onChange   = function(){ if( isNaN(this.text)) this.text = af.frame_end;      af.frame_end      = parseInt(this.text);};
 	elFpt.onChange   = function(){ if( isNaN(this.text)) this.text = af.frame_per_task; af.frame_per_task = parseInt(this.text);};
 	elBy.onChange    = function(){ if( isNaN(this.text)) this.text = af.frame_by;       af.frame_by       = parseInt(this.text);};
+	elCap.onChange   = function(){ if( isNaN(this.text)) this.text = af.capacity;       af.capacity       = parseInt(this.text);};
+	elSet.onChange   = function(){ af.settings = this.text;};
 
 	generalTab.add('statictext', undefined, 'Comp Name:');
 	generalTab.add('statictext', undefined, af.comp_name);
+
+	var elMP = generalTab.add('checkbox', undefined, 'Multiprocessing');
+	elMP.helpTip = 'More processes may be created to render multiple frames simultaneously, depending on system configuration and preference settings. (See Memory & Multiprocessing preferences.)';
+	elMP.value = af.mp;
+	elMP.onClick = function(){ af.mp = this.value;};
 
 	var elPaused = generalTab.add('checkbox', undefined, 'Start Paused');
 	elPaused.helpTip = 'If enabled, the job will submit in the offline state.';

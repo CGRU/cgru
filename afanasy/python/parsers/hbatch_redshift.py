@@ -32,4 +32,4 @@ class hbatch_redshift(hbatch.hbatch, redshift.redshift):
         """
         # print data
         redshift.redshift.do(self, data, mode)
-        hbatch.hbatch.do(self, data, mode)
+        # hbatch.hbatch.do(self, data, mode)

@@ -27,7 +27,7 @@ af::MsgStat mgstat;
 /// Read data from file descriptor. Return bytes than was written or -1 on any error and prints an error in \c stderr.
 int readdata( int fd, char* data, int data_len, int buffer_maxlen)
 {
-	AFINFA("readdata: trying to recieve %d bytes.\n", data_len);
+	AFINFA("readdata: trying to receive %d bytes.\n", data_len);
 	int bytes = 0;
 	while( bytes < data_len )
 	{
@@ -525,7 +525,7 @@ std::string af::msgMakeWriteHeader( const af::Msg * i_msg)
 	}
 	else if( i_msg->type() == af::Msg::TJSON )
 	{
-		header = std::string("AFANASY ") + std::to_string(size) + " JSON";
+		header = std::string("AFANASY ") + af::itos(size) + " JSON";
 	}
 	return header;
 }
@@ -538,9 +538,9 @@ std::string af::getHttpHeader(int file_size, const std::string &mimeType, const 
 
 	return "HTTP/1.1 " + status + "\r\n"  // set the http status code
 			 + "Connection: close" + "\r\n"   // instruct browser to close the connection after receiving data
-			 + "Content-Length: " + std::to_string(file_size) + "\r\n"         // tell how long the content is
+			 + "Content-Length: " + af::itos(file_size) + "\r\n"         // tell how long the content is
 			 + "Content-Type: " + mimeType + "\r\n"                            // set the mime type of the result
-			 + "Cache-Control: max-age=" + std::to_string(maxAge) + "\r\n"     // optional browser caching
+			 + "Cache-Control: max-age=" + af::itos(maxAge) + "\r\n"     // optional browser caching
 			 + "Server: afanasy/" + af::Environment::getVersionCGRU() + "\r\n" // identify server
 			 + "\r\n";
 }

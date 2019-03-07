@@ -5,10 +5,27 @@ echo "Detecting UNIX distribution..."
 distskeys="Debian Ubuntu CentOS Red Fedora openSUSE Simply Gentoo Mint SUSE Mageia Arch Manjaro"
 knowndists="Debian Ubuntu CentOS RedHat Fedora openSUSE AltLinux MacOSX Gentoo Mint SUSE Mageia Arch Manjaro"
 
+# MacOSX
 if [ `uname` == "Darwin" ]; then
 	export DISTRIBUTIVE="MacOSX"
 	export DISTRIBUTIVE_VERSION=$(sw_vers -productVersion)
-else
+fi
+
+# Linuxes os-release file:
+osreleasefile="/etc/os-release"
+if [ -z "${DISTRIBUTIVE}" ] && [ -f "${osreleasefile}" ]; then
+	source "${osreleasefile}"
+	for distr in $distskeys; do
+		if [ `eval "echo \"${ID}\" | awk '{ print match(\\$0,tolower(\"${distr}\"))}'"` != "0" ]; then
+			export DISTRIBUTIVE="${distr}"
+			export DISTRIBUTIVE_VERSION="${VERSION_ID}"
+			break
+		fi
+	done
+fi
+
+# Linuxes issue file:
+if [ -z "${DISTRIBUTIVE}" ]; then
 	# Load issue file:
 	issuefile="/etc/system-release"
 	[ -f "${issuefile}" ] || issuefile="/etc/gentoo-release" ; [ -f "${issuefile}" ] || issuefile="/etc/issue"
@@ -16,39 +33,40 @@ else
 		echo "File '${issuefile}' not found. Can't detect distribution."
 		exit 1
 	fi
+
 	# Search issue file:
 	for distr in $distskeys; do
-		issue=`cat "${issuefile}" | grep "${distr}"`
+		issue=`cat "${issuefile}" | grep -i "${distr}"`
 		[ -z "${issue}" ] && continue
 		if [ `eval "echo \"${issue}\" | awk '{ print match(\\$0,\"${distr}\")}'"` != "0" ]; then
 			export DISTRIBUTIVE="${distr}"
 			break
 		fi
 	done
+
+	# Search distributive version
+	export DISTRIBUTIVE_VERSION=`echo "${issue}" | awk '{match($0,"[0-9.-]+"); print substr($0,RSTART,RLENGTH)}'`
+	# Search distribution version for Manjaro
+	if [ "${DISTRIBUTIVE}" == "Manjaro" ]; then
+		export DISTRIBUTIVE_VERSION=`echo "/etc/lsb-release" | awk '{match($0,"[0-9.-]+"); print substr($0,RSTART,RLENGTH)}'`
+	fi
+
+	# No distributive version found
+	if [ -z "${DISTRIBUTIVE_VERSION}" ]; then
+		echo "Can't detect ${DISTRIBUTIVE} version. You can:"
+		echo "export DISTRIBUTIVE_VERSION="
+		exit 1
+	fi
+
 fi
 
-# No distribution found:
+# Still no distributive found
 if [ -z "${DISTRIBUTIVE}" ]; then
 	echo "Unsupported distribution:"
 	cat "${issuefile}"
 	echo "Supported distributions:"
 	echo "${knowndists}"
 	exit 1
-fi
-
-# Search distribution version for Manjaro
-if [ "${DISTRIBUTIVE}" == "Manjaro" ]; then
-	export DISTRIBUTIVE_VERSION=`echo "/etc/lsb-release" | awk '{match($0,"[0-9.-]+"); print substr($0,RSTART,RLENGTH)}'`
-fi
-
-# Search distribution version:
-if [ -z "${DISTRIBUTIVE_VERSION}" ]; then
-	export DISTRIBUTIVE_VERSION=`echo "${issue}" | awk '{match($0,"[0-9.-]+"); print substr($0,RSTART,RLENGTH)}'`
-	if [ -z "${DISTRIBUTIVE_VERSION}" ]; then
-		echo "Can't detect ${DISTRIBUTIVE} version. You can:"
-		echo "export DISTRIBUTIVE_VERSION="
-		exit 1
-	fi
 fi
 
 # Check architecture:

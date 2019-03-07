@@ -1,0 +1,17 @@
+[Unit]
+Description=Afanasy server daemon
+After=syslog.target network.target remote-fs.target postgresql.service
+
+[Service]
+Type=simple
+User=render
+#Group=render
+WorkingDirectory=/opt/cgru
+ExecStart=/opt/cgru/start/AFANASY/_afserver.sh -log_nodate
+KillMode=process
+TimeoutStopSec=30
+LimitNOFILE=16384
+
+[Install]
+WantedBy=remote-fs.target
+

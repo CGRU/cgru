@@ -1,3 +1,6 @@
+# Any custom folder
+/_*
+
 # Settings
 config.json
 farm.json
@@ -32,6 +35,8 @@ override.cmd
 
 # Python
 *.pyc
+/python
+/python-devel
 
 # Temporary and old files and folders
 Deploy

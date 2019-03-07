@@ -272,7 +272,7 @@ int main(int argc, char *argv[])
 				}
 				else
 				{
-					AF_LOG << "System job retrieved from store is obsolete. Deleting it...";
+					AF_WARN << "System job is obsolete. Deleting it...";
 					delete job;
 					continue;
 				}
@@ -295,7 +295,7 @@ int main(int argc, char *argv[])
 	// Disable new commands and editing:
 	if( af::Environment::hasArgument("-demo"))
 	{
-		AF_LOG << "Demo mode, no new commands.";
+		AF_WARN << "Demo mode, no new commands.";
 		af::Environment::setDemoMode();
 	}
 

@@ -54,7 +54,7 @@ class afqt::QAfClient : public QObject
 {
 Q_OBJECT
 public:
-	QAfClient( QObject * i_qparent, int i_num_conn_lost = 1 );
+	QAfClient(QObject * i_qparent, int i_conn_lost_time);
 	~QAfClient();
 
 	void sendMsg( af::Msg * msg, bool i_updater = false);
@@ -82,8 +82,10 @@ private slots:
 private:
 	QList<QAfSocket*> m_qafsockets_list;
 
-	int  m_numconnlost;
-	int  m_connlostcount;
+	bool   m_connected;
+	int    m_conn_lost_time;
+	time_t m_last_conn_time;
+
 	bool m_closing;
 
 	QTimer  * m_up_timer;

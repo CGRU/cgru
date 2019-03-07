@@ -63,6 +63,15 @@
 
 "aux_folders":[".","_","-","tmp","temp","tmp","common"],
 
+"execute":[
+	{
+		"label":"XTerm",
+		"icon":"icons/terminal.png",
+		"title":"Open terminal in this location.",
+		"cmd":"cd \"@PATH@\"; xterm"
+	}
+],
+
 "assets":{
 	"projects_root":{
 		"play_folders":false,
@@ -76,7 +85,7 @@
 		"show_files":true
 	},
 	"scenes":{
-		"seek":["[project]/SCENES","[project]/SHOTS"],
+		"seek":["[project]/SCENE.*","[project]/SHOT.*","[project]/ANIM.*","[project]/RND.*"],
 		"uploads":{
 			"upload":{
 				"masks":[".*"],
@@ -133,7 +142,19 @@
 			"path":["RESULT/DAILIES"]
 		},
 		"template":"rules/assets/shot",
-		"nuke_template":"/cgru/plugins/nuke/_template.nk"
+
+		"shot_process":[
+			{
+				"label":"Nk New",
+				"title":"Create and open new Nuke scene.",
+				"cmd":"/cgru/rules/bin/shot_process -s nuke -r nuke @template@ @fps@ @colorspace@",
+				"template":"/cgru/plugins/nuke/_template.nk"
+			},{
+				"label":"Nk Latest",
+				"title":"Open the latest Nuke scene.",
+				"cmd":"/cgru/rules/bin/shot_open_latest -s nuke -e .nk -r nuke"
+			}
+		]
 	}
 },
 
@@ -214,7 +235,7 @@
 "dailies":
 {
 	"format":"1280x720",
-	"fps":"25",
+	"-fps":24,
 	"codec":"h264_mid",
 	"container":"DEFAULT",
 	"colorspace":"auto",
@@ -282,8 +303,12 @@
 	"af_capacity":500
 },
 
+"permissions":{
+	"default_groups":["admins","users"]
+},
+
 "cut":{
-	"input":"RESULT/JPG,RESULT/PNG,RESULT/TIF,RESULT/DPX",
+	"input":"RESULT/ANIM,RESULT/PNG,RESULT/JPG,RESULT/TIF,RESULT/DPX",
 	"output":"COMMON/_cut",
 	"af_capacity":500,
 	"af_maxtasks":10,

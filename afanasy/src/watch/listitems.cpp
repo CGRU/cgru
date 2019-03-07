@@ -37,8 +37,11 @@ AFINFO("ListItems::ListItems.\n");
 	m_panel_l->setContentsMargins( 5, 5, 5, 5);
 	m_panel_l->setSpacing( 5);
 
-//m_panel_l->addWidget(new QLabel("left"));
-//m_panel_r->addWidget(new QLabel("right"));
+	m_panel_r->setAlignment( Qt::AlignTop);
+	m_panel_r->setContentsMargins( 5, 5, 5, 5);
+	m_panel_r->setSpacing( 5);
+	//m_panel_r->setFiltedWidth(400);
+	//m_panel_r->addWidget(new QLabel("right"));
 
 	m_hlayout->setSpacing( 0);
 	m_vlayout->setSpacing( 0);
@@ -221,9 +224,10 @@ void ListItems::setParameter( const std::string & i_name, const std::string & i_
 	af::jsonActionParamsStart( str, m_type, "", getSelectedIds());
 
 	str << "\n\"" << i_name << "\":";
-	if( i_quoted ) str << "\"";
-	str << i_value;
-	if( i_quoted ) str << "\"";
+	if (i_quoted)
+		str << "\"" << af::strEscape(i_value) << "\"";
+	else
+		str << i_value;
 
 	af::jsonActionParamsFinish( str);
 
@@ -248,10 +252,14 @@ void ListItems::operation( const std::string & i_operation)
 const std::vector<int> ListItems::getSelectedIds() const
 {
 	std::vector<int> ids;
-	QModelIndexList indexes( m_view->selectionModel()->selectedIndexes());
-	for( int i = 0; i < indexes.count(); i++)
-		if( Item::isItemP( indexes[i].data()))
-			ids.push_back( Item::toItemP( indexes[i].data())->getId());
+	QModelIndexList indexes(m_view->selectionModel()->selectedIndexes());
+	for (int i = 0; i < indexes.count(); i++)
+		if (Item::isItemP(indexes[i].data()))
+		{
+			Item * item = Item::toItemP(indexes[i].data());
+			if (false == item->isHidden())
+				ids.push_back(item->getId());
+		}
 	return ids;
 }
 

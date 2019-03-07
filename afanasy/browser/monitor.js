@@ -82,7 +82,7 @@ function Monitor(i_args)
 	this.elList.onmousedown = function(e) { return e.currentTarget.monitor.noneSelected(e); };
 
 
-	// Sorting direction (can be overriden later in onMonitorCreate function):
+	// Sorting direction (can be overridden later in onMonitorCreate function):
 	if (localStorage[this.type + '_sort_dir'] == 'ON')
 		this.sortDirection = true;
 	else
@@ -138,7 +138,7 @@ function Monitor(i_args)
 		this.nodeConstructor.createPanels(this);
 
 	// Parameters section:
-	var el = document.createElement('div');
+	el = document.createElement('div');
 	this.elPanelR.appendChild(el);
 	this.elPanelR.m_elParams = el;
 	this.elPanelR.m_elParams.m_elPMap = {};
@@ -153,7 +153,7 @@ function Monitor(i_args)
 		'always_active': true
 	});
 	// Label:
-	var el = document.createElement('div');
+	el = document.createElement('div');
 	this.elPanelR.m_elParams.appendChild(el);
 	el.textContent = 'Parameters';
 	el.classList.add('caption');
@@ -209,18 +209,18 @@ function Monitor(i_args)
 		}
 
 	// Info section:
-	var el = document.createElement('div');
+	el = document.createElement('div');
 	this.elPanelR.appendChild(el);
 	this.elPanelR.m_elInfo = el;
 	el.classList.add('section');
 	// Label:
-	var el = document.createElement('div');
+	el = document.createElement('div');
 	this.elPanelR.m_elInfo.appendChild(el);
 	el.textContent = 'Info';
 	el.classList.add('caption');
 	el.title = 'Node information.';
 	// Body:
-	var el = document.createElement('div');
+	el = document.createElement('div');
 	this.elPanelR.m_elInfo.appendChild(el);
 	this.elPanelR.m_elInfo.m_elBody = el;
 	el.classList.add('info_body');
@@ -570,27 +570,56 @@ Monitor.prototype.processMsg = function(obj) {
 
 Monitor.prototype.setWindowTitle = function() {
 	var title = null;
+//var i, tasks;
 	if (this.type == 'jobs')
 	{
-		title = 'AJ';
-		var tasks = 0;
-		for (var i = 0; i < this.items.length; i++)
-			if (this.items[i].state.RUN)
+		title = 'AJ:';
+		let tasks = 0;
+		let in_queue_tasks = 0;
+
+		let total_frames_to_be_rendered = 0;
+		for (let i = 0; i < this.items.length; i++){
+			if(this.items[i].state.RUN){
 				tasks += this.items[i].running_tasks;
+			}
+
+			if (this.items[i].state.DON == false && this.items[i].params.name != "afanasy"){
+				in_queue_tasks += this.items[i].blocks.length;
+
+				let current_block;
+				let block_start_frame, block_end_frame;
+				let percentage_done = this.items[i].percentage;
+				for (let j=0; j < this.items[i].blocks.length; j++){
+					current_block = this.items[i].blocks[j];
+					block_start_frame = current_block.params.frame_first;
+					block_end_frame = current_block.params.frame_last;
+					total_frames_to_be_rendered += Math.ceil((block_end_frame - block_start_frame) * (100 - percentage_done) / 100);
+				 }
+			}
+		}
+
 		if (tasks > 0)
+		{
 			title += ' ' + tasks;
+		} else {
+			title += ' 0';
+		}
+		title +=  '/' + in_queue_tasks + ' | F: ' + total_frames_to_be_rendered;
+
 		if (this.cur_item)
 		{
 			if (this.cur_item.state.RUN)
+			{
 				title += ' ' + this.cur_item.percentage + '%';
-			title += this.cur_item.params.state;
+			}
+			title += ' | ' + this.cur_item.params.state;
 		}
 	}
 	else if (this.type == 'renders')
 	{
-		title = 'AR';
-		var tasks = 0;
-		for (var i = 0; i < this.items.length; i++)
+		title = 'AR:';
+		let tasks = 0;
+		for (let i = 0; i < this.items.length; i++)
 			if (this.items[i].state.RUN)
 				tasks += this.items[i].params.tasks.length;
 		if (tasks > 0)
@@ -598,9 +627,9 @@ Monitor.prototype.setWindowTitle = function() {
 	}
 	else if (this.type == 'users')
 	{
-		title = 'AU';
-		var tasks = 0;
-		for (var i = 0; i < this.items.length; i++)
+		title = 'AU:';
+		let tasks = 0;
+		for (let i = 0; i < this.items.length; i++)
 			if (this.items[i].params.running_tasks_num)
 				tasks += this.items[i].params.running_tasks_num;
 		if (tasks > 0)
@@ -608,12 +637,12 @@ Monitor.prototype.setWindowTitle = function() {
 	}
 	else if (this.type == 'tasks' && this.job)
 	{
-		var count = 0;
-		var percent = 0;
-		var run = 0;
-		var error = 0;
-		for (var i = 0; i < this.items.length; i++)
-			if (this.items[i].task_num)
+		let count = 0;
+		let percent = 0;
+		let run = 0;
+		let error = 0;
+		for (let i = 0; i < this.items.length; i++)
+			if(this.items[i].task_num)
 			{
 				if (this.items[i].state.DON)
 					percent += 100;
@@ -964,7 +993,13 @@ Monitor.prototype.updatePanels = function(i_item, i_args) {
 
 		var value = i_item.params[p];
 		if (this.nodeConstructor.params[p].type == 'hrs')
+		{
 			value = cm_TimeStringFromSeconds(value, true);
+		}
+		else if (this.nodeConstructor.params[p].type == 'tim')
+		{
+			value = cm_DateTimeStrFromSec(value);
+		}
 		else if ((typeof value) == 'string')
 		{
 			// word-wrap long regular expressions:
@@ -972,6 +1007,7 @@ Monitor.prototype.updatePanels = function(i_item, i_args) {
 			value = value.replace(/\|/g, '|&shy;');
 			value = value.replace(/\)/g, ')&shy;');
 		}
+
 		elParams[p].m_elValue.innerHTML = value;
 		elParams[p].style.display = 'block';
 	}

@@ -27,15 +27,16 @@ var d_params_types = {
 
 var d_params = {"general": {}, "settings": {}};
 d_params.general = {
-	project /***/: {"width": '50%'},
-	shot /******/: {"width": '50%', "lwidth": '70px'},
-	artist /****/: {"width": '50%'},
-	activity /**/: {"width": '25%', "lwidth": '70px'},
-	version /***/: {"width": '25%', "lwidth": '70px'},
-	input /*****/: {},
-	output /****/: {},
-	filename /**/: {"width": '75%'},
-	fps /*******/: {"label": 'FPS', "width": '25%', "lwidth": '70px'}
+	project  : {"width": '50%'},
+	shot     : {"width": '50%', "lwidth": '70px'},
+	artist   : {"width": '50%'},
+	activity : {"width": '25%', "lwidth": '70px'},
+	version  : {"width": '25%', "lwidth": '70px'},
+	input    : {},
+	output   : {},
+	filename : {"width": '75%'},
+	fps      : {"label": 'FPS', "width": '25%', "lwidth": '70px'},
+	comments : {}
 };
 d_params.settings = {
 	audio_file /******/: {"label": 'Audio', "default": "REF/sound.flac", "tooltip": 'Sound file'},
@@ -52,6 +53,10 @@ function d_Make(i_path, i_outfolder)
 	c_Log('Make Dailies: ' + i_path);
 
 	var params = {};
+
+	params.fps = RULES.fps;
+	if (RULES.dailies.fps)
+		params.fps = RULES.dailies.fps;
 
 	params.project = 'project';
 	if (ASSETS.project)
@@ -112,10 +117,12 @@ function d_Make(i_path, i_outfolder)
 
 	var wnd = new cgru_Window({"name": 'dailies', "title": 'Make Dailies'});
 
-	n_WalkDir({
-		"paths": [i_path],
-		"wfunc": d_DailiesWalkReceived,
+	var cmd = 'rules/bin/walk.sh -m "' + RULES.root + i_path + '"';
+	n_Request({
+		"send": {"cmdexec": {"cmds": [cmd]}},
+		"func": d_DailiesWalkReceived,
 		"info": 'walk dailies',
+		"wpath": i_path,
 		"d_params": params,
 		"d_wnd": wnd
 	});
@@ -123,28 +130,48 @@ function d_Make(i_path, i_outfolder)
 
 function d_DailiesWalkReceived(i_data, i_args)
 {
+	//console.log(JSON.stringify(i_data));
 	var wnd = i_args.d_wnd;
 	var params = i_args.d_params;
-	var walk = i_data[0];
 
-	if (walk && walk.files && walk.files.length)
-		for (var f = 0; f < walk.files.length; f++)
+	var data = null;
+	if (i_data.cmdexec && i_data.cmdexec[0].walk)
+		data = i_data.cmdexec[0].walk;
+
+	params.comments = '';
+	if (RULES.status.annotation && RULES.status.annotation.length)
+		params.comments = RULES.status.annotation.trim();
+
+	//console.log(JSON.stringify(data));
+	// Get files sequence pattern and comments:
+	if (data && data.walk && data.walk.exif)
+	{
+		var exif = data.walk.exif;
+
+		// Get files pattern (from one file):
+		var file = exif.file;
+		var match = file.match(/\d+\./g);
+		if (match)
 		{
-			var file = walk.files[f].name;
-			var match = file.match(/\d+\./g);
-			if (match)
-			{
-				match = match[match.length - 1];
-				var pos = file.lastIndexOf(match);
-				var pattern = file.substr(0, pos);
-				for (var d = 0; d < match.length - 1; d++)
-					pattern += '#';
-				pattern += file.substr(pos - 1 + match.length);
-				params.input = c_PathPM_Rules2Client(params.input + '/' + pattern);
-				break;
-			}
-			// window.console.log( match);
+			match = match[match.length - 1];
+			var pos = file.lastIndexOf(match);
+			var pattern = file.substr(0, pos);
+			for (var d = 0; d < match.length - 1; d++)
+				pattern += '#';
+			pattern += file.substr(pos - 1 + match.length);
+			params.input = c_PathPM_Rules2Client(params.input + '/' + pattern);
 		}
+
+		// Get comments (came from image EXIF metadata):
+		if (exif.comments)
+			params.comments += ' ' + exif.comments.trim();
+	}
+
+	params.comments = params.comments.trim();
+
+	// Update filesviews
+	if (data)
+		fv_UpdateFromWalk(data, i_args.wpath);
 
 	wnd.elTabs =
 		gui_CreateTabs({"tabs": d_params_types, "elParent": wnd.elContent, "name": 'd_params_types'});
@@ -286,8 +313,15 @@ function d_MakeCmd(i_params)
 	cmd += ' -c "' + params.codec + '"';
 	cmd += ' -f ' + params.fps;
 	cmd += ' -r ' + params.format;
-	cmd += ' -s ' + params.slate;
+
+	if (params.slate && params.slate.length)
+		cmd += ' -s ' + params.slate;
+
 	cmd += ' -t ' + params.template;
+
+	params.comments = params.comments.trim();
+	if (params.comments != '')
+		cmd += ' --comments "' + params.comments + '"';
 
 	if (RULES.dailies.font)
 		cmd += ' --font "' + RULES.dailies.font + '"';
@@ -384,6 +418,9 @@ var d_cvtmulti_params = {
 function d_Convert(i_args)
 {
 	var params = {};
+	params.fps = RULES.fps;
+	if (RULES.dailies.fps)
+		params.fps = RULES.dailies.fps;
 
 	var title = 'Convert ';
 	if (i_args.images)
@@ -411,7 +448,7 @@ function d_Convert(i_args)
 	gui_CreateChoices({
 		"wnd": wnd.elContent,
 		"name": 'format',
-		"value": 'asis',
+		"value": '1280x720',
 		"label": 'Formats:',
 		"keys": RULES.dailies.formats
 	});
@@ -975,6 +1012,9 @@ function d_MakeCut(i_args)
 	params.cut_name = i_args.cut_name;
 	params.output = c_PathPM_Rules2Client(i_args.output);
 	params.input = RULES.assets.shot.result.path.join(',');
+	params.fps = RULES.fps;
+	if (RULES.dailies.fps)
+		params.fps = RULES.dailies.fps;
 	if (RULES.cut.input)
 		params.input = RULES.cut.input;
 

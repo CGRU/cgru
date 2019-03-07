@@ -22,7 +22,7 @@ RenderHost::RenderHost():
 	af::Render( Client::GetEnvironment),
 	m_updateMsgType( af::Msg::TRenderRegister),
 	m_connected( false),
-	m_connection_lost_count( 0),
+	m_server_update_time(0),
 	m_no_output_redirection( false)
 {
 	m_has_tasks_time = time(NULL);
@@ -99,14 +99,15 @@ RenderHost * RenderHost::getInstance()
 void RenderHost::connectionEstablished()
 
 {
-	if (m_connection_lost_count > 0)
+	if (m_connected)
+	{
+		m_server_update_time = time(NULL);
+	}
+	else
 	{
 		AF_LOG << "Reconnected to the server";
+		setUpdateMsgType(af::Msg::TRenderUpdate);
 	}
-	
-	m_connection_lost_count = 0;
-	
-	setUpdateMsgType( af::Msg::TRenderUpdate);
 }
 
 void RenderHost::setRegistered( int i_id)
@@ -117,22 +118,27 @@ void RenderHost::setRegistered( int i_id)
 	RenderHost::connectionEstablished();
 }
 
-void RenderHost::connectionLost( bool i_any_case)
+void RenderHost::serverUpdateFailed()
 {
-    if( m_connected == false )
+    if (m_connected == false)
 		return;
 
-	m_connection_lost_count++;
+	AF_LOG << "Failed to connect to server."
+			<< " Last success connect time: " << af::time2str(m_server_update_time);
+	AF_LOG << "Last connect was: " << (time(NULL) - m_server_update_time) << " seconds ago"
+			<< ", Connection lost time: " << af::Environment::getRenderConnectionLostTime() << "s"
+			<< ", Zombie time: " << af::Environment::getRenderZombieTime() << "s";
 
-	if( false == i_any_case )
+	if (time(NULL) >= (m_server_update_time + af::Environment::getRenderConnectionLostTime()))
 	{
-		AF_LOG << "Connection lost count = " << m_connection_lost_count
-			   << " of " << af::Environment::getRenderConnectRetries();
-		if( m_connection_lost_count <= af::Environment::getRenderConnectRetries() )
-		{
-			return;
-		}
+		connectionLost();
 	}
+}
+
+void RenderHost::connectionLost()
+{
+    if (m_connected == false)
+		return;
 
 	m_connected = false;
 
@@ -247,10 +253,10 @@ af::Msg * RenderHost::updateServer()
 	af::Msg * server_answer = af::sendToServer( msg, ok,
 		msg->type() == af::Msg::TRenderRegister ? af::VerboseOff : af::VerboseOn);
 
-	if( ok )
+	if (ok)
 		connectionEstablished();
 	else
-		connectionLost();
+		serverUpdateFailed();
 
 	delete msg;
 

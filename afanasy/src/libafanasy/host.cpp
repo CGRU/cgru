@@ -560,7 +560,7 @@ void HostRes::v_generateInfoStream( std::ostringstream & stream, bool full) cons
             stream << ", buffers " << mem_buffers_mb << " Mb)";
         }
         stream << "\n   Swap: " << swap_total_mb << " Mb / " << swap_used_mb << " Mb used";
-        stream << "\n   Network: Recieved " << net_recv_kbsec << " Kb/sec, Send " << net_send_kbsec  << " Kb/sec",
+        stream << "\n   Network: Received " << net_recv_kbsec << " Kb/sec, Send " << net_send_kbsec  << " Kb/sec",
         stream << "\n   IO: Read " << hdd_rd_kbsec << " Kb/sec, Write " << hdd_wr_kbsec << " Kb/sec, Busy = " << int(hdd_busy) << "%";
         stream << "\n   HDD: " << hdd_total_gb << " Gb / " << hdd_free_gb  << " Gb free";
         

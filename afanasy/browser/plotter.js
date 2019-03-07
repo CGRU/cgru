@@ -75,7 +75,7 @@ Plotter.prototype.setLabel = function(i_label, i_clr, i_size) {
 	if (i_label)
 		this.elLabel.innerHTML = i_label.replace(/\n/g, '<br>');
 	if (i_clr)
-		this.elLabel.color = 'rgb(' + i_clr[0] + ',' + i_clr[1] + ',' + i_clr[2] + ')';
+		this.elLabel.style.color = 'rgb(' + i_clr[0] + ',' + i_clr[1] + ',' + i_clr[2] + ')';
 	if (i_size)
 		this.elLabel.style.fontSize = i_size + 'px';
 };

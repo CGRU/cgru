@@ -72,6 +72,11 @@
 
 "":"Job:",
 	"af_task_default_capacity":1000,
+	"af_task_progress_change_timeout":-1,
+		"":"This is a default value for a job block.",
+		"":"If task progress did not change within this time, consider that it is erroneous.",
+		"":"A value of -1 means not to check timeout.",
+
 	"af_task_default_service":"generic",
 	"af_task_log_linesmax":100,
 
@@ -103,7 +108,7 @@
 		"":"Device to measure disk IO statistics.",
 		"":"For MS Windows - statistics only for first disk available.",
 
-	"-af_render_resclasses":["example","iostat"],
+	"-af_render_resclasses":["example","iostat","nvidia_smi"],
 		"":"Custom resources meters:",
 			"":"example - simple resource meter for an example only",
 			"":"iostat - parse output of linux 'iostat' command",
@@ -127,6 +132,9 @@
 		"":"If render will not send update its resources for this time(seconds),",
 		"":"server will put it in 'OFFLINE' state.",
 
+	"af_render_connection_lost_time":10,
+		"":"If render can`t update server for this time, it considers that server connection lost and tries to register again.",
+
 	"af_render_exit_no_task_time":-1,
 		"":"Program will exit if there will be no tasks for this time(seconds),",
 		"":"Negative value disables this feature",
@@ -138,13 +146,6 @@
 	"af_task_stop_timeout":30,
 		"":"If render was asked to stop a task, but it did not send task finish message,",
 		"":"it wiil be considered as not running any way.",
-
-	"af_task_progress_change_timeout":-1,
-		"":"If task progress did not change within this time, consider that it is erroneous.",
-		"":"A value of -1 will disable this feature.",
-
-	"af_render_connectretries":3,
-		"":"Connection fails number to consider that render can`t connect to server.",
 
 	"af_render_exec":"afrender",
 		"":"Was used, will be needed, but not used for now",
@@ -173,7 +174,8 @@
 "":"Watch: (qt gui - client side)",
 	"af_watch_get_events_sec":1,
 	"af_watch_refresh_gui_sec":5,
-	"af_watch_connectretries":3,
+	"af_watch_connection_lost_time":10,
+		"":"If watch can`t update server for this time, it considers that server connection lost and tries to register again.",
 	"af_watch_render_idle_bar_max":3600,
 
 "":"Database:",

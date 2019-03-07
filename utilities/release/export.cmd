@@ -33,6 +33,7 @@ xcopy afanasy\browser %dest%\afanasy\browser\ /y
 xcopy afanasy\icons %dest%\afanasy\icons\ /ys
 xcopy afanasy\python %dest%\afanasy\python\ /ys
 xcopy afanasy\statistics %dest%\afanasy\statistics\ /ys
+xcopy afanasy\service %dest%\afanasy\service\ /ys
 
 xcopy utilities %dest%\utilities\ /y
 xcopy utilities\keeper %dest%\utilities\keeper\ /ys

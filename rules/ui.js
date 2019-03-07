@@ -72,18 +72,21 @@ function u_Init()
 	for (var i = 0; i < u_elements.length; i++)
 		u_el[u_elements[i]] = document.getElementById(u_elements[i]);
 
-	if ( localStorage.header_opened == 'true' )
-		 u_OpenCloseHeader();
-	if ( localStorage.footer_opened == 'true' )
-		 u_OpenCloseFooter();
+	if (localStorage.store_opened == 'ON')
+	{
+		if (localStorage.header_opened == 'true')
+			 u_OpenCloseHeader();
+		if (localStorage.footer_opened == 'true')
+			 u_OpenCloseFooter();
+	}
 
 	if (p_PLAYER)
 		return;
 
 	if (localStorage.navig_width == null)
-		localStorage.navig_width = 300;
+		localStorage.navig_width = 360;
 	if (localStorage.sidepanel_width == null)
-		localStorage.sidepanel_width = 200;
+		localStorage.sidepanel_width = 260;
 	if (localStorage.sidepanel_closed_width == null)
 		localStorage.sidepanel_closed_width = 20;
 
@@ -99,9 +102,21 @@ function u_Init()
 	if (localStorage.thumb_file_crop == null)
 		localStorage.thumb_file_crop = 'false';
 
+	if (localStorage.store_opened == null)
+		localStorage.store_opened = 'OFF';
+	$('store_opened').textContent = localStorage.store_opened;
+
 	if (localStorage.show_hidden == null)
 		localStorage.show_hidden = 'OFF';
 	$('show_hidden').textContent = localStorage.show_hidden;
+
+	if (localStorage.has_filesystem == null)
+		localStorage.has_filesystem = 'OFF';
+	$('has_filesystem').textContent = localStorage.has_filesystem;
+
+	if (localStorage.execute_soft == null)
+		localStorage.execute_soft = 'OFF';
+	$('execute_soft').textContent = localStorage.execute_soft;
 
 	u_CalcGUI();
 
@@ -129,6 +144,13 @@ function u_InitAuth()
 	$('body_edit').style.display = 'block';
 	$('search_artists_div').style.display = 'block';
 	$('auth_user').textContent = c_GetUserTitle() + ' [' + g_auth_user.id + ']';
+
+	if (c_CanExecuteSoft())
+		$('execute_div').style.display = 'block';
+}
+
+function u_InitConfigured()
+{
 }
 
 function u_Process()
@@ -182,7 +204,7 @@ function u_Process()
 	var path = c_PathPM_Rules2Client(g_elCurFolder.m_path);
 	c_Info(path);
 
-	if (RULES.has_filesystem !== false)
+	if (c_HasFileSystem())
 	{
 		$('open').style.display = 'block';
 		cgru_CmdExecProcess({"element": $('open'), "open": path});
@@ -206,11 +228,20 @@ function u_Finish()
 	cm_Finish();
 
 	u_ViewsFuncsClose();
+	u_ExecuteShow(false);
 
 	$('body_avatar_c').style.display = 'none';
 	$('body_avatar_m').style.display = 'none';
 }
 
+function u_StoreOpened()
+{
+	if (localStorage.store_opened == 'ON')
+		localStorage.store_opened = 'OFF';
+	else
+		localStorage.store_opened = 'ON';
+	$('store_opened').textContent = localStorage.store_opened;
+}
 function u_OpenCloseHeader()
 {
 	u_OpenCloseHeaderFooter($('headeropenbtn'), 'header', -200, 0);
@@ -318,9 +349,9 @@ function u_ResizeGUI(i_e)
 	var size = parseInt(localStorage[u_resizing_name]);
 	var delta = i_e.screenX - u_resizing_x;
 	var size = size + delta * u_resizing_koeff;
-	if (size < 50)
+	if (size < 128)
 		return;
-	if (size > 500)
+	if (size > 768)
 		return;
 	u_resizing_x = i_e.screenX;
 	// console.log( size+'+'+i_e.screenX+'-'+u_resizing_x+'='+size);
@@ -375,6 +406,7 @@ function u_OpenCloseHeaderFooter(i_elBtn, i_id, i_closed, i_opened)
 			localStorage.footer_opened = 'false';
 			document.getElementById('footer').style.height = i_closed + 'px';
 			document.getElementById('log').style.display = 'none';
+			$('log_ctrl').style.display = 'none';
 		}
 	}
 	else
@@ -390,6 +422,7 @@ function u_OpenCloseHeaderFooter(i_elBtn, i_id, i_closed, i_opened)
 			localStorage.footer_opened = 'true';
 			document.getElementById('footer').style.height = i_opened + 'px';
 			document.getElementById('log').style.display = 'block';
+			$('log_ctrl').style.display = 'block';
 		}
 	}
 }
@@ -1005,5 +1038,95 @@ function u_ThumbnailShow(i_data)
 			g_elCurFolder.m_dir.rufiles = [];
 		if (g_elCurFolder.m_dir.rufiles.indexOf(RULES.thumbnail.filename) == -1)
 			g_elCurFolder.m_dir.rufiles.push(RULES.thumbnail.filename);
+	}
+}
+
+function u_HasFilesystem()
+{
+	if (localStorage.has_filesystem == 'OFF')
+		localStorage.has_filesystem = 'ON';
+	else
+		localStorage.has_filesystem = 'OFF';
+	$('has_filesystem').textContent = localStorage.has_filesystem;
+}
+
+function u_ExecuteSoft()
+{
+	if (localStorage.execute_soft == 'OFF')
+		localStorage.execute_soft = 'ON';
+	else
+		localStorage.execute_soft = 'OFF';
+	$('execute_soft').textContent = localStorage.execute_soft;
+}
+
+function u_ExecuteShow(i_show)
+{
+	let elBody = $('execute_body');
+	elBody.textContent = '';
+
+	if (false == c_CanExecuteSoft())
+		return;
+
+	let elBtn = $('execute_btn');
+	if (i_show == null)
+	{
+		if (elBtn.classList.contains('pushed'))
+			i_show = false;
+		else
+			i_show = true;
+	}
+
+	if (i_show)
+	{
+		elBtn.classList.add('pushed');
+		u_CreateActions(RULES.execute, elBody);
+	}
+	else
+	{
+		elBtn.classList.remove('pushed');
+	}
+}
+
+function u_CreateActions(i_actions, i_el)
+{
+	for (let n = 0; n < i_actions.length; n++)
+	{
+		let action = i_actions[n];
+		let el = document.createElement('div');
+		i_el.appendChild(el);
+		el.textContent = action.label;
+		if (action.title)
+			el.title = action.title;
+
+		// Process icon:
+		let icon = action.icon;
+		if (icon)
+		{
+			el.style.backgroundImage = 'url(' + icon + ')';
+			el.style.paddingLeft = '28px';
+		}
+
+		// Process command:
+		let cmd = c_PathPM_Server2Client(action.cmd);
+		cmd = cmd.replace(/@PATH@/g, c_PathPM_Rules2Client(g_CurPath()));
+		// '@arg@' will be replaced with '--arg [arg value]'
+		// Value will be the first defined in action, ASSET, RULES
+		// For example: '@fps@' will be replaces with '--fps 24'
+		let matches = cmd.match(/@\w*@/g);
+		if (matches && matches.length)
+			for (let i = 0; i < matches.length; i++)
+			{
+				let match = matches[i];
+				let arg = match.replace(/@/g,'');
+				let val = action[arg];
+				if (null == val) val = ASSET[arg];
+				if (null == val) val = RULES[arg];
+				if (val) val = '--' + arg + ' ' + val;
+				else val = '';
+				cmd = cmd.replace(match, val);
+			}
+
+		// Make an executable button:
+		cgru_CmdExecProcess({'element':el,'cmd':cmd});
 	}
 }

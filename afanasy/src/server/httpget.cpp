@@ -27,8 +27,18 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
-
+/*
+This can be done only in std++11 stantard.
+For now can't drop gcc < 4.8 support for now.
 std::vector<char *> HttpGet::http_get_blacklist_files = {
+	"..",		// do not allow escaping the document root of the webserver
+	"htdigest", // do not allow access to the .htdigest file
+	"htaccess", // do not allow access to the .htaccess file
+	".json"		// do not allow access to any json file
+};
+*/
+static const int http_get_blacklist_files_len = 4;
+static const char * http_get_blacklist_files[http_get_blacklist_files_len] = {
 	"..",		// do not allow escaping the document root of the webserver
 	"htdigest", // do not allow access to the .htdigest file
 	"htaccess", // do not allow access to the .htaccess file
@@ -144,7 +154,8 @@ std::string HttpGet::getMimeTypeFromFileName(const std::string &filename)
 bool HttpGet::getValidateFileName(const std::string &i_name)
 {
 	// do not serve files, which match an entry on the blacklist
-	for (int i = 0; i < http_get_blacklist_files.size(); i++)
+	//for (int i = 0; i < http_get_blacklist_files.size(); i++)
+	for (int i = 0; i < http_get_blacklist_files_len; i++)
 		if (i_name.find(http_get_blacklist_files[i]) != -1) return false;
 
 	return true;

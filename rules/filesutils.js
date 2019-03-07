@@ -545,7 +545,7 @@ function fu_PutMultiDo(i_wnd)
 /* ---------------- [ Archive structs and functions ] ---------------------------------------------------- */
 var fu_arch_params = {
 	dest: {'label': 'Destination'},
-	split: {'tooltip': 'Split archive size.'},
+	split: {'tooltip': 'Split archive size (MB).'},
 	af_capacity: {'label': 'Capacity', 'tooltip': 'Afanasy tasks capacity.', 'width': '25%'},
 	af_maxtasks:
 		{'label': 'Max Run Tasks', 'tooltip': 'Maximum running tasks.', 'width': '25%', 'lwidth': '150px'},
@@ -774,6 +774,7 @@ function fu_WalkProcessGUI(i_wnd)
 	block.tasks = [task];
 
 	var cmd = c_PathPM_Client2Server(RULES.walk.cmd);
+	cmd += ' -p';
 	cmd += ' --thumb 128';
 	cmd += ' --report 256';
 	if (params.upparents == false)

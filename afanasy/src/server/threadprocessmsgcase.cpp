@@ -44,7 +44,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	}
 	case af::Msg::TInvalid:
 	{
-		AFCommon::QueueLogError( std::string("Invalid message recieved: ") + i_msg->v_generateInfoString( false));
+		AFCommon::QueueLogError( std::string("Invalid message received: ") + i_msg->v_generateInfoString( false));
 		o_msg_response = af::jsonMsgInfo("error","TInvalid message received.");
 		break;
 	}
@@ -202,7 +202,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	// -------------------------------------------------------------------------//
 	default:
 	{
-		AFCommon::QueueLogError( std::string("Unknown message recieved: ") + i_msg->v_generateInfoString( false));
+		AFCommon::QueueLogError( std::string("Unknown message received: ") + i_msg->v_generateInfoString( false));
 		break;
 	}
 	}

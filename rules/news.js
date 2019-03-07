@@ -51,11 +51,6 @@ function nw_Init()
 	if (localStorage.news_ignore_own == 'true')
 		nw_ignore_own = true;
 
-	if (localStorage.news_opened == 'true')
-		nw_NewsOpen(false);
-	else
-		nw_NewsClose();
-
 	nw_Finish();
 	nw_UpdateChannels();
 	nw_DisableNewsToggle(false);
@@ -64,6 +59,11 @@ function nw_Init()
 
 function nw_InitConfigured()
 {
+	if (localStorage.news_opened == 'true')
+		nw_NewsOpen(false);
+	else
+		nw_NewsClose();
+
 	if (RULES.news.refresh == null)
 		return;
 	if (RULES.news.refresh < 1)
@@ -359,14 +359,14 @@ function nw_StatusesChanged(i_statuses)
 	var news_requests = [];
 	var bookmarks = [];
 
-	for (var i = 0; i < i_statuses.length; i++)
+	for (let i = 0; i < i_statuses.length; i++)
 	{
-		var request = nw_CreateNews(
-			{"title": 'status', "path": i_statuses[i].path, "artists": i_statuses[i].obj.artists});
+		let request = nw_CreateNews(
+			{'title':'status','path':i_statuses[i].path,'status':i_statuses[i].obj});
 		if (request)
 			news_requests.push(request);
 
-		var bm = {};
+		let bm = {};
 		bm.status = i_statuses[i].obj;
 		bm.path = i_statuses[i].path;
 		bookmarks.push(bm);
@@ -400,9 +400,14 @@ function nw_CreateNews(i_news)
 	if (news.user_id == null)
 	{
 		if (g_auth_user)
+		{
 			news.user = g_auth_user.id;
+		}
 		else
+		{
 			c_Error('Can`t make news with no user.');
+			return;
+		}
 	}
 
 	if (news.path == null)
@@ -411,9 +416,9 @@ function nw_CreateNews(i_news)
 	news.time = c_DT_CurSeconds();
 	news.id = news.user + '_' + news.time + '_' + news.path;
 
-	// If news path is the current we get artists from status, if them not set in input arguments:
-	if ((news.artists == null) && (news.path == g_CurPath()) && RULES.status && RULES.status.artists)
-		news.artists = RULES.status.artists;
+	// If news status is not set, we get the current:
+	if (news.status == null)
+		news.status = RULES.status;
 
 	var email_subject = c_GetUserTitle(news.user) + ' - ' + news.title;
 	var email_body = '<a href="';
@@ -522,17 +527,15 @@ function nw_ShowCount(i_hidden_count)
 
 function nw_NewsLoad(i_refresh)
 {
-	// console.log('nw_NewsLoad()');
 	if (g_auth_user == null)
 		return;
 
 	if (i_refresh === false)
 	{
-		nw_NewsShow();
+		nw_NewsShow(false);
 		return;
 	}
 
-	$('news').innerHTML = 'Loading...';
 	var filename = 'users/' + g_auth_user.id + '.json';
 	n_Request({
 		'send': {'getobjects': {'file': filename, 'objects': ['news']}},
@@ -543,7 +546,6 @@ function nw_NewsLoad(i_refresh)
 
 function nw_NewsReceived(i_data)
 {
-	// console.log('nw_NewsReceived()');
 	if (i_data == null)
 		return;
 	if (i_data.error)
@@ -564,12 +566,10 @@ function nw_NewsReceived(i_data)
 	nw_NewsShow();
 }
 
-function nw_NewsShow()
+function nw_NewsShow(i_update_folders)
 {
 	$('news').innerHTML = '';
 	$('news').m_elArray = [];
-
-	var projects = [];
 
 	g_auth_user.news.sort(function(a, b) {
 		var attr = 'time';
@@ -583,11 +583,13 @@ function nw_NewsShow()
 	if (localStorage.news_sort_order == 'ASC')
 		g_auth_user.news.reverse();
 
-	for (var i = 0; i < g_auth_user.news.length; i++)
-	{
-		var news = g_auth_user.news[i];
+	let projects = [];
 
-		var el = document.createElement('div');
+	for (let i = 0; i < g_auth_user.news.length; i++)
+	{
+		let news = g_auth_user.news[i];
+
+		let el = document.createElement('div');
 		$('news').appendChild(el);
 		$('news').m_elArray.push(el);
 		el.classList.add('news');
@@ -598,21 +600,13 @@ function nw_NewsShow()
 		// but only if artists has no subscribed channels
 		// ( if artist has no channels all news are "assigned"
 		if (g_auth_user.channels && g_auth_user.channels.length)
-			if (news.artists && (news.artists.indexOf(g_auth_user.id) != -1))
+			if (news.status && news.status.artists && (news.status.artists.indexOf(g_auth_user.id) != -1))
 				el.classList.add('assigned');
 
-		var elBtn = document.createElement('div');
-		el.appendChild(elBtn);
-		elBtn.classList.add('button');
-		elBtn.classList.add('delete');
-		elBtn.m_id = news.id;
-		elBtn.ondblclick = function(e) { nw_DeleteNews([e.currentTarget.m_id]); };
-		elBtn.title = 'Double click to remove link';
-
-		var avatar = c_GetAvatar(news.user, news.guest);
+		let avatar = c_GetAvatar(news.user, news.guest);
 		if (avatar)
 		{
-			var elAvatar = document.createElement('img');
+			let elAvatar = document.createElement('img');
 			el.appendChild(elAvatar);
 			elAvatar.classList.add('avatar');
 			elAvatar.src = avatar;
@@ -622,16 +616,50 @@ function nw_NewsShow()
 			elAvatar.ondblclick = function(e) { nw_DeleteNewsUser(e.currentTarget.m_news); };
 		}
 
-		var elLabel = document.createElement('div');
+		// Display news status:
+		if (news.status)
+		{
+			let elStatus = document.createElement('div');
+			el.appendChild(elStatus);
+			elStatus.classList.add('status');
+
+			// Flags:
+			if (news.status.flags && news.status.flags.length)
+			{
+				let elFlags = document.createElement('div');
+				elStatus.appendChild(elFlags);
+				elFlags.classList.add('flags');
+				st_SetElFlags(news.status, elFlags);
+			}
+
+			// Progress:
+			if (news.status.progress)
+			{
+				let elBar = document.createElement('div');
+				el.appendChild(elBar);
+				elBar.classList.add('bar');
+				st_SetElProgress(news.status, elBar);
+			}
+		}
+
+		let elBtn = document.createElement('div');
+		el.appendChild(elBtn);
+		elBtn.classList.add('button');
+		elBtn.classList.add('delete');
+		elBtn.m_id = news.id;
+		elBtn.ondblclick = function(e) { nw_DeleteNews([e.currentTarget.m_id]); };
+		elBtn.title = 'Double click to remove link';
+
+		let elLabel = document.createElement('div');
 		el.appendChild(elLabel);
 		elLabel.classList.add('news_label');
 		elLabel.innerHTML = c_GetUserTitle(news.user, news.guest) + ': ' + news.title;
 
-		var elLinkDiv = document.createElement('div');
+		let elLinkDiv = document.createElement('div');
 		el.appendChild(elLinkDiv);
 		elLinkDiv.classList.add('link');
 
-		var elLink = document.createElement('a');
+		let elLink = document.createElement('a');
 		elLinkDiv.appendChild(elLink);
 		if (news.link)
 			elLink.href = news.link;
@@ -639,16 +667,16 @@ function nw_NewsShow()
 			elLink.href = '#' + news.path;
 		elLink.textContent = news.path;
 
-		var prj = news.path.split('/')[1];
+		let prj = news.path.split('/')[1];
 		if (projects.indexOf(prj) == -1)
 			projects.push(prj);
 	}
 
 	// News projects:
 	$('news_projects').innerHTML = '';
-	for (var i = 0; i < projects.length; i++)
+	for (let i = 0; i < projects.length; i++)
 	{
-		var el = document.createElement('div');
+		let el = document.createElement('div');
 		$('news_projects').appendChild(el);
 		el.classList.add('button');
 		el.classList.add('nw_fb');
@@ -660,6 +688,36 @@ function nw_NewsShow()
 
 		if (nw_filter_project == projects[i])
 			el.classList.add('pushed');
+	}
+
+	// Update folders statuses:
+	if (i_update_folders !== false)
+	{
+		// Update only if news status mtime > folder status mtime
+		for (let i = 0; i < g_auth_user.news.length; i++)
+		{
+			let news = g_auth_user.news[i];
+			if (news.status == null) continue;
+			if (news.status.mtime == null) continue;
+
+			let el = g_elFolders[news.path];
+			if (el == null) continue;
+
+			let fstat = el.m_fobject.status;
+			if (fstat == null) continue;
+			if (fstat.mtime >= news.status.mtime) continue;
+
+			// Update folder status:
+			g_FolderSetStatus(news.status, el);
+
+			// Update current location status:
+			if ((news.path == g_CurPath()) && st_Status)
+				st_Status.show(news.status);
+
+			// Remove walk cache:
+			if (n_walks[news.path])
+				n_walks[news.path] = null;
+		}
 	}
 
 	nw_HighlightCurrent();
@@ -919,6 +977,32 @@ function nw_RecentReceived(i_data, i_args)
 			el.appendChild(elAvatar);
 			elAvatar.classList.add('avatar');
 			elAvatar.src = avatar;
+		}
+
+		// Display status:
+		if (news.status)
+		{
+			let elStatus = document.createElement('div');
+			el.appendChild(elStatus);
+			elStatus.classList.add('status');
+
+			// Flags:
+			if (news.status.flags && news.status.flags.length)
+			{
+				let elFlags = document.createElement('div');
+				elStatus.appendChild(elFlags);
+				elFlags.classList.add('flags');
+				st_SetElFlags(news.status, elFlags);
+			}
+
+			// Progress:
+			if (news.status.progress)
+			{
+				let elBar = document.createElement('div');
+				el.appendChild(elBar);
+				elBar.classList.add('bar');
+				st_SetElProgress(news.status, elBar);
+			}
 		}
 
 		var elUser = document.createElement('div');

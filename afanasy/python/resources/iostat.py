@@ -1,10 +1,13 @@
-import resbase
-
 import cgruconfig
+import cgruutils
 
 import re
 import os
 import subprocess
+import sys
+import traceback
+
+from resources import resbase
 
 ENV_KEY = 'af_render_customiostat_devices'
 ENV_VAR = 'AF_CUSTOMIOSTAT_DEVICES'
@@ -56,7 +59,10 @@ class iostat(resbase.resbase):
 
     def update(self):
         if self.process is not None:
-            data = self.process.stdout.readlines()
+            out, err = self.process.communicate()
+            data = cgruutils.toStr(out)
+            data = data.replace(',','.')
+            data = data.splitlines()
 
             fields_pos = -1
             for i in range(1, len(data)):
@@ -65,10 +71,12 @@ class iostat(resbase.resbase):
                     fields_pos = i
                     break
             if fields_pos == -1:
-                print('ERROR: iostat: Can not find "Device" in output lines.')
+                print('ERROR: iostat: Can not find "Device" in output lines:')
+                print(data)
                 return
             if fields_pos >= (len(data) - 1):
                 print('ERROR: iostat: Can not find any devices.')
+                print(data)
                 return
             fieldsline = data[fields_pos]
             fields = fieldsline.split()
@@ -103,6 +111,7 @@ class iostat(resbase.resbase):
                     f_svctm = float(values[COL_svctm])
                 except:  # TODO: too broad exception clause
                     print('ERROR: iostat: Invalid columns values formatting.')
+                    traceback.print_exc(file=sys.stdout)
                     continue
                 rMBs += f_rMBs
                 wMBs += f_wMBs

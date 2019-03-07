@@ -115,8 +115,11 @@ ListJobs::ListJobs( QWidget* parent):
 	bp = addButtonPanel("DEL","jobs_delete","Delete selected jobs.","", true);
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actDelete()));
 
-	bp = addButtonPanel("DDJ","jobs_delete_done","Delete all done jobs.","", true);
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actDeleteDone()));
+	if (false == af::Environment::VISOR())
+	{
+		bp = addButtonPanel("DDJ","jobs_delete_done","Delete all done jobs.","", true);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actDeleteDone()));
+	}
 
 
 	init();
@@ -404,13 +407,20 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	// System job ID is 1, and can not be deleted
 	if( jobitem->getId() != 1 )
 	{
-		action = new QAction( "Delete All Done", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actDeleteDone()));
-		menu.addAction( action);
+		submenu = new QMenu( "Delete", this);
 
-		action = new QAction( "Delete", this);
+		action = new QAction( "Delete Selected", this);
 		connect( action, SIGNAL( triggered() ), this, SLOT( actDelete()));
-		menu.addAction( action);
+		submenu->addAction( action);
+
+		if (false == af::Environment::VISOR())
+		{
+			action = new QAction("Delete All Done", this);
+			connect(action, SIGNAL(triggered()), this, SLOT(actDeleteDone()));
+			submenu->addAction(action);
+		}
+
+		menu.addMenu( submenu);
 	}
 
 	menu.exec(event->globalPos());

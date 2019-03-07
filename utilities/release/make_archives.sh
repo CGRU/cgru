@@ -15,11 +15,11 @@ for archive_dir in `ls`; do
 
 	# Cleanup archive dir:
 	echo "Clearing archive folder '${archive_dir}':"
-	find "${archive_dir}" -type d -name .git -exec rm -rvf {} \;
-	find "${archive_dir}" -type f -name .gitignore -exec rm -vf {} \;
-	find "${archive_dir}" -type d -name .svn -exec rm -rvf {} \;
+	find "${archive_dir}" -type d -name .git -prune -exec echo {} \; -exec rm -rf {} \;
+	find "${archive_dir}" -type d -name .svn -prune -exec echo {} \; -exec rm -rf {} \;
+	find "${archive_dir}" -type d -name __pycache__ -prune -exec echo {} \; -exec rm -rf {} \;
 	find "${archive_dir}" -type f -name *.pyc -exec rm -vf {} \;
-	find "${archive_dir}" -type d -name __pycache__ -exec rm -rvf {} \;
+	find "${archive_dir}" -type f -name .gitignore -exec rm -vf {} \;
 	find "${archive_dir}" -type f -name config.json -exec rm -vf {} \;
 	find "${archive_dir}" -type f -name farm.json -exec rm -vf {} \;
 	rm -fv ${archive_dir}/software_setup/locate_*
@@ -67,8 +67,9 @@ for archive_dir in `ls`; do
 
 	# Rename archive folder as processed:
 	processed="${archive_dir}.${archive_name}"
+	echo "Removing old processed folder..." 
+	[ -d "${processed}" ] && rm -rf "${processed}"
 	echo "Renaming archive folder as processed:" 
-	[ -d "${processed}" ] && rm -rvf "${processed}"
 	mv -v "${archive_dir}" "${processed}"
 
 done

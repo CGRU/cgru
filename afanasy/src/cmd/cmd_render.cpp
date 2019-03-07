@@ -159,6 +159,45 @@ bool CmdRenderFree::v_processArguments( int argc, char** argv, af::Msg &msg)
 	return true;
 }
 
+CmdRenderPause::CmdRenderPause()
+{
+	setCmd("rpause");
+	setArgsCount(1);
+	setInfo("Set render paused.");
+	setHelp("rpause [name] Set render paused state.");
+	setMsgType( af::Msg::TJSON);
+}
+CmdRenderPause::~CmdRenderPause(){}
+bool CmdRenderPause::v_processArguments( int argc, char** argv, af::Msg &msg)
+{
+	std::string name = argv[0];
+
+	af::jsonActionParamsStart( m_str, "renders", name);
+	m_str << "\n\"paused\":true";
+	af::jsonActionParamsFinish( m_str);
+
+	return true;
+}
+CmdRenderUnpause::CmdRenderUnpause()
+{
+	setCmd("runpause");
+	setArgsCount(1);
+	setInfo("Set render unpaused.");
+	setHelp("rpause [name] Unset render paused state.");
+	setMsgType( af::Msg::TJSON);
+}
+CmdRenderUnpause::~CmdRenderUnpause(){}
+bool CmdRenderUnpause::v_processArguments( int argc, char** argv, af::Msg &msg)
+{
+	std::string name = argv[0];
+
+	af::jsonActionParamsStart( m_str, "renders", name);
+	m_str << "\n\"paused\":false";
+	af::jsonActionParamsFinish( m_str);
+
+	return true;
+}
+
 CmdRenderEjectTasks::CmdRenderEjectTasks()
 {
 	setCmd("reject");

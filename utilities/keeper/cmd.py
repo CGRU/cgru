@@ -104,21 +104,21 @@ def afwebgui():
 	)
 
 
-def exitRender(text='(keeper)'):
-	af.Cmd().renderExit(text)
+def exitRender():
+	af.Cmd().renderExit()
 
 
-def exitMonitor(text='(keeper)'):
-	af.Cmd().monitorExit(text)
+def exitMonitor():
+	af.Cmd().monitorExit()
 
 
-def exitClients(text='(keeper)'):
-	exitRender(text)
-	exitMonitor(text)
+def exitClients():
+	exitRender()
+	exitMonitor()
 
 
 def quitExitClients():
-	exitClients('(keeper quit)')
+	exitClients()
 	Application.quit()
 
 
@@ -134,7 +134,7 @@ def restart():
 
 
 def update():
-	exitClients('(keeper update)')
+	exitClients()
 	QtCore.QProcess.startDetached(cgruconfig.VARS['CGRU_UPDATE_CMD'])
 	Application.quit()
 

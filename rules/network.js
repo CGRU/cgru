@@ -26,6 +26,8 @@ var n_conn_count = 0;
 var n_walks = {};
 var n_gets = {};
 
+var n_log_responses = true;
+
 function n_WalkDir(i_args)
 {
 	// i_args.cache_time = null;
@@ -71,6 +73,8 @@ function n_WalkDir(i_args)
 		i_args.func = n_WalkDirProcess;
 		i_args.parse = true;
 		i_args.wait = false;
+		if (i_args.local !== false)
+			i_args.local = true;
 		n_Request(i_args);
 		return;
 	}
@@ -234,15 +238,26 @@ function n_XHRHandler()
 
 		if (this.status == 200)
 		{
-			c_Log(
-				'<b><i style="color:#048">recv ' + this.m_args.id + ' (' + n_conn_count + ')</i> ' +
-				this.m_args.info + ':</b> ' + this.responseText.replace(/[<>]/g, '*'));
+			let log = '<b><i style="color:#048">recv ' + this.m_args.id + ' (' + n_conn_count + ')</i> ' + this.m_args.info + '</b> ';
+			if (n_log_responses)
+			{
+				log += ': ' + this.responseText.replace(/[<>]/g, '*');
+			}
+			else
+			{
+				log += ': received';
+			}
+
+			c_Log(log);
 
 			if (this.m_args.func)
 			{
 				if (p_PLAYER != true)
 					if (this.m_args.local && (this.m_args.path != g_CurPath()))
+					{
+						c_Log('Response location: "' + this.m_args.path + '" != "' + g_CurPath() + '"');
 						return;
+					}
 
 				var data = this.responseText;
 				if (this.m_args.parse)
@@ -251,6 +266,20 @@ function n_XHRHandler()
 				this.m_args.func(data, this.m_args);
 			}
 		}
+	}
+}
+
+function n_LogResponses()
+{
+	if (n_log_responses)
+	{
+		n_log_responses = false;
+		$('log_responses').classList.remove('pushed');
+	}
+	else
+	{
+		n_log_responses = true;
+		$('log_responses').classList.add('pushed');
 	}
 }
 
