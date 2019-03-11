@@ -304,9 +304,12 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 
 	submenu = new QMenu( "Set Parameter", this);
 
-	action = new QAction( "Change Branch", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actChangeBranch() ));
-	submenu->addAction( action);
+	if (af::Environment::VISOR())
+	{
+		action = new QAction("Change Branch", this);
+		connect(action, SIGNAL(triggered()), this, SLOT(actChangeBranch()));
+		submenu->addAction(action);
+	}
 	action = new QAction( "Max Running Tasks", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunningTasks() ));
 	submenu->addAction( action);
