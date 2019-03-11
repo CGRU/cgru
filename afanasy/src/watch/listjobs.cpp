@@ -304,6 +304,9 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 
 	submenu = new QMenu( "Set Parameter", this);
 
+	action = new QAction( "Change Branch", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actChangeBranch() ));
+	submenu->addAction( action);
 	action = new QAction( "Max Running Tasks", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunningTasks() ));
 	submenu->addAction( action);
@@ -682,6 +685,17 @@ void ListJobs::actWaitTime()
 	}
 
 	setParameter("time_wait", waittime);
+}
+
+void ListJobs::actChangeBranch()
+{
+	ItemJob* jobitem = (ItemJob*)getCurrentItem();
+	if( jobitem == NULL ) return;
+	QString current = jobitem->branch;
+	bool ok;
+	QString branch = QInputDialog::getText(this, "Change Branch", "Branch", QLineEdit::Normal, current, &ok);
+	if( !ok) return;
+	setParameter("branch", afqt::qtos( branch));
 }
 
 void ListJobs::actMaxRunningTasks()

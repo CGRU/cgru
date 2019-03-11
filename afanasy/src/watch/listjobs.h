@@ -43,6 +43,7 @@ private slots:
 	void actSetUser();
 	void actHostsMask();
 	void actHostsMaskExclude();
+	void actChangeBranch();
 	void actMaxRunningTasks();
 	void actMaxRunTasksPerHost();
 	void actDependMask();
