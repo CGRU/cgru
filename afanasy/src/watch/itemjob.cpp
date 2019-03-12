@@ -104,6 +104,7 @@ void ItemJob::updateValues( af::Node * i_node, int i_type)
 	project              = afqt::stoq( job->getProject());
 	department           = afqt::stoq( job->getDepartment());
 	folders              = afqt::stoq( job->getFolders());
+	branch               = afqt::stoq( job->getBranch());
 	num_runningtasks     = job->getRunningTasksNum();
 	lifetime             = job->getTimeLife();
 	ppapproval           = job->isPPAFlag();

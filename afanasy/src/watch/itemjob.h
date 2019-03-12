@@ -45,6 +45,7 @@ public:
 	QString service;
 	QString hostname;
 	QString username;
+	QString branch;
 	QString hostsmask;
 	QString hostsmask_exclude;
 	QString dependmask;

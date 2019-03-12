@@ -45,13 +45,6 @@ class Tray(QtWidgets.QSystemTrayIcon):
         self.menu = dict()
         self.menu['menu'] = QtWidgets.QMenu()
 
-        # Update item only if CGRU_UPDATE_CMD defined:
-        if cgruconfig.VARS['CGRU_UPDATE_CMD'] is not None:
-            action = QtWidgets.QAction('Update', self)
-            action.triggered.connect( cmd.update)
-            self.menu['menu'].addAction(action)
-            self.menu['menu'].addSeparator()
-
         # Load menu:
         menu_path = os.path.join(
             os.path.join(cgruconfig.VARS['CGRU_LOCATION'], 'start')
@@ -240,11 +233,17 @@ class Tray(QtWidgets.QSystemTrayIcon):
         action.triggered.connect( cmd.confReload)
         self.menu['Configure'].addAction(action)
 
-        self.addAction('menu', True,  'Show Info...',         self.cgruInfo, 'info')
-        self.addAction('menu', True,  'Documentation...',     cmd.cgruDocs)
-        self.addAction('menu', False, 'Forum...',             cmd.cgruForum)
-        self.addAction('menu', True,  'Restart',              cmd.restart)
-        self.addAction('menu', False, 'Quit',                 cmd.quit)
+        # Some general menu items:
+        self.addAction('menu', True,  'Documentation...', cmd.cgruDocs)
+        self.addAction('menu', False, 'Forum...',         cmd.cgruForum)
+        # System sub-menu:
+        self.addMenu(self.menu['menu'],'System')
+        self.addAction('System', True,'Show Info...', self.cgruInfo,'info')
+        # Update item only if CGRU_UPDATE_CMD defined:
+        if cgruconfig.VARS['CGRU_UPDATE_CMD'] is not None:
+            self.addAction('System', True, 'Update', cmd.update)
+        self.addAction('System', True, 'Restart', cmd.restart)
+        self.addAction('System', False,'Quit',    cmd.quit)
 
         self.setContextMenu(self.menu['menu'])
 
