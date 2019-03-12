@@ -283,6 +283,14 @@ class Render:
         output = _sendRequest(action, data, verbose)
         return output
 
+    def setServiceState(self, serviceName, enabled, verbose=False):
+        action = 'action'
+        data = {'type': 'renders'}
+        data['mask'] = self.name
+        data['operation'] = {'type': 'service', 'name': serviceName, 'enable': enabled}
+        output = _sendRequest(action, data, verbose)
+        return output
+
 
 class Monitor():
     '''
