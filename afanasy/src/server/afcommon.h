@@ -59,11 +59,11 @@ public:
 	//
 	// Store folders:
 	//
-	static const std::string getStoreDir(const std::string &i_root, int i_id, const std::string &i_name);
+	static const std::string getStoreDir(const std::string &i_folder, int i_id, const std::string &i_name);
 
-	inline static const std::string getStoreDir(const std::string &i_root, const af::Node &i_node)
+	inline static const std::string getStoreDir(const std::string &i_folder, const af::Node &i_node)
 	{
-		return getStoreDir(i_root, i_node.getId(), i_node.getName());
+		return getStoreDir(i_folder, i_node.getId(), i_node.getName());
 	}
 
 	inline static const std::string getStoreDirJob(const af::Node &i_node)
@@ -86,9 +86,17 @@ public:
 		return getStoreDir(af::Environment::getStoreFolderBranches(), i_node);
 	}
 
-	static const std::vector<std::string> getStoredFolders(const std::string &i_root);
+	inline static const std::string getStoreDirPool(const af::Node &i_node)
+	{
+		return getStoreDir(af::Environment::getStoreFolderPools(), i_node);
+	}
 
-	static const std::vector<std::string> getStoredFoldersBranches();
+	static const std::vector<std::string> getStoredFolders(const std::string &i_folder);
+
+	// Get stored foders sorted by specially node name,
+	// assuming that name represents path (branches, pools),
+	// and parent node should be always before childs.
+	static const std::vector<std::string> getStoredFoldersSortedPath(const std::string &i_folder);
 
 	//
 	// Store operations:

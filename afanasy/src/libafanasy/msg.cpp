@@ -591,7 +591,10 @@ const char * Msg::TNAMES[]=
 	"TTask",                      ///< A task of some job.
 	"TTaskFiles",                 ///< Task (or entire job) files
 
-	"TRESERVED10",
+	// NEW_VERSION
+	/*"TRESERVED10",*/
+	"TPoolsList",                 ///< Pools nodes list.
+
 	"TRESERVED11",
 	"TRESERVED12",
 	"TRESERVED13",

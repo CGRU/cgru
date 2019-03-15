@@ -31,6 +31,7 @@
 #include "branchescontainer.h"
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
+#include "poolscontainer.h"
 #include "socketsprocessing.h"
 #include "sysjob.h"
 #include "rendercontainer.h"
@@ -88,11 +89,12 @@ int main(int argc, char *argv[])
 	if( ENV.isHelpMode()) return 0;
 
 	// create directories if it is not exists
-	if( af::pathMakePath( ENV.getStoreFolder(),        af::VerboseOn ) == false) return 1;
-	if( af::pathMakeDir(  ENV.getStoreFolderBranches(),af::VerboseOn ) == false) return 1;
-	if( af::pathMakeDir(  ENV.getStoreFolderJobs(),    af::VerboseOn ) == false) return 1;
-	if( af::pathMakeDir(  ENV.getStoreFolderRenders(), af::VerboseOn ) == false) return 1;
-	if( af::pathMakeDir(  ENV.getStoreFolderUsers(),   af::VerboseOn ) == false) return 1;
+	if (af::pathMakePath(ENV.getStoreFolder(),        af::VerboseOn) == false) return 1;
+	if (af::pathMakeDir (ENV.getStoreFolderBranches(),af::VerboseOn) == false) return 1;
+	if (af::pathMakeDir (ENV.getStoreFolderJobs(),    af::VerboseOn) == false) return 1;
+	if (af::pathMakeDir (ENV.getStoreFolderRenders(), af::VerboseOn) == false) return 1;
+	if (af::pathMakeDir (ENV.getStoreFolderUsers(),   af::VerboseOn) == false) return 1;
+	if (af::pathMakeDir (ENV.getStoreFolderPools(),   af::VerboseOn) == false) return 1;
 
 // Server for windows can be me more simple and not use signals at all.
 // Windows is not a server platform, so it designed for individual tests or very small companies with easy load.
@@ -137,6 +139,9 @@ int main(int argc, char *argv[])
 	UserContainer users;
 	if( false == users.isInitialized()) return 1;
 
+	PoolsContainer pools;
+	if( false == pools.isInitialized()) return 1;
+
 	RenderContainer renders;
 	if( false == renders.isInitialized()) return 1;
 
@@ -150,26 +155,52 @@ int main(int argc, char *argv[])
 	ThreadArgs threadArgs;
 	threadArgs.branches  = &branches;
 	threadArgs.jobs      = &jobs;
+	threadArgs.monitors  = &monitors;
+	threadArgs.pools     = &pools;
 	threadArgs.renders   = &renders;
 	threadArgs.users     = &users;
-	threadArgs.monitors  = &monitors;
 	threadArgs.rupQueue  = &rupQueue;
 
 	/*
 	  Creating the afcommon object will actually create many message queues
 	  that will spawn threads. Have a look in the implementation of AfCommon.
 	*/
-	AFCommon afcommon( &threadArgs );
+	AFCommon afcommon(&threadArgs);
 
 	// Update SQL tables:
 	afsql::DBConnection afdb_upTables("AFDB_upTables");
 	afdb_upTables.DBOpen();
-	if( afdb_upTables.isOpen())
+	if (afdb_upTables.isOpen())
 	{
-		afsql::UpdateTables( &afdb_upTables);
+		afsql::UpdateTables(&afdb_upTables);
 		afdb_upTables.DBClose();
 	}
 
+	//
+	// Get Pools from store:
+	//
+	{
+	AF_LOG << "Getting pools from store...";
+
+	// We need to get pools folders by the way that childs go after parents.
+	// And there is a special function for it:
+	std::vector<std::string> folders = AFCommon::getStoredFoldersSortedPath(ENV.getStoreFolderPools());
+	AF_LOG << folders.size() << " pools found.";
+
+	for (int i = 0; i < folders.size(); i++)
+	{
+		PoolSrv * pool = new PoolSrv(folders[i]);
+		if (pool->isStoredOk() != true )
+		{
+			af::removeDir(pool->getStoreDir());
+			delete pool;
+			continue;
+		}
+		if (false == pools.addPoolFromStore(pool))
+			delete pool;
+	}
+	AF_LOG << pools.getCount() << " pools registered from store.";
+	}
 	//
 	// Get Renders from store:
 	//
@@ -224,7 +255,7 @@ int main(int argc, char *argv[])
 
 	// We need to get branches folders by the way that childs go after parents.
 	// And there is a special function for it:
-	std::vector<std::string> folders = AFCommon::getStoredFoldersBranches();
+	std::vector<std::string> folders = AFCommon::getStoredFoldersSortedPath(ENV.getStoreFolderBranches());
 	AF_LOG << folders.size() << " branches found.";
 
 	for (int i = 0; i < folders.size(); i++)

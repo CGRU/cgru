@@ -150,7 +150,11 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TTask/**/,                      ///< A task of some job.
 /**/TTaskFiles/**/,                 ///< Task (or entire job) files
 
-TRESERVED10,TRESERVED11,TRESERVED12,TRESERVED13,TRESERVED14,TRESERVED15,TRESERVED16,TRESERVED17,TRESERVED18,TRESERVED19,
+// NEW_VERSION
+/*TRESERVED10,*/
+/*- Poolss messages -*/
+/**/TPoolsList/**/,                 ///< Pools nodes list.
+TRESERVED11,TRESERVED12,TRESERVED13,TRESERVED14,TRESERVED15,TRESERVED16,TRESERVED17,TRESERVED18,TRESERVED19,
 
 TLAST
 };

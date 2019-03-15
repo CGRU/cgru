@@ -85,30 +85,30 @@ void AFCommon::catchDetached()
 }
 */
 
-const std::string AFCommon::getStoreDir(const std::string &i_root, int i_id, const std::string &i_name)
+const std::string AFCommon::getStoreDir(const std::string &i_folder, int i_id, const std::string &i_name)
 {
 	std::string store_dir = af::itos(i_id);
 	store_dir = af::itos(i_id / 1000) + AFGENERAL::PATH_SEPARATOR + store_dir;
-	store_dir = i_root + AFGENERAL::PATH_SEPARATOR + store_dir;
+	store_dir = i_folder + AFGENERAL::PATH_SEPARATOR + store_dir;
 	store_dir += '.' + af::pathFilterFileName(i_name);
 	return store_dir;
 }
 
-const std::vector<std::string> AFCommon::getStoredFolders(const std::string &i_root)
+const std::vector<std::string> AFCommon::getStoredFolders(const std::string &i_folder)
 {
 	std::vector<std::string> o_folders;
 
 #ifdef WINNT
 	HANDLE thousand_dir_handle;
 	WIN32_FIND_DATA thousand_dir_data;
-	if ((thousand_dir_handle = FindFirstFile((i_root + "\\*").c_str(), &thousand_dir_data))
+	if ((thousand_dir_handle = FindFirstFile((i_folder + "\\*").c_str(), &thousand_dir_data))
 		!= INVALID_HANDLE_VALUE)
 	{
 		do
 		{
 			std::string thousand_dir(thousand_dir_data.cFileName);
 			if (thousand_dir.find(".") == 0) continue;
-			thousand_dir = i_root + '\\' + thousand_dir;
+			thousand_dir = i_folder + '\\' + thousand_dir;
 			if (false == af::pathIsFolder(thousand_dir)) continue;
 
 			HANDLE job_dir_handle;
@@ -138,16 +138,16 @@ const std::vector<std::string> AFCommon::getStoredFolders(const std::string &i_r
 	}
 	else
 	{
-		AF_ERR << "Can't open folder: " << i_root.c_str();
+		AF_ERR << "Can't open folder: " << i_folder.c_str();
 		return o_folders;
 	}
 
 #else
 
-	DIR *thousand_dir_handle = opendir(i_root.c_str());
+	DIR *thousand_dir_handle = opendir(i_folder.c_str());
 	if (thousand_dir_handle == NULL)
 	{
-		AF_ERR << "Can't open folder:" << i_root.c_str();
+		AF_ERR << "Can't open folder:" << i_folder.c_str();
 		return o_folders;
 	}
 
@@ -170,7 +170,7 @@ const std::vector<std::string> AFCommon::getStoredFolders(const std::string &i_r
 		if (NULL == thousand_dir_ptr) break;
 
 		if (thousand_dir_ptr->d_name[0] == '.') continue;
-		std::string thousand_dir = i_root + '/' + thousand_dir_ptr->d_name;
+		std::string thousand_dir = i_folder + '/' + thousand_dir_ptr->d_name;
 		if (false == af::pathIsFolder(thousand_dir)) continue;
 
 		DIR *job_dir_handle = opendir(thousand_dir.c_str());
@@ -207,7 +207,7 @@ const std::vector<std::string> AFCommon::getStoredFolders(const std::string &i_r
 	return o_folders;
 }
 
-const std::string trim_branch_folder(const std::string &i_f)
+const std::string trim_path_folder(const std::string &i_f)
 {
 	size_t p;
 	std::string f(i_f);
@@ -223,22 +223,22 @@ const std::string trim_branch_folder(const std::string &i_f)
 
 	return f;
 }
-bool sort_branches_folders(const std::string &i_a, const std::string &i_b)
+bool sort_paths_folders(const std::string &i_a, const std::string &i_b)
 {
-	// We need to extract branch name from a store folder full path
-	std::string a(trim_branch_folder(i_a));
-	std::string b(trim_branch_folder(i_b));
+	// We need to extract name from a store folder full path
+	std::string a(trim_path_folder(i_a));
+	std::string b(trim_path_folder(i_b));
 	// printf("\"%s\" <> \"%s\"\n", a.c_str(), b.c_str());
 
-	// Parent branch always has less path size
+	// Parent path always has less path size
 	return (a.size() < b.size());
 }
-const std::vector<std::string> AFCommon::getStoredFoldersBranches()
+const std::vector<std::string> AFCommon::getStoredFoldersSortedPath(const std::string & i_folder)
 {
-	std::vector<std::string> folders = getStoredFolders(af::Environment::getStoreFolderBranches());
+	std::vector<std::string> folders = getStoredFolders(i_folder);
 
-	// We need to sort branches the way that parent branch goes first
-	std::sort(folders.begin(), folders.end(), sort_branches_folders);
+	// We need to sort pahts the way that path goes first
+	std::sort(folders.begin(), folders.end(), sort_paths_folders);
 	// for (int i = 0; i < folders.size(); i++) printf("%s\n", folders[i].c_str());
 
 	return folders;

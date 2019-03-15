@@ -19,6 +19,7 @@
 #include "jobcontainer.h"
 #include "monitoraf.h"
 #include "monitorcontainer.h"
+#include "poolscontainer.h"
 #include "rendercontainer.h"
 #include "threadargs.h"
 #include "usercontainer.h"
@@ -322,6 +323,29 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 
 			if (o_msg_response == NULL)
 				o_msg_response = i_args->branches->generateList(af::Msg::TBranchesList, type, ids, mask, json);
+		}
+		else if (type == "pools")
+		{
+			AfContainerLock lock(i_args->pools, AfContainerLock::READLOCK);
+			if (mode.size())
+			{
+				PoolSrv * pool = NULL;
+				if (ids.size() == 1)
+				{
+					PoolsContainerIt it(i_args->pools);
+					pool = it.getPool(ids[0]);
+					if (pool == NULL)
+						o_msg_response = af::jsonMsgError("Invalid ID");
+				}
+				if (pool)
+				{
+					if (mode == "log")
+						o_msg_response = pool->writeLog(binary);
+				}
+			}
+
+			if (o_msg_response == NULL)
+				o_msg_response = i_args->pools->generateList(af::Msg::TPoolsList, type, ids, mask, json);
 		}
 		else if( type == "monitors")
 		{

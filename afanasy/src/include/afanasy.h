@@ -65,6 +65,13 @@ const int TASKSPERSECOND_MAX = 10000;
 const char STORE_FOLDER[] = "branches";
 }
 
+/// Pools options:
+namespace AFPOOL
+{
+const int MAXCOUNT = 1000;
+const char STORE_FOLDER[] = "pools";
+}
+
 /// Users options:
 namespace AFUSER
 {

@@ -149,6 +149,7 @@ std::string Environment::store_folder_branches;
 std::string Environment::store_folder_jobs;
 std::string Environment::store_folder_renders;
 std::string Environment::store_folder_users;
+std::string Environment::store_folder_pools;
 
 std::string Environment::timeformat =                 AFGENERAL::TIME_FORMAT;
 std::string Environment::servername =                 AFADDR::SERVER_NAME;
@@ -803,6 +804,7 @@ bool Environment::initAfterLoad()
 	store_folder_jobs    = store_folder + AFGENERAL::PATH_SEPARATOR +    AFJOB::STORE_FOLDER;
 	store_folder_renders = store_folder + AFGENERAL::PATH_SEPARATOR + AFRENDER::STORE_FOLDER;
 	store_folder_users   = store_folder + AFGENERAL::PATH_SEPARATOR +   AFUSER::STORE_FOLDER;
+	store_folder_pools   = store_folder + AFGENERAL::PATH_SEPARATOR +   AFPOOL::STORE_FOLDER;
 
 	// HTTP serve folder:
 	if( http_serve_dir.empty()) 

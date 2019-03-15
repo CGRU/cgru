@@ -181,6 +181,7 @@ public:
 	static inline const std::string & getStoreFolderJobs()    { return store_folder_jobs;    }
 	static inline const std::string & getStoreFolderRenders() { return store_folder_renders; }
 	static inline const std::string & getStoreFolderUsers()   { return store_folder_users;   }
+	static inline const std::string & getStoreFolderPools()   { return store_folder_pools;   }
 
 	static inline const std::string & get_DB_ConnInfo()        { return db_conninfo;     } ///< Get database connection information.
 	static inline const std::string & get_DB_StringQuotes()    { return db_stringquotes; } ///< Get database string quotes.
@@ -353,6 +354,7 @@ private:
 	static std::string store_folder_jobs;
 	static std::string store_folder_renders;
 	static std::string store_folder_users;
+	static std::string store_folder_pools;
 
 	static std::string db_conninfo;       ///< Database connection info
 	static std::string db_stringquotes;   ///< Database string quotes
