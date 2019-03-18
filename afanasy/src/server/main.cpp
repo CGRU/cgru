@@ -199,7 +199,9 @@ int main(int argc, char *argv[])
 		if (false == pools.addPoolFromStore(pool))
 			delete pool;
 	}
+	// We should check that root pool was created.
 	AF_LOG << pools.getCount() << " pools registered from store.";
+	pools.addRootPool();
 	}
 	//
 	// Get Renders from store:

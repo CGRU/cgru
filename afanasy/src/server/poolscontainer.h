@@ -31,6 +31,8 @@ public:
 	PoolsContainer();
 	~PoolsContainer();
 
+	void addRootPool();
+
 	/// Add user, called when job registering, if user with this name exists it's hostname set to \c hostname only.
 	PoolSrv * addPoolFromPath(const std::string & i_path, MonitorContainer * i_monitors);
 

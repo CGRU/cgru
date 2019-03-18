@@ -44,6 +44,24 @@ PoolsContainer::~PoolsContainer()
 AFINFO("PoolsContainer::~PoolsContainer:\n");
 }
 
+void PoolsContainer::addRootPool()
+{
+	if (m_root_pool)
+		return;
+
+	m_root_pool = new PoolSrv(NULL,"/");
+
+	if (addPoolToContainer(m_root_pool) == 0)
+	{
+		AF_ERR << "Can't add root pool to container.";
+		delete m_root_pool;
+		m_root_pool = NULL;
+		return;
+	}
+
+	AF_LOG << "Root pool created: " << m_root_pool;
+}
+
 PoolSrv * PoolsContainer::addPoolFromPath(const std::string & i_path, MonitorContainer * i_monitors)
 {
 //AF_DEBUG << i_path;

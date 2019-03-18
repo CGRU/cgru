@@ -183,7 +183,7 @@ CmdRenderUnpause::CmdRenderUnpause()
 	setCmd("runpause");
 	setArgsCount(1);
 	setInfo("Set render unpaused.");
-	setHelp("rpause [name] Unset render paused state.");
+	setHelp("runpause [name] Unset render paused state.");
 	setMsgType( af::Msg::TJSON);
 }
 CmdRenderUnpause::~CmdRenderUnpause(){}

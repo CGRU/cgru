@@ -19,6 +19,7 @@
 
 #include "cmd_database.h"
 
+#include "cmd_pool.h"
 #include "cmd_render.h"
 #include "cmd_user.h"
 #include "cmd_monitor.h"
@@ -48,6 +49,13 @@ void AfCmd::RegisterCommands()
 	addCmd(new CmdMonitorList);
 	addCmd(new CmdMonitorLog);
 	addCmd(new CmdMonitorMsg);
+
+	addCmd(new CmdPoolList);
+	addCmd(new CmdPoolPriority);
+	addCmd(new CmdPoolPause);
+	addCmd(new CmdPoolUnpause);
+	addCmd(new CmdPoolServiceAdd);
+	addCmd(new CmdPoolServiceDel);
 
 	addCmd(new CmdRenderList);
 	addCmd(new CmdRenderPriority);

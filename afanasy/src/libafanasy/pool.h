@@ -46,10 +46,7 @@ protected:
 
 	std::string m_parent_path;
 
-	int64_t     m_creation_time;
-	std::string m_creation_user;
-	int64_t     m_modified_time;
-	std::string m_modified_user;
+	int64_t m_creation_time;
 
 	int32_t m_pools_num;
 	int32_t m_pools_total;
