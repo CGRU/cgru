@@ -16,6 +16,7 @@ public:
 
 	inline void setCmd(   const std::string & str) { m_cmd    = str;   }
 	inline void setInfo(  const std::string & str) { m_info   = str;   }
+	inline void setUsage( const std::string & str) { m_usage  = str;   }
 	inline void setHelp(  const std::string & str) { m_help   = str;   }
 	inline void setArgsCount(  int value         ) { m_argscount   = value; }
 	inline void setMsgType(    int value         ) { m_msgtype     = value; }
@@ -37,8 +38,9 @@ public:
 /// Print message information in stdout.
 	virtual void v_msgOut( af::Msg& msg);
 
-	virtual void v_printInfo() const;
-	virtual void v_printHelp() const;
+	virtual void v_printInfo()  const;
+	virtual void v_printUsage() const;
+	virtual void v_printHelp()  const;
 
 	inline const std::string getStreamString() const { return m_str.str(); }
 
@@ -53,5 +55,6 @@ private:
 
 	std::string m_cmd;
 	std::string m_info;
+	std::string m_usage;
 	std::string m_help;
 };

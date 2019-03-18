@@ -51,6 +51,7 @@ void AfCmd::RegisterCommands()
 	addCmd(new CmdMonitorMsg);
 
 	addCmd(new CmdPoolList);
+	addCmd(new CmdPoolLog);
 	addCmd(new CmdPoolPriority);
 	addCmd(new CmdPoolPause);
 	addCmd(new CmdPoolUnpause);

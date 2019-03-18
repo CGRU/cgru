@@ -30,12 +30,29 @@ void CmdPoolList::v_msgOut(af::Msg& msg)
 	list.v_stdOut(Verbose);
 }
 
+CmdPoolLog::CmdPoolLog()
+{
+	setCmd("plog");
+	setArgsCount(1);
+	setInfo("Get pool log.");
+	setUsage("plog id");
+	setHelp("Get pool log by id.");
+	setMsgType( af::Msg::TJSON);
+}
+CmdPoolLog::~CmdPoolLog(){}
+bool CmdPoolLog::v_processArguments(int argc, char** argv, af::Msg &msg)
+{
+	int id = atoi(argv[0]);
+	m_str << "{\"get\":{\"type\":\"pools\",\"mode\":\"log\",\"ids\":[" << id << "]}}";
+	return true;
+}
+
 CmdPoolPriority::CmdPoolPriority()
 {
 	setCmd("ppri");
 	setArgsCount(2);
 	setInfo("Change pool priority.");
-	setHelp("ppri [name] [priority] Set pool priority.");
+	setHelp("ppri [name] [priority]\nSet pool priority.");
 	setMsgType(af::Msg::TJSON);
 }
 CmdPoolPriority::~CmdPoolPriority(){}

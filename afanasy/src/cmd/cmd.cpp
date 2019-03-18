@@ -28,12 +28,23 @@ void Cmd::v_printInfo() const
 	std::cout << std::endl;
 }
 
+void Cmd::v_printUsage() const
+{
+	if (m_usage.empty())
+		return;
+
+	std::cout << "Usage: " << m_usage << std::endl;
+}
+
 void Cmd::v_printHelp() const
 {
 	v_printInfo();
+	v_printUsage();
 
-	if (false == m_help.empty())
-		std::cout << m_help << std::endl;
+	if (m_help.empty())
+		return;
+
+	std::cout << m_help << std::endl;
 }
 
 void Cmd::v_msgOut( af::Msg& msg) {}
