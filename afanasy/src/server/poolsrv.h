@@ -36,17 +36,9 @@ public:
 
 	~PoolSrv();
 
-	bool setParent(PoolSrv * i_parent);
-
 	bool initialize();
 
-	bool hasPool(const PoolSrv * i_pool) const;
-	void addPool(PoolSrv * i_pool);
-	void removePool(PoolSrv * i_pool);
-
-	bool hasRender(const RenderAf * i_render) const;
-	void addRender(RenderAf * i_render, UserAf * i_user);
-	void removeRender(RenderAf * i_render, UserAf * i_user);
+	bool addPool(PoolSrv * i_pool);
 
 	void v_refresh(time_t i_current_time, AfContainer * i_container, MonitorContainer * i_monitoring);
 
@@ -60,7 +52,15 @@ public:
 	inline static void setPoolsContainer(PoolsContainer * i_pools ) { ms_pools = i_pools;}
 
 private:
-	void deletePool(Action & o_action, MonitorContainer * i_monitoring);
+	bool hasPool(const std::string & i_name) const;
+	bool hasPool(const PoolSrv * i_pool) const;
+	void addPool(Action & i_action);
+	void deletePool(Action & o_action);
+	void removePool(PoolSrv * i_pool);
+
+	bool hasRender(const RenderAf * i_render) const;
+	void addRender(RenderAf * i_render, UserAf * i_user);
+	void removeRender(RenderAf * i_render, UserAf * i_user);
 
 private:
 	PoolSrv * m_parent;

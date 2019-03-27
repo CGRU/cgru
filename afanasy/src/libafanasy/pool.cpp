@@ -10,6 +10,22 @@
 
 using namespace af;
 
+const std::string Pool::FilterName(const std::string & i_name)
+{
+	std::string name;
+
+	for (int i = 0; i < i_name.size(); i++)
+	{
+		char c = i_name.at(i);
+		if ((c < '0') || (c > 'z'))
+			c = '_';
+
+		name.push_back(c);
+	}
+
+	return name;
+}
+
 Pool::Pool(const std::string &i_path)
 {
 	initDefaultValues();

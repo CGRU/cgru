@@ -44,102 +44,36 @@ PoolsContainer::~PoolsContainer()
 AFINFO("PoolsContainer::~PoolsContainer:\n");
 }
 
-void PoolsContainer::addRootPool()
+void PoolsContainer::createRootPool()
 {
 	if (m_root_pool)
 		return;
 
-	m_root_pool = new PoolSrv(NULL,"/");
+	addRootPool(new PoolSrv(NULL,"/"));
+
+	AF_LOG << "Root pool created: " << m_root_pool;
+}
+
+bool PoolsContainer::addRootPool(PoolSrv * i_root_pool)
+{
+	if (m_root_pool)
+	{
+		AF_ERR << "Root pool already exists.";
+		delete i_root_pool;
+		return false;
+	}
+
+	m_root_pool = i_root_pool;
 
 	if (addPoolToContainer(m_root_pool) == 0)
 	{
 		AF_ERR << "Can't add root pool to container.";
 		delete m_root_pool;
 		m_root_pool = NULL;
-		return;
+		return false;
 	}
 
-	AF_LOG << "Root pool created: " << m_root_pool;
-}
-
-PoolSrv * PoolsContainer::addPoolFromPath(const std::string & i_path, MonitorContainer * i_monitors)
-{
-//AF_DEBUG << i_path;
-//Filter pool path
-//std::string path = Pool::FilterPath(i_path);
-
-	// Look for an existing pool
-	PoolSrv * pool = getPool(i_path);
-	if (pool)
-		return pool;
-
-	// Look for a parent pool if it is not the root
-	PoolSrv * parent = NULL;
-	if (i_path != "/")
-	{
-		std::string up_path = af::pathUp(i_path);
-		if (up_path != i_path)
-			parent = addPoolFromPath(up_path, i_monitors);
-		if (NULL == parent)
-		{
-			AF_ERR << "Can't process parent pool:\n" << i_path << "\n" << up_path;
-			delete pool;
-			return NULL;
-		}
-	}
-
-	// Create new Pool if parent can,
-	// or we should to create the first root pool
-	if ((i_path == "/")/* || parent->isCreateChilds()*/)
-	{
-		pool = new PoolSrv(parent, i_path);
-		if (addPoolToContainer(pool) == 0)
-		{
-			AF_ERR << "Can't add pool to container: " << i_path;
-			delete pool;
-			return NULL;
-		}
-
-		AFCommon::QueueLog("New pool registered: " + pool->v_generateInfoString(false));
-
-		// Store root pool if it was not:
-		if ((m_root_pool == NULL) && (i_path == "/"))
-		{
-			m_root_pool = pool;
-			AF_LOG << "Root pool created.";
-		}
-
-		if (i_monitors)
-			i_monitors->addEvent(af::Monitor::EVT_pools_add, pool->getId());
-	}
-	else
-		pool = parent;
-
-	return pool;
-}
-
-bool PoolsContainer::addPoolFromStore(PoolSrv * i_pool)
-{
-	std::string path = i_pool->getName();
-	if (path != "/")
-	{
-		std::string up_path = af::pathUp(path);
-		PoolSrv * parent = getPool(up_path);
-		if (NULL == parent)
-		{
-			AF_ERR << "Can't process parent of a stored pool:\n" << path << "\n" << up_path;
-			return false;
-		}
-		i_pool->setParent(parent);
-	}
-	else if (m_root_pool == NULL)
-	{
-		// Store root pool if it was not:
-		m_root_pool = i_pool;
-		AF_LOG << "Root pool created from store.";
-	}
-
-	return (addPoolToContainer(i_pool) != 0);
+	return true;
 }
 
 int PoolsContainer::addPoolToContainer(PoolSrv * i_pool)
@@ -153,6 +87,36 @@ int PoolsContainer::addPoolToContainer(PoolSrv * i_pool)
 		return 0;
 
 	return i_pool->getId();
+}
+
+bool PoolsContainer::addPoolFromStore(PoolSrv * i_pool)
+{
+	std::string path = i_pool->getName();
+
+	if (path == "/")
+	{
+		if (NULL != m_root_pool)
+		{
+			AF_ERR << "An attempt to create a second root pool from store.";
+			return false;
+		}
+
+		if (false == addRootPool(i_pool))
+			return false;
+
+		AF_LOG << "Root pool created from store.";
+		return true;
+	}
+
+	std::string up_path = af::pathUp(path);
+	PoolSrv * parent = getPool(up_path);
+	if (NULL == parent)
+	{
+		AF_ERR << "Can't find a parent of a stored pool:\n" << path << "\n" << up_path;
+		return false;
+	}
+
+	return parent->addPool(i_pool);
 }
 
 PoolSrv * PoolsContainer::getPool(const std::string & i_path)

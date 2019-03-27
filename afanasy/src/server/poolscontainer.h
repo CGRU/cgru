@@ -31,13 +31,17 @@ public:
 	PoolsContainer();
 	~PoolsContainer();
 
-	void addRootPool();
+	// This is called from main(),
+	// just after all store read,
+	// to check/ensure that root pool exists.
+	// Or it was read from store or will be created a new one.
+	void createRootPool();
 
-	/// Add user, called when job registering, if user with this name exists it's hostname set to \c hostname only.
-	PoolSrv * addPoolFromPath(const std::string & i_path, MonitorContainer * i_monitors);
+	bool addRootPool(PoolSrv * i_root_pool);
 
-	/// Add user, called on start with user created from batadase
 	bool addPoolFromStore(PoolSrv * i_pool);
+
+	int addPoolToContainer(PoolSrv * i_pool);
 
 	PoolSrv * getPool(const std::string & i_path);
 
@@ -45,7 +49,6 @@ public:
 
 private:
 	PoolSrv * m_root_pool;
-	int addPoolToContainer(PoolSrv * i_pool);
 };
 
 //########################## Iterator ##############################

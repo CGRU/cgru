@@ -24,7 +24,7 @@
 
 #include "action.h"
 #include "afcommon.h"
-//#include "poolscontainer.h"
+#include "poolscontainer.h"
 #include "monitorcontainer.h"
 #include "renderaf.h"
 
@@ -40,7 +40,7 @@ PoolSrv::PoolSrv(PoolSrv * i_parent, const std::string & i_path):
 	m_parent(i_parent),
 	AfNodeSrv(this)
 {
-	appendLog("Created from render.");
+	appendLog("Created.");
 }
 
 PoolSrv::PoolSrv(const std::string & i_store_dir):
@@ -67,23 +67,6 @@ PoolSrv::PoolSrv(const std::string & i_store_dir):
 	delete [] data;
 }
 
-bool PoolSrv::setParent(PoolSrv * i_parent)
-{
-	if (NULL != m_parent)
-	{
-		AF_ERR << "PoolSrv::setParent: Pool['" << m_name << "'] already has a parent.";
-		return false;
-	}
-
-	if (m_name == "/")
-	{
-		AF_ERR << "PoolSrv::setParent: Root pool should not have any parent.";
-		return false;
-	}
-
-	m_parent = i_parent;
-}
-
 bool PoolSrv::initialize()
 {
 	// Non root pool should have a parent
@@ -96,7 +79,6 @@ bool PoolSrv::initialize()
 	if (NULL != m_parent)
 	{
 		m_parent_path = m_parent->getName();
-		m_parent->addPool(this);
 	}
 
 	if (isFromStore())
@@ -139,9 +121,19 @@ void PoolSrv::v_action(Action & i_action)
 
 		if (type == "delete")
 		{
-			deletePool(i_action, i_action.monitors);
+			deletePool(i_action);
 			return;
 		}
+
+		if (type == "add_pool")
+		{
+			addPool(i_action);
+			return;
+		}
+
+		i_action.answer_kind = "error";
+		i_action.answer = "Unknown operation: " + type;
+		return;
 	}
 
 	const JSON & params = (*i_action.data)["params"];
@@ -163,7 +155,7 @@ void PoolSrv::logAction(const Action & i_action, const std::string & i_node_name
 	appendLog(std::string("Action[") + i_action.type + "][" +  i_node_name + "]: " + i_action.log);
 }
 
-void PoolSrv::deletePool(Action & o_action, MonitorContainer * i_monitoring)
+void PoolSrv::deletePool(Action & o_action)
 {
 	if (NULL == m_parent)
 	{
@@ -182,15 +174,27 @@ void PoolSrv::deletePool(Action & o_action, MonitorContainer * i_monitoring)
 	appendLog(std::string("Deleted by ") + o_action.author);
 	setZombie();
 
-	if (i_monitoring)
-		i_monitoring->addEvent(af::Monitor::EVT_pools_del, m_id);
+	o_action.monitors->addEvent(af::Monitor::EVT_pools_del, m_id);
+}
+
+bool PoolSrv::hasPool(const std::string & i_name) const
+{
+	for (std::list<PoolSrv*>::const_iterator it = m_pools_list.begin(); it != m_pools_list.end(); it++)
+		if ((*it)->getName() == i_name)
+			return true;
+	return false;
 }
 
 bool PoolSrv::hasPool(const PoolSrv * i_pool) const
 {
 	for (std::list<PoolSrv*>::const_iterator it = m_pools_list.begin(); it != m_pools_list.end(); it++)
+	{
 		if (*it == i_pool)
 			return true;
+
+		if ((*it)->getName() == i_pool->getName())
+			return true;
+	}
 	return false;
 }
 
@@ -202,19 +206,66 @@ bool PoolSrv::hasRender(const RenderAf * i_render) const
 	return false;
 }
 
-void PoolSrv::addPool(PoolSrv * i_pool)
+void PoolSrv::addPool(Action & i_action)
+{
+	const JSON & operation = (*i_action.data)["operation"];
+
+	std::string name;
+	if (false == af::jr_string("name", name, operation))
+	{
+		i_action.answer_kind = "error";
+		i_action.answer = "add_pool operation should have a new pools name string.";
+		return;
+	}
+
+	if (name.size() < 1)
+	{
+		i_action.answer_kind = "error";
+		i_action.answer = "New pool name should not have a zero length.";
+		return;
+	}
+
+	if (m_name == "/")
+		name = "/" + FilterName(name);
+	else
+		name = m_name + "/" + FilterName(name);
+
+	if (hasPool(name))
+	{
+		i_action.answer_kind = "error";
+		i_action.answer = std::string("Pool[") + getName() + "] already has a pool[" + name + "]";
+		return;
+	}
+
+	PoolSrv * pool = new PoolSrv(this, name);
+
+	if (false == addPool(pool))
+		delete pool;
+}
+
+bool PoolSrv::addPool(PoolSrv * i_pool)
 {
 	if (hasPool(i_pool))
 	{
 		AF_ERR << "Pool[" << getName() << "] already has a pool[" << i_pool->getName() << "]";
-		return;
+		return false;
 	}
 
 	appendLog(std::string("Adding a pool: ") + i_pool->getName());
 
+	i_pool->m_parent = this;
+
+	if (false == ms_pools->addPoolToContainer(i_pool))
+	{
+		appendLog("Failed to add pool to container. See server log for details.");
+		return false;
+	}
+
 	m_pools_list.push_back(i_pool);
 
 	m_pools_num++;
+
+	return true;
 }
 
 void PoolSrv::removePool(PoolSrv * i_pool)

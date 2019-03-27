@@ -1,0 +1,15 @@
+{
+	"action":
+	{
+		"user_name"  : "jimmy",
+		"host_name"  : "pc01",
+		"mask"       : "/",
+		"-ids"       : [4],
+		"type"       : "pools",
+		"operation"  :
+		{
+			"type" : "add_pool",
+			"name" : "local"
+		}
+	}
+}

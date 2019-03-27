@@ -201,7 +201,7 @@ int main(int argc, char *argv[])
 	}
 	// We should check that root pool was created.
 	AF_LOG << pools.getCount() << " pools registered from store.";
-	pools.addRootPool();
+	pools.createRootPool();
 	}
 	//
 	// Get Renders from store:

@@ -33,11 +33,13 @@ public:
 	inline int getMaxTasks() const { return m_max_tasks;}
 
 public:
-	
 	enum State
 	{
 		SPaused  = 1ULL << 0
 	};
+
+public:
+	static const std::string FilterName(const std::string & i_name);
 
 protected:
 //	void checkDirty();
