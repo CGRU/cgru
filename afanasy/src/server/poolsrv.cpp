@@ -83,9 +83,9 @@ bool PoolSrv::initialize()
 
 	if (isFromStore())
 	{
-		if (m_creation_time == 0)
+		if (m_time_creation == 0)
 		{
-			m_creation_time = time(NULL);
+			m_time_creation = time(NULL);
 			store();
 		}
 		appendLog("Initialized from store.");
@@ -97,7 +97,7 @@ bool PoolSrv::initialize()
 			// The root pool is just created for the first time (not from store)
 		}
 
-		m_creation_time = time(NULL);
+		m_time_creation = time(NULL);
 
 		setStoreDir(AFCommon::getStoreDirPool(*this));
 		store();

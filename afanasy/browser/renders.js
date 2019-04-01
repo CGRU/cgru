@@ -17,6 +17,7 @@
 "use strict";
 
 RenderNode.onMonitorCreate = function() {
+	PoolNode.onMonitorCreate();
 	RenderNode.createActions();
 };
 

@@ -48,7 +48,7 @@ protected:
 
 	std::string m_parent_path;
 
-	int64_t m_creation_time;
+	int64_t m_time_creation;
 
 	int32_t m_pools_num;
 	int32_t m_pools_total;

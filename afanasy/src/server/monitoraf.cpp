@@ -137,6 +137,12 @@ void MonitorAf::v_action( Action & i_action)
 				eids.push_back( af::Monitor::EVT_renders_change);
 				eids.push_back( af::Monitor::EVT_renders_del);
 			}
+			else if( opclass == "pools")
+			{
+				eids.push_back( af::Monitor::EVT_pools_add);
+				eids.push_back( af::Monitor::EVT_pools_change);
+				eids.push_back( af::Monitor::EVT_pools_del);
+			}
 			else if( opclass == "users")
 			{
 				eids.push_back( af::Monitor::EVT_users_add);

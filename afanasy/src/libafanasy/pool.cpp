@@ -46,7 +46,7 @@ Pool::Pool(int i_id)
 
 void Pool::initDefaultValues()
 {
-	m_creation_time = 0;
+	m_time_creation = 0;
 	m_time_offline = 0;
 	m_time_empty = 0;
 
@@ -69,12 +69,14 @@ void Pool::v_jsonWrite(std::ostringstream & o_str, int i_type) const // Thread-s
 
 	Node::v_jsonWrite(o_str, i_type);
 
-	o_str << ",\n\"creation_time\":"   << m_creation_time;
+	o_str << ",\n\"time_creation\":"   << m_time_creation;
 
+	o_str << ",\n\"parent\":\"" << m_parent_path << "\"";
+/*
 	o_str << ",\n\"st\":" << m_state;
 	o_str << ",\n";
 	jw_state(m_state, o_str);
-
+*/
 	o_str << ",\n\"task_start_finish_time\":" << m_task_start_finish_time;
 	if (m_max_tasks  >= 0)
 		o_str << ",\n\"max_tasks\":" << m_max_tasks;
@@ -141,7 +143,7 @@ void Pool::v_readwrite(Msg * msg) // Thread-safe
 	rw_int64_t(m_flags,                  msg);
 	rw_String (m_annotation,             msg);
 	rw_String (m_parent_path,            msg);
-	rw_int64_t(m_creation_time,          msg);
+	rw_int64_t(m_time_creation,          msg);
 	rw_int32_t(m_max_tasks,              msg);
 	rw_int64_t(m_task_start_finish_time, msg);
 }

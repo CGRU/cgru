@@ -372,31 +372,45 @@ function Monitor(i_args)
 	this.menu = null;
 	this.cycle = 0;
 
+	// Monitor can watch several node types:
+	this.types = [this.type];
+
+	// Add other node type to monitor:
+	if (this.type == 'renders')
+		this.types.push('pools');
+
 	if (this.type == 'tasks')
 	{
 		this.job_id = i_args.id;
 		nw_GetNodes('jobs', [this.job_id], 'full');
+		return;
 	}
-	else
+
+	for (let type of this.types)
 	{
-		g_refreshers.push(this);
-		nw_Subscribe(this.type, true);
-		nw_GetNodes(this.type);
+		nw_Subscribe(type, true);
+		nw_GetNodes(type);
 	}
+
+	g_refreshers.push(this);
 }
 
 Monitor.prototype.destroy = function() {
 	if (this.menu)
 		this.menu.destroy();
+
 	if (g_cur_monitor == this)
 		g_cur_monitor = null;
+
 	cm_ArrayRemove(g_receivers, this);
 	cm_ArrayRemove(g_refreshers, this);
 	cm_ArrayRemove(g_monitors, this);
+
 	if (this.type == 'tasks')
 		nw_Subscribe(this.type, false, [this.job_id]);
 	else
-		nw_Subscribe(this.type, false);
+		for (let type of this.types)
+			nw_Subscribe(type, false);
 
 	for (var i = 0; i < this.items.length; i++)
 		if (this.items[i].monitorDestroy)
@@ -432,10 +446,10 @@ Monitor.prototype.refresh = function() {
 	else if ((this.type == 'renders') && (this.cycle % 5 == 0))
 	{
 		// Get resources of online renders:
-		var ids = [];
-		for (var i = 0; i < this.items.length; i++)
-			if (this.items[i].state.ONL)
-				ids.push(this.items[i].params.id);
+		let ids = [];
+		for (let item of this.items)
+			if ((item.node_type == 'renders') && item.state.ONL)
+				ids.push(item.params.id);
 		if (ids.length)
 			nw_GetNodes('renders', ids, 'resources');
 	}
@@ -462,11 +476,18 @@ Monitor.prototype.processMsg = function(obj) {
 			}
 			return;
 		}
-		this.delNodes(eval('obj.events.' + this.type + '_del'));
-		var ids = cm_IdsMerge(
-			eval('obj.events.' + this.type + '_change'), eval('obj.events.' + this.type + '_add'));
-		if (ids.length > 0)
-			nw_GetNodes(this.type, ids);
+
+		// Delete nodes:
+		for (let type of this.types)
+			this.delNodes(obj.events[type + '_del']);
+
+		// Get changed and new nodes:
+		for (let type of this.types)
+		{
+			let ids = cm_IdsMerge(obj.events[type + '_change'], obj.events[type + '_add']);
+			if (ids.length > 0)
+				nw_GetNodes(type, ids);
+		}
 
 		// Jobs order:
 		if (this.type == 'jobs')
@@ -500,61 +521,66 @@ Monitor.prototype.processMsg = function(obj) {
 		return;
 	}
 
-	var nodes = eval('obj.' + this.type);
-	if (nodes == null)
+	var msg_nodes = [];
+	for (let type of this.types)
+		if (obj[type] && obj[type].length)
+			for (let node of obj[type])
+				msg_nodes.push({'type':type,'id':node.id,'node':node});
+
+	if (msg_nodes.length == 0)
 		return;
 
-	var new_ids = [];
-	var updated = [];
+	var new_nodes = [];
+	var updated_items = [];
 
-	for (var j = 0; j < nodes.length; j++)
+	for (let mnode of msg_nodes)
 	{
-		var found = false;
-		for (var i = 0; i < this.items.length; i++)
+		let found = false;
+		for (let item of this.items)
 		{
-			if (this.items[i].params.id == nodes[j].id)
+			if ((item.params.id == mnode.id) && (item.node_type == mnode.type))
 			{
-				this.items[i].update(nodes[j]);
+				item.update(mnode.node);
 
-				if (this.panel_item == this.items[i])
-					this.updatePanels(this.items[i]);
+				if (this.panel_item == item)
+					this.updatePanels(item);
 
 				if ((this.type == 'jobs') && this.elPanelR.m_elBlocks.m_cur_block)
-					if (this.elPanelR.m_elBlocks.m_cur_block.job.params.id == this.items[i].params.id)
+					if (this.elPanelR.m_elBlocks.m_cur_block.job.params.id == item.params.id)
 						this.elPanelR.m_elBlocks.m_cur_block.updatePanels();
 
-				updated.push(this.items[i]);
-				this.filterItem(this.items[i]);
+				updated_items.push(item);
+				this.filterItem(item);
 
 				found = true;
 				break;
 			}
 		}
 		if (found == false)
-			new_ids.push(j);
+			new_nodes.push(mnode);
 	}
 
 	if (this.sortParm != 'order')
-		for (var i = 0; i < updated.length; i++)
-			this.sortItem(updated[i]);
+		for (let item of updated_items)
+			this.sortItem(item);
 
-	var new_nodes = [];
-	for (var i = 0; i < new_ids.length; i++)
-		new_nodes.push(this.createNode(nodes[new_ids[i]]));
+	var new_items = [];
+	for (let nnode of new_nodes)
+		new_items.push(this.createNodeItem(nnode.node,nnode.type));
 
 	if ((this.type == 'jobs') && (this.sortParm == 'order'))
-		if (new_ids.length)  //|| updated.length )
+		if (new_items.length)  //|| updated_items.length )
 			nw_GetNodes('users', [g_uid], 'jobs_order');
 
 	if (false == this.hasSelection())
 	{
-		if (new_nodes.length)
-			this.cur_item = new_nodes[new_nodes.length - 1];
-		else if (updated.length)
-			this.cur_item = updated[updated.length - 1];
+		if (new_items.length)
+			this.cur_item = new_items[new_items.length - 1];
+		else if (updated_items.length)
+			this.cur_item = updated_items[updated_items.length - 1];
 	}
 
-	if ((this.firstNodesReceived != true) && new_nodes.length && (g_VISOR() != true))
+	if ((this.firstNodesReceived != true) && new_items.length && (g_VISOR() != true))
 	{
 		this.items[this.items.length - 1].element.scrollIntoView();
 		this.firstNodesReceived = true;
@@ -564,8 +590,7 @@ Monitor.prototype.processMsg = function(obj) {
 		this.nodeConstructor.updatingFinished();
 
 	this.setWindowTitle();
-	// this.info( 'c' + this.cycle + ': nodes processed: ' + nodes.length + ' new:' + new_ids.length + ' up:'
-	// + updated.length);
+//console.log('c' + this.cycle + ': nodes processed: ' + msg_nodes.length + ' new:' + new_nodes.length + ' up:' + updated_items.length);
 };
 
 Monitor.prototype.setWindowTitle = function() {
@@ -619,9 +644,9 @@ Monitor.prototype.setWindowTitle = function() {
 	{
 		title = 'AR:';
 		let tasks = 0;
-		for (let i = 0; i < this.items.length; i++)
-			if (this.items[i].state.RUN)
-				tasks += this.items[i].params.tasks.length;
+		for (let item of this.items)
+			if ((item.node_type == 'renders') && item.state.RUN)
+				tasks += item.params.tasks.length;
 		if (tasks > 0)
 			title += ' ' + tasks;
 	}
@@ -700,8 +725,13 @@ Monitor.prototype.delNodes = function(i_ids) {
 			}
 };
 
-Monitor.prototype.createNode = function(i_obj) {
-	var node = new this.nodeConstructor();
+Monitor.prototype.createNodeItem = function(i_obj, i_type) {
+	var node;
+	if (i_type == 'pools')
+		node = new PoolNode();
+	else
+		node = new this.nodeConstructor();
+	node.node_type = i_type;
 	this.createItem(node, i_obj, false);
 	this.filterItem(node);
 	this.addItemSorted(node);
@@ -1163,12 +1193,19 @@ Monitor.prototype.mh_Get = function(i_param, i_evt) {
 		return;
 	}
 
-	var get = {"type": this.type, "ids": [this.cur_item.params.id], "mode": i_param.name};
+	var get = {"type": this.cur_item.node_type, "ids": [this.cur_item.params.id], "mode": i_param.name};
 	nw_request({"send": {"get": get}, "func": g_ShowObject, "evt": i_evt, "wnd": this.window});
 };
 
 Monitor.prototype.action = function(i_operation, i_params) {
-	nw_Action(this.type, this.getSelectedIds(), i_operation, i_params);
+	var type;
+	var ids = [];
+	for (let item of this.selected_items)
+	{
+		ids.push(item.params.id);
+		type = item.node_type;
+	}
+	nw_Action(type, ids, i_operation, i_params);
 };
 
 Monitor.prototype.mh_Opt = function(i_param) {
