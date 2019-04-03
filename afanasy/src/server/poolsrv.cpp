@@ -121,7 +121,7 @@ void PoolSrv::v_action(Action & i_action)
 
 		if (type == "delete")
 		{
-			deletePool(i_action);
+			deleteThisPool(i_action);
 			return;
 		}
 
@@ -155,7 +155,7 @@ void PoolSrv::logAction(const Action & i_action, const std::string & i_node_name
 	appendLog(std::string("Action[") + i_action.type + "][" +  i_node_name + "]: " + i_action.log);
 }
 
-void PoolSrv::deletePool(Action & o_action)
+void PoolSrv::deleteThisPool(Action & o_action)
 {
 	if (NULL == m_parent)
 	{
@@ -167,14 +167,17 @@ void PoolSrv::deletePool(Action & o_action)
 	if (m_pools_num || m_renders_num)
 	{
 		o_action.answer_kind = "error";
-		o_action.answer = "Pool['" + m_name + "'] has child pools/renders.";
+		o_action.answer = "Pool '" + m_name + "' has child pools/renders.";
 		return;
 	}
 
-	appendLog(std::string("Deleted by ") + o_action.author);
-	setZombie();
+	m_parent->removePool(this);
 
 	o_action.monitors->addEvent(af::Monitor::EVT_pools_del, m_id);
+	o_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_parent->getId());
+
+	appendLog(std::string("Deleted by ") + o_action.author);
+	setZombie();
 }
 
 bool PoolSrv::hasPool(const std::string & i_name) const
@@ -233,14 +236,22 @@ void PoolSrv::addPool(Action & i_action)
 	if (hasPool(name))
 	{
 		i_action.answer_kind = "error";
-		i_action.answer = std::string("Pool[") + getName() + "] already has a pool[" + name + "]";
+		i_action.answer = std::string("Pool '") + getName() + "' already has a pool '" + name + "'";
 		return;
 	}
 
 	PoolSrv * pool = new PoolSrv(this, name);
 
 	if (false == addPool(pool))
+	{
 		delete pool;
+		return;
+	}
+
+	i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_id);
+	i_action.monitors->addEvent(af::Monitor::EVT_pools_add, pool->getId());
+	i_action.answer_kind = "info";
+	i_action.answer = "Pool '" + pool->getName() + "' added to pool '" + getName() + "'";
 }
 
 bool PoolSrv::addPool(PoolSrv * i_pool)
@@ -281,7 +292,7 @@ void PoolSrv::addRender(RenderAf * i_render, UserAf * i_user)
 {
 	if (hasRender(i_render))
 	{
-		AF_ERR << "Pool[" << getName() << "] already has a render[" << i_render->getName() << "]";
+		AF_ERR << "Pool '" << getName() << "' already has a render '" << i_render->getName() << "'";
 		return;
 	}
 

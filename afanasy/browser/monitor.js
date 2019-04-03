@@ -1000,12 +1000,19 @@ Monitor.prototype.updatePanels = function(i_item, i_args) {
 	this.panel_item = i_item;
 
 	this.elPanelR.m_elName.textContent = i_item.params.name;
-	this.elPanelR.m_elName.title = 'Current job name:\n' + i_item.params.name;
 	this.elPanelR.m_elName.style.display = 'block';
 
-	var els = this.elPanelL.getElementsByClassName('ctrl_button');
-	for (var i = 0; i < els.length; i++)
-		els[i].classList.add('active');
+	for (let el of this.elPanelL.getElementsByClassName('ctrl_button'))
+	{
+		el.style.display = 'block';
+		el.classList.add('active');
+		if (el.m_act && el.m_act.node_type)
+		{
+			if (el.m_act.node_type != i_item.node_type)
+				el.style.display = 'none';
+		}
+	}
+
 	var els = this.elPanelR.getElementsByClassName('section');
 	for (var i = 0; i < els.length; i++)
 		els[i].classList.add('active');

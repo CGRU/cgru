@@ -55,7 +55,7 @@ private:
 	bool hasPool(const std::string & i_name) const;
 	bool hasPool(const PoolSrv * i_pool) const;
 	void addPool(Action & i_action);
-	void deletePool(Action & o_action);
+	void deleteThisPool(Action & o_action);
 	void removePool(PoolSrv * i_pool);
 
 	bool hasRender(const RenderAf * i_render) const;

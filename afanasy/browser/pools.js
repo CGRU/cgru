@@ -198,7 +198,11 @@ PoolNode.createPanels = function(i_monitor) {
 
 	var acts = {};
 
-	acts.delete = {"label": "DEL", "tooltip": 'Double click to delete pool.', "ondblclick": true};
+	acts.add_pool = {
+		'label': 'ADD',
+		'node_type': 'pools',
+		'handle': 'addPoolDialog',
+		'tooltip': 'Add pool'};
 
 	i_monitor.createCtrlBtns(acts);
 };
@@ -214,6 +218,26 @@ PoolNode.prototype.updatePanels = function() {
 		info += ', since: ' + cm_DateTimeStrFromSec(this.params.time_empty) + '</p>';
 	}
 	this.monitor.setPanelInfo(info);
+};
+
+RenderNode.addPoolDialog = function(i_args) {
+	new cgru_Dialog({
+		"wnd": i_args.monitor.window,
+		"receiver": i_args.monitor.cur_item,
+		"handle": 'addPoolDo',
+		"param": i_args.name,
+		"name": 'add_pool',
+		"title": 'Add a child pool to this poll',
+		"info": 'Enter a new child pool name:'
+	});
+};
+
+PoolNode.prototype.addPoolDo = function(i_value, i_name) {
+	g_Info('Adding a pool "' + i_value + '" to "' + this.params.name + '"');
+	var operation = {};
+	operation.type = 'add_pool';
+	operation.name = i_value;
+	nw_Action('pools', [this.monitor.getSelectedIds()[0]], operation, null);
 };
 
 PoolNode.prototype.onDoubleClick = function(e) {

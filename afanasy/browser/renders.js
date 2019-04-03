@@ -639,6 +639,9 @@ RenderNode.prototype.launchCmdExitDo = function(i_value, i_name) {
 };
 
 RenderNode.createPanels = function(i_monitor) {
+	// Create pool buttons first
+	PoolNode.createPanels(i_monitor);
+
 	// Info:
 	var acts = {};
 	acts.tasks_log = {'label': 'TSK', 'tooltip': 'Get tasks Log.'};
@@ -648,6 +651,7 @@ RenderNode.createPanels = function(i_monitor) {
 		'label': 'INFO',
 		'tooltip': 'Get render info.',
 		'handle': 'mh_Get',
+		'node_type': 'renders',
 		'sub_menu': acts
 	});
 
