@@ -379,6 +379,14 @@ background-position: left;
 #search_artists .role .label { cursor: pointer; }
 .tags { font-style:italic;}
 
+.new_line {
+border-bottom: 1px solid rgba(98,98,98,.5);
+margin: 6px;
+height: 6px;
+clear:both;
+float:none;
+}
+
 .progress, .progressbar { /*border-radius: 3px;*/ box-shadow: 0 0 1px #000 inset; }
 .progress { position: relative; background-color: rgba(0,0,0,.5); }
 

@@ -938,9 +938,18 @@ Status.prototype.editListEdit = function(i_args) {
 		return;
 	}
 
-	for (var item in i_args.list_all)
+	let new_line = false;
+	for (let item in i_args.list_all)
 	{
-		var el = document.createElement('div');
+		if (new_line)
+		{
+			let el = document.createElement('div');
+			i_args.elRoot.appendChild(el);
+			el.classList.add('new_line');
+			new_line = false;
+		}
+
+		let el = document.createElement('div');
 		i_args.elRoot.appendChild(el);
 		el.classList.add('tag');
 		if (i_args.name == 'flags')
@@ -948,10 +957,14 @@ Status.prototype.editListEdit = function(i_args) {
 			el.classList.add('flag');
 			if (RULES.flags[item] && RULES.flags[item].clr)
 			{
-				var c = RULES.flags[item].clr;
+				let c = RULES.flags[item].clr;
 				el.style.borderColor = 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
 			}
+
+			if (RULES.flags[item] && RULES.flags[item].new_line)
+				new_line = true;
 		}
+
 		el.m_item = item;
 
 		if (i_args.list_all[item].title)
