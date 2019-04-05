@@ -16,9 +16,12 @@
 
 "use strict";
 
+var renders_pools = null;
+
 RenderNode.onMonitorCreate = function() {
 	PoolNode.onMonitorCreate();
 	RenderNode.createActions();
+	renders_pools = {};
 };
 
 function RenderNode()
@@ -256,6 +259,24 @@ RenderNode.prototype.update = function(i_obj) {
 	if (i_obj)
 		this.params = i_obj;
 
+	// We force sorting parameter,
+	// as render should be sorted by pool first.
+	this.sort_force = this.params.pool;
+
+	// Collect render in renders_pools.
+	// This needed to offset render to show hierarchy on pool update.
+	// May be render will be created before its pooll,
+	// so pool should know its childs (that were created first) to update.
+	if (renders_pools[this.params.pool] == null)
+		renders_pools[this.params.pool] = [];
+	if (false == renders_pools[this.params.pool].includes(this))
+		renders_pools[this.params.pool].push(this);
+
+	// Offset hierarchy right now.
+	// May be render was created after its pool.
+	this.offsetHierarchy();
+
+
 	cm_GetState(this.params.state, this.state, this.element);
 
 	this.elName.innerHTML = '<b>' + this.params.name + '</b>';
@@ -370,6 +391,14 @@ RenderNode.prototype.update = function(i_obj) {
 	this.updateTasksPercents();
 	this.refresh();
 };
+
+RenderNode.prototype.offsetHierarchy = function() {
+	var depth = 0;
+	var parent_pool = pools[this.params.pool];
+	if (parent_pool)
+		depth = parent_pool.pool_depth + 1;
+	this.element.style.marginLeft = (depth * 32 + 2) + 'px';
+}
 
 RenderNode.prototype.plottersCsDelete = function() {
 	if (this.plottersCs.length == 0)
@@ -638,6 +667,26 @@ RenderNode.prototype.launchCmdExitDo = function(i_value, i_name) {
 	nw_Action('renders', this.monitor.getSelectedIds(), operation, null);
 };
 
+RenderNode.setPoolDialog = function(i_args) {
+	new cgru_Dialog({
+		"wnd": i_args.monitor.window,
+		"receiver": i_args.monitor.cur_item,
+		"handle": 'setPoolDo',
+		"param": i_args.name,
+		"name": 'set_pool',
+		"title": 'Assign render to poll',
+		"info": 'Enter a new pool name:'
+	});
+};
+
+RenderNode.prototype.setPoolDo = function(i_value, i_name) {
+	g_Info('Setting a pool "' + i_value + '" for "' + this.params.name + '"');
+	var operation = {};
+	operation.type = 'set_pool';
+	operation.name = i_value;
+	nw_Action('renders', this.monitor.getSelectedIds(), operation, null);
+};
+
 RenderNode.createPanels = function(i_monitor) {
 	// Create pool buttons first
 	PoolNode.createPanels(i_monitor);
@@ -654,6 +703,15 @@ RenderNode.createPanels = function(i_monitor) {
 		'node_type': 'renders',
 		'sub_menu': acts
 	});
+
+	// Pools:
+	var acts = {};
+	acts.set_pool = {
+		'label': 'SPL',
+		'node_type': 'renders',
+		'handle': 'setPoolDialog',
+		'tooltip': 'Set pool'};
+	i_monitor.createCtrlBtns(acts);
 
 	// Nimby:
 	var acts = {

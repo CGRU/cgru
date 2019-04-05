@@ -96,6 +96,8 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const // Threa
 
 	Client::v_jsonWrite( o_str, i_type);
 
+	o_str << ",\n\"pool\":\"" << m_pool << "\"";
+
 	o_str << ",\n\"st\":" << m_state;
 	o_str << ",\n";
 	jw_state( m_state, o_str, true /*it is render node state type*/);
@@ -187,6 +189,8 @@ bool Render::jsonRead( const JSON &i_object, std::string * io_changes)
 		return true;
 
 	Node::jsonRead( i_object);
+
+	jr_string("pool", m_pool, i_object, io_changes);
 
 	jr_int64("st", m_state, i_object);
 

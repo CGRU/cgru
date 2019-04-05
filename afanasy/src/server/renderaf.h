@@ -11,8 +11,9 @@
 #include "afnodesrv.h"
 
 class Action;
-class MsgQueue;
 class JobContainer;
+class MsgQueue;
+class PoolSrv;
 class RenderContainer;
 
 /// Afanasy server side of Render host.
@@ -101,6 +102,8 @@ public:
 private:
 	void initDefaultValues();
 
+	void setPool(const std::string & i_pool_name, Action & i_action);
+
 	/// Add the task exec to this render and take over its ownership (meaning
 	/// one should not free taskexec after having provided it to this method).
 	void addTask( af::TaskExec * taskexec);
@@ -129,6 +132,8 @@ private:
 	void appendTasksLog( const std::string & message);  ///< Append tasks log with a \c message .
 
 private:
+	PoolSrv * m_poolsrv;
+
 	std::string m_farm_host_name;
 	std::string m_farm_host_description;
 

@@ -25,6 +25,7 @@ Action::Action(const af::Msg *i_msg, ThreadArgs *i_args)
 	  branches(i_args->branches),
 	  jobs(i_args->jobs),
 	  monitors(i_args->monitors),
+	  pools(i_args->pools),
 	  renders(i_args->renders),
 	  users(i_args->users),
 	  m_buffer(NULL),

@@ -25,6 +25,7 @@
 #include "afcommon.h"
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
+#include "poolscontainer.h"
 #include "rendercontainer.h"
 #include "sysjob.h"
 
@@ -46,7 +47,6 @@ RenderAf::RenderAf( const std::string & i_store_dir):
 	af::Render(),
 	AfNodeSrv( this, i_store_dir)
 {
-	AFINFA("RenderAf::RenderAf(%d)", m_id);
 	initDefaultValues();
 
 	int size;
@@ -74,11 +74,15 @@ RenderAf::RenderAf( const std::string & i_store_dir):
 
 void RenderAf::initDefaultValues()
 {
+	m_poolsrv = NULL;
+
 	m_farm_host_name = "no farm host";
 	m_farm_host_description = "";
 	m_services_num = 0;
+
 	if( m_host.m_capacity == 0 ) m_host.m_capacity = af::Environment::getRenderDefaultCapacity();
 	if( m_host.m_max_tasks == 0 ) m_host.m_max_tasks = af::Environment::getRenderDefaultMaxTasks();
+
 	setBusy( false);
 	setWOLFalling( false);
 	setWOLSleeping( false);
@@ -397,9 +401,17 @@ void RenderAf::v_action( Action & i_action)
 			m_services_disabled.clear();
 			disableServices(); // Dirty check exists in that function
 		}
+		else if (type == "set_pool")
+		{
+			std::string pool_name;
+			af::jr_string("name", pool_name, operation);
+			setPool(pool_name, i_action);
+		}
 		else
 		{
 			appendLog("Unknown operation \"" + type + "\" by " + i_action.author);
+			i_action.answer_kind = "error";
+			i_action.answer = "Unknown operation: " + type;
 			return;
 		}
 		appendLog("Operation \"" + type + "\" by " + i_action.author);
@@ -417,6 +429,35 @@ void RenderAf::v_action( Action & i_action)
 		store();
 		i_action.monitors->addEvent( af::Monitor::EVT_renders_change, m_id);
 	}
+}
+
+void RenderAf::setPool(const std::string & i_pool_name, Action & i_action)
+{
+	if (m_pool == i_pool_name)
+	{
+		i_action.answer_kind = "error";
+		i_action.answer = "Render '" + getName() + "' already in a poll '" + i_pool_name + "'.";
+		return;
+	}
+
+	PoolSrv * pool = i_action.pools->getPool(i_pool_name);
+	if (NULL == pool)
+	{
+		i_action.answer_kind = "error";
+		i_action.answer = "Pool '" + i_pool_name + "' does not exist.";
+		return;
+	}
+
+	if (pool->hasRender(this))
+	{
+		i_action.answer_kind = "error";
+		i_action.answer = "Pool '" + pool->getName() + "' already has a render '" + getName() + "'.";
+		return;
+	}
+
+	m_pool = i_pool_name;
+	pool->addRender(this);
+	m_poolsrv = pool;
 }
 
 void RenderAf::ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus, const std::string * i_keeptasks_username )

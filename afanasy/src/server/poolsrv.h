@@ -48,6 +48,10 @@ public:
 
 	virtual int v_calcWeight() const;
 
+	bool hasRender(const RenderAf * i_render) const;
+	void addRender(RenderAf * i_render);
+	void removeRender(RenderAf * i_render);
+
 public:
 	inline static void setPoolsContainer(PoolsContainer * i_pools ) { ms_pools = i_pools;}
 
@@ -57,10 +61,6 @@ private:
 	void addPool(Action & i_action);
 	void deleteThisPool(Action & o_action);
 	void removePool(PoolSrv * i_pool);
-
-	bool hasRender(const RenderAf * i_render) const;
-	void addRender(RenderAf * i_render, UserAf * i_user);
-	void removeRender(RenderAf * i_render, UserAf * i_user);
 
 private:
 	PoolSrv * m_parent;

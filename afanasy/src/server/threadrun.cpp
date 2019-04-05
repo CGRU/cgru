@@ -24,6 +24,7 @@
 #include "branchescontainer.h"
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
+#include "poolscontainer.h"
 #include "rendercontainer.h"
 #include "socketsprocessing.h"
 #include "solver.h"
@@ -81,8 +82,9 @@ void threadRunCycle( void * i_args)
 	AFINFO("ThreadRun::run: Locking containers...")
 	AfContainerLock bLock( a->branches, AfContainerLock::WRITELOCK);
 	AfContainerLock jLock( a->jobs,     AfContainerLock::WRITELOCK);
-	AfContainerLock lLock( a->renders,  AfContainerLock::WRITELOCK);
 	AfContainerLock mlock( a->monitors, AfContainerLock::WRITELOCK);
+	AfContainerLock pLock( a->pools,    AfContainerLock::WRITELOCK);
+	AfContainerLock rLock( a->renders,  AfContainerLock::WRITELOCK);
 	AfContainerLock ulock( a->users,    AfContainerLock::WRITELOCK);
 
 	//
@@ -123,6 +125,7 @@ void threadRunCycle( void * i_args)
 	a->monitors ->refresh( NULL,        a->monitors);
 	a->jobs     ->refresh( a->renders,  a->monitors);
 	a->branches ->refresh( NULL,        a->monitors);
+	a->pools    ->refresh( a->renders,  a->monitors);
 	a->renders  ->refresh( a->jobs,     a->monitors);
 	a->users    ->refresh( NULL,        a->monitors);
 

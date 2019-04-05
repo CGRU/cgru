@@ -288,7 +288,7 @@ void PoolSrv::removePool(PoolSrv * i_pool)
 	m_pools_num--;
 }
 
-void PoolSrv::addRender(RenderAf * i_render, UserAf * i_user)
+void PoolSrv::addRender(RenderAf * i_render)
 {
 	if (hasRender(i_render))
 	{
@@ -300,12 +300,10 @@ void PoolSrv::addRender(RenderAf * i_render, UserAf * i_user)
 
 	m_renders_list.push_back(i_render);
 
-	//i_render->setPool(this);
-
 	m_renders_num++;
 }
 
-void PoolSrv::removeRender(RenderAf * i_render, UserAf * i_user)
+void PoolSrv::removeRender(RenderAf * i_render)
 {
 	appendLog(std::string("Removing a render: ") + i_render->getName());
 

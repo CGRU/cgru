@@ -55,12 +55,25 @@ PoolNode.prototype.update = function(i_obj) {
 	if (i_obj)
 		this.params = i_obj;
 
+
+	// Sort needed to force sort by this first:
+	this.sort_force = this.params.name;
+
+
+	// Offset hierarchy:
 	this.pool_depth = 0;
 	pools[this.params.name] = this;
 	var parent_pool = pools[this.params.parent];
 	if (parent_pool)
 		this.pool_depth = parent_pool.pool_depth + 1;
 	this.element.style.marginLeft = (this.pool_depth * 32 + 2) + 'px';
+
+
+	// Offset child renders hierarchy:
+	if (renders_pools[this.params.name])
+		for (let render of renders_pools[this.params.name])
+			render.offsetHierarchy();
+			//^ this function requires filled in pools object
 
 
 	if (cm_IsPadawan())
@@ -94,12 +107,7 @@ PoolNode.prototype.update = function(i_obj) {
 		this.element.classList.remove('running');
 
 
-	var name = this.params.name;
-	if (name == '/')
-		name = 'ROOT';
-	else
-		name = cm_PathBase(name);
-	this.elName.innerHTML = '<b>' + name + '/</b>';
+	this.elName.innerHTML = '<b>' + cm_PathBase(this.params.name) + '/</b>';
 
 	var flags = '';
 	var flags_tip = 'Flags:';
@@ -220,6 +228,8 @@ PoolNode.prototype.updatePanels = function() {
 	this.monitor.setPanelInfo(info);
 };
 
+// RenderNode here! This not an error!
+// We can't use PoolNode as this is not prototype function.
 RenderNode.addPoolDialog = function(i_args) {
 	new cgru_Dialog({
 		"wnd": i_args.monitor.window,

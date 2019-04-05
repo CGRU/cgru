@@ -55,7 +55,8 @@ void Pool::initDefaultValues()
 	m_renders_num = 0;
 	m_renders_total = 0;
 
-	m_max_tasks = -1;
+	m_max_run_tasks = -1;
+	m_max_run_tasks_per_host = -1;
 	m_task_start_finish_time = 0;
 }
 
@@ -69,17 +70,22 @@ void Pool::v_jsonWrite(std::ostringstream & o_str, int i_type) const // Thread-s
 
 	Node::v_jsonWrite(o_str, i_type);
 
-	o_str << ",\n\"time_creation\":"   << m_time_creation;
-
-	o_str << ",\n\"parent\":\"" << m_parent_path << "\"";
+	o_str << ",\n\"parent\":\""       << m_parent_path << "\"";
+	o_str << ",\n\"time_creation\":"  << m_time_creation;
+	o_str << ",\n\"pools_num\":"      << m_pools_num;
+	o_str << ",\n\"pools_total\":"    << m_pools_total;
+	o_str << ",\n\"renders_num\":"    << m_renders_num;
+	o_str << ",\n\"renders_total\":"  << m_renders_total;
 /*
 	o_str << ",\n\"st\":" << m_state;
 	o_str << ",\n";
 	jw_state(m_state, o_str);
 */
 	o_str << ",\n\"task_start_finish_time\":" << m_task_start_finish_time;
-	if (m_max_tasks  >= 0)
-		o_str << ",\n\"max_tasks\":" << m_max_tasks;
+	if (m_max_run_tasks >= 0)
+		o_str << ",\n\"max_run_tasks\":" << m_max_run_tasks;
+	if (m_max_run_tasks_per_host >= 0)
+		o_str << ",\n\"max_run_tasks_per_host\":" << m_max_run_tasks_per_host;
 
 
 	// We do not need to store host on hdd,
@@ -113,8 +119,8 @@ bool Pool::jsonRead(const JSON &i_object, std::string * io_changes)
 		return false;
 	}
 
-	jr_int32 ("max_tasks", m_max_tasks, i_object, io_changes);
-	//checkDirty();
+	jr_int32 ("max_run_tasks", m_max_run_tasks, i_object, io_changes);
+	jr_int32 ("max_run_tasks_per_hsot", m_max_run_tasks_per_host, i_object, io_changes);
 
 	bool paused;
 	if (jr_bool("paused", paused, i_object, io_changes))
@@ -135,7 +141,7 @@ bool Pool::jsonRead(const JSON &i_object, std::string * io_changes)
 	return true;
 }
 
-void Pool::v_readwrite(Msg * msg) // Thread-safe
+void Pool::v_readwrite(Msg * msg)
 {
 	Node::v_readwrite(msg);
 
@@ -144,20 +150,11 @@ void Pool::v_readwrite(Msg * msg) // Thread-safe
 	rw_String (m_annotation,             msg);
 	rw_String (m_parent_path,            msg);
 	rw_int64_t(m_time_creation,          msg);
-	rw_int32_t(m_max_tasks,              msg);
+	rw_int32_t(m_max_run_tasks,          msg);
+	rw_int32_t(m_max_run_tasks_per_host, msg);
 	rw_int64_t(m_task_start_finish_time, msg);
 }
-/*
-void Pool::checkDirty()
-{
-	if (m_capacity == m_host.m_capacity) m_capacity = -1;
-	if (m_max_tasks == m_host.m_max_tasks) m_max_tasks = -1;
-	if ((m_capacity == -1) && (m_max_tasks == -1) && (m_services_disabled.empty()))
-		m_state = m_state & (~SDirty);
-	else
-		m_state = m_state | SDirty;
-}
-*/
+
 int Pool::v_calcWeight() const
 {
 	int weight = Node::v_calcWeight();
@@ -176,7 +173,6 @@ void Pool::v_generateInfoStream(std::ostringstream & stream, bool full) const
 		if (isPaused()) stream << " Paused";
 
 		stream << "\n Priority = " << int(m_priority);
-		stream << "\n Max Tasks = " << getMaxTasks();
 
 		//m_host.v_generateInfoStream(stream ,full);
 	}

@@ -30,7 +30,8 @@ public:
 	inline bool isPaused() const { return (m_state & SPaused);}
 	inline void setPaused(bool set) { m_state = set ? m_state | SPaused : m_state & (~SPaused); }
 
-	inline int getMaxTasks() const { return m_max_tasks;}
+	inline int getMaxRunTasks() const { return m_max_run_tasks;}
+	inline int getMaxRunTasksPerHost() const { return m_max_run_tasks_per_host;}
 
 public:
 	enum State
@@ -40,9 +41,6 @@ public:
 
 public:
 	static const std::string FilterName(const std::string & i_name);
-
-protected:
-//	void checkDirty();
 
 protected:
 
@@ -58,7 +56,8 @@ protected:
 	int64_t m_time_offline;
 	int64_t m_time_empty;
 
-	int32_t m_max_tasks;
+	int32_t m_max_run_tasks;
+	int32_t m_max_run_tasks_per_host;
 
 	int64_t m_task_start_finish_time; ///< Task start or finish time.
 

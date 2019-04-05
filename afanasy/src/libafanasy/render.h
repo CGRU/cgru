@@ -118,6 +118,8 @@ protected:
 
 protected:
 
+   std::string m_pool;
+
 	int32_t m_capacity;
 	int32_t m_capacity_used;
 	int32_t m_max_tasks;
