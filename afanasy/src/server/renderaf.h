@@ -13,6 +13,7 @@
 class Action;
 class JobContainer;
 class MsgQueue;
+class PoolsContainer;
 class PoolSrv;
 class RenderContainer;
 
@@ -28,7 +29,9 @@ public:
 	RenderAf( const std::string & i_store_dir);
 
 /// Set registration time ( and update time).
-	void setRegistered();
+	void setRegistered(PoolsContainer * i_pools);
+
+	void setPool(PoolSrv * i_pool);
 
 /// Awake offline render
 	void online( RenderAf * render, JobContainer * i_jobs, MonitorContainer * monitoring);
@@ -102,7 +105,10 @@ public:
 private:
 	void initDefaultValues();
 
-	void setPool(const std::string & i_pool_name, Action & i_action);
+	void findPool(PoolsContainer * i_pools);
+
+	void actionSetPool(const std::string & i_pool_name, Action & i_action);
+	void actionReassignPool(Action & i_action);
 
 	/// Add the task exec to this render and take over its ownership (meaning
 	/// one should not free taskexec after having provided it to this method).

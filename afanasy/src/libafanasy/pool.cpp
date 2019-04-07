@@ -46,6 +46,8 @@ Pool::Pool(int i_id)
 
 void Pool::initDefaultValues()
 {
+	m_pattern.setCaseInsensitive();
+
 	m_time_creation = 0;
 	m_time_offline = 0;
 	m_time_empty = 0;
@@ -69,6 +71,9 @@ void Pool::v_jsonWrite(std::ostringstream & o_str, int i_type) const // Thread-s
 	o_str << "{";
 
 	Node::v_jsonWrite(o_str, i_type);
+
+	if (notRoot() && m_pattern.notEmpty())
+		o_str << ",\n\"pattern\":\""   << af::strEscape(m_pattern.getPattern()) << "\"";
 
 	o_str << ",\n\"parent\":\""       << m_parent_path << "\"";
 	o_str << ",\n\"time_creation\":"  << m_time_creation;
@@ -119,6 +124,9 @@ bool Pool::jsonRead(const JSON &i_object, std::string * io_changes)
 		return false;
 	}
 
+	if (notRoot())
+		jr_regexp("pattern", m_pattern, i_object, io_changes);
+
 	jr_int32 ("max_run_tasks", m_max_run_tasks, i_object, io_changes);
 	jr_int32 ("max_run_tasks_per_hsot", m_max_run_tasks_per_host, i_object, io_changes);
 
@@ -144,6 +152,9 @@ bool Pool::jsonRead(const JSON &i_object, std::string * io_changes)
 void Pool::v_readwrite(Msg * msg)
 {
 	Node::v_readwrite(msg);
+
+	if (notRoot())
+		rw_RegExp (m_pattern, msg);
 
 	rw_int64_t(m_state,                  msg);
 	rw_int64_t(m_flags,                  msg);

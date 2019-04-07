@@ -221,7 +221,7 @@ int main(int argc, char *argv[])
 			delete render;
 			continue;
 		}
-		renders.addRender( render, NULL, NULL);
+		renders.addRender(render, &pools, NULL, NULL);
 	}
 	AF_LOG << renders.getCount() << " renders registered.";
 	}

@@ -19,8 +19,9 @@
 var pools = null;
 
 PoolNode.onMonitorCreate = function() {
-	pools = {};
 	PoolNode.createParams();
+
+	pools = {};
 };
 
 function PoolNode()
@@ -35,6 +36,7 @@ PoolNode.prototype.init = function() {
 	this.element.appendChild(this.elName);
 	this.elName.title = 'Pool name (path)';
 
+	this.elPattern = cm_ElCreateFloatText(this.element, 'left', 'Pattern');
 	this.elPriority = cm_ElCreateFloatText(this.element, 'right', 'Priority');
 
 	this.element.appendChild(document.createElement('br'));
@@ -75,6 +77,7 @@ PoolNode.prototype.update = function(i_obj) {
 			render.offsetHierarchy();
 			//^ this function requires filled in pools object
 
+//this.elPattern.textContent = this.params.pattern;
 
 	if (cm_IsPadawan())
 	{
@@ -107,7 +110,10 @@ PoolNode.prototype.update = function(i_obj) {
 		this.element.classList.remove('running');
 
 
-	this.elName.innerHTML = '<b>' + cm_PathBase(this.params.name) + '/</b>';
+	var name = '<b>' + cm_PathBase(this.params.name)  + '/</b>';
+	if (this.params.pattern)
+		name += ' [' + this.params.pattern + ']';
+	this.elName.innerHTML = name;
 
 	var flags = '';
 	var flags_tip = 'Flags:';
@@ -207,10 +213,16 @@ PoolNode.createPanels = function(i_monitor) {
 	var acts = {};
 
 	acts.add_pool = {
-		'label': 'ADD',
+		'label': 'ADD POOL',
 		'node_type': 'pools',
 		'handle': 'addPoolDialog',
 		'tooltip': 'Add pool'};
+
+	acts.revert_renders = {
+		'label': 'REVERT',
+		'node_type': 'pools',
+		'handle': 'mh_Oper',
+		'tooltip': 'Revert renders'};
 
 	i_monitor.createCtrlBtns(acts);
 };
@@ -254,16 +266,16 @@ PoolNode.prototype.onDoubleClick = function(e) {
 	g_ShowObject({"object": this.params}, {"evt": e, "wnd": this.monitor.window});
 };
 
-PoolNode.params_pool = {};
+PoolNode.params_pool = {
+	pattern : {"type": 'str', "permissions": 'god', "label": 'Pattern', 'node_type':'pools'}
+};
 
 PoolNode.createParams = function() {
 	if (PoolNode.params_created)
 		return;
 
 	PoolNode.params = {};
-	for (var p in work_params)
-		PoolNode.params[p] = work_params[p];
-	for (var p in PoolNode.params_pool)
+	for (let p in PoolNode.params_pool)
 		PoolNode.params[p] = PoolNode.params_pool[p];
 
 	PoolNode.params_created = true;

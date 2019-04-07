@@ -150,7 +150,7 @@ overflow: hidden;
 
 .view {
 position: absolute;
-left: 50px; right: 400px;
+left: 80px; right: 400px;
 top: 0; bottom: 0;
 }
 .panel {
@@ -159,7 +159,7 @@ top: 0; bottom: 0;
 }
 .panel.left {
 left: 0;
-width: 48px;
+width: 78px;
 border-right: 2px solid #575757;
 }
 .panel.right {

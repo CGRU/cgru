@@ -93,8 +93,10 @@ RenderAf::~RenderAf()
 {
 }
 
-void RenderAf::setRegistered()
+void RenderAf::setRegistered(PoolsContainer * i_pools)
 {
+	findPool(i_pools);
+
 	getFarmHost();
 
 	if( isFromStore())
@@ -130,6 +132,37 @@ void RenderAf::setRegistered()
 	m_busy_time = m_idle_time;
 }
 
+void RenderAf::findPool(PoolsContainer * i_pools)
+{
+	if (m_poolsrv)
+	{
+		AF_ERR << "Render '" << getName() << "' already in pool '" + m_poolsrv->getName() + "'";
+		return;
+	}
+
+	if (m_pool.empty())
+	{
+		i_pools->assignRender(this);
+		return;
+	}
+
+	m_poolsrv = i_pools->getPool(m_pool);
+	if (NULL == m_poolsrv)
+	{
+		AF_ERR << "Render pool '" + m_pool + "' does not exist.";
+		i_pools->assignRender(this);
+		return;
+	}
+
+	m_poolsrv->addRender(this);
+}
+
+void RenderAf::setPool(PoolSrv * i_pool)
+{
+	m_pool = i_pool->getName();
+	m_poolsrv = i_pool;
+}
+
 void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorContainer * monitoring, bool toZombie )
 {
 	setOffline();
@@ -152,8 +185,13 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
 	{
 		AFCommon::QueueLog("Render Deleting: " + v_generateInfoString( false));
 		appendLog("Waiting for deletion.");
+		if (m_poolsrv)
+		{
+			m_poolsrv->removeRender(this);
+			if (monitoring) monitoring->addEvent( af::Monitor::EVT_pools_change, m_poolsrv->getId());
+		}
 		setZombie();
-		if( monitoring ) monitoring->addEvent( af::Monitor::EVT_renders_del, m_id);
+		if (monitoring) monitoring->addEvent( af::Monitor::EVT_renders_del, m_id);
 	}
 	else
 	{
@@ -359,7 +397,12 @@ void RenderAf::v_action( Action & i_action)
 		}
 		else if( type == "delete")
 		{
-			if( isOnline() ) return;
+			if(isOnline())
+			{
+				i_action.answer_kind = "error";
+				i_action.answer = "Can`t delete online render.";
+				return;
+			}
 			appendLog( std::string("Deleted by ") + i_action.author);
 			offline( NULL, 0, i_action.monitors, true);
 			return;
@@ -405,7 +448,11 @@ void RenderAf::v_action( Action & i_action)
 		{
 			std::string pool_name;
 			af::jr_string("name", pool_name, operation);
-			setPool(pool_name, i_action);
+			actionSetPool(pool_name, i_action);
+		}
+		else if (type == "reassign_pool")
+		{
+			actionReassignPool(i_action);
 		}
 		else
 		{
@@ -431,7 +478,7 @@ void RenderAf::v_action( Action & i_action)
 	}
 }
 
-void RenderAf::setPool(const std::string & i_pool_name, Action & i_action)
+void RenderAf::actionSetPool(const std::string & i_pool_name, Action & i_action)
 {
 	if (m_pool == i_pool_name)
 	{
@@ -455,9 +502,30 @@ void RenderAf::setPool(const std::string & i_pool_name, Action & i_action)
 		return;
 	}
 
+	if (m_poolsrv)
+	{
+		m_poolsrv->removeRender(this);
+		i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_poolsrv->getId());
+	}
+
 	m_pool = i_pool_name;
 	pool->addRender(this);
 	m_poolsrv = pool;
+
+	i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_poolsrv->getId());
+}
+
+void RenderAf::actionReassignPool(Action & i_action)
+{
+	if (m_poolsrv)
+	{
+		m_poolsrv->removeRender(this);
+		i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_poolsrv->getId());
+	}
+
+	i_action.pools->assignRender(this);
+
+	i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_poolsrv->getId());
 }
 
 void RenderAf::ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus, const std::string * i_keeptasks_username )

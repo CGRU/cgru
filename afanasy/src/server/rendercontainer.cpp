@@ -23,7 +23,7 @@ RenderContainer::~RenderContainer()
 AFINFO("RenderContainer::~RenderContainer:")
 }
 
-af::Msg * RenderContainer::addRender( RenderAf *newRender, JobContainer * i_jobs, MonitorContainer * monitoring)
+af::Msg * RenderContainer::addRender(RenderAf * newRender, PoolsContainer * i_pools, JobContainer * i_jobs, MonitorContainer * monitoring)
 {
    // Online render register request, from client, not from database:
    if( newRender->isOnline())
@@ -64,7 +64,7 @@ af::Msg * RenderContainer::addRender( RenderAf *newRender, JobContainer * i_jobs
 		int id = add( newRender);
 		if( id != 0 )
 		{
-			newRender->setRegistered();
+			newRender->setRegistered(i_pools);
 			if( monitoring )
 				monitoring->addEvent( af::Monitor::EVT_renders_add, id);
 
@@ -83,7 +83,7 @@ af::Msg * RenderContainer::addRender( RenderAf *newRender, JobContainer * i_jobs
 	if( add( newRender))
 	{
 		std::cout << "Render offline registered - \"" << newRender->getName() << "\"." << std::endl;
-		newRender->setRegistered();
+		newRender->setRegistered(i_pools);
 	}
 	else
 	{

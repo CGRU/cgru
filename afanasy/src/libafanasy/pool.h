@@ -1,7 +1,9 @@
 #pragma once
 
 #include "name_af.h"
+
 #include "afnode.h"
+#include "regexp.h"
 
 namespace af
 {
@@ -18,6 +20,9 @@ public:
 	Pool(Msg * msg);
 
 	virtual ~Pool();
+
+	inline const bool  isRoot() const { return m_name == "/"; }
+	inline const bool notRoot() const { return m_name != "/"; }
 
 	void v_generateInfoStream(std::ostringstream & stream, bool full = false) const;
 
@@ -43,6 +48,7 @@ public:
 	static const std::string FilterName(const std::string & i_name);
 
 protected:
+	RegExp m_pattern;
 
 	std::string m_parent_path;
 

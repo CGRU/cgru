@@ -158,52 +158,41 @@ function Monitor(i_args)
 	el.textContent = 'Parameters';
 	el.classList.add('caption');
 	el.title = 'Click to edit all parameters.';
-	el.m_elParams = this.elPanelR.m_elParams;
-	el.onclick = function(e) {
-		var el = e.currentTarget;
-		if (el.m_elParams.classList.contains('active') != true)
-			return false;
-		if (el.m_elParams.m_all_shown == true)
-			return;
-		el.m_elParams.m_all_shown = true;
-		var elParams = el.m_elParams.m_elPMap;
-		for (var p in elParams)
-			elParams[p].style.display = 'block';
-		return false;
-	};
+	el.m_monitor = this;
+	el.onclick = function(e) {e.currentTarget.m_monitor.panelShowAllParameters();}
 	el.oncontextmenu = el.onclick;
 
 	if (this.nodeConstructor.params)
-		for (var p in this.nodeConstructor.params)
+		for (let p in this.nodeConstructor.params)
 		{
 			var param = this.nodeConstructor.params[p];
 			if (false == cm_CheckPermissions(param.permissions))
 				continue;
 
-			var elDiv = document.createElement('div');
+			let elDiv = document.createElement('div');
 			this.elPanelR.m_elParams.appendChild(elDiv);
 			elDiv.classList.add('param');
 			elDiv.style.display = 'none';
 
-			var elLabel = document.createElement('div');
+			let elLabel = document.createElement('div');
 			elDiv.appendChild(elLabel);
 			elLabel.classList.add('label');
 			elLabel.textContent = param.label;
 
-			var elValue = document.createElement('div');
+			let elValue = document.createElement('div');
 			elDiv.appendChild(elValue);
 			elValue.classList.add('value');
 			elDiv.m_elValue = elValue;
 
 			this.elPanelR.m_elParams.m_elPMap[p] = elDiv;
 
-			var el = elDiv;
+			let el = elDiv;
 			el.title = 'Double click to edit.';
 			el.monitor = this;
 			el.name = p;
 			el.param = param;
 			el.ondblclick = function(e) {
-				var el = e.currentTarget;
+				let el = e.currentTarget;
 				el.monitor.mh_Dialog({'name': el.name, 'type': el.param.type});
 			}
 		}
@@ -479,7 +468,7 @@ Monitor.prototype.processMsg = function(obj) {
 
 		// Delete nodes:
 		for (let type of this.types)
-			this.delNodes(obj.events[type + '_del']);
+			this.delNodes(type, obj.events[type + '_del']);
 
 		// Get changed and new nodes:
 		for (let type of this.types)
@@ -698,7 +687,7 @@ Monitor.prototype.setWindowTitle = function() {
 		this.document.title = title;
 };
 
-Monitor.prototype.delNodes = function(i_ids) {
+Monitor.prototype.delNodes = function(i_type, i_ids) {
 	if (i_ids == null)
 		return;
 	if (i_ids.length == null)
@@ -712,6 +701,10 @@ Monitor.prototype.delNodes = function(i_ids) {
 		for (var i = 0; i < this.items.length; i++)
 			if (this.items[i].params.id == i_ids[d])
 			{
+				// Skip nodes of other type
+				if (this.items[i].node_type != i_type)
+					continue;
+
 				if (this.panel_item == this.items[i])
 					this.resetPanels({'hide_params': true});
 
@@ -1052,6 +1045,42 @@ Monitor.prototype.updatePanels = function(i_item, i_args) {
 		i_item.updatePanels();
 };
 
+Monitor.prototype.panelShowAllParameters = function() {
+	var elParams = this.elPanelR.m_elParams;
+
+	// If parametes section is not active at all we should exit.
+	// Nothing is selected.
+	if (elParams.classList.contains('active') != true)
+		return false;
+
+	// If all are aready shown we exit
+	if (elParams.m_all_shown == true)
+		return;
+
+	// Store current node type to filter(hide) other node type specific parameters
+	var node_type = null;
+	if (this.cur_item)
+		node_type = this.cur_item.node_type;
+
+	for (let p in elParams.m_elPMap)
+	{
+		let el = elParams.m_elPMap[p];
+
+		// Filter node type specific parameters
+		if (node_type && el.param.node_type)
+			if (node_type != el.param.node_type)
+			{
+				el.style.display = 'none';
+				continue;
+			}
+
+		el.style.display = 'block';
+	}
+
+	// Store that we show all
+	elParams.m_all_shown = true;
+};
+
 Monitor.prototype.setPanelInfo = function(i_html) {
 	this.elPanelR.m_elInfo.m_elBody.innerHTML = i_html;
 };
@@ -1117,11 +1146,11 @@ Monitor.prototype.addMenuItem = function(i_menu, i_action) {
 
 	if (i_action.mode == 'cgru_cmdexec')
 	{
-		var cmds = [];
-		for (var i = 0; i < this.items.length; i++)
+		let cmds = [];
+		for (let i = 0; i < this.items.length; i++)
 			if (this.items[i].selected == true)
 			{
-				var cmd = i_action.handle;
+				let cmd = i_action.handle;
 				cmd = cmd.replace(/@ARG@/g, this.items[i].params.name);
 				if (this.items[i].params.address.ip)
 					cmd = cmd.replace(/@IP@/g, this.items[i].params.address.ip);

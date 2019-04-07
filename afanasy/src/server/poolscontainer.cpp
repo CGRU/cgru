@@ -128,6 +128,12 @@ PoolSrv * PoolsContainer::getPool(const std::string & i_path)
 	return NULL;
 }
 
+void PoolsContainer::assignRender(RenderAf * i_render)
+{
+	if (false == m_root_pool->assignRender(i_render))
+		AF_ERR << "Can`t assign render '" << i_render->getName() << "' to any pool.";
+}
+
 //############################################################################
 //                               PoolsContainerIt
 //############################################################################

@@ -19,6 +19,7 @@
 #include "jobcontainer.h"
 #include "monitoraf.h"
 #include "monitorcontainer.h"
+#include "poolscontainer.h"
 #include "rendercontainer.h"
 #include "threadargs.h"
 #include "usercontainer.h"
@@ -104,13 +105,14 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	case af::Msg::TRenderRegister:
 	{
 //printf("case af::Msg::TRenderRegister:\n");
-		AfContainerLock jLock( i_args->jobs,     AfContainerLock::WRITELOCK);
-		AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
-		AfContainerLock rLock( i_args->renders,  AfContainerLock::WRITELOCK);
+		AfContainerLock jLock(i_args->jobs,     AfContainerLock::WRITELOCK);
+		AfContainerLock mLock(i_args->monitors, AfContainerLock::WRITELOCK);
+		AfContainerLock pLock(i_args->pools,    AfContainerLock::WRITELOCK);
+		AfContainerLock rLock(i_args->renders,  AfContainerLock::WRITELOCK);
 
-		RenderAf * newRender = new RenderAf( i_msg);
-		newRender->setAddressIP( i_msg->getAddress());
-		o_msg_response = i_args->renders->addRender( newRender, i_args->jobs, i_args->monitors);
+		RenderAf * newRender = new RenderAf(i_msg);
+		newRender->setAddressIP(i_msg->getAddress());
+		o_msg_response = i_args->renders->addRender(newRender, i_args->pools, i_args->jobs, i_args->monitors);
 		break;
 	}
 	case af::Msg::TRenderUpdate:

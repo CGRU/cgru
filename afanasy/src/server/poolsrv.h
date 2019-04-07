@@ -52,6 +52,8 @@ public:
 	void addRender(RenderAf * i_render);
 	void removeRender(RenderAf * i_render);
 
+	bool assignRender(RenderAf * i_render);
+
 public:
 	inline static void setPoolsContainer(PoolsContainer * i_pools ) { ms_pools = i_pools;}
 

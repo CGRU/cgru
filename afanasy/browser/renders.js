@@ -19,8 +19,14 @@
 var renders_pools = null;
 
 RenderNode.onMonitorCreate = function() {
+	// Call pools on create first,
+	// as there are actions and params creation,
+	// that will be merged with render actions and params.
 	PoolNode.onMonitorCreate();
+
 	RenderNode.createActions();
+	RenderNode.createParams();
+
 	renders_pools = {};
 };
 
@@ -693,8 +699,8 @@ RenderNode.createPanels = function(i_monitor) {
 
 	// Info:
 	var acts = {};
-	acts.tasks_log = {'label': 'TSK', 'tooltip': 'Get tasks Log.'};
-	acts.full = {'label': 'FULL', 'tooltip': 'Request full render node info.'};
+	acts.tasks_log = {'label': 'TasksLog', 'tooltip': 'Get tasks Log.'};
+	acts.full = {'label': 'FullInfo', 'tooltip': 'Request full render node info.'};
 	i_monitor.createCtrlBtn({
 		'name': 'info',
 		'label': 'INFO',
@@ -706,12 +712,15 @@ RenderNode.createPanels = function(i_monitor) {
 
 	// Pools:
 	var acts = {};
-	acts.set_pool = {
-		'label': 'SPL',
+	acts.set_pool =      {'label':'Set',      'handle':'setPoolDialog', 'tooltip':'Set pool'};
+	acts.reassign_pool = {'label':'ReAssign', 'handle':'mh_Oper',       'tooltip':'Reassign pool'};
+	i_monitor.createCtrlBtn({
+		'name': 'pool',
+		'label': 'POOL',
+		'tooltip': 'Manipulate render pool.',
 		'node_type': 'renders',
-		'handle': 'setPoolDialog',
-		'tooltip': 'Set pool'};
-	i_monitor.createCtrlBtns(acts);
+		'sub_menu': acts
+	});
 
 	// Nimby:
 	var acts = {
@@ -719,21 +728,24 @@ RenderNode.createPanels = function(i_monitor) {
 			'name': 'nimby',
 			'value': false,
 			'handle': 'mh_Param',
-			'label': 'FRE',
+			'label': 'FREE',
+			'node_type': 'renders',
 			'tooltip': 'Set render free.'
 		},
 		nimby: {
 			'name': 'nimby',
 			'value': true,
 			'handle': 'mh_Param',
-			'label': 'Nim',
+			'label': 'Nimby',
+			'node_type': 'renders',
 			'tooltip': 'Set render nimby.\nRun only owner tasks.'
 		},
 		NIMBY: {
 			'name': 'NIMBY',
 			'value': true,
 			'handle': 'mh_Param',
-			'label': 'NBY',
+			'label': 'NIMBY',
+			'node_type': 'renders',
 			'tooltip': 'Set render NIMBY.\nDo not run any tasks.'
 		}
 	};
@@ -741,23 +753,25 @@ RenderNode.createPanels = function(i_monitor) {
 
 	// Eject tasks:
 	var acts = {};
-	acts.eject_tasks = {'label': 'ALL', 'tooltip': 'Eject all running tasks.'};
-	acts.eject_tasks_keep_my = {'label': 'NOM', 'tooltip': 'Eject not my tasks.'};
+	acts.eject_tasks = {'label': 'All Tasks', 'tooltip': 'Eject all running tasks.'};
+	acts.eject_tasks_keep_my = {'label': 'Not My', 'tooltip': 'Eject not my tasks.'};
 	i_monitor.createCtrlBtn(
-		{'name': 'eject', 'label': 'EJT', 'tooltip': 'Eject tasks from render.', 'sub_menu': acts});
+		{'name': 'eject', 'label': 'EJECT', 'tooltip': 'Eject tasks from render.', 'sub_menu': acts});
 
 
 	// Custom commands:
 	var el = document.createElement('div');
 	i_monitor.elPanelL.appendChild(el);
 	el.classList.add('ctrl_button');
-	el.textContent = 'CMD';
+	el.textContent = 'CUSTOM';
 	el.monitor = i_monitor;
 	el.onclick = function(e) {
 		e.currentTarget.monitor.showMenu(e, 'cgru_cmdexec');
 		return false;
 	};
 	el.oncontextmenu = el.onclick;
+	// We can execute custom commands on renders only
+	el.m_act = {'node_type':'renders'};
 
 	// Admin related functions:
 	if (!g_GOD())
@@ -769,14 +783,14 @@ RenderNode.createPanels = function(i_monitor) {
 		'name': 'paused',
 		'value': true,
 		'handle': 'mh_Param',
-		'label': 'PAU',
+		'label': 'PAUSE',
 		'tooltip': 'Set render paused.'
 	};
 	acts.unpause = {
 		'name': 'paused',
 		'value': false,
 		'handle': 'mh_Param',
-		'label': 'UNP',
+		'label': 'UNPAUSE',
 		'tooltip': 'Unset render pause.'
 	};
 	i_monitor.createCtrlBtns(acts);
@@ -784,13 +798,13 @@ RenderNode.createPanels = function(i_monitor) {
 
 	// Services:
 	var acts = {};
-	acts.enable = {'handle': 'setService', 'label': 'ENS', 'tooltip': 'Enable service.'};
-	acts.disable = {'handle': 'setService', 'label': 'DIS', 'tooltip': 'Disable service.'};
+	acts.enable = {'handle':  'setService', 'label': 'Enable', 'tooltip': 'Enable service.'};
+	acts.disable = {'handle': 'setService', 'label': 'Disable', 'tooltip': 'Disable service.'};
 	acts.restore_defaults =
-		{'handle': 'mh_Oper', 'label': 'DEF', 'tooltip': 'Restore default farm settings.'};
+		{'handle': 'mh_Oper', 'label': 'Restore', 'tooltip': 'Restore default farm settings.'};
 	i_monitor.createCtrlBtn({
 		'name': 'services',
-		'label': 'SRV',
+		'label': 'SERVICES',
 		'tooltip': 'Enable/Disable service\nRestore defaults.',
 		'sub_menu': acts
 	});
@@ -798,21 +812,29 @@ RenderNode.createPanels = function(i_monitor) {
 
 	// Power/WOL:
 	var acts = {
-		wol_sleep /**/: {'label': 'WSL', 'tooltip': 'Wake-On-Lan sleep.'},
-		wol_wake /***/: {'label': 'WWK', 'tooltip': 'Wake-On-Lan wake.'},
-		exit /*******/: {'label': 'EXT', 'tooltip': 'Exit client.'},
-		reboot /*****/: {'label': 'REB', 'tooltip': 'Reboot machine.'},
-		shutdown /***/: {'label': 'SHD', 'tooltip': 'Shutdown machine.'},
-		delete /*****/: {'label': 'DEL', 'tooltip': 'Delete render from Afanasy database.'}
+		wol_sleep /**/: {'label': 'WOLSleep', 'tooltip': 'Wake-On-Lan sleep.'},
+		wol_wake /***/: {'label': 'WOLWake',  'tooltip': 'Wake-On-Lan wake.'},
+		exit /*******/: {'label': 'Exit',     'tooltip': 'Exit client.'},
+		reboot /*****/: {'label': 'Reboot',   'tooltip': 'Reboot machine.'},
+		shutdown /***/: {'label': 'Shutdown', 'tooltip': 'Shutdown machine.'},
+		delete /*****/: {'label': 'Delete',   'tooltip': 'Delete render from Afanasy database.'}
 	};
 	i_monitor.createCtrlBtn(
-		{'name': 'power', 'label': 'POW', 'tooltip': 'Power / Exit / Delete.', 'sub_menu': acts});
+		{'name': 'power', 'label': 'POWER', 'tooltip': 'Power / Exit / Delete.', 'sub_menu': acts});
 
 	// Launch and Exit:
 	var acts = {};
-	acts.lcmd = {'name': 'lcmd', 'label': 'LCMD', 'handle': 'launchCmdExit', 'tooltip': 'Launch command.'};
-	acts.lcex =
-		{'name': 'lcex', 'label': 'LCEX', 'handle': 'launchCmdExit', 'tooltip': 'Launch command and exit.'};
+	acts.lcmd = {'name': 'lcmd', 'label': 'Command',  'handle': 'launchCmdExit', 'tooltip': 'Launch command.'};
+	acts.lcex = {'name': 'lcex', 'label': 'Cmd&Exit', 'handle': 'launchCmdExit', 'tooltip': 'Launch command and exit.'};
+	i_monitor.createCtrlBtn({
+		'name': 'launch',
+		'label': 'LAUNCH',
+		'tooltip': 'Launch command by afrender.',
+		'sub_menu': acts
+	});
+
+	var acts = {};
+	acts.delete = {"label": "DELETE", "tooltip": 'Double click to delete.', "ondblclick": true};
 	i_monitor.createCtrlBtns(acts);
 };
 
@@ -854,18 +876,6 @@ RenderNode.prototype.updatePanels = function() {
 	this.monitor.setPanelInfo(info);
 };
 
-RenderNode.params = {
-	priority /****/: {"type": 'num', "permissions": 'god', "label": 'Priority'},
-	capacity /****/: {"type": 'num', "permissions": 'god', "label": 'Capacity'},
-	max_tasks /***/: {"type": 'num', "permissions": 'god', "label": 'Maximum Tasks'},
-	user_name /***/: {"type": 'str', "permissions": 'god', "label": 'User Name'},
-	annotation /**/: {"type": 'str', "permissions": 'god', "label": 'Annotation'},
-	hidden /******/: {"type": 'bl1', "permissions": 'god', "label": 'Hide/Unhide'}
-};
-
-RenderNode.sort = ['priority', 'user_name', 'name'];
-RenderNode.filter = ['user_name', 'name', 'host_name'];
-
 RenderNode.actions = [];
 RenderNode.actionsCreated = false;
 RenderNode.createActions = function() {
@@ -891,5 +901,36 @@ RenderNode.createActions = function() {
 				"permissions": 'god'
 			});
 
+	for (let p in PoolNode.params)
+		PoolNode.params[p] = PoolNode.params[p];
+
 	RenderNode.actionsCreated = true;
+};
+
+RenderNode.params_render = {
+	priority   : {"type": 'num', "permissions": 'god', "label": 'Priority'},
+	capacity   : {"type": 'num', "permissions": 'god', "label": 'Capacity'},
+	max_tasks  : {"type": 'num', "permissions": 'god', "label": 'Maximum Tasks'},
+	user_name  : {"type": 'str', "permissions": 'god', "label": 'User Name', 'node_type': 'renders'},
+	annotation : {"type": 'str', "permissions": 'god', "label": 'Annotation'}
+};
+
+RenderNode.sort = ['priority', 'user_name', 'name'];
+RenderNode.filter = ['user_name', 'name', 'host_name'];
+
+RenderNode.createParams = function() {
+	if (RenderNode.params_created)
+		return;
+
+	RenderNode.params = {};
+
+	// Add pool node params:
+	for (let p in PoolNode.params)
+		RenderNode.params[p] = PoolNode.params[p];
+
+	// Add render node params:
+	for (let p in RenderNode.params_render)
+		RenderNode.params[p] = RenderNode.params_render[p];
+
+	RenderNode.params_created = true;
 };

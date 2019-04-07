@@ -312,6 +312,27 @@ void PoolSrv::removeRender(RenderAf * i_render)
 	m_renders_num--;
 }
 
+bool PoolSrv::assignRender(RenderAf * i_render)
+{
+	if (false == isRoot())
+	{
+		if (m_pattern.empty())
+			return false;
+
+		if (false == m_pattern.match(i_render->getName()))
+			return false;
+	}
+
+	for (PoolSrv * child : m_pools_list)
+		if (child->assignRender(i_render))
+			return true;
+
+	addRender(i_render);
+	i_render->setPool(this);
+
+	return true;
+}
+
 void PoolSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, MonitorContainer * i_monitoring)
 {
 	bool changed = false;

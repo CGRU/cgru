@@ -45,6 +45,8 @@ public:
 
 	PoolSrv * getPool(const std::string & i_path);
 
+	void assignRender(RenderAf * i_render);
+
 	PoolSrv * getRootPool() {return m_root_pool;}
 
 private:
