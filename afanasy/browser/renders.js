@@ -832,6 +832,8 @@ RenderNode.prototype.updatePanels = function() {
 	// Info:
 	var info = '';
 
+	info += '<p>Pool: <b>' + this.params.pool + '</b></p>'
+
 	var r = this.params.host_resources;
 	if (r)
 	{

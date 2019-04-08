@@ -232,7 +232,7 @@ UserNode.createPanels = function(i_monitor) {
 	// Custom data:
 	var acts = {};
 	acts.custom_data =
-		{'type': 'json', 'handle': 'mh_Dialog', 'label': 'DAT', 'tooltip': 'Set user custom data.'};
+		{'type': 'json', 'handle': 'mh_Dialog', 'label': 'CUSTOM', 'tooltip': 'Set user custom data.'};
 	i_monitor.createCtrlBtns(acts);
 };
 

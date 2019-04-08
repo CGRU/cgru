@@ -1436,36 +1436,36 @@ JobNode.createPanels = function(i_monitor) {
 
 	// Errors:
 	var acts = {};
-	acts.error_hosts /********/ = {'label': 'GEH', "handle": 'mh_Get', 'tooltip': 'Show error hosts.'};
-	acts.reset_error_hosts /**/ = {'label': 'REH', 'handle': 'mh_Oper', 'tooltip': 'Reset error hosts.'};
-	acts.restart_errors /*****/ = {'label': 'RET', 'handle': 'mh_Oper', 'tooltip': 'Restart error tasks.'};
+	acts.error_hosts       = {'label':'Get',     'handle':'mh_Get',  'tooltip':'Show error hosts.'};
+	acts.reset_error_hosts = {'label':'Reset',   'handle':'mh_Oper', 'tooltip':'Reset error hosts.'};
+	acts.restart_errors    = {'label':'Restart', 'handle':'mh_Oper', 'tooltip':'Restart error tasks.'};
 	i_monitor.createCtrlBtn(
-		{'name': 'errors', 'label': 'ERR', 'tooltip': 'Error tasks and hosts.', 'sub_menu': acts});
+		{'name': 'errors', 'label': 'ERRORS', 'tooltip': 'Error tasks and hosts.', 'sub_menu': acts});
 
 
 	// Restart:
 	var acts = {};
-	acts.restart /**********/ = {'label': 'ALL', 'tooltip': 'Restart all tasks.'};
-	acts.restart_pause /****/ = {'label': 'A&P', 'tooltip': 'Restart all and pause.'};
-	acts.restart_errors /***/ = {'label': 'ERR', 'tooltip': 'Restart error tasks.'};
-	acts.restart_running /**/ = {'label': 'RUN', 'tooltip': 'Restart running tasks.'};
-	acts.restart_skipped /**/ = {'label': 'SKP', 'tooltip': 'Restart skipped tasks.'};
-	acts.restart_done /*****/ = {'label': 'DON', 'tooltip': 'Restart done task.'};
+	acts.restart         = {'label':'All',       'tooltip':'Restart all tasks.'};
+	acts.restart_pause   = {'label':'All&Pause', 'tooltip':'Restart all and pause.'};
+	acts.restart_errors  = {'label':'Errors',    'tooltip':'Restart error tasks.'};
+	acts.restart_running = {'label':'Running',   'tooltip':'Restart running tasks.'};
+	acts.restart_skipped = {'label':'Skipped',   'tooltip':'Restart skipped tasks.'};
+	acts.restart_done    = {'label':'Done',      'tooltip':'Restart done task.'};
 	i_monitor.createCtrlBtn(
-		{'name': 'restart_tasks', 'label': 'RES', 'tooltip': 'Restart job tasks.', 'sub_menu': acts});
+		{'name': 'restart_tasks', 'label': 'RESTART', 'tooltip': 'Restart job tasks.', 'sub_menu': acts});
 
 
 	// Move:
 	if(false == g_VISOR())
 	{
 		var acts = {};
-		acts.move_jobs_top /*****/ = {'label': 'TOP', 'tooltip': 'Move jobs top.'};
-		acts.move_jobs_up /******/ = {'label': 'UP', 'tooltip': 'Move jobs up.'};
-		acts.move_jobs_down /****/ = {'label': 'DWN', 'tooltip': 'Move jobs down.'};
-		acts.move_jobs_bottom /**/ = {'label': 'BOT', 'tooltip': 'Move jobs bottom.'};
+		acts.move_jobs_top    = {'label':'Top',    'tooltip':'Move jobs top.'};
+		acts.move_jobs_up     = {'label':'Up',     'tooltip':'Move jobs up.'};
+		acts.move_jobs_down   = {'label':'Down',   'tooltip':'Move jobs down.'};
+		acts.move_jobs_bottom = {'label':'Bottom', 'tooltip':'Move jobs bottom.'};
 		i_monitor.createCtrlBtn({
 			'name': 'move_jobs',
-			'label': 'MOV',
+			'label': 'MOVE',
 			'tooltip': 'Move jobs.',
 			'sub_menu': acts,
 			'handle': 'moveJobs'
@@ -1474,16 +1474,15 @@ JobNode.createPanels = function(i_monitor) {
 
 	// Actions:
 	var acts = {};
-	acts.start = {"label": "STA", "tooltip": 'Start job.'};
-	acts.pause = {"label": "PAU", "tooltip": 'Pause job.'};
-	acts.stop = {"label": "STP", "tooltip": 'Double click to stop job running tasks.', "ondblclick": true};
-	acts.listen =
-		{"label": "LIS", "tooltip": 'Double click to listen job.', "ondblclick": true, "handle": 'listen'};
-	acts.delete = {"label": "DEL", "tooltip": 'Double click to delete job(s).', "ondblclick": true};
+	acts.start  = {'label':'START',  'tooltip':'Start job.'};
+	acts.pause  = {'label':'PAUSE',  'tooltip':'Pause job.'};
+	acts.stop   = {'label':'STOP',   'tooltip':'Double click to stop job running tasks.', 'ondblclick': true};
+	acts.listen = {'label':'LISTEN', 'tooltip':'Double click to listen job.','ondblclick':true, 'handle':'listen'};
+	acts.delete = {'label':'DELETE', 'tooltip':'Double click to delete job(s).', 'ondblclick':true};
 	if(false == g_VISOR())
 	{
 		acts.deldone = {
-			"label": "DDJ",
+			"label": "DELDONE",
 			"tooltip": 'Double click to delete all done jobs.',
 			"ondblclick": true,
 			"always_active": true,

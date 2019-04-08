@@ -285,7 +285,7 @@ BranchNode.createPanels = function(i_monitor) {
 	acts.create_childs = {
 		'name': 'create_childs',
 		'value': true,
-		'label': 'ACC',
+		'label': 'CREATE',
 		'tooltip': 'Auto create childs.',
 		'handle': 'mh_Param'
 	};
@@ -293,7 +293,7 @@ BranchNode.createPanels = function(i_monitor) {
 	acts.do_not_create_childs = {
 		'name': 'create_childs',
 		'value': false,
-		'label': 'DNC',
+		'label': 'NOCREATE',
 		'tooltip': 'Do not create childs.',
 		'handle': 'mh_Param'
 	};
@@ -308,12 +308,12 @@ BranchNode.createPanels = function(i_monitor) {
 	acts.solve_users = {
 		'name': 'solve_jobs',
 		'value': false,
-		'label': 'USR',
+		'label': 'USERS',
 		'tooltip': 'Solve users.',
 		'handle': 'mh_Param'
 	};
 
-	acts.delete = {"label": "DEL", "tooltip": 'Double click to delete branch.', "ondblclick": true};
+	acts.delete = {"label": "DELETE", "tooltip": 'Double click to delete branch.', "ondblclick": true};
 
 	i_monitor.createCtrlBtns(acts);
 };
