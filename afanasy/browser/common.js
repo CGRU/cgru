@@ -161,12 +161,24 @@ function cm_CompareItems(i_itemA, i_itemB, i_param, i_greater)
 	if (i_itemA == null || i_itemB == null)
 		return false;
 
+	// Sorting is forced (branches&jobs, pools&renders)
 	if (i_itemA.sort_force || i_itemB.sort_force)
+	{
 		if (i_itemA.sort_force != i_itemB.sort_force)
+		{
 			if (i_itemA.sort_force < i_itemB.sort_force)
 				return true;
 			else
 				return false;
+		}
+		else if (i_itemA.node_type != i_itemB.node_type)
+		{
+			// If path is the same we should show parent node first:
+			if (i_itemA.node_type == 'branches') return true;
+			if (i_itemA.node_type == 'pools') return true;
+			return false;
+		}
+	}
 
 	if (i_itemA.params[i_param] > i_itemB.params[i_param])
 		return i_greater == true;
