@@ -340,8 +340,6 @@ void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const
 		if( isWOLWaking()) stream << " WOL-Waking";
 
 		stream << "\n Priority = " << int(m_priority);
-		stream << "\n Capacity = " << getCapacityFree() << " of " << getCapacity() << " ( " << getCapacityUsed() << " used )";
-		stream << "\n Max Tasks = " << getMaxTasks() << " ( " << getTasksNumber() << " running )";
 
 		if( m_wol_operation_time ) stream << "\n WOL operation time = " << time2str( m_wol_operation_time);
 

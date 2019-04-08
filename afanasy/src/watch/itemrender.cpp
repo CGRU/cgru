@@ -156,8 +156,6 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 
 	    m_engine             = afqt::stoq( render->getEngine());
 	    m_username           = afqt::stoq( render->getUserName());
-	    m_capacity           = render->getCapacity();
-	    m_maxtasks           = render->getMaxTasks();
 	    m_time_launched      = render->getTimeLaunch();
 	    m_time_registered    = render->getTimeRegister();
 
@@ -251,15 +249,18 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 	    m_capacity_used = render->getCapacityUsed();
 		if( Watch::isPadawan())
 		{
-		    m_capacity_usage = QString("Capacity: %1 of %2; Tasks: %3 of %4").arg( m_capacity_used).arg( m_capacity).arg( m_tasks.size()).arg( m_maxtasks);
+		    m_capacity_usage = QString("Tasks: %1 Capacity: %2")
+				.arg(m_tasks.size()).arg(m_capacity_used);
 		}
 		else if( Watch::isJedi())
 		{
-		    m_capacity_usage = QString("C:%1/%2 T:%3/%4").arg( m_capacity_used).arg( m_capacity).arg( m_tasks.size()).arg( m_maxtasks);
+		    m_capacity_usage = QString("T:%1 C:%2")
+				.arg(m_tasks.size()).arg(m_capacity_used);
 		}
 		else
 		{
-		    m_capacity_usage = QString("%1/%2 (%3/%4)").arg( m_capacity_used).arg( m_capacity).arg( m_tasks.size()).arg( m_maxtasks);
+		    m_capacity_usage = QString("%1:%2")
+				.arg(m_tasks.size()).arg(m_capacity_used);
 		}
 
 	    if( m_busy )

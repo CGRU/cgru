@@ -72,9 +72,9 @@ RenderNode.prototype.init = function() {
 	this.elNewLine = document.createElement('br');
 	this.element.appendChild(this.elNewLine);
 
-	this.elCapacity = cm_ElCreateText(this.element, 'Capacity: Used / Total');
-	this.elCapacity.classList.add('prestar');
-	this.elMaxTasks = cm_ElCreateText(this.element, 'Tasks: Running / Maximum');
+	this.elRunTasks = cm_ElCreateText(this.element, 'Running Tasks');
+	this.elRunTasks.classList.add('prestar');
+	this.elCapacity = cm_ElCreateText(this.element, 'Capacity');
 	this.elStateTime = cm_ElCreateFloatText(this.element, 'right', 'Busy/Free Status and Time');
 
 	this.elAnnotation = document.createElement('div');
@@ -342,7 +342,7 @@ RenderNode.prototype.update = function(i_obj) {
 		this.elResources.style.display = 'none';
 		this.params.host_resources = null;
 		this.elCapacity.textContent = '';
-		this.elMaxTasks.textContent = '';
+		this.elRunTasks.textContent = '';
 		this.state.textContent = '';
 		this.elStateTime.textContent = '';
 		this.elNewLine.style.display = 'none';
@@ -351,34 +351,24 @@ RenderNode.prototype.update = function(i_obj) {
 	this.elPower.textContent = '';
 	this.elNewLine.style.display = 'block';
 
-	if (this.params.capacity == null)
-		this.params.capacity = this.params.host.capacity;
-	if (this.params.max_tasks == null)
-		this.params.max_tasks = this.params.host.max_tasks;
 	this.params.run_tasks = 0;
 	if (this.params.tasks)
 		this.params.run_tasks = this.params.tasks.length;
 
 	if (cm_IsPadawan())
 	{
-		this.elCapacity.innerHTML = 'Capacity[ Used:<b>' + this.params.capacity_used + '</b> / Total:<b>' +
-			this.params.capacity + '</b> ]';
-		this.elMaxTasks.innerHTML =
-			'( Run:<b>' + this.params.run_tasks + '</b> / Max:<b>' + this.params.max_tasks + '</b> )Tasks';
+		this.elRunTasks.innerHTML =	'Tasks: <b>' + this.params.run_tasks + '</b>';
+		this.elCapacity.innerHTML = 'Capacity: <b>' + this.params.capacity_used + '</b>';
 	}
 	else if (cm_IsJedi())
 	{
-		this.elCapacity.innerHTML =
-			'Cap[ <b>' + this.params.capacity_used + '</b> / <b>' + this.params.capacity + '</b> ]';
-		this.elMaxTasks.innerHTML =
-			'( <b>' + this.params.run_tasks + '</b> / <b>' + this.params.max_tasks + '</b> )Tasks';
+		this.elRunTasks.innerHTML =	'Tasks:<b>' + this.params.run_tasks + '</b>';
+		this.elCapacity.innerHTML = 'Cap:<b>' + this.params.capacity_used + '</b>';
 	}
 	else
 	{
-		this.elCapacity.innerHTML =
-			'[<b>' + this.params.capacity_used + '</b>/<b>' + this.params.capacity + '</b>]';
-		this.elMaxTasks.innerHTML =
-			'(<b>' + this.params.run_tasks + '</b>/<b>' + this.params.max_tasks + '</b>)';
+		this.elRunTasks.innerHTML =	'T:<b>' + this.params.run_tasks + '</b>';
+		this.elCapacity.innerHTML = 'C:<b>' + this.params.capacity_used + '</b>';
 	}
 
 	if (this.state.RUN == true)
@@ -909,8 +899,8 @@ RenderNode.createActions = function() {
 
 RenderNode.params_render = {
 	priority   : {"type": 'num', "permissions": 'god', "label": 'Priority'},
-	capacity   : {"type": 'num', "permissions": 'god', "label": 'Capacity'},
-	max_tasks  : {"type": 'num', "permissions": 'god', "label": 'Maximum Tasks'},
+	capacity   : {"type": 'num', "permissions": 'god', "label": 'Capacity', 'node_type': 'renders'},
+	max_tasks  : {"type": 'num', "permissions": 'god', "label": 'Maximum Tasks', 'node_type': 'renders'},
 	user_name  : {"type": 'str', "permissions": 'god', "label": 'User Name', 'node_type': 'renders'},
 	annotation : {"type": 'str', "permissions": 'god', "label": 'Annotation'}
 };

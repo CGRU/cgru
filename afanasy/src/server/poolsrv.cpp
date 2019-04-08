@@ -95,6 +95,8 @@ bool PoolSrv::initialize()
 		if (NULL == m_parent)
 		{
 			// The root pool is just created for the first time (not from store)
+			m_max_tasks_per_host = 8;
+			m_max_capacity_per_host = 1100;
 		}
 
 		m_time_creation = time(NULL);
@@ -401,6 +403,28 @@ void PoolSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, Monitor
 	// Store if needed
 	if (tostore)
 		store();
+}
+
+int PoolSrv::getMaxTasksPerHost() const
+{
+	if (m_max_tasks_per_host >= 0)
+		return m_max_tasks_per_host;
+
+	if (m_parent)
+		return m_parent->getMaxTasksPerHost();
+
+	return m_max_tasks_per_host;
+}
+
+int PoolSrv::getMaxCapacityPerHost() const
+{
+	if (m_max_capacity_per_host >= 0)
+		return m_max_capacity_per_host;
+
+	if (m_parent)
+		return m_parent->getMaxCapacityPerHost();
+
+	return m_max_capacity_per_host;
 }
 
 int PoolSrv::v_calcWeight() const

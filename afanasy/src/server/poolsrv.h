@@ -54,6 +54,9 @@ public:
 
 	bool assignRender(RenderAf * i_render);
 
+	int getMaxTasksPerHost() const;
+	int getMaxCapacityPerHost() const;
+
 public:
 	inline static void setPoolsContainer(PoolsContainer * i_pools ) { ms_pools = i_pools;}
 

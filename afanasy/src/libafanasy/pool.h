@@ -35,8 +35,13 @@ public:
 	inline bool isPaused() const { return (m_state & SPaused);}
 	inline void setPaused(bool set) { m_state = set ? m_state | SPaused : m_state & (~SPaused); }
 
-	inline int getMaxRunTasks() const { return m_max_run_tasks;}
-	inline int getMaxRunTasksPerHost() const { return m_max_run_tasks_per_host;}
+	inline int getRunTasks()        const { return m_run_tasks;         }
+	inline int getMaxTasks()        const { return m_max_tasks;         }
+	inline int getMaxTasksPerHost() const { return m_max_tasks_per_host;}
+
+	inline int getRunCapacity()        const { return m_run_capacity;         }
+	inline int getMaxCapacity()        const { return m_max_capacity;         }
+	inline int getMaxCapacityPerHost() const { return m_max_capacity_per_host;}
 
 public:
 	enum State
@@ -62,8 +67,13 @@ protected:
 	int64_t m_time_offline;
 	int64_t m_time_empty;
 
-	int32_t m_max_run_tasks;
-	int32_t m_max_run_tasks_per_host;
+	int32_t m_run_tasks;
+	int32_t m_max_tasks;
+	int32_t m_max_tasks_per_host;
+
+	int32_t m_run_capacity;
+	int32_t m_max_capacity;
+	int32_t m_max_capacity_per_host;
 
 	int64_t m_task_start_finish_time; ///< Task start or finish time.
 

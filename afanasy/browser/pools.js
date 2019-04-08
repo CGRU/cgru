@@ -36,8 +36,7 @@ PoolNode.prototype.init = function() {
 	this.element.appendChild(this.elName);
 	this.elName.title = 'Pool name (path)';
 
-	this.elPattern = cm_ElCreateFloatText(this.element, 'left', 'Pattern');
-	this.elPriority = cm_ElCreateFloatText(this.element, 'right', 'Priority');
+	this.elParams = cm_ElCreateFloatText(this.element,'right','Parameters');
 
 	this.element.appendChild(document.createElement('br'));
 
@@ -77,20 +76,24 @@ PoolNode.prototype.update = function(i_obj) {
 			render.offsetHierarchy();
 			//^ this function requires filled in pools object
 
-//this.elPattern.textContent = this.params.pattern;
-
+	var params = '';
 	if (cm_IsPadawan())
 	{
-		this.elPriority.innerHTML = ' Priority:<b>' + this.params.priority + '</b>';
+		if (this.params.max_tasks_per_host)
+			params += ' Max Tasks Per Host:<b>' + this.params.max_tasks_per_host + '</b>';
+		if (this.params.max_capacity_per_host)
+			params += ' Max Capacity Per Host:<b>' + this.params.max_capacity_per_host + '</b>';
+		params += ' Priority:<b>' + this.params.priority + '</b>';
 	}
 	else if (cm_IsJedi())
 	{
-		this.elPriority.innerHTML = ' Pri:<b>' + this.params.priority + '</b>';
+		params += ' Pri:<b>' + this.params.priority + '</b>';
 	}
 	else
 	{
-		this.elPriority.innerHTML = '-<b>' + this.params.priority + '</b>';
+		params += '-<b>' + this.params.priority + '</b>';
 	}
+	this.elParams.innerHTML = params;
 
 
 	// Add/Remove CSS classes to highlight/colorize/mute:
@@ -267,7 +270,9 @@ PoolNode.prototype.onDoubleClick = function(e) {
 };
 
 PoolNode.params_pool = {
-	pattern : {"type": 'str', "permissions": 'god', "label": 'Pattern', 'node_type':'pools'}
+	pattern               : {'type':'str', 'permissions':'god', 'label':'Pattern'},
+	max_tasks_per_host    : {'type':'num', 'permissions':'god', 'label':'Max Tasks Per Host'},
+	max_capacity_per_host : {'type':'num', 'permissions':'god', 'label':'Max Capacity Per Host'}
 };
 
 PoolNode.createParams = function() {
@@ -276,7 +281,10 @@ PoolNode.createParams = function() {
 
 	PoolNode.params = {};
 	for (let p in PoolNode.params_pool)
+	{
 		PoolNode.params[p] = PoolNode.params_pool[p];
+		PoolNode.params[p].node_type = 'pools';
+	}
 
 	PoolNode.params_created = true;
 };

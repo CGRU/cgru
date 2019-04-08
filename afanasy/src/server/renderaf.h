@@ -9,12 +9,12 @@
 #include "../libafanasy/taskexec.h"
 
 #include "afnodesrv.h"
+#include "poolsrv.h"
 
 class Action;
 class JobContainer;
 class MsgQueue;
 class PoolsContainer;
-class PoolSrv;
 class RenderContainer;
 
 /// Afanasy server side of Render host.
@@ -35,6 +35,29 @@ public:
 
 /// Awake offline render
 	void online( RenderAf * render, JobContainer * i_jobs, MonitorContainer * monitoring);
+
+	inline int getMaxTasks()     const { return m_max_tasks == -1 ? m_poolsrv->getMaxTasksPerHost()    : m_max_tasks;}
+	inline int getCapacity()     const { return m_capacity  == -1 ? m_poolsrv->getMaxCapacityPerHost() : m_capacity;}
+	inline int getCapacityFree() const { return getCapacity() - m_capacity_used;}
+	inline bool hasCapacity(int value) const { return m_capacity_used + value <= getCapacity();}
+
+/// Whether Render is ready to render tasks.
+	inline bool isReady() const { return (
+			(m_state & SOnline) &&
+			(m_priority > 0) &&
+			(m_capacity_used < getCapacity()) &&
+			((int)m_tasks.size() < getMaxTasks()) &&
+			(false == isWOLFalling())
+		);}
+
+	inline bool isWOLWakeAble() const { return (
+			isOffline() &&
+			isWOLSleeping() &&
+			(false == isWOLWaking()) &&
+			(getCapacity() > 0) &&
+			(getMaxTasks() > 0) &&
+			(m_priority > 0)
+		);}
 
 /// Add task \c taskexec to render, \c start or only capture it
 /// Takes over the taskexec ownership
