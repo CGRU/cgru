@@ -958,7 +958,8 @@ Status.prototype.editListEdit = function(i_args) {
 			if (RULES.flags[item] && RULES.flags[item].clr)
 			{
 				let c = RULES.flags[item].clr;
-				el.style.borderColor = 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
+				el.style.borderColor = 'rgb(' + c[0]*0.5 + ',' + c[1]*0.5 + ',' + c[2]*0.5 + ')';
+				el.style.backgroundColor = 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
 			}
 
 			if (RULES.flags[item] && RULES.flags[item].new_line)
