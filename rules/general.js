@@ -31,9 +31,9 @@ var g_navigating_path = null;
 var g_arguments = null;
 
 var g_navig_infos = {
-	all /******/: ['annotation', 'size', 'artists', 'tags', 'duration', 'price', 'frames', 'percent'],
-	default /**/: ['annotation', 'artists', 'percent'],
-	current /**/: []
+	all     : ['annotation', 'size', 'flags', 'artists', 'tags', 'duration', 'price', 'frames', 'percent'],
+	default : ['annotation', 'flags', 'artists', 'percent'],
+	current : []
 };
 
 function cgru_params_OnChange(i_param, i_value)
@@ -614,6 +614,12 @@ function g_AppendFolder(i_elParent, i_fobject)
 	elArtists.classList.add('artists');
 	elArtists.classList.add('info');
 
+	var elFlags = document.createElement('div');
+	elFBody.appendChild(elFlags);
+	elFolder.m_elFlags = elFlags;
+	elFlags.classList.add('flags');
+	elFlags.classList.add('info');
+
 	elFolder.m_elProgress = document.createElement('div');
 	elFBody.appendChild(elFolder.m_elProgress);
 	elFolder.m_elProgress.classList.add('progress');
@@ -752,15 +758,13 @@ function g_FolderSetStatusPath(i_status, i_path, i_up_params)
 
 function g_FolderSetStatus(i_status, i_elFolder, i_up_params)
 {
-	// console.log('GFS:'+JSON.stringify(i_status));
-	// return;
 	if (i_elFolder == null)
 		i_elFolder = g_elCurFolder;
 	if (i_elFolder.m_fobject.status == null)
 		i_elFolder.m_fobject.status = {};
 
 	if (i_up_params)
-		for (var parm in i_up_params)
+		for (let parm in i_up_params)
 			i_elFolder.m_fobject.status[parm] = i_status[parm];
 	else
 		i_elFolder.m_fobject.status = i_status;
@@ -777,6 +781,8 @@ function g_FolderSetStatus(i_status, i_elFolder, i_up_params)
 		st_SetElPrice(i_status, i_elFolder.m_elPrice);
 	if ((i_up_params == null) || i_up_params.tags)
 		st_SetElTags(i_status, i_elFolder.m_elTags, true);
+	if ((i_up_params == null) || i_up_params.flags)
+		st_SetElFlags(i_status, i_elFolder.m_elFlags, true);
 
 	if (i_elFolder.m_fobject.auxiliary)
 	{

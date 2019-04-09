@@ -210,6 +210,7 @@ border-right: 0;
 #navig .folder .price    { font-weight: bold; background-color: rgba( 255,255,  0,.1); padding: 0px 4px; }
 #navig .folder .frames { width:50px; }
 #navig .folder .annotation { }
+#navig .folder .flags { font-weight: bold; }
 #navig .folder .tags { font-style: italic; }
 #navig .folder .percent {
 font: 12px monospace;
@@ -218,6 +219,7 @@ width: 30px; height: 14px;
 border: 1px solid rgba(0,0,0,.3);
 /*border-radius: 4px;*/
 }
+#navig.navig_show_flags      .folder .flags      { display: inline; }
 #navig.navig_show_tags       .folder .tags       { display: inline; }
 #navig.navig_show_artists    .folder .artists    { display: inline; }
 #navig.navig_show_annotation .folder .annotation { display: inline; }
