@@ -471,7 +471,6 @@ function st_SetElColor(i_status, i_elBack, i_elColor, i_setNone)
 		if (RULES.flags[flag] && RULES.flags[flag].clr)
 		{
 			c = RULES.flags[flag].clr;
-			a = 0.5;
 		}
 	}
 
