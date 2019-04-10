@@ -319,7 +319,7 @@ cursor: default;
 .RER { background: #F77;}
 .WRC { background: #4AC;}
 .OFF, .item.task.SKP { background: #777;}
-.DRT { border: 1px solid #955;}
+.DRT { border: 1px solid #F00;}
 .item.hidden { display: none;}
 .monitor.show_hidden .item.hidden { display: block; opacity: .5;}
 .item.selected, .item.task.selected {

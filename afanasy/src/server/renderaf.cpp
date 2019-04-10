@@ -107,14 +107,14 @@ void RenderAf::setRegistered(PoolsContainer * i_pools)
 	{
 		std::string log = "Registered";
 
-		if( m_host.m_register_nimby > 0 )
+		if (m_poolsrv->newNimby())
 		{
 			setNimby();
 			log += " nimby";
 		}
-		if( m_host.m_register_paused > 0 )
+		if (m_poolsrv->newPaused())
 		{
-			setPaused( true);
+			setPaused(true);
 			log += " paused";
 		}
 

@@ -312,7 +312,7 @@ RenderNode.prototype.update = function(i_obj) {
 		user = 'Paused(<b>' + user + '</b>)<b>P</b>';
 		if (this.state.NBY)
 			user += '+<b>N</b>';
-		if (this.state.Nby)
+		if (this.state.NbY)
 			user += '+<b>n</b>';
 	}
 	else if (this.state.NbY)
@@ -806,8 +806,7 @@ RenderNode.createPanels = function(i_monitor) {
 		wol_wake /***/: {'label': 'WOLWake',  'tooltip': 'Wake-On-Lan wake.'},
 		exit /*******/: {'label': 'Exit',     'tooltip': 'Exit client.'},
 		reboot /*****/: {'label': 'Reboot',   'tooltip': 'Reboot machine.'},
-		shutdown /***/: {'label': 'Shutdown', 'tooltip': 'Shutdown machine.'},
-		delete /*****/: {'label': 'Delete',   'tooltip': 'Delete render from Afanasy database.'}
+		shutdown /***/: {'label': 'Shutdown', 'tooltip': 'Shutdown machine.'}
 	};
 	i_monitor.createCtrlBtn(
 		{'name': 'power', 'label': 'POWER', 'tooltip': 'Power / Exit / Delete.', 'sub_menu': acts});

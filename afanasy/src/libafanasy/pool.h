@@ -43,10 +43,14 @@ public:
 	inline int getMaxCapacity()        const { return m_max_capacity;         }
 	inline int getMaxCapacityPerHost() const { return m_max_capacity_per_host;}
 
+	inline bool newNimby()  const { return m_new_nimby;  }
+	inline bool newPaused() const { return m_new_paused; }
+
 public:
 	enum State
 	{
-		SPaused  = 1ULL << 0
+		SPaused  = 1ULL << 0,
+		SBusy    = 1ULL << 1
 	};
 
 public:
@@ -58,6 +62,9 @@ protected:
 	std::string m_parent_path;
 
 	int64_t m_time_creation;
+
+	bool m_new_nimby;
+	bool m_new_paused;
 
 	int32_t m_pools_num;
 	int32_t m_pools_total;

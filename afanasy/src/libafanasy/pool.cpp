@@ -57,6 +57,9 @@ void Pool::initDefaultValues()
 	m_renders_num = 0;
 	m_renders_total = 0;
 
+	m_new_nimby = false;
+	m_new_paused = false;
+
 	m_run_tasks = 0;
 	m_max_tasks = -1;
 	m_max_tasks_per_host = -1;
@@ -118,6 +121,11 @@ void Pool::v_jsonWrite(std::ostringstream & o_str, int i_type) const // Thread-s
 	}
 */
 
+	if (m_new_nimby)
+		o_str << ",\n\"new_nimby\": true";
+	if (m_new_paused)
+		o_str << ",\n\"new_paused\": true";
+
 	if (m_services_disabled.size())
 	{
 		o_str << ",\n\"services_disabled\":[";
@@ -142,6 +150,9 @@ bool Pool::jsonRead(const JSON &i_object, std::string * io_changes)
 
 	if (notRoot())
 		jr_regexp("pattern", m_pattern, i_object, io_changes);
+
+	jr_bool  ("new_nimby",             m_new_nimby,             i_object, io_changes);
+	jr_bool  ("new_paused",            m_new_paused,            i_object, io_changes);
 
 	jr_int32 ("max_tasks",             m_max_tasks,             i_object, io_changes);
 	jr_int32 ("max_tasks_per_host",    m_max_tasks_per_host,    i_object, io_changes);

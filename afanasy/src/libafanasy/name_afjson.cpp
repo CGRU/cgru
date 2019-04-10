@@ -402,7 +402,7 @@ void af::jw_state( const int64_t & i_state, std::ostringstream & o_str, bool i_r
 		if( i_state & Render::SWOLFalling  ) o_str << " WFL";
 		if( i_state & Render::SWOLSleeping ) o_str << " WSL";
 		if( i_state & Render::SWOLWaking   ) o_str << " WWK";
-		if( i_state & Render::SPaused  ) o_str << " PAU";
+		if( i_state & Render::SPaused      ) o_str << " PAU";
 	}
 	else
 	{

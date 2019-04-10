@@ -79,19 +79,39 @@ PoolNode.prototype.update = function(i_obj) {
 	var params = '';
 	if (cm_IsPadawan())
 	{
+		if (this.params.new_nimby)
+			params += ' NewRender:<b>Nimby</b>';
+		if (this.params.new_paused)
+			params += ' NewRender:<b>Paused</b>';
 		if (this.params.max_tasks_per_host)
-			params += ' Max Tasks Per Host:<b>' + this.params.max_tasks_per_host + '</b>';
+			params += ' MaxTasksPerHost:<b>' + this.params.max_tasks_per_host + '</b>';
 		if (this.params.max_capacity_per_host)
-			params += ' Max Capacity Per Host:<b>' + this.params.max_capacity_per_host + '</b>';
+			params += ' MaxCapacityPerHost:<b>' + this.params.max_capacity_per_host + '</b>';
 		params += ' Priority:<b>' + this.params.priority + '</b>';
 	}
 	else if (cm_IsJedi())
 	{
+		if (this.params.new_nimby)
+			params += ' New:<b>Nimby</b>';
+		if (this.params.new_paused)
+			params += ' New:<b>Paused</b>';
+		if (this.params.max_tasks_per_host)
+			params += ' maxTasksPH:<b>' + this.params.max_tasks_per_host + '</b>';
+		if (this.params.max_capacity_per_host)
+			params += ' maxCapPH:<b>' + this.params.max_capacity_per_host + '</b>';
 		params += ' Pri:<b>' + this.params.priority + '</b>';
 	}
 	else
 	{
-		params += '-<b>' + this.params.priority + '</b>';
+		if (this.params.new_nimby)
+			params += ' n:<b>n</b>';
+		if (this.params.new_paused)
+			params += ' n:<b>p</b>';
+		if (this.params.max_tasks_per_host)
+			params += ' tph:<b>' + this.params.max_tasks_per_host + '</b>';
+		if (this.params.max_capacity_per_host)
+			params += ' cph:<b>' + this.params.max_capacity_per_host + '</b>';
+		params += ' p<b>' + this.params.priority + '</b>';
 	}
 	this.elParams.innerHTML = params;
 
@@ -169,7 +189,7 @@ PoolNode.prototype.update = function(i_obj) {
 	}
 	else
 	{
-		var renders = 'j:';
+		var renders = 'r:';
 		if (this.params.renders_total)
 			renders += '<b>' + this.params.renders_total + '</b>';
 		else
@@ -180,7 +200,7 @@ PoolNode.prototype.update = function(i_obj) {
 
 		var counts = '';
 		if (this.params.pools_total)
-			counts = 'b:<b>' + this.params.pools_total + '</b>';
+			counts = 'p:<b>' + this.params.pools_total + '</b>';
 		this.elPoolsCounts.innerHTML = counts;
 	}
 
@@ -213,21 +233,60 @@ PoolNode.prototype.refresh = function() {
 
 PoolNode.createPanels = function(i_monitor) {
 
-	var acts = {};
+	// Admin related functions:
+	if (!g_GOD())
+		return;
 
+	var acts = {};
 	acts.add_pool = {
 		'label': 'ADD POOL',
 		'node_type': 'pools',
 		'handle': 'addPoolDialog',
 		'tooltip': 'Add pool'};
-
 	acts.revert_renders = {
 		'label': 'REVERT',
 		'node_type': 'pools',
 		'handle': 'mh_Oper',
 		'tooltip': 'Revert renders'};
-
 	i_monitor.createCtrlBtns(acts);
+
+
+	var acts = {};
+	acts.new_nimby = {
+		'name': 'new_nimby',
+		'value': true,
+		'handle': 'mh_Param',
+		'label': 'Nimby',
+		'tooltip': 'New render will be registered as nimby.'
+	};
+	acts.new_free = {
+		'name': 'new_nimby',
+		'value': false,
+		'handle': 'mh_Param',
+		'label': 'Free',
+		'tooltip': 'New render will NOT be registered as nimby.'
+	};
+	acts.new_paused = {
+		'name': 'new_paused',
+		'value': true,
+		'handle': 'mh_Param',
+		'label': 'Paused',
+		'tooltip': 'New render will be registered as paused.'
+	};
+	acts.new_notpaused = {
+		'name': 'new_paused',
+		'value': false,
+		'handle': 'mh_Param',
+		'label': 'Ready',
+		'tooltip': 'New render will NOT be registered as paused.'
+	};
+	i_monitor.createCtrlBtn({
+		'name': 'new_render',
+		'label': 'NEW RENDER',
+		'node_type': 'pools',
+		'tooltip': 'New render status.',
+		'sub_menu': acts
+	});
 };
 
 PoolNode.prototype.updatePanels = function() {
@@ -270,9 +329,9 @@ PoolNode.prototype.onDoubleClick = function(e) {
 };
 
 PoolNode.params_pool = {
-	pattern               : {'type':'str', 'permissions':'god', 'label':'Pattern'},
-	max_tasks_per_host    : {'type':'num', 'permissions':'god', 'label':'Max Tasks Per Host'},
-	max_capacity_per_host : {'type':'num', 'permissions':'god', 'label':'Max Capacity Per Host'}
+	pattern               : {'type':'str', 'label':'Pattern'},
+	max_tasks_per_host    : {'type':'num', 'label':'Max Tasks Per Host'},
+	max_capacity_per_host : {'type':'num', 'label':'Max Capacity Per Host'}
 };
 
 PoolNode.createParams = function() {
@@ -283,6 +342,7 @@ PoolNode.createParams = function() {
 	for (let p in PoolNode.params_pool)
 	{
 		PoolNode.params[p] = PoolNode.params_pool[p];
+		PoolNode.params[p].permissions = 'god';
 		PoolNode.params[p].node_type = 'pools';
 	}
 
