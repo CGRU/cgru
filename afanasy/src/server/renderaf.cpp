@@ -704,8 +704,9 @@ void RenderAf::addTask( af::TaskExec * taskexec)
 
 	m_capacity_used += taskexec->getCapResult();
 
-	if( m_capacity_used > getCapacity() )
-		AF_ERR << "Capacity_used > host.capacity (" << m_capacity_used << " > " << m_host.m_capacity << ")";
+	// Just check capacity:
+	if ((getCapacity() >= 0) && (m_capacity_used > getCapacity()))
+		AF_ERR << "Capacity_used > max capacity (" << m_capacity_used << " > " << getCapacity() << ")";
 }
 
 void RenderAf::removeTask( const af::TaskExec * i_exec)

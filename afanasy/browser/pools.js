@@ -83,9 +83,9 @@ PoolNode.prototype.update = function(i_obj) {
 			params += ' NewRender:<b>Nimby</b>';
 		if (this.params.new_paused)
 			params += ' NewRender:<b>Paused</b>';
-		if (this.params.max_tasks_per_host)
+		if (this.params.max_tasks_per_host != null)
 			params += ' MaxTasksPerHost:<b>' + this.params.max_tasks_per_host + '</b>';
-		if (this.params.max_capacity_per_host)
+		if (this.params.max_capacity_per_host != null)
 			params += ' MaxCapacityPerHost:<b>' + this.params.max_capacity_per_host + '</b>';
 		params += ' Priority:<b>' + this.params.priority + '</b>';
 	}

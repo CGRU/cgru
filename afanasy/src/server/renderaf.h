@@ -39,13 +39,14 @@ public:
 	inline int getMaxTasks()     const { return m_max_tasks == -1 ? m_poolsrv->getMaxTasksPerHost()    : m_max_tasks;}
 	inline int getCapacity()     const { return m_capacity  == -1 ? m_poolsrv->getMaxCapacityPerHost() : m_capacity;}
 	inline int getCapacityFree() const { return getCapacity() - m_capacity_used;}
-	inline bool hasCapacity(int value) const { return m_capacity_used + value <= getCapacity();}
+	inline bool hasCapacity(int value) const {
+		int c = getCapacity(); if (c<0) return true; else return m_capacity_used + value <= c;}
 
 /// Whether Render is ready to render tasks.
 	inline bool isReady() const { return (
 			(m_state & SOnline) &&
 			(m_priority > 0) &&
-			(m_capacity_used < getCapacity()) &&
+			((getCapacity() < 0) || (m_capacity_used < getCapacity())) &&
 			((int)m_tasks.size() < getMaxTasks()) &&
 			(false == isWOLFalling())
 		);}
@@ -54,7 +55,7 @@ public:
 			isOffline() &&
 			isWOLSleeping() &&
 			(false == isWOLWaking()) &&
-			(getCapacity() > 0) &&
+			(getCapacity() != 0) &&
 			(getMaxTasks() > 0) &&
 			(m_priority > 0)
 		);}

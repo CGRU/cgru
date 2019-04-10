@@ -163,6 +163,10 @@ bool Pool::jsonRead(const JSON &i_object, std::string * io_changes)
 	if (jr_bool("paused", paused, i_object, io_changes))
 		setPaused(paused);
 
+	// There can`t be infinite max tasks per host on farm (on root pool).
+	if (isRoot() && (m_max_tasks_per_host < 0))
+		m_max_tasks_per_host = 0;
+
 	// Paramers below are not editable and read only on creation
 	// (but they can be changes by other actions, like disable service)
 	// When use edit parameters, log provided to store changes

@@ -95,7 +95,7 @@ bool PoolSrv::initialize()
 		if (NULL == m_parent)
 		{
 			// The root pool is just created for the first time (not from store)
-			m_max_tasks_per_host = 8;
+			m_max_tasks_per_host = 4;
 			m_max_capacity_per_host = 1100;
 		}
 

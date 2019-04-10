@@ -214,11 +214,16 @@ void Block::reconnectTask(af::TaskExec *i_taskexec, RenderAf & i_render, Monitor
 
 bool Block::canRunOn( RenderAf * render)
 {
-   // check max running tasks on the same host:
-   if(  m_data->getMaxRunTasksPerHost() == 0 ) return false;
-	if((m_data->getMaxRunTasksPerHost() > 0) && (getRenderCount(render) >= m_data->getMaxRunTasksPerHost())) return false;
-   // check available capacity:
-   if( false == render->hasCapacity( m_data->getCapMinResult())) return false;
+	// Check max running tasks on the same host:
+	if (m_data->getMaxRunTasksPerHost() == 0)
+		return false;
+	if ((m_data->getMaxRunTasksPerHost() > 0) && (getRenderCount(render) >= m_data->getMaxRunTasksPerHost()))
+		return false;
+
+	// Check available capacity:
+	if (false == render->hasCapacity(m_data->getCapMinResult()))
+		return false;
+
    // render services:
    if( false == render->canRunService( m_data->getService())) return false;
    // check maximum hosts:
