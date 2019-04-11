@@ -405,28 +405,6 @@ void PoolSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, Monitor
 		store();
 }
 
-int PoolSrv::getMaxTasksPerHost() const
-{
-	if (m_max_tasks_per_host >= 0)
-		return m_max_tasks_per_host;
-
-	if (m_parent)
-		return m_parent->getMaxTasksPerHost();
-
-	return m_max_tasks_per_host;
-}
-
-int PoolSrv::getMaxCapacityPerHost() const
-{
-	if (m_max_capacity_per_host >= 0)
-		return m_max_capacity_per_host;
-
-	if (m_parent)
-		return m_parent->getMaxCapacityPerHost();
-
-	return m_max_capacity_per_host;
-}
-
 int PoolSrv::v_calcWeight() const
 {
 	int weight = af::Pool::v_calcWeight();

@@ -54,8 +54,46 @@ public:
 
 	bool assignRender(RenderAf * i_render);
 
-	int getMaxTasksPerHost() const;
-	int getMaxCapacityPerHost() const;
+	inline int getMaxTasksPerHost()    const
+		{ if (m_max_tasks_per_host     < 0 && m_parent) return m_parent->getMaxTasksPerHost();    else return m_max_tasks_per_host;   }
+	inline int getMaxCapacityPerHost() const
+		{ if (m_max_capacity_per_host  < 0 && m_parent) return m_parent->getMaxCapacityPerHost(); else return m_max_capacity_per_host;}
+
+	inline bool newNimby()  const
+		{ if (!m_new_nimby  && m_parent) return m_parent->newNimby();  else return m_new_nimby; }
+	inline bool newPaused() const
+		{ if (!m_new_paused && m_parent) return m_parent->newPaused(); else return m_new_paused;}
+
+	inline int get_idle_wolsleep_time() const
+		{ if (m_idle_wolsleep_time < 0 && m_parent) return m_parent->get_idle_wolsleep_time(); else return m_idle_wolsleep_time;}
+	inline int get_idle_free_time()     const
+		{ if (m_idle_free_time     < 0 && m_parent) return m_parent->get_idle_free_time();     else return m_idle_free_time;    }
+	inline int get_busy_nimby_time()    const
+		{ if (m_busy_nimby_time    < 0 && m_parent) return m_parent->get_busy_nimby_time();    else return m_busy_nimby_time;   }
+	inline int get_idle_cpu()           const
+		{ if (m_idle_cpu           < 0 && m_parent) return m_parent->get_idle_cpu();           else return m_idle_cpu;          }
+	inline int get_busy_cpu()           const
+		{ if (m_busy_cpu           < 0 && m_parent) return m_parent->get_busy_cpu();           else return m_busy_cpu;          }
+	inline int get_idle_mem()           const
+		{ if (m_idle_mem           < 0 && m_parent) return m_parent->get_idle_mem();           else return m_idle_mem;          }
+	inline int get_busy_mem()           const
+		{ if (m_busy_mem           < 0 && m_parent) return m_parent->get_busy_mem();           else return m_busy_mem;          }
+	inline int get_idle_swp()           const
+		{ if (m_idle_swp           < 0 && m_parent) return m_parent->get_idle_swp();           else return m_idle_swp;          }
+	inline int get_busy_swp()           const
+		{ if (m_busy_swp           < 0 && m_parent) return m_parent->get_busy_swp();           else return m_busy_swp;          }
+	inline int get_idle_hddgb()         const
+		{ if (m_idle_hddgb         < 0 && m_parent) return m_parent->get_idle_hddgb();         else return m_idle_hddgb;        }
+	inline int get_busy_hddgb()         const
+		{ if (m_busy_hddgb         < 0 && m_parent) return m_parent->get_busy_hddgb();         else return m_busy_hddgb;        }
+	inline int get_idle_hddio()         const
+		{ if (m_idle_hddio         < 0 && m_parent) return m_parent->get_idle_hddio();         else return m_idle_hddio;        }
+	inline int get_busy_hddio()         const
+		{ if (m_busy_hddio         < 0 && m_parent) return m_parent->get_busy_hddio();         else return m_busy_hddio;        }
+	inline int get_idle_netmbs()        const
+		{ if (m_idle_netmbs        < 0 && m_parent) return m_parent->get_idle_netmbs();        else return m_idle_netmbs;       }
+	inline int get_busy_netmbs()        const
+		{ if (m_busy_netmbs        < 0 && m_parent) return m_parent->get_busy_netmbs();        else return m_busy_netmbs;       }
 
 public:
 	inline static void setPoolsContainer(PoolsContainer * i_pools ) { ms_pools = i_pools;}

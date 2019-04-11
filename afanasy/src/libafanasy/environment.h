@@ -150,8 +150,6 @@ public:
 
 	static inline int getWOLWakeInterval() { return wolwake_interval; }
 
-	static inline int getRenderDefaultCapacity()       { return render_default_capacity;     }
-	static inline int getRenderDefaultMaxTasks()       { return render_default_maxtasks;     }
 	static inline std::string & getCmdShell()          { return cmd_shell;}
  
 	static inline int getRenderHeartbeatSec()       { return render_heartbeat_sec;        }
@@ -317,8 +315,6 @@ private:
 
 	static int render_heartbeat_sec;
 	static int render_up_resources_period;
-	static int render_default_capacity;
-	static int render_default_maxtasks;
 	static int render_nice;       ///< Render task process nice factor.
 	static int render_zombietime;
 	static int render_exit_no_task_time;

@@ -126,8 +126,6 @@ const char CMD_SHELL[] = "cmd.exe /c";
 const char CMD_SHELL[] = "/bin/bash -c";
 #endif
 const int TERMINATEWAITKILL = 10; ///< Seconds to wait task task finish after termination, then perform kill
-const int DEFAULTCAPACITY = 1000; ///< Default render capacity.
-const int DEFAULTMAXTASKS = 2; ///< Maximum tasks on can run on the same render the same time (default value).
 const int HEARTBEAT_SEC /********/ = 1;		 ///< Heartbeat seconds.
 const int UP_RESOURCES_PERIOD /**/ = 5;		 ///< Query machine resourcs period.
 const int ZOMBIETIME /***********/ = 60;	 ///< Seconds to wait for update to Render is zombie.

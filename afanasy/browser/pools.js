@@ -52,6 +52,13 @@ PoolNode.prototype.init = function() {
 	this.elAnnotation.title = 'Annotation';
 };
 
+PoolNode.prototype.getParmParent = function(i_parm) {
+	if ((this.params[i_parm] == null) && pools[this.params.parent])
+		return pools[this.params.parent].params[i_parm];
+	else
+		return this.params[i_parm];
+}
+
 PoolNode.prototype.update = function(i_obj) {
 	if (i_obj)
 		this.params = i_obj;
@@ -330,8 +337,26 @@ PoolNode.prototype.onDoubleClick = function(e) {
 
 PoolNode.params_pool = {
 	pattern               : {'type':'str', 'label':'Pattern'},
+	priority              : {'type':'num', 'label':'Priority'},
 	max_tasks_per_host    : {'type':'num', 'label':'Max Tasks Per Host'},
-	max_capacity_per_host : {'type':'num', 'label':'Max Capacity Per Host'}
+	max_capacity_per_host : {'type':'num', 'label':'Max Capacity Per Host'},
+	annotation            : {'type':'str', 'label':'Annotation'},
+
+	idle_wolsleep_time    : {'type':'num', 'label':'Idle WOL sleep time'},
+	idle_free_time        : {'type':'num', 'label':'Idle FREE time'},
+	busy_nimby_time       : {'type':'num', 'label':'Busy NIMBY time'},
+	idle_cpu              : {'type':'num', 'label':'Idle CPU percent'},
+	busy_cpu              : {'type':'num', 'label':'Busy CPU percent'},
+	idle_mem              : {'type':'num', 'label':'Idle memory percent'},
+	busy_mem              : {'type':'num', 'label':'Busy memory percent'},
+	idle_swp              : {'type':'num', 'label':'Idle swap percent'},
+	busy_swp              : {'type':'num', 'label':'Busy swap percent'},
+	idle_hddgb            : {'type':'num', 'label':'Idle HDD Gb'},
+	busy_hddgb            : {'type':'num', 'label':'Busy HDD Gb'},
+	idle_hddio            : {'type':'num', 'label':'Idle HDD I/O'},
+	busy_hddio            : {'type':'num', 'label':'Busy HDD I/O'},
+	idle_netmbs           : {'type':'num', 'label':'Idle Network Mb/sec'},
+	busy_netmbs           : {'type':'num', 'label':'Busy Network Mb/sec'}
 };
 
 PoolNode.createParams = function() {

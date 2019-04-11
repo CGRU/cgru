@@ -90,12 +90,6 @@
 		"":"Render resources update period.",
 		"":"If heartbeat is 3 and up_resources is 5, render will update resources every 15 seconds.",
 
-	"af_render_default_capacity":1000,
-		"":"Default render capacity value, if not set in farm config.",
-
-	"af_render_default_maxtasks":5,
-		"":"Maximum allowed simultaneously running tasks on render, if not set in farm config.",
-
 	"-af_render_networkif":"eth0",
 		"":"Network interface to measure traffic",
 		"":"If not specified all used except loopback",
@@ -170,6 +164,7 @@
 
 "":"Monitor: (server side - any gui)",
 	"af_monitor_zombietime":40,
+    "af_monitor_render_idle_bar_max":3600,
 
 "":"Watch: (qt gui - client side)",
 	"af_watch_get_events_sec":1,

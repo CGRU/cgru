@@ -70,8 +70,6 @@ int     Environment::watch_render_idle_bar_max =       AFWATCH::RENDER_IDLE_BAR_
 
 int     Environment::render_heartbeat_sec =            AFRENDER::HEARTBEAT_SEC;
 int     Environment::render_up_resources_period =      AFRENDER::UP_RESOURCES_PERIOD;
-int     Environment::render_default_capacity =         AFRENDER::DEFAULTCAPACITY;
-int     Environment::render_default_maxtasks =         AFRENDER::DEFAULTMAXTASKS;
 int     Environment::render_nice =                     AFRENDER::TASKPROCESSNICE;
 int     Environment::render_zombietime =               AFRENDER::ZOMBIETIME;
 int     Environment::render_exit_no_task_time =        AFRENDER::EXIT_NO_TASK_TIME;
@@ -277,8 +275,6 @@ void Environment::getVars( const JSON * i_obj)
 
 	getVar( i_obj, render_heartbeat_sec,              "af_render_heartbeat_sec"              );
 	getVar( i_obj, render_up_resources_period,        "af_render_up_resources_period"        );
-	getVar( i_obj, render_default_capacity,           "af_render_default_capacity"           );
-	getVar( i_obj, render_default_maxtasks,           "af_render_default_maxtasks"           );
 	getVar( i_obj, render_cmd_reboot,                 "af_render_cmd_reboot"                 );
 	getVar( i_obj, render_cmd_shutdown,               "af_render_cmd_shutdown"               );
 	getVar( i_obj, render_cmd_wolsleep,               "af_render_cmd_wolsleep"               );

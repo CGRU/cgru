@@ -446,6 +446,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 	    offlineState_time = m_offlineState + " " + afqt::stoq( af::time2strHMS( time(NULL) - m_wol_operation_time ));
 
 	// Draw busy/idle bar:
+	/* TODO take this from pool
 	if( m_online )
 	{
 		int width = w/7;
@@ -492,7 +493,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 		painter->setBrush( Qt::NoBrush);
 		painter->drawRect( posx, posy, width, height);
 	}
-
+	*/
 
 	QString ann_state = m_state;
 	// Join annotation+state+tasks on small displays:

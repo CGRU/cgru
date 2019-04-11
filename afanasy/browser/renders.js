@@ -417,6 +417,8 @@ RenderNode.prototype.clearTasks = function() {
 };
 
 RenderNode.prototype.refresh = function() {
+	var pool = pools[this.params.pool];
+
 	if (this.state.OFF || this.state.WFL)
 	{
 		var power = this.offlineState;
@@ -435,9 +437,8 @@ RenderNode.prototype.refresh = function() {
 	var stateTime = 'NEW';
 	var stateTimeTitle = 'Idle time: ' + cm_TimeStringInterval(this.params.idle_time);
 
-	// Draw idle bar (almost in all cases)
-	if ((this.params.host.wol_idlesleep_time > 0) || (this.params.host.nimby_idlefree_time > 0) ||
-		(this.params.host.nimby_busyfree_time > 0) || (cgru_Config.af_monitor_render_idle_bar_max > 0))
+	// Draw idle bar:
+	if (pool)
 	{
 		var curtime = new Date();
 		var idle_sec = curtime.valueOf() / 1000.0 - this.params.idle_time;
@@ -446,16 +447,16 @@ RenderNode.prototype.refresh = function() {
 		var busy_sec = curtime.valueOf() / 1000.0 - this.params.busy_time;
 		if (busy_sec < 0)
 			busy_sec = 0;
-		var percent = null;
+		var percent = 0;
 
-		if ((this.params.host.nimby_idlefree_time > 0) && (this.state.RUN != true) &&
+		if ((pool.getParmParent('idle_free_time') > 0) && (this.state.RUN != true) &&
 			(this.state.NbY || this.state.NBY))
 		{
 			stateTimeTitle +=
-				'\nNimby idle free time: ' + cm_TimeStringFromSeconds(this.params.host.nimby_idlefree_time);
-			percent = Math.round(100.0 * idle_sec / this.params.host.nimby_idlefree_time);
+				'\nNimby idle free time: ' + cm_TimeStringFromSeconds(pool.getParmParent('idle_free_time'));
+			percent = Math.round(100.0 * idle_sec / pool.getParmParent('idle_free_time'));
 
-			idle_sec = Math.round(this.params.host.nimby_idlefree_time - idle_sec);
+			idle_sec = Math.round(pool.getParmParent('idle_free_time') - idle_sec);
 			if (idle_sec > 0)
 				this.elIdleBox.title = 'Nimby idle free in ' + cm_TimeStringFromSeconds(idle_sec);
 			else
@@ -465,14 +466,14 @@ RenderNode.prototype.refresh = function() {
 			this.elIdleBox.classList.remove('nimby');
 		}
 		else if (
-			(this.params.host.nimby_busyfree_time > 0) && (busy_sec > 6) && (this.state.RUN != true) &&
+			(pool.getParmParent('busy_nimby_time') > 0) && (busy_sec > 6) && (this.state.RUN != true) &&
 			(this.state.NbY != true) && (this.state.NBY != true))
 		{
 			stateTimeTitle +=
-				'\nBusy free Nimby time: ' + cm_TimeStringFromSeconds(this.params.host.nimby_busyfree_time);
-			percent = Math.round(100.0 * busy_sec / this.params.host.nimby_busyfree_time);
+				'\nBusy free Nimby time: ' + cm_TimeStringFromSeconds(pool.getParmParent('busy_nimby_time'));
+			percent = Math.round(100.0 * busy_sec / pool.getParmParent('busy_nimby_time'));
 
-			busy_sec = Math.round(this.params.host.nimby_busyfree_time - busy_sec);
+			busy_sec = Math.round(pool.getParmParent('busy_nimby_time') - busy_sec);
 			if (busy_sec > 0)
 				this.elIdleBox.title = 'Nimby busy in ' + cm_TimeStringFromSeconds(busy_sec);
 			else
@@ -481,13 +482,13 @@ RenderNode.prototype.refresh = function() {
 			this.elIdleBox.classList.remove('free');
 			this.elIdleBox.classList.add('nimby');
 		}
-		else if ((this.params.host.wol_idlesleep_time > 0) && (this.state.RUN != true))
+		else if ((pool.getParmParent('idle_wolsleep_time') > 0) && (this.state.RUN != true))
 		{
 			stateTimeTitle +=
-				'\nWOL idle sleep time: ' + cm_TimeStringFromSeconds(this.params.host.wol_idlesleep_time);
-			percent = Math.round(100.0 * idle_sec / this.params.host.wol_idlesleep_time);
+				'\nWOL idle sleep time: ' + cm_TimeStringFromSeconds(pool.getParmParent('idle_wolsleep_time'));
+			percent = Math.round(100.0 * idle_sec / pool.getParmParent('idle_wolsleep_time'));
 
-			idle_sec = Math.round(this.params.host.wol_idlesleep_time - idle_sec);
+			idle_sec = Math.round(pool.getParmParent('idle_wolsleep_time') - idle_sec);
 			if (idle_sec > 0)
 				this.elIdleBox.title = 'WOL idle sleep in ' + cm_TimeStringFromSeconds(idle_sec);
 			else
@@ -833,6 +834,8 @@ RenderNode.prototype.updatePanels = function() {
 
 	info += '<p>Pool: <b>' + this.params.pool + '</b></p>'
 
+	info += '<p>IP: ' + this.params.address.ip + '</p>'
+
 	var r = this.params.host_resources;
 	if (r)
 	{
@@ -842,27 +845,15 @@ RenderNode.prototype.updatePanels = function() {
 		info += '</p>';
 	}
 
-	if (this.params.host.nimby_idlefree_time || this.params.host.nimby_busyfree_time)
-	{
-		info += '<p>Auto Nimby:';
-		if (this.params.host.nimby_busyfree_time)
-			info += '<br>Busy time: ' + cm_TimeStringFromSeconds(this.params.host.nimby_busyfree_time) +
-				' CPU > ' + this.params.host.nimby_busy_cpu + '%';
-		if (this.params.host.nimby_idlefree_time)
-			info += '<br>Free time: ' + cm_TimeStringFromSeconds(this.params.host.nimby_idlefree_time) +
-				' CPU: < ' + this.params.host.nimby_idle_cpu + '%';
-		info += '</p>';
-	}
-
-	info += '<p>Registered: ' + cm_DateTimeStrFromSec(this.params.time_register) + '</p>';
+	info += '<div>Registered: ' + cm_DateTimeStrFromSec(this.params.time_register) + '</div>';
 	if (this.params.time_launch)
-		info += '<p>Launched: ' + cm_DateTimeStrFromSec(this.params.time_launch) + '</p>';
+		info += '<div>Launched: ' + cm_DateTimeStrFromSec(this.params.time_launch) + '</div>';
 	if (this.params.idle_time)
-		info += '<p>Idle since: ' + cm_DateTimeStrFromSec(this.params.idle_time) + '</p>';
+		info += '<div>Idle since: ' + cm_DateTimeStrFromSec(this.params.idle_time) + '</div>';
 	if (this.params.busy_time)
-		info += '<p>Busy since: ' + cm_DateTimeStrFromSec(this.params.busy_time) + '</p>';
+		info += '<div>Busy since: ' + cm_DateTimeStrFromSec(this.params.busy_time) + '</div>';
 	if (this.task_start_finish_time)
-		info += '<p>Task finished at: ' + cm_DateTimeStrFromSec(this.params.task_start_finish_time) + '</p>';
+		info += '<div>Task finished at: ' + cm_DateTimeStrFromSec(this.params.task_start_finish_time) + '</div>';
 
 	this.monitor.setPanelInfo(info);
 };
@@ -899,11 +890,11 @@ RenderNode.createActions = function() {
 };
 
 RenderNode.params_render = {
-	priority   : {"type": 'num', "permissions": 'god', "label": 'Priority'},
-	capacity   : {"type": 'num', "permissions": 'god', "label": 'Capacity', 'node_type': 'renders'},
-	max_tasks  : {"type": 'num', "permissions": 'god', "label": 'Maximum Tasks', 'node_type': 'renders'},
-	user_name  : {"type": 'str', "permissions": 'god', "label": 'User Name', 'node_type': 'renders'},
-	annotation : {"type": 'str', "permissions": 'god', "label": 'Annotation'}
+	priority   : {'type':'num', 'label':'Priority'},
+	capacity   : {'type':'num', 'label':'Capacity'},
+	max_tasks  : {'type':'num', 'label':'Maximum Tasks'},
+	user_name  : {'type':'str', 'label':'User Name'},
+	annotation : {'type':'str', 'label':'Annotation'}
 };
 
 RenderNode.sort = ['priority', 'user_name', 'name'];
@@ -921,7 +912,11 @@ RenderNode.createParams = function() {
 
 	// Add render node params:
 	for (let p in RenderNode.params_render)
+	{
 		RenderNode.params[p] = RenderNode.params_render[p];
+		RenderNode.params[p].permissions = 'god';
+		RenderNode.params[p].node_type = 'renders';
+	}
 
 	RenderNode.params_created = true;
 };

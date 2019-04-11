@@ -69,6 +69,22 @@ void Pool::initDefaultValues()
 	m_max_capacity_per_host = -1;
 
 	m_task_start_finish_time = 0;
+
+	m_idle_wolsleep_time = -1;
+	m_idle_free_time = -1;
+	m_busy_nimby_time = -1;
+	m_idle_cpu = -1;
+	m_busy_cpu = -1;
+	m_idle_mem = -1;
+	m_busy_mem = -1;
+	m_idle_swp = -1;
+	m_busy_swp = -1;
+	m_idle_hddgb = -1;
+	m_busy_hddgb = -1;
+	m_idle_hddio = -1;
+	m_busy_hddio = -1;
+	m_idle_netmbs = -1;
+	m_busy_netmbs = -1;
 }
 
 Pool::~Pool()
@@ -112,15 +128,6 @@ void Pool::v_jsonWrite(std::ostringstream & o_str, int i_type) const // Thread-s
 	o_str << ",\n\"task_start_finish_time\":" << m_task_start_finish_time;
 
 
-	// We do not need to store host on hdd,
-	// it will be taken from farm setup when online.
-/*	if (i_type != 0)
-	{
-		o_str << ",\n";
-		m_host.jsonWrite(o_str);
-	}
-*/
-
 	if (m_new_nimby)
 		o_str << ",\n\"new_nimby\": true";
 	if (m_new_paused)
@@ -136,6 +143,22 @@ void Pool::v_jsonWrite(std::ostringstream & o_str, int i_type) const // Thread-s
 		}
 		o_str << ']';
 	}
+
+	if (m_idle_wolsleep_time >= 0) o_str << ",\n\"idle_wolsleep_time\":" << m_idle_wolsleep_time;
+	if (m_idle_free_time     >= 0) o_str << ",\n\"idle_free_time\":"     << m_idle_free_time;
+	if (m_busy_nimby_time    >= 0) o_str << ",\n\"busy_nimby_time\":"    << m_busy_nimby_time;
+	if (m_idle_cpu           >= 0) o_str << ",\n\"idle_cpu\":"           << m_idle_cpu;
+	if (m_busy_cpu           >= 0) o_str << ",\n\"busy_cpu\":"           << m_busy_cpu;
+	if (m_idle_mem           >= 0) o_str << ",\n\"idle_mem\":"           << m_idle_mem;
+	if (m_busy_mem           >= 0) o_str << ",\n\"busy_mem\":"           << m_busy_mem;
+	if (m_idle_swp           >= 0) o_str << ",\n\"idle_swp\":"           << m_idle_swp;
+	if (m_busy_swp           >= 0) o_str << ",\n\"busy_swp\":"           << m_busy_swp;
+	if (m_idle_hddgb         >= 0) o_str << ",\n\"idle_hddgb\":"         << m_idle_hddgb;
+	if (m_busy_hddgb         >= 0) o_str << ",\n\"busy_hddgb\":"         << m_busy_hddgb;
+	if (m_idle_hddio         >= 0) o_str << ",\n\"idle_hddio\":"         << m_idle_hddio;
+	if (m_busy_hddio         >= 0) o_str << ",\n\"busy_hddio\":"         << m_busy_hddio;
+	if (m_idle_netmbs        >= 0) o_str << ",\n\"idle_netmbs\":"        << m_idle_netmbs;
+	if (m_busy_netmbs        >= 0) o_str << ",\n\"busy_netmbs\":"        << m_busy_netmbs;
 
 	o_str << "\n}";
 }
@@ -158,6 +181,22 @@ bool Pool::jsonRead(const JSON &i_object, std::string * io_changes)
 	jr_int32 ("max_tasks_per_host",    m_max_tasks_per_host,    i_object, io_changes);
 	jr_int32 ("max_capacity",          m_max_capacity,          i_object, io_changes);
 	jr_int32 ("max_capacity_per_host", m_max_capacity_per_host, i_object, io_changes);
+
+	jr_int32 ("idle_wolsleep_time",    m_idle_wolsleep_time,    i_object, io_changes);
+	jr_int32 ("idle_free_time",        m_idle_free_time,        i_object, io_changes);
+	jr_int32 ("busy_nimby_time",       m_busy_nimby_time,        i_object, io_changes);
+	jr_int32 ("idle_cpu",              m_idle_cpu,              i_object, io_changes);
+	jr_int32 ("busy_cpu",              m_busy_cpu,              i_object, io_changes);
+	jr_int32 ("idle_mem",              m_idle_mem,              i_object, io_changes);
+	jr_int32 ("busy_mem",              m_busy_mem,              i_object, io_changes);
+	jr_int32 ("idle_swp",              m_idle_swp,              i_object, io_changes);
+	jr_int32 ("busy_swp",              m_busy_swp,              i_object, io_changes);
+	jr_int32 ("idle_hddgb",            m_idle_hddgb,            i_object, io_changes);
+	jr_int32 ("busy_hddgb",            m_busy_hddgb,            i_object, io_changes);
+	jr_int32 ("idle_hddio",            m_idle_hddio,            i_object, io_changes);
+	jr_int32 ("busy_hddio",            m_busy_hddio,            i_object, io_changes);
+	jr_int32 ("idle_netmbs",           m_idle_netmbs,           i_object, io_changes);
+	jr_int32 ("busy_netmbs",           m_busy_netmbs,           i_object, io_changes);
 
 	bool paused;
 	if (jr_bool("paused", paused, i_object, io_changes))
@@ -188,6 +227,8 @@ void Pool::v_readwrite(Msg * msg)
 
 	if (notRoot())
 		rw_RegExp (m_pattern, msg);
+
+	// NEW_VERSION
 
 	rw_int64_t(m_state,                  msg);
 	rw_int64_t(m_flags,                  msg);

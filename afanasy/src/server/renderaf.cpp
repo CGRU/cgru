@@ -80,9 +80,6 @@ void RenderAf::initDefaultValues()
 	m_farm_host_description = "";
 	m_services_num = 0;
 
-	if( m_host.m_capacity == 0 ) m_host.m_capacity = af::Environment::getRenderDefaultCapacity();
-	if( m_host.m_max_tasks == 0 ) m_host.m_max_tasks = af::Environment::getRenderDefaultMaxTasks();
-
 	setBusy( false);
 	setWOLFalling( false);
 	setWOLSleeping( false);
@@ -769,49 +766,49 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 		int cpu=0,mem=0,swp=0,hgb=0,hio=0,net=0;
 
 		// CPU % busy:
-		if(( m_host.m_nimby_busy_cpu <= 0 ) ||
-			(( 100 - m_hres.cpu_idle ) < m_host.m_nimby_busy_cpu ))
+		if ((m_poolsrv->get_busy_cpu() <= 0) ||
+			((100 - m_hres.cpu_idle) < m_poolsrv->get_busy_cpu()))
 			cpu = 1;
 
 		// Mem % used:
-		if(( m_hres.mem_total_mb <= 0 ) || ( m_host.m_nimby_busy_mem <= 0 ) ||
-			(( 100 * ( m_hres.mem_total_mb - m_hres.mem_free_mb ) / m_hres.mem_total_mb ) < m_host.m_nimby_busy_mem ))
+		if ((m_hres.mem_total_mb <= 0) || (m_poolsrv->get_busy_mem() <= 0) ||
+			((100 * (m_hres.mem_total_mb - m_hres.mem_free_mb) / m_hres.mem_total_mb) < m_poolsrv->get_busy_mem()))
 			mem = 1;
 
 		// Swap % used:
-		if(( m_hres.swap_total_mb <= 0 ) || (( m_host.m_nimby_busy_swp <= 0 ) ||
-			( 100 * m_hres.swap_used_mb / m_hres.swap_total_mb ) < m_host.m_nimby_busy_swp ))
+		if ((m_hres.swap_total_mb <= 0) || ((m_poolsrv->get_busy_swp() <= 0) ||
+			(100 * m_hres.swap_used_mb / m_hres.swap_total_mb) < m_poolsrv->get_busy_swp()))
 			swp = 1;
 
 		// Hdd free GB:
-		if(( m_hres.hdd_total_gb <= 0 ) || ( m_host.m_nimby_busy_hddgb <= 0 ) ||
-			( m_hres.hdd_free_gb > m_host.m_nimby_busy_hddgb ))
+		if ((m_hres.hdd_total_gb <= 0) || (m_poolsrv->get_busy_hddgb() <= 0) ||
+			(m_hres.hdd_free_gb > m_poolsrv->get_busy_hddgb()))
 			hgb = 1;
 
 		// Hdd I/O %:
-		if(( m_host.m_nimby_busy_hddio <= 0 ) ||
-			( m_hres.hdd_busy < m_host.m_nimby_busy_hddio ))
+		if ((m_poolsrv->get_busy_hddio() <= 0) ||
+			(m_hres.hdd_busy < m_poolsrv->get_busy_hddio()))
 			hio = 1;
 
 		// Net Mb/s:
-		if(( m_host.m_nimby_busy_netmbs <= 0 ) ||
-		( m_hres.net_recv_kbsec + m_hres.net_send_kbsec < 1024 * m_host.m_nimby_busy_netmbs ))
+		if ((m_poolsrv->get_busy_netmbs() <= 0) ||
+			(m_hres.net_recv_kbsec + m_hres.net_send_kbsec < (1024 * m_poolsrv->get_busy_netmbs())))
 			net = 1;
 
 		// Render will be treated as 'not busy' if all params are 'not busy'
-		if( cpu & mem & swp & hio & hgb & net )
+		if (cpu & mem & swp & hio & hgb & net)
 		{
 			m_busy_time = currentTime;
 		}
-		else if(( m_host.m_nimby_busyfree_time > 0 ) && ( currentTime - m_busy_time > m_host.m_nimby_busyfree_time ))
+		else if ((m_poolsrv->get_busy_nimby_time() > 0) && (currentTime - m_busy_time > m_poolsrv->get_busy_nimby_time()))
 		{
 		// Automatic Nimby ON:
 			std::string log("Automatic Nimby: ");
-			log += "\n Busy since: " + af::time2str( m_busy_time);// + " CPU >= " + af::itos( m_host.m_nimby_busy_cpu) + "%";
-			log += "\n Nimby busy free time = " + af::time2strHMS( m_host.m_nimby_busyfree_time, true );
-			appendLog( log);
+			log += "\n Busy since: " + af::time2str (m_busy_time);// + " CPU >= " + af::itos (m_poolsrv->get_busy_cpu) + "%";
+			log += "\n Nimby busy free time = " + af::time2strHMS (m_poolsrv->get_busy_nimby_time(), true);
+			appendLog (log);
 			setNIMBY();
-			monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
+			monitoring->addEvent (af::Monitor::EVT_renders_change, m_id);
 			store();
 		}
 	}
@@ -821,12 +818,12 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 	{
 		m_idle_time = currentTime;
 	}
-	else if(( m_host.m_nimby_idle_cpu    <= 0 ) &&
-			( m_host.m_nimby_idle_mem    <= 0 ) &&
-			( m_host.m_nimby_idle_swp    <= 0 ) &&
-			( m_host.m_nimby_idle_hddgb  <= 0 ) &&
-			( m_host.m_nimby_idle_hddio  <= 0 ) &&
-			( m_host.m_nimby_idle_netmbs <= 0 ))
+	else if((m_poolsrv->get_idle_cpu()    <= 0) &&
+			(m_poolsrv->get_idle_mem()    <= 0) &&
+			(m_poolsrv->get_idle_swp()    <= 0) &&
+			(m_poolsrv->get_idle_hddgb()  <= 0) &&
+			(m_poolsrv->get_idle_hddio()  <= 0) &&
+			(m_poolsrv->get_idle_netmbs() <= 0))
 	{
 		// If all params are 'off' there is no 'idle':
 		m_idle_time = currentTime;
@@ -836,33 +833,33 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 		int cpu=0,mem=0,swp=0,hgb=0,hio=0,net=0;
 
 		// CPU % busy:
-		if(( m_host.m_nimby_idle_cpu > 0 ) &&
-			(( 100 - m_hres.cpu_idle) > m_host.m_nimby_idle_cpu ))
+		if ((m_poolsrv->get_idle_cpu() > 0) &&
+			((100 - m_hres.cpu_idle) > m_poolsrv->get_idle_cpu()))
 			cpu = 1;
 
 		// Mem % used:
-		if(( m_hres.mem_total_mb > 0 ) && ( m_host.m_nimby_idle_mem > 0 ) &&
-			(( 100 * ( m_hres.mem_total_mb - m_hres.mem_free_mb ) / m_hres.mem_total_mb ) > m_host.m_nimby_idle_mem ))
+		if ((m_hres.mem_total_mb > 0) && (m_poolsrv->get_idle_mem() > 0) &&
+			((100 * (m_hres.mem_total_mb - m_hres.mem_free_mb) / m_hres.mem_total_mb) > m_poolsrv->get_idle_mem()))
 			mem = 1;
 
 		// Swap % used:
-		if(( m_hres.swap_total_mb ) && ( m_host.m_nimby_idle_swp > 0 ) &&
-			(( 100 * m_hres.swap_used_mb / m_hres.swap_total_mb ) > m_host.m_nimby_idle_swp ))
+		if ((m_hres.swap_total_mb) && (m_poolsrv->get_idle_swp() > 0) &&
+			((100 * m_hres.swap_used_mb / m_hres.swap_total_mb) > m_poolsrv->get_idle_swp()))
 			swp = 1;
 
 		// Hdd free GB:
-		if(( m_hres.hdd_total_gb > 0 ) && ( m_host.m_nimby_idle_hddgb > 0 ) &&
-			( m_hres.hdd_free_gb < m_host.m_nimby_idle_hddgb ))
+		if ((m_hres.hdd_total_gb > 0) && (m_poolsrv->get_idle_hddgb() > 0) &&
+			(m_hres.hdd_free_gb < m_poolsrv->get_idle_hddgb()))
 			hgb = 1;
 
 		// Hdd I/O %:
-		if(( m_host.m_nimby_idle_hddio > 0 ) &&
-			( m_hres.hdd_busy > m_host.m_nimby_idle_hddio ))
+		if ((m_poolsrv->get_idle_hddio() > 0) &&
+			(m_hres.hdd_busy > m_poolsrv->get_idle_hddio()))
 			hio = 1;
 
 		// Net Mb/s:
-		if(( m_host.m_nimby_idle_netmbs > 0 ) &&
-			( m_hres.net_recv_kbsec + m_hres.net_send_kbsec > 1024 * m_host.m_nimby_idle_netmbs ))
+		if ((m_poolsrv->get_idle_netmbs() > 0) &&
+			(m_hres.net_recv_kbsec + m_hres.net_send_kbsec > (1024 * m_poolsrv->get_idle_netmbs())))
 			net = 1;
 
 		// it will be treated as 'not idle' any param is 'not idle'
@@ -873,26 +870,26 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 		else 
 		{
 			// Automatic WOL sleep:
-			if(( m_host.m_wol_idlesleep_time > 0 ) && isOnline() && ( isWOLSleeping() == false) && ( isWOLFalling() == false)
-				&& ( currentTime - m_idle_time > m_host.m_wol_idlesleep_time ))
+			if ((m_poolsrv->get_idle_wolsleep_time() > 0) && isOnline() && (isWOLSleeping() == false) && (isWOLFalling() == false)
+				&& (currentTime - m_idle_time > m_poolsrv->get_idle_wolsleep_time()))
 			{
 				std::string log("Automatic WOL Sleep: ");
-				log += "\n Idle since: " + af::time2str( m_idle_time);
-				log += "\n WOL idle sleep time = " + af::time2strHMS( m_host.m_wol_idlesleep_time, true );
-				appendLog( log);
-				wolSleep( monitoring);
+				log += "\n Idle since: " + af::time2str(m_idle_time);
+				log += "\n WOL idle sleep time = " + af::time2strHMS(m_poolsrv->get_idle_wolsleep_time(), true);
+				appendLog(log);
+				wolSleep(monitoring);
 			}
 
 			// Automatic Nimby Free:
-			if(( m_host.m_nimby_idlefree_time > 0 ) && isOnline() && ( isNimby() || isNIMBY())
-				&& ( currentTime - m_idle_time > m_host.m_nimby_idlefree_time ))
+			if ((m_poolsrv->get_idle_free_time() > 0) && isOnline() && (isNimby() || isNIMBY())
+				&& (currentTime - m_idle_time > m_poolsrv->get_idle_free_time()))
 			{
 				std::string log("Automatic Nimby Free: ");
-				log += "\n Idle since: " + af::time2str( m_idle_time);
-				log += "\n Nimby idle free time = " + af::time2strHMS( m_host.m_nimby_idlefree_time, true );
-				appendLog( log);
+				log += "\n Idle since: " + af::time2str(m_idle_time);
+				log += "\n Nimby idle free time = " + af::time2strHMS(m_poolsrv->get_idle_free_time(), true );
+				appendLog(log);
 				setFree();
-				monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
+				monitoring->addEvent(af::Monitor::EVT_renders_change, m_id);
 				store();
 			}
 		}

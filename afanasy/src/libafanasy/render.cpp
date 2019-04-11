@@ -31,7 +31,6 @@ Render::Render(  Client::Flags i_flags):
 			m_state = m_state | af::Render::Snimby;
 		}
 		m_priority = af::Environment::getPriority();
-		m_capacity = af::Environment::getRenderDefaultCapacity();
 	}
 }
 

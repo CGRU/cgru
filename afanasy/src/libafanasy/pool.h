@@ -43,15 +43,28 @@ public:
 	inline int getMaxCapacity()        const { return m_max_capacity;         }
 	inline int getMaxCapacityPerHost() const { return m_max_capacity_per_host;}
 
-	inline bool newNimby()  const { return m_new_nimby;  }
-	inline bool newPaused() const { return m_new_paused; }
-
 public:
 	enum State
 	{
 		SPaused  = 1ULL << 0,
 		SBusy    = 1ULL << 1
 	};
+
+	int32_t m_idle_wolsleep_time;
+	int32_t m_idle_free_time;
+	int32_t m_busy_nimby_time;
+	int32_t m_idle_cpu;
+	int32_t m_busy_cpu;
+	int32_t m_idle_mem;
+	int32_t m_busy_mem;
+	int32_t m_idle_swp;
+	int32_t m_busy_swp;
+	int32_t m_idle_hddgb;
+	int32_t m_busy_hddgb;
+	int32_t m_idle_hddio;
+	int32_t m_busy_hddio;
+	int32_t m_idle_netmbs;
+	int32_t m_busy_netmbs;
 
 public:
 	static const std::string FilterName(const std::string & i_name);
@@ -85,8 +98,6 @@ protected:
 	int64_t m_task_start_finish_time; ///< Task start or finish time.
 
 	std::vector<std::string> m_services_disabled;
-
-//	Host     m_host;
 
 private:
 	void initDefaultValues();
