@@ -14,7 +14,6 @@
 #include "cmd_numeric.h"
 #include "cmd_passwd.h"
 #include "cmd_config.h"
-#include "cmd_farm.h"
 #include "cmd_statistics.h"
 
 #include "cmd_database.h"
@@ -117,10 +116,6 @@ void AfCmd::RegisterCommands()
 	addCmd(new CmdDBUpdateTables);
 
 	addCmd(new CmdConfigLoad);
-
-	addCmd(new CmdFarm);
-	addCmd(new CmdFarmLoad);
-	addCmd(new CmdFarmCheck);
 
 	addCmd(new CmdStatistics);
 

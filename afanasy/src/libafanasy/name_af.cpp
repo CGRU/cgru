@@ -26,11 +26,8 @@ extern char **environ;
 
 #include "blockdata.h"
 #include "environment.h"
-#include "farm.h"
 #include "regexp.h"
 #include "taskprogress.h"
-
-af::Farm* ferma = NULL;
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -197,68 +194,6 @@ void af::outError( const char * errMsg, const char * baseMsg)
       AFERRAR("%s: %s", baseMsg, errMsg)
    else
       AFERRAR("%s", errMsg)
-}
-
-bool af::init( uint32_t flags)
-{
-   AFINFO("af::init:\n");
-   if( flags & InitFarm)
-   {
-      AFINFO("af::init: trying to load farm.");
-
-      if( loadFarm( flags & InitVerbose ? VerboseOn : VerboseOff) == false)
-		  return false;
-   }
-   return true;
-}
-
-af::Farm * af::farm()
-{
-   return ferma;
-}
-
-bool af::loadFarm( VerboseMode i_verbose)
-{
-	std::string filename = af::Environment::getAfRoot() + "/farm.json";
-	if( loadFarm( filename, i_verbose) == false)
-	{
-		filename = af::Environment::getAfRoot() + "/farm_example.json";
-		if( loadFarm( filename, i_verbose) == false)
-		{
-			AF_ERR << "Can't load default farm settings file:\n" << filename;
-			return false;
-		}
-	}
-	return true;
-}
-
-bool af::loadFarm( const std::string & filename, VerboseMode i_verbose)
-{
-	af::Farm * new_farm = new Farm( filename);
-
-	if( false == new_farm->isValid())
-	{
-		delete new_farm;
-		return false;
-	}
-
-	if( ferma != NULL)
-	{
-		new_farm->servicesLimitsGetUsage( *ferma);
-		delete ferma;
-	}
-
-	ferma = new_farm;
-
-	if( i_verbose == VerboseOn)
-		ferma->stdOut( true);
-
-	return true;
-}
-
-void af::destroy()
-{
-   if( ferma != NULL) delete ferma;
 }
 
 void af::sleep_sec(  int i_seconds )

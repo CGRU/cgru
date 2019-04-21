@@ -15,8 +15,6 @@
 */
 #include "useraf.h"
 
-#include <math.h>
-
 #include "../libafanasy/environment.h"
 
 #include "action.h"

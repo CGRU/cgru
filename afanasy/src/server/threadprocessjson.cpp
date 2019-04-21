@@ -24,7 +24,6 @@
 #include "threadargs.h"
 #include "usercontainer.h"
 
-#include "../libafanasy/farm.h"
 #include "../libafanasy/msgclasses/mctask.h"
 #include "../libafanasy/rapidjson/stringbuffer.h"
 #include "../libafanasy/rapidjson/prettywriter.h"
@@ -392,14 +391,6 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 		{
 			o_msg_response = af::jsonMsg( af::Environment::getConfigData());
 		}
-		else if( type == "farm" )
-		{
-			o_msg_response = af::jsonMsg( af::farm()->getText());
-		}
-		else if( type == "services_limits" )
-		{
-			o_msg_response = af::jsonMsg( af::farm()->jsonWriteLimits() );
-		}
 		else
 		{
 			o_msg_response = af::jsonMsgError(std::string("Invalid get type = '") + type + "'");
@@ -442,15 +433,6 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 	{
 		AfContainerLock ulock( i_args->users, AfContainerLock::WRITELOCK);
 		o_msg_response = i_args->users->addUser( new UserAf( document["user"]), i_args->monitors);
-	}
-	else if( document.HasMember("reload_farm"))
-	{
-		AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
-		AfContainerLock rlock( i_args->renders,  AfContainerLock::WRITELOCK);
-
-		std::string status;
-		bool success = i_args->renders->farmLoad( status, i_args->monitors);
-		o_msg_response = af::jsonMsgStatus( success,"reload_farm", status);
 	}
 	else if( document.HasMember("reload_config"))
 	{

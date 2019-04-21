@@ -44,6 +44,7 @@ public:
 
 /// Whether Render is ready to render tasks.
 	inline bool isReady() const { return (
+			(m_poolsrv != NULL) &&
 			(m_state & SOnline) &&
 			(m_priority > 0) &&
 			((getCapacity() < 0) || (m_capacity_used < getCapacity())) &&

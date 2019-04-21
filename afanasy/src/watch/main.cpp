@@ -93,7 +93,6 @@ int main(int argc, char *argv[])
    int status = app.exec();
 
 	Watch::destroy();
-   af::destroy();
    Py_Finalize();
 
 	AF_DEBUG << "QApplication::exec: returned status = " << status;

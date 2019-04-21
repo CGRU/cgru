@@ -554,7 +554,7 @@ RenderNode.setService = function(i_args) {
 		"handle": 'serviceApply',
 		"param": i_args.name,
 		"name": 'service',
-		"title": (i_args.name == 'enable' ? 'Enable' : 'Disable') + ' Service',
+		"title": i_args.tooltip,
 		"info": 'Enter Service Name:'
 	});
 };
@@ -648,7 +648,7 @@ RenderNode.launchCmdExit = function(i_args) {
 		"receiver": i_args.monitor.cur_item,
 		"handle": 'launchCmdExitDo',
 		"param": i_args.name,
-		"name": 'service',
+		"name": 'farm',
 		"title": 'Launch Command' + (i_args.name == 'lcex' ? ' And Exit' : ''),
 		"info": 'Enter command:'
 	});
@@ -789,8 +789,10 @@ RenderNode.createPanels = function(i_monitor) {
 
 	// Services:
 	var acts = {};
-	acts.enable = {'handle':  'setService', 'label': 'Enable', 'tooltip': 'Enable service.'};
-	acts.disable = {'handle': 'setService', 'label': 'Disable', 'tooltip': 'Disable service.'};
+	acts.service_add     = {'handle':'setService', 'label':'Add',     'tooltip':'Add service.'};
+	acts.service_remove  = {'handle':'setService', 'label':'Remove',  'tooltip':'Remove service.'};
+	acts.service_enable  = {'handle':'setService', 'label':'Enable',  'tooltip':'Enable service.'};
+	acts.service_disable = {'handle':'setService', 'label':'Disable', 'tooltip':'Disable service.'};
 	acts.restore_defaults =
 		{'handle': 'mh_Oper', 'label': 'Restore', 'tooltip': 'Restore default farm settings.'};
 	i_monitor.createCtrlBtn({

@@ -211,32 +211,22 @@ PoolNode.prototype.update = function(i_obj) {
 		this.elPoolsCounts.innerHTML = counts;
 	}
 
+
+	// Running counts:
+	var rc = '';
+	if (this.params.services && this.params.services.length)
+		for (let srv of this.params.services)
+			rc += ' ' + srv;
+	this.elRunningCounts.innerHTML = rc;
+
+	// Annotation
 	if (this.params.annotation)
 		this.elAnnotation.innerHTML = this.params.annotation;
 	else
 		this.elAnnotation.textContent = '';
-
-	this.refresh();
 };
 
-PoolNode.prototype.refresh = function() {
-	var percent = '';
-	var label = '';
-	if (this.params.running_tasks_num && (this.monitor.max_tasks > 0))
-	{
-		percent = 100 * this.params.running_tasks_num / this.monitor.max_tasks;
-		var capacity = cm_ToKMG(this.params.running_capacity_total);
-		if (cm_IsPadawan())
-			label = 'Running Tasks: <b>' + this.params.running_tasks_num + '</b> / Total Capacity: <b>' +
-				capacity + '</b>';
-		else if (cm_IsJedi())
-			label = 'Tasks:<b>' + this.params.running_tasks_num + '</b> / Capacity:<b>' + capacity + '</b>';
-		else
-			label = 't<b>' + this.params.running_tasks_num + '</b>/c<b>' + capacity + '</b>';
-	}
-	else
-		percent = '0';
-};
+PoolNode.prototype.refresh = function() {};
 
 PoolNode.createPanels = function(i_monitor) {
 
@@ -330,6 +320,17 @@ PoolNode.prototype.addPoolDo = function(i_value, i_name) {
 	operation.name = i_value;
 	nw_Action('pools', [this.monitor.getSelectedIds()[0]], operation, null);
 };
+
+PoolNode.prototype.serviceApply = function(i_value, i_name) {
+	g_Info('menuHandleService = ' + i_name + ',' + i_value);
+	var operation = {};
+	operation.type = 'farm';
+	operation.mode = i_name;
+	operation.name = i_value;
+	operation.mask = i_value;
+	nw_Action('pools', this.monitor.getSelectedIds(), operation, null);
+};
+
 
 PoolNode.prototype.onDoubleClick = function(e) {
 	g_ShowObject({"object": this.params}, {"evt": e, "wnd": this.monitor.window});

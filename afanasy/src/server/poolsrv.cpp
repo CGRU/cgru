@@ -15,8 +15,6 @@
 */
 #include "poolsrv.h"
 
-#include <math.h>
-
 #include "../include/afanasy.h"
 
 #include "../libafanasy/environment.h"
@@ -37,16 +35,14 @@ PoolsContainer * PoolSrv::ms_pools = NULL;
 
 PoolSrv::PoolSrv(PoolSrv * i_parent, const std::string & i_path):
 	af::Pool(i_path),
-	m_parent(i_parent),
-	AfNodeSrv(this)
+	AfNodeFarm(this, this, i_parent)
 {
 	appendLog("Created.");
 }
 
 PoolSrv::PoolSrv(const std::string & i_store_dir):
 	af::Pool(),
-	m_parent(NULL),
-	AfNodeSrv(this, i_store_dir)
+	AfNodeFarm(this, this, NULL, i_store_dir)
 {
 	int size;
 	char * data = af::fileRead(getStoreFile(), &size);
@@ -123,18 +119,30 @@ void PoolSrv::v_action(Action & i_action)
 
 		if (type == "delete")
 		{
-			deleteThisPool(i_action);
+			actionDelete(i_action);
 			return;
 		}
-
-		if (type == "add_pool")
+		else if (type == "add_pool")
 		{
-			addPool(i_action);
+			actionAddPool(i_action);
+			return;
+		}
+		else if (type == "farm")
+		{
+			actionFarm(i_action);
+			return;
+		}
+		else
+		{
+			appendLog("Unknown operation \"" + type + "\" by " + i_action.author);
+			i_action.answer_kind = "error";
+			i_action.answer = "Unknown operation: " + type;
 			return;
 		}
 
-		i_action.answer_kind = "error";
-		i_action.answer = "Unknown operation: " + type;
+		appendLog("Operation \"" + type + "\" by " + i_action.author);
+		i_action.monitors->addEvent( af::Monitor::EVT_pools_change, m_id);
+		store();
 		return;
 	}
 
@@ -157,28 +165,28 @@ void PoolSrv::logAction(const Action & i_action, const std::string & i_node_name
 	appendLog(std::string("Action[") + i_action.type + "][" +  i_node_name + "]: " + i_action.log);
 }
 
-void PoolSrv::deleteThisPool(Action & o_action)
+void PoolSrv::actionDelete(Action & i_action)
 {
 	if (NULL == m_parent)
 	{
-		o_action.answer_kind = "error";
-		o_action.answer = "Can`t delete ROOT pool.";
+		i_action.answer_kind = "error";
+		i_action.answer = "Can`t delete ROOT pool.";
 		return;
 	}
 
 	if (m_pools_num || m_renders_num)
 	{
-		o_action.answer_kind = "error";
-		o_action.answer = "Pool '" + m_name + "' has child pools/renders.";
+		i_action.answer_kind = "error";
+		i_action.answer = "Pool '" + m_name + "' has child pools/renders.";
 		return;
 	}
 
 	m_parent->removePool(this);
 
-	o_action.monitors->addEvent(af::Monitor::EVT_pools_del, m_id);
-	o_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_parent->getId());
+	i_action.monitors->addEvent(af::Monitor::EVT_pools_del, m_id);
+	i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_parent->getId());
 
-	appendLog(std::string("Deleted by ") + o_action.author);
+	appendLog(std::string("Deleted by ") + i_action.author);
 	setZombie();
 }
 
@@ -211,7 +219,7 @@ bool PoolSrv::hasRender(const RenderAf * i_render) const
 	return false;
 }
 
-void PoolSrv::addPool(Action & i_action)
+void PoolSrv::actionAddPool(Action & i_action)
 {
 	const JSON & operation = (*i_action.data)["operation"];
 

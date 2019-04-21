@@ -5,7 +5,6 @@
 #include "../include/afanasy.h"
 
 #include "../libafanasy/environment.h"
-#include "../libafanasy/farm.h"
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgqueue.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"

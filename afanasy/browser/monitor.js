@@ -1480,8 +1480,12 @@ Monitor.ctrlBtnClicked = function(e) {
 	if (elBtn.classList.contains('active') != true)
 		return false;
 
-	var args =
-		{'name': el.m_act.name, 'type': el.m_act.type, 'value': el.m_act.value, 'monitor': el.m_monitor};
+	var args = {};
+	// Just copy action at first, as it can be used:
+	// name, default value, dialog name (tooltip).
+	for (let p in el.m_act)
+		args[p] = el.m_act[p];
+	args.monitor = el.m_monitor;
 
 	var handle = el.m_act.handle;
 	if (handle == null)

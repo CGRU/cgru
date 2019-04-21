@@ -65,7 +65,6 @@ namespace af
 	class Address;
 	class AddressesList;
 	class Passwd;
-	class Farm;
 	class Host;
 	class HostRes;
 	class Parser;
@@ -87,6 +86,8 @@ namespace af
 	class MCTaskUp;
 	class MCJobsWeight;
 
+	class Farm;
+	class Work;
 	class Node;
 
 	class Client;
@@ -109,13 +110,6 @@ namespace af
 	{
 		VerboseOff,
 		VerboseOn
-	};
-
-	enum InitFlags
-	{
-		NoFlags      = 0,
-		InitVerbose  = 1,
-		InitFarm     = 1 << 1,
 	};
 
 	enum Direction
@@ -184,14 +178,6 @@ namespace af
 	int weigh( const std::vector<std::string> & i_list);
 	int weigh( const std::map<std::string, int32_t> & i_map);
 	int weigh( const std::map<std::string, std::string> & i_map);
-
-
-	bool  init( uint32_t flags );
-	void  destroy();
-
-	bool  loadFarm( VerboseMode i_verbose = VerboseOff);
-	bool  loadFarm( const std::string & filename, VerboseMode i_verbose = VerboseOff);
-	Farm * farm();
 
 
 //
@@ -279,6 +265,32 @@ namespace af
 
 	/// Send a message to all its addresses and receive an answer if needed
 	Msg * sendToServer( Msg * i_msg, bool & o_ok, VerboseMode i_verbose);
+
+	// Read/Write binary data
+	void rw_bool     ( bool     & boolean,  Msg * msg);
+	void rw_int8_t   ( int8_t   & integer,  Msg * msg);
+	void rw_uint8_t  ( uint8_t  & integer,  Msg * msg);
+	void rw_int16_t  ( int16_t  & integer,  Msg * msg);
+	void rw_uint16_t ( uint16_t & integer,  Msg * msg);
+	void rw_int32_t  ( int32_t  & integer,  Msg * msg);
+	void rw_uint32_t ( uint32_t & integer,  Msg * msg);
+	void rw_int64_t  ( int64_t  & integer,  Msg * msg);
+
+	void rw_Int32_List( std::list   < int32_t > &list, Msg * msg);
+	void rw_Int32_Vect( std::vector < int32_t > &vect, Msg * msg);
+
+	void rw_String(       std::string & string, Msg * msg);
+	void  w_String( const std::string & string, Msg * msg);
+
+	void rw_StringList(       std::list<std::string> & stringList, Msg * msg);
+	void  w_StringList( const std::list<std::string> & stringList, Msg * msg);
+	void rw_StringVect(     std::vector<std::string> & stringVect, Msg * msg);
+	void rw_StringMap( std::map< std::string, std::string > & stringMap, Msg * msg);
+
+	void rw_RegExp( RegExp & regExp, Msg * msg);
+
+	void rw_data(       char * data, Msg * msg, int size);
+	void  w_data( const char * data, Msg * msg, int size);
 
 
 	// Python:

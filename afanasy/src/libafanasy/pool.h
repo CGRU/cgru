@@ -2,13 +2,14 @@
 
 #include "name_af.h"
 
+#include "affarm.h"
 #include "afnode.h"
 #include "regexp.h"
 
 namespace af
 {
 /// Afanasy render slave.
-class Pool : public Node
+class Pool : public Node, public Farm
 {
 public:
 
@@ -96,8 +97,6 @@ protected:
 	int32_t m_max_capacity_per_host;
 
 	int64_t m_task_start_finish_time; ///< Task start or finish time.
-
-	std::vector<std::string> m_services_disabled;
 
 private:
 	void initDefaultValues();

@@ -139,16 +139,16 @@ af::Msg * af::jsonMsg( const std::string & i_type, const std::string & i_name, c
 bool af::jr_regexp( const char * i_name, RegExp & o_attr, const JSON & i_object, std::string * o_str)
 {
 	const JSON & value = i_object[i_name];
-	if( false == value.IsString()) return false;
+	if (false == value.IsString()) return false;
 	std::string pattern = (char*)value.GetString();
 	bool ok = o_attr.setPattern( pattern);
-	if( o_str == NULL )
-		return false;
-	if( ok )
+	if (NULL == o_str)
+		return ok;
+	if (ok)
 		*o_str += std::string("\n\"") + i_name + "\" set to \"" + pattern + "\"";
 	else
 		*o_str += std::string("\n\"") + i_name + "\" invalid pattern \"" + pattern + "\"";
-	return true;
+	return ok;
 }
 
 bool af::jr_string( const char * i_name, std::string & o_attr, const JSON & i_object, std::string * o_str)

@@ -133,16 +133,7 @@ void Pool::v_jsonWrite(std::ostringstream & o_str, int i_type) const // Thread-s
 	if (m_new_paused)
 		o_str << ",\n\"new_paused\": true";
 
-	if (m_services_disabled.size())
-	{
-		o_str << ",\n\"services_disabled\":[";
-		for (int i = 0; i < m_services_disabled.size(); i++)
-		{
-			if (i) o_str << ",";
-			o_str << '\"' << m_services_disabled[i] << '\"';
-		}
-		o_str << ']';
-	}
+	Farm::jsonWrite(o_str, i_type);
 
 	if (m_idle_wolsleep_time >= 0) o_str << ",\n\"idle_wolsleep_time\":" << m_idle_wolsleep_time;
 	if (m_idle_free_time     >= 0) o_str << ",\n\"idle_free_time\":"     << m_idle_free_time;
@@ -216,7 +207,7 @@ bool Pool::jsonRead(const JSON &i_object, std::string * io_changes)
 
 	jr_int64("st", m_state, i_object);
 
-	jr_stringvec("services_disabled", m_services_disabled, i_object);
+	Farm::jsonRead(i_object);
 
 	return true;
 }
@@ -249,7 +240,7 @@ void Pool::v_readwrite(Msg * msg)
 
 int Pool::v_calcWeight() const
 {
-	int weight = Node::v_calcWeight();
+	int weight = Node::v_calcWeight() + Farm::calcWeight();
 	weight += sizeof(Pool) - sizeof(Node);
 	return weight;
 }

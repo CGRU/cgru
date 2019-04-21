@@ -64,7 +64,6 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
     af::Environment ENV( envflags, argc, argv);
     if( ENV.isValid() == false ) return 1;
 
-    if( af::init( af::InitFarm | (argc == 1 ? af::InitVerbose : af::NoFlags)) == false) return 1;
     afsql::init();
 
     int return_value = 0;
@@ -96,7 +95,6 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
     }
     else return_value = 1;
 
-    af::destroy();
 	Py_Finalize();
 
     AFINFA("afcmd main: return value = %d\n", return_value)

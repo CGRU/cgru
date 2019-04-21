@@ -18,7 +18,6 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgqueue.h"
-#include "../libafanasy/farm.h"
 #include "../libafanasy/regexp.h"
 
 #include "action.h"
@@ -76,8 +75,6 @@ void RenderAf::initDefaultValues()
 {
 	m_poolsrv = NULL;
 
-	m_farm_host_name = "no farm host";
-	m_farm_host_description = "";
 	m_services_num = 0;
 
 	setBusy( false);
@@ -740,6 +737,15 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 
 	JobContainer * jobs = (JobContainer*)pointer;
 
+
+	if ((NULL == m_poolsrv) && isOnline())
+	{
+		AF_ERR << "Render '" + getName() + "' has no pool.";
+		offline(jobs, af::TaskExec::UPRenderZombie, monitoring);
+		appendLog("Has no pool");
+		monitoring->addEvent(af::Monitor::EVT_renders_change, m_id);
+	}
+
 	if( isOnline() && (getTimeUpdate() < (currentTime - af::Environment::getRenderZombieTime())))
 	{
 		appendLog( std::string("ZOMBIETIME: ") + af::itos(af::Environment::getRenderZombieTime()) + " seconds.");
@@ -963,14 +969,6 @@ bool RenderAf::getFarmHost( af::Host * newHost)
 	// When render becames online it refresh hardware information:
 	if( newHost ) m_host.copy( *newHost);
 
-	// Get farm services setttings:
-	if( af::farm()->getHost( m_name, m_host, m_farm_host_name, m_farm_host_description ) == false)
-	{
-		m_farm_host_name = "no farm host";
-		m_farm_host_description = "";
-		return false;
-	}
-
 	// Check dirty - check if capacity was overriden and now is equal to the new value
 	checkDirty();
 
@@ -1067,26 +1065,12 @@ void RenderAf::jsonWriteServices( std::ostringstream & o_str) const
 
 bool RenderAf::canRunService( const std::string & type) const
 {
-	if( false == af::farm()->serviceLimitCheck( type, m_name)) return false;
-
-	for( int i = 0; i < m_services_num; i++)
-	{
-		if( m_host.getServiceName(i) == type)
-		{
-			if( m_services_disabled_nums[i]) return false;
-			if( m_host.getServiceCount(i) > 0)
-			{
-				return m_services_counts[i] < m_host.getServiceCount(i);
-			}
-			return true;
-		}
-	}
-	return false;
+	return m_poolsrv->canRunService(type);
 }
 
 void RenderAf::addService( const std::string & type)
 {
-	af::farm()->serviceLimitAdd( type, m_name);
+//	af::farm()->serviceLimitAdd( type, m_name);
 
 	for( int i = 0; i < m_services_num; i++)
 	{
@@ -1103,7 +1087,7 @@ void RenderAf::addService( const std::string & type)
 
 void RenderAf::remService( const std::string & type)
 {
-	af::farm()->serviceLimitRelease( type, m_name);
+//	af::farm()->serviceLimitRelease( type, m_name);
 
 	for( int i = 0; i < m_services_num; i++)
 	{
@@ -1152,12 +1136,6 @@ af::Msg * RenderAf::writeFullInfo( bool i_binary) const
 		str += "\nCustom Data:\n" + m_custom_data;
 		str += "\n";
 		str += getServicesString();
-		std::string servicelimits = af::farm()->serviceLimitsInfoString( true);
-		if( servicelimits.size())
-		{
-			str += "\n";
-			str += servicelimits;
-		}
 
 		o_msg->setString( str);
 
@@ -1177,9 +1155,6 @@ af::Msg * RenderAf::writeFullInfo( bool i_binary) const
 
 	str << ",";
 	jsonWriteServices( str);
-
-	str << ",";
-	af::farm()->jsonWriteLimits( str);
 
 	if( isOnline())
 	{

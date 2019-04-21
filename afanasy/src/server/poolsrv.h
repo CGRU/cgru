@@ -17,15 +17,14 @@
 
 #include "../libafanasy/pool.h"
 
-#include "afnodesrv.h"
+#include "afnodefarm.h"
 
 class Action;
 class PoolsContainer;
 class RenderAf;
-class UserAf;
 
 /// Server side of Afanasy pool.
-class PoolSrv : public af::Pool, public AfNodeSrv
+class PoolSrv : public af::Pool, public AfNodeFarm
 {
 public:
 	/// Create a new pool on a new render.
@@ -101,12 +100,13 @@ public:
 private:
 	bool hasPool(const std::string & i_name) const;
 	bool hasPool(const PoolSrv * i_pool) const;
-	void addPool(Action & i_action);
-	void deleteThisPool(Action & o_action);
 	void removePool(PoolSrv * i_pool);
 
+	void actionAddPool(Action & i_action);
+	void actionDelete (Action & i_action);
+	void actionService(Action & i_action);
+
 private:
-	PoolSrv * m_parent;
 	std::list<PoolSrv*> m_pools_list;
 	std::list<RenderAf*> m_renders_list;
 

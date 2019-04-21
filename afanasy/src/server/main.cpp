@@ -79,9 +79,6 @@ int main(int argc, char *argv[])
 	af::Environment ENV( af::Environment::Server, argc, argv);
 	ENV.addUsage("-demo", "Disable tasks changing and new jobs.");
 
-	// Initialize general library:
-	if( af::init( af::InitFarm) == false) return 1;
-
 	// Initialize store:
 	afsql::init();
 
@@ -377,8 +374,6 @@ int main(int argc, char *argv[])
 	RunCycleThread.Join();
 
 	delete socketsProcessing;
-
-	af::destroy();
 
 	AF_LOG << "Exiting process...";
 
