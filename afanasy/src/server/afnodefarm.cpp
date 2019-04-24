@@ -86,25 +86,46 @@ void AfNodeFarm::actionFarm(Action & i_action)
 		}
 
 		bool found = false;
-		std::vector<std::string>::iterator it = m_farm->m_services.begin();
-		while (it != m_farm->m_services.end())
+
+		std::vector<std::string>::iterator it;
+		std::vector<std::string>::const_iterator end;
+
+		if (mode == "service_enable")
+		{
+			it  = m_farm->m_services_disabled.begin();
+			end = m_farm->m_services_disabled.end();
+		}
+		else
+		{
+			it  = m_farm->m_services.begin();
+			end = m_farm->m_services.end();
+		}
+
+		while (it != end)
 		{
 			if (mask.match(*it))
 			{
 
 				if (mode == "service_remove")
 				{
-					it = m_farm->m_services.erase(it);
+					it  = m_farm->m_services.erase(it);
+					end = m_farm->m_services.end();
 					found = true;
 					continue;
 				}
-//				if (mode == "service_disable")
-//				{
-//					if (false == isServiceDisabled(*it))
-//				}
-//				else if (mode == "service_enable")
-//				{
-//				}
+				else if ((mode == "service_disable") && (false == isServiceDisabled(*it)))
+				{
+					m_farm->m_services_disabled.push_back(*it);
+					found = true;
+					appendLog("Service \"" + *it + "\" disabled by " + i_action.author);
+				}
+				else if ((mode == "service_enable") && isServiceDisabled(*it))
+				{
+					it  = m_farm->m_services_disabled.erase(it);
+					end = m_farm->m_services_disabled.end();
+					found = true;
+					continue;
+				}
 			}
 
 			it++;
@@ -112,19 +133,30 @@ void AfNodeFarm::actionFarm(Action & i_action)
 
 		if (false == found)
 		{
-			appendLog("No services found matching mask \"" + mask.getPattern() + "\" by " + i_action.author);
-			i_action.answer_kind = "error";
-			i_action.answer = "No services found mathing pattern " + mask.getPattern();
-			return;
+			if ((mode == "service_disable") && (false == isServiceDisabled(mask.getPattern())))
+			{
+				m_farm->m_services_disabled.push_back(mask.getPattern());
+				found = true;
+				appendLog("Service \"" + mask.getPattern() + "\" disabled by " + i_action.author);
+			}
+			else
+			{
+				appendLog("No services found matching mask \"" + mask.getPattern() + "\" by " + i_action.author);
+				i_action.answer_kind = "error";
+				i_action.answer = "No services found mathing pattern " + mask.getPattern();
+				return;
+			}
 		}
-	}
-	else
-	{
-		appendLog("Unknown farm operation mode \"" + mode + "\" by " + i_action.author);
-		i_action.answer_kind = "error";
-		i_action.answer = "Unknown farm operation mode: " + mode;
+
+		i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_node->getId());
+		i_action.answer_kind = "info";
+		i_action.answer = "Services \"" + mask.getPattern() + "\" " + "removed/enabled/disabled.";
 		return;
 	}
+
+	appendLog("Unknown farm operation mode \"" + mode + "\" by " + i_action.author);
+	i_action.answer_kind = "error";
+	i_action.answer = "Unknown farm operation mode: " + mode;
 }
 
 bool AfNodeFarm::hasService(const std::string & i_service_name) const
@@ -147,6 +179,9 @@ bool AfNodeFarm::canRunService(const std::string & i_service_name) const
 {
 	if (m_farm->m_services.size() == 0)
 	{
+		if (isServiceDisabled(i_service_name))
+			return false;
+
 		if (m_parent)
 			return m_parent->canRunService(i_service_name);
 		else

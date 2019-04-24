@@ -215,8 +215,19 @@ PoolNode.prototype.update = function(i_obj) {
 	// Running counts:
 	var rc = '';
 	if (this.params.services && this.params.services.length)
+	{
 		for (let srv of this.params.services)
-			rc += ' ' + srv;
+			if (this.params.services_disabled && this.params.services_disabled.includes(srv))
+				rc += ' <i><strike>' + srv + '</strike></i>';
+			else
+				rc += ' ' + srv;
+		rc = '<b>' + rc + '</b>';
+	}
+	else if (this.params.services_disabled && this.params.services_disabled.length)
+	{
+		for (let srv of this.params.services_disabled)
+			rc += ' <i><strike>' + srv + '</strike></i>';
+	}
 	this.elRunningCounts.innerHTML = rc;
 
 	// Annotation
