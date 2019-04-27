@@ -39,6 +39,8 @@ var cm_States = [
 	'NBY', 'PAU', 'PER', 'PBR', 'PSC', 'WFL', 'WSL', 'WWK', 'PPA', 'RER', 'WRC'
 ];
 
+var cm_SoftwareIcons = [];
+
 var cm_blockFlags = {
 	numeric /*************/: 1 << 0,
 	varCapacity /*********/: 1 << 1,
@@ -499,4 +501,13 @@ function cm_CheckPermissions(i_perm)
 		return false;
 
 	return true;
+}
+
+function cm_SoftwareIconsReceived(i_obj)
+{
+	//console.log(JSON.stringify(i_obj));
+	if (i_obj.files && i_obj.files.length)
+		cm_SoftwareIcons = i_obj.files;
+	else
+		g_Error('Invalid softwate icons: ' + JSON.stringify(i_obj));
 }

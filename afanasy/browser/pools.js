@@ -213,22 +213,49 @@ PoolNode.prototype.update = function(i_obj) {
 
 
 	// Running counts:
-	var rc = '';
+	this.elRunningCounts.textContent = '';
 	if (this.params.services && this.params.services.length)
 	{
 		for (let srv of this.params.services)
+		{
+			let elSrv = document.createElement('div');
+			this.elRunningCounts.appendChild(elSrv);
+			elSrv.classList.add('service');
+
+			if (cm_SoftwareIcons.includes(srv + '.png'))
+			{
+				let elIcon = document.createElement('img');
+				elSrv.appendChild(elIcon);
+				elIcon.src = 'icons/software/' + srv + '.png';
+			}
+
+			let elName = document.createElement('div');
+			elSrv.appendChild(elName);
+			elName.textContent = srv;
+
 			if (this.params.services_disabled && this.params.services_disabled.includes(srv))
-				rc += ' <i><strike>' + srv + '</strike></i>';
+			{
+				elSrv.classList.add('disabled');
+				elSrv.title = 'Service is disabled'
+			}
 			else
-				rc += ' ' + srv;
-		rc = '<b>' + rc + '</b>';
+				elSrv.title = 'Service'
+		}
 	}
-	else if (this.params.services_disabled && this.params.services_disabled.length)
+	if (this.params.services_disabled && this.params.services_disabled.length)
 	{
 		for (let srv of this.params.services_disabled)
-			rc += ' <i><strike>' + srv + '</strike></i>';
+		{
+			if (this.params.services && this.params.services.includes(srv))
+				continue;
+
+			let elSrv = document.createElement('div');
+			this.elRunningCounts.appendChild(elSrv);
+			elSrv.classList.add('disabled_service');
+			elSrv.textContent = srv;
+			elSrv.title = 'Disabled service';
+		}
 	}
-	this.elRunningCounts.innerHTML = rc;
 
 	// Annotation
 	if (this.params.annotation)
