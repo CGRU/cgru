@@ -77,6 +77,10 @@ RenderNode.prototype.init = function() {
 	this.elCapacity = cm_ElCreateText(this.element, 'Capacity');
 	this.elStateTime = cm_ElCreateFloatText(this.element, 'right', 'Busy/Free Status and Time');
 
+	this.elFarm = document.createElement('div');
+	this.element.appendChild(this.elFarm);
+	this.elFarm.classList.add('farm');
+
 	this.elAnnotation = document.createElement('div');
 	this.element.appendChild(this.elAnnotation);
 	this.elAnnotation.title = 'Annotation';
@@ -379,6 +383,12 @@ RenderNode.prototype.update = function(i_obj) {
 	else
 		this.elStar.style.display = 'none';
 
+
+	// Running counts:
+	this.elFarm.textContent = '';
+	farm_showServices(this.elFarm, this.params,'renders');
+
+
 	this.clearTasks();
 	if (this.params.tasks != null)
 		for (var t = 0; t < this.params.tasks.length; t++)
@@ -562,14 +572,10 @@ RenderNode.setService = function(i_args) {
 RenderNode.prototype.serviceApply = function(i_value, i_name) {
 	g_Info('menuHandleService = ' + i_name + ',' + i_value);
 	var operation = {};
-	operation.type = 'service';
+	operation.type = 'farm';
+	operation.mode = i_name;
 	operation.name = i_value;
-	if (i_name == 'enable')
-		operation.enable = true;
-	else if (i_name == 'disable')
-		operation.enable = false;
-	else
-		return;
+	operation.mask = i_value;
 	nw_Action('renders', this.monitor.getSelectedIds(), operation, null);
 };
 

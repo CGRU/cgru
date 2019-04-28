@@ -12,11 +12,24 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-AfNodeFarm::AfNodeFarm(af::Node * i_node, af::Farm * i_farm, PoolSrv * i_parent, const std::string & i_store_dir):
+AfNodeFarm::AfNodeFarm(af::Node * i_node, af::Farm * i_farm, int i_type, PoolSrv * i_parent, const std::string & i_store_dir):
 	AfNodeSrv(i_node, i_store_dir),
+	m_type(i_type),
 	m_parent(i_parent),
-	m_farm(i_farm)
+	m_farm(i_farm),
+	m_change_event(0)
 {
+	switch(m_type)
+	{
+	case AfNodeFarm::TPool:
+		m_change_event = af::Monitor::EVT_pools_change;
+		break;
+	case AfNodeFarm::TRenderer:
+		m_change_event = af::Monitor::EVT_renders_change;
+		break;
+	default:
+		AF_ERR << "AfNodeFarm invalid type: " << m_type;
+	}
 }
 
 AfNodeFarm::~AfNodeFarm()
@@ -65,7 +78,7 @@ void AfNodeFarm::actionFarm(Action & i_action)
 
 		m_farm->m_services.push_back(name);
 
-		i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_node->getId());
+		i_action.monitors->addEvent(m_change_event, m_node->getId());
 
 		appendLog("Service \"" + name + "\" added by " + i_action.author);
 		i_action.answer_kind = "info";
@@ -148,7 +161,7 @@ void AfNodeFarm::actionFarm(Action & i_action)
 			}
 		}
 
-		i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_node->getId());
+		i_action.monitors->addEvent(m_change_event, m_node->getId());
 		i_action.answer_kind = "info";
 		i_action.answer = "Services \"" + mask.getPattern() + "\" " + "removed/enabled/disabled.";
 		return;

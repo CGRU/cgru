@@ -37,14 +37,14 @@ RenderContainer * RenderAf::ms_renders = NULL;
 
 RenderAf::RenderAf( af::Msg * msg):
 	af::Render( msg),
-	AfNodeSrv( this)
+	AfNodeFarm(this, this, AfNodeFarm::TRenderer, NULL)
 {
 	initDefaultValues();
 }
 
 RenderAf::RenderAf( const std::string & i_store_dir):
 	af::Render(),
-	AfNodeSrv( this, i_store_dir)
+	AfNodeFarm(this, this, AfNodeFarm::TRenderer, NULL, i_store_dir)
 {
 	initDefaultValues();
 
@@ -419,6 +419,12 @@ void RenderAf::v_action( Action & i_action)
 			wolSleep( i_action.monitors);
 		else if( type == "wol_wake")
 			wolWake( i_action.monitors);
+		else if (type == "farm")
+		{
+			actionFarm(i_action);
+			return;
+		}
+		/*
 		else if( type == "service")
 		{
 			af::RegExp service_mask; bool enable;
@@ -431,6 +437,7 @@ void RenderAf::v_action( Action & i_action)
 					setService( service, enable);
 			}
 		}
+
 		else if( type == "restore_defaults")
 		{
 			m_max_tasks = -1;
@@ -438,6 +445,7 @@ void RenderAf::v_action( Action & i_action)
 			m_services_disabled.clear();
 			disableServices(); // Dirty check exists in that function
 		}
+		*/
 		else if (type == "set_pool")
 		{
 			std::string pool_name;
@@ -982,11 +990,11 @@ bool RenderAf::getFarmHost( af::Host * newHost)
 			if( *osnIt == m_host.getServiceName(i))
 				m_services_counts[i] = *oscIt;
 
-	disableServices();
+//	disableServices();
 
 	return true;
 }
-
+/*
 void RenderAf::disableServices()
 {
 	m_services_disabled_nums.clear();
@@ -1000,7 +1008,8 @@ void RenderAf::disableServices()
 	}
 	checkDirty();
 }
-
+*/
+/*
 void RenderAf::setService( const std::string & srvname, bool enable)
 {
 	std::vector<std::string> m_services_disabled_old = m_services_disabled;
@@ -1017,7 +1026,7 @@ void RenderAf::setService( const std::string & srvname, bool enable)
 
 	disableServices();
 }
-
+*/
 const std::string RenderAf::getServicesString() const
 {
 	if( m_services_num == 0) return "No services.";
@@ -1062,12 +1071,12 @@ void RenderAf::jsonWriteServices( std::ostringstream & o_str) const
 	if( false == m_services_disabled.size())
 		o_str << ",\"services_disabled\":\"" << af::strJoin( m_services_disabled) << "\"";
 }
-
+/*
 bool RenderAf::canRunService( const std::string & type) const
 {
 	return m_poolsrv->canRunService(type);
 }
-
+*/
 void RenderAf::addService( const std::string & type)
 {
 //	af::farm()->serviceLimitAdd( type, m_name);

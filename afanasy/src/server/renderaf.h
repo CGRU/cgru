@@ -8,7 +8,7 @@
 #include "../libafanasy/renderupdate.h"
 #include "../libafanasy/taskexec.h"
 
-#include "afnodesrv.h"
+#include "afnodefarm.h"
 #include "poolsrv.h"
 
 class Action;
@@ -18,7 +18,7 @@ class PoolsContainer;
 class RenderContainer;
 
 /// Afanasy server side of Render host.
-class RenderAf: public af::Render, public AfNodeSrv
+class RenderAf: public af::Render, public AfNodeFarm
 {
 public:
 /// Construct Render from message and provided address.
@@ -105,8 +105,6 @@ public:
 
 	virtual int v_calcWeight() const; ///< Calculate and return memory size.
 
-	bool canRunService( const std::string & type) const; ///< Check whether block can run a service
-
 	// Update render and send instructions back:
 	af::Msg * update( const af::RenderUpdate & i_up);
 
@@ -144,9 +142,6 @@ private:
 
 	void addService( const std::string & type);
 	void remService( const std::string & type);
-
-	void setService( const std::string & srvname, bool enable);
-	void disableServices();
 
 /// Stop tasks.
 	void ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus, const std::string * i_keeptasks_username = NULL);

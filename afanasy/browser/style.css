@@ -338,19 +338,24 @@ font-style: italic;
 text-transform: lowercase;
 }
 
-.item.pool .service, .item.pool .disabled_service {
+.service, .disabled_service {
 float: left;
 margin: 1px 4px;
 padding: 1px 4px;
 border-radius: 2px;
 border: 1px solid #555;
 }
-.item.pool .service { font-weight: bold;}
-.item.pool .service img { width: 12px; height: 12px;}
-.item.pool .service div { float: right;}
-.item.pool .service.disabled { opacity: 0.7;}
-.item.pool .service.disabled div { text-decoration: line-through; font-style: italic;}
-.item.pool .disabled_service { text-decoration: line-through;}
+.service { font-weight: bold;}
+.service img { width: 12px; height: 12px;}
+.service div { float: right;}
+.service.disabled { opacity: 0.7;}
+.service.disabled div { text-decoration: line-through; font-style: italic;}
+.disabled_service { text-decoration: line-through;}
+
+.render .farm {
+clear: both;
+float: right;
+}
 
 .render .resources {
 background: #EEEE99;

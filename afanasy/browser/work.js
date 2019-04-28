@@ -11,7 +11,7 @@
 \* ....................................................................................................... */
 
 /*
-	work.js - work related methods for the jobs.js
+	work.js - work related methods for Branches, Jobs, Users
 */
 
 "use strict";
@@ -129,9 +129,17 @@ function work_generateRunningCountsString(i_params, i_type)
 	}
 	else if (cm_IsJedi())
 	{
+		if (i_params.running_tasks_num)
+			str += "Tasks:<b>" + i_params.running_tasks_num + "</b>";
+		if (i_params.running_capacity_total)
+			str += " Capacity:<b>" + cm_ToKMG(i_params.running_capacity_total) + "</b>";
 	}
 	else
 	{
+		if (i_params.running_tasks_num)
+			str += "t:<b>" + i_params.running_tasks_num + "</b>";
+		if (i_params.running_capacity_total)
+			str += " c:<b>" + cm_ToKMG(i_params.running_capacity_total) + "</b>";
 	}
 
 	return str;

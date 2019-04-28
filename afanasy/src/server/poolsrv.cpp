@@ -35,14 +35,14 @@ PoolsContainer * PoolSrv::ms_pools = NULL;
 
 PoolSrv::PoolSrv(PoolSrv * i_parent, const std::string & i_path):
 	af::Pool(i_path),
-	AfNodeFarm(this, this, i_parent)
+	AfNodeFarm(this, this, AfNodeFarm::TPool, i_parent)
 {
 	appendLog("Created.");
 }
 
 PoolSrv::PoolSrv(const std::string & i_store_dir):
 	af::Pool(),
-	AfNodeFarm(this, this, NULL, i_store_dir)
+	AfNodeFarm(this, this, AfNodeFarm::TPool, NULL, i_store_dir)
 {
 	int size;
 	char * data = af::fileRead(getStoreFile(), &size);

@@ -138,16 +138,7 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const // Threa
 		m_host.jsonWrite( o_str);
 	}
 
-	if( m_services_disabled.size())
-	{
-		o_str << ",\n\"services_disabled\":[";
-		for( int i = 0; i < m_services_disabled.size(); i++)
-		{
-			if( i ) o_str << ",";
-			o_str << '\"' << m_services_disabled[i] << '\"';
-		}
-		o_str << ']';
-	}
+	Farm::jsonWrite(o_str, i_type);
 
 	o_str << "\n}";
 }
@@ -195,7 +186,7 @@ bool Render::jsonRead( const JSON &i_object, std::string * io_changes)
 
 	Client::jsonRead( i_object);
 
-	jr_stringvec("services_disabled", m_services_disabled, i_object);
+	Farm::jsonRead(i_object);
 
 	return true;
 }
@@ -291,9 +282,7 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
 
 void Render::checkDirty()
 {
-   if( m_capacity == m_host.m_capacity ) m_capacity = -1;
-   if( m_max_tasks == m_host.m_max_tasks ) m_max_tasks = -1;
-   if(( m_capacity == -1 ) && ( m_max_tasks == -1 ) && ( m_services_disabled.empty() ))
+   if ((m_capacity == -1) && (m_max_tasks == -1))
 	  m_state = m_state & (~SDirty);
    else
 	  m_state = m_state | SDirty;

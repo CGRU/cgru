@@ -1,13 +1,14 @@
 #pragma once
 
 #include "name_af.h"
+#include "affarm.h"
 #include "host.h"
 #include "client.h"
 
 namespace af
 {
-/// Afanasy render slave.
-class Render : public Client
+/// Afanasy renderer client.
+class Render : public Client, public Farm
 {
 public:
 
@@ -96,13 +97,11 @@ protected:
 
 protected:
 
-   std::string m_pool;
+	std::string m_pool;
 
 	int32_t m_capacity;
 	int32_t m_capacity_used;
 	int32_t m_max_tasks;
-
-	std::vector<std::string> m_services_disabled;
 
 	Host     m_host;
 	HostRes  m_hres;
