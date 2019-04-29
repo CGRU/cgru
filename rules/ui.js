@@ -1107,26 +1107,40 @@ function u_CreateActions(i_actions, i_el)
 		}
 
 		// Process command:
-		let cmd = c_PathPM_Server2Client(action.cmd);
-		cmd = cmd.replace(/@PATH@/g, c_PathPM_Rules2Client(g_CurPath()));
-		// '@arg@' will be replaced with '--arg [arg value]'
-		// Value will be the first defined in action, ASSET, RULES
-		// For example: '@fps@' will be replaces with '--fps 24'
-		let matches = cmd.match(/@\w*@/g);
-		if (matches && matches.length)
-			for (let i = 0; i < matches.length; i++)
-			{
-				let match = matches[i];
-				let arg = match.replace(/@/g,'');
-				let val = action[arg];
-				if (null == val) val = ASSET[arg];
-				if (null == val) val = RULES[arg];
-				if (val) val = '--' + arg + ' ' + val;
-				else val = '';
-				cmd = cmd.replace(match, val);
-			}
+		let cmd = null;
+		if (action.cmd)
+		{
+			cmd = c_PathPM_Server2Client(action.cmd);
+			cmd = cmd.replace(/@PATH@/g, c_PathPM_Rules2Client(g_CurPath()));
+			// '@arg@' will be replaced with '--arg [arg value]'
+			// Value will be the first defined in action, ASSET, RULES
+			// For example: '@fps@' will be replaces with '--fps 24'
+			let matches = cmd.match(/@\w*@/g);
+			if (matches && matches.length)
+				for (let i = 0; i < matches.length; i++)
+				{
+					let match = matches[i];
+					let arg = match.replace(/@/g,'');
+					let val = action[arg];
+					if (null == val) val = ASSET[arg];
+					if (null == val) val = RULES[arg];
+					if (val) val = '--' + arg + ' ' + val;
+					else val = '';
+					cmd = cmd.replace(match, val);
+				}
+		}
+
+		// Process open:
+		let open = null;
+		if (action.open)
+			open = action.open.replace(/@PATH@/g, c_PathPM_Rules2Client(g_CurPath()));
+
+		// Process terminal:
+		let terminal = null;
+		if (action.terminal)
+			terminal = action.terminal.replace(/@PATH@/g, c_PathPM_Rules2Client(g_CurPath()));
 
 		// Make an executable button:
-		cgru_CmdExecProcess({'element':el,'cmd':cmd});
+		cgru_CmdExecProcess({'element':el,'cmd':cmd,'open':open,'terminal':terminal});
 	}
 }

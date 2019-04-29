@@ -73,10 +73,10 @@
 
 "execute":[
 	{
-		"label":"XTerm",
+		"label":"Terminal",
 		"icon":"icons/terminal.png",
 		"title":"Open terminal in this location.",
-		"cmd":"cd \"@PATH@\"; xterm"
+		"terminal":"\"@PATH@\""
 	}
 ],
 
