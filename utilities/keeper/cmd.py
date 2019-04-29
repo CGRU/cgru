@@ -2,6 +2,7 @@
 
 import json
 import subprocess
+import sys
 
 import cgrudocs
 import cgruconfig
@@ -170,7 +171,10 @@ def execute( i_str):
         for cmd in cmds:
             print('Executing command:')
             if cgruconfig.getVar('keeper_execute_in_terminal'):
-                cmd = cgruconfig.VARS['open_terminal_cmd'].replace('@CMD@', cmd)
+                if sys.platform.find('win') == 0:
+                    cmd = 'start cmd.exe /C "%s"' % cmd
+                else:
+                    cmd = cgruconfig.VARS['open_terminal_cmd'].replace('@CMD@', cmd)
             print(cmd)
             subprocess.Popen(cmd, shell=True)
 
@@ -181,7 +185,10 @@ def execute( i_str):
         subprocess.Popen( cmd, shell=True)
 
     if 'terminal' in cmdexec:
-        cmd = ('cd %s; openterminal' % cmdexec['terminal'])
+        if sys.platform.find('win') == 0:
+            cmd = ('start cmd.exe /K "cd %s"' % cmdexec['terminal'])
+        else:
+            cmd = ('cd %s; openterminal' % cmdexec['terminal'])
         print('Opening terminal:')
         print(cmd)
         subprocess.Popen(cmd, shell=True)
