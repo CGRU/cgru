@@ -169,13 +169,7 @@ class Tray(QtWidgets.QSystemTrayIcon):
         if not 'Software' in self.menu:
             self.addMenu(self.menu['menu'], 'Software')
             self.menu['menu'].addSeparator()
-            action = QtWidgets.QAction(
-                QtGui.QIcon(cgruutils.getIconFileName('folder')),
-                '[ browse ]',
-                self
-            )
-            action.triggered.connect( software.browse)
-            self.menu['Software'].addAction(action)
+
             for soft in software.Names:
                 icon = software.getIcon(soft)
                 if icon is None:
@@ -203,6 +197,15 @@ class Tray(QtWidgets.QSystemTrayIcon):
         if not self.addMenu(self.menu['menu'], 'Configure'):
             self.menu['Configure'].addSeparator()
 
+        action = QtWidgets.QAction('Execute in terminal', self)
+        action.setCheckable(True)
+        action.triggered.connect(cmd.triggerExecInTerminal)
+        if cgruconfig.getVar('keeper_execute_in_terminal'):
+            action.setChecked(True)
+        self.menu['Configure'].addAction(action)
+
+        self.menu['Configure'].addSeparator()
+
         if serverhttps.isRunning:
             self.addAction('Configure', False,  'HTTPS Server...', self.httpsServer)
             self.menu['Configure'].addSeparator()
@@ -215,8 +218,8 @@ class Tray(QtWidgets.QSystemTrayIcon):
         action.triggered.connect( cmd.setOpenCmd)
         self.menu['Configure'].addAction(action)
 
-        action = QtWidgets.QAction('Set Docs URL...', self)
-        action.triggered.connect( cmd.setDocsURL)
+        action = QtWidgets.QAction('Set Teminal...', self)
+        action.triggered.connect(cmd.setTerminal)
         self.menu['Configure'].addAction(action)
 
         action = QtWidgets.QAction('Set Text Editor...', self)

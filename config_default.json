@@ -21,7 +21,8 @@
 
 	"-nuke_filenamefilter":true,
 
-	"open_folder_cmd":"open \"@PATH@\"",
+	"open_folder_cmd":"openfolder \"@PATH@\"",
+	"open_terminal_cmd":"openterminal -e '@CMD@'",
 
 	"previewcmds":[
 		"Nuke|nuke -v \"@ARG@\"",
@@ -73,9 +74,6 @@
 		],
 			"":"Client slashes direction plays no role, as it tries both slashes when searchs a path to replace.",
 			"":"But will replace with specified slashes, if unix slashes not forced (for Nuke, for example)."
-	},
-	"OS_linux":{
-		"open_folder_cmd":"nautilus \"@PATH@\""
 	},
 
 	"pswd_visor":"1832116180fdc61b64fd978401e462e9",

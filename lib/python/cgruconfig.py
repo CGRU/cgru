@@ -251,6 +251,11 @@ def reconfigure():
     VARS = dict()
     Config()
 
+def getVar(i_var):
+    if not i_var in VARS:
+        return None
+    return VARS[i_var]
+
 def writeVars(variables, configfile=VARS['config_file_home']):
     with open(configfile, 'r') as file_:
         lines = file_.readlines()

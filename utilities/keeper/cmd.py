@@ -63,14 +63,6 @@ def setAFANASYServer():
 	)
 
 
-def setDocsURL():
-	getVar(
-		'docshost',
-		'Set Docs Host',
-		'Enter host name or IP address:'
-	)
-
-
 def setTextEditor():
 	getVar(
 		'editor',
@@ -92,6 +84,14 @@ def setOpenCmd():
 		'open_folder_cmd',
 		'Set Open Folder Command',
 		'Enter command with "@PATH@":'
+	)
+
+
+def setTerminal():
+	getVar(
+		'open_terminal_cmd',
+		'Set Open Terminal Command',
+		'Enter command with @CMD@:'
 	)
 
 
@@ -139,6 +139,13 @@ def update():
 	Application.quit()
 
 
+def triggerExecInTerminal(i_checked):
+    var = 'keeper_execute_in_terminal'
+    cgruconfig.VARS[var] = i_checked
+    variables = [var]
+    cgruconfig.writeVars(variables)
+
+
 def execute( i_str):
 
     print('Execute:')
@@ -162,14 +169,22 @@ def execute( i_str):
 
         for cmd in cmds:
             print('Executing command:')
+            if cgruconfig.getVar('keeper_execute_in_terminal'):
+                cmd = cgruconfig.VARS['open_terminal_cmd'].replace('@CMD@', cmd)
             print(cmd)
-            subprocess.Popen( cmd, shell=True)
+            subprocess.Popen(cmd, shell=True)
 
     if 'open' in cmdexec:
         cmd = cgruconfig.VARS['open_folder_cmd'].replace('@PATH@',cmdexec['open'])
         print('Opening folder:')
         print(cmd)
         subprocess.Popen( cmd, shell=True)
+
+    if 'terminal' in cmdexec:
+        cmd = ('cd %s; openterminal' % cmdexec['terminal'])
+        print('Opening terminal:')
+        print(cmd)
+        subprocess.Popen(cmd, shell=True)
 
     if 'eval' in cmdexec:
         cmd = cmdexec['eval']

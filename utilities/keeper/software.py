@@ -142,19 +142,6 @@ def exampleAfterFX():
     exampleSoftware('After FX', 'start_afterfx')
 
 
-def browse():
-    folder = os.path.join(os.environ['CGRU_LOCATION'], 'software_setup')
-    if sys.platform.find('win') == 0:
-        print('Opening "%s"' % folder)
-        QtCore.QProcess.startDetached('cmd.exe', ['/c', 'start', folder])
-    else:
-        cmd = 'browse.sh'
-        cmd = os.path.join('utilities', cmd)
-        cmd = os.path.join(os.environ['CGRU_LOCATION'], cmd)
-        cmd = '"%s" "%s"' % ( cmd, folder)
-        startDetached(cmd)
-
-
 def locateSoftware(soft):
     filename, fltr = QtWidgets.QFileDialog.getOpenFileName(None, 'Select %s executable:' % soft)
     if filename is None: return
