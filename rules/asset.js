@@ -291,6 +291,27 @@ function a_Copy(i_args)
 
 	params.name = i_args.name;
 	if (params.name == null)
+	{
+		// Try to increment latest number in name by 10:
+		// Find all numbers
+		let numbers = ASSET.name.match(/\d+/g);
+		if (numbers.length)
+		{
+			let number = numbers[numbers.length-1];
+			let numplus = '' + (parseInt(number) + 10);
+			// Apply padding
+			while (numplus.length < number.length)
+				numplus = '0' + numplus;
+			// Lenght may be bigger on 'SHOT_990'
+			if (numplus.length == number.length)
+				params.name = ASSET.name.replace(number, numplus);
+				// Check if such folder already exists:
+				if (g_elCurFolder.m_elNext)
+					if (c_PathBase(g_elCurFolder.m_elNext.m_path) == params.name)
+						params.name = null;
+		}
+	}
+	if (params.name == null)
 		params.name = ASSET.name + '-01';
 
 	params.destination = i_args.destination;
