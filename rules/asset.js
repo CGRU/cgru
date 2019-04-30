@@ -295,7 +295,7 @@ function a_Copy(i_args)
 		// Try to increment latest number in name by 10:
 		// Find all numbers
 		let numbers = ASSET.name.match(/\d+/g);
-		if (numbers.length)
+		if ((numbers != null) && numbers.length)
 		{
 			let number = numbers[numbers.length-1];
 			let numplus = '' + (parseInt(number) + 10);
