@@ -38,14 +38,15 @@ var table_functions = null;
 var table_function_num = null;
 
 var table_params = {
-	picture /***/: {'type': 'bool', 'default': true, 'width': '25%'},
-	status /****/: {'type': 'bool', 'default': true, 'width': '25%'},
-	comments /**/: {'type': 'bool', 'default': false, 'width': '25%'},
-	price /*****/: {'type': 'bool', 'default': true, 'width': '25%'},
-	timecode /**/: {'type': 'bool', 'default': false, 'width': '25%'},
-	frames_num   : {'type': 'bool', 'default': false, 'width': '25%'},
-	duration /**/: {'type': 'bool', 'default': true, 'width': '25%'},
-	tasks /*****/: {'type': 'bool', 'default': false, 'width': '25%'}
+	picture    : {'type': 'bool', 'default': true,  'width': '20%'},
+	status     : {'type': 'bool', 'default': true,  'width': '20%'},
+	annotation : {'type': 'bool', 'default': false, 'width': '20%'},
+	comments   : {'type': 'bool', 'default': false, 'width': '20%'},
+	price      : {'type': 'bool', 'default': true,  'width': '20%'},
+	timecode   : {'type': 'bool', 'default': false, 'width': '20%'},
+	frames_num : {'type': 'bool', 'default': false, 'width': '20%'},
+	duration   : {'type': 'bool', 'default': true,  'width': '20%'},
+	tasks      : {'type': 'bool', 'default': false, 'width': '20%'}
 };
 
 function table_Export(i_args)
@@ -59,6 +60,7 @@ function table_Export(i_args)
 	wnd.elContent.appendChild(elExport);
 	elExport.textContent = 'Export';
 	elExport.classList.add('button');
+	elExport.style.clear = 'both';
 	elExport.m_wnd = wnd;
 	elExport.onclick = function(e) { table_ExportDo(e.currentTarget.m_wnd); }
 }
@@ -387,7 +389,7 @@ function table_Gen_info(i_shot)
 function table_BodyReceived(i_data, i_args)
 {
 	var info = '';
-	if (i_args.shot.status.annotation)
+	if (table_args.params.annotation && i_args.shot.status.annotation)
 		info += i_args.shot.status.annotation;
 
 	if (i_data.indexOf('"error"') == -1)
