@@ -579,6 +579,14 @@ RenderNode.prototype.serviceApply = function(i_value, i_name) {
 	nw_Action('renders', this.monitor.getSelectedIds(), operation, null);
 };
 
+RenderNode.clearServices = function(i_args) {
+	g_Info('Clear services...');
+	var operation = {};
+	operation.type = 'farm';
+	operation.mode = 'clear_services';
+	nw_Action(i_args.monitor.cur_item.node_type, i_args.monitor.getSelectedIds(), operation, null);
+};
+
 function RenderTask(i_task, i_elParent)
 {
 	this.elParent = i_elParent;
@@ -799,12 +807,12 @@ RenderNode.createPanels = function(i_monitor) {
 	acts.service_remove  = {'handle':'setService', 'label':'Remove',  'tooltip':'Remove service.'};
 	acts.service_enable  = {'handle':'setService', 'label':'Enable',  'tooltip':'Enable service.'};
 	acts.service_disable = {'handle':'setService', 'label':'Disable', 'tooltip':'Disable service.'};
-	acts.restore_defaults =
-		{'handle': 'mh_Oper', 'label': 'Restore', 'tooltip': 'Restore default farm settings.'};
+	acts.clear_services =
+		{'handle':'clearServices','label':'Clear','tooltip':'Double click to clear services.','ondblclick':true};
 	i_monitor.createCtrlBtn({
 		'name': 'services',
 		'label': 'SERVICES',
-		'tooltip': 'Enable/Disable service\nRestore defaults.',
+		'tooltip': 'Enable/Disable services.',
 		'sub_menu': acts
 	});
 

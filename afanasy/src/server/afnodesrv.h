@@ -11,6 +11,7 @@ public:
 	virtual ~AfNodeSrv();
 
 	inline af::Node * node() { return m_node; }
+	const std::string & name() const { return m_node->getName(); }
 	int priority() const { return m_node->getPriority(); }
 
 	void store() const;

@@ -36,7 +36,7 @@ AfNodeFarm::~AfNodeFarm()
 {
 }
 
-void AfNodeFarm::actionFarm(Action & i_action)
+bool AfNodeFarm::actionFarm(Action & i_action)
 {
 	const JSON & operation = (*i_action.data)["operation"];
 	std::string mode;
@@ -46,7 +46,7 @@ void AfNodeFarm::actionFarm(Action & i_action)
 		i_action.answer_kind = "error";
 		i_action.answer = "Service operation mode is not set.\
 			Valid modes are: 'service_add','service_remove','service_enable','service_disable'.";
-		return;
+		return false;
 	}
 
 	if (mode == "service_add")
@@ -57,7 +57,7 @@ void AfNodeFarm::actionFarm(Action & i_action)
 			appendLog("Service add: Service name is not specified by " + i_action.author);
 			i_action.answer_kind = "error";
 			i_action.answer = "Service name is not specified.";
-			return;
+			return false;
 		}
 
 		if (name.size() == 0)
@@ -65,7 +65,7 @@ void AfNodeFarm::actionFarm(Action & i_action)
 			appendLog("Service add: Service name is empty by " + i_action.author);
 			i_action.answer_kind = "error";
 			i_action.answer = "Service name is empty.";
-			return;
+			return false;
 		}
 
 		if (hasService(name))
@@ -73,18 +73,16 @@ void AfNodeFarm::actionFarm(Action & i_action)
 			appendLog("Service add: Service \"" + name + "\" already exists by " + i_action.author);
 			i_action.answer_kind = "error";
 			i_action.answer = "Service \"" + name + "\" already exists.";
-			return;
+			return false;
 		}
 
 		m_farm->m_services.push_back(name);
-
-		i_action.monitors->addEvent(m_change_event, m_node->getId());
 
 		appendLog("Service \"" + name + "\" added by " + i_action.author);
 		i_action.answer_kind = "info";
 		i_action.answer = "Service \"" + name + "\" added.";
 
-		return;
+		return true;
 	}
 
 	if ((mode == "service_remove") || (mode == "service_enable") || (mode == "service_disable"))
@@ -95,7 +93,7 @@ void AfNodeFarm::actionFarm(Action & i_action)
 			appendLog("Service add: Invalid service mask by " + i_action.author);
 			i_action.answer_kind = "error";
 			i_action.answer = "Invalid service mask.";
-			return;
+			return false;
 		}
 
 		bool found = false;
@@ -157,14 +155,41 @@ void AfNodeFarm::actionFarm(Action & i_action)
 				appendLog("No services found matching mask \"" + mask.getPattern() + "\" by " + i_action.author);
 				i_action.answer_kind = "error";
 				i_action.answer = "No services found mathing pattern " + mask.getPattern();
-				return;
+				return false;
 			}
 		}
 
-		i_action.monitors->addEvent(m_change_event, m_node->getId());
 		i_action.answer_kind = "info";
 		i_action.answer = "Services \"" + mask.getPattern() + "\" " + "removed/enabled/disabled.";
-		return;
+		return true;
+	}
+
+	if (mode == "clear_services")
+	{
+		bool cleared = false;
+		if (m_farm->m_services.size())
+		{
+			m_farm->m_services.clear();
+			cleared = true;
+		}
+		if (m_farm->m_services_disabled.size())
+		{
+			m_farm->m_services_disabled.clear();
+			cleared = true;
+		}
+
+		if (cleared)
+		{
+			i_action.answer_kind = "info";
+			i_action.answer = "Services cleared";
+			return true;
+		}
+		else
+		{
+			i_action.answer_kind = "error";
+			i_action.answer = "No services to clear";
+			return false;
+		}
 	}
 
 	appendLog("Unknown farm operation mode \"" + mode + "\" by " + i_action.author);
@@ -190,6 +215,8 @@ bool AfNodeFarm::isServiceDisabled(const std::string & i_service_name) const
 
 bool AfNodeFarm::canRunService(const std::string & i_service_name) const
 {
+//printf("%s:can(%s):s(%d:",name().c_str(),i_service_name.c_str(),m_farm->m_services.size());for (const std::string & s : m_farm->m_services) printf(" %s",s.c_str());printf(")/d(%d:",m_farm->m_services_disabled.size());for (const std::string & s : m_farm->m_services_disabled) printf(" %s",s.c_str());printf("): ");if (hasService(i_service_name)) printf(" HAS");if (isServiceDisabled(i_service_name)) printf(" DIS");printf("\n");
+
 	if (m_farm->m_services.size() == 0)
 	{
 		if (isServiceDisabled(i_service_name))
@@ -198,7 +225,7 @@ bool AfNodeFarm::canRunService(const std::string & i_service_name) const
 		if (m_parent)
 			return m_parent->canRunService(i_service_name);
 		else
-			return  true;
+			return true;
 	}
 
 	if (hasService(i_service_name))

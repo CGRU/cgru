@@ -129,8 +129,8 @@ void PoolSrv::v_action(Action & i_action)
 		}
 		else if (type == "farm")
 		{
-			actionFarm(i_action);
-			return;
+			if (false == actionFarm(i_action))
+				return;
 		}
 		else
 		{

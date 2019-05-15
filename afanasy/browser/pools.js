@@ -327,7 +327,6 @@ PoolNode.prototype.serviceApply = function(i_value, i_name) {
 	nw_Action('pools', this.monitor.getSelectedIds(), operation, null);
 };
 
-
 PoolNode.prototype.onDoubleClick = function(e) {
 	g_ShowObject({"object": this.params}, {"evt": e, "wnd": this.monitor.window});
 };

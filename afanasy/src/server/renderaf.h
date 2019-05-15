@@ -36,15 +36,15 @@ public:
 /// Awake offline render
 	void online( RenderAf * render, JobContainer * i_jobs, MonitorContainer * monitoring);
 
-	inline int getMaxTasks()     const { return m_max_tasks == -1 ? m_poolsrv->getMaxTasksPerHost()    : m_max_tasks;}
-	inline int getCapacity()     const { return m_capacity  == -1 ? m_poolsrv->getMaxCapacityPerHost() : m_capacity;}
+	inline int getMaxTasks()     const { return m_max_tasks == -1 ? m_parent->getMaxTasksPerHost()    : m_max_tasks;}
+	inline int getCapacity()     const { return m_capacity  == -1 ? m_parent->getMaxCapacityPerHost() : m_capacity;}
 	inline int getCapacityFree() const { return getCapacity() - m_capacity_used;}
 	inline bool hasCapacity(int value) const {
 		int c = getCapacity(); if (c<0) return true; else return m_capacity_used + value <= c;}
 
 /// Whether Render is ready to render tasks.
 	inline bool isReady() const { return (
-			(m_poolsrv != NULL) &&
+			(m_parent != NULL) &&
 			(m_state & SOnline) &&
 			(m_priority > 0) &&
 			((getCapacity() < 0) || (m_capacity_used < getCapacity())) &&
@@ -158,8 +158,6 @@ private:
 	void appendTasksLog( const std::string & message);  ///< Append tasks log with a \c message .
 
 private:
-	PoolSrv * m_poolsrv;
-
 	std::string m_farm_host_name;
 	std::string m_farm_host_description;
 

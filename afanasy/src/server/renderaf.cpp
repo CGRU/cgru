@@ -73,7 +73,7 @@ RenderAf::RenderAf( const std::string & i_store_dir):
 
 void RenderAf::initDefaultValues()
 {
-	m_poolsrv = NULL;
+	m_parent = NULL;
 
 	m_services_num = 0;
 
@@ -101,12 +101,12 @@ void RenderAf::setRegistered(PoolsContainer * i_pools)
 	{
 		std::string log = "Registered";
 
-		if (m_poolsrv->newNimby())
+		if (m_parent->newNimby())
 		{
 			setNimby();
 			log += " nimby";
 		}
-		if (m_poolsrv->newPaused())
+		if (m_parent->newPaused())
 		{
 			setPaused(true);
 			log += " paused";
@@ -128,9 +128,9 @@ void RenderAf::setRegistered(PoolsContainer * i_pools)
 
 void RenderAf::findPool(PoolsContainer * i_pools)
 {
-	if (m_poolsrv)
+	if (m_parent)
 	{
-		AF_ERR << "Render '" << getName() << "' already in pool '" + m_poolsrv->getName() + "'";
+		AF_ERR << "Render '" << getName() << "' already in pool '" + m_parent->getName() + "'";
 		return;
 	}
 
@@ -140,21 +140,21 @@ void RenderAf::findPool(PoolsContainer * i_pools)
 		return;
 	}
 
-	m_poolsrv = i_pools->getPool(m_pool);
-	if (NULL == m_poolsrv)
+	m_parent = i_pools->getPool(m_pool);
+	if (NULL == m_parent)
 	{
 		AF_ERR << "Render pool '" + m_pool + "' does not exist.";
 		i_pools->assignRender(this);
 		return;
 	}
 
-	m_poolsrv->addRender(this);
+	m_parent->addRender(this);
 }
 
 void RenderAf::setPool(PoolSrv * i_pool)
 {
 	m_pool = i_pool->getName();
-	m_poolsrv = i_pool;
+	m_parent = i_pool;
 }
 
 void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorContainer * monitoring, bool toZombie )
@@ -179,10 +179,10 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
 	{
 		AFCommon::QueueLog("Render Deleting: " + v_generateInfoString( false));
 		appendLog("Waiting for deletion.");
-		if (m_poolsrv)
+		if (m_parent)
 		{
-			m_poolsrv->removeRender(this);
-			if (monitoring) monitoring->addEvent( af::Monitor::EVT_pools_change, m_poolsrv->getId());
+			m_parent->removeRender(this);
+			if (monitoring) monitoring->addEvent( af::Monitor::EVT_pools_change, m_parent->getId());
 		}
 		setZombie();
 		if (monitoring) monitoring->addEvent( af::Monitor::EVT_renders_del, m_id);
@@ -421,8 +421,8 @@ void RenderAf::v_action( Action & i_action)
 			wolWake( i_action.monitors);
 		else if (type == "farm")
 		{
-			actionFarm(i_action);
-			return;
+			if (false == actionFarm(i_action))
+				return;
 		}
 		/*
 		else if( type == "service")
@@ -463,6 +463,7 @@ void RenderAf::v_action( Action & i_action)
 			i_action.answer = "Unknown operation: " + type;
 			return;
 		}
+
 		appendLog("Operation \"" + type + "\" by " + i_action.author);
 		i_action.monitors->addEvent( af::Monitor::EVT_renders_change, m_id);
 		store();
@@ -504,30 +505,30 @@ void RenderAf::actionSetPool(const std::string & i_pool_name, Action & i_action)
 		return;
 	}
 
-	if (m_poolsrv)
+	if (m_parent)
 	{
-		m_poolsrv->removeRender(this);
-		i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_poolsrv->getId());
+		m_parent->removeRender(this);
+		i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_parent->getId());
 	}
 
 	m_pool = i_pool_name;
 	pool->addRender(this);
-	m_poolsrv = pool;
+	m_parent = pool;
 
-	i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_poolsrv->getId());
+	i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_parent->getId());
 }
 
 void RenderAf::actionReassignPool(Action & i_action)
 {
-	if (m_poolsrv)
+	if (m_parent)
 	{
-		m_poolsrv->removeRender(this);
-		i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_poolsrv->getId());
+		m_parent->removeRender(this);
+		i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_parent->getId());
 	}
 
 	i_action.pools->assignRender(this);
 
-	i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_poolsrv->getId());
+	i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_parent->getId());
 }
 
 void RenderAf::ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus, const std::string * i_keeptasks_username )
@@ -746,7 +747,7 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 	JobContainer * jobs = (JobContainer*)pointer;
 
 
-	if ((NULL == m_poolsrv) && isOnline())
+	if ((NULL == m_parent) && isOnline())
 	{
 		AF_ERR << "Render '" + getName() + "' has no pool.";
 		offline(jobs, af::TaskExec::UPRenderZombie, monitoring);
@@ -780,33 +781,33 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 		int cpu=0,mem=0,swp=0,hgb=0,hio=0,net=0;
 
 		// CPU % busy:
-		if ((m_poolsrv->get_busy_cpu() <= 0) ||
-			((100 - m_hres.cpu_idle) < m_poolsrv->get_busy_cpu()))
+		if ((m_parent->get_busy_cpu() <= 0) ||
+			((100 - m_hres.cpu_idle) < m_parent->get_busy_cpu()))
 			cpu = 1;
 
 		// Mem % used:
-		if ((m_hres.mem_total_mb <= 0) || (m_poolsrv->get_busy_mem() <= 0) ||
-			((100 * (m_hres.mem_total_mb - m_hres.mem_free_mb) / m_hres.mem_total_mb) < m_poolsrv->get_busy_mem()))
+		if ((m_hres.mem_total_mb <= 0) || (m_parent->get_busy_mem() <= 0) ||
+			((100 * (m_hres.mem_total_mb - m_hres.mem_free_mb) / m_hres.mem_total_mb) < m_parent->get_busy_mem()))
 			mem = 1;
 
 		// Swap % used:
-		if ((m_hres.swap_total_mb <= 0) || ((m_poolsrv->get_busy_swp() <= 0) ||
-			(100 * m_hres.swap_used_mb / m_hres.swap_total_mb) < m_poolsrv->get_busy_swp()))
+		if ((m_hres.swap_total_mb <= 0) || ((m_parent->get_busy_swp() <= 0) ||
+			(100 * m_hres.swap_used_mb / m_hres.swap_total_mb) < m_parent->get_busy_swp()))
 			swp = 1;
 
 		// Hdd free GB:
-		if ((m_hres.hdd_total_gb <= 0) || (m_poolsrv->get_busy_hddgb() <= 0) ||
-			(m_hres.hdd_free_gb > m_poolsrv->get_busy_hddgb()))
+		if ((m_hres.hdd_total_gb <= 0) || (m_parent->get_busy_hddgb() <= 0) ||
+			(m_hres.hdd_free_gb > m_parent->get_busy_hddgb()))
 			hgb = 1;
 
 		// Hdd I/O %:
-		if ((m_poolsrv->get_busy_hddio() <= 0) ||
-			(m_hres.hdd_busy < m_poolsrv->get_busy_hddio()))
+		if ((m_parent->get_busy_hddio() <= 0) ||
+			(m_hres.hdd_busy < m_parent->get_busy_hddio()))
 			hio = 1;
 
 		// Net Mb/s:
-		if ((m_poolsrv->get_busy_netmbs() <= 0) ||
-			(m_hres.net_recv_kbsec + m_hres.net_send_kbsec < (1024 * m_poolsrv->get_busy_netmbs())))
+		if ((m_parent->get_busy_netmbs() <= 0) ||
+			(m_hres.net_recv_kbsec + m_hres.net_send_kbsec < (1024 * m_parent->get_busy_netmbs())))
 			net = 1;
 
 		// Render will be treated as 'not busy' if all params are 'not busy'
@@ -814,12 +815,12 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 		{
 			m_busy_time = currentTime;
 		}
-		else if ((m_poolsrv->get_busy_nimby_time() > 0) && (currentTime - m_busy_time > m_poolsrv->get_busy_nimby_time()))
+		else if ((m_parent->get_busy_nimby_time() > 0) && (currentTime - m_busy_time > m_parent->get_busy_nimby_time()))
 		{
 		// Automatic Nimby ON:
 			std::string log("Automatic Nimby: ");
-			log += "\n Busy since: " + af::time2str (m_busy_time);// + " CPU >= " + af::itos (m_poolsrv->get_busy_cpu) + "%";
-			log += "\n Nimby busy free time = " + af::time2strHMS (m_poolsrv->get_busy_nimby_time(), true);
+			log += "\n Busy since: " + af::time2str (m_busy_time);// + " CPU >= " + af::itos (m_parent->get_busy_cpu) + "%";
+			log += "\n Nimby busy free time = " + af::time2strHMS (m_parent->get_busy_nimby_time(), true);
 			appendLog (log);
 			setNIMBY();
 			monitoring->addEvent (af::Monitor::EVT_renders_change, m_id);
@@ -832,12 +833,12 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 	{
 		m_idle_time = currentTime;
 	}
-	else if((m_poolsrv->get_idle_cpu()    <= 0) &&
-			(m_poolsrv->get_idle_mem()    <= 0) &&
-			(m_poolsrv->get_idle_swp()    <= 0) &&
-			(m_poolsrv->get_idle_hddgb()  <= 0) &&
-			(m_poolsrv->get_idle_hddio()  <= 0) &&
-			(m_poolsrv->get_idle_netmbs() <= 0))
+	else if((m_parent->get_idle_cpu()    <= 0) &&
+			(m_parent->get_idle_mem()    <= 0) &&
+			(m_parent->get_idle_swp()    <= 0) &&
+			(m_parent->get_idle_hddgb()  <= 0) &&
+			(m_parent->get_idle_hddio()  <= 0) &&
+			(m_parent->get_idle_netmbs() <= 0))
 	{
 		// If all params are 'off' there is no 'idle':
 		m_idle_time = currentTime;
@@ -847,33 +848,33 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 		int cpu=0,mem=0,swp=0,hgb=0,hio=0,net=0;
 
 		// CPU % busy:
-		if ((m_poolsrv->get_idle_cpu() > 0) &&
-			((100 - m_hres.cpu_idle) > m_poolsrv->get_idle_cpu()))
+		if ((m_parent->get_idle_cpu() > 0) &&
+			((100 - m_hres.cpu_idle) > m_parent->get_idle_cpu()))
 			cpu = 1;
 
 		// Mem % used:
-		if ((m_hres.mem_total_mb > 0) && (m_poolsrv->get_idle_mem() > 0) &&
-			((100 * (m_hres.mem_total_mb - m_hres.mem_free_mb) / m_hres.mem_total_mb) > m_poolsrv->get_idle_mem()))
+		if ((m_hres.mem_total_mb > 0) && (m_parent->get_idle_mem() > 0) &&
+			((100 * (m_hres.mem_total_mb - m_hres.mem_free_mb) / m_hres.mem_total_mb) > m_parent->get_idle_mem()))
 			mem = 1;
 
 		// Swap % used:
-		if ((m_hres.swap_total_mb) && (m_poolsrv->get_idle_swp() > 0) &&
-			((100 * m_hres.swap_used_mb / m_hres.swap_total_mb) > m_poolsrv->get_idle_swp()))
+		if ((m_hres.swap_total_mb) && (m_parent->get_idle_swp() > 0) &&
+			((100 * m_hres.swap_used_mb / m_hres.swap_total_mb) > m_parent->get_idle_swp()))
 			swp = 1;
 
 		// Hdd free GB:
-		if ((m_hres.hdd_total_gb > 0) && (m_poolsrv->get_idle_hddgb() > 0) &&
-			(m_hres.hdd_free_gb < m_poolsrv->get_idle_hddgb()))
+		if ((m_hres.hdd_total_gb > 0) && (m_parent->get_idle_hddgb() > 0) &&
+			(m_hres.hdd_free_gb < m_parent->get_idle_hddgb()))
 			hgb = 1;
 
 		// Hdd I/O %:
-		if ((m_poolsrv->get_idle_hddio() > 0) &&
-			(m_hres.hdd_busy > m_poolsrv->get_idle_hddio()))
+		if ((m_parent->get_idle_hddio() > 0) &&
+			(m_hres.hdd_busy > m_parent->get_idle_hddio()))
 			hio = 1;
 
 		// Net Mb/s:
-		if ((m_poolsrv->get_idle_netmbs() > 0) &&
-			(m_hres.net_recv_kbsec + m_hres.net_send_kbsec > (1024 * m_poolsrv->get_idle_netmbs())))
+		if ((m_parent->get_idle_netmbs() > 0) &&
+			(m_hres.net_recv_kbsec + m_hres.net_send_kbsec > (1024 * m_parent->get_idle_netmbs())))
 			net = 1;
 
 		// it will be treated as 'not idle' any param is 'not idle'
@@ -884,23 +885,23 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 		else 
 		{
 			// Automatic WOL sleep:
-			if ((m_poolsrv->get_idle_wolsleep_time() > 0) && isOnline() && (isWOLSleeping() == false) && (isWOLFalling() == false)
-				&& (currentTime - m_idle_time > m_poolsrv->get_idle_wolsleep_time()))
+			if ((m_parent->get_idle_wolsleep_time() > 0) && isOnline() && (isWOLSleeping() == false) && (isWOLFalling() == false)
+				&& (currentTime - m_idle_time > m_parent->get_idle_wolsleep_time()))
 			{
 				std::string log("Automatic WOL Sleep: ");
 				log += "\n Idle since: " + af::time2str(m_idle_time);
-				log += "\n WOL idle sleep time = " + af::time2strHMS(m_poolsrv->get_idle_wolsleep_time(), true);
+				log += "\n WOL idle sleep time = " + af::time2strHMS(m_parent->get_idle_wolsleep_time(), true);
 				appendLog(log);
 				wolSleep(monitoring);
 			}
 
 			// Automatic Nimby Free:
-			if ((m_poolsrv->get_idle_free_time() > 0) && isOnline() && (isNimby() || isNIMBY())
-				&& (currentTime - m_idle_time > m_poolsrv->get_idle_free_time()))
+			if ((m_parent->get_idle_free_time() > 0) && isOnline() && (isNimby() || isNIMBY())
+				&& (currentTime - m_idle_time > m_parent->get_idle_free_time()))
 			{
 				std::string log("Automatic Nimby Free: ");
 				log += "\n Idle since: " + af::time2str(m_idle_time);
-				log += "\n Nimby idle free time = " + af::time2strHMS(m_poolsrv->get_idle_free_time(), true );
+				log += "\n Nimby idle free time = " + af::time2strHMS(m_parent->get_idle_free_time(), true );
 				appendLog(log);
 				setFree();
 				monitoring->addEvent(af::Monitor::EVT_renders_change, m_id);
@@ -1071,12 +1072,7 @@ void RenderAf::jsonWriteServices( std::ostringstream & o_str) const
 	if( false == m_services_disabled.size())
 		o_str << ",\"services_disabled\":\"" << af::strJoin( m_services_disabled) << "\"";
 }
-/*
-bool RenderAf::canRunService( const std::string & type) const
-{
-	return m_poolsrv->canRunService(type);
-}
-*/
+
 void RenderAf::addService( const std::string & type)
 {
 //	af::farm()->serviceLimitAdd( type, m_name);

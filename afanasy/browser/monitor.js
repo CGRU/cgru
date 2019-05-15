@@ -1460,7 +1460,10 @@ Monitor.prototype.createCtrlBtn = function(i_args) {
 	else
 	{
 		if (i_args.ondblclick)
+		{
 			elBtn.ondblclick = Monitor.ctrlBtnClicked;
+			elBtn.onclick = function(e) { e.stopPropagation(); return false; }
+		}
 		else
 			elBtn.onclick = Monitor.ctrlBtnClicked;
 		elBtn.oncontextmenu = function(e) { return false; }

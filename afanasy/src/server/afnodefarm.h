@@ -20,7 +20,8 @@ public:
 
 	bool canRunService(const std::string & i_service_name) const;
 
-	void actionFarm(Action & i_action);
+	// On success return true for monitoring/storing
+	bool actionFarm(Action & i_action);
 
 protected:
 	PoolSrv * m_parent;
