@@ -424,28 +424,6 @@ void RenderAf::v_action( Action & i_action)
 			if (false == actionFarm(i_action))
 				return;
 		}
-		/*
-		else if( type == "service")
-		{
-			af::RegExp service_mask; bool enable;
-			af::jr_regexp("name", service_mask, operation);
-			af::jr_bool("enable", enable, operation);
-			for (int i = 0 ; i < m_host.getServicesNum() ; ++i)
-			{
-				std::string service = m_host.getServiceName(i);
-				if( service_mask.match( service))
-					setService( service, enable);
-			}
-		}
-
-		else if( type == "restore_defaults")
-		{
-			m_max_tasks = -1;
-			m_capacity = -1;
-			m_services_disabled.clear();
-			disableServices(); // Dirty check exists in that function
-		}
-		*/
 		else if (type == "set_pool")
 		{
 			std::string pool_name;
@@ -991,43 +969,9 @@ bool RenderAf::getFarmHost( af::Host * newHost)
 			if( *osnIt == m_host.getServiceName(i))
 				m_services_counts[i] = *oscIt;
 
-//	disableServices();
-
 	return true;
 }
-/*
-void RenderAf::disableServices()
-{
-	m_services_disabled_nums.clear();
-	m_services_disabled_nums.resize( m_services_num, 0);
-	if( m_services_disabled.size())
-	{
-		for( int i = 0; i < m_services_disabled.size(); i++)
-			for( int j = 0; j < m_services_num; j++)
-				if( m_services_disabled[i] == m_host.getServiceName(j))
-					m_services_disabled_nums[j] = 1;
-	}
-	checkDirty();
-}
-*/
-/*
-void RenderAf::setService( const std::string & srvname, bool enable)
-{
-	std::vector<std::string> m_services_disabled_old = m_services_disabled;
-	m_services_disabled.clear();
 
-	// Collect new disabled services list w/o specified service:
-	for( int i = 0; i < m_services_disabled_old.size(); i++)
-		if( m_services_disabled_old[i] != srvname )
-			m_services_disabled.push_back( m_services_disabled_old[i]);
-
-	// Add specified service in disabled list:
-	if( false == enable )
-		m_services_disabled.push_back( srvname);
-
-	disableServices();
-}
-*/
 const std::string RenderAf::getServicesString() const
 {
 	if( m_services_num == 0) return "No services.";
