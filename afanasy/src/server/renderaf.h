@@ -92,7 +92,7 @@ public:
 	af::Msg * writeTasksLog( bool i_binary);
 
 /// Get host parameters from farm.
-	bool getFarmHost( af::Host * newHost = NULL);
+	void getFarmHost( af::Host * newHost = NULL);
 
 /// Deregister render, on SIGINT client recieving.
 	void deregister( JobContainer * jobs, MonitorContainer * monitoring );
@@ -100,8 +100,6 @@ public:
 	virtual void v_action( Action & i_action);
 
 	inline const std::list<std::string> & getTasksLog() { return m_tasks_log; }  ///< Get tasks log list.
-	const std::string getServicesString() const;							 ///< Get services information.
-	void jsonWriteServices( std::ostringstream & o_str) const; ///< Get services information.
 
 	virtual int v_calcWeight() const; ///< Calculate and return memory size.
 
@@ -140,9 +138,6 @@ private:
 	/// caller.
 	void removeTask( const af::TaskExec * taskexec);
 
-	void addService( const std::string & type);
-	void remService( const std::string & type);
-
 /// Stop tasks.
 	void ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus, const std::string * i_keeptasks_username = NULL);
 
@@ -158,14 +153,6 @@ private:
 	void appendTasksLog( const std::string & message);  ///< Append tasks log with a \c message .
 
 private:
-	std::string m_farm_host_name;
-	std::string m_farm_host_description;
-
-	std::vector<int> m_services_counts;
-	int m_services_num;
-
-	std::vector<int> m_services_disabled_nums;
-
 	std::list<std::string> m_tasks_log;							///< Tasks Log.
 
 	af::RenderEvents m_re;

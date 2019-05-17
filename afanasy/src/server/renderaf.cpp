@@ -75,8 +75,6 @@ void RenderAf::initDefaultValues()
 {
 	m_parent = NULL;
 
-	m_services_num = 0;
-
 	setBusy( false);
 	setWOLFalling( false);
 	setWOLSleeping( false);
@@ -230,21 +228,24 @@ void RenderAf::online( RenderAf * render, JobContainer * i_jobs, MonitorContaine
 		return;
 	}
 
-	m_idle_time = time( NULL);
+	// Update some attributes to make it online:
+	m_task_start_finish_time = 0;
+	m_idle_time = time(NULL);
 	m_busy_time = m_idle_time;
-	setBusy( false);
-	setWOLSleeping( false);
-	setWOLWaking( false);
-	setWOLFalling( false);
+	setBusy(false);
+	setWOLSleeping(false);
+	setWOLWaking(false);
+	setWOLFalling(false);
+	updateTime();
+	setOnline();
+
+	// Grab some attributes from an incoming render data:
 	m_time_launch = render->m_time_launch;
 	m_engine = render->m_engine;
-	m_task_start_finish_time = 0;
-	m_address.copy( render->getAddress());
-	grabNetIFs( render->m_netIFs);
-	getFarmHost( &render->m_host);
-	setOnline();
-	updateTime();
-	m_hres.copy( render->getHostRes());
+	m_address.copy(render->getAddress());
+	grabNetIFs(render->m_netIFs);
+	getFarmHost(&render->m_host);
+	m_hres.copy(render->getHostRes());
 
 
 	// Reconnect tasks if any:
@@ -293,7 +294,7 @@ void RenderAf::setTask( af::TaskExec *taskexec, MonitorContainer * monitoring, b
 	}
 
 	addTask( taskexec);
-	addService( taskexec->getServiceType());
+
 	if( monitoring ) monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
 
 	if( start)
@@ -649,7 +650,6 @@ void RenderAf::stopTask( int jobid, int blocknum, int tasknum, int number)
 void RenderAf::taskFinished( const af::TaskExec * taskexec, MonitorContainer * monitoring)
 {
 	removeTask( taskexec);
-	remService( taskexec->getServiceType());
 
 	if( taskexec->getNumber())
 	{
@@ -688,6 +688,8 @@ void RenderAf::addTask( af::TaskExec * taskexec)
 	// Just check capacity:
 	if ((getCapacity() >= 0) && (m_capacity_used > getCapacity()))
 		AF_ERR << "Capacity_used > max capacity (" << m_capacity_used << " > " << getCapacity() << ")";
+
+	//farmTaskAcuire( taskexec->getServiceType());
 }
 
 void RenderAf::removeTask( const af::TaskExec * i_exec)
@@ -716,6 +718,8 @@ void RenderAf::removeTask( const af::TaskExec * i_exec)
 		m_capacity_used = 0;
 	}
 	else m_capacity_used -= i_exec->getCapResult();
+
+	//farmTaskRelease( taskexec->getServiceType());
 }
 
 void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorContainer * monitoring)
@@ -936,121 +940,10 @@ af::Msg * RenderAf::writeTasksLog( bool i_binary)
 	return msg;
 }
 
-bool RenderAf::getFarmHost( af::Host * newHost)
+void RenderAf::getFarmHost( af::Host * newHost)
 {
-	// Store old services usage:
-	std::list<int> servicescounts_old;
-	std::list<std::string> servicesnames_old;
-	for( int i = 0; i < m_services_num; i++)
-	{
-		servicescounts_old.push_back( m_services_counts[i]);
-		servicesnames_old.push_back( m_host.getServiceName(i));
-	}
-	int servicesnum_old = m_services_num;
-
-	// Clear services and services usage:
-	m_host.clearServices();
-	m_services_counts.clear();
-	m_services_num = 0;
-
 	// When render becames online it refresh hardware information:
 	if( newHost ) m_host.copy( *newHost);
-
-	// Check dirty - check if capacity was overriden and now is equal to the new value
-	checkDirty();
-
-	m_services_num = m_host.getServicesNum();
-	m_services_counts.resize( m_services_num, 0);
-
-	std::list<std::string>::const_iterator osnIt = servicesnames_old.begin();
-	std::list<int>::const_iterator oscIt = servicescounts_old.begin();
-	for( int o = 0; o < servicesnum_old; o++, osnIt++, oscIt++)
-		for( int i = 0; i < m_services_num; i++)
-			if( *osnIt == m_host.getServiceName(i))
-				m_services_counts[i] = *oscIt;
-
-	return true;
-}
-
-const std::string RenderAf::getServicesString() const
-{
-	if( m_services_num == 0) return "No services.";
-
-	std::string str = "Services:";
-	for( int i = 0; i < m_services_num; i++)
-	{
-		str += "\n	";
-		str += m_host.getServiceName(i);
-		if( m_services_disabled_nums[i] ) str += " (DISABLED)";
-		if(( m_services_counts[i] > 0) || ( m_host.getServiceCount(i) > 0))
-		{
-			str += ": ";
-			if( m_services_counts[i] > 0) str += af::itos( m_services_counts[i]);
-			if( m_host.getServiceCount(i) > 0) str += " / max=" + af::itos( m_host.getServiceCount(i));
-		}
-	}
-	if( m_services_disabled.size())
-	{
-		str += "\nDisabled services:\n	";
-		str += af::strJoin( m_services_disabled);
-	}
-
-	return str;
-}
-void RenderAf::jsonWriteServices( std::ostringstream & o_str) const
-{
-	o_str << "\"services\":{";
-
-	for( int i = 0; i < m_services_num; i++)
-	{
-		if( i > 0 ) o_str << ",";
-		o_str << "\"" << m_host.getServiceName(i) << "\":[" << int( m_services_counts[i]);
-		if( m_host.getServiceCount(i) > 0)
-			o_str << ",\"max\"," << int( m_host.getServiceCount(i));
-		if( m_services_disabled_nums[i] ) o_str << ",false";
-		o_str << "]";
-	}
-
-	o_str << "}";
-
-	if( false == m_services_disabled.size())
-		o_str << ",\"services_disabled\":\"" << af::strJoin( m_services_disabled) << "\"";
-}
-
-void RenderAf::addService( const std::string & type)
-{
-//	af::farm()->serviceLimitAdd( type, m_name);
-
-	for( int i = 0; i < m_services_num; i++)
-	{
-		if( m_host.getServiceName(i) == type)
-		{
-			m_services_counts[i]++;
-			if((m_host.getServiceCount(i) > 0 ) && (m_services_counts[i] > m_host.getServiceCount(i)))
-				AFERRAR("RenderAf::addService: m_services_counts > host.getServiceCount for '%s' (%d>=%d)",
-						  type.c_str(), m_services_counts[i], m_host.getServiceCount(i))
-			return;
-		}
-	}
-}
-
-void RenderAf::remService( const std::string & type)
-{
-//	af::farm()->serviceLimitRelease( type, m_name);
-
-	for( int i = 0; i < m_services_num; i++)
-	{
-		if( m_host.getServiceName(i) == type)
-		{
-			if( m_services_counts[i] < 1)
-			{
-				AFERRAR("RenderAf::remService: m_services_counts < 1 for '%s' (=%d)", type.c_str(), m_services_counts[i])
-			}
-			else
-				m_services_counts[i]--;
-			return;
-		}
-	}
 }
 
 void RenderAf::closeLostTask( const af::MCTaskUp &taskup)
@@ -1083,8 +976,6 @@ af::Msg * RenderAf::writeFullInfo( bool i_binary) const
 		std::string str = v_generateInfoString( true);
 		if( m_custom_data.size())
 		str += "\nCustom Data:\n" + m_custom_data;
-		str += "\n";
-		str += getServicesString();
 
 		o_msg->setString( str);
 
@@ -1101,9 +992,6 @@ af::Msg * RenderAf::writeFullInfo( bool i_binary) const
 	af::Render::v_jsonWrite( str, af::Msg::TRendersList);
 
 	str << ",\"custom_data\":\"" << m_custom_data << '"';
-
-	str << ",";
-	jsonWriteServices( str);
 
 	if( isOnline())
 	{
