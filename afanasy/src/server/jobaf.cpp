@@ -837,7 +837,7 @@ bool JobAf::v_canRunOn( RenderAf * i_render)
 		return false;
 	
 	// check needed os:
-	if( false == checkNeedOS( i_render->getHost().m_os))
+	if (false == checkNeedOS(i_render->getOS()))
 	{
 		return false;
 	}

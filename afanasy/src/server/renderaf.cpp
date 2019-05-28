@@ -240,6 +240,7 @@ void RenderAf::online( RenderAf * render, JobContainer * i_jobs, MonitorContaine
 	setOnline();
 
 	// Grab some attributes from an incoming render data:
+	m_os = render->m_os;
 	m_time_launch = render->m_time_launch;
 	m_engine = render->m_engine;
 	m_address.copy(render->getAddress());

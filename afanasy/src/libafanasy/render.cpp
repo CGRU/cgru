@@ -228,6 +228,8 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
 			}
 		}
 
+		rw_String  ( m_os,           msg);
+
 	  rw_String  ( m_engine,       msg);
 	  rw_String  ( m_name,         msg);
 	  rw_String  ( m_user_name,    msg);
@@ -354,29 +356,24 @@ void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const
    }
    else
    {
-		if( isOnline())     stream << " ON ";
-		if( isOffline())    stream << " off";
-
-		if( isBusy()) stream << " BUSY"; else stream << "     ";
-
-		if( isWOLFalling())  stream << " WFL"; else stream << "    ";
-		if( isWOLSleeping()) stream << " WSL"; else stream << "    ";
-		if( isWOLWaking())   stream << " WWK"; else stream << "    ";
-
-		if( isNimby())           stream << " n";
-		else if( isNIMBY())      stream << " N";
-		else if( isPaused()) stream << " P";
-		else                     stream << "  ";
-
 		stream << " " << m_name << "@" << m_user_name << "[" << m_id << "]";
-/*
-		if( m_wol_operation_time ) stream << " W:" << time2str( m_wol_operation_time);
-		stream << " I:" << time2str( m_idle_time);
-		stream << " B:" << time2str( m_busy_time);
 
-		stream << " e'" << m_engine << "'";
-*/
+		stream << " " << m_os << " " << m_engine;
+
 		stream << " ";
 		m_address.v_generateInfoStream( stream ,full);
+
+		if( isOnline())  stream << " ON ";
+		if( isOffline()) stream << " off";
+
+		if( isBusy()) stream << " BUSY";
+
+		if (isNimby())  stream << " n";
+		if (isNIMBY())  stream << " N";
+		if (isPaused()) stream << " P";
+
+		if( isWOLFalling())  stream << " WFL";
+		if( isWOLSleeping()) stream << " WSL";
+		if( isWOLWaking())   stream << " WWK";
    }
 }
