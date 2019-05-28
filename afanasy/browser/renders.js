@@ -290,7 +290,6 @@ RenderNode.prototype.update = function(i_obj) {
 	cm_GetState(this.params.state, this.state, this.element);
 
 	this.elName.innerHTML = '<b>' + this.params.name + '</b>';
-	this.elName.title = this.params.host.os;
 
 	if (this.params.version != null)
 		this.elVersion.textContent = 'v' + this.params.version;
@@ -848,9 +847,11 @@ RenderNode.prototype.updatePanels = function() {
 	// Info:
 	var info = '';
 
-	info += '<p>Pool: <b>' + this.params.pool + '</b></p>'
+	info += '<p>OS: <b>' + this.params.os + '</b></p>';
 
-	info += '<p>IP: ' + this.params.address.ip + '</p>'
+	info += '<p>Pool: <b>' + this.params.pool + '</b></p>';
+
+	info += '<p>IP: ' + this.params.address.ip + '</p>';
 
 	var r = this.params.host_resources;
 	if (r)
