@@ -16,6 +16,7 @@ public:
 	enum Level
 	{
 		LDEBUG,
+		LDEVEL,
 		LVERBOSE,
 		LINFO,
 		LWARNING,
@@ -75,6 +76,7 @@ public:
 #define AF_LOG     af::Logger(__func__, __FILE__, __LINE__, af::Logger::LINFO,    DISPLAY_PID).stream()
 #define AF_WARN    af::Logger(__func__, __FILE__, __LINE__, af::Logger::LWARNING, DISPLAY_PID).stream()
 #define AF_ERR     af::Logger(__func__, __FILE__, __LINE__, af::Logger::LERROR,   DISPLAY_PID).stream()
+#define AF_DEV     af::Logger(__func__, __FILE__, __LINE__, af::Logger::LDEVEL,   DISPLAY_PID).stream()
 
 #define AF_LOGBATCH_BEGIN() { if (NULL != af::Logger::log_batch) delete af::Logger::log_batch; af::Logger::log_batch = new std::stringstream(); }
 #define AF_LOGBATCH_PRINT() std::cerr << af::Logger::log_batch->str() << std::flush

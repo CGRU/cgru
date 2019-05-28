@@ -62,10 +62,10 @@ namespace Color
 
 Logger::Logger(const char *func, const char *file, int line, Logger::Level level, bool display_pid)
 {
-	if (false == af::Environment::logNoDate())
+	if ((false == af::Environment::logNoDate()) && (level != LDEVEL))
 		m_ss << af::time2str() << ": ";
 
-	switch( level)
+	switch (level)
 	{
 	case Logger::LDEBUG:
 		m_ss << Color::bold_grey   << "DEBUG  " << Color::nocolor;
@@ -82,6 +82,9 @@ Logger::Logger(const char *func, const char *file, int line, Logger::Level level
 	case Logger::LERROR:
 		m_ss << Color::bold_red    << "ERROR  " << Color::nocolor;
 		break;
+	case Logger::LDEVEL:
+		m_ss << Color::bold_grey    << "devel  " << Color::nocolor;
+		break;
 	}
 
 	#ifndef WINNT
@@ -89,7 +92,7 @@ Logger::Logger(const char *func, const char *file, int line, Logger::Level level
 		m_ss << " [" << getpid() << "]";
 	#endif
 
-	if( level == LDEBUG )
+	if ((level == LDEBUG) || (level == LDEVEL))
 	{
 		std::stringstream pos;
 		pos << " (" << func << "():" << Logger::shorterFilename(file) << ":" << line << ")";
@@ -99,12 +102,13 @@ Logger::Logger(const char *func, const char *file, int line, Logger::Level level
 	
 	m_ss << " ";
 
-	switch( level) {
-	case Logger::LDEBUG:   m_ss << Color::bold_grey;    break;
-	case Logger::LVERBOSE: m_ss << Color::nocolor; break;
-	case Logger::LINFO:    m_ss << Color::nocolor; break;
-	case Logger::LWARNING: m_ss << Color::yellow;  break;
-	case Logger::LERROR:   m_ss << Color::red;     break;
+	switch (level) {
+	case Logger::LDEBUG:   m_ss << Color::bold_grey; break;
+	case Logger::LDEVEL:   m_ss << Color::bold_grey; break;
+	case Logger::LVERBOSE: m_ss << Color::nocolor;   break;
+	case Logger::LINFO:    m_ss << Color::nocolor;   break;
+	case Logger::LWARNING: m_ss << Color::yellow;    break;
+	case Logger::LERROR:   m_ss << Color::red;       break;
 	}
 }
 
