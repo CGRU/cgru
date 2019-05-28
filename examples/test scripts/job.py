@@ -45,6 +45,7 @@ parser.add_option('-m', '--maxtime',      dest='maxtime',      type='int',    de
 parser.add_option(      '--pkp',          dest='pkp',          type='int',    default=1,  help='Parser key percentage')
 parser.add_option(      '--send',         dest='sendjob',      type='int',    default=1,  help='send job')
 parser.add_option('-w', '--waittime',     dest='waittime',     type='int',    default=0,  help='set job to wait to start time')
+parser.add_option(      '--os',           dest='os',           type='string', default=None, help='OS needed')
 parser.add_option('-c', '--capacity',     dest='capacity',     type='int',    default=0,  help='tasks capacity')
 parser.add_option(      '--capmin',       dest='capmin',       type='int',    default=-1, help='tasks variable capacity coeff min')
 parser.add_option(      '--capmax',       dest='capmax',       type='int',    default=-1, help='tasks variable capacity coeff max')
@@ -281,7 +282,10 @@ if Options.pause:
 if Options.output:
     job.output()
 
-job.setNeedOS('')
+if Options.os is None:
+    job.setNeedOS('')
+else:
+    job.setNeedOS(Options.os)
 
 exit_status = 0
 if Options.sendjob:
