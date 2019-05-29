@@ -547,12 +547,17 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 	if( username.empty()) username = "unknown";
 
 	// Convert to lowercase:
-	std::transform( username.begin(), username.end(), username.begin(), ::tolower);
-	// cut DOMAIN/
-	size_t dpos = username.rfind('/');
-	if( dpos == std::string::npos) dpos = username.rfind('\\');
-	if( dpos != std::string::npos) username = username.substr( dpos + 1);
-	std::transform( username.begin(), username.end(), username.begin(), ::tolower);
+	std::transform(username.begin(), username.end(), username.begin(), ::tolower);
+
+	// cut DOMAIN
+	{
+		size_t dpos = username.rfind('/');
+		if (dpos == std::string::npos)
+			dpos = username.rfind('\\');
+		if (dpos != std::string::npos)
+			username = username.substr( dpos + 1);
+	}
+
 	PRINT("Afanasy user name = '%s'\n", username.c_str());
 
 //
@@ -587,9 +592,20 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 		}
 		computername = buffer;
 	}
-	if( hostname.empty()) hostname = computername;
-	std::transform( hostname.begin(), hostname.end(), hostname.begin(), ::tolower);
-	std::transform( computername.begin(), computername.end(), computername.begin(), ::tolower);
+
+	if(hostname.empty())
+		hostname = computername;
+
+	// To lower case:
+	std::transform(hostname.begin(), hostname.end(), hostname.begin(), ::tolower);
+	std::transform(computername.begin(), computername.end(), computername.begin(), ::tolower);
+
+	// Cut DOMAIN:
+	{
+		size_t dpos = hostname.find('.');
+		if (dpos != std::string::npos)
+			hostname = hostname.substr(0, dpos);
+	}
 
 	PRINT("Local computer name = '%s'\n", computername.c_str());
 	PRINT("Afanasy host name = '%s'\n", hostname.c_str());
