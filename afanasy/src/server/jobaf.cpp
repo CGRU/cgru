@@ -841,13 +841,13 @@ bool JobAf::v_canRunOn( RenderAf * i_render)
 	{
 		return false;
 	}
-	
+
 	// check needed properties:
-	if( false == checkNeedProperties( i_render->getHost().m_properties))
+/*	if( false == checkNeedProperties( i_render->getHost().m_properties))
 	{
 		return false;
-	}
-	
+	}*/
+
 	return true;
 }
 

@@ -4,7 +4,7 @@
 #endif
 
 #include "../libafanasy/environment.h"
-#include "../libafanasy/host.h"
+#include "../libafanasy/hostres.h"
 #include "../libafanasy/render.h"
 #include "../libafanasy/renderevents.h"
 
@@ -97,13 +97,11 @@ int main(int argc, char *argv[])
 	// Check resources and exit:
 	if( ENV.hasArgument("-res"))
 	{
-		af::Host host;
 		af::HostRes hostres;
-		GetResources( host, hostres, true);
+		GetResources(hostres, true);
 		af::sleep_msec(100);
-		GetResources( host, hostres);
+		GetResources(hostres);
 		printf("\n");
-		host.v_stdOut( true);
 		hostres.v_stdOut( true);
 		Py_Finalize();
 		return 0;

@@ -31,8 +31,7 @@ RenderHost::RenderHost():
 
     setOnline();
 
-    m_host.m_os = af::strJoin( af::Environment::getPlatform(), " ");
-    GetResources( m_host, m_hres);
+	GetResources(m_hres);
 
     std::vector<std::string> resclasses = af::Environment::getRenderResClasses();
     for( std::vector<std::string>::const_iterator it = resclasses.begin(); it != resclasses.end(); it++)
@@ -55,11 +54,10 @@ RenderHost::RenderHost():
 
 	af::sleep_msec( 100);
 
-    GetResources( m_host, m_hres);
+	GetResources(m_hres);
     for( int i = 0; i < m_pyres.size(); i++) m_pyres[i]->update();
 
     v_stdOut();
-    m_host.v_stdOut( true);
     m_hres.v_stdOut( true);
 }
 
@@ -205,7 +203,7 @@ void RenderHost::getResources()
 		return;
 	}
 
-	GetResources( m_host, m_hres);
+	GetResources(m_hres);
 
 	for( int i = 0; i < m_pyres.size(); i++)
 		m_pyres[i]->update();

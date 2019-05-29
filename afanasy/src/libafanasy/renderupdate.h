@@ -5,7 +5,7 @@
 
 #include "af.h"
 #include "afqueue.h"
-#include "host.h"
+#include "hostres.h"
 #include "msgclasses/mctaskpos.h"
 #include "msgclasses/mctaskup.h"
 

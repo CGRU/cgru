@@ -59,9 +59,9 @@ private:
 
 private:
 
-	af::Host    m_host;
 	af::HostRes m_hres;
 
+	QString m_os;
 	QString m_engine;
 	QString m_username;
 	QString m_tasksusers; ///< For sorting and filtering only

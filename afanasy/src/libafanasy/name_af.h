@@ -65,7 +65,6 @@ namespace af
 	class Address;
 	class AddressesList;
 	class Passwd;
-	class Host;
 	class HostRes;
 	class Parser;
 	class PyClass;

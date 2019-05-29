@@ -171,7 +171,6 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 			becameOnline = true;
 	        m_update_counter = 0;
 
-	        m_host = render->getHost();
 	        m_hres.copy( render->getHostRes());
 
 	        m_plotMem.setScale( m_hres.mem_total_mb);

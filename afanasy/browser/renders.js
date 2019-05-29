@@ -847,7 +847,7 @@ RenderNode.prototype.updatePanels = function() {
 	// Info:
 	var info = '';
 
-	info += '<p>OS: <b>' + this.params.os + '</b></p>';
+	info += '<p>OS: <b>' + this.params.os + '</b> - ' + this.params.engine + '</p>';
 
 	info += '<p>Pool: <b>' + this.params.pool + '</b></p>';
 

@@ -61,7 +61,7 @@ static struct timeval sg_current_time = {0}, sg_last_time = {0};
 
    Main entry point in this file. All other functions are utilities
 */
-void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
+void GetResources(af::HostRes & hres, bool verbose)
 {
    static unsigned s_init = 0;
 

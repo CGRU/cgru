@@ -89,7 +89,7 @@ void RenderAf::setRegistered(PoolsContainer * i_pools)
 {
 	findPool(i_pools);
 
-	getFarmHost();
+//getFarmHost();
 
 	if( isFromStore())
 	{
@@ -245,7 +245,7 @@ void RenderAf::online( RenderAf * render, JobContainer * i_jobs, MonitorContaine
 	m_engine = render->m_engine;
 	m_address.copy(render->getAddress());
 	grabNetIFs(render->m_netIFs);
-	getFarmHost(&render->m_host);
+//getFarmHost(&render->m_host);
 	m_hres.copy(render->getHostRes());
 
 
@@ -939,12 +939,6 @@ af::Msg * RenderAf::writeTasksLog( bool i_binary)
 		msg->setStringList( m_tasks_log);
 
 	return msg;
-}
-
-void RenderAf::getFarmHost( af::Host * newHost)
-{
-	// When render becames online it refresh hardware information:
-	if( newHost ) m_host.copy( *newHost);
 }
 
 void RenderAf::closeLostTask( const af::MCTaskUp &taskup)

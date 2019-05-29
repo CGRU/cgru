@@ -130,14 +130,6 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const // Threa
 		o_str << "\n]";
 	}
 
-	// We do not need to store host on hdd,
-	// it will be taken from farm setup when online.
-	if( i_type != 0 )
-	{
-		o_str << ",\n";
-		m_host.jsonWrite( o_str);
-	}
-
 	Farm::jsonWrite(o_str, i_type);
 
 	o_str << "\n}";
@@ -237,7 +229,6 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
 	  rw_int64_t ( m_flags,        msg);
 	  rw_uint8_t ( m_priority,     msg);
 	  rw_int64_t ( m_time_launch,  msg);
-	  m_host.v_readwrite( msg);
 	  m_address.v_readwrite( msg);
 
    case Msg::TRenderUpdate:
@@ -338,9 +329,6 @@ void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const
 
 		if( m_time_launch   ) stream << "\n Launched at: " << time2str( m_time_launch   );
 		if( m_time_register ) stream << "\n Registered at: " << time2str( m_time_register );
-
-		stream << std::endl;
-		m_host.v_generateInfoStream( stream, full);
 
 		if( m_netIFs.size())
 		{

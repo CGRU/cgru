@@ -2,7 +2,7 @@
 
 #include "name_af.h"
 #include "affarm.h"
-#include "host.h"
+#include "hostres.h"
 #include "client.h"
 
 namespace af
@@ -42,7 +42,6 @@ public:
 
 	inline int getCapacityUsed() const { return m_capacity_used;}
 
-   inline const Host    & getHost()    const { return m_host;}
    inline const HostRes & getHostRes() const { return m_hres;}
 
 	/// Set free (unset nimby and NIMBY).
@@ -103,7 +102,6 @@ protected:
 	int32_t m_capacity_used;
 	int32_t m_max_tasks;
 
-	Host     m_host;
 	HostRes  m_hres;
 
 	std::list<TaskExec*> m_tasks;

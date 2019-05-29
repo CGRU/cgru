@@ -7,7 +7,7 @@
 #include "../include/afpynames.h"
 
 #include "../libafanasy/environment.h"
-#include "../libafanasy/host.h"
+#include "../libafanasy/hostres.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT

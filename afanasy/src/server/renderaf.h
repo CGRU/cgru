@@ -91,9 +91,6 @@ public:
 
 	af::Msg * writeTasksLog( bool i_binary);
 
-/// Get host parameters from farm.
-	void getFarmHost( af::Host * newHost = NULL);
-
 /// Deregister render, on SIGINT client recieving.
 	void deregister( JobContainer * jobs, MonitorContainer * monitoring );
 
