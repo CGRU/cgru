@@ -18,7 +18,7 @@ public:
 		TRenderer
 	};
 
-	bool canRunService(const std::string & i_service_name) const;
+	bool canRunService(const std::string & i_service_name, bool i_hasServicesSetup = false) const;
 
 	// On success return true for monitoring/storing
 	bool actionFarm(Action & i_action);

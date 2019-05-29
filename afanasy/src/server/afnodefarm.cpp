@@ -213,25 +213,26 @@ bool AfNodeFarm::isServiceDisabled(const std::string & i_service_name) const
 	return false;
 }
 
-bool AfNodeFarm::canRunService(const std::string & i_service_name) const
+bool AfNodeFarm::canRunService(const std::string & i_service_name, bool i_hasServicesSetup) const
 {
 //printf("%s:can(%s):s(%d:",name().c_str(),i_service_name.c_str(),m_farm->m_services.size());for (const std::string & s : m_farm->m_services) printf(" %s",s.c_str());printf(")/d(%d:",m_farm->m_services_disabled.size());for (const std::string & s : m_farm->m_services_disabled) printf(" %s",s.c_str());printf("): ");if (hasService(i_service_name)) printf(" HAS");if (isServiceDisabled(i_service_name)) printf(" DIS");printf("\n");
 
-	if (m_farm->m_services.size() == 0)
-	{
-		if (isServiceDisabled(i_service_name))
-			return false;
-
-		if (m_parent)
-			return m_parent->canRunService(i_service_name);
-		else
-			return true;
-	}
+	if (isServiceDisabled(i_service_name))
+		return false;
 
 	if (hasService(i_service_name))
-		if (false == isServiceDisabled(i_service_name))
-			return true;
+		return true;
 
-	return false;
+	// Store that pool has services setup, if no child had
+	if (false == i_hasServicesSetup)
+		i_hasServicesSetup = m_farm->m_services.size() > 0;
+
+	if (m_parent)
+		return m_parent->canRunService(i_service_name, i_hasServicesSetup);
+
+	// This is the root pool, that has not service and not disables service.
+	// If no child node has any service, that means that no services was set at all.
+	// Assuming that there is no matter what service to run.
+	return false == i_hasServicesSetup;
 }
 
