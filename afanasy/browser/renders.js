@@ -873,6 +873,8 @@ RenderNode.prototype.updatePanels = function() {
 		info += '<div>Task finished at: ' + cm_DateTimeStrFromSec(this.params.task_start_finish_time) + '</div>';
 
 	this.monitor.setPanelInfo(info);
+
+	farm_showServicesInfo(this);
 };
 
 RenderNode.actions = [];

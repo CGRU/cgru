@@ -292,7 +292,10 @@ PoolNode.prototype.updatePanels = function() {
 		info += '<p>Empty for: ' + cm_TimeStringInterval(this.params.time_empty);
 		info += ', since: ' + cm_DateTimeStrFromSec(this.params.time_empty) + '</p>';
 	}
+
 	this.monitor.setPanelInfo(info);
+
+	farm_showServicesInfo(this);
 };
 
 // RenderNode here! This not an error!

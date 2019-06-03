@@ -139,6 +139,14 @@ background-color: rgba(150,255,255,.1);
 -webkit-user-select: none;
 }
 .button:hover { background-color: rgba(150,255,255,.3); }
+.button.delete {
+background-image: url(/lib/icons/delete.png);
+background-size: 100%;
+background-repeat: no-repeat;
+background-position: center;
+width: 12px; height: 12px;
+margin: 0; padding: 0;
+}
 
 .monitor {
 position: absolute;
@@ -346,11 +354,17 @@ border-radius: 2px;
 border: 1px solid #555;
 }
 .service { font-weight: bold;}
-.service img { width: 12px; height: 12px;}
-.service div { float: right;}
+.service img { width: 12px; height: 12px; float: left;}
+.info_services .service img { width: 24px; height: 24px; }
 .service.disabled { opacity: 0.7;}
 .service.disabled div { text-decoration: line-through; font-style: italic;}
 .disabled_service { text-decoration: line-through;}
+.service .button.delete, .disabled_service .button.delete { float: right;}
+.info_services {
+border-top: 1px solid #555;
+margin-top: 4px;
+padding-top: 4px;
+}
 
 .render .farm {
 clear: both;

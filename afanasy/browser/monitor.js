@@ -1089,6 +1089,10 @@ Monitor.prototype.resetPanelInfo = function() {
 	this.elPanelR.m_elInfo.m_elBody.textContent = '';
 };
 
+Monitor.prototype.getElPanelInfo = function() {
+	return this.elPanelR.m_elInfo.m_elBody;
+};
+
 Monitor.prototype.onContextMenu = function(i_evt, i_el) {
 	i_evt.stopPropagation();
 	g_cur_monitor = this;
