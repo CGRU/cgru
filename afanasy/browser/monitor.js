@@ -132,7 +132,7 @@ function Monitor(i_args)
 	var el = document.createElement('div');
 	this.elPanelR.appendChild(el);
 	this.elPanelR.m_elName = el;
-	el.classList.add('name');
+	el.classList.add('node_name');
 
 	if (this.nodeConstructor.createPanels)
 		this.nodeConstructor.createPanels(this);

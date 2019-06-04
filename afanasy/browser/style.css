@@ -177,7 +177,7 @@ border-left: 2px solid #575757;
 overflow-y: auto;
 word-wrap: break-word;
 }
-.panel.right .name {
+.panel.right .node_name {
 padding: 4px;
 text-align: center;
 font-weight: bold;
@@ -353,13 +353,22 @@ padding: 1px 4px;
 border-radius: 2px;
 border: 1px solid #555;
 }
+/*
+	.service.disabled is a configured service that is temporary disabled
+	.disabled_service is not a service that is disabled, it is not a service
+ */
 .service { font-weight: bold;}
 .service img { width: 12px; height: 12px; float: left;}
+.info_services .service .name { padding: 4px; }
+.info_services .disabled_service .name { padding: 2px 4px; }
 .info_services .service img { width: 24px; height: 24px; }
 .service.disabled { opacity: 0.7;}
 .service.disabled div { text-decoration: line-through; font-style: italic;}
 .disabled_service { text-decoration: line-through;}
 .service .button.delete, .disabled_service .button.delete { float: right;}
+/*
+	serivces are shown in a pool/render item and in the right panel info
+*/
 .info_services {
 border-top: 1px solid #555;
 margin-top: 4px;
