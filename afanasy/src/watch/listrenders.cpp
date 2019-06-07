@@ -73,35 +73,39 @@ ListRenders::ListRenders( QWidget* parent):
 	m_ctrl_sf->getLayout()->addWidget( control);
 
 	// Add left panel buttons:
-	ButtonPanel * bp;
+	ButtonPanel * bp; ButtonsMenu * bm;
 
-	bp = addButtonPanel("LOG","renders_log","Show render log.");
+	bp = addButtonPanel("LOG","renders_log","Get render log.");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestLog()));
 
-	bp = addButtonPanel("TLG","renders_tasks_log","Show tasks log.");
+	bp = addButtonPanel("TASKS LOG","renders_tasks_log","Get tasks log.");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestTasksLog()));
 
-	bp = addButtonPanel("nim","renders_nimby","Set nimby.","M");
+	bp = addButtonPanel("nimby","renders_nimby","Set nimby.","M");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actNimby()));
 
-	bp = addButtonPanel("NIM","renders_NIMBY","Set NIMBY.","N");
+	bp = addButtonPanel("NIMBY","renders_NIMBY","Set NIMBY.","N");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actNIMBY()));
 
-	bp = addButtonPanel("FRE","renders_free","Set free.","F");
+	bp = addButtonPanel("FREE","renders_free","Set free.","F");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actFree()));
 
-	bp = addButtonPanel("EJA","renders_eject_all","Eject all tasks.","", true);
+	bm = addButtonsMenu("Eject Tasks","Eject tasks from render.");
+
+	bp = addButtonPanel("ALL","renders_eject_all","Eject all tasks.","", true);
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actEjectTasks()));
 
-	bp = addButtonPanel("EJN","renders_eject_notmy","Eject not my tasks.","", true);
+	bp = addButtonPanel("NOT MY","renders_eject_notmy","Eject not my tasks.","", true);
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actEjectNotMyTasks()));
+
+	resetButtonsMenu();
 
 	if( af::Environment::GOD())
 	{
-		bp = addButtonPanel("PAU","renders_pause","Pause selected renders.","P");
+		bp = addButtonPanel("PAUSE","renders_pause","Pause selected renders.","P");
 		connect( bp, SIGNAL( sigClicked()), this, SLOT( actSetPaused()));
 
-		bp = addButtonPanel("STA","renders_unpause","Start (Unpause) selected renders.","S");
+		bp = addButtonPanel("START","renders_unpause","Start (Unpause) selected renders.","S");
 		connect( bp, SIGNAL( sigClicked()), this, SLOT( actUnsetPaused()));
 	}
 

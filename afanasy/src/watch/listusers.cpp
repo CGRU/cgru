@@ -6,6 +6,7 @@
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
 #include "buttonpanel.h"
+#include "buttonsmenu.h"
 #include "ctrlsortfilter.h"
 #include "itemuser.h"
 #include "modelnodes.h"
@@ -54,23 +55,32 @@ ListUsers::ListUsers( QWidget* parent):
 
 
 	// Add left panel buttons:
-	ButtonPanel * bp;
+	ButtonPanel * bp; ButtonsMenu * bm;
 
-	bp = addButtonPanel("LOG","users_log","Show user log.");
+	bp = addButtonPanel("LOG","users_log","Get user log.");
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRequestLog()));
 
-	bp = addButtonPanel("ORD","users_solve_ordered","Solve jobs by order.");
+	bm = addButtonsMenu("Solve","Choose jobs solving method.");
+	bm->openMenu();
+
+	bp = addButtonPanel("ORDER","users_solve_ordered","Solve jobs by order.");
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actSolveJobsByOrder()));
 
-	bp = addButtonPanel("PRI","users_solve_priority","Solve jobs by priority.");
+	bp = addButtonPanel("PRIORITY","users_solve_priority","Solve jobs by priority.");
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actSolveJobsByPriority()));
 
-	bp = addButtonPanel("CAP","users_solve_capacity","Solve jobs need by capacity.");
+	resetButtonsMenu();
+
+	bm = addButtonsMenu("Need","Choose jobs solving need.");
+	bm->openMenu();
+
+	bp = addButtonPanel("CAPACITY","users_solve_capacity","Solve jobs need by running tasks total capacity.");
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actSolveJobsByCapacity()));
 
-	bp = addButtonPanel("TSK","users_solve_tasksnum","Solve jobs need by tasks number.");
+	bp = addButtonPanel("TASKS NUM","users_solve_tasksnum","Solve jobs need by running tasks number.");
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actSolveJobsByTasksNum()));
 
+	resetButtonsMenu();
 
 	m_parentWindow->setWindowTitle("Users");
 

@@ -91,33 +91,56 @@ ListJobs::ListJobs( QWidget* parent):
 	bp = addButtonPanel("LOG","jobs_log","Show job log.");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestLog()));
 
-	bp = addButtonPanel("EHO","jobs_show_err_hosts","Show error hosts.");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestErrorHostsList()));
-
-	bp = addButtonPanel("PAU","jobs_pause","Pause selected jobs.","P");
+	bp = addButtonPanel("PAUSE","jobs_pause","Pause selected jobs.","P");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actPause()));
 
-	bp = addButtonPanel("STA","jobs_start","Start selected jobs.","S");
+	bp = addButtonPanel("START","jobs_start","Start selected jobs.","S");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actStart()));
 
-	bp = addButtonPanel("REH","jobs_reset_avoid_hosts","Reset error hosts.","E");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actResetErrorHosts()));
+	bp = addButtonPanel("STOP","jobs_stop","Stop selected jobs tasks and pause jobs.","", true);
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actStop()));
 
-	bp = addButtonPanel("RET","jobs_restart_error_tasks","Restart error tasks.","R");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRestartErrors()));
+	addButtonsMenu("Restart","Restart jobs tasks menu.");
 
-	bp = addButtonPanel("RST","jobs_restart","Restart selected jobs.","", true);
+	bp = addButtonPanel("SELECTED","jobs_restart","Restart all selected jobs tasks.","", true);
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRestart()));
 
-	bp = addButtonPanel("RSP","jobs_restart_pause","Restart&Pause selected jobs.","", true);
+	bp = addButtonPanel("AND PAUSE","jobs_restart_pause","Restart tasks and pause selected jobs.","", true);
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRestartPause()));
 
-	bp = addButtonPanel("DEL","jobs_delete","Delete selected jobs.","", true);
+	bp = addButtonPanel("WARNINGS","jobs_restart_warning","Restart tasks with warnings.","", true);
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRestartWarnings()));
+
+	bp = addButtonPanel("RUNNING","jobs_restart_running","Restart runnning tasks.","", true);
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRestartRunning()));
+
+	bp = addButtonPanel("SKIPPED","jobs_restart_skipped","Restart skipped tasks.","", true);
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRestartSkipped()));
+
+	bp = addButtonPanel("DONE","jobs_restart_done","Restart done tasks.","", true);
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRestartDone()));
+
+	resetButtonsMenu();
+
+	addButtonsMenu("Errors","Show/Manipulate error hosts and tasks.");
+
+	bp = addButtonPanel("SHOW HOSTS","jobs_show_err_hosts","Show error hosts.");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestErrorHostsList()));
+
+	bp = addButtonPanel("RESET HOSTS","jobs_reset_avoid_hosts","Reset error hosts.","E");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actResetErrorHosts()));
+
+	bp = addButtonPanel("RETRY TASKS","jobs_restart_error_tasks","Restart error tasks.","R");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRestartErrors()));
+
+	resetButtonsMenu();
+
+	bp = addButtonPanel("DELETE","jobs_delete","Delete selected jobs.","", true);
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actDelete()));
 
 	if (false == af::Environment::VISOR())
 	{
-		bp = addButtonPanel("DDJ","jobs_delete_done","Delete all done jobs.","", true);
+		bp = addButtonPanel("DEL DONE","jobs_delete_done","Delete all done jobs.","", true);
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(actDeleteDone()));
 	}
 

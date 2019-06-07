@@ -3,6 +3,7 @@
 #include "../libafanasy/regexp.h"
 
 #include "buttonpanel.h"
+#include "buttonsmenu.h"
 #include "item.h"
 #include "modelitems.h"
 #include "viewitems.h"
@@ -20,27 +21,33 @@
 ListItems::ListItems( QWidget* parent, const std::string & type):
 	QWidget( parent),
 	m_type( type),
+	m_current_buttons_menu(NULL),
 	m_parentWindow( parent)
 {
 AFINFO("ListItems::ListItems.\n");
 	setAttribute ( Qt::WA_DeleteOnClose, true );
 
-	m_hlayout = new QHBoxLayout( this);
+	m_hlayout = new QHBoxLayout(this);
 	m_vlayout = new QVBoxLayout();
+	QWidget * panel_l_widget = new QWidget();
+	QWidget * panel_r_widget = new QWidget();
+	m_hlayout->addWidget(panel_l_widget);
+	m_hlayout->addLayout(m_vlayout);
+	m_hlayout->addWidget(panel_r_widget);
+
 	m_panel_l = new QVBoxLayout();
+	panel_l_widget->setLayout(m_panel_l);
+	panel_l_widget->setFixedWidth(100);
+	m_panel_l->setAlignment(Qt::AlignTop);
+	m_panel_l->setContentsMargins(5, 5, 5, 5);
+	m_panel_l->setSpacing(5);
+
 	m_panel_r = new QVBoxLayout();
-	m_hlayout->addLayout( m_panel_l);
-	m_hlayout->addLayout( m_vlayout);
-	m_hlayout->addLayout( m_panel_r);
-
-	m_panel_l->setAlignment( Qt::AlignTop);
-	m_panel_l->setContentsMargins( 5, 5, 5, 5);
-	m_panel_l->setSpacing( 5);
-
-	m_panel_r->setAlignment( Qt::AlignTop);
-	m_panel_r->setContentsMargins( 5, 5, 5, 5);
-	m_panel_r->setSpacing( 5);
-	//m_panel_r->setFiltedWidth(400);
+	panel_r_widget->setLayout(m_panel_r);
+	//panel_r_widget->setFixedWidth(400);
+	m_panel_r->setAlignment(Qt::AlignTop);
+	m_panel_r->setContentsMargins(5, 5, 5, 5);
+	m_panel_r->setSpacing(5);
 	//m_panel_r->addWidget(new QLabel("right"));
 
 	m_hlayout->setSpacing( 0);
@@ -263,6 +270,20 @@ const std::vector<int> ListItems::getSelectedIds() const
 	return ids;
 }
 
+ButtonsMenu * ListItems::addButtonsMenu(const QString & i_label, const QString & i_tip)
+{
+	m_current_buttons_menu = new ButtonsMenu(this, i_label, i_tip);
+
+	m_panel_l->addWidget(m_current_buttons_menu);
+
+	return m_current_buttons_menu;
+}
+
+void ListItems::resetButtonsMenu()
+{
+	m_current_buttons_menu = NULL;
+}
+
 ButtonPanel * ListItems::addButtonPanel(
 		const QString & i_label,
 		const QString & i_name,
@@ -270,11 +291,14 @@ ButtonPanel * ListItems::addButtonPanel(
 		const QString & i_hotkey,
 		bool i_dblclick)
 {
-	ButtonPanel * bp = new ButtonPanel( this, i_label, i_name, i_description, i_hotkey, i_dblclick);
+	ButtonPanel * bp = new ButtonPanel(this, i_label, i_name, i_description, i_hotkey, i_dblclick, m_current_buttons_menu);
 
-	m_panel_l->addWidget( bp);
+	if (m_current_buttons_menu)
+		m_current_buttons_menu->addButton(bp);
+	else
+		m_panel_l->addWidget(bp);
 
-	m_btns.push_back( bp);
+	m_btns.push_back(bp);
 
 	return bp;
 }

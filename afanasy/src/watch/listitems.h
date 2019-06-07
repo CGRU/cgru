@@ -22,6 +22,7 @@ class QModelIndex;
 
 class Item;
 class ButtonPanel;
+class ButtonsMenu;
 class ModelItems;
 class ViewItems;
 
@@ -78,6 +79,9 @@ protected:
 	const std::vector<int> getSelectedIds() const;
 	void setSelectedItems( const QList<Item*> & items, bool resetSelection = true);
 
+	ButtonsMenu * addButtonsMenu(const QString & i_label, const QString & i_tip);
+	void resetButtonsMenu();
+
 	ButtonPanel * addButtonPanel(
 		const QString & i_label,
 		const QString & i_name,
@@ -106,6 +110,8 @@ private slots:
 
 private:
 	std::string m_type;
+
+	ButtonsMenu * m_current_buttons_menu;
 
 	std::vector<ButtonPanel*> m_btns;
 };
