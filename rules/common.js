@@ -883,6 +883,21 @@ function c_PathPM_Server2Client(i_path)
 	return cgru_PM(i_path);
 }
 
+// Check where i_subfolder is located in i_folder
+function c_PathIsInFolder(i_folder, i_subfolder)
+{
+	var folders = i_folder.split('/');
+	var subs = i_subfolder.split('/');
+
+	if (folders.length > subs.length)
+		return false;
+
+	for (let i = 0; i < folders.length; i++)
+		if (folders[i] != subs[i])
+			return false;
+
+	return true;
+}
 
 function c_CreateOpenButton(i_args)
 {

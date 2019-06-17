@@ -171,13 +171,11 @@ function nw_Process()
 
 	nw_HighlightChannels();
 
-	// window.console.log(g_auth_user.channels);
 	var subscribed = false;
 	var path = g_CurPath();
-	for (var i = 0; i < g_auth_user.channels.length; i++)
+	for (let chan of g_auth_user.channels)
 	{
-		var nw_path = g_auth_user.channels[i].id;
-		if (path.indexOf(nw_path) == 0)
+		if (c_PathIsInFolder(chan.id, path))
 		{
 			subscribed = true;
 			break;
