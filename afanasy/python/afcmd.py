@@ -315,6 +315,14 @@ class Render:
         output = _sendRequest(action, data, verbose)
         return output
 
+    def clearServices(self, verbose=False):
+        action = 'action'
+        data = {'type': 'renders'}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'farm', 'mode': 'clear_services'}
+        output = _sendRequest(action, data, verbose)
+        return output
+
 
 class Monitor():
     '''
