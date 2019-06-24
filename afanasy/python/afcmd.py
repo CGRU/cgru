@@ -323,6 +323,22 @@ class Render:
         output = _sendRequest(action, data, verbose)
         return output
 
+    def setPool(self, poolName, verbose=False):
+        action = 'action'
+        data = {'type': 'renders'}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'set_pool', 'name': poolName}
+        output = _sendRequest(action, data, verbose)
+        return output
+
+    def reassignPool(self, verbose=False):
+        action = 'action'
+        data = {'type': 'renders'}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'reassign_pool'}
+        output = _sendRequest(action, data, verbose)
+        return output
+
 
 class Monitor():
     '''
