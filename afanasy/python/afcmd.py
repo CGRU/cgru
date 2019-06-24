@@ -340,6 +340,66 @@ class Render:
         return output
 
 
+class Pool():
+    '''
+    Pool class for pool manipulation
+    '''
+    def __init__(self, poolId, data=None):
+        '''
+        Constructor
+        '''
+        self.id = poolId
+
+        if data is not None:
+            self.fillPoolInfo(data)
+
+    def fillPoolInfo(self, data):
+        self.name = data.get('name')
+        self.parent = data.get('parent')
+        self.services = data.get('services')
+        self.priority = data.get('priority')
+
+    def addService(self, serviceName, verbose=False):
+        action = 'action'
+        data = {'type': 'pools'}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'farm', 'mode': 'service_add', 'name': serviceName, 'mask': serviceName}
+        output = _sendRequest(action, data, verbose)
+        return output
+
+    def removeService(self, serviceName, verbose=False):
+        action = 'action'
+        data = {'type': 'pools'}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'farm', 'mode': 'service_remove', 'name': serviceName, 'mask': serviceName}
+        output = _sendRequest(action, data, verbose)
+        return output
+
+    def disableService(self, serviceName, verbose=False):
+        action = 'action'
+        data = {'type': 'pools'}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'farm', 'mode': 'service_disable', 'name': serviceName, 'mask': serviceName}
+        output = _sendRequest(action, data, verbose)
+        return output
+
+    def enableService(self, serviceName, verbose=False):
+        action = 'action'
+        data = {'type': 'pools'}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'farm', 'mode': 'service_enable', 'name': serviceName, 'mask': serviceName}
+        output = _sendRequest(action, data, verbose)
+        return output
+
+    def clearServices(self, verbose=False):
+        action = 'action'
+        data = {'type': 'pools'}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'farm', 'mode': 'clear_services'}
+        output = _sendRequest(action, data, verbose)
+        return output
+
+
 class Monitor():
     '''
     Monitor class for monitor registration
@@ -464,3 +524,18 @@ def getRenderResources():
         if 'renders' in output:
             return output['renders']
     return None
+
+
+def getPoolList(ids=None, verbose=False):
+    action = 'get'
+    data = {'type': 'pools'}
+    if ids is not None:
+        data['ids'] = ids
+    output = _sendRequest(action, data, verbose)
+    pools = []
+    if output is not None:
+            if 'pools' in output:
+                for poolData in output['pools']:
+                    pool = Pool(poolData['id'], poolData)
+                    pools.append(pool)
+    return pools
