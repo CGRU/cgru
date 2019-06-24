@@ -283,11 +283,35 @@ class Render:
         output = _sendRequest(action, data, verbose)
         return output
 
-    def setServiceState(self, serviceName, enabled, verbose=False):
+    def addService(self, serviceName, verbose=False):
         action = 'action'
         data = {'type': 'renders'}
-        data['mask'] = self.name
-        data['operation'] = {'type': 'service', 'name': serviceName, 'enable': enabled}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'farm', 'mode': 'service_add', 'name': serviceName, 'mask': serviceName}
+        output = _sendRequest(action, data, verbose)
+        return output
+
+    def removeService(self, serviceName, verbose=False):
+        action = 'action'
+        data = {'type': 'renders'}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'farm', 'mode': 'service_remove', 'name': serviceName, 'mask': serviceName}
+        output = _sendRequest(action, data, verbose)
+        return output
+
+    def disableService(self, serviceName, verbose=False):
+        action = 'action'
+        data = {'type': 'renders'}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'farm', 'mode': 'service_disable', 'name': serviceName, 'mask': serviceName}
+        output = _sendRequest(action, data, verbose)
+        return output
+
+    def enableService(self, serviceName, verbose=False):
+        action = 'action'
+        data = {'type': 'renders'}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'farm', 'mode': 'service_enable', 'name': serviceName, 'mask': serviceName}
         output = _sendRequest(action, data, verbose)
         return output
 
