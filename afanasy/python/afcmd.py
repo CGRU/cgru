@@ -344,6 +344,21 @@ class Pool():
     '''
     Pool class for pool manipulation
     '''
+    id = None
+    name = None
+    parent = None
+    services = None
+    priority = None
+    time_creation = None
+    pools_total = None
+    max_capacity_per_host = None
+    task_start_finish_time = None
+    run_tasks = None
+    max_tasks_per_host = None
+    renders_total = None
+    run_capacity = None
+    renders_num = None
+
     def __init__(self, poolId, data=None):
         '''
         Constructor
@@ -358,6 +373,14 @@ class Pool():
         self.parent = data.get('parent')
         self.services = data.get('services')
         self.priority = data.get('priority')
+        self.time_creation = data.get('time_creation')
+        self.pools_total = data.get('pools_total')
+        self.max_capacity_per_host = data.get('max_capacity_per_host')
+        self.task_start_finish_time = data.get('task_start_finish_time')
+        self.run_tasks = data.get('run_tasks')
+        self.max_tasks_per_host = data.get('max_tasks_per_host')
+        self.renders_total = data.get('renders_total')
+        self.run_capacity = data.get('run_capacity')
 
     def addService(self, serviceName, verbose=False):
         action = 'action'
