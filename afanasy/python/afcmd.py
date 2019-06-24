@@ -339,6 +339,14 @@ class Render:
         output = _sendRequest(action, data, verbose)
         return output
 
+    def setMaxCapacity(self, capacity, verbose=False):
+        action = 'action'
+        data = {'type': 'renders'}
+        data['ids'] = [self.id]
+        data['params'] = {'max_capacity_per_host': capacity}
+        output = _sendRequest(action, data, verbose)
+        return output
+
 
 class Pool():
     '''
@@ -419,6 +427,14 @@ class Pool():
         data = {'type': 'pools'}
         data['ids'] = [self.id]
         data['operation'] = {'type': 'farm', 'mode': 'clear_services'}
+        output = _sendRequest(action, data, verbose)
+        return output
+
+    def setMaxCapacity(self, capacity, verbose=False):
+        action = 'action'
+        data = {'type': 'pools'}
+        data['ids'] = [self.id]
+        data['params'] = {'max_capacity_per_host': capacity}
         output = _sendRequest(action, data, verbose)
         return output
 
