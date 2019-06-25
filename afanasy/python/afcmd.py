@@ -547,10 +547,10 @@ def getRenderList(mask=None, ids=None, verbose=False):
     output = _sendRequest(action, data, verbose)
     renders = []
     if output is not None:
-            if 'renders' in output:
-                for renderData in output['renders']:
-                    render = Render(renderData['id'], renderData)
-                    renders.append(render)
+        if 'renders' in output:
+            for renderData in output['renders']:
+                render = Render(renderData['id'], renderData)
+                renders.append(render)
     return renders
 
 
@@ -573,8 +573,8 @@ def getPoolList(ids=None, verbose=False):
     output = _sendRequest(action, data, verbose)
     pools = []
     if output is not None:
-            if 'pools' in output:
-                for poolData in output['pools']:
-                    pool = Pool(poolData['id'], poolData)
-                    pools.append(pool)
+        if 'pools' in output:
+            for poolData in output['pools']:
+                pool = Pool(poolData['id'], poolData)
+                pools.append(pool)
     return pools
