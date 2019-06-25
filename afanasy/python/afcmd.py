@@ -153,16 +153,16 @@ class Job:
         return output
 
     def pause(self):
-        self.setJobState(self.State.pause)
+        self.setState(self.State.pause)
 
     def start(self):
-        self.setJobState(self.State.start)
+        self.setState(self.State.start)
 
     def stop(self):
-        self.setJobState(self.State.stop)
+        self.setState(self.State.stop)
 
     def delete(self):
-        self.setJobState(self.State.delete)
+        self.setState(self.State.delete)
 
     def getProgress(self, verbose=False,):
         action = 'get'
