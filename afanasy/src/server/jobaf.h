@@ -89,6 +89,9 @@ public:
 	/// Initialize new job, came to Afanasy container.
 	bool initialize();
 
+	/// Set state of new tasks
+	void checkStates();
+
 	int getUid() const;
 
 	virtual int v_calcWeight()        const;  ///< Calculate and return memory size.

@@ -285,8 +285,15 @@ bool JobAf::initialize()
 		appendLog("Initialized from database.");
 	}
 
-	//
-	// Checking states
+	checkStates();
+
+	v_refresh( time(NULL), NULL, NULL);
+
+	return true;
+}
+
+void JobAf::checkStates()
+{
 	for( int b = 0; b < m_blocks_num; b++)
 	{
 		int numtasks = m_blocks_data[b]->getTasksNum();
@@ -312,10 +319,6 @@ bool JobAf::initialize()
 	}
 	
 	if(( m_state & AFJOB::STATE_DONE_MASK) == false ) m_state = m_state | AFJOB::STATE_WAITDEP_MASK;
-	
-	v_refresh( time(NULL), NULL, NULL);
-	
-	return true;
 }
 
 int JobAf::getUid() const { return m_user->getId(); }

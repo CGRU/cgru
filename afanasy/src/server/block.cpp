@@ -626,10 +626,16 @@ bool Block::appendTasks(const JSON &operation)
 		return false;
 	}
 
+	// Allocate new tasks
 	int old_tasks_num = m_data->getTasksNum();
 	m_data->jsonReadAndAppendTasks(operation);
 	m_jobprogress->appendTasks(m_data->getBlockNum(), m_data->getTasksNum() - old_tasks_num);
 	allocateTasks(old_tasks_num); // allocate only new tasks
+
+	// Store tasks
 	storeTasks();
+
+	// Set new tasks ready
+	m_job->checkStates();
 	return true;
 }
