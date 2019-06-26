@@ -304,6 +304,41 @@ void BlockData::jsonReadTasks(const JSON &i_object)
 	}
 }
 
+void BlockData::jsonReadAndAppendTasks(const JSON &i_object)
+{
+	// This function is similar to jsonReadTasks but adds new tasks to the block
+	// instead of overriding the previous ones.
+
+	const JSON &tasks = i_object["tasks"];
+
+	if (!tasks.IsArray() || tasks.Size() == 0)
+		return;
+
+	TaskData **old_tasks_data = m_tasks_data;
+	int old_tasks_num = m_tasks_num;
+
+	m_tasks_num += tasks.Size();
+	m_tasks_data = new TaskData *[m_tasks_num];
+	for (int t = 0; t < m_tasks_num; t++)
+	{
+		if (t < old_tasks_num)
+		{
+			m_tasks_data[t] = old_tasks_data[t];
+			continue;
+		}
+
+		m_tasks_data[t] = createTask(tasks[t - old_tasks_num]);
+		if (m_tasks_data[t] == NULL)
+		{
+			AFERROR("BlockData::BlockData: Can not allocate memory for new task.")
+			break;
+		}
+	}
+
+	if (NULL != old_tasks_data)
+		delete [] old_tasks_data;
+}
+
 void BlockData::jsonWrite(std::ostringstream &o_str, const std::string &i_datamode) const
 {
 	int type = 0;

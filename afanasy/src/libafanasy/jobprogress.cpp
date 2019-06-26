@@ -94,6 +94,20 @@ bool JobProgress::initTasks( int block, int numtasks)
    return true;
 }
 
+void JobProgress::appendTasks(int block, int numtasks)
+{
+	int old_tasksnum = tasksnum[block];
+	TaskProgress **old_tp = tp[block];
+
+	tasksnum[block] += numtasks;
+	tp[block] = new TaskProgress *[tasksnum[block]];
+
+	for (int t = 0; t < tasksnum[block]; t++)
+		tp[block][t] = t < old_tasksnum ? old_tp[t] : newTaskProgress();
+
+	if (old_tp != NULL) delete [] old_tp;
+}
+
 TaskProgress * JobProgress::newTaskProgress() const
 {
    return new TaskProgress;

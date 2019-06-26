@@ -32,6 +32,7 @@ public:
 /// Get tasks number in \c b block.
    inline int getTasksNum( int b) const
       { if( b < m_blocks_num ) return tasksnum[b]; else return -1;}
+   void appendTasks(int block, int numtasks);
 
    virtual int calcWeight() const;                   ///< Calculate and return memory size.
 

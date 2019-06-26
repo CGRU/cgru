@@ -269,6 +269,7 @@ public:
 	void jsonWrite(std::ostringstream &o_str, const std::string &i_datamode) const;
 	void jsonWriteTasks(std::ostringstream &o_str) const;
 	void jsonReadTasks(const JSON &i_object);
+	void jsonReadAndAppendTasks(const JSON &i_object); ///< Append new tasks from JSON object
 
 	/// Generate progress bits info string.
 	void generateProgressStream(std::ostringstream &o_str) const;

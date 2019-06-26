@@ -90,6 +90,9 @@ private:
 	bool m_initialized;             ///< Where the block was successfully  initialized.
 
 private:
+	/// Allocate, or reallocate when appending tasks, Task objects.
+	/// When reallocating, one must provide the number of alread allocated tasks
+	bool allocateTasks(int alreadyAllocated = 0);
 	void constructDependBlocks();
 
 	const std::string getStoreTasksFileName() const;
@@ -100,5 +103,6 @@ private:
 	int  getRenderCount(RenderAf * i_render) const;
 	void remRenderCount(RenderAf * i_render);
 
+	bool appendTasks(const JSON &tasks_json);
 };
 
