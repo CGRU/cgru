@@ -32,7 +32,10 @@ public:
 /// Get tasks number in \c b block.
    inline int getTasksNum( int b) const
       { if( b < m_blocks_num ) return tasksnum[b]; else return -1;}
-   void appendTasks(int block, int numtasks);
+   
+   void appendTasks( int block, int numtasks);
+   /// Reconstruct a job after new blocks have been appent
+   bool reconstruct( Job * job);
 
    virtual int calcWeight() const;                   ///< Calculate and return memory size.
 
@@ -44,6 +47,7 @@ public:
 protected:
    bool construct( Job * job);               ///< Construct progress blocks and tasks data.
    bool initBlocks();                        ///< Allocate memory for blocks data.
+   void appendBlocks( int numblocks);
    bool initTasks( int block, int numtasks); ///< Allocate memory for tasks  data.
 
 protected:

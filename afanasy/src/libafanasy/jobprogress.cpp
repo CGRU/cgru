@@ -52,6 +52,41 @@ bool JobProgress::construct( Job * job)
    return true;
 }
 
+bool JobProgress::reconstruct( Job * job)
+{
+   int32_t old_blocks_num = m_blocks_num;
+   int32_t new_blocks_num = job->getBlocksNum();
+   if( new_blocks_num == old_blocks_num)
+	   return true;
+
+   if( new_blocks_num < 1)
+   {
+      AFERRAR("JobProgress::JobProgress: Invalid number if blocks = %d (job name: '%s')", m_blocks_num, job->getName().c_str())
+      return false;
+   }
+
+   appendBlocks( new_blocks_num - old_blocks_num);
+
+   for( int b = old_blocks_num; b < m_blocks_num; b++)
+   {
+      const af::BlockData * block = job->getBlock( b);
+      tasksnum[b] = block->getTasksNum();
+      if( tasksnum[b] < 1)
+      {
+         AFERRAR("JobProgress::JobProgress: Invalid number of tasks = %d (m_job_id=%d,block=%d)", tasksnum[b], job->getId(), b)
+         return false;
+      }
+
+      if( initTasks( b, tasksnum[b]) == false)
+      {
+         AFERRAR("JobProgress::JobProgress: Tasks initalization failed ( block=%d, tasks number=%d).", b, tasksnum[b])
+         return false;
+      }
+   }
+
+   return true;
+}
+
 JobProgress::JobProgress( Msg * msg)
 {
 	initProperties();
@@ -80,6 +115,24 @@ bool JobProgress::initBlocks()
    return true;
 }
 
+void JobProgress::appendBlocks(int numblocks)
+{
+	int32_t old_blocks_num = m_blocks_num;
+	m_blocks_num += numblocks;
+
+	int32_t * old_tasksnum = tasksnum;
+	tasksnum = new int32_t[m_blocks_num];
+	for (int b = 0; b < m_blocks_num; b++)
+		tasksnum[b] = b < old_blocks_num ? old_tasksnum[b] : 0;
+	if( old_tasksnum != NULL) delete [] old_tasksnum;
+
+	TaskProgress ***old_tp = tp;
+	tp = new TaskProgress **[ m_blocks_num]();
+	for (int b = 0; b < m_blocks_num; b++)
+		tp[b] = b < old_blocks_num ? old_tp[b] : 0;
+	if( old_tp != NULL) delete [] old_tp;
+}
+
 bool JobProgress::initTasks( int block, int numtasks)
 {
    if( numtasks == 0)
@@ -96,16 +149,16 @@ bool JobProgress::initTasks( int block, int numtasks)
 
 void JobProgress::appendTasks(int block, int numtasks)
 {
-	int old_tasksnum = tasksnum[block];
+	int32_t old_tasksnum = tasksnum[block];
 	TaskProgress **old_tp = tp[block];
 
 	tasksnum[block] += numtasks;
-	tp[block] = new TaskProgress *[tasksnum[block]];
+	tp[block] = new TaskProgress*[ tasksnum[block]];
 
-	for (int t = 0; t < tasksnum[block]; t++)
+	for( int t = 0; t < tasksnum[block]; t++)
 		tp[block][t] = t < old_tasksnum ? old_tp[t] : newTaskProgress();
 
-	if (old_tp != NULL) delete [] old_tp;
+	if( old_tp != NULL) delete [] old_tp;
 }
 
 TaskProgress * JobProgress::newTaskProgress() const

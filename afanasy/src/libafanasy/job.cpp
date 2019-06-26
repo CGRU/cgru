@@ -125,14 +125,21 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	jr_string("project",    m_project,    i_object);
 	jr_string("department", m_department, i_object);
 
-	const JSON & blocks = i_object["blocks"];
-	if( false == blocks.IsArray())
+	return jsonReadAndAppendBlocks(i_object["blocks"]);
+}
+
+bool Job::jsonReadAndAppendBlocks( const JSON &i_blocks)
+{
+	if( false == i_blocks.IsArray())
 	{
 		AFERROR("Job::jsonRead: Can't find blocks array.");
 		return false;
 	}
 
-	m_blocks_num = blocks.Size();
+	int old_blocks_num = m_blocks_num;
+	BlockData ** old_blocks_data = m_blocks_data;
+
+	m_blocks_num += i_blocks.Size();
 	if( m_blocks_num < 1 )
 	{
 		AFERROR("Job::jsonRead: Blocks array has zero size.");
@@ -140,17 +147,19 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	}
 
 	m_blocks_data = new BlockData*[m_blocks_num];
-	for( int b = 0; b < m_blocks_num; b++) m_blocks_data[b] = NULL;
 	for( int b = 0; b < m_blocks_num; b++)
+		m_blocks_data[b] = b < old_blocks_num ? old_blocks_data[b] : NULL;
+	if( NULL == old_blocks_data)
+		delete [] old_blocks_data;
+	for( int b = old_blocks_num; b < m_blocks_num; b++)
 	{
-		m_blocks_data[b] = newBlockData( blocks[b], b);
+		m_blocks_data[b] = newBlockData( i_blocks[b - old_blocks_num], b);
 		if( m_blocks_data[b] == NULL)
 		{
 			AFERROR("Job::jsonRead: Can not allocate memory for new block.\n");
 			return false;
 		}
 	}
-
 	return true;
 }
 

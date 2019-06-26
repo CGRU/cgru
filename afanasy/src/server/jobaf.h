@@ -119,8 +119,9 @@ public:
 	inline static void setJobContainer( JobContainer *Jobs){ ms_jobs = Jobs;}
 
 protected:
-	/// Allocate JobInfo, tasksLog.
-	void construct();
+	/// Allocate Block objects.
+	/// Assumes that 'alreadyConstructed' Block objects are already allocated (usefull when appending new blocks)
+	void construct(int alreadyConstructed = 0);
 
 	void readStore();
 	
@@ -163,6 +164,8 @@ private:
 	
 	/// Restart tasks, can restart only matching state mask.
 	void restartAllTasks( const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state = 0);
+
+	void appendBlocks( const JSON & i_blocks);
 
 	af::TaskExec *genTask( RenderAf *render, int block, int task, std::list<int> * blocksIds, MonitorContainer * monitoring);
 	
