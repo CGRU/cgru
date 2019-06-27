@@ -1209,3 +1209,44 @@ class Cmd:
         :return:
         """
         return self.renderGetList(cgruconfig.VARS['HOSTNAME'])
+
+    def appendBlocks(self, jobId, blocks, verbose=False):
+        """Append new blocks to an existing job
+
+        :param jobId: Id of the job to which blocks are added
+        :param blocks: list of new Block() objects
+        :param bool verbose: verbosity toggle
+        :return: server response
+        """
+        blocks_data = []
+        for b in blocks:
+            b.fillTasks()
+            blocks_data.append(b.data)
+
+        self.action = 'action'
+        self.data['type'] = 'jobs'
+        self.data['ids'] = [jobId]
+        self.data['operation'] = {'type': 'append_blocks',
+                                  'blocks': blocks_data}
+        return self._sendRequest(verbose)
+
+    def appendTasks(self, jobId, blockId, tasks, verbose=False):
+        """Append new tasks to an existing block
+
+        :param jobId: Id of the job to which tasks are added
+        :param blockId: Index of the block to which tasks are added
+        :param blocks: list of new Task() objects
+        :param bool verbose: verbosity toggle
+        :return: server response
+        """
+        tasks_data = []
+        for t in tasks:
+            tasks_data.append(t.data)
+
+        self.action = 'action'
+        self.data['type'] = 'jobs'
+        self.data['ids'] = [jobId]
+        self.data['block_ids'] = [blockId]
+        self.data['operation'] = {'type': 'append_tasks',
+                                  'tasks': tasks_data}
+        return self._sendRequest(verbose)
