@@ -79,9 +79,7 @@ class Block:
     def appendTasks(self, tasks, verbose=False):
         """Append new tasks to an existing block
 
-        :param jobId: Id of the job to which tasks are added
-        :param blockId: Index of the block to which tasks are added
-        :param blocks: list of new Task() objects
+        :param tasks: list of new Task() objects
         :param bool verbose: verbosity toggle
         :return: server response
         """
@@ -197,6 +195,25 @@ class Job:
             if 'job_progress' in output:
                 return output['job_progress']
         return None
+
+    def appendBlocks(self, blocks, verbose=False):
+        """Append new blocks to an existing job
+
+        :param bool verbose: verbosity toggle
+        :return: server response
+        """
+        action = 'action'
+        blocks_data = []
+        for block in blocks:
+            block.fillTasks()
+            blocks_data.append(block.data)
+        data = {'type': 'jobs',
+                'ids': [self.id],
+                "operation": {
+                    'type': 'append_blocks',
+                    'blocks': blocks_data}}
+        output = _sendRequest(action, data, verbose)
+        return output
 
 
 class Render:
