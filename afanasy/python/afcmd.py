@@ -59,6 +59,7 @@ class Block:
         self.frames_inc = data.get('frames_inc')
         self.p_tasks_done = data.get('p_tasks_done')
         self.time_started = data.get('time_started')
+        print(data)
 
     def setState(self, state, taskIds=[], verbose=False):
         action = 'action'
@@ -76,6 +77,9 @@ class Block:
     def skip(self, taskIds=[]):
         self.setState(self.State.skip, taskIds=taskIds)
 
+    def isNumeric(self):
+        return bool(self.flags >> 0)
+
     def appendTasks(self, tasks, verbose=False):
         """Append new tasks to an existing block
 
@@ -83,18 +87,20 @@ class Block:
         :param bool verbose: verbosity toggle
         :return: server response
         """
-        tasks_data = []
-        for t in tasks:
-            tasks_data.append(t.data)
-        print(tasks_data)
-        action = 'action'
-        data = {'ids': [self.job_id],
-                'type': 'jobs',
-                'block_ids': [self.block_num],
-                'operation': {
-                    'type': 'append_tasks',
-                    'tasks': tasks_data}}
-        output = _sendRequest(action, data, verbose)
+        output = "The block is numeric and cannot have tasks appended"
+        if self.isNumeric() is False:
+            tasks_data = []
+            for t in tasks:
+                tasks_data.append(t.data)
+            print(tasks_data)
+            action = 'action'
+            data = {'ids': [self.job_id],
+                    'type': 'jobs',
+                    'block_ids': [self.block_num],
+                    'operation': {
+                        'type': 'append_tasks',
+                        'tasks': tasks_data}}
+            output = _sendRequest(action, data, verbose)
         return output
 
 
