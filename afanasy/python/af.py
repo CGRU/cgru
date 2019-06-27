@@ -1235,7 +1235,7 @@ class Cmd:
 
         :param jobId: Id of the job to which tasks are added
         :param blockId: Index of the block to which tasks are added
-        :param blocks: list of new Task() objects
+        :param tasks: list of new Task() objects
         :param bool verbose: verbosity toggle
         :return: server response
         """
