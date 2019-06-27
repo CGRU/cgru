@@ -76,6 +76,29 @@ class Block:
     def skip(self, taskIds=[]):
         self.setState(self.State.skip, taskIds=taskIds)
 
+    def appendTasks(self, tasks, verbose=False):
+        """Append new tasks to an existing block
+
+        :param jobId: Id of the job to which tasks are added
+        :param blockId: Index of the block to which tasks are added
+        :param blocks: list of new Task() objects
+        :param bool verbose: verbosity toggle
+        :return: server response
+        """
+        tasks_data = []
+        for t in tasks:
+            tasks_data.append(t.data)
+        print(tasks_data)
+        action = 'action'
+        data = {'ids': [self.job_id],
+                'type': 'jobs',
+                'block_ids': [self.block_num],
+                'operation': {
+                    'type': 'append_tasks',
+                    'tasks': tasks_data}}
+        output = _sendRequest(action, data, verbose)
+        return output
+
 
 class Job:
     '''
