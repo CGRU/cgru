@@ -1490,21 +1490,20 @@ void JobAf::appendBlocks( const JSON & i_blocks)
 {
 	int old_blocks_num = m_blocks_num;
 
-	// initialize
 	jsonReadAndAppendBlocks( i_blocks);
-	for( int b = old_blocks_num; b < m_blocks_num; b++)
-	{
-		m_blocks_data[b]->setJobId( m_id);
-	}
 
 	m_progress->reconstruct( this);
 
 	// construct new blocks only (reuse the old_blocks_num existing ones)
 	construct( old_blocks_num);
 
-	// TODO:
-	//  - store block/task data
-	//  - set block ready
+	// initialize
+	for( int b = old_blocks_num; b < m_blocks_num; b++)
+	{
+		m_blocks_data[b]->setJobId( m_id);
+		m_blocks[b]->storeTasks();
+		m_blocks[b]->setUser( m_user);
+	}
 
 	checkDepends();
 	checkStates();
