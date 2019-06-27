@@ -30,12 +30,15 @@ class Block:
     frames_inc = None
     p_tasks_done = None
     time_started = None
+    data = None
+    tasks = []
+    full = False
 
     class State:
         restart = 'restart'
         skip = 'skip'
 
-    def __init__(self, data):
+    def __init__(self, data, full=False):
         '''
         Constructor
         '''
@@ -59,7 +62,17 @@ class Block:
         self.frames_inc = data.get('frames_inc')
         self.p_tasks_done = data.get('p_tasks_done')
         self.time_started = data.get('time_started')
-        print(data)
+        self.data = data
+        self.full = full
+        if self.full is True and self.isNumeric() is False:
+            self.tasks = data.get('tasks', [])
+
+    def fillTasks(self):
+        if self.full is not True:
+            job = getJob(self.job_id, full=True)
+            block = job.blocks[self.block_num]
+            self.data = block.data
+            self.tasks = block.tasks
 
     def setState(self, state, taskIds=[], verbose=False):
         action = 'action'
@@ -126,6 +139,8 @@ class Job:
     max_running_tasks_per_host = None
     depend_mask = ''
     p_percentage = 0
+    data = None
+    full = False
 
     class State:
         restart = 'restart'
@@ -135,13 +150,15 @@ class Job:
         skip = 'skip'
         delete = 'delete'
 
-    def __init__(self, jobId, data=None):
+    def __init__(self, jobId, data=None, full=False):
         '''
         Constructor
         '''
         self.id = jobId
         self.blocks = []
+        self.full = full
         if data is not None:
+            self.data = data
             self.fillInfo(data)
 
     def fillInfo(self, data):
@@ -160,12 +177,12 @@ class Job:
         self.max_running_tasks = data.get('max_running_tasks', -1)
         self.max_running_tasks_per_host = data.get('max_running_tasks_per_host', -1)
         self.depend_mask = data.get('depend_mask', '')
-        self.fillBlocks(data['blocks'])
+        self.fillBlocks(data['blocks'], self.full)
 
-    def fillBlocks(self, blocksData):
+    def fillBlocks(self, blocksData, full):
         blocksProgress = 0
         for blockData in blocksData:
-            block = Block(blockData)
+            block = Block(blockData, full)
             if block.p_percentage is not None:
                 blocksProgress += block.p_percentage
             self.blocks.append(block)
@@ -423,7 +440,7 @@ def getJobList(ids=None, full=False, verbose=False):
     if output is not None:
         if 'jobs' in output:
             for jobData in output['jobs']:
-                job = Job(jobData['id'], jobData)
+                job = Job(jobData['id'], jobData, full=full)
                 jobs.append(job)
     return jobs
 
