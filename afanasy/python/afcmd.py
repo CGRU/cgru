@@ -105,7 +105,6 @@ class Block:
             tasks_data = []
             for t in tasks:
                 tasks_data.append(t.data)
-            print(tasks_data)
             action = 'action'
             data = {'ids': [self.job_id],
                     'type': 'jobs',
