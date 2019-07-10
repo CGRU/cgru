@@ -726,6 +726,7 @@ Comment.prototype.updateStatus = function() {
 	var reps_tags = [];
 	var reps_arts = [];
 
+	// Collect reports for status:
 	for (var i = 0; i < cm_array.length; i++)
 	{
 		var obj = cm_array[i].obj;
@@ -737,7 +738,6 @@ Comment.prototype.updateStatus = function() {
 		if (obj.duration == null)
 			continue;
 
-		// console.log( JSON.stringify( obj));
 		var rep = {};
 		rep.duration = obj.duration;
 		if (rep.duration < 0)
@@ -746,22 +746,23 @@ Comment.prototype.updateStatus = function() {
 		rep.artist = obj.user_name;
 		rep.time = obj.time;
 
-		for (var t = 0; t < obj.tags.length; t++)
-			if (reps_tags.indexOf(obj.tags[t]) == -1)
-				reps_tags.push(obj.tags[t]);
-
-		reps_arts.push(obj.user_name);
-
 		reports.push(rep);
 	}
 
-	for (var t = 0; t < reps_tags.length; t++)
-		if (RULES.status.tags.indexOf(reps_tags[t]) == -1)
-			RULES.status.tags.push(reps_tags[t]);
+	// If this is a report, we add artist and tags to current status
+	if ((this.obj.type == 'report') && (this.obj.deleted !== true))
+	{
+		// Add tags:
+		if (this.obj.tags && this.obj.tags.length)
+			for (let tag of this.obj.tags)
+				if (RULES.status.tags.indexOf(tag) == -1)
+					RULES.status.tags.push(tag);
 
-	for (var t = 0; t < reps_arts.length; t++)
-		if (RULES.status.artists.indexOf(reps_arts[t]) == -1)
-			RULES.status.artists.push(reps_arts[t]);
+		// Add artist:
+		if (this.obj.user_name && this.obj.user_name.length)
+			if (RULES.status.artists.indexOf(this.obj.user_name) == -1)
+				RULES.status.artists.push(this.obj.user_name);
+	}
 
 	RULES.status.reports = reports;
 	st_Save();
