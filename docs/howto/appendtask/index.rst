@@ -144,3 +144,16 @@ Example::
 	job = afcmd.getJob(3)
 	block = job.blocks[0]
 	print(block.appendTasks([tasks]))
+
+Known limitations
+-----------------
+
+Numeric block
+*************
+
+It does not makes sense to append tasks to numeric blocks, only non-numeric block can have tasks appent.
+
+afwatch
+*******
+
+When appending new blocks to a job that is opened in afwatch, one must reopen the job window to see the update.
