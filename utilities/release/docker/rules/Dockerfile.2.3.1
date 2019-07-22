@@ -1,14 +1,13 @@
-FROM cgru/afcommon:2.2.1-ubuntu-16.04
+FROM cgru/afcommon:2.3.1
 
 LABEL maintainer="Alexandre Buisine <alexandrejabuisine@gmail.com>"
-LABEL cgru_container_version="1.0.0"
 
 USER root
-RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update \
- && apt-get -yqq install \
+RUN apt-get -qq update \
+ && DEBIAN_FRONTEND=noninteractive apt-get -yqq install \
     apache2 \
-    libapache2-mod-php5 \
-    php5-pgsql \
+    libapache2-mod-php \
+    php-pgsql \
  && apt-get -yqq clean \
  && rm -rf /var/lib/apt/lists/*
 
