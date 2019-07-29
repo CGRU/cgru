@@ -56,7 +56,10 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
 		envflags = af::Environment::SolveServerName;
 
 		if( std::string( argv[1]) == "v" )
+		{
 			envflags |= af::Environment::Verbose;
+			Verbose = true;
+		}
 		else
 			envflags |= af::Environment::Quiet;
 	}
@@ -78,7 +81,10 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
     {
         if( msg.isNull() == false)
         {
-            if( Verbose ) msg.v_stdOut();
+			if( Verbose )
+			{
+				msg.stdOutData();
+			}
 
             bool ok;
             af::Msg * answer = af::sendToServer( &msg, ok, af::VerboseOn);
