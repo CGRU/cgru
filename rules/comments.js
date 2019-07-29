@@ -748,7 +748,7 @@ Comment.prototype.updateStatus = function() {
 
 		reports.push(rep);
 	}
-
+/*
 	// If this is a report, we add artist and tags to current status
 	if ((this.obj.type == 'report') && (this.obj.deleted !== true))
 	{
@@ -763,7 +763,7 @@ Comment.prototype.updateStatus = function() {
 			if (RULES.status.artists.indexOf(this.obj.user_name) == -1)
 				RULES.status.artists.push(this.obj.user_name);
 	}
-
+*/
 	RULES.status.reports = reports;
 	st_Save();
 	st_Show(RULES.status);
