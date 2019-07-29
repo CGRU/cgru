@@ -1494,7 +1494,7 @@ Status.prototype.editSave = function(i_args) {
 					}
 				}
 
-				// Add artist to status:
+				/*/ Add artist to status:
 				if (tasks[t].artists && tasks[t].artists.length)
 				{
 					if (statuses[i].obj.artists == null)
@@ -1507,7 +1507,7 @@ Status.prototype.editSave = function(i_args) {
 						if (statuses[i].obj.artists.indexOf(artist) == -1)
 							statuses[i].obj.artists.push(artist);
 					}
-				}
+				}*/
 			}
 
 			statuses[i].obj.tasks = tasks;
