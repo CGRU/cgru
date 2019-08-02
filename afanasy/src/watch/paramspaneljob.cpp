@@ -40,6 +40,7 @@ ParamsPanelJob::ParamsPanelJob()
 
 	m_folders_root = new QLabel();
 	m_folders_root->setHidden(true);
+	m_folders_root->setTextInteractionFlags(Qt::TextBrowserInteraction);
 	m_folders_layout->addWidget(m_folders_root);
 
 	m_folders_layout->addSpacing(4);
@@ -88,21 +89,25 @@ void ParamsPanelJob::constructFolders(ItemJob * i_item_job)
 		if (it.value().isEmpty())
 			continue;
 
+		// root is first same characters of all folders:
 		if (root.isNull())
 		{
 			root = it.value();
 		}
 		else
 		{
-			QString s;
 			int c = 0;
+			// seek the same chars size:
 			while (c < root.size())
 			{
 				if (root.left(c) == it.value().left(c))
 					c++;
 				else break;
 			}
-			root = root.left(c);
+
+			c--;
+			if (c > 0)
+				root = root.left(c);
 		}
 
 		FolderWidget * fw = new FolderWidget(it.key(), it.value(), m_folders_layout);
