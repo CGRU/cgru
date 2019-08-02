@@ -479,7 +479,7 @@ void Watch::browseFolder( const QString & i_folder, const QString & i_wdir)
 #ifdef WINNT
 	QString cmd = "explorer";
 #else
-	QString cmd = afqt::stoq( af::Environment::getCGRULocation()) + "/utilities/browse.sh";
+	QString cmd = "openfolder";
 #endif
 	cmd += " \"" + i_folder + "\"";
 	Watch::startProcess( cmd, i_wdir);
