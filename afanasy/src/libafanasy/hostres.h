@@ -79,6 +79,9 @@ public:
 	/// Generate information.
 	void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
+	inline bool isEmpty() const { return cpu_num == 0; }
+	inline bool notEmpty() const { return cpu_num > 0; }
+
 	void copy( const HostRes & other);
 
 	void jsonWrite( std::ostringstream & o_str) const;
