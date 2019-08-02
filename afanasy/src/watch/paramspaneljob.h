@@ -33,10 +33,15 @@ private slots:
 
 private:
 	QFrame      * m_folders_frame;
+
 	QVBoxLayout * m_folders_layout;
+
 	QLabel      * m_folders_label;
+
 	QPushButton * m_rules_btn;
 	QString       m_rules_path;
+
+	QLabel      * m_folders_root;
 
 	QList<FolderWidget*> m_folders_list;
 };

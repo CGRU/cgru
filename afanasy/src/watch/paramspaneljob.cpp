@@ -38,6 +38,10 @@ ParamsPanelJob::ParamsPanelJob()
 	m_rules_btn->setToolTip("Open in WEB browser");
 	m_rules_btn->setHidden(true);
 
+	m_folders_root = new QLabel();
+	m_folders_root->setHidden(true);
+	m_folders_layout->addWidget(m_folders_root);
+
 	m_folders_layout->addSpacing(4);
 
 	connect(m_rules_btn, SIGNAL(clicked()), this, SLOT(slot_Rules()));
@@ -75,20 +79,45 @@ void ParamsPanelJob::constructFolders(ItemJob * i_item_job)
 		}
 	}
 
+	QString root;
 	QMapIterator<QString, QString> it(i_item_job->folders);
 	while (it.hasNext())
 	{
 		it.next();
 
+		if (it.value().isEmpty())
+			continue;
+
+		if (root.isNull())
+		{
+			root = it.value();
+		}
+		else
+		{
+			QString s;
+			int c = 0;
+			while (c < root.size())
+			{
+				if (root.left(c) == it.value().left(c))
+					c++;
+				else break;
+			}
+			root = root.left(c);
+		}
+
 		FolderWidget * fw = new FolderWidget(it.key(), it.value(), m_folders_layout);
 
 		m_folders_list.append(fw);
 	}
+
+	m_folders_root->setText(root);
+	m_folders_root->setHidden(false);
 }
 
 void ParamsPanelJob::clearFolders()
 {
 	m_rules_btn->setHidden(true);
+	m_folders_root->setHidden(true);
 
 	while (m_folders_list.size())
 		delete m_folders_list.takeFirst();
@@ -117,7 +146,12 @@ FolderWidget::FolderWidget(const QString & i_name, const QString & i_value, QLay
 
 	layout->addStretch();
 
-	QLabel * fvalue = new QLabel(m_value);
+	static const int max_size = 32;
+	QString text = m_value;
+	if (text.size() > max_size)
+		text = QString("...") + text.remove(0, text.size() - max_size);
+	QLabel * fvalue = new QLabel(text);
+	fvalue->setToolTip(m_value);
 	fvalue->setOpenExternalLinks(true);
 	fvalue->setTextInteractionFlags(Qt::TextBrowserInteraction);
 	layout->addWidget(fvalue);
