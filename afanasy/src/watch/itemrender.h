@@ -99,7 +99,7 @@ private:
 	long long m_taskstartfinishtime;
 	QString m_taskstartfinishtime_str;
 	QString m_offlineState;
-	QString m_creationTime;
+//	QString m_creationTime;
 
 	Plotter m_plotCpu;
 	Plotter m_plotMem;

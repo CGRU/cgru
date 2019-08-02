@@ -4,6 +4,7 @@
 #include "ctrlsortfilter.h"
 #include "modelnodes.h"
 #include "monitorhost.h"
+#include "paramspanel.h"
 #include "viewitems.h"
 #include "watch.h"
 #include "wndcustomdata.h"
@@ -22,7 +23,6 @@ uint32_t ListNodes::ms_flagsHideShow = e_HideHidden;
 
 ListNodes::ListNodes( QWidget * i_parent, const std::string & i_type):
 	ListItems( i_parent, i_type),
-	m_ctrl_sf( NULL),
 	m_subscribed( false)
 {
 AFINFO("ListNodes::ListNodes.\n");
@@ -35,24 +35,6 @@ AFINFO("ListNodes::~ListNodes.\n");
 	unSubscribe();
 }
 
-bool ListNodes::init( bool createModelView)
-{
-	if( createModelView)
-	{
-		m_model = new ModelNodes(this);
-		m_view = new ViewItems( this);
-		m_view->setModel( m_model);
-
-		if( m_ctrl_sf ) m_vlayout->addWidget( m_ctrl_sf);
-		m_vlayout->addWidget( m_view);
-		m_vlayout->addWidget( m_infoline);
-	}
-
-	if( ListItems::init( false) == false) return false;
-
-	return true;
-}
-
 void ListNodes::initSortFilterCtrl()
 {
 	m_ctrl_sf->init();
@@ -62,6 +44,12 @@ void ListNodes::initSortFilterCtrl()
 	connect( m_ctrl_sf, SIGNAL( filterChanged()          ), this, SLOT( filterChanged()         ));
 	connect( m_ctrl_sf, SIGNAL( filterTypeChanged()      ), this, SLOT( filterTypeChanged()     ));
 	connect( m_ctrl_sf, SIGNAL( filterSettingsChanged()  ), this, SLOT( filterSettingsChanged() ));
+}
+
+void ListNodes::initListNodes()
+{
+	m_model = new ModelNodes(this);
+	initListItems();
 }
 
 void ListNodes::get() const
@@ -174,6 +162,10 @@ bool ListNodes::updateItems( af::Msg * msg)
 
 				// update node values
 				itemnode->updateValues(  node, msg->type());
+
+				// update panels if this item is current:
+				if (itemnode == m_current_item)
+					m_paramspanel->v_updatePanel(itemnode);
 
 				// check for item new geometry height
 				if( oldheight != itemnode->getHeight()) m_view->emitSizeHintChanged( m_model->index(i));

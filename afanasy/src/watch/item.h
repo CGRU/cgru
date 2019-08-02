@@ -64,6 +64,8 @@ public:
 
 	virtual void v_filesReceived( const af::MCTaskUp & i_taskup);
 
+	inline const QString & getInfoText() const {return m_info_text;}
+
 	virtual bool calcHeight();
 
 	inline void setHidded(bool i_hidden) {m_hidden = i_hidden;}
@@ -84,6 +86,8 @@ protected:
 
 protected:
 	QString m_name;           ///< Item name.
+
+	QString m_info_text;
 
 	int m_height;
 

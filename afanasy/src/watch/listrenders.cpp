@@ -116,7 +116,7 @@ ListRenders::ListRenders( QWidget* parent):
 
 	m_parentWindow->setWindowTitle("Renders");
 
-	init();
+	initListNodes();
 
 	connect( (ModelNodes*)m_model, SIGNAL(   nodeAdded( ItemNode *, const QModelIndex &)),
 	                         this,   SLOT( renderAdded( ItemNode *, const QModelIndex &)));
@@ -173,20 +173,32 @@ void ListRenders::renderAdded( ItemNode * node, const QModelIndex & index)
 	if (af::Environment::VISOR() == false)
 	{
 	   if (render->getName() == QString::fromUtf8(af::Environment::getComputerName().c_str()))
-			m_view->selectionModel()->select(index, QItemSelectionModel::Select);
+		{
+		   m_view->selectionModel()->setCurrentIndex(index, QItemSelectionModel::Select);
+		}
 	}
 }
 
 void ListRenders::selectionChanged( const QItemSelection & selected, const QItemSelection & deselected )
 {
 	QModelIndexList indexes = selected.indexes();
-	for( int i = 0; i < indexes.count(); i++)
-		if( Item::isItemP( indexes[i].data()))
+	if (indexes.size() == 0)
+	{
+//		updatePanels();
+		return;
+	}
+
+	for (int i = 0; i < indexes.count(); i++)
+		if (Item::isItemP(indexes[i].data()))
 		{
-			ItemRender * render = (ItemRender*)(Item::toItemP( indexes[i].data()));
-			if(( render->getName() != QString::fromUtf8( af::Environment::getComputerName().c_str())) && ( render->getUserName() != QString::fromUtf8( af::Environment::getUserName().c_str())))
-				m_view->selectionModel()->select( indexes[i], QItemSelectionModel::Deselect);
+			ItemRender * render = (ItemRender*)(Item::toItemP(indexes[i].data()));
+			if ((render->getName() != QString::fromUtf8(af::Environment::getComputerName().c_str())) &&
+				(render->getUserName() != QString::fromUtf8(af::Environment::getUserName().c_str())))
+				m_view->selectionModel()->select(indexes[i], QItemSelectionModel::Deselect);
 		}
+
+//	if (Item::isItemP(indexes.last().data()))
+//		updatePanels(Item::toItemP(indexes.last().data()));
 }
 
 void ListRenders::requestResources()

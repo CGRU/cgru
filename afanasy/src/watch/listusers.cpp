@@ -82,9 +82,13 @@ ListUsers::ListUsers( QWidget* parent):
 
 	resetButtonsMenu();
 
+
+	// Add parameters:
+
+
 	m_parentWindow->setWindowTitle("Users");
 
-	init();
+	initListNodes();
 
 	if( false == af::Environment::VISOR()) setAllowSelection( false);
 
@@ -253,10 +257,12 @@ ItemNode* ListUsers::v_createNewItem( af::Node * i_node, bool i_subscibed)
 	return new ItemUser( (af::User*)i_node, m_ctrl_sf);
 }
 
-void ListUsers::userAdded( ItemNode * node, const QModelIndex & index)
+void ListUsers::userAdded(ItemNode * node, const QModelIndex & index)
 {
-//printf("node->getId()=%d ,   Watch::getUid()=%d,  row=%d\n", node->getId(), Watch::getUid(), index.row());
-	if( node->getId() == MonitorHost::getUid()) m_view->selectionModel()->select( index, QItemSelectionModel::Select);
+	if (node->getId() == MonitorHost::getUid())
+	{
+		m_view->selectionModel()->setCurrentIndex(index, QItemSelectionModel::Select);
+	}
 }
 
 void ListUsers::calcTitle()

@@ -11,6 +11,7 @@
 #include "ctrlsortfilter.h"
 #include "monitorhost.h"
 #include "modelnodes.h"
+#include "paramspaneljob.h"
 #include "viewitems.h"
 #include "watch.h"
 
@@ -144,8 +145,8 @@ ListJobs::ListJobs( QWidget* parent):
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(actDeleteDone()));
 	}
 
-
-	init();
+	m_paramspanel = new ParamsPanelJob();
+	initListNodes();
 
 	QTimer * timer = new QTimer(this);
 	timer->start( 1000 * af::Environment::getWatchRefreshGuiSec());

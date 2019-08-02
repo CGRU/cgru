@@ -4,8 +4,10 @@
 
 #include "buttonpanel.h"
 #include "buttonsmenu.h"
+#include "ctrlsortfilter.h"
 #include "item.h"
 #include "modelitems.h"
+#include "paramspanel.h"
 #include "viewitems.h"
 #include "watch.h"
 
@@ -21,8 +23,12 @@
 ListItems::ListItems( QWidget* parent, const std::string & type):
 	QWidget( parent),
 	m_type( type),
+	m_model(NULL),
+	m_ctrl_sf(NULL),
+	m_paramspanel(NULL),
 	m_current_buttons_menu(NULL),
-	m_parentWindow( parent)
+	m_parentWindow(parent),
+	m_current_item(NULL)
 {
 AFINFO("ListItems::ListItems.\n");
 	setAttribute ( Qt::WA_DeleteOnClose, true );
@@ -30,10 +36,8 @@ AFINFO("ListItems::ListItems.\n");
 	m_hlayout = new QHBoxLayout(this);
 	m_vlayout = new QVBoxLayout();
 	QWidget * panel_l_widget = new QWidget();
-	QWidget * panel_r_widget = new QWidget();
 	m_hlayout->addWidget(panel_l_widget);
 	m_hlayout->addLayout(m_vlayout);
-	m_hlayout->addWidget(panel_r_widget);
 
 	m_panel_l = new QVBoxLayout();
 	panel_l_widget->setLayout(m_panel_l);
@@ -41,14 +45,6 @@ AFINFO("ListItems::ListItems.\n");
 	m_panel_l->setAlignment(Qt::AlignTop);
 	m_panel_l->setContentsMargins(5, 5, 5, 5);
 	m_panel_l->setSpacing(5);
-
-	m_panel_r = new QVBoxLayout();
-	panel_r_widget->setLayout(m_panel_r);
-	//panel_r_widget->setFixedWidth(400);
-	m_panel_r->setAlignment(Qt::AlignTop);
-	m_panel_r->setContentsMargins(5, 5, 5, 5);
-	m_panel_r->setSpacing(5);
-	//m_panel_r->addWidget(new QLabel("right"));
 
 	m_hlayout->setSpacing( 0);
 	m_vlayout->setSpacing( 0);
@@ -60,24 +56,33 @@ AFINFO("ListItems::ListItems.\n");
 	setFocusPolicy(Qt::StrongFocus);
 }
 
-bool ListItems::init( bool createModelView)
+void ListItems::initListItems()
 {
-	if( createModelView)
-	{
+	// Descendant classes may create own panel:
+	if (NULL == m_paramspanel)
+		m_paramspanel = new ParamsPanel();
+	m_hlayout->addWidget(m_paramspanel);
+
+	// ListNodes creates: m_model = new ModelNodes
+	if (NULL == m_model)
 		m_model = new ModelItems(this);
-		m_view = new ViewItems( this);
-		m_view->setModel( m_model);
+	m_view = new ViewItems(this);
+	m_view->setModel(m_model);
 
-		m_vlayout->addWidget( m_view);
-		m_vlayout->addWidget( m_infoline);
-	}
+	// Various ListNodes (Jobs, Users, ...) create sorting filtering control.
+	// ListTasks does not.
+	// And it should be properly inserted.
+	if (m_ctrl_sf)
+		m_vlayout->addWidget(m_ctrl_sf);
+	m_vlayout->addWidget(m_view);
+	m_vlayout->addWidget(m_infoline);
 
-	connect( m_view, SIGNAL(doubleClicked( const QModelIndex &)), this, SLOT( doubleClicked_slot( const QModelIndex &)));
+	connect(m_view, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(doubleClicked_slot(const QModelIndex &)));
 
-	connect( m_view->selectionModel(), SIGNAL(     currentChanged( const QModelIndex &, const QModelIndex &)),
-	                             this, SLOT(   currentItemChanged( const QModelIndex &, const QModelIndex &)));
-
-	return true;
+	connect(m_view->selectionModel(), SIGNAL(    currentChanged( const    QModelIndex &, const    QModelIndex &)),
+	                            this,   SLOT(currentItemChanged( const    QModelIndex &, const    QModelIndex &)));
+	connect(m_view->selectionModel(), SIGNAL(  selectionChanged( const QItemSelection &, const QItemSelection &)),
+	                            this,   SLOT(  selectionChanged( const QItemSelection &, const QItemSelection &)));
 }
 
 ListItems::~ListItems()
@@ -181,8 +186,46 @@ void ListItems::doubleClicked_slot( const QModelIndex & index )
 
 void ListItems::currentItemChanged( const QModelIndex & current, const QModelIndex & previous )
 {
-	if( Item::isItemP( current.data()))
-		displayInfo( Item::toItemP( current.data())->getSelectString());
+	Item * item = NULL;
+
+	if (Item::isItemP(current.data()))
+		item = Item::toItemP(current.data());
+
+	if (item)
+	{
+		displayInfo(item->getSelectString());
+		updatePanels(item);
+	}
+
+	m_current_item = item;
+}
+
+void ListItems::selectionChanged(const QItemSelection & i_selected, const QItemSelection & i_deselected)
+{
+/*
+	QModelIndexList indexes = i_selected.indexes();
+	if ((indexes.size()) && (Item::isItemP(indexes.last().data())))
+	{
+		Item * item = Item::toItemP(indexes.last().data());
+		updatePanels(item);
+	}
+	else
+	{
+		updatePanels();
+		m_infoline->clear();
+	}
+*/
+	if (m_view->selectionModel()->selectedIndexes().size())
+		return;
+
+	m_current_item = NULL;
+	m_infoline->clear();
+	updatePanels();
+}
+
+void ListItems::updatePanels(Item * i_item)
+{
+	m_paramspanel->v_updatePanel(i_item);
 }
 
 void ListItems::getItemInfo( const std::string & i_mode)

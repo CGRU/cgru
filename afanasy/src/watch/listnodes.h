@@ -11,7 +11,6 @@ class QVBoxLayout;
 class QMouseEvent;
 
 class ItemNode;
-class CtrlSortFilter;
 
 class ListNodes : public ListItems
 {
@@ -39,6 +38,8 @@ public slots:
 
 protected:
 
+	void initListNodes();
+
 	virtual void showEvent( QShowEvent  * event );
 
 	virtual void v_showFunc();
@@ -49,8 +50,6 @@ protected:
 
 	virtual void v_connectionLost();
 
-	virtual bool init( bool createModelView = true);
-
 	virtual ItemNode * v_createNewItem( af::Node * i_node, bool i_subscibed) = 0;
 
 	void get() const;
@@ -58,7 +57,6 @@ protected:
 
 	bool updateItems( af::Msg* msg);
 
-	CtrlSortFilter * m_ctrl_sf;
 	void initSortFilterCtrl();
 
 	void sort();

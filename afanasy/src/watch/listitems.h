@@ -18,12 +18,15 @@ class QMouseEvent;
 class QAction;
 class QIcon;
 
+class QItemSelection;
 class QModelIndex;
 
+class CtrlSortFilter;
 class Item;
 class ButtonPanel;
 class ButtonsMenu;
 class ModelItems;
+class ParamsPanel;
 class ViewItems;
 
 class ListItems : public QWidget, public Receiver
@@ -57,7 +60,7 @@ public slots:
 
 protected:
 
-	virtual bool init( bool createModelView = true);
+	void initListItems();
 
 	virtual void doubleClicked( Item * item);
 
@@ -89,11 +92,18 @@ protected:
 		const QString & i_hotkey = "",
 		bool i_dblclick = false);
 
+	void updatePanels(Item * i_item = NULL);
+
 protected:
 	QHBoxLayout * m_hlayout;
 	QVBoxLayout * m_panel_l;
 	QVBoxLayout * m_vlayout;
-	QVBoxLayout * m_panel_r;
+
+	Item * m_current_item;
+
+	CtrlSortFilter * m_ctrl_sf;
+
+	ParamsPanel * m_paramspanel;
 
 	InfoLine * m_infoline;
 
@@ -105,8 +115,9 @@ protected:
 	QMutex m_mutex;
 
 private slots:
-	void currentItemChanged( const QModelIndex & current, const QModelIndex & previous );
-	void doubleClicked_slot( const QModelIndex & index );
+	void currentItemChanged(const QModelIndex & current, const QModelIndex & previous);
+	void selectionChanged(const QItemSelection & i_selected, const QItemSelection & i_deselected);
+	void doubleClicked_slot(const QModelIndex & index);
 
 private:
 	std::string m_type;

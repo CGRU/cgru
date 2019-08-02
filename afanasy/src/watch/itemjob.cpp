@@ -1,9 +1,6 @@
 #include "itemjob.h"
 
 #include "../libafanasy/environment.h"
-#include "../libafanasy/msg.h"
-#include "../libafanasy/msgclasses/mcgeneral.h"
-#include "../libafanasy/msgclasses/mctaskup.h"
 
 #include "../libafqt/qenvironment.h"
 
@@ -201,6 +198,7 @@ void ItemJob::updateValues( af::Node * i_node, int i_type)
 	}
 
 	m_tooltip = job->v_generateInfoString( true).c_str();
+	updateInfo(job);
 
 	calcHeight();
 
@@ -222,6 +220,23 @@ void ItemJob::updateValues( af::Node * i_node, int i_type)
 			if( state & AFJOB::STATE_ERROR_MASK )
 				Watch::ntf_JobError( this);
 	}
+}
+
+void ItemJob::updateInfo(const af::Job * i_job)
+{
+	m_info_text.clear();
+
+	m_info_text = "Branch: <b>" + branch + "</b>";
+
+	m_info_text += "<br>Username: <b>" + username + "</b> Creation host: <b>" + hostname + "</b>";
+
+	m_info_text += "<br>Created at: <b>" + afqt::time2Qstr(time_creation) + "</b>";
+	if (time_started)
+		m_info_text += "<br>Started at: <b>" + afqt::time2Qstr(time_started) + "</b>";
+	if (time_done)
+		m_info_text += "<br>Was done at: <b>" + afqt::time2Qstr(time_done) + "</b>";
+	else if (time_wait)
+		m_info_text += "<br>Waiting for: <b>" + afqt::time2Qstr(time_wait) + "</b>";
 }
 
 bool ItemJob::calcHeight()

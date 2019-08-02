@@ -91,6 +91,9 @@ private:
 	static const int HeightAnnotation;
 
 private:
+	void updateInfo(const af::Job * i_job);
+
+private:
 	ListJobs * m_list;
 
 	int m_blocks_num;

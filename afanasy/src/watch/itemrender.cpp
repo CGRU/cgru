@@ -149,20 +149,26 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 	case 0: // The item was just created
 	case af::Msg::TRendersList:
 	{
-		updateNodeValues( i_node);
+		m_info_text.clear();
 
-		setHidden(  render->isHidden()  );
-		setOffline( render->isOffline() );
+		updateNodeValues(i_node);
 
-	    m_engine             = afqt::stoq( render->getEngine());
-	    m_username           = afqt::stoq( render->getUserName());
-	    m_time_launched      = render->getTimeLaunch();
-	    m_time_registered    = render->getTimeRegister();
+		setHidden( render->isHidden() );
+		setOffline(render->isOffline());
+
+		m_engine          = afqt::stoq(render->getEngine());
+		m_username        = afqt::stoq(render->getUserName());
+		m_time_launched   = render->getTimeLaunch();
+		m_time_registered = render->getTimeRegister();
+
+		m_info_text += "OS: <b>" + afqt::stoq(render->getOS()) + "</b> - " + m_engine;
 
 		if( render->getAddress().notEmpty())
 		{
 	        m_address_ip_str = render->getAddress().generateIPString().c_str();
 	        m_address_str = render->getAddress().v_generateInfoString().c_str();
+
+			m_info_text += " IP: <b>" + m_address_ip_str + "</b>";
 		}
 
 		bool becameOnline = false;
@@ -185,6 +191,7 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 	            m_plotSwp.setLabel("S");
 	            m_plotSwp.setHotMin(( 10*m_hres.swap_total_mb)/100);
 	            m_plotSwp.setHotMax((100*m_hres.swap_total_mb)/100);
+				m_info_text += QString(" Swap: <b>%1</b> Gb").arg(m_hres.swap_total_mb>>10);
 			}
 			else
 			{
@@ -203,20 +210,35 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 	            m_plots[i]->height = 0;
 		}
 
-	    m_online = render->isOnline();
-	    if( m_time_launched) m_creationTime = "Launched   at " + afqt::time2Qstr( m_time_launched);
-	    else m_creationTime = "Offline.";
-	    if( m_time_registered) m_creationTime += "\nRegistered at " + afqt::time2Qstr( m_time_registered);
-	    else m_creationTime = "\nNot registered.";
+		if (m_hres.notEmpty())
+		{
+			m_info_text += "<br>";
+			m_info_text += QString(" CPU: <b>%1</b> MHz x<b>%2</b>").arg(m_hres.cpu_mhz).arg(m_hres.cpu_num);
+			m_info_text += QString(" MEM: <b>%1</b> Gb").arg(m_hres.mem_total_mb>>10);
+		}
 
-	    m_busy = render->isBusy();
-	    m_taskstartfinishtime = render->getTasksStartFinishTime();
+	    m_online = render->isOnline();
+		m_info_text += "<br>";
+		m_info_text += "<br>Registered at " + afqt::time2Qstr(m_time_registered);
+		if (m_online)
+		{
+			m_info_text += "<br>Launched at " + afqt::time2Qstr(m_time_launched);
+		}
+		else
+		{
+			m_info_text += "<br>Offline";
+			if (m_wol_operation_time > 0)
+				m_info_text += " since " + afqt::time2Qstr(m_wol_operation_time);
+		}
+
+		m_busy = render->isBusy();
+		m_taskstartfinishtime = render->getTasksStartFinishTime();
 
 		// Get tasks inforamtion:
 		deleteTasks();
-	        m_tasksusers.clear();
-	    m_tasks_users_counts.clear();
-	    m_tasks = render->takeTasks();
+		m_tasksusers.clear();
+		m_tasks_users_counts.clear();
+		m_tasks = render->takeTasks();
 		QStringList tasks_users;
 		QList<int> tasks_counts;
 		m_elder_task_time = time(NULL);

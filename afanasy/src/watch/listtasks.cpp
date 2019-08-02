@@ -50,7 +50,7 @@ ListTasks::ListTasks( QWidget* parent, int JobId, const QString & JobName):
 	m_tasks( NULL),
 	constructed( false)
 {
-	init();
+	initListItems();
 
 	m_view->setSpacing( 1);
 //   view->setUniformItemSizes( true);
