@@ -202,25 +202,26 @@ void ListItems::currentItemChanged( const QModelIndex & current, const QModelInd
 
 void ListItems::selectionChanged(const QItemSelection & i_selected, const QItemSelection & i_deselected)
 {
-/*
-	QModelIndexList indexes = i_selected.indexes();
-	if ((indexes.size()) && (Item::isItemP(indexes.last().data())))
+	if (m_view->selectionModel()->selectedIndexes().size() == 0)
 	{
-		Item * item = Item::toItemP(indexes.last().data());
-		updatePanels(item);
-	}
-	else
-	{
-		updatePanels();
+		// Everything was deselected:
+		m_current_item = NULL;
 		m_infoline->clear();
-	}
-*/
-	if (m_view->selectionModel()->selectedIndexes().size())
+		updatePanels();
 		return;
+	}
 
-	m_current_item = NULL;
-	m_infoline->clear();
-	updatePanels();
+	if (NULL == m_current_item)
+	{
+		// This can be if the same one node was deselected, than selected again.
+		// In such case current item was not changed.
+		QModelIndexList indexes = i_selected.indexes();
+		if ((indexes.size()) && (Item::isItemP(indexes.last().data())))
+		{
+			m_current_item = Item::toItemP(indexes.last().data());
+			updatePanels(m_current_item);
+		}
+	}
 }
 
 void ListItems::updatePanels(Item * i_item)
