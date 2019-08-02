@@ -30,6 +30,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 ListRenders::EDisplaySize ListRenders::ms_displaysize = ListRenders::EVariableSize;
 
@@ -121,9 +122,9 @@ ListRenders::ListRenders( QWidget* parent):
 	connect( (ModelNodes*)m_model, SIGNAL(   nodeAdded( ItemNode *, const QModelIndex &)),
 	                         this,   SLOT( renderAdded( ItemNode *, const QModelIndex &)));
 
-	if( false == af::Environment::VISOR())
-		connect( m_view->selectionModel(), SIGNAL( selectionChanged( const QItemSelection &, const QItemSelection &)),
-	                                 this,   SLOT( selectionChanged( const QItemSelection &, const QItemSelection &)));
+	if (false == af::Environment::VISOR())
+		connect(m_view->selectionModel(), SIGNAL(       selectionChanged(const QItemSelection &, const QItemSelection &)),
+	                                this,   SLOT(rendersSelectionChanged(const QItemSelection &, const QItemSelection &)));
 
 	setSpacing();
 
@@ -179,12 +180,11 @@ void ListRenders::renderAdded( ItemNode * node, const QModelIndex & index)
 	}
 }
 
-void ListRenders::selectionChanged( const QItemSelection & selected, const QItemSelection & deselected )
+void ListRenders::rendersSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected)
 {
 	QModelIndexList indexes = selected.indexes();
 	if (indexes.size() == 0)
 	{
-//		updatePanels();
 		return;
 	}
 
@@ -196,9 +196,6 @@ void ListRenders::selectionChanged( const QItemSelection & selected, const QItem
 				(render->getUserName() != QString::fromUtf8(af::Environment::getUserName().c_str())))
 				m_view->selectionModel()->select(indexes[i], QItemSelectionModel::Deselect);
 		}
-
-//	if (Item::isItemP(indexes.last().data()))
-//		updatePanels(Item::toItemP(indexes.last().data()));
 }
 
 void ListRenders::requestResources()
