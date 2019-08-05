@@ -39,13 +39,16 @@ d_params.general = {
 	comments : {}
 };
 d_params.settings = {
-	audio_file /******/: {"label": 'Audio', "default": "REF/sound.flac", "tooltip": 'Sound file'},
-	af_depend_mask /**/: {"label": 'Depends', "tooltip": 'Afanasy job depend mask'},
-	af_hostsmask /****/: {'label': 'Hosts Mask'},
-	fffirst /*********/:
-		{"label": "F.F.First", "tooltip": 'First frame is "1"\nNo matter image file name number.'},
-	aspect_in /*******/: {"label": 'Aspect In'},
-	gamma /***********/: {}
+	audio_file     : {"label":'Audio', "default":"REF/sound.flac", "tooltip":'Sound file'},
+	af_depend_mask : {"label":'Depends', "tooltip":'Afanasy job depend mask'},
+	af_hostsmask   : {'label':'Hosts Mask'},
+	cacher_aspect  : {'width':'25%', 'lwidth':'160px', 'label':'Cacher Aspect',  'tooltip':'Cacher aspect (float aspect: 2.39)'},
+	cacher_opacity : {'width':'25%', 'lwidth':'160px', 'label':'Cacher Opacity', 'tooltip':'Cacher opacity (integer percentage: 100)'},
+	draw169        : {'width':'25%', 'lwidth':'160px', 'label':'Cacher 16x9',    'tooltip':'Cacher 16x9 opacity percentage.'},
+	draw235        : {'width':'25%', 'lwidth':'160px', 'label':'Cacher 2.35',    'tooltip':'Cacher 2.35 opacity percentage.'},
+	fffirst        : {"label":"F.F.First", "tooltip":'First frame is "1"\nNo matter image file name number.'},
+	aspect_in      : {"label":'Aspect In'},
+	gamma          : {}
 };
 
 function d_Make(i_path, i_outfolder)
@@ -362,6 +365,15 @@ function d_MakeCmd(i_params)
 
 	if ((params.aspect_in != null) && (params.aspect_in != ''))
 		cmd += ' --aspect_in ' + params.aspect_in;
+
+	if ((params.cacher_aspect != null) && (params.cacher_aspect != ''))
+		cmd += ' --cacher_aspect ' + params.cacher_aspect;
+	if ((params.cacher_opacity != null) && (params.cacher_opacity != ''))
+		cmd += ' --cacher_opacity ' + params.cacher_opacity;
+	if ((params.draw169 != null) && (params.draw169 != ''))
+		cmd += ' --draw169 ' + params.draw169;
+	if ((params.draw235 != null) && (params.draw235 != ''))
+		cmd += ' --draw235 ' + params.draw235;
 
 	cmd += ' --createoutdir';
 
