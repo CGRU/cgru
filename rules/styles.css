@@ -514,7 +514,9 @@ display: none;
 }
 #bookmarks .project .label {
 text-align: center;
-font-size: 14px;
+font-size: 16px;
+padding: 0px 4px 0px 4px;
+margin: 0px 4px 0px 4px;
 cursor: pointer;
 }
 #bookmarks .project .label:hover {
@@ -524,8 +526,9 @@ text-shadow: 0 0 2px rgba( 100, 255, 255, .5);
 font-style: italic;
 }
 #bookmarks .project .bm_folder_label {
-font-size: 10px;
+font-size: 14px;
 padding: 6px 4px 0px 4px;
+margin: 0px 4px 0px 4px;
 font-weight: bold;
 opacity: .7;
 }
