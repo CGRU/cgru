@@ -219,16 +219,16 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 
 	    m_online = render->isOnline();
 		m_info_text += "<br>";
-		m_info_text += "<br>Registered at " + afqt::time2Qstr(m_time_registered);
+		m_info_text += "<br>Registered at <b>" + afqt::time2Qstr(m_time_registered) + "</b>";
 		if (m_online)
 		{
-			m_info_text += "<br>Launched at " + afqt::time2Qstr(m_time_launched);
+			m_info_text += "<br>Launched at <b>" + afqt::time2Qstr(m_time_launched) + "</b>";
 		}
 		else
 		{
 			m_info_text += "<br>Offline";
 			if (m_wol_operation_time > 0)
-				m_info_text += " since " + afqt::time2Qstr(m_wol_operation_time);
+				m_info_text += " since <b>" + afqt::time2Qstr(m_wol_operation_time) + "</b>";
 		}
 
 		m_busy = render->isBusy();
