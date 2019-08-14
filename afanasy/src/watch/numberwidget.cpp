@@ -1,6 +1,6 @@
 #include "numberwidget.h"
 
-#include "../libafqt/attrnumber.h"
+#include "../libafqt/attr.h"
 
 #include "watch.h"
 

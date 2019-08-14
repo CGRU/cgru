@@ -70,7 +70,10 @@ public:
 
 	inline void setHidded(bool i_hidden) {m_hidden = i_hidden;}
 	inline bool isHidden() const {return m_hidden;}
-	
+
+	inline bool hasParam(const QString & i_name) const {return m_params.contains(i_name);}
+	const QVariant & getParamVar(const QString & i_name) const;
+
 protected:
 	void drawBack( QPainter *painter, const QStyleOptionViewItem &option, const QColor * i_clrItem = NULL, const QColor * i_clrBorder = NULL) const;
 
@@ -88,6 +91,8 @@ protected:
 	QString m_name;           ///< Item name.
 
 	QString m_info_text;
+
+	QMap<QString, QVariant> m_params;
 
 	int m_height;
 

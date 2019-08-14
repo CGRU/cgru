@@ -73,6 +73,13 @@ void ItemJob::updateValues( af::Node * i_node, int i_type)
 
 	updateNodeValues( i_node);
 
+	// Changeable parameters:
+	m_params["max_running_tasks"]          = job->getMaxRunningTasks();
+	m_params["max_running_tasks_per_host"] = job->getMaxRunTasksPerHost();
+	m_params["hosts_mask"]                 = afqt::stoq(job->getHostsMask());
+	m_params["hosts_mask_exclude"]         = afqt::stoq(job->getHostsMaskExclude());
+	m_params["depend_mask"]                = afqt::stoq(job->getDependMask());
+	m_params["depend_mask_global"]         = afqt::stoq(job->getDependMaskGlobal());
 
 	setHidden(  job->isHidden()  );
 	setOffline( job->isOffline() );

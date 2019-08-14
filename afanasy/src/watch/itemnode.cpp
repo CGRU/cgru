@@ -31,6 +31,9 @@ ItemNode::~ItemNode()
 
 void ItemNode::updateNodeValues( const af::Node * i_node)
 {
+	m_params["priority"]   = i_node->getPriority();
+	m_params["annotation"] = afqt::stoq(i_node->getAnnotation());
+
 	m_priority    = i_node->getPriority();
 	m_annotation  = afqt::stoq( i_node->getAnnotation());
 	m_custom_data = afqt::stoq( i_node->getCustomData());

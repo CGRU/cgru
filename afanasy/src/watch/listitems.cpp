@@ -2,6 +2,8 @@
 
 #include "../libafanasy/regexp.h"
 
+#include "../libafqt/qenvironment.h"
+
 #include "buttonpanel.h"
 #include "buttonsmenu.h"
 #include "ctrlsortfilter.h"
@@ -15,10 +17,12 @@
 #include <QtGui/QKeyEvent>
 #include <QBoxLayout>
 #include <QLabel>
+#include <QSplitter>
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 ListItems::ListItems( QWidget* parent, const std::string & type):
 	QWidget( parent),
@@ -30,27 +34,32 @@ ListItems::ListItems( QWidget* parent, const std::string & type):
 	m_parentWindow(parent),
 	m_current_item(NULL)
 {
-AFINFO("ListItems::ListItems.\n");
+	m_type_qs = afqt::stoq(m_type);
+
 	setAttribute ( Qt::WA_DeleteOnClose, true );
 
-	m_hlayout = new QHBoxLayout(this);
-	m_vlayout = new QVBoxLayout();
-	QWidget * panel_l_widget = new QWidget();
-	m_hlayout->addWidget(panel_l_widget);
-	m_hlayout->addLayout(m_vlayout);
+	QHBoxLayout * hlayout = new QHBoxLayout(this);
 
+	QWidget * panel_l_widget = new QWidget();
+	hlayout->addWidget(panel_l_widget);
 	m_panel_l = new QVBoxLayout();
 	panel_l_widget->setLayout(m_panel_l);
 	panel_l_widget->setFixedWidth(100);
 	m_panel_l->setAlignment(Qt::AlignTop);
-	m_panel_l->setContentsMargins(5, 5, 5, 5);
+	m_panel_l->setContentsMargins(0, 5, 0, 5);
 	m_panel_l->setSpacing(5);
 
-	m_hlayout->setSpacing( 0);
-	m_vlayout->setSpacing( 0);
-	m_hlayout->setContentsMargins( 0, 0, 0, 0);
-	m_vlayout->setContentsMargins( 0, 0, 0, 0);
-	m_infoline = new InfoLine( this);
+	m_splitter = new QSplitter();
+	hlayout->addWidget(m_splitter);
+	m_vlayout = new QVBoxLayout();
+	QWidget * widget = new QWidget();
+	m_splitter->addWidget(widget);
+	widget->setLayout(m_vlayout);
+
+	m_vlayout->setSpacing(0);
+	m_splitter->setContentsMargins(0, 0, 0, 0);
+	m_vlayout->setContentsMargins(0, 0, 0, 0);
+	m_infoline = new InfoLine(this);
 
 //	if( m_parentWindow != (QWidget*)(Watch::getDialog())) setFocusPolicy(Qt::StrongFocus);
 	setFocusPolicy(Qt::StrongFocus);
@@ -61,7 +70,12 @@ void ListItems::initListItems()
 	// Descendant classes may create own panel:
 	if (NULL == m_paramspanel)
 		m_paramspanel = new ParamsPanel();
-	m_hlayout->addWidget(m_paramspanel);
+	m_splitter->addWidget(m_paramspanel);
+	// Resize splitter to restore size, stored in dtor
+	QList<int> panel_sizes;
+	panel_sizes << afqt::QEnvironment::ms_attrs_panel[m_type_qs + "_size_right_0"].n;
+	panel_sizes << afqt::QEnvironment::ms_attrs_panel[m_type_qs + "_size_right_1"].n;
+	m_splitter->setSizes(panel_sizes);
 
 	// ListNodes creates: m_model = new ModelNodes
 	if (NULL == m_model)
@@ -87,7 +101,17 @@ void ListItems::initListItems()
 
 ListItems::~ListItems()
 {
-AFINFO("ListItems::~ListItems.\n");
+	QList<int> panel_sizes = m_splitter->sizes();
+	if (panel_sizes.size() != 2)
+	{
+		AF_ERR << "panel_sizes.size() = " <<panel_sizes.size();
+		return;
+	}
+
+	int splitter_size = m_splitter->frameRect().width();
+AF_DEV << "panel_sizes = " << panel_sizes[0] << ", " << panel_sizes[1];
+	afqt::QEnvironment::ms_attrs_panel[m_type_qs + "_size_right_0"].n = panel_sizes[0];
+	afqt::QEnvironment::ms_attrs_panel[m_type_qs + "_size_right_1"].n = panel_sizes[1];
 }
 
 int ListItems::count() const { return m_model->count();}

@@ -41,7 +41,7 @@
 #include "../libafanasy/logger.h"
 
 ListTasks::ListTasks( QWidget* parent, int JobId, const QString & JobName):
-	ListItems( parent),
+	ListItems( parent, "tasks"),
 	m_job_id( JobId),
 	m_job_name( JobName),
 	m_blocks_num(0),

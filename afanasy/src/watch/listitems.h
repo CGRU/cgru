@@ -17,6 +17,7 @@ class QKeyEvent;
 class QMouseEvent;
 class QAction;
 class QIcon;
+class QSplitter;
 
 class QItemSelection;
 class QModelIndex;
@@ -95,7 +96,8 @@ protected:
 	void updatePanels(Item * i_item = NULL);
 
 protected:
-	QHBoxLayout * m_hlayout;
+	//QHBoxLayout * m_hlayout;
+	QSplitter   * m_splitter;
 	QVBoxLayout * m_panel_l;
 	QVBoxLayout * m_vlayout;
 
@@ -121,6 +123,7 @@ private slots:
 
 private:
 	std::string m_type;
+	QString m_type_qs;
 
 	ButtonsMenu * m_current_buttons_menu;
 

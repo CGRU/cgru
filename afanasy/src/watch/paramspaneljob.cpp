@@ -183,6 +183,6 @@ void FolderWidget::paintEvent(QPaintEvent * event)
 void FolderWidget::slot_Open()
 {
 	af::Service service(afqt::qtos(m_value));
-	Watch::browseFolder(afqt::stoq( service.getWDir()));
+	Watch::browseFolder(afqt::stoq(service.getWDir()));
 }
 

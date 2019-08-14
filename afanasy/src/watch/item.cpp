@@ -37,6 +37,15 @@ Item::~Item()
 {
 }
 
+const QVariant & Item::getParamVar(const QString & i_name) const
+{
+	static const QVariant var;
+	QMap<QString, QVariant>::const_iterator it = m_params.find(i_name);
+	if (it == m_params.end())
+		return var;
+	return it.value();
+}
+
 QSize Item::sizeHint( const QStyleOptionViewItem &option) const
 {
    return QSize( Width, m_height);
