@@ -34,8 +34,6 @@ ListItems::ListItems( QWidget* parent, const std::string & type):
 	m_parentWindow(parent),
 	m_current_item(NULL)
 {
-	m_type_qs = afqt::stoq(m_type);
-
 	setAttribute ( Qt::WA_DeleteOnClose, true );
 
 	QHBoxLayout * hlayout = new QHBoxLayout(this);
@@ -71,11 +69,7 @@ void ListItems::initListItems()
 	if (NULL == m_paramspanel)
 		m_paramspanel = new ParamsPanel();
 	m_splitter->addWidget(m_paramspanel);
-	// Resize splitter to restore size, stored in dtor
-	QList<int> panel_sizes;
-	panel_sizes << afqt::QEnvironment::ms_attrs_panel[m_type_qs + "_size_right_0"].n;
-	panel_sizes << afqt::QEnvironment::ms_attrs_panel[m_type_qs + "_size_right_1"].n;
-	m_splitter->setSizes(panel_sizes);
+	m_paramspanel->initPanel(m_splitter, afqt::stoq(m_type));
 
 	// ListNodes creates: m_model = new ModelNodes
 	if (NULL == m_model)
@@ -101,17 +95,9 @@ void ListItems::initListItems()
 
 ListItems::~ListItems()
 {
-	QList<int> panel_sizes = m_splitter->sizes();
-	if (panel_sizes.size() != 2)
-	{
-		AF_ERR << "panel_sizes.size() = " <<panel_sizes.size();
-		return;
-	}
-
-	int splitter_size = m_splitter->frameRect().width();
-AF_DEV << "panel_sizes = " << panel_sizes[0] << ", " << panel_sizes[1];
-	afqt::QEnvironment::ms_attrs_panel[m_type_qs + "_size_right_0"].n = panel_sizes[0];
-	afqt::QEnvironment::ms_attrs_panel[m_type_qs + "_size_right_1"].n = panel_sizes[1];
+	// We can`t store state just in m_paramspanel dtor,
+	// as storeState() uses m_splitter, that can be destroyed first.
+	m_paramspanel->storeState();
 }
 
 int ListItems::count() const { return m_model->count();}

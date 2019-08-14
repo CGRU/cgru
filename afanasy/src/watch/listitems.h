@@ -123,7 +123,6 @@ private slots:
 
 private:
 	std::string m_type;
-	QString m_type_qs;
 
 	ButtonsMenu * m_current_buttons_menu;
 

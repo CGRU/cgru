@@ -22,7 +22,7 @@ namespace AFGUI
 	const int LEFT   = 0;
 	const int TOP    = 1;
 	const int RIGHT  = 2;
-	const int BOTTON = 3;
+	const int BOTTOM = 3;
 
 	const int STAR_NUMPOINTS = 5;
 	const int STAR_RADIUSOUT = 100;

@@ -6,6 +6,8 @@
 
 class QFrame;
 class QLabel;
+class QPushButton;
+class QSplitter;
 class QVBoxLayout;
 
 class Item;
@@ -19,6 +21,8 @@ public:
 	ParamsPanel();
 	virtual ~ParamsPanel();
 
+	void initPanel(QSplitter * i_splitter, const QString & i_type);
+
 	virtual void v_updatePanel(Item * i_item = NULL);
 
 	void addParamWidget(ParamWidget * i_pw);
@@ -28,12 +32,29 @@ public:
 
 	void updateParams();
 
+	void storeState();
+
 protected:
 	Item * m_cur_item;
 
 	QVBoxLayout * m_panel_layout;
 
+private slots:
+	void slot_moveRight();
+	void slot_moveBottom();
+
 private:
+	void move(int i_position);
+	void move();
+
+private:
+	int m_position;
+	QSplitter * m_splitter;
+	QString m_type;
+
+	QPushButton * m_btn_layout_right;
+	QPushButton * m_btn_layout_bottom;
+
 	QLabel * m_name;
 
 	QFrame      * m_params_frame;

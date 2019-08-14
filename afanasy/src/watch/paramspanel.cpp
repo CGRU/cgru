@@ -5,7 +5,9 @@
 #include <QLabel>
 #include <QPainter>
 #include <QPushButton>
+#include <QSplitter>
 
+#include "../include/afgui.h"
 #include "../libafqt/qenvironment.h"
 
 #include "item.h"
@@ -16,6 +18,8 @@
 #include "../libafanasy/logger.h"
 
 ParamsPanel::ParamsPanel():
+	m_splitter(NULL),
+	m_position(-1),
 	m_cur_item(NULL)
 {
 	QWidget * widget = new QWidget();
@@ -26,11 +30,29 @@ ParamsPanel::ParamsPanel():
 	setWidgetResizable(true);
 
 
-	// Node name:
+	// Node name and layout buttons:
+	QHBoxLayout * btns_layout = new QHBoxLayout();
+	m_panel_layout->addLayout(btns_layout);
+
+	// ⏵ ⏷ ▶ ▼ ◥ ⯆ ⯈
+	m_btn_layout_bottom = new QPushButton("⏷⏷⏷");
+	btns_layout->addWidget(m_btn_layout_bottom);
+	m_btn_layout_bottom->setFixedSize(32,12);
+	connect(m_btn_layout_bottom, SIGNAL(pressed()), this, SLOT(slot_moveBottom()));
+	m_btn_layout_bottom->setToolTip("Move panel bottom.");
+
+	btns_layout->addStretch();
 	m_name = new QLabel();
-	m_panel_layout->addWidget(m_name);
+	btns_layout->addWidget(m_name);
 	m_name->setAlignment(Qt::AlignHCenter);
 	m_name->setTextInteractionFlags(Qt::TextBrowserInteraction);
+	btns_layout->addStretch();
+
+	m_btn_layout_right = new QPushButton("⏵⏵⏵");
+	btns_layout->addWidget(m_btn_layout_right);
+	m_btn_layout_right->setFixedSize(32,12);
+	connect(m_btn_layout_right, SIGNAL(pressed()), this, SLOT(slot_moveRight()));
+	m_btn_layout_right->setToolTip("Move panel right.");
 
 
 	// Node parameters:
@@ -56,6 +78,68 @@ ParamsPanel::ParamsPanel():
 	m_info_text = new QLabel();
 	m_info_layout->addWidget(m_info_text);
 	m_info_text->setTextInteractionFlags(Qt::TextBrowserInteraction);
+}
+
+void ParamsPanel::initPanel(QSplitter * i_splitter, const QString & i_type)
+{
+	m_splitter = i_splitter;
+	m_type = i_type;
+
+	// Set stored position:
+	m_position = afqt::QEnvironment::ms_attrs_panel[m_type + "_pos"].n;
+	move();
+}
+
+void ParamsPanel::slot_moveRight() { move(AFGUI::RIGHT );}
+void ParamsPanel::slot_moveBottom(){ move(AFGUI::BOTTOM);}
+void ParamsPanel::move(int i_position)
+{
+	if (m_position == i_position)
+		return;
+
+	storeState();
+	m_position = i_position;
+	move();
+}
+void ParamsPanel::move()
+{
+	QString pos_str = "right";
+	if (m_position == AFGUI::BOTTOM)
+	{
+		m_splitter->setOrientation(Qt::Vertical);
+		m_btn_layout_bottom->setHidden(true);
+		m_btn_layout_right->setHidden(false);
+		pos_str = "bottom";
+	}
+	else
+	{
+		m_splitter->setOrientation(Qt::Horizontal);
+		m_btn_layout_right->setHidden(true);
+		m_btn_layout_bottom->setHidden(false);
+	}
+
+	QList<int> sizes;
+	sizes << afqt::QEnvironment::ms_attrs_panel[m_type + "_size_" + pos_str + "_0"].n;
+	sizes << afqt::QEnvironment::ms_attrs_panel[m_type + "_size_" + pos_str + "_1"].n;
+	m_splitter->setSizes(sizes);
+}
+
+void ParamsPanel::storeState()
+{
+	QList<int> sizes = m_splitter->sizes();
+	if (sizes.size() != 2)
+	{
+		AF_ERR << "sizes.size() = " <<sizes.size();
+		return;
+	}
+
+	QString pos_str = "right";
+	if (m_position == AFGUI::BOTTOM)
+		pos_str = "bottom";
+
+	afqt::QEnvironment::ms_attrs_panel[m_type + "_pos"].n = m_position;
+	afqt::QEnvironment::ms_attrs_panel[m_type + "_size_" + pos_str + "_0"].n = sizes[0];
+	afqt::QEnvironment::ms_attrs_panel[m_type + "_size_" + pos_str + "_1"].n = sizes[1];
 }
 
 ParamsPanel::~ParamsPanel()
