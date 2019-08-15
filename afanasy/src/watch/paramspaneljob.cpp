@@ -22,7 +22,7 @@
 ParamsPanelJob::ParamsPanelJob()
 {
 	m_folders_frame = new QFrame();
-	m_panel_layout->insertWidget(1, m_folders_frame);
+	getPublicLayout()->insertWidget(0, m_folders_frame);
 	m_folders_frame->setFrameShape(QFrame::StyledPanel);
 	m_folders_frame->setFrameShadow(QFrame::Plain);
 

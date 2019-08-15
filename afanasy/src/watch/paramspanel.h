@@ -4,6 +4,7 @@
 
 #include <QScrollArea>
 
+class QBoxLayout;
 class QFrame;
 class QLabel;
 class QPushButton;
@@ -35,10 +36,10 @@ public:
 
 	void storeState();
 
+	inline QVBoxLayout * getPublicLayout() { return m_layout_params;}
+
 protected:
 	Item * m_cur_item;
-
-	QVBoxLayout * m_panel_layout;
 
 private slots:
 	void slot_moveRight();
@@ -52,6 +53,10 @@ private:
 	int m_position;
 	QSplitter * m_splitter;
 	QString m_type;
+
+	QVBoxLayout * m_layout_name;
+	QBoxLayout  * m_layout_info;
+	QVBoxLayout * m_layout_params;
 
 	QPushButton * m_btn_layout_right;
 	QPushButton * m_btn_layout_bottom;

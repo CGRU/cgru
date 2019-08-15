@@ -23,16 +23,14 @@ ParamsPanel::ParamsPanel():
 	m_cur_item(NULL)
 {
 	QWidget * widget = new QWidget();
-	m_panel_layout = new QVBoxLayout();
-	m_panel_layout->setAlignment(Qt::AlignTop);
-	widget->setLayout(m_panel_layout);
-	setWidget(widget);
-	setWidgetResizable(true);
 
+	m_layout_name = new QVBoxLayout();
+	m_layout_name->setAlignment(Qt::AlignTop);
+	widget->setLayout(m_layout_name);
 
 	// Node name and layout buttons:
 	QHBoxLayout * btns_layout = new QHBoxLayout();
-	m_panel_layout->addLayout(btns_layout);
+	m_layout_name->addLayout(btns_layout);
 
 	// ⏵ ⏷ ▶ ▼ ◥ ⯆ ⯈
 	m_btn_layout_bottom = new QPushButton("⏷⏷⏷");
@@ -55,9 +53,19 @@ ParamsPanel::ParamsPanel():
 	m_btn_layout_right->setToolTip("Move panel right.");
 
 
+	// Info and params layout:
+	m_layout_info = new QBoxLayout(QBoxLayout::TopToBottom);
+	m_layout_info->setAlignment(Qt::AlignTop);
+	m_layout_name->addLayout(m_layout_info);
+
+	m_layout_params = new QVBoxLayout();
+	m_layout_params->setAlignment(Qt::AlignTop);
+	m_layout_info->addLayout(m_layout_params);
+
+
 	// Node parameters:
 	m_params_frame =  new QFrame();
-	m_panel_layout->addWidget(m_params_frame);
+	m_layout_params->addWidget(m_params_frame);
 	m_params_frame->setFrameShape(QFrame::StyledPanel);
 	m_params_frame->setFrameShadow(QFrame::Plain);
 
@@ -68,17 +76,22 @@ ParamsPanel::ParamsPanel():
 
 	// Node info:
 	m_info_frame = new QFrame();
-	m_panel_layout->addWidget(m_info_frame);
+	m_layout_info->addWidget(m_info_frame);
 	m_info_frame->setFrameShape(QFrame::StyledPanel);
 	m_info_frame->setFrameShadow(QFrame::Plain);
 
 	m_info_layout = new QVBoxLayout(m_info_frame);
+	m_info_layout->setAlignment(Qt::AlignTop);
 	m_info_label = new QLabel("<b>Info</b>");
+	m_info_layout->addWidget(m_info_label);
 	m_info_layout->addWidget(m_info_label);
 	m_info_text = new QLabel();
 	m_info_layout->addWidget(m_info_text);
 	m_info_text->setTextInteractionFlags(Qt::TextBrowserInteraction);
 	m_info_text->setWordWrap(true);
+
+	setWidget(widget);
+	setWidgetResizable(true);
 }
 
 void ParamsPanel::initPanel(QSplitter * i_splitter, const QString & i_type)
@@ -110,6 +123,7 @@ void ParamsPanel::move()
 		m_splitter->setOrientation(Qt::Vertical);
 		m_btn_layout_bottom->setHidden(true);
 		m_btn_layout_right->setHidden(false);
+		m_layout_info->setDirection(QBoxLayout::LeftToRight);
 		pos_str = "bottom";
 	}
 	else
@@ -117,6 +131,7 @@ void ParamsPanel::move()
 		m_splitter->setOrientation(Qt::Horizontal);
 		m_btn_layout_right->setHidden(true);
 		m_btn_layout_bottom->setHidden(false);
+		m_layout_info->setDirection(QBoxLayout::TopToBottom);
 	}
 
 	QList<int> sizes;
