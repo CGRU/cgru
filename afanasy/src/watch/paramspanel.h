@@ -14,6 +14,7 @@ class Item;
 class ParamWidget;
 class ParamWidget_Int;
 
+
 class ParamsPanel : public QScrollArea
 {
 Q_OBJECT
@@ -83,8 +84,8 @@ protected:
 	virtual void v_updateVar(const QVariant & i_var) = 0;
 
 protected:
-	QLabel * m_qlabel;
-	QLabel * m_qvalue;
+	QLabel * m_label_widget;
+	QLabel * m_value_widget;
 
 private slots:
 	void slot_Edit();

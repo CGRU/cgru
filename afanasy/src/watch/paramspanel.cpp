@@ -78,6 +78,7 @@ ParamsPanel::ParamsPanel():
 	m_info_text = new QLabel();
 	m_info_layout->addWidget(m_info_text);
 	m_info_text->setTextInteractionFlags(Qt::TextBrowserInteraction);
+	m_info_text->setWordWrap(true);
 }
 
 void ParamsPanel::initPanel(QSplitter * i_splitter, const QString & i_type)
@@ -215,15 +216,15 @@ ParamWidget::ParamWidget(const QString & i_name, const QString & i_label, const 
 	btn->setToolTip("Edit");
 	btn->setFixedWidth(32);
 
-	m_qlabel = new QLabel(i_label);
-	layout->addWidget(m_qlabel);
-	m_qlabel->setToolTip(i_tip);
+	m_label_widget = new QLabel(i_label);
+	layout->addWidget(m_label_widget);
+	m_label_widget->setToolTip(i_tip);
 
 	layout->addStretch();
 
-	m_qvalue = new QLabel("value");
-	layout->addWidget(m_qvalue);
-	m_qvalue->setTextInteractionFlags(Qt::TextBrowserInteraction);
+	m_value_widget = new QLabel();
+	layout->addWidget(m_value_widget);
+	m_value_widget->setTextInteractionFlags(Qt::TextBrowserInteraction);
 
 	connect(btn, SIGNAL(clicked()), this, SLOT(slot_Edit()));
 }
@@ -259,6 +260,8 @@ void ParamWidget::slot_Edit()
 AF_DEV << afqt::qtos(m_name);
 }
 
+
+
 ///////////////////////////////////////////////////////
 ////////////////   ParamWidget Types   ////////////////
 ///////////////////////////////////////////////////////
@@ -280,7 +283,7 @@ ParamWidget_Int::~ParamWidget_Int()
 void ParamWidget_Int::v_updateVar(const QVariant & i_var)
 {
 	m_value = i_var.toInt();
-	m_qvalue->setText(QString("%1").arg(m_value));
+	m_value_widget->setText(QString("%1").arg(m_value));
 	setHidden(false);
 }
 
@@ -299,7 +302,7 @@ ParamWidget_Str::~ParamWidget_Str()
 void ParamWidget_Str::v_updateVar(const QVariant & i_var)
 {
 	m_value = i_var.toString();
-	m_qvalue->setText(m_value);
+	m_value_widget->setText(m_value);
 	setHidden(false);
 }
 

@@ -14,6 +14,7 @@ class QVBoxLayout;
 class Item;
 class ItemJob;
 class FolderWidget;
+class FValueWidget;
 
 class ParamsPanelJob : public ParamsPanel
 {
@@ -58,9 +59,26 @@ protected:
 
 private slots:
 	void slot_Open();
+	void slot_Copy();
+	void slot_Term();
 
 private:
 	QString m_name;
 	QString m_value;
+};
+
+class FValueWidget: public QWidget
+{
+public:
+	FValueWidget();
+	~FValueWidget();
+
+	void setText(const QString & i_text);
+
+protected:
+	virtual void paintEvent(QPaintEvent *event);
+
+private:
+	QString m_text;
 };
 

@@ -120,6 +120,7 @@ public:
 
 	void static browseImages( const QString & i_image,  const QString & i_wdir);
 	void static browseFolder( const QString & i_folder, const QString & i_wdir = QString());
+	void static openTerminal(const QString & i_wdir = QString());
 
 	void static notify( const QString & i_title, const QString & i_msg = QString(), uint32_t i_state = 0);
 

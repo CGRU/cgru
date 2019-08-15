@@ -1,7 +1,9 @@
 #include "paramspaneljob.h"
 
+#include <QClipboard>
 #include <QBoxLayout>
 #include <QFrame>
+#include <QGuiApplication>
 #include <QLabel>
 #include <QPushButton>
 
@@ -144,24 +146,28 @@ FolderWidget::FolderWidget(const QString & i_name, const QString & i_value, QLay
 	QHBoxLayout * layout = new QHBoxLayout(this);
 	layout->setContentsMargins(0, 4, 0, 4);
 
-	QPushButton * btn = new QPushButton(m_name);
-	layout->addWidget(btn);
-	btn->setToolTip("Click to open folder");
-	btn->setFixedWidth(100);
+	QPushButton * btn_open = new QPushButton(m_name);
+	layout->addWidget(btn_open);
+	btn_open->setToolTip("Click to open folder");
+	btn_open->setFixedWidth(72);
+	connect(btn_open, SIGNAL(clicked()), this, SLOT(slot_Open()));
 
-	layout->addStretch();
-
-	static const int max_size = 32;
-	QString text = m_value;
-	if (text.size() > max_size)
-		text = QString("...") + text.remove(0, text.size() - max_size);
-	QLabel * fvalue = new QLabel(text);
+	FValueWidget * fvalue = new FValueWidget();
+	fvalue->setText(m_value);
 	fvalue->setToolTip(m_value);
-	fvalue->setOpenExternalLinks(true);
-	fvalue->setTextInteractionFlags(Qt::TextBrowserInteraction);
 	layout->addWidget(fvalue);
 
-	connect(btn, SIGNAL(clicked()), this, SLOT(slot_Open()));
+	QPushButton * btn_copy = new QPushButton("C");
+	layout->addWidget(btn_copy);
+	btn_copy->setToolTip("Copy to clipboard");
+	btn_copy->setFixedSize(16, 24);
+	connect(btn_copy, SIGNAL(clicked()), this, SLOT(slot_Copy()));
+
+	QPushButton * btn_term = new QPushButton("T");
+	layout->addWidget(btn_term);
+	btn_term->setToolTip("Open terminal");
+	btn_term->setFixedSize(16, 24);
+	connect(btn_term, SIGNAL(clicked()), this, SLOT(slot_Term()));
 }
 
 FolderWidget::~FolderWidget()
@@ -184,5 +190,41 @@ void FolderWidget::slot_Open()
 {
 	af::Service service(afqt::qtos(m_value));
 	Watch::browseFolder(afqt::stoq(service.getWDir()));
+}
+void FolderWidget::slot_Copy()
+{
+	af::Service service(afqt::qtos(m_value));
+	QGuiApplication::clipboard()->setText(afqt::stoq(service.getWDir()));
+}
+void FolderWidget::slot_Term()
+{
+	af::Service service(afqt::qtos(m_value));
+	Watch::openTerminal(afqt::stoq(service.getWDir()));
+}
+
+
+FValueWidget::FValueWidget()
+{
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
+	setFixedHeight(24);
+}
+
+FValueWidget::~FValueWidget(){}
+
+void FValueWidget::setText(const QString & i_text)
+{
+	m_text =  i_text;
+	repaint();
+}
+
+void FValueWidget::paintEvent(QPaintEvent *event)
+{
+	QPainter painter(this);
+
+	QPen pen(Qt::SolidLine);
+	pen.setColor(afqt::QEnvironment::clr_Text.c);
+	painter.setPen(pen);
+
+	painter.drawText(rect(), Qt::AlignVCenter | Qt::AlignRight, m_text);
 }
 

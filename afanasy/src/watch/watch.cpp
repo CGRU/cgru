@@ -485,6 +485,24 @@ void Watch::browseFolder( const QString & i_folder, const QString & i_wdir)
 	Watch::startProcess( cmd, i_wdir);
 }
 
+void Watch::openTerminal(const QString & i_wdir)
+{
+	QDir dir(i_wdir);
+	if(false == dir.exists())
+	{
+		Watch::displayError(QString("Folder '%1' does not exist.").arg(dir.path()));
+		return;
+	}
+
+	Watch::displayInfo(QString("Terminal '%1'").arg(dir.path()));
+#ifdef WINNT
+	QString cmd = QString("start cmd.exe /K \"cd %1\"").arg(dir.path());
+#else
+	QString cmd = QString("cd \"%1\"; openterminal").arg(dir.path());
+#endif
+	Watch::startProcess(cmd);
+}
+
 void Watch::repaint()
 {
 //printf("Watch::repaint: start\n");
