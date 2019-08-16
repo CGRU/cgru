@@ -58,6 +58,12 @@ private:
 	void deletePlots();
 
 private:
+	// We need to keep two info strings,
+	// because render can update its properties w/o resources at one time,
+	// and at the other just resources.
+	// So the result string should be a combination of a two strings
+	// that are updating separately.
+	QString m_info_text_render;
 	QString m_info_text_hres;
 
 	af::HostRes m_hres;

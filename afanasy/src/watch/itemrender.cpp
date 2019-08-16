@@ -149,7 +149,7 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 	case 0: // The item was just created
 	case af::Msg::TRendersList:
 	{
-		m_info_text.clear();
+		m_info_text_render.clear();
 
 		updateNodeValues(i_node);
 
@@ -161,14 +161,14 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 		m_time_launched   = render->getTimeLaunch();
 		m_time_registered = render->getTimeRegister();
 
-		m_info_text += "OS: <b>" + afqt::stoq(render->getOS()) + "</b> - " + m_engine;
+		m_info_text_render += "OS: <b>" + afqt::stoq(render->getOS()) + "</b> - " + m_engine;
 
 		if( render->getAddress().notEmpty())
 		{
 	        m_address_ip_str = render->getAddress().generateIPString().c_str();
 	        m_address_str = render->getAddress().v_generateInfoString().c_str();
 
-			m_info_text += " IP: <b>" + m_address_ip_str + "</b>";
+			m_info_text_render += " IP: <b>" + m_address_ip_str + "</b>";
 		}
 
 		bool becameOnline = false;
@@ -210,20 +210,20 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 	            m_plots[i]->height = 0;
 		}
 
-		m_info_text += "<br>@HRES@";
+		m_info_text_render += "<br>@HRES@";
 
 	    m_online = render->isOnline();
-		m_info_text += "<br>";
-		m_info_text += "<br>Registered at <b>" + afqt::time2Qstr(m_time_registered) + "</b>";
+		m_info_text_render += "<br>";
+		m_info_text_render += "<br>Registered at <b>" + afqt::time2Qstr(m_time_registered) + "</b>";
 		if (m_online)
 		{
-			m_info_text += "<br>Launched at <b>" + afqt::time2Qstr(m_time_launched) + "</b>";
+			m_info_text_render += "<br>Launched at <b>" + afqt::time2Qstr(m_time_launched) + "</b>";
 		}
 		else
 		{
-			m_info_text += "<br>Offline";
+			m_info_text_render += "<br>Offline";
 			if (m_wol_operation_time > 0)
-				m_info_text += " since <b>" + afqt::time2Qstr(m_wol_operation_time) + "</b>";
+				m_info_text_render += " since <b>" + afqt::time2Qstr(m_wol_operation_time) + "</b>";
 		}
 
 		m_busy = render->isBusy();
@@ -393,6 +393,7 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 
 	    m_update_counter++;
 
+		m_info_text_hres.clear();
 		m_info_text_hres += QString(" CPU: <b>%1</b> MHz x<b>%2</b>").arg(m_hres.cpu_mhz).arg(m_hres.cpu_num);
 		m_info_text_hres += QString(" MEM: <b>%1</b> Gb").arg(m_hres.mem_total_mb>>10);
 		if( m_hres.swap_total_mb )
@@ -420,6 +421,7 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 	else m_offlineState = "Offline";
 
 	// Join info texts:
+	m_info_text = m_info_text_render;
 	m_info_text.replace("@HRES@", m_info_text_hres);
 }
 
