@@ -68,10 +68,34 @@ ParamsPanel::ParamsPanel():
 	m_layout_params->addWidget(m_params_frame);
 	m_params_frame->setFrameShape(QFrame::StyledPanel);
 	m_params_frame->setFrameShadow(QFrame::Plain);
-
 	m_params_layout = new QVBoxLayout(m_params_frame);
+	m_params_layout->setSpacing(0);
+
+	// Parametes label and buttons:
+	QHBoxLayout * params_caption_layout = new QHBoxLayout();
+	m_params_layout->addLayout(params_caption_layout);
+	// Label
 	m_params_label = new QLabel("<b>Parameters</b>");
-	m_params_layout->addWidget(m_params_label);
+	params_caption_layout->addWidget(m_params_label);
+	params_caption_layout->addStretch();
+	// "Show all" button
+	m_params_btn_show_all = new QPushButton(">>>");
+	params_caption_layout->addWidget(m_params_btn_show_all);
+	m_params_btn_show_all->setFixedSize(32, 12);
+	connect(m_params_btn_show_all, SIGNAL(clicked()), this, SLOT(slot_paramsShowAll()));
+	m_params_btn_show_all->setToolTip("Show all parameters");
+	// "Hide empty" button
+	m_params_btn_hide_empty = new QPushButton("<<<");
+	params_caption_layout->addWidget(m_params_btn_hide_empty);
+	m_params_btn_hide_empty->setFixedSize(32, 12);
+	connect(m_params_btn_hide_empty, SIGNAL(clicked()), this, SLOT(slot_paramsHideEmpty()));
+	m_params_btn_hide_empty->setToolTip("Hide parameters with empty (default) values");
+	// "Hide all" button
+	m_params_btn_hide_all = new QPushButton("^^^");
+	params_caption_layout->addWidget(m_params_btn_hide_all);
+	m_params_btn_hide_all->setFixedSize(32, 12);
+	connect(m_params_btn_hide_all, SIGNAL(clicked()), this, SLOT(slot_paramsHideAll()));
+	m_params_btn_hide_empty->setToolTip("Hide all parameters");
 
 
 	// Node info:
@@ -196,6 +220,27 @@ void ParamsPanel::updateParams()
 	QList<ParamWidget*>::iterator it;
 	for (it = m_params_list.begin(); it != m_params_list.end(); it++)
 		(*it)->update(m_cur_item);
+}
+
+void ParamsPanel::slot_paramsShowAll()
+{
+	QList<ParamWidget*>::iterator it;
+	for (it = m_params_list.begin(); it != m_params_list.end(); it++)
+		(*it)->setHidden(false);
+}
+
+void ParamsPanel::slot_paramsHideEmpty()
+{
+	QList<ParamWidget*>::iterator it;
+	for (it = m_params_list.begin(); it != m_params_list.end(); it++)
+		(*it)->setHidden(true);
+}
+
+void ParamsPanel::slot_paramsHideAll()
+{
+	QList<ParamWidget*>::iterator it;
+	for (it = m_params_list.begin(); it != m_params_list.end(); it++)
+		(*it)->setHidden(true);
 }
 
 void ParamsPanel::addParam_Int(

@@ -45,6 +45,10 @@ private slots:
 	void slot_moveRight();
 	void slot_moveBottom();
 
+	void slot_paramsShowAll();
+	void slot_paramsHideEmpty();
+	void slot_paramsHideAll();
+
 private:
 	void move(int i_position);
 	void move();
@@ -66,6 +70,9 @@ private:
 	QFrame      * m_params_frame;
 	QVBoxLayout * m_params_layout;
 	QLabel      * m_params_label;
+	QPushButton * m_params_btn_show_all;
+	QPushButton * m_params_btn_hide_empty;
+	QPushButton * m_params_btn_hide_all;
 	QList<ParamWidget*> m_params_list;
 
 	QFrame      * m_info_frame;
