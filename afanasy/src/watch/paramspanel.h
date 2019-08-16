@@ -38,20 +38,24 @@ public:
 
 	inline QVBoxLayout * getPublicLayout() { return m_layout_params;}
 
+	enum ParamsShow {
+		PS_CHANGED = 0,
+		PS_ALL     = 1,
+		PS_NONE    = 2
+	};
+
 protected:
 	Item * m_cur_item;
 
 private slots:
 	void slot_moveRight();
 	void slot_moveBottom();
-
-	void slot_paramsShowAll();
-	void slot_paramsHideEmpty();
-	void slot_paramsHideAll();
+	void slot_paramsShow();
 
 private:
 	void move(int i_position);
 	void move();
+	void updateParamShowButton();
 
 private:
 	int m_position;
@@ -67,12 +71,11 @@ private:
 
 	QLabel * m_name;
 
+	int m_params_show;
 	QFrame      * m_params_frame;
 	QVBoxLayout * m_params_layout;
 	QLabel      * m_params_label;
-	QPushButton * m_params_btn_show_all;
-	QPushButton * m_params_btn_hide_empty;
-	QPushButton * m_params_btn_hide_all;
+	QPushButton * m_params_btn_show;
 	QList<ParamWidget*> m_params_list;
 
 	QFrame      * m_info_frame;
@@ -88,12 +91,12 @@ public:
 	ParamWidget(const QString & i_name, const QString & i_label, const QString & i_tip);
 	virtual ~ParamWidget();
 
-	void update(Item * i_item);
+	void update(Item * i_item, int i_params_show);
 
 protected:
 	virtual void paintEvent(QPaintEvent *event);
 
-	virtual void v_updateVar(const QVariant & i_var) = 0;
+	virtual bool v_updateVar(const QVariant & i_var) = 0;
 
 protected:
 	QLabel * m_label_widget;
@@ -113,10 +116,13 @@ public:
 	virtual ~ParamWidget_Int();
 
 protected:
-	virtual void v_updateVar(const QVariant & i_var);
+	virtual bool v_updateVar(const QVariant & i_var);
 
 private:
 	int m_value;
+	int m_default;
+	int m_min;
+	int m_max;
 };
 
 class ParamWidget_Str: public ParamWidget
@@ -126,7 +132,7 @@ public:
 	virtual ~ParamWidget_Str();
 
 protected:
-	virtual void v_updateVar(const QVariant & i_var);
+	virtual bool v_updateVar(const QVariant & i_var);
 
 private:
 	QString m_value;

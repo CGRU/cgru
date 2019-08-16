@@ -20,6 +20,7 @@
 ParamsPanel::ParamsPanel():
 	m_splitter(NULL),
 	m_position(-1),
+	m_params_show(PS_CHANGED),
 	m_cur_item(NULL)
 {
 	QWidget * widget = new QWidget();
@@ -78,24 +79,12 @@ ParamsPanel::ParamsPanel():
 	m_params_label = new QLabel("<b>Parameters</b>");
 	params_caption_layout->addWidget(m_params_label);
 	params_caption_layout->addStretch();
-	// "Show all" button
-	m_params_btn_show_all = new QPushButton(">>>");
-	params_caption_layout->addWidget(m_params_btn_show_all);
-	m_params_btn_show_all->setFixedSize(32, 12);
-	connect(m_params_btn_show_all, SIGNAL(clicked()), this, SLOT(slot_paramsShowAll()));
-	m_params_btn_show_all->setToolTip("Show all parameters");
-	// "Hide empty" button
-	m_params_btn_hide_empty = new QPushButton("<<<");
-	params_caption_layout->addWidget(m_params_btn_hide_empty);
-	m_params_btn_hide_empty->setFixedSize(32, 12);
-	connect(m_params_btn_hide_empty, SIGNAL(clicked()), this, SLOT(slot_paramsHideEmpty()));
-	m_params_btn_hide_empty->setToolTip("Hide parameters with empty (default) values");
-	// "Hide all" button
-	m_params_btn_hide_all = new QPushButton("^^^");
-	params_caption_layout->addWidget(m_params_btn_hide_all);
-	m_params_btn_hide_all->setFixedSize(32, 12);
-	connect(m_params_btn_hide_all, SIGNAL(clicked()), this, SLOT(slot_paramsHideAll()));
-	m_params_btn_hide_empty->setToolTip("Hide all parameters");
+	// "Show" button
+	m_params_btn_show= new QPushButton();
+	params_caption_layout->addWidget(m_params_btn_show);
+	m_params_btn_show->setFixedSize(32, 12);
+	connect(m_params_btn_show, SIGNAL(clicked()), this, SLOT(slot_paramsShow()));
+	updateParamShowButton();
 
 
 	// Node info:
@@ -219,28 +208,31 @@ void ParamsPanel::updateParams()
 {
 	QList<ParamWidget*>::iterator it;
 	for (it = m_params_list.begin(); it != m_params_list.end(); it++)
-		(*it)->update(m_cur_item);
+		(*it)->update(m_cur_item, m_params_show);
 }
 
-void ParamsPanel::slot_paramsShowAll()
+void ParamsPanel::updateParamShowButton()
 {
-	QList<ParamWidget*>::iterator it;
-	for (it = m_params_list.begin(); it != m_params_list.end(); it++)
-		(*it)->setHidden(false);
+	switch(m_params_show)
+	{
+	case PS_CHANGED:
+		m_params_btn_show->setText(">>>");
+		break;
+	case PS_ALL:
+		m_params_btn_show->setText("^^^");
+		break;
+	case PS_NONE:
+		m_params_btn_show->setText("<<<");
+		break;
+	}
 }
-
-void ParamsPanel::slot_paramsHideEmpty()
+void ParamsPanel::slot_paramsShow()
 {
-	QList<ParamWidget*>::iterator it;
-	for (it = m_params_list.begin(); it != m_params_list.end(); it++)
-		(*it)->setHidden(true);
-}
-
-void ParamsPanel::slot_paramsHideAll()
-{
-	QList<ParamWidget*>::iterator it;
-	for (it = m_params_list.begin(); it != m_params_list.end(); it++)
-		(*it)->setHidden(true);
+	m_params_show++;
+	if (m_params_show > PS_NONE)
+		m_params_show = 0;
+	updateParamShowButton();
+	updateParams();
 }
 
 void ParamsPanel::addParam_Int(
@@ -293,14 +285,22 @@ ParamWidget::~ParamWidget()
 {
 }
 
-void ParamWidget::update(Item * i_item)
+void ParamWidget::update(Item * i_item, int i_params_show)
 {
 	QVariant var;
 
+	bool hidden = true;
+
 	if (i_item && (i_item->hasParam(m_name)))
-		v_updateVar(i_item->getParamVar(m_name));
-	else
-		setHidden(true);
+	{
+		bool is_default = v_updateVar(i_item->getParamVar(m_name));
+		if (i_params_show == ParamsPanel::PS_ALL)
+			hidden = false;
+		else if (i_params_show == ParamsPanel::PS_CHANGED)
+			hidden = is_default;
+	}
+
+	setHidden(hidden);
 }
 
 void ParamWidget::paintEvent(QPaintEvent * event)
@@ -332,7 +332,10 @@ ParamWidget_Int::ParamWidget_Int(
 		const QString & i_tip,
 		int i_default,
 		int i_min, int i_max):
-	ParamWidget(i_name, i_label, i_tip)
+	ParamWidget(i_name, i_label, i_tip),
+	m_default(i_default),
+	m_min(i_min),
+	m_max(i_max)
 {
 }
 
@@ -340,11 +343,12 @@ ParamWidget_Int::~ParamWidget_Int()
 {
 }
 
-void ParamWidget_Int::v_updateVar(const QVariant & i_var)
+bool ParamWidget_Int::v_updateVar(const QVariant & i_var)
 {
 	m_value = i_var.toInt();
 	m_value_widget->setText(QString("%1").arg(m_value));
-	setHidden(false);
+
+	return m_value == m_default;
 }
 
 ParamWidget_Str::ParamWidget_Str(
@@ -359,10 +363,11 @@ ParamWidget_Str::~ParamWidget_Str()
 {
 }
 
-void ParamWidget_Str::v_updateVar(const QVariant & i_var)
+bool ParamWidget_Str::v_updateVar(const QVariant & i_var)
 {
 	m_value = i_var.toString();
 	m_value_widget->setText(m_value);
-	setHidden(false);
+
+	return m_value.isEmpty();
 }
 
