@@ -58,6 +58,7 @@ private:
 	void deletePlots();
 
 private:
+	QString m_info_text_hres;
 
 	af::HostRes m_hres;
 

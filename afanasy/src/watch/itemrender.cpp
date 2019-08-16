@@ -191,7 +191,7 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 	            m_plotSwp.setLabel("S");
 	            m_plotSwp.setHotMin(( 10*m_hres.swap_total_mb)/100);
 	            m_plotSwp.setHotMax((100*m_hres.swap_total_mb)/100);
-				m_info_text += QString(" Swap: <b>%1</b> Gb").arg(m_hres.swap_total_mb>>10);
+
 			}
 			else
 			{
@@ -210,12 +210,7 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 	            m_plots[i]->height = 0;
 		}
 
-		if (m_hres.notEmpty())
-		{
-			m_info_text += "<br>";
-			m_info_text += QString(" CPU: <b>%1</b> MHz x<b>%2</b>").arg(m_hres.cpu_mhz).arg(m_hres.cpu_num);
-			m_info_text += QString(" MEM: <b>%1</b> Gb").arg(m_hres.mem_total_mb>>10);
-		}
+		m_info_text += "<br>@HRES@";
 
 	    m_online = render->isOnline();
 		m_info_text += "<br>";
@@ -398,6 +393,11 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 
 	    m_update_counter++;
 
+		m_info_text_hres += QString(" CPU: <b>%1</b> MHz x<b>%2</b>").arg(m_hres.cpu_mhz).arg(m_hres.cpu_num);
+		m_info_text_hres += QString(" MEM: <b>%1</b> Gb").arg(m_hres.mem_total_mb>>10);
+		if( m_hres.swap_total_mb )
+			m_info_text_hres += QString(" Swap: <b>%1</b> Gb").arg(m_hres.swap_total_mb>>10);
+
 		break;
 	}
 	default:
@@ -418,6 +418,9 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 	if( m_wolWaking ) m_offlineState = "Waking Up";
 	else if( m_wolSleeping || m_wolFalling) m_offlineState = "Sleeping";
 	else m_offlineState = "Offline";
+
+	// Join info texts:
+	m_info_text.replace("@HRES@", m_info_text_hres);
 }
 
 void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) const
