@@ -43,6 +43,7 @@ ParamsPanelJob::ParamsPanelJob()
 	m_folders_root = new QLabel();
 	m_folders_root->setHidden(true);
 	m_folders_root->setTextInteractionFlags(Qt::TextBrowserInteraction);
+	m_folders_root->setWordWrap(true);
 	m_folders_layout->addWidget(m_folders_root);
 
 	m_folders_layout->addSpacing(4);
