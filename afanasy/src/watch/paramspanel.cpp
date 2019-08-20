@@ -33,8 +33,9 @@ ParamsPanel::ParamsPanel():
 	QHBoxLayout * btns_layout = new QHBoxLayout();
 	m_layout_name->addLayout(btns_layout);
 
-	// ⏵ ⏷ ▶ ▼ ◥ ⯆ ⯈
-	m_btn_layout_bottom = new QPushButton("⏷⏷⏷");
+	// ⏵ ⏷ ▶ ▼ ◥ ⯆ ⯈ This characters may not work,
+	// even on a machine where are they correctly shown in the code.
+	m_btn_layout_bottom = new QPushButton("<<<");
 	btns_layout->addWidget(m_btn_layout_bottom);
 	m_btn_layout_bottom->setFixedSize(32,12);
 	connect(m_btn_layout_bottom, SIGNAL(pressed()), this, SLOT(slot_moveBottom()));
@@ -47,7 +48,7 @@ ParamsPanel::ParamsPanel():
 	m_name->setTextInteractionFlags(Qt::TextBrowserInteraction);
 	btns_layout->addStretch();
 
-	m_btn_layout_right = new QPushButton("⏵⏵⏵");
+	m_btn_layout_right = new QPushButton("^^^");
 	btns_layout->addWidget(m_btn_layout_right);
 	m_btn_layout_right->setFixedSize(32,12);
 	connect(m_btn_layout_right, SIGNAL(pressed()), this, SLOT(slot_moveRight()));
