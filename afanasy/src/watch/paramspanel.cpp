@@ -11,6 +11,7 @@
 #include "../libafqt/qenvironment.h"
 
 #include "item.h"
+#include "param.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -44,6 +45,7 @@ ParamsPanel::ParamsPanel():
 	btns_layout->addStretch();
 	m_name = new QLabel();
 	btns_layout->addWidget(m_name);
+	m_name->setWordWrap(true);
 	m_name->setAlignment(Qt::AlignHCenter);
 	m_name->setTextInteractionFlags(Qt::TextBrowserInteraction);
 	btns_layout->addStretch();
@@ -108,10 +110,27 @@ ParamsPanel::ParamsPanel():
 	setWidgetResizable(true);
 }
 
-void ParamsPanel::initPanel(QSplitter * i_splitter, const QString & i_type)
+void ParamsPanel::initPanel(const QList<Param*> & i_params, QSplitter * i_splitter, const QString & i_type)
 {
+	// Remember type and splitter pointer
 	m_splitter = i_splitter;
 	m_type = i_type;
+
+	QList<Param*>::const_iterator it;
+	for (it = i_params.begin(); it != i_params.end(); it++)
+	{
+		switch((*it)->type)
+		{
+		case Param::TInt:
+			addParamWidget(new ParamWidget_Int(*it));
+			break;
+		case Param::TStr:
+			addParamWidget(new ParamWidget_Str(*it));
+			break;
+		default:
+			AF_ERR << "Invalid param type = " << (*it)->type;
+		}
+	}
 
 	// Set stored position:
 	m_position = afqt::QEnvironment::ms_attrs_panel[m_type + "_pos"].n;
@@ -187,7 +206,7 @@ void ParamsPanel::v_updatePanel(Item * i_item)
 
 	if (NULL == m_cur_item)
 	{
-		AF_DEBUG << "ParamsPanel::update(): NULL item. Clearing.";
+		AF_DEBUG << "ParamsPanel::v_updatePanel(): NULL item. Clearing.";
 		return;
 	}
 
@@ -236,48 +255,32 @@ void ParamsPanel::slot_paramsShow()
 	updateParams();
 }
 
-void ParamsPanel::addParam_Int(
-		const QString & i_name,
-		const QString & i_label,
-		const QString & i_tip,
-		int i_default,
-		int i_min, int i_max)
-{
-	addParamWidget(new ParamWidget_Int(i_name, i_label, i_tip, i_default, i_min, i_max));
-}
 
-void ParamsPanel::addParam_Str(
-		const QString & i_name,
-		const QString & i_label,
-		const QString & i_tip)
-{
-	addParamWidget(new ParamWidget_Str(i_name, i_label, i_tip));
-}
 
 /////////////////////////////////////////////////
 ////////////////   ParamWidget   ////////////////
 /////////////////////////////////////////////////
 
-ParamWidget::ParamWidget(const QString & i_name, const QString & i_label, const QString & i_tip):
-	m_name(i_name)
+ParamWidget::ParamWidget(const Param * i_param):
+	m_param(i_param)
 {
 	QHBoxLayout * layout = new QHBoxLayout(this);
 	layout->setContentsMargins(0, 4, 0, 4);
 
-	QPushButton * btn = new QPushButton("[...]");
-	layout->addWidget(btn);
-	btn->setToolTip("Edit");
-	btn->setFixedWidth(32);
-
-	m_label_widget = new QLabel(i_label);
+	m_label_widget = new QLabel(m_param->label);
 	layout->addWidget(m_label_widget);
-	m_label_widget->setToolTip(i_tip);
+	m_label_widget->setToolTip(m_param->tip);
 
 	layout->addStretch();
 
 	m_value_widget = new QLabel();
 	layout->addWidget(m_value_widget);
 	m_value_widget->setTextInteractionFlags(Qt::TextBrowserInteraction);
+
+	QPushButton * btn = new QPushButton("[...]");
+	layout->addWidget(btn);
+	btn->setToolTip("Edit");
+	btn->setFixedSize(24, 16);
 
 	connect(btn, SIGNAL(clicked()), this, SLOT(slot_Edit()));
 }
@@ -292,9 +295,9 @@ void ParamWidget::update(Item * i_item, int i_params_show)
 
 	bool hidden = true;
 
-	if (i_item && (i_item->hasParam(m_name)))
+	if (i_item && (i_item->hasParam(m_param->name)))
 	{
-		bool is_default = v_updateVar(i_item->getParamVar(m_name));
+		bool is_default = v_updateVar(i_item->getParamVar(m_param->name));
 		if (i_params_show == ParamsPanel::PS_ALL)
 			hidden = false;
 		else if (i_params_show == ParamsPanel::PS_CHANGED)
@@ -318,7 +321,7 @@ void ParamWidget::paintEvent(QPaintEvent * event)
 
 void ParamWidget::slot_Edit()
 {
-AF_DEV << afqt::qtos(m_name);
+AF_DEV << afqt::qtos(m_param->name);
 }
 
 
@@ -327,16 +330,8 @@ AF_DEV << afqt::qtos(m_name);
 ////////////////   ParamWidget Types   ////////////////
 ///////////////////////////////////////////////////////
 
-ParamWidget_Int::ParamWidget_Int(
-		const QString & i_name,
-		const QString & i_label,
-		const QString & i_tip,
-		int i_default,
-		int i_min, int i_max):
-	ParamWidget(i_name, i_label, i_tip),
-	m_default(i_default),
-	m_min(i_min),
-	m_max(i_max)
+ParamWidget_Int::ParamWidget_Int(const Param * i_param):
+	ParamWidget(i_param)
 {
 }
 
@@ -349,14 +344,11 @@ bool ParamWidget_Int::v_updateVar(const QVariant & i_var)
 	m_value = i_var.toInt();
 	m_value_widget->setText(QString("%1").arg(m_value));
 
-	return m_value == m_default;
+	return m_value == -1;
 }
 
-ParamWidget_Str::ParamWidget_Str(
-		const QString & i_name,
-		const QString & i_label,
-		const QString & i_tip):
-	ParamWidget(i_name, i_label, i_tip)
+ParamWidget_Str::ParamWidget_Str(const Param * i_param):
+	ParamWidget(i_param)
 {
 }
 

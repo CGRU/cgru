@@ -5,36 +5,21 @@
 class Param
 {
 public:
-	Param(const QString & i_name, const QString & i_label, const QString & i_tip);
-	virtual ~Param();
+	Param(int i_type, const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = -1);
+	~Param();
 
-protected:
+	enum Type {
+		TInt = 0,
+		TStr = 1,
+		TReg = 2,
+		Time = 3
+	};
 
-private:
-	QString m_name;
-	QString m_label;
-	QString m_tip;
-};
-
-class Param_Int: public Param
-{
-public:
-	Param_Int(const QString & i_name, const QString & i_label, const QString & i_tip, int i_default, int i_min = -1, int i_max = -1);
-	virtual ~Param_Int();
-
-protected:
-
-private:
-};
-
-class Param_Str: public Param
-{
-public:
-	Param_Str(const QString & i_name, const QString & i_label, const QString & i_tip);
-	virtual ~Param_Str();
-
-protected:
-
-private:
+	const int type;
+	const QString name;
+	const QString label;
+	const QString tip;
+	const int min;
+	const int max;
 };
 

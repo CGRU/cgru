@@ -146,15 +146,16 @@ ListJobs::ListJobs( QWidget* parent):
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(actDeleteDone()));
 	}
 
+	// Add parameters
+	addParam_Int("priority",                  "Priorty",         "Priority number",0,200);
+	addParam_Str("annotation",                "Annotation",      "Annotation string");
+	addParam_Int("max_running_tasks",         "Maximum running", "Maximum runnint tasks number");
+	addParam_Int("max_running_tasks_per_host","Max run per host","Max run tasks on the same host");
+	addParam_Str("depend_mask",               "Depend Mask",     "Jobs name mask to wait");
+	addParam_Str("depend_mask_global",        "Global Depend",   "Depend mask for jobs from any user");
+
 	m_paramspanel = new ParamsPanelJob();
 	initListNodes();
-
-	m_paramspanel->addParam_Int("priority",                  "Priorty",         "Priority number",-1,0,200);
-	m_paramspanel->addParam_Str("annotation",                "Annotation",      "Annotation string");
-	m_paramspanel->addParam_Int("max_running_tasks",         "Maximum running", "Maximum runnint tasks number",-1);
-	m_paramspanel->addParam_Int("max_running_tasks_per_host","Max run per host","Max run tasks on the same host",-1);
-	m_paramspanel->addParam_Str("depend_mask",               "Depend Mask",     "Jobs name mask to wait");
-	m_paramspanel->addParam_Str("depend_mask_global",        "Global Depend",   "Depend mask for jobs from any user");
 
 	QTimer * timer = new QTimer(this);
 	timer->start( 1000 * af::Environment::getWatchRefreshGuiSec());

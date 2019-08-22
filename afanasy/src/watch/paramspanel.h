@@ -12,8 +12,8 @@ class QSplitter;
 class QVBoxLayout;
 
 class Item;
+class Param;
 class ParamWidget;
-class ParamWidget_Int;
 
 
 class ParamsPanel : public QScrollArea
@@ -23,14 +23,11 @@ public:
 	ParamsPanel();
 	virtual ~ParamsPanel();
 
-	void initPanel(QSplitter * i_splitter, const QString & i_type);
+	void initPanel(const QList<Param*> & i_params, QSplitter * i_splitter, const QString & i_type);
 
 	virtual void v_updatePanel(Item * i_item = NULL);
 
 	void addParamWidget(ParamWidget * i_pw);
-
-	void addParam_Int(const QString & i_name, const QString & i_label, const QString & i_tip, int i_default, int i_min = -1, int i_max = -1);
-	void addParam_Str(const QString & i_name, const QString & i_label, const QString & i_tip);
 
 	void updateParams();
 
@@ -88,7 +85,7 @@ class ParamWidget: public QWidget
 {
 Q_OBJECT
 public:
-	ParamWidget(const QString & i_name, const QString & i_label, const QString & i_tip);
+	ParamWidget(const Param * i_parm);
 	virtual ~ParamWidget();
 
 	void update(Item * i_item, int i_params_show);
@@ -99,6 +96,8 @@ protected:
 	virtual bool v_updateVar(const QVariant & i_var) = 0;
 
 protected:
+	const Param * m_param;
+
 	QLabel * m_label_widget;
 	QLabel * m_value_widget;
 
@@ -106,13 +105,12 @@ private slots:
 	void slot_Edit();
 
 private:
-	QString m_name;
 };
 
 class ParamWidget_Int: public ParamWidget
 {
 public:
-	ParamWidget_Int(const QString & i_name, const QString & i_label, const QString & i_tip, int i_default, int i_min = -1, int i_max = -1);
+	ParamWidget_Int(const Param * i_parm);
 	virtual ~ParamWidget_Int();
 
 protected:
@@ -120,15 +118,12 @@ protected:
 
 private:
 	int m_value;
-	int m_default;
-	int m_min;
-	int m_max;
 };
 
 class ParamWidget_Str: public ParamWidget
 {
 public:
-	ParamWidget_Str(const QString & i_name, const QString & i_label, const QString & i_tip);
+	ParamWidget_Str(const Param * i_parm);
 	virtual ~ParamWidget_Str();
 
 protected:

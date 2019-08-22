@@ -9,6 +9,7 @@
 #include "ctrlsortfilter.h"
 #include "item.h"
 #include "modelitems.h"
+#include "param.h"
 #include "paramspanel.h"
 #include "viewitems.h"
 #include "watch.h"
@@ -69,7 +70,7 @@ void ListItems::initListItems()
 	if (NULL == m_paramspanel)
 		m_paramspanel = new ParamsPanel();
 	m_splitter->addWidget(m_paramspanel);
-	m_paramspanel->initPanel(m_splitter, afqt::stoq(m_type));
+	m_paramspanel->initPanel(m_params, m_splitter, afqt::stoq(m_type));
 
 	// ListNodes creates: m_model = new ModelNodes
 	if (NULL == m_model)
@@ -98,6 +99,10 @@ ListItems::~ListItems()
 	// We can`t store state just in m_paramspanel dtor,
 	// as storeState() uses m_splitter, that can be destroyed first.
 	m_paramspanel->storeState();
+
+	QList<Param*>::iterator it;
+	for (it = m_params.begin(); it != m_params.end(); it++)
+		delete (*it);
 }
 
 int ListItems::count() const { return m_model->count();}
@@ -372,5 +377,27 @@ void ListItems::keyPressEvent( QKeyEvent * i_evt)
 
 	for( int i = 0; i < m_btns.size(); i++ )
 		m_btns[i]->keyPressed( str);
+}
+
+void ListItems::addParam(Param * i_param)
+{
+	m_params.append(i_param);
+}
+
+void ListItems::addParam_Int(
+		const QString & i_name,
+		const QString & i_label,
+		const QString & i_tip,
+		int i_min, int i_max)
+{
+	addParam(new Param(Param::TInt, i_name, i_label, i_tip, i_min, i_max));
+}
+
+void ListItems::addParam_Str(
+		const QString & i_name,
+		const QString & i_label,
+		const QString & i_tip)
+{
+	addParam(new Param(Param::TStr, i_name, i_label, i_tip));
 }
 

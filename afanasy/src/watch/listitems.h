@@ -27,6 +27,7 @@ class Item;
 class ButtonPanel;
 class ButtonsMenu;
 class ModelItems;
+class Param;
 class ParamsPanel;
 class ViewItems;
 
@@ -60,6 +61,10 @@ public slots:
 	void deleteAllItems();
 
 protected:
+
+	void addParam(Param * i_param);
+	void addParam_Int(const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = -1);
+	void addParam_Str(const QString & i_name, const QString & i_label, const QString & i_tip);
 
 	void initListItems();
 
@@ -123,6 +128,8 @@ private slots:
 
 private:
 	std::string m_type;
+
+	QList<Param*> m_params;
 
 	ButtonsMenu * m_current_buttons_menu;
 
