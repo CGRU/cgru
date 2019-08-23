@@ -102,8 +102,6 @@ signals:
 protected:
 	virtual void paintEvent(QPaintEvent *event);
 
-	virtual bool v_updateVar(const QVariant & i_var) = 0;
-
 protected:
 	const Param * m_param;
 
@@ -114,31 +112,5 @@ private slots:
 	void slot_Edit();
 
 private:
-};
-
-class ParamWidget_Int: public ParamWidget
-{
-public:
-	ParamWidget_Int(const Param * i_parm);
-	virtual ~ParamWidget_Int();
-
-protected:
-	virtual bool v_updateVar(const QVariant & i_var);
-
-private:
-	int m_value;
-};
-
-class ParamWidget_Str: public ParamWidget
-{
-public:
-	ParamWidget_Str(const Param * i_parm);
-	virtual ~ParamWidget_Str();
-
-protected:
-	virtual bool v_updateVar(const QVariant & i_var);
-
-private:
-	QString m_value;
 };
 

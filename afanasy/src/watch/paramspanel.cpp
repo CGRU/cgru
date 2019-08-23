@@ -118,19 +118,7 @@ void ParamsPanel::initPanel(const QList<Param*> & i_params, QSplitter * i_splitt
 
 	QList<Param*>::const_iterator it;
 	for (it = i_params.begin(); it != i_params.end(); it++)
-	{
-		switch((*it)->type)
-		{
-		case Param::TInt:
-			addParamWidget(new ParamWidget_Int(*it));
-			break;
-		case Param::TStr:
-			addParamWidget(new ParamWidget_Str(*it));
-			break;
-		default:
-			AF_ERR << "Invalid param type = " << (*it)->type;
-		}
-	}
+		addParamWidget(new ParamWidget(*it));
 
 	// Set stored position:
 	m_position = afqt::QEnvironment::ms_attrs_panel[m_type + "_pos"].n;
@@ -303,7 +291,8 @@ void ParamWidget::update(Item * i_item, int i_params_show)
 
 	if (i_item && (i_item->hasParam(m_param->name)))
 	{
-		bool is_default = v_updateVar(i_item->getParamVar(m_param->name));
+		bool is_default;
+		m_value_widget->setText(m_param->varToQStr(i_item->getParamVar(m_param->name), &is_default));
 		if (i_params_show == ParamsPanel::PS_ALL)
 			hidden = false;
 		else if (i_params_show == ParamsPanel::PS_CHANGED)
@@ -328,45 +317,5 @@ void ParamWidget::paintEvent(QPaintEvent * event)
 void ParamWidget::slot_Edit()
 {
 	emit sig_changeParam(m_param);
-}
-
-
-
-///////////////////////////////////////////////////////
-////////////////   ParamWidget Types   ////////////////
-///////////////////////////////////////////////////////
-
-ParamWidget_Int::ParamWidget_Int(const Param * i_param):
-	ParamWidget(i_param)
-{
-}
-
-ParamWidget_Int::~ParamWidget_Int()
-{
-}
-
-bool ParamWidget_Int::v_updateVar(const QVariant & i_var)
-{
-	m_value = i_var.toInt();
-	m_value_widget->setText(QString("%1").arg(m_value));
-
-	return m_value == -1;
-}
-
-ParamWidget_Str::ParamWidget_Str(const Param * i_param):
-	ParamWidget(i_param)
-{
-}
-
-ParamWidget_Str::~ParamWidget_Str()
-{
-}
-
-bool ParamWidget_Str::v_updateVar(const QVariant & i_var)
-{
-	m_value = i_var.toString();
-	m_value_widget->setText(m_value);
-
-	return m_value.isEmpty();
 }
 

@@ -1,6 +1,9 @@
 #pragma once
 
+#include "watch.h"
+
 #include <QtCore/QString>
+#include <QtCore/QVariant>
 
 class Param
 {
@@ -21,5 +24,10 @@ public:
 	const QString tip;
 	const int min;
 	const int max;
+
+	// Convert variable to string.
+	// Default is true if value is default,
+	// as default parameters can be hidden.
+	const QString varToQStr(const QVariant & i_var, bool * o_default = NULL) const;
 };
 

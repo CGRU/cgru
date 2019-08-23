@@ -21,3 +21,33 @@ Param::~Param()
 {
 }
 
+const QString Param::varToQStr(const QVariant & i_var, bool * o_default) const
+{
+	bool is_default = false;
+	QString str;
+
+	switch(type)
+	{
+	case TInt:
+	{
+		int value = i_var.toInt();
+		str = QString("%1").arg(value);
+		is_default = (value == -1);
+		break;
+	}
+	case TStr:
+	{
+		str = i_var.toString();
+		is_default = str.isEmpty();
+		break;
+	}
+	default:
+		AF_ERR << "Unknown parameter type: " << type;
+	}
+
+	if (o_default)
+		*o_default = is_default;
+
+	return str;
+}
+
