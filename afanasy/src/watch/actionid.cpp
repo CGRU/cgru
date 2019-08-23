@@ -1,5 +1,7 @@
 #include "actionid.h"
 
+#include "param.h"
+
 ActionId::ActionId( int i_id, const QString & text, QObject * parent ):
 	QAction( text, parent),
 	m_id(i_id)
@@ -59,5 +61,17 @@ ActionIdString::ActionIdString( int i_id, const QString & i_string, const QStrin
 void ActionIdString::triggeredId_Slot()
 {
 	emit triggeredId( m_id, m_string);
+}
+
+
+ActionParam::ActionParam(const Param * i_param):
+	QAction(i_param->label),
+	m_param(i_param)
+{
+	connect(this, SIGNAL(triggered()), this, SLOT(triggeredParam_Slot()));
+}
+void ActionParam::triggeredParam_Slot()
+{
+	emit triggeredParam(m_param);
 }
 

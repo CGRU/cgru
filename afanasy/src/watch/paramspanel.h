@@ -41,6 +41,12 @@ public:
 		PS_NONE    = 2
 	};
 
+public slots:
+	void slot_changeParam(const Param * i_param);
+
+signals:
+	void sig_changeParam(const Param *);
+
 protected:
 	Item * m_cur_item;
 
@@ -89,6 +95,9 @@ public:
 	virtual ~ParamWidget();
 
 	void update(Item * i_item, int i_params_show);
+
+signals:
+	void sig_changeParam(const Param *);
 
 protected:
 	virtual void paintEvent(QPaintEvent *event);

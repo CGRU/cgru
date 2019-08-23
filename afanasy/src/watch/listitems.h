@@ -59,6 +59,7 @@ public:
 public slots:
 	void repaintItems();
 	void deleteAllItems();
+	void changeParam(const Param * i_param);
 
 protected:
 
@@ -67,6 +68,8 @@ protected:
 	void addParam_Str(const QString & i_name, const QString & i_label, const QString & i_tip);
 
 	void initListItems();
+
+	void addMenuParameters(QMenu * i_menu);
 
 	virtual void doubleClicked( Item * item);
 

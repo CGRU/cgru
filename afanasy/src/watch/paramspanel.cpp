@@ -222,6 +222,7 @@ void ParamsPanel::addParamWidget(ParamWidget * i_pw)
 	m_params_layout->addWidget(i_pw);
 	m_params_list.append(i_pw);
 	i_pw->setHidden(true);
+	connect(i_pw, SIGNAL(sig_changeParam(const Param *)), this, SLOT(slot_changeParam(const Param *)));
 }
 
 void ParamsPanel::updateParams()
@@ -246,6 +247,7 @@ void ParamsPanel::updateParamShowButton()
 		break;
 	}
 }
+
 void ParamsPanel::slot_paramsShow()
 {
 	m_params_show++;
@@ -255,6 +257,10 @@ void ParamsPanel::slot_paramsShow()
 	updateParams();
 }
 
+void ParamsPanel::slot_changeParam(const Param * i_param)
+{
+	emit sig_changeParam(i_param);
+}
 
 
 /////////////////////////////////////////////////
@@ -321,7 +327,7 @@ void ParamWidget::paintEvent(QPaintEvent * event)
 
 void ParamWidget::slot_Edit()
 {
-AF_DEV << afqt::qtos(m_param->name);
+	emit sig_changeParam(m_param);
 }
 
 

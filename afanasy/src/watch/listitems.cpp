@@ -4,6 +4,7 @@
 
 #include "../libafqt/qenvironment.h"
 
+#include "actionid.h"
 #include "buttonpanel.h"
 #include "buttonsmenu.h"
 #include "ctrlsortfilter.h"
@@ -71,6 +72,7 @@ void ListItems::initListItems()
 		m_paramspanel = new ParamsPanel();
 	m_splitter->addWidget(m_paramspanel);
 	m_paramspanel->initPanel(m_params, m_splitter, afqt::stoq(m_type));
+	connect(m_paramspanel, SIGNAL(sig_changeParam(const Param *)), this, SLOT(changeParam(const Param *)));
 
 	// ListNodes creates: m_model = new ModelNodes
 	if (NULL == m_model)
@@ -399,5 +401,21 @@ void ListItems::addParam_Str(
 		const QString & i_tip)
 {
 	addParam(new Param(Param::TStr, i_name, i_label, i_tip));
+}
+
+void ListItems::addMenuParameters(QMenu * i_menu)
+{
+	QList<Param*>::const_iterator it;
+	for (it = m_params.begin(); it != m_params.end(); it++)
+	{
+		ActionParam * action = new ActionParam(*it);
+		connect(action, SIGNAL(triggeredParam(const Param *)), this, SLOT(changeParam(const Param *)));
+		i_menu->addAction(action);
+	}
+}
+
+void ListItems::changeParam(const Param * i_param)
+{
+	AF_DEV << i_param->name.toUtf8().data();
 }
 

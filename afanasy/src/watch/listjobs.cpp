@@ -147,7 +147,8 @@ ListJobs::ListJobs( QWidget* parent):
 	}
 
 	// Add parameters
-	addParam_Int("priority",                  "Priorty",         "Priority number",0,200);
+	if	((af::Environment::VISOR()) || (af::Environment::getPermUserModJobPriority()))
+		addParam_Int("priority",              "Priorty",         "Priority number",0,200);
 	addParam_Str("annotation",                "Annotation",      "Annotation string");
 	addParam_Int("max_running_tasks",         "Maximum running", "Maximum runnint tasks number");
 	addParam_Int("max_running_tasks_per_host","Max run per host","Max run tasks on the same host");
@@ -311,9 +312,12 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	}
 	else
 	{
-		  action = new QAction("Change Owner", this);
-		  connect( action, SIGNAL( triggered() ), this, SLOT( actSetUser() ));
-		  menu.addAction( action);
+		action = new QAction("Change Owner", this);
+		connect( action, SIGNAL( triggered() ), this, SLOT( actSetUser() ));
+		menu.addAction( action);
+		action = new QAction("Change Branch", this);
+		connect(action, SIGNAL(triggered()), this, SLOT(actChangeBranch()));
+		menu.addAction(action);
 	}
 	menu.addSeparator();
 	
@@ -337,12 +341,8 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 
 	submenu = new QMenu( "Set Parameter", this);
 
-	if (af::Environment::VISOR())
-	{
-		action = new QAction("Change Branch", this);
-		connect(action, SIGNAL(triggered()), this, SLOT(actChangeBranch()));
-		submenu->addAction(action);
-	}
+	addMenuParameters(submenu);
+/*
 	action = new QAction( "Max Running Tasks", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunningTasks() ));
 	submenu->addAction( action);
@@ -390,7 +390,7 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	action = new QAction( "Life Time", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actLifeTime() ));
 	submenu->addAction( action);
-
+*/
 	submenu->addSeparator();
 
 	action = new QAction( "Hidden", this);
