@@ -49,7 +49,7 @@ int Dialog::ms_size_border_right = 75;
 Dialog::Dialog():
     m_connected(false),
     m_monitorType( Watch::WNONE),
-	m_qafclient( this, af::Environment::getWatchConnectRetries()),
+	m_qafclient(this, af::Environment::getWatchConnectionLostTime()),
     m_listitems( NULL),
     m_offlinescreen( NULL),
     m_repaintTimer( this),
@@ -318,7 +318,12 @@ void Dialog::connectionLost()
         ButtonMonitor::unset();
     }
 
-    displayError("Connection lost.");
+	if (m_connected)
+	{
+		AF_WARN << "Watch connection lost, trying to reconnect...";
+		displayError("Connection lost.");
+	}
+
     m_connected = false;
     setWindowTitle( "Watch - " + afqt::stoq( af::Environment::getUserName()) + " (connecting...)");
 

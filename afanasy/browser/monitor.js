@@ -82,7 +82,7 @@ function Monitor(i_args)
 	this.elList.onmousedown = function(e) { return e.currentTarget.monitor.noneSelected(e); };
 
 
-	// Sorting direction (can be overriden later in onMonitorCreate function):
+	// Sorting direction (can be overridden later in onMonitorCreate function):
 	if (localStorage[this.type + '_sort_dir'] == 'ON')
 		this.sortDirection = true;
 	else
@@ -132,13 +132,13 @@ function Monitor(i_args)
 	var el = document.createElement('div');
 	this.elPanelR.appendChild(el);
 	this.elPanelR.m_elName = el;
-	el.classList.add('name');
+	el.classList.add('node_name');
 
 	if (this.nodeConstructor.createPanels)
 		this.nodeConstructor.createPanels(this);
 
 	// Parameters section:
-	var el = document.createElement('div');
+	el = document.createElement('div');
 	this.elPanelR.appendChild(el);
 	this.elPanelR.m_elParams = el;
 	this.elPanelR.m_elParams.m_elPMap = {};
@@ -153,74 +153,63 @@ function Monitor(i_args)
 		'always_active': true
 	});
 	// Label:
-	var el = document.createElement('div');
+	el = document.createElement('div');
 	this.elPanelR.m_elParams.appendChild(el);
 	el.textContent = 'Parameters';
 	el.classList.add('caption');
 	el.title = 'Click to edit all parameters.';
-	el.m_elParams = this.elPanelR.m_elParams;
-	el.onclick = function(e) {
-		var el = e.currentTarget;
-		if (el.m_elParams.classList.contains('active') != true)
-			return false;
-		if (el.m_elParams.m_all_shown == true)
-			return;
-		el.m_elParams.m_all_shown = true;
-		var elParams = el.m_elParams.m_elPMap;
-		for (var p in elParams)
-			elParams[p].style.display = 'block';
-		return false;
-	};
+	el.m_monitor = this;
+	el.onclick = function(e) {e.currentTarget.m_monitor.panelShowAllParameters();}
 	el.oncontextmenu = el.onclick;
 
 	if (this.nodeConstructor.params)
-		for (var p in this.nodeConstructor.params)
+		for (let p in this.nodeConstructor.params)
 		{
 			var param = this.nodeConstructor.params[p];
 			if (false == cm_CheckPermissions(param.permissions))
 				continue;
 
-			var elDiv = document.createElement('div');
+			let elDiv = document.createElement('div');
 			this.elPanelR.m_elParams.appendChild(elDiv);
 			elDiv.classList.add('param');
 			elDiv.style.display = 'none';
 
-			var elLabel = document.createElement('div');
+			let elLabel = document.createElement('div');
 			elDiv.appendChild(elLabel);
 			elLabel.classList.add('label');
 			elLabel.textContent = param.label;
 
-			var elValue = document.createElement('div');
+			let elValue = document.createElement('div');
 			elDiv.appendChild(elValue);
 			elValue.classList.add('value');
 			elDiv.m_elValue = elValue;
 
 			this.elPanelR.m_elParams.m_elPMap[p] = elDiv;
 
-			var el = elDiv;
+			let el = elDiv;
 			el.title = 'Double click to edit.';
 			el.monitor = this;
 			el.name = p;
 			el.param = param;
 			el.ondblclick = function(e) {
-				var el = e.currentTarget;
+				let el = e.currentTarget;
 				el.monitor.mh_Dialog({'name': el.name, 'type': el.param.type});
 			}
 		}
 
 	// Info section:
-	var el = document.createElement('div');
+	el = document.createElement('div');
 	this.elPanelR.appendChild(el);
 	this.elPanelR.m_elInfo = el;
 	el.classList.add('section');
 	// Label:
-	var el = document.createElement('div');
+	el = document.createElement('div');
 	this.elPanelR.m_elInfo.appendChild(el);
 	el.textContent = 'Info';
 	el.classList.add('caption');
 	el.title = 'Node information.';
 	// Body:
-	var el = document.createElement('div');
+	el = document.createElement('div');
 	this.elPanelR.m_elInfo.appendChild(el);
 	this.elPanelR.m_elInfo.m_elBody = el;
 	el.classList.add('info_body');
@@ -372,31 +361,45 @@ function Monitor(i_args)
 	this.menu = null;
 	this.cycle = 0;
 
+	// Monitor can watch several node types:
+	this.types = [this.type];
+
+	// Add other node type to monitor:
+	if (this.type == 'renders')
+		this.types.push('pools');
+
 	if (this.type == 'tasks')
 	{
 		this.job_id = i_args.id;
 		nw_GetNodes('jobs', [this.job_id], 'full');
+		return;
 	}
-	else
+
+	for (let type of this.types)
 	{
-		g_refreshers.push(this);
-		nw_Subscribe(this.type, true);
-		nw_GetNodes(this.type);
+		nw_Subscribe(type, true);
+		nw_GetNodes(type);
 	}
+
+	g_refreshers.push(this);
 }
 
 Monitor.prototype.destroy = function() {
 	if (this.menu)
 		this.menu.destroy();
+
 	if (g_cur_monitor == this)
 		g_cur_monitor = null;
+
 	cm_ArrayRemove(g_receivers, this);
 	cm_ArrayRemove(g_refreshers, this);
 	cm_ArrayRemove(g_monitors, this);
+
 	if (this.type == 'tasks')
 		nw_Subscribe(this.type, false, [this.job_id]);
 	else
-		nw_Subscribe(this.type, false);
+		for (let type of this.types)
+			nw_Subscribe(type, false);
 
 	for (var i = 0; i < this.items.length; i++)
 		if (this.items[i].monitorDestroy)
@@ -432,10 +435,10 @@ Monitor.prototype.refresh = function() {
 	else if ((this.type == 'renders') && (this.cycle % 5 == 0))
 	{
 		// Get resources of online renders:
-		var ids = [];
-		for (var i = 0; i < this.items.length; i++)
-			if (this.items[i].state.ONL)
-				ids.push(this.items[i].params.id);
+		let ids = [];
+		for (let item of this.items)
+			if ((item.node_type == 'renders') && item.state.ONL)
+				ids.push(item.params.id);
 		if (ids.length)
 			nw_GetNodes('renders', ids, 'resources');
 	}
@@ -462,11 +465,18 @@ Monitor.prototype.processMsg = function(obj) {
 			}
 			return;
 		}
-		this.delNodes(eval('obj.events.' + this.type + '_del'));
-		var ids = cm_IdsMerge(
-			eval('obj.events.' + this.type + '_change'), eval('obj.events.' + this.type + '_add'));
-		if (ids.length > 0)
-			nw_GetNodes(this.type, ids);
+
+		// Delete nodes:
+		for (let type of this.types)
+			this.delNodes(type, obj.events[type + '_del']);
+
+		// Get changed and new nodes:
+		for (let type of this.types)
+		{
+			let ids = cm_IdsMerge(obj.events[type + '_change'], obj.events[type + '_add']);
+			if (ids.length > 0)
+				nw_GetNodes(type, ids);
+		}
 
 		// Jobs order:
 		if (this.type == 'jobs')
@@ -500,61 +510,66 @@ Monitor.prototype.processMsg = function(obj) {
 		return;
 	}
 
-	var nodes = eval('obj.' + this.type);
-	if (nodes == null)
+	var msg_nodes = [];
+	for (let type of this.types)
+		if (obj[type] && obj[type].length)
+			for (let node of obj[type])
+				msg_nodes.push({'type':type,'id':node.id,'node':node});
+
+	if (msg_nodes.length == 0)
 		return;
 
-	var new_ids = [];
-	var updated = [];
+	var new_nodes = [];
+	var updated_items = [];
 
-	for (var j = 0; j < nodes.length; j++)
+	for (let mnode of msg_nodes)
 	{
-		var found = false;
-		for (var i = 0; i < this.items.length; i++)
+		let found = false;
+		for (let item of this.items)
 		{
-			if (this.items[i].params.id == nodes[j].id)
+			if ((item.params.id == mnode.id) && (item.node_type == mnode.type))
 			{
-				this.items[i].update(nodes[j]);
+				item.update(mnode.node);
 
-				if (this.panel_item == this.items[i])
-					this.updatePanels(this.items[i]);
+				if (this.panel_item == item)
+					this.updatePanels(item);
 
 				if ((this.type == 'jobs') && this.elPanelR.m_elBlocks.m_cur_block)
-					if (this.elPanelR.m_elBlocks.m_cur_block.job.params.id == this.items[i].params.id)
+					if (this.elPanelR.m_elBlocks.m_cur_block.job.params.id == item.params.id)
 						this.elPanelR.m_elBlocks.m_cur_block.updatePanels();
 
-				updated.push(this.items[i]);
-				this.filterItem(this.items[i]);
+				updated_items.push(item);
+				this.filterItem(item);
 
 				found = true;
 				break;
 			}
 		}
 		if (found == false)
-			new_ids.push(j);
+			new_nodes.push(mnode);
 	}
 
 	if (this.sortParm != 'order')
-		for (var i = 0; i < updated.length; i++)
-			this.sortItem(updated[i]);
+		for (let item of updated_items)
+			this.sortItem(item);
 
-	var new_nodes = [];
-	for (var i = 0; i < new_ids.length; i++)
-		new_nodes.push(this.createNode(nodes[new_ids[i]]));
+	var new_items = [];
+	for (let nnode of new_nodes)
+		new_items.push(this.createNodeItem(nnode.node,nnode.type));
 
 	if ((this.type == 'jobs') && (this.sortParm == 'order'))
-		if (new_ids.length)  //|| updated.length )
+		if (new_items.length)  //|| updated_items.length )
 			nw_GetNodes('users', [g_uid], 'jobs_order');
 
 	if (false == this.hasSelection())
 	{
-		if (new_nodes.length)
-			this.cur_item = new_nodes[new_nodes.length - 1];
-		else if (updated.length)
-			this.cur_item = updated[updated.length - 1];
+		if (new_items.length)
+			this.cur_item = new_items[new_items.length - 1];
+		else if (updated_items.length)
+			this.cur_item = updated_items[updated_items.length - 1];
 	}
 
-	if ((this.firstNodesReceived != true) && new_nodes.length && (g_VISOR() != true))
+	if ((this.firstNodesReceived != true) && new_items.length && (g_VISOR() != true))
 	{
 		this.items[this.items.length - 1].element.scrollIntoView();
 		this.firstNodesReceived = true;
@@ -564,43 +579,71 @@ Monitor.prototype.processMsg = function(obj) {
 		this.nodeConstructor.updatingFinished();
 
 	this.setWindowTitle();
-	// this.info( 'c' + this.cycle + ': nodes processed: ' + nodes.length + ' new:' + new_ids.length + ' up:'
-	// + updated.length);
+//console.log('c' + this.cycle + ': nodes processed: ' + msg_nodes.length + ' new:' + new_nodes.length + ' up:' + updated_items.length);
 };
 
 Monitor.prototype.setWindowTitle = function() {
 	var title = null;
+//var i, tasks;
 	if (this.type == 'jobs')
 	{
-		title = 'AJ';
-		var tasks = 0;
-		for (var i = 0; i < this.items.length; i++)
-			if (this.items[i].state.RUN)
+		title = 'AJ:';
+		let tasks = 0;
+		let in_queue_tasks = 0;
+
+		let total_frames_to_be_rendered = 0;
+		for (let i = 0; i < this.items.length; i++){
+			if(this.items[i].state.RUN){
 				tasks += this.items[i].running_tasks;
+			}
+
+			if (this.items[i].state.DON == false && this.items[i].params.name != "afanasy"){
+				in_queue_tasks += this.items[i].blocks.length;
+
+				let current_block;
+				let block_start_frame, block_end_frame;
+				let percentage_done = this.items[i].percentage;
+				for (let j=0; j < this.items[i].blocks.length; j++){
+					current_block = this.items[i].blocks[j];
+					block_start_frame = current_block.params.frame_first;
+					block_end_frame = current_block.params.frame_last;
+					total_frames_to_be_rendered += Math.ceil((block_end_frame - block_start_frame) * (100 - percentage_done) / 100);
+				 }
+			}
+		}
+
 		if (tasks > 0)
+		{
 			title += ' ' + tasks;
+		} else {
+			title += ' 0';
+		}
+		title +=  '/' + in_queue_tasks + ' | F: ' + total_frames_to_be_rendered;
+
 		if (this.cur_item)
 		{
 			if (this.cur_item.state.RUN)
+			{
 				title += ' ' + this.cur_item.percentage + '%';
-			title += this.cur_item.params.state;
+			}
+			title += ' | ' + this.cur_item.params.state;
 		}
 	}
 	else if (this.type == 'renders')
 	{
-		title = 'AR';
-		var tasks = 0;
-		for (var i = 0; i < this.items.length; i++)
-			if (this.items[i].state.RUN)
-				tasks += this.items[i].params.tasks.length;
+		title = 'AR:';
+		let tasks = 0;
+		for (let item of this.items)
+			if ((item.node_type == 'renders') && item.state.RUN)
+				tasks += item.params.tasks.length;
 		if (tasks > 0)
 			title += ' ' + tasks;
 	}
 	else if (this.type == 'users')
 	{
-		title = 'AU';
-		var tasks = 0;
-		for (var i = 0; i < this.items.length; i++)
+		title = 'AU:';
+		let tasks = 0;
+		for (let i = 0; i < this.items.length; i++)
 			if (this.items[i].params.running_tasks_num)
 				tasks += this.items[i].params.running_tasks_num;
 		if (tasks > 0)
@@ -608,12 +651,12 @@ Monitor.prototype.setWindowTitle = function() {
 	}
 	else if (this.type == 'tasks' && this.job)
 	{
-		var count = 0;
-		var percent = 0;
-		var run = 0;
-		var error = 0;
-		for (var i = 0; i < this.items.length; i++)
-			if (this.items[i].task_num)
+		let count = 0;
+		let percent = 0;
+		let run = 0;
+		let error = 0;
+		for (let i = 0; i < this.items.length; i++)
+			if(this.items[i].task_num)
 			{
 				if (this.items[i].state.DON)
 					percent += 100;
@@ -644,7 +687,7 @@ Monitor.prototype.setWindowTitle = function() {
 		this.document.title = title;
 };
 
-Monitor.prototype.delNodes = function(i_ids) {
+Monitor.prototype.delNodes = function(i_type, i_ids) {
 	if (i_ids == null)
 		return;
 	if (i_ids.length == null)
@@ -658,6 +701,10 @@ Monitor.prototype.delNodes = function(i_ids) {
 		for (var i = 0; i < this.items.length; i++)
 			if (this.items[i].params.id == i_ids[d])
 			{
+				// Skip nodes of other type
+				if (this.items[i].node_type != i_type)
+					continue;
+
 				if (this.panel_item == this.items[i])
 					this.resetPanels({'hide_params': true});
 
@@ -671,8 +718,13 @@ Monitor.prototype.delNodes = function(i_ids) {
 			}
 };
 
-Monitor.prototype.createNode = function(i_obj) {
-	var node = new this.nodeConstructor();
+Monitor.prototype.createNodeItem = function(i_obj, i_type) {
+	var node;
+	if (i_type == 'pools')
+		node = new PoolNode();
+	else
+		node = new this.nodeConstructor();
+	node.node_type = i_type;
 	this.createItem(node, i_obj, false);
 	this.filterItem(node);
 	this.addItemSorted(node);
@@ -941,12 +993,19 @@ Monitor.prototype.updatePanels = function(i_item, i_args) {
 	this.panel_item = i_item;
 
 	this.elPanelR.m_elName.textContent = i_item.params.name;
-	this.elPanelR.m_elName.title = 'Current job name:\n' + i_item.params.name;
 	this.elPanelR.m_elName.style.display = 'block';
 
-	var els = this.elPanelL.getElementsByClassName('ctrl_button');
-	for (var i = 0; i < els.length; i++)
-		els[i].classList.add('active');
+	for (let el of this.elPanelL.getElementsByClassName('ctrl_button'))
+	{
+		el.style.display = 'block';
+		el.classList.add('active');
+		if (el.m_act && el.m_act.node_type)
+		{
+			if (el.m_act.node_type != i_item.node_type)
+				el.style.display = 'none';
+		}
+	}
+
 	var els = this.elPanelR.getElementsByClassName('section');
 	for (var i = 0; i < els.length; i++)
 		els[i].classList.add('active');
@@ -964,7 +1023,13 @@ Monitor.prototype.updatePanels = function(i_item, i_args) {
 
 		var value = i_item.params[p];
 		if (this.nodeConstructor.params[p].type == 'hrs')
+		{
 			value = cm_TimeStringFromSeconds(value, true);
+		}
+		else if (this.nodeConstructor.params[p].type == 'tim')
+		{
+			value = cm_DateTimeStrFromSec(value);
+		}
 		else if ((typeof value) == 'string')
 		{
 			// word-wrap long regular expressions:
@@ -972,11 +1037,48 @@ Monitor.prototype.updatePanels = function(i_item, i_args) {
 			value = value.replace(/\|/g, '|&shy;');
 			value = value.replace(/\)/g, ')&shy;');
 		}
+
 		elParams[p].m_elValue.innerHTML = value;
 		elParams[p].style.display = 'block';
 	}
 	if (i_item.updatePanels)
 		i_item.updatePanels();
+};
+
+Monitor.prototype.panelShowAllParameters = function() {
+	var elParams = this.elPanelR.m_elParams;
+
+	// If parametes section is not active at all we should exit.
+	// Nothing is selected.
+	if (elParams.classList.contains('active') != true)
+		return false;
+
+	// If all are aready shown we exit
+	if (elParams.m_all_shown == true)
+		return;
+
+	// Store current node type to filter(hide) other node type specific parameters
+	var node_type = null;
+	if (this.cur_item)
+		node_type = this.cur_item.node_type;
+
+	for (let p in elParams.m_elPMap)
+	{
+		let el = elParams.m_elPMap[p];
+
+		// Filter node type specific parameters
+		if (node_type && el.param.node_type)
+			if (node_type != el.param.node_type)
+			{
+				el.style.display = 'none';
+				continue;
+			}
+
+		el.style.display = 'block';
+	}
+
+	// Store that we show all
+	elParams.m_all_shown = true;
 };
 
 Monitor.prototype.setPanelInfo = function(i_html) {
@@ -985,6 +1087,10 @@ Monitor.prototype.setPanelInfo = function(i_html) {
 
 Monitor.prototype.resetPanelInfo = function() {
 	this.elPanelR.m_elInfo.m_elBody.textContent = '';
+};
+
+Monitor.prototype.getElPanelInfo = function() {
+	return this.elPanelR.m_elInfo.m_elBody;
 };
 
 Monitor.prototype.onContextMenu = function(i_evt, i_el) {
@@ -1044,11 +1150,11 @@ Monitor.prototype.addMenuItem = function(i_menu, i_action) {
 
 	if (i_action.mode == 'cgru_cmdexec')
 	{
-		var cmds = [];
-		for (var i = 0; i < this.items.length; i++)
+		let cmds = [];
+		for (let i = 0; i < this.items.length; i++)
 			if (this.items[i].selected == true)
 			{
-				var cmd = i_action.handle;
+				let cmd = i_action.handle;
 				cmd = cmd.replace(/@ARG@/g, this.items[i].params.name);
 				if (this.items[i].params.address.ip)
 					cmd = cmd.replace(/@IP@/g, this.items[i].params.address.ip);
@@ -1127,12 +1233,19 @@ Monitor.prototype.mh_Get = function(i_param, i_evt) {
 		return;
 	}
 
-	var get = {"type": this.type, "ids": [this.cur_item.params.id], "mode": i_param.name};
+	var get = {"type": this.cur_item.node_type, "ids": [this.cur_item.params.id], "mode": i_param.name};
 	nw_request({"send": {"get": get}, "func": g_ShowObject, "evt": i_evt, "wnd": this.window});
 };
 
 Monitor.prototype.action = function(i_operation, i_params) {
-	nw_Action(this.type, this.getSelectedIds(), i_operation, i_params);
+	var type;
+	var ids = [];
+	for (let item of this.selected_items)
+	{
+		ids.push(item.params.id);
+		type = item.node_type;
+	}
+	nw_Action(type, ids, i_operation, i_params);
 };
 
 Monitor.prototype.mh_Opt = function(i_param) {
@@ -1351,7 +1464,10 @@ Monitor.prototype.createCtrlBtn = function(i_args) {
 	else
 	{
 		if (i_args.ondblclick)
+		{
 			elBtn.ondblclick = Monitor.ctrlBtnClicked;
+			elBtn.onclick = function(e) { e.stopPropagation(); return false; }
+		}
 		else
 			elBtn.onclick = Monitor.ctrlBtnClicked;
 		elBtn.oncontextmenu = function(e) { return false; }
@@ -1371,8 +1487,12 @@ Monitor.ctrlBtnClicked = function(e) {
 	if (elBtn.classList.contains('active') != true)
 		return false;
 
-	var args =
-		{'name': el.m_act.name, 'type': el.m_act.type, 'value': el.m_act.value, 'monitor': el.m_monitor};
+	var args = {};
+	// Just copy action at first, as it can be used:
+	// name, default value, dialog name (tooltip).
+	for (let p in el.m_act)
+		args[p] = el.m_act[p];
+	args.monitor = el.m_monitor;
 
 	var handle = el.m_act.handle;
 	if (handle == null)

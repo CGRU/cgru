@@ -156,9 +156,9 @@ top: 0; left: 0;
 opacity: 0.8;
 padding: 3px 8px;
 border-radius: 2px;
-
-background: #DD8;
-/*box-shadow: 0px 0px 3px #000 inset;*/
+background-color: #DD8;
+background-size: 22px;
+background-repeat: no-repeat;
 border: 1px solid rgba(0,0,0,.5);
 padding: 4px 8px;
 font-weight: bold;

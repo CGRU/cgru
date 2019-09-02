@@ -8,9 +8,9 @@
 #include "../include/macrooutput.h"
 
 Cmd::Cmd():
-   m_msgtype( 0),
-   m_msgouttype( 0),
-   m_argscount( 0)
+	m_msgtype(0),
+	m_msgouttype(0),
+	m_argscount(0)
 {
 }
 
@@ -18,15 +18,33 @@ Cmd::~Cmd(){}
 
 void Cmd::v_printInfo() const
 {
-   std::cout << " \t" << m_cmd;
-   if( m_msgtype ) std::cout << " \t- Msg::" << af::Msg::TNAMES[m_msgtype];
-   std::cout << std::endl;
+	std::cout << "    " << m_cmd;
+	int cmd_column_len = 16;
+	while(cmd_column_len-- > m_cmd.size())
+		std::cout << " ";
+
+	std::cout << " - " << m_info;
+
+	std::cout << std::endl;
+}
+
+void Cmd::v_printUsage() const
+{
+	if (m_usage.empty())
+		return;
+
+	std::cout << "Usage: " << m_usage << std::endl;
 }
 
 void Cmd::v_printHelp() const
 {
-   v_printInfo();
-   if( false == m_help.empty() ) std::cout << m_help << std::endl;
+	v_printInfo();
+	v_printUsage();
+
+	if (m_help.empty())
+		return;
+
+	std::cout << m_help << std::endl;
 }
 
 void Cmd::v_msgOut( af::Msg& msg) {}

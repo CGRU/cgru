@@ -100,7 +100,7 @@ bool RadiolocationStation::QStringFromMsg(QString& o_ret, Waves::Ptr i_answer)
         {
             std::string str;
             i_answer.get()->getString( str);
-            if( str.size() == 0) str = "An empty string recieved.";
+            if( str.size() == 0) str = "An empty string received.";
             o_ret += QString::fromStdString( str );
             break;
         }
@@ -108,7 +108,7 @@ bool RadiolocationStation::QStringFromMsg(QString& o_ret, Waves::Ptr i_answer)
         {
             std::list<std::string> strlist;
             i_answer.get()->getStringList( strlist);
-            if( strlist.size() == 0) strlist.push_back("An empty list recieved.");
+            if( strlist.size() == 0) strlist.push_back("An empty list received.");
             for( std::list<std::string>::const_iterator it = strlist.begin(); it != strlist.end(); it++)
             {
                 std::string str = *it ;

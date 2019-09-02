@@ -58,6 +58,7 @@ Use [ART],[TAG],[ANN] buttons
 to show/hide folder status info."
 			></div>
 		<div class="button" style="width:16px;" title="Scroll to current" onclick="g_NavigScrollCurrent()">&gt;&lt;</div>
+		<div class="button" id="navig_show_flags"      title="Show flags"      onclick="g_NavigShowInfo(this)">FLG</div>
 		<div class="button" id="navig_show_artists"    title="Show artists"    onclick="g_NavigShowInfo(this)">ART</div>
 		<div class="button" id="navig_show_tags"       title="Show tags"       onclick="g_NavigShowInfo(this)">TAG</div>
 		<div class="button" id="navig_show_annotation" title="Show annotation" onclick="g_NavigShowInfo(this)">ANN</div>
@@ -178,12 +179,13 @@ Supervisor can assign artist by creating a task."
 			<div id="status_tags" class="tags"></div>
 			<div id="status_finish" class="finish"></div>
 			<div id="status_progress" class="progress"><div id="status_progressbar" class="progressbar"></div></div>
-			<div id="status_modified"></div>
+			<div style="clear:both"></div>
 			<div id="status_framesnum_div">
 				<div id="status_framesnum"
 					style="font: 16px monospace; padding: 1px 6px; float: left;"></div>
 				<div style="padding: 1px 6px; float: right;">Frames</div>
 			</div>
+			<div id="status_modified"></div>
 			<div id="status_adinfo" style="clear:both; display: none;"></div>
 			<div style="clear:both;">
 				<div id="status_reports_div">
@@ -196,6 +198,10 @@ Supervisor can assign artist by creating a task."
 				</div>
 			</div>
 		</div>
+	</div>
+	<div id="execute_div" class="_view">
+		<div id="execute_btn" onclick="u_ExecuteShow()" class="button">EXECUTE</div>
+		<div id="execute_body"></div>
 	</div>
 	<div id="asset_div" class="view">
 		<div class="button show" onclick="u_OpenCloseView('asset')"
@@ -526,18 +532,29 @@ So folder will appear on unpack.
 			</div>
 		</div>
 		<div id="cgru_parameters" style="position:absolute; left: 250px; width: 250px; top:0;bottom:0; /*border: 1px solid #000;*/"></div>
-		<div style="position:absolute; left: 500px; width: 200px; top:0px;bottom:0; /*border: 1px solid #000;*/">
+		<div class="rules_parameters" style="position:absolute; left: 500px; width: 200px; top:0px;bottom:0; /*border: 1px solid #000;*/">
+			<div class="cgru_parameter" title="Store Header/Footer opened state.">
+				<div class="label">Header Opened:</div>
+				<div class="variable button" id="store_opened" onclick="u_StoreOpened()">unknown</div>
+			</div>
 			<div class="cgru_parameter" title="Show Hidden Folders.
 Need restart (F5).
 Create '.hidden' in folder to hide.
-Link with hidden folder will not works.
-Hidden folders increase system speed.">
+Link with hidden folder will not works.">
 				<div class="label">Show Hidden:</div>
-				<div class="variable button" id="show_hidden" style="left:110px;right:15px;cursor:pointer" onclick="u_ShowHiddenToggle()">unknown</div>
+				<div class="variable button" id="show_hidden" onclick="u_ShowHiddenToggle()">unknown</div>
 			</div>
 			<div class="cgru_parameter">
 				<div class="label">Hide ScrollBars:</div>
-				<div class="variable button" id="hide_scrollbars" style="left:110px;right:15px;cursor:pointer" onclick="u_CalcGUI(true)">unknown</div>
+				<div class="variable button" id="hide_scrollbars" onclick="u_CalcGUI(true)">unknown</div>
+			</div>
+			<div class="cgru_parameter" title="Refresh required.">
+				<div class="label">Has Filesystem:</div>
+				<div class="variable button" id="has_filesystem" onclick="u_HasFilesystem()">unknown</div>
+			</div>
+			<div class="cgru_parameter" title="Refresh required.">
+				<div class="label">Execute Soft:</div>
+				<div class="variable button" id="execute_soft" onclick="u_ExecuteSoft()">unknown</div>
 			</div>
 		</div>
 		<div style="position:absolute; left: 700px; width: 200px; top:5px;bottom:0; /*border: 1px solid #000;*/">
@@ -545,9 +562,6 @@ Hidden folders increase system speed.">
 				style="display:none; background: rgba(200,0,0,.2)"
 				title="Administrate all users"
 				onclick="ad_OpenWindow()">Administrate</div>
-			<div class="button" id="profile_button" style="display:none"
-				title="Edit my profile settings"
-				onclick="ad_ProfileOpen()">My Profile</div>
 			<div style="text-align:center; padding: 10px 0 0 0;">
 				<a href="http://cgru.info/rules/general" target="_blank" onclick="u_OpenCloseHeader()">
 					Documentation</a></div>
@@ -561,15 +575,21 @@ Hidden folders increase system speed.">
 	<div id="headeropenbtn" class="headeropenbtn button" onclick="u_OpenCloseHeader()"
 		title="Open/close settings"></div>
 	<div class="panel">
-		<a class="button" id="navigate_root" title="Navigate RULES root and refresh"
-			style="background-image:url(rules/icons/top.png);"></a>
-		<a class="button" id="navigate_up" title="Navigate up"
-			style="background-image:url(rules/icons/up.png);"></a>
-		<a class="button" id="navigate_prev" title="Navigate to the previous folder (shot)"
-			style="background-image:url(rules/icons/previous.png);"></a>
-		<a class="button" id="navigate_next" title="Navigate to the next folder (shot)"
-			style="background-image:url(rules/icons/next.png);"></a>
+		<div id="navigation_buttons">
+			<a class="button" id="navigate_root" title="Navigate RULES root and refresh"
+				style="background-image:url(rules/icons/top.png);"></a>
+			<a class="button" id="navigate_up" title="Navigate up"
+				style="background-image:url(rules/icons/up.png);"></a>
+			<a class="button" id="navigate_prev" title="Navigate to the previous folder (shot)"
+				style="background-image:url(rules/icons/previous.png);"></a>
+			<a class="button" id="navigate_next" title="Navigate to the next folder (shot)"
+				style="background-image:url(rules/icons/next.png);"></a>
+		</div>
 		<div id="panel_logo"><img id="panel_logo_img" src="rules/icons/rules.png" width="90px" height="30px"></div>
+		<div id="profile_settings" title="Edit Profile Settings" onclick="ad_ProfileOpen()">
+			<img id="profile_settings_avatar"></img>
+			<div id="profile_settings_name">Guest</div>
+		</div>
 		<div id="assets"></div>
 	</div>
 </div>
@@ -579,7 +599,11 @@ Hidden folders increase system speed.">
 		title="Open/close system log"></div>
 	<div id="cycle"></div>
 	<div id="version" style="float:right;margin:10px;" title="CGRU version">v?</div>
-	<div id="open" class="open" style="height: 26px; float:right; margin:8px;" title="Open location a file browser.
+	<div id="log_ctrl">
+		<div class="button" onclick="n_LogResponses()" title ="Log Responses" id="log_responses">Responses</div>
+		<div class="button" onclick="c_LogClear()" title ="Clear Log">Clear</div>
+	</div>
+	<div id="open" class="open" style="height: 26px; float:right; margin:8px; display: none;" title="Open location in a file browser.
 Double click to launch."></div>
 	<div id="info"></div>
 	<div id="log"></div>

@@ -229,7 +229,7 @@ bool RadiolocationService::get(QList<TaskObject> &o_tasks, int i_index)
         if (it != m_task_resources.end())
             m_task_resources.erase (it);
 
-        TaskManager::Ptr task_container = TaskManager::create( taskexec->getCommand(), taskexec->getNumber() );
+        TaskManager::Ptr task_container = TaskManager::create( taskexec->getCommandBlock(), taskexec->getNumber() );
 
         m_task_resources.insert( std::pair<size_t, TaskManager::Ptr >(hash,task_container) );
 
@@ -752,7 +752,7 @@ void RadiolocationService::jobsUpdate(bool show_all_users_job)
             job->m_resource_map["errors_forgive_time"] = QString::number( block->getErrorsForgiveTime() );
             job->m_resource_map["task_progress_change_timeout"] = QString::number( block->getTaskProgressChangeTimeout() );
             job->m_resource_map["errors_avoid_blades"] = QString::number(errors_avoid_blades);
-            job->m_resource_map["tasks_max_runtime"] = QString::number( block->getTasksMaxRunTime() );
+            job->m_resource_map["tasks_max_runtime"] = QString::number( block->getTaskMaxRunTime() );
             job->m_resource_map["max_run_tasks_perblade"] = QString::number( block->getMaxRunTasksPerHost() );
             job->m_resource_map["depend_mask"] = QString::fromStdString( block->getDependMask() );
             job->m_resource_map["time_life"] = group_time_life; 
@@ -1444,7 +1444,7 @@ void RadiolocationService::usersUpdate()
         std::string hostname = user->getHostName();
         int priority = user->getPriority();
         int jobs_size = user->getNumRunningJobs();
-        int tasks_size = user->getRunningTasksNumber();
+        int tasks_size = user->getRunningTasksNum();
 
         UserObject::Ptr u = m_users->insert( QString::fromStdString(name)
                 ,   jobs_size

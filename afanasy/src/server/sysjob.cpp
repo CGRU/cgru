@@ -109,7 +109,7 @@ void SysTask::appendSysJobLog( const std::string & message)
 void SysTask::v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring)
 {
 	i_taskexec->setName(         m_syscmd->task_name        );
-	i_taskexec->setCommand(      m_syscmd->command          );
+	i_taskexec->setTaskCommand(  m_syscmd->command          );
 	i_taskexec->setUserName(     m_syscmd->user_name        );
 	i_taskexec->setJobName(      m_syscmd->job_name         );
 	i_taskexec->setWDir(         m_syscmd->working_directory);
@@ -207,6 +207,14 @@ SysBlock::~SysBlock()
 {
 	for( std::list<SysCmd *>::iterator it = m_commands.begin(); it != m_commands.end(); it++) delete *it;
 	for( std::list<SysTask*>::iterator it = m_systasks.begin(); it != m_systasks.end(); it++) delete *it;
+}
+
+bool SysBlock::initSystem()
+{
+	if (false == ((SysBlockData*)m_data)->initSystem())
+		return false;
+
+	return true;
 }
 
 void SysBlock::addCommand( SysCmd * syscmd)
@@ -514,7 +522,7 @@ AFINFA("SysJob::SysJob: folder = '%s'", i_folder.c_str())
 
 	construct();
 
-	printf("System job constructed.\n");
+	AF_LOG << "System job constructed.";
 }
 
 SysJob::~SysJob()
@@ -619,7 +627,13 @@ void SysJob::appendJobLog( const std::string & message)
 
 bool SysJob::initSystem()
 {
-	if( m_blocks_num != BlockLastIndex ) return false;
+	if (m_blocks_num != BlockLastIndex)
+		return false;
+
+	for (int i = 0; i < m_blocks_num; i++)
+		if (false == ((SysBlock*)(m_blocks[i]))->initSystem())
+			return false;
+
 	m_time_creation = time(NULL);
 	return true;
 }
@@ -649,6 +663,16 @@ AFINFA("DBBlockData::DBBlockData: JobId=%d, BlockNum=%d", m_job_id, m_block_num)
 
 SysBlockData::~SysBlockData()
 {
+}
+
+bool SysBlockData::initSystem()
+{
+	if (isNumeric())
+		return false;
+
+	m_flags = 0;
+
+	return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////

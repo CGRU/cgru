@@ -204,17 +204,9 @@ elif drivertypename == "arnold":
                 print('Failed, frame progress not available.')
 
 elif drivertypename == "alembic":
-    ropnode.parm('lpostframe').set('python')
-    expr = r'''import sys
-    
-elif drivertypename == "Redshift_ROP":
-    # Trying to set ROP to output progress
-    print('Trying to set Redshift log level to "Debug"')
     try:
-        hou.hscript("Redshift_setLogLevel -L 5")
-    except:
-        print('Failed, frame progress not available.')
-    
+        ropnode.parm('lpostframe').set('python')
+        expr = r'''import sys
 f = hou.parmTuple('f').eval()
 percent = int(100*(hou.frame()-f[0])/(f[1]-f[0]))
 
@@ -222,7 +214,17 @@ out = 'ABC_PROGRESS ' + str(percent) + '%\n'
 
 sys.stdout.write(out)
 sys.stdout.flush()'''
-    ropnode.parm('postframe').set(expr)
+        ropnode.parm('postframe').set(expr)
+    except:
+        print('Failed, frame progress not available.')
+
+elif drivertypename == "Redshift_ROP":
+    # Trying to set ROP to output progress
+    print('Trying to set Redshift log level to "Debug"')
+    try:
+        hou.hscript("Redshift_setLogLevel -L 5")
+    except:
+        print('Failed, frame progress not available.')
 
 #
 # Distribute simulation:

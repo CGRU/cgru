@@ -45,13 +45,6 @@ class Tray(QtWidgets.QSystemTrayIcon):
         self.menu = dict()
         self.menu['menu'] = QtWidgets.QMenu()
 
-        # Update item only if CGRU_UPDATE_CMD defined:
-        if cgruconfig.VARS['CGRU_UPDATE_CMD'] is not None:
-            action = QtWidgets.QAction('Update', self)
-            action.triggered.connect( cmd.update)
-            self.menu['menu'].addAction(action)
-            self.menu['menu'].addSeparator()
-
         # Load menu:
         menu_path = os.path.join(
             os.path.join(cgruconfig.VARS['CGRU_LOCATION'], 'start')
@@ -176,13 +169,7 @@ class Tray(QtWidgets.QSystemTrayIcon):
         if not 'Software' in self.menu:
             self.addMenu(self.menu['menu'], 'Software')
             self.menu['menu'].addSeparator()
-            action = QtWidgets.QAction(
-                QtGui.QIcon(cgruutils.getIconFileName('folder')),
-                '[ browse ]',
-                self
-            )
-            action.triggered.connect( software.browse)
-            self.menu['Software'].addAction(action)
+
             for soft in software.Names:
                 icon = software.getIcon(soft)
                 if icon is None:
@@ -210,6 +197,15 @@ class Tray(QtWidgets.QSystemTrayIcon):
         if not self.addMenu(self.menu['menu'], 'Configure'):
             self.menu['Configure'].addSeparator()
 
+        action = QtWidgets.QAction('Execute in terminal', self)
+        action.setCheckable(True)
+        action.triggered.connect(cmd.triggerExecInTerminal)
+        if cgruconfig.getVar('keeper_execute_in_terminal'):
+            action.setChecked(True)
+        self.menu['Configure'].addAction(action)
+
+        self.menu['Configure'].addSeparator()
+
         if serverhttps.isRunning:
             self.addAction('Configure', False,  'HTTPS Server...', self.httpsServer)
             self.menu['Configure'].addSeparator()
@@ -222,8 +218,8 @@ class Tray(QtWidgets.QSystemTrayIcon):
         action.triggered.connect( cmd.setOpenCmd)
         self.menu['Configure'].addAction(action)
 
-        action = QtWidgets.QAction('Set Docs URL...', self)
-        action.triggered.connect( cmd.setDocsURL)
+        action = QtWidgets.QAction('Set Teminal...', self)
+        action.triggered.connect(cmd.setTerminal)
         self.menu['Configure'].addAction(action)
 
         action = QtWidgets.QAction('Set Text Editor...', self)
@@ -240,11 +236,17 @@ class Tray(QtWidgets.QSystemTrayIcon):
         action.triggered.connect( cmd.confReload)
         self.menu['Configure'].addAction(action)
 
-        self.addAction('menu', True,  'Show Info...',         self.cgruInfo, 'info')
-        self.addAction('menu', True,  'Documentation...',     cmd.cgruDocs)
-        self.addAction('menu', False, 'Forum...',             cmd.cgruForum)
-        self.addAction('menu', True,  'Restart',              cmd.restart)
-        self.addAction('menu', False, 'Quit',                 cmd.quit)
+        # Some general menu items:
+        self.addAction('menu', True,  'Documentation...', cmd.cgruDocs)
+        self.addAction('menu', False, 'Forum...',         cmd.cgruForum)
+        # System sub-menu:
+        self.addMenu(self.menu['menu'],'System')
+        self.addAction('System', True,'Show Info...', self.cgruInfo,'info')
+        # Update item only if CGRU_UPDATE_CMD defined:
+        if cgruconfig.VARS['CGRU_UPDATE_CMD'] is not None:
+            self.addAction('System', True, 'Update', cmd.update)
+        self.addAction('System', True, 'Restart', cmd.restart)
+        self.addAction('System', False,'Quit',    cmd.quit)
 
         self.setContextMenu(self.menu['menu'])
 

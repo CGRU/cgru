@@ -11,7 +11,7 @@
 \* ....................................................................................................... */
 
 /*
-	work.js - work related methods for the jobs.js
+	work.js - work related methods for Branches, Jobs, Users
 */
 
 "use strict";
@@ -129,9 +129,17 @@ function work_generateRunningCountsString(i_params, i_type)
 	}
 	else if (cm_IsJedi())
 	{
+		if (i_params.running_tasks_num)
+			str += "Tasks:<b>" + i_params.running_tasks_num + "</b>";
+		if (i_params.running_capacity_total)
+			str += " Capacity:<b>" + cm_ToKMG(i_params.running_capacity_total) + "</b>";
 	}
 	else
 	{
+		if (i_params.running_tasks_num)
+			str += "t:<b>" + i_params.running_tasks_num + "</b>";
+		if (i_params.running_capacity_total)
+			str += " c:<b>" + cm_ToKMG(i_params.running_capacity_total) + "</b>";
 	}
 
 	return str;
@@ -168,28 +176,28 @@ function work_CreatePanels(i_monitor, i_type)
 	acts.solve_ord = {
 		'name': 'solve_method',
 		'value': 'solve_order',
-		'label': 'ORD',
+		'label': 'ORDER',
 		'tooltip': 'Solve jobs by order.',
 		'handle': 'mh_Param'
 	};
 	acts.solve_pri = {
 		'name': 'solve_method',
 		'value': 'solve_priority',
-		'label': 'PRI',
+		'label': 'PRIORITY',
 		'tooltip': 'Solve jobs by priority.',
 		'handle': 'mh_Param'
 	};
 	acts.solve_cap = {
 		'name': 'solve_need',
 		'value': 'solve_capacity',
-		'label': 'CAP',
+		'label': 'CAPACITY',
 		'tooltip': 'Solve need by running capacity total.',
 		'handle': 'mh_Param'
 	};
 	acts.solve_tsk = {
 		'name': 'solve_need',
 		'value': 'solve_tasksnum',
-		'label': 'TKS',
+		'label': 'TASKS',
 		'tooltip': 'Solve need by running tasks number.',
 		'handle': 'mh_Param'
 	};

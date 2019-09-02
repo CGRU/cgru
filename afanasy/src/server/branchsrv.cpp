@@ -15,8 +15,6 @@
 */
 #include "branchsrv.h"
 
-#include <math.h>
-
 #include "../include/afanasy.h"
 
 #include "../libafanasy/environment.h"

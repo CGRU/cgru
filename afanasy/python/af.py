@@ -283,7 +283,7 @@ class Block:
         :param i_value:
         :return:
         """
-        if self.data not in ["environment"]:
+        if "environment" not in self.data:
             self.data["environment"] = dict()
 
         self.data["environment"][i_name] = i_value
@@ -730,7 +730,7 @@ class Job:
         :return:
         """
         if value > time.time():
-            self.data["time_wait"] = value
+            self.data["time_wait"] = int(value)
 
     def setMaxRunningTasks(self, value):
         """Missing DocString
@@ -871,7 +871,7 @@ class Cmd:
         self.data['host_name'] = cgruconfig.VARS['HOSTNAME']
         self.action = None
 
-    def _sendRequest(self, verbose=False):
+    def _sendRequest(self, verbose=False, without_answer=False):
         """Missing DocString
 
         :param bool verbose:
@@ -883,7 +883,7 @@ class Cmd:
 
         obj = {self.action: self.data}
         # print(json.dumps( obj))
-        output = afnetwork.sendServer(json.dumps(obj), verbose)
+        output = afnetwork.sendServer(json.dumps(obj), verbose, without_answer)
         self.__init__()
         if output[0] is True:
             return output[1]
@@ -1095,21 +1095,11 @@ class Cmd:
         """Missing DocString
         :return:
         """
-        self.action = 'get'
-        self.data['type'] = 'monitors'
-        # print(self.data)
+        self.__init__()
+        self.action = "monitor"
+        self.data['engine'] = 'python'
         result = self._sendRequest()
-        monitorId = None
-        for monitor in result['monitors']:
-            if monitor['user_name'] == self.data['user_name'] and monitor['name'] == "%s@%s" % (self.data['user_name'], self.data['host_name']) and monitor['engine'] == "python":
-                monitorId = monitor['id']
-
-        if monitorId is not None:
-            self.__init__()
-            self.action = "monitor"
-            self.data['engine'] = 'python'
-            result = self._sendRequest()
-            monitorId = result['monitor']['id']
+        monitorId = result['monitor']['id']
         return monitorId
 
     def monitorChangeUid(self, monitorId, uid):
@@ -1136,7 +1126,7 @@ class Cmd:
         self.data["type"] = "monitors"
         self.data["ids"] = [monitorId]
         self.data["operation"] = {"type": "deregister"}
-        return self._sendRequest()
+        return self._sendRequest(without_answer=True)
 
     def monitorSubscribe(self, monitorId, classType):
         """Missing DocString

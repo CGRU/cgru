@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 
+import re
+
 Digits = '01234567890'
 
 BlockFlags = {
-    'numeric': 1 << 0,
-    'varcapacity': 1 << 1,
-    'multihost': 1 << 2,
-    'masteronslave': 1 << 3,
-    'dependsubtask': 1 << 4,
-    'skipthumbnails': 1 << 5,
-    'skipexistingfiles': 1 << 6,
+    'numeric':            1 << 0,
+    'varcapacity':        1 << 1,
+    'multihost':          1 << 2,
+    'masteronslave':      1 << 3,
+    'dependsubtask':      1 << 4,
+    'skipthumbnails':     1 << 5,
+    'skipexistingfiles':  1 << 6,
     'checkrenderedfiles': 1 << 7,
-    'slavelostignore': 1 << 8
+    'slavelostignore':    1 << 8
 }
 
 
@@ -29,6 +31,27 @@ def setBlockFlag(i_flags, i_name):
         print('Existing flags are: ' + str(BlockFlags))
         return i_flags
     return i_flags | BlockFlags[i_name]
+
+
+def fillNumbers(i_pattern, i_start, i_end):
+    """Fill numeric block command pattern with start and end frame numbers
+    """
+    cmd = ''
+    frame = i_start
+    for split in re.split('(@#{1,}@)', i_pattern):
+        if re.match('@#{1,}@', split) is None:
+            cmd += split
+            continue
+        pad = len(split) - 2
+        pad = '%0' + str(pad) + 'd'
+        pad = pad % frame
+        cmd += pad
+        if frame == i_start:
+            frame = i_end
+        else:
+            frame = i_start
+
+    return cmd
 
 
 def filterFileName(filename):

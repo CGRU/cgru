@@ -83,35 +83,9 @@ function shot_InitHTML( i_data)
 		el.onclick = shot_Rename;
 	}
 
-	// Set process buttons commands:
-	var path = c_PathPM_Rules2Client( g_CurPath());
-
-	cmd = c_PathPM_Server2Client('/cgru/rules/bin/shot_process');
-	if( ASSET.process )
-		cmd = c_PathPM_Server2Client( ASSET.process);
-
-	cmd = cmd + ' -s nuke -r nuke -f ' + RULES.fps;
-	if( ASSET.nuke_template )
-		cmd += ' -t ' + c_PathPM_Server2Client(ASSET.nuke_template);
-
-	if( RULES.colorspace )
-		cmd += ' -c ' + RULES.colorspace
-
-	cmd += ' ' + path;
-
-//console.log( cmd);
-	cgru_CmdExecProcess({"element":$('shot_nuke_new_btn'),"cmd":cmd});
-
-	cmd = c_PathPM_Server2Client('/cgru/rules/bin/shot_open_latest');
-	if( ASSET.open_latest )
-		cmd = c_PathPM_Server2Client( ASSET.open_latest);
-
-	cmd = cmd + ' -s nuke -e .nk -r nuke';
-
-	cmd += ' ' + path;
-//console.log( cmd);
-
-	cgru_CmdExecProcess({"element":$('shot_nuke_latest_btn'),"cmd":cmd});
+	// Create shot process buttons:
+    if (c_CanExecuteSoft())
+    	u_CreateActions(ASSET.shot_process, $('shot_process_div')); 
 
 	shot_ResultsRead( true);
 }

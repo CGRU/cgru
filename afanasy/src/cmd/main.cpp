@@ -56,7 +56,10 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
 		envflags = af::Environment::SolveServerName;
 
 		if( std::string( argv[1]) == "v" )
+		{
 			envflags |= af::Environment::Verbose;
+			Verbose = true;
+		}
 		else
 			envflags |= af::Environment::Quiet;
 	}
@@ -64,12 +67,12 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
     af::Environment ENV( envflags, argc, argv);
     if( ENV.isValid() == false ) return 1;
 
-    if( af::init( af::InitFarm | (argc == 1 ? af::InitVerbose : af::NoFlags)) == false) return 1;
     afsql::init();
 
     int return_value = 0;
 //
 // initialize command class
+	Py_InitializeEx(0);
     AfCmd afcmd;
 //
 // generate message from command line arguments
@@ -78,7 +81,10 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
     {
         if( msg.isNull() == false)
         {
-            if( Verbose ) msg.v_stdOut();
+			if( Verbose )
+			{
+				msg.stdOutData();
+			}
 
             bool ok;
             af::Msg * answer = af::sendToServer( &msg, ok, af::VerboseOn);
@@ -95,7 +101,7 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
     }
     else return_value = 1;
 
-    af::destroy();
+	Py_Finalize();
 
     AFINFA("afcmd main: return value = %d\n", return_value)
 

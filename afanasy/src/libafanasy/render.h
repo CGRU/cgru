@@ -1,13 +1,14 @@
 #pragma once
 
 #include "name_af.h"
-#include "host.h"
+#include "affarm.h"
+#include "hostres.h"
 #include "client.h"
 
 namespace af
 {
-/// Afanasy render slave.
-class Render : public Client
+/// Afanasy renderer client.
+class Render : public Client, public Farm
 {
 public:
 
@@ -39,31 +40,8 @@ public:
 	inline void setWOLSleeping( bool value) { if( value ) m_state = m_state | SWOLSleeping; else m_state = m_state & (~SWOLSleeping);}
 	inline void setWOLWaking(   bool value) { if( value ) m_state = m_state | SWOLWaking;   else m_state = m_state & (~SWOLWaking);  }
 
-	inline int getMaxTasks()     const { return (m_max_tasks == -1 ? m_host.m_max_tasks : m_max_tasks);}
-	inline int getCapacity()     const { return (m_capacity == -1 ? m_host.m_capacity : m_capacity);}
 	inline int getCapacityUsed() const { return m_capacity_used;}
-	inline int getCapacityFree() const { return (m_capacity == -1 ? m_host.m_capacity : m_capacity) - m_capacity_used;}
-	inline bool hasCapacity( int value) const { return m_capacity_used + value <= (m_capacity == -1 ? m_host.m_capacity : m_capacity );}
 
-/// Whether Render is ready to render tasks.
-   inline bool isReady() const { return (
-			( m_state & SOnline ) &&
-			( m_priority > 0 ) &&
-			( m_capacity_used < getCapacity() ) &&
-			( (int)m_tasks.size() < getMaxTasks() ) &&
-            ( false == isWOLFalling())
-         );}
-
-	inline bool isWOLWakeAble() const { return (
-			isOffline() &&
-			isWOLSleeping() &&
-			( false == isWOLWaking()) &&
-			( getCapacity() > 0 ) &&
-			( getMaxTasks() > 0 ) &&
-			( m_priority > 0 )
-		);}
-
-   inline const Host    & getHost()    const { return m_host;}
    inline const HostRes & getHostRes() const { return m_hres;}
 
 	/// Set free (unset nimby and NIMBY).
@@ -118,13 +96,12 @@ protected:
 
 protected:
 
+	std::string m_pool;
+
 	int32_t m_capacity;
 	int32_t m_capacity_used;
 	int32_t m_max_tasks;
 
-	std::vector<std::string> m_services_disabled;
-
-	Host     m_host;
 	HostRes  m_hres;
 
 	std::list<TaskExec*> m_tasks;

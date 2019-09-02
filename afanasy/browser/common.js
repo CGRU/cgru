@@ -39,6 +39,8 @@ var cm_States = [
 	'NBY', 'PAU', 'PER', 'PBR', 'PSC', 'WFL', 'WSL', 'WWK', 'PPA', 'RER', 'WRC'
 ];
 
+var cm_SoftwareIcons = [];
+
 var cm_blockFlags = {
 	numeric /*************/: 1 << 0,
 	varCapacity /*********/: 1 << 1,
@@ -160,6 +162,25 @@ function cm_CompareItems(i_itemA, i_itemB, i_param, i_greater)
 
 	if (i_itemA == null || i_itemB == null)
 		return false;
+
+	// Sorting is forced (branches&jobs, pools&renders)
+	if (i_itemA.sort_force || i_itemB.sort_force)
+	{
+		if (i_itemA.sort_force != i_itemB.sort_force)
+		{
+			if (i_itemA.sort_force < i_itemB.sort_force)
+				return true;
+			else
+				return false;
+		}
+		else if (i_itemA.node_type != i_itemB.node_type)
+		{
+			// If path is the same we should show parent node first:
+			if (i_itemA.node_type == 'branches') return true;
+			if (i_itemA.node_type == 'pools') return true;
+			return false;
+		}
+	}
 
 	if (i_itemA.params[i_param] > i_itemB.params[i_param])
 		return i_greater == true;
@@ -480,4 +501,13 @@ function cm_CheckPermissions(i_perm)
 		return false;
 
 	return true;
+}
+
+function cm_SoftwareIconsReceived(i_obj)
+{
+	//console.log(JSON.stringify(i_obj));
+	if (i_obj.files && i_obj.files.length)
+		cm_SoftwareIcons = i_obj.files;
+	else
+		g_Error('Invalid softwate icons: ' + JSON.stringify(i_obj));
 }

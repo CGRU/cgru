@@ -29,22 +29,23 @@ mkdir -p $RPM_BUILD_ROOT
 
 %pre
 echo "Afanasy render PRE INSTALL"
-if [ -e "/etc/init.d/afrender" ]; then
-   echo "Trying to stop previously installed service..."
-   "/etc/init.d/afrender" stop || true
-fi
+systemctl stop afrender || true
+systemctl disable afrender || true
+systemctl daemon-reload || true
 exit 0
 
 %post
 echo "Afanasy render POST INSTALL"
 id render || useradd render -m
-/opt/cgru/afanasy/init/initlinks.sh c add afrender || true
-"/etc/init.d/afrender" start || true
+systemctl enable /opt/cgru/afanasy/systemd/afrender.service || true
+systemctl daemon-reload || true
+systemctl start afrender.service || true
 exit 0
 
 %preun
 echo "Afanasy render PRE REMOVE: $1"
 [ "$1" != "0" ] && exit 0
-"/etc/init.d/afrender stop" || true
-/opt/cgru/afanasy/init/initlinks.sh c rm afrender || true
+systemctl stop afrender || true
+systemctl disable afrender || true
+systemctl daemon-reload || true
 exit 0

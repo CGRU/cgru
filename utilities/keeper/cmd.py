@@ -2,6 +2,7 @@
 
 import json
 import subprocess
+import sys
 
 import cgrudocs
 import cgruconfig
@@ -63,14 +64,6 @@ def setAFANASYServer():
 	)
 
 
-def setDocsURL():
-	getVar(
-		'docshost',
-		'Set Docs Host',
-		'Enter host name or IP address:'
-	)
-
-
 def setTextEditor():
 	getVar(
 		'editor',
@@ -95,6 +88,14 @@ def setOpenCmd():
 	)
 
 
+def setTerminal():
+	getVar(
+		'open_terminal_cmd',
+		'Set Open Terminal Command',
+		'Enter command with @CMD@:'
+	)
+
+
 def afwebgui():
 	cgruutils.webbrowse(
 		'%s:%s' % (
@@ -104,21 +105,21 @@ def afwebgui():
 	)
 
 
-def exitRender(text='(keeper)'):
-	af.Cmd().renderExit(text)
+def exitRender():
+	af.Cmd().renderExit()
 
 
-def exitMonitor(text='(keeper)'):
-	af.Cmd().monitorExit(text)
+def exitMonitor():
+	af.Cmd().monitorExit()
 
 
-def exitClients(text='(keeper)'):
-	exitRender(text)
-	exitMonitor(text)
+def exitClients():
+	exitRender()
+	exitMonitor()
 
 
 def quitExitClients():
-	exitClients('(keeper quit)')
+	exitClients()
 	Application.quit()
 
 
@@ -134,9 +135,16 @@ def restart():
 
 
 def update():
-	exitClients('(keeper update)')
+	exitClients()
 	QtCore.QProcess.startDetached(cgruconfig.VARS['CGRU_UPDATE_CMD'])
 	Application.quit()
+
+
+def triggerExecInTerminal(i_checked):
+    var = 'keeper_execute_in_terminal'
+    cgruconfig.VARS[var] = i_checked
+    variables = [var]
+    cgruconfig.writeVars(variables)
 
 
 def execute( i_str):
@@ -162,14 +170,28 @@ def execute( i_str):
 
         for cmd in cmds:
             print('Executing command:')
+            if cgruconfig.getVar('keeper_execute_in_terminal'):
+                if sys.platform.find('win') == 0:
+                    cmd = 'start cmd.exe /C "%s"' % cmd
+                else:
+                    cmd = cgruconfig.VARS['open_terminal_cmd'].replace('@CMD@', cmd)
             print(cmd)
-            subprocess.Popen( cmd, shell=True)
+            subprocess.Popen(cmd, shell=True)
 
     if 'open' in cmdexec:
         cmd = cgruconfig.VARS['open_folder_cmd'].replace('@PATH@',cmdexec['open'])
         print('Opening folder:')
         print(cmd)
         subprocess.Popen( cmd, shell=True)
+
+    if 'terminal' in cmdexec:
+        if sys.platform.find('win') == 0:
+            cmd = ('start cmd.exe /K "cd %s"' % cmdexec['terminal'])
+        else:
+            cmd = ('cd %s; openterminal' % cmdexec['terminal'])
+        print('Opening terminal:')
+        print(cmd)
+        subprocess.Popen(cmd, shell=True)
 
     if 'eval' in cmdexec:
         cmd = cmdexec['eval']

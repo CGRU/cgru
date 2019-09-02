@@ -4,6 +4,7 @@
 
 #include <QWidget>
 
+class ButtonsMenu;
 class ListItems;
 
 class ButtonPanel : public QWidget
@@ -16,12 +17,12 @@ public:
 		const QString & i_label,
 		const QString & i_name,
 		const QString & i_description,
-		const QString & i_hotkey = "",
-		bool i_dblclick = false);
+		const QString & i_hotkey,
+		bool i_dblclick,
+		ButtonsMenu * i_bm);
 
 	~ButtonPanel();
 
-	static const int ms_Width;
 	static const int ms_Height;
 
 	void keyPressed( const QString & i_str);
@@ -49,6 +50,7 @@ private slots:
 	void listenHotkey();
 
 private:
+	int m_height;
 	QString m_label;
 	QString m_name;
 	QString m_description;
@@ -59,6 +61,8 @@ private:
 	bool m_activated;
 
 	ListItems * m_listitems;
+
+	ButtonsMenu * m_buttonsmenu;
 
 	static ButtonPanel * ms_button_hotkey;
 };

@@ -41,7 +41,7 @@ private slots:
 	void actChangeSize( int i_size);
 
 	void renderAdded( ItemNode * node, const QModelIndex & index);
-	void selectionChanged ( const QItemSelection & selected, const QItemSelection & deselected );
+	void rendersSelectionChanged ( const QItemSelection & selected, const QItemSelection & deselected );
 
 	void actCapacity();
 	void actMaxTasks();

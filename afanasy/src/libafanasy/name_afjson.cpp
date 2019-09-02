@@ -139,16 +139,16 @@ af::Msg * af::jsonMsg( const std::string & i_type, const std::string & i_name, c
 bool af::jr_regexp( const char * i_name, RegExp & o_attr, const JSON & i_object, std::string * o_str)
 {
 	const JSON & value = i_object[i_name];
-	if( false == value.IsString()) return false;
+	if (false == value.IsString()) return false;
 	std::string pattern = (char*)value.GetString();
 	bool ok = o_attr.setPattern( pattern);
-	if( o_str == NULL )
-		return false;
-	if( ok )
+	if (NULL == o_str)
+		return ok;
+	if (ok)
 		*o_str += std::string("\n\"") + i_name + "\" set to \"" + pattern + "\"";
 	else
 		*o_str += std::string("\n\"") + i_name + "\" invalid pattern \"" + pattern + "\"";
-	return true;
+	return ok;
 }
 
 bool af::jr_string( const char * i_name, std::string & o_attr, const JSON & i_object, std::string * o_str)
@@ -342,6 +342,17 @@ void af::jw_intmap( const char * i_name, const std::map<std::string,int32_t> & i
 	o_str << "\n}";
 }
 
+void af::jw_stringvec( const char * i_name, const std::vector<std::string> & i_vec, std::ostringstream & o_str)
+{
+	o_str << ",\n\"" << i_name << "\":[";
+	for (int i = 0; i < i_vec.size(); i++)
+	{
+		if (i) o_str << ",";
+		o_str << "\n\"" << af::strEscape(i_vec[i]) << "\"";
+	}
+	o_str << "\n]";
+}
+
 void af::jw_stringmap( const char * i_name, const std::map<std::string,std::string> & i_map, std::ostringstream & o_str)
 {
 	o_str << ",\n\"" << i_name << "\":{";
@@ -391,7 +402,7 @@ void af::jw_state( const int64_t & i_state, std::ostringstream & o_str, bool i_r
 		if( i_state & Render::SWOLFalling  ) o_str << " WFL";
 		if( i_state & Render::SWOLSleeping ) o_str << " WSL";
 		if( i_state & Render::SWOLWaking   ) o_str << " WWK";
-		if( i_state & Render::SPaused  ) o_str << " PAU";
+		if( i_state & Render::SPaused      ) o_str << " PAU";
 	}
 	else
 	{

@@ -11,14 +11,15 @@ Makefile
 *_automoc.cpp
 
 # MS Visual Studio:
-*.user
-*.filters
-*.vcxproj
 *.dir
+*.filters
 *.sln
 *.opensdf
+*.user
+*.vcxproj
 *.VC.db
 *.VC.opendb
+.vs
 Debug
 Release
 ipch

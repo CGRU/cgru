@@ -35,8 +35,8 @@ var ad_states = {
 
 var ad_prof_props = {
 	id /**********/: {"disabled": true, "lwidth": '170px', "label": 'ID'},
-	title /*******/: {"disabled": true, "lwidth": '170px'},
 	role /********/: {"disabled": true, "lwidth": '170px'},
+	title /*******/: {"lwidth": '170px'},
 	avatar /******/: {},
 	news_limit /**/: {},
 	email /*******/: {"width": '70%'},
@@ -49,7 +49,9 @@ function ad_Init()
 	if (g_auth_user == null)
 		return;
 
-	$('profile_button').style.display = 'block';
+	$('profile_settings').style.display = 'block';
+	ad_UpdateProfileSettings();
+
 	$('ad_logout').style.display = 'block';
 	$('ad_login').style.display = 'none';
 
@@ -66,6 +68,23 @@ function ad_Init()
 
 	ad_initialized = true;
 }
+
+function ad_UpdateProfileSettings()
+{
+	$('profile_settings_name').textContent = c_GetUserTitle();
+
+	let avatar = c_GetAvatar();
+	if (avatar && avatar.length)
+	{
+		$('profile_settings_avatar').src = avatar;
+		$('profile_settings_avatar').style.display = 'block';
+	}
+	else
+	{
+		$('profile_settings_avatar').style.display = 'none';
+	}
+}
+
 
 function ad_Login()
 {
@@ -252,7 +271,6 @@ function ad_PermissionsLoad()
 function ad_PermissionsReceived(i_data)
 {
 	ad_permissions = i_data;
-
 	if (ad_permissions == null)
 		return;
 	if (ad_permissions.error)
@@ -362,7 +380,15 @@ function ad_PermissionsAdd(i_id, i_type)
 		c_Error(i_id + ' is already in ' + i_type);
 		return;
 	}
-	ad_permissions[i_type].push(i_id);
+
+	// Set default minimal permissions:
+	if (RULES.permissions.default_groups)
+		if ((ad_permissions.groups.length == 0) && (ad_permissions.users.length == 0))
+			ad_permissions.groups = RULES.permissions.default_groups;
+
+	if (ad_permissions[i_type].indexOf(i_id) == -1)
+		ad_permissions[i_type].push(i_id);
+
 	n_Request({
 		"send": {"permissionsset": ad_permissions},
 		"func": ad_ChangesFinished,
@@ -1089,7 +1115,7 @@ function ad_ChangeAvatarOnClick(i_user_id)
 		"value": g_users[i_user_id].avatar,
 		"name": 'users',
 		"title": 'Change Avatar',
-		"info": 'Enter new avatar link for ' + c_GetUserTitle(i_user_id)
+		"info": 'Enter new avatar link for ' + c_GetUserTitle(i_user_id) + ' [' + i_user_id + ']'
 	});
 }
 
@@ -1454,8 +1480,6 @@ function ad_ProfileOpen()
 		return;
 	}
 
-	u_OpenCloseHeader();
-
 	var wnd = new cgru_Window({"name": 'profile', "title": 'My Profile'});
 	wnd.elContent.classList.add('profile');
 
@@ -1474,6 +1498,12 @@ function ad_ProfileOpen()
 	wnd.elContent.appendChild(elBtns);
 	elBtns.style.clear = 'both';
 
+	wnd.elContent.m_wnd = wnd;
+	wnd.elContent.onkeydown = function(e) {
+		if (e.keyCode == 13) // Enter
+			ad_ProfileSave(e.currentTarget.m_wnd);
+	}
+
 	var el = document.createElement('div');
 	elBtns.appendChild(el);
 	el.textContent = 'Save';
@@ -1488,7 +1518,7 @@ function ad_ProfileOpen()
 	el.onclick = function(e) { e.currentTarget.m_wnd.destroy(); };
 	el.m_wnd = wnd;
 
-	//	if( g_auth_user.states.indexOf('passwd') != -1 )
+	if (c_CanSetPassword())
 	{
 		var el = document.createElement('div');
 		elBtns.appendChild(el);
@@ -1514,7 +1544,12 @@ function ad_ProfileSave(i_wnd)
 	}
 
 	for (var p in params)
+	{
 		g_auth_user[p] = params[p];
+	}
+	g_users[g_auth_user.id] = g_auth_user;
+
 	ad_SaveUser();
+	ad_UpdateProfileSettings();
 	i_wnd.destroy();
 }

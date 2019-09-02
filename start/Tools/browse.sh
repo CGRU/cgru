@@ -1,6 +1,6 @@
 #!/bin/bash
-# Name=[ CGRU_LOCATION ]
+# Name=Open CGRU Folder
 
 source "`dirname "$0"`/_setup.sh"
 
-"$CGRU_LOCATION/utilities/browse.sh" "$CGRU_LOCATION"
+openfolder "$CGRU_LOCATION"

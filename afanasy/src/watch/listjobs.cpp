@@ -11,6 +11,7 @@
 #include "ctrlsortfilter.h"
 #include "monitorhost.h"
 #include "modelnodes.h"
+#include "paramspaneljob.h"
 #include "viewitems.h"
 #include "watch.h"
 
@@ -21,6 +22,7 @@
 #include <QBoxLayout>
 #include <QInputDialog>
 #include <QMenu>
+#include <QSplitter>
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -91,35 +93,70 @@ ListJobs::ListJobs( QWidget* parent):
 	bp = addButtonPanel("LOG","jobs_log","Show job log.");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestLog()));
 
-	bp = addButtonPanel("EHO","jobs_show_err_hosts","Show error hosts.");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestErrorHostsList()));
-
-	bp = addButtonPanel("PAU","jobs_pause","Pause selected jobs.","P");
+	bp = addButtonPanel("PAUSE","jobs_pause","Pause selected jobs.","P");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actPause()));
 
-	bp = addButtonPanel("STA","jobs_start","Start selected jobs.","S");
+	bp = addButtonPanel("START","jobs_start","Start selected jobs.","S");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actStart()));
 
-	bp = addButtonPanel("REH","jobs_reset_avoid_hosts","Reset error hosts.","E");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actResetErrorHosts()));
+	bp = addButtonPanel("STOP","jobs_stop","Stop selected jobs tasks and pause jobs.","", true);
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actStop()));
 
-	bp = addButtonPanel("RET","jobs_restart_error_tasks","Restart error tasks.","R");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRestartErrors()));
+	addButtonsMenu("Restart","Restart jobs tasks menu.");
 
-	bp = addButtonPanel("RST","jobs_restart","Restart selected jobs.","", true);
+	bp = addButtonPanel("SELECTED","jobs_restart","Restart all selected jobs tasks.","", true);
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRestart()));
 
-	bp = addButtonPanel("RSP","jobs_restart_pause","Restart&Pause selected jobs.","", true);
+	bp = addButtonPanel("AND PAUSE","jobs_restart_pause","Restart tasks and pause selected jobs.","", true);
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRestartPause()));
 
-	bp = addButtonPanel("DEL","jobs_delete","Delete selected jobs.","", true);
+	bp = addButtonPanel("WARNINGS","jobs_restart_warning","Restart tasks with warnings.","", true);
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRestartWarnings()));
+
+	bp = addButtonPanel("RUNNING","jobs_restart_running","Restart runnning tasks.","", true);
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRestartRunning()));
+
+	bp = addButtonPanel("SKIPPED","jobs_restart_skipped","Restart skipped tasks.","", true);
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRestartSkipped()));
+
+	bp = addButtonPanel("DONE","jobs_restart_done","Restart done tasks.","", true);
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRestartDone()));
+
+	resetButtonsMenu();
+
+	addButtonsMenu("Errors","Show/Manipulate error hosts and tasks.");
+
+	bp = addButtonPanel("SHOW HOSTS","jobs_show_err_hosts","Show error hosts.");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestErrorHostsList()));
+
+	bp = addButtonPanel("RESET HOSTS","jobs_reset_avoid_hosts","Reset error hosts.","E");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actResetErrorHosts()));
+
+	bp = addButtonPanel("RETRY TASKS","jobs_restart_error_tasks","Restart error tasks.","R");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRestartErrors()));
+
+	resetButtonsMenu();
+
+	bp = addButtonPanel("DELETE","jobs_delete","Delete selected jobs.","", true);
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actDelete()));
 
-	bp = addButtonPanel("DDJ","jobs_delete_done","Delete all done jobs.","", true);
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actDeleteDone()));
+	if (false == af::Environment::VISOR())
+	{
+		bp = addButtonPanel("DEL DONE","jobs_delete_done","Delete all done jobs.","", true);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actDeleteDone()));
+	}
 
+	// Add parameters
+	if	((af::Environment::VISOR()) || (af::Environment::getPermUserModJobPriority()))
+		addParam_Int("priority",              "Priorty",         "Priority number",0,200);
+	addParam_Str("annotation",                "Annotation",      "Annotation string");
+	addParam_Int("max_running_tasks",         "Maximum running", "Maximum runnint tasks number");
+	addParam_Int("max_running_tasks_per_host","Max run per host","Max run tasks on the same host");
+	addParam_Str("depend_mask",               "Depend Mask",     "Jobs name mask to wait");
+	addParam_Str("depend_mask_global",        "Global Depend",   "Depend mask for jobs from any user");
 
-	init();
+	m_paramspanel = new ParamsPanelJob();
+	initListNodes();
 
 	QTimer * timer = new QTimer(this);
 	timer->start( 1000 * af::Environment::getWatchRefreshGuiSec());
@@ -275,9 +312,12 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	}
 	else
 	{
-		  action = new QAction("Change Owner", this);
-		  connect( action, SIGNAL( triggered() ), this, SLOT( actSetUser() ));
-		  menu.addAction( action);
+		action = new QAction("Change Owner", this);
+		connect( action, SIGNAL( triggered() ), this, SLOT( actSetUser() ));
+		menu.addAction( action);
+		action = new QAction("Change Branch", this);
+		connect(action, SIGNAL(triggered()), this, SLOT(actChangeBranch()));
+		menu.addAction(action);
 	}
 	menu.addSeparator();
 	
@@ -301,6 +341,8 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 
 	submenu = new QMenu( "Set Parameter", this);
 
+	addMenuParameters(submenu);
+/*
 	action = new QAction( "Max Running Tasks", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunningTasks() ));
 	submenu->addAction( action);
@@ -348,7 +390,7 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	action = new QAction( "Life Time", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actLifeTime() ));
 	submenu->addAction( action);
-
+*/
 	submenu->addSeparator();
 
 	action = new QAction( "Hidden", this);
@@ -404,13 +446,20 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	// System job ID is 1, and can not be deleted
 	if( jobitem->getId() != 1 )
 	{
-		action = new QAction( "Delete All Done", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actDeleteDone()));
-		menu.addAction( action);
+		submenu = new QMenu( "Delete", this);
 
-		action = new QAction( "Delete", this);
+		action = new QAction( "Delete Selected", this);
 		connect( action, SIGNAL( triggered() ), this, SLOT( actDelete()));
-		menu.addAction( action);
+		submenu->addAction( action);
+
+		if (false == af::Environment::VISOR())
+		{
+			action = new QAction("Delete All Done", this);
+			connect(action, SIGNAL(triggered()), this, SLOT(actDeleteDone()));
+			submenu->addAction(action);
+		}
+
+		menu.addMenu( submenu);
 	}
 
 	menu.exec(event->globalPos());
@@ -672,6 +721,17 @@ void ListJobs::actWaitTime()
 	}
 
 	setParameter("time_wait", waittime);
+}
+
+void ListJobs::actChangeBranch()
+{
+	ItemJob* jobitem = (ItemJob*)getCurrentItem();
+	if( jobitem == NULL ) return;
+	QString current = jobitem->branch;
+	bool ok;
+	QString branch = QInputDialog::getText(this, "Change Branch", "Branch", QLineEdit::Normal, current, &ok);
+	if( !ok) return;
+	setParameter("branch", afqt::qtos( branch));
 }
 
 void ListJobs::actMaxRunningTasks()

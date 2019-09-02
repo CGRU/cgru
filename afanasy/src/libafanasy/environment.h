@@ -55,13 +55,14 @@ public:
 	/// Return \c true if argument exists and return its value if it has any:
 	static bool getArgument( const std::string & argument, std::string & value);
 
-	static inline bool isHelpMode()    { return help_mode;   }
+	static inline bool isHelpMode()    { return m_help_mode;   }
 	static inline bool isVerboseMode() { return m_verbose_mode;}
-	static inline void addUsage( const std::string & i_arg, const std::string & i_help) { cmdarguments_usage[i_arg] = i_help; }
+	static inline bool logNoDate()     { return m_log_nodate;  }
+	static inline void addUsage(const std::string & i_arg, const std::string & i_help) { m_cmdarguments_usage[i_arg] = i_help; }
 
-	static inline bool isDemoMode()  { return demo_mode; }
-	static inline bool notDemoMode() { return false == demo_mode; }
-	static inline void setDemoMode() { demo_mode = true; }
+	static inline bool isDemoMode()  { return m_demo_mode; }
+	static inline bool notDemoMode() { return false == m_demo_mode; }
+	static inline void setDemoMode() { m_demo_mode = true; }
 
 	static bool reload();
 
@@ -84,9 +85,12 @@ public:
 	/// Get versions:
 	static inline const std::string & getVersionRevision(){ return version_revision; }
 	static inline const std::string & getVersionCGRU()    { return version_cgru;     }
+	static inline const std::string & getVersionCompiled(){ return version_compiled; }
 	static inline const std::string & getVersionPython()  { return version_python;   }
 	static inline const std::string & getVersionGCC()     { return version_gcc;      }
 	static inline const std::string & getBuildDate()      { return build_date;       }
+
+	static inline const std::string & getExecutablePath() { return executable_path; }
 
 	static inline const std::string & getHome()        { return home;          }
 	static inline const std::string & getHomeAfanasy() { return home_afanasy;  }
@@ -113,7 +117,7 @@ public:
 
 	static inline int getWatchGetEventsSec()           { return watch_get_events_sec;      }
 	static inline int getWatchRefreshGuiSec()          { return watch_refresh_gui_sec;     }
-	static inline int getWatchConnectRetries()         { return watch_connectretries;      }
+	static inline int getWatchConnectionLostTime()     { return watch_connection_lost_time;}
 	static inline int getWatchRenderIdleBarMax()       { return watch_render_idle_bar_max; }
 
 	static inline const char * getTimeFormat()         { return timeformat.c_str();       } ///< Get default time format.
@@ -146,8 +150,6 @@ public:
 
 	static inline int getWOLWakeInterval() { return wolwake_interval; }
 
-	static inline int getRenderDefaultCapacity()       { return render_default_capacity;     }
-	static inline int getRenderDefaultMaxTasks()       { return render_default_maxtasks;     }
 	static inline std::string & getCmdShell()          { return cmd_shell;}
  
 	static inline int getRenderHeartbeatSec()       { return render_heartbeat_sec;        }
@@ -155,7 +157,7 @@ public:
 	static inline int getRenderNice()               { return render_nice;                 }
 	static inline int getRenderZombieTime()         { return render_zombietime;           }
 	static inline int getRenderExitNoTaskTime()     { return render_exit_no_task_time;    }
-	static inline int getRenderConnectRetries()     { return render_connectretries;       }
+	static inline int getRenderConnectionLostTime() { return render_connection_lost_time; }
 
 	static inline bool hasRULES() { return rules_url.size(); }
 	static inline std::vector<std::string> & getRenderWindowsMustDie() { return render_windowsmustdie; }
@@ -177,6 +179,7 @@ public:
 	static inline const std::string & getStoreFolderJobs()    { return store_folder_jobs;    }
 	static inline const std::string & getStoreFolderRenders() { return store_folder_renders; }
 	static inline const std::string & getStoreFolderUsers()   { return store_folder_users;   }
+	static inline const std::string & getStoreFolderPools()   { return store_folder_pools;   }
 
 	static inline const std::string & get_DB_ConnInfo()        { return db_conninfo;     } ///< Get database connection information.
 	static inline const std::string & get_DB_StringQuotes()    { return db_stringquotes; } ///< Get database string quotes.
@@ -214,15 +217,16 @@ private:
 	static bool m_verbose_init;     ///< Verbose environment initialization
 	static bool m_quiet_init;       ///< Quiet environment initialization
 	static bool m_verbose_mode;     ///< Application verbose mode
+	static bool m_log_nodate;
 	static bool m_solveservername;  ///< Whether to solve server name
 	static bool m_server;           ///< Whether the it is a server
 	static std::vector<std::string> m_config_files;
 	static std::string m_config_data;
 
-	static std::vector<std::string> cmdarguments;
-	static std::map<std::string,std::string> cmdarguments_usage;
-	static bool help_mode;
-	static bool demo_mode;
+	static std::vector<std::string> m_cmdarguments;
+	static std::map<std::string,std::string> m_cmdarguments_usage;
+	static bool m_help_mode;
+	static bool m_demo_mode;
 
 	static void initCommandArguments( int argc = 0, char** argv = NULL); ///< Initialize command arguments
 	static void printUsage(); ///< Output command usage
@@ -240,6 +244,7 @@ private:
 	static std::string digest_realm;
 	static std::map<std::string, std::string> digest_map;
 
+	static std::string executable_path;
 	static std::string cgrulocation;    ///< CGRU root directory.
 	static std::string afroot;          ///< Afanasy root directory.
 	static std::string home;            ///< User home directory.
@@ -295,7 +300,7 @@ private:
 	static std::vector<std::string> rendercmds_admin; ///< Render commannds for admin only
 	static int watch_get_events_sec;
 	static int watch_refresh_gui_sec;
-	static int watch_connectretries;
+	static int watch_connection_lost_time;
 	static int watch_render_idle_bar_max;
 
 	static int monitor_zombietime;
@@ -310,12 +315,10 @@ private:
 
 	static int render_heartbeat_sec;
 	static int render_up_resources_period;
-	static int render_default_capacity;
-	static int render_default_maxtasks;
 	static int render_nice;       ///< Render task process nice factor.
 	static int render_zombietime;
 	static int render_exit_no_task_time;
-	static int render_connectretries;
+	static int render_connection_lost_time;
 	static std::vector<std::string> render_windowsmustdie;
 
 	static std::string cmd_shell;
@@ -347,6 +350,7 @@ private:
 	static std::string store_folder_jobs;
 	static std::string store_folder_renders;
 	static std::string store_folder_users;
+	static std::string store_folder_pools;
 
 	static std::string db_conninfo;       ///< Database connection info
 	static std::string db_stringquotes;   ///< Database string quotes

@@ -49,8 +49,6 @@ public:
 	/// Get \c task task from \c block log.
 	const std::list<std::string> & getTaskLog( int block, int task) const;
 	
-	af::TaskExec * generateTask( int block, int task) const;
-	
 	/// Construct MCTaskOutput with render ID
 	/// for retrieveing output from running remote host
 	/// or filename if task is not running.

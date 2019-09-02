@@ -45,7 +45,6 @@ int main(int argc, char *argv[])
    actint.sa_handler = sig_int;
    sigaction( SIGINT,  &actint, NULL);
    sigaction( SIGTERM, &actint, NULL);
-   sigaction( SIGSEGV, &actint, NULL);
 // SIGPIPE signal catch:
    struct sigaction actpipe;
    bzero( &actpipe, sizeof(actpipe));
@@ -93,7 +92,6 @@ int main(int argc, char *argv[])
    int status = app.exec();
 
 	Watch::destroy();
-   af::destroy();
    Py_Finalize();
 
 	AF_DEBUG << "QApplication::exec: returned status = " << status;

@@ -123,7 +123,46 @@ function jsonEncode(&$i_obj)
 
 function _flock_(&$i_handle, $i_type)
 {
-//	flock( $i_handle, $i_type);
+	flock( $i_handle, $i_type);
+}
+
+function fileRead($i_filename, $i_lock = true, $i_verbose = false)
+{
+	$fHandle = fopen($i_filename, 'r');
+	if ($fHandle === false)
+		return null;
+
+	if ($i_verbose) error_log('fileRead: Opened: '.$i_filename);
+
+	if ($i_lock) flock($fHandle, LOCK_SH);
+	$data = fread($fHandle, FILE_MAX_LENGTH);
+	if ($i_lock) flock($fHandle, LOCK_UN);
+	fclose($fHandle);
+
+	if ($i_verbose) error_log('fileRead: Read '.strlen($data).' bytes from: '.$i_filename);
+
+	return $data;
+}
+
+function fileWrite($i_filename, $i_data, $i_lock = true, $i_verbose = false)
+{
+	$fHandle = fopen($i_filename, 'w');
+	if ($fHandle === false)
+	{
+		if ($i_verbose)
+			error_log('fileWrite: Unable open for writing: '.$i_filename);
+		return false;
+	}
+
+	if ($i_lock) flock($fHandle, LOCK_EX);
+	fwrite($fHandle, $i_data);
+	if ($i_lock) flock($fHandle, LOCK_UN);
+	fclose($fHandle);
+
+	if ($i_verbose)
+		error_log('fileWrite: Written '.strlen($i_data).' bytes to: '.$i_filename);
+
+	return true;
 }
 
 function jsf_start($i_arg, &$o_out)
@@ -134,11 +173,7 @@ function jsf_start($i_arg, &$o_out)
 	$o_out['memory_limit'] = ini_get('memory_limit');
 	$o_out['max_input_time'] = ini_get('max_input_time');
 	$o_out['max_execution_time'] = ini_get('max_execution_time');
-	if ($fHandle = fopen('version.txt', 'r'))
-	{
-		$o_out['version'] = fread($fHandle, FILE_MAX_LENGTH);
-		fclose($fHandle);
-	}
+	$o_out['version'] = fileRead('version.txt');
 	$o_out['name'] = $_SERVER['SERVER_NAME'];
 	$o_out['software'] = $_SERVER['SERVER_SOFTWARE'];
 	$o_out['php_version'] = phpversion();
@@ -217,7 +252,7 @@ function jsf_initialize($i_arg, &$o_out)
 		if (isset($obj['avatar']) && strlen($obj['avatar']))
 			$user['avatar'] = $obj['avatar'];
 		else if (isset($obj['email']) && strlen($obj['email']))
-			$user['avatar'] = 'http://www.gravatar.com/avatar/' . md5(strtolower(trim($obj['email'])));
+			$user['avatar'] = 'https://gravatar.com/avatar/' . md5(strtolower(trim($obj['email'])));
 
 		$o_out['users'][$obj['id']] = $user;
 	}
@@ -293,14 +328,8 @@ function writeUser(&$i_user)
 {
 	$filename = 'users/' . $i_user['id'] . '.json';
 
-	if ($fHandle = fopen($filename, 'w'))
-	{
-		flock($fHandle, LOCK_EX);
-		fwrite($fHandle, jsonEncode($i_user));
-		flock($fHandle, LOCK_UN);
-		fclose($fHandle);
+	if (fileWrite($filename, jsonEncode($i_user)))
 		return true;
-	}
 
 	return false;
 }
@@ -339,15 +368,8 @@ function http_digest_validate(&$o_out)
 		return false;
 	}
 
-	$data = null;
-	if ($fHandle = fopen(HT_DIGEST_FILE_NAME, 'r'))
-	{
-		flock($fHandle, LOCK_SH);
-		$data = fread($fHandle, FILE_MAX_LENGTH);
-		flock($fHandle, LOCK_UN);
-		fclose($fHandle);
-	}
-	else
+	$data = fileRead(HT_DIGEST_FILE_NAME);
+	if ($data === null)
 	{
 		$o_out['error'] = 'Can`t open HT digest file.';
 		error_log($o_out['error']);
@@ -574,14 +596,8 @@ function walkDir($i_recv, $i_dir, &$o_out, $i_depth)
 		$walk = null;
 		$walk_file = $i_dir . '/' . $rufolder . '/walk.json';
 		if (is_file($walk_file))
-			if ($wHandle = fopen($walk_file, 'r'))
-			{
-//error_log($path);
-				$wdata = fread($wHandle, FILE_MAX_LENGTH);
-//error_log($wdata);
+			if ($wdata = fileRead($walk_file, false))
 				$walk = json_decode($wdata, true);
-				fclose($wHandle);
-			}
 
 		while (false !== ($entry = readdir($handle)))
 		{
@@ -632,13 +648,8 @@ function walkDir($i_recv, $i_dir, &$o_out, $i_depth)
 							}
 						if (false == $found) continue;
 
-						if ($fHandle = fopen($path . '/' . $ruentry, 'r'))
-						{
-							$rudata = fread($fHandle, FILE_MAX_LENGTH);
-							$ruobj = json_decode($rudata, true);
-							$o_out['rules'][$ruentry] = $ruobj;
-							fclose($fHandle);
-						}
+						if ($rudata = fileRead($path . '/' . $ruentry, false))
+							$o_out['rules'][$ruentry] = json_decode($rudata, true);
 					}
 					closedir($rHandle);
 					sort($o_out['rufiles']);
@@ -666,14 +677,8 @@ function walkDir($i_recv, $i_dir, &$o_out, $i_depth)
 				{
 					$sfilepath = $path . '/' . $rufolder . '/' . $sfile . '.json';
 					if (is_file($sfilepath))
-					{
-						if ($fHandle = fopen($sfilepath, 'r'))
-						{
-							$data = fread($fHandle, FILE_MAX_LENGTH);
-							fclose($fHandle);
+						if ($data = fileRead($sfilepath, false))
 							mergeObjs($folderObj, json_decode($data, true));
-						}
-					}
 				}
 
 			if ($i_depth < $i_recv['depth'])
@@ -691,10 +696,8 @@ function readConfig($i_file, &$o_out)
 	if (false == is_file($i_file))
 		return;
 
-	if ($fHandle = fopen($i_file, 'r'))
+	if ($data = fileRead($i_file))
 	{
-		$data = fread($fHandle, FILE_MAX_LENGTH);
-		fclose($fHandle);
 		$o_out[$i_file] = json_decode($data, true);
 		if (array_key_exists('include', $o_out[$i_file]['cgru_config']))
 			foreach ($o_out[$i_file]['cgru_config']['include'] as $file)
@@ -715,12 +718,9 @@ function jsf_getfile($i_file, &$o_out)
 		return;
 	}
 
-	if ($fHandle = fopen($i_file, 'r'))
+	if ($data = fileRead($i_file))
 	{
-		_flock_($fHandle, LOCK_SH);
-		echo fread($fHandle, FILE_MAX_LENGTH);
-		_flock_($fHandle, LOCK_UN);
-		fclose($fHandle);
+		echo $data;
 		$o_out = null;
 	}
 	else
@@ -754,11 +754,9 @@ function jsf_getobjects($i_args, &$o_out)
 		return;
 	}
 
-	if ($fHandle = fopen($file, 'r'))
+	if ($data = fileRead($file))
 	{
-		_flock_($fHandle, LOCK_SH);
-
-		$data = json_decode(fread($fHandle, FILE_MAX_LENGTH), true);
+		$data = json_decode($data, true);
 		foreach ($objects as $object)
 		{
 			if (false == is_null($data) && isset($data[$object]))
@@ -766,9 +764,6 @@ function jsf_getobjects($i_args, &$o_out)
 			else
 				$o_out[$object] = null;
 		}
-
-		_flock_($fHandle, LOCK_UN);
-		fclose($fHandle);
 	}
 	else
 		$o_out['error'] = 'Unable to load file ' . $file;
@@ -809,32 +804,19 @@ function readObj($i_file, &$o_out)
 		return;
 	}
 
-	if ($fHandle = fopen($i_file, 'r'))
-	{
-		_flock_($fHandle, LOCK_SH);
-		$data = fread($fHandle, FILE_MAX_LENGTH);
-		_flock_($fHandle, LOCK_UN);
-		fclose($fHandle);
+	if ($data = fileRead($i_file))
 		$o_out = json_decode($data, true);
-	}
 	else
 		$o_out['error'] = 'Unable to load file ' . $i_file;
 }
 
 function mergeObjs(&$o_obj, $i_obj)
 {
-//error_log('mergeObjs: i='.json_encode($i_obj));
 	if (is_null($i_obj) || is_null($o_obj)) return;
 	foreach ($i_obj as $key => $val)
 	{
 		if (array_key_exists($key, $o_obj) && is_array($val) && is_array($o_obj[$key]))
 		{
-			/*			if( is_int( key($o_obj[$key])) && is_int( key($val)))
-						{
-							foreach( $val as $v )
-								array_push( $o_obj[$key], $v);
-							continue;
-						}*/
 			if (is_string(key($o_obj[$key])) && is_string(key($val)))
 			{
 				mergeObjs($o_obj[$key], $val);
@@ -989,14 +971,6 @@ function replaceObject(&$o_obj, $i_obj)
 		foreach ($i_obj as $key => $val)
 			if ($key != 'id')
 				$o_obj[$key] = $val;
-
-//static $replaceObjectCount = 0;
-//error_log('replace:'.$replaceObjectCount.' '.json_encode( $o_obj));
-//$replaceObjectCount++;
-//if( $replaceObjectCount > 5 ) return;
-
-//	if( array_key_exists( $i_attr, $o_obj))
-//		$o_obj[$i_attr] = $i_obj;
 }
 
 function jsf_editobj($i_edit, &$o_out)
@@ -1023,35 +997,50 @@ function jsf_editobj($i_edit, &$o_out)
 		}
 	}
 
-	$mode = 'w+';
-	if (is_file($i_edit['file'])) $mode = 'r+';
-	if (false == is_dir(dirname($i_edit['file'])))
-		mkdir(dirname($i_edit['file']), 0777, true);
-	if ($fHandle = fopen($i_edit['file'], $mode))
+	// Read object:
+	$obj = json_decode(fileRead($i_edit['file']), true);
+
+	// Edit object:
+	if (array_key_exists('add', $i_edit) && ($i_edit['add'] == true))
 	{
-		_flock_($fHandle, LOCK_EX);
-		$data = fread($fHandle, FILE_MAX_LENGTH);
-		$obj = json_decode($data, true);
-
 		if (is_null($obj))
+		{
+			// This is a new object creation
 			$obj = array();
+			// Create folder if does not exist
+			if (false == is_dir(dirname($i_edit['file'])))
+				mkdir(dirname($i_edit['file']), 0777, true);
+		}
+		mergeObjs($obj, $i_edit['object']);
+	}
+	else
+	{
+		if (is_null($obj))
+		{
+			// Object to edit does not exists
+			$o_out['status'] = 'error';
+			$o_out['error'] = 'Can`t edit null object: ' . $i_edit['file'];
+			return;
+		}
 
-		if (array_key_exists('add', $i_edit) && ($i_edit['add'] == true))
-			mergeObjs($obj, $i_edit['object']);
-		else if (array_key_exists('pusharray', $i_edit))
+		if (array_key_exists('pusharray', $i_edit))
 			pushArray($obj, $i_edit);
 		else if (array_key_exists('replace', $i_edit) && ($i_edit['replace'] == true))
 			foreach ($i_edit['objects'] as $newobj)
 				replaceObject($obj, $newobj);
 		else if (array_key_exists('delarray', $i_edit))
 			delArray($obj, $i_edit);
+		else
+		{
+			$o_out['status'] = 'error';
+			$o_out['error'] = 'Unknown edit object operation: ' . $i_edit['file'];
+			return;
+		}
+	}
 
-//error_log('obj:'.json_encode($obj));
-		rewind($fHandle);
-		ftruncate($fHandle, 0);
-		fwrite($fHandle, jsonEncode($obj));
-		_flock_($fHandle, LOCK_UN);
-		fclose($fHandle);
+	// Write object:
+	if (fileWrite($i_edit['file'], jsonEncode($obj)))
+	{
 		$o_out['status'] = 'success';
 		$o_out['object'] = $obj;
 	}
@@ -1160,23 +1149,14 @@ function jsf_save($i_save, &$o_out)
 		}
 	}
 
-	$fHandle = fopen($filename, 'wb');
-	if (false === $fHandle)
-	{
-		$o_out['error'] = 'Unable to open file for writing ' . $filename;
-		return;
-	}
-
 	$data = $i_save['data'];
 	if (array_key_exists('type', $i_save))
 	{
 		if ($i_save['type'] == 'base64') $data = base64_decode($data);
 	}
 
-	_flock_($fHandle, LOCK_EX);
-	fwrite($fHandle, $data);
-	_flock_($fHandle, LOCK_UN);
-	fclose($fHandle);
+	if (false === fileWrite($filename, $data))
+		$o_out['error'] = 'Unable to open save file: ' . $filename;
 }
 
 function jsf_makenews($i_args, &$o_out)
@@ -1253,10 +1233,10 @@ function makenews($i_args, &$io_users, &$o_out)
 		$path = '/' . $path;
 
 	// Ensure that path last character is not '/' (if path is not just '/' root):
-	if (($path != '/') && ($path[strlen($path - 1)] == '/'))
+	if (($path != '/') && ($path[strlen($path) - 1] == '/'))
 		$path = substr($path, 0, strlen($path) - 1);
 
-	// Process recent for current and each parent folders till root:
+	// Process recent for current and each parent folder till root:
 	for ($i = 0; $i <= 100; $i++)
 	{
 		// Simple loop check:
@@ -1266,18 +1246,13 @@ function makenews($i_args, &$io_users, &$o_out)
 			break;
 		}
 
-//error_log('path='.$path);
 		$rarray = array();
 
 		// Get existing recent:
 		$rfile = $i_args['root'] . $path . '/' . $i_args['rufolder'] . '/' . $i_args['recent_file'];
 		if (is_file($rfile))
-			if ($rhandle = fopen($rfile, 'r'))
+			if ($rdata = fileRead($rfile))
 			{
-				_flock_($rhandle, LOCK_SH);
-				$rdata = fread($rhandle, FILE_MAX_LENGTH);
-				_flock_($rhandle, LOCK_UN);
-				fclose($rhandle);
 				$rarray = json_decode($rdata, true);
 				if (is_null($rarray))
 					$rarray = array();
@@ -1316,13 +1291,7 @@ function makenews($i_args, &$io_users, &$o_out)
 		// Save recent:
 		if (false == is_dir(dirname($rfile)))
 			mkdir(dirname($rfile));
-		if ($rhandle = fopen($rfile, 'w'))
-		{
-			_flock_($rhandle, LOCK_EX);
-			fwrite($rhandle, jsonEncode($rarray));
-			_flock_($rhandle, LOCK_UN);
-			fclose($rhandle);
-		}
+		fileWrite($rfile, jsonEncode($rarray));
 
 		// Exit cycle if path is root:
 		if (strlen($path) == 0) break;
@@ -1360,15 +1329,17 @@ function makenews($i_args, &$io_users, &$o_out)
 				continue;
 		}
 
-		if (array_key_exists('artists', $news))
-			if (in_array($user['id'], $news['artists']))
-			{
-				if (false == in_array($user['id'], $sub_users))
-					array_push($sub_users, $user['id']);
-				continue;
-			}
+		// If user is assigned, it should receive news:
+		if (array_key_exists('status', $news))
+			if (array_key_exists('artists', $news['status']))
+				if (in_array($user['id'], $news['status']['artists']))
+				{
+					if (false == in_array($user['id'], $sub_users))
+						array_push($sub_users, $user['id']);
+					continue;
+				}
 
-
+		// Check user subscriptions:
 		if (array_key_exists('channels', $user))
 			foreach ($user['channels'] as $channel)
 				if (strpos($news['path'], $channel['id']) === 0)
@@ -1526,7 +1497,7 @@ function isAdmin(&$o_out)
 
 function jsf_htdigest($i_recv, &$o_out)
 {
-		$user = $i_recv['user'];
+	$user = $i_recv['user'];
 
 	// Not admin can change only own password,
 	//    if he has special state "passwd".
@@ -1568,14 +1539,9 @@ function jsf_htdigest($i_recv, &$o_out)
 		}
 	}
 
-	$data = '';
-	if ($fHandle = fopen(HT_DIGEST_FILE_NAME, 'r'))
-	{
-		_flock_($fHandle, LOCK_SH);
-		$data = fread($fHandle, FILE_MAX_LENGTH);
-		_flock_($fHandle, LOCK_UN);
-		fclose($fHandle);
-	}
+	$data = fileRead(HT_DIGEST_FILE_NAME, true);
+	if (is_null($data))
+		$data = '';
 
 	// Construct new lines w/o our user (if it exists):
 	$o_out['status'] = 'User "' . $user . '" set.';
@@ -1603,19 +1569,8 @@ function jsf_htdigest($i_recv, &$o_out)
 	array_push($new_lines, $i_recv['digest']);
 
 	$data = implode("\n", $new_lines) . "\n";
-
-	if ($fHandle = fopen(HT_DIGEST_FILE_NAME, 'w'))
-	{
-		_flock_($fHandle, LOCK_EX);
-		fwrite($fHandle, $data);
-		_flock_($fHandle, LOCK_UN);
-		fclose($fHandle);
-	}
-	else
-	{
+	if (false === fileWrite(HT_DIGEST_FILE_NAME, $data))
 		$o_out['error'] = 'Unable to write into the file.';
-	}
-//error_log($data);
 }
 
 function jsf_disableuser($i_args, &$o_out)
@@ -1639,14 +1594,8 @@ function jsf_disableuser($i_args, &$o_out)
 		// This needed to just disable user and not to loose its settings.
 		if (array_key_exists('uobj', $i_args))
 		{
-			if ($fHandle = fopen("users/$uid.json", 'w'))
-			{
-				flock($fHandle, LOCK_EX);
-				fwrite($fHandle, jsonEncode($i_args['uobj']));
-				flock($fHandle, LOCK_UN);
-				fclose($fHandle);
+			if (writeUser($i_args['uobj']))
 				$o_out['status'] = 'success';
-			}
 			else
 				$out['error'] = 'Unable to write "' . $uid . '" user file';
 		}
@@ -1659,19 +1608,13 @@ function jsf_disableuser($i_args, &$o_out)
 	}
 	closedir($dHandle);
 
-	$data = '';
-	if ($fHandle = fopen(HT_DIGEST_FILE_NAME, 'r'))
-	{
-		flock($fHandle, LOCK_SH);
-		$data = fread($fHandle, FILE_MAX_LENGTH);
-		flock($fHandle, LOCK_UN);
-		fclose($fHandle);
-	}
-	else
+	$data = fileRead(HT_DIGEST_FILE_NAME, true);
+	if (is_null($data))
 	{
 		$o_out['error'] = 'Unable to read the file.';
 		return;
 	}
+
 	$old_lines = explode("\n", $data);
 	$new_lines = array();
 	foreach ($old_lines as $line)
@@ -1683,16 +1626,11 @@ function jsf_disableuser($i_args, &$o_out)
 				array_push($new_lines, $line);
 		}
 	}
+
 	$data = implode("\n", $new_lines) . "\n";
 
-	if ($fHandle = fopen(HT_DIGEST_FILE_NAME, 'w'))
-	{
-		flock($fHandle, LOCK_EX);
-		fwrite($fHandle, $data);
-		flock($fHandle, LOCK_UN);
-		fclose($fHandle);
-	}
-	else $o_out['error'] = 'Unable to write into the file.';
+	if (false === fileWrite(HT_DIGEST_FILE_NAME, $data))
+		$o_out['error'] = 'Unable to write into the file.';
 }
 
 function jsf_getallusers($i_args, &$o_out)
@@ -1717,15 +1655,8 @@ function getallusers(&$o_out)
 		if (false === is_file("users/$entry")) continue;
 		if (strrpos($entry, '.json') !== (strlen($entry) - 5)) continue;
 
-		if ($fHandle = fopen("users/$entry", 'r'))
-		{
-			flock($fHandle, LOCK_SH);
-			$user = json_decode(fread($fHandle, FILE_MAX_LENGTH), true);
-			flock($fHandle, LOCK_UN);
-			if (false == is_null($user))
-				$o_out['users'][$user['id']] = $user;
-			fclose($fHandle);
-		}
+		if ($user = json_decode(fileRead("users/$entry", true), true))
+			$o_out['users'][$user['id']] = $user;
 	}
 	closedir($dHandle);
 }
@@ -1747,19 +1678,15 @@ function readGroups(&$o_out)
 		$o_out['error'] = 'HT Groups file does not exist.';
 		return;
 	}
-	$fHandle = fopen(HT_GROUPS_FILE_NAME, 'r');
-	if ($fHandle === false)
+
+	$data = fileRead(HT_GROUPS_FILE_NAME, true);
+	if (null == $data)
 	{
 		$o_out['error'] = 'Unable to open groups file.';
 		return;
 	}
 
 	$Groups = array();
-
-	flock($fHandle, LOCK_SH);
-	$data = fread($fHandle, FILE_MAX_LENGTH);
-	flock($fHandle, LOCK_UN);
-	fclose($fHandle);
 
 	$lines = explode("\n", $data);
 	foreach ($lines as $line)
@@ -1784,29 +1711,12 @@ function jsf_writegroups($i_groups, &$o_out)
 	global $Groups;
 
 	$Groups = $i_groups;
-	/*
-		if( false == is_file( HT_GROUPS_FILE_NAME))
-		{
-			$o_out['error'] = 'HT Groups file does not exist.';
-			return;
-		}
-	*/
 	$data = '';
 	foreach ($i_groups as $group => $users)
 		$data = $data . "$group:" . implode(' ', $users) . "\n";
 
-	if ($fHandle = fopen(HT_GROUPS_FILE_NAME, 'w'))
-	{
-		flock($fHandle, LOCK_EX);
-		fwrite($fHandle, $data);
-		flock($fHandle, LOCK_UN);
-		fclose($fHandle);
-	}
-	else
-	{
+	if (false === fileWrite(HT_GROUPS_FILE_NAME, $data))
 		$o_out['error'] = 'Unable to write in groups file.';
-		return;
-	}
 }
 
 function jsf_permissionsset($i_args, &$o_out)
@@ -1824,17 +1734,9 @@ function jsf_permissionsset($i_args, &$o_out)
 	}
 
 	$data = implode("\n", $lines) . "\n";
-//error_log($data);return;
 
 	$htaccess = $i_args['path'] . '/' . HT_ACCESS_FILE_NAME;
-	if ($fHandle = fopen($htaccess, 'w'))
-	{
-		_flock_($fHandle, LOCK_EX);
-		fwrite($fHandle, $data);
-		_flock_($fHandle, LOCK_UN);
-		fclose($fHandle);
-	}
-	else
+	if (false === fileWrite($htaccess, $data))
 		$o_out['error'] = 'Unable to write into the file.';
 }
 
@@ -1875,18 +1777,13 @@ function permissionsGet($i_args, &$o_out)
 	$htaccess = $i_args['path'] . '/' . HT_ACCESS_FILE_NAME;
 	if (false === is_file($htaccess)) return;
 
-	$fHandle = fopen($htaccess, 'r');
-	if ($fHandle === false)
+	$data = fileRead($htaccess, true);
+	if (null === $data)
 	{
 		$o_out['error'] = 'Can`t open the file.';
 		return;
 	}
-	_flock_($fHandle, LOCK_SH);
-	$data = fread($fHandle, FILE_MAX_LENGTH);
-	_flock_($fHandle, LOCK_UN);
-	fclose($fHandle);
 
-	$found = false;
 	$lines = explode("\n", $data);
 	foreach ($lines as $line)
 	{
@@ -1895,32 +1792,22 @@ function permissionsGet($i_args, &$o_out)
 		if ($words[0] != 'Require') continue;
 
 		unset($words[0]);
-//error_log( implode(' ',$words));
+		//error_log( implode(' ',$words));
 		if ($words[1] == 'group')
 		{
 			unset($words[1]);
 			foreach ($words as $group) array_push($o_out['groups'], $group);
-			$found = true;
 		}
 		else if ($words[1] == 'user')
 		{
 			unset($words[1]);
 			foreach ($words as $user) array_push($o_out['users'], $user);
-			$found = true;
 		}
 		else if ($words[1] == 'valid-user')
 		{
 			$o_out['valid_user'] = true;
-			$found = true;
 		}
 	}
-	/*	if( false == $found )
-		{
-			$o_out['error'] = 'Unable to find users or groups in the file.';
-			error_log( $htaccess);
-			error_log( $data);
-			return;
-		}*/
 }
 
 function jsf_search($i_args, &$o_out)
@@ -1976,15 +1863,9 @@ function searchFolder(&$i_args, &$o_out, $i_path, $i_depth)
 			$found = false;
 			$rufile = "$rufolder/status.json";
 			if (is_file($rufile))
-			{
-				if ($fHandle = fopen($rufile, 'r'))
-				{
-					$obj = json_decode(fread($fHandle, FILE_MAX_LENGTH), true);
+				if ($obj = json_decode(fileRead($rufile), true))
 					if (searchStatus($i_args['status'], $obj))
 						$found = true;
-					fclose($fHandle);
-				}
-			}
 		}
 
 		if ($found && array_key_exists('body', $i_args))
@@ -1992,15 +1873,9 @@ function searchFolder(&$i_args, &$o_out, $i_path, $i_depth)
 			$found = false;
 			$rufile = "$rufolder/body.html";
 			if (is_file($rufile))
-			{
-				if ($fHandle = fopen($rufile, 'r'))
-				{
-					$data = fread($fHandle, FILE_MAX_LENGTH);
-					fclose($fHandle);
+				if ($data = fileRead($rufile))
 					if (mb_stripos($data, $i_args['body'], 0, 'utf-8') !== false)
 						$found = true;
-				}
-			}
 		}
 
 		if ($found && array_key_exists('comment', $i_args))
@@ -2008,15 +1883,9 @@ function searchFolder(&$i_args, &$o_out, $i_path, $i_depth)
 			$found = false;
 			$rufile = "$rufolder/comments.json";
 			if (is_file($rufile))
-			{
-				if ($fHandle = fopen($rufile, 'r'))
-				{
-					$obj = json_decode(fread($fHandle, FILE_MAX_LENGTH), true);
+				if ($obj = json_decode(fileRead($rufile), true))
 					if (searchComment($i_args['comment'], $obj))
 						$found = true;
-					fclose($fHandle);
-				}
-			}
 		}
 
 		if ($found)

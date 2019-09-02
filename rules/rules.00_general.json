@@ -19,13 +19,21 @@
 },
 
 "flags":{
-	"hold"    :{"title":"HOLD",    "clr":[111,111,111],"short":"Hl",              "excl":true, "tip":"On hold"},
-	"error"   :{"title":"ERROR",   "clr":[255, 55, 55],"short":"Err", "p_max":99, "excl":false,"tip":"Error"},
-	"comment" :{"title":"COMMENT", "clr":[222,111,222],"short":"Cmm", "p_max":99, "excl":true, "tip":"Comment"},
-	"omit"    :{"title":"OMIT",    "clr":[ 99, 99, 99],"short":"Om",  "p_max":-1, "excl":true, "tip":"Omit"},
-	"done"    :{"title":"DONE",    "clr":[121,155,121],"short":"D",   "p_min":100,"excl":true, "tip":"Done"},
-	"closed"  :{"title":"CLOSED",  "clr":[ 11, 55, 11],"short":"CLS", "p_min":100,"excl":true, "tip":"Closed"},
-	"aux"     :{"title":"AUX",     "clr":[127,127,127],"short":"AUX", "p_max":-1, "excl":true, "tip":"Auxiliary"}
+	"hold"        :{"title":"HOLD",        "clr":[111,111,111], "short":"Hl",                          "excl":true,  "tip":"On hold"},
+	"error"       :{"title":"ERROR",       "clr":[255, 55, 55], "short":"Err",             "p_max":50, "excl":false, "tip":"Error"},
+	"on_farm"     :{"title":"ONFARM",      "clr":[250,150,100], "short":"OF",  "p_min":20, "p_max":20, "excl":false, "tip":"On farm"},
+	"check"       :{"title":"CHECK",       "clr":[ 77, 77,177], "short":"Chk", "p_min":60, "p_max":90, "excl":true,  "tip":"To check"},
+	"comment"     :{"title":"COMMENT",     "clr":[222,111,222], "short":"Cmm",             "p_max":50, "excl":true,  "tip":"Comment"},
+	"send_ready"  :{"title":"SENDREADY",   "clr":[ 77,177,177], "short":"SR",  "p_min":70, "p_max":90, "excl":true,  "tip":"Ready to send."},
+	"sent"        :{"title":"SENT",        "clr":[222,222,191], "short":"SNT", "p_min":80, "p_max":90, "excl":true,  "tip":"Was sent"},
+	"omit"        :{"title":"OMIT",        "clr":[ 99, 99, 99], "short":"Om",              "p_max":-1, "excl":true,  "tip":"Omit"},
+	"done"        :{"title":"DONE",        "clr":[121,155,121], "short":"D",   "p_min":99, "p_max":99, "excl":true,  "tip":"Done"},
+	"closed"      :{"title":"CLOSED",      "clr":[ 11, 55, 11], "short":"CLS", "p_min":100,            "excl":true,  "tip":"Closed"},
+	"aux"         :{"title":"AUX",         "clr":[127,127,127], "short":"AUX",             "p_max":-1, "excl":true,  "tip":"Auxiliary",
+		"new_line":true},
+
+	"render_ready":{"title":"RENDERREADY", "clr":[177,157,136], "short":"RR",  "p_min":10, "p_max":50, "excl":false, "tip":"Ready to render"},
+	"compoz_ready":{"title":"COMPOZREADY", "clr":[215,211,157], "short":"CR",  "p_min":30, "p_max":30, "excl":false, "tip":"Ready to compoz"}
 },
 
 "tags":{
@@ -63,6 +71,15 @@
 
 "aux_folders":[".","_","-","tmp","temp","tmp","common"],
 
+"execute":[
+	{
+		"label":"Terminal",
+		"icon":"icons/terminal.png",
+		"title":"Open terminal in this location.",
+		"terminal":"\"@PATH@\""
+	}
+],
+
 "assets":{
 	"projects_root":{
 		"play_folders":false,
@@ -76,7 +93,7 @@
 		"show_files":true
 	},
 	"scenes":{
-		"seek":["[project]/SCENES","[project]/SHOTS"],
+		"seek":["[project]/SCENE.*","[project]/SHOT.*","[project]/ANIM.*","[project]/RND.*"],
 		"uploads":{
 			"upload":{
 				"masks":[".*"],
@@ -127,13 +144,25 @@
 			"path":["SRC","SOURCE"]
 		},
 		"result":{
-			"path":["RESULT/JPG","RESULT/PNG","RESULT/DPX","RESULT/TIF","RESULT/ANIM"]
+			"path":["RESULT/JPG","RESULT/PNG","RESULT/DPX","RESULT/TIF","RESULT/EXR","RESULT/ANIM"]
 		},
 		"dailies":{
 			"path":["RESULT/DAILIES"]
 		},
 		"template":"rules/assets/shot",
-		"nuke_template":"/cgru/plugins/nuke/_template.nk"
+
+		"shot_process":[
+			{
+				"label":"Nk New",
+				"title":"Create and open new Nuke scene.",
+				"cmd":"/cgru/rules/bin/shot_process -s nuke -r nuke @template@ @fps@ @colorspace@",
+				"template":"/cgru/plugins/nuke/_template.nk"
+			},{
+				"label":"Nk Latest",
+				"title":"Open the latest Nuke scene.",
+				"cmd":"/cgru/rules/bin/shot_open_latest -s nuke -e .nk -r nuke"
+			}
+		]
 	}
 },
 
@@ -209,11 +238,12 @@
 "avcmd":"ffmpeg",
 "skipfiles":[".","Thumbs.db"],
 
+"-colorspace":"extension",
 "fps":24,
 "dailies":
 {
 	"format":"1280x720",
-	"fps":"25",
+	"-fps":24,
 	"codec":"h264_mid",
 	"container":"DEFAULT",
 	"colorspace":"auto",
@@ -281,8 +311,12 @@
 	"af_capacity":500
 },
 
+"permissions":{
+	"default_groups":["admins","users"]
+},
+
 "cut":{
-	"input":"RESULT/JPG,RESULT/PNG,RESULT/TIF,RESULT/DPX",
+	"input":"RESULT/ANIM,RESULT/PNG,RESULT/JPG,RESULT/TIF,RESULT/DPX",
 	"output":"COMMON/_cut",
 	"af_capacity":500,
 	"af_maxtasks":10,

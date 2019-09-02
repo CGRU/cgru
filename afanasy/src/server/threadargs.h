@@ -32,6 +32,7 @@ class RenderUpdatetQueue;
 class BranchesContainer;
 class JobContainer;
 class MonitorContainer;
+class PoolsContainer;
 class RenderContainer;
 class UserContainer;
 
@@ -39,11 +40,12 @@ class SocketsProcessing;
 
 struct ThreadArgs
 {
-	BranchesContainer /**/ *branches;
-	JobContainer /*******/ *jobs;
-	MonitorContainer /***/ *monitors;
-	RenderContainer /****/ *renders;
-	UserContainer /******/ *users;
+	BranchesContainer *branches;
+	JobContainer      *jobs;
+	MonitorContainer  *monitors;
+	PoolsContainer    *pools;
+	RenderContainer   *renders;
+	UserContainer     *users;
 
 	SocketsProcessing *socketsProcessing;
 

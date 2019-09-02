@@ -28,12 +28,22 @@ Item::Item( const QString &itemname, int itemid):
 	m_height( Height),
 	m_locked( false),
 	m_running( false),
-	m_id( itemid)
+	m_id(itemid),
+	m_hidden(false)
 {
 }
 
 Item::~Item()
 {
+}
+
+const QVariant & Item::getParamVar(const QString & i_name) const
+{
+	static const QVariant var;
+	QMap<QString, QVariant>::const_iterator it = m_params.find(i_name);
+	if (it == m_params.end())
+		return var;
+	return it.value();
 }
 
 QSize Item::sizeHint( const QStyleOptionViewItem &option) const

@@ -77,9 +77,8 @@ bool CmdUserDelete::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
 	std::string name = argv[0];
 
-	af::jsonActionParamsStart( m_str, "users", name);
-	m_str << "\n\"permanent\":false";
-	af::jsonActionParamsFinish( m_str);
+	af::jsonActionOperationStart(m_str, "users", "delete", name);
+	af::jsonActionOperationFinish(m_str);
 
 	return true;
 }

@@ -30,6 +30,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 ListRenders::EDisplaySize ListRenders::ms_displaysize = ListRenders::EVariableSize;
 
@@ -73,35 +74,39 @@ ListRenders::ListRenders( QWidget* parent):
 	m_ctrl_sf->getLayout()->addWidget( control);
 
 	// Add left panel buttons:
-	ButtonPanel * bp;
+	ButtonPanel * bp; ButtonsMenu * bm;
 
-	bp = addButtonPanel("LOG","renders_log","Show render log.");
+	bp = addButtonPanel("LOG","renders_log","Get render log.");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestLog()));
 
-	bp = addButtonPanel("TLG","renders_tasks_log","Show tasks log.");
+	bp = addButtonPanel("TASKS LOG","renders_tasks_log","Get tasks log.");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestTasksLog()));
 
-	bp = addButtonPanel("nim","renders_nimby","Set nimby.","M");
+	bp = addButtonPanel("nimby","renders_nimby","Set nimby.","M");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actNimby()));
 
-	bp = addButtonPanel("NIM","renders_NIMBY","Set NIMBY.","N");
+	bp = addButtonPanel("NIMBY","renders_NIMBY","Set NIMBY.","N");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actNIMBY()));
 
-	bp = addButtonPanel("FRE","renders_free","Set free.","F");
+	bp = addButtonPanel("FREE","renders_free","Set free.","F");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actFree()));
 
-	bp = addButtonPanel("EJA","renders_eject_all","Eject all tasks.","", true);
+	bm = addButtonsMenu("Eject Tasks","Eject tasks from render.");
+
+	bp = addButtonPanel("ALL","renders_eject_all","Eject all tasks.","", true);
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actEjectTasks()));
 
-	bp = addButtonPanel("EJN","renders_eject_notmy","Eject not my tasks.","", true);
+	bp = addButtonPanel("NOT MY","renders_eject_notmy","Eject not my tasks.","", true);
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actEjectNotMyTasks()));
+
+	resetButtonsMenu();
 
 	if( af::Environment::GOD())
 	{
-		bp = addButtonPanel("PAU","renders_pause","Pause selected renders.","P");
+		bp = addButtonPanel("PAUSE","renders_pause","Pause selected renders.","P");
 		connect( bp, SIGNAL( sigClicked()), this, SLOT( actSetPaused()));
 
-		bp = addButtonPanel("STA","renders_unpause","Start (Unpause) selected renders.","S");
+		bp = addButtonPanel("START","renders_unpause","Start (Unpause) selected renders.","S");
 		connect( bp, SIGNAL( sigClicked()), this, SLOT( actUnsetPaused()));
 	}
 
@@ -112,14 +117,14 @@ ListRenders::ListRenders( QWidget* parent):
 
 	m_parentWindow->setWindowTitle("Renders");
 
-	init();
+	initListNodes();
 
 	connect( (ModelNodes*)m_model, SIGNAL(   nodeAdded( ItemNode *, const QModelIndex &)),
 	                         this,   SLOT( renderAdded( ItemNode *, const QModelIndex &)));
 
-	if( false == af::Environment::VISOR())
-		connect( m_view->selectionModel(), SIGNAL( selectionChanged( const QItemSelection &, const QItemSelection &)),
-	                                 this,   SLOT( selectionChanged( const QItemSelection &, const QItemSelection &)));
+	if (false == af::Environment::VISOR())
+		connect(m_view->selectionModel(), SIGNAL(       selectionChanged(const QItemSelection &, const QItemSelection &)),
+	                                this,   SLOT(rendersSelectionChanged(const QItemSelection &, const QItemSelection &)));
 
 	setSpacing();
 
@@ -166,22 +171,30 @@ void ListRenders::actChangeSize( int i_size)
 void ListRenders::renderAdded( ItemNode * node, const QModelIndex & index)
 {
 	ItemRender * render = (ItemRender*)node;
-	if( af::Environment::VISOR() == false)
+	if (af::Environment::VISOR() == false)
 	{
-	   if(( render->getName() == QString::fromUtf8( af::Environment::getComputerName().c_str())) || (render->getUserName() == QString::fromUtf8( af::Environment::getUserName().c_str())))
-			m_view->selectionModel()->select( index, QItemSelectionModel::Select);
+	   if (render->getName() == QString::fromUtf8(af::Environment::getComputerName().c_str()))
+		{
+		   m_view->selectionModel()->setCurrentIndex(index, QItemSelectionModel::Select);
+		}
 	}
 }
 
-void ListRenders::selectionChanged( const QItemSelection & selected, const QItemSelection & deselected )
+void ListRenders::rendersSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected)
 {
 	QModelIndexList indexes = selected.indexes();
-	for( int i = 0; i < indexes.count(); i++)
-		if( Item::isItemP( indexes[i].data()))
+	if (indexes.size() == 0)
+	{
+		return;
+	}
+
+	for (int i = 0; i < indexes.count(); i++)
+		if (Item::isItemP(indexes[i].data()))
 		{
-			ItemRender * render = (ItemRender*)(Item::toItemP( indexes[i].data()));
-			if(( render->getName() != QString::fromUtf8( af::Environment::getComputerName().c_str())) && ( render->getUserName() != QString::fromUtf8( af::Environment::getUserName().c_str())))
-				m_view->selectionModel()->select( indexes[i], QItemSelectionModel::Deselect);
+			ItemRender * render = (ItemRender*)(Item::toItemP(indexes[i].data()));
+			if ((render->getName() != QString::fromUtf8(af::Environment::getComputerName().c_str())) &&
+				(render->getUserName() != QString::fromUtf8(af::Environment::getUserName().c_str())))
+				m_view->selectionModel()->select(indexes[i], QItemSelectionModel::Deselect);
 		}
 }
 

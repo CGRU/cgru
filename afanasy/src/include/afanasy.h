@@ -65,6 +65,13 @@ const int TASKSPERSECOND_MAX = 10000;
 const char STORE_FOLDER[] = "branches";
 }
 
+/// Pools options:
+namespace AFPOOL
+{
+const int MAXCOUNT = 1000;
+const char STORE_FOLDER[] = "pools";
+}
+
 /// Users options:
 namespace AFUSER
 {
@@ -119,13 +126,11 @@ const char CMD_SHELL[] = "cmd.exe /c";
 const char CMD_SHELL[] = "/bin/bash -c";
 #endif
 const int TERMINATEWAITKILL = 10; ///< Seconds to wait task task finish after termination, then perform kill
-const int DEFAULTCAPACITY = 1000; ///< Default render capacity.
-const int DEFAULTMAXTASKS = 2; ///< Maximum tasks on can run on the same render the same time (default value).
 const int HEARTBEAT_SEC /********/ = 1;		 ///< Heartbeat seconds.
 const int UP_RESOURCES_PERIOD /**/ = 5;		 ///< Query machine resourcs period.
 const int ZOMBIETIME /***********/ = 60;	 ///< Seconds to wait for update to Render is zombie.
 const int EXIT_NO_TASK_TIME /****/ = -1;	 ///< Seconds to exit if no tasks.
-const int CONNECTRETRIES /*******/ = 3;		 ///< Number of connect fails to turn to disconnected state.
+const int CONNECTION_LOST_TIME     = 30;     ///< Connection lost, if render can't update server for this time.
 const int MAXCOUNT /*************/ = 100000; ///< Maximum allowed online Renders.
 const int TASKPROCESSNICE /******/ = 10;	 ///< Child process nice.
 const char STORE_FOLDER[] /**/ = "renders"; ///< Renders store directory, relative to AFSERVER::TEMP_DIRECTORY
@@ -142,9 +147,9 @@ const int TASK_READ_BUFFER_SIZE /**/ = 1024 * 1024; ///< Task process read buffe
 /// Watch options:
 namespace AFWATCH
 {
-const int GET_EVENTS_SEC /***/ = 1; ///< Server connection & update status period ( seconds).
-const int CONNECTRETRIES /***/ = 3; ///< Number of connect fails to turn to disconnected state.
-const int REFRESH_GUI_SEC /**/ = 5; ///< Node items update interval time in seconds.
+const int GET_EVENTS_SEC /***/ = 1;  ///< Server connection & update status period ( seconds).
+const int CONNECTION_LOST_TIME = 30; ///< Connection lost, if watch can't update server for this time.
+const int REFRESH_GUI_SEC /**/ = 5;  ///< Node items update interval time in seconds.
 
 const char CMDS_IPADDRESS[] = "@IP@";
 ///< Commands argument will be replaced with selected render ip address.

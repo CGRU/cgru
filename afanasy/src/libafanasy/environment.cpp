@@ -64,18 +64,16 @@ int     Environment::serverport =                      AFADDR::SERVER_PORT;
 int     Environment::monitor_zombietime =              AFMONITOR::ZOMBIETIME;
 
 int     Environment::watch_get_events_sec =            AFWATCH::GET_EVENTS_SEC;
-int     Environment::watch_connectretries =            AFWATCH::CONNECTRETRIES;
+int     Environment::watch_connection_lost_time =      AFWATCH::CONNECTION_LOST_TIME;
 int     Environment::watch_refresh_gui_sec =           AFWATCH::REFRESH_GUI_SEC;
 int     Environment::watch_render_idle_bar_max =       AFWATCH::RENDER_IDLE_BAR_MAX;
 
 int     Environment::render_heartbeat_sec =            AFRENDER::HEARTBEAT_SEC;
 int     Environment::render_up_resources_period =      AFRENDER::UP_RESOURCES_PERIOD;
-int     Environment::render_default_capacity =         AFRENDER::DEFAULTCAPACITY;
-int     Environment::render_default_maxtasks =         AFRENDER::DEFAULTMAXTASKS;
 int     Environment::render_nice =                     AFRENDER::TASKPROCESSNICE;
 int     Environment::render_zombietime =               AFRENDER::ZOMBIETIME;
 int     Environment::render_exit_no_task_time =        AFRENDER::EXIT_NO_TASK_TIME;
-int     Environment::render_connectretries =           AFRENDER::CONNECTRETRIES;
+int     Environment::render_connection_lost_time =     AFRENDER::CONNECTION_LOST_TIME;
 
 
 std::string Environment::rules_url;
@@ -149,6 +147,7 @@ std::string Environment::store_folder_branches;
 std::string Environment::store_folder_jobs;
 std::string Environment::store_folder_renders;
 std::string Environment::store_folder_users;
+std::string Environment::store_folder_pools;
 
 std::string Environment::timeformat =                 AFGENERAL::TIME_FORMAT;
 std::string Environment::servername =                 AFADDR::SERVER_NAME;
@@ -156,6 +155,8 @@ int Environment::ipv6_disable = 0;
 std::string Environment::username;
 std::string Environment::computername;
 std::string Environment::hostname;
+
+std::string Environment::executable_path;
 std::string Environment::cgrulocation;
 std::string Environment::afroot;
 std::string Environment::home;
@@ -166,12 +167,13 @@ Address Environment::serveraddress;
 
 bool Environment::god_mode       = false;
 bool Environment::visor_mode     = false;
-bool Environment::help_mode      = false;
-bool Environment::demo_mode      = false;
+bool Environment::m_help_mode    = false;
+bool Environment::m_demo_mode    = false;
 bool Environment::m_valid        = false;
 bool Environment::m_verbose_init = false;
 bool Environment::m_quiet_init   = false;
 bool Environment::m_verbose_mode = false;
+bool Environment::m_log_nodate   = false;
 bool Environment::m_solveservername = false;
 bool Environment::m_server          = false;
 std::vector<std::string> Environment::m_config_files;
@@ -186,8 +188,8 @@ std::vector<std::string> Environment::rendercmds;
 std::vector<std::string> Environment::rendercmds_admin;
 std::vector<std::string> Environment::ip_trust;
 std::vector<std::string> Environment::render_resclasses;
-std::vector<std::string> Environment::cmdarguments;
-std::map<std::string,std::string> Environment::cmdarguments_usage;
+std::vector<std::string> Environment::m_cmdarguments;
+std::map<std::string,std::string> Environment::m_cmdarguments_usage;
 
 std::string Environment::version_revision;
 std::string Environment::version_compiled;
@@ -273,8 +275,6 @@ void Environment::getVars( const JSON * i_obj)
 
 	getVar( i_obj, render_heartbeat_sec,              "af_render_heartbeat_sec"              );
 	getVar( i_obj, render_up_resources_period,        "af_render_up_resources_period"        );
-	getVar( i_obj, render_default_capacity,           "af_render_default_capacity"           );
-	getVar( i_obj, render_default_maxtasks,           "af_render_default_maxtasks"           );
 	getVar( i_obj, render_cmd_reboot,                 "af_render_cmd_reboot"                 );
 	getVar( i_obj, render_cmd_shutdown,               "af_render_cmd_shutdown"               );
 	getVar( i_obj, render_cmd_wolsleep,               "af_render_cmd_wolsleep"               );
@@ -286,14 +286,14 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, render_nice,                       "af_render_nice"                       );
 	getVar( i_obj, render_zombietime,                 "af_render_zombietime"                 );
 	getVar( i_obj, render_exit_no_task_time,          "af_render_exit_no_task_time"          );
-	getVar( i_obj, render_connectretries,             "af_render_connectretries"             );
+	getVar( i_obj, render_connection_lost_time,       "af_render_connection_lost_time"       );
 	getVar( i_obj, render_windowsmustdie,             "af_render_windowsmustdie"             );
 
 	getVar( i_obj, rendercmds,                        "af_rendercmds"                        );
 	getVar( i_obj, rendercmds_admin,                  "af_rendercmds_admin"                  );
 	getVar( i_obj, watch_get_events_sec,              "af_watch_get_events_sec"              );
 	getVar( i_obj, watch_refresh_gui_sec,             "af_watch_refresh_gui_sec"             );
-	getVar( i_obj, watch_connectretries,              "af_watch_connectretries"              );
+	getVar( i_obj, watch_connection_lost_time,        "af_watch_connection_lost_time"        );
 	getVar( i_obj, watch_render_idle_bar_max,         "af_watch_render_idle_bar_max"         );
 
 	getVar( i_obj, monitor_zombietime,                "af_monitor_zombietime"                );
@@ -423,12 +423,38 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 // Init command arguments:
 	initCommandArguments( argc, argv);
 
+	// Executable path:
+	#ifdef LINUX
+	{
+		static const char * link = "/proc/self/exe";
+		static char buf[PATH_MAX];
+		int size = readlink(link, buf, PATH_MAX);
+		if (size)
+			executable_path = std::string(buf, size);
+		else
+			AF_ERR << "Unable to read '" << link << "': " << strerror(errno);
+	}
+	#endif
+	#ifdef WINNT
+	{
+		static char buf[MAX_PATH];
+		int size = GetModuleFileName( NULL, buf, MAX_PATH);
+		if (size)
+			executable_path = std::string(buf, size);
+		else
+			AF_ERR << "GetModuleFileName: " << af::GetLastErrorStdStr();
+	}
+	#endif
+	if (executable_path.size() == 0)
+		executable_path = argv[0];
+	QUIET("Executable path: %s\n", executable_path.c_str());
+
 //
 //############ afanasy root directory:
 	afroot = af::getenv("AF_ROOT");
 	if( afroot.size() == 0 )
 	{
-		 afroot = argv[0];
+		 afroot = executable_path;
 		 afroot = af::pathAbsolute( afroot);
 		 afroot = af::pathUp(afroot, true);
 		 afroot = af::pathUp(afroot, true);
@@ -521,12 +547,17 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 	if( username.empty()) username = "unknown";
 
 	// Convert to lowercase:
-	std::transform( username.begin(), username.end(), username.begin(), ::tolower);
-	// cut DOMAIN/
-	size_t dpos = username.rfind('/');
-	if( dpos == std::string::npos) dpos = username.rfind('\\');
-	if( dpos != std::string::npos) username = username.substr( dpos + 1);
-	std::transform( username.begin(), username.end(), username.begin(), ::tolower);
+	std::transform(username.begin(), username.end(), username.begin(), ::tolower);
+
+	// cut DOMAIN
+	{
+		size_t dpos = username.rfind('/');
+		if (dpos == std::string::npos)
+			dpos = username.rfind('\\');
+		if (dpos != std::string::npos)
+			username = username.substr( dpos + 1);
+	}
+
 	PRINT("Afanasy user name = '%s'\n", username.c_str());
 
 //
@@ -561,9 +592,20 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 		}
 		computername = buffer;
 	}
-	if( hostname.empty()) hostname = computername;
-	std::transform( hostname.begin(), hostname.end(), hostname.begin(), ::tolower);
-	std::transform( computername.begin(), computername.end(), computername.begin(), ::tolower);
+
+	if(hostname.empty())
+		hostname = computername;
+
+	// To lower case:
+	std::transform(hostname.begin(), hostname.end(), hostname.begin(), ::tolower);
+	std::transform(computername.begin(), computername.end(), computername.begin(), ::tolower);
+
+	// Cut DOMAIN:
+	{
+		size_t dpos = hostname.find('.');
+		if (dpos != std::string::npos)
+			hostname = hostname.substr(0, dpos);
+	}
 
 	PRINT("Local computer name = '%s'\n", computername.c_str());
 	PRINT("Afanasy host name = '%s'\n", hostname.c_str());
@@ -590,6 +632,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 	}
 	}
 	PRINT("Platform: '%s'\n", af::strJoin( platform).c_str());
+
 //
 //############ Versions: ########################
 	#define STRINGIFY(x) #x
@@ -636,6 +679,9 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 	QUIET("RLIMIT_NPROC: Processes (threads) limit: %d\n", rlimit_NPROC);
 	#endif
 //###################################################
+
+	// Log options:
+	m_log_nodate = hasArgument("-log_nodate");
 
 	load();
 	m_valid = initAfterLoad();
@@ -770,6 +816,7 @@ bool Environment::initAfterLoad()
 	store_folder_jobs    = store_folder + AFGENERAL::PATH_SEPARATOR +    AFJOB::STORE_FOLDER;
 	store_folder_renders = store_folder + AFGENERAL::PATH_SEPARATOR + AFRENDER::STORE_FOLDER;
 	store_folder_users   = store_folder + AFGENERAL::PATH_SEPARATOR +   AFUSER::STORE_FOLDER;
+	store_folder_pools   = store_folder + AFGENERAL::PATH_SEPARATOR +   AFPOOL::STORE_FOLDER;
 
 	// HTTP serve folder:
 	if( http_serve_dir.empty()) 
@@ -834,54 +881,54 @@ void Environment::initCommandArguments( int argc, char** argv)
 
 	for( int i = 0; i < argc; i++)
 	{
-		cmdarguments.push_back(argv[i]);
+		m_cmdarguments.push_back(argv[i]);
 
-		if( false == m_verbose_mode)
-		if(( cmdarguments.back() == "-V"    ) ||
-			( cmdarguments.back() == "--Verbose")
-			)
+		if (false == m_verbose_mode)
+		if ((m_cmdarguments.back() == "-V"    ) ||
+			(m_cmdarguments.back() == "--Verbose"))
 		{
 			printf("Verbose is on.\n");
 			m_verbose_mode = true;
 		}
 
-		if( false == help_mode)
-		if(( cmdarguments.back() == "-"     ) ||
-			( cmdarguments.back() == "--"    ) ||
-			( cmdarguments.back() == "-?"    ) ||
-			( cmdarguments.back() == "?"     ) ||
-			( cmdarguments.back() == "/?"    ) ||
-			( cmdarguments.back() == "-h"    ) ||
-			( cmdarguments.back() == "--help")
-			)
+		if (false == m_help_mode)
+		if ((m_cmdarguments.back() == "-"     ) ||
+			(m_cmdarguments.back() == "--"    ) ||
+			(m_cmdarguments.back() == "-?"    ) ||
+			(m_cmdarguments.back() == "?"     ) ||
+			(m_cmdarguments.back() == "/?"    ) ||
+			(m_cmdarguments.back() == "-h"    ) ||
+			(m_cmdarguments.back() == "--help"))
 		{
-			help_mode = true;
+			m_help_mode = true;
 		}
 	}
+
 	addUsage("-username", "Override user name.");
 	addUsage("-hostname", "Override host name.");
+	addUsage("-log_nodate", "Do not output date in each line log.");
 	addUsage("-h --help", "Display this help.");
 	addUsage("-V --Verbose", "Verbose mode.");
 }
 
 bool Environment::hasArgument( const std::string & argument)
 {
-	for( std::vector<std::string>::const_iterator it = cmdarguments.begin(); it != cmdarguments.end(); it++)
-		if( *it == argument )
+	for (std::vector<std::string>::const_iterator it = m_cmdarguments.begin(); it != m_cmdarguments.end(); it++)
+		if (*it == argument )
 			return true;
 	return false;
 }
 
 bool Environment::getArgument( const std::string & argument, std::string & value)
 {
-	for( std::vector<std::string>::const_iterator it = cmdarguments.begin(); it != cmdarguments.end(); it++)
+	for (std::vector<std::string>::const_iterator it = m_cmdarguments.begin(); it != m_cmdarguments.end(); it++)
 	{
-		if( *it == argument )
+		if (*it == argument)
 		{
 			// check for the next argument:
 			it++;
 
-			if( it != cmdarguments.end())
+			if (it != m_cmdarguments.end())
 				value = *it;
 
 			return true;
@@ -901,11 +948,15 @@ const std::string Environment::getDigest( const std::string & i_user_name)
 
 void Environment::printUsage()
 {
-	if( false == help_mode ) return;
-	if( cmdarguments_usage.empty() ) return;
-	printf("USAGE: %s [arguments]\n", cmdarguments.front().c_str());
-	std::map<std::string,std::string>::const_iterator it = cmdarguments_usage.begin();
-	for( ; it != cmdarguments_usage.end(); it++)
+	if (false == m_help_mode)
+		return;
+
+	if (m_cmdarguments_usage.empty())
+		return;
+
+	printf("USAGE: %s [arguments]\n", m_cmdarguments.front().c_str());
+	std::map<std::string,std::string>::const_iterator it = m_cmdarguments_usage.begin();
+	for (; it != m_cmdarguments_usage.end(); it++)
 	{
 		printf("   %s:\n      %s\n",
 			(it->first).c_str(),

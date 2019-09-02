@@ -8,7 +8,7 @@
 #include "buttonpanel.h"
 #include "itemmonitor.h"
 #include "ctrlsortfilter.h"
-#include "modelitems.h"
+#include "modelnodes.h"
 #include "watch.h"
 
 #include <QtCore/QEvent>
@@ -63,7 +63,7 @@ ListMonitors::ListMonitors( QWidget* parent):
 
 	m_parentWindow->setWindowTitle("Monitors");
 
-	init();
+	initListNodes();
 }
 
 ListMonitors::~ListMonitors()

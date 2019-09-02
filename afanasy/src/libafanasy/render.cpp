@@ -31,7 +31,6 @@ Render::Render(  Client::Flags i_flags):
 			m_state = m_state | af::Render::Snimby;
 		}
 		m_priority = af::Environment::getPriority();
-		m_capacity = af::Environment::getRenderDefaultCapacity();
 	}
 }
 
@@ -96,6 +95,8 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const // Threa
 
 	Client::v_jsonWrite( o_str, i_type);
 
+	o_str << ",\n\"pool\":\"" << m_pool << "\"";
+
 	o_str << ",\n\"st\":" << m_state;
 	o_str << ",\n";
 	jw_state( m_state, o_str, true /*it is render node state type*/);
@@ -129,24 +130,7 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const // Threa
 		o_str << "\n]";
 	}
 
-	// We do not need to store host on hdd,
-	// it will be taken from farm setup when online.
-	if( i_type != 0 )
-	{
-		o_str << ",\n";
-		m_host.jsonWrite( o_str);
-	}
-
-	if( m_services_disabled.size())
-	{
-		o_str << ",\n\"services_disabled\":[";
-		for( int i = 0; i < m_services_disabled.size(); i++)
-		{
-			if( i ) o_str << ",";
-			o_str << '\"' << m_services_disabled[i] << '\"';
-		}
-		o_str << ']';
-	}
+	Farm::jsonWrite(o_str, i_type);
 
 	o_str << "\n}";
 }
@@ -188,11 +172,13 @@ bool Render::jsonRead( const JSON &i_object, std::string * io_changes)
 
 	Node::jsonRead( i_object);
 
+	jr_string("pool", m_pool, i_object, io_changes);
+
 	jr_int64("st", m_state, i_object);
 
 	Client::jsonRead( i_object);
 
-	jr_stringvec("services_disabled", m_services_disabled, i_object);
+	Farm::jsonRead(i_object);
 
 	return true;
 }
@@ -234,6 +220,8 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
 			}
 		}
 
+		rw_String  ( m_os,           msg);
+
 	  rw_String  ( m_engine,       msg);
 	  rw_String  ( m_name,         msg);
 	  rw_String  ( m_user_name,    msg);
@@ -241,7 +229,6 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
 	  rw_int64_t ( m_flags,        msg);
 	  rw_uint8_t ( m_priority,     msg);
 	  rw_int64_t ( m_time_launch,  msg);
-	  m_host.v_readwrite( msg);
 	  m_address.v_readwrite( msg);
 
    case Msg::TRenderUpdate:
@@ -288,9 +275,7 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
 
 void Render::checkDirty()
 {
-   if( m_capacity == m_host.m_capacity ) m_capacity = -1;
-   if( m_max_tasks == m_host.m_max_tasks ) m_max_tasks = -1;
-   if(( m_capacity == -1 ) && ( m_max_tasks == -1 ) && ( m_services_disabled.empty() ))
+   if ((m_capacity == -1) && (m_max_tasks == -1))
 	  m_state = m_state & (~SDirty);
    else
 	  m_state = m_state | SDirty;
@@ -336,8 +321,6 @@ void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const
 		if( isWOLWaking()) stream << " WOL-Waking";
 
 		stream << "\n Priority = " << int(m_priority);
-		stream << "\n Capacity = " << getCapacityFree() << " of " << getCapacity() << " ( " << getCapacityUsed() << " used )";
-		stream << "\n Max Tasks = " << getMaxTasks() << " ( " << getTasksNumber() << " running )";
 
 		if( m_wol_operation_time ) stream << "\n WOL operation time = " << time2str( m_wol_operation_time);
 
@@ -346,9 +329,6 @@ void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const
 
 		if( m_time_launch   ) stream << "\n Launched at: " << time2str( m_time_launch   );
 		if( m_time_register ) stream << "\n Registered at: " << time2str( m_time_register );
-
-		stream << std::endl;
-		m_host.v_generateInfoStream( stream, full);
 
 		if( m_netIFs.size())
 		{
@@ -364,29 +344,24 @@ void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const
    }
    else
    {
-		if( isOnline())     stream << " ON ";
-		if( isOffline())    stream << " off";
-
-		if( isBusy()) stream << " BUSY"; else stream << "     ";
-
-		if( isWOLFalling())  stream << " WFL"; else stream << "    ";
-		if( isWOLSleeping()) stream << " WSL"; else stream << "    ";
-		if( isWOLWaking())   stream << " WWK"; else stream << "    ";
-
-		if( isNimby())           stream << " n";
-		else if( isNIMBY())      stream << " N";
-		else if( isPaused()) stream << " P";
-		else                     stream << "  ";
-
 		stream << " " << m_name << "@" << m_user_name << "[" << m_id << "]";
-/*
-		if( m_wol_operation_time ) stream << " W:" << time2str( m_wol_operation_time);
-		stream << " I:" << time2str( m_idle_time);
-		stream << " B:" << time2str( m_busy_time);
 
-		stream << " e'" << m_engine << "'";
-*/
+		stream << " " << m_os << " " << m_engine;
+
 		stream << " ";
 		m_address.v_generateInfoStream( stream ,full);
+
+		if( isOnline())  stream << " ON ";
+		if( isOffline()) stream << " off";
+
+		if( isBusy()) stream << " BUSY";
+
+		if (isNimby())  stream << " n";
+		if (isNIMBY())  stream << " N";
+		if (isPaused()) stream << " P";
+
+		if( isWOLFalling())  stream << " WFL";
+		if( isWOLSleeping()) stream << " WSL";
+		if( isWOLWaking())   stream << " WWK";
    }
 }

@@ -58,10 +58,17 @@ private:
 	void deletePlots();
 
 private:
+	// We need to keep two info strings,
+	// because render can update its properties w/o resources at one time,
+	// and at the other just resources.
+	// So the result string should be a combination of a two strings
+	// that are updating separately.
+	QString m_info_text_render;
+	QString m_info_text_hres;
 
-	af::Host    m_host;
 	af::HostRes m_hres;
 
+	QString m_os;
 	QString m_engine;
 	QString m_username;
 	QString m_tasksusers; ///< For sorting and filtering only
@@ -99,7 +106,7 @@ private:
 	long long m_taskstartfinishtime;
 	QString m_taskstartfinishtime_str;
 	QString m_offlineState;
-	QString m_creationTime;
+//	QString m_creationTime;
 
 	Plotter m_plotCpu;
 	Plotter m_plotMem;

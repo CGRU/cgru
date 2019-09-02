@@ -1,7 +1,5 @@
 #include "buttonpanel.h"
 
-#include "../libafqt/qenvironment.h"
-
 #include <QtCore/QEvent>
 #include <QtCore/QTimer>
 #include <QtGui/QMouseEvent>
@@ -9,11 +7,13 @@
 #include <QAction>
 #include <QMenu>
 
+#include "../libafqt/qenvironment.h"
+#include "buttonsmenu.h"
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-const int ButtonPanel::ms_Width  = 50;
 const int ButtonPanel::ms_Height = 24;
 ButtonPanel * ButtonPanel::ms_button_hotkey = NULL;
 
@@ -23,13 +23,15 @@ ButtonPanel::ButtonPanel(
 		const QString & i_name,
 		const QString & i_description,
 		const QString & i_hotkey,
-		bool i_dblclick):
+		bool i_dblclick,
+		ButtonsMenu * i_bm):
 	m_listitems( i_listitems),
 	m_label( i_label),
 	m_name( i_name),
 	m_description( i_description),
 	m_hotkey( i_hotkey),
 	m_dblclick( i_dblclick),
+	m_buttonsmenu(i_bm),
 	m_hovered( false),
 	m_activated( false)
 {
@@ -37,7 +39,8 @@ ButtonPanel::ButtonPanel(
 
 	updateTip();
 
-	setFixedSize( ms_Width, ms_Height);
+	m_height = ms_Height * (1 + i_label.count('\n'));
+	setFixedHeight(m_height);
 }
 
 ButtonPanel::~ButtonPanel() {}
@@ -73,7 +76,7 @@ void ButtonPanel::paintEvent( QPaintEvent * i_evt)
 		color.setAlphaF( .2);
 	painter.setPen( pen);
 	painter.setBrush( QBrush( color, Qt::SolidPattern));
-	painter.drawRoundedRect( 0, 0, ms_Width-1, ms_Height-1, 2.5, 2.5);
+	painter.drawRoundedRect(1, 1, width()-2, height()-2, 2.5, 2.5);
 
 	painter.setPen( QPen( afqt::QEnvironment::clr_Text.c));
 	painter.drawText( rect(), Qt::AlignHCenter | Qt::AlignVCenter, m_label);
@@ -102,6 +105,9 @@ void ButtonPanel::emitSignal()
 	repaint();
 
 	emit sigClicked();
+
+	if (m_buttonsmenu)
+		m_buttonsmenu->openMenu();
 
 	QTimer::singleShot( 1000, this, SLOT( deactivate()));
 }

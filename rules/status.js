@@ -395,38 +395,27 @@ function st_SetElArtists(i_status, i_el, i_short)
 }
 function st_SetElFlags(i_status, i_elFlags, i_short)
 {
-	if (i_short)
-	{
-		var flags = '';
-		if (i_status && i_status.flags)
-			for (var i = 0; i < i_status.flags.length; i++)
-			{
-				if (i)
-					flags += ' ';
-				flags += c_GetFlagShort(i_status.flags[i]);
-			}
-		i_elFlags.textContent = flags;
-		return;
-	}
-
 	if (i_elFlags.m_elFlags)
-		for (i = 0; i < i_elFlags.m_elFlags.length; i++)
-			i_elFlags.removeChild(i_elFlags.m_elFlags[i]);
+		for (let el of i_elFlags.m_elFlags)
+			i_elFlags.removeChild(el);
 	i_elFlags.m_elFlags = [];
 
 	if (i_status && i_status.flags)
-		for (var i = 0; i < i_status.flags.length; i++)
+		for (let flag of i_status.flags)
 		{
-			var el = document.createElement('div');
+			let el = document.createElement('div');
 			i_elFlags.appendChild(el);
 			i_elFlags.m_elFlags.push(el);
 			el.classList.add('flag');
-			el.textContent = c_GetFlagTitle(i_status.flags[i]);
-			el.title = c_GetFlagTip(i_status.flags[i]);
+			if (i_short)
+				el.textContent = c_GetFlagShort(flag);
+			else
+				el.textContent = c_GetFlagTitle(flag);
+			el.title = c_GetFlagTip(flag);
 
-			var clr = null;
-			if (RULES.flags[i_status.flags[i]] && RULES.flags[i_status.flags[i]].clr)
-				clr = RULES.flags[i_status.flags[i]].clr;
+			let clr = null;
+			if (RULES.flags[flag] && RULES.flags[flag].clr)
+				clr = RULES.flags[flag].clr;
 			if (clr)
 				st_SetElColor({"color": clr}, el);
 		}
@@ -471,6 +460,7 @@ function st_SetElColor(i_status, i_elBack, i_elColor, i_setNone)
 		i_setNone = true;
 
 	var c = null;
+	var a = 1;
 	if (i_status && i_status.color)
 	{
 		c = i_status.color;
@@ -479,17 +469,15 @@ function st_SetElColor(i_status, i_elBack, i_elColor, i_setNone)
 	{
 		var flag = i_status.flags[i_status.flags.length - 1];
 		if (RULES.flags[flag] && RULES.flags[flag].clr)
+		{
 			c = RULES.flags[flag].clr;
+		}
 	}
 
 	if (c)
 	{
-		i_elBack.style.background = 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
-		if (c[0] + c[1] + .3 * c[2] > 300)
-			i_elColor.style.color = '#000';
-		else
-			i_elColor.style.color = '#FFF';
-		// window.console.log(c[0]+c[1]+c[2])
+		i_elBack.style.backgroundColor = 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')';
+		st_SetElColorTextFromBack(c, i_elColor);
 		return true;
 	}
 	else if (i_setNone)
@@ -506,6 +494,14 @@ function st_SetElColor(i_status, i_elBack, i_elColor, i_setNone)
 	}
 	return false;
 }
+function st_SetElColorTextFromBack(i_clr, i_el)
+{
+	if (i_clr[0] + i_clr[1] + .3 * i_clr[2] > 300)
+		i_el.style.color = '#000';
+	else
+		i_el.style.color = '#FFF';
+}
+
 function st_SetElFinish(i_status, i_elFinish, i_full)
 {
 	if (i_full == null)
@@ -938,9 +934,18 @@ Status.prototype.editListEdit = function(i_args) {
 		return;
 	}
 
-	for (var item in i_args.list_all)
+	let new_line = false;
+	for (let item in i_args.list_all)
 	{
-		var el = document.createElement('div');
+		if (new_line)
+		{
+			let el = document.createElement('div');
+			i_args.elRoot.appendChild(el);
+			el.classList.add('new_line');
+			new_line = false;
+		}
+
+		let el = document.createElement('div');
 		i_args.elRoot.appendChild(el);
 		el.classList.add('tag');
 		if (i_args.name == 'flags')
@@ -948,10 +953,15 @@ Status.prototype.editListEdit = function(i_args) {
 			el.classList.add('flag');
 			if (RULES.flags[item] && RULES.flags[item].clr)
 			{
-				var c = RULES.flags[item].clr;
-				el.style.borderColor = 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
+				let c = RULES.flags[item].clr;
+				el.style.borderColor = 'rgb(' + c[0]*0.5 + ',' + c[1]*0.5 + ',' + c[2]*0.5 + ')';
+				el.style.backgroundColor = 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
 			}
+
+			if (RULES.flags[item] && RULES.flags[item].new_line)
+				new_line = true;
 		}
+
 		el.m_item = item;
 
 		if (i_args.list_all[item].title)
@@ -1484,7 +1494,7 @@ Status.prototype.editSave = function(i_args) {
 					}
 				}
 
-				// Add artist to status:
+				/*/ Add artist to status:
 				if (tasks[t].artists && tasks[t].artists.length)
 				{
 					if (statuses[i].obj.artists == null)
@@ -1497,7 +1507,7 @@ Status.prototype.editSave = function(i_args) {
 						if (statuses[i].obj.artists.indexOf(artist) == -1)
 							statuses[i].obj.artists.push(artist);
 					}
-				}
+				}*/
 			}
 
 			statuses[i].obj.tasks = tasks;

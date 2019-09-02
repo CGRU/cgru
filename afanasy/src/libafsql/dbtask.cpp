@@ -42,7 +42,7 @@ void DBTask::add(
 	std::list<std::string> * o_queries)
 {
 	// Get task exec parameters:
-	m_command   = i_exec->getCommand();
+	m_command   = i_exec->getCommandBlock() + i_exec->getCommandTask();
 	m_username  = i_exec->getUserName();
 	m_jobname   = i_exec->getJobName();
 	m_blockname = i_exec->getBlockName();

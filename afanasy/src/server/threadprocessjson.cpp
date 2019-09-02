@@ -19,11 +19,11 @@
 #include "jobcontainer.h"
 #include "monitoraf.h"
 #include "monitorcontainer.h"
+#include "poolscontainer.h"
 #include "rendercontainer.h"
 #include "threadargs.h"
 #include "usercontainer.h"
 
-#include "../libafanasy/farm.h"
 #include "../libafanasy/msgclasses/mctask.h"
 #include "../libafanasy/rapidjson/stringbuffer.h"
 #include "../libafanasy/rapidjson/prettywriter.h"
@@ -323,6 +323,29 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 			if (o_msg_response == NULL)
 				o_msg_response = i_args->branches->generateList(af::Msg::TBranchesList, type, ids, mask, json);
 		}
+		else if (type == "pools")
+		{
+			AfContainerLock lock(i_args->pools, AfContainerLock::READLOCK);
+			if (mode.size())
+			{
+				PoolSrv * pool = NULL;
+				if (ids.size() == 1)
+				{
+					PoolsContainerIt it(i_args->pools);
+					pool = it.getPool(ids[0]);
+					if (pool == NULL)
+						o_msg_response = af::jsonMsgError("Invalid ID");
+				}
+				if (pool)
+				{
+					if (mode == "log")
+						o_msg_response = pool->writeLog(binary);
+				}
+			}
+
+			if (o_msg_response == NULL)
+				o_msg_response = i_args->pools->generateList(af::Msg::TPoolsList, type, ids, mask, json);
+		}
 		else if( type == "monitors")
 		{
 			AfContainerLock lock( i_args->monitors, AfContainerLock::READLOCK);
@@ -368,14 +391,6 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 		{
 			o_msg_response = af::jsonMsg( af::Environment::getConfigData());
 		}
-		else if( type == "farm" )
-		{
-			o_msg_response = af::jsonMsg( af::farm()->getText());
-		}
-		else if( type == "services_limits" )
-		{
-			o_msg_response = af::jsonMsg( af::farm()->jsonWriteLimits() );
-		}
 		else
 		{
 			o_msg_response = af::jsonMsgError(std::string("Invalid get type = '") + type + "'");
@@ -418,15 +433,6 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 	{
 		AfContainerLock ulock( i_args->users, AfContainerLock::WRITELOCK);
 		o_msg_response = i_args->users->addUser( new UserAf( document["user"]), i_args->monitors);
-	}
-	else if( document.HasMember("reload_farm"))
-	{
-		AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
-		AfContainerLock rlock( i_args->renders,  AfContainerLock::WRITELOCK);
-
-		std::string status;
-		bool success = i_args->renders->farmLoad( status, i_args->monitors);
-		o_msg_response = af::jsonMsgStatus( success,"reload_farm", status);
 	}
 	else if( document.HasMember("reload_config"))
 	{

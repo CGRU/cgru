@@ -28,6 +28,11 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
         self.verbose = i_verbose
         self.log = None
 
+        self.numeric = afcommon.checkBlockFlag(
+            taskInfo['block_flags'], 'numeric'
+        )
+        if self.verbose: print(taskInfo)
+
         self.pm = cgrupathmap.PathMap()
 
         self.str_capacity = str_capacity
@@ -35,8 +40,13 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
         self.str_hostsprefix = str_hostsprefix
         self.str_hostseparator = str_hostseparator
 
-        # Transfer command and working folder:
-        command = taskInfo['command']
+        # Transfer working folder:
+        taskInfo['wdir'] = self.pm.toClient(taskInfo['wdir'])
+
+        # Process command:
+        command = self.processCommandPattern()
+
+        # Transfer command:
         command = self.pm.toClient(command)
 
         # Apply capacity:
@@ -46,37 +56,26 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
         # Apply hosts (multihosts tasks):
         if len(self.taskInfo['hosts']):
             command = self.applyCmdHosts(command)
-        taskInfo['command'] = command
-        taskInfo['wdir'] = self.pm.toClient(taskInfo['wdir'])
 
+        taskInfo['command'] = command
+        if self.verbose:
+            print('Processed task command:\n' + command)
+
+        # Process files:
+        taskInfo['files'] = self.processFilesPattern()
+        if self.verbose:
+            print('Processed task files:')
+            for afile in taskInfo['files']:
+                print(afile)
+
+        # Transfer paths in files:
         for i in range(0, len(self.taskInfo['files'])):
             self.taskInfo['files'][i] = \
                 self.pm.toClient(self.taskInfo['files'][i])
 
         # Check files:
-        if self.isSkippingExistingFiles():
-            allFilesExist = True
-            for i in range(0, len(self.taskInfo['files'])):
-                afile = self.taskInfo['files'][i]
-                afile = os.path.join(taskInfo['wdir'], afile)
-                if not os.path.isfile(afile):
-                    allFilesExist = False
-                    break
-                # Check files size:
-                file_size_min = self.taskInfo['file_size_min']
-                file_size_max = self.taskInfo['file_size_max']
-                if file_size_min > 0 or file_size_max > 0:
-                    size = os.path.getsize(afile)
-                    if file_size_min > 0 and size < file_size_min:
-                        allFilesExist = False
-                        break
-                    if file_size_max > 0 and size > file_size_max:
-                        allFilesExist = False
-                        break
-
-            if allFilesExist:
-                self.log = 'Task file(s) exits.'
-                self.taskInfo['command'] = ''
+        if self.isSkippingExistingFiles() and len(self.taskInfo['files']):
+            self.checkExistingFiles()
 
         # When GUI receives task exec to show files,
         # server sends exec with parsed files.
@@ -98,11 +97,96 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
                 print('ERROR: Failed to import parser "%s"' % parser)
                 traceback.print_exc(file=sys.stdout)
 
-        if self.verbose:
-            print(taskInfo)
+        if self.verbose and self.log and len(self.log):
+            print(self.log)
+
+    def processCommandPattern(self):
+        return self.processPattern(
+                self.taskInfo['command_block'],
+                [self.taskInfo['command_task']],
+                self.taskInfo['frame_start'],
+                self.taskInfo['frame_finish'])[0]
+
+    def processPattern(self, i_block, i_tasks, i_start, i_finish):
+        """ Fill numbers for numeric blocks or combine block and tasks patterns for blocks with tasks
+        :param i_block: a string with a block part
+        :param i_tasks: an array of strings with a tasks parts for a not numeric blocks
+        :retutn: as array combined of stings (1 element in array for a numeric)
+        """
+        block = cgruutils.toStr(i_block)
+
+        if self.numeric:
+            return [afcommon.fillNumbers(block, i_start, i_finish)]
+
+        array = []
+        for task in i_tasks:
+            if len(task) == 0:
+                continue
+            task = cgruutils.toStr(task)
+            result = block
+            if len(result):
+                if result.find('@#@') != -1:
+                    result = result.replace('@#@', task)
+                else:
+                    result += task
+            else:
+                result = task
+            array.append(result)
+
+        if len(array) == 0:
+             array.append(block)
+
+        return array
+
+    def processFilesPattern(self):
+        files = []
+        for block_file in self.taskInfo['files_block']:
+            frame = self.taskInfo['frame_start']
+            while frame <= self.taskInfo['frame_finish']:
+                files.extend(self.processPattern(block_file, self.taskInfo['files_task'], frame, frame))
+                frame += self.taskInfo['frame_inc']
+        return files
 
     def isSkippingExistingFiles(self):
         return afcommon.checkBlockFlag(self.taskInfo['block_flags'], 'skipexistingfiles')
+
+    def checkExistingFiles(self):
+        allFilesExist = True
+        log = ''
+        for i in range(0, len(self.taskInfo['files'])):
+            afile = self.taskInfo['files'][i]
+            if len(afile) == 0: continue
+            afile = os.path.join(self.taskInfo['wdir'], afile)
+            if not os.path.isfile(afile):
+                log += 'File does not exist: "%s"\n' % afile
+                allFilesExist = False
+                continue
+
+            # Check files size:
+            file_size_min = self.taskInfo['file_size_min']
+            file_size_max = self.taskInfo['file_size_max']
+            if file_size_min > 0 or file_size_max > 0:
+                size = os.path.getsize(afile)
+                if file_size_min > 0 and size < file_size_min:
+                    allFilesExist = False
+                    log += 'File size less than minimum(%d): "%s"\n' % (file_size_min, afile)
+                    continue
+                if file_size_max > 0 and size > file_size_max:
+                    log += 'File size greater than maximum(%d): "%s"\n' % (file_size_max, afile)
+                    allFilesExist = False
+                    continue
+
+            log += 'File exists: "%s"\n' % afile
+
+        if allFilesExist:
+            log += 'Task file(s) exits. Skipping command execution.\n'
+            self.taskInfo['command'] = ''
+
+        if len(log):
+            if self.log is not None and len(self.log):
+                self.log += log
+            else:
+                self.log = log
 
     def getWDir(self):
         """Missing DocString
@@ -158,9 +242,6 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
             if len(log):
                 log += '\n'
             log += 'Service: ' + self.log
-
-        if len(log):
-            print('Log ' + log)
 
         return log
 

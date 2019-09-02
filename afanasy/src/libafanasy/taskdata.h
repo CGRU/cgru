@@ -26,10 +26,6 @@ public:
 	inline const std::string & getCustomData()  const { return m_custom_data; }
 	inline const std::vector<std::string> & getFiles() const { return m_files;}
 
-//	inline void setFiles(      const std::string & str) { m_files       = str;  }
-//	inline void setDependMask( const std::string & str) { m_depend_mask = str;  }
-//	inline void setCustomData( const std::string & str) { m_custom_data = str;  }
-
 	inline bool hasFiles()        const { return       m_files.size(); }  ///< Whether files are set.
 	inline bool hasDependMask()   const { return m_depend_mask.size(); }  ///< Whether depend mask is set.
 	inline bool hasCustomData()   const { return m_custom_data.size();}  ///< Whether files are set.

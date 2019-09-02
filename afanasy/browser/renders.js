@@ -16,8 +16,18 @@
 
 "use strict";
 
+var renders_pools = null;
+
 RenderNode.onMonitorCreate = function() {
+	// Call pools on create first,
+	// as there are actions and params creation,
+	// that will be merged with render actions and params.
+	PoolNode.onMonitorCreate();
+
 	RenderNode.createActions();
+	RenderNode.createParams();
+
+	renders_pools = {};
 };
 
 function RenderNode()
@@ -62,10 +72,14 @@ RenderNode.prototype.init = function() {
 	this.elNewLine = document.createElement('br');
 	this.element.appendChild(this.elNewLine);
 
-	this.elCapacity = cm_ElCreateText(this.element, 'Capacity: Used / Total');
-	this.elCapacity.classList.add('prestar');
-	this.elMaxTasks = cm_ElCreateText(this.element, 'Tasks: Running / Maximum');
+	this.elRunTasks = cm_ElCreateText(this.element, 'Running Tasks');
+	this.elRunTasks.classList.add('prestar');
+	this.elCapacity = cm_ElCreateText(this.element, 'Capacity');
 	this.elStateTime = cm_ElCreateFloatText(this.element, 'right', 'Busy/Free Status and Time');
+
+	this.elFarm = document.createElement('div');
+	this.element.appendChild(this.elFarm);
+	this.elFarm.classList.add('farm');
 
 	this.elAnnotation = document.createElement('div');
 	this.element.appendChild(this.elAnnotation);
@@ -255,10 +269,27 @@ RenderNode.prototype.update = function(i_obj) {
 	if (i_obj)
 		this.params = i_obj;
 
+	// We force sorting parameter,
+	// as render should be sorted by pool first.
+	this.sort_force = this.params.pool;
+
+	// Collect render in renders_pools.
+	// This needed to offset render to show hierarchy on pool update.
+	// May be render will be created before its pooll,
+	// so pool should know its childs (that were created first) to update.
+	if (renders_pools[this.params.pool] == null)
+		renders_pools[this.params.pool] = [];
+	if (false == renders_pools[this.params.pool].includes(this))
+		renders_pools[this.params.pool].push(this);
+
+	// Offset hierarchy right now.
+	// May be render was created after its pool.
+	this.offsetHierarchy();
+
+
 	cm_GetState(this.params.state, this.state, this.element);
 
 	this.elName.innerHTML = '<b>' + this.params.name + '</b>';
-	this.elName.title = this.params.host.os;
 
 	if (this.params.version != null)
 		this.elVersion.textContent = 'v' + this.params.version;
@@ -284,7 +315,7 @@ RenderNode.prototype.update = function(i_obj) {
 		user = 'Paused(<b>' + user + '</b>)<b>P</b>';
 		if (this.state.NBY)
 			user += '+<b>N</b>';
-		if (this.state.Nby)
+		if (this.state.NbY)
 			user += '+<b>n</b>';
 	}
 	else if (this.state.NbY)
@@ -314,7 +345,7 @@ RenderNode.prototype.update = function(i_obj) {
 		this.elResources.style.display = 'none';
 		this.params.host_resources = null;
 		this.elCapacity.textContent = '';
-		this.elMaxTasks.textContent = '';
+		this.elRunTasks.textContent = '';
 		this.state.textContent = '';
 		this.elStateTime.textContent = '';
 		this.elNewLine.style.display = 'none';
@@ -323,34 +354,24 @@ RenderNode.prototype.update = function(i_obj) {
 	this.elPower.textContent = '';
 	this.elNewLine.style.display = 'block';
 
-	if (this.params.capacity == null)
-		this.params.capacity = this.params.host.capacity;
-	if (this.params.max_tasks == null)
-		this.params.max_tasks = this.params.host.max_tasks;
 	this.params.run_tasks = 0;
 	if (this.params.tasks)
 		this.params.run_tasks = this.params.tasks.length;
 
 	if (cm_IsPadawan())
 	{
-		this.elCapacity.innerHTML = 'Capacity[ Used:<b>' + this.params.capacity_used + '</b> / Total:<b>' +
-			this.params.capacity + '</b> ]';
-		this.elMaxTasks.innerHTML =
-			'( Run:<b>' + this.params.run_tasks + '</b> / Max:<b>' + this.params.max_tasks + '</b> )Tasks';
+		this.elRunTasks.innerHTML =	'Tasks: <b>' + this.params.run_tasks + '</b>';
+		this.elCapacity.innerHTML = 'Capacity: <b>' + this.params.capacity_used + '</b>';
 	}
 	else if (cm_IsJedi())
 	{
-		this.elCapacity.innerHTML =
-			'Cap[ <b>' + this.params.capacity_used + '</b> / <b>' + this.params.capacity + '</b> ]';
-		this.elMaxTasks.innerHTML =
-			'( <b>' + this.params.run_tasks + '</b> / <b>' + this.params.max_tasks + '</b> )Tasks';
+		this.elRunTasks.innerHTML =	'Tasks:<b>' + this.params.run_tasks + '</b>';
+		this.elCapacity.innerHTML = 'Cap:<b>' + this.params.capacity_used + '</b>';
 	}
 	else
 	{
-		this.elCapacity.innerHTML =
-			'[<b>' + this.params.capacity_used + '</b>/<b>' + this.params.capacity + '</b>]';
-		this.elMaxTasks.innerHTML =
-			'(<b>' + this.params.run_tasks + '</b>/<b>' + this.params.max_tasks + '</b>)';
+		this.elRunTasks.innerHTML =	'T:<b>' + this.params.run_tasks + '</b>';
+		this.elCapacity.innerHTML = 'C:<b>' + this.params.capacity_used + '</b>';
 	}
 
 	if (this.state.RUN == true)
@@ -361,6 +382,12 @@ RenderNode.prototype.update = function(i_obj) {
 	else
 		this.elStar.style.display = 'none';
 
+
+	// Running counts:
+	this.elFarm.textContent = '';
+	farm_showServices(this.elFarm, this.params,'renders');
+
+
 	this.clearTasks();
 	if (this.params.tasks != null)
 		for (var t = 0; t < this.params.tasks.length; t++)
@@ -369,6 +396,14 @@ RenderNode.prototype.update = function(i_obj) {
 	this.updateTasksPercents();
 	this.refresh();
 };
+
+RenderNode.prototype.offsetHierarchy = function() {
+	var depth = 0;
+	var parent_pool = pools[this.params.pool];
+	if (parent_pool)
+		depth = parent_pool.pool_depth + 1;
+	this.element.style.marginLeft = (depth * 32 + 2) + 'px';
+}
 
 RenderNode.prototype.plottersCsDelete = function() {
 	if (this.plottersCs.length == 0)
@@ -391,6 +426,8 @@ RenderNode.prototype.clearTasks = function() {
 };
 
 RenderNode.prototype.refresh = function() {
+	var pool = pools[this.params.pool];
+
 	if (this.state.OFF || this.state.WFL)
 	{
 		var power = this.offlineState;
@@ -409,9 +446,8 @@ RenderNode.prototype.refresh = function() {
 	var stateTime = 'NEW';
 	var stateTimeTitle = 'Idle time: ' + cm_TimeStringInterval(this.params.idle_time);
 
-	// Draw idle bar (almost in all cases)
-	if ((this.params.host.wol_idlesleep_time > 0) || (this.params.host.nimby_idlefree_time > 0) ||
-		(this.params.host.nimby_busyfree_time > 0) || (cgru_Config.af_monitor_render_idle_bar_max > 0))
+	// Draw idle bar:
+	if (pool)
 	{
 		var curtime = new Date();
 		var idle_sec = curtime.valueOf() / 1000.0 - this.params.idle_time;
@@ -420,16 +456,16 @@ RenderNode.prototype.refresh = function() {
 		var busy_sec = curtime.valueOf() / 1000.0 - this.params.busy_time;
 		if (busy_sec < 0)
 			busy_sec = 0;
-		var percent = null;
+		var percent = 0;
 
-		if ((this.params.host.nimby_idlefree_time > 0) && (this.state.RUN != true) &&
+		if ((pool.getParmParent('idle_free_time') > 0) && (this.state.RUN != true) &&
 			(this.state.NbY || this.state.NBY))
 		{
 			stateTimeTitle +=
-				'\nNimby idle free time: ' + cm_TimeStringFromSeconds(this.params.host.nimby_idlefree_time);
-			percent = Math.round(100.0 * idle_sec / this.params.host.nimby_idlefree_time);
+				'\nNimby idle free time: ' + cm_TimeStringFromSeconds(pool.getParmParent('idle_free_time'));
+			percent = Math.round(100.0 * idle_sec / pool.getParmParent('idle_free_time'));
 
-			idle_sec = Math.round(this.params.host.nimby_idlefree_time - idle_sec);
+			idle_sec = Math.round(pool.getParmParent('idle_free_time') - idle_sec);
 			if (idle_sec > 0)
 				this.elIdleBox.title = 'Nimby idle free in ' + cm_TimeStringFromSeconds(idle_sec);
 			else
@@ -439,14 +475,14 @@ RenderNode.prototype.refresh = function() {
 			this.elIdleBox.classList.remove('nimby');
 		}
 		else if (
-			(this.params.host.nimby_busyfree_time > 0) && (busy_sec > 6) && (this.state.RUN != true) &&
+			(pool.getParmParent('busy_nimby_time') > 0) && (busy_sec > 6) && (this.state.RUN != true) &&
 			(this.state.NbY != true) && (this.state.NBY != true))
 		{
 			stateTimeTitle +=
-				'\nBusy free Nimby time: ' + cm_TimeStringFromSeconds(this.params.host.nimby_busyfree_time);
-			percent = Math.round(100.0 * busy_sec / this.params.host.nimby_busyfree_time);
+				'\nBusy free Nimby time: ' + cm_TimeStringFromSeconds(pool.getParmParent('busy_nimby_time'));
+			percent = Math.round(100.0 * busy_sec / pool.getParmParent('busy_nimby_time'));
 
-			busy_sec = Math.round(this.params.host.nimby_busyfree_time - busy_sec);
+			busy_sec = Math.round(pool.getParmParent('busy_nimby_time') - busy_sec);
 			if (busy_sec > 0)
 				this.elIdleBox.title = 'Nimby busy in ' + cm_TimeStringFromSeconds(busy_sec);
 			else
@@ -455,13 +491,13 @@ RenderNode.prototype.refresh = function() {
 			this.elIdleBox.classList.remove('free');
 			this.elIdleBox.classList.add('nimby');
 		}
-		else if ((this.params.host.wol_idlesleep_time > 0) && (this.state.RUN != true))
+		else if ((pool.getParmParent('idle_wolsleep_time') > 0) && (this.state.RUN != true))
 		{
 			stateTimeTitle +=
-				'\nWOL idle sleep time: ' + cm_TimeStringFromSeconds(this.params.host.wol_idlesleep_time);
-			percent = Math.round(100.0 * idle_sec / this.params.host.wol_idlesleep_time);
+				'\nWOL idle sleep time: ' + cm_TimeStringFromSeconds(pool.getParmParent('idle_wolsleep_time'));
+			percent = Math.round(100.0 * idle_sec / pool.getParmParent('idle_wolsleep_time'));
 
-			idle_sec = Math.round(this.params.host.wol_idlesleep_time - idle_sec);
+			idle_sec = Math.round(pool.getParmParent('idle_wolsleep_time') - idle_sec);
 			if (idle_sec > 0)
 				this.elIdleBox.title = 'WOL idle sleep in ' + cm_TimeStringFromSeconds(idle_sec);
 			else
@@ -527,7 +563,7 @@ RenderNode.setService = function(i_args) {
 		"handle": 'serviceApply',
 		"param": i_args.name,
 		"name": 'service',
-		"title": (i_args.name == 'enable' ? 'Enable' : 'Disable') + ' Service',
+		"title": i_args.tooltip,
 		"info": 'Enter Service Name:'
 	});
 };
@@ -535,15 +571,19 @@ RenderNode.setService = function(i_args) {
 RenderNode.prototype.serviceApply = function(i_value, i_name) {
 	g_Info('menuHandleService = ' + i_name + ',' + i_value);
 	var operation = {};
-	operation.type = 'service';
+	operation.type = 'farm';
+	operation.mode = i_name;
 	operation.name = i_value;
-	if (i_name == 'enable')
-		operation.enable = true;
-	else if (i_name == 'disable')
-		operation.enable = false;
-	else
-		return;
+	operation.mask = i_value;
 	nw_Action('renders', this.monitor.getSelectedIds(), operation, null);
+};
+
+RenderNode.clearServices = function(i_args) {
+	g_Info('Clear services...');
+	var operation = {};
+	operation.type = 'farm';
+	operation.mode = 'clear_services';
+	nw_Action(i_args.monitor.cur_item.node_type, i_args.monitor.getSelectedIds(), operation, null);
 };
 
 function RenderTask(i_task, i_elParent)
@@ -621,7 +661,7 @@ RenderNode.launchCmdExit = function(i_args) {
 		"receiver": i_args.monitor.cur_item,
 		"handle": 'launchCmdExitDo',
 		"param": i_args.name,
-		"name": 'service',
+		"name": 'farm',
 		"title": 'Launch Command' + (i_args.name == 'lcex' ? ' And Exit' : ''),
 		"info": 'Enter command:'
 	});
@@ -637,16 +677,52 @@ RenderNode.prototype.launchCmdExitDo = function(i_value, i_name) {
 	nw_Action('renders', this.monitor.getSelectedIds(), operation, null);
 };
 
+RenderNode.setPoolDialog = function(i_args) {
+	new cgru_Dialog({
+		"wnd": i_args.monitor.window,
+		"receiver": i_args.monitor.cur_item,
+		"handle": 'setPoolDo',
+		"param": i_args.name,
+		"name": 'set_pool',
+		"title": 'Assign render to poll',
+		"info": 'Enter a new pool name:'
+	});
+};
+
+RenderNode.prototype.setPoolDo = function(i_value, i_name) {
+	g_Info('Setting a pool "' + i_value + '" for "' + this.params.name + '"');
+	var operation = {};
+	operation.type = 'set_pool';
+	operation.name = i_value;
+	nw_Action('renders', this.monitor.getSelectedIds(), operation, null);
+};
+
 RenderNode.createPanels = function(i_monitor) {
+	// Create pool buttons first
+	PoolNode.createPanels(i_monitor);
+
 	// Info:
 	var acts = {};
-	acts.tasks_log = {'label': 'TSK', 'tooltip': 'Get tasks Log.'};
-	acts.full = {'label': 'FULL', 'tooltip': 'Request full render node info.'};
+	acts.tasks_log = {'label': 'TasksLog', 'tooltip': 'Get tasks Log.'};
+	acts.full = {'label': 'FullInfo', 'tooltip': 'Request full render node info.'};
 	i_monitor.createCtrlBtn({
 		'name': 'info',
 		'label': 'INFO',
 		'tooltip': 'Get render info.',
 		'handle': 'mh_Get',
+		'node_type': 'renders',
+		'sub_menu': acts
+	});
+
+	// Pools:
+	var acts = {};
+	acts.set_pool =      {'label':'Set',      'handle':'setPoolDialog', 'tooltip':'Set pool'};
+	acts.reassign_pool = {'label':'ReAssign', 'handle':'mh_Oper',       'tooltip':'Reassign pool'};
+	i_monitor.createCtrlBtn({
+		'name': 'pool',
+		'label': 'POOL',
+		'tooltip': 'Manipulate render pool.',
+		'node_type': 'renders',
 		'sub_menu': acts
 	});
 
@@ -656,21 +732,24 @@ RenderNode.createPanels = function(i_monitor) {
 			'name': 'nimby',
 			'value': false,
 			'handle': 'mh_Param',
-			'label': 'FRE',
+			'label': 'FREE',
+			'node_type': 'renders',
 			'tooltip': 'Set render free.'
 		},
 		nimby: {
 			'name': 'nimby',
 			'value': true,
 			'handle': 'mh_Param',
-			'label': 'Nim',
+			'label': 'Nimby',
+			'node_type': 'renders',
 			'tooltip': 'Set render nimby.\nRun only owner tasks.'
 		},
 		NIMBY: {
 			'name': 'NIMBY',
 			'value': true,
 			'handle': 'mh_Param',
-			'label': 'NBY',
+			'label': 'NIMBY',
+			'node_type': 'renders',
 			'tooltip': 'Set render NIMBY.\nDo not run any tasks.'
 		}
 	};
@@ -678,23 +757,25 @@ RenderNode.createPanels = function(i_monitor) {
 
 	// Eject tasks:
 	var acts = {};
-	acts.eject_tasks = {'label': 'ALL', 'tooltip': 'Eject all running tasks.'};
-	acts.eject_tasks_keep_my = {'label': 'NOM', 'tooltip': 'Eject not my tasks.'};
+	acts.eject_tasks = {'label': 'All Tasks', 'tooltip': 'Eject all running tasks.'};
+	acts.eject_tasks_keep_my = {'label': 'Not My', 'tooltip': 'Eject not my tasks.'};
 	i_monitor.createCtrlBtn(
-		{'name': 'eject', 'label': 'EJT', 'tooltip': 'Eject tasks from render.', 'sub_menu': acts});
+		{'name': 'eject', 'label': 'EJECT', 'tooltip': 'Eject tasks from render.', 'sub_menu': acts});
 
 
 	// Custom commands:
 	var el = document.createElement('div');
 	i_monitor.elPanelL.appendChild(el);
 	el.classList.add('ctrl_button');
-	el.textContent = 'CMD';
+	el.textContent = 'CUSTOM';
 	el.monitor = i_monitor;
 	el.onclick = function(e) {
 		e.currentTarget.monitor.showMenu(e, 'cgru_cmdexec');
 		return false;
 	};
 	el.oncontextmenu = el.onclick;
+	// We can execute custom commands on renders only
+	el.m_act = {'node_type':'renders'};
 
 	// Admin related functions:
 	if (!g_GOD())
@@ -706,14 +787,14 @@ RenderNode.createPanels = function(i_monitor) {
 		'name': 'paused',
 		'value': true,
 		'handle': 'mh_Param',
-		'label': 'PAU',
+		'label': 'PAUSE',
 		'tooltip': 'Set render paused.'
 	};
 	acts.unpause = {
 		'name': 'paused',
 		'value': false,
 		'handle': 'mh_Param',
-		'label': 'UNP',
+		'label': 'UNPAUSE',
 		'tooltip': 'Unset render pause.'
 	};
 	i_monitor.createCtrlBtns(acts);
@@ -721,41 +802,56 @@ RenderNode.createPanels = function(i_monitor) {
 
 	// Services:
 	var acts = {};
-	acts.enable = {'handle': 'setService', 'label': 'ENS', 'tooltip': 'Enable service.'};
-	acts.disable = {'handle': 'setService', 'label': 'DIS', 'tooltip': 'Disable service.'};
-	acts.restore_defaults =
-		{'handle': 'mh_Oper', 'label': 'DEF', 'tooltip': 'Restore default farm settings.'};
+	acts.service_add     = {'handle':'setService', 'label':'Add',     'tooltip':'Add service.'};
+	acts.service_remove  = {'handle':'setService', 'label':'Remove',  'tooltip':'Remove service.'};
+	acts.service_enable  = {'handle':'setService', 'label':'Enable',  'tooltip':'Enable service.'};
+	acts.service_disable = {'handle':'setService', 'label':'Disable', 'tooltip':'Disable service.'};
+	acts.clear_services =
+		{'handle':'clearServices','label':'Clear','tooltip':'Double click to clear services.','ondblclick':true};
 	i_monitor.createCtrlBtn({
 		'name': 'services',
-		'label': 'SRV',
-		'tooltip': 'Enable/Disable service\nRestore defaults.',
+		'label': 'SERVICES',
+		'tooltip': 'Enable/Disable services.',
 		'sub_menu': acts
 	});
 
 
 	// Power/WOL:
 	var acts = {
-		wol_sleep /**/: {'label': 'WSL', 'tooltip': 'Wake-On-Lan sleep.'},
-		wol_wake /***/: {'label': 'WWK', 'tooltip': 'Wake-On-Lan wake.'},
-		exit /*******/: {'label': 'EXT', 'tooltip': 'Exit client.'},
-		reboot /*****/: {'label': 'REB', 'tooltip': 'Reboot machine.'},
-		shutdown /***/: {'label': 'SHD', 'tooltip': 'Shutdown machine.'},
-		delete /*****/: {'label': 'DEL', 'tooltip': 'Delete render from Afanasy database.'}
+		wol_sleep /**/: {'label': 'WOLSleep', 'tooltip': 'Wake-On-Lan sleep.'},
+		wol_wake /***/: {'label': 'WOLWake',  'tooltip': 'Wake-On-Lan wake.'},
+		exit /*******/: {'label': 'Exit',     'tooltip': 'Exit client.'},
+		reboot /*****/: {'label': 'Reboot',   'tooltip': 'Reboot machine.'},
+		shutdown /***/: {'label': 'Shutdown', 'tooltip': 'Shutdown machine.'}
 	};
 	i_monitor.createCtrlBtn(
-		{'name': 'power', 'label': 'POW', 'tooltip': 'Power / Exit / Delete.', 'sub_menu': acts});
+		{'name': 'power', 'label': 'POWER', 'tooltip': 'Power / Exit / Delete.', 'sub_menu': acts});
 
 	// Launch and Exit:
 	var acts = {};
-	acts.lcmd = {'name': 'lcmd', 'label': 'LCMD', 'handle': 'launchCmdExit', 'tooltip': 'Launch command.'};
-	acts.lcex =
-		{'name': 'lcex', 'label': 'LCEX', 'handle': 'launchCmdExit', 'tooltip': 'Launch command and exit.'};
+	acts.lcmd = {'name': 'lcmd', 'label': 'Command',  'handle': 'launchCmdExit', 'tooltip': 'Launch command.'};
+	acts.lcex = {'name': 'lcex', 'label': 'Cmd&Exit', 'handle': 'launchCmdExit', 'tooltip': 'Launch command and exit.'};
+	i_monitor.createCtrlBtn({
+		'name': 'launch',
+		'label': 'LAUNCH',
+		'tooltip': 'Launch command by afrender.',
+		'sub_menu': acts
+	});
+
+	var acts = {};
+	acts.delete = {"label": "DELETE", "tooltip": 'Double click to delete.', "ondblclick": true};
 	i_monitor.createCtrlBtns(acts);
 };
 
 RenderNode.prototype.updatePanels = function() {
 	// Info:
 	var info = '';
+
+	info += '<p>OS: <b>' + this.params.os + '</b> - ' + this.params.engine + '</p>';
+
+	info += '<p>Pool: <b>' + this.params.pool + '</b></p>';
+
+	info += '<p>IP: ' + this.params.address.ip + '</p>';
 
 	var r = this.params.host_resources;
 	if (r)
@@ -766,42 +862,20 @@ RenderNode.prototype.updatePanels = function() {
 		info += '</p>';
 	}
 
-	if (this.params.host.nimby_idlefree_time || this.params.host.nimby_busyfree_time)
-	{
-		info += '<p>Auto Nimby:';
-		if (this.params.host.nimby_busyfree_time)
-			info += '<br>Busy time: ' + cm_TimeStringFromSeconds(this.params.host.nimby_busyfree_time) +
-				' CPU > ' + this.params.host.nimby_busy_cpu + '%';
-		if (this.params.host.nimby_idlefree_time)
-			info += '<br>Free time: ' + cm_TimeStringFromSeconds(this.params.host.nimby_idlefree_time) +
-				' CPU: < ' + this.params.host.nimby_idle_cpu + '%';
-		info += '</p>';
-	}
-
-	info += '<p>Registered: ' + cm_DateTimeStrFromSec(this.params.time_register) + '</p>';
+	info += '<div>Registered: ' + cm_DateTimeStrFromSec(this.params.time_register) + '</div>';
 	if (this.params.time_launch)
-		info += '<p>Launched: ' + cm_DateTimeStrFromSec(this.params.time_launch) + '</p>';
+		info += '<div>Launched: ' + cm_DateTimeStrFromSec(this.params.time_launch) + '</div>';
 	if (this.params.idle_time)
-		info += '<p>Idle since: ' + cm_DateTimeStrFromSec(this.params.idle_time) + '</p>';
+		info += '<div>Idle since: ' + cm_DateTimeStrFromSec(this.params.idle_time) + '</div>';
 	if (this.params.busy_time)
-		info += '<p>Busy since: ' + cm_DateTimeStrFromSec(this.params.busy_time) + '</p>';
+		info += '<div>Busy since: ' + cm_DateTimeStrFromSec(this.params.busy_time) + '</div>';
 	if (this.task_start_finish_time)
-		info += '<p>Task finished at: ' + cm_DateTimeStrFromSec(this.params.task_start_finish_time) + '</p>';
+		info += '<div>Task finished at: ' + cm_DateTimeStrFromSec(this.params.task_start_finish_time) + '</div>';
 
 	this.monitor.setPanelInfo(info);
-};
 
-RenderNode.params = {
-	priority /****/: {"type": 'num', "permissions": 'god', "label": 'Priority'},
-	capacity /****/: {"type": 'num', "permissions": 'god', "label": 'Capacity'},
-	max_tasks /***/: {"type": 'num', "permissions": 'god', "label": 'Maximum Tasks'},
-	user_name /***/: {"type": 'str', "permissions": 'god', "label": 'User Name'},
-	annotation /**/: {"type": 'str', "permissions": 'god', "label": 'Annotation'},
-	hidden /******/: {"type": 'bl1', "permissions": 'god', "label": 'Hide/Unhide'}
+	farm_showServicesInfo(this);
 };
-
-RenderNode.sort = ['priority', 'user_name', 'name'];
-RenderNode.filter = ['user_name', 'name', 'host_name'];
 
 RenderNode.actions = [];
 RenderNode.actionsCreated = false;
@@ -828,5 +902,40 @@ RenderNode.createActions = function() {
 				"permissions": 'god'
 			});
 
+	for (let p in PoolNode.params)
+		PoolNode.params[p] = PoolNode.params[p];
+
 	RenderNode.actionsCreated = true;
+};
+
+RenderNode.params_render = {
+	priority   : {'type':'num', 'label':'Priority'},
+	capacity   : {'type':'num', 'label':'Capacity'},
+	max_tasks  : {'type':'num', 'label':'Maximum Tasks'},
+	user_name  : {'type':'str', 'label':'User Name'},
+	annotation : {'type':'str', 'label':'Annotation'}
+};
+
+RenderNode.sort = ['priority', 'user_name', 'name'];
+RenderNode.filter = ['user_name', 'name', 'host_name'];
+
+RenderNode.createParams = function() {
+	if (RenderNode.params_created)
+		return;
+
+	RenderNode.params = {};
+
+	// Add pool node params:
+	for (let p in PoolNode.params)
+		RenderNode.params[p] = PoolNode.params[p];
+
+	// Add render node params:
+	for (let p in RenderNode.params_render)
+	{
+		RenderNode.params[p] = RenderNode.params_render[p];
+		RenderNode.params[p].permissions = 'god';
+		RenderNode.params[p].node_type = 'renders';
+	}
+
+	RenderNode.params_created = true;
 };

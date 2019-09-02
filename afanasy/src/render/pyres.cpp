@@ -7,36 +7,30 @@
 #include "../include/afpynames.h"
 
 #include "../libafanasy/environment.h"
-#include "../libafanasy/host.h"
-/*
-#if PY_MAJOR_VERSION < 3
-#define PyBytes_Check PyString_Check
-#define PyBytes_AsString PyString_AsString
-#define PyBytes_FromString PyString_FromString
-#define PyBytes_FromStringAndSize PyString_FromStringAndSize
-#define PyLong_AsLong PyLong_AsLong
-#define PyLong_FromLong PyInt_FromLong
-#endif
-*/
+#include "../libafanasy/hostres.h"
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
-PyRes::PyRes( const std::string & className, af::HostRes * hostRes):
-   name( className),
-   hres( hostRes),
-   initialized( false)
+PyRes::PyRes(const std::string & i_className, af::HostRes * i_hostRes):
+	m_name(i_className),
+	m_hres(i_hostRes),
+	m_initialized(false)
 {
-   index = int( hres->custom.size());
+	m_index = int(m_hres->custom.size());
 
-   if( PyClass::init( AFPYNAMES::RES_CLASSESDIR, name.c_str(), NULL) == false) return;
+	if (PyClass::init(AFPYNAMES::RES_CLASSESDIR, m_name.c_str(), NULL) == false)
+		return;
 
-   //Get functions:
-   PyObj_FuncUpdate = getFunction( AFPYNAMES::RES_FUNC_UPDATE);
-   if( PyObj_FuncUpdate == NULL ) return;
+	//Get functions:
+	m_PyObj_FuncUpdate = getFunction(AFPYNAMES::RES_FUNC_UPDATE);
+	if (m_PyObj_FuncUpdate == NULL)
+		return;
 
-   hres->custom.push_back( new af::HostResMeter());
-   initialized = true;
+	m_hres->custom.push_back(new af::HostResMeter());
+	m_initialized = true;
 }
 
 PyRes::~PyRes()
@@ -45,35 +39,59 @@ PyRes::~PyRes()
 
 void PyRes::update()
 {
-   if( false == initialized ) return;
+	if (false == m_initialized)
+		return;
 
-   PyObject * pTuple = PyObject_CallObject( PyObj_FuncUpdate, NULL);
-   if( PyTuple_Check( pTuple))
-   {
-      if( PyTuple_Size( pTuple) == 16)
-      {
-         hres->custom[index]->value       = PyLong_AsLong(     PyTuple_GetItem( pTuple,  0));
-         hres->custom[index]->valuemax    = PyLong_AsLong(     PyTuple_GetItem( pTuple,  1));
-         hres->custom[index]->width       = PyLong_AsLong(     PyTuple_GetItem( pTuple,  2));
-         hres->custom[index]->height      = PyLong_AsLong(     PyTuple_GetItem( pTuple,  3));
-         hres->custom[index]->graphr      = PyLong_AsLong(     PyTuple_GetItem( pTuple,  4));
-         hres->custom[index]->graphg      = PyLong_AsLong(     PyTuple_GetItem( pTuple,  5));
-         hres->custom[index]->graphb      = PyLong_AsLong(     PyTuple_GetItem( pTuple,  6));
-         hres->custom[index]->label       = PyBytes_AsString(  PyTuple_GetItem( pTuple,  7));
-         hres->custom[index]->labelsize   = PyLong_AsLong(     PyTuple_GetItem( pTuple,  8));
-         hres->custom[index]->labelr      = PyLong_AsLong(     PyTuple_GetItem( pTuple,  9));
-         hres->custom[index]->labelg      = PyLong_AsLong(     PyTuple_GetItem( pTuple, 10));
-         hres->custom[index]->labelb      = PyLong_AsLong(     PyTuple_GetItem( pTuple, 11));
-         hres->custom[index]->bgcolorr    = PyLong_AsLong(     PyTuple_GetItem( pTuple, 12));
-         hres->custom[index]->bgcolorg    = PyLong_AsLong(     PyTuple_GetItem( pTuple, 13));
-         hres->custom[index]->bgcolorb    = PyLong_AsLong(     PyTuple_GetItem( pTuple, 14));
-         hres->custom[index]->tooltip     = PyBytes_AsString(  PyTuple_GetItem( pTuple, 15));
-      }
-      else
-         AFERRAR("PyRes::update: type=\"%s\" returned tuple size != 12\n", name.c_str());
-   }
-   else
-      AFERRAR("PyRes::update: type=\"%s\" value is not a tuple\n", name.c_str());
+	PyObject * pClass = PyObject_CallObject(m_PyObj_FuncUpdate, NULL);
 
-   Py_DECREF( pTuple);
+	if (pClass == NULL)
+	{
+		AF_ERR << "PyRes::update['" << m_name << "']: returned NULL";
+		return;
+	}
+
+	if (pClass == Py_None)
+	{
+		AF_ERR << "PyRes::update['" << m_name << "']: returned None";
+		return;
+	}
+
+	std::string err = std::string("PyRes::update['" + m_name + "']: ");
+
+
+	int value, valuemax, width, height, graphr, graphg, graphb, labelsize, labelr, labelg, labelb, bgcolorr, bgcolorg, bgcolorb = 0;
+	std::string label, tooltip;
+
+	if (false == af::PyGetAttrInt(pClass,"value",     value,     err)) return;
+	if (false == af::PyGetAttrInt(pClass,"valuemax",  valuemax,  err)) return;
+	if (false == af::PyGetAttrInt(pClass,"width",     width,     err)) return;
+	if (false == af::PyGetAttrInt(pClass,"height",    height,    err)) return;
+	if (false == af::PyGetAttrInt(pClass,"graphr",    graphr,    err)) return;
+	if (false == af::PyGetAttrInt(pClass,"graphg",    graphg,    err)) return;
+	if (false == af::PyGetAttrStr(pClass,"label",     label,     err)) return;
+	if (false == af::PyGetAttrInt(pClass,"labelsize", labelsize, err)) return;
+	if (false == af::PyGetAttrInt(pClass,"labelr",    labelr,    err)) return;
+	if (false == af::PyGetAttrInt(pClass,"labelg",    labelg,    err)) return;
+	if (false == af::PyGetAttrInt(pClass,"labelb",    labelb,    err)) return;
+	if (false == af::PyGetAttrInt(pClass,"bgcolorr",  bgcolorr,  err)) return;
+	if (false == af::PyGetAttrInt(pClass,"bgcolorg",  bgcolorg,  err)) return;
+	if (false == af::PyGetAttrInt(pClass,"bgcolorb",  bgcolorb,  err)) return;
+	if (false == af::PyGetAttrStr(pClass,"tooltip",   tooltip,   err)) return;
+
+	m_hres->custom[m_index]->value     = value;
+	m_hres->custom[m_index]->valuemax  = valuemax;
+	m_hres->custom[m_index]->width     = width;
+	m_hres->custom[m_index]->height    = height;
+	m_hres->custom[m_index]->graphr    = graphr;
+	m_hres->custom[m_index]->graphg    = graphg;
+	m_hres->custom[m_index]->graphb    = graphb;
+	m_hres->custom[m_index]->label     = label;
+	m_hres->custom[m_index]->labelsize = labelsize;
+	m_hres->custom[m_index]->labelr    = labelr;
+	m_hres->custom[m_index]->labelg    = labelg;
+	m_hres->custom[m_index]->labelb    = labelb;
+	m_hres->custom[m_index]->bgcolorr  = bgcolorr;
+	m_hres->custom[m_index]->bgcolorg  = bgcolorg;
+	m_hres->custom[m_index]->bgcolorb  = bgcolorb;
+	m_hres->custom[m_index]->tooltip   = tooltip;
 }

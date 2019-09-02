@@ -149,22 +149,26 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 	case 0: // The item was just created
 	case af::Msg::TRendersList:
 	{
-		updateNodeValues( i_node);
+		m_info_text_render.clear();
 
-		setHidden(  render->isHidden()  );
-		setOffline( render->isOffline() );
+		updateNodeValues(i_node);
 
-	    m_engine             = afqt::stoq( render->getEngine());
-	    m_username           = afqt::stoq( render->getUserName());
-	    m_capacity           = render->getCapacity();
-	    m_maxtasks           = render->getMaxTasks();
-	    m_time_launched      = render->getTimeLaunch();
-	    m_time_registered    = render->getTimeRegister();
+		setHidden( render->isHidden() );
+		setOffline(render->isOffline());
+
+		m_engine          = afqt::stoq(render->getEngine());
+		m_username        = afqt::stoq(render->getUserName());
+		m_time_launched   = render->getTimeLaunch();
+		m_time_registered = render->getTimeRegister();
+
+		m_info_text_render += "OS: <b>" + afqt::stoq(render->getOS()) + "</b> - " + m_engine;
 
 		if( render->getAddress().notEmpty())
 		{
 	        m_address_ip_str = render->getAddress().generateIPString().c_str();
 	        m_address_str = render->getAddress().v_generateInfoString().c_str();
+
+			m_info_text_render += " IP: <b>" + m_address_ip_str + "</b>";
 		}
 
 		bool becameOnline = false;
@@ -173,7 +177,6 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 			becameOnline = true;
 	        m_update_counter = 0;
 
-	        m_host = render->getHost();
 	        m_hres.copy( render->getHostRes());
 
 	        m_plotMem.setScale( m_hres.mem_total_mb);
@@ -188,6 +191,7 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 	            m_plotSwp.setLabel("S");
 	            m_plotSwp.setHotMin(( 10*m_hres.swap_total_mb)/100);
 	            m_plotSwp.setHotMax((100*m_hres.swap_total_mb)/100);
+
 			}
 			else
 			{
@@ -206,20 +210,30 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 	            m_plots[i]->height = 0;
 		}
 
-	    m_online = render->isOnline();
-	    if( m_time_launched) m_creationTime = "Launched   at " + afqt::time2Qstr( m_time_launched);
-	    else m_creationTime = "Offline.";
-	    if( m_time_registered) m_creationTime += "\nRegistered at " + afqt::time2Qstr( m_time_registered);
-	    else m_creationTime = "\nNot registered.";
+		m_info_text_render += "<br>@HRES@";
 
-	    m_busy = render->isBusy();
-	    m_taskstartfinishtime = render->getTasksStartFinishTime();
+	    m_online = render->isOnline();
+		m_info_text_render += "<br>";
+		m_info_text_render += "<br>Registered at <b>" + afqt::time2Qstr(m_time_registered) + "</b>";
+		if (m_online)
+		{
+			m_info_text_render += "<br>Launched at <b>" + afqt::time2Qstr(m_time_launched) + "</b>";
+		}
+		else
+		{
+			m_info_text_render += "<br>Offline";
+			if (m_wol_operation_time > 0)
+				m_info_text_render += " since <b>" + afqt::time2Qstr(m_wol_operation_time) + "</b>";
+		}
+
+		m_busy = render->isBusy();
+		m_taskstartfinishtime = render->getTasksStartFinishTime();
 
 		// Get tasks inforamtion:
 		deleteTasks();
-	        m_tasksusers.clear();
-	    m_tasks_users_counts.clear();
-	    m_tasks = render->takeTasks();
+		m_tasksusers.clear();
+		m_tasks_users_counts.clear();
+		m_tasks = render->takeTasks();
 		QStringList tasks_users;
 		QList<int> tasks_counts;
 		m_elder_task_time = time(NULL);
@@ -251,15 +265,18 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 	    m_capacity_used = render->getCapacityUsed();
 		if( Watch::isPadawan())
 		{
-		    m_capacity_usage = QString("Capacity: %1 of %2; Tasks: %3 of %4").arg( m_capacity_used).arg( m_capacity).arg( m_tasks.size()).arg( m_maxtasks);
+		    m_capacity_usage = QString("Tasks: %1 Capacity: %2")
+				.arg(m_tasks.size()).arg(m_capacity_used);
 		}
 		else if( Watch::isJedi())
 		{
-		    m_capacity_usage = QString("C:%1/%2 T:%3/%4").arg( m_capacity_used).arg( m_capacity).arg( m_tasks.size()).arg( m_maxtasks);
+		    m_capacity_usage = QString("T:%1 C:%2")
+				.arg(m_tasks.size()).arg(m_capacity_used);
 		}
 		else
 		{
-		    m_capacity_usage = QString("%1/%2 (%3/%4)").arg( m_capacity_used).arg( m_capacity).arg( m_tasks.size()).arg( m_maxtasks);
+		    m_capacity_usage = QString("%1:%2")
+				.arg(m_tasks.size()).arg(m_capacity_used);
 		}
 
 	    if( m_busy )
@@ -376,6 +393,12 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 
 	    m_update_counter++;
 
+		m_info_text_hres.clear();
+		m_info_text_hres += QString(" CPU: <b>%1</b> MHz x<b>%2</b>").arg(m_hres.cpu_mhz).arg(m_hres.cpu_num);
+		m_info_text_hres += QString(" MEM: <b>%1</b> Gb").arg(m_hres.mem_total_mb>>10);
+		if( m_hres.swap_total_mb )
+			m_info_text_hres += QString(" Swap: <b>%1</b> Gb").arg(m_hres.swap_total_mb>>10);
+
 		break;
 	}
 	default:
@@ -396,6 +419,10 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 	if( m_wolWaking ) m_offlineState = "Waking Up";
 	else if( m_wolSleeping || m_wolFalling) m_offlineState = "Sleeping";
 	else m_offlineState = "Offline";
+
+	// Join info texts:
+	m_info_text = m_info_text_render;
+	m_info_text.replace("@HRES@", m_info_text_hres);
 }
 
 void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) const
@@ -445,6 +472,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 	    offlineState_time = m_offlineState + " " + afqt::stoq( af::time2strHMS( time(NULL) - m_wol_operation_time ));
 
 	// Draw busy/idle bar:
+	/* TODO take this from pool
 	if( m_online )
 	{
 		int width = w/7;
@@ -491,7 +519,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 		painter->setBrush( Qt::NoBrush);
 		painter->drawRect( posx, posy, width, height);
 	}
-
+	*/
 
 	QString ann_state = m_state;
 	// Join annotation+state+tasks on small displays:

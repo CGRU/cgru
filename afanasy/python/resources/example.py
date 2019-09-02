@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import resbase
+from resources import resbase
 
 
 class example(resbase.resbase):
@@ -9,8 +9,6 @@ class example(resbase.resbase):
 
     def __init__(self):
         resbase.resbase.__init__(self)
-        self.value = 0
-
         self.value = 0
         self.valuemax = 100
         self.height = 50
@@ -30,7 +28,6 @@ class example(resbase.resbase):
 
     def update(self):
         """Missing DocString
-
         :return:
         """
         self.value += 3
@@ -40,7 +37,7 @@ class example(resbase.resbase):
         self.height = 15 + self.value
         self.graphr = 2 * self.value
         self.label = 'Example\nValue = %d' % self.value
-        self.labelsize = 5 + self.value / 5
+        self.labelsize = 5 + int(self.value / 5)
         self.labelr = 255
         self.labelg = 255
         self.labelb = 2 * self.value

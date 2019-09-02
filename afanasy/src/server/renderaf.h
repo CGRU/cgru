@@ -8,15 +8,17 @@
 #include "../libafanasy/renderupdate.h"
 #include "../libafanasy/taskexec.h"
 
-#include "afnodesrv.h"
+#include "afnodefarm.h"
+#include "poolsrv.h"
 
 class Action;
-class MsgQueue;
 class JobContainer;
+class MsgQueue;
+class PoolsContainer;
 class RenderContainer;
 
 /// Afanasy server side of Render host.
-class RenderAf: public af::Render, public AfNodeSrv
+class RenderAf: public af::Render, public AfNodeFarm
 {
 public:
 /// Construct Render from message and provided address.
@@ -27,10 +29,37 @@ public:
 	RenderAf( const std::string & i_store_dir);
 
 /// Set registration time ( and update time).
-	void setRegistered();
+	void setRegistered(PoolsContainer * i_pools);
+
+	void setPool(PoolSrv * i_pool);
 
 /// Awake offline render
 	void online( RenderAf * render, JobContainer * i_jobs, MonitorContainer * monitoring);
+
+	inline int getMaxTasks()     const { return m_max_tasks == -1 ? m_parent->getMaxTasksPerHost()    : m_max_tasks;}
+	inline int getCapacity()     const { return m_capacity  == -1 ? m_parent->getMaxCapacityPerHost() : m_capacity;}
+	inline int getCapacityFree() const { return getCapacity() - m_capacity_used;}
+	inline bool hasCapacity(int value) const {
+		int c = getCapacity(); if (c<0) return true; else return m_capacity_used + value <= c;}
+
+/// Whether Render is ready to render tasks.
+	inline bool isReady() const { return (
+			(m_parent != NULL) &&
+			(m_state & SOnline) &&
+			(m_priority > 0) &&
+			((getCapacity() < 0) || (m_capacity_used < getCapacity())) &&
+			((int)m_tasks.size() < getMaxTasks()) &&
+			(false == isWOLFalling())
+		);}
+
+	inline bool isWOLWakeAble() const { return (
+			isOffline() &&
+			isWOLSleeping() &&
+			(false == isWOLWaking()) &&
+			(getCapacity() != 0) &&
+			(getMaxTasks() > 0) &&
+			(m_priority > 0)
+		);}
 
 /// Add task \c taskexec to render, \c start or only capture it
 /// Takes over the taskexec ownership
@@ -62,21 +91,14 @@ public:
 
 	af::Msg * writeTasksLog( bool i_binary);
 
-/// Get host parameters from farm.
-	bool getFarmHost( af::Host * newHost = NULL);
-
 /// Deregister render, on SIGINT client recieving.
 	void deregister( JobContainer * jobs, MonitorContainer * monitoring );
 
 	virtual void v_action( Action & i_action);
 
 	inline const std::list<std::string> & getTasksLog() { return m_tasks_log; }  ///< Get tasks log list.
-	const std::string getServicesString() const;							 ///< Get services information.
-	void jsonWriteServices( std::ostringstream & o_str) const; ///< Get services information.
 
 	virtual int v_calcWeight() const; ///< Calculate and return memory size.
-
-	bool canRunService( const std::string & type) const; ///< Check whether block can run a service
 
 	// Update render and send instructions back:
 	af::Msg * update( const af::RenderUpdate & i_up);
@@ -101,18 +123,17 @@ public:
 private:
 	void initDefaultValues();
 
+	void findPool(PoolsContainer * i_pools);
+
+	void actionSetPool(const std::string & i_pool_name, Action & i_action);
+	void actionReassignPool(Action & i_action);
+
 	/// Add the task exec to this render and take over its ownership (meaning
 	/// one should not free taskexec after having provided it to this method).
 	void addTask( af::TaskExec * taskexec);
 	/// Remove the task exec from this render and give back its ownership to the
 	/// caller.
 	void removeTask( const af::TaskExec * taskexec);
-
-	void addService( const std::string & type);
-	void remService( const std::string & type);
-
-	void setService( const std::string & srvname, bool enable);
-	void disableServices();
 
 /// Stop tasks.
 	void ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus, const std::string * i_keeptasks_username = NULL);
@@ -129,14 +150,6 @@ private:
 	void appendTasksLog( const std::string & message);  ///< Append tasks log with a \c message .
 
 private:
-	std::string m_farm_host_name;
-	std::string m_farm_host_description;
-
-	std::vector<int> m_services_counts;
-	int m_services_num;
-
-	std::vector<int> m_services_disabled_nums;
-
 	std::list<std::string> m_tasks_log;							///< Tasks Log.
 
 	af::RenderEvents m_re;

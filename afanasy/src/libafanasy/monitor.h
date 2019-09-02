@@ -57,6 +57,9 @@ public:
 	/**/EVT_branches_add/**/,
 	/**/EVT_branches_change/**/,
 	/**/EVT_branches_del/**/,
+	/**/EVT_pools_add/**/,
+	/**/EVT_pools_change/**/,
+	/**/EVT_pools_del/**/,
 	/**/EVT_COUNT/**/
 	};
 	static const char * EVT_NAMES[];

@@ -60,7 +60,7 @@ private slots:
 	void actBlockPreview( int num_cmd, int num_img);
 
 	void actTaskOpen();
-	void actTaskPreview( int num_cmd, int num_img);
+	void actTaskPreview(int i_num_cmd, int i_num_img);
 	void actTasksRestart();
 	void actTasksSkip();
 

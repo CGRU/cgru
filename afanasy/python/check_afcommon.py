@@ -15,6 +15,11 @@ if sys.argv[1] == 'pat2':
         print('Usage: %s %s str1 str2' % (sys.argv[0], sys.argv[1]))
     else:
         print(afcommon.patternFromPaths(sys.argv[2], sys.argv[3]))
+elif sys.argv[1] == 'fillnum':
+    if len(sys.argv) < 5:
+        print('Usage: %s %s pattern start end' % (sys.argv[0], sys.argv[1]))
+    else:
+        print(afcommon.fillNumbers(sys.argv[2], int(sys.argv[3]), int(sys.argv[4])))
 elif sys.argv[1] == 'patc':
     if len(sys.argv) < 3:
         print('Usage: %s %s str' % (sys.argv[0], sys.argv[1]))

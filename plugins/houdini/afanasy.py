@@ -356,8 +356,9 @@ class BlockParameters:
         if self.capacity_min != -1 or self.capacity_max != -1:
             block.setVariableCapacity(self.capacity_min, self.capacity_max)
 
-        block.setTaskMaxRunTime(self.maxruntime)
         block.setTaskMinRunTime(self.minruntime)
+        block.setTaskMaxRunTime(self.maxruntime*3600)
+
 
         # Delete files in a block post command:
         if len(self.delete_files):
@@ -383,7 +384,7 @@ class BlockParameters:
         if self.subtaskdepend:
             block.setDependSubTask()
         if self.min_memory > -1:
-            block.setNeedMemory(self.min_memory)
+            block.setNeedMemory(self.min_memory*1024)
 
         return block
 

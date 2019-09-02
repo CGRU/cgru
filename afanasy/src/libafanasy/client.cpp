@@ -8,6 +8,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 using namespace af;
 
@@ -39,6 +40,7 @@ Client::Client( int i_flags, int Id):
 	  m_user_name = af::Environment::getUserName();
 	  m_name = af::Environment::getHostName();
 
+		m_os = af::strJoin(af::Environment::getPlatform()," ");
 		m_engine = af::Environment::getVersionCGRU();
    }
 }
@@ -56,6 +58,7 @@ void Client::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 	o_str << ",\n\"time_register\":" << m_time_register;
 	o_str << ",\n\"time_launch\":" << m_time_launch;
 	o_str << ",\n\"time_update\":" << m_time_update;
+	o_str << ",\n\"os\":\"" << m_os << "\"";
 
 	if( false == m_address.isEmpty())
 	{
@@ -80,10 +83,14 @@ void Client::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 
 void Client::jsonRead( const JSON & i_object)
 {
+	jr_string("os",     m_os,     i_object);
+	jr_string("engine", m_engine, i_object);
+
 	m_address.jsonRead( i_object["address"]);
 
 	const JSON & netifs_array = i_object["netifs"];
-	if( false == netifs_array.IsArray()) return;
+	if (false == netifs_array.IsArray())
+		return;
 
 	clearNetIFs();
 

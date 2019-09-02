@@ -189,6 +189,9 @@ const char * Monitor::EVT_NAMES[] =
 	"branches_add",
 	"branches_change",
 	"branches_del",
+	"pools_add",
+	"pools_change",
+	"pools_del",
 	"COUNT"
 };
 

@@ -400,7 +400,6 @@ function g_MonitorClosed(i_monitor)
 		g_main_monitor = null;
 }
 
-// function g_OpenMonitor( i_type, i_evt, i_id, i_name)
 function g_OpenMonitor(i_args)
 {
 	if (i_args.name == null)

@@ -1,1 +1,1 @@
-print 'Init resources'
+print('Init resources')

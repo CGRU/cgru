@@ -4,73 +4,6 @@ version: "2"
 #  build: ../afcommon/.
 
 services:
- # rules:
- #  build: ../rules/.
- #  ports:
- #   - "50000:80"
- #  volumes:
- #   - rules_root:/opt/cgru/rules_root
-
- afserver-2.0.8-ubuntu-14.04:
-  build: ../afserver/2.0.8-ubuntu-14.04/.
-  ports:
-   - "52084:51000"
-
- afrender-2.0.8-ubuntu-14.04:
-  build: ../afrender/2.0.8-ubuntu-14.04/.
-  links:
-   - afserver-2.0.8-ubuntu-14.04
-  environment:
-   AF_SERVERNAME: "cgru_afserver-2.0.8-ubuntu-14.04_1"
-
- afserver-2.1.0-ubuntu-14.04:
-  build: ../afserver/2.1.0-ubuntu-14.04/.
-  ports:
-   - "52104:51000"
-
- afrender-2.1.0-ubuntu-14.04:
-  build: ../afrender/2.1.0-ubuntu-14.04/.
-  links:
-   - afserver-2.1.0-ubuntu-14.04
-  environment:
-   AF_SERVERNAME: "cgru_afserver-2.1.0-ubuntu-14.04_1"
-
- afserver-2.1.0-ubuntu-16.04:
-  build: ../afserver/2.1.0-ubuntu-16.04/.
-  ports:
-   - "52106:51000"
-
- afrender-2.1.0-ubuntu-16.04:
-  build: ../afrender/2.1.0-ubuntu-16.04/.
-  links:
-   - afserver-2.1.0-ubuntu-16.04
-  environment:
-   AF_SERVERNAME: "cgru_afserver-2.1.0-ubuntu-16.04_1"
-
- afserver-2.2.1-ubuntu-14.04:
-  build: ../afserver/2.2.1-ubuntu-14.04/.
-  ports:
-   - "52214:51000"
-
- afrender-2.2.1-ubuntu-14.04:
-  build: ../afrender/2.2.1-ubuntu-14.04/.
-  links:
-   - afserver-2.2.1-ubuntu-14.04
-  environment:
-   AF_SERVERNAME: "cgru_afserver-2.2.1-ubuntu-14.04_1"
-
- afserver-2.2.1-ubuntu-16.04:
-  build: ../afserver/2.2.1-ubuntu-16.04/.
-  ports:
-   - "52216:51000"
-
- afrender-2.2.1-ubuntu-16.04:
-  build: ../afrender/2.2.1-ubuntu-16.04/.
-  links:
-   - afserver-2.2.1-ubuntu-16.04
-  environment:
-   AF_SERVERNAME: "cgru_afserver-2.2.1-ubuntu-16.04_1"
-
  db:
   image: postgres:9.5
   environment:
@@ -85,11 +18,39 @@ services:
   environment:
    DB_HOST: db
    DB_PORT: 5432
- 
- afstatistics:
-  build: ../afstatistics/.
+
+ afserver:
+  build:
+    context: ../afserver/.
+    dockerfile: Dockerfile.2.3.1
   ports:
-   - "50080:80"
+   - "51000:51000"
+  environment:
+    AF_DB_HOST: "db"
+    AF_DB_NAME: "afanasy"
+    AF_DB_USER: "afadmin"
+    AF_DB_PASSWORD: "AfPassword"
+
+ afrender-2.0.8-ubuntu-14.04:
+  build:
+    context: ../afrender/.
+    dockerfile: Dockerfile.2.3.1
+  environment:
+   AF_SERVERNAME: "afserver"
+
+ afstatistics:
+  build:
+    context: ../afstatistics/.
+    dockerfile: Dockerfile.2.3.1
+  ports:
+   - "8080:80"
+ 
+ # rules:
+ #  build: ../rules/.
+ #  ports:
+ #   - "50000:80"
+ #  volumes:
+ #   - rules_root:/opt/cgru/rules_root
 
 volumes:
  rules_root:

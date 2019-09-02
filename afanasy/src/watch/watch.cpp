@@ -160,7 +160,7 @@ void Watch::addReceiver( Receiver * receiver)
 {
    if( ms_receivers.contains( receiver))
    {
-      AFERROR("Watch::addReciever: Receiver already exists.")
+      AFERROR("Watch::addReceiver: Receiver already exists.")
    }
    else ms_receivers.append( receiver);
 }
@@ -479,10 +479,28 @@ void Watch::browseFolder( const QString & i_folder, const QString & i_wdir)
 #ifdef WINNT
 	QString cmd = "explorer";
 #else
-	QString cmd = afqt::stoq( af::Environment::getCGRULocation()) + "/utilities/browse.sh";
+	QString cmd = "openfolder";
 #endif
 	cmd += " \"" + i_folder + "\"";
 	Watch::startProcess( cmd, i_wdir);
+}
+
+void Watch::openTerminal(const QString & i_wdir)
+{
+	QDir dir(i_wdir);
+	if(false == dir.exists())
+	{
+		Watch::displayError(QString("Folder '%1' does not exist.").arg(dir.path()));
+		return;
+	}
+
+	Watch::displayInfo(QString("Terminal '%1'").arg(dir.path()));
+#ifdef WINNT
+	QString cmd = QString("start cmd.exe /K \"cd %1\"").arg(dir.path());
+#else
+	QString cmd = QString("cd \"%1\"; openterminal").arg(dir.path());
+#endif
+	Watch::startProcess(cmd);
 }
 
 void Watch::repaint()

@@ -6,6 +6,8 @@
 
 #include "../libafanasy/msgclasses/mctaskup.h"
 
+class PoolsContainer;
+
 /// Renders container.
 class RenderContainer : public AfContainer
 {
@@ -14,11 +16,7 @@ public:
    ~RenderContainer();
 
 	/// Add new Render to container, new id returned on success, else return 0.
-	af::Msg * addRender( RenderAf *newRender, JobContainer * i_jobs, MonitorContainer * monitoring);
-
-	/// Reload farm settings from a config file.
-	/// Return true on success and a status (error) message.
-	bool farmLoad( std::string & o_status, MonitorContainer * i_monitors = NULL);
+	af::Msg * addRender(RenderAf * newRender, PoolsContainer * i_pools, JobContainer * i_jobs, MonitorContainer * monitoring);
 };
 
 /// Renders iterator.

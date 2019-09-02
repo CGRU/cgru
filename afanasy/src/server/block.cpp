@@ -214,11 +214,16 @@ void Block::reconnectTask(af::TaskExec *i_taskexec, RenderAf & i_render, Monitor
 
 bool Block::canRunOn( RenderAf * render)
 {
-   // check max running tasks on the same host:
-   if(  m_data->getMaxRunTasksPerHost() == 0 ) return false;
-	if((m_data->getMaxRunTasksPerHost() > 0) && (getRenderCount(render) >= m_data->getMaxRunTasksPerHost())) return false;
-   // check available capacity:
-   if( false == render->hasCapacity( m_data->getCapMinResult())) return false;
+	// Check max running tasks on the same host:
+	if (m_data->getMaxRunTasksPerHost() == 0)
+		return false;
+	if ((m_data->getMaxRunTasksPerHost() > 0) && (getRenderCount(render) >= m_data->getMaxRunTasksPerHost()))
+		return false;
+
+	// Check available capacity:
+	if (false == render->hasCapacity(m_data->getCapMinResult()))
+		return false;
+
    // render services:
    if( false == render->canRunService( m_data->getService())) return false;
    // check maximum hosts:
@@ -230,14 +235,14 @@ bool Block::canRunOn( RenderAf * render)
    // Check needed hdd:
    if( m_data->getNeedHDD()    > render->getHostRes().hdd_free_gb ) return false;
    // Check needed power:
-   if( m_data->getNeedPower()  > render->getHost().m_power       ) return false;
+//if( m_data->getNeedPower()  > render->getHost().m_power       ) return false;
 
    // check hosts mask:
    if( false == m_data->checkHostsMask( render->getName())) return false;
    // check exclude hosts mask:
    if( false == m_data->checkHostsMaskExclude( render->getName())) return false;
    // Check needed properties:
-   if( false == m_data->checkNeedProperties( render->getHost().m_properties)) return false;
+//if( false == m_data->checkNeedProperties( render->getHost().m_properties)) return false;
 
    return true;
 }

@@ -56,7 +56,7 @@ function sc_Post()
 {
 	if( g_arguments )
 		if( g_arguments.s_Search )
-			sc_FilterShots( g_arguments.s_Search);
+			s_Found(sc_FilterShots( g_arguments.s_Search));
 }
 
 function scene_Show()
@@ -131,6 +131,7 @@ function scene_Show()
 		}
 
 		elShot.m_elBody = document.createElement('div');
+		elShot.m_elBody.onclick = function(i_e){i_e.stopPropagation();}
 		elDiv.appendChild( elShot.m_elBody);
 		elShot.m_elBody.classList.add('body');
 		elShot.m_elBody.m_elShot = elShot;
@@ -604,15 +605,17 @@ function scenes_GetSelectedShots()
 
 function sc_FilterShots( i_args)
 {
-	if( sc_elShots == null ) return;
+	var o_res = {};
+	o_res.found = {};
+	o_res.found.artists = [];
+	o_res.found.flags = [];
+	o_res.found.tags = [];
 
-//console.log( JSON.stringify(i_args));
-//	if( i_args == null ) i_args = {};
-	if( i_args == null )
-	{
-		sc_ShowAllShots();
+	if (sc_elShots == null)
 		return;
-	}
+
+	if (i_args == null)
+		i_args = {};
 
 	var anns = null;
 	if( i_args.ann )
@@ -719,6 +722,19 @@ function sc_FilterShots( i_args)
 		{
 			el.style.display = 'block';
 			el.m_filtered = false;
+
+			if (st_obj.artists)
+				for (let a = 0; a < st_obj.artists.length; a++)
+					o_res.found.artists.push(st_obj.artists[a]);
+
+			if (st_obj.flags)
+				for (let f = 0; f < st_obj.flags.length; f++)
+					o_res.found.flags.push(st_obj.flags[f]);
+
+			if (st_obj.tags)
+				for (let t = 0; t < st_obj.tags.length; t++)
+					o_res.found.tags.push(st_obj.tags[t]);
+
 		}
 		else
 		{
@@ -752,6 +768,8 @@ function sc_FilterShots( i_args)
 		}
 
 	sc_DisplayStatistics();
+
+	return o_res;
 }
 
 function sc_ShowAllShots()

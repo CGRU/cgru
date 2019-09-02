@@ -45,6 +45,7 @@ public:
 	QString service;
 	QString hostname;
 	QString username;
+	QString branch;
 	QString hostsmask;
 	QString hostsmask_exclude;
 	QString dependmask;
@@ -88,6 +89,9 @@ private:
 	static const int Height;
 	static const int HeightThumbName;
 	static const int HeightAnnotation;
+
+private:
+	void updateInfo(const af::Job * i_job);
 
 private:
 	ListJobs * m_list;

@@ -53,6 +53,7 @@ public:
 	BranchesContainer *branches;
 	JobContainer *jobs;
 	MonitorContainer *monitors;
+	PoolsContainer *pools;
 	RenderContainer *renders;
 	UserContainer *users;
 

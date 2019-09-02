@@ -223,7 +223,7 @@ class CGRU_Submit(bpy.types.Operator):
         job.setCmdPost('deletefiles "%s"' % os.path.abspath(renderscenefile))
 
         # Print job information:
-        job.output(True)
+        job.output()
 
         # Save Temporary file
         bpy.ops.wm.save_as_mainfile(filepath=renderscenefile, copy=True)

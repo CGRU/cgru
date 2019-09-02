@@ -222,7 +222,6 @@ void BlockData::jsonRead(const JSON &i_object, std::string *io_changes)
 	uint16_t multihost_max_wait = 0;
 	std::string multihost_service;
 	uint16_t multihost_service_wait = 0;
-	//	bool        multihost_master_on_slave = false;
 
 	jr_string("multihost_service", multihost_service, i_object);
 
@@ -238,12 +237,10 @@ void BlockData::jsonRead(const JSON &i_object, std::string *io_changes)
 	jr_int8("multihost_max", multihost_max, i_object);
 	jr_uint16("multihost_max_wait" /******/, multihost_max_wait /******/, i_object);
 	jr_uint16("multihost_service_wait" /**/, multihost_service_wait /**/, i_object);
-	//	jr_bool  ("multihost_master_on_slave", multihost_master_on_slave, i_object);
 
 	jr_int64("file_size_min", m_file_size_min, i_object);
 	jr_int64("file_size_max", m_file_size_max, i_object);
 
-	//	if( numeric )
 	if (isNumeric())
 	{
 		setNumeric(frame_first, frame_last, frames_per_task, frames_inc);
@@ -668,17 +665,6 @@ TaskData *BlockData::createTask(Msg *msg)
 	return new TaskData(msg);
 }
 
-bool BlockData::setCapacity(int value)
-{
-	if (value > 0)
-	{
-		m_capacity = value;
-		return true;
-	}
-	AFERRAR("BlockData::setCapacity: invalid capacity = %d", value)
-	return false;
-}
-
 void BlockData::setVariableCapacity(int i_capacity_coeff_min, int i_capacity_coeff_max)
 {
 	if (i_capacity_coeff_min < 0) i_capacity_coeff_min = 0;
@@ -723,60 +709,6 @@ bool BlockData::setMultiHost(int i_min, int i_max, int i_waitmax, const std::str
 	return true;
 }
 
-bool BlockData::setCapacityCoeffMin(int value)
-{
-	if (canVarCapacity() == false)
-	{
-		AFERROR("BlockData::setCapacityCoeffMin: Block can't variate capacity.")
-		return false;
-	}
-	m_capacity_coeff_min = value;
-	return true;
-}
-
-bool BlockData::setCapacityCoeffMax(int value)
-{
-	if (canVarCapacity() == false)
-	{
-		AFERROR("BlockData::setCapacityCoeffMax: Block can't variate capacity.")
-		return false;
-	}
-	m_capacity_coeff_max = value;
-	return true;
-}
-
-bool BlockData::setMultiHostMin(int value)
-{
-	if (isMultiHost() == false)
-	{
-		AFERROR("BlockData::setMultiHostMin: Block is not multihost.")
-		return false;
-	}
-	if (value < 1)
-	{
-		AFERROR("BlockData::setMultiHostMin: Hosts minimum can't be less than one.")
-		return false;
-	}
-	m_multihost_min = value;
-	return true;
-}
-
-bool BlockData::setMultiHostMax(int value)
-{
-	if (isMultiHost() == false)
-	{
-		AFERROR("BlockData::setMultiHostMax: Block is not multihost.")
-		return false;
-	}
-	if (value < m_multihost_min)
-	{
-		AFERROR("BlockData::setMultiHostMax: Hosts maximum can't be less than minimum.")
-		return false;
-	}
-	m_multihost_max = value;
-	return true;
-}
-
 bool BlockData::setNumeric(long long start, long long end, long long perTask, long long increment)
 {
 	if (perTask < 1)
@@ -794,11 +726,6 @@ bool BlockData::setNumeric(long long start, long long end, long long perTask, lo
 		AFERROR("BlockData::setNumeric(): this block already has tasks.")
 		return false;
 	}
-	/*   if( isNumeric())
-	   {
-		  AFERROR("BlockData::setNumeric(): this block is already numeric and numbers are set.")
-		  return false;
-	   }*/
 	if (start > end)
 	{
 		AFERRAR(
@@ -1078,76 +1005,6 @@ int BlockData::getReadyTaskNumber(TaskProgress **i_tp, const int64_t &i_job_flag
 	// printf("No ready tasks found.\n");
 	return AFJOB::TASK_NUM_NO_TASK;
 }
-const std::string BlockData::genCommand(int num, long long *fstart, long long *fend) const
-{
-	std::string str;
-	if (num > m_tasks_num)
-	{
-		AFERROR("BlockData::getCmd: n > tasksnum.")
-		return str;
-	}
-	if (isNumeric())
-	{
-		long long start, end;
-		bool ok = true;
-		if (fstart && fend)
-		{
-			start = *fstart;
-			end = *fend;
-		}
-		else
-			ok = genNumbers(start, end, num);
-
-		if (ok) str = fillNumbers(m_command, start, end);
-	}
-	else
-	{
-		str = af::replaceArgs(m_command, m_tasks_data[num]->getCommand());
-	}
-	return str;
-}
-
-const std::vector<std::string> BlockData::genFiles(int num, long long *fstart, long long *fend) const
-{
-	std::vector<std::string> files;
-	if (num >= m_tasks_num)
-	{
-		AFERROR("BlockData::genCmdView: n >= tasksnum.")
-		return files;
-	}
-	if (isNumeric())
-	{
-		if (m_files.size())
-		{
-			long long start, end;
-			bool ok = true;
-			if (fstart && fend)
-			{
-				start = *fstart;
-				end = *fend;
-			}
-			else
-				ok = genNumbers(start, end, num);
-
-			if (ok)
-			{
-				for (int i = 0; i < m_files.size(); i++)
-					files.push_back(af::fillNumbers(m_files[i], start, end));
-			}
-		}
-	}
-	else
-	{
-		if (m_tasks_data[num]->getFiles().empty()) return files;
-
-		if (m_files.empty()) return m_tasks_data[num]->getFiles();
-
-		for (int bf = 0; bf < m_files.size(); bf++)
-			for (int tf = 0; tf < m_tasks_data[num]->getFiles().size(); tf++)
-				files.push_back(af::replaceArgs(m_files[bf], m_tasks_data[num]->getFiles()[tf]));
-	}
-	return files;
-}
 
 TaskExec *BlockData::genTask(int num) const
 {
@@ -1164,17 +1021,29 @@ TaskExec *BlockData::genTask(int num) const
 	if (false == genNumbers(start, end, num, &frames_num)) return NULL;
 
 	TaskExec *taskExec =
-		new TaskExec(genTaskName(num, &start, &end), m_service, m_parser, genCommand(num, &start, &end),
-			m_capacity, m_file_size_min, m_file_size_max, genFiles(num, &start, &end),
+		new TaskExec(
+			genTaskName(num, &start, &end), m_service, m_parser,
 
-			start, end, frames_num,
+			m_capacity, m_file_size_min, m_file_size_max,
+
+			m_command,
+
+			m_files,
+
+			start, end, m_frames_inc, frames_num,
 
 			m_working_directory, m_environment,
 
 			m_job_id, m_block_num, m_flags, num);
 
 	taskExec->m_custom_data_block = m_custom_data;
-	if (isNotNumeric()) taskExec->m_custom_data_task = m_tasks_data[num]->getCustomData();
+
+	if (isNotNumeric())
+	{
+		taskExec->setTaskCommand(m_tasks_data[num]->getCommand());
+		taskExec->setTaskFiles(m_tasks_data[num]->getFiles());
+		taskExec->m_custom_data_task = m_tasks_data[num]->getCustomData();
+	}
 
 	return taskExec;
 }
@@ -1227,6 +1096,20 @@ void BlockData::setStateDependent(bool depend)
 	{
 		m_state = m_state & (~AFJOB::STATE_WAITDEP_MASK);
 	}
+}
+
+const TaskData * BlockData::getTaskData(int i_num_task) const
+{
+	if (NULL == m_tasks_data)
+		return NULL;
+
+	if (i_num_task >= m_tasks_num)
+	{
+		AF_ERR << __func__ << ": i_num_task(" << i_num_task << ") >= m_tasks_num(" << m_tasks_num << ")";
+		return NULL;
+	}
+
+	return m_tasks_data[i_num_task];
 }
 
 int BlockData::calcWeight() const

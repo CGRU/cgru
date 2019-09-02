@@ -6,13 +6,14 @@
 
 class QByteArray;
 class QDomDocument;
-class QDomElement;
 
 class afqt::Attr
 {
 public:
-    Attr( const QString & Name, const QString & Label, const QString & initString);
-    virtual ~Attr();
+	Attr();
+	Attr(const Attr & i_other);
+	Attr(const QString & i_name, const QString & i_label, const QString & i_init);
+	virtual ~Attr();
 
 	virtual const QString v_writeData();
 
@@ -29,3 +30,22 @@ private:
     QString name;
     QString label;
 };
+
+class afqt::AttrNumber: public Attr
+{
+public:
+	AttrNumber();
+	AttrNumber(const AttrNumber & i_other);
+	AttrNumber(const QString & i_name, int i_init);
+	AttrNumber(const QString & i_name, const QString & i_label, int i_init);
+	~AttrNumber();
+
+	virtual bool v_read( const JSON & i_obj);
+	const QString v_writeData();
+
+public:
+   int n;
+
+private:
+};
+

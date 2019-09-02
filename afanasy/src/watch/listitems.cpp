@@ -2,9 +2,16 @@
 
 #include "../libafanasy/regexp.h"
 
+#include "../libafqt/qenvironment.h"
+
+#include "actionid.h"
 #include "buttonpanel.h"
+#include "buttonsmenu.h"
+#include "ctrlsortfilter.h"
 #include "item.h"
 #include "modelitems.h"
+#include "param.h"
+#include "paramspanel.h"
 #include "viewitems.h"
 #include "watch.h"
 
@@ -12,67 +19,92 @@
 #include <QtGui/QKeyEvent>
 #include <QBoxLayout>
 #include <QLabel>
+#include <QSplitter>
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 ListItems::ListItems( QWidget* parent, const std::string & type):
 	QWidget( parent),
 	m_type( type),
-	m_parentWindow( parent)
+	m_model(NULL),
+	m_ctrl_sf(NULL),
+	m_paramspanel(NULL),
+	m_current_buttons_menu(NULL),
+	m_parentWindow(parent),
+	m_current_item(NULL)
 {
-AFINFO("ListItems::ListItems.\n");
 	setAttribute ( Qt::WA_DeleteOnClose, true );
 
-	m_hlayout = new QHBoxLayout( this);
-	m_vlayout = new QVBoxLayout();
+	QHBoxLayout * hlayout = new QHBoxLayout(this);
+
+	QWidget * panel_l_widget = new QWidget();
+	hlayout->addWidget(panel_l_widget);
 	m_panel_l = new QVBoxLayout();
-	m_panel_r = new QVBoxLayout();
-	m_hlayout->addLayout( m_panel_l);
-	m_hlayout->addLayout( m_vlayout);
-	m_hlayout->addLayout( m_panel_r);
+	panel_l_widget->setLayout(m_panel_l);
+	panel_l_widget->setFixedWidth(100);
+	m_panel_l->setAlignment(Qt::AlignTop);
+	m_panel_l->setContentsMargins(0, 5, 0, 5);
+	m_panel_l->setSpacing(5);
 
-	m_panel_l->setAlignment( Qt::AlignTop);
-	m_panel_l->setContentsMargins( 5, 5, 5, 5);
-	m_panel_l->setSpacing( 5);
+	m_splitter = new QSplitter();
+	hlayout->addWidget(m_splitter);
+	m_vlayout = new QVBoxLayout();
+	QWidget * widget = new QWidget();
+	m_splitter->addWidget(widget);
+	widget->setLayout(m_vlayout);
 
-//m_panel_l->addWidget(new QLabel("left"));
-//m_panel_r->addWidget(new QLabel("right"));
-
-	m_hlayout->setSpacing( 0);
-	m_vlayout->setSpacing( 0);
-	m_hlayout->setContentsMargins( 0, 0, 0, 0);
-	m_vlayout->setContentsMargins( 0, 0, 0, 0);
-	m_infoline = new InfoLine( this);
+	m_vlayout->setSpacing(0);
+	m_splitter->setContentsMargins(0, 0, 0, 0);
+	m_vlayout->setContentsMargins(0, 0, 0, 0);
+	m_infoline = new InfoLine(this);
 
 //	if( m_parentWindow != (QWidget*)(Watch::getDialog())) setFocusPolicy(Qt::StrongFocus);
 	setFocusPolicy(Qt::StrongFocus);
 }
 
-bool ListItems::init( bool createModelView)
+void ListItems::initListItems()
 {
-	if( createModelView)
-	{
+	// Descendant classes may create own panel:
+	if (NULL == m_paramspanel)
+		m_paramspanel = new ParamsPanel();
+	m_splitter->addWidget(m_paramspanel);
+	m_paramspanel->initPanel(m_params, m_splitter, afqt::stoq(m_type));
+	connect(m_paramspanel, SIGNAL(sig_changeParam(const Param *)), this, SLOT(changeParam(const Param *)));
+
+	// ListNodes creates: m_model = new ModelNodes
+	if (NULL == m_model)
 		m_model = new ModelItems(this);
-		m_view = new ViewItems( this);
-		m_view->setModel( m_model);
+	m_view = new ViewItems(this);
+	m_view->setModel(m_model);
 
-		m_vlayout->addWidget( m_view);
-		m_vlayout->addWidget( m_infoline);
-	}
+	// Various ListNodes (Jobs, Users, ...) create sorting filtering control.
+	// ListTasks does not.
+	// And it should be properly inserted.
+	if (m_ctrl_sf)
+		m_vlayout->addWidget(m_ctrl_sf);
+	m_vlayout->addWidget(m_view);
+	m_vlayout->addWidget(m_infoline);
 
-	connect( m_view, SIGNAL(doubleClicked( const QModelIndex &)), this, SLOT( doubleClicked_slot( const QModelIndex &)));
+	connect(m_view, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(doubleClicked_slot(const QModelIndex &)));
 
-	connect( m_view->selectionModel(), SIGNAL(     currentChanged( const QModelIndex &, const QModelIndex &)),
-	                             this, SLOT(   currentItemChanged( const QModelIndex &, const QModelIndex &)));
-
-	return true;
+	connect(m_view->selectionModel(), SIGNAL(    currentChanged( const    QModelIndex &, const    QModelIndex &)),
+	                            this,   SLOT(currentItemChanged( const    QModelIndex &, const    QModelIndex &)));
+	connect(m_view->selectionModel(), SIGNAL(  selectionChanged( const QItemSelection &, const QItemSelection &)),
+	                            this,   SLOT(  selectionChanged( const QItemSelection &, const QItemSelection &)));
 }
 
 ListItems::~ListItems()
 {
-AFINFO("ListItems::~ListItems.\n");
+	// We can`t store state just in m_paramspanel dtor,
+	// as storeState() uses m_splitter, that can be destroyed first.
+	m_paramspanel->storeState();
+
+	QList<Param*>::iterator it;
+	for (it = m_params.begin(); it != m_params.end(); it++)
+		delete (*it);
 }
 
 int ListItems::count() const { return m_model->count();}
@@ -171,8 +203,47 @@ void ListItems::doubleClicked_slot( const QModelIndex & index )
 
 void ListItems::currentItemChanged( const QModelIndex & current, const QModelIndex & previous )
 {
-	if( Item::isItemP( current.data()))
-		displayInfo( Item::toItemP( current.data())->getSelectString());
+	Item * item = NULL;
+
+	if (Item::isItemP(current.data()))
+		item = Item::toItemP(current.data());
+
+	if (item)
+	{
+		displayInfo(item->getSelectString());
+		updatePanels(item);
+	}
+
+	m_current_item = item;
+}
+
+void ListItems::selectionChanged(const QItemSelection & i_selected, const QItemSelection & i_deselected)
+{
+	if (m_view->selectionModel()->selectedIndexes().size() == 0)
+	{
+		// Everything was deselected:
+		m_current_item = NULL;
+		m_infoline->clear();
+		updatePanels();
+		return;
+	}
+
+	if (NULL == m_current_item)
+	{
+		// This can be if the same one node was deselected, than selected again.
+		// In such case current item was not changed.
+		QModelIndexList indexes = i_selected.indexes();
+		if ((indexes.size()) && (Item::isItemP(indexes.last().data())))
+		{
+			m_current_item = Item::toItemP(indexes.last().data());
+			updatePanels(m_current_item);
+		}
+	}
+}
+
+void ListItems::updatePanels(Item * i_item)
+{
+	m_paramspanel->v_updatePanel(i_item);
 }
 
 void ListItems::getItemInfo( const std::string & i_mode)
@@ -221,9 +292,10 @@ void ListItems::setParameter( const std::string & i_name, const std::string & i_
 	af::jsonActionParamsStart( str, m_type, "", getSelectedIds());
 
 	str << "\n\"" << i_name << "\":";
-	if( i_quoted ) str << "\"";
-	str << i_value;
-	if( i_quoted ) str << "\"";
+	if (i_quoted)
+		str << "\"" << af::strEscape(i_value) << "\"";
+	else
+		str << i_value;
 
 	af::jsonActionParamsFinish( str);
 
@@ -248,11 +320,29 @@ void ListItems::operation( const std::string & i_operation)
 const std::vector<int> ListItems::getSelectedIds() const
 {
 	std::vector<int> ids;
-	QModelIndexList indexes( m_view->selectionModel()->selectedIndexes());
-	for( int i = 0; i < indexes.count(); i++)
-		if( Item::isItemP( indexes[i].data()))
-			ids.push_back( Item::toItemP( indexes[i].data())->getId());
+	QModelIndexList indexes(m_view->selectionModel()->selectedIndexes());
+	for (int i = 0; i < indexes.count(); i++)
+		if (Item::isItemP(indexes[i].data()))
+		{
+			Item * item = Item::toItemP(indexes[i].data());
+			if (false == item->isHidden())
+				ids.push_back(item->getId());
+		}
 	return ids;
+}
+
+ButtonsMenu * ListItems::addButtonsMenu(const QString & i_label, const QString & i_tip)
+{
+	m_current_buttons_menu = new ButtonsMenu(this, i_label, i_tip);
+
+	m_panel_l->addWidget(m_current_buttons_menu);
+
+	return m_current_buttons_menu;
+}
+
+void ListItems::resetButtonsMenu()
+{
+	m_current_buttons_menu = NULL;
 }
 
 ButtonPanel * ListItems::addButtonPanel(
@@ -262,11 +352,14 @@ ButtonPanel * ListItems::addButtonPanel(
 		const QString & i_hotkey,
 		bool i_dblclick)
 {
-	ButtonPanel * bp = new ButtonPanel( this, i_label, i_name, i_description, i_hotkey, i_dblclick);
+	ButtonPanel * bp = new ButtonPanel(this, i_label, i_name, i_description, i_hotkey, i_dblclick, m_current_buttons_menu);
 
-	m_panel_l->addWidget( bp);
+	if (m_current_buttons_menu)
+		m_current_buttons_menu->addButton(bp);
+	else
+		m_panel_l->addWidget(bp);
 
-	m_btns.push_back( bp);
+	m_btns.push_back(bp);
 
 	return bp;
 }
@@ -286,5 +379,43 @@ void ListItems::keyPressEvent( QKeyEvent * i_evt)
 
 	for( int i = 0; i < m_btns.size(); i++ )
 		m_btns[i]->keyPressed( str);
+}
+
+void ListItems::addParam(Param * i_param)
+{
+	m_params.append(i_param);
+}
+
+void ListItems::addParam_Int(
+		const QString & i_name,
+		const QString & i_label,
+		const QString & i_tip,
+		int i_min, int i_max)
+{
+	addParam(new Param(Param::TInt, i_name, i_label, i_tip, i_min, i_max));
+}
+
+void ListItems::addParam_Str(
+		const QString & i_name,
+		const QString & i_label,
+		const QString & i_tip)
+{
+	addParam(new Param(Param::TStr, i_name, i_label, i_tip));
+}
+
+void ListItems::addMenuParameters(QMenu * i_menu)
+{
+	QList<Param*>::const_iterator it;
+	for (it = m_params.begin(); it != m_params.end(); it++)
+	{
+		ActionParam * action = new ActionParam(*it);
+		connect(action, SIGNAL(triggeredParam(const Param *)), this, SLOT(changeParam(const Param *)));
+		i_menu->addAction(action);
+	}
+}
+
+void ListItems::changeParam(const Param * i_param)
+{
+	AF_DEV << i_param->name.toUtf8().data();
 }
 

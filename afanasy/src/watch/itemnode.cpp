@@ -31,6 +31,9 @@ ItemNode::~ItemNode()
 
 void ItemNode::updateNodeValues( const af::Node * i_node)
 {
+	m_params["priority"]   = i_node->getPriority();
+	m_params["annotation"] = afqt::stoq(i_node->getAnnotation());
+
 	m_priority    = i_node->getPriority();
 	m_annotation  = afqt::stoq( i_node->getAnnotation());
 	m_custom_data = afqt::stoq( i_node->getCustomData());
@@ -112,11 +115,11 @@ bool ItemNode::filter()
 	return ( false == m_ctrl_sf->getFilterRE().match( m_filter_str));
 }
 
-bool ItemNode::getHidden( int32_t i_flags) const
+bool ItemNode::getHiddenFlags(int32_t i_flags) const
 {
 	bool result = m_flagshidden & i_flags;
 
-	if( i_flags & ListNodes::e_HideInvert)
+	if (i_flags & ListNodes::e_HideInvert)
 		result = !result;
 
 	return result;

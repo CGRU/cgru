@@ -66,7 +66,7 @@ struct drivestats
 static bool get_drive_stats( uint64_t &o_read, uint64_t &o_write);
 static double compute_etime( struct timeval cur_time, struct timeval prev_time);
 
-void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
+void GetResources(af::HostRes & hres, bool verbose)
 {
    /* Will be set to 1 after first run. */
    static unsigned s_init = 0;

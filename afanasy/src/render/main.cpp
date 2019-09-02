@@ -1,11 +1,10 @@
-//#include "../libafanasy/common/dlThread.h"
-
 #ifndef WINNT
+#include <signal.h>
 #include <sys/wait.h>
 #endif
 
 #include "../libafanasy/environment.h"
-#include "../libafanasy/host.h"
+#include "../libafanasy/hostres.h"
 #include "../libafanasy/render.h"
 #include "../libafanasy/renderevents.h"
 
@@ -19,11 +18,26 @@
 
 extern bool AFRunning;
 
-//####################### interrupt signal handler ####################################
-#include <signal.h>
+//######################### Signal handlers ############################################
+#ifdef WINNT
+BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
+{
+	switch (fdwCtrlType)
+	{
+	case CTRL_C_EVENT:        AF_LOG << "Ctrl-C event\n";        break;
+	case CTRL_CLOSE_EVENT:    AF_LOG << "Ctrl-Close event\n";    break;
+	case CTRL_BREAK_EVENT:    AF_LOG << "Ctrl-Break event\n";    break;
+	case CTRL_LOGOFF_EVENT:   AF_LOG << "Ctrl-Logoff event\n";   break;
+	case CTRL_SHUTDOWN_EVENT: AF_LOG << "Ctrl-Shutdown event\n"; break;
+	default:                  AF_LOG << "Ctrl-UNKNOWN event\n";  return FALSE;
+	}
+	AFRunning = false;
+	return TRUE;
+}
+#else
 void sig_pipe(int signum)
 {
-	AFERROR("AFRender SIGPIPE");
+	AF_ERR << "SIGPIPE";
 }
 void sig_int(int signum)
 {
@@ -31,6 +45,7 @@ void sig_int(int signum)
 		fprintf( stderr,"\nAFRender: Interrupt signal catched.\n");
 	AFRunning = false;
 }
+#endif
 //#####################################################################################
 
 // Functions:
@@ -45,16 +60,14 @@ int main(int argc, char *argv[])
 
    // Set signals handlers:
 #ifdef WINNT
-	signal( SIGINT,  sig_int);
-	signal( SIGTERM, sig_int);
-	signal( SIGSEGV, sig_int);
+	if (false == SetConsoleCtrlHandler(CtrlHandler, TRUE))
+		AF_ERR << "SetConsoleCtrlHandler: " << af::GetLastErrorStdStr() << "\n";
 #else
 	struct sigaction actint;
 	bzero( &actint, sizeof(actint));
 	actint.sa_handler = sig_int;
 	sigaction( SIGINT,  &actint, NULL);
 	sigaction( SIGTERM, &actint, NULL);
-	sigaction( SIGSEGV, &actint, NULL);
 	// SIGPIPE signal catch:
 	struct sigaction actpipe;
 	bzero( &actpipe, sizeof(actpipe));
@@ -83,13 +96,11 @@ int main(int argc, char *argv[])
 	// Check resources and exit:
 	if( ENV.hasArgument("-res"))
 	{
-		af::Host host;
 		af::HostRes hostres;
-		GetResources( host, hostres, true);
+		GetResources(hostres, true);
 		af::sleep_msec(100);
-		GetResources( host, hostres);
+		GetResources(hostres);
 		printf("\n");
-		host.v_stdOut( true);
 		hostres.v_stdOut( true);
 		Py_Finalize();
 		return 0;
@@ -201,23 +212,22 @@ AF_LOG << " >>> " << i_msg;
 			AFRunning = false;
 		}
 		// Render was trying to register (its id==0) and server has send id>0
-		// This is the situation when client was sucessfully registered
-//		else if((new_id > 0) && (i_render.getId() == 0))
+		// This is the situation when client was successfully registered
 		else if((new_id > 0) && i_render.notConnected())
 		{
 			i_render.setRegistered( new_id);
 		}
 		// Server sends back zero id on any error
-		else if ( new_id == 0 )
+		else if (new_id == 0)
 		{
-			AF_ERR << "Zero ID recieved, no such online render, re-connecting...";
-			i_render.connectionLost( true);
+			AF_WARN << "Zero ID received, no such online render, re-connecting...";
+			i_render.connectionLost();
 		}
 		// Bad case, should not ever happen, try to re-register.
-		else if ( i_render.getId() != new_id )
+		else if (i_render.getId() != new_id)
 		{
-			AF_ERR << "IDs mistatch: this " << i_render.getId() << " != " << new_id << " new, re-connecting...";
-			i_render.connectionLost( true);
+			AF_ERR << "IDs mismatch: this " << i_render.getId() << " != " << new_id << " new, re-connecting...";
+			i_render.connectionLost();
 		}
 		// Id, that returns from server is equals to stored on client.
 		// This is a normal case.
@@ -241,7 +251,7 @@ AF_LOG << " >>> " << i_msg;
 	}
 	default:
 	{
-        AF_ERR << "Unknown message recieved: " << *i_msg;
+        AF_ERR << "Unknown message received: " << *i_msg;
 		break;
 	}
 	}
