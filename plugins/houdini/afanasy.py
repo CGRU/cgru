@@ -201,6 +201,17 @@ class BlockParameters:
                             rs_picture.evalAsStringAtFrame(self.frame_last)
                         )
 
+            # For files menu in watcher
+            elif roptype == 'geometry':
+                file_geo = ropnode.parm('sopoutput')
+
+                if file_geo is not None:
+                    self.preview = \
+                        afcommon.patternFromPaths(
+                            file_geo.evalAsStringAtFrame(self.frame_first),
+                            file_geo.evalAsStringAtFrame(self.frame_last)
+                        )
+
             # Block command:
             self.cmd = 'hrender_af'
             if afnode.parm('ignore_inputs').eval():
@@ -212,14 +223,6 @@ class BlockParameters:
             self.cmd += ' -s @#@ -e @#@ --by %d -t "%s"' % (
                 self.frame_inc, afnode.parm('take').eval()
             )
-
-#            numWedges = computeWedge(ropnode, roptype)
-#            if numWedges:
-#                self.frame_first = 0
-#                self.frame_last = numWedges - 1
-#                self.frame_inc = 1
-#                self.frame_pertask = 1
-#                self.parser = "mantra"
 
             self.cmd += '%(auxargs)s'
             self.cmd += ' "%(hipfilename)s"'
@@ -808,6 +811,10 @@ def getJobParameters(afnode, subblock=False, frame_range=None, prefix=''):
                 return None
 
         elif node and node.type().name() == "wedge":
+            newprefix = node.name()
+            if prefix != '':
+                newprefix = prefix + '_' + newprefix
+
             wedgednode = None
             if node.inputs():
                 wedgednode = node.inputs()[0]
@@ -824,13 +831,14 @@ def getJobParameters(afnode, subblock=False, frame_range=None, prefix=''):
                 hou.hscript('set WEDGENUM = ' + str(wedge))
                 hou.hscript('varchange')
                 #add wedged node to next block
-                block = getBlockParameters(afnode, wedgednode, subblock, "{}_{}".format(node.name(),wedge), frame_range)[0]
+                block = getBlockParameters(afnode, wedgednode, subblock, "{}_{:02}".format(newprefix,wedge), frame_range)[0]
                 block.auxargs += " --wedge " + node.path() + " --wedgenum " + str(wedge)
                 newparams.append(block)
             # clear environment
             hou.hscript('set WEDGE = ')
             hou.hscript('set WEDGENUM = ')
             hou.hscript('varchange')
+            dependmask = newprefix + '_.*'
 
         else:
             newparams = \
