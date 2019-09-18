@@ -275,6 +275,14 @@ if output is not None and len(output) > 0:
     render_output = output
 
 frame = start
+
+if drivertypename == "alembic":
+    ropnode.render(
+            output_file=render_output,
+            method=hou.renderMethod.FrameByFrame,
+            ignore_inputs=ignoreInputs
+        )
+
 while frame <= end:
     render_range = (frame, frame, by)
     print(parsers.hbatch.keyframe + str(frame))
