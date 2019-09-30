@@ -135,17 +135,17 @@ function stcs_Show(i_args)
 							if (tasks_artists[artist].tags.indexOf(task.tags[g]) == -1)
 								tasks_artists[artist].tags.push(task.tags[g]);
 
-					tasks_artists[tag].duration += task.duration;
+					tasks_artists[artist].duration += task.duration;
 					if (task.done)
-						tasks_artists[tag].done += task.duration;
+						tasks_artists[artist].done += task.duration;
 					if (task.progress)
-						tasks_artists[tag].progress += task.duration * task.progress;
+						tasks_artists[artist].progress += task.duration * task.progress;
 
 					if (task.price)
 					{
-						if (tasks_artists[tag].price == null)
-							tasks_artists[tag].price = 0;
-						tasks_artists[tag].price += task.price;
+						if (tasks_artists[artist].price == null)
+							tasks_artists[artist].price = 0;
+						tasks_artists[artist].price += task.price;
 					}
 				}
 			}
