@@ -126,7 +126,7 @@ function stcs_Show(i_args)
 							"duration": 0,
 							"done": 0,
 							"progress": 0,
-							"price": 0,
+							"price": null,
 							"tags": []
 						};
 
