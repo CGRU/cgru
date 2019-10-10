@@ -660,3 +660,8 @@ void QEnvironment::setHotkey( const QString & i_name, const QString & i_str)
 		ms_attrs_hotkeys[i_name]->str = i_str;
 }
 
+const QString & QEnvironment::getDateTimeFormat()
+{
+	static const QString date_time_format("yyyy.MM.dd HH:mm:ss");
+	return date_time_format;
+}

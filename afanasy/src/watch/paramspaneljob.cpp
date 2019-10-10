@@ -57,14 +57,12 @@ ParamsPanelJob::~ParamsPanelJob()
 
 void ParamsPanelJob::v_updatePanel(Item * i_item)
 {
-	clearFolders();
-
 	ItemJob * job_item = (ItemJob*)(i_item);
 
 	if (job_item)
-	{
 		constructFolders(job_item);
-	}
+	else
+		clearFolders();
 
 	ParamsPanel::v_updatePanel(job_item);
 }
@@ -72,7 +70,10 @@ void ParamsPanelJob::v_updatePanel(Item * i_item)
 void ParamsPanelJob::constructFolders(ItemJob * i_item_job)
 {
 	if (i_item_job->folders.size() == 0)
+	{
+		clearFolders();
 		return;
+	}
 
 	if (af::Environment::hasRULES())
 	{
@@ -113,9 +114,16 @@ void ParamsPanelJob::constructFolders(ItemJob * i_item_job)
 				root = root.left(c);
 		}
 
-		FolderWidget * fw = new FolderWidget(it.key(), it.value(), m_folders_layout);
-
-		m_folders_list.append(fw);
+		QMap<QString, FolderWidget*>::iterator fwIt = m_folders_map.find(it.key());
+		if (fwIt != m_folders_map.end())
+		{
+			FolderWidget * fw = fwIt.value();
+		}
+		else
+		{
+			FolderWidget * fw = new FolderWidget(it.key(), it.value(), m_folders_layout);
+			m_folders_map[it.key()] = fw;
+		}
 	}
 
 	m_folders_root->setText(root);
@@ -127,8 +135,14 @@ void ParamsPanelJob::clearFolders()
 	m_rules_btn->setHidden(true);
 	m_folders_root->setHidden(true);
 
-	while (m_folders_list.size())
-		delete m_folders_list.takeFirst();
+	QMapIterator <QString, FolderWidget*> it(m_folders_map);
+	while (it.hasNext())
+	{
+		it.next();
+		delete it.value();
+	}
+
+	m_folders_map.clear();
 }
 
 void ParamsPanelJob::slot_Rules()
@@ -153,10 +167,10 @@ FolderWidget::FolderWidget(const QString & i_name, const QString & i_value, QLay
 	btn_open->setFixedWidth(72);
 	connect(btn_open, SIGNAL(clicked()), this, SLOT(slot_Open()));
 
-	FValueWidget * fvalue = new FValueWidget();
-	fvalue->setText(m_value);
-	fvalue->setToolTip(m_value);
-	layout->addWidget(fvalue);
+	m_value_widget = new FValueWidget();
+	m_value_widget->setText(m_value);
+	m_value_widget->setToolTip(m_value);
+	layout->addWidget(m_value_widget);
 
 	QPushButton * btn_copy = new QPushButton("C");
 	layout->addWidget(btn_copy);
@@ -173,6 +187,12 @@ FolderWidget::FolderWidget(const QString & i_name, const QString & i_value, QLay
 
 FolderWidget::~FolderWidget()
 {
+}
+
+void FolderWidget::setValue(const QString & i_value)
+{
+	m_value_widget->setText(i_value);
+	m_value_widget->setToolTip(i_value);
 }
 
 void FolderWidget::paintEvent(QPaintEvent * event)

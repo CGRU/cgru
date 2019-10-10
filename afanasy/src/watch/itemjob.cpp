@@ -80,6 +80,7 @@ void ItemJob::updateValues( af::Node * i_node, int i_type)
 	m_params["hosts_mask_exclude"]         = afqt::stoq(job->getHostsMaskExclude());
 	m_params["depend_mask"]                = afqt::stoq(job->getDependMask());
 	m_params["depend_mask_global"]         = afqt::stoq(job->getDependMaskGlobal());
+	m_params["time_wait"]                  = job->getTimeWait();
 
 	setHidden(  job->isHidden()  );
 	setOffline( job->isOffline() );

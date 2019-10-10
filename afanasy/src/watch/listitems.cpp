@@ -403,6 +403,22 @@ void ListItems::addParam_Str(
 	addParam(new Param(Param::TStr, i_name, i_label, i_tip));
 }
 
+void ListItems::addParam_REx(
+		const QString & i_name,
+		const QString & i_label,
+		const QString & i_tip)
+{
+	addParam(new Param(Param::TREx, i_name, i_label, i_tip));
+}
+
+void ListItems::addParam_Tim(
+		const QString & i_name,
+		const QString & i_label,
+		const QString & i_tip)
+{
+	addParam(new Param(Param::Time, i_name, i_label, i_tip));
+}
+
 void ListItems::addMenuParameters(QMenu * i_menu)
 {
 	QList<Param*>::const_iterator it;
@@ -416,6 +432,26 @@ void ListItems::addMenuParameters(QMenu * i_menu)
 
 void ListItems::changeParam(const Param * i_param)
 {
-	AF_DEV << i_param->name.toUtf8().data();
+	Item * item = getCurrentItem();
+	if (NULL == item)
+		return;
+
+	if (false == item->hasParam(i_param->name))
+	{
+		AF_ERR << "No such parameter: " << i_param->name.toUtf8().data();
+		return;
+	}
+
+	QVariant var = item->getParamVar(i_param->name);
+
+	QString str;
+	if (false == i_param->getInputDialog(var, str))
+	{
+		if (false == str.isEmpty())
+			displayError(str);
+		return;
+	}
+
+	setParameter(afqt::qtos(i_param->name), afqt::qtos(str), false);
 }
 

@@ -44,7 +44,7 @@ private:
 
 	QLabel      * m_folders_root;
 
-	QList<FolderWidget*> m_folders_list;
+	QMap<QString, FolderWidget*> m_folders_map;
 };
 
 class FolderWidget: public QWidget
@@ -53,6 +53,8 @@ Q_OBJECT
 public:
 	FolderWidget(const QString & i_name, const QString & i_value, QLayout * i_layout);
 	~FolderWidget();
+
+	void setValue(const QString & i_value);
 
 protected:
 	virtual void paintEvent(QPaintEvent *event);
@@ -65,6 +67,8 @@ private slots:
 private:
 	QString m_name;
 	QString m_value;
+
+	FValueWidget * m_value_widget;
 };
 
 class FValueWidget: public QWidget

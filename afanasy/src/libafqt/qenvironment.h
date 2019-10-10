@@ -148,6 +148,8 @@ public:
 
 	static const QStringList getThemes();
 
+	static const QString & getDateTimeFormat();
+
 	static bool loadTheme( const QString & i_theme);
 
 	static bool loadAttrs( const QString & i_filename );

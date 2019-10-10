@@ -50,6 +50,9 @@ public:
 	static const QString BtnName[WLAST];
 	static const QString WndName[WLAST];
 
+	inline static Dialog  * getDialog() {return ms_d;}
+	static QWidget * getWidget();
+
 	static bool isInitialized();
 	static bool isConnected();
 
@@ -92,7 +95,6 @@ public:
 	static void watchJodTasksWindowRem( int id);
 	static void listenTask( int jobid, int block, int task, const QString & name);
 
-	inline static Dialog * getDialog()  { return ms_d;}
 	static void keyPressEvent( QKeyEvent * event);
 
 	static void ntf_JobAdded( const ItemJob * i_job);

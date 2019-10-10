@@ -81,6 +81,8 @@ Watch::~Watch()
 
 void Watch::destroy() { ms_d = NULL; }
 
+QWidget * Watch::getWidget() { return (QWidget*)(ms_d);}
+
 void Watch::sendMsg( af::Msg * msg)
 {
 	if( msg->type() == af::Msg::TJSON )

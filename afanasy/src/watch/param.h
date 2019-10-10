@@ -14,7 +14,7 @@ public:
 	enum Type {
 		TInt = 0,
 		TStr = 1,
-		TReg = 2,
+		TREx = 2,
 		Time = 3
 	};
 
@@ -25,9 +25,14 @@ public:
 	const int min;
 	const int max;
 
+
 	// Convert variable to string.
 	// Default is true if value is default,
 	// as default parameters can be hidden.
 	const QString varToQStr(const QVariant & i_var, bool * o_default = NULL) const;
+
+
+	// Get value from input dialog.
+	bool getInputDialog(const QVariant & i_var, QString & o_str) const;
 };
 
