@@ -402,13 +402,13 @@ void ListItems::addParam(Param * i_param)
 	m_params.append(i_param);
 }
 
-void ListItems::addParam_Int(
+void ListItems::addParam_Num(
 		const QString & i_name,
 		const QString & i_label,
 		const QString & i_tip,
 		int i_min, int i_max)
 {
-	addParam(new Param(Param::TInt, i_name, i_label, i_tip, i_min, i_max));
+	addParam(new Param(Param::TNum, i_name, i_label, i_tip, i_min, i_max));
 }
 
 void ListItems::addParam_Str(

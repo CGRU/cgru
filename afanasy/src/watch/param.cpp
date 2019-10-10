@@ -33,9 +33,9 @@ const QString Param::varToQStr(const QVariant & i_var, bool * o_default) const
 
 	switch(type)
 	{
-	case TInt:
+	case TNum:
 	{
-		int value = i_var.toInt();
+		int64_t value = i_var.toLongLong();
 		str = QString("%1").arg(value);
 		is_default = (value == -1);
 		break;
@@ -75,10 +75,10 @@ bool Param::getInputDialog(const QVariant & i_var, QString & o_str) const
 	QWidget * qParent = Watch::getWidget();
 	switch(type)
 	{
-	case TInt:
+	case TNum:
 	{
-		int current = i_var.toInt();
-		int value = QInputDialog::getInt(qParent, label, tip, current, min, max, 1, &ok);
+		int64_t current = i_var.toLongLong();
+		int64_t value = QInputDialog::getInt(qParent, label, tip, current, min, max, 1, &ok);
 		if (ok)
 			o_str = QString("%1").arg(value);
 		break;

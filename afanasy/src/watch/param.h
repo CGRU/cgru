@@ -12,7 +12,7 @@ public:
 	~Param();
 
 	enum Type {
-		TInt = 0,
+		TNum = 0,
 		TStr = 1,
 		TREx = 2,
 		Time = 3

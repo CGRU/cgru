@@ -64,7 +64,7 @@ public slots:
 protected:
 
 	void addParam(Param * i_param);
-	void addParam_Int(const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = -1);
+	void addParam_Num(const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = -1);
 	void addParam_Str(const QString & i_name, const QString & i_label, const QString & i_tip);
 	void addParam_REx(const QString & i_name, const QString & i_label, const QString & i_tip);
 	void addParam_Tim(const QString & i_name, const QString & i_label, const QString & i_tip);

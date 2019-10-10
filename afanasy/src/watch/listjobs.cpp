@@ -152,12 +152,12 @@ ListJobs::ListJobs( QWidget* parent):
 		int max = 200;
 		if(( isTypeUsers()) && ( true != af::Environment::VISOR()))
 			max = af::Environment::getPriority();
-		addParam_Int("priority",              "Priorty",         "Priority number", 0, max);
+		addParam_Num("priority",              "Priorty",         "Priority number", 0, max);
 	}
 	addParam_Str("annotation",                "Annotation",      "Annotation string");
 	addParam_Tim("time_wait",                 "Wait Time",       "Time to wait to start");
-	addParam_Int("max_running_tasks",         "Maximum running", "Maximum runnint tasks number", -1, 1<<30);
-	addParam_Int("max_running_tasks_per_host","Max run per host","Max run tasks on the same host", -1, 1<<30);
+	addParam_Num("max_running_tasks",         "Maximum running", "Maximum runnint tasks number", -1, 1<<30);
+	addParam_Num("max_running_tasks_per_host","Max run per host","Max run tasks on the same host", -1, 1<<30);
 	addParam_REx("depend_mask",               "Depend Mask",     "Jobs name mask to wait");
 	addParam_REx("depend_mask_global",        "Global Depend",   "Depend mask for jobs from any user");
 
