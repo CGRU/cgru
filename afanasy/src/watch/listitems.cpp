@@ -177,22 +177,32 @@ const QList<Item*> ListItems::getSelectedItems() const
 	return items;
 }
 
-void ListItems::setSelectedItems( const QList<Item*> & items, bool resetSelection)
+void ListItems::storeSelection()
 {
-	if( resetSelection ) m_view->clearSelection();
-	if( items.count() < 1 ) return;
+	m_stored_selection = getSelectedItems();
+}
+
+void ListItems::reStoreSelection()
+{
+	m_view->clearSelection();
+	if (m_stored_selection.count() < 1)
+		return;
+
 	int modelcount = m_model->count();
 	int lastselectedrow = -1;
-	for( int i = 0; i < modelcount; i++)
+	for (int i = 0; i < modelcount; i++)
 	{
-		if( items.contains( m_model->item(i)))
+		if (m_stored_selection.contains(m_model->item(i)))
 		{
-			m_view->selectionModel()->select( m_model->index(i), QItemSelectionModel::Select);
+			m_view->selectionModel()->select(m_model->index(i), QItemSelectionModel::Select);
 			lastselectedrow = i;
 		}
 	}
+
 	if( lastselectedrow != -1)
 		m_view->selectionModel()->setCurrentIndex( m_model->index(lastselectedrow), QItemSelectionModel::Current);
+
+	m_stored_selection.clear();
 }
 
 void ListItems::doubleClicked_slot( const QModelIndex & index )
@@ -203,6 +213,9 @@ void ListItems::doubleClicked_slot( const QModelIndex & index )
 
 void ListItems::currentItemChanged( const QModelIndex & current, const QModelIndex & previous )
 {
+	if (m_stored_selection.count())
+		return;
+
 	Item * item = NULL;
 
 	if (Item::isItemP(current.data()))
@@ -219,6 +232,9 @@ void ListItems::currentItemChanged( const QModelIndex & current, const QModelInd
 
 void ListItems::selectionChanged(const QItemSelection & i_selected, const QItemSelection & i_deselected)
 {
+	if (m_stored_selection.count())
+		return;
+
 	if (m_view->selectionModel()->selectedIndexes().size() == 0)
 	{
 		// Everything was deselected:

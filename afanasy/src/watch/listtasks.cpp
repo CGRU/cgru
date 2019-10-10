@@ -890,9 +890,9 @@ void ListTasks::sortBlock( int i_block_num)
 	int start = i_block_num+1;
 	for( int b = 0; b < i_block_num; b++) start += m_tasks_num[b];
 
-	const QList<Item*> selection = getSelectedItems();
+	storeSelection();
 	m_model->setItems( start, (Item**)array, m_tasks_num[i_block_num]);
-	setSelectedItems( selection);
+	reStoreSelection();
 
 	delete [] array;
 }

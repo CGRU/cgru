@@ -192,9 +192,9 @@ bool ListNodes::updateItems( af::Msg * msg)
 	// sort needed items, or simple emit data changed signal
 	if( itemsToSort.size() > 0 )
 	{
-		QList<Item*> selectedItems = getSelectedItems();
+		storeSelection();
 		((ModelNodes*)m_model)->sortnodes( itemsToSort);
-		setSelectedItems( selectedItems);
+		reStoreSelection();
 	}
 	else if( firstChangedRow != -1 )
 		m_model->emit_dataChanged( firstChangedRow, lastChangedRow);
@@ -255,9 +255,9 @@ void ListNodes::sort()
 	if( false == m_ctrl_sf->isSortEnabled())
 	   return;
 
-	QList<Item*> selectedItems( getSelectedItems());
+	storeSelection();
 	((ModelNodes*)m_model)->sortnodes();
-	setSelectedItems( selectedItems);
+	reStoreSelection();
 
 	if( m_ctrl_sf->isFilterEnabled()) processHidden();
 }
@@ -327,9 +327,9 @@ void ListNodes::actHideShow( int i_type )
 
 void ListNodes::sortMatch( const std::vector<int32_t> & i_list)
 {
-	QList<Item*> selectedItems( getSelectedItems());
+	storeSelection();
 	((ModelNodes*)m_model)->sortMatch( i_list);
-	setSelectedItems( selectedItems);
+	reStoreSelection();
 }
 
 void ListNodes::actPriority()

@@ -84,6 +84,7 @@ void ParamsPanelJob::constructFolders(ItemJob * i_item_job)
 		}
 	}
 
+	// Append new or update folder widgets:
 	QString root;
 	QMapIterator<QString, QString> it(i_item_job->folders);
 	while (it.hasNext())
@@ -117,13 +118,29 @@ void ParamsPanelJob::constructFolders(ItemJob * i_item_job)
 		QMap<QString, FolderWidget*>::iterator fwIt = m_folders_map.find(it.key());
 		if (fwIt != m_folders_map.end())
 		{
+			// Update exisintg folder widget:
 			FolderWidget * fw = fwIt.value();
+			fw->setValue(it.value());
 		}
 		else
 		{
+			// Create a new folder widget:
 			FolderWidget * fw = new FolderWidget(it.key(), it.value(), m_folders_layout);
 			m_folders_map[it.key()] = fw;
 		}
+	}
+
+	// Delete not existing folder widgets:
+	QMap<QString, FolderWidget*>::iterator fwIt = m_folders_map.begin();
+	while (fwIt != m_folders_map.end())
+	{
+		if (false == i_item_job->folders.contains(fwIt.key()))
+		{
+			delete fwIt.value();
+			fwIt = m_folders_map.erase(fwIt);
+		}
+		else
+			fwIt++;
 	}
 
 	m_folders_root->setText(root);

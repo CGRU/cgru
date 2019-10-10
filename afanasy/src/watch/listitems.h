@@ -91,7 +91,8 @@ protected:
 	int getSelectedItemsCount() const;
 	const QList<Item*> getSelectedItems() const;
 	const std::vector<int> getSelectedIds() const;
-	void setSelectedItems( const QList<Item*> & items, bool resetSelection = true);
+	void storeSelection();
+	void reStoreSelection();
 
 	ButtonsMenu * addButtonsMenu(const QString & i_label, const QString & i_tip);
 	void resetButtonsMenu();
@@ -139,4 +140,6 @@ private:
 	ButtonsMenu * m_current_buttons_menu;
 
 	std::vector<ButtonPanel*> m_btns;
+
+	QList<Item*> m_stored_selection;
 };
