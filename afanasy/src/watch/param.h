@@ -15,7 +15,8 @@ public:
 		TNum = 0,
 		TStr = 1,
 		TREx = 2,
-		Time = 3
+		Time = 3,
+		THrs = 4
 	};
 
 	const int type;

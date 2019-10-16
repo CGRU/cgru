@@ -59,6 +59,18 @@ const QString Param::varToQStr(const QVariant & i_var, bool * o_default) const
 			str = QDateTime::fromSecsSinceEpoch(value).toString(afqt::QEnvironment::getDateTimeFormat());
 		break;
 	}
+	case THrs:
+	{
+		int64_t value = i_var.toLongLong();
+		if (value <= 0)
+		{
+			is_default = true;
+			str = "";
+		}
+		else
+			str = afqt::stoq(af::time2strHMS(value, true));
+		break;
+	}
 	default:
 		AF_ERR << "Unknown parameter '" << name.toUtf8().data() << "' type: " << type;
 	}
@@ -116,8 +128,10 @@ bool Param::getInputDialog(const QVariant & i_var, QString & o_str) const
 			qdt = QDateTime::fromSecsSinceEpoch(time);
 		else
 			qdt = QDateTime::currentDateTime();
+
+		QString _tip = tip + "\n" + afqt::QEnvironment::getDateTimeFormat();
 		QString current = qdt.toString(afqt::QEnvironment::getDateTimeFormat());
-		QString value = QInputDialog::getText(qParent, label, tip, QLineEdit::Normal, current, &ok);
+		QString value = QInputDialog::getText(qParent, label, _tip, QLineEdit::Normal, current, &ok);
 		if (ok)
 		{
 			if ((value.size() == 0) || (value == "0"))
@@ -134,6 +148,23 @@ bool Param::getInputDialog(const QVariant & i_var, QString & o_str) const
 			}
 			else
 				o_str = QString("%1").arg(qdt.toSecsSinceEpoch());
+		}
+		break;
+	}
+	case THrs:
+	{
+		int64_t time = i_var.toLongLong();
+
+		QString _tip = tip + "\nEnter number of hours";
+		double current = double(time) / (60.0 * 60.0);
+		double value = QInputDialog::getDouble(qParent, label, _tip, current, -1, 1<<30, 1, &ok);
+
+		if (ok)
+		{
+			if (value <= 0)
+				o_str = "0";
+			else
+				o_str = QString("%1").arg(int(value * (60.0 * 60.0)));
 		}
 		break;
 	}

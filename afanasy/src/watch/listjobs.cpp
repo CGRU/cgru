@@ -156,10 +156,11 @@ ListJobs::ListJobs( QWidget* parent):
 	}
 	addParam_Str("annotation",                "Annotation",      "Annotation string");
 	addParam_Tim("time_wait",                 "Wait Time",       "Time to wait to start");
-	addParam_Num("max_running_tasks",         "Maximum running", "Maximum runnint tasks number", -1, 1<<30);
-	addParam_Num("max_running_tasks_per_host","Max run per host","Max run tasks on the same host", -1, 1<<30);
+	addParam_Num("max_running_tasks",         "Maximum Running", "Maximum runnint tasks number", -1, 1<<30);
+	addParam_Num("max_running_tasks_per_host","Max Run Per Host","Max run tasks on the same host", -1, 1<<30);
 	addParam_REx("depend_mask",               "Depend Mask",     "Jobs name mask to wait");
 	addParam_REx("depend_mask_global",        "Global Depend",   "Depend mask for jobs from any user");
+	addParam_Hrs("time_life",                 "Life Time",       "Time to be deleted after creation");
 
 	m_paramspanel = new ParamsPanelJob();
 	initListNodes();

@@ -68,6 +68,7 @@ protected:
 	void addParam_Str(const QString & i_name, const QString & i_label, const QString & i_tip);
 	void addParam_REx(const QString & i_name, const QString & i_label, const QString & i_tip);
 	void addParam_Tim(const QString & i_name, const QString & i_label, const QString & i_tip);
+	void addParam_Hrs(const QString & i_name, const QString & i_label, const QString & i_tip);
 
 	void initListItems();
 

@@ -435,6 +435,14 @@ void ListItems::addParam_Tim(
 	addParam(new Param(Param::Time, i_name, i_label, i_tip));
 }
 
+void ListItems::addParam_Hrs(
+		const QString & i_name,
+		const QString & i_label,
+		const QString & i_tip)
+{
+	addParam(new Param(Param::THrs, i_name, i_label, i_tip));
+}
+
 void ListItems::addMenuParameters(QMenu * i_menu)
 {
 	QList<Param*>::const_iterator it;
