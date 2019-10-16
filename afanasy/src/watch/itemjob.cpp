@@ -82,6 +82,8 @@ void ItemJob::updateValues( af::Node * i_node, int i_type)
 	m_params["depend_mask_global"]         = afqt::stoq(job->getDependMaskGlobal());
 	m_params["time_wait"]                  = job->getTimeWait();
 	m_params["time_life"]                  = job->getTimeLife();
+	m_params["need_os"]                    = afqt::stoq(job->getNeedOS());
+	m_params["need_properties"]            = afqt::stoq(job->getNeedProperties());
 
 	setHidden(  job->isHidden()  );
 	setOffline( job->isOffline() );

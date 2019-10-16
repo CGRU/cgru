@@ -154,13 +154,17 @@ ListJobs::ListJobs( QWidget* parent):
 			max = af::Environment::getPriority();
 		addParam_Num("priority",              "Priorty",         "Priority number", 0, max);
 	}
-	addParam_Str("annotation",                "Annotation",      "Annotation string");
-	addParam_Tim("time_wait",                 "Wait Time",       "Time to wait to start");
-	addParam_Num("max_running_tasks",         "Maximum Running", "Maximum runnint tasks number", -1, 1<<30);
-	addParam_Num("max_running_tasks_per_host","Max Run Per Host","Max run tasks on the same host", -1, 1<<30);
-	addParam_REx("depend_mask",               "Depend Mask",     "Jobs name mask to wait");
-	addParam_REx("depend_mask_global",        "Global Depend",   "Depend mask for jobs from any user");
-	addParam_Hrs("time_life",                 "Life Time",       "Time to be deleted after creation");
+	addParam_Str("annotation",                "Annotation",         "Annotation string");
+	addParam_Tim("time_wait",                 "Wait Time",          "Time to wait to start");
+	addParam_Num("max_running_tasks",         "Maximum Running",    "Maximum runnint tasks number", -1, 1<<30);
+	addParam_Num("max_running_tasks_per_host","Max Run Per Host",   "Max run tasks on the same host", -1, 1<<30);
+	addParam_REx("hosts_mask",                "Hosts Mask",         "Host names pattern that job can run on");
+	addParam_REx("hosts_mask_exclude",        "Hosts Mask Exclude", "Host names pattern that job will not run");
+	addParam_REx("depend_mask",               "Depend Mask",        "Jobs name mask to wait");
+	addParam_REx("depend_mask_global",        "Global Depend",      "Depend mask for jobs from any user");
+	addParam_Hrs("time_life",                 "Life Time",          "Time to be deleted after creation");
+	addParam_REx("need_os",                   "OS Needed",          "Job will run only on this OS");
+	addParam_REx("need_properties",           "Properties Needed",  "Job need client that has such properties");
 
 	m_paramspanel = new ParamsPanelJob();
 	initListNodes();
@@ -349,55 +353,16 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	submenu = new QMenu( "Set Parameter", this);
 
 	addMenuParameters(submenu);
-/*
-	action = new QAction( "Max Running Tasks", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunningTasks() ));
-	submenu->addAction( action);
-	action = new QAction( "Max Run Tasks Per Host", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunTasksPerHost() ));
-	submenu->addAction( action);
-	action = new QAction( "Hosts Mask", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actHostsMask() ));
-	submenu->addAction( action);
-	action = new QAction( "Hosts Exclude Mask", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actHostsMaskExclude() ));
-	submenu->addAction( action);
 
-	if(( af::Environment::VISOR()) || ( af::Environment::getPermUserModJobPriority()))
-	{
-	   action = new QAction( "Priority", this);
-	   connect( action, SIGNAL( triggered() ), this, SLOT( actPriority() ));
-	   submenu->addAction( action);
-	}
+	submenu->addSeparator();
 
-	action = new QAction( "Depend Mask", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actDependMask() ));
-	submenu->addAction( action);
-	action = new QAction( "Global Depend Mask", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actDependMaskGlobal() ));
-	submenu->addAction( action);
-	action = new QAction( "Wait Time", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actWaitTime() ));
-	submenu->addAction( action);
 	action = new QAction( "Preview Approval", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actPreviewApproval() ));
 	submenu->addAction( action);
 	action = new QAction( "No Preview Approval", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actNoPreviewApproval() ));
 	submenu->addAction( action);
-	action = new QAction( "OS Needed", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actNeedOS() ));
-	submenu->addAction( action);
-	action = new QAction( "Properties Needed", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actNeedProperties() ));
-	submenu->addAction( action);
-	action = new QAction( "Post Command", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actPostCommand() ));
-	submenu->addAction( action);
-	action = new QAction( "Life Time", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actLifeTime() ));
-	submenu->addAction( action);
-*/
+
 	submenu->addSeparator();
 
 	action = new QAction( "Hidden", this);
@@ -405,6 +370,12 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	submenu->addAction( action);
 	action = new QAction( "Not Hidden", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actUnsetHidden() ));
+	submenu->addAction( action);
+
+	submenu->addSeparator();
+
+	action = new QAction( "Post Command", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actPostCommand() ));
 	submenu->addAction( action);
 
 	submenu->addSeparator();
@@ -705,31 +676,6 @@ void ListJobs::actSetUser()
 	setParameter("user_name", afqt::qtos( text));
 }
 
-void ListJobs::actWaitTime()
-{
-	static const QString format("yyyy.MM.dd HH:mm:ss");
-
-	ItemJob* jobitem = (ItemJob*)getCurrentItem();
-	if( jobitem == NULL ) return;
-
-	uint32_t waittime = jobitem->time_wait;
-	if( waittime < time( NULL)) waittime = time( NULL);
-	QString current = QDateTime::fromTime_t( waittime).toString( format);
-	bool ok;
-	QString waittime_str = QInputDialog::getText(this, "Set Wait Time", format, QLineEdit::Normal, current, &ok);
-	if( !ok) return;
-
-	waittime = QDateTime::fromString( waittime_str, format).toTime_t();
-//printf("waittime_str=\"%s\", waittime=%d\n", waittime_str.toUtf8().data(), waittime);
-	if( waittime == unsigned(-1) )
-	{
-		displayError( "Time format : " + format);
-		return;
-	}
-
-	setParameter("time_wait", waittime);
-}
-
 void ListJobs::actChangeBranch()
 {
 	ItemJob* jobitem = (ItemJob*)getCurrentItem();
@@ -739,110 +685,6 @@ void ListJobs::actChangeBranch()
 	QString branch = QInputDialog::getText(this, "Change Branch", "Branch", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 	setParameter("branch", afqt::qtos( branch));
-}
-
-void ListJobs::actMaxRunningTasks()
-{
-	ItemJob* jobitem = (ItemJob*)getCurrentItem();
-	if( jobitem == NULL ) return;
-	int current = jobitem->maxrunningtasks;
-
-	bool ok;
-	int max = QInputDialog::getInt(this, "Change Maximum Running Tasks", "Enter Number", current, -1, 999999, 1, &ok);
-	if( !ok) return;
-
-	setParameter("max_running_tasks", max);
-}
-
-void ListJobs::actMaxRunTasksPerHost()
-{
-	ItemJob* jobitem = (ItemJob*)getCurrentItem();
-	if( jobitem == NULL ) return;
-	int current = jobitem->maxruntasksperhost;
-
-	bool ok;
-	int max = QInputDialog::getInt(this, "Change Maximum Running Tasks Per Host", "Enter Number", current, -1, 999999, 1, &ok);
-	if( !ok) return;
-
-	setParameter("max_running_tasks_per_host", max);
-}
-
-void ListJobs::actHostsMask()
-{
-	ItemJob* jobitem = (ItemJob*)getCurrentItem();
-	if( jobitem == NULL ) return;
-	QString current = jobitem->hostsmask;
-
-	bool ok;
-	QString mask = QInputDialog::getText(this, "Change Hosts Mask", "Enter New Mask", QLineEdit::Normal, current, &ok);
-	if( !ok) return;
-
-	setParameterRE("hosts_mask", afqt::qtos( mask));
-}
-
-void ListJobs::actHostsMaskExclude()
-{
-	ItemJob* jobitem = (ItemJob*)getCurrentItem();
-	if( jobitem == NULL ) return;
-	QString current = jobitem->hostsmask_exclude;
-
-	bool ok;
-	QString mask = QInputDialog::getText(this, "Change Exclude Mask", "Enter New Mask", QLineEdit::Normal, current, &ok);
-	if( !ok) return;
-
-	setParameterRE("hosts_mask_exclude", afqt::qtos( mask));
-}
-
-void ListJobs::actDependMask()
-{
-	ItemJob* jobitem = (ItemJob*)getCurrentItem();
-	if( jobitem == NULL ) return;
-	QString current = jobitem->dependmask;
-
-	bool ok;
-	QString mask = QInputDialog::getText(this, "Change Depend Mask", "Enter New Mask", QLineEdit::Normal, current, &ok);
-	if( !ok) return;
-
-	setParameterRE("depend_mask", afqt::qtos( mask));
-}
-
-void ListJobs::actDependMaskGlobal()
-{
-	ItemJob* jobitem = (ItemJob*)getCurrentItem();
-	if( jobitem == NULL ) return;
-	QString current = jobitem->dependmask_global;
-
-	bool ok;
-	QString mask = QInputDialog::getText(this, "Change Depend Mask", "Enter New Mask", QLineEdit::Normal, current, &ok);
-	if( !ok) return;
-
-	setParameterRE("depend_mask_global", afqt::qtos( mask));
-}
-
-void ListJobs::actNeedOS()
-{
-	ItemJob* jobitem = (ItemJob*)getCurrentItem();
-	if( jobitem == NULL ) return;
-	QString current = jobitem->need_os;
-
-	bool ok;
-	QString mask = QInputDialog::getText(this, "Change OS Needed", "Enter New Mask", QLineEdit::Normal, current, &ok);
-	if( !ok) return;
-
-	setParameterRE("need_os", afqt::qtos( mask));
-}
-
-void ListJobs::actNeedProperties()
-{
-	ItemJob* jobitem = (ItemJob*)getCurrentItem();
-	if( jobitem == NULL ) return;
-	QString current = jobitem->need_properties;
-
-	bool ok;
-	QString mask = QInputDialog::getText(this, "Change Properties Needed", "Enter New Mask", QLineEdit::Normal, current, &ok);
-	if( !ok) return;
-
-	setParameterRE("need_properties", afqt::qtos( mask));
 }
 
 void ListJobs::actPostCommand()
@@ -856,21 +698,6 @@ void ListJobs::actPostCommand()
 	if( !ok) return;
 
 	setParameter("command_post", afqt::qtos( cmd));
-}
-
-void ListJobs::actLifeTime()
-{
-	ItemJob* jobitem = (ItemJob*)getCurrentItem();
-	if( jobitem == NULL ) return;
-	double cur = double( jobitem->lifetime ) / (60.0*60.0);
-
-	bool ok;
-	double hours = QInputDialog::getDouble( this, "Life Time", "Enter number of hours (0=infinite)", cur, -1, 365*24, 3, &ok);
-	if( !ok) return;
-
-	int seconds = hours * 60.0 * 60.0;
-	if( seconds < -1 ) seconds = -1;
-	setParameter("time_life", seconds);
 }
 
 void ListJobs::doubleClicked( Item * item)

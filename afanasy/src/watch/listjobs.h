@@ -41,18 +41,8 @@ private slots:
 	void actMoveBottom();
 
 	void actSetUser();
-	void actHostsMask();
-	void actHostsMaskExclude();
 	void actChangeBranch();
-	void actMaxRunningTasks();
-	void actMaxRunTasksPerHost();
-	void actDependMask();
-	void actDependMaskGlobal();
-	void actWaitTime();
-	void actNeedOS();
-	void actNeedProperties();
 	void actPostCommand();
-	void actLifeTime();
 	void actSetHidden();
 	void actUnsetHidden();
 	void actPreviewApproval();
