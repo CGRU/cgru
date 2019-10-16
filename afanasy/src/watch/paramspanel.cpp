@@ -187,14 +187,14 @@ void ParamsPanel::v_updatePanel(Item * i_item)
 {
 	m_cur_item = i_item;
 
-	m_name->clear();
-	m_info_text->clear();
-
 	updateParams();
 
 	if (NULL == m_cur_item)
 	{
-		AF_DEBUG << "ParamsPanel::v_updatePanel(): NULL item. Clearing.";
+		m_name->clear();
+		m_info_text->clear();
+		m_info_label->setHidden(false);
+
 		return;
 	}
 
@@ -203,6 +203,7 @@ void ParamsPanel::v_updatePanel(Item * i_item)
 	m_name->setText(QString("<b>%1</b>").arg(m_cur_item->getName()));
 
 	m_info_text->setText(m_cur_item->getInfoText());
+	m_info_label->setHidden(true);
 }
 
 void ParamsPanel::addParamWidget(ParamWidget * i_pw)
