@@ -66,6 +66,7 @@ class BlockParameters:
         self.maxperhost = -1
         self.maxruntime = -1
         self.minruntime = -1
+        self.progress_timeout = -1
         self.capacity = -1
         self.capacity_min = -1
         self.capacity_max = -1
@@ -82,8 +83,9 @@ class BlockParameters:
             self.priority = int(afnode.parm('priority').eval())
             self.max_runtasks = int(afnode.parm('max_runtasks').eval())
             self.maxperhost = int(afnode.parm('maxperhost').eval())
-            self.maxruntime = int(afnode.parm('maxruntime').eval())
+            self.maxruntime = float(afnode.parm('maxruntime').eval())
             self.minruntime = int(afnode.parm('minruntime').eval())
+            self.progress_timeout = float(afnode.parm('progress_timeout').eval())
             self.min_memory = int(afnode.parm('min_memory').eval())
             self.capacity = int(afnode.parm('capacity').eval())
             self.capacity_min = int(
@@ -359,8 +361,12 @@ class BlockParameters:
         if self.capacity_min != -1 or self.capacity_max != -1:
             block.setVariableCapacity(self.capacity_min, self.capacity_max)
 
-        block.setTaskMinRunTime(self.minruntime)
-        block.setTaskMaxRunTime(self.maxruntime*3600)
+        if self.minruntime > 0.01:
+            block.setTaskMinRunTime(self.minruntime)
+        if self.maxruntime > 0.01:
+            block.setTaskMaxRunTime(int(self.maxruntime*3600.0))
+        if self.progress_timeout > 0.01:
+            block.setTaskProgressChangeTimeout(int(self.progress_timeout*3600.0))
 
 
         # Delete files in a block post command:
