@@ -34,6 +34,16 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 
 	updateNodeValues( i_node);
 
+	m_params["max_running_tasks"]          = user->getMaxRunningTasks();
+	m_params["max_running_tasks_per_host"] = user->getMaxRunTasksPerHost();
+	m_params["hosts_mask"]                 = afqt::stoq(user->getHostsMask());
+	m_params["hosts_mask_exclude"]         = afqt::stoq(user->getHostsMaskExclude());
+	m_params["errors_avoid_host"]          = user->getErrorsAvoidHost();
+	m_params["errors_task_same_host"]      = user->getErrorsTaskSameHost();
+	m_params["errors_retries"]             = user->getErrorsRetries();
+	m_params["errors_forgive_time"]        = user->getErrorsForgiveTime();
+	m_params["jobs_life_time"]             = user->getJobsLifeTime();
+
 	hostname                   = afqt::stoq(user->getHostName());
 	jobs_num                   = user->getNumJobs();
 	running_tasks_num          = user->getRunningTasksNum();
@@ -148,7 +158,25 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 
 	m_tooltip = user->v_generateInfoString( true).c_str();
 
+	updateInfo(user);
+
 	calcHeight();
+}
+
+void ItemUser::updateInfo(af::User * i_user)
+{
+	m_info_text.clear();
+
+	m_info_text = QString("Jobs total: <b>%1</b>").arg(i_user->getNumJobs());
+	m_info_text += QString(", running: <b>%1</b>").arg(i_user->getNumRunningJobs());
+	m_info_text += "<br>";
+
+	if (i_user->getHostName().size())
+		m_info_text += QString("<br>Activity host: <b>%1</b>").arg(afqt::stoq(i_user->getHostName()));
+
+	m_info_text += "<br>";
+	m_info_text += QString("<br>Registered at: <b>%1</b>").arg(afqt::time2Qstr(i_user->getTimeRegister()));
+	m_info_text += QString("<br>Last activity at: <b>%1</b>").arg(afqt::time2Qstr(i_user->getTimeActivity()));
 }
 
 bool ItemUser::calcHeight()

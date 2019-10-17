@@ -84,6 +84,20 @@ ListUsers::ListUsers( QWidget* parent):
 
 
 	// Add parameters:
+	if (af::Environment::VISOR() || (af::Environment::getPermUserModHisPriority()))
+	{
+		addParam_Num("priority", "Priority",  "Priority number", 0, 250);
+	}
+	addParam_Str("annotation",                "Annotation",             "Annotation string");
+	addParam_Num("max_running_tasks",         "Maximum Running",        "Maximum running tasks number", -1, 1<<20);
+	addParam_Num("max_running_tasks_per_host","Max Run Per Host",       "Max run tasks on the same host", -1, 1<<20);
+	addParam_REx("hosts_mask",                "Hosts Mask",             "Host names pattern that job can run on");
+	addParam_REx("hosts_mask_exclude",        "Hosts Mask Exclude",     "Host names pattern that job will not run");
+	addParam_Num("errors_avoid_host",         "Errors Job  Avoid Host", "Number of errors for job to avoid host", -1, 1<<10);
+	addParam_Num("errors_task_same_host",     "Errors Task Avoid Host", "Number of errors for task to avoid host", -1, 1<<10);
+	addParam_Num("errors_retries",            "Errors Retries",         "Number of errors task retries", -1, 1<<10);
+	addParam_Hrs("errors_forgive_time",       "Errors Forgive Time",    "After this time host errors will be reset");
+	addParam_Hrs("jobs_life_time",            "Jobs Life Time",         "After this time job will be deleted");
 
 
 	m_parentWindow->setWindowTitle("Users");
@@ -126,46 +140,7 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 
 		menu.addSeparator();
 
-		action = new QAction( "Set Max Running Tasks", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunningTasks() ));
-		menu.addAction( action);
-		action = new QAction( "Set Max Run Tasks Per Host", this);
-		connect(action, SIGNAL(triggered() ), this, SLOT(actMaxRunTasksPerHost()));
-		menu.addAction( action);
-		action = new QAction( "Set Hosts Mask", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actHostsMask() ));
-		menu.addAction( action);
-		action = new QAction( "Set Exclude Hosts Mask", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actHostsMaskExclude() ));
-		menu.addAction( action);
-
-		if(( af::Environment::VISOR()) || ( af::Environment::getPermUserModHisPriority()))
-		{
-			action = new QAction( "Set Priority", this);
-			connect( action, SIGNAL( triggered() ), this, SLOT( actPriority() ));
-			menu.addAction( action);
-		}
-
-		menu.addSeparator();
-
-		action = new QAction( "Set Job Avoid Errors", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actErrorsAvoidHost() ));
-		menu.addAction( action);
-		action = new QAction( "Set Task Avoid Errors", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actErrorsSameHost() ));
-		menu.addAction( action);
-		action = new QAction( "Set Task Error Retries", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actErrorRetries() ));
-		menu.addAction( action);
-		action = new QAction( "Set Errors Forgive Time", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actErrorsForgiveTime() ));
-		menu.addAction( action);
-
-		menu.addSeparator();
-
-		action = new QAction( "Set Jobs Life Time", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actJobsLifeTime() ));
-		menu.addAction( action);
+		addMenuParameters(submenu);
 
 		menu.addSeparator();
 
@@ -275,123 +250,6 @@ void ListUsers::calcTitle()
 		if (itemuser->running_tasks_num > 0) running++;
 	}
 	m_parentWindow->setWindowTitle(QString("U[%1]: %2R").arg( total).arg( running));
-}
-
-void ListUsers::actErrorsAvoidHost()
-{
-	ItemUser* useritem = (ItemUser*)getCurrentItem();
-	if( useritem == NULL ) return;
-	int current = useritem->errors_avoidhost;
-
-	bool ok;
-	int value = QInputDialog::getInt(this, "Errors to avoid host", "Enter Number of Errors", current, 0, 99, 1, &ok);
-	if( !ok) return;
-
-	setParameter("errors_avoid_host", value);
-}
-
-void ListUsers::actErrorsSameHost()
-{
-	ItemUser* useritem = (ItemUser*)getCurrentItem();
-	if( useritem == NULL ) return;
-	int current = useritem->errors_tasksamehost;
-
-	bool ok;
-	int value = QInputDialog::getInt(this, "Errors same host", "Enter Number of Errors", current, 0, 99, 1, &ok);
-	if( !ok) return;
-
-	setParameter("errors_task_same_host", value);
-}
-
-void ListUsers::actErrorRetries()
-{
-	ItemUser* useritem = (ItemUser*)getCurrentItem();
-	if( useritem == NULL ) return;
-	int current = useritem->errors_retries;
-
-	bool ok;
-	int value = QInputDialog::getInt(this, "Auto retry error tasks", "Enter Number of Errors", current, 0, 99, 1, &ok);
-	if( !ok) return;
-
-	setParameter("errors_retries", value);
-}
-
-void ListUsers::actErrorsForgiveTime()
-{
-	ItemUser* useritem = (ItemUser*)getCurrentItem();
-	if( useritem == NULL ) return;
-	double cur = double( useritem->errors_forgivetime ) / (60.0*60.0);
-
-	bool ok;
-	double hours = QInputDialog::getDouble( this, "Errors Forgive Time", "Enter number of hours (0=infinite)", cur, 0, 365*24, 3, &ok);
-	if( !ok) return;
-
-	setParameter("errors_forgive_time", int( hours * 60.0 * 60.0 ));
-}
-
-void ListUsers::actJobsLifeTime()
-{
-	ItemUser* useritem = (ItemUser*)getCurrentItem();
-	if( useritem == NULL ) return;
-	double cur = double( useritem->jobs_lifetime ) / (60.0*60.0);
-
-	bool ok;
-	double hours = QInputDialog::getDouble( this, "Jobs Life Time", "Enter number of hours (0=infinite)", cur, 0, 365*24, 3, &ok);
-	if( !ok) return;
-
-	setParameter("jobs_life_time", int( hours * 60.0 * 60.0 ));
-}
-
-void ListUsers::actMaxRunningTasks()
-{
-	ItemUser* useritem = (ItemUser*)getCurrentItem();
-	if( useritem == NULL ) return;
-	int current = useritem->max_running_tasks;
-
-	bool ok;
-	int max = QInputDialog::getInt(this, "Change Maximum Running Tasks", "Enter Number", current, -1, 9999, 1, &ok);
-	if( !ok) return;
-
-	setParameter("max_running_tasks", max);
-}
-
-void ListUsers::actMaxRunTasksPerHost()
-{
-	ItemUser * useritem = (ItemUser*)getCurrentItem();
-	if (useritem == NULL) return;
-	int current = useritem->max_running_tasks_per_host;
-
-	bool ok;
-	int max = QInputDialog::getInt(this, "Change Max Run Tasks Per Host", "Enter Number", current, -1, 9999, 1, &ok);
-	if( !ok) return;
-
-	setParameter("max_running_tasks_per_host", max);
-}
-
-void ListUsers::actHostsMask()
-{
-	ItemUser* useritem = (ItemUser*)getCurrentItem();
-	if( useritem == NULL ) return;
-	QString current = useritem->hostsmask;
-
-	bool ok;
-	QString mask = QInputDialog::getText(this, "Change Hosts Mask", "Enter Mask", QLineEdit::Normal, current, &ok);
-	if( !ok) return;
-
-	setParameterRE("hosts_mask", afqt::qtos( mask));
-}
-
-void ListUsers::actHostsMaskExclude()
-{
-	ItemUser* useritem = (ItemUser*)getCurrentItem();
-	if( useritem == NULL ) return;
-	QString current = useritem->hostsmask_exclude;
-
-	bool ok;
-	QString mask = QInputDialog::getText(this, "Change Exclude Mask", "Enter Mask", QLineEdit::Normal, current, &ok);
-	if( !ok) return;
-
-	setParameterRE("hosts_mask_exclude", afqt::qtos( mask));
 }
 
 void ListUsers::actDelete() { operation("delete"); }

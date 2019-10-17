@@ -39,6 +39,9 @@ protected:
 	virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
 
 private:
+	void updateInfo(af::User * i_user);
+
+private:
 
 	static const int HeightUser;
 	static const int HeightAnnotation;

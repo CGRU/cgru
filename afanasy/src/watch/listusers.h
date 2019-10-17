@@ -25,15 +25,6 @@ private slots:
 
 	void userAdded( ItemNode * node, const QModelIndex & index);
 
-	void actHostsMask();
-	void actHostsMaskExclude();
-	void actMaxRunningTasks();
-	void actMaxRunTasksPerHost();
-	void actErrorsAvoidHost();
-	void actErrorRetries();
-	void actErrorsSameHost();
-	void actErrorsForgiveTime();
-	void actJobsLifeTime();
 	void actRequestLog();
 
 	void actSolveJobsByOrder();
