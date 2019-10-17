@@ -139,9 +139,11 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 		menu.addAction( action);
 
 		menu.addSeparator();
+		submenu = new QMenu("Set Parameter", this);
 
 		addMenuParameters(submenu);
 
+		menu.addMenu( submenu);
 		menu.addSeparator();
 
 		submenu = new QMenu("Jobs Solving Method", this);
