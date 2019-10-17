@@ -715,7 +715,9 @@ var fu_walk_params = {
 		"width": '33%'
 	},
 	mediainfo:
-		{"label": 'Get Media Info', 'type': "bool", 'default': false, "lwidth": '180px', "width": '33%'}
+		{"label": 'Get Media Info', 'type': "bool", 'default': false, "lwidth": '170px', "width": '34%'},
+	af_hostsmask: {'label': 'Hosts Mask', 'width': '50%', 'lwidth': '160px'},
+	af_paused: {'label': 'Paused', 'width': '50%', 'lwidth': '50px', 'type': 'bool'}
 };
 
 function fu_Walk(i_args)
@@ -761,6 +763,8 @@ function fu_WalkProcessGUI(i_wnd)
 
 	var job = {};
 	job.name = 'Walk ' + params.path;
+	job.hosts_mask = params.af_hostsmask;
+	job.offline = params.af_paused;
 
 	var block = {};
 	block.name = 'walk';
