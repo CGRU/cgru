@@ -35,7 +35,7 @@ ParamsPanel::ParamsPanel():
 	m_layout_name->addLayout(btns_layout);
 
 	// ⏵ ⏷ ▶ ▼ ◥ ⯆ ⯈ This characters may not work,
-	// even on a machine where are they correctly shown in the code.
+	// even on a machine where they correctly shown in the code.
 	m_btn_layout_bottom = new QPushButton("<<<");
 	btns_layout->addWidget(m_btn_layout_bottom);
 	m_btn_layout_bottom->setFixedSize(32,12);
@@ -116,9 +116,18 @@ void ParamsPanel::initPanel(const QList<Param*> & i_params, QSplitter * i_splitt
 	m_splitter = i_splitter;
 	m_type = i_type;
 
-	QList<Param*>::const_iterator it;
-	for (it = i_params.begin(); it != i_params.end(); it++)
-		addParamWidget(new ParamWidget(*it));
+	if (i_params.empty())
+	{
+		// Hide parametes if empty:
+		m_params_frame->setHidden(true);
+	}
+	else
+	{
+		// Add wiget to each parameter:
+		QList<Param*>::const_iterator it;
+		for (it = i_params.begin(); it != i_params.end(); it++)
+			addParamWidget(new ParamWidget(*it));
+	}
 
 	// Set stored position:
 	m_position = afqt::QEnvironment::ms_attrs_panel[m_type + "_pos"].n;
@@ -202,7 +211,7 @@ void ParamsPanel::v_updatePanel(Item * i_item)
 
 	m_name->setText(QString("<b>%1</b>").arg(m_cur_item->getName()));
 
-	m_info_text->setText(m_cur_item->getInfoText());
+	m_info_text->setText(m_cur_item->v_getInfoText());
 	m_info_label->setHidden(true);
 }
 

@@ -96,7 +96,7 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
       description += QString(" (str:%1pertask)").arg(pertask);
    if( multihost && (multihost_service.isEmpty() == false)) description += QString(" MHS='%1'").arg( multihost_service);
 
-   tooltip = afqt::stoq( tooltip_base + "\n" + tooltip_progress + "\n" + tooltip_properties);
+   m_tooltip = afqt::stoq( tooltip_base + "\n" + tooltip_progress + "\n" + tooltip_properties);
 }
 
 ItemJobBlock::~ItemJobBlock()

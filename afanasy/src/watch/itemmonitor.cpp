@@ -110,6 +110,36 @@ void ItemMonitor::updateValues( af::Node * i_node, int i_type)
 	}
 
 	m_tooltip = afqt::stoq( monitor->v_generateInfoString( true));
+	updateInfo(monitor);
+}
+
+void ItemMonitor::updateInfo(af::Monitor * i_monitor)
+{
+	m_info_text.clear();
+
+	m_info_text += QString("Engine: <b>%1</b>").arg(afqt::stoq(i_monitor->getEngine()));
+	m_info_text += "<br>";
+	m_info_text += QString("<br>Launch Time: <b>%1</b>").arg(afqt::stoq(af::time2str(i_monitor->getTimeLaunch())));
+	m_info_text += QString("<br>Register Time: <b>%1</b>").arg(afqt::stoq(af::time2str(i_monitor->getTimeRegister())));
+	if (i_monitor->getTimeActivity())
+		m_info_text += QString("<br>Time Activity: <b>%1</b>").arg(afqt::stoq(af::time2str(i_monitor->getTimeActivity())));
+
+	m_info_text += "<br>";
+	const std::list<int32_t> * jlist = i_monitor->getJobsIds();
+	m_info_text += QString("<br>Job Ids[%1]:").arg(jlist->size());
+	for (std::list<int32_t>::const_iterator it = jlist->begin(); it != jlist->end(); it++)
+		m_info_text += QString(" <b>%1</b>").arg(*it);
+
+	m_info_text += "<br>";
+	m_info_text += "<br>Monitor Events:";
+	for (int e = 0; e < af::Monitor::EVT_COUNT; e++)
+	{
+		m_info_text += QString(" <br> ") + af::Monitor::EVT_NAMES[e] + " : ";
+		if (i_monitor->hasEvent(e))
+			m_info_text += " <b>SUBMITTED</b>";
+		else
+			m_info_text += " ---";
+	}
 }
 
 void ItemMonitor::paint( QPainter *painter, const QStyleOptionViewItem &option) const

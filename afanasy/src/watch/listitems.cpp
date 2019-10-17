@@ -223,7 +223,7 @@ void ListItems::currentItemChanged( const QModelIndex & current, const QModelInd
 
 	if (item)
 	{
-		displayInfo(item->getSelectString());
+		displayInfo(item->v_getSelectString());
 		updatePanels(item);
 	}
 

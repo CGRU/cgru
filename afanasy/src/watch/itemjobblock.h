@@ -20,7 +20,7 @@ public:
 
    inline int getNumBlock() const { return numblock; }
 
-   virtual inline const QVariant getToolTip()      const { return tooltip;      }
+   virtual const QVariant v_getToolTip() const { return m_tooltip;}
 
 	const std::string & getWDir();
 	const std::string & getWDirOriginal() const {return m_wdir_orig;}
@@ -94,7 +94,7 @@ private:
    static const int HeightFooter;
 
 private:
-   QString tooltip;
+   QString m_tooltip;
 
 	std::string m_wdir_orig;
 	std::string m_wdir;

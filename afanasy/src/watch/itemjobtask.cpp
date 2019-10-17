@@ -77,7 +77,22 @@ bool ItemJobTask::calcHeight()
 	return old_height == m_height;
 }
 
-const QVariant ItemJobTask::getToolTip() const
+const QString ItemJobTask::v_getInfoText() const
+{
+	QString info;
+	info += QString("Times started: <b>%1</b> / <b>%2</b> with errors").arg(taskprogress.starts_count).arg(taskprogress.errors_count);
+	if (false == taskprogress.hostname.empty())
+		info += QString("<br>Last started host: <b>%1</b>").arg(afqt::stoq(taskprogress.hostname));
+	if (taskprogress.time_start != 0)
+	{
+		info += QString("<br>Started at <b>%1</b>").arg(afqt::time2Qstr(taskprogress.time_start));
+		if (((taskprogress.state & AFJOB::STATE_RUNNING_MASK) == false) && taskprogress.time_done)
+			info += QString("<br>Finished at <b>%1</b>").arg(afqt::time2Qstr(taskprogress.time_done));
+	}
+	return info;
+}
+
+const QVariant ItemJobTask::v_getToolTip() const
 {
 	QString tooltip = QString("Task #%1:").arg( m_tasknum);
 	tooltip += QString("\nTimes started: %1 / %2 with errors").arg(taskprogress.starts_count).arg(taskprogress.errors_count);
@@ -91,7 +106,7 @@ const QVariant ItemJobTask::getToolTip() const
 	return tooltip;
 }
 
-const QString ItemJobTask::getSelectString() const
+const QString ItemJobTask::v_getSelectString() const
 {
 	return m_name;
 }

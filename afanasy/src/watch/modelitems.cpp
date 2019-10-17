@@ -35,7 +35,7 @@ QVariant ModelItems::data( const QModelIndex &index, int role) const
    case Qt::DisplayRole:
       return qVariantFromValue( items[index.row()]);
    case Qt::ToolTipRole:
-      return items[index.row()]->getToolTip();
+		return items[index.row()]->v_getToolTip();
    default:
       return QVariant();
    }

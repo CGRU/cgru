@@ -22,8 +22,9 @@ public:
 
 	inline const QString& getName()              const { return m_name;}   ///< Get item name.
 
-	virtual inline const QVariant getToolTip()     const { return QVariant(); }
-	virtual inline const QString getSelectString() const { return m_name; }///< Get item select string.
+	virtual const QVariant v_getToolTip()      const { return QVariant();  }
+	virtual const QString  v_getSelectString() const { return m_name;      }
+	virtual const QString  v_getInfoText()     const { return m_info_text; }
 
 	inline void lock()                const { setLock( true);  }
 	inline void unLock()              const { setLock( false); }
@@ -63,8 +64,6 @@ public:
 	inline static Item* toItemP(const QVariant & i_v) { return i_v.value<Item*>(); }
 
 	virtual void v_filesReceived( const af::MCTaskUp & i_taskup);
-
-	inline const QString & getInfoText() const {return m_info_text;}
 
 	virtual bool calcHeight();
 

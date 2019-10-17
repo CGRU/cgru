@@ -16,7 +16,7 @@ public:
 
 	virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
 
-	virtual inline const QVariant getToolTip() const { return m_tooltip;}
+	virtual const QVariant v_getToolTip() const { return m_tooltip;}
 
 	/// Update ItemNode attributes ( copy them from given node).
 	virtual void updateValues( af::Node *node, int type) = 0;

@@ -21,6 +21,9 @@ protected:
    virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
 
 private:
+	void updateInfo(af::Monitor * i_monitor);
+
+private:
 
    long long time_launch;
    long long time_register;
