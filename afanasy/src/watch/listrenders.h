@@ -60,6 +60,7 @@ private slots:
 	void actUnsetPaused();
 	void actLaunchCmd();
 	void actLaunchCmdExit();
+	void actLaunchCmdString(QString i_cmd);
 
 	void actEjectTasks();
 	void actEjectNotMyTasks();
@@ -81,6 +82,7 @@ private:
 private:
 	void setService( bool enable);
 	void launchCmdExit( bool i_exit);
+	void launchCmdStringExit(const QString & i_cmd, bool i_exit);
 	void calcTitle();
 	void setSpacing();
 

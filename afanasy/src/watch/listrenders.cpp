@@ -394,14 +394,32 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 
 	submenu->addSeparator();
 
-	action = new QAction("Launch Command", this);
+	action = new QAction("Launch Command ...", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actLaunchCmd() ));
 	if( selectedItemsCount == 1) action->setEnabled( render->isOnline());
 	submenu->addAction( action);
-	action = new QAction("Launch And Exit", this);
+	action = new QAction("Launch And Exit ...", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actLaunchCmdExit() ));
 	if( selectedItemsCount == 1) action->setEnabled( render->isOnline());
 	submenu->addAction( action);
+
+	if (af::Environment::getRenderLaunchCmds().size())
+	{
+		QMenu * custom_submenu = new QMenu("Launch Predefined", this);
+		for (
+				std::vector<std::string>::const_iterator it = af::Environment::getRenderLaunchCmds().begin();
+				it != af::Environment::getRenderLaunchCmds().end();
+				it++)
+		{
+			QString cmd(afqt::stoq(*it));
+			QStringList cmdSplit = cmd.split("|");
+
+			ActionString * action_string = new ActionString(cmdSplit.last(), cmdSplit.first(), this);
+			connect(action_string, SIGNAL(triggeredString(QString)), this, SLOT(actLaunchCmdString(QString)));
+			custom_submenu->addAction(action_string);
+		}
+		submenu->addMenu(custom_submenu);
+	}
 
 	submenu->addSeparator();
 
@@ -667,13 +685,20 @@ void ListRenders::launchCmdExit( bool i_exit)
 	QString cmd = QInputDialog::getText( this, caption,"Enter Command", QLineEdit::Normal, QString(), &ok);
 	if( !ok) return;
 
-	std::ostringstream str;
-	af::jsonActionOperationStart( str, "renders", "launch_cmd", "", getSelectedIds());
-	str << ",\n\"cmd\":\"" << afqt::qtos( cmd) << "\"";
-	if( i_exit )
-		str << ",\n\"exit\":true";
-	af::jsonActionOperationFinish( str);
-	Watch::sendMsg( af::jsonMsg( str));
+	launchCmdStringExit(cmd, i_exit);
 }
-
+void ListRenders::actLaunchCmdString(QString i_cmd)
+{
+	launchCmdStringExit(i_cmd, false);
+}
+void ListRenders::launchCmdStringExit(const QString & i_cmd, bool i_exit)
+{
+	std::ostringstream str;
+	af::jsonActionOperationStart(str, "renders", "launch_cmd", "", getSelectedIds());
+	str << ",\n\"cmd\":\"" << afqt::qtos(i_cmd) << "\"";
+	if (i_exit)
+		str << ",\n\"exit\":true";
+	af::jsonActionOperationFinish(str);
+	Watch::sendMsg(af::jsonMsg(str));
+}
 
