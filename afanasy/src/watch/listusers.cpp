@@ -133,12 +133,6 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 	if( me || af::Environment::VISOR() )
 	{
 		menu.addSeparator();
-
-		action = new QAction( "Annotate", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actAnnotate() ));
-		menu.addAction( action);
-
-		menu.addSeparator();
 		submenu = new QMenu("Set Parameter", this);
 
 		addMenuParameters(submenu);
