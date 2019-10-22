@@ -398,14 +398,10 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 	connect( action, SIGNAL( triggered() ), this, SLOT( actLaunchCmd() ));
 	if( selectedItemsCount == 1) action->setEnabled( render->isOnline());
 	submenu->addAction( action);
-	action = new QAction("Launch And Exit ...", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actLaunchCmdExit() ));
-	if( selectedItemsCount == 1) action->setEnabled( render->isOnline());
-	submenu->addAction( action);
 
 	if (af::Environment::getRenderLaunchCmds().size())
 	{
-		QMenu * custom_submenu = new QMenu("Launch Predefined", this);
+		QMenu * custom_submenu = new QMenu("Launch Command >>>", this);
 		for (
 				std::vector<std::string>::const_iterator it = af::Environment::getRenderLaunchCmds().begin();
 				it != af::Environment::getRenderLaunchCmds().end();
@@ -416,6 +412,29 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 
 			ActionString * action_string = new ActionString(cmdSplit.last(), cmdSplit.first(), this);
 			connect(action_string, SIGNAL(triggeredString(QString)), this, SLOT(actLaunchCmdString(QString)));
+			custom_submenu->addAction(action_string);
+		}
+		submenu->addMenu(custom_submenu);
+	}
+
+	action = new QAction("Launch And Exit ...", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actLaunchCmdExit() ));
+	if( selectedItemsCount == 1) action->setEnabled( render->isOnline());
+	submenu->addAction( action);
+
+	if (af::Environment::getRenderLaunchCmdsExit().size())
+	{
+		QMenu * custom_submenu = new QMenu("Launch And Exit >>>", this);
+		for (
+				std::vector<std::string>::const_iterator it = af::Environment::getRenderLaunchCmdsExit().begin();
+				it != af::Environment::getRenderLaunchCmdsExit().end();
+				it++)
+		{
+			QString cmd(afqt::stoq(*it));
+			QStringList cmdSplit = cmd.split("|");
+
+			ActionString * action_string = new ActionString(cmdSplit.last(), cmdSplit.first(), this);
+			connect(action_string, SIGNAL(triggeredString(QString)), this, SLOT(actLaunchCmdExitString(QString)));
 			custom_submenu->addAction(action_string);
 		}
 		submenu->addMenu(custom_submenu);
@@ -687,10 +706,8 @@ void ListRenders::launchCmdExit( bool i_exit)
 
 	launchCmdStringExit(cmd, i_exit);
 }
-void ListRenders::actLaunchCmdString(QString i_cmd)
-{
-	launchCmdStringExit(i_cmd, false);
-}
+void ListRenders::actLaunchCmdString(    QString i_cmd) { launchCmdStringExit(i_cmd, false);}
+void ListRenders::actLaunchCmdExitString(QString i_cmd) { launchCmdStringExit(i_cmd, true );}
 void ListRenders::launchCmdStringExit(const QString & i_cmd, bool i_exit)
 {
 	std::ostringstream str;

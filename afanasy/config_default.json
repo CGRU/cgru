@@ -42,7 +42,10 @@
 			"":"Try to use 'sudo wolsleep' and add a line in /etc/sudoers:",
 			"":"render ALL = (ALL) NOPASSWD: /opt/cgru/bin/wolsleep",
 			"":"Or configure your own way to sleep.",
-		"af_render_launch_cmds":["Update|sudo update.sh","Free Mem|sudo free_mem.sh"],
+		"af_render_launch_cmds":["Free Mem|sudo free_mem.sh"],
+			"":"From GUI you can ask render to launch a command",
+		"af_render_launch_cmds_exit":["Update|sudo update.sh"],
+			"":"Ask render to launch a command and exit no waiting for finish",
 		"":""
 	},
 	"OS_windows":{

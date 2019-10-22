@@ -61,6 +61,7 @@ private slots:
 	void actLaunchCmd();
 	void actLaunchCmdExit();
 	void actLaunchCmdString(QString i_cmd);
+	void actLaunchCmdExitString(QString i_cmd);
 
 	void actEjectTasks();
 	void actEjectNotMyTasks();
