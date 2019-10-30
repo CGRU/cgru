@@ -541,7 +541,8 @@ function c_CanExecuteSoft(i_user)
 function c_GetRolesArtists(i_users)
 {
 	var roles_obj = {};
-	for (var uid in g_users)
+	// Collect users by roles:
+	for (let uid in g_users)
 	{
 		// console.log(g_users[uid].states);
 		if ((i_users == null) || (i_users[uid] == null))
@@ -552,19 +553,52 @@ function c_GetRolesArtists(i_users)
 				continue;
 		}
 
-		var role = g_users[uid].role;
+		let role = g_users[uid].role;
 
 		if (roles_obj[role] == null)
-			roles_obj[role] = [];
+			roles_obj[role] = {'users':[]};
 
-		roles_obj[role].push(g_users[uid]);
+		roles_obj[role].users.push(g_users[uid]);
+	}
+
+	// Collect users by tag for earch role:
+	for (let role in roles_obj)
+	{
+		roles_obj[role].tags_obj = {};
+		for (let u in roles_obj[role].users)
+		{
+			let user = roles_obj[role].users[u];
+			let tag = user.tag;
+			if (tag == null) tag = '';
+
+			if (roles_obj[role].tags_obj[tag] == null)
+				roles_obj[role].tags_obj[tag] = [];
+
+			roles_obj[role].tags_obj[tag].push(user);
+		}
 	}
 
 	var roles = [];
-	for (var role in roles_obj)
+	for (let role in roles_obj)
 	{
-		roles_obj[role].sort(function(a, b) { return a.title > b.title });
-		roles.push({"role": role, "artists": roles_obj[role]});
+		roles_obj[role].users.sort(function(a, b) { return a.title > b.title });
+
+		let role_obj = {};
+		role_obj.role = role;
+		role_obj.artists = roles_obj[role].users;
+		role_obj.tags = [];
+
+		for (let tag in roles_obj[role].tags_obj)
+		{
+			roles_obj[role].tags_obj[tag].sort(function(a, b) { return a.title > b.title });
+
+			role_obj.tags.push({'tag':tag,'artists':roles_obj[role].tags_obj[tag]});
+		}
+
+		role_obj.tags.sort(function(a, b) { return a.tag > b.tag });
+
+		roles.push(role_obj);
+
 	}
 	roles.sort(function(a, b) { return a.role < b.role });
 

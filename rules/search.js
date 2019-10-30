@@ -36,6 +36,7 @@ function s_SearchOnClick()
 			$('search_artists').appendChild(elRole);
 			$('search_artists').m_elRoles.push(elRole);
 			elRole.classList.add('role');
+			elRole.m_elTags = [];
 			elRole.m_elArtists = [];
 
 			let elLabel = document.createElement('div');
@@ -53,42 +54,71 @@ function s_SearchOnClick()
 					s_ProcessGUI();
 			};
 
-			for (let a = 0; a < roles[r].artists.length; a++)
+			for (let t = 0; t < roles[r].tags.length; t++)
 			{
-				let artist = roles[r].artists[a];
+				let tag = roles[r].tags[t].tag;
 
-				el = document.createElement('div');
-				el.m_hidden = false;
-				elRole.appendChild(el);
-				elRole.m_elArtists.push(el);
-				$('search_artists').m_elArtists.push(el);
-				el.style.cssFloat = 'left';
-				el.textContent = c_GetUserTitle(artist.id);
-				el.m_user = artist
-				el.classList.add('tag');
-				el.classList.add('artist');
+				let elTag = document.createElement('div');
+				elTag.classList.add('role_tag');
+				elRole.appendChild(elTag);
+				elTag.m_elArtists = [];
+				elRole.m_elTags.push(elTag);
 
-				if (artist.id == g_auth_user.id)
-					el.classList.add('me');
-
-				if (artist.disabled)
-					el.classList.add('disabled');
-
-				if (c_IsNotAnArtist(artist))
-					el.classList.add('notartist');
-
-				var avatar = c_GetAvatar(artist.id);
-				if (avatar)
-				{
-					el.classList.add('with_icon');
-					el.style.backgroundImage = 'url(' + avatar + ')';
-				}
-
-				el.onclick = function(e) {
-					c_ElToggleSelected(e);
+				let elLabel = document.createElement('div');
+				elLabel.textContent = c_GetTagTitle(tag) + ':';
+				elLabel.classList.add('label');
+				elTag.appendChild(elLabel);
+				elLabel.title = c_GetTagTip(tag)
+					+ '\nClick to (un)select all artists with "' + c_GetTagTitle(tag) + '" tag.';
+				elLabel.m_elTag = elTag;
+				elLabel.onclick = function(e) {
+					let el = e.currentTarget.m_elTag;
+					for (let a = 0; a < el.m_elArtists.length; a++)
+						if (false == el.m_elArtists[a].m_hidden)
+							c_ElToggleSelected(el.m_elArtists[a]);
 					if (ASSET && ASSET.filter)
 						s_ProcessGUI();
 				};
+
+				for (let a = 0; a < roles[r].tags[t].artists.length; a++)
+				{
+					let artist = roles[r].tags[t].artists[a];
+
+					el = document.createElement('div');
+					el.m_hidden = false;
+					//elRole.appendChild(el);
+					elTag.appendChild(el);
+					elRole.m_elArtists.push(el);
+					elTag.m_elArtists.push(el);
+					$('search_artists').m_elArtists.push(el);
+					el.style.cssFloat = 'left';
+					el.textContent = c_GetUserTitle(artist.id);
+					el.m_user = artist
+					el.classList.add('tag');
+					el.classList.add('artist');
+
+					if (artist.id == g_auth_user.id)
+						el.classList.add('me');
+
+					if (artist.disabled)
+						el.classList.add('disabled');
+
+					if (c_IsNotAnArtist(artist))
+						el.classList.add('notartist');
+
+					var avatar = c_GetAvatar(artist.id);
+					if (avatar)
+					{
+						el.classList.add('with_icon');
+						el.style.backgroundImage = 'url(' + avatar + ')';
+					}
+
+					el.onclick = function(e) {
+						c_ElToggleSelected(e);
+						if (ASSET && ASSET.filter)
+							s_ProcessGUI();
+					};
+				}
 			}
 
 			s_ShowHideRoles();
@@ -215,22 +245,36 @@ function s_ShowHideRoles()
 	{
 		let role_hidden = true;
 
-		for (let a = 0; a < elRoles[r].m_elArtists.length; a++)
+		for (let t= 0; t < elRoles[r].m_elTags.length; t++)
 		{
-			let el = elRoles[r].m_elArtists[a];
-			el.m_hidden = false;
+			let tag_hidden = true;
 
-			if (el.m_user.disabled && (false == show_disabled))
-				el.m_hidden = true;
+			for (let a = 0; a < elRoles[r].m_elTags[t].m_elArtists.length; a++)
+			{
 
-			if (c_IsNotAnArtist(el.m_user) && (false == show_not_artists))
-				el.m_hidden = true;
+				let el = elRoles[r].m_elTags[t].m_elArtists[a];
+				el.m_hidden = false;
 
-			if (el.m_hidden)
-				el.style.display = 'none';
+				if (el.m_user.disabled && (false == show_disabled))
+					el.m_hidden = true;
+
+				if (c_IsNotAnArtist(el.m_user) && (false == show_not_artists))
+					el.m_hidden = true;
+
+				if (el.m_hidden)
+					el.style.display = 'none';
+				else
+				{
+					el.style.display = 'block';
+					tag_hidden = false;
+				}
+			}
+
+			if (tag_hidden)
+				elRoles[r].m_elTags[t].style.display = 'none';
 			else
 			{
-				el.style.display = 'block';
+				elRoles[r].m_elTags[t].style.display = 'block';
 				role_hidden = false;
 			}
 		}

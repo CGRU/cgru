@@ -377,8 +377,11 @@ background-position: left;
 /*border-radius: 2px;*/
 /*padding: 0 2px;*/ }
 .artists .role { padding: 2px 4px; margin: 1px; border-bottom: 1px solid rgba(98,98,98,.5); }
-.artists .role .label { float: left; padding: 0px 6px; font-style: italic; }
+.artists .role .label { float: left; padding: 0px 6px; font-style: italic; font-weight: bold }
+.artists .role_tag { padding: 4px; }
+.artists .role_tag .label { font-weight: normal; }
 #search_artists .role .label { cursor: pointer; }
+#search_artists .tag { margin: 4px; }
 .tags { font-style:italic;}
 
 .new_line {
@@ -705,7 +708,7 @@ border-radius: 8px;
 .status_edit .edit_tasks .task .dur_label { float: left; padding: 2px 6px; }
 .status_edit .edit_tasks .task .duration { width: 60px; float: left; }
 .status_edit .edit_tasks .tags { clear: both; }
-.status_edit .tag { cursor: pointer; }
+.status_edit .tag { cursor: pointer; margin: 4px; }
 .status_edit .flag { border-width: 0px; margin: 7px; padding: 0px 2px; opacity: 0.5;}
 .status_edit .flag.selected { border-width: 4px; margin: 3px; opacity: 1.0; _border-color: rgba( 100, 255, 255, 1.0) }
 

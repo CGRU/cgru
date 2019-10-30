@@ -1004,52 +1004,67 @@ Status.prototype.editArtistsEdit = function(i_args) {
 		elLabel.classList.add('label');
 		elLabel.textContent = roles[r].role + ':';
 
-		for (var a = 0; a < roles[r].artists.length; a++)
+		for (let t = 0; t < roles[r].tags.length; t++)
 		{
-			var artist = roles[r].artists[a];
+			let tag = roles[r].tags[t].tag;
 
-			var el = document.createElement('div');
-			elRole.appendChild(el);
-			el.classList.add('tag');
-			el.classList.add('artist');
-			el.m_item = artist.id;
-			if (artist.id == g_auth_user.id)
-				el.classList.add('me');
+			let elTag = document.createElement('div');
+			elTag.classList.add('role_tag');
+			elRole.appendChild(elTag);
 
-			if (g_users[artist.id] && g_users[artist.id].disabled)
-				el.classList.add('disabled');
+			let elLabel = document.createElement('div');
+			elLabel.textContent = c_GetTagTitle(tag) + ':';
+			elLabel.title = c_GetTagTip(tag);
+			elLabel.classList.add('label');
+			elTag.appendChild(elLabel);
 
-			if (artist.title)
-				el.textContent = artist.title;
-			else
-				el.textContent = artist.id;
-
-			if (artist.tip)
-				el.title = artist.tip;
-
-			var avatar = c_GetAvatar(artist.id);
-			if (avatar)
+			for (let a = 0; a < roles[r].tags[t].artists.length; a++)
 			{
-				el.classList.add('with_icon');
-				el.style.backgroundImage = 'url(' + avatar + ')';
-			}
+				let artist = roles[r].tags[t].artists[a];
 
-			if (i_args.list[artist.id])
-			{
-				if (i_args.list[artist.id].half)
-				{
-					el.m_half_selected = true;
-					el.classList.add('half_selected');
-				}
+				var el = document.createElement('div');
+				elTag.appendChild(el);
+				el.classList.add('tag');
+				el.classList.add('artist');
+				el.m_item = artist.id;
+				if (artist.id == g_auth_user.id)
+					el.classList.add('me');
+
+				if (g_users[artist.id] && g_users[artist.id].disabled)
+					el.classList.add('disabled');
+
+				if (artist.title)
+					el.textContent = artist.title;
 				else
-				{
-					el.m_selected = true;
-					el.classList.add('selected');
-				}
-			}
+					el.textContent = artist.id;
 
-			el.onclick = status_elToggleSelection;
-			i_args.elEdit[i_args.name].push(el);
+				if (artist.tip)
+					el.title = artist.tip;
+
+				var avatar = c_GetAvatar(artist.id);
+				if (avatar)
+				{
+					el.classList.add('with_icon');
+					el.style.backgroundImage = 'url(' + avatar + ')';
+				}
+
+				if (i_args.list[artist.id])
+				{
+					if (i_args.list[artist.id].half)
+					{
+						el.m_half_selected = true;
+						el.classList.add('half_selected');
+					}
+					else
+					{
+						el.m_selected = true;
+						el.classList.add('selected');
+					}
+				}
+
+				el.onclick = status_elToggleSelection;
+				i_args.elEdit[i_args.name].push(el);
+			}
 		}
 	}
 };

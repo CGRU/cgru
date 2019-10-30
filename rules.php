@@ -245,7 +245,7 @@ function jsf_initialize($i_arg, &$o_out)
 		$user['id'] = $obj['id'];
 
 		// We do not send all users props to each user.
-		$props = array('title', 'role', 'states', 'disabled', 'signature');
+		$props = array('title', 'role', 'tag', 'states', 'disabled', 'signature');
 		foreach ($props as $prop)
 			if (isset($obj[$prop])) $user[$prop] = $obj[$prop];
 
