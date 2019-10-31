@@ -223,9 +223,9 @@ bool ListUsers::v_processEvents( const af::MonitorEvents & i_me)
 	return false;
 }
 
-ItemNode* ListUsers::v_createNewItem( af::Node * i_node, bool i_subscibed)
+ItemNode* ListUsers::v_createNewItemNode(af::Node * i_afnode, bool i_notify)
 {
-	return new ItemUser( (af::User*)i_node, m_ctrl_sf);
+	return new ItemUser((af::User*)i_afnode, m_ctrl_sf);
 }
 
 void ListUsers::userAdded(ItemNode * node, const QModelIndex & index)

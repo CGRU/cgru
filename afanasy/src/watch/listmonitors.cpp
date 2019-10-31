@@ -140,9 +140,9 @@ bool ListMonitors::v_processEvents( const af::MonitorEvents & i_me)
 	return false;
 }
 
-ItemNode* ListMonitors::v_createNewItem( af::Node * i_node, bool i_subscibed)
+ItemNode* ListMonitors::v_createNewItemNode(af::Node * i_afnode, bool i_notify)
 {
-	return new ItemMonitor( (af::Monitor*)i_node, m_ctrl_sf);
+	return new ItemMonitor((af::Monitor*)i_afnode, m_ctrl_sf);
 }
 
 void ListMonitors::calcTitle()

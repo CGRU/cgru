@@ -14,7 +14,7 @@ public:
 
 	bool v_caseMessage( af::Msg * msg);
 
-	ItemNode * v_createNewItem( af::Node * i_node, bool i_subscibed);
+	ItemNode * v_createNewItemNode(af::Node * i_afnode, bool i_notify);
 
 	virtual bool v_processEvents( const af::MonitorEvents & i_me);
 

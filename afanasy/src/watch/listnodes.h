@@ -50,7 +50,7 @@ protected:
 
 	virtual void v_connectionLost();
 
-	virtual ItemNode * v_createNewItem( af::Node * i_node, bool i_subscibed) = 0;
+	virtual ItemNode * v_createNewItemNode(af::Node * i_afnode, bool i_notify) = 0;
 
 	void get() const;
 	void get( const std::vector<int32_t> & i_ids) const;

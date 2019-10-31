@@ -20,7 +20,7 @@ const int ItemJob::Height = 30;
 const int ItemJob::HeightThumbName = 12;
 const int ItemJob::HeightAnnotation = 12;
 
-ItemJob::ItemJob( ListJobs * i_list, af::Job * i_job, bool i_subscibed, const CtrlSortFilter * i_ctrl_sf):
+ItemJob::ItemJob( ListJobs * i_list, af::Job * i_job, const CtrlSortFilter * i_ctrl_sf, bool i_notify):
 	ItemNode( (af::Node*)i_job, i_ctrl_sf),
 	m_list( i_list),
 	m_blocks_num( i_job->getBlocksNum()),
@@ -45,7 +45,7 @@ ItemJob::ItemJob( ListJobs * i_list, af::Job * i_job, bool i_subscibed, const Ct
 
 	updateValues( (af::Node*)i_job, af::Msg::TJobsList);
 
-	if( i_subscibed )
+	if(i_notify)
 		Watch::ntf_JobAdded( this);
 }
 

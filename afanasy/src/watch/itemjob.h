@@ -10,7 +10,7 @@ class ListJobs;
 class ItemJob : public ItemNode
 {
 public:
-	ItemJob( ListJobs * i_list, af::Job *job, bool i_subscibed, const CtrlSortFilter * i_ctrl_sf);
+	ItemJob(ListJobs * i_list, af::Job *job, const CtrlSortFilter * i_ctrl_sf, bool i_notify);
 	~ItemJob();
 
 	void updateValues( af::Node *node, int type);

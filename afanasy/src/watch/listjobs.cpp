@@ -521,9 +521,9 @@ bool ListJobs::v_processEvents( const af::MonitorEvents & i_me)
 	return processed;
 }
 
-ItemNode * ListJobs::v_createNewItem( af::Node *node, bool i_subscibed)
+ItemNode * ListJobs::v_createNewItemNode(af::Node * i_afnode, bool i_notify)
 {
-	return new ItemJob( this, (af::Job*)node, i_subscibed, m_ctrl_sf);
+	return new ItemJob(this, (af::Job*)i_afnode, m_ctrl_sf, i_notify);
 }
 
 void ListJobs::v_resetSorting()

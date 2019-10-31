@@ -529,9 +529,9 @@ bool ListRenders::v_processEvents( const af::MonitorEvents & i_me)
 	return false;
 }
 
-ItemNode* ListRenders::v_createNewItem( af::Node * i_node, bool i_subscibed)
+ItemNode* ListRenders::v_createNewItemNode(af::Node * i_afnode, bool i_notify)
 {
-	return new ItemRender( (af::Render*)i_node, m_ctrl_sf);
+	return new ItemRender((af::Render*)i_afnode, m_ctrl_sf);
 }
 
 void ListRenders::calcTitle()
