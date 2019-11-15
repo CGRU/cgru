@@ -36,6 +36,20 @@ public:
 	inline bool isPaused() const { return (m_state & SPaused);}
 	inline void setPaused(bool set) { m_state = set ? m_state | SPaused : m_state & (~SPaused); }
 
+	inline const std::string & getParentPath() const { return m_parent_path; }
+
+	inline const std::string & getPatternStr() const { return m_pattern.getPattern(); }
+
+	inline long long getTimeCreation() const { return m_time_creation; }
+
+	inline bool isNewRenderNimby()  const { return m_new_nimby;  }
+	inline bool isNewRenderPaused() const { return m_new_paused; }
+
+	inline int32_t getPoolsNum()     const { return m_pools_num;     }
+	inline int32_t getPoolsTotal()   const { return m_pools_total;   }
+	inline int32_t getRendersNum()   const { return m_renders_num;   }
+	inline int32_t getRendersTotal() const { return m_renders_total; }
+
 	inline int getRunTasks()        const { return m_run_tasks;         }
 	inline int getMaxTasks()        const { return m_max_tasks;         }
 	inline int getMaxTasksPerHost() const { return m_max_tasks_per_host;}

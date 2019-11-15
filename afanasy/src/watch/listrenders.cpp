@@ -14,6 +14,7 @@
 #include "ctrlrenders.h"
 #include "ctrlsortfilter.h"
 #include "itemrender.h"
+#include "itempool.h"
 #include "modelnodes.h"
 #include "viewitems.h"
 #include "watch.h"
@@ -46,6 +47,10 @@ std::string ListRenders::ms_FilterString = "";
 ListRenders::ListRenders( QWidget* parent):
 	ListNodes( parent, "renders")
 {
+	m_node_types.clear();
+	m_node_types.push_back("pools");
+	m_node_types.push_back("renders");
+
 	m_ctrl_sf = new CtrlSortFilter( this,
 			&ms_SortType1, &ms_SortAscending1,
 			&ms_SortType2, &ms_SortAscending2,
@@ -191,9 +196,16 @@ void ListRenders::rendersSelectionChanged(const QItemSelection & selected, const
 	for (int i = 0; i < indexes.count(); i++)
 		if (Item::isItemP(indexes[i].data()))
 		{
-			ItemRender * render = (ItemRender*)(Item::toItemP(indexes[i].data()));
-			if ((render->getName() != QString::fromUtf8(af::Environment::getComputerName().c_str())) &&
-				(render->getUserName() != QString::fromUtf8(af::Environment::getUserName().c_str())))
+			Item * item = (Item::toItemP(indexes[i].data()));
+
+			if (item->getType() == Item::TRender)
+			{
+				ItemRender * render = (ItemRender*)item;
+				if ((render->getName() != QString::fromUtf8(af::Environment::getComputerName().c_str())) &&
+					(render->getUserName() != QString::fromUtf8(af::Environment::getUserName().c_str())))
+					m_view->selectionModel()->select(indexes[i], QItemSelectionModel::Deselect);
+			}
+			else
 				m_view->selectionModel()->select(indexes[i], QItemSelectionModel::Deselect);
 		}
 }
@@ -203,10 +215,16 @@ void ListRenders::requestResources()
 	af::MCGeneral ids;
 	for( int i = 0; i < m_model->count(); i++)
 	{
-		ItemRender *render = (ItemRender*)(m_model->item(i));
-		if( render == NULL) continue;
-		if( false == render->isOnline()) continue;
-		ids.addId( render->getId());
+		Item * item = m_model->item(i);
+		if (item == NULL)
+			continue;
+
+		if (item->getType() != Item::TRender)
+			continue;
+
+		ItemRender * render = (ItemRender*)item;
+		if (render->isOnline())
+			ids.addId(render->getId());
 	}
 
 	if( ids.getCount())
@@ -217,8 +235,15 @@ void ListRenders::requestResources()
 
 void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 {
-	ItemRender* render = (ItemRender*)getCurrentItem();
-	if( render == NULL ) return;
+	Item * item = getCurrentItem();
+	if (item == NULL)
+		return;
+
+	if (item->getType() != Item::TRender)
+		return;
+
+	ItemRender * render = (ItemRender*)item;
+
 	bool me = false;
 	if( render->getName().contains( QString::fromUtf8( af::Environment::getComputerName().c_str())) || ( render->getUserName() == QString::fromUtf8( af::Environment::getUserName().c_str()))) me = true;
 	int selectedItemsCount = getSelectedItemsCount();
@@ -489,11 +514,17 @@ bool ListRenders::v_caseMessage( af::Msg * msg)
 #endif
 	switch( msg->type())
 	{
+	case af::Msg::TPoolsList:
+	{
+		updateItems(msg, Item::TPool);
+		calcTitle();
+		break;
+	}
 	case af::Msg::TRendersList:
 		subscribe();
 	case af::Msg::TRendersResources:
 	{
-		updateItems( msg);
+		updateItems(msg, Item::TRender);
 		calcTitle();
 		break;
 	}
@@ -505,33 +536,150 @@ bool ListRenders::v_caseMessage( af::Msg * msg)
 
 bool ListRenders::v_processEvents( const af::MonitorEvents & i_me)
 {
-	if( i_me.m_events[af::Monitor::EVT_renders_del].size())
+	bool processed = false;
+
+	// Delete renders by ids:
+	if (i_me.m_events[af::Monitor::EVT_renders_del].size())
 	{
-		deleteItems( i_me.m_events[af::Monitor::EVT_renders_del]);
+		deleteItems(i_me.m_events[af::Monitor::EVT_renders_del], Item::TRender);
 		calcTitle();
-		return true;
+		processed = true;
 	}
 
-	std::vector<int> ids;
-
-	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_renders_change].size(); i++)
-		af::addUniqueToVect( ids, i_me.m_events[af::Monitor::EVT_renders_change][i]);
-
-	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_renders_add].size(); i++)
-		af::addUniqueToVect( ids, i_me.m_events[af::Monitor::EVT_renders_add][i]);
-
-	if( ids.size())
+	// Delete pools by ids:
+	if (i_me.m_events[af::Monitor::EVT_pools_del].size())
 	{
-		get( ids);
-		return true;
+		deleteItems(i_me.m_events[af::Monitor::EVT_pools_del], Item::TPool);
+		calcTitle();
+		processed = true;
 	}
 
-	return false;
+	// Get new and changed pools ids:
+	std::vector<int> pids;
+	for (int i = 0; i < i_me.m_events[af::Monitor::EVT_pools_change].size(); i++)
+		af::addUniqueToVect(pids, i_me.m_events[af::Monitor::EVT_pools_change][i]);
+	for (int i = 0; i < i_me.m_events[af::Monitor::EVT_pools_add].size(); i++)
+		af::addUniqueToVect(pids, i_me.m_events[af::Monitor::EVT_pools_add][i]);
+	if (pids.size())
+	{
+		get(pids, "pools");
+		processed = true;
+	}
+
+	// Get new and changed renders ids:
+	std::vector<int> rids;
+	for (int i = 0; i < i_me.m_events[af::Monitor::EVT_renders_change].size(); i++)
+		af::addUniqueToVect(rids, i_me.m_events[af::Monitor::EVT_renders_change][i]);
+	for (int i = 0; i < i_me.m_events[af::Monitor::EVT_renders_add].size(); i++)
+		af::addUniqueToVect(rids, i_me.m_events[af::Monitor::EVT_renders_add][i]);
+	if (rids.size())
+	{
+		get(rids, "renders");
+		processed = true;
+	}
+
+	return processed;
 }
 
-ItemNode* ListRenders::v_createNewItemNode(af::Node * i_afnode, bool i_notify)
+ItemNode * ListRenders::v_createNewItemNode(af::Node * i_afnode, Item::EType i_type, bool i_notify)
 {
-	return new ItemRender((af::Render*)i_afnode, m_ctrl_sf);
+	switch (i_type)
+	{
+	case Item::TRender:
+		return new ItemRender((af::Render*)i_afnode, this, m_ctrl_sf);
+	case Item::TPool:
+		return new ItemPool((af::Pool*)i_afnode, this, m_ctrl_sf);
+	default:
+		AF_ERR << "Invalid Item::EType: " << i_type;
+		return NULL;
+	}
+}
+
+void ListRenders::offsetHierarchy(ItemPool * i_item_pool)
+{
+	// Store pool in "pool name" -> "pool item" map:
+	m_pools[i_item_pool->getName()] = i_item_pool;
+
+	// Offset pool:
+	int depth = 0;
+	QMap<QString, ItemPool*>::iterator pIt = m_pools.find(i_item_pool->getParentPath());
+	if (pIt != m_pools.end())
+		depth = (*pIt)->getDepth() + 1;
+	i_item_pool->setDepth(depth);
+
+	// Offset its renders (as pool item can be created after it render items):
+	QMap<QString, QList<ItemRender*>>::iterator rIt = m_pool_renders.find(i_item_pool->getName());
+	if (rIt != m_pool_renders.end())
+		for (int i = 0; i < rIt.value().size(); i++)
+			offsetHierarchy(rIt.value()[i]);
+}
+
+void ListRenders::offsetHierarchy(ItemRender * i_item_render)
+{
+	// Store render in "pool name" -> "renders items list" map:
+	QMap<QString, QList<ItemRender*>>::iterator rIt = m_pool_renders.find(i_item_render->getPool());
+	if (rIt == m_pool_renders.end())
+		rIt = m_pool_renders.insert(i_item_render->getPool(), QList<ItemRender*>());
+	if (false == rIt.value().contains(i_item_render))
+		rIt.value().push_back(i_item_render);
+
+	// Offset:
+	int depth = 0;
+	QMap<QString, ItemPool*>::iterator pIt = m_pools.find(i_item_render->getPool());
+	if (pIt != m_pools.end())
+		depth = (*pIt)->getDepth() + 1;
+	i_item_render->setDepth(depth);
+}
+
+void ListRenders::removeRender(ItemRender * i_item_render)
+{
+	QMap<QString, QList<ItemRender*>>::iterator rIt = m_pool_renders.find(i_item_render->getPool());
+	if (rIt == m_pool_renders.end())
+	{
+		AF_ERR << "ListRenders::removeRender: render['" << afqt::qtos(i_item_render->getName())
+			<< "'] pool['" << afqt::qtos(i_item_render->getPool()) << "'] not found";
+		return;
+	}
+
+	int count = rIt.value().removeAll(i_item_render);
+	if (count != 1)
+		AF_ERR << "ListRenders::removeRender: render['" << afqt::qtos(i_item_render->getName())
+			<< "'] pool['" << afqt::qtos(i_item_render->getPool()) << "'] count = " << count;
+}
+
+void ListRenders::removePool(ItemPool * i_item_pool)
+{
+	int count = m_pools.remove(i_item_pool->getName());
+	if (count != 1)
+		AF_ERR << "ListRenders::removePool: pool['" << afqt::qtos(i_item_pool->getName())
+			<< "'] m_pools count = " << count;
+
+	count = m_pool_renders.remove(i_item_pool->getName());
+	if (count > 1)
+		AF_ERR << "ListRenders::removePool: pool['" << afqt::qtos(i_item_pool->getName())
+			<< "'] m_pool_renders count = " << count;
+}
+
+void ListRenders::v_itemToBeDeleted(Item * i_item)
+{
+	switch(i_item->getType())
+	{
+	case Item::TRender:
+		removeRender((ItemRender*)i_item);
+		break;
+	case Item::TPool:
+		removePool((ItemPool*)i_item);
+		break;
+	default:
+		AF_ERR << "ListRenders::v_itemToBeDeleted: Invalid item type.";
+	}
+}
+
+void ListRenders::v_connectionLost()
+{
+	m_pool_renders.clear();
+	m_pools.clear();
+	ListNodes::v_connectionLost();
 }
 
 void ListRenders::calcTitle()

@@ -186,7 +186,7 @@ bool ListUsers::v_caseMessage( af::Msg * msg)
 	{
 	case af::Msg::TUsersList:
 	{
-		updateItems( msg);
+		updateItems(msg, Item::TUser);
 		calcTitle();
 		subscribe();
 		break;
@@ -199,9 +199,9 @@ bool ListUsers::v_caseMessage( af::Msg * msg)
 
 bool ListUsers::v_processEvents( const af::MonitorEvents & i_me)
 {
-	if( i_me.m_events[af::Monitor::EVT_users_del].size())
+	if (i_me.m_events[af::Monitor::EVT_users_del].size())
 	{
-		deleteItems( i_me.m_events[af::Monitor::EVT_users_del]);
+		deleteItems(i_me.m_events[af::Monitor::EVT_users_del], Item::TUser);
 		calcTitle();
 		return true;
 	}
@@ -223,7 +223,7 @@ bool ListUsers::v_processEvents( const af::MonitorEvents & i_me)
 	return false;
 }
 
-ItemNode* ListUsers::v_createNewItemNode(af::Node * i_afnode, bool i_notify)
+ItemNode* ListUsers::v_createNewItemNode(af::Node * i_afnode, Item::EType i_type, bool i_notify)
 {
 	return new ItemUser((af::User*)i_afnode, m_ctrl_sf);
 }

@@ -11,14 +11,26 @@ class MainWidget;
 class Item
 {
 public:
-	Item(const QString &itemname, int itemid);
+	enum EType {
+		TBlock,
+		TBranch,
+		TJob,
+		TMonitor,
+		TPool,
+		TRender,
+		TTask,
+		TUser
+	};
+
+	Item(const QString &i_name, int i_id, EType i_type);
 	virtual ~Item();
 
 	virtual QSize sizeHint( const QStyleOptionViewItem &option) const;
 
 	inline int getHeight() const { return m_height;}
 
-	virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
+	void paint(QPainter * i_painter, const QStyleOptionViewItem & i_option) const;
+	virtual void v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const;
 
 	inline const QString& getName()              const { return m_name;}   ///< Get item name.
 
@@ -32,7 +44,13 @@ public:
 	inline void setLock( bool value ) const { m_locked = value;  }
 
 	inline int getId() const { return m_id; }
+
+	// Item can decide to delete itself.
+	// It can set its ID to zero.
+	// ListNodes deletes such items on update.
 	inline void resetId() { m_id = 0; }
+
+	inline const EType getType() const { return m_type;}
 
 	const QColor & clrTextMain(      const QStyleOptionViewItem &option)           const;
 	const QColor & clrTextInfo(      const QStyleOptionViewItem &option)           const;
@@ -74,13 +92,17 @@ public:
 	const QVariant & getParamVar(const QString & i_name) const;
 
 protected:
-	void drawBack( QPainter *painter, const QStyleOptionViewItem &option, const QColor * i_clrItem = NULL, const QColor * i_clrBorder = NULL) const;
+	void drawBack(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option, const QColor * i_clrItem = NULL, const QColor * i_clrBorder = NULL) const;
 
 	/// Print AFJOB::STATE informaton
 	void printfState( const uint32_t state, int posx, int posy, QPainter * painter, const QStyleOptionViewItem &option) const;
 
 	/// Draw a star at \c x,y coordinates with \c size size.
 	static void drawStar( int size, int posx, int posy, QPainter * painter);
+
+	static void drawServices(QPainter * i_painter,
+		const QList<QString> & i_services, const QList<QString> & i_services_disabled,
+		int i_x, int i_y, int i_w, int i_h);
 
 protected:
 	static const int Height;
@@ -97,6 +119,8 @@ protected:
 
 	mutable bool m_locked;
 
+	int m_margin_left;
+
 private:
 	/// Node "m_running" property.
 	mutable bool m_running;
@@ -110,6 +134,8 @@ private:
 	bool m_hidden;
 
 	int m_id;
+
+	EType m_type;
 };
 
 Q_DECLARE_METATYPE( Item*)

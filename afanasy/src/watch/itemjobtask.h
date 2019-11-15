@@ -61,7 +61,7 @@ public:
 	inline const af::MCTaskPos getTaskPos() const { return af::MCTaskPos( m_job_id, m_blocknum, m_tasknum);}
 	
 protected:
-	virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
+	virtual void v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const;
 
 private:
 	void processFiles();

@@ -5,6 +5,7 @@
 #include "../libafanasy/msgclasses/mcgeneral.h"
 #include "../libafanasy/msgclasses/mcafnodes.h"
 
+#include "item.h"
 #include "listitems.h"
 
 class QVBoxLayout;
@@ -50,12 +51,13 @@ protected:
 
 	virtual void v_connectionLost();
 
-	virtual ItemNode * v_createNewItemNode(af::Node * i_afnode, bool i_notify) = 0;
+	virtual ItemNode * v_createNewItemNode(af::Node * i_afnode, Item::EType i_type, bool i_notify) = 0;
 
 	void get() const;
-	void get( const std::vector<int32_t> & i_ids) const;
+	void get(const std::vector<int32_t> & i_ids) const;
+	static void get(const std::vector<int32_t> & i_ids, const std::string & i_type);
 
-	bool updateItems( af::Msg* msg);
+	bool updateItems(af::Msg* msg, Item::EType i_type);
 
 	void initSortFilterCtrl();
 
@@ -64,6 +66,9 @@ protected:
 
 	/// Needed for jobs, to get user jobs list from server
 	virtual void v_resetSorting();
+
+protected:
+	std::vector<std::string> m_node_types;
 
 private slots:
 	void actAnnotate();

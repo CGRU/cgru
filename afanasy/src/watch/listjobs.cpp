@@ -453,7 +453,7 @@ bool ListJobs::v_caseMessage( af::Msg * msg)
 	{
 	case af::Msg::TJobsList:
 	{
-		if( updateItems( msg) && (af::Environment::VISOR() == false))
+		if(updateItems(msg, Item::TJob) && (af::Environment::VISOR() == false))
 		{
 			getUserJobsOrder();
 		}
@@ -491,9 +491,9 @@ bool ListJobs::v_processEvents( const af::MonitorEvents & i_me)
 {
 	bool processed = false;
 
-	if( i_me.m_events[af::Monitor::EVT_jobs_del].size())
+	if (i_me.m_events[af::Monitor::EVT_jobs_del].size())
 	{
-		deleteItems( i_me.m_events[af::Monitor::EVT_jobs_del]);
+		deleteItems(i_me.m_events[af::Monitor::EVT_jobs_del], Item::TJob);
 		calcTotals();
 		processed = true;
 	}
@@ -521,7 +521,7 @@ bool ListJobs::v_processEvents( const af::MonitorEvents & i_me)
 	return processed;
 }
 
-ItemNode * ListJobs::v_createNewItemNode(af::Node * i_afnode, bool i_notify)
+ItemNode * ListJobs::v_createNewItemNode(af::Node * i_afnode, Item::EType i_type, bool i_notify)
 {
 	return new ItemJob(this, (af::Job*)i_afnode, m_ctrl_sf, i_notify);
 }

@@ -209,6 +209,8 @@ bool Pool::jsonRead(const JSON &i_object, std::string * io_changes)
 
 	Farm::jsonRead(i_object);
 
+	jr_int64 ("time_creation", m_time_creation, i_object);
+
 	return true;
 }
 
@@ -216,8 +218,10 @@ void Pool::v_readwrite(Msg * msg)
 {
 	Node::v_readwrite(msg);
 
+	Farm::readwrite(msg);
+
 	if (notRoot())
-		rw_RegExp (m_pattern, msg);
+		rw_RegExp(m_pattern, msg);
 
 	// NEW_VERSION
 
@@ -226,6 +230,14 @@ void Pool::v_readwrite(Msg * msg)
 	rw_String (m_annotation,             msg);
 	rw_String (m_parent_path,            msg);
 	rw_int64_t(m_time_creation,          msg);
+
+	rw_bool   (m_new_nimby,              msg);
+	rw_bool   (m_new_paused,             msg);
+
+	rw_int32_t(m_pools_num,              msg);
+	rw_int32_t(m_pools_total,            msg);
+	rw_int32_t(m_renders_num,            msg);
+	rw_int32_t(m_renders_total,          msg);
 
 	rw_int32_t(m_run_tasks,              msg);
 	rw_int32_t(m_max_tasks,              msg);
@@ -236,6 +248,23 @@ void Pool::v_readwrite(Msg * msg)
 	rw_int32_t(m_max_capacity_per_host,  msg);
 
 	rw_int64_t(m_task_start_finish_time, msg);
+
+	rw_int32_t(m_idle_wolsleep_time,     msg);
+	rw_int32_t(m_idle_free_time,         msg);
+	rw_int32_t(m_busy_nimby_time,        msg);
+
+	rw_int32_t(m_idle_cpu,               msg);
+	rw_int32_t(m_busy_cpu,               msg);
+	rw_int32_t(m_idle_mem,               msg);
+	rw_int32_t(m_busy_mem,               msg);
+	rw_int32_t(m_idle_swp,               msg);
+	rw_int32_t(m_busy_swp,               msg);
+	rw_int32_t(m_idle_hddgb,             msg);
+	rw_int32_t(m_busy_hddgb,             msg);
+	rw_int32_t(m_idle_hddio,             msg);
+	rw_int32_t(m_busy_hddio,             msg);
+	rw_int32_t(m_idle_netmbs,            msg);
+	rw_int32_t(m_busy_netmbs,            msg);
 }
 
 int Pool::v_calcWeight() const

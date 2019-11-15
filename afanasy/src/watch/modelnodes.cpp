@@ -2,13 +2,14 @@
 
 #include "item.h"
 #include "itemnode.h"
+#include "listnodes.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-ModelNodes::ModelNodes( QObject * parent):
-	ModelItems( parent)
+ModelNodes::ModelNodes(ListNodes * i_list_nodes):
+	ModelItems(i_list_nodes)
 {
 }
 

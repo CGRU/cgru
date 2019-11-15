@@ -18,7 +18,7 @@
 
 
 ItemMonitor::ItemMonitor( af::Monitor * i_monitor, const CtrlSortFilter * i_ctrl_sf):
-	ItemNode( (af::Monitor*)i_monitor, i_ctrl_sf)
+	ItemNode((af::Monitor*)i_monitor, TMonitor, i_ctrl_sf)
 {
 	time_launch   = i_monitor->getTimeLaunch();
 	time_register = i_monitor->getTimeRegister();
@@ -44,16 +44,16 @@ ItemMonitor::ItemMonitor( af::Monitor * i_monitor, const CtrlSortFilter * i_ctrl
 
 	engine = i_monitor->getEngine().c_str();
 
-	updateValues( i_monitor, 0);
+	v_updateValues(i_monitor, 0);
 }
 
 ItemMonitor::~ItemMonitor()
 {
 }
 
-void ItemMonitor::updateValues( af::Node * i_node, int i_type)
+void ItemMonitor::v_updateValues(af::Node * i_afnode, int i_msgType)
 {
-	af::Monitor *monitor = (af::Monitor*)i_node;
+	af::Monitor *monitor = (af::Monitor*)i_afnode;
 
 	m_user_id = monitor->getUid();
 	time_activity = monitor->getTimeActivity();
@@ -142,37 +142,37 @@ void ItemMonitor::updateInfo(af::Monitor * i_monitor)
 	}
 }
 
-void ItemMonitor::paint( QPainter *painter, const QStyleOptionViewItem &option) const
+void ItemMonitor::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const
 {
-	drawBack( painter, option, isSuperUser() ? &(afqt::QEnvironment::clr_LinkVisited.c) : NULL);
+	drawBack(i_painter, i_rect, i_option, isSuperUser() ? &(afqt::QEnvironment::clr_LinkVisited.c) : NULL);
 
-	int x = option.rect.x(); int y = option.rect.y(); int w = option.rect.width(); int h = option.rect.height();
+	int x = i_rect.x(); int y = i_rect.y(); int w = i_rect.width(); int h = i_rect.height();
 
-	painter->setPen(   clrTextMain( option) );
-	painter->setFont(  afqt::QEnvironment::f_name);
-	painter->drawText( option.rect, Qt::AlignTop | Qt::AlignHCenter, m_name );
+	i_painter->setPen(clrTextMain(i_option));
+	i_painter->setFont(afqt::QEnvironment::f_name);
+	i_painter->drawText(i_rect, Qt::AlignTop | Qt::AlignHCenter, m_name);
 
-	painter->setPen(   clrTextInfo( option) );
-	painter->setFont(  afqt::QEnvironment::f_info);
-	painter->drawText( x+10, y+15, eventstitle );
-	for( int e = 0; e < eventscount; e++)
-		painter->drawText( x+5, y+30+12*e, events[e] );
+	i_painter->setPen(clrTextInfo(i_option));
+	i_painter->setFont(afqt::QEnvironment::f_info);
+	i_painter->drawText(x+10, y+15, eventstitle);
+	for (int e = 0; e < eventscount; e++)
+		i_painter->drawText( x+5, y+30+12*e, events[e]);
 
-	painter->setPen(   clrTextInfo( option) );
-	painter->setFont(  afqt::QEnvironment::f_info);
+	i_painter->setPen(clrTextInfo(i_option));
+	i_painter->setFont(afqt::QEnvironment::f_info);
 	int i = y+2; int dy = 15;
-	painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, time_launch_str );
-	painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, time_register_str );
-	painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, time_activity_str );
+	i_painter->drawText(x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, time_launch_str);
+	i_painter->drawText(x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, time_register_str);
+	i_painter->drawText(x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, time_activity_str);
 
-	painter->drawText( x, y, w-5, h, Qt::AlignBottom | Qt::AlignRight, address_str );
+	i_painter->drawText(x, y, w-5, h, Qt::AlignBottom | Qt::AlignRight, address_str);
 
 	i = y+2;
-	painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignHCenter, m_user_id_str );
-	painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignHCenter, jobsidstitle );
-	painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignHCenter, jobsids );
+	i_painter->drawText(x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignHCenter, m_user_id_str);
+	i_painter->drawText(x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignHCenter, jobsidstitle);
+	i_painter->drawText(x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignHCenter, jobsids);
 
-	painter->drawText( x, y+2, w-5, h, Qt::AlignTop | Qt::AlignRight, engine );
+	i_painter->drawText(x, y+2, w-5, h, Qt::AlignTop | Qt::AlignRight, engine);
 }
 
 void ItemMonitor::setSortType( int i_type1, int i_type2 )

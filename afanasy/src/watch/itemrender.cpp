@@ -23,8 +23,9 @@ const int ItemRender::ms_HeightAnnotation = 14;
 const int ItemRender::ms_HeightTask = 15;
 const int ItemRender::ms_HeightOffline = 15;
 
-ItemRender::ItemRender( af::Render * i_render, const CtrlSortFilter * i_ctrl_sf):
-	ItemNode( (af::Node*)i_render, i_ctrl_sf),
+ItemRender::ItemRender(af::Render * i_render, ListRenders * i_list_renders, const CtrlSortFilter * i_ctrl_sf):
+	ItemNode((af::Node*)i_render, TRender, i_ctrl_sf),
+	m_ListRenders(i_list_renders),
 	m_online( false),
 	m_taskstartfinishtime( 0),
 	m_plotCpu( 2),
@@ -87,7 +88,7 @@ ItemRender::ItemRender( af::Render * i_render, const CtrlSortFilter * i_ctrl_sf)
 	m_plotIO.setLabelValue( 1000);
 	m_plotIO.setAutoScaleMaxBGC( 100000);
 
-	updateValues( i_render, 0);
+	v_updateValues(i_render, 0);
 }
 
 ItemRender::~ItemRender()
@@ -140,18 +141,28 @@ bool ItemRender::calcHeight()
 	return old_height == m_height;
 }
 
-void ItemRender::updateValues( af::Node * i_node, int i_type)
+void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 {
-	af::Render * render = (af::Render*)i_node;
+	af::Render * render = (af::Render*)i_afnode;
 
-	switch( i_type )
+	switch(i_msgType)
 	{
 	case 0: // The item was just created
 	case af::Msg::TRendersList:
 	{
 		m_info_text_render.clear();
 
-		updateNodeValues(i_node);
+		updateNodeValues(i_afnode);
+
+		QString new_pool = afqt::stoq(render->getPool());
+		if (m_pool.size() && (m_pool != new_pool))
+		{
+			// Pool was changed:
+//			m_ListRenders->removeRender(this);
+		}
+
+		m_pool = new_pool;
+		m_sort_force = m_pool;
 
 		setHidden( render->isHidden() );
 		setOffline(render->isOffline());
@@ -172,7 +183,7 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 		}
 
 		bool becameOnline = false;
-	    if(((m_online == false) && (render->isOnline())) || (i_type == 0))
+	    if(((m_online == false) && (render->isOnline())) || (i_msgType == 0))
 		{
 			becameOnline = true;
 	        m_update_counter = 0;
@@ -402,7 +413,7 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 		break;
 	}
 	default:
-		AFERRAR("ItemRender::updateValues: Invalid type = [%s]\n", af::Msg::TNAMES[i_type]);
+		AFERRAR("ItemRender::v_updateValues: Invalid type = [%s]\n", af::Msg::TNAMES[i_msgType]);
 		return;
 	}
 
@@ -423,22 +434,29 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 	// Join info texts:
 	m_info_text = m_info_text_render;
 	m_info_text.replace("@HRES@", m_info_text_hres);
+
+	m_ListRenders->offsetHierarchy(this);
 }
 
-void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) const
+void ItemRender::setDepth(int i_depth)
 {
-	assert( painter );
+	m_margin_left = ListRenders::ms_DepthOffset * i_depth;
+}
 
-	if( !painter )
+void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const
+{
+	assert(i_painter);
+
+	if(!i_painter)
 		return;
  
 	// Calculate some sizes:
-	int x = option.rect.x(); int y = option.rect.y(); int w = option.rect.width(); int h = option.rect.height();
+	int x = i_rect.x(); int y = i_rect.y(); int w = i_rect.width(); int h = i_rect.height();
 
 	int base_height = ms_HeightHost;
 	int plot_y_offset = 4;
 	int plot_h = base_height - 5;
-	if( ListRenders::getDisplaySize() == ListRenders::ESMallSize )
+	if (ListRenders::getDisplaySize() == ListRenders::ESMallSize)
 	{
 	    base_height = ms_HeightHostSmall;
 		plot_y_offset = 1;
@@ -453,23 +471,23 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 
 	static const int left_x_offset = 25;
 	int left_text_x = x + left_x_offset;
-	int left_text_w = plot_x - left_x_offset - 5;
-	int right_text_x = x + plot_x + allplots_w - 5;
-	int right_text_w = w - plot_x - allplots_w;
+	int left_text_w = plot_x - left_text_x - 4;
+	int right_text_x = plot_x + allplots_w;
+	int right_text_w = w - (right_text_x - x);
 
 	// Draw back with render state specific color (if it is not selected)
 	const QColor * itemColor = &(afqt::QEnvironment::clr_itemrender.c);
-	if     ( m_online == false ) itemColor = &(afqt::QEnvironment::clr_itemrenderoff.c   );
-	else if( m_paused ) itemColor = &(afqt::QEnvironment::clr_itemrenderpaused.c );
-	else if( m_NIMBY || m_nimby ) itemColor = &(afqt::QEnvironment::clr_itemrendernimby.c );
-	else if( m_busy            ) itemColor = &(afqt::QEnvironment::clr_itemrenderbusy.c  );
+	if      (m_online == false) itemColor = &(afqt::QEnvironment::clr_itemrenderoff.c);
+	else if (m_paused ) itemColor = &(afqt::QEnvironment::clr_itemrenderpaused.c);
+	else if (m_NIMBY || m_nimby) itemColor = &(afqt::QEnvironment::clr_itemrendernimby.c);
+	else if (m_busy            ) itemColor = &(afqt::QEnvironment::clr_itemrenderbusy.c);
 
 	// Draw standart backgroud
-	drawBack( painter, option, itemColor, m_dirty ? &(afqt::QEnvironment::clr_error.c) : NULL);
+	drawBack(i_painter, i_rect, i_option, itemColor, m_dirty ? &(afqt::QEnvironment::clr_error.c) : NULL);
 
 	QString offlineState_time = m_offlineState;
-	if( m_wol_operation_time > 0 )
-	    offlineState_time = m_offlineState + " " + afqt::stoq( af::time2strHMS( time(NULL) - m_wol_operation_time ));
+	if (m_wol_operation_time > 0)
+	    offlineState_time = m_offlineState + " " + afqt::stoq(af::time2strHMS(time(NULL) - m_wol_operation_time ));
 
 	// Draw busy/idle bar:
 	/* TODO take this from pool
@@ -523,42 +541,44 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 
 	QString ann_state = m_state;
 	// Join annotation+state+tasks on small displays:
-	if(  ListRenders::getDisplaySize() == ListRenders::ESMallSize )
+	if (ListRenders::getDisplaySize() == ListRenders::ESMallSize)
 	{
-	    if( false == m_annotation.isEmpty())
+	    if (false == m_annotation.isEmpty())
 	        ann_state = m_annotation + ' ' + ann_state;
-	    if( false == m_tasks_users_counts.isEmpty())
+	    if (false == m_tasks_users_counts.isEmpty())
 	        ann_state = ann_state + ' ' + m_tasks_users_counts;
 	}
 	else
 	{
-		if( m_paused )
+		if (m_paused)
 		{
 			ann_state = "Paused" + ann_state;
 		}
-	    else if( m_NIMBY )
+	    else if (m_NIMBY)
 		{
 			ann_state = "NIMBY" + ann_state;
 		}
-	    else if( m_nimby )
+	    else if (m_nimby)
 		{
 			ann_state = "nimby" + ann_state;
 		}
 	}
 
-	if( false == m_online )
+	if (false == m_online)
 	{
-		painter->setPen(   afqt::QEnvironment::qclr_black );
-		painter->setFont(  afqt::QEnvironment::f_info);
-	    painter->drawText( x+5, y, w-10, ms_HeightOffline, Qt::AlignVCenter | Qt::AlignRight, ann_state );
+		i_painter->setPen(  afqt::QEnvironment::qclr_black);
+		i_painter->setFont( afqt::QEnvironment::f_info);
+		i_painter->drawText(x+5, y, w-10, ms_HeightOffline, Qt::AlignVCenter | Qt::AlignRight, ann_state);
 
 		QRect rect_center;
-	    painter->drawText( x+5, y, w-10, ms_HeightOffline, Qt::AlignVCenter | Qt::AlignHCenter, offlineState_time, &rect_center);
-	    painter->drawText( x+5, y, (w>>1)-10-(rect_center.width()>>1), ms_HeightOffline, Qt::AlignVCenter | Qt::AlignLeft,    m_name + ' ' + m_engine);
+		i_painter->drawText(x+5, y, w-10, ms_HeightOffline,
+				Qt::AlignVCenter | Qt::AlignHCenter, offlineState_time, &rect_center);
+		i_painter->drawText(x+5, y, (w>>1)-10-(rect_center.width()>>1), ms_HeightOffline,
+				Qt::AlignVCenter | Qt::AlignLeft, m_name + ' ' + m_engine);
 
 		// Print annonation at next line if display is not small
-	    if( false == m_annotation.isEmpty() && (ListRenders::getDisplaySize() != ListRenders::ESMallSize))
-	            painter->drawText( x+5, y+2, w-10, ms_HeightOffline-4 + ms_HeightOffline, Qt::AlignBottom | Qt::AlignHCenter, m_annotation);
+		if (false == m_annotation.isEmpty() && (ListRenders::getDisplaySize() != ListRenders::ESMallSize))
+			i_painter->drawText( x+5, y+2, w-10, ms_HeightOffline-4 + ms_HeightOffline, Qt::AlignBottom | Qt::AlignHCenter, m_annotation);
 
 		return;
 	}
@@ -566,68 +586,69 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 	QString users = "";
 	for (int i = 0 ; i < m_hres.logged_in_users.size() ; ++i)
 	{
-		if ( i ) users += ",";
+		if (i) users += ",";
 		users += QString::fromStdString(m_hres.logged_in_users[i]);
 	}
 
-	switch( ListRenders::getDisplaySize() )
+	switch (ListRenders::getDisplaySize())
 	{
 	case ListRenders::ESMallSize:
-		painter->setPen(   clrTextInfo( option) );
-		painter->setFont(  afqt::QEnvironment::f_info);
-	    painter->drawText( left_text_x, y+1, left_text_w, h, Qt::AlignVCenter | Qt::AlignLeft, m_name + ' ' + m_capacity_usage + ' ' + users + ' ' + m_engine);
+		i_painter->setPen(clrTextInfo(i_option));
+		i_painter->setFont(afqt::QEnvironment::f_info);
+	    i_painter->drawText(left_text_x, y+1, left_text_w, h,
+				Qt::AlignVCenter | Qt::AlignLeft, m_name + ' ' + m_capacity_usage + ' ' + users + ' ' + m_engine);
 
-		painter->setPen(   clrTextInfo( option) );
-		painter->setFont(  afqt::QEnvironment::f_info);
-		painter->drawText( right_text_x, y+1, right_text_w, h, Qt::AlignVCenter | Qt::AlignRight, ann_state );
+		i_painter->setPen(clrTextInfo(i_option));
+		i_painter->setFont(afqt::QEnvironment::f_info);
+		i_painter->drawText(right_text_x, y+1, right_text_w, h, Qt::AlignVCenter | Qt::AlignRight, ann_state);
 
 		break;
 	default:
-		painter->setPen(   clrTextMain( option) );
-		painter->setFont(  afqt::QEnvironment::f_name);
-	    painter->drawText( left_text_x, y, left_text_w, h, Qt::AlignTop | Qt::AlignLeft, m_name + ' ' + m_engine);
+		i_painter->setPen(clrTextMain(i_option));
+		i_painter->setFont(afqt::QEnvironment::f_name);
+	    i_painter->drawText(left_text_x, y, left_text_w, h, Qt::AlignTop | Qt::AlignLeft, m_name + ' ' + m_engine);
 
-		painter->setPen(   afqt::QEnvironment::qclr_black );
-		painter->setFont(  afqt::QEnvironment::f_info);
-		painter->drawText( right_text_x, y+2, right_text_w, h, Qt::AlignTop | Qt::AlignRight, ann_state );
+		i_painter->setPen(afqt::QEnvironment::qclr_black );
+		i_painter->setFont(afqt::QEnvironment::f_info);
+		i_painter->drawText(right_text_x, y+2, right_text_w, h, Qt::AlignTop | Qt::AlignRight, ann_state );
 
-		painter->setPen(   clrTextInfo( option) );
-		painter->setFont(  afqt::QEnvironment::f_info);
-	    painter->drawText( left_text_x,  y, left_text_w,  base_height+2, Qt::AlignBottom | Qt::AlignLeft,  m_capacity_usage + ' ' + users);
+		i_painter->setPen(clrTextInfo(i_option));
+		i_painter->setFont(afqt::QEnvironment::f_info);
+	    i_painter->drawText(left_text_x,  y, left_text_w,  base_height+2, Qt::AlignBottom | Qt::AlignLeft,  m_capacity_usage + ' ' + users);
 	}
 	
 	// Print Bottom|Right
 	// busy/free time for big displays or annotation+users for normal
-	switch( ListRenders::getDisplaySize() )
+	switch (ListRenders::getDisplaySize())
 	{
 	case ListRenders::ESMallSize:
 		break;
 	case ListRenders::ENormalSize:
-	    if( m_annotation.isEmpty() && m_tasks_users_counts.isEmpty())
+	    if (m_annotation.isEmpty() && m_tasks_users_counts.isEmpty())
 			break;
-		painter->drawText( right_text_x, y, right_text_w, base_height+2, Qt::AlignBottom | Qt::AlignRight,
+		i_painter->drawText(right_text_x, y, right_text_w, base_height+2, Qt::AlignBottom | Qt::AlignRight,
 	        m_annotation + ' ' + m_tasks_users_counts);
 		break;
 	default:
-		painter->drawText( right_text_x, y, right_text_w, base_height+2, Qt::AlignBottom | Qt::AlignRight,
+		i_painter->drawText(right_text_x, y, right_text_w, base_height+2, Qt::AlignBottom | Qt::AlignRight,
 	        m_taskstartfinishtime_str);
 	}
 
 	// Print information under plotters:
-	switch( ListRenders::getDisplaySize() )
+	switch (ListRenders::getDisplaySize())
 	{
 	case  ListRenders::ESMallSize:
 	case  ListRenders::ENormalSize:
 		break;
 	case  ListRenders::EBigSize:
 	{
-	    painter->drawText( x+5, y, w-10, m_plots_height + ms_HeightAnnotation, Qt::AlignBottom | Qt::AlignLeft, m_tasks_users_counts);
+		i_painter->drawText(x+5, y, w-10, m_plots_height + ms_HeightAnnotation, Qt::AlignBottom | Qt::AlignLeft, m_tasks_users_counts);
 
-	    if( false == m_annotation.isEmpty())
+	    if (false == m_annotation.isEmpty())
 		{
-			 painter->setPen(   afqt::QEnvironment::qclr_black );
-			 painter->setFont(  afqt::QEnvironment::f_info);
-	         painter->drawText( x+5, y, w-10, m_plots_height + ms_HeightAnnotation, Qt::AlignBottom | Qt::AlignRight, m_annotation);
+			i_painter->setPen(afqt::QEnvironment::qclr_black);
+			i_painter->setFont( afqt::QEnvironment::f_info);
+	       	i_painter->drawText(x+5, y, w-10, m_plots_height + ms_HeightAnnotation, Qt::AlignBottom | Qt::AlignRight, m_annotation);
 		}
 
 		break;
@@ -636,69 +657,71 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 	{
 	    std::list<af::TaskExec*>::const_iterator it = m_tasks.begin();
 	    std::list<const QPixmap*>::const_iterator icons_it = m_tasksicons.begin();
-	    for( int numtask = 1; it != m_tasks.end(); it++, icons_it++, numtask++)
+	    for (int numtask = 1; it != m_tasks.end(); it++, icons_it++, numtask++)
 		{
 			QString taskstr = QString("%1").arg((*it)->getCapacity());
-			if((*it)->getCapCoeff()) taskstr += QString("x%1").arg((*it)->getCapCoeff());
+			if ((*it)->getCapCoeff()) taskstr += QString("x%1").arg((*it)->getCapCoeff());
 			taskstr += QString(": %1[%2][%3]").arg( QString::fromUtf8((*it)->getJobName().c_str())).arg(QString::fromUtf8((*it)->getBlockName().c_str())).arg(QString::fromUtf8((*it)->getName().c_str()));
-			if((*it)->getNumber()) taskstr += QString("(%1)").arg((*it)->getNumber());
+			if ((*it)->getNumber()) taskstr += QString("(%1)").arg((*it)->getNumber());
 
 			QRect rect_usertime;
 			QString user_time = QString("%1 - %2").arg(QString::fromUtf8((*it)->getUserName().c_str())).arg( af::time2strHMS( time(NULL) - (*it)->getTimeStart()).c_str());
 
 			// Show task percent
-			if( m_tasks_percents.size() >= numtask )
-			if( m_tasks_percents[numtask-1] > 0 )
+			if (m_tasks_percents.size() >= numtask )
+			if (m_tasks_percents[numtask-1] > 0 )
 			{
 				user_time += QString(" %1%").arg( m_tasks_percents[numtask-1]);
 
 				// Draw task percent bar:
-				painter->setPen( Qt::NoPen );
-				painter->setOpacity( .5);
-				painter->setBrush( QBrush( afqt::QEnvironment::clr_done.c, Qt::SolidPattern ));
-		        painter->drawRect( x, y+m_plots_height + ms_HeightTask * (numtask-1),
+				i_painter->setPen(Qt::NoPen );
+				i_painter->setOpacity(.5);
+				i_painter->setBrush(QBrush( afqt::QEnvironment::clr_done.c, Qt::SolidPattern));
+		        i_painter->drawRect(x, y+m_plots_height + ms_HeightTask * (numtask-1),
 					(w-5)*m_tasks_percents[numtask-1]/100, ms_HeightTask - 2);
-				painter->setOpacity(1.0);
+				i_painter->setOpacity(1.0);
 			}
 
-			painter->setPen(   clrTextInfo( option) );
-	        painter->drawText( x, y, w-5, m_plots_height + ms_HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignRight, user_time, &rect_usertime );
-	        painter->drawText( x+18, y, w-30-rect_usertime.width(), m_plots_height + ms_HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignLeft, taskstr);
+			i_painter->setPen(clrTextInfo(i_option));
+			i_painter->drawText(x, y, w-5, m_plots_height + ms_HeightTask * numtask - 2,
+					Qt::AlignBottom | Qt::AlignRight, user_time, &rect_usertime );
+			i_painter->drawText(x+18, y, w-30-rect_usertime.width(), m_plots_height + ms_HeightTask * numtask - 2,
+					Qt::AlignBottom | Qt::AlignLeft, taskstr);
 
 			// Draw an icon only if pointer is not NULL:
-			if( *icons_it )
+			if (*icons_it)
 			{
-	            painter->drawPixmap( x+5, y + m_plots_height + ms_HeightTask * numtask - 15, *(*icons_it) );
+	            i_painter->drawPixmap(x+5, y + m_plots_height + ms_HeightTask * numtask - 15, *(*icons_it));
 			}
 		}
-		painter->setPen(   afqt::QEnvironment::qclr_black );
-		painter->setFont(  afqt::QEnvironment::f_info);
-	    painter->drawText( x+5, y, w-10, h-1, Qt::AlignBottom | Qt::AlignHCenter, m_annotation);
+		i_painter->setPen(  afqt::QEnvironment::qclr_black);
+		i_painter->setFont( afqt::QEnvironment::f_info);
+		i_painter->drawText(x+5, y, w-10, h-1, Qt::AlignBottom | Qt::AlignHCenter, m_annotation);
 	}
 	}
 
-	m_plotCpu.paint( painter, plot_x, plot_y, plot_w, plot_h);
+	m_plotCpu.paint(i_painter, plot_x, plot_y, plot_w, plot_h);
 	plot_x += plot_dw;
-	m_plotMem.paint( painter, plot_x, plot_y, plot_w, plot_h);
+	m_plotMem.paint(i_painter, plot_x, plot_y, plot_w, plot_h);
 	plot_x += plot_dw;
-	m_plotSwp.paint( painter, plot_x, plot_y, plot_w, plot_h);
+	m_plotSwp.paint(i_painter, plot_x, plot_y, plot_w, plot_h);
 	plot_x += plot_dw;
-	m_plotHDD.paint( painter, plot_x, plot_y, plot_w, plot_h);
+	m_plotHDD.paint(i_painter, plot_x, plot_y, plot_w, plot_h);
 	plot_x += plot_dw;
-	m_plotNet.paint( painter, plot_x, plot_y, plot_w, plot_h);
+	m_plotNet.paint(i_painter, plot_x, plot_y, plot_w, plot_h);
 	plot_x += plot_dw;
-	m_plotIO.paint(  painter, plot_x, plot_y, plot_w, plot_h);
+	m_plotIO.paint( i_painter, plot_x, plot_y, plot_w, plot_h);
 
 	plot_x = x + 4;
-	for( unsigned i = 0; i < m_plots.size(); i++)
+	for (unsigned i = 0; i < m_plots.size(); i++)
 	{
 	    int custom_w = (w - 4) / int( m_plots.size());
 		int plot_y = y + base_height + 4;
-	    m_plots[i]->paint( painter, plot_x, plot_y, custom_w-4, m_plots[i]->height);
+	    m_plots[i]->paint(i_painter, plot_x, plot_y, custom_w-4, m_plots[i]->height);
 		plot_x += custom_w;
 	}
 
-	if( m_busy)
+	if (m_busy)
 	{
 		int stars_offset_y = 13;
 		int stars_offset_x = 13;
@@ -706,7 +729,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 		int star_size_txt = 11;
 		int tasks_num_x = 25;
 		int tasks_num_y = 28;
-		if( ListRenders::getDisplaySize() == ListRenders::ESMallSize)
+		if (ListRenders::getDisplaySize() == ListRenders::ESMallSize)
 		{
 			stars_offset_y = 7;
 			stars_offset_x = 17;
@@ -716,25 +739,25 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 			tasks_num_y = 16;
 		}
 
-	    if( m_tasks.size() > 1 )
+	    if (m_tasks.size() > 1 )
 		{
-			drawStar( star_size_txt, x+stars_offset_x, y+stars_offset_y, painter);
-			painter->setFont( afqt::QEnvironment::f_name);
-			painter->setPen( afqt::QEnvironment::clr_textstars.c);
-			painter->drawText( x, y, tasks_num_x, tasks_num_y, Qt::AlignHCenter | Qt::AlignVCenter,
-	                           QString::number( m_tasks.size()));
+			drawStar(star_size_txt, x+stars_offset_x, y+stars_offset_y, i_painter);
+			i_painter->setFont(afqt::QEnvironment::f_name);
+			i_painter->setPen(afqt::QEnvironment::clr_textstars.c);
+			i_painter->drawText(x, y, tasks_num_x, tasks_num_y, Qt::AlignHCenter | Qt::AlignVCenter,
+	                           QString::number(m_tasks.size()));
 		}
 		else
 		{
-			drawStar( star_size_one, x+stars_offset_x, y+stars_offset_y, painter);
+			drawStar(star_size_one, x+stars_offset_x, y+stars_offset_y, i_painter);
 		}
 	}
 
-	if( m_wolFalling)
+	if (m_wolFalling)
 	{
-		painter->setFont( afqt::QEnvironment::f_name);
-		painter->setPen( afqt::QEnvironment::clr_star.c);
-		painter->drawText( x, y, w, h, Qt::AlignCenter, offlineState_time);
+		i_painter->setFont(afqt::QEnvironment::f_name);
+		i_painter->setPen(afqt::QEnvironment::clr_star.c);
+		i_painter->drawText(x, y, w, h, Qt::AlignCenter, offlineState_time);
 	}
 }
 

@@ -8,7 +8,6 @@
 #include "buttonpanel.h"
 #include "buttonsmenu.h"
 #include "ctrlsortfilter.h"
-#include "item.h"
 #include "modelitems.h"
 #include "param.h"
 #include "paramspanel.h"
@@ -118,28 +117,35 @@ void ListItems::itemsHeightChanged() { m_model->itemsHeightChanged();}
 void ListItems::itemsHeightCalc() { m_model->itemsHeightCalc();}
 void ListItems::repaintItems() { m_view->repaintViewport();}
 
-void ListItems::deleteItems( const std::vector<int32_t> & i_ids)
+void ListItems::deleteItems(const std::vector<int32_t> & i_ids, Item::EType i_type)
 {
 	int row = 0;
-	while( row < m_model->count())
+	while (row < m_model->count())
 	{
 		bool deleted = false;
-		for( int i = 0; i < i_ids.size(); i++)
+		for (int i = 0; i < i_ids.size(); i++)
 		{
-			if( i_ids[i] == m_model->item(row)->getId())
-			{
-				m_model->delItem( row);
-				deleted = true;
-				break;
-			}
+			Item * item = m_model->item(row);
+
+			if (i_type != item->getType())
+				continue;
+
+			if (i_ids[i] != item->getId())
+				continue;
+
+			m_model->delItem(row);
+			deleted = true;
+			break;
 		}
 
-		if( deleted )
+		if (deleted)
 			continue;
 
 		row++;
 	}
 }
+void ListItems::v_itemToBeDeleted(Item * i_item){}
+
 void ListItems::setAllowSelection( bool allow)
 {
 	if( allow ) m_view->setSelectionMode( QAbstractItemView::ExtendedSelection  );

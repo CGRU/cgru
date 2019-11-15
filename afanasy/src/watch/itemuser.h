@@ -10,7 +10,7 @@ public:
 	ItemUser( af::User * i_user, const CtrlSortFilter * i_ctrl_sf);
 	~ItemUser();
 
-	void updateValues( af::Node * i_node, int i_type);
+	void v_updateValues(af::Node * i_afnode, int i_msgType);
 
 	int errors_avoidhost;
 	int errors_tasksamehost;
@@ -36,7 +36,7 @@ public:
 	bool calcHeight();
 
 protected:
-	virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
+	virtual void v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const;
 
 private:
 	void updateInfo(af::User * i_user);

@@ -190,6 +190,7 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
    case Msg::TRendersList:
 
 	  rw_bool   ( m_locked,                 msg);
+	  rw_String ( m_pool,                   msg);
 	  rw_int64_t( m_task_start_finish_time, msg);
 	  rw_int32_t( m_max_tasks,              msg);
 	  rw_int32_t( m_capacity,               msg);

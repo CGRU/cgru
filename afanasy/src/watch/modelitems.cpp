@@ -1,11 +1,14 @@
 #include "modelitems.h"
 
+#include "listitems.h"
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-ModelItems::ModelItems( QObject * parent):
-   QAbstractListModel( parent)
+ModelItems::ModelItems(ListItems * i_list_items):
+	QAbstractListModel(i_list_items),
+	m_list_items(i_list_items)
 {
 }
 
@@ -65,6 +68,7 @@ void ModelItems::delItem( int row)
    beginRemoveRows( QModelIndex(), row, row);
    Item * item = items.takeAt( row);
    endRemoveRows();
+	m_list_items->v_itemToBeDeleted(item);
    delete item;
 }
 

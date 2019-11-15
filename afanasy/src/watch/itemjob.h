@@ -13,7 +13,7 @@ public:
 	ItemJob(ListJobs * i_list, af::Job *job, const CtrlSortFilter * i_ctrl_sf, bool i_notify);
 	~ItemJob();
 
-	void updateValues( af::Node *node, int type);
+	void v_updateValues(af::Node * i_afnode, int i_msgType);
 
 	inline int getErrorRetries(         int block = 0 ) const
 		{if(block<m_blocks_num )return m_blockinfo[ block].getErrorsRetries();       else return 0; }
@@ -83,7 +83,7 @@ public:
 	void getThumbnail() const;
 
 protected:
-	void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
+	virtual void v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const;
 
 private:
 	static const int Height;

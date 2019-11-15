@@ -103,7 +103,7 @@ bool ListMonitors::v_caseMessage( af::Msg * msg)
 	{
 	case af::Msg::TMonitorsList:
 	{
-		updateItems( msg);
+		updateItems(msg, Item::TMonitor);
 		subscribe();
 		calcTitle();
 		break;
@@ -116,9 +116,9 @@ bool ListMonitors::v_caseMessage( af::Msg * msg)
 
 bool ListMonitors::v_processEvents( const af::MonitorEvents & i_me)
 {
-	if( i_me.m_events[af::Monitor::EVT_monitors_del].size())
+	if (i_me.m_events[af::Monitor::EVT_monitors_del].size())
 	{
-		deleteItems( i_me.m_events[af::Monitor::EVT_monitors_del]);
+		deleteItems(i_me.m_events[af::Monitor::EVT_monitors_del], Item::TMonitor);
 		calcTitle();
 		return true;
 	}
@@ -140,7 +140,7 @@ bool ListMonitors::v_processEvents( const af::MonitorEvents & i_me)
 	return false;
 }
 
-ItemNode* ListMonitors::v_createNewItemNode(af::Node * i_afnode, bool i_notify)
+ItemNode* ListMonitors::v_createNewItemNode(af::Node * i_afnode, Item::EType i_type, bool i_notify)
 {
 	return new ItemMonitor((af::Monitor*)i_afnode, m_ctrl_sf);
 }

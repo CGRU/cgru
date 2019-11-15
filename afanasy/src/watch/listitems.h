@@ -6,6 +6,7 @@
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
 #include "infoline.h"
+#include "item.h"
 #include "receiver.h"
 
 #include <QtCore/QMutex>
@@ -23,7 +24,6 @@ class QItemSelection;
 class QModelIndex;
 
 class CtrlSortFilter;
-class Item;
 class ButtonPanel;
 class ButtonsMenu;
 class ModelItems;
@@ -56,6 +56,8 @@ public:
 	inline bool isTypeJobs()  const { return m_type == "jobs";  }
 	inline bool isTypeUsers() const { return m_type == "users"; }
 
+	virtual void v_itemToBeDeleted(Item * i_item);
+
 public slots:
 	void repaintItems();
 	void deleteAllItems();
@@ -85,7 +87,7 @@ protected:
 
 	void operation( const std::string & i_operation);
 
-	void deleteItems( const std::vector<int32_t> & i_ids);
+	void deleteItems(const std::vector<int32_t> & i_ids, Item::EType i_type);
 
 	void setAllowSelection( bool allow);
 	Item* getCurrentItem() const;

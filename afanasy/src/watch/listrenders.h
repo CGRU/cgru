@@ -7,6 +7,9 @@
 
 class QItemSelection;
 
+class ItemPool;
+class ItemRender;
+
 class ListRenders : public ListNodes
 {
 	Q_OBJECT
@@ -17,14 +20,26 @@ public:
 
 	bool v_caseMessage( af::Msg * msg);
 
-	ItemNode * v_createNewItemNode(af::Node * i_afnode, bool i_notify);
+	ItemNode * v_createNewItemNode(af::Node * i_afnode, Item::EType i_type, bool i_notify);
 
 	virtual bool v_processEvents( const af::MonitorEvents & i_me);
+
+	void offsetHierarchy(ItemPool   * i_item_pool);
+	void offsetHierarchy(ItemRender * i_item_render);
+
+	void removeRender(ItemRender * i_item_render);
+	void removePool(ItemPool * i_item_pool);
+
+	static const int ms_DepthOffset = 32;
 
 protected:
 	void contextMenuEvent( QContextMenuEvent *event);
 
 	void doubleClicked( Item * item);
+
+	virtual void v_connectionLost();
+
+	virtual void v_itemToBeDeleted(Item * i_item);
 
 public:
 	 enum EDisplaySize
@@ -78,9 +93,6 @@ private slots:
 	void requestResources();
 
 private:
-	QTimer * timer;
-
-private:
 	void setService( bool enable);
 	void launchCmdExit( bool i_exit);
 	void launchCmdStringExit(const QString & i_cmd, bool i_exit);
@@ -88,6 +100,9 @@ private:
 	void setSpacing();
 
 private:
+	QMap<QString, ItemPool*> m_pools;
+	QMap<QString, QList<ItemRender*>> m_pool_renders;
+
 	static EDisplaySize ms_displaysize;
 
 	static int     ms_SortType1;
@@ -98,4 +113,6 @@ private:
 	static bool    ms_FilterInclude;
 	static bool    ms_FilterMatch;
 	static std::string ms_FilterString;
+
+	QTimer * timer;
 };

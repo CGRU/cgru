@@ -87,7 +87,7 @@ public:
    static const int WTime = 50;
 
 protected:
-   virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
+	virtual void v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const;
    
 private:
    static const int HeightHeader;

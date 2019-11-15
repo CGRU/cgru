@@ -5,13 +5,18 @@
 #include "itemnode.h"
 #include "plotter.h"
 
+class ListRenders;
+
 class ItemRender : public ItemNode
 {
 public:
-	ItemRender( af::Render * i_render, const CtrlSortFilter * i_ctrl_sf);
+	ItemRender( af::Render * i_render, ListRenders * i_list_renders, const CtrlSortFilter * i_ctrl_sf);
 	~ItemRender();
 
-	void updateValues( af::Node * i_node, int i_type);
+	void v_updateValues(af::Node * i_afnode, int i_msgType);
+
+	inline const QString & getPool() const { return m_pool; }
+	void setDepth(int i_depth);
 
 	inline const QString & getUserName()   const { return m_username;      }
 	inline const QString & getIPString()   const { return m_address_ip_str;}
@@ -44,7 +49,7 @@ public:
 	bool calcHeight();
 
 protected:
-	virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
+	virtual void v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const;
 
 private:
 	static const int ms_HeightHost;
@@ -58,6 +63,8 @@ private:
 	void deletePlots();
 
 private:
+	ListRenders * m_ListRenders;
+
 	// We need to keep two info strings,
 	// because render can update its properties w/o resources at one time,
 	// and at the other just resources.
@@ -68,6 +75,7 @@ private:
 
 	af::HostRes m_hres;
 
+	QString m_pool;
 	QString m_os;
 	QString m_engine;
 	QString m_username;

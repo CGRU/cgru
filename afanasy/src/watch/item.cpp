@@ -23,12 +23,14 @@ QPolygonF Item::ms_star_pointsDraw;
 const int Item::Height = 14;
 const int Item::Width  = 100;
 
-Item::Item( const QString &itemname, int itemid):
-	m_name( itemname),
+Item::Item(const QString &i_name, int i_id, EType i_type):
+	m_name(i_name),
 	m_height( Height),
+	m_margin_left(0),
 	m_locked( false),
 	m_running( false),
-	m_id(itemid),
+	m_id(i_id),
+	m_type(i_type),
 	m_hidden(false)
 {
 }
@@ -93,33 +95,41 @@ const QColor & Item::clrTextState( const QStyleOptionViewItem &option, bool on )
 	else   return (option.state & QStyle::State_Selected) ? afqt::QEnvironment::clr_textbright.c : afqt::QEnvironment::clr_textmuted.c;
 }
 
-void Item::drawBack( QPainter *painter, const QStyleOptionViewItem &option, const QColor * i_clrItem, const QColor * i_clrBorder) const
+void Item::drawBack(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option,
+		const QColor * i_clrItem, const QColor * i_clrBorder) const
 {
-	painter->setOpacity( 1.0);
-	painter->setRenderHint(QPainter::Antialiasing);
-	painter->setRenderHint(QPainter::TextAntialiasing);
+	i_painter->setOpacity(1.0);
+	i_painter->setRenderHint(QPainter::Antialiasing);
+	i_painter->setRenderHint(QPainter::TextAntialiasing);
 
-	if( option.state & QStyle::State_Selected )
+	if (i_option.state & QStyle::State_Selected)
 		i_clrItem = &afqt::QEnvironment::clr_selected.c;
-	else if( i_clrItem == NULL )
+	else if(i_clrItem == NULL)
 		i_clrItem = &afqt::QEnvironment::clr_item.c;
 
-	painter->setPen( i_clrBorder ? (*i_clrBorder) : (afqt::QEnvironment::clr_outline.c));
-	painter->setBrush( *i_clrItem);
-	painter->drawRoundedRect( option.rect, 2, 2);
+	i_painter->setPen(i_clrBorder ? (*i_clrBorder) : (afqt::QEnvironment::clr_outline.c));
+	i_painter->setBrush(*i_clrItem);
+	i_painter->drawRoundedRect(i_rect, 2, 2);
 }
 
-void Item::paint( QPainter *painter, const QStyleOptionViewItem &option) const
+void Item::paint(QPainter * i_painter, const QStyleOptionViewItem & i_option) const
 {
-	drawBack( painter, option);
+	QRect rect(i_option.rect);
+	rect.setLeft(rect.left() + m_margin_left);
+	v_paint(i_painter, rect, i_option);
+}
 
-	painter->setPen( afqt::QEnvironment::qclr_black );
+void Item::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const
+{
+	drawBack(i_painter, i_rect, i_option);
 
-	painter->setFont( afqt::QEnvironment::f_name);
-	painter->drawText( option.rect, Qt::AlignTop | Qt::AlignLeft, m_name);
+	i_painter->setPen(afqt::QEnvironment::qclr_black);
 
-	painter->setFont( afqt::QEnvironment::f_info);
-	painter->drawText( option.rect, Qt::AlignBottom | Qt::AlignRight, QString(" ( virtual Item painting ) "));
+	i_painter->setFont(afqt::QEnvironment::f_name);
+	i_painter->drawText(i_rect, Qt::AlignTop | Qt::AlignLeft, m_name);
+
+	i_painter->setFont(afqt::QEnvironment::f_info);
+	i_painter->drawText(i_rect, Qt::AlignBottom | Qt::AlignRight, QString(" ( virtual Item painting ) "));
 }
 
 void Item::v_filesReceived( const af::MCTaskUp & i_taskup) {}
@@ -302,3 +312,65 @@ void Item::drawStar( int size, int posx, int posy, QPainter * painter)
 	painter->setBrush( QBrush( afqt::QEnvironment::clr_star.c, Qt::SolidPattern ));
 	painter->drawPolygon( ms_star_pointsDraw);//, Qt::WindingFill);
 }
+
+void Item::drawServices(QPainter * i_painter,
+		const QList<QString> & i_services, const QList<QString> & i_services_disabled,
+		int i_x, int i_y, int i_w, int i_h)
+{
+	int x = i_x;
+	// Iterate services:
+	for (int i = 0; i < i_services.size(); i++)
+	{
+		int w = 4;
+
+		// Draw icon:
+		const QPixmap * icon = Watch::getServiceIconSmall(i_services[i]);
+		if (icon)
+		{
+			i_painter->drawPixmap(x+2, i_y+2, *icon);
+			w += 16;
+		}
+
+		// Draw name:
+		i_painter->setFont(afqt::QEnvironment::f_info);
+		QPen pen(afqt::QEnvironment::qclr_black);
+		i_painter->setPen(pen);
+		QRect bound;
+		i_painter->drawText(x+w, i_y, i_w, i_h, Qt::AlignLeft | Qt::AlignVCenter, i_services[i], &bound);
+		w += bound.width() + 4;
+
+		// Draw border:
+		i_painter->setPen(afqt::QEnvironment::clr_outline.c);
+		i_painter->setBrush(Qt::NoBrush);
+		i_painter->drawRect(x, i_y, w, i_h);
+
+		x += w + 8;
+	}
+
+	int w = i_w;
+	// Iterate disabled services:
+	for (int i = 0; i < i_services_disabled.size(); i++)
+	{
+		int x = 4;
+
+		// Draw name:
+		i_painter->setFont(afqt::QEnvironment::f_info);
+		QPen pen(afqt::QEnvironment::qclr_black);
+		i_painter->setPen(pen);
+		QRect bound;
+		i_painter->drawText(i_x, i_y, w-x, i_h, Qt::AlignRight | Qt::AlignVCenter, i_services_disabled[i], &bound);
+		x += bound.width() + 4;
+
+		// Draw line:
+		i_painter->setPen(afqt::QEnvironment::clr_error.c);
+		i_painter->drawLine(i_x+w-x, i_y, i_x+w, i_y+i_h);
+
+		// Draw border:
+		i_painter->setPen(afqt::QEnvironment::clr_outline.c);
+		i_painter->setBrush(Qt::NoBrush);
+		i_painter->drawRect(i_x+w-x, i_y, x, i_h);
+
+		w -= x + 8;
+	}
+}
+

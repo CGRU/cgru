@@ -21,7 +21,7 @@ const int ItemJob::HeightThumbName = 12;
 const int ItemJob::HeightAnnotation = 12;
 
 ItemJob::ItemJob( ListJobs * i_list, af::Job * i_job, const CtrlSortFilter * i_ctrl_sf, bool i_notify):
-	ItemNode( (af::Node*)i_job, i_ctrl_sf),
+	ItemNode( (af::Node*)i_job, TJob, i_ctrl_sf),
 	m_list( i_list),
 	m_blocks_num( i_job->getBlocksNum()),
 	m_tasks_done( -1),
@@ -43,7 +43,7 @@ ItemJob::ItemJob( ListJobs * i_list, af::Job * i_job, const CtrlSortFilter * i_c
 		m_blockinfo[b].setJobId( getId());
 	}
 
-	updateValues( (af::Node*)i_job, af::Msg::TJobsList);
+	v_updateValues((af::Node*)i_job, af::Msg::TJobsList);
 
 	if(i_notify)
 		Watch::ntf_JobAdded( this);
@@ -57,13 +57,13 @@ ItemJob::~ItemJob()
 		delete m_thumbs[i];
 }
 
-void ItemJob::updateValues( af::Node * i_node, int i_type)
+void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 {
-	af::Job *job = (af::Job*)i_node;
+	af::Job *job = (af::Job*)i_afnode;
 
 	if( m_blocks_num != job->getBlocksNum())
 	{
-		AFERROR("ItemJob::updateValues: Blocks number mismatch, deleting invalid item.")
+		AFERROR("ItemJob::v_updateValues: Blocks number mismatch, deleting invalid item.")
 		resetId();
 		return;
 	}
@@ -71,7 +71,7 @@ void ItemJob::updateValues( af::Node * i_node, int i_type)
 	// Store previous state to check difference for notifications.
 	int64_t prev_state = state;
 
-	updateNodeValues( i_node);
+	updateNodeValues(i_afnode);
 
 	// Changeable parameters:
 	m_params["max_running_tasks"]          = job->getMaxRunningTasks();
@@ -128,7 +128,7 @@ void ItemJob::updateValues( af::Node * i_node, int i_type)
 	for( int b = 0; b < m_blocks_num; b++)
 	{
 		const af::BlockData * block = job->getBlock(b);
-		m_blockinfo[b].update( block, i_type);
+		m_blockinfo[b].update(block, i_msgType);
 
 		if( block->getProgressAvoidHostsNum() > 0 )
 			compact_display = false;
@@ -285,28 +285,28 @@ bool ItemJob::calcHeight()
 	return old_height == m_height;
 }
 
-void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) const
+void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const
 {
-	int x = option.rect.x(); int y = option.rect.y(); int w = option.rect.width(); int h = option.rect.height();
+	int x = i_rect.x(); int y = i_rect.y(); int w = i_rect.width(); int h = i_rect.height();
 
 	// Draw back with job state specific color (if it is not selected)
 	const QColor * itemColor = &(afqt::QEnvironment::clr_itemjob.c);
-	if     ( state & AFJOB::STATE_OFFLINE_MASK)    itemColor = &(afqt::QEnvironment::clr_itemjoboff.c  );
-	else if( state & AFJOB::STATE_ERROR_MASK)      itemColor = &(afqt::QEnvironment::clr_itemjoberror.c);
-	else if( state & AFJOB::STATE_PPAPPROVAL_MASK) itemColor = &(afqt::QEnvironment::clr_itemjobppa.c);
-	else if( state & AFJOB::STATE_WAITTIME_MASK)   itemColor = &(afqt::QEnvironment::clr_itemjobwtime.c);
-	else if( state & AFJOB::STATE_WAITDEP_MASK)    itemColor = &(afqt::QEnvironment::clr_itemjobwdep.c );
-	else if( state & AFJOB::STATE_WARNING_MASK )   itemColor = &(afqt::QEnvironment::clr_itemjobwarning.c );
-	else if( state & AFJOB::STATE_DONE_MASK)       itemColor = &(afqt::QEnvironment::clr_itemjobdone.c );
+	if     (state & AFJOB::STATE_OFFLINE_MASK)    itemColor = &(afqt::QEnvironment::clr_itemjoboff.c);
+	else if(state & AFJOB::STATE_ERROR_MASK)      itemColor = &(afqt::QEnvironment::clr_itemjoberror.c);
+	else if(state & AFJOB::STATE_PPAPPROVAL_MASK) itemColor = &(afqt::QEnvironment::clr_itemjobppa.c);
+	else if(state & AFJOB::STATE_WAITTIME_MASK)   itemColor = &(afqt::QEnvironment::clr_itemjobwtime.c);
+	else if(state & AFJOB::STATE_WAITDEP_MASK)    itemColor = &(afqt::QEnvironment::clr_itemjobwdep.c);
+	else if(state & AFJOB::STATE_WARNING_MASK )   itemColor = &(afqt::QEnvironment::clr_itemjobwarning.c);
+	else if(state & AFJOB::STATE_DONE_MASK)       itemColor = &(afqt::QEnvironment::clr_itemjobdone.c);
 
 	// Draw standart backgroud
-	drawBack( painter, option, itemColor);
+	drawBack(i_painter, i_rect, i_option, itemColor);
 
-	uint32_t currenttime = time( NULL);
+	uint32_t currenttime = time(NULL);
 
 	QString user_time = user_eta;
 	QString properties_time = properties;
-	if( time_started && (( state & AFJOB::STATE_DONE_MASK) == false))
+	if (time_started && ((state & AFJOB::STATE_DONE_MASK) == false))
 	{
 		QString runtime = QString(af::time2strHMS( currenttime - time_started).c_str());
 		if( Watch::isPadawan())
@@ -315,22 +315,22 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 			properties_time += " " + runtime;
 
 		// ETA (but not for the system job):
-		if( getId() != AFJOB::SYSJOB_ID )
+		if (getId() != AFJOB::SYSJOB_ID)
 		{
 			int percentage = 0;
-			for( int b = 0; b < m_blocks_num; b++)
+			for (int b = 0; b < m_blocks_num; b++)
 				percentage += m_blockinfo[b].p_percentage;
 
 			percentage /= m_blocks_num;
-			if(( percentage > 0 ) && ( percentage < 100 ))
+			if ((percentage > 0) && (percentage < 100))
 			{
 				int sec_run = currenttime - time_started;
 				int sec_all = sec_run * 100.0 / percentage;
 				int eta = sec_all - sec_run;
-				if( eta > 0 )
+				if (eta > 0)
 				{
-					QString etas = afqt::stoq( af::time2strHMS( eta)) + " " + user_eta;
-					if( Watch::isPadawan() || Watch::isJedi())
+					QString etas = afqt::stoq(af::time2strHMS(eta)) + " " + user_eta;
+					if (Watch::isPadawan() || Watch::isJedi())
 						user_time = QString::fromUtf8("ETA: ~") + etas;
 					else
 						user_time = QString::fromUtf8("eta: ~") + etas;
@@ -339,9 +339,9 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 		}
 	}
 
-	if( time_wait > currenttime )
+	if (time_wait > currenttime)
 	{
-		QString wait = af::time2strHMS( time_wait - currenttime ).c_str();
+		QString wait = af::time2strHMS(time_wait - currenttime ).c_str();
 		if( Watch::isPadawan())
 			user_time = user_eta + " Waiting Time:" + wait;
 		else if( Watch::isJedi())
@@ -350,73 +350,74 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 			user_time = user_eta + " w:" + wait;
 	}
 
-	printfState( state, x+35+(w>>3), y+25, painter, option);
+	printfState(state, x+35+(w>>3), y+25, i_painter, i_option);
 
-	painter->setFont( afqt::QEnvironment::f_info);
-	painter->setPen( clrTextInfo( option));
+	i_painter->setFont(afqt::QEnvironment::f_info);
+	i_painter->setPen(clrTextInfo(i_option));
 
 	int cy = y-10; int dy = 13;
 	QRect rect_user;
-	painter->drawText( x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, user_time, &rect_user);
+	i_painter->drawText( x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, user_time, &rect_user);
 
-	if( lifetime > 0 ) properties_time += QString(" L%1-%2")
-		.arg( af::time2strHMS( lifetime, true).c_str()).arg( af::time2strHMS( lifetime - (currenttime - time_creation)).c_str());
-	painter->drawText( x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, properties_time);
+	if (lifetime > 0)
+		properties_time += QString(" L%1-%2")
+			.arg(af::time2strHMS(lifetime, true).c_str()).arg( af::time2strHMS( lifetime - (currenttime - time_creation)).c_str());
+	i_painter->drawText(x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, properties_time);
 
 	int offset = 30;
 
-	painter->setPen( clrTextMain( option) );
-	painter->setFont( afqt::QEnvironment::f_name);
+	i_painter->setPen(clrTextMain(i_option) );
+	i_painter->setFont(afqt::QEnvironment::f_name);
 	QFontMetrics fm(afqt::QEnvironment::f_name);
 	QString id_str = QString("#%1").arg(getId());
-	painter->drawText( x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, id_str);
+	i_painter->drawText(x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, id_str);
 	offset += fm.width(id_str) + 10;
 	
 	if (project.size())
 	{
-		painter->setPen( afqt::QEnvironment::clr_textbright.c );
-		painter->setFont( afqt::QEnvironment::f_name);
-		painter->drawText( x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, project);
+		i_painter->setPen(afqt::QEnvironment::clr_textbright.c);
+		i_painter->setFont(afqt::QEnvironment::f_name);
+		i_painter->drawText(x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, project);
 		offset += fm.width(project);
 		if (department.size())
 		{
-			painter->drawText( x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, "(" + department + ")");
+			i_painter->drawText(x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, "(" + department + ")");
 			offset += fm.width(department);
 		}
 		offset += 25;
 	}
 	
-	painter->setPen( clrTextMain( option) );
-	painter->setFont( afqt::QEnvironment::f_name);
-	painter->drawText( x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, m_name);
+	i_painter->setPen(clrTextMain(i_option));
+	i_painter->setFont(afqt::QEnvironment::f_name);
+	i_painter->drawText(x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, m_name);
 
-	if( state & AFJOB::STATE_DONE_MASK)
+	if (state & AFJOB::STATE_DONE_MASK)
 	{
-		painter->setFont( afqt::QEnvironment::f_name);
-		painter->setPen( clrTextDone( option) );
-		painter->drawText(  x+3, y+26, runningTime );
+		i_painter->setFont(afqt::QEnvironment::f_name);
+		i_painter->setPen(clrTextDone(i_option));
+		i_painter->drawText(x+3, y+26, runningTime);
 	}
 
-	for( int b = 0; b < m_blocks_num; b++)
-		m_blockinfo[b].paint( painter, option,
+	for (int b = 0; b < m_blocks_num; b++)
+		m_blockinfo[b].paint( i_painter, i_option,
 			x+5, y + Height + block_height*b + 3, w-12,
 			compact_display, itemColor);
 
-	if( state & AFJOB::STATE_RUNNING_MASK )
+	if (state & AFJOB::STATE_RUNNING_MASK)
 	{
-		drawStar( num_runningtasks>=10 ? 14:10, x+15, y+16, painter);
-		painter->setFont( afqt::QEnvironment::f_name);
-		painter->setPen( afqt::QEnvironment::clr_textstars.c);
-		painter->drawText( x+0, y+0, 30, 34, Qt::AlignHCenter | Qt::AlignVCenter, num_runningtasks_str );
+		drawStar(num_runningtasks>=10 ? 14:10, x+15, y+16, i_painter);
+		i_painter->setFont(afqt::QEnvironment::f_name);
+		i_painter->setPen(afqt::QEnvironment::clr_textstars.c);
+		i_painter->drawText(x+0, y+0, 30, 34, Qt::AlignHCenter | Qt::AlignVCenter, num_runningtasks_str);
 	}
 
 
 	// Thumbnails:
 	int tx = x + w;
 	static const int xb = 4;
-	painter->setPen( afqt::QEnvironment::qclr_black );
-	painter->setFont( afqt::QEnvironment::f_info );
-	for( int i = 0; i < m_thumbs.size(); i++ )
+	i_painter->setPen(afqt::QEnvironment::qclr_black);
+	i_painter->setFont(afqt::QEnvironment::f_info);
+	for (int i = 0; i < m_thumbs.size(); i++)
 	{
 		tx -= xb;
 		if( tx < x + xb ) break;
@@ -431,33 +432,31 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 		}
 		int th = y + Height + block_height * m_blocks_num;
 
-		painter->drawText( tx, th, tw, ItemJob::HeightThumbName, Qt::AlignRight | Qt::AlignVCenter, m_thumbs_paths[i]);
+		i_painter->drawText(tx, th, tw, ItemJob::HeightThumbName, Qt::AlignRight | Qt::AlignVCenter, m_thumbs_paths[i]);
 
 		th += ItemJob::HeightThumbName;
 
-		painter->drawImage( tx, th, * m_thumbs[i], sx, 0, tw, m_thumbs[i]->size().height());
-
-//		tx -= m_thumbs[i]->size().width();
+		i_painter->drawImage(tx, th, * m_thumbs[i], sx, 0, tw, m_thumbs[i]->size().height());
 	}
 
 
 	// Report:
-	if( false == report.isEmpty())
+	if (false == report.isEmpty())
 	{
-		painter->setPen( clrTextMain( option) );
-		painter->setFont( afqt::QEnvironment::f_info);
+		i_painter->setPen(clrTextMain(i_option));
+		i_painter->setFont(afqt::QEnvironment::f_info);
 		int y_report = y;
-		if( false == m_annotation.isEmpty())
+		if (false == m_annotation.isEmpty())
 			y_report -= HeightAnnotation;
-		painter->drawText( x, y_report, w, h, Qt::AlignHCenter | Qt::AlignBottom, report );
+		i_painter->drawText(x, y_report, w, h, Qt::AlignHCenter | Qt::AlignBottom, report);
 	}
 
 	// Annotation:
-	if( false == m_annotation.isEmpty())
+	if (false == m_annotation.isEmpty())
 	{
-		painter->setPen( clrTextMain( option) );
-		painter->setFont( afqt::QEnvironment::f_info);
-		painter->drawText( x, y, w, h, Qt::AlignHCenter | Qt::AlignBottom, m_annotation );
+		i_painter->setPen(clrTextMain(i_option));
+		i_painter->setFont(afqt::QEnvironment::f_info);
+		i_painter->drawText(x, y, w, h, Qt::AlignHCenter | Qt::AlignBottom, m_annotation);
 	}
 }
 
