@@ -605,7 +605,8 @@ void ListJobs::moveJobs( const std::string & i_operation)
 	std::vector<int> uids;
 	uids.push_back( MonitorHost::getUid());
 	af::jsonActionOperationStart( str, "users", i_operation, "", uids);
-	std::vector<int> jids = getSelectedIds();
+	Item::EType type = Item::TJob;
+	std::vector<int> jids = getSelectedIds(type);
 	str << ",\n\"jids\":[";
 	for( int i = 0; i < jids.size(); i++)
 	{
@@ -618,18 +619,18 @@ void ListJobs::moveJobs( const std::string & i_operation)
 	displayInfo( afqt::stoq( i_operation));
 }
 
-void ListJobs::actStart()           { operation("start"            );}
-void ListJobs::actStop()            { operation("stop"             );}
-void ListJobs::actRestart()         { operation("restart"          );}
-void ListJobs::actRestartErrors()   { operation("restart_errors"   );}
-void ListJobs::actRestartWarnings() { operation("restart_warnings" );}
-void ListJobs::actRestartRunning()  { operation("restart_running"  );}
-void ListJobs::actRestartSkipped()  { operation("restart_skipped"  );}
-void ListJobs::actRestartDone()     { operation("restart_done"     );}
-void ListJobs::actResetErrorHosts() { operation("reset_error_hosts");}
-void ListJobs::actPause()           { operation("pause"            );}
-void ListJobs::actRestartPause()    { operation("restart_pause"    );}
-void ListJobs::actDelete()          { operation("delete"           );}
+void ListJobs::actStart()           { operation(Item::TJob, "start"            );}
+void ListJobs::actStop()            { operation(Item::TJob, "stop"             );}
+void ListJobs::actRestart()         { operation(Item::TJob, "restart"          );}
+void ListJobs::actRestartErrors()   { operation(Item::TJob, "restart_errors"   );}
+void ListJobs::actRestartWarnings() { operation(Item::TJob, "restart_warnings" );}
+void ListJobs::actRestartRunning()  { operation(Item::TJob, "restart_running"  );}
+void ListJobs::actRestartSkipped()  { operation(Item::TJob, "restart_skipped"  );}
+void ListJobs::actRestartDone()     { operation(Item::TJob, "restart_done"     );}
+void ListJobs::actResetErrorHosts() { operation(Item::TJob, "reset_error_hosts");}
+void ListJobs::actPause()           { operation(Item::TJob, "pause"            );}
+void ListJobs::actRestartPause()    { operation(Item::TJob, "restart_pause"    );}
+void ListJobs::actDelete()          { operation(Item::TJob, "delete"           );}
 
 void ListJobs::actDeleteDone()
 {
@@ -654,14 +655,14 @@ void ListJobs::actDeleteDone()
 	displayInfo("Delete all done jobs.");
 }
 
-void ListJobs::actRequestLog() { getItemInfo("log"); }
-void ListJobs::actRequestErrorHostsList() { getItemInfo("error_hosts"); }
+void ListJobs::actRequestLog() { getItemInfo(Item::TAny, "log"); }
+void ListJobs::actRequestErrorHostsList() { getItemInfo(Item::TAny, "error_hosts"); }
 
-void ListJobs::actSetHidden()   { setParameter("hidden", "true",  false); }
-void ListJobs::actUnsetHidden() { setParameter("hidden", "false", false); }
+void ListJobs::actSetHidden()   { setParameter(Item::TJob, "hidden", "true",  false); }
+void ListJobs::actUnsetHidden() { setParameter(Item::TJob, "hidden", "false", false); }
 
-void ListJobs::actPreviewApproval()   { setParameter("ppa", "true",  false); }
-void ListJobs::actNoPreviewApproval() { setParameter("ppa", "false", false); }
+void ListJobs::actPreviewApproval()   { setParameter(Item::TJob, "ppa", "true",  false); }
+void ListJobs::actNoPreviewApproval() { setParameter(Item::TJob, "ppa", "false", false); }
 
 void ListJobs::actSetUser()
 {
@@ -673,7 +674,7 @@ void ListJobs::actSetUser()
 	QString text = QInputDialog::getText(this, "Change Owner", "Enter New User Name", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	setParameter("user_name", afqt::qtos( text));
+	setParameter(Item::TJob, "user_name", afqt::qtos( text));
 }
 
 void ListJobs::actChangeBranch()
@@ -684,7 +685,7 @@ void ListJobs::actChangeBranch()
 	bool ok;
 	QString branch = QInputDialog::getText(this, "Change Branch", "Branch", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
-	setParameter("branch", afqt::qtos( branch));
+	setParameter(Item::TJob, "branch", afqt::qtos( branch));
 }
 
 void ListJobs::actPostCommand()
@@ -697,7 +698,7 @@ void ListJobs::actPostCommand()
 	QString cmd = QInputDialog::getText(this, "Change Post Command", "Enter Command", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	setParameter("command_post", afqt::qtos( cmd));
+	setParameter(Item::TJob, "command_post", afqt::qtos( cmd));
 }
 
 void ListJobs::doubleClicked( Item * item)
@@ -740,7 +741,9 @@ void ListJobs::blockAction( int id_block, QString i_action)
 	if( jobitem == NULL ) return;
 
 	std::ostringstream str;
-	af::jsonActionStart( str, "jobs", "", getSelectedIds());
+	Item::EType type = Item::TJob;
+	std::vector<int> ids(getSelectedIds(type));
+	af::jsonActionStart(str, "jobs", "", ids);
 	str << ",\n\"block_ids\":[" << id_block << ']';
 
 	if( jobitem->blockAction( str, id_block, i_action, this))

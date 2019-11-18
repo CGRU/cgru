@@ -8,10 +8,7 @@
 class Param
 {
 public:
-	Param(int i_type, const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = -1);
-	~Param();
-
-	enum Type {
+	enum EType {
 		TNum = 0,
 		TStr = 1,
 		TREx = 2,
@@ -19,7 +16,10 @@ public:
 		THrs = 4
 	};
 
-	const int type;
+	Param(EType i_type, const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = -1);
+	~Param();
+
+	const EType type;
 	const QString name;
 	const QString label;
 	const QString tip;

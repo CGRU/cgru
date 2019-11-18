@@ -36,6 +36,8 @@ class ListItems : public QWidget, public Receiver
 Q_OBJECT
 public:
 
+	static const std::string & itemTypeToAf(Item::EType i_type);
+
 	ListItems( QWidget* parent, const std::string & type = "");
 	virtual ~ListItems();
 
@@ -78,14 +80,14 @@ protected:
 
 	virtual void doubleClicked( Item * item);
 
-	void getItemInfo( const std::string & i_mode);
+	void getItemInfo(Item::EType i_type, const std::string & i_mode);
 
-	inline void setParameter( const std::string & i_name, long long i_value)
-		{ setParameter( i_name, af::itos( i_value), false);}
-	void setParameterRE( const std::string & i_name, const std::string & i_value);
-	void setParameter( const std::string & i_name, const std::string & i_value, bool i_quoted = true);
+	inline void setParameter(Item::EType i_type, const std::string & i_name, long long i_value)
+		{ setParameter(i_type, i_name, af::itos(i_value), false);}
+	void setParameterRE(Item::EType i_type, const std::string & i_name, const std::string & i_value);
+	void setParameter(Item::EType i_type, const std::string & i_name, const std::string & i_value, bool i_quoted = true);
 
-	void operation( const std::string & i_operation);
+	void operation(Item::EType i_type, const std::string & i_operation);
 
 	void deleteItems(const std::vector<int32_t> & i_ids, Item::EType i_type);
 
@@ -93,7 +95,7 @@ protected:
 	Item* getCurrentItem() const;
 	int getSelectedItemsCount() const;
 	const QList<Item*> getSelectedItems() const;
-	const std::vector<int> getSelectedIds() const;
+	const std::vector<int> getSelectedIds(Item::EType & io_type) const;
 	void storeSelection();
 	void reStoreSelection();
 

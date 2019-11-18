@@ -12,14 +12,18 @@ class Item
 {
 public:
 	enum EType {
-		TBlock,
-		TBranch,
-		TJob,
-		TMonitor,
-		TPool,
-		TRender,
-		TTask,
-		TUser
+		TNone    = 0,
+
+		TBlock   = 1,
+		TBranch  = 2,
+		TJob     = 3,
+		TMonitor = 4,
+		TPool    = 5,
+		TRender  = 6,
+		TTask    = 7,
+		TUser    = 8,
+
+		TAny     = 99
 	};
 
 	Item(const QString &i_name, int i_id, EType i_type);

@@ -167,7 +167,9 @@ void ListMonitors::actSendMessage()
 	if( !ok) return;
 
 	std::ostringstream str;
-	af::jsonActionOperationStart( str,"monitors","message","", getSelectedIds());
+	Item::EType type = Item::TAny;
+	std::vector<int> ids(getSelectedIds(type));
+	af::jsonActionOperationStart(str, "monitors", "message", "", ids);
 	str << ",\n\"text\":\"" << af::strEscape( afqt::qtos( text)) << "\"";
 	af::jsonActionOperationFinish( str);
 
@@ -175,7 +177,7 @@ void ListMonitors::actSendMessage()
 }
 
 
-void ListMonitors::actRequestLog() { getItemInfo("log"); }
+void ListMonitors::actRequestLog() { getItemInfo(Item::TAny, "log"); }
 
-void ListMonitors::actExit() { operation("exit"); }
+void ListMonitors::actExit() { operation(Item::TMonitor, "exit"); }
 

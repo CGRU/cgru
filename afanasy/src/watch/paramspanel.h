@@ -35,7 +35,7 @@ public:
 
 	inline QVBoxLayout * getPublicLayout() { return m_layout_params;}
 
-	enum ParamsShow {
+	enum EParamsShow {
 		PS_CHANGED = 0,
 		PS_ALL     = 1,
 		PS_NONE    = 2

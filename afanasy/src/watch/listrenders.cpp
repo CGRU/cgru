@@ -709,7 +709,7 @@ void ListRenders::actCapacity()
 	bool ok;
 	int capacity = QInputDialog::getInt(this, "Change Capacity", "Enter New Capacity", current, -1, 1000000, 1, &ok);
 	if( !ok) return;
-	setParameter("capacity", capacity);
+	setParameter(Item::TRender, "capacity", capacity);
 }
 void ListRenders::actMaxTasks()
 {
@@ -720,14 +720,14 @@ void ListRenders::actMaxTasks()
 	bool ok;
 	int max_tasks = QInputDialog::getInt(this, "Change Maximum Tasksy", "Enter New Limit", current, -1, 1000000, 1, &ok);
 	if( !ok) return;
-	setParameter("max_tasks", max_tasks);
+	setParameter(Item::TRender, "max_tasks", max_tasks);
 }
 
-void ListRenders::actNIMBY()       { setParameter("NIMBY",  "true",  false); }
-void ListRenders::actNimby()       { setParameter("nimby",  "true",  false); }
-void ListRenders::actFree()        { setParameter("nimby",  "false", false); }
-void ListRenders::actSetPaused()   { setParameter("paused", "true",  false); }
-void ListRenders::actUnsetPaused() { setParameter("paused", "false", false); }
+void ListRenders::actNIMBY()       { setParameter(Item::TRender, "NIMBY",  "true",  false); }
+void ListRenders::actNimby()       { setParameter(Item::TRender, "nimby",  "true",  false); }
+void ListRenders::actFree()        { setParameter(Item::TRender, "nimby",  "false", false); }
+void ListRenders::actSetPaused()   { setParameter(Item::TRender, "paused", "true",  false); }
+void ListRenders::actUnsetPaused() { setParameter(Item::TRender, "paused", "false", false); }
 
 void ListRenders::actUser()
 {
@@ -737,22 +737,22 @@ void ListRenders::actUser()
 	QString text = QInputDialog::getText(this, "Set User", "Enter User Name", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	setParameter("user_name", afqt::qtos( text));
+	setParameter(Item::TRender, "user_name", afqt::qtos( text));
 }
 
-void ListRenders::actEjectTasks()      { operation("eject_tasks"); }
-void ListRenders::actEjectNotMyTasks() { operation("eject_tasks_keep_my"); }
-void ListRenders::actExit()            { operation("exit"); }
-void ListRenders::actDelete()          { operation("delete"); }
-void ListRenders::actReboot()          { operation("reboot"); }
-void ListRenders::actShutdown()        { operation("shutdown"); }
-void ListRenders::actWOLSleep()        { operation("wol_sleep"); }
-void ListRenders::actWOLWake()         { operation("wol_wake"); }
-void ListRenders::actRestoreDefaults() { operation("restore_defaults"); }
+void ListRenders::actEjectTasks()      { operation(Item::TRender, "eject_tasks"        ); }
+void ListRenders::actEjectNotMyTasks() { operation(Item::TRender, "eject_tasks_keep_my"); }
+void ListRenders::actExit()            { operation(Item::TRender, "exit"               ); }
+void ListRenders::actDelete()          { operation(Item::TRender, "delete"             ); }
+void ListRenders::actReboot()          { operation(Item::TRender, "reboot"             ); }
+void ListRenders::actShutdown()        { operation(Item::TRender, "shutdown"           ); }
+void ListRenders::actWOLSleep()        { operation(Item::TRender, "wol_sleep"          ); }
+void ListRenders::actWOLWake()         { operation(Item::TRender, "wol_wake"           ); }
+void ListRenders::actRestoreDefaults() { operation(Item::TRender, "restore_defaults"   ); }
 
-void ListRenders::actRequestLog()      { getItemInfo("log"); }
-void ListRenders::actRequestTasksLog() { getItemInfo("tasks_log"); }
-void ListRenders::actRequestInfo()     { getItemInfo("full"); }
+void ListRenders::actRequestLog()      { getItemInfo(Item::TAny,    "log"      ); }
+void ListRenders::actRequestTasksLog() { getItemInfo(Item::TRender, "tasks_log"); }
+void ListRenders::actRequestInfo()     { getItemInfo(Item::TRender, "full"     ); }
 
 void ListRenders::actRequestTaskInfo(int jid, int bnum, int tnum)
 {
@@ -780,7 +780,9 @@ void ListRenders::setService( bool enable)
 	}
 	
 	std::ostringstream str;
-	af::jsonActionOperationStart( str, "renders", "service", "", getSelectedIds());
+	Item::EType type = Item::TRender;
+	std::vector<int> ids(getSelectedIds(type));
+	af::jsonActionOperationStart(str, "renders", "service", "", ids);
 	str << ",\n\"name\":\"" << afqt::qtos( service_mask) << "\"";
 	str << ",\n\"enable\":" << ( enable ? "true": "false" );
 	af::jsonActionOperationFinish( str);
@@ -859,7 +861,9 @@ void ListRenders::actLaunchCmdExitString(QString i_cmd) { launchCmdStringExit(i_
 void ListRenders::launchCmdStringExit(const QString & i_cmd, bool i_exit)
 {
 	std::ostringstream str;
-	af::jsonActionOperationStart(str, "renders", "launch_cmd", "", getSelectedIds());
+	Item::EType type = Item::TRender;
+	std::vector<int> ids(getSelectedIds(type));
+	af::jsonActionOperationStart(str, "renders", "launch_cmd", "", ids);
 	str << ",\n\"cmd\":\"" << afqt::qtos(i_cmd) << "\"";
 	if (i_exit)
 		str << ",\n\"exit\":true";

@@ -248,11 +248,11 @@ void ListUsers::calcTitle()
 	m_parentWindow->setWindowTitle(QString("U[%1]: %2R").arg( total).arg( running));
 }
 
-void ListUsers::actDelete() { operation("delete"); }
-void ListUsers::actSolveJobsByOrder()    { setParameter("solve_method", "solve_order",    true); }
-void ListUsers::actSolveJobsByPriority() { setParameter("solve_method", "solve_priority", true); }
-void ListUsers::actSolveJobsByCapacity() { setParameter("solve_need",   "solve_capacity", true); }
-void ListUsers::actSolveJobsByTasksNum() { setParameter("solve_need",   "solve_tasksnum", true); }
+void ListUsers::actDelete() { operation(Item::TUser, "delete"); }
+void ListUsers::actSolveJobsByOrder()    { setParameter(Item::TUser, "solve_method", "solve_order",    true); }
+void ListUsers::actSolveJobsByPriority() { setParameter(Item::TUser, "solve_method", "solve_priority", true); }
+void ListUsers::actSolveJobsByCapacity() { setParameter(Item::TUser, "solve_need",   "solve_capacity", true); }
+void ListUsers::actSolveJobsByTasksNum() { setParameter(Item::TUser, "solve_need",   "solve_tasksnum", true); }
 
-void ListUsers::actRequestLog() { getItemInfo("log"); }
+void ListUsers::actRequestLog() { getItemInfo(Item::TAny, "log"); }
 

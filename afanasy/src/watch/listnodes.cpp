@@ -345,7 +345,7 @@ void ListNodes::actPriority()
 	int priority = QInputDialog::getInt( this, "Change Priority", "Enter New Priority", current, 0, maximum, 1, &ok);
 	if( !ok) return;
 
-	setParameter("priority", priority);
+	setParameter(Item::TAny, "priority", priority);
 }
 
 void ListNodes::actAnnotate()
@@ -358,12 +358,12 @@ void ListNodes::actAnnotate()
 	QString text = QInputDialog::getText( this, "Annotate", "Enter Annotation", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	setParameter("annotation", afqt::qtos( text));
+	setParameter(Item::TAny, "annotation", afqt::qtos( text));
 }
 
 void ListNodes::actAnnotate(QString text)
 {
-	setParameter("annotation", afqt::qtos( text));
+	setParameter(Item::TAny, "annotation", afqt::qtos( text));
 }
 
 void ListNodes::actCustomData()
@@ -378,5 +378,5 @@ void ListNodes::actCustomData()
 
 void ListNodes::customDataSet( const QString & text)
 {
-	setParameter("custom_data", af::strEscape(afqt::qtos( text)));
+	setParameter(Item::TAny, "custom_data", af::strEscape(afqt::qtos( text)));
 }

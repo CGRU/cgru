@@ -25,6 +25,44 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
+const std::string & ListItems::itemTypeToAf(Item::EType i_type)
+{
+	static const std::string branch ("branches");
+	static const std::string job    ("jobs"    );
+	static const std::string monitor("monitors");
+	static const std::string pool   ("pools"   );
+	static const std::string render ("renders" );
+	static const std::string user   ("users"   );
+
+	static const std::string invalid("invalid" );
+
+	switch(i_type)
+	{
+	case Item::TBranch:
+		return branch;
+	case Item::TJob:
+		return job;
+	case Item::TMonitor:
+		return monitor;
+	case Item::TPool:
+		return pool;
+	case Item::TRender:
+		return render;
+	case Item::TUser:
+		return user;
+	case Item::TNone:
+		AF_ERR << "Can't translate Item::TNone to Afanasy.";
+		return invalid;
+	case Item::TAny:
+		AF_ERR << "Can't translate Item::TAny to Afanasy.";
+		return invalid;
+	default:
+		AF_ERR << "Can't translate unknown Item type to Afanasy.";
+	}
+
+	return invalid;
+}
+
 ListItems::ListItems( QWidget* parent, const std::string & type):
 	QWidget( parent),
 	m_type( type),
@@ -268,12 +306,19 @@ void ListItems::updatePanels(Item * i_item)
 	m_paramspanel->v_updatePanel(i_item);
 }
 
-void ListItems::getItemInfo( const std::string & i_mode)
+void ListItems::getItemInfo(Item::EType i_type, const std::string & i_mode)
 {
 	Item * item = getCurrentItem();
-	if( item == NULL ) return;
+	if (item == NULL)
+		return;
 
-//{"get":{"type":"renders","ids":[1],"mode":"log"}}
+	if (Item::TAny != i_type)
+	{
+		if (item->getType() != i_type)
+			return;
+	}
+	else
+		i_type = item->getType();
 
 	displayInfo(QString("GET: \"%1\"").arg( afqt::stoq(i_mode)));
 
@@ -281,7 +326,7 @@ void ListItems::getItemInfo( const std::string & i_mode)
 
 	str << "{\"get\":{";
 	str << "\"binary\":true";
-	str << ",\"type\":\"" << m_type << "\"";
+	str << ",\"type\":\"" << itemTypeToAf(i_type) << "\"";
 	str << ",\"ids\":[" << item->getId() << "]";
 	str << ",\"mode\":\"" << i_mode << "\"";
 	str << "}}";
@@ -289,29 +334,31 @@ void ListItems::getItemInfo( const std::string & i_mode)
 	Watch::sendMsg( af::jsonMsg( str));
 }
 
-void ListItems::setParameterRE( const std::string & i_name, const std::string & i_value)
+void ListItems::setParameterRE(Item::EType i_type, const std::string & i_name, const std::string & i_value)
 {
 	std::string err;
 
-	if( af::RegExp::Validate( i_value, &err))
-		setParameter( i_name, i_value, true);
+	if (af::RegExp::Validate(i_value, &err))
+		setParameter(i_type, i_name, i_value, true);
 	else
-		displayError( afqt::stoq(err));
+		displayError(afqt::stoq(err));
 }
 
-void ListItems::setParameter( const std::string & i_name, const std::string & i_value, bool i_quoted)
+void ListItems::setParameter(Item::EType i_type, const std::string & i_name, const std::string & i_value, bool i_quoted)
 {
-	if( getSelectedItemsCount() == 0 )
+	std::vector<int> ids = getSelectedIds(i_type);
+	if (ids.size() == 0)
 	{
 		displayWarning("No items selected.");
 		return;
 	}
 
+
 	displayInfo(QString("\"%1\" = \"%2\"").arg( afqt::stoq(i_name), afqt::stoq( i_value)));
 
 	std::ostringstream str;
 
-	af::jsonActionParamsStart( str, m_type, "", getSelectedIds());
+	af::jsonActionParamsStart(str, m_type, "", ids);
 
 	str << "\n\"" << i_name << "\":";
 	if (i_quoted)
@@ -324,32 +371,54 @@ void ListItems::setParameter( const std::string & i_name, const std::string & i_
 	Watch::sendMsg( af::jsonMsg( str));
 }
 
-void ListItems::operation( const std::string & i_operation)
+void ListItems::operation(Item::EType i_type, const std::string & i_operation)
 {
-	std::ostringstream str;
-	std::vector<int> ids = getSelectedIds();
-	if( ids.size() == 0 )
+	std::vector<int> ids = getSelectedIds(i_type);
+	if (ids.size() == 0)
 	{
 		displayWarning("No items selected.");
 		return;
 	}
-	af::jsonActionOperation( str, m_type, i_operation, "", ids);
-	Watch::sendMsg( af::jsonMsg( str));
 
-	displayInfo(QString("Operation: \"%1\".").arg( afqt::stoq( i_operation)));
+	std::ostringstream str;
+	af::jsonActionOperation(str, m_type, i_operation, "", ids);
+	Watch::sendMsg(af::jsonMsg( str));
+
+	displayInfo(QString("Operation: \"%1\".").arg(afqt::stoq(i_operation)));
 }
 
-const std::vector<int> ListItems::getSelectedIds() const
+const std::vector<int> ListItems::getSelectedIds(Item::EType & io_type) const
 {
 	std::vector<int> ids;
+
 	QModelIndexList indexes(m_view->selectionModel()->selectedIndexes());
+
+	Item::EType type = Item::TNone;
 	for (int i = 0; i < indexes.count(); i++)
 		if (Item::isItemP(indexes[i].data()))
 		{
 			Item * item = Item::toItemP(indexes[i].data());
-			if (false == item->isHidden())
-				ids.push_back(item->getId());
+			if (item->isHidden())
+				continue;
+
+			// On TAny type, we collect items that are
+			// the same time, as first selected item.
+			if (io_type == Item::TAny)
+			{
+				if (type == Item::TNone)
+					type = item->getType();
+				else if(type != item->getType())
+					continue;
+			}
+			else if(item->getType() != io_type)
+				continue;
+
+			ids.push_back(item->getId());
 		}
+
+	if (io_type == Item::TAny)
+		io_type = type;
+
 	return ids;
 }
 
@@ -482,6 +551,6 @@ void ListItems::changeParam(const Param * i_param)
 		return;
 	}
 
-	setParameter(afqt::qtos(i_param->name), afqt::qtos(str), false);
+	setParameter(Item::TAny, afqt::qtos(i_param->name), afqt::qtos(str), false);
 }
 
