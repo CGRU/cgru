@@ -99,10 +99,11 @@ protected:
 	void storeSelection();
 	void reStoreSelection();
 
-	ButtonsMenu * addButtonsMenu(const QString & i_label, const QString & i_tip);
+	ButtonsMenu * addButtonsMenu(Item::EType i_type, const QString & i_label, const QString & i_tip);
 	void resetButtonsMenu();
 
 	ButtonPanel * addButtonPanel(
+		Item::EType i_type,
 		const QString & i_label,
 		const QString & i_name,
 		const QString & i_description,
@@ -144,6 +145,7 @@ private:
 
 	ButtonsMenu * m_current_buttons_menu;
 
+	std::vector<ButtonsMenu*> m_btn_menus;
 	std::vector<ButtonPanel*> m_btns;
 
 	QList<Item*> m_stored_selection;

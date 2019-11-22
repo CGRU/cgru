@@ -54,10 +54,10 @@ ListMonitors::ListMonitors( QWidget* parent):
 	// Add left panel buttons:
 	ButtonPanel * bp;
 
-	bp = addButtonPanel("LOG","monitors_log","Show monitor log.");
+	bp = addButtonPanel(Item::TMonitor, "LOG","monitors_log","Show monitor log.");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestLog()));
 
-	bp = addButtonPanel("EXIT","monitors_exit","Exit monitor.","", true);
+	bp = addButtonPanel(Item::TMonitor, "EXIT","monitors_exit","Exit monitor.","", true);
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actExit()));
 
 

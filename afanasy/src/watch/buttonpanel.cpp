@@ -19,6 +19,7 @@ ButtonPanel * ButtonPanel::ms_button_hotkey = NULL;
 
 ButtonPanel::ButtonPanel(
 		ListItems * i_listitems,
+		Item::EType i_type,
 		const QString & i_label,
 		const QString & i_name,
 		const QString & i_description,
@@ -26,6 +27,7 @@ ButtonPanel::ButtonPanel(
 		bool i_dblclick,
 		ButtonsMenu * i_bm):
 	m_listitems( i_listitems),
+	m_type(i_type),
 	m_label( i_label),
 	m_name( i_name),
 	m_description( i_description),
@@ -33,6 +35,7 @@ ButtonPanel::ButtonPanel(
 	m_dblclick( i_dblclick),
 	m_buttonsmenu(i_bm),
 	m_hovered( false),
+	m_active(false),
 	m_activated( false)
 {
 	afqt::QEnvironment::getHotkey( m_name, m_hotkey);
@@ -68,6 +71,8 @@ void ButtonPanel::paintEvent( QPaintEvent * i_evt)
 	pen.setColor( afqt::QEnvironment::clr_Dark.c);
 	if( ms_button_hotkey == this )
 		color = afqt::QEnvironment::clr_Link.c;
+	else if (false == m_active)
+		color.setAlphaF(.2);
 	else if( m_activated )
 		color.setAlphaF( .8);
 	else if( m_hovered )
@@ -78,6 +83,10 @@ void ButtonPanel::paintEvent( QPaintEvent * i_evt)
 	painter.setBrush( QBrush( color, Qt::SolidPattern));
 	painter.drawRoundedRect(1, 1, width()-2, height()-2, 2.5, 2.5);
 
+	if (false == m_active)
+		painter.setOpacity(0.5);
+	else
+		painter.setOpacity(1.0);
 	painter.setPen( QPen( afqt::QEnvironment::clr_Text.c));
 	painter.drawText( rect(), Qt::AlignHCenter | Qt::AlignVCenter, m_label);
 }
@@ -88,6 +97,9 @@ void ButtonPanel::mousePressEvent(       QMouseEvent * i_evt ) { clicked( i_evt,
 void ButtonPanel::mouseDoubleClickEvent( QMouseEvent * i_evt ) { clicked( i_evt, true );}
 void ButtonPanel::clicked( QMouseEvent * i_evt, bool i_dbl)
 {
+	if (false == m_active)
+		return;
+
 	if( i_dbl != m_dblclick) return;
 
 	if( i_evt->button() == Qt::LeftButton)

@@ -57,27 +57,27 @@ ListUsers::ListUsers( QWidget* parent):
 	// Add left panel buttons:
 	ButtonPanel * bp; ButtonsMenu * bm;
 
-	bp = addButtonPanel("LOG","users_log","Get user log.");
+	bp = addButtonPanel(Item::TUser, "LOG","users_log","Get user log.");
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRequestLog()));
 
-	bm = addButtonsMenu("Solve","Choose jobs solving method.");
+	bm = addButtonsMenu(Item::TUser, "Solve","Choose jobs solving method.");
 	bm->openMenu();
 
-	bp = addButtonPanel("ORDER","users_solve_ordered","Solve jobs by order.");
+	bp = addButtonPanel(Item::TUser, "ORDER","users_solve_ordered","Solve jobs by order.");
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actSolveJobsByOrder()));
 
-	bp = addButtonPanel("PRIORITY","users_solve_priority","Solve jobs by priority.");
+	bp = addButtonPanel(Item::TUser, "PRIORITY","users_solve_priority","Solve jobs by priority.");
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actSolveJobsByPriority()));
 
 	resetButtonsMenu();
 
-	bm = addButtonsMenu("Need","Choose jobs solving need.");
+	bm = addButtonsMenu(Item::TUser, "Need","Choose jobs solving need.");
 	bm->openMenu();
 
-	bp = addButtonPanel("CAPACITY","users_solve_capacity","Solve jobs need by running tasks total capacity.");
+	bp = addButtonPanel(Item::TUser, "CAPACITY","users_solve_capacity","Solve jobs need by running tasks total capacity.");
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actSolveJobsByCapacity()));
 
-	bp = addButtonPanel("TASKS NUM","users_solve_tasksnum","Solve jobs need by running tasks number.");
+	bp = addButtonPanel(Item::TUser, "TASKS NUM","users_solve_tasksnum","Solve jobs need by running tasks number.");
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actSolveJobsByTasksNum()));
 
 	resetButtonsMenu();

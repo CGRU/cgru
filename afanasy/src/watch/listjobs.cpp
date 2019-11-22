@@ -90,59 +90,59 @@ ListJobs::ListJobs( QWidget* parent):
 	// Add left panel buttons:
 	ButtonPanel * bp;
 
-	bp = addButtonPanel("LOG","jobs_log","Show job log.");
+	bp = addButtonPanel(Item::TJob, "LOG","jobs_log","Show job log.");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestLog()));
 
-	bp = addButtonPanel("PAUSE","jobs_pause","Pause selected jobs.","P");
+	bp = addButtonPanel(Item::TJob, "PAUSE","jobs_pause","Pause selected jobs.","P");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actPause()));
 
-	bp = addButtonPanel("START","jobs_start","Start selected jobs.","S");
+	bp = addButtonPanel(Item::TJob, "START","jobs_start","Start selected jobs.","S");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actStart()));
 
-	bp = addButtonPanel("STOP","jobs_stop","Stop selected jobs tasks and pause jobs.","", true);
+	bp = addButtonPanel(Item::TJob, "STOP","jobs_stop","Stop selected jobs tasks and pause jobs.","", true);
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actStop()));
 
-	addButtonsMenu("Restart","Restart jobs tasks menu.");
+	addButtonsMenu(Item::TJob, "Restart","Restart jobs tasks menu.");
 
-	bp = addButtonPanel("SELECTED","jobs_restart","Restart all selected jobs tasks.","", true);
+	bp = addButtonPanel(Item::TJob, "SELECTED","jobs_restart","Restart all selected jobs tasks.","", true);
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRestart()));
 
-	bp = addButtonPanel("AND PAUSE","jobs_restart_pause","Restart tasks and pause selected jobs.","", true);
+	bp = addButtonPanel(Item::TJob, "AND PAUSE","jobs_restart_pause","Restart tasks and pause selected jobs.","", true);
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRestartPause()));
 
-	bp = addButtonPanel("WARNINGS","jobs_restart_warning","Restart tasks with warnings.","", true);
+	bp = addButtonPanel(Item::TJob, "WARNINGS","jobs_restart_warning","Restart tasks with warnings.","", true);
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRestartWarnings()));
 
-	bp = addButtonPanel("RUNNING","jobs_restart_running","Restart runnning tasks.","", true);
+	bp = addButtonPanel(Item::TJob, "RUNNING","jobs_restart_running","Restart runnning tasks.","", true);
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRestartRunning()));
 
-	bp = addButtonPanel("SKIPPED","jobs_restart_skipped","Restart skipped tasks.","", true);
+	bp = addButtonPanel(Item::TJob, "SKIPPED","jobs_restart_skipped","Restart skipped tasks.","", true);
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRestartSkipped()));
 
-	bp = addButtonPanel("DONE","jobs_restart_done","Restart done tasks.","", true);
+	bp = addButtonPanel(Item::TJob, "DONE","jobs_restart_done","Restart done tasks.","", true);
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRestartDone()));
 
 	resetButtonsMenu();
 
-	addButtonsMenu("Errors","Show/Manipulate error hosts and tasks.");
+	addButtonsMenu(Item::TJob, "Errors","Show/Manipulate error hosts and tasks.");
 
-	bp = addButtonPanel("SHOW HOSTS","jobs_show_err_hosts","Show error hosts.");
+	bp = addButtonPanel(Item::TJob, "SHOW HOSTS","jobs_show_err_hosts","Show error hosts.");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestErrorHostsList()));
 
-	bp = addButtonPanel("RESET HOSTS","jobs_reset_avoid_hosts","Reset error hosts.","E");
+	bp = addButtonPanel(Item::TJob, "RESET HOSTS","jobs_reset_avoid_hosts","Reset error hosts.","E");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actResetErrorHosts()));
 
-	bp = addButtonPanel("RETRY TASKS","jobs_restart_error_tasks","Restart error tasks.","R");
+	bp = addButtonPanel(Item::TJob, "RETRY TASKS","jobs_restart_error_tasks","Restart error tasks.","R");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRestartErrors()));
 
 	resetButtonsMenu();
 
-	bp = addButtonPanel("DELETE","jobs_delete","Delete selected jobs.","", true);
+	bp = addButtonPanel(Item::TJob, "DELETE","jobs_delete","Delete selected jobs.","", true);
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actDelete()));
 
 	if (false == af::Environment::VISOR())
 	{
-		bp = addButtonPanel("DEL DONE","jobs_delete_done","Delete all done jobs.","", true);
+		bp = addButtonPanel(Item::TJob, "DEL DONE","jobs_delete_done","Delete all done jobs.","", true);
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(actDeleteDone()));
 	}
 

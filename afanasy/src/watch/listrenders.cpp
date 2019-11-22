@@ -81,37 +81,37 @@ ListRenders::ListRenders( QWidget* parent):
 	// Add left panel buttons:
 	ButtonPanel * bp; ButtonsMenu * bm;
 
-	bp = addButtonPanel("LOG","renders_log","Get render log.");
+	bp = addButtonPanel(Item::TAny, "LOG","renders_log","Get render log.");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestLog()));
 
-	bp = addButtonPanel("TASKS LOG","renders_tasks_log","Get tasks log.");
+	bp = addButtonPanel(Item::TRender, "TASKS LOG","renders_tasks_log","Get tasks log.");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestTasksLog()));
 
-	bp = addButtonPanel("nimby","renders_nimby","Set nimby.","M");
+	bp = addButtonPanel(Item::TRender, "nimby","renders_nimby","Set nimby.","M");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actNimby()));
 
-	bp = addButtonPanel("NIMBY","renders_NIMBY","Set NIMBY.","N");
+	bp = addButtonPanel(Item::TRender, "NIMBY","renders_NIMBY","Set NIMBY.","N");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actNIMBY()));
 
-	bp = addButtonPanel("FREE","renders_free","Set free.","F");
+	bp = addButtonPanel(Item::TRender, "FREE","renders_free","Set free.","F");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actFree()));
 
-	bm = addButtonsMenu("Eject Tasks","Eject tasks from render.");
+	bm = addButtonsMenu(Item::TRender, "Eject Tasks","Eject tasks from render.");
 
-	bp = addButtonPanel("ALL","renders_eject_all","Eject all tasks.","", true);
+	bp = addButtonPanel(Item::TAny, "ALL","renders_eject_all","Eject all tasks.","", true);
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actEjectTasks()));
 
-	bp = addButtonPanel("NOT MY","renders_eject_notmy","Eject not my tasks.","", true);
+	bp = addButtonPanel(Item::TAny, "NOT MY","renders_eject_notmy","Eject not my tasks.","", true);
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actEjectNotMyTasks()));
 
 	resetButtonsMenu();
 
 	if( af::Environment::GOD())
 	{
-		bp = addButtonPanel("PAUSE","renders_pause","Pause selected renders.","P");
+		bp = addButtonPanel(Item::TRender, "PAUSE","renders_pause","Pause selected renders.","P");
 		connect( bp, SIGNAL( sigClicked()), this, SLOT( actSetPaused()));
 
-		bp = addButtonPanel("START","renders_unpause","Start (Unpause) selected renders.","S");
+		bp = addButtonPanel(Item::TRender, "START","renders_unpause","Start (Unpause) selected renders.","S");
 		connect( bp, SIGNAL( sigClicked()), this, SLOT( actUnsetPaused()));
 	}
 

@@ -303,6 +303,48 @@ void ListItems::selectionChanged(const QItemSelection & i_selected, const QItemS
 
 void ListItems::updatePanels(Item * i_item)
 {
+	// Show hide panel button menus:
+	for (int i = 0; i < m_btn_menus.size(); i++)
+	{
+		if (i_item == NULL)
+		{
+			m_btn_menus[i]->setHidden(false);
+			m_btn_menus[i]->setActive(false);
+			continue;
+		}
+
+		m_btn_menus[i]->setActive(true);
+
+		if (m_btn_menus[i]->getType() != Item::TAny)
+		{
+			if (m_btn_menus[i]->getType() != i_item->getType())
+				m_btn_menus[i]->setHidden(true);
+			else
+				m_btn_menus[i]->setHidden(false);
+		}
+	}
+
+	// Show hide panel buttons:
+	for (int i = 0; i < m_btns.size(); i++)
+	{
+		if (i_item == NULL)
+		{
+			m_btns[i]->setHidden(false);
+			m_btns[i]->setActive(false);
+			continue;
+		}
+
+		m_btns[i]->setActive(true);
+
+		if (m_btns[i]->getType() != Item::TAny)
+		{
+			if (m_btns[i]->getType() != i_item->getType())
+				m_btns[i]->setHidden(true);
+			else
+				m_btns[i]->setHidden(false);
+		}
+	}
+
 	m_paramspanel->v_updatePanel(i_item);
 }
 
@@ -422,9 +464,11 @@ const std::vector<int> ListItems::getSelectedIds(Item::EType & io_type) const
 	return ids;
 }
 
-ButtonsMenu * ListItems::addButtonsMenu(const QString & i_label, const QString & i_tip)
+ButtonsMenu * ListItems::addButtonsMenu(Item::EType i_type, const QString & i_label, const QString & i_tip)
 {
-	m_current_buttons_menu = new ButtonsMenu(this, i_label, i_tip);
+	m_current_buttons_menu = new ButtonsMenu(this, i_type, i_label, i_tip);
+
+	m_btn_menus.push_back(m_current_buttons_menu);
 
 	m_panel_l->addWidget(m_current_buttons_menu);
 
@@ -437,13 +481,14 @@ void ListItems::resetButtonsMenu()
 }
 
 ButtonPanel * ListItems::addButtonPanel(
+		Item::EType i_type,
 		const QString & i_label,
 		const QString & i_name,
 		const QString & i_description,
 		const QString & i_hotkey,
 		bool i_dblclick)
 {
-	ButtonPanel * bp = new ButtonPanel(this, i_label, i_name, i_description, i_hotkey, i_dblclick, m_current_buttons_menu);
+	ButtonPanel * bp = new ButtonPanel(this, i_type, i_label, i_name, i_description, i_hotkey, i_dblclick, m_current_buttons_menu);
 
 	if (m_current_buttons_menu)
 		m_current_buttons_menu->addButton(bp);
