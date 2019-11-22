@@ -161,7 +161,12 @@ void ItemPool::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleO
 				x+6, y+HeightPool, w-6, HeightServices-6);
 
 	if (m_annotation.size())
+	{
+		i_painter->setFont(afqt::QEnvironment::f_info);
+		QPen pen(afqt::QEnvironment::qclr_black);
+		i_painter->setPen(pen);
 		i_painter->drawText( x, y, w, h, Qt::AlignBottom | Qt::AlignHCenter, m_annotation);
+	}
 }
 
 void ItemPool::setSortType( int i_type1, int i_type2 )

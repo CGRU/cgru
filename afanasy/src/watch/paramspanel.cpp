@@ -295,21 +295,27 @@ ParamWidget::~ParamWidget()
 
 void ParamWidget::update(Item * i_item, int i_params_show)
 {
-	QVariant var;
+	if ((NULL == i_item) || (i_params_show == ParamsPanel::PS_NONE))
+	{
+		setHidden(true);
+		return;
+	}
 
-	bool hidden = true;
+	if ((m_param->itemtype != Item::TAny) && (m_param->itemtype != i_item->getType()))
+	{
+		setHidden(true);
+		return;
+	}
 
-	if (i_item && (i_item->hasParam(m_param->name)))
+	if (i_item->hasParam(m_param->name))
 	{
 		bool is_default;
 		m_value_widget->setText(m_param->varToQStr(i_item->getParamVar(m_param->name), &is_default));
 		if (i_params_show == ParamsPanel::PS_ALL)
-			hidden = false;
+			setHidden(false);
 		else if (i_params_show == ParamsPanel::PS_CHANGED)
-			hidden = is_default;
+			setHidden(is_default);
 	}
-
-	setHidden(hidden);
 }
 
 void ParamWidget::paintEvent(QPaintEvent * event)

@@ -473,7 +473,7 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	int left_text_x = x + left_x_offset;
 	int left_text_w = plot_x - left_text_x - 4;
 	int right_text_x = plot_x + allplots_w;
-	int right_text_w = w - (right_text_x - x);
+	int right_text_w = w - (right_text_x - x) - 4;
 
 	// Draw back with render state specific color (if it is not selected)
 	const QColor * itemColor = &(afqt::QEnvironment::clr_itemrender.c);

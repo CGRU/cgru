@@ -400,7 +400,7 @@ void ListItems::setParameter(Item::EType i_type, const std::string & i_name, con
 
 	std::ostringstream str;
 
-	af::jsonActionParamsStart(str, m_type, "", ids);
+	af::jsonActionParamsStart(str, itemTypeToAf(i_type), "", ids);
 
 	str << "\n\"" << i_name << "\":";
 	if (i_quoted)
@@ -523,44 +523,49 @@ void ListItems::addParam(Param * i_param)
 }
 
 void ListItems::addParam_Num(
+		Item::EType i_type,
 		const QString & i_name,
 		const QString & i_label,
 		const QString & i_tip,
 		int i_min, int i_max)
 {
-	addParam(new Param(Param::TNum, i_name, i_label, i_tip, i_min, i_max));
+	addParam(new Param(Param::TNum, i_type, i_name, i_label, i_tip, i_min, i_max));
 }
 
 void ListItems::addParam_Str(
+		Item::EType i_type,
 		const QString & i_name,
 		const QString & i_label,
 		const QString & i_tip)
 {
-	addParam(new Param(Param::TStr, i_name, i_label, i_tip));
+	addParam(new Param(Param::TStr, i_type, i_name, i_label, i_tip));
 }
 
 void ListItems::addParam_REx(
+		Item::EType i_type,
 		const QString & i_name,
 		const QString & i_label,
 		const QString & i_tip)
 {
-	addParam(new Param(Param::TREx, i_name, i_label, i_tip));
+	addParam(new Param(Param::TREx, i_type, i_name, i_label, i_tip));
 }
 
 void ListItems::addParam_Tim(
+		Item::EType i_type,
 		const QString & i_name,
 		const QString & i_label,
 		const QString & i_tip)
 {
-	addParam(new Param(Param::Time, i_name, i_label, i_tip));
+	addParam(new Param(Param::Time, i_type, i_name, i_label, i_tip));
 }
 
 void ListItems::addParam_Hrs(
+		Item::EType i_type,
 		const QString & i_name,
 		const QString & i_label,
 		const QString & i_tip)
 {
-	addParam(new Param(Param::THrs, i_name, i_label, i_tip));
+	addParam(new Param(Param::THrs, i_type, i_name, i_label, i_tip));
 }
 
 void ListItems::addMenuParameters(QMenu * i_menu)
@@ -596,6 +601,6 @@ void ListItems::changeParam(const Param * i_param)
 		return;
 	}
 
-	setParameter(Item::TAny, afqt::qtos(i_param->name), afqt::qtos(str), false);
+	setParameter(i_param->itemtype, afqt::qtos(i_param->name), afqt::qtos(str), false);
 }
 

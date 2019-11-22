@@ -1,5 +1,6 @@
 #pragma once
 
+#include "item.h"
 #include "watch.h"
 
 #include <QtCore/QString>
@@ -16,10 +17,11 @@ public:
 		THrs = 4
 	};
 
-	Param(EType i_type, const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = -1);
+	Param(EType i_type, Item::EType i_itemtype, const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = -1);
 	~Param();
 
 	const EType type;
+	const Item::EType itemtype;
 	const QString name;
 	const QString label;
 	const QString tip;

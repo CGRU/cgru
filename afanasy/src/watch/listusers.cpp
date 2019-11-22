@@ -86,18 +86,18 @@ ListUsers::ListUsers( QWidget* parent):
 	// Add parameters:
 	if (af::Environment::VISOR() || (af::Environment::getPermUserModHisPriority()))
 	{
-		addParam_Num("priority", "Priority",  "Priority number", 0, 250);
+		addParam_Num(Item::TUser, "priority", "Priority", "Priority number", 0, 250);
 	}
-	addParam_Str("annotation",                "Annotation",             "Annotation string");
-	addParam_Num("max_running_tasks",         "Maximum Running",        "Maximum running tasks number", -1, 1<<20);
-	addParam_Num("max_running_tasks_per_host","Max Run Per Host",       "Max run tasks on the same host", -1, 1<<20);
-	addParam_REx("hosts_mask",                "Hosts Mask",             "Host names pattern that job can run on");
-	addParam_REx("hosts_mask_exclude",        "Hosts Mask Exclude",     "Host names pattern that job will not run");
-	addParam_Num("errors_avoid_host",         "Errors Job  Avoid Host", "Number of errors for job to avoid host", -1, 1<<10);
-	addParam_Num("errors_task_same_host",     "Errors Task Avoid Host", "Number of errors for task to avoid host", -1, 1<<10);
-	addParam_Num("errors_retries",            "Errors Retries",         "Number of errors task retries", -1, 1<<10);
-	addParam_Hrs("errors_forgive_time",       "Errors Forgive Time",    "After this time host errors will be reset");
-	addParam_Hrs("jobs_life_time",            "Jobs Life Time",         "After this time job will be deleted");
+	addParam_Str(Item::TUser, "annotation",                "Annotation",             "Annotation string");
+	addParam_Num(Item::TUser, "max_running_tasks",         "Maximum Running",        "Maximum running tasks number", -1, 1<<20);
+	addParam_Num(Item::TUser, "max_running_tasks_per_host","Max Run Per Host",       "Max run tasks on the same host", -1, 1<<20);
+	addParam_REx(Item::TUser, "hosts_mask",                "Hosts Mask",             "Host names pattern that job can run on");
+	addParam_REx(Item::TUser, "hosts_mask_exclude",        "Hosts Mask Exclude",     "Host names pattern that job will not run");
+	addParam_Num(Item::TUser, "errors_avoid_host",         "Errors Job  Avoid Host", "Number of errors for job to avoid host", -1, 1<<10);
+	addParam_Num(Item::TUser, "errors_task_same_host",     "Errors Task Avoid Host", "Number of errors for task to avoid host", -1, 1<<10);
+	addParam_Num(Item::TUser, "errors_retries",            "Errors Retries",         "Number of errors task retries", -1, 1<<10);
+	addParam_Hrs(Item::TUser, "errors_forgive_time",       "Errors Forgive Time",    "After this time host errors will be reset");
+	addParam_Hrs(Item::TUser, "jobs_life_time",            "Jobs Life Time",         "After this time job will be deleted");
 
 
 	m_parentWindow->setWindowTitle("Users");

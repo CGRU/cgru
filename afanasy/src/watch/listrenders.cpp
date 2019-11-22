@@ -122,6 +122,12 @@ ListRenders::ListRenders( QWidget* parent):
 
 	m_parentWindow->setWindowTitle("Renders");
 
+	if (af::Environment::GOD())
+	{
+		addParam_Num(Item::TAny, "priority", "Priority", "Priority number", 0, 250);
+	}
+	addParam_Str(Item::TAny,    "annotation",                "Annotation",             "Annotation string");
+
 	initListNodes();
 
 	connect( (ModelNodes*)m_model, SIGNAL(   nodeAdded( ItemNode *, const QModelIndex &)),

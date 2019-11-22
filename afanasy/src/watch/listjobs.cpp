@@ -152,19 +152,19 @@ ListJobs::ListJobs( QWidget* parent):
 		int max = 200;
 		if(( isTypeUsers()) && ( true != af::Environment::VISOR()))
 			max = af::Environment::getPriority();
-		addParam_Num("priority",              "Priority",           "Priority number", 0, max);
+		addParam_Num(Item::TAny, "priority",              "Priority",           "Priority number", 0, max);
 	}
-	addParam_Str("annotation",                "Annotation",         "Annotation string");
-	addParam_Tim("time_wait",                 "Wait Time",          "Time to wait to start");
-	addParam_Num("max_running_tasks",         "Maximum Running",    "Maximum running tasks number", -1, 1<<20);
-	addParam_Num("max_running_tasks_per_host","Max Run Per Host",   "Max run tasks on the same host", -1, 1<<20);
-	addParam_REx("hosts_mask",                "Hosts Mask",         "Host names pattern that job can run on");
-	addParam_REx("hosts_mask_exclude",        "Hosts Mask Exclude", "Host names pattern that job will not run");
-	addParam_REx("depend_mask",               "Depend Mask",        "Jobs name mask to wait");
-	addParam_REx("depend_mask_global",        "Global Depend",      "Depend mask for jobs from any user");
-	addParam_Hrs("time_life",                 "Life Time",          "Time to be deleted after creation");
-	addParam_REx("need_os",                   "OS Needed",          "Job will run only on this OS");
-	addParam_REx("need_properties",           "Properties Needed",  "Job need client that has such properties");
+	addParam_Str(Item::TAny, "annotation",                "Annotation",         "Annotation string");
+	addParam_Tim(Item::TJob, "time_wait",                 "Wait Time",          "Time to wait to start");
+	addParam_Num(Item::TAny, "max_running_tasks",         "Maximum Running",    "Maximum running tasks number", -1, 1<<20);
+	addParam_Num(Item::TAny, "max_running_tasks_per_host","Max Run Per Host",   "Max run tasks on the same host", -1, 1<<20);
+	addParam_REx(Item::TAny, "hosts_mask",                "Hosts Mask",         "Host names pattern that job can run on");
+	addParam_REx(Item::TAny, "hosts_mask_exclude",        "Hosts Mask Exclude", "Host names pattern that job will not run");
+	addParam_REx(Item::TJob, "depend_mask",               "Depend Mask",        "Jobs name mask to wait");
+	addParam_REx(Item::TJob, "depend_mask_global",        "Global Depend",      "Depend mask for jobs from any user");
+	addParam_Hrs(Item::TJob, "time_life",                 "Life Time",          "Time to be deleted after creation");
+	addParam_REx(Item::TJob, "need_os",                   "OS Needed",          "Job will run only on this OS");
+	addParam_REx(Item::TJob, "need_properties",           "Properties Needed",  "Job need client that has such properties");
 
 	m_paramspanel = new ParamsPanelJob();
 	initListNodes();

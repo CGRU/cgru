@@ -12,8 +12,9 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-Param::Param(EType i_type, const QString & i_name, const QString & i_label, const QString & i_tip, int i_min, int i_max):
+Param::Param(EType i_type, Item::EType i_itemtype, const QString & i_name, const QString & i_label, const QString & i_tip, int i_min, int i_max):
 	type(i_type),
+	itemtype(i_itemtype),
 	name(i_name),
 	label(i_label),
 	tip(i_tip),
