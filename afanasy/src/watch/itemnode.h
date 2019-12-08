@@ -21,8 +21,8 @@ public:
 	/// Update ItemNode attributes ( copy them from given node).
 	virtual void v_updateValues(af::Node * i_afnode, int i_msgType) = 0;
 
-	virtual void setSortType(   int i_type1, int i_type2 ) = 0;
-	virtual void setFilterType( int i_type ) = 0;
+	virtual void v_setSortType(   int i_type1, int i_type2 ) = 0;
+	virtual void v_setFilterType( int i_type ) = 0;
 
 	inline void resetSorting()   { m_sort_int1 = 0; m_sort_int2 = 0; m_sort_str1.clear(); m_sort_str2.clear(); }
 	inline void resetFiltering() { m_filter_str.clear(); }

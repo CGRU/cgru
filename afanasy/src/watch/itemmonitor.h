@@ -12,8 +12,8 @@ public:
 
 	void v_updateValues(af::Node * i_afnode, int i_msgType);
 
-	void setSortType(   int i_type1, int i_type2 );
-	void setFilterType( int i_type );
+	void v_setSortType(   int i_type1, int i_type2 );
+	void v_setFilterType( int i_type );
 
 	inline bool isSuperUser() const { return m_user_id == 0; }
 

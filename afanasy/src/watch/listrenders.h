@@ -30,8 +30,6 @@ public:
 	void removeRender(ItemRender * i_item_render);
 	void removePool(ItemPool * i_item_pool);
 
-	static const int ms_DepthOffset = 32;
-
 protected:
 	void contextMenuEvent( QContextMenuEvent *event);
 
@@ -68,9 +66,6 @@ private slots:
 	void actRequestTasksLog();
 	void actRequestInfo();
 	void actRequestTaskInfo(int jid, int bnum, int tnum);
-	void actEnableService();
-	void actDisableService();
-	void actRestoreDefaults();
 	void actSetPaused();
 	void actUnsetPaused();
 	void actLaunchCmd();
@@ -80,6 +75,13 @@ private slots:
 
 	void actEjectTasks();
 	void actEjectNotMyTasks();
+
+	void actServiceAdd();
+	void actServiceRemove();
+	void actServiceEnable();
+	void actServiceDisable();
+	void editService(QString i_mode, QString i_service);
+	void actClearServices();
 
 	void actExit();
 	void actDelete();
@@ -93,7 +95,7 @@ private slots:
 	void requestResources();
 
 private:
-	void setService( bool enable);
+	void editServiceDialog(const QString & i_mode, const QString & i_dialog_caption);
 	void launchCmdExit( bool i_exit);
 	void launchCmdStringExit(const QString & i_cmd, bool i_exit);
 	void calcTitle();

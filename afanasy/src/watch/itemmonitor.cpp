@@ -18,7 +18,7 @@
 
 
 ItemMonitor::ItemMonitor( af::Monitor * i_monitor, const CtrlSortFilter * i_ctrl_sf):
-	ItemNode((af::Monitor*)i_monitor, TMonitor, i_ctrl_sf)
+	ItemNode(i_monitor, TMonitor, i_ctrl_sf)
 {
 	time_launch   = i_monitor->getTimeLaunch();
 	time_register = i_monitor->getTimeRegister();
@@ -175,7 +175,7 @@ void ItemMonitor::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 	i_painter->drawText(x, y+2, w-5, h, Qt::AlignTop | Qt::AlignRight, engine);
 }
 
-void ItemMonitor::setSortType( int i_type1, int i_type2 )
+void ItemMonitor::v_setSortType( int i_type1, int i_type2 )
 {
 	resetSorting();
 
@@ -232,7 +232,7 @@ void ItemMonitor::setSortType( int i_type1, int i_type2 )
 	}
 }
 
-void ItemMonitor::setFilterType( int i_type )
+void ItemMonitor::v_setFilterType( int i_type )
 {
 	resetFiltering();
 

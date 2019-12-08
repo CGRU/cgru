@@ -21,10 +21,9 @@ const int ItemPool::HeightServices = 24;
 const int ItemPool::HeightAnnotation = 14;
 
 ItemPool::ItemPool(af::Pool * i_pool, ListRenders * i_list_renders, const CtrlSortFilter * i_ctrl_sf):
-	ItemNode((af::Node*)i_pool, TPool, i_ctrl_sf),
+	ItemFarm(i_pool, TPool, i_ctrl_sf),
 	m_ListRenders(i_list_renders),
-	m_root(false),
-	m_depth(0)
+	m_root(false)
 {
 	v_updateValues(i_pool, 0);
 }
@@ -37,23 +36,15 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 {
 	af::Pool * pool = (af::Pool*)i_afnode;
 
-	updateNodeValues(i_afnode);
+	updateNodeValues(pool);
+
+	updateFarmValues(pool);
 
 	m_sort_force = m_name;
 
 	m_root = pool->isRoot();
 	m_parent_path = afqt::stoq(pool->getParentPath());
 
-	// Grab services:
-	m_services.clear();
-	for (const std::string & s : pool->m_services)
-		m_services.append(afqt::stoq(s));
-	// Grab disabled services:
-	m_services_disabled.clear();
-	for (const std::string & s : pool->m_services_disabled)
-		m_services_disabled.append(afqt::stoq(s));
-
-	// Get parameters:
 	if (false == m_root)
 		m_params["pattern"] = afqt::stoq(pool->getPatternStr());
 	m_params["max_tasks_per_host"] = pool->getMaxTasksPerHost();
@@ -104,12 +95,6 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 	calcHeight();
 
 	m_ListRenders->offsetHierarchy(this);
-}
-
-void ItemPool::setDepth(int i_depth)
-{
-	m_depth = i_depth;
-	m_margin_left = ListRenders::ms_DepthOffset * m_depth;
 }
 
 void ItemPool::updateInfo(af::Pool * i_pool)
@@ -169,12 +154,12 @@ void ItemPool::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleO
 	}
 }
 
-void ItemPool::setSortType( int i_type1, int i_type2 )
+void ItemPool::v_setSortType( int i_type1, int i_type2 )
 {
 	resetSorting();
 }
 
-void ItemPool::setFilterType( int i_type )
+void ItemPool::v_setFilterType( int i_type )
 {
 	resetFiltering();
 }

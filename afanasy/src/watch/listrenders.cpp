@@ -16,6 +16,7 @@
 #include "itemrender.h"
 #include "itempool.h"
 #include "modelnodes.h"
+#include "paramspanelfarm.h"
 #include "viewitems.h"
 #include "watch.h"
 #include "wndtask.h"
@@ -106,6 +107,25 @@ ListRenders::ListRenders( QWidget* parent):
 
 	resetButtonsMenu();
 
+	bm = addButtonsMenu(Item::TAny, "SERVICES","Add/Remove/Disable service(s).");
+
+	bp = addButtonPanel(Item::TAny, "Add","service_add","Add a service.","", false);
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actServiceAdd()));
+
+	bp = addButtonPanel(Item::TAny, "Remove","service_remove","Remove services by mask.","", false);
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actServiceRemove()));
+
+	bp = addButtonPanel(Item::TAny, "Enable","service_enable","Enable services by mask.","", false);
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actServiceEnable()));
+
+	bp = addButtonPanel(Item::TAny, "Disable","service_disable","Disable services by mask.","", false);
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actServiceDisable()));
+
+	bp = addButtonPanel(Item::TAny, "Clear","clear_services","Clear services.\nServices settings will be taken from the parent pool.","", true);
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actClearServices()));
+
+	resetButtonsMenu();
+
 	if( af::Environment::GOD())
 	{
 		bp = addButtonPanel(Item::TRender, "PAUSE","renders_pause","Pause selected renders.","P");
@@ -128,6 +148,9 @@ ListRenders::ListRenders( QWidget* parent):
 	}
 	addParam_Str(Item::TAny,    "annotation",                "Annotation",             "Annotation string");
 
+	ParamsPanelFarm * paramspanelfarm = new ParamsPanelFarm();
+	connect(paramspanelfarm, SIGNAL(sig_EditService(QString, QString)), this, SLOT(editService(QString, QString)));
+	m_paramspanel = paramspanelfarm;
 	initListNodes();
 
 	connect( (ModelNodes*)m_model, SIGNAL(   nodeAdded( ItemNode *, const QModelIndex &)),
@@ -411,16 +434,6 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 	submenu->addAction( action);
 	action = new QAction( "Change Max Tasks", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actMaxTasks() ));
-	submenu->addAction( action);
-	action = new QAction( "Enable Service", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actEnableService() ));
-	submenu->addAction( action);
-	action = new QAction( "Disable Service", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actDisableService() ));
-	submenu->addAction( action);
-	action = new QAction( "Restore Defaults", this);
-	if( selectedItemsCount == 1) action->setEnabled(render->isDirty());
-	connect( action, SIGNAL( triggered() ), this, SLOT( actRestoreDefaults() ));
 	submenu->addAction( action);
 
 	submenu->addSeparator();
@@ -754,7 +767,6 @@ void ListRenders::actReboot()          { operation(Item::TRender, "reboot"      
 void ListRenders::actShutdown()        { operation(Item::TRender, "shutdown"           ); }
 void ListRenders::actWOLSleep()        { operation(Item::TRender, "wol_sleep"          ); }
 void ListRenders::actWOLWake()         { operation(Item::TRender, "wol_wake"           ); }
-void ListRenders::actRestoreDefaults() { operation(Item::TRender, "restore_defaults"   ); }
 
 void ListRenders::actRequestLog()      { getItemInfo(Item::TAny,    "log"      ); }
 void ListRenders::actRequestTasksLog() { getItemInfo(Item::TRender, "tasks_log"); }
@@ -765,34 +777,57 @@ void ListRenders::actRequestTaskInfo(int jid, int bnum, int tnum)
 	WndTask::openTask( af::MCTaskPos( jid, bnum, tnum));
 }
 
-void ListRenders::actEnableService()  { setService( true );}
-void ListRenders::actDisableService() { setService( false);}
-void ListRenders::setService( bool enable)
+void ListRenders::actServiceAdd()    {editServiceDialog("service_add",     "Add Service");    }
+void ListRenders::actServiceRemove() {editServiceDialog("service_remove",  "Remove Service"); }
+void ListRenders::actServiceEnable() {editServiceDialog("service_enable",  "Enable Service"); }
+void ListRenders::actServiceDisable(){editServiceDialog("service_disable", "Disable Service");}
+void ListRenders::editServiceDialog(const QString & i_mode, const QString & i_dialog_caption)
 {
-	Item* item = getCurrentItem();
-	if( item == NULL ) return;
-	QString caption("Service");
-	if( enable ) caption = "Enable " + caption; else caption = "Disable " + caption;
+	if (getCurrentItem() == NULL)
+		return;
+
+	QString dialog_tip("Enter service mask");
+	if (i_mode == "service_add")
+		dialog_tip = "Enter service name";
 
 	bool ok;
-	QString service_mask = QInputDialog::getText(this, caption, "Enter Service Name", QLineEdit::Normal, QString(), &ok);
-	if( !ok) return;
+	QString service_mask = QInputDialog::getText(this, i_dialog_caption, dialog_tip, QLineEdit::Normal, QString(), &ok);
+	if (false == ok)
+		return;
 
 	std::string err;
-	if( false == af::RegExp::Validate( afqt::qtos( service_mask), &err))
+	if (false == af::RegExp::Validate(afqt::qtos(service_mask), &err))
 	{
-		displayError( afqt::stoq( err));
+		displayError(afqt::stoq(err));
 		return;
 	}
-	
+
+	editService(i_mode, service_mask);
+}
+void ListRenders::editService(QString i_mode, QString i_service)
+{
 	std::ostringstream str;
-	Item::EType type = Item::TRender;
+	Item::EType type = Item::TAny;
 	std::vector<int> ids(getSelectedIds(type));
-	af::jsonActionOperationStart(str, "renders", "service", "", ids);
-	str << ",\n\"name\":\"" << afqt::qtos( service_mask) << "\"";
-	str << ",\n\"enable\":" << ( enable ? "true": "false" );
-	af::jsonActionOperationFinish( str);
-	Watch::sendMsg( af::jsonMsg( str));
+	af::jsonActionOperationStart(str, itemTypeToAf(type), "farm", "", ids);
+	str << ",\n\"mode\":\"" << afqt::qtos(i_mode) << "\"";
+	str << ",\n\"name\":\"" << afqt::qtos(i_service) << "\"";
+	str << ",\n\"mask\":\"" << afqt::qtos(i_service) << "\"";
+	af::jsonActionOperationFinish(str);
+	Watch::sendMsg(af::jsonMsg(str));
+}
+void ListRenders::actClearServices()
+{
+	if (getCurrentItem() == NULL)
+		return;
+
+	std::ostringstream str;
+	Item::EType type = Item::TAny;
+	std::vector<int> ids(getSelectedIds(type));
+	af::jsonActionOperationStart(str, itemTypeToAf(type), "farm", "", ids);
+	str << ",\n\"mode\":\"clear_services\"";
+	af::jsonActionOperationFinish(str);
+	Watch::sendMsg(af::jsonMsg(str));
 }
 
 void ListRenders::actCommand( int number)

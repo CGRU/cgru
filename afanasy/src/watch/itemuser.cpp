@@ -19,7 +19,7 @@ const int ItemUser::HeightUser = 32;
 const int ItemUser::HeightAnnotation = 14;
 
 ItemUser::ItemUser( af::User * i_user, const CtrlSortFilter * i_ctrl_sf):
-	ItemNode((af::Node*)i_user, TUser, i_ctrl_sf)
+	ItemNode(i_user, TUser, i_ctrl_sf)
 {
 	v_updateValues(i_user, 0);
 }
@@ -253,7 +253,7 @@ void ItemUser::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleO
 	i_painter->drawText(x, y, w, HeightUser, Qt::AlignHCenter | Qt::AlignBottom, running_str);
 }
 
-void ItemUser::setSortType( int i_type1, int i_type2 )
+void ItemUser::v_setSortType( int i_type1, int i_type2 )
 {
 	resetSorting();
 
@@ -316,7 +316,7 @@ void ItemUser::setSortType( int i_type1, int i_type2 )
 	}
 }
 
-void ItemUser::setFilterType( int i_type )
+void ItemUser::v_setFilterType( int i_type )
 {
 	resetFiltering();
 

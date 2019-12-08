@@ -2,12 +2,12 @@
 
 #include "../libafanasy/render.h"
 
-#include "itemnode.h"
+#include "itemfarm.h"
 #include "plotter.h"
 
 class ListRenders;
 
-class ItemRender : public ItemNode
+class ItemRender : public ItemFarm
 {
 public:
 	ItemRender( af::Render * i_render, ListRenders * i_list_renders, const CtrlSortFilter * i_ctrl_sf);
@@ -16,15 +16,14 @@ public:
 	void v_updateValues(af::Node * i_afnode, int i_msgType);
 
 	inline const QString & getPool() const { return m_pool; }
-	void setDepth(int i_depth);
 
 	inline const QString & getUserName()   const { return m_username;      }
 	inline const QString & getIPString()   const { return m_address_ip_str;}
 	inline int getCapacity() const { return m_capacity;  }
 	inline int getMaxTasks() const { return m_maxtasks;  }
 
-	void setSortType(   int i_type1, int i_type2 );
-	void setFilterType( int i_type );
+	void v_setSortType(   int i_type1, int i_type2 );
+	void v_setFilterType( int i_type );
 
 	inline bool isOnline()        const { return m_online;           }
 	inline bool isOffline()       const { return false == m_online;  }
@@ -114,7 +113,6 @@ private:
 	long long m_taskstartfinishtime;
 	QString m_taskstartfinishtime_str;
 	QString m_offlineState;
-//	QString m_creationTime;
 
 	Plotter m_plotCpu;
 	Plotter m_plotMem;

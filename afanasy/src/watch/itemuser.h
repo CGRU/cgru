@@ -30,8 +30,8 @@ public:
 	int64_t time_register;
 	int64_t time_activity;
 
-	void setSortType(   int i_type1, int i_type2 );
-	void setFilterType( int i_type );
+	void v_setSortType(   int i_type1, int i_type2 );
+	void v_setFilterType( int i_type );
 
 	bool calcHeight();
 

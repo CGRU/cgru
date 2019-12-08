@@ -24,7 +24,7 @@ const int ItemRender::ms_HeightTask = 15;
 const int ItemRender::ms_HeightOffline = 15;
 
 ItemRender::ItemRender(af::Render * i_render, ListRenders * i_list_renders, const CtrlSortFilter * i_ctrl_sf):
-	ItemNode((af::Node*)i_render, TRender, i_ctrl_sf),
+	ItemFarm(i_render, TRender, i_ctrl_sf),
 	m_ListRenders(i_list_renders),
 	m_online( false),
 	m_taskstartfinishtime( 0),
@@ -438,11 +438,6 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 	m_ListRenders->offsetHierarchy(this);
 }
 
-void ItemRender::setDepth(int i_depth)
-{
-	m_margin_left = ListRenders::ms_DepthOffset * i_depth;
-}
-
 void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const
 {
 	assert(i_painter);
@@ -761,7 +756,7 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	}
 }
 
-void ItemRender::setSortType( int i_type1, int i_type2 )
+void ItemRender::v_setSortType( int i_type1, int i_type2 )
 {
 	resetSorting();
 
@@ -842,7 +837,7 @@ void ItemRender::setSortType( int i_type1, int i_type2 )
 	}
 }
 
-void ItemRender::setFilterType( int i_type )
+void ItemRender::v_setFilterType( int i_type )
 {
 	resetFiltering();
 

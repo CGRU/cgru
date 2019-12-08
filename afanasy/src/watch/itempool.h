@@ -2,11 +2,11 @@
 
 #include "../libafanasy/pool.h"
 
-#include "itemnode.h"
+#include "itemfarm.h"
 
 class ListRenders;
 
-class ItemPool : public ItemNode
+class ItemPool : public ItemFarm
 {
 public:
 	ItemPool(af::Pool * i_pool, ListRenders * i_list_renders, const CtrlSortFilter * i_ctrl_sf);
@@ -19,12 +19,10 @@ public:
 	int64_t time_register;
 	int64_t time_activity;
 
-	void setSortType(   int i_type1, int i_type2 );
-	void setFilterType( int i_type );
+	void v_setSortType(   int i_type1, int i_type2 );
+	void v_setFilterType( int i_type );
 
 	inline const QString & getParentPath() const { return m_parent_path; }
-	inline int getDepth() const { return m_depth; }
-	void setDepth(int i_depth);
 
 	bool calcHeight();
 
@@ -43,11 +41,7 @@ private:
 	ListRenders * m_ListRenders;
 
 	bool m_root;
-	int m_depth;
 	QString m_parent_path;
-
-	QList<QString> m_services;
-	QList<QString> m_services_disabled;
 
 	QString strLeftBottom;
 	QString strLeftTop;

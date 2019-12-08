@@ -1,13 +1,9 @@
 #include "itemnode.h"
 
-#include "../include/afjob.h"
-
 #include "../libafqt/name_afqt.h"
 
 #include "ctrlsortfilter.h"
 
-#include <QtCore/QEvent>
-#include <QtCore/QTimer>
 #include <QtGui/QPainter>
 
 #define AFOUTPUT

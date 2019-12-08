@@ -188,7 +188,7 @@ bool ListNodes::updateItems(af::Msg * msg, Item::EType i_type)
 				// sort node if sorting parameters changed
 				if( m_ctrl_sf->isSortEnabled())
 				{
-					itemnode->setSortType( m_ctrl_sf->getSortType1(), m_ctrl_sf->getSortType2());
+					itemnode->v_setSortType(m_ctrl_sf->getSortType1(), m_ctrl_sf->getSortType2());
 					if(sort_force_val != itemnode->getSortForce())itemsToSort << itemnode;
 					if( sort_int_val1 != itemnode->getSortInt1()) itemsToSort << itemnode;
 					if( sort_int_val2 != itemnode->getSortInt2()) itemsToSort << itemnode;
@@ -232,13 +232,13 @@ bool ListNodes::updateItems(af::Msg * msg, Item::EType i_type)
 		int row;
 		if ( m_ctrl_sf->isSortEnabled())
 		{
-			new_item->setSortType( m_ctrl_sf->getSortType1(), m_ctrl_sf->getSortType2());
+			new_item->v_setSortType( m_ctrl_sf->getSortType1(), m_ctrl_sf->getSortType2());
 			row = ((ModelNodes*)m_model)->addNodeSorted( new_item);
 		}
 		else row = ((ModelNodes*)m_model)->addNode( new_item);
 
 		if( m_ctrl_sf->isFilterEnabled())
-			new_item->setFilterType( m_ctrl_sf->getFilterType() );
+			new_item->v_setFilterType(m_ctrl_sf->getFilterType() );
 
 		if( newitemscreated == false ) newitemscreated = true;
 	}
@@ -282,7 +282,7 @@ void ListNodes::processHidden()
 void ListNodes::sortTypeChanged()
 {
 	for( int i = 0; i < m_model->count(); i++)
-		((ItemNode*)(m_model->item(i)))->setSortType( m_ctrl_sf->getSortType1(), m_ctrl_sf->getSortType2());
+		((ItemNode*)(m_model->item(i)))->v_setSortType(m_ctrl_sf->getSortType1(), m_ctrl_sf->getSortType2());
 
 	if( m_ctrl_sf->isSortEnabled())
 		sort();
@@ -307,7 +307,7 @@ void ListNodes::filterChanged()
 void ListNodes::filterTypeChanged()
 {
 	for( int i = 0; i < m_model->count(); i++)
-		((ItemNode*)(m_model->item(i)))->setFilterType( m_ctrl_sf->getFilterType());
+		((ItemNode*)(m_model->item(i)))->v_setFilterType(m_ctrl_sf->getFilterType());
 
 	processHidden();
 }

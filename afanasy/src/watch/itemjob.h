@@ -67,8 +67,8 @@ public:
 	inline int getBlockPercent( int block ) const
 		{ if( block < m_blocks_num ) return m_blockinfo[block].p_percentage; else return 0;}
 
-	void setSortType(   int type1, int i_type2 );
-	void setFilterType( int type );
+	void v_setSortType(   int type1, int i_type2 );
+	void v_setFilterType( int type );
 
 	void generateMenu( int id_block, QMenu * menu, QWidget * qwidget);
 

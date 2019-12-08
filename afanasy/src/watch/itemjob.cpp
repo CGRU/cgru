@@ -21,7 +21,7 @@ const int ItemJob::HeightThumbName = 12;
 const int ItemJob::HeightAnnotation = 12;
 
 ItemJob::ItemJob( ListJobs * i_list, af::Job * i_job, const CtrlSortFilter * i_ctrl_sf, bool i_notify):
-	ItemNode( (af::Node*)i_job, TJob, i_ctrl_sf),
+	ItemNode(i_job, TJob, i_ctrl_sf),
 	m_list( i_list),
 	m_blocks_num( i_job->getBlocksNum()),
 	m_tasks_done( -1),
@@ -460,7 +460,7 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 	}
 }
 
-void ItemJob::setSortType( int i_type1, int i_type2 )
+void ItemJob::v_setSortType( int i_type1, int i_type2 )
 {
 	resetSorting();
 
@@ -541,7 +541,7 @@ void ItemJob::setSortType( int i_type1, int i_type2 )
 	}
 }
 
-void ItemJob::setFilterType( int i_type )
+void ItemJob::v_setFilterType( int i_type )
 {
 	resetFiltering();
 
