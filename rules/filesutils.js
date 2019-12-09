@@ -778,13 +778,13 @@ function fu_WalkProcessGUI(i_wnd)
 	block.tasks = [task];
 
 	var cmd = c_PathPM_Client2Server(RULES.walk.cmd);
-	cmd += ' -p';
+	cmd += ' --progress';
 	cmd += ' --thumb 128';
 	cmd += ' --report 256';
-	if (params.upparents == false)
-		cmd += ' -n';
+	if (params.upparents)
+		cmd += ' --upparents';
 	if (params.mediainfo)
-		cmd += ' -m';
+		cmd += ' --mediainfo';
 	cmd += ' -V ' + params.verbose;
 	cmd += ' "' + c_PathPM_Client2Server(params.path) + '"';
 	task.command = cmd;
