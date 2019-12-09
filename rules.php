@@ -134,9 +134,9 @@ function fileRead($i_filename, $i_lock = true, $i_verbose = false)
 
 	if ($i_verbose) error_log('fileRead: Opened: '.$i_filename);
 
-	if ($i_lock) flock($fHandle, LOCK_SH);
+	if ($i_lock) _flock_($fHandle, LOCK_SH);
 	$data = fread($fHandle, FILE_MAX_LENGTH);
-	if ($i_lock) flock($fHandle, LOCK_UN);
+	if ($i_lock) _flock_($fHandle, LOCK_UN);
 	fclose($fHandle);
 
 	if ($i_verbose) error_log('fileRead: Read '.strlen($data).' bytes from: '.$i_filename);
@@ -154,9 +154,9 @@ function fileWrite($i_filename, $i_data, $i_lock = true, $i_verbose = false)
 		return false;
 	}
 
-	if ($i_lock) flock($fHandle, LOCK_EX);
+	if ($i_lock) _flock_($fHandle, LOCK_EX);
 	fwrite($fHandle, $i_data);
-	if ($i_lock) flock($fHandle, LOCK_UN);
+	if ($i_lock) _flock_($fHandle, LOCK_UN);
 	fclose($fHandle);
 
 	if ($i_verbose)
