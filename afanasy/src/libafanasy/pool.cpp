@@ -217,7 +217,6 @@ bool Pool::jsonRead(const JSON &i_object, std::string * io_changes)
 void Pool::v_readwrite(Msg * msg)
 {
 	Node::v_readwrite(msg);
-
 	Farm::readwrite(msg);
 
 	if (notRoot())
@@ -225,9 +224,6 @@ void Pool::v_readwrite(Msg * msg)
 
 	// NEW_VERSION
 
-	rw_int64_t(m_state,                  msg);
-	rw_int64_t(m_flags,                  msg);
-	rw_String (m_annotation,             msg);
 	rw_String (m_parent_path,            msg);
 	rw_int64_t(m_time_creation,          msg);
 

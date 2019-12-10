@@ -51,11 +51,11 @@ protected:
 	virtual void v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const;
 
 private:
-	static const int ms_HeightHost;
-	static const int ms_HeightHostSmall;
-	static const int ms_HeightAnnotation;
-	static const int ms_HeightTask;
-	static const int ms_HeightOffline;
+	static const int HeightBase;
+	static const int HeightSmall;
+	static const int HeightOffline;
+	static const int HeightAnnotation;
+	static const int HeightTask;
 
 private:
 	void deleteTasks();

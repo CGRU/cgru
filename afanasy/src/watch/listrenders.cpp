@@ -37,9 +37,9 @@
 ListRenders::EDisplaySize ListRenders::ms_displaysize = ListRenders::EVariableSize;
 
 int     ListRenders::ms_SortType1      = CtrlSortFilter::TPRIORITY;
-int     ListRenders::ms_SortType2      = CtrlSortFilter::TCAPACITY;
+int     ListRenders::ms_SortType2      = CtrlSortFilter::TNAME;
 bool    ListRenders::ms_SortAscending1 = false;
-bool    ListRenders::ms_SortAscending2 = false;
+bool    ListRenders::ms_SortAscending2 = true;
 int     ListRenders::ms_FilterType     = CtrlSortFilter::TNAME;
 bool    ListRenders::ms_FilterInclude  = true;
 bool    ListRenders::ms_FilterMatch    = false;
@@ -176,7 +176,7 @@ void ListRenders::setSpacing()
 {
 	 switch( ms_displaysize )
 	 {
-	 case  ListRenders::ESMallSize:
+	 case  ListRenders::ESmallSize:
 		  m_view->setSpacing( 1);
 		  break;
 	 case  ListRenders::ENormalSize:

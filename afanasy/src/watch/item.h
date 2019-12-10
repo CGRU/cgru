@@ -104,10 +104,6 @@ protected:
 	/// Draw a star at \c x,y coordinates with \c size size.
 	static void drawStar( int size, int posx, int posy, QPainter * painter);
 
-	static void drawServices(QPainter * i_painter,
-		const QList<QString> & i_services, const QList<QString> & i_services_disabled,
-		int i_x, int i_y, int i_w, int i_h);
-
 protected:
 	static const int Height;
 	static const int Width;

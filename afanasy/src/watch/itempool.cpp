@@ -17,7 +17,6 @@
 #include "../libafanasy/logger.h"
 
 const int ItemPool::HeightPool = 32;
-const int ItemPool::HeightServices = 24;
 const int ItemPool::HeightAnnotation = 14;
 
 ItemPool::ItemPool(af::Pool * i_pool, ListRenders * i_list_renders, const CtrlSortFilter * i_ctrl_sf):
@@ -142,8 +141,7 @@ void ItemPool::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleO
 	i_painter->drawText(x, y, w, height_pool, Qt::AlignRight | Qt::AlignTop,    strRightTop);
 
 	if (m_services.size() || m_services_disabled.size())
-		drawServices(i_painter, m_services, m_services_disabled,
-				x+6, y+HeightPool, w-6, HeightServices-6);
+		drawServices(i_painter, x+6, y+HeightPool, w-6, HeightServices-6);
 
 	if (m_annotation.size())
 	{

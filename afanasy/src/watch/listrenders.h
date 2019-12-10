@@ -45,7 +45,7 @@ public:
 		  EVariableSize,
 		  EBigSize,
 		  ENormalSize,
-		  ESMallSize
+		  ESmallSize
 	 };
 	 static EDisplaySize getDisplaySize() { return ms_displaysize; }
 

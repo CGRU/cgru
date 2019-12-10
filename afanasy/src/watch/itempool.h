@@ -35,7 +35,6 @@ private:
 private:
 
 	static const int HeightPool;
-	static const int HeightServices;
 	static const int HeightAnnotation;
 
 	ListRenders * m_ListRenders;

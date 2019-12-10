@@ -189,6 +189,8 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
    {
    case Msg::TRendersList:
 
+		Farm::readwrite(msg);
+
 	  rw_bool   ( m_locked,                 msg);
 	  rw_String ( m_pool,                   msg);
 	  rw_int64_t( m_task_start_finish_time, msg);

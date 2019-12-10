@@ -17,10 +17,14 @@ public:
 	inline int getDepth() const { return m_depth; }
 	void setDepth(int i_depth);
 
-	static const int ms_DepthOffset = 32;
+	static const int HeightServices = 24;
+
+	static const int DepthOffset = 32;
 
 	QList<QString> m_services;
 	QList<QString> m_services_disabled;
+
+	void drawServices(QPainter * i_painter, int i_x, int i_y, int i_w, int i_h) const;
 
 private:
 	int m_depth;

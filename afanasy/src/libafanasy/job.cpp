@@ -320,8 +320,6 @@ void Job::v_readwrite( Msg * msg)
 	Work::readwrite(   msg);
 
 	rw_int64_t(m_serial,     msg);
-	rw_int64_t(m_flags,      msg);
-	rw_int64_t(m_state,      msg);
 
 	rw_int32_t(m_blocks_num,      msg);
 	rw_int32_t(m_user_list_order, msg);
@@ -336,10 +334,8 @@ void Job::v_readwrite( Msg * msg)
 	rw_String(m_host_name,    msg);
 	rw_String(m_command_pre,  msg);
 	rw_String(m_command_post, msg);
-	rw_String(m_annotation,   msg);
 	rw_String(m_report,       msg);
 	rw_String(m_description,  msg);
-	rw_String(m_custom_data,  msg);
 	rw_String(m_thumb_path,   msg);
 	rw_String(m_project,      msg);
 	rw_String(m_department,   msg);
