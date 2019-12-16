@@ -85,6 +85,9 @@ ListRenders::ListRenders( QWidget* parent):
 	bp = addButtonPanel(Item::TAny, "LOG","renders_log","Get render log.");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestLog()));
 
+	bp = addButtonPanel(Item::TPool, "ADD POOL","pools_add","Add a new child pool.");
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actAddPool()));
+
 	bp = addButtonPanel(Item::TRender, "TASKS LOG","renders_tasks_log","Get tasks log.");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestTasksLog()));
 
@@ -144,9 +147,9 @@ ListRenders::ListRenders( QWidget* parent):
 
 	if (af::Environment::GOD())
 	{
-		addParam_Num(Item::TAny, "priority", "Priority", "Priority number", 0, 250);
+		addParam_Num(Item::TAny, "priority",  "Priority",   "Priority number", 0, 250);
+		addParam_Str(Item::TAny, "annotation","Annotation", "Annotation string");
 	}
-	addParam_Str(Item::TAny,    "annotation",                "Annotation",             "Annotation string");
 
 	ParamsPanelFarm * paramspanelfarm = new ParamsPanelFarm();
 	connect(paramspanelfarm, SIGNAL(sig_EditService(QString, QString)), this, SLOT(editService(QString, QString)));
@@ -717,6 +720,36 @@ void ListRenders::calcTitle()
 		else if( itemrender->isOnline() && (false == itemrender->isBusy())) free++;
 	}
 	m_parentWindow->setWindowTitle(QString("R[%1/%2]: B%3/%4F (n%5)").arg( total).arg( online).arg( busy).arg( free).arg( nimby));
+}
+
+void ListRenders::actAddPool()
+{
+	Item * item = getCurrentItem();
+	if (item == NULL)
+		return;
+
+	if (item->getType() != Item::TPool)
+		return;
+
+	bool ok;
+	QString name = QInputDialog::getText(this, "Add Child Pool",
+			QString("Enter a new \"%1\" child pool name").arg(item->getName()),
+			QLineEdit::Normal, QString(), &ok);
+	if (false == ok)
+		return;
+
+	displayInfo(QString("Adding a pool \"%1\" to \"%2\"").arg(name, item->getName()));
+
+	addPool(item->getId(), name);
+}
+
+void ListRenders::addPool(int i_parent_id, const QString & i_child)
+{
+	std::ostringstream str;
+	af::jsonActionOperationStart(str, "pools", "add_pool", "", std::vector<int>(1 , i_parent_id));
+	str << ",\n\"name\":\"" << afqt::qtos(i_child) << "\"";
+	af::jsonActionOperationFinish(str);
+	Watch::sendMsg(af::jsonMsg(str));
 }
 
 void ListRenders::actCapacity()

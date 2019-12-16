@@ -58,6 +58,9 @@ private slots:
 
 	void actCapacity();
 	void actMaxTasks();
+
+	void actAddPool();
+
 	void actNIMBY();
 	void actNimby();
 	void actFree();
@@ -95,6 +98,7 @@ private slots:
 	void requestResources();
 
 private:
+	void addPool(int i_parent_id, const QString & i_child);
 	void editServiceDialog(const QString & i_mode, const QString & i_dialog_caption);
 	void launchCmdExit( bool i_exit);
 	void launchCmdStringExit(const QString & i_cmd, bool i_exit);
