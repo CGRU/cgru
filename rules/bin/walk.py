@@ -19,7 +19,7 @@ Parser = OptionParser(
 )
 
 Parser.add_option('-o', '--output',   dest='output',   type = 'string',     default='.rules/walk.json', help='File to save results.')
-Parser.add_option('-u', '--upparents',dest='upparents',action='store_true', default=False,              help='Update parent folders.')
+Parser.add_option('-u', '--upparents',dest='upparents',type = 'int',        default=0,                  help='Update parent folders count (-1 = infinite, up to the root).')
 Parser.add_option('-m', '--mediainfo',dest='mediainfo',action='store_true', default=False,              help='Get media information.')
 Parser.add_option('-p', '--progress', dest='progress', action='store_true', default=False,              help='Output progress percentage.')
 Parser.add_option('-t', '--thumb',    dest='thumb',    type = 'int',        default=None,               help='Make thumbnail frequency.')
@@ -278,9 +278,10 @@ if PrevFiles:
 
 
 # Update parent folders:
-if Options.upparents:
+if Options.upparents != 0:
     curpath = StartPath
     PrevFiles = None
+    depth = 0
     while curpath != '/' and curpath != '':
         # Go one folder upper:
         uppath = os.path.dirname(curpath)
@@ -290,6 +291,10 @@ if Options.upparents:
 
         outInfo('updating', curpath)
         walkdir(curpath, False)
+
+        depth += 1
+        if Options.upparents > 0 and depth >= Options.upparents:
+            break
 
 
 # Output statistics:

@@ -29,6 +29,7 @@
 	"send_ready"  :{"title":"SENDREADY",   "clr":[ 77,177,177], "short":"SR",  "p_min":70, "p_max":90, "excl":true,  "tip":"Ready to send."},
 	"sent"        :{"title":"SENT",        "clr":[222,222,191], "short":"SNT", "p_min":80, "p_max":90, "excl":true,  "tip":"Was sent"},
 	"omit"        :{"title":"OMIT",        "clr":[ 99, 99, 99], "short":"Om",              "p_max":-1, "excl":true,  "tip":"Omit"},
+	"hqres"       :{"title":"HQRES",       "clr":[100,250,100], "short":"HQR", "p_min":98, "p_max":98, "excl":true,  "tip":"Render high quality results"},
 	"done"        :{"title":"DONE",        "clr":[121,155,121], "short":"D",   "p_min":99, "p_max":99, "excl":true,  "tip":"Done"},
 	"closed"      :{"title":"CLOSED",      "clr":[ 11, 55, 11], "short":"CLS", "p_min":100,            "excl":true,  "tip":"Closed"},
 	"aux"         :{"title":"AUX",         "clr":[127,127,127], "short":"AUX",             "p_max":-1, "excl":true,  "tip":"Auxiliary",

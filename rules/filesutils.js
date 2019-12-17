@@ -782,7 +782,7 @@ function fu_WalkProcessGUI(i_wnd)
 	cmd += ' --thumb 128';
 	cmd += ' --report 256';
 	if (params.upparents)
-		cmd += ' --upparents';
+		cmd += ' --upparents -1';
 	if (params.mediainfo)
 		cmd += ' --mediainfo';
 	cmd += ' -V ' + params.verbose;
