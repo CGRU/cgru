@@ -1100,7 +1100,7 @@ FilesView.prototype.getSelected = function() {
 
 FilesView.prototype.countFiles = function(i_path, i_args) {
 	c_LoadingElSet(this.elRoot);
-	var cmd = 'rules/bin/walk.sh --mediainfo --upparents 1"' + RULES.root + i_path + '"';
+	var cmd = 'rules/bin/walk.sh --mediainfo --upparents 1 "' + RULES.root + i_path + '"';
 	n_Request({
 		"send": {"cmdexec": {"cmds": [cmd]}},
 		"func": this.countFilesFinished,
