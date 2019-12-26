@@ -423,8 +423,8 @@ void ListItems::operation(Item::EType i_type, const std::string & i_operation)
 	}
 
 	std::ostringstream str;
-	af::jsonActionOperation(str, m_type, i_operation, "", ids);
-	Watch::sendMsg(af::jsonMsg( str));
+	af::jsonActionOperation(str, itemTypeToAf(i_type), i_operation, "", ids);
+	Watch::sendMsg(af::jsonMsg(str));
 
 	displayInfo(QString("Operation: \"%1\".").arg(afqt::stoq(i_operation)));
 }

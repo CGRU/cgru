@@ -236,11 +236,11 @@ PoolNode.createPanels = function(i_monitor) {
 		'node_type': 'pools',
 		'handle': 'addPoolDialog',
 		'tooltip': 'Add pool'};
-	acts.revert_renders = {
+/*	acts.revert_renders = {
 		'label': 'REVERT',
 		'node_type': 'pools',
 		'handle': 'mh_Oper',
-		'tooltip': 'Revert renders'};
+		'tooltip': 'Revert renders'};*/
 	i_monitor.createCtrlBtns(acts);
 
 

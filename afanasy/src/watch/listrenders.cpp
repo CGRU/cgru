@@ -85,8 +85,11 @@ ListRenders::ListRenders( QWidget* parent):
 	bp = addButtonPanel(Item::TAny, "LOG","renders_log","Get render log.");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestLog()));
 
-	bp = addButtonPanel(Item::TPool, "ADD POOL","pools_add","Add a new child pool.");
-	connect(bp, SIGNAL(sigClicked()), this, SLOT(actAddPool()));
+	if( af::Environment::GOD())
+	{
+		bp = addButtonPanel(Item::TPool, "ADD POOL","pools_add","Add a new child pool.");
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actAddPool()));
+	}
 
 	bp = addButtonPanel(Item::TRender, "TASKS LOG","renders_tasks_log","Get tasks log.");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestTasksLog()));
@@ -110,32 +113,62 @@ ListRenders::ListRenders( QWidget* parent):
 
 	resetButtonsMenu();
 
-	bm = addButtonsMenu(Item::TAny, "SERVICES","Add/Remove/Disable service(s).");
-
-	bp = addButtonPanel(Item::TAny, "Add","service_add","Add a service.","", false);
-	connect(bp, SIGNAL(sigClicked()), this, SLOT(actServiceAdd()));
-
-	bp = addButtonPanel(Item::TAny, "Remove","service_remove","Remove services by mask.","", false);
-	connect(bp, SIGNAL(sigClicked()), this, SLOT(actServiceRemove()));
-
-	bp = addButtonPanel(Item::TAny, "Enable","service_enable","Enable services by mask.","", false);
-	connect(bp, SIGNAL(sigClicked()), this, SLOT(actServiceEnable()));
-
-	bp = addButtonPanel(Item::TAny, "Disable","service_disable","Disable services by mask.","", false);
-	connect(bp, SIGNAL(sigClicked()), this, SLOT(actServiceDisable()));
-
-	bp = addButtonPanel(Item::TAny, "Clear","clear_services","Clear services.\nServices settings will be taken from the parent pool.","", true);
-	connect(bp, SIGNAL(sigClicked()), this, SLOT(actClearServices()));
-
-	resetButtonsMenu();
-
 	if( af::Environment::GOD())
 	{
+		bm = addButtonsMenu(Item::TRender, "Pool","Change render pool.");
+
+		bp = addButtonPanel(Item::TRender, "SET","renders_pool_set","Set render pool.","", false);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actRenderSetPool()));
+
+		bp = addButtonPanel(Item::TRender, "REASSIGN","renders_pool_reassign","Re-assign render pool.","", true);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actRenderReAssing()));
+
+		resetButtonsMenu();
+
+		bm = addButtonsMenu(Item::TAny, "Services","Add/Remove/Disable service(s).");
+
+		bp = addButtonPanel(Item::TAny, "ADD","service_add","Add a service.","", false);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actServiceAdd()));
+
+		bp = addButtonPanel(Item::TAny, "REMOVE","service_remove","Remove services by mask.","", false);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actServiceRemove()));
+
+		bp = addButtonPanel(Item::TAny, "ENABLE","service_enable","Enable services by mask.","", false);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actServiceEnable()));
+
+		bp = addButtonPanel(Item::TAny, "DISABLE","service_disable","Disable services by mask.","", false);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actServiceDisable()));
+
+		bp = addButtonPanel(Item::TAny, "CLEAR","clear_services",
+				"Clear services.\nServices settings will be taken from the parent pool.","", true);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actClearServices()));
+
+		resetButtonsMenu();
+
+		bm = addButtonsMenu(Item::TPool, "New Render","New render default state.");
+
+		bp = addButtonPanel(Item::TPool, "Nimby","new_render_nimby","New render will be registered in NIMBY state.","", true);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actNewRenderNimby()));
+
+		bp = addButtonPanel(Item::TPool, "Free","new_render_free","New render will NOT be registered in NIMBY state.","", true);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actNewRenderFree()));
+
+		bp = addButtonPanel(Item::TPool, "Paused","new_render_paused","New render will be registered in Paused state.","", true);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actNewRenderPaused()));
+
+		bp = addButtonPanel(Item::TPool, "Ready","new_render_free","New render will NOT be registered in Paused state.","", true);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actNewRenderReady()));
+
+		resetButtonsMenu();
+
 		bp = addButtonPanel(Item::TRender, "PAUSE","renders_pause","Pause selected renders.","P");
 		connect( bp, SIGNAL( sigClicked()), this, SLOT( actSetPaused()));
 
 		bp = addButtonPanel(Item::TRender, "START","renders_unpause","Start (Unpause) selected renders.","S");
 		connect( bp, SIGNAL( sigClicked()), this, SLOT( actUnsetPaused()));
+
+		bp = addButtonPanel(Item::TAny, "DELETE","renders_delete","Delete pool or render.","", true);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actDelete()));
 	}
 
 
@@ -147,8 +180,9 @@ ListRenders::ListRenders( QWidget* parent):
 
 	if (af::Environment::GOD())
 	{
-		addParam_Num(Item::TAny, "priority",  "Priority",   "Priority number", 0, 250);
-		addParam_Str(Item::TAny, "annotation","Annotation", "Annotation string");
+		addParam_REx(Item::TPool, "pattern",    "Pattern",    "Host names pattern regular expression");
+		addParam_Num(Item::TAny,  "priority",   "Priority",   "Priority number", 0, 250);
+		addParam_Str(Item::TAny,  "annotation", "Annotation", "Annotation string");
 	}
 
 	ParamsPanelFarm * paramspanelfarm = new ParamsPanelFarm();
@@ -752,6 +786,73 @@ void ListRenders::addPool(int i_parent_id, const QString & i_child)
 	Watch::sendMsg(af::jsonMsg(str));
 }
 
+void ListRenders::actRenderSetPool()
+{
+	Item * item = getCurrentItem();
+	if (item == NULL)
+		return;
+
+	if (item->getType() != Item::TRender)
+		return;
+
+	bool ok;
+	QString name = QInputDialog::getText(this, "Set Render Pool",
+			"Enter render(s) new pool name",
+			QLineEdit::Normal, QString(), &ok);
+	if (false == ok)
+		return;
+
+	displayInfo(QString("Setting pool to \"%1\"").arg(name));
+
+	renderSetPool(name);
+}
+
+void ListRenders::renderSetPool(const QString & i_name)
+{
+	Item::EType type = Item::TRender;
+	std::vector<int> ids(getSelectedIds(type));
+	std::ostringstream str;
+	af::jsonActionOperationStart(str, "renders", "set_pool", "", ids);
+	str << ",\n\"name\":\"" << afqt::qtos(i_name) << "\"";
+	af::jsonActionOperationFinish(str);
+	Watch::sendMsg(af::jsonMsg(str));
+}
+
+void ListRenders::actRenderReAssing()
+{
+	Item::EType type = Item::TRender;
+	std::vector<int> ids(getSelectedIds(type));
+	if (ids.size() == 0)
+	{
+		displayError("No renders selected.");
+		return;
+	}
+	std::ostringstream str;
+	af::jsonActionOperationStart(str, "renders", "reassign_pool", "", ids);
+	af::jsonActionOperationFinish(str);
+	Watch::sendMsg(af::jsonMsg(str));
+}
+
+void ListRenders::actNewRenderNimby()
+{
+	setParameter(Item::TPool, "new_nimby", "true", false);
+}
+
+void ListRenders::actNewRenderFree()
+{
+	setParameter(Item::TPool, "new_nimby", "false", false);
+}
+
+void ListRenders::actNewRenderPaused()
+{
+	setParameter(Item::TPool, "new_paused", "true", false);
+}
+
+void ListRenders::actNewRenderReady()
+{
+	setParameter(Item::TPool, "new_paused", "false", false);
+}
+
 void ListRenders::actCapacity()
 {
 	ItemRender* item = (ItemRender*)getCurrentItem();
@@ -795,11 +896,11 @@ void ListRenders::actUser()
 void ListRenders::actEjectTasks()      { operation(Item::TRender, "eject_tasks"        ); }
 void ListRenders::actEjectNotMyTasks() { operation(Item::TRender, "eject_tasks_keep_my"); }
 void ListRenders::actExit()            { operation(Item::TRender, "exit"               ); }
-void ListRenders::actDelete()          { operation(Item::TRender, "delete"             ); }
 void ListRenders::actReboot()          { operation(Item::TRender, "reboot"             ); }
 void ListRenders::actShutdown()        { operation(Item::TRender, "shutdown"           ); }
 void ListRenders::actWOLSleep()        { operation(Item::TRender, "wol_sleep"          ); }
 void ListRenders::actWOLWake()         { operation(Item::TRender, "wol_wake"           ); }
+void ListRenders::actDelete()          { operation(Item::TAny,    "delete"             ); }
 
 void ListRenders::actRequestLog()      { getItemInfo(Item::TAny,    "log"      ); }
 void ListRenders::actRequestTasksLog() { getItemInfo(Item::TRender, "tasks_log"); }
