@@ -626,7 +626,8 @@ function walkDir($i_recv, $i_dir, &$o_out, $i_depth)
 
 		$walk = null;
 		$walk_file = $i_dir . '/' . $rufolder . '/walk.json';
-		readObj($walk_file, $walk);
+		if (false == readObj($walk_file, $walk))
+			$walk = null;
 
 		while (false !== ($entry = readdir($handle)))
 		{
@@ -1016,7 +1017,8 @@ function jsf_editobj($i_edit, &$o_out)
 
 	// Read object:
 	$obj = null;
-	readObj($i_edit['file'], $obj);
+	if (false == readObj($i_edit['file'], $obj))
+		$obj = null;
 
 	// Edit object:
 	if (array_key_exists('add', $i_edit) && ($i_edit['add'] == true))

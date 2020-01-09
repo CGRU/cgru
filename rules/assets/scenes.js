@@ -252,7 +252,7 @@ function sc_BodyReceived( i_data, i_args)
 	i_args.elShot.m_elBody.innerHTML = i_data.replace(/\<\s*br\s*\/?\s*\>/g,'@@BR@@');
 	i_args.elShot.m_elBody.innerHTML = i_args.elShot.m_elBody.textContent.replace(/@@BR@@/g,' ');
 
-	if (i_args.elShot.m_status && i_args.elShot.m_status.obj.body)
+	if (i_args.elShot.m_status && i_args.elShot.m_status.obj && i_args.elShot.m_status.obj.body)
 		i_args.elShot.m_status.obj.body.data = i_data;
 }
 

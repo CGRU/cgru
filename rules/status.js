@@ -1558,12 +1558,23 @@ Status.prototype.save = function() {
 	st_Save(this.obj, this.path);
 };
 
+function st_FilterStatusForSave(i_status)
+{
+console.log(JSON.stringify(i_status));
+	delete i_status.error;
+	if (i_status.body)
+		delete i_status.body.data;
+console.log(JSON.stringify(i_status));
+}
+
 function st_Save(i_status, i_path, i_func, i_args, i_navig_params_update)
 {
 	if (i_status == null)
 		i_status = RULES.status;
 	if (i_path == null)
 		i_path = g_CurPath();
+
+	st_FilterStatusForSave(i_status);
 
 	g_FolderSetStatusPath(i_status, i_path, i_navig_params_update);
 	n_walks[i_path] = null;
@@ -1572,7 +1583,7 @@ function st_Save(i_status, i_path, i_func, i_args, i_navig_params_update)
 	obj.object = {"status": i_status};
 	obj.add = true;
 	obj.file = c_GetRuFilePath('status.json', i_path);
-
+console.log(JSON.stringify(obj));
 	n_Request(
 		{"send": {"editobj": obj}, "func": i_func, "args": i_args, "wait": false, 'info': 'status save'});
 }
