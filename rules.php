@@ -1380,6 +1380,10 @@ function makenews($i_args, &$io_users, &$o_out)
 		if (false == in_array($user['id'], $changed_users))
 			array_push($changed_users, $user['id']);
 
+		// On empty news create an empty news array:
+		if (false == is_array($user['news']))
+			$user['news'] = [];
+
 		// Delete older news with the same path:
 		for ($i = 0; $i < count($user['news']); $i++)
 		{
