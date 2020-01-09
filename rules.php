@@ -318,10 +318,11 @@ function processUser($i_arg, &$o_out)
 	// Delete nulls from some arrays:
 	$arrays = array('news', 'bookmarks', 'channels');
 	foreach ($arrays as $arr)
-		for ($i = 0; $i < count($user[$arr]);)
-			if (is_null($user[$arr][$i]))
-				array_splice($user[$arr], $i, 1);
-			else $i++;
+        if (is_array($user[$arr]))
+            for ($i = 0; $i < count($user[$arr]);)
+                if (is_null($user[$arr][$i]))
+                    array_splice($user[$arr], $i, 1);
+                else $i++;
 
 	if (false == writeUser($user))
 	{
