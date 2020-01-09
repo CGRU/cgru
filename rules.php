@@ -144,13 +144,34 @@ function fileRead($i_filename, $i_lock = true, $i_verbose = false)
 	return $data;
 }
 
+function readObj($i_file, &$o_out, $i_lock = true)
+{
+	if (false == is_file($i_file))
+	{
+		$o_out['error'] = 'No such file ' . $i_file;
+		return false;
+	}
+
+	if ($data = fileRead($i_file, $i_lock))
+	{
+		$o_out = json_decode($data, true);
+		return true;
+	}
+	else
+	{
+		$o_out['error'] = 'Unable to load file ' . $i_file;
+		return false;
+	}
+}
+
 function fileWrite($i_filename, $i_data, $i_lock = true, $i_verbose = false)
 {
-	$fHandle = fopen($i_filename, 'w');
+	$tmp_name = "$i_filename.tmp";
+	$fHandle = fopen($tmp_name, 'w');
 	if ($fHandle === false)
 	{
 		if ($i_verbose)
-			error_log('fileWrite: Unable open for writing: '.$i_filename);
+			error_log('fileWrite: Unable open for writing: '.$tmp_name);
 		return false;
 	}
 
@@ -159,10 +180,20 @@ function fileWrite($i_filename, $i_data, $i_lock = true, $i_verbose = false)
 	if ($i_lock) _flock_($fHandle, LOCK_UN);
 	fclose($fHandle);
 
+	rename($tmp_name, $i_filename);
+
 	if ($i_verbose)
 		error_log('fileWrite: Written '.strlen($i_data).' bytes to: '.$i_filename);
 
 	return true;
+}
+
+function writeObj($i_filename, $i_obj, $i_lock = true, $i_verbose = false)
+{
+	if (fileWrite($i_filename, jsonEncode($i_obj), $i_lock, $i_verbose))
+		return true;
+
+	return false;
 }
 
 function jsf_start($i_arg, &$o_out)
@@ -328,7 +359,7 @@ function writeUser(&$i_user)
 {
 	$filename = 'users/' . $i_user['id'] . '.json';
 
-	if (fileWrite($filename, jsonEncode($i_user)))
+	if (writeObj($filename, $i_user))
 		return true;
 
 	return false;
@@ -595,9 +626,7 @@ function walkDir($i_recv, $i_dir, &$o_out, $i_depth)
 
 		$walk = null;
 		$walk_file = $i_dir . '/' . $rufolder . '/walk.json';
-		if (is_file($walk_file))
-			if ($wdata = fileRead($walk_file, false))
-				$walk = json_decode($wdata, true);
+		readObj($walk_file, $walk);
 
 		while (false !== ($entry = readdir($handle)))
 		{
@@ -648,8 +677,9 @@ function walkDir($i_recv, $i_dir, &$o_out, $i_depth)
 							}
 						if (false == $found) continue;
 
-						if ($rudata = fileRead($path . '/' . $ruentry, false))
-							$o_out['rules'][$ruentry] = json_decode($rudata, true);
+						$obj = null;
+						if (readObj($path . '/' . $ruentry, $obj, false))
+							$o_out['rules'][$ruentry] = $obj;
 					}
 					closedir($rHandle);
 					sort($o_out['rufiles']);
@@ -676,9 +706,9 @@ function walkDir($i_recv, $i_dir, &$o_out, $i_depth)
 				foreach ($lookahead as $sfile)
 				{
 					$sfilepath = $path . '/' . $rufolder . '/' . $sfile . '.json';
-					if (is_file($sfilepath))
-						if ($data = fileRead($sfilepath, false))
-							mergeObjs($folderObj, json_decode($data, true));
+					$obj = null;
+					if (readObj($sfilepath, $obj, false))
+						mergeObjs($folderObj, $obj);
 				}
 
 			if ($i_depth < $i_recv['depth'])
@@ -696,9 +726,10 @@ function readConfig($i_file, &$o_out)
 	if (false == is_file($i_file))
 		return;
 
-	if ($data = fileRead($i_file))
+	$obj = null;
+	if (readObj($i_file, $obj))
 	{
-		$o_out[$i_file] = json_decode($data, true);
+		$o_out[$i_file] = $obj;
 		if (array_key_exists('include', $o_out[$i_file]['cgru_config']))
 			foreach ($o_out[$i_file]['cgru_config']['include'] as $file)
 				readConfig($file, $o_out);
@@ -754,13 +785,13 @@ function jsf_getobjects($i_args, &$o_out)
 		return;
 	}
 
-	if ($data = fileRead($file))
+	$obj = null;
+	if (readObj($file, $obj))
 	{
-		$data = json_decode($data, true);
 		foreach ($objects as $object)
 		{
-			if (false == is_null($data) && isset($data[$object]))
-				$o_out[$object] = $data[$object];
+			if (false == is_null($obj) && isset($obj[$object]))
+				$o_out[$object] = $obj[$object];
 			else
 				$o_out[$object] = null;
 		}
@@ -794,20 +825,6 @@ function jsf_readobj($i_file, &$o_out)
 		return;
 	}
 	readObj($i_file, $o_out);
-}
-
-function readObj($i_file, &$o_out)
-{
-	if (false == is_file($i_file))
-	{
-		$o_out['error'] = 'No such file ' . $i_file;
-		return;
-	}
-
-	if ($data = fileRead($i_file))
-		$o_out = json_decode($data, true);
-	else
-		$o_out['error'] = 'Unable to load file ' . $i_file;
 }
 
 function mergeObjs(&$o_obj, $i_obj)
@@ -998,7 +1015,8 @@ function jsf_editobj($i_edit, &$o_out)
 	}
 
 	// Read object:
-	$obj = json_decode(fileRead($i_edit['file']), true);
+	$obj = null;
+	readObj($i_edit['file'], $obj);
 
 	// Edit object:
 	if (array_key_exists('add', $i_edit) && ($i_edit['add'] == true))
@@ -1039,7 +1057,7 @@ function jsf_editobj($i_edit, &$o_out)
 	}
 
 	// Write object:
-	if (fileWrite($i_edit['file'], jsonEncode($obj)))
+	if (writeObj($i_edit['file'], $obj))
 	{
 		$o_out['status'] = 'success';
 		$o_out['object'] = $obj;
@@ -1250,10 +1268,10 @@ function makenews($i_args, &$io_users, &$o_out)
 
 		// Get existing recent:
 		$rfile = $i_args['root'] . $path . '/' . $i_args['rufolder'] . '/' . $i_args['recent_file'];
-		if (is_file($rfile))
-			if ($rdata = fileRead($rfile))
+		$obj = null;
+		if (readObj($rfile, $obj))
 			{
-				$rarray = json_decode($rdata, true);
+				$rarray = $obj;
 				if (is_null($rarray))
 					$rarray = array();
 				$count = count($rarray);
@@ -1291,7 +1309,7 @@ function makenews($i_args, &$io_users, &$o_out)
 		// Save recent:
 		if (false == is_dir(dirname($rfile)))
 			mkdir(dirname($rfile));
-		fileWrite($rfile, jsonEncode($rarray));
+		writeObj($rfile, $rarray);
 
 		// Exit cycle if path is root:
 		if (strlen($path) == 0) break;
@@ -1330,7 +1348,7 @@ function makenews($i_args, &$io_users, &$o_out)
 		}
 
 		// If user is assigned, it should receive news:
-		if (array_key_exists('status', $news))
+		if (array_key_exists('status', $news) && is_array($news['status']))
 			if (array_key_exists('artists', $news['status']))
 				if (in_array($user['id'], $news['status']['artists']))
 				{
@@ -1655,7 +1673,8 @@ function getallusers(&$o_out)
 		if (false === is_file("users/$entry")) continue;
 		if (strrpos($entry, '.json') !== (strlen($entry) - 5)) continue;
 
-		if ($user = json_decode(fileRead("users/$entry", true), true))
+		$user = null;
+		if (readObj("users/$entry", $user))
 			$o_out['users'][$user['id']] = $user;
 	}
 	closedir($dHandle);
