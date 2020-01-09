@@ -1,5 +1,7 @@
 <style type="text/css">
 
+#scenes_load_btn { font-size:18px; font-weight:bold; margin:20px; padding:20px; border-radius:16px;}
+
 #scenes_ctrl_panel { -float: right; margin: 2px 8px; font-size: 14px; }
 #scenes_ctrl_panel div { float: left; margin: 2px 4px; }
 #scenes_select_panel { border: 1px solid rgba(98,98,98,.5); border-radius: 2px; font-size: 12px;}
@@ -100,6 +102,9 @@ position: relative;
 
 </style>
 
+<div id="scenes_load_btn" class="button">Load</div>
+
+<div id="scenes_show_loaded" style="display:none;">
 <div id="scenes_ctrl_panel" style="float:right;">
 	<div id="scenes_select_panel">
 		<div>Select:</div>
@@ -139,5 +144,6 @@ position: relative;
 		Tasks / Reports Difference:
 		<div id="scenes_differ"></div>
 	</div>
+</div>
 </div>
 

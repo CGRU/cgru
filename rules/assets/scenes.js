@@ -44,12 +44,28 @@ function sc_InitHTML( i_data)
 
 	if( sc_scenes )
 	{
-		scenes_Show();
+		$('scenes_load_btn').textContent = 'Load All Shots';
+		$('scenes_load_btn').onclick = function()
+		{
+			sc_Show_Loaded();
+			scenes_Show();
+		}
 	}
 	else
 	{
-		scene_Show();
+		$('scenes_load_btn').textContent = 'Load Scene Shots';
+		$('scenes_load_btn').onclick = function()
+		{
+			sc_Show_Loaded();
+			scene_Show();
+		}
 	}
+}
+
+function sc_Show_Loaded()
+{
+	$('scenes_load_btn').style.display = 'none';
+	$('scenes_show_loaded').style.display = 'block';
 }
 
 function sc_Post()
