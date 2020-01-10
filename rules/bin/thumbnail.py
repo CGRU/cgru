@@ -290,6 +290,9 @@ if Options.debug:
     sys.exit(0)
 
 for cmd in Cmds:
-    os.system(cmd)
+    if Options.verbose:
+        os.system(cmd)
+    else:
+        os.system(cmd + ' > /dev/null 2>&1')
 
 print(json.dumps(out))
