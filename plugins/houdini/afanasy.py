@@ -28,6 +28,7 @@ class BlockParameters:
         self.afnode = afnode
         self.ropnode = None
         self.subblock = subblock
+        self.single_task = False
         self.frame_pertask = 1
         self.frame_sequential = 1
         self.prefix = prefix
@@ -54,8 +55,13 @@ class BlockParameters:
         self.soho_outputmode = None
 
         # Get parameters:
-        self.frame_pertask = int(afnode.parm('frame_pertask').eval())
-        self.frame_sequential = int(afnode.parm('frame_sequential').eval())
+        self.single_task = bool(afnode.parm('single_task').eval())
+        if self.single_task:
+            self.frame_pertask = self.frame_last - self.frame_first + 1
+            self.frame_sequential = 1
+        else:
+            self.frame_pertask = int(afnode.parm('frame_pertask').eval())
+            self.frame_sequential = int(afnode.parm('frame_sequential').eval())
         self.job_name = str(afnode.parm('job_name').eval())
         self.job_branch = ''
         self.start_paused = int(afnode.parm('start_paused').eval())
