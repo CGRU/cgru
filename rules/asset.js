@@ -273,7 +273,7 @@ function a_ShowHeaders()
 		var elName = document.createElement('span');
 		elHeader.appendChild(elName);
 		elName.classList.add('name');
-		elName.textContent = a_name;
+		elName.innerHTML = c_HighlightBadChars(a_name);
 		//		elName.href = href;
 	}
 }
