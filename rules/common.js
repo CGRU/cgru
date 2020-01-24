@@ -882,6 +882,56 @@ function c_MakeThumbnail(i_file, i_func)
 	n_Request({"send": {"cmdexec": {"cmds": [cmd]}}, "func": i_func, "file": i_file, "info": 'thumbnail'});
 }
 
+var c_file_good_symbols = ['_','-','.'];
+function c_IsFileGoodChar(i_char)
+{
+	var code = i_char.charCodeAt(0);
+
+	// Not ASCII
+	if (code >= 128)
+		return false;
+
+	// 0-9 (48-57)
+	if (code <= 57 && code >= 48)
+		return true;
+
+	// A-Z (65-90)
+	if (code <= 90 && code >= 65)
+		return true;
+
+	// A-Z (97-122)
+	if (code <= 122 && code >= 97)
+		return true;
+
+	if (c_file_good_symbols.indexOf(i_char) != -1)
+		return true;
+
+	return false;
+}
+
+function c_HighlightBadChars(i_file)
+{
+	var o_file = '';
+
+	for (let c = 0; c < i_file.length; c++)
+	{
+		let ch = i_file.charAt(c);
+		let bad = false == c_IsFileGoodChar(ch);
+
+		if (bad)
+		{
+			o_file += '<span class="file_bad_char">';
+			if (ch == ' ')
+				ch = '_';
+		}
+		o_file += ch;
+		if (bad)
+			o_file += '</span>';
+	}
+
+	return o_file;
+}
+
 /* ---------------- [ Path transposing functions ] ------------------------------------------------------- */
 
 function c_PathBase(i_file)

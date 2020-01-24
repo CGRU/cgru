@@ -392,6 +392,8 @@ clear:both;
 float:none;
 }
 
+.file_bad_char { color: #FF0000; font-weight: bold; }
+
 .progress, .progressbar { /*border-radius: 3px;*/ box-shadow: 0 0 1px #000 inset; }
 .progress { position: relative; background-color: rgba(0,0,0,.5); }
 

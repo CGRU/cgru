@@ -564,7 +564,7 @@ function g_AppendFolder(i_elParent, i_fobject)
 	var elName = document.createElement('a');
 	elFBody.appendChild(elName);
 	elName.classList.add('fname');
-	elName.textContent = folder;
+	elName.innerHTML = c_HighlightBadChars(folder);
 
 	var elPercent = document.createElement('div');
 	elFBody.appendChild(elPercent);
