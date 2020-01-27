@@ -68,18 +68,18 @@ BranchSrv::BranchSrv(const std::string & i_store_dir):
 	delete [] data;
 }
 
-bool BranchSrv::setParent(BranchSrv * i_parent)
+void BranchSrv::setParent(BranchSrv * i_parent)
 {
 	if (NULL != m_parent)
 	{
 		AF_ERR << "BranchSrv::setParent: Branch['" << m_name << "'] already has a parent.";
-		return false;
+		return;
 	}
 
 	if (m_name == "/")
 	{
 		AF_ERR << "BranchSrv::setParent: Root branch should not have any parent.";
-		return false;
+		return;
 	}
 
 	m_parent = i_parent;
