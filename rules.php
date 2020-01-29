@@ -300,10 +300,10 @@ function processUser($i_arg, &$o_out)
 	if (USER_ID == null) return;
 
 	$filename = $dirname . '/' . USER_ID . '.json';
-	$user = array();
+	$user = null;
+	if (false == readObj($filename, $user))
+		$user = array();
 
-	if (is_file($filename))
-		readObj($filename, $user);
 	if (array_key_exists('error', $user))
 		$o_out['error'] = $user['error'];
 
