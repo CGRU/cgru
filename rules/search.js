@@ -320,6 +320,12 @@ function s_ProcessGUI()
 	$('search').m_path = g_CurPath();
 
 	var args = {};
+
+	// Depth:
+	if (c_Strip($('search_depth').textContent).length)
+		args.depth = parseInt(c_Strip($('search_depth').textContent));
+
+	// Annotation:
 	if (c_Strip($('search_annotation').textContent).length)
 		args.ann = c_Strip($('search_annotation').textContent);
 
@@ -414,6 +420,11 @@ function s_Search(i_args)
 	if (i_args == null)
 		i_args = {};
 
+	if (i_args.depth)
+		$('search_depth').textContent = i_args.depth;
+	else
+		i_args.depth = 1;
+
 	var anns = null;
 	if (i_args.ann)
 		$('search_annotation').textContent = i_args.ann;
@@ -475,13 +486,17 @@ function s_Search(i_args)
 			args.body = i_args['body'];
 			continue;
 		}
+		if (arg == 'depth')
+		{
+			args.depth = i_args['depth'];
+			continue;
+		}
 		if (args.status == null)
 			args.status = {};
 		args.status[arg] = i_args[arg];
 	}
 	args.path = RULES.root + g_CurPath();
 	args.rufolder = RULES.rufolder;
-	args.depth = 4;
 
 	n_Request({"send": {"search": args}, "func": s_ResultReceived});
 	$('search').classList.add('waiting');
