@@ -166,7 +166,7 @@ function readObj($i_file, &$o_out, $i_lock = true)
 
 function fileWrite($i_filename, $i_data, $i_lock = true, $i_verbose = false)
 {
-	$tmp_name = "$i_filename.tmp";
+	$tmp_name = $i_filename.'.'.getmypid();
 	$fHandle = fopen($tmp_name, 'w');
 	if ($fHandle === false)
 	{
@@ -667,9 +667,13 @@ function walkDir($i_recv, $i_dir, &$o_out, $i_depth)
 						if ($access)
 							array_push($o_out['rufiles'], $ruentry);
 
-						if (strrpos($ruentry, '.json') === false) continue;
-
+						// No rufiles specified to read objects to
 						if (is_null($rufiles)) continue;
+
+						// Ensure in '.json' extension
+						if (substr($ruentry, -5) != '.json') continue;
+
+						// Check that file is specified in rufiles array
 						$found = false;
 						foreach ($rufiles as $rufile)
 							if (strpos($ruentry, $rufile) === 0)
@@ -679,6 +683,7 @@ function walkDir($i_recv, $i_dir, &$o_out, $i_depth)
 							}
 						if (false == $found) continue;
 
+						// Read object from rufile
 						$obj = null;
 						if (readObj($path . '/' . $ruentry, $obj, false))
 							$o_out['rules'][$ruentry] = $obj;
