@@ -192,7 +192,7 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 	        m_address_ip_str = render->getAddress().generateIPString().c_str();
 	        m_address_str = render->getAddress().v_generateInfoString().c_str();
 
-			m_info_text_render += " IP: <b>" + m_address_ip_str + "</b>";
+			m_info_text_render += "<br>IP: <b>" + m_address_ip_str + "</b>";
 		}
 
 		bool becameOnline = false;
@@ -418,8 +418,8 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 	    m_update_counter++;
 
 		m_info_text_hres.clear();
-		m_info_text_hres += QString(" CPU: <b>%1</b> x<b>%2</b> MHz").arg(m_hres.cpu_mhz).arg(m_hres.cpu_num);
-		m_info_text_hres += QString(" MEM: <b>%1 Gb</b>").arg(m_hres.mem_total_mb>>10);
+		m_info_text_hres += QString("CPU: <b>%1</b> x<b>%2</b> MHz").arg(m_hres.cpu_mhz).arg(m_hres.cpu_num);
+		m_info_text_hres += QString("<br>MEM: <b>%1 Gb</b>").arg(m_hres.mem_total_mb>>10);
 		if( m_hres.swap_total_mb )
 			m_info_text_hres += QString(" Swap: <b>%1 Gb</b>").arg(m_hres.swap_total_mb>>10);
 
@@ -453,8 +453,9 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 
 void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const
 {
-	int x = i_rect.x(); int y = i_rect.y(); int w = i_rect.width(); int h = i_rect.height();
+	const int x = i_rect.x(); const int y = i_rect.y(); const int w = i_rect.width(); const int h = i_rect.height();
 
+	int y_cur = y;
 	int base_height = HeightBase;
 	int plot_y_offset = 4;
 	int plot_h = base_height - 5;
@@ -571,27 +572,30 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	{
 		i_painter->setPen(  afqt::QEnvironment::qclr_black);
 		i_painter->setFont( afqt::QEnvironment::f_info);
-		i_painter->drawText(x+5, y, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignRight, ann_state);
+		i_painter->drawText(x+5, y_cur, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignRight, ann_state);
 
 		QRect rect_center;
-		i_painter->drawText(x+5, y, w-10, HeightOffline,
+		i_painter->drawText(x+5, y_cur, w-10, HeightOffline,
 				Qt::AlignVCenter | Qt::AlignHCenter, offlineState_time, &rect_center);
-		i_painter->drawText(x+5, y, (w>>1)-10-(rect_center.width()>>1), HeightOffline,
+		i_painter->drawText(x+5, y_cur, (w>>1)-10-(rect_center.width()>>1), HeightOffline,
 				Qt::AlignVCenter | Qt::AlignLeft, m_name + ' ' + m_engine);
 
-		if (ListRenders::getDisplaySize() != ListRenders::ESmallSize)
-		{
-			if (false == m_annotation.isEmpty())
-				i_painter->drawText( x+5, y+2, w-10, h-4, Qt::AlignBottom | Qt::AlignHCenter, m_annotation);
+		y_cur += HeightOffline;
 
-			if (m_services.size() || m_services_disabled.size())
-				drawServices(i_painter, x+6, y+HeightOffline+2, w-12, HeightServices-4);
-		}
-		else
+		if (m_services.size() || m_services_disabled.size())
 		{
-			if (m_services.size() || m_services_disabled.size())
-				drawServices(i_painter, x+6, y+m_plots_height+2, w-12, HeightServices-4);
+			drawServices(i_painter, x+6, y_cur+2, w-12, HeightServices-4);
+			y_cur += HeightServices;
 		}
+
+		if (m_tickets_pool.size() || m_tickets_host.size())
+		{
+			drawTickets(i_painter, x+6, y_cur+2, w-12, HeightTickets-4);
+			y_cur += HeightTickets;
+		}
+
+		if (m_annotation.size())
+			i_painter->drawText( x+5, y_cur, w-10, HeightAnnotation-2, Qt::AlignVCenter | Qt::AlignHCenter, m_annotation);
 
 		return;
 	}
@@ -608,26 +612,26 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	case ListRenders::ESmallSize:
 		i_painter->setPen(clrTextInfo(i_option));
 		i_painter->setFont(afqt::QEnvironment::f_info);
-	    i_painter->drawText(left_text_x, y, left_text_w, h, Qt::AlignTop | Qt::AlignLeft,
+	    i_painter->drawText(left_text_x, y_cur, left_text_w, h, Qt::AlignTop | Qt::AlignLeft,
 				m_name + ' ' + m_capacity_usage + ' ' + users + ' ' + m_engine);
 
 		i_painter->setPen(clrTextInfo(i_option));
 		i_painter->setFont(afqt::QEnvironment::f_info);
-		i_painter->drawText(right_text_x, y, right_text_w, h, Qt::AlignTop | Qt::AlignRight, ann_state);
+		i_painter->drawText(right_text_x, y_cur, right_text_w, h, Qt::AlignTop | Qt::AlignRight, ann_state);
 
 		break;
 	default:
 		i_painter->setPen(clrTextMain(i_option));
 		i_painter->setFont(afqt::QEnvironment::f_name);
-	    i_painter->drawText(left_text_x, y, left_text_w, h, Qt::AlignTop | Qt::AlignLeft, m_name + ' ' + m_engine);
+	    i_painter->drawText(left_text_x, y_cur, left_text_w, h, Qt::AlignTop | Qt::AlignLeft, m_name + ' ' + m_engine);
 
 		i_painter->setPen(afqt::QEnvironment::qclr_black );
 		i_painter->setFont(afqt::QEnvironment::f_info);
-		i_painter->drawText(right_text_x, y+2, right_text_w, h, Qt::AlignTop | Qt::AlignRight, ann_state );
+		i_painter->drawText(right_text_x, y_cur+2, right_text_w, h, Qt::AlignTop | Qt::AlignRight, ann_state );
 
 		i_painter->setPen(clrTextInfo(i_option));
 		i_painter->setFont(afqt::QEnvironment::f_info);
-	    i_painter->drawText(left_text_x,  y, left_text_w,  base_height+2, Qt::AlignBottom | Qt::AlignLeft,  m_capacity_usage + ' ' + users);
+	    i_painter->drawText(left_text_x,  y_cur, left_text_w,  base_height+2, Qt::AlignBottom | Qt::AlignLeft,  m_capacity_usage + ' ' + users);
 	}
 	
 	// Print Bottom|Right
@@ -648,37 +652,58 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	}
 
 	// Print information under plotters:
+	y_cur += m_plots_height;
 	switch (ListRenders::getDisplaySize())
 	{
 	case  ListRenders::ESmallSize:
 	case  ListRenders::ENormalSize:
 		if (m_services.size() || m_services_disabled.size())
-			drawServices(i_painter, x+6, y+m_plots_height+2, w-12, HeightServices-4);
+		{
+			drawServices(i_painter, x+6, y_cur+2, w-12, HeightServices-4);
+			y_cur += HeightServices;
+		}
+		if (m_tickets_pool.size() || m_tickets_host.size())
+		{
+			drawTickets(i_painter, x+6, y_cur+2, w-12, HeightTickets-4);
+			y_cur += HeightTickets;
+		}
 		break;
 	case  ListRenders::EBigSize:
 	{
-		i_painter->drawText(x+5, y, w-10, m_plots_height + HeightAnnotation, Qt::AlignBottom | Qt::AlignLeft, m_tasks_users_counts);
+		i_painter->drawText(x+5, y_cur, w-10, HeightAnnotation, Qt::AlignBottom | Qt::AlignLeft, m_tasks_users_counts);
+		y_cur += HeightAnnotation;
 
 		if (m_services.size() || m_services_disabled.size())
-			drawServices(i_painter, x+6, y + m_plots_height + HeightAnnotation, w-12, HeightServices-4);
+		{
+			drawServices(i_painter, x+6, y_cur, w-12, HeightServices-4);
+			y_cur += HeightServices;
+		}
+		if (m_tickets_pool.size() || m_tickets_host.size())
+		{
+			drawTickets(i_painter, x+6, y_cur, w-12, HeightTickets-4);
+			y_cur += HeightTickets;
+		}
 
-	    if (false == m_annotation.isEmpty())
+	    if (m_annotation.size())
 		{
 			i_painter->setPen(afqt::QEnvironment::qclr_black);
 			i_painter->setFont( afqt::QEnvironment::f_info);
-			i_painter->drawText(x+5, y, w-10, h, Qt::AlignBottom | Qt::AlignRight, m_annotation);
+			i_painter->drawText(x+5, y_cur, w-10, h, Qt::AlignVCenter | Qt::AlignRight, m_annotation);
 		}
 
 		break;
 	}
 	default:
 	{
-		int task_heigh = 0;
-
 		if (m_services.size() || m_services_disabled.size())
 		{
-			drawServices(i_painter, x+6, y+m_plots_height+2, w-12, HeightServices-4);
-			task_heigh += HeightServices;
+			drawServices(i_painter, x+6, y_cur+2, w-12, HeightServices-4);
+			y_cur += HeightServices;
+		}
+		if (m_tickets_pool.size() || m_tickets_host.size())
+		{
+			drawTickets(i_painter, x+6, y_cur+2, w-12, HeightTickets-4);
+			y_cur += HeightTickets;
 		}
 
 	    std::list<af::TaskExec*>::const_iterator it = m_tasks.begin();
@@ -710,28 +735,31 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 				i_painter->setPen(Qt::NoPen );
 				i_painter->setOpacity(.5);
 				i_painter->setBrush(QBrush( afqt::QEnvironment::clr_done.c, Qt::SolidPattern));
-				i_painter->drawRect(x, y + m_plots_height + task_heigh + 2, (w-5)*m_tasks_percents[numtask]/100, HeightTask - 2);
+				i_painter->drawRect(x, y_cur+2, (w-5)*m_tasks_percents[numtask]/100, HeightTask - 2);
 				i_painter->setOpacity(1.0);
 			}
 
 			i_painter->setPen(clrTextInfo(i_option));
-			i_painter->drawText(x, y + m_plots_height + task_heigh, w-5, HeightTask,
+			i_painter->drawText(x, y_cur, w-5, HeightTask,
 					Qt::AlignVCenter | Qt::AlignRight, user_time, &rect_usertime );
-			i_painter->drawText(x+18, y + m_plots_height + task_heigh, w-30-rect_usertime.width(), HeightTask,
+			i_painter->drawText(x+18, y_cur, w-30-rect_usertime.width(), HeightTask,
 					Qt::AlignVCenter | Qt::AlignLeft, taskstr);
 
 			// Draw an icon only if pointer is not NULL:
 			if (*icons_it)
 			{
-	            i_painter->drawPixmap(x+5, y + m_plots_height + task_heigh, *(*icons_it));
+	            i_painter->drawPixmap(x+5, y_cur, *(*icons_it));
 			}
 
-			task_heigh += HeightTask;
+			y_cur += HeightTask;
 		}
 
-		i_painter->setPen(  afqt::QEnvironment::qclr_black);
-		i_painter->setFont( afqt::QEnvironment::f_info);
-		i_painter->drawText(x+5, y, w-10, h-1, Qt::AlignBottom | Qt::AlignHCenter, m_annotation);
+		if (m_annotation.size())
+		{
+			i_painter->setPen(afqt::QEnvironment::qclr_black);
+			i_painter->setFont(afqt::QEnvironment::f_info);
+			i_painter->drawText(x+5, y_cur, w-10, HeightAnnotation, Qt::AlignVCenter | Qt::AlignHCenter, m_annotation);
+		}
 	}
 	}
 

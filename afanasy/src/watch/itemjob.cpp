@@ -237,10 +237,10 @@ void ItemJob::updateInfo(const af::Job * i_job)
 	m_info_text.clear();
 
 	m_info_text = "Branch: <b>" + branch + "</b>";
-
-	m_info_text += "<br>Username: <b>" + username + "</b> Creation host: <b>" + hostname + "</b>";
-
+	m_info_text += "<br>Username: <b>" + username + "</b>";
+	m_info_text += "<br>Creation host: <b>" + hostname + "</b>";
 	m_info_text += "<br>Created at: <b>" + afqt::time2Qstr(time_creation) + "</b>";
+
 	if (time_started)
 		m_info_text += "<br>Started at: <b>" + afqt::time2Qstr(time_started) + "</b>";
 	if (time_done)

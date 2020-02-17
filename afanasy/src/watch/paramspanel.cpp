@@ -395,6 +395,8 @@ ParamTicket::ParamTicket(const QString & i_name, int i_count):
 	m_count_label = new QLabel();
 	layout->addWidget(m_count_label);
 
+	layout->addStretch();
+
 	QPushButton * btn = new QPushButton("[...]");
 	btn->setFixedSize(22, 16);
 	layout->addWidget(btn);
