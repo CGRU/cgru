@@ -53,10 +53,10 @@ public:
 
 	bool assignRender(RenderAf * i_render);
 
-	inline int getMaxTasksPerHost()    const
-		{ if (m_max_tasks_per_host     < 0 && m_parent) return m_parent->getMaxTasksPerHost();    else return m_max_tasks_per_host;   }
-	inline int getMaxCapacityPerHost() const
-		{ if (m_max_capacity_per_host  < 0 && m_parent) return m_parent->getMaxCapacityPerHost(); else return m_max_capacity_per_host;}
+	inline int getHostMaxTasks()    const
+		{ if (m_host_max_tasks < 0 && m_parent) return m_parent->getHostMaxTasks(); else return m_host_max_tasks; }
+	inline int getHostMaxCapacity() const
+		{ if (m_host_capacity  < 0 && m_parent) return m_parent->getHostCapacity(); else return m_host_capacity;}
 
 	inline bool newNimby()  const
 		{ if (!m_new_nimby  && m_parent) return m_parent->newNimby();  else return m_new_nimby; }

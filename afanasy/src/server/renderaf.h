@@ -36,8 +36,8 @@ public:
 /// Awake offline render
 	void online( RenderAf * render, JobContainer * i_jobs, MonitorContainer * monitoring);
 
-	inline int getMaxTasks()     const { return m_max_tasks == -1 ? m_parent->getMaxTasksPerHost()    : m_max_tasks;}
-	inline int getCapacity()     const { return m_capacity  == -1 ? m_parent->getMaxCapacityPerHost() : m_capacity;}
+	inline int getMaxTasks()     const { return m_max_tasks == -1 ? m_parent->getHostMaxTasks() : m_max_tasks;}
+	inline int getCapacity()     const { return m_capacity  == -1 ? m_parent->getHostCapacity() : m_capacity;}
 	inline int getCapacityFree() const { return getCapacity() - m_capacity_used;}
 	inline bool hasCapacity(int value) const {
 		int c = getCapacity(); if (c<0) return true; else return m_capacity_used + value <= c;}

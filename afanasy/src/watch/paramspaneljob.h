@@ -13,8 +13,12 @@ class QVBoxLayout;
 
 class Item;
 class ItemJob;
+class BlockCaptionWidget;
+class BlockInfo;
+class BlockInfoWidget;
 class FolderWidget;
 class FValueWidget;
+class ParamTicket;
 
 class ParamsPanelJob : public ParamsPanel
 {
@@ -29,22 +33,23 @@ private:
 	void constructFolders(ItemJob * i_item);
 	void clearFolders();
 
+	void updateBlocks(ItemJob * i_item);
+	void constructBlocks(ItemJob * i_item);
+	void clearBlocks();
+
 private slots:
 	void slot_Rules();
 
 private:
-	QFrame      * m_folders_frame;
-
 	QVBoxLayout * m_folders_layout;
-
-	QLabel      * m_folders_label;
-
 	QPushButton * m_rules_btn;
 	QString       m_rules_path;
-
 	QLabel      * m_folders_root;
-
 	QMap<QString, FolderWidget*> m_folders_map;
+
+	QVBoxLayout * m_blocks_layout;
+	QLabel * m_blocks_label;
+	QList<BlockCaptionWidget*> m_blocks_widgets;
 };
 
 class FolderWidget: public QWidget
@@ -84,5 +89,41 @@ protected:
 
 private:
 	QString m_text;
+};
+
+class BlockCaptionWidget: public QFrame
+{
+Q_OBJECT;
+public:
+	BlockCaptionWidget(const BlockInfo * i_info);
+	~BlockCaptionWidget();
+
+	void update();
+
+private slots:
+	void slot_OpenInfo();
+	void slot_CloseInfo();
+
+private:
+	const BlockInfo * m_info;
+	QVBoxLayout * m_layout;
+	QPushButton * m_btn_open;
+	QPushButton * m_btn_close;
+	BlockInfoWidget * m_info_widget;
+};
+
+class BlockInfoWidget: public QWidget
+{
+Q_OBJECT;
+public:
+	BlockInfoWidget(const BlockInfo * i_info);
+	~BlockInfoWidget();
+
+	void update();
+
+private:
+	const BlockInfo * m_info;
+	QVBoxLayout * m_layout;
+	QMap<QString, ParamTicket*> m_map_params_ticket;
 };
 

@@ -197,6 +197,65 @@ bool AfNodeFarm::actionFarm(Action & i_action)
 	i_action.answer = "Unknown farm operation mode: " + mode;
 }
 
+bool AfNodeFarm::actionTicket(Action & i_action)
+{
+	const JSON & operation = (*i_action.data)["operation"];
+
+	std::string tk_name;
+	if (false == af::jr_string("name", tk_name, operation))
+	{
+		appendLog("Ticket name is not specified by " + i_action.author);
+		i_action.answer_kind = "error";
+		i_action.answer = "Ticket name is not specified.";
+		return false;
+	}
+
+	int32_t tk_count;
+	if (false == af::jr_int32("count", tk_count, operation))
+	{
+		appendLog("Ticket count is not specified by " + i_action.author);
+		i_action.answer_kind = "error";
+		i_action.answer = "Ticket count is not specified.";
+		return false;
+	}
+
+	bool tk_host = false;
+	af::jr_bool("host", tk_host, operation);
+
+	std::map<std::string, int32_t> * tickets;
+	if (tk_host)
+	{
+		tickets = &m_farm->m_tickets_host;
+	}
+	else
+	{
+		if (m_type != TPool)
+		{
+			appendLog("This node['" + name() + "'] is not a pool (by " + i_action.author + ")");
+			i_action.answer_kind = "error";
+			i_action.answer = "Node['" + name() + "'] is not a pool.";
+			return false;
+		}
+		tickets = &m_farm->m_tickets_pool;
+	}
+
+	if (tk_count == -1)
+	{
+		size_t size = tickets->erase(tk_name);
+		if (size == 0)
+		{
+			appendLog("This node['" + name() + "'] has no '" + tk_name + "' ticket (by " + i_action.author + ")");
+			i_action.answer_kind = "error";
+			i_action.answer = "Node['" + name() + "'] has no '" + tk_name + "' ticket.";
+			return false;
+		}
+	}
+	else
+		(*tickets)[tk_name] = tk_count;
+
+	return true;
+}
+
 bool AfNodeFarm::hasService(const std::string & i_service_name) const
 {
 	for (const std::string & s : m_farm->m_services)

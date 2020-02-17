@@ -50,13 +50,14 @@ public:
 	inline int32_t getRendersNum()   const { return m_renders_num;   }
 	inline int32_t getRendersTotal() const { return m_renders_total; }
 
-	inline int getRunTasks()        const { return m_run_tasks;         }
-	inline int getMaxTasks()        const { return m_max_tasks;         }
-	inline int getMaxTasksPerHost() const { return m_max_tasks_per_host;}
+	inline int getRunTasks()    const { return m_run_tasks;   }
+	inline int getRunCapacity() const { return m_run_capacity;}
 
-	inline int getRunCapacity()        const { return m_run_capacity;         }
-	inline int getMaxCapacity()        const { return m_max_capacity;         }
-	inline int getMaxCapacityPerHost() const { return m_max_capacity_per_host;}
+	inline int getHostMaxTasks() const { return m_host_max_tasks;}
+	inline int getHostCapacity() const { return m_host_capacity; }
+
+	inline const std::map<std::string, int32_t> getTicketsPool() const {return m_tickets_pool;}
+	inline const std::map<std::string, int32_t> getTicketsHost() const {return m_tickets_host;}
 
 public:
 	enum State
@@ -103,12 +104,10 @@ protected:
 	int64_t m_time_empty;
 
 	int32_t m_run_tasks;
-	int32_t m_max_tasks;
-	int32_t m_max_tasks_per_host;
-
 	int32_t m_run_capacity;
-	int32_t m_max_capacity;
-	int32_t m_max_capacity_per_host;
+
+	int32_t m_host_max_tasks;
+	int32_t m_host_capacity;
 
 	int64_t m_task_start_finish_time; ///< Task start or finish time.
 

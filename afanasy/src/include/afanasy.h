@@ -70,6 +70,8 @@ namespace AFPOOL
 {
 const int MAXCOUNT = 1000;
 const char STORE_FOLDER[] = "pools";
+const int ROOT_HOST_MAX_TASKS = 4;
+const int ROOT_HOST_CAPACITY = 1100;
 }
 
 /// Users options:

@@ -30,6 +30,15 @@ public:
 	void removeRender(ItemRender * i_item_render);
 	void removePool(ItemPool * i_item_pool);
 
+public slots:
+	void slot_ServiceAdd();
+	void slot_ServiceDisable();
+	void slot_ServiceEdit(QString i_mode, QString i_service);
+	void slot_TicketPoolAdd();
+	void slot_TicketHostAdd();
+	void slot_TicketPoolEdit(const QString & i_name);
+	void slot_TicketHostEdit(const QString & i_name);
+
 protected:
 	void contextMenuEvent( QContextMenuEvent *event);
 
@@ -87,11 +96,8 @@ private slots:
 	void actEjectTasks();
 	void actEjectNotMyTasks();
 
-	void actServiceAdd();
 	void actServiceRemove();
 	void actServiceEnable();
-	void actServiceDisable();
-	void editService(QString i_mode, QString i_service);
 	void actClearServices();
 
 	void actExit();
@@ -113,6 +119,9 @@ private:
 	void launchCmdStringExit(const QString & i_cmd, bool i_exit);
 	void calcTitle();
 	void setSpacing();
+
+	void ticketAdd(bool i_host_ticket);
+	void ticketEdit(const QString & i_name, bool i_host_ticket);
 
 private:
 	QMap<QString, ItemPool*> m_pools;

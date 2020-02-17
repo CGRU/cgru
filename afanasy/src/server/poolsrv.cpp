@@ -91,8 +91,8 @@ bool PoolSrv::initialize()
 		if (NULL == m_parent)
 		{
 			// The root pool is just created for the first time (not from store)
-			m_max_tasks_per_host = 4;
-			m_max_capacity_per_host = 1100;
+			m_host_max_tasks = AFPOOL::ROOT_HOST_MAX_TASKS;
+			m_host_capacity  = AFPOOL::ROOT_HOST_CAPACITY;
 		}
 
 		m_time_creation = time(NULL);
@@ -130,6 +130,11 @@ void PoolSrv::v_action(Action & i_action)
 		else if (type == "farm")
 		{
 			if (false == actionFarm(i_action))
+				return;
+		}
+		else if (type == "tickets")
+		{
+			if (false == actionTicket(i_action))
 				return;
 		}
 		else

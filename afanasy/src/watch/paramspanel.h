@@ -13,6 +13,7 @@ class QVBoxLayout;
 
 class Item;
 class Param;
+class ParamSeparator;
 class ParamWidget;
 
 
@@ -27,7 +28,7 @@ public:
 
 	virtual void v_updatePanel(Item * i_item = NULL);
 
-	void addParamWidget(ParamWidget * i_pw);
+	void addParamWidget(Param * i_param);
 
 	void updateParams();
 
@@ -80,6 +81,7 @@ private:
 	QLabel      * m_params_label;
 	QPushButton * m_params_btn_show;
 	QList<ParamWidget*> m_params_list;
+	QList<ParamSeparator*> m_separatos;
 
 	QFrame      * m_info_frame;
 	QVBoxLayout * m_info_layout;
@@ -114,3 +116,36 @@ private slots:
 private:
 };
 
+class ParamSeparator: public QWidget
+{
+public:
+	ParamSeparator(Param * i_param);
+	~ParamSeparator();
+
+	void update(int i_params_show);
+
+protected:
+	virtual void paintEvent(QPaintEvent *event);
+};
+
+
+class ParamTicket: public QWidget
+{
+Q_OBJECT
+public:
+	ParamTicket(const QString & i_name, int i_count);
+	~ParamTicket();
+
+	void update(int i_count);
+
+signals:
+	void sig_Edit(QString i_name);
+
+protected slots:
+	void slot_Edit();
+
+protected:
+	QString m_name;
+	QLabel * m_count_label;
+	int m_count;
+};

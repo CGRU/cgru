@@ -30,10 +30,14 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 const QString Watch::BtnName[WLAST] = { "null","Jobs","Users","Renders","Monitors"};
 const QString Watch::WndName[WLAST] = { "null","Jobs","Users","Renders","Monitors"};
 WndList* Watch::opened[WLAST] = {0,0,0,0,0};
+
+const int Watch::Icons_Size_Large = 48;
+const int Watch::Icons_Size_Small = 16;
 
 QLinkedList<Wnd*>      Watch::ms_windows;
 QLinkedList<Receiver*> Watch::ms_receivers;
@@ -43,6 +47,7 @@ QLinkedList<QWidget*>  Watch::ms_watchtaskswindows;
 
 QMap<QString, QPixmap *> Watch::ms_services_icons_large;
 QMap<QString, QPixmap *> Watch::ms_services_icons_small;
+QMap<QString, QPixmap *> Watch::ms_tickets_icons;
 
 QApplication * Watch::ms_app = NULL;
 Dialog * Watch::ms_d = NULL;
@@ -52,34 +57,81 @@ Watch::Watch( Dialog * pDialog, QApplication * pApplication)
    ms_app = pApplication;
    ms_d = pDialog;
 
-// Get services icons:
-   QDir dir( afqt::stoq( af::Environment::getCGRULocation()) + "/icons/software");
-   if( false == dir.exists()) return;
-   QFileInfoList files = dir.entryInfoList();
-   if( files.size() == 0) return;
-   for( int i = 0; i < files.size(); i++)
-   {
-      if( false == files[i].isFile()) continue;
-      if( ms_services_icons_large.contains( files[i].completeBaseName()) || ms_services_icons_small.contains( files[i].completeBaseName())) continue;
-      QPixmap icon( files[i].filePath());
-      if( icon.isNull())
-      {
-         AFERRAR("Invalid service icon:\n%s", files[i].filePath().toUtf8().data())
-         continue;
-      }
-      ms_services_icons_large[ files[i].completeBaseName()] = new QPixmap( icon.scaledToHeight( BlockInfo::Height,        Qt::SmoothTransformation));
-      ms_services_icons_small[ files[i].completeBaseName()] = new QPixmap( icon.scaledToHeight( BlockInfo::HeightCompact, Qt::SmoothTransformation));
-   }
+	// Load icons:
+	QString icons_path = afqt::stoq(af::Environment::getCGRULocation()) + "/icons";
+	// Load services icons:
+	loadIcons(ms_services_icons_small, icons_path + "/software", Icons_Size_Small);
+	loadIcons(ms_services_icons_large, icons_path + "/software", Icons_Size_Large);
+
+	// Load tickets icons:
+	loadIcons(ms_tickets_icons, icons_path + "/tickets", Icons_Size_Small);
 }
 
 Watch::~Watch()
 {
-// Delete services icons:
-   for( QMap<QString, QPixmap *>::iterator it = ms_services_icons_large.begin(); it != ms_services_icons_large.end(); it++) delete *it;
-   for( QMap<QString, QPixmap *>::iterator it = ms_services_icons_small.begin(); it != ms_services_icons_small.end(); it++) delete *it;
+	// Delete icons:
+	deleteIcons(ms_services_icons_large);
+	deleteIcons(ms_services_icons_small);
+	deleteIcons(ms_tickets_icons);
 }
 
 void Watch::destroy() { ms_d = NULL; }
+
+void Watch::loadIcons(QMap<QString, QPixmap*> & o_map, const QString & i_path, int i_height)
+{
+	QDir dir(i_path);
+	if(false == dir.exists())
+	{
+		AF_WARN << "Icons folder '" << afqt::qtos(i_path) << "' does not exist.";
+		return;
+	}
+
+	QFileInfoList files = dir.entryInfoList();
+	if (files.size() == 0)
+	{
+		AF_WARN << "Icons folder '" << afqt::qtos(i_path) << "' is empty.";
+		return;
+	}
+
+	int icons_loaded = 0;
+	for (int i = 0; i < files.size(); i++)
+	{
+		if (false == files[i].isFile())
+			continue;
+
+		QString name = files[i].completeBaseName();
+
+		if (o_map.contains(name))
+			continue;
+
+		QPixmap icon(files[i].filePath());
+		if (icon.isNull())
+		{
+			AF_ERR << "Invalid icon: '" << afqt::qtos(files[i].filePath()) << "'.";
+			continue;
+		}
+
+		o_map[name] = new QPixmap(icon.scaledToHeight(i_height, Qt::SmoothTransformation));
+
+		icons_loaded++;
+	}
+
+	if (icons_loaded)
+		AF_LOG << "Loaded " << icons_loaded << "*" << i_height << "px icons from '" << afqt::qtos(i_path) << "'.";
+	else
+		AF_WARN << "No icons loaded from '" << afqt::qtos(i_path) << "'.";
+}
+
+void Watch::deleteIcons(QMap<QString, QPixmap*> & o_map)
+{
+	QMapIterator <QString, QPixmap*> it(o_map);
+	while (it.hasNext())
+	{
+		it.next();
+		delete it.value();
+	}
+	o_map.clear();
+}
 
 QWidget * Watch::getWidget() { return (QWidget*)(ms_d);}
 

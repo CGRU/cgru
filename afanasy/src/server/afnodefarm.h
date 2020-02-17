@@ -22,6 +22,7 @@ public:
 
 	// On success return true for monitoring/storing
 	bool actionFarm(Action & i_action);
+	bool actionTicket(Action & i_action);
 
 protected:
 	PoolSrv * m_parent;

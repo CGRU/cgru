@@ -20,28 +20,26 @@ const int ItemJob::Height = 30;
 const int ItemJob::HeightThumbName = 12;
 const int ItemJob::HeightAnnotation = 12;
 
-ItemJob::ItemJob( ListJobs * i_list, af::Job * i_job, const CtrlSortFilter * i_ctrl_sf, bool i_notify):
+ItemJob::ItemJob(ListJobs * i_listjobs, af::Job * i_job, const CtrlSortFilter * i_ctrl_sf, bool i_notify):
 	ItemNode(i_job, TJob, i_ctrl_sf),
-	m_list( i_list),
-	m_blocks_num( i_job->getBlocksNum()),
+	m_listjobs(i_listjobs),
 	m_tasks_done( -1),
 	state(0)
 {
-	if( m_blocks_num == 0)
+	for (int b = 0; b < i_job->getBlocksNum(); b++)
 	{
-		AFERROR("ItemJob::ItemJob( Job *job, QWidget *parent): m_blocks_num == 0")
+		const af::BlockData * blockdata = i_job->getBlock(b);
+		BlockInfo * blockinfo = new BlockInfo(blockdata, this, m_listjobs);
+		QObject::connect(blockinfo, SIGNAL(sig_BlockAction(int, QString)), m_listjobs, SLOT(slot_BlockAction(int, QString)));
+		m_blocks.append(blockinfo);
+	}
+
+	if (m_blocks.size() == 0)
+	{
+		AF_ERR << "ItemJob::ItemJob: Zero blocks numer.";
 		return;
 	}
 
-	m_blockinfo = new BlockInfo[m_blocks_num];
-	for( int b = 0; b < m_blocks_num; b++)
-	{
-		const af::BlockData * block = i_job->getBlock(b);
-		m_blockinfo[b].setName( afqt::stoq( block->getName()));
-		m_blockinfo[b].setItem( this);
-		m_blockinfo[b].setBlockNumber( b);
-		m_blockinfo[b].setJobId( getId());
-	}
 
 	v_updateValues((af::Node*)i_job, af::Msg::TJobsList);
 
@@ -51,9 +49,10 @@ ItemJob::ItemJob( ListJobs * i_list, af::Job * i_job, const CtrlSortFilter * i_c
 
 ItemJob::~ItemJob()
 {
-	if( m_blockinfo  ) delete [] m_blockinfo;
+	for (int b = 0; b < m_blocks.size(); b++)
+		delete m_blocks[b];
 
-	for( int i = 0; i < m_thumbs.size(); i++)
+	for (int i = 0; i < m_thumbs.size(); i++)
 		delete m_thumbs[i];
 }
 
@@ -61,7 +60,7 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 {
 	af::Job *job = (af::Job*)i_afnode;
 
-	if( m_blocks_num != job->getBlocksNum())
+	if (m_blocks.size() != job->getBlocksNum())
 	{
 		AFERROR("ItemJob::v_updateValues: Blocks number mismatch, deleting invalid item.")
 		resetId();
@@ -125,10 +124,10 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 	compact_display = true;
 
 	m_tasks_done = 0;
-	for( int b = 0; b < m_blocks_num; b++)
+	for( int b = 0; b < m_blocks.size(); b++)
 	{
 		const af::BlockData * block = job->getBlock(b);
-		m_blockinfo[b].update(block, i_msgType);
+		m_blocks[b]->update(block, i_msgType);
 
 		if( block->getProgressAvoidHostsNum() > 0 )
 			compact_display = false;
@@ -136,7 +135,7 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 		if( b == 0 )
 			service = afqt::stoq( block->getService());
 
-		m_tasks_done += m_blockinfo[b].p_tasksdone;
+		m_tasks_done += m_blocks[b]->p_tasksdone;
 	}
 
 	if( time_started ) compact_display = false;
@@ -263,7 +262,7 @@ bool ItemJob::calcHeight()
 		block_height = BlockInfo::Height + 5;
 	}
 
-	m_height = Height + block_height*m_blocks_num;
+	m_height = Height + block_height*m_blocks.size();
 
 	if( false == m_annotation.isEmpty())
 	{
@@ -318,10 +317,10 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 		if (getId() != AFJOB::SYSJOB_ID)
 		{
 			int percentage = 0;
-			for (int b = 0; b < m_blocks_num; b++)
-				percentage += m_blockinfo[b].p_percentage;
+			for (int b = 0; b < m_blocks.size(); b++)
+				percentage += m_blocks[b]->p_percentage;
 
-			percentage /= m_blocks_num;
+			percentage /= m_blocks.size();
 			if ((percentage > 0) && (percentage < 100))
 			{
 				int sec_run = currenttime - time_started;
@@ -398,8 +397,8 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 		i_painter->drawText(x+3, y+26, runningTime);
 	}
 
-	for (int b = 0; b < m_blocks_num; b++)
-		m_blockinfo[b].paint( i_painter, i_option,
+	for (int b = 0; b < m_blocks.size(); b++)
+		m_blocks[b]->paint( i_painter, i_option,
 			x+5, y + Height + block_height*b + 3, w-12,
 			compact_display, itemColor);
 
@@ -430,7 +429,7 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 			tw -= ( x + xb ) - tx;
 			tx = x + xb;
 		}
-		int th = y + Height + block_height * m_blocks_num;
+		int th = y + Height + block_height * m_blocks.size();
 
 		i_painter->drawText(tx, th, tw, ItemJob::HeightThumbName, Qt::AlignRight | Qt::AlignVCenter, m_thumbs_paths[i]);
 
@@ -566,26 +565,6 @@ void ItemJob::v_setFilterType( int i_type )
 	}
 }
 
-void ItemJob::generateMenu( int id_block, QMenu * menu, QWidget * qwidget)
-{
-	if((id_block >= 0) && (id_block >= m_blocks_num))
-	{
-		AFERRAR("ListJobs::generateMenu: id_block >= m_blocks_num (%d>=%d)", id_block, m_blocks_num)
-		return;
-	}
-	m_blockinfo[ id_block >= 0 ? id_block : 0].generateMenu( id_block, menu, qwidget);
-}
-
-bool ItemJob::blockAction( std::ostringstream & i_str, int id_block, const QString & i_action, ListItems * listitems) const
-{
-	if((id_block >= 0) && (id_block >= m_blocks_num))
-	{
-		AFERRAR("ListJobs::blockAction: id_block >= m_blocks_num (%d>=%d)", id_block, m_blocks_num)
-		return false;
-	}
-	return m_blockinfo[ id_block >= 0 ? id_block : 0].blockAction( i_str, id_block, i_action, listitems);
-}
-
 void ItemJob::getThumbnail() const
 {
 	if( afqt::QEnvironment::thumb_jobs_num.n < 1 )
@@ -640,7 +619,7 @@ void ItemJob::v_filesReceived( const af::MCTaskUp & i_taskup)
 	}
 
 	if( false == calcHeight())
-		m_list->itemsHeightChanged();
+		m_listjobs->itemsHeightChanged();
 }
 
 const QString ItemJob::getRulesFolder()

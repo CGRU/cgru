@@ -436,6 +436,11 @@ void RenderAf::v_action( Action & i_action)
 		{
 			actionReassignPool(i_action);
 		}
+		else if (type == "tickets")
+		{
+			if (false == actionTicket(i_action))
+				return;
+		}
 		else
 		{
 			appendLog("Unknown operation \"" + type + "\" by " + i_action.author);

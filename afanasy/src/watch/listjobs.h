@@ -12,7 +12,7 @@ class ListJobs : public ListNodes
 	Q_OBJECT
 
 public:
-	ListJobs( QWidget* parent);
+	ListJobs(QWidget * i_parent);
 	~ListJobs();
 
 	bool v_caseMessage( af::Msg * msg);
@@ -48,8 +48,6 @@ private slots:
 	void actPreviewApproval();
 	void actNoPreviewApproval();
 
-	void blockAction( int id_block, QString i_action);
-
 	void actStart();
 	void actStop();
 	void actRestart();
@@ -71,6 +69,12 @@ private slots:
 
 	void actBrowseFolder( QString i_folder);
 	void actOpenRULES();
+
+	// Needed to store where a menu for all blocks manipulation opened
+	void slot_BlocksMenuForAll();
+	void slot_BlocksMenuNotAll();
+
+	void slot_BlockAction(int i_bum, QString i_json);
 
 private:
 
@@ -100,4 +104,7 @@ private:
 	static bool    ms_FilterInclude_SU;
 	static bool    ms_FilterMatch_SU;
 	static std::string ms_FilterString_SU;
+
+	// Needed to store where a menu for all blocks manipulation opened
+	bool m_all_blocks_menu_shown;
 };

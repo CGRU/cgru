@@ -34,6 +34,11 @@ const QString Param::varToQStr(const QVariant & i_var, bool * o_default) const
 
 	switch(type)
 	{
+	case tsep:
+	{
+		AF_ERR << "Param::varToQStr(): This parameters separator.";
+		break;
+	}
 	case TNum:
 	{
 		int64_t value = i_var.toLongLong();
@@ -73,7 +78,7 @@ const QString Param::varToQStr(const QVariant & i_var, bool * o_default) const
 		break;
 	}
 	default:
-		AF_ERR << "Unknown parameter '" << name.toUtf8().data() << "' type: " << type;
+		AF_ERR << "Param::varToQStr(): Unknown parameter '" << name.toUtf8().data() << "' type: " << type;
 	}
 
 	if (o_default)
@@ -82,16 +87,20 @@ const QString Param::varToQStr(const QVariant & i_var, bool * o_default) const
 	return str;
 }
 
-bool Param::getInputDialog(const QVariant & i_var, QString & o_str) const
+bool Param::getInputDialog(const QVariant & i_var, QString & o_str, QWidget * i_parent) const
 {
-	bool ok;
-	QWidget * qParent = Watch::getWidget();
+	bool ok = false;
 	switch(type)
 	{
+	case tsep:
+	{
+		AF_ERR << "Param::varToQStr(): This parameters separator.";
+		break;
+	}
 	case TNum:
 	{
 		int64_t current = i_var.toLongLong();
-		int64_t value = QInputDialog::getInt(qParent, label, tip, current, min, max, 1, &ok);
+		int64_t value = QInputDialog::getInt(i_parent, label, tip, current, min, max, 1, &ok);
 		if (ok)
 			o_str = QString("%1").arg(value);
 		break;
@@ -99,7 +108,7 @@ bool Param::getInputDialog(const QVariant & i_var, QString & o_str) const
 	case TStr:
 	{
 		QString current = i_var.toString();
-		QString value = QInputDialog::getText(qParent, label, tip, QLineEdit::Normal, current, &ok);
+		QString value = QInputDialog::getText(i_parent, label, tip, QLineEdit::Normal, current, &ok);
 		if (ok)
 			o_str = QString("\"%1\"").arg(value);
 		break;
@@ -107,7 +116,7 @@ bool Param::getInputDialog(const QVariant & i_var, QString & o_str) const
 	case TREx:
 	{
 		QString current = i_var.toString();
-		QString value = QInputDialog::getText(qParent, label, tip, QLineEdit::Normal, current, &ok);
+		QString value = QInputDialog::getText(i_parent, label, tip, QLineEdit::Normal, current, &ok);
 		if (ok)
 		{
 			std::string err;
@@ -132,7 +141,7 @@ bool Param::getInputDialog(const QVariant & i_var, QString & o_str) const
 
 		QString _tip = tip + "\n" + afqt::QEnvironment::getDateTimeFormat();
 		QString current = qdt.toString(afqt::QEnvironment::getDateTimeFormat());
-		QString value = QInputDialog::getText(qParent, label, _tip, QLineEdit::Normal, current, &ok);
+		QString value = QInputDialog::getText(i_parent, label, _tip, QLineEdit::Normal, current, &ok);
 		if (ok)
 		{
 			if ((value.size() == 0) || (value == "0"))
@@ -158,7 +167,7 @@ bool Param::getInputDialog(const QVariant & i_var, QString & o_str) const
 
 		QString _tip = tip + "\nEnter number of hours";
 		double current = double(time) / (60.0 * 60.0);
-		double value = QInputDialog::getDouble(qParent, label, _tip, current, -1, 1<<30, 1, &ok);
+		double value = QInputDialog::getDouble(i_parent, label, _tip, current, -1, 1<<30, 1, &ok);
 
 		if (ok)
 		{
@@ -175,4 +184,3 @@ bool Param::getInputDialog(const QVariant & i_var, QString & o_str) const
 
 	return ok;
 }
-

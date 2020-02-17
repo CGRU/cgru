@@ -345,7 +345,7 @@ void ListNodes::actPriority()
 	int priority = QInputDialog::getInt( this, "Change Priority", "Enter New Priority", current, 0, maximum, 1, &ok);
 	if( !ok) return;
 
-	setParameter(Item::TAny, "priority", priority);
+	setParameter(Item::TAny, "priority", af::itos(priority));
 }
 
 void ListNodes::actAnnotate()

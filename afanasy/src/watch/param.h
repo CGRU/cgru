@@ -10,11 +10,12 @@ class Param
 {
 public:
 	enum EType {
-		TNum = 0,
-		TStr = 1,
-		TREx = 2,
-		Time = 3,
-		THrs = 4
+		tsep = 0,
+		TNum = 1,
+		TStr = 2,
+		TREx = 3,
+		Time = 4,
+		THrs = 5
 	};
 
 	Param(EType i_type, Item::EType i_itemtype, const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = -1);
@@ -28,6 +29,7 @@ public:
 	const int min;
 	const int max;
 
+	bool isSeparator() const {return type == tsep;}
 
 	// Convert variable to string.
 	// Default is true if value is default,
@@ -36,6 +38,5 @@ public:
 
 
 	// Get value from input dialog.
-	bool getInputDialog(const QVariant & i_var, QString & o_str) const;
+	bool getInputDialog(const QVariant & i_var, QString & o_str, QWidget * i_parent) const;
 };
-

@@ -19,12 +19,22 @@ public:
 
 	static const int HeightServices = 24;
 
+	static const int HeightTickets = 24;
+
 	static const int DepthOffset = 32;
 
 	QList<QString> m_services;
 	QList<QString> m_services_disabled;
 
 	void drawServices(QPainter * i_painter, int i_x, int i_y, int i_w, int i_h) const;
+
+	QMap<QString, int> m_tickets_pool;
+	QMap<QString, int> m_tickets_host;
+
+	void drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int i_h) const;
+
+protected:
+	int calcHeightFarm() const;
 
 private:
 	int m_depth;

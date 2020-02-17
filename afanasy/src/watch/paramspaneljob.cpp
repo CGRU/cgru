@@ -2,6 +2,7 @@
 
 #include <QClipboard>
 #include <QBoxLayout>
+#include <QInputDialog>
 #include <QFrame>
 #include <QGuiApplication>
 #include <QLabel>
@@ -21,19 +22,20 @@
 
 ParamsPanelJob::ParamsPanelJob()
 {
-	m_folders_frame = new QFrame();
-	getPublicLayout()->insertWidget(0, m_folders_frame);
-	m_folders_frame->setFrameShape(QFrame::StyledPanel);
-	m_folders_frame->setFrameShadow(QFrame::Plain);
+	// Construct folders widgets:
+	QFrame * folders_frame = new QFrame();
+	getPublicLayout()->insertWidget(0, folders_frame);
+	folders_frame->setFrameShape(QFrame::StyledPanel);
+	folders_frame->setFrameShadow(QFrame::Plain);
 
-	m_folders_layout = new QVBoxLayout(m_folders_frame);
+	m_folders_layout = new QVBoxLayout(folders_frame);
 	m_folders_layout->setSpacing(0);
 
 	QHBoxLayout * hlayout = new QHBoxLayout();
 	m_folders_layout->addLayout(hlayout);
 
-	m_folders_label = new QLabel("<b>Folders</b>");
-	hlayout->addWidget(m_folders_label);
+	QLabel * folders_label = new QLabel("<b>Folders</b>");
+	hlayout->addWidget(folders_label);
 
 	m_rules_btn = new QPushButton("RULES");
 	hlayout->addWidget(m_rules_btn);
@@ -49,6 +51,19 @@ ParamsPanelJob::ParamsPanelJob()
 	m_folders_layout->addSpacing(4);
 
 	connect(m_rules_btn, SIGNAL(clicked()), this, SLOT(slot_Rules()));
+
+	// Constuct blocks widgets:
+	QFrame * blocks_frame = new QFrame();
+	blocks_frame->setContentsMargins(0, 0, 0, 0);
+	getPublicLayout()->insertWidget(1, blocks_frame);
+
+	m_blocks_layout = new QVBoxLayout(blocks_frame);
+	m_blocks_layout->setContentsMargins(0, 0, 0, 0);
+	m_blocks_layout->setSpacing(2);
+
+	m_blocks_label = new QLabel("<b>Blocks</b>");
+	m_blocks_label->setContentsMargins(10, 4, 10, 4);
+	m_blocks_layout->addWidget(m_blocks_label);
 }
 
 ParamsPanelJob::~ParamsPanelJob()
@@ -60,9 +75,17 @@ void ParamsPanelJob::v_updatePanel(Item * i_item)
 	ItemJob * job_item = (ItemJob*)(i_item);
 
 	if (job_item)
+	{
+		m_blocks_label->setHidden(true);
 		constructFolders(job_item);
+		updateBlocks(job_item);
+	}
 	else
+	{
+		m_blocks_label->setHidden(false);
 		clearFolders();
+		clearBlocks();
+	}
 
 	ParamsPanel::v_updatePanel(job_item);
 }
@@ -168,6 +191,42 @@ void ParamsPanelJob::slot_Rules()
 	Watch::startProcess(cmd);
 }
 
+void ParamsPanelJob::updateBlocks(ItemJob * i_item)
+{
+	// (Re)Construct blocks, if job ID or blocks number is changed
+	if ((m_cur_item && (m_cur_item->getId() != i_item->getId())) ||
+		(m_blocks_widgets.size() != i_item->getBlocksNum()))
+	{
+		constructBlocks(i_item);
+		return;
+	}
+
+	for (int b = 0; b < m_blocks_widgets.size(); b++)
+		m_blocks_widgets[b]->update();
+}
+
+void ParamsPanelJob::constructBlocks(ItemJob * i_item)
+{
+	if (m_blocks_widgets.size())
+		clearBlocks();
+
+	for (int b = 0; b < i_item->getBlocksNum(); b++)
+	{
+		BlockCaptionWidget * bw = new BlockCaptionWidget(i_item->getBlockInfo(b));
+		m_blocks_widgets.push_back(bw);
+		m_blocks_layout->addWidget(bw);
+	}
+}
+
+void ParamsPanelJob::clearBlocks()
+{
+	for (int b = 0; b < m_blocks_widgets.size(); b++)
+		delete m_blocks_widgets[b];
+	m_blocks_widgets.clear();
+}
+
+
+///////////// Folders:
 
 FolderWidget::FolderWidget(const QString & i_name, const QString & i_value, QLayout * i_layout):
 	m_name(i_name),
@@ -266,3 +325,146 @@ void FValueWidget::paintEvent(QPaintEvent *event)
 	painter.drawText(rect(), Qt::AlignVCenter | Qt::AlignRight, m_text);
 }
 
+
+
+//////////// Blocks:
+
+BlockCaptionWidget::BlockCaptionWidget(const BlockInfo * i_info):
+	m_info(i_info),
+	m_info_widget(NULL)
+{
+	setFrameShape(QFrame::StyledPanel);
+	setFrameShadow(QFrame::Plain);
+
+	m_layout = new QVBoxLayout(this);
+	m_layout->setContentsMargins(0, 0, 0, 0);
+
+	QWidget * top_widget = new QWidget();
+	m_layout->addWidget(top_widget);
+
+	QHBoxLayout * h_layout = new QHBoxLayout(top_widget);
+	h_layout->setContentsMargins(10, 2, 10, 2);
+
+	QLabel * label = new QLabel(QString("<b>%1</b>").arg(m_info->getName()));
+	h_layout->addWidget(label);
+
+	m_btn_open = new QPushButton("open");
+	m_btn_open->setFixedSize(48, 16);
+	h_layout->addWidget(m_btn_open);
+	connect(m_btn_open, SIGNAL(clicked()), this, SLOT(slot_OpenInfo()));
+
+	m_btn_close = new QPushButton("close");
+	m_btn_close->setFixedSize(48, 16);
+	m_btn_close->setHidden(true);
+	h_layout->addWidget(m_btn_close);
+	connect(m_btn_close, SIGNAL(clicked()), this, SLOT(slot_CloseInfo()));
+
+//slot_OpenInfo();
+}
+
+BlockCaptionWidget::~BlockCaptionWidget()
+{
+}
+
+void BlockCaptionWidget::slot_OpenInfo()
+{
+	if (m_info_widget)
+	{
+		AF_ERR << "Block already opened.";
+		return;
+	}
+
+	m_btn_open->setHidden(true);
+	m_btn_close->setHidden(false);
+
+	m_info_widget = new BlockInfoWidget(m_info);
+	m_layout->addWidget(m_info_widget);
+}
+
+void BlockCaptionWidget::slot_CloseInfo()
+{
+	if (NULL == m_info_widget)
+	{
+		AF_ERR << "Block is not opened.";
+		return;
+	}
+
+	m_btn_open->setHidden(false);
+	m_btn_close->setHidden(true);
+
+	delete m_info_widget;
+	m_info_widget = NULL;
+}
+
+void BlockCaptionWidget::update()
+{
+	if (m_info_widget)
+		m_info_widget->update();
+}
+
+BlockInfoWidget::BlockInfoWidget(const BlockInfo * i_info):
+	m_info(i_info)
+{
+	m_layout = new QVBoxLayout(this);
+
+	// Tickets:
+	QHBoxLayout * tcaplayout = new QHBoxLayout();
+	m_layout->addLayout(tcaplayout);
+
+	QLabel * ltickets = new QLabel("<b>Tickets</b>:");
+	tcaplayout->addWidget(ltickets);
+
+	QPushButton * btn_ticket_add = new QPushButton("add");
+	btn_ticket_add->setFixedSize(36, 16);
+	connect(btn_ticket_add, SIGNAL(clicked()), m_info, SLOT(slot_BlockTicketAdd()));
+	tcaplayout->addWidget(btn_ticket_add);
+
+	QMapIterator<QString, int> it(m_info->tickets);
+	while (it.hasNext())
+	{
+		it.next();
+		ParamTicket * pt = new ParamTicket(it.key(), it.value());
+		m_map_params_ticket[it.key()] = pt;
+		m_layout->addWidget(pt);
+		connect(pt, SIGNAL(sig_Edit(QString)), m_info, SLOT(slot_BlockTicketEdit(QString)));
+	}
+}
+
+BlockInfoWidget::~BlockInfoWidget()
+{
+}
+
+void BlockInfoWidget::update()
+{
+	// Update or delete tickets:
+	QMap<QString, ParamTicket*>::iterator pIt = m_map_params_ticket.begin();
+	while (pIt != m_map_params_ticket.end())
+	{
+		QMap<QString, int>::const_iterator bIt = m_info->tickets.find(pIt.key());
+		if (bIt == m_info->tickets.end())
+		{
+			delete pIt.value();
+			pIt = m_map_params_ticket.erase(pIt);
+		}
+		else
+		{
+			pIt.value()->update(bIt.value());
+			pIt++;
+		}
+	}
+
+	// Delete not exisintg tickets:
+	QMap<QString, int>::const_iterator bIt = m_info->tickets.begin();
+	while (bIt != m_info->tickets.end())
+	{
+		QMap<QString, ParamTicket*>::const_iterator pIt = m_map_params_ticket.find(bIt.key());
+		if (pIt == m_map_params_ticket.end())
+		{
+			ParamTicket * pt = new ParamTicket(bIt.key(), bIt.value());
+			m_map_params_ticket[bIt.key()] = pt;
+			m_layout->addWidget(pt);
+			connect(pt, SIGNAL(sig_Edit(QString)), m_info, SLOT(slot_BlockTicketEdit(QString)));
+		}
+		bIt++;
+	}
+}

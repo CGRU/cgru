@@ -376,17 +376,7 @@ void ListItems::getItemInfo(Item::EType i_type, const std::string & i_mode)
 	Watch::sendMsg( af::jsonMsg( str));
 }
 
-void ListItems::setParameterRE(Item::EType i_type, const std::string & i_name, const std::string & i_value)
-{
-	std::string err;
-
-	if (af::RegExp::Validate(i_value, &err))
-		setParameter(i_type, i_name, i_value, true);
-	else
-		displayError(afqt::stoq(err));
-}
-
-void ListItems::setParameter(Item::EType i_type, const std::string & i_name, const std::string & i_value, bool i_quoted)
+void ListItems::setParameter(Item::EType i_type, const std::string & i_name, const std::string & i_value)
 {
 	std::vector<int> ids = getSelectedIds(i_type);
 	if (ids.size() == 0)
@@ -395,18 +385,13 @@ void ListItems::setParameter(Item::EType i_type, const std::string & i_name, con
 		return;
 	}
 
-
 	displayInfo(QString("\"%1\" = \"%2\"").arg( afqt::stoq(i_name), afqt::stoq( i_value)));
 
 	std::ostringstream str;
 
 	af::jsonActionParamsStart(str, itemTypeToAf(i_type), "", ids);
 
-	str << "\n\"" << i_name << "\":";
-	if (i_quoted)
-		str << "\"" << af::strEscape(i_value) << "\"";
-	else
-		str << i_value;
+	str << "\n\"" << i_name << "\":" << i_value;
 
 	af::jsonActionParamsFinish( str);
 
@@ -522,6 +507,11 @@ void ListItems::addParam(Param * i_param)
 	m_params.append(i_param);
 }
 
+void ListItems::addParam_separator()
+{
+	addParam(new Param(Param::tsep, Item::TAny, "separator", "Separator", "This is parameters separator."));
+}
+
 void ListItems::addParam_Num(
 		Item::EType i_type,
 		const QString & i_name,
@@ -573,6 +563,12 @@ void ListItems::addMenuParameters(QMenu * i_menu)
 	QList<Param*>::const_iterator it;
 	for (it = m_params.begin(); it != m_params.end(); it++)
 	{
+		if ((*it)->isSeparator())
+		{
+			i_menu->addSeparator();
+			continue;
+		}
+
 		ActionParam * action = new ActionParam(*it);
 		connect(action, SIGNAL(triggeredParam(const Param *)), this, SLOT(changeParam(const Param *)));
 		i_menu->addAction(action);
@@ -594,13 +590,13 @@ void ListItems::changeParam(const Param * i_param)
 	QVariant var = item->getParamVar(i_param->name);
 
 	QString str;
-	if (false == i_param->getInputDialog(var, str))
+	if (false == i_param->getInputDialog(var, str, this))
 	{
 		if (false == str.isEmpty())
 			displayError(str);
 		return;
 	}
 
-	setParameter(i_param->itemtype, afqt::qtos(i_param->name), afqt::qtos(str), false);
+	setParameter(i_param->itemtype, afqt::qtos(i_param->name), afqt::qtos(str));
 }
 

@@ -249,10 +249,10 @@ void ListUsers::calcTitle()
 }
 
 void ListUsers::actDelete() { operation(Item::TUser, "delete"); }
-void ListUsers::actSolveJobsByOrder()    { setParameter(Item::TUser, "solve_method", "solve_order",    true); }
-void ListUsers::actSolveJobsByPriority() { setParameter(Item::TUser, "solve_method", "solve_priority", true); }
-void ListUsers::actSolveJobsByCapacity() { setParameter(Item::TUser, "solve_need",   "solve_capacity", true); }
-void ListUsers::actSolveJobsByTasksNum() { setParameter(Item::TUser, "solve_need",   "solve_tasksnum", true); }
+void ListUsers::actSolveJobsByOrder()    {setParameter(Item::TUser, "solve_method", "\"solve_order\""   ); }
+void ListUsers::actSolveJobsByPriority() {setParameter(Item::TUser, "solve_method", "\"solve_priority\""); }
+void ListUsers::actSolveJobsByCapacity() {setParameter(Item::TUser, "solve_need",   "\"solve_capacity\""); }
+void ListUsers::actSolveJobsByTasksNum() {setParameter(Item::TUser, "solve_need",   "\"solve_tasksnum\""); }
 
 void ListUsers::actRequestLog() { getItemInfo(Item::TAny, "log"); }
 

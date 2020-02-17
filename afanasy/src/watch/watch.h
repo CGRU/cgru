@@ -113,8 +113,11 @@ public:
 			const QString & i_wdir = QString(),
 			const std::map<std::string,std::string> & i_env_map = std::map<std::string,std::string>());
 
-	inline static const QPixmap * getServiceIconLarge( const QString & service_name) { return ms_services_icons_large.value( service_name, NULL);}
-	inline static const QPixmap * getServiceIconSmall( const QString & service_name) { return ms_services_icons_small.value( service_name, NULL);}
+	static const int Icons_Size_Large;
+	static const int Icons_Size_Small;
+	inline static const QPixmap * getServiceIconLarge(const QString & i_name) { return ms_services_icons_large.value(i_name, NULL);}
+	inline static const QPixmap * getServiceIconSmall(const QString & i_name) { return ms_services_icons_small.value(i_name, NULL);}
+	inline static const QPixmap * getTicketIcon(const QString & i_name) { return ms_tickets_icons.value(i_name, NULL);}
 
 	void static refreshGui();
 
@@ -125,6 +128,10 @@ public:
 	void static openTerminal(const QString & i_wdir = QString());
 
 	void static notify( const QString & i_title, const QString & i_msg = QString(), uint32_t i_state = 0);
+
+private:
+	void loadIcons(QMap<QString, QPixmap*> & o_map, const QString & i_path, int i_height);
+	void deleteIcons(QMap<QString, QPixmap*> & o_map);
 
 private:
 	static Dialog * ms_d;
@@ -139,4 +146,5 @@ private:
 
 	static QMap<QString, QPixmap *> ms_services_icons_large;
 	static QMap<QString, QPixmap *> ms_services_icons_small;
+	static QMap<QString, QPixmap *> ms_tickets_icons;
 };

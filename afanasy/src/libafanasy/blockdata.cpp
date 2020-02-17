@@ -199,6 +199,7 @@ void BlockData::jsonRead(const JSON &i_object, std::string *io_changes)
 	jr_int64("time_started" /***********/, m_time_started /***********/, i_object, io_changes);
 	jr_int64("time_done" /**************/, m_time_done /**************/, i_object, io_changes);
 	jr_stringmap("environment" /********/, m_environment /************/, i_object, io_changes);
+	jr_intmap("tickets",                   m_tickets,                    i_object, io_changes);
 
 	if (m_capacity < 1) m_capacity = 1;
 
@@ -422,6 +423,8 @@ void BlockData::jsonWrite(std::ostringstream &o_str, int i_type) const
 				o_str << ",\n\"hosts_mask_exclude\":\"" << m_hosts_mask_exclude.getPattern() << "\"";
 			if (hasNeedProperties())
 				o_str << ",\n\"need_properties\":\"" << m_need_properties.getPattern() << "\"";
+			if (m_tickets.size()) af::jw_intmap("tickets", m_tickets, o_str);
+
 			o_str << ',';
 
 		case Msg::TBlocksProgress:
@@ -581,6 +584,7 @@ void BlockData::v_readwrite(Msg *msg)
 			rw_int32_t(m_task_progress_change_timeout, msg);
 			rw_int32_t(m_task_max_run_time, msg);
 			rw_int32_t(m_task_min_run_time, msg);
+			rw_IntMap(m_tickets, msg);
 
 		case Msg::TBlocksProgress:
 
@@ -1479,4 +1483,12 @@ void BlockData::setTimeStarted(long long value, bool reset)
 void BlockData::setTimeDone(long long value)
 {
 	m_time_done = value;
+}
+
+void BlockData::editTicket(std::string & i_name, int32_t & i_count)
+{
+	if (i_count == -1)
+		m_tickets.erase(i_name);
+	else
+		m_tickets[i_name] = i_count;
 }

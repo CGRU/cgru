@@ -126,7 +126,7 @@ void ParamsPanel::initPanel(const QList<Param*> & i_params, QSplitter * i_splitt
 		// Add wiget to each parameter:
 		QList<Param*>::const_iterator it;
 		for (it = i_params.begin(); it != i_params.end(); it++)
-			addParamWidget(new ParamWidget(*it));
+			addParamWidget((*it));
 	}
 
 	// Set stored position:
@@ -207,27 +207,37 @@ void ParamsPanel::v_updatePanel(Item * i_item)
 		return;
 	}
 
-	AF_DEBUG << "ParamsPanel::update(): Item is not null";
-
 	m_name->setText(QString("<b>%1</b>").arg(m_cur_item->getName()));
 
 	m_info_text->setText(m_cur_item->v_getInfoText());
 	m_info_label->setHidden(true);
 }
 
-void ParamsPanel::addParamWidget(ParamWidget * i_pw)
+void ParamsPanel::addParamWidget(Param * i_param)
 {
-	m_params_layout->addWidget(i_pw);
-	m_params_list.append(i_pw);
-	i_pw->setHidden(true);
-	connect(i_pw, SIGNAL(sig_changeParam(const Param *)), this, SLOT(slot_changeParam(const Param *)));
+	if (i_param->isSeparator())
+	{
+		ParamSeparator * ps = new ParamSeparator(i_param);
+		m_params_layout->addWidget(ps);
+		m_separatos.append(ps);
+		return;
+	}
+	ParamWidget * pw = new ParamWidget(i_param);
+	m_params_layout->addWidget(pw);
+	m_params_list.append(pw);
+	pw->setHidden(true);
+	connect(pw, SIGNAL(sig_changeParam(const Param *)), this, SLOT(slot_changeParam(const Param *)));
 }
 
 void ParamsPanel::updateParams()
 {
-	QList<ParamWidget*>::iterator it;
-	for (it = m_params_list.begin(); it != m_params_list.end(); it++)
-		(*it)->update(m_cur_item, m_params_show);
+	QList<ParamWidget*>::iterator pIt;
+	for (pIt = m_params_list.begin(); pIt != m_params_list.end(); pIt++)
+		(*pIt)->update(m_cur_item, m_params_show);
+
+	QList<ParamSeparator*>::iterator sIt;
+	for (sIt = m_separatos.begin(); sIt != m_separatos.end(); sIt++)
+		(*sIt)->update(m_params_show);
 }
 
 void ParamsPanel::updateParamShowButton()
@@ -333,5 +343,78 @@ void ParamWidget::paintEvent(QPaintEvent * event)
 void ParamWidget::slot_Edit()
 {
 	emit sig_changeParam(m_param);
+}
+
+// Separator:
+ParamSeparator::ParamSeparator(Param * i_param)
+{
+	setFixedHeight(8);
+	setHidden(true);
+}
+
+ParamSeparator::~ParamSeparator(){}
+
+void ParamSeparator::update(int i_params_show)
+{
+	if (ParamsPanel::PS_ALL == i_params_show)
+		setHidden(false);
+	else
+		setHidden(true);
+}
+
+void ParamSeparator::paintEvent(QPaintEvent * event)
+{
+	QPainter painter(this);
+
+	QPen pen(Qt::SolidLine);
+	pen.setColor(afqt::QEnvironment::clr_Dark.c);
+	painter.setPen(pen);
+
+	painter.setOpacity(0.5);
+	painter.drawLine(0, 0, width(), 0);
+}
+
+ParamTicket::ParamTicket(const QString & i_name, int i_count):
+	m_name(i_name)
+{
+	QHBoxLayout * layout = new QHBoxLayout(this);
+	layout->setContentsMargins(0,0,0,0);
+
+	QLabel * lname = new QLabel(m_name);
+	lname->setTextInteractionFlags(Qt::TextBrowserInteraction);
+	layout->addWidget(lname);
+
+	const QPixmap * icon = Watch::getTicketIcon(m_name);
+	if (icon)
+	{
+		QLabel * licon = new QLabel();
+		licon->setPixmap(*icon);
+		layout->addWidget(licon);
+	}
+
+	m_count_label = new QLabel();
+	layout->addWidget(m_count_label);
+
+	QPushButton * btn = new QPushButton("[...]");
+	btn->setFixedSize(22, 16);
+	layout->addWidget(btn);
+	connect(btn, SIGNAL(clicked()), this, SLOT(slot_Edit()));
+
+	update(i_count);
+}
+
+ParamTicket::~ParamTicket()
+{
+}
+
+void ParamTicket::update(int i_count)
+{
+	m_count = i_count;
+	m_count_label->setText(QString(" x %1").arg(m_count));
+}
+
+void ParamTicket::slot_Edit()
+{
+	emit sig_Edit(m_name);
 }
 

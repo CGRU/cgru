@@ -865,7 +865,7 @@ bool Environment::initAfterLoad()
 	// Check whether server address is configured:
 	if(( servername == std::string(AFADDR::SERVER_NAME)) && ( isServer() != true ))
 	{
-		printf("WARNING: SERVER ADDRESS ID NOT CONFIGURED, USING %s\n", AFADDR::SERVER_NAME);
+		printf("WARNING: SERVER ADDRESS IS NOT CONFIGURED, USING %s\n", AFADDR::SERVER_NAME);
 	}
 
 	// Solve server name

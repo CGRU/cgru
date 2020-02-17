@@ -145,6 +145,7 @@ public:
 	{
 		return m_environment;
 	}
+	inline const std::map<std::string, int32_t> & getTickets() const { return m_tickets;}
 
 	inline bool hasDependMask() const { return m_depend_mask.notEmpty(); } ///< Whether depend mask is set.
 	inline bool hasTasksDependMask() const
@@ -283,6 +284,8 @@ public:
 
 	const TaskData * getTaskData(int i_num_task) const;
 
+	void editTicket(std::string & i_name, int32_t & i_count);
+
 protected:
 	/// Read or write block.
 	virtual void v_readwrite(Msg *msg);
@@ -330,6 +333,8 @@ protected:
 
 	std::string m_working_directory;				  ///< Block tasks working directory.
 	std::map<std::string, std::string> m_environment; ///< Block tasks extra environment.
+
+	std::map<std::string, int32_t> m_tickets;
 
 	std::string m_command_pre;  ///< Pre command.
 	std::string m_command_post; ///< Post command.

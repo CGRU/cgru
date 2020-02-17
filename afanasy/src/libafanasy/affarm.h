@@ -48,5 +48,6 @@ protected:
 	std::vector<std::string> m_services_disabled;
 
 	std::map<std::string, int32_t> m_tickets_pool;
+	std::map<std::string, int32_t> m_tickets_host;
 };
 }

@@ -35,13 +35,18 @@ void Farm::readwrite(Msg *msg)
 {
 	rw_StringVect(m_services,          msg);
 	rw_StringVect(m_services_disabled, msg);
+
+	rw_IntMap(m_tickets_pool, msg);
+	rw_IntMap(m_tickets_host, msg);
 }
 
 void Farm::jsonRead(const JSON &i_object, std::string *io_changes)
 {
 	jr_stringvec("services",          m_services,          i_object);
 	jr_stringvec("services_disabled", m_services_disabled, i_object);
-	jr_intmap   ("tickets_pool",      m_tickets_pool,      i_object);
+
+	jr_intmap("tickets_pool", m_tickets_pool, i_object);
+	jr_intmap("tickets_host", m_tickets_host, i_object);
 }
 
 void Farm::jsonWrite(std::ostringstream &o_str, int i_type) const
@@ -54,6 +59,9 @@ void Farm::jsonWrite(std::ostringstream &o_str, int i_type) const
 
 	if (m_tickets_pool.size())
 		jw_intmap("tickets_pool", m_tickets_pool, o_str);
+
+	if (m_tickets_host.size())
+		jw_intmap("tickets_host", m_tickets_host, o_str);
 }
 
 int Farm::calcWeight() const

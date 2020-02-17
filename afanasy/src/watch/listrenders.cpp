@@ -128,7 +128,7 @@ ListRenders::ListRenders( QWidget* parent):
 		bm = addButtonsMenu(Item::TAny, "Services","Add/Remove/Disable service(s).");
 
 		bp = addButtonPanel(Item::TAny, "ADD","service_add","Add a service.","", false);
-		connect(bp, SIGNAL(sigClicked()), this, SLOT(actServiceAdd()));
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_ServiceAdd()));
 
 		bp = addButtonPanel(Item::TAny, "REMOVE","service_remove","Remove services by mask.","", false);
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(actServiceRemove()));
@@ -137,7 +137,7 @@ ListRenders::ListRenders( QWidget* parent):
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(actServiceEnable()));
 
 		bp = addButtonPanel(Item::TAny, "DISABLE","service_disable","Disable services by mask.","", false);
-		connect(bp, SIGNAL(sigClicked()), this, SLOT(actServiceDisable()));
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_ServiceDisable()));
 
 		bp = addButtonPanel(Item::TAny, "CLEAR","clear_services",
 				"Clear services.\nServices settings will be taken from the parent pool.","", true);
@@ -180,13 +180,14 @@ ListRenders::ListRenders( QWidget* parent):
 
 	if (af::Environment::GOD())
 	{
-		addParam_REx(Item::TPool, "pattern",    "Pattern",    "Host names pattern regular expression");
-		addParam_Num(Item::TAny,  "priority",   "Priority",   "Priority number", 0, 250);
-		addParam_Str(Item::TAny,  "annotation", "Annotation", "Annotation string");
+		addParam_REx(Item::TPool, "pattern",        "Pattern",        "Host names pattern regular expression");
+		addParam_Num(Item::TAny,  "priority",       "Priority",       "Priority number", 0, 250);
+		addParam_Num(Item::TPool, "host_max_tasks", "Host Max Tasks", "Pool hosts Maximum running tasks", -1, 99);
+		addParam_Num(Item::TPool, "host_capacity",  "Host Capacity",  "Pool hosts Capacity", -1, 1<<30);
+		addParam_Str(Item::TAny,  "annotation",     "Annotation",     "Annotation string");
 	}
 
-	ParamsPanelFarm * paramspanelfarm = new ParamsPanelFarm();
-	connect(paramspanelfarm, SIGNAL(sig_EditService(QString, QString)), this, SLOT(editService(QString, QString)));
+	ParamsPanelFarm * paramspanelfarm = new ParamsPanelFarm(this);
 	m_paramspanel = paramspanelfarm;
 	initListNodes();
 
@@ -424,7 +425,9 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 			menu.addSeparator();
 			custom_submenu = new QMenu( "Custom", this);
 		}
-	  for( std::vector<std::string>::const_iterator it = af::Environment::getRenderCmdsAdmin().begin(); it != af::Environment::getRenderCmdsAdmin().end(); it++, custom_cmd_index++)
+	  for (std::vector<std::string>::const_iterator it = af::Environment::getRenderCmdsAdmin().begin();
+			  it != af::Environment::getRenderCmdsAdmin().end();
+			  it++, custom_cmd_index++)
 		{
 			ActionId * actionid = new ActionId( custom_cmd_index, QString("%1").arg( afqt::stoq(*it)), this);
 			connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actCommand( int ) ));
@@ -835,22 +838,22 @@ void ListRenders::actRenderReAssing()
 
 void ListRenders::actNewRenderNimby()
 {
-	setParameter(Item::TPool, "new_nimby", "true", false);
+	setParameter(Item::TPool, "new_nimby", "true");
 }
 
 void ListRenders::actNewRenderFree()
 {
-	setParameter(Item::TPool, "new_nimby", "false", false);
+	setParameter(Item::TPool, "new_nimby", "false");
 }
 
 void ListRenders::actNewRenderPaused()
 {
-	setParameter(Item::TPool, "new_paused", "true", false);
+	setParameter(Item::TPool, "new_paused", "true");
 }
 
 void ListRenders::actNewRenderReady()
 {
-	setParameter(Item::TPool, "new_paused", "false", false);
+	setParameter(Item::TPool, "new_paused", "false");
 }
 
 void ListRenders::actCapacity()
@@ -862,7 +865,7 @@ void ListRenders::actCapacity()
 	bool ok;
 	int capacity = QInputDialog::getInt(this, "Change Capacity", "Enter New Capacity", current, -1, 1000000, 1, &ok);
 	if( !ok) return;
-	setParameter(Item::TRender, "capacity", capacity);
+	setParameter(Item::TRender, "capacity", af::itos(capacity));
 }
 void ListRenders::actMaxTasks()
 {
@@ -873,14 +876,14 @@ void ListRenders::actMaxTasks()
 	bool ok;
 	int max_tasks = QInputDialog::getInt(this, "Change Maximum Tasksy", "Enter New Limit", current, -1, 1000000, 1, &ok);
 	if( !ok) return;
-	setParameter(Item::TRender, "max_tasks", max_tasks);
+	setParameter(Item::TRender, "max_tasks", af::itos(max_tasks));
 }
 
-void ListRenders::actNIMBY()       { setParameter(Item::TRender, "NIMBY",  "true",  false); }
-void ListRenders::actNimby()       { setParameter(Item::TRender, "nimby",  "true",  false); }
-void ListRenders::actFree()        { setParameter(Item::TRender, "nimby",  "false", false); }
-void ListRenders::actSetPaused()   { setParameter(Item::TRender, "paused", "true",  false); }
-void ListRenders::actUnsetPaused() { setParameter(Item::TRender, "paused", "false", false); }
+void ListRenders::actNIMBY()       {setParameter(Item::TRender, "NIMBY",  "true" );}
+void ListRenders::actNimby()       {setParameter(Item::TRender, "nimby",  "true" );}
+void ListRenders::actFree()        {setParameter(Item::TRender, "nimby",  "false");}
+void ListRenders::actSetPaused()   {setParameter(Item::TRender, "paused", "true" );}
+void ListRenders::actUnsetPaused() {setParameter(Item::TRender, "paused", "false");}
 
 void ListRenders::actUser()
 {
@@ -911,10 +914,10 @@ void ListRenders::actRequestTaskInfo(int jid, int bnum, int tnum)
 	WndTask::openTask( af::MCTaskPos( jid, bnum, tnum));
 }
 
-void ListRenders::actServiceAdd()    {editServiceDialog("service_add",     "Add Service");    }
-void ListRenders::actServiceRemove() {editServiceDialog("service_remove",  "Remove Service"); }
-void ListRenders::actServiceEnable() {editServiceDialog("service_enable",  "Enable Service"); }
-void ListRenders::actServiceDisable(){editServiceDialog("service_disable", "Disable Service");}
+void ListRenders::slot_ServiceAdd()    {editServiceDialog("service_add",     "Add Service");    }
+void ListRenders::actServiceRemove()   {editServiceDialog("service_remove",  "Remove Service"); }
+void ListRenders::actServiceEnable()   {editServiceDialog("service_enable",  "Enable Service"); }
+void ListRenders::slot_ServiceDisable(){editServiceDialog("service_disable", "Disable Service");}
 void ListRenders::editServiceDialog(const QString & i_mode, const QString & i_dialog_caption)
 {
 	if (getCurrentItem() == NULL)
@@ -929,6 +932,12 @@ void ListRenders::editServiceDialog(const QString & i_mode, const QString & i_di
 	if (false == ok)
 		return;
 
+	if (service_mask.isEmpty())
+	{
+		displayError("Empty service name/mask");
+		return;
+	}
+
 	std::string err;
 	if (false == af::RegExp::Validate(afqt::qtos(service_mask), &err))
 	{
@@ -936,9 +945,9 @@ void ListRenders::editServiceDialog(const QString & i_mode, const QString & i_di
 		return;
 	}
 
-	editService(i_mode, service_mask);
+	slot_ServiceEdit(i_mode, service_mask);
 }
-void ListRenders::editService(QString i_mode, QString i_service)
+void ListRenders::slot_ServiceEdit(QString i_mode, QString i_service)
 {
 	std::ostringstream str;
 	Item::EType type = Item::TAny;
@@ -960,6 +969,74 @@ void ListRenders::actClearServices()
 	std::vector<int> ids(getSelectedIds(type));
 	af::jsonActionOperationStart(str, itemTypeToAf(type), "farm", "", ids);
 	str << ",\n\"mode\":\"clear_services\"";
+	af::jsonActionOperationFinish(str);
+	Watch::sendMsg(af::jsonMsg(str));
+}
+
+void ListRenders::slot_TicketPoolAdd(){ticketAdd(false);}
+void ListRenders::slot_TicketHostAdd(){ticketAdd(true );}
+void ListRenders::ticketAdd(bool i_host_ticket)
+{
+	bool ok;
+	QString name = QInputDialog::getText(this,
+			QString("Add %1 Ticket").arg(i_host_ticket ? "Host" : "Pool"),
+			"Enter a new ticket name", QLineEdit::Normal, "", &ok);
+	if (false == ok)
+		return;
+
+	ticketEdit(name, i_host_ticket);
+}
+
+void ListRenders::slot_TicketPoolEdit(const QString & i_name){ticketEdit(i_name, false);}
+void ListRenders::slot_TicketHostEdit(const QString & i_name){ticketEdit(i_name, true );}
+void ListRenders::ticketEdit(const QString & i_name, bool i_host_ticket)
+{
+	if (i_name.isEmpty())
+	{
+		displayError("Ticket name is empty.");
+		return;
+	}
+
+	Item * item = getCurrentItem();
+	if (item == NULL)
+		return;
+	ItemFarm * item_farm = (ItemFarm*)(item);
+
+	int cur_count = 1;
+
+	if (i_host_ticket)
+	{
+		QMap<QString, int>::const_iterator it = item_farm->m_tickets_host.find(i_name);
+		if (it != item_farm->m_tickets_host.end())
+			cur_count = it.value();
+	}
+	else
+	{
+		if (item->getType() == Item::TRender)
+		{
+			displayError("Render can have only host tickets.");
+			return;
+		}
+
+		QMap<QString, int>::const_iterator it = item_farm->m_tickets_pool.find(i_name);
+		if (it != item_farm->m_tickets_pool.end())
+			cur_count = it.value();
+	}
+
+	bool ok;
+	int new_count = QInputDialog::getInt(this,
+			QString("Edit %1 Ticket").arg(i_host_ticket ? "Host" : "Pool"),
+			QString("Enter %1 cur_count.\nType -1 to remove.").arg(i_name),
+			cur_count, -1, 1<<30, 1, &ok);
+
+	std::ostringstream str;
+	Item::EType type = Item::TAny;
+	std::vector<int> ids(getSelectedIds(type));
+	af::jsonActionOperationStart(str, itemTypeToAf(type), "tickets", "", ids);
+	str << ",\n\"name\":\"" << afqt::qtos(i_name) << "\"";
+	str << ",\n\"count\":" << new_count;
+	if (i_host_ticket)
+		str << ",\n\"host\":true";
 	af::jsonActionOperationFinish(str);
 	Watch::sendMsg(af::jsonMsg(str));
 }

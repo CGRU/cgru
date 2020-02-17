@@ -1,4 +1,3 @@
-#include "name_af.h"
 
 #include "../include/afjob.h"
 
@@ -10,6 +9,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 char * af::jsonParseMsg( rapidjson::Document & o_doc, const af::Msg * i_msg, std::string * o_err)
 {

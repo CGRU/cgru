@@ -46,8 +46,8 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 
 	if (false == m_root)
 		m_params["pattern"] = afqt::stoq(pool->getPatternStr());
-	m_params["max_tasks_per_host"] = pool->getMaxTasksPerHost();
-	m_params["max_capacity_per_host"] = pool->getMaxCapacityPerHost();
+	m_params["host_max_tasks"] = pool->getHostMaxTasks();
+	m_params["host_capacity"]  = pool->getHostCapacity();
 /*
 	if (running_tasks_num)
 		setRunning();
@@ -71,10 +71,10 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 			strRightTop += " NewRender:Nimby";
 		if (pool->isNewRenderPaused())
 			strRightTop += " NewRender:Paused";
-		if (pool->getMaxTasksPerHost() >= 0)
-			strRightTop += QString(" MaxTasksPerHost:%1").arg(pool->getMaxTasksPerHost());
-		if (pool->getMaxCapacityPerHost() >= 0)
-			strRightTop += QString(" MaxCapacityPerHost:%1").arg(pool->getMaxCapacityPerHost());
+		if (pool->getHostMaxTasks() >= 0)
+			strRightTop += QString(" HostMaxTasks:%1").arg(pool->getHostMaxTasks());
+		if (pool->getHostCapacity() >= 0)
+			strRightTop += QString(" HostCapacity:%1").arg(pool->getHostCapacity());
 		strRightTop += QString(" Priority:%1").arg(pool->getPriority());
 	}
 	else if(Watch::isJedi())
@@ -112,8 +112,9 @@ bool ItemPool::calcHeight()
 	int old_height = m_height;
 
 	m_height = HeightPool;
-	if (m_services.size() || m_services_disabled.size())
-		m_height += HeightServices;
+
+	m_height += calcHeightFarm();
+
 	if (m_annotation.size())
 		m_height += HeightAnnotation;
 
@@ -140,15 +141,26 @@ void ItemPool::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleO
 	i_painter->setPen(afqt::QEnvironment::qclr_black);
 	i_painter->drawText(x, y, w, height_pool, Qt::AlignRight | Qt::AlignTop,    strRightTop);
 
+	y += HeightPool;
+
 	if (m_services.size() || m_services_disabled.size())
-		drawServices(i_painter, x+6, y+HeightPool, w-6, HeightServices-6);
+	{
+		drawServices(i_painter, x+6, y, w-6, HeightServices-6);
+		y += HeightServices;
+	}
+
+	if (m_tickets_pool.size() || m_tickets_host.size())
+	{
+		drawTickets(i_painter, x+6, y, w-6, HeightTickets-6);
+		y += HeightTickets;
+	}
 
 	if (m_annotation.size())
 	{
 		i_painter->setFont(afqt::QEnvironment::f_info);
 		QPen pen(afqt::QEnvironment::qclr_black);
 		i_painter->setPen(pen);
-		i_painter->drawText( x, y, w, h, Qt::AlignBottom | Qt::AlignHCenter, m_annotation);
+		i_painter->drawText(x, y-3, w, HeightAnnotation, Qt::AlignHCenter | Qt::AlignVCenter, m_annotation);
 	}
 }
 

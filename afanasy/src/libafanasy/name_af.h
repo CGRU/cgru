@@ -285,6 +285,7 @@ namespace af
 	void  w_StringList( const std::list<std::string> & stringList, Msg * msg);
 	void rw_StringVect(     std::vector<std::string> & stringVect, Msg * msg);
 	void rw_StringMap( std::map< std::string, std::string > & stringMap, Msg * msg);
+	void rw_IntMap(std::map<std::string, int32_t> & io_map, Msg * io_msg);
 
 	void rw_RegExp( RegExp & regExp, Msg * msg);
 

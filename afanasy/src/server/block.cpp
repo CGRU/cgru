@@ -418,7 +418,7 @@ bool Block::checkDepends( MonitorContainer * i_monitoring)
 bool Block::action( Action & i_action)
 {
 	uint32_t blockchanged_type = 0;
-	bool job_progress_changed = false;
+	bool job_changed = false;
 
 	const JSON & operation = (*i_action.data)["operation"];
 	if( operation.IsObject())
@@ -429,7 +429,7 @@ bool Block::action( Action & i_action)
 		{
 			v_errorHostsReset();
 			if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
-			job_progress_changed = true;
+			job_changed = true;
 		}
 		else if( type == "skip")
 		{
@@ -451,9 +451,23 @@ bool Block::action( Action & i_action)
 		{
 			skipRestartTasks( false, "Tasks restart done by " + i_action.author, i_action, operation, AFJOB::STATE_DONE_MASK);
 		}
+		else if( type == "restart_done")
+		{
+			skipRestartTasks( false, "Tasks restart done by " + i_action.author, i_action, operation, AFJOB::STATE_DONE_MASK);
+		}
+		else if(type == "tickets")
+		{
+			if (editTickets(i_action, operation))
+			{
+				blockchanged_type = af::Msg::TBlocksProperties;
+				job_changed = true;
+			}
+		}
 		else
 		{
 			appendJobLog("Unknown block operation \"" + type + "\" by " + i_action.author);
+			i_action.answer_kind = "error";
+			i_action.answer = "Unknown operation: \"" + type + "\"";
 			return false;
 		}
 
@@ -473,7 +487,7 @@ bool Block::action( Action & i_action)
 			i_action.log += "\nBlock['" + m_data->getName() + "']:" + changes;
 
 			blockchanged_type = af::Msg::TBlocksProperties;
-			job_progress_changed = true;
+			job_changed = true;
 			constructDependBlocks();
 		}
 	}
@@ -484,7 +498,30 @@ bool Block::action( Action & i_action)
 		i_action.monitors->addBlock( af::Msg::TBlocksProperties, m_data);
 	}
 
-	return job_progress_changed;
+	return job_changed;
+}
+
+bool Block::editTickets(Action & i_action, const JSON & operation)
+{
+	std::string name;
+	if (false == af::jr_string("name", name, operation))
+	{
+		i_action.answer_kind = "error";
+		i_action.answer = "Ticket \"name\" string is not specified.";
+		return false;
+	}
+
+	int32_t count;
+	if (false == af::jr_int32("count", count, operation))
+	{
+		i_action.answer_kind = "error";
+		i_action.answer = "Ticket \"count\" integer is not specified.";
+		return false;
+	}
+
+	m_data->editTicket(name, count);
+
+	return true;
 }
 
 void Block::skipRestartTasks( bool i_skip, const std::string & i_message, const Action & i_action, const JSON & i_operation, uint32_t i_state)

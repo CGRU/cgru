@@ -147,8 +147,7 @@ bool ItemRender::calcHeight()
 			m_height += HeightAnnotation;
 	}
 
-	if (m_services.size() || m_services_disabled.size())
-		m_height += HeightServices;
+	m_height += calcHeightFarm();
 
 	return old_height == m_height;
 }

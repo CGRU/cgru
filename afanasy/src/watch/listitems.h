@@ -68,6 +68,7 @@ public slots:
 protected:
 
 	void addParam(Param * i_param);
+	void addParam_separator();
 	void addParam_Num(Item::EType i_type, const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = -1);
 	void addParam_Str(Item::EType i_type, const QString & i_name, const QString & i_label, const QString & i_tip);
 	void addParam_REx(Item::EType i_type, const QString & i_name, const QString & i_label, const QString & i_tip);
@@ -82,10 +83,7 @@ protected:
 
 	void getItemInfo(Item::EType i_type, const std::string & i_mode);
 
-	inline void setParameter(Item::EType i_type, const std::string & i_name, long long i_value)
-		{ setParameter(i_type, i_name, af::itos(i_value), false);}
-	void setParameterRE(Item::EType i_type, const std::string & i_name, const std::string & i_value);
-	void setParameter(Item::EType i_type, const std::string & i_name, const std::string & i_value, bool i_quoted = true);
+	void setParameter(Item::EType i_type, const std::string & i_name, const std::string & i_value);
 
 	void operation(Item::EType i_type, const std::string & i_operation);
 

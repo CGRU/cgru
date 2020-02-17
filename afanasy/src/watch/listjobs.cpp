@@ -47,8 +47,9 @@ bool    ListJobs::ms_FilterInclude_SU  = true;
 bool    ListJobs::ms_FilterMatch_SU    = false;
 std::string ListJobs::ms_FilterString_SU = "";
 
-ListJobs::ListJobs( QWidget* parent):
-	ListNodes( parent, "jobs")
+ListJobs::ListJobs(QWidget * i_parent):
+	ListNodes(i_parent, "jobs"),
+	m_all_blocks_menu_shown(false)
 {
 	if( af::Environment::VISOR())
 		m_ctrl_sf = new CtrlSortFilter( this,
@@ -155,14 +156,19 @@ ListJobs::ListJobs( QWidget* parent):
 		addParam_Num(Item::TAny, "priority",              "Priority",           "Priority number", 0, max);
 	}
 	addParam_Str(Item::TAny, "annotation",                "Annotation",         "Annotation string");
+	addParam_separator();
 	addParam_Tim(Item::TJob, "time_wait",                 "Wait Time",          "Time to wait to start");
+	addParam_separator();
 	addParam_Num(Item::TAny, "max_running_tasks",         "Maximum Running",    "Maximum running tasks number", -1, 1<<20);
 	addParam_Num(Item::TAny, "max_running_tasks_per_host","Max Run Per Host",   "Max run tasks on the same host", -1, 1<<20);
+	addParam_separator();
 	addParam_REx(Item::TAny, "hosts_mask",                "Hosts Mask",         "Host names pattern that job can run on");
 	addParam_REx(Item::TAny, "hosts_mask_exclude",        "Hosts Mask Exclude", "Host names pattern that job will not run");
 	addParam_REx(Item::TJob, "depend_mask",               "Depend Mask",        "Jobs name mask to wait");
 	addParam_REx(Item::TJob, "depend_mask_global",        "Global Depend",      "Depend mask for jobs from any user");
+	addParam_separator();
 	addParam_Hrs(Item::TJob, "time_life",                 "Life Time",          "Time to be deleted after creation");
+	addParam_separator();
 	addParam_REx(Item::TJob, "need_os",                   "OS Needed",          "Job will run only on this OS");
 	addParam_REx(Item::TJob, "need_properties",           "Properties Needed",  "Job need client that has such properties");
 
@@ -174,6 +180,10 @@ ListJobs::ListJobs( QWidget* parent):
 	connect( timer, SIGNAL( timeout()), this, SLOT( repaintItems()));
 
 	m_parentWindow->setWindowTitle("Jobs:");
+}
+
+ListJobs::~ListJobs()
+{
 }
 
 void ListJobs::v_showFunc()
@@ -388,28 +398,40 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 
 	menu.addSeparator();
 
+	m_all_blocks_menu_shown = false;
 	if( selectedItemsCount == 1)
 	{
 		if( jobitem->getBlocksNum() > 1)
 		{
 			submenu = new QMenu( "Tasks Blocks", this);
-			for( int b = -1; b < jobitem->getBlocksNum(); b++)
+			for (int b = -1; b < jobitem->getBlocksNum(); b++)
 			{
-				QMenu * subsubmenu = new QMenu( b == -1 ? QString("_to_all_") : jobitem->getBlockName(b), this);
-				jobitem->generateMenu( b, subsubmenu , this);
-				submenu->addMenu( subsubmenu);
+				QMenu * subsubmenu = new QMenu(b == -1 ? QString("_to_all_") : jobitem->getBlockName(b), this);
+				if (b == -1)
+				{
+					// This menu changes all job blocks
+					connect(subsubmenu, SIGNAL(aboutToShow()), this, SLOT(slot_BlocksMenuForAll()));
+				}
+				else
+				{
+					connect(subsubmenu, SIGNAL(aboutToShow()), this, SLOT(slot_BlocksMenuNotAll()));
+				}
+				jobitem->getBlockInfo(b==-1?0:b)->generateMenu(subsubmenu);
+				submenu->addMenu(subsubmenu);
 			}
 		}
 		else
 		{
-			submenu = new QMenu( "Tasks Block", this);
-			jobitem->generateMenu( 0, submenu, this);
+			submenu = new QMenu("Tasks Block", this);
+			jobitem->getBlockInfo(0)->generateMenu(submenu);
+			connect(submenu, SIGNAL(aboutToShow()), this, SLOT(slot_BlocksMenuNotAll()));
 		}
 	}
 	else
 	{
-		submenu = new QMenu( "All Selected Blocks", this);
-		jobitem->generateMenu( -1, submenu, this);
+		submenu = new QMenu("All Selected Blocks", this);
+		jobitem->getBlockInfo(0)->generateMenu( submenu);
+		connect(submenu, SIGNAL(aboutToShow()), this, SLOT(slot_BlocksMenuForAll()));
 	}
 	menu.addMenu( submenu);
 
@@ -442,10 +464,8 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 
 	menu.exec(event->globalPos());
 }
-
-ListJobs::~ListJobs()
-{
-}
+void ListJobs::slot_BlocksMenuForAll() {m_all_blocks_menu_shown = true; }
+void ListJobs::slot_BlocksMenuNotAll() {m_all_blocks_menu_shown = false;}
 
 bool ListJobs::v_caseMessage( af::Msg * msg)
 {
@@ -658,11 +678,11 @@ void ListJobs::actDeleteDone()
 void ListJobs::actRequestLog() { getItemInfo(Item::TAny, "log"); }
 void ListJobs::actRequestErrorHostsList() { getItemInfo(Item::TAny, "error_hosts"); }
 
-void ListJobs::actSetHidden()   { setParameter(Item::TJob, "hidden", "true",  false); }
-void ListJobs::actUnsetHidden() { setParameter(Item::TJob, "hidden", "false", false); }
+void ListJobs::actSetHidden()   {setParameter(Item::TJob, "hidden", "true" );}
+void ListJobs::actUnsetHidden() {setParameter(Item::TJob, "hidden", "false");}
 
-void ListJobs::actPreviewApproval()   { setParameter(Item::TJob, "ppa", "true",  false); }
-void ListJobs::actNoPreviewApproval() { setParameter(Item::TJob, "ppa", "false", false); }
+void ListJobs::actPreviewApproval()   {setParameter(Item::TJob, "ppa", "true" );}
+void ListJobs::actNoPreviewApproval() {setParameter(Item::TJob, "ppa", "false");}
 
 void ListJobs::actSetUser()
 {
@@ -735,22 +755,26 @@ void ListJobs::actOpenRULES()
 	Watch::startProcess( cmd);
 }
 
-void ListJobs::blockAction( int id_block, QString i_action)
+void ListJobs::slot_BlockAction(int i_bnum, QString i_json)
 {
 	ItemJob* jobitem = (ItemJob*)getCurrentItem();
-	if( jobitem == NULL ) return;
+	if (jobitem == NULL) return;
 
 	std::ostringstream str;
 	Item::EType type = Item::TJob;
 	std::vector<int> ids(getSelectedIds(type));
 	af::jsonActionStart(str, "jobs", "", ids);
-	str << ",\n\"block_ids\":[" << id_block << ']';
 
-	if( jobitem->blockAction( str, id_block, i_action, this))
-	{
-		af::jsonActionFinish( str);
-		Watch::sendMsg( af::jsonMsg( str));
-	}
+	if (m_all_blocks_menu_shown)
+		str << ",\n\"block_ids\":[-1]";
+	else
+		str << ",\n\"block_ids\":[" << i_bnum << "]";
+
+	str << ",\n" << afqt::qtos(i_json);
+
+	af::jsonActionFinish(str);
+
+	Watch::sendMsg(af::jsonMsg(str));
 }
 
 bool ListJobs::v_filesReceived( const af::MCTaskUp & i_taskup )
