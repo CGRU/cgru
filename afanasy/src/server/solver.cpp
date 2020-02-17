@@ -137,13 +137,13 @@ void Solver::solve()
 
 	// Start solve cycle.
 	// If some node was solved it means that it can be solved again.
-	// Of some node was not solved it can't be solved again (before something changed),
+	// If some node was not solved it can't be solved again (before something changed),
 	// and not solved node will be removed from list.
-	while( solve_list.size())
+	while (solve_list.size())
 	{
 		// Increment cycle and check limit:
 		solve_cycle++;
-		if( solve_cycle > ms_solve_cycles_limit )
+		if (solve_cycle > ms_solve_cycles_limit)
 		{
 			// This should not happen.
 			// Most probably it is a bug in solving code.
@@ -164,12 +164,12 @@ void Solver::solve()
 			// Check that render is ready to run a task:
 			if (false == render->isReady())
 			{
-				// Render is not ready, but may be we should wake it up
+				// Render is not ready, but may be we should wake it up?
 				if ((false == render->isWOLWakeAble()) ||
 					(ms_awaken_renders >= ms_awaken_renders_max) ||
 					(ms_run_cycle % af::Environment::getWOLWakeInterval() != 0))
 				{
-					continue; ///< - We don't
+					continue; ///< - We should not.
 				}
 			}
 
@@ -179,13 +179,13 @@ void Solver::solve()
 		// Function exits on each solve success (just 1 task solved),
 		// removes nodes that was not solved from list.
 		RenderAf * render = SolveList(solve_list, renders_list, ms_branchescontainer->getRootBranch());
-		if( render )
+		if (render)
 		{
 			// Check Wake-On-LAN:
-			if( render->isWOLWakeAble())
+			if (render->isWOLWakeAble())
 			{
 				AF_DEBUG << "Solving waking up render '" << render->node()->getName() << "'.";
-				render->wolWake( ms_monitorcontaier, std::string("Automatic waking by a job."));
+				render->wolWake(ms_monitorcontaier, std::string("Automatic waking by a job."));
 				ms_awaken_renders++;
 			}
 			else
@@ -199,28 +199,28 @@ void Solver::solve()
 RenderAf * Solver::SolveList(std::list<AfNodeSolve*> & i_list, std::list<RenderAf*> & i_renders, BranchSrv * i_branch)
 {
 	// Iterate solving nodes list:
-	for( std::list<AfNodeSolve*>::iterator it = i_list.begin(); it != i_list.end(); )
+	for (std::list<AfNodeSolve*>::iterator it = i_list.begin(); it != i_list.end(); )
 	{
 		// Get renders that node can run on:
 		std::list<RenderAf*> renders;
-		for( std::list<RenderAf*>::iterator rIt = i_renders.begin(); rIt != i_renders.end(); rIt++)
+		for (std::list<RenderAf*>::iterator rIt = i_renders.begin(); rIt != i_renders.end(); rIt++)
 		{
 			// Check that the node can run this render:
-			if( false == (*it)->canRunOn( *rIt))
+			if (false == (*it)->canRunOn(*rIt))
 				continue;
 
-			renders.push_back( *rIt);
+			renders.push_back(*rIt);
 		}
 
 		// Sort renders:
-		renders.sort( MostReadyRender());
+		renders.sort(MostReadyRender());
 
 		RenderAf * render = (*it)->solve(renders, ms_monitorcontaier, i_branch);
 
-		if( render )
+		if (render)
 			return render;
 
-		it = i_list.erase( it);
+		it = i_list.erase(it);
 	}
 
 	return NULL;
