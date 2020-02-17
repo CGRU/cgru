@@ -224,27 +224,41 @@ bool Block::canRunOn( RenderAf * render)
 	if (false == render->hasCapacity(m_data->getCapMinResult()))
 		return false;
 
-   // render services:
-   if( false == render->canRunService( m_data->getService())) return false;
-   // check maximum hosts:
-   if(( m_data->getMaxRunningTasks() >= 0 ) && ( m_data->getRunningTasksNumber() >= m_data->getMaxRunningTasks() )) return false;
-   // Check block avoid hosts list:
-   if( avoidHostsCheck( render->getName()) ) return false;
-   // Check task avoid hosts list:
-   if( m_data->getNeedMemory() > render->getHostRes().mem_free_mb ) return false;
-   // Check needed hdd:
-   if( m_data->getNeedHDD()    > render->getHostRes().hdd_free_gb ) return false;
-   // Check needed power:
-//if( m_data->getNeedPower()  > render->getHost().m_power       ) return false;
+	// render services:
+	if (false == render->canRunService(m_data->getService()))
+		return false;
 
-   // check hosts mask:
-   if( false == m_data->checkHostsMask( render->getName())) return false;
-   // check exclude hosts mask:
-   if( false == m_data->checkHostsMaskExclude( render->getName())) return false;
-   // Check needed properties:
-//if( false == m_data->checkNeedProperties( render->getHost().m_properties)) return false;
+	// check maximum hosts:
+	if ((m_data->getMaxRunningTasks() >= 0) && (m_data->getRunningTasksNumber() >= m_data->getMaxRunningTasks()))
+		return false;
 
-   return true;
+	// Check block avoid hosts list:
+	if (avoidHostsCheck(render->getName()))
+		return false;
+
+	// Check task avoid hosts list:
+	if (m_data->getNeedMemory() > render->getHostRes().mem_free_mb)
+		return false;
+
+	// Check needed hdd:
+	if (m_data->getNeedHDD() > render->getHostRes().hdd_free_gb)
+		return false;
+
+	// Check needed power:
+	//if (m_data->getNeedPower() > render->getHost().m_power) return false;
+
+	// check hosts mask:
+	if (false == m_data->checkHostsMask(render->getName()))
+		return false;
+
+	// check exclude hosts mask:
+	if (false == m_data->checkHostsMaskExclude(render->getName()))
+		return false;
+
+	// Check needed properties:
+	//if (false == m_data->checkNeedProperties(render->getHost().m_properties)) return false;
+
+	return true;
 }
 
 void Block::addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
