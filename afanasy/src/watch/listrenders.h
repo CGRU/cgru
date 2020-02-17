@@ -34,8 +34,8 @@ public slots:
 	void slot_ServiceAdd();
 	void slot_ServiceDisable();
 	void slot_ServiceEdit(QString i_mode, QString i_service);
-	void slot_TicketPoolAdd();
-	void slot_TicketHostAdd();
+	void slot_TicketPoolEdit();
+	void slot_TicketHostEdit();
 	void slot_TicketPoolEdit(const QString & i_name);
 	void slot_TicketHostEdit(const QString & i_name);
 
@@ -120,7 +120,7 @@ private:
 	void calcTitle();
 	void setSpacing();
 
-	void ticketAdd(bool i_host_ticket);
+	void ticketEdit(bool i_host_ticket);
 	void ticketEdit(const QString & i_name, bool i_host_ticket);
 
 private:

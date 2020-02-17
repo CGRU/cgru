@@ -93,7 +93,7 @@ ParamsPanelFarm::ParamsPanelFarm(ListRenders * i_list_renders):
 	m_btn_ticket_pool_add = new QPushButton("add");
 	tickets_pool_caption->addWidget(m_btn_ticket_pool_add);
 	m_btn_ticket_pool_add->setFixedSize(36, 16);
-	connect(m_btn_ticket_pool_add, SIGNAL(clicked()), m_list_renders, SLOT(slot_TicketPoolAdd()));
+	connect(m_btn_ticket_pool_add, SIGNAL(clicked()), m_list_renders, SLOT(slot_TicketPoolEdit()));
 	m_btn_ticket_pool_add->setHidden(true);
 
 	// Tickets host
@@ -111,7 +111,7 @@ ParamsPanelFarm::ParamsPanelFarm(ListRenders * i_list_renders):
 	m_btn_ticket_host_add = new QPushButton("add");
 	tickets_host_caption->addWidget(m_btn_ticket_host_add);
 	m_btn_ticket_host_add->setFixedSize(36, 16);
-	connect(m_btn_ticket_host_add, SIGNAL(clicked()), m_list_renders, SLOT(slot_TicketHostAdd()));
+	connect(m_btn_ticket_host_add, SIGNAL(clicked()), m_list_renders, SLOT(slot_TicketHostEdit()));
 }
 
 ParamsPanelFarm::~ParamsPanelFarm()

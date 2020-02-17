@@ -143,6 +143,14 @@ ListRenders::ListRenders( QWidget* parent):
 				"Clear services.\nServices settings will be taken from the parent pool.","", true);
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(actClearServices()));
 
+		bm = addButtonsMenu(Item::TAny, "Tickets","Edit tickets");
+
+		bp = addButtonPanel(Item::TPool, "Edit Pool","ticket_pool_edit","Edit pool ticket.","", false);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_TicketPoolEdit()));
+
+		bp = addButtonPanel(Item::TAny, "Edit Host","ticket_host_edit","Edit host ticket.","", false);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_TicketHostEdit()));
+
 		resetButtonsMenu();
 
 		bm = addButtonsMenu(Item::TPool, "New Render","New render default state.");
@@ -973,13 +981,13 @@ void ListRenders::actClearServices()
 	Watch::sendMsg(af::jsonMsg(str));
 }
 
-void ListRenders::slot_TicketPoolAdd(){ticketAdd(false);}
-void ListRenders::slot_TicketHostAdd(){ticketAdd(true );}
-void ListRenders::ticketAdd(bool i_host_ticket)
+void ListRenders::slot_TicketPoolEdit(){ticketEdit(false);}
+void ListRenders::slot_TicketHostEdit(){ticketEdit(true );}
+void ListRenders::ticketEdit(bool i_host_ticket)
 {
 	bool ok;
 	QString name = QInputDialog::getText(this,
-			QString("Add %1 Ticket").arg(i_host_ticket ? "Host" : "Pool"),
+			QString("Edit %1 Ticket").arg(i_host_ticket ? "Host" : "Pool"),
 			"Enter a new ticket name", QLineEdit::Normal, "", &ok);
 	if (false == ok)
 		return;
