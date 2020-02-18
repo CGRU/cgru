@@ -493,7 +493,9 @@ FilesView.prototype.showAttrs = function(i_el, i_obj) {
 	if (i_obj)
 		i_el.m_obj = i_obj;
 
-	if (this.masks && this.masks.length)
+	// Highlight valid/error objects by given masks.
+	// Skip aux folders that starting with '_'.
+	if ((c_PathBase(i_el.m_path).charAt(0) != '_') && this.masks && this.masks.length)
 		for (var i = 0; i < this.masks.length; i++)
 			if (this.masks[i].re.test(c_PathBase(i_el.m_path)))
 			{
@@ -577,7 +579,9 @@ FilesView.prototype.showAttrs = function(i_el, i_obj) {
 			title += '\nFiles: ' + i_el.m_obj.num_files_total;
 		}
 
-		if (RULES.status && (RULES.status.frames_num != null))
+		// Highlight correct/error files number if it defined in status.
+		// Skip aux folders that starting with '_'.
+		if ((c_PathBase(i_el.m_path).charAt(0) != '_') && RULES.status && (RULES.status.frames_num != null))
 		{
 			i_el.m_el_num_files.classList.add('correct');
 			if (f_count != RULES.status.frames_num)

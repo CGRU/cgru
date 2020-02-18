@@ -2,6 +2,7 @@
 
 import os
 import re
+import socket
 import time
 
 import hou
@@ -29,6 +30,7 @@ class BlockParameters:
         self.ropnode = None
         self.subblock = subblock
         self.single_task = False
+        self.local_render = False
         self.frame_pertask = 1
         self.frame_sequential = 1
         self.prefix = prefix
@@ -62,6 +64,7 @@ class BlockParameters:
         else:
             self.frame_pertask = int(afnode.parm('frame_pertask').eval())
             self.frame_sequential = int(afnode.parm('frame_sequential').eval())
+        self.local_render = bool(afnode.parm('local_render').eval())
         self.job_name = str(afnode.parm('job_name').eval())
         self.job_branch = ''
         self.start_paused = int(afnode.parm('start_paused').eval())
@@ -104,6 +107,9 @@ class BlockParameters:
             self.depend_mask = str(afnode.parm('depend_mask').eval())
             self.depend_mask_global = str(
                 afnode.parm('depend_mask_global').eval())
+
+        if self.local_render:
+            self.hosts_mask = str(socket.gethostname())
 
         # Process frame range:
         opname = afnode.path()
