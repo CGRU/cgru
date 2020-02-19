@@ -402,7 +402,7 @@ var d_cvtguiparams = {
 	duration /*****/: {"default": '00:00:00', "width": '20%'},
 	quality /******/: {"label": 'JPEG Quality', 'type': 'int', "default": 100, 'width': '20%',"lwidth":'160px'},
 	ipar /*********/: {"label": 'Input pixel aspect', "width": '20%',"lwidth":'160px'},
-	padding /******/: {"label": 'Padding', 'width': '20%'},
+	padding /******/: {"label": 'Padding', 'width': '20%', "default": 4},
 	first_frame /**/: {"label": 'First Frame', 'width': '20%'},
 	af_capacity /**/: {'label': 'Capacity', 'width': '15%', 'type': 'int'},
 	af_maxtasks /***/: {'label': 'Max Tasks', 'width': '15%', 'type': 'int', 'default': -1},
@@ -820,6 +820,9 @@ function d_CvtMovies(i_wnd, i_params, i_to_sequence)
 
 		if (i_params.padding)
 			cmd += ' -p ' + i_params.padding;
+
+		if (i_params.first_frame)
+			cmd += ' --first ' + i_params.first_frame;
 	}
 	else
 	{
