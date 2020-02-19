@@ -400,16 +400,16 @@ var d_cvtguiparams = {
 	fps /**********/: {"label": 'FPS', "width": '20%'},
 	time_start /***/: {"default": '00:00:00', "width": '20%'},
 	duration /*****/: {"default": '00:00:00', "width": '20%'},
-	quality /******/: {"label": 'JPEG Quality', 'type': 'int', "default": 100, 'width': '20%'},
+	quality /******/: {"label": 'JPEG Quality', 'type': 'int', "default": 100, 'width': '20%',"lwidth":'160px'},
 	ipar /*********/: {"label": 'Input pixel aspect', "width": '20%',"lwidth":'160px'},
 	padding /******/: {"label": 'Padding', 'width': '20%'},
-	af_capacity /**/: {'label': 'Capacity', 'width': '20%', 'type': 'int'},
-	af_maxtasks /***/: {'label': 'Max Tasks', 'width': '20%', 'type': 'int', 'default': -1},
-	af_perhost /****/: {'label': 'Per Host', 'width': '20%', 'type': 'int', 'default': 1},
+	first_frame /**/: {"label": 'First Frame', 'width': '20%'},
+	af_capacity /**/: {'label': 'Capacity', 'width': '15%', 'type': 'int'},
+	af_maxtasks /***/: {'label': 'Max Tasks', 'width': '15%', 'type': 'int', 'default': -1},
+	af_perhost /****/: {'label': 'Per Host', 'width': '15%', 'type': 'int', 'default': 1},
 	af_fpt /********/: {
-		'label': 'Frames Per Task',
-		'width': '20%',
-		'lwidth': '160px',
+		'label': 'FPT',
+		'width': '15%',
 		'type': 'int',
 		'default': 10,
 		'tooltip': 'Frames Per Task'
@@ -465,7 +465,7 @@ function d_Convert(i_args)
 		"keys": RULES.dailies.formats
 	});
 
-	gui_Create(wnd.elContent, d_cvtguiparams, [params, RULES.dailies]);
+	gui_Create(wnd.elContent, d_cvtguiparams, [params, RULES, RULES.dailies]);
 
 	gui_CreateChoices(
 		{"wnd": wnd.elContent, "name": 'imgtype', "value": 'jpg', "label": 'Image Type:', "keys": img_types});
@@ -662,6 +662,8 @@ function d_CvtImages(i_wnd, i_params)
 	cmd += ' -q ' + i_params.quality;
 	if (i_params.padding)
 		cmd += ' --renumpad ' + i_params.padding;
+	if (i_params.first_frame)
+		cmd += ' --renumfirst ' + i_params.first_frame;
 	if (i_params.format && (i_params.format != 'asis'))
 		cmd += ' -r ' + i_params.format;
 

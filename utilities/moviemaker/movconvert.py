@@ -26,6 +26,7 @@ Parser.add_option('-q', '--qscale',    dest='qscale',    type  ='int',    defaul
 Parser.add_option('-s', '--timestart', dest='timestart', type  ='string', default=None,     help='Time start')
 Parser.add_option('-d', '--duration',  dest='duration',  type  ='string', default=None,     help='Duration')
 Parser.add_option('-p', '--padding',   dest='padding' ,  type  ='int',    default=7,        help='Padding')
+Parser.add_option(      '--first',     dest='first' ,    type  ='int',    default=1,        help='First frame number')
 Parser.add_option('-w', '--watermark', dest='watermark', type  ='string', default=None,     help='Add watermark')
 Parser.add_option('-u', '--suffix',    dest='suffix',    type  ='string', default=None,     help='Add suffix to ouput file name')
 Parser.add_option(      '--imgname',   dest='imgname',   type  ='string', default=None,     help='Images files name (frame)')
@@ -122,6 +123,9 @@ if Codec is None:
             resize.append('-1')
         cmd += ' -vf "%s"' % ('scale=%s:%s' % (resize[0], resize[1]))
         Output += '.r%s' % Options.resize
+
+    # Specify first frame number:
+    cmd += ' -start_number %d' % Options.first
 
     # Add images type (extension,format) to output:
     Output += '.' + Options.type
