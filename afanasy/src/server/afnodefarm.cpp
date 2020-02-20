@@ -222,7 +222,7 @@ bool AfNodeFarm::actionTicket(Action & i_action)
 	bool tk_host = false;
 	af::jr_bool("host", tk_host, operation);
 
-	std::map<std::string, int32_t> * tickets;
+	std::map<std::string, af::Farm::Tiks> * tickets;
 	if (tk_host)
 	{
 		tickets = &m_farm->m_tickets_host;
@@ -251,7 +251,7 @@ bool AfNodeFarm::actionTicket(Action & i_action)
 		}
 	}
 	else
-		(*tickets)[tk_name] = tk_count;
+		(*tickets)[tk_name] = af::Farm::Tiks(tk_count, 0);
 
 	return true;
 }
@@ -274,8 +274,6 @@ bool AfNodeFarm::isServiceDisabled(const std::string & i_service_name) const
 
 bool AfNodeFarm::canRunService(const std::string & i_service_name, bool i_hasServicesSetup) const
 {
-//printf("%s:can(%s):s(%d:",name().c_str(),i_service_name.c_str(),m_farm->m_services.size());for (const std::string & s : m_farm->m_services) printf(" %s",s.c_str());printf(")/d(%d:",m_farm->m_services_disabled.size());for (const std::string & s : m_farm->m_services_disabled) printf(" %s",s.c_str());printf("): ");if (hasService(i_service_name)) printf(" HAS");if (isServiceDisabled(i_service_name)) printf(" DIS");printf("\n");
-
 	if (isServiceDisabled(i_service_name))
 		return false;
 
@@ -295,3 +293,44 @@ bool AfNodeFarm::canRunService(const std::string & i_service_name, bool i_hasSer
 	return false == i_hasServicesSetup;
 }
 
+bool AfNodeFarm::hasTickets(const std::map<std::string, int32_t> & i_tickets) const
+{
+	for (auto const& it : i_tickets)
+	{
+		if (false == hasPoolTicket(it.first, it.second))
+			return false;
+
+		if (false == hasHostTicket(it.first, it.second))
+			return false;
+	}
+
+	return true;
+}
+
+bool AfNodeFarm::hasPoolTicket(const std::string & i_name, const int32_t & i_count) const
+{
+	std::map<std::string, af::Farm::Tiks>::const_iterator it = m_farm->m_tickets_pool.find(i_name);
+	if (it != m_farm->m_tickets_pool.end())
+	{
+		if ((it->second.count - it->second.usage) < i_count)
+			return false;
+	}
+	else if (m_parent)
+		return m_parent->hasPoolTicket(i_name, i_count);
+
+	return true;
+}
+
+bool AfNodeFarm::hasHostTicket(const std::string & i_name, const int32_t & i_count) const
+{
+	std::map<std::string, af::Farm::Tiks>::const_iterator it = m_farm->m_tickets_host.find(i_name);
+	if (it != m_farm->m_tickets_host.end())
+	{
+		if ((it->second.count - it->second.usage) < i_count)
+			return false;
+	}
+	else if (m_parent)
+		return m_parent->hasHostTicket(i_name, i_count);
+
+	return true;
+}

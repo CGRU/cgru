@@ -2,6 +2,8 @@
 
 #include "paramspanel.h"
 
+#include "../libafanasy/affarm.h"
+
 class QHBoxLayout;
 
 class Item;
@@ -25,7 +27,9 @@ private:
 	void clearServices();
 	void clearTickets();
 
-	void updateTickets(const QMap<QString, int> & i_tickets, QMap<QString, ParamTicket*> & i_widgets, bool i_host, QVBoxLayout * i_layout);
+	void updateTickets(const QMap<QString, af::Farm::Tiks> & i_tickets,
+			QMap<QString, ParamTicket*> & i_widgets,
+			bool i_host, QVBoxLayout * i_layout);
 
 private:
 	ListRenders * m_list_renders;

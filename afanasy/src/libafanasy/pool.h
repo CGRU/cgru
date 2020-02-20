@@ -56,9 +56,6 @@ public:
 	inline int getHostMaxTasks() const { return m_host_max_tasks;}
 	inline int getHostCapacity() const { return m_host_capacity; }
 
-	inline const std::map<std::string, int32_t> getTicketsPool() const {return m_tickets_pool;}
-	inline const std::map<std::string, int32_t> getTicketsHost() const {return m_tickets_host;}
-
 public:
 	enum State
 	{

@@ -1014,9 +1014,9 @@ void ListRenders::ticketEdit(const QString & i_name, bool i_host_ticket)
 
 	if (i_host_ticket)
 	{
-		QMap<QString, int>::const_iterator it = item_farm->m_tickets_host.find(i_name);
+		QMap<QString, af::Farm::Tiks>::const_iterator it = item_farm->m_tickets_host.find(i_name);
 		if (it != item_farm->m_tickets_host.end())
-			cur_count = it.value();
+			cur_count = it.value().count;
 	}
 	else
 	{
@@ -1026,9 +1026,9 @@ void ListRenders::ticketEdit(const QString & i_name, bool i_host_ticket)
 			return;
 		}
 
-		QMap<QString, int>::const_iterator it = item_farm->m_tickets_pool.find(i_name);
+		QMap<QString, af::Farm::Tiks>::const_iterator it = item_farm->m_tickets_pool.find(i_name);
 		if (it != item_farm->m_tickets_pool.end())
-			cur_count = it.value();
+			cur_count = it.value().count;
 	}
 
 	bool ok;

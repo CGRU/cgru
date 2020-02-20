@@ -35,6 +35,14 @@ public:
 	void jsonRead(const JSON &i_object, std::string *io_changes = NULL);
 	void jsonWrite(std::ostringstream &o_str, int i_type) const;
 
+struct Tiks
+{
+	Tiks(): count(-1), usage(-1) {}
+	Tiks(const int32_t & i_count, const int32_t & i_usage): count(i_count), usage(i_usage) {}
+	int32_t count;
+	int32_t usage;
+};
+
 protected:
 	void readwrite(Msg *msg); ///< Read or write node attributes in message
 
@@ -47,7 +55,12 @@ protected:
 	std::vector<std::string> m_services;
 	std::vector<std::string> m_services_disabled;
 
-	std::map<std::string, int32_t> m_tickets_pool;
-	std::map<std::string, int32_t> m_tickets_host;
+	std::map<std::string, Tiks> m_tickets_pool;
+	std::map<std::string, Tiks> m_tickets_host;
+
+private:
+	static void rw_Tickets(std::map<std::string, Tiks> & io_tickets, Msg * io_msg);
+	static bool jr_Tickets(const char * i_name, std::map<std::string, Tiks> & o_map, const JSON & i_object);
+	static void jw_Tickets(const char * i_name, const std::map<std::string, Tiks> & i_map, std::ostringstream & o_str);
 };
 }

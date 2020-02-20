@@ -228,6 +228,10 @@ bool Block::canRunOn( RenderAf * render)
 	if (false == render->canRunService(m_data->getService()))
 		return false;
 
+	// Check Tickets:
+	if (false == render->hasTickets(m_data->getTickets()))
+		return false;
+
 	// check maximum hosts:
 	if ((m_data->getMaxRunningTasks() >= 0) && (m_data->getRunningTasksNumber() >= m_data->getMaxRunningTasks()))
 		return false;

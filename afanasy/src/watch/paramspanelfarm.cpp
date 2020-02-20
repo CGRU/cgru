@@ -282,7 +282,7 @@ void ParamsPanelFarm::updateTickets(ItemFarm * i_item)
 }
 
 void ParamsPanelFarm::updateTickets(
-		const QMap<QString, int> & i_tickets,
+		const QMap<QString, af::Farm::Tiks> & i_tickets,
 		QMap<QString, ParamTicket*> & i_widgets,
 		bool i_host, QVBoxLayout * i_layout)
 {
@@ -290,7 +290,7 @@ void ParamsPanelFarm::updateTickets(
 	QMap<QString, ParamTicket*>::iterator wIt = i_widgets.begin();
 	while (wIt != i_widgets.end())
 	{
-		QMap<QString, int>::const_iterator tIt = i_tickets.find(wIt.key());
+		QMap<QString, af::Farm::Tiks>::const_iterator tIt = i_tickets.find(wIt.key());
 		if (tIt == i_tickets.end())
 		{
 			delete wIt.value();
@@ -298,19 +298,19 @@ void ParamsPanelFarm::updateTickets(
 		}
 		else
 		{
-			wIt.value()->update(tIt.value());
+			wIt.value()->update(tIt.value().count);
 			wIt++;
 		}
 	}
 
 	// Delete not exisintg tickets:
-	QMap<QString, int>::const_iterator tIt = i_tickets.begin();
+	QMap<QString, af::Farm::Tiks>::const_iterator tIt = i_tickets.begin();
 	while (tIt != i_tickets.end())
 	{
 		QMap<QString, ParamTicket*>::const_iterator wIt = i_widgets.find(tIt.key());
 		if (wIt == i_widgets.end())
 		{
-			ParamTicket * tw = new ParamTicket(tIt.key(), tIt.value());
+			ParamTicket * tw = new ParamTicket(tIt.key(), tIt.value().count);
 			i_widgets[tIt.key()] = tw;
 			i_layout->addWidget(tw);
 			if (i_host)
