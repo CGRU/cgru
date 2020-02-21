@@ -209,6 +209,8 @@ void TaskExec::v_readwrite( Msg * msg)
 		rw_int32_t ( m_block_num,         msg);
 		rw_int32_t ( m_task_num,          msg);
 
+		rw_IntMap(m_tickets, msg);
+
 	break;
 
 	default:

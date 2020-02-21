@@ -374,7 +374,7 @@ void ParamSeparator::paintEvent(QPaintEvent * event)
 	painter.drawLine(0, 0, width(), 0);
 }
 
-ParamTicket::ParamTicket(const QString & i_name, int i_count):
+ParamTicket::ParamTicket(const QString & i_name, int i_count, int i_usage):
 	m_name(i_name)
 {
 	QHBoxLayout * layout = new QHBoxLayout(this);
@@ -402,17 +402,19 @@ ParamTicket::ParamTicket(const QString & i_name, int i_count):
 	layout->addWidget(btn);
 	connect(btn, SIGNAL(clicked()), this, SLOT(slot_Edit()));
 
-	update(i_count);
+	update(i_count, i_usage);
 }
 
 ParamTicket::~ParamTicket()
 {
 }
 
-void ParamTicket::update(int i_count)
+void ParamTicket::update(int i_count, int i_usage)
 {
-	m_count = i_count;
-	m_count_label->setText(QString(" x %1").arg(m_count));
+	if (i_usage == -1)
+		m_count_label->setText(QString(" x %1").arg(i_count));
+	else
+		m_count_label->setText(QString(" x %1 / %2").arg(i_count).arg(i_usage));
 }
 
 void ParamTicket::slot_Edit()

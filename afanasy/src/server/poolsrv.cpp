@@ -348,6 +348,40 @@ bool PoolSrv::assignRender(RenderAf * i_render)
 	return true;
 }
 
+void PoolSrv::taskAcuire(const af::TaskExec * i_taskexec, MonitorContainer * i_monitoring)
+{
+	for (auto const& eIt : i_taskexec->m_tickets)
+	{
+		std::map<std::string, af::Farm::Tiks>::iterator it = m_tickets_pool.find(eIt.first);
+		if (it != m_tickets_pool.end())
+		{
+			it->second.usage += eIt.second;
+			if (i_monitoring)
+				i_monitoring->addEvent(af::Monitor::EVT_pools_change, m_id);
+		}
+	}
+
+	if (m_parent)
+		m_parent->taskAcuire(i_taskexec, i_monitoring);
+}
+
+void PoolSrv::taskRelease(const af::TaskExec * i_taskexec, MonitorContainer * i_monitoring)
+{
+	for (auto const& eIt : i_taskexec->m_tickets)
+	{
+		std::map<std::string, af::Farm::Tiks>::iterator it = m_tickets_pool.find(eIt.first);
+		if (it != m_tickets_pool.end())
+		{
+			it->second.usage -= eIt.second;
+			if (i_monitoring)
+				i_monitoring->addEvent(af::Monitor::EVT_pools_change, m_id);
+		}
+	}
+
+	if (m_parent)
+		m_parent->taskRelease(i_taskexec, i_monitoring);
+}
+
 void PoolSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, MonitorContainer * i_monitoring)
 {
 	bool changed = false;

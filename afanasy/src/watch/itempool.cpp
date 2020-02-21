@@ -104,7 +104,7 @@ void ItemPool::updateInfo(af::Pool * i_pool)
 	m_info_text += QString("Renders Total: <b>%1</b><br>").arg(i_pool->getRendersTotal());
 
 	m_info_text += "<br>";
-	m_info_text += QString("Created at: <b>%1</b>").arg(afqt::time2Qstr(i_pool->getTimeCreation()));
+	m_info_text += QString("Created: <b>%1</b>").arg(afqt::time2Qstr(i_pool->getTimeCreation()));
 }
 
 bool ItemPool::calcHeight()

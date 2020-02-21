@@ -15,6 +15,7 @@
 */
 #pragma once
 
+#include "../libafanasy/name_af.h"
 #include "../libafanasy/pool.h"
 
 #include "afnodefarm.h"
@@ -52,6 +53,9 @@ public:
 	void removeRender(RenderAf * i_render);
 
 	bool assignRender(RenderAf * i_render);
+
+	void taskAcuire (const af::TaskExec * i_taskexec, MonitorContainer * i_monitoring);
+	void taskRelease(const af::TaskExec * i_taskexec, MonitorContainer * i_monitoring);
 
 	inline int getHostMaxTasks()    const
 		{ if (m_host_max_tasks < 0 && m_parent) return m_parent->getHostMaxTasks(); else return m_host_max_tasks; }

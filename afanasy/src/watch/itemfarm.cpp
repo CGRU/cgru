@@ -147,7 +147,8 @@ void ItemFarm::drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int 
 			tkp_w += tk_rect.width();
 		}
 
-		i_painter->drawText(i_x+5+tkp_w, i_y, i_w-10, 15, Qt::AlignLeft | Qt::AlignTop, QString("x%1").arg(tkp_it.value().count), &tk_rect);
+		i_painter->drawText(i_x+5+tkp_w, i_y, i_w-10, 15, Qt::AlignLeft | Qt::AlignTop,
+				QString("x%1 / %2").arg(tkp_it.value().count).arg(tkp_it.value().usage), &tk_rect);
 		tkp_w += tk_rect.width() + 1;
 
 		tkp_w += 8;
@@ -160,7 +161,8 @@ void ItemFarm::drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int 
 		tkh_it.next();
 
 		QRect tk_rect;
-		i_painter->drawText(i_x+5, i_y, i_w-10-tkh_w, 15, Qt::AlignRight | Qt::AlignTop, QString("x%1").arg(tkh_it.value().count), &tk_rect);
+		i_painter->drawText(i_x+5, i_y, i_w-10-tkh_w, 15, Qt::AlignRight | Qt::AlignTop,
+				QString("x%1 / %2").arg(tkh_it.value().count).arg(tkh_it.value().usage), &tk_rect);
 		tkh_w += tk_rect.width() + 1;
 
 		const QPixmap * icon = Watch::getTicketIcon(tkh_it.key());

@@ -298,7 +298,7 @@ void ParamsPanelFarm::updateTickets(
 		}
 		else
 		{
-			wIt.value()->update(tIt.value().count);
+			wIt.value()->update(tIt.value().count, tIt.value().usage);
 			wIt++;
 		}
 	}
@@ -310,7 +310,7 @@ void ParamsPanelFarm::updateTickets(
 		QMap<QString, ParamTicket*>::const_iterator wIt = i_widgets.find(tIt.key());
 		if (wIt == i_widgets.end())
 		{
-			ParamTicket * tw = new ParamTicket(tIt.key(), tIt.value().count);
+			ParamTicket * tw = new ParamTicket(tIt.key(), tIt.value().count, tIt.value().usage);
 			i_widgets[tIt.key()] = tw;
 			i_layout->addWidget(tw);
 			if (i_host)

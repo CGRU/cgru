@@ -187,6 +187,7 @@ public:
 	/// Read or write task in message buffer.
 	void v_readwrite( Msg * msg);
 
+	std::map<std::string, int32_t> m_tickets;
 
 	std::string m_custom_data_task;
 	std::string m_custom_data_block;
@@ -236,7 +237,6 @@ private:
 	int64_t m_frames_num;    ///< Number of frames.
 
 	int64_t m_time_start;
-
 
 private:
 	void initDefaults();

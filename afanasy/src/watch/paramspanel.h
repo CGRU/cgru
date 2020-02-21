@@ -133,10 +133,10 @@ class ParamTicket: public QWidget
 {
 Q_OBJECT
 public:
-	ParamTicket(const QString & i_name, int i_count);
+	ParamTicket(const QString & i_name, int i_count, int i_usage = -1);
 	~ParamTicket();
 
-	void update(int i_count);
+	void update(int i_count, int i_usage = -1);
 
 signals:
 	void sig_Edit(QString i_name);
@@ -146,6 +146,6 @@ protected slots:
 
 protected:
 	QString m_name;
+
 	QLabel * m_count_label;
-	int m_count;
 };

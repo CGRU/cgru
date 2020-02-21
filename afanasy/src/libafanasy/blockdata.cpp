@@ -1041,6 +1041,7 @@ TaskExec *BlockData::genTask(int num) const
 			m_job_id, m_block_num, m_flags, num);
 
 	taskExec->m_custom_data_block = m_custom_data;
+	taskExec->m_tickets = m_tickets;
 
 	if (isNotNumeric())
 	{

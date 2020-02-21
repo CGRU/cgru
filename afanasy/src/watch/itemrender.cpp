@@ -238,10 +238,10 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 
 	    m_online = render->isOnline();
 		m_info_text_render += "<br>";
-		m_info_text_render += "<br>Registered at <b>" + afqt::time2Qstr(m_time_registered) + "</b>";
+		m_info_text_render += "<br>Registered: <b>" + afqt::time2Qstr(m_time_registered) + "</b>";
 		if (m_online)
 		{
-			m_info_text_render += "<br>Launched at <b>" + afqt::time2Qstr(m_time_launched) + "</b>";
+			m_info_text_render += "<br>Launched: <b>" + afqt::time2Qstr(m_time_launched) + "</b>";
 		}
 		else
 		{

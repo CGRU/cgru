@@ -294,7 +294,7 @@ void RenderAf::setTask( af::TaskExec *taskexec, MonitorContainer * monitoring, b
 		return;
 	}
 
-	addTask( taskexec);
+	addTask(taskexec, monitoring);
 
 	if( monitoring ) monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
 
@@ -655,7 +655,7 @@ void RenderAf::stopTask( int jobid, int blocknum, int tasknum, int number)
 
 void RenderAf::taskFinished( const af::TaskExec * taskexec, MonitorContainer * monitoring)
 {
-	removeTask( taskexec);
+	removeTask(taskexec, monitoring);
 
 	if( taskexec->getNumber())
 	{
@@ -673,32 +673,33 @@ void RenderAf::taskFinished( const af::TaskExec * taskexec, MonitorContainer * m
 	if( monitoring ) monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
 }
 
-void RenderAf::addTask( af::TaskExec * taskexec)
+void RenderAf::addTask(af::TaskExec * i_taskexec, MonitorContainer * i_monitoring)
 {
 	// If render was not busy it has become busy now
-	if( false == isBusy())
+	if (false == isBusy())
 	{
-		setBusy( true);
-		m_task_start_finish_time = time( NULL);
+		setBusy(true);
+		m_task_start_finish_time = time(NULL);
 		store();
 	}
 
 	#ifdef AFOUTPUT
-	AF_DEBUG << *taskexec;
+	AF_DEBUG << *i_taskexec;
 	#endif
 
-	m_tasks.push_back( taskexec);
+	m_tasks.push_back(i_taskexec);
 
-	m_capacity_used += taskexec->getCapResult();
+	m_capacity_used += i_taskexec->getCapResult();
 
-	// Just check capacity:
+	// Just check capacity.
+	// It was checked before, when we run canRunOn function
 	if ((getCapacity() >= 0) && (m_capacity_used > getCapacity()))
 		AF_ERR << "Capacity_used > max capacity (" << m_capacity_used << " > " << getCapacity() << ")";
 
-	//farmTaskAcuire( taskexec->getServiceType());
+	m_parent->taskAcuire(i_taskexec, i_monitoring);
 }
 
-void RenderAf::removeTask( const af::TaskExec * i_exec)
+void RenderAf::removeTask(const af::TaskExec * i_taskexec, MonitorContainer * i_monitoring)
 {
 	// Do not set free status here, even if this task was last.
 	// May it will take another task in this run cycle
@@ -707,25 +708,25 @@ void RenderAf::removeTask( const af::TaskExec * i_exec)
 	// As this af::TaskExec will be deleted by TaskRun very soon.
 
 	// Remove exec pointer:
-	for( std::list<af::TaskExec*>::iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
+	for (std::list<af::TaskExec*>::iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
 	{
-		if( *it == i_exec)
+		if (*it == i_taskexec)
 		{
-			it = m_tasks.erase( it);
+			it = m_tasks.erase(it);
 		}
 	}
 
 	// Remove exec pointer from events:
-	m_re.remTaskExec( i_exec);
+	m_re.remTaskExec(i_taskexec);
 
-	if( m_capacity_used < i_exec->getCapResult())
+	if (m_capacity_used < i_taskexec->getCapResult())
 	{
-		AF_ERR << "Capacity_used < getCapResult() (" << m_capacity_used << " < " << i_exec->getCapResult() << ")";
+		AF_ERR << "Capacity_used < getCapResult() (" << m_capacity_used << " < " << i_taskexec->getCapResult() << ")";
 		m_capacity_used = 0;
 	}
-	else m_capacity_used -= i_exec->getCapResult();
+	else m_capacity_used -= i_taskexec->getCapResult();
 
-	//farmTaskRelease( taskexec->getServiceType());
+	m_parent->taskRelease(i_taskexec, i_monitoring);
 }
 
 void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorContainer * monitoring)

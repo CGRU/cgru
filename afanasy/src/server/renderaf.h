@@ -130,10 +130,10 @@ private:
 
 	/// Add the task exec to this render and take over its ownership (meaning
 	/// one should not free taskexec after having provided it to this method).
-	void addTask( af::TaskExec * taskexec);
+	void addTask(af::TaskExec * i_taskexec, MonitorContainer * i_monitoring);
 	/// Remove the task exec from this render and give back its ownership to the
 	/// caller.
-	void removeTask( const af::TaskExec * taskexec);
+	void removeTask(const af::TaskExec * i_taskexec, MonitorContainer * i_monitoring);
 
 /// Stop tasks.
 	void ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus, const std::string * i_keeptasks_username = NULL);
