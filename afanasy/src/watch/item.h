@@ -29,6 +29,8 @@ public:
 	Item(const QString &i_name, int i_id, EType i_type);
 	virtual ~Item();
 
+	static const int HeightTickets = 24;
+
 	virtual QSize sizeHint( const QStyleOptionViewItem &option) const;
 
 	inline int getHeight() const { return m_height;}
@@ -94,6 +96,18 @@ public:
 
 	inline bool hasParam(const QString & i_name) const {return m_params.contains(i_name);}
 	const QVariant & getParamVar(const QString & i_name) const;
+
+	enum ETK_DRAW_OPTS {
+		TKD_LEFT   = 0,
+		TKD_RIGHT  = 1,
+		TKD_BORDER = 1 << 1
+	};
+
+	/// Draw ticket and return its width
+	static int drawTicket(QPainter * i_painter, const QPen & i_text_pen,
+			int i_x, int i_y, int i_w,
+			int i_opts,
+			const QString & i_name, int i_count, int i_usage = -1);
 
 protected:
 	void drawBack(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option, const QColor * i_clrItem = NULL, const QColor * i_clrBorder = NULL) const;

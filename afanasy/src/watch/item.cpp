@@ -313,3 +313,85 @@ void Item::drawStar( int size, int posx, int posy, QPainter * painter)
 	painter->drawPolygon( ms_star_pointsDraw);//, Qt::WindingFill);
 }
 
+int Item::drawTicket(QPainter * i_painter, const QPen & i_text_pen,
+		int i_x, int i_y, int i_w,
+		int i_opts,
+		const QString & i_name, int i_count, int i_usage)
+{
+	i_painter->setPen(i_text_pen);
+
+	QPen border_pen;
+	if (i_opts & TKD_BORDER)
+	{
+		i_x += 2;
+		i_y += 2;
+
+		if (i_usage >= i_count)
+			border_pen.setColor(afqt::QEnvironment::clr_error.c);
+		else if (i_usage > 0)
+			border_pen.setColor(afqt::QEnvironment::clr_running.c);
+		else
+			border_pen.setColor(afqt::QEnvironment::clr_done.c);
+	}
+
+	const QPixmap * icon = Watch::getTicketIcon(i_name);
+	QString text;
+	if (i_usage == -1)
+		text = QString("x%1").arg(i_count);
+	else
+		text = QString("x%1 / %2").arg(i_count).arg(i_usage);
+
+	QRect tk_rect;
+	int tk_width = 0;
+	if (i_opts & TKD_RIGHT)
+	{
+		if (icon)
+		{
+			i_painter->drawPixmap(i_x + tk_width, i_y-1, *icon);
+			tk_width += icon->width();
+		}
+		else
+		{
+			i_painter->drawText(i_x + tk_width, i_y, i_w, 15, Qt::AlignLeft | Qt::AlignTop, i_name, &tk_rect);
+			tk_width += tk_rect.width();
+		}
+
+		i_painter->drawText(i_x + tk_width, i_y, i_w, 15, Qt::AlignLeft | Qt::AlignTop, text, &tk_rect);
+		tk_width += tk_rect.width() + 1;
+
+		if (i_opts & TKD_BORDER)
+		{
+			i_painter->setPen(border_pen);
+			i_painter->setBrush(Qt::NoBrush);
+			i_painter->drawRect(i_x - 2, i_y - 2, tk_width + 4, HeightTickets - 5);
+			tk_width += 4;
+		}
+	}
+	else
+	{
+		i_painter->drawText(i_x, i_y, i_w - tk_width, 15, Qt::AlignRight | Qt::AlignTop, text, &tk_rect);
+		tk_width += tk_rect.width() + 1;
+
+		if (icon)
+		{
+			i_painter->drawPixmap(i_x + i_w - tk_width - icon->width(), i_y-1, *icon);
+			tk_width += icon->width();
+		}
+		else
+		{
+			i_painter->drawText(i_x, i_y, i_w - tk_width, 15, Qt::AlignRight | Qt::AlignTop, i_name, &tk_rect);
+			tk_width += tk_rect.width();
+		}
+
+		if (i_opts & TKD_BORDER)
+		{
+			i_painter->setPen(border_pen);
+			i_painter->setBrush(Qt::NoBrush);
+			i_painter->drawRect(i_x + i_w - 2 - tk_width, i_y - 2, tk_width + 4, HeightTickets - 5);
+			tk_width += 4;
+		}
+	}
+
+	return tk_width;
+}
+

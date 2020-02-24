@@ -547,8 +547,6 @@ void BlockInfo::paint( QPainter * i_painter, const QStyleOptionViewItem &option,
 	// Setup font size and color:
 	i_painter->setFont(afqt::QEnvironment::f_info);
 	QPen pen(Item::clrTextInfo(p_tasksrunning, option.state & QStyle::State_Selected, m_item->isLocked()));
-	i_painter->setPen(pen);
-
 
 	// Draw tickets:
 	int tk_w = 0;
@@ -558,25 +556,14 @@ void BlockInfo::paint( QPainter * i_painter, const QStyleOptionViewItem &option,
 	{
 		it.next();
 
-		QRect tk_rect;
-		i_painter->drawText(x+xoffset+5, tk_y, w-10-xoffset-tk_w, 15, Qt::AlignRight | Qt::AlignTop, QString("x%1").arg(it.value()), &tk_rect);
-		tk_w += tk_rect.width() + 1;
-
-		const QPixmap * icon = Watch::getTicketIcon(it.key());
-		if (icon)
-		{
-			i_painter->drawPixmap(x+xoffset+5+w-10-xoffset-tk_w-icon->width(), tk_y-1, *icon);
-			tk_w += icon->width();
-		}
-		else
-		{
-			i_painter->drawText(x+xoffset+5, tk_y, w-10-xoffset-tk_w, 15, Qt::AlignRight | Qt::AlignTop, it.key(), &tk_rect);
-			tk_w += tk_rect.width();
-		}
+		tk_w += Item::drawTicket(i_painter, pen, x+5 + xoffset, tk_y, w-10 - xoffset - tk_w,
+				Item::TKD_LEFT,
+				it.key(), it.value());
 
 		tk_w += 8;
 	}
 
+	i_painter->setPen(pen);
 
 	// Paint parameters:
 	QRect rect_params;

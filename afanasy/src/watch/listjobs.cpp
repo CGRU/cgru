@@ -105,7 +105,7 @@ ListJobs::ListJobs(QWidget * i_parent):
 
 	addButtonsMenu(Item::TJob, "Restart","Restart jobs tasks menu.");
 
-	bp = addButtonPanel(Item::TJob, "SELECTED","jobs_restart","Restart all selected jobs tasks.","", true);
+	bp = addButtonPanel(Item::TJob, "ALL TASKS","jobs_restart","Restart all tasks of all selected jobs.","", true);
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRestart()));
 
 	bp = addButtonPanel(Item::TJob, "AND PAUSE","jobs_restart_pause","Restart tasks and pause selected jobs.","", true);

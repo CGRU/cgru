@@ -19,8 +19,6 @@ public:
 
 	static const int HeightServices = 24;
 
-	static const int HeightTickets = 24;
-
 	static const int DepthOffset = 32;
 
 	QList<QString> m_services;

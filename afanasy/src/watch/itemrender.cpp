@@ -100,7 +100,6 @@ ItemRender::~ItemRender()
 void ItemRender::deleteTasks()
 {
 	for( std::list<af::TaskExec*>::iterator it = m_tasks.begin(); it != m_tasks.end(); it++) delete *it;
-	m_tasksicons.clear();
 }
 
 void ItemRender::deletePlots()
@@ -263,7 +262,6 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 		m_elder_task_time = time(NULL);
 	    for( std::list<af::TaskExec*>::const_iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
 		{
-	        m_tasksicons.push_back( Watch::getServiceIconSmall( QString::fromUtf8( (*it)->getServiceType().c_str())));
 			QString tusr = QString::fromUtf8( (*it)->getUserName().c_str());
 			int pos = tasks_users.indexOf( tusr);
 			if( pos != -1) tasks_counts[pos]++;
@@ -707,9 +705,9 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 		}
 
 	    std::list<af::TaskExec*>::const_iterator it = m_tasks.begin();
-	    std::list<const QPixmap*>::const_iterator icons_it = m_tasksicons.begin();
-	    for (int numtask = 0; it != m_tasks.end(); it++, icons_it++, numtask++)
+	    for (int numtask = 0; it != m_tasks.end(); it++, numtask++)
 		{
+			int tw = 0;
 			// Prepare strings
 			QString taskstr = QString("%1").arg((*it)->getCapacity());
 			if ((*it)->getCapCoeff())
@@ -739,17 +737,35 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 				i_painter->setOpacity(1.0);
 			}
 
-			i_painter->setPen(clrTextInfo(i_option));
-			i_painter->drawText(x, y_cur, w-5, HeightTask,
-					Qt::AlignVCenter | Qt::AlignRight, user_time, &rect_usertime );
-			i_painter->drawText(x+18, y_cur, w-30-rect_usertime.width(), HeightTask,
-					Qt::AlignVCenter | Qt::AlignLeft, taskstr);
-
-			// Draw an icon only if pointer is not NULL:
-			if (*icons_it)
+			// Draw an icon if exists:
+			const QPixmap * icon = Watch::getServiceIconSmall(afqt::stoq((*it)->getServiceType()));
+			if (icon)
 			{
-	            i_painter->drawPixmap(x+5, y_cur, *(*icons_it));
+				i_painter->drawPixmap(x+5, y_cur, *icon);
+				tw += icon->width() + 2;
 			}
+
+			// Setup pen color
+			QPen pen(clrTextInfo(i_option));
+
+			// Draw tickets
+			for (auto const & tIt : (*it)->m_tickets)
+			{
+				tw += Item::drawTicket(i_painter, pen, x+5 + tw, y_cur, w-10 - tw,
+						Item::TKD_RIGHT,
+						afqt::stoq(tIt.first), tIt.second);
+
+				tw += 8;
+			}
+
+			i_painter->setPen(pen);
+
+			// Draw informatin strings
+			i_painter->drawText(x+5, y_cur, w-5, HeightTask,
+					Qt::AlignVCenter | Qt::AlignRight, user_time, &rect_usertime );
+
+			i_painter->drawText(x+5 + tw, y_cur, w-10 - rect_usertime.width(), HeightTask,
+					Qt::AlignVCenter | Qt::AlignLeft, taskstr);
 
 			y_cur += HeightTask;
 		}

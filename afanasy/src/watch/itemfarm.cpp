@@ -125,59 +125,49 @@ void ItemFarm::drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int 
 {
 	i_painter->setFont(afqt::QEnvironment::f_info);
 	QPen pen(afqt::QEnvironment::qclr_black);
-	i_painter->setPen(pen);
 
-	int tkp_w = 0;
-	QMapIterator<QString, af::Farm::Tiks> tkp_it(m_tickets_pool);
-	while (tkp_it.hasNext())
+	if (getType() == Item::TPool)
 	{
-		tkp_it.next();
-
-		QRect tk_rect;
-
-		const QPixmap * icon = Watch::getTicketIcon(tkp_it.key());
-		if (icon)
+		int tkp_w = 0;
+		QMapIterator<QString, af::Farm::Tiks> tkp_it(m_tickets_pool);
+		while (tkp_it.hasNext())
 		{
-			i_painter->drawPixmap(i_x+5+tkp_w, i_y-1, *icon);
-			tkp_w += icon->width();
-		}
-		else
-		{
-			i_painter->drawText(i_x+5+tkp_w, i_y, i_w-10, 15, Qt::AlignLeft | Qt::AlignTop, tkp_it.key(), &tk_rect);
-			tkp_w += tk_rect.width();
+			tkp_it.next();
+
+			tkp_w += drawTicket(i_painter, pen, i_x + 5 + tkp_w, i_y, i_w - 10,
+					Item::TKD_RIGHT | Item::TKD_BORDER,
+					tkp_it.key(), tkp_it.value().count, tkp_it.value().usage);
+
+			tkp_w += 8;
 		}
 
-		i_painter->drawText(i_x+5+tkp_w, i_y, i_w-10, 15, Qt::AlignLeft | Qt::AlignTop,
-				QString("x%1 / %2").arg(tkp_it.value().count).arg(tkp_it.value().usage), &tk_rect);
-		tkp_w += tk_rect.width() + 1;
+		int tkh_w = 0;
+		QMapIterator<QString, af::Farm::Tiks> tkh_it(m_tickets_host);
+		while (tkh_it.hasNext())
+		{
+			tkh_it.next();
 
-		tkp_w += 8;
+			tkh_w += drawTicket(i_painter, pen, i_x + 5, i_y + 3, i_w - 10 - tkh_w,
+					Item::TKD_LEFT,
+					tkh_it.key(), tkh_it.value().count);
+
+			tkh_w += 8;
+		}
 	}
-
-	int tkh_w = 0;
-	QMapIterator<QString, af::Farm::Tiks> tkh_it(m_tickets_host);
-	while (tkh_it.hasNext())
+	else
 	{
-		tkh_it.next();
-
-		QRect tk_rect;
-		i_painter->drawText(i_x+5, i_y, i_w-10-tkh_w, 15, Qt::AlignRight | Qt::AlignTop,
-				QString("x%1 / %2").arg(tkh_it.value().count).arg(tkh_it.value().usage), &tk_rect);
-		tkh_w += tk_rect.width() + 1;
-
-		const QPixmap * icon = Watch::getTicketIcon(tkh_it.key());
-		if (icon)
+		int tkh_w = 0;
+		QMapIterator<QString, af::Farm::Tiks> tkh_it(m_tickets_host);
+		while (tkh_it.hasNext())
 		{
-			i_painter->drawPixmap(i_x+5+i_w-10-tkh_w-icon->width(), i_y-1, *icon);
-			tkh_w += icon->width();
-		}
-		else
-		{
-			i_painter->drawText(i_x+5, i_y, i_w-10-tkh_w, 15, Qt::AlignRight | Qt::AlignTop, tkh_it.key(), &tk_rect);
-			tkh_w += tk_rect.width();
-		}
+			tkh_it.next();
 
-		tkh_w += 8;
+			tkh_w += drawTicket(i_painter, pen, i_x + 5, i_y, i_w - 10 - tkh_w,
+					Item::TKD_LEFT | Item::TKD_BORDER,
+					tkh_it.key(), tkh_it.value().count, tkh_it.value().usage);
+
+			tkh_w += 8;
+		}
 	}
 }
 

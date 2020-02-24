@@ -109,7 +109,6 @@ private:
 	QString  m_state;
 	std::list<af::TaskExec*> m_tasks;
 	std::vector<int32_t> m_tasks_percents;
-	std::list<const QPixmap*> m_tasksicons;
 	long long m_taskstartfinishtime;
 	QString m_taskstartfinishtime_str;
 	QString m_offlineState;
