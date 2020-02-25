@@ -12,6 +12,7 @@
 
 ItemFarm::ItemFarm(af::Node * i_afnode, Item::EType i_type, const CtrlSortFilter * i_ctrl_sf):
 	ItemNode(i_afnode, i_type, i_ctrl_sf),
+	m_parent(NULL),
 	m_depth(0)
 {
 }
@@ -54,6 +55,16 @@ int ItemFarm::calcHeightFarm() const
 		height += HeightTickets;
 
 	return height;
+}
+
+void ItemFarm::setParent(ItemFarm * i_parent)
+{
+	m_parent = i_parent;
+
+	if (m_parent)
+		m_depth = m_parent->m_depth + 1;
+	else
+		m_depth = 0;
 }
 
 void ItemFarm::setDepth(int i_depth)
@@ -162,12 +173,34 @@ void ItemFarm::drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int 
 		{
 			tkh_it.next();
 
+			int draw_flags = Item::TKD_LEFT | Item::TKD_BORDER;
+			int count = tkh_it.value().count;
+			if (count == -1)
+			{
+				draw_flags |= Item::TKD_DASH;
+				count = m_parent->getTicketHostCount(tkh_it.key());
+				if (count == -1)
+					continue;
+			}
+
 			tkh_w += drawTicket(i_painter, pen, i_x + 5, i_y, i_w - 10 - tkh_w,
-					Item::TKD_LEFT | Item::TKD_BORDER,
-					tkh_it.key(), tkh_it.value().count, tkh_it.value().usage);
+					draw_flags,
+					tkh_it.key(), count, tkh_it.value().usage);
 
 			tkh_w += 8;
 		}
 	}
+}
+
+int ItemFarm::getTicketHostCount(const QString & i_name) const
+{
+	QMap<QString, af::Farm::Tiks>::const_iterator it = m_tickets_host.find(i_name);
+	if (it != m_tickets_host.end())
+		return it.value().count;
+
+	if (m_parent)
+		return m_parent->getTicketHostCount(i_name);
+
+	return -1;
 }
 

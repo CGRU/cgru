@@ -14,6 +14,8 @@ public:
 
 	void updateFarmValues(af::Farm * i_affarm);
 
+	void setParent(ItemFarm * i_parent);
+
 	inline int getDepth() const { return m_depth; }
 	void setDepth(int i_depth);
 
@@ -35,5 +37,9 @@ protected:
 	int calcHeightFarm() const;
 
 private:
+	int getTicketHostCount(const QString & i_name) const;
+
+private:
+	ItemFarm * m_parent;
 	int m_depth;
 };

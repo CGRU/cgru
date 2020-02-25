@@ -100,7 +100,8 @@ public:
 	enum ETK_DRAW_OPTS {
 		TKD_LEFT   = 0,
 		TKD_RIGHT  = 1,
-		TKD_BORDER = 1 << 1
+		TKD_BORDER = 1 << 1,
+		TKD_DASH   = 1 << 2
 	};
 
 	/// Draw ticket and return its width

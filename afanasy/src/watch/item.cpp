@@ -332,6 +332,9 @@ int Item::drawTicket(QPainter * i_painter, const QPen & i_text_pen,
 			border_pen.setColor(afqt::QEnvironment::clr_running.c);
 		else
 			border_pen.setColor(afqt::QEnvironment::clr_done.c);
+
+		if (i_opts & TKD_DASH)
+			border_pen.setStyle(Qt::DashDotDotLine);
 	}
 
 	const QPixmap * icon = Watch::getTicketIcon(i_name);

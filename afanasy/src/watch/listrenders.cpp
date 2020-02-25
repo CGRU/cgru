@@ -668,11 +668,11 @@ void ListRenders::offsetHierarchy(ItemPool * i_item_pool)
 	m_pools[i_item_pool->getName()] = i_item_pool;
 
 	// Offset pool:
-	int depth = 0;
+	ItemPool * pool = NULL;
 	QMap<QString, ItemPool*>::iterator pIt = m_pools.find(i_item_pool->getParentPath());
 	if (pIt != m_pools.end())
-		depth = (*pIt)->getDepth() + 1;
-	i_item_pool->setDepth(depth);
+		pool = (*pIt);
+	i_item_pool->setParent(pool);
 
 	// Offset its renders (as pool item can be created after it render items):
 	QMap<QString, QList<ItemRender*>>::iterator rIt = m_pool_renders.find(i_item_pool->getName());
@@ -691,11 +691,11 @@ void ListRenders::offsetHierarchy(ItemRender * i_item_render)
 		rIt.value().push_back(i_item_render);
 
 	// Offset:
-	int depth = 0;
+	ItemPool * pool = NULL;
 	QMap<QString, ItemPool*>::iterator pIt = m_pools.find(i_item_render->getPool());
 	if (pIt != m_pools.end())
-		depth = (*pIt)->getDepth() + 1;
-	i_item_render->setDepth(depth);
+		pool = (*pIt);
+	i_item_render->setParent(pool);
 }
 
 void ListRenders::removeRender(ItemRender * i_item_render)

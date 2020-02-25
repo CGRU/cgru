@@ -689,12 +689,22 @@ void RenderAf::addTask(af::TaskExec * i_taskexec, MonitorContainer * i_monitorin
 
 	m_tasks.push_back(i_taskexec);
 
+	// Add task capacity
 	m_capacity_used += i_taskexec->getCapResult();
-
 	// Just check capacity.
 	// It was checked before, when we run canRunOn function
 	if ((getCapacity() >= 0) && (m_capacity_used > getCapacity()))
 		AF_ERR << "Capacity_used > max capacity (" << m_capacity_used << " > " << getCapacity() << ")";
+
+	// Add task tickets
+	for (auto & tIt : i_taskexec->m_tickets)
+	{
+		std::map<std::string, af::Farm::Tiks>::iterator hIt = m_tickets_host.find(tIt.first);
+		if (hIt != m_tickets_host.end())
+			hIt->second.usage += tIt.second;
+		else
+			m_tickets_host[tIt.first] = Tiks(-1, tIt.second);
+	}
 
 	m_parent->taskAcuire(i_taskexec, i_monitoring);
 }
@@ -719,12 +729,21 @@ void RenderAf::removeTask(const af::TaskExec * i_taskexec, MonitorContainer * i_
 	// Remove exec pointer from events:
 	m_re.remTaskExec(i_taskexec);
 
+	// Remove task capacty
 	if (m_capacity_used < i_taskexec->getCapResult())
 	{
 		AF_ERR << "Capacity_used < getCapResult() (" << m_capacity_used << " < " << i_taskexec->getCapResult() << ")";
 		m_capacity_used = 0;
 	}
 	else m_capacity_used -= i_taskexec->getCapResult();
+
+	// Remove task tickets
+	for (auto & tIt : i_taskexec->m_tickets)
+	{
+		std::map<std::string, af::Farm::Tiks>::iterator hIt = m_tickets_host.find(tIt.first);
+		if (hIt != m_tickets_host.end())
+			hIt->second.usage -= tIt.second;
+	}
 
 	m_parent->taskRelease(i_taskexec, i_monitoring);
 }
@@ -897,6 +916,16 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 				store();
 			}
 		}
+	}
+
+	// Remove not used tickets
+	std::map<std::string, Tiks>::iterator hIt = m_tickets_host.begin();
+	while (hIt != m_tickets_host.end())
+	{
+		if ((hIt->second.count < 0) && (hIt->second.usage <= 0))
+			hIt = m_tickets_host.erase(hIt);
+		else
+			hIt++;
 	}
 }
 

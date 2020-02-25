@@ -326,6 +326,19 @@ bool AfNodeFarm::hasHostTicket(const std::string & i_name, const int32_t & i_cou
 	std::map<std::string, af::Farm::Tiks>::const_iterator it = m_farm->m_tickets_host.find(i_name);
 	if (it != m_farm->m_tickets_host.end())
 	{
+		if (it->second.count == -1)
+		{
+			// This means that render does not have such host ticket.
+			// It was created to store ticket usage for parent.
+			if (m_parent)
+			{
+				int count = i_count + it->second.usage;
+				return m_parent->hasHostTicket(i_name, count);
+			}
+
+			return true;
+		}
+
 		if ((it->second.count - it->second.usage) < i_count)
 			return false;
 	}
