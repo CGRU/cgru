@@ -26,8 +26,6 @@ public:
 	const QString name;
 	const QString label;
 	const QString tip;
-	const int min;
-	const int max;
 
 	bool isSeparator() const {return type == tsep;}
 
@@ -39,4 +37,8 @@ public:
 
 	// Get value from input dialog.
 	bool getInputDialog(const QVariant & i_var, QString & o_str, QWidget * i_parent) const;
+
+private:
+	const int m_min;
+	const int m_max;
 };

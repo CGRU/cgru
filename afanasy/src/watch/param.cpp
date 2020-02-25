@@ -18,8 +18,8 @@ Param::Param(EType i_type, Item::EType i_itemtype, const QString & i_name, const
 	name(i_name),
 	label(i_label),
 	tip(i_tip),
-	min(i_min),
-	max(i_max)
+	m_min(i_min),
+	m_max(i_max)
 {
 }
 
@@ -100,7 +100,7 @@ bool Param::getInputDialog(const QVariant & i_var, QString & o_str, QWidget * i_
 	case TNum:
 	{
 		int64_t current = i_var.toLongLong();
-		int64_t value = QInputDialog::getInt(i_parent, label, tip, current, min, max, 1, &ok);
+		int64_t value = QInputDialog::getInt(i_parent, label, tip, current, m_min, m_max, 1, &ok);
 		if (ok)
 			o_str = QString("%1").arg(value);
 		break;
