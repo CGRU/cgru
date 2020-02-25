@@ -6,6 +6,7 @@
 #include "../libafqt/qenvironment.h"
 
 #include "ctrlsortfilter.h"
+#include "itempool.h"
 #include "listrenders.h"
 #include "watch.h"
 
@@ -491,8 +492,7 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	    offlineState_time = m_offlineState + " " + afqt::stoq(af::time2strHMS(time(NULL) - m_wol_operation_time ));
 
 	// Draw busy/idle bar:
-	/* TODO take this from pool
-	if( m_online )
+	if (m_online && m_parent)
 	{
 		int width = w/7;
 		static const int height = 3;
@@ -503,42 +503,41 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 		int bar_secs = curtime - m_idle_time;
 		int busy_secs = curtime - m_busy_time;
 		int max = af::Environment::getWatchRenderIdleBarMax();
-		painter->setBrush( QBrush( afqt::QEnvironment::clr_itemrenderoff.c, Qt::SolidPattern ));
+		i_painter->setBrush(QBrush(afqt::QEnvironment::clr_itemrenderoff.c, Qt::SolidPattern));
 
-		if( m_host.m_wol_idlesleep_time > 0 )
+		if ((m_parent->get_idle_free_time() > 0) && (isNimby() || isNIMBY()))
 		{
-			max = m_host.m_wol_idlesleep_time;
-			painter->setOpacity( .5);
-			painter->setBrush( QBrush( afqt::QEnvironment::clr_running.c, Qt::SolidPattern ));
+			max = m_parent->get_idle_free_time();
+			i_painter->setOpacity(.5);
+			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_error.c, Qt::SolidPattern));
 		}
-		if(( m_host.m_nimby_busyfree_time > 0 ) && ( busy_secs > 6 ) && ( isNimby() == false) && ( isNIMBY() == false))
+		else if ((m_parent->get_busy_nimby_time() > 0) && (busy_secs > 6) && (isNimby() == false) && (isNIMBY() == false))
 		{
 			bar_secs = busy_secs;
-			max = m_host.m_nimby_busyfree_time;
-			painter->setOpacity( 1.0);
-			painter->setBrush( QBrush( afqt::QEnvironment::clr_itemrendernimby.c, Qt::SolidPattern ));
+			max = m_parent->get_busy_nimby_time();
+			i_painter->setOpacity(1.0);
+			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_itemrendernimby.c, Qt::SolidPattern));
 		}
-		if(( m_host.m_nimby_idlefree_time > 0 ) && ( isNimby() || isNIMBY() ))
+		else if (m_parent->get_idle_wolsleep_time() > 0)
 		{
-			max = m_host.m_nimby_idlefree_time;
-			painter->setOpacity( .5);
-			painter->setBrush( QBrush( afqt::QEnvironment::clr_error.c, Qt::SolidPattern ));
+			max = m_parent->get_idle_wolsleep_time();
+			i_painter->setOpacity(.5);
+			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_running.c, Qt::SolidPattern));
 		}
 
-		if( max > 0 )
+		if (max > 0)
 		{
 			int barw = width * bar_secs / max;
-			if( barw > width ) barw = width;
-			painter->setPen( Qt::NoPen );
-			painter->drawRect( posx, posy, barw, height);
+			if (barw > width) barw = width;
+			i_painter->setPen(Qt::NoPen);
+			i_painter->drawRect(posx, posy, barw, height);
 		}
 
-		painter->setOpacity( 1.0);
-		painter->setPen( afqt::QEnvironment::clr_outline.c );
-		painter->setBrush( Qt::NoBrush);
-		painter->drawRect( posx, posy, width, height);
+		i_painter->setOpacity(1.0);
+		i_painter->setPen(afqt::QEnvironment::clr_outline.c);
+		i_painter->setBrush(Qt::NoBrush);
+		i_painter->drawRect(posx, posy, width, height);
 	}
-	*/
 
 	QString ann_state = m_state;
 	// Join annotation+state+tasks on small displays:

@@ -4,6 +4,7 @@
 
 #include "itemnode.h"
 
+class ItemPool;
 class ListRenders;
 
 class ItemFarm : public ItemNode
@@ -14,7 +15,7 @@ public:
 
 	void updateFarmValues(af::Farm * i_affarm);
 
-	void setParent(ItemFarm * i_parent);
+	void setParent(ItemPool * i_parent);
 
 	inline int getDepth() const { return m_depth; }
 	void setDepth(int i_depth);
@@ -36,10 +37,12 @@ public:
 protected:
 	int calcHeightFarm() const;
 
+protected:
+	ItemPool * m_parent;
+
 private:
 	int getTicketHostCount(const QString & i_name) const;
 
 private:
-	ItemFarm * m_parent;
 	int m_depth;
 };

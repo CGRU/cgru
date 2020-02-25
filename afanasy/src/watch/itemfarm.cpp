@@ -2,6 +2,7 @@
 
 #include <QtGui/QPainter>
 
+#include "itempool.h"
 #include "listrenders.h"
 #include "watch.h"
 
@@ -57,7 +58,7 @@ int ItemFarm::calcHeightFarm() const
 	return height;
 }
 
-void ItemFarm::setParent(ItemFarm * i_parent)
+void ItemFarm::setParent(ItemPool * i_parent)
 {
 	m_parent = i_parent;
 

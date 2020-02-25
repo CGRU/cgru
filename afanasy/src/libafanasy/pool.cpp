@@ -214,8 +214,6 @@ void Pool::v_readwrite(Msg * msg)
 	if (notRoot())
 		rw_RegExp(m_pattern, msg);
 
-	// NEW_VERSION
-
 	rw_String (m_parent_path,            msg);
 	rw_int64_t(m_time_creation,          msg);
 

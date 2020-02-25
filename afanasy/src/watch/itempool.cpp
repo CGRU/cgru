@@ -84,6 +84,22 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 	{
 	}
 
+	m_idle_wolsleep_time = pool->m_idle_wolsleep_time;
+	m_idle_free_time     = pool->m_idle_free_time;
+	m_busy_nimby_time    = pool->m_busy_nimby_time;
+	m_idle_cpu           = pool->m_idle_cpu;
+	m_busy_cpu           = pool->m_busy_cpu;
+	m_idle_mem           = pool->m_idle_mem;
+	m_busy_mem           = pool->m_busy_mem;
+	m_idle_swp           = pool->m_idle_swp;
+	m_busy_swp           = pool->m_busy_swp;
+	m_idle_hddgb         = pool->m_idle_hddgb;
+	m_busy_hddgb         = pool->m_busy_hddgb;
+	m_idle_hddio         = pool->m_idle_hddio;
+	m_busy_hddio         = pool->m_busy_hddio;
+	m_idle_netmbs        = pool->m_idle_netmbs;
+	m_busy_netmbs        = pool->m_busy_netmbs;
+
 	if (isLocked())
 		strLeftTop += " (LOCKED)";
 
