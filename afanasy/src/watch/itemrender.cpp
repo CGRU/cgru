@@ -718,7 +718,6 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 			if ((*it)->getNumber())
 				taskstr += QString("(%1)").arg((*it)->getNumber());
 
-			QRect rect_usertime;
 			QString user_time = QString("%1 - %2")
 				.arg(QString::fromUtf8((*it)->getUserName().c_str()))
 				.arg( af::time2strHMS( time(NULL) - (*it)->getTimeStart()).c_str());
@@ -761,10 +760,11 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 			i_painter->setPen(pen);
 
 			// Draw informatin strings
-			i_painter->drawText(x+5, y_cur, w-5, HeightTask,
+			QRect rect_usertime;
+			i_painter->drawText(x+5, y_cur, w-10, HeightTask,
 					Qt::AlignVCenter | Qt::AlignRight, user_time, &rect_usertime );
 
-			i_painter->drawText(x+5 + tw, y_cur, w-10 - rect_usertime.width(), HeightTask,
+			i_painter->drawText(x+5 + tw, y_cur, w-10-10 - tw - rect_usertime.width(), HeightTask,
 					Qt::AlignVCenter | Qt::AlignLeft, taskstr);
 
 			y_cur += HeightTask;
