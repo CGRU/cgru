@@ -175,8 +175,8 @@ void ItemUser::updateInfo(af::User * i_user)
 		m_info_text += QString("<br>Activity host: <b>%1</b>").arg(afqt::stoq(i_user->getHostName()));
 
 	m_info_text += "<br>";
-	m_info_text += QString("<br>Registered at: <b>%1</b>").arg(afqt::time2Qstr(i_user->getTimeRegister()));
-	m_info_text += QString("<br>Last activity at: <b>%1</b>").arg(afqt::time2Qstr(i_user->getTimeActivity()));
+	m_info_text += QString("<br>Registered: <b>%1</b>").arg(afqt::time2Qstr(i_user->getTimeRegister()));
+	m_info_text += QString("<br>Last activity: <b>%1</b>").arg(afqt::time2Qstr(i_user->getTimeActivity()));
 }
 
 bool ItemUser::calcHeight()
