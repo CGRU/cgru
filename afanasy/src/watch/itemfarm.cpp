@@ -65,6 +65,8 @@ void ItemFarm::setParent(ItemFarm * i_parent)
 		m_depth = m_parent->m_depth + 1;
 	else
 		m_depth = 0;
+
+	m_margin_left = DepthOffset * m_depth;
 }
 
 void ItemFarm::setDepth(int i_depth)
