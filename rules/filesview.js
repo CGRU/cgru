@@ -928,8 +928,9 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 	}
 
 	// Folder dailies button:
-	if (i_isFolder && (RULES.afanasy_enabled !== false) && ASSET && ASSET.subfolders_dailies_hide &&
-		(ASSET.path == g_CurPath()))
+	if (i_isFolder && (RULES.afanasy_enabled !== false) && ASSET &&
+		((ASSET.subfolders_dailies_hide && (ASSET.path == g_CurPath())) ||
+		 (ASSET.subfolders_dailies_hide == false)))
 	{
 		var out_path = c_PathDir(path);
 		if (ASSET && (ASSET.dailies))

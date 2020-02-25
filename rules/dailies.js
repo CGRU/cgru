@@ -142,7 +142,7 @@ function d_DailiesWalkReceived(i_data, i_args)
 		data = i_data.cmdexec[0].walk;
 
 	params.comments = '';
-	if (RULES.status.annotation && RULES.status.annotation.length)
+	if (RULES.status && RULES.status.annotation && RULES.status.annotation.length)
 		params.comments = RULES.status.annotation.trim();
 
 	//console.log(JSON.stringify(data));
@@ -296,7 +296,10 @@ function d_ProcessGUI(i_wnd)
 	// console.log( JSON.stringify(job));
 	n_SendJob(job);
 
-	nw_MakeNews({"title": 'dailies'});
+	let news_path = g_CurPath();
+	if (ASSET && ASSET.dailies && ASSET.dailies.paths)
+		news_path = ASSET.path;
+	nw_MakeNews({'title':'dailies','path':news_path});
 }
 
 function d_MakeCmd(i_params)

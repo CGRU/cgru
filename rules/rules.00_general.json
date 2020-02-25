@@ -137,7 +137,7 @@
 		},
 		"scripts":["shot.js"],
 		"subfolders_status_hide":true,
-		"subfolders_dailies_hide":true,
+		"subfolders_dailies_hide":false,
 		"post":"shot_Post",
 			"":"custom post function",
 		"references":{
