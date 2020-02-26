@@ -237,7 +237,7 @@ void ParamsPanel::updateParams()
 
 	QList<ParamSeparator*>::iterator sIt;
 	for (sIt = m_separatos.begin(); sIt != m_separatos.end(); sIt++)
-		(*sIt)->update(m_params_show);
+		(*sIt)->update(m_cur_item, m_params_show);
 }
 
 void ParamsPanel::updateParamShowButton()
@@ -354,9 +354,9 @@ ParamSeparator::ParamSeparator(Param * i_param)
 
 ParamSeparator::~ParamSeparator(){}
 
-void ParamSeparator::update(int i_params_show)
+void ParamSeparator::update(Item * i_item, int i_params_show)
 {
-	if (ParamsPanel::PS_ALL == i_params_show)
+	if ((NULL != i_item) && (ParamsPanel::PS_ALL == i_params_show))
 		setHidden(false);
 	else
 		setHidden(true);

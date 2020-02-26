@@ -122,7 +122,7 @@ public:
 	ParamSeparator(Param * i_param);
 	~ParamSeparator();
 
-	void update(int i_params_show);
+	void update(Item * i_item, int i_params_show);
 
 protected:
 	virtual void paintEvent(QPaintEvent *event);
