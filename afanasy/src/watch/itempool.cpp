@@ -79,9 +79,37 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 	}
 	else if(Watch::isJedi())
 	{
+		if (pool->getPoolsTotal())
+			strLeftBottom += QString(" Pools: %1").arg(pool->getPoolsTotal());
+		if (pool->getRendersTotal())
+			strLeftBottom += QString(" Renders: %1").arg(pool->getRendersTotal());
+
+		if (pool->isNewRenderNimby())
+			strRightTop += " New:Nimby";
+		if (pool->isNewRenderPaused())
+			strRightTop += " New:Paused";
+		if (pool->getHostMaxTasks() >= 0)
+			strRightTop += QString(" HostMaxTasks:%1").arg(pool->getHostMaxTasks());
+		if (pool->getHostCapacity() >= 0)
+			strRightTop += QString(" HostCapacity:%1").arg(pool->getHostCapacity());
+		strRightTop += QString(" Priority:%1").arg(pool->getPriority());
 	}
 	else
 	{
+		if (pool->getPoolsTotal())
+			strLeftBottom += QString(" p:%1").arg(pool->getPoolsTotal());
+		if (pool->getRendersTotal())
+			strLeftBottom += QString(" r:%1").arg(pool->getRendersTotal());
+
+		if (pool->isNewRenderNimby())
+			strRightTop += " n:Nimby";
+		if (pool->isNewRenderPaused())
+			strRightTop += " n:Paused";
+		if (pool->getHostMaxTasks() >= 0)
+			strRightTop += QString(" ht:%1").arg(pool->getHostMaxTasks());
+		if (pool->getHostCapacity() >= 0)
+			strRightTop += QString(" hc:%1").arg(pool->getHostCapacity());
+		strRightTop += QString(" p:%1").arg(pool->getPriority());
 	}
 
 	m_idle_wolsleep_time = pool->m_idle_wolsleep_time;
