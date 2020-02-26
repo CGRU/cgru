@@ -516,6 +516,23 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 				it++)
 		{
 			QString cmd(afqt::stoq(*it));
+
+			// Ignore empty command
+			if (cmd.isEmpty())
+				continue;
+
+			// Treat as a separator
+			if (cmd.indexOf("---") == 0)
+			{
+				custom_submenu->addSeparator();
+				continue;
+			}
+
+			// Treat as a commented command
+			if (cmd.indexOf("-") == 0)
+				continue;
+
+			// Split "Name|command line with arguments"
 			QStringList cmdSplit = cmd.split("|");
 
 			ActionString * action_string = new ActionString(cmdSplit.last(), cmdSplit.first(), this);
