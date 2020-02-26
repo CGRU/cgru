@@ -137,6 +137,7 @@ namespace af
 	const std::string getenv( const char * i_name);
 	const std::string state2str( int state);
 	const std::string toKMG(long long i_number);
+	const std::string toLower(const std::string & i_str);
 	const std::string strStrip( const std::string & i_str, const std::string & i_characters = " \n");
 	const std::string strStripLeft( const std::string & i_str, const std::string & i_characters = " \n");
 	const std::string strStripRight( const std::string & i_str, const std::string & i_characters = " \n");

@@ -132,6 +132,13 @@ const std::string af::toKMG(long long i_number)
 	return str;
 }
 
+const std::string af::toLower(const std::string & i_str)
+{
+	std::string lower(i_str);
+	std::transform(lower.begin(), lower.end(), lower.begin(), [](unsigned char c){ return std::tolower(c); });
+	return lower;
+}
+
 const std::string af::vectToStr( const std::vector<int32_t> & i_vec)
 {
 	std::string o_str;
