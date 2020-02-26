@@ -180,10 +180,12 @@ void ItemFarm::drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int 
 			int count = tkh_it.value().count;
 			if (count == -1)
 			{
-				draw_flags |= Item::TKD_DASH;
+				if (NULL == m_parent)
+					continue;
 				count = m_parent->getTicketHostCount(tkh_it.key());
 				if (count == -1)
 					continue;
+				draw_flags |= Item::TKD_DASH;
 			}
 
 			tkh_w += drawTicket(i_painter, pen, i_x + 5, i_y, i_w - 10 - tkh_w,
