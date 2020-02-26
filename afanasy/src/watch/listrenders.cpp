@@ -193,6 +193,22 @@ ListRenders::ListRenders( QWidget* parent):
 		addParam_Num(Item::TPool, "host_max_tasks", "Host Max Tasks", "Pool hosts Maximum running tasks", -1, 99);
 		addParam_Num(Item::TPool, "host_capacity",  "Host Capacity",  "Pool hosts Capacity", -1, 1<<30);
 		addParam_Str(Item::TAny,  "annotation",     "Annotation",     "Annotation string");
+
+		addParam_Hrs(Item::TPool, "idle_free_time",     "Idle Free Time",  "Unset Nimby idle time.");
+		addParam_Hrs(Item::TPool, "busy_nimby_time",    "Busy Nimby Time", "Set Nimby busy time.");
+		addParam_Num(Item::TPool, "idle_cpu",           "Idle CPU",        "Idle CPU usage percentage.",          -1, 100);
+		addParam_Num(Item::TPool, "busy_cpu",           "Busy CPU",        "Busy CPU usage percentage.",          -1, 100);
+		addParam_Num(Item::TPool, "idle_mem",           "Idle MEM",        "Idle memory usage percentage.",       -1, 100);
+		addParam_Num(Item::TPool, "busy_mem",           "Busy MEM",        "Busy memory usage percentage.",       -1, 100);
+		addParam_Num(Item::TPool, "idle_swp",           "Idle SWAP",       "Idle swap usage percentage.",         -1, 100);
+		addParam_Num(Item::TPool, "busy_swp",           "Busy SWAP",       "Busy swap usage percentage.",         -1, 100);
+		addParam_Num(Item::TPool, "idle_hddgb",         "Idle HDD GB",     "Idle HDD free space (GB).",           -1, 1<<30);
+		addParam_Num(Item::TPool, "busy_hddgb",         "Busy HDD GB",     "Busy HDD free space (GB).",           -1, 1<<30);
+		addParam_Num(Item::TPool, "idle_hddio",         "Idle HDD I/O",    "Idle HDD I/O usage percentage.",      -1, 100);
+		addParam_Num(Item::TPool, "busy_hddio",         "Busy HDD I/O",    "Busy HDD I/O usage percentage.",      -1, 100);
+		addParam_Num(Item::TPool, "idle_netmbs",        "Idle NET MB/s",   "Idle network usage (MBytes/second).", -1, 1<<30);
+		addParam_Num(Item::TPool, "busy_netmbs",        "Busy NET MB/s",   "Busy network usage (MBytes/second).", -1, 1<<30);
+		addParam_Hrs(Item::TPool, "idle_wolsleep_time", "Idle WOL Sleep",  "WOL sleep after this idle time.");
 	}
 
 	ParamsPanelFarm * paramspanelfarm = new ParamsPanelFarm(this);

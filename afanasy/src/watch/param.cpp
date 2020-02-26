@@ -167,7 +167,7 @@ bool Param::getInputDialog(const QVariant & i_var, QString & o_str, QWidget * i_
 
 		QString _tip = tip + "\nEnter number of hours";
 		double current = double(time) / (60.0 * 60.0);
-		double value = QInputDialog::getDouble(i_parent, label, _tip, current, -1, 1<<30, 1, &ok);
+		double value = QInputDialog::getDouble(i_parent, label, _tip, current, -1, 1<<30, 2, &ok);
 
 		if (ok)
 		{

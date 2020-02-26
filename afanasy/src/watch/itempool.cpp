@@ -48,6 +48,22 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 		m_params["pattern"] = afqt::stoq(pool->getPatternStr());
 	m_params["host_max_tasks"] = pool->getHostMaxTasks();
 	m_params["host_capacity"]  = pool->getHostCapacity();
+
+	m_params["idle_free_time"]     = pool->m_idle_free_time;
+	m_params["busy_nimby_time"]    = pool->m_busy_nimby_time;
+	m_params["idle_cpu"]           = pool->m_idle_cpu;
+	m_params["busy_cpu"]           = pool->m_busy_cpu;
+	m_params["idle_mem"]           = pool->m_idle_mem;
+	m_params["busy_mem"]           = pool->m_busy_mem;
+	m_params["idle_swp"]           = pool->m_idle_swp;
+	m_params["busy_swp"]           = pool->m_busy_swp;
+	m_params["idle_hddgb"]         = pool->m_idle_hddgb;
+	m_params["busy_hddgb"]         = pool->m_busy_hddgb;
+	m_params["idle_hddio"]         = pool->m_idle_hddio;
+	m_params["busy_hddio"]         = pool->m_busy_hddio;
+	m_params["idle_netmbs"]        = pool->m_idle_netmbs;
+	m_params["busy_netmbs"]        = pool->m_busy_netmbs;
+	m_params["idle_wolsleep_time"] = pool->m_idle_wolsleep_time;
 /*
 	if (running_tasks_num)
 		setRunning();
