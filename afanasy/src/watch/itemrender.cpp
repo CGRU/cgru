@@ -505,14 +505,18 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 		int max = af::Environment::getWatchRenderIdleBarMax();
 		i_painter->setBrush(QBrush(afqt::QEnvironment::clr_itemrenderoff.c, Qt::SolidPattern));
 
-		if ((m_parent->get_idle_free_time() > 0) && (isNimby() || isNIMBY()))
+		if ((m_parent->get_idle_free_time() > 0) && (isNimby() || isNIMBY()) && (false == isBusy()))
 		{
+			// We have auto nimby off (free) enabled,
+			// Nimby is set and render has no tasks
 			max = m_parent->get_idle_free_time();
 			i_painter->setOpacity(.5);
 			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_error.c, Qt::SolidPattern));
 		}
-		else if ((m_parent->get_busy_nimby_time() > 0) && (busy_secs > 6) && (isNimby() == false) && (isNIMBY() == false))
+		else if ((m_parent->get_busy_nimby_time() > 0) && (busy_secs > 6) && isFree())
 		{
+			// We have auto nimby enabled,
+			// Nimby is not set (is free) and render is busy (for more 6 seconds - afwatch update interval)
 			bar_secs = busy_secs;
 			max = m_parent->get_busy_nimby_time();
 			i_painter->setOpacity(1.0);
@@ -520,6 +524,7 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 		}
 		else if (m_parent->get_idle_wolsleep_time() > 0)
 		{
+			// We have auto sleep enabled
 			max = m_parent->get_idle_wolsleep_time();
 			i_painter->setOpacity(.5);
 			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_running.c, Qt::SolidPattern));

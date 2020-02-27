@@ -30,6 +30,7 @@ public:
 	inline bool isBusy()          const { return m_busy;             }
 	inline bool isNimby()         const { return m_nimby;            }
 	inline bool isNIMBY()         const { return m_NIMBY;            }
+	inline bool isFree()          const { return !m_NIMBY&&!m_nimby; }
 	inline bool isPaused()        const { return m_paused;           }
 	inline bool isDirty()         const { return m_dirty;            }
 	inline bool isWOLFalling()    const { return m_wolFalling;       }
