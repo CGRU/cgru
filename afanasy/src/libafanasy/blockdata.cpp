@@ -82,9 +82,9 @@ void BlockData::initDefaults()
 	m_task_max_run_time /******/ = 0;
 	m_task_min_run_time /******/ = 0;
 	m_capacity = AFJOB::TASK_DEFAULT_CAPACITY;
-	m_need_memory /************/ = 0;
-	m_need_power /*************/ = 0;
-	m_need_hdd /***************/ = 0;
+	m_need_memory /************/ = -1;
+	m_need_power /*************/ = -1;
+	m_need_hdd /***************/ = -1;
 	m_errors_retries /*********/ = -1;
 	m_errors_avoid_host /******/ = -1;
 	m_errors_task_same_host /**/ = -1;
