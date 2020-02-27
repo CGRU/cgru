@@ -54,7 +54,7 @@ BlockInfo::BlockInfo(const af::BlockData * i_data, Item * i_item, ListItems * i_
 
 	tasksnum(1)
 {
-	addParam_Num("sequential",                   "Sequential",            "Tasks solving order");
+	addParam_Num("sequential",                   "Sequential",            "Tasks solving order", -(1<<30));
 	addParam_Num("capacity",                     "Capacity",              "Tasks capacity");
 	addParam_Num("max_running_tasks",            "Maximum Running",       "Maximum running tasks number");
 	addParam_Num("max_running_tasks_per_host",   "Max Run Per Host",      "Max run tasks on the same host");
