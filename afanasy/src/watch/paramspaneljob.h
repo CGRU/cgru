@@ -121,9 +121,22 @@ public:
 
 	void update();
 
+private slots:
+	void slot_BlockParamsShowAll();
+
+private:
+	void addBlockParamWidget(Param * i_param);
+
 private:
 	const BlockInfo * m_info;
-	QVBoxLayout * m_layout;
+
+	QVBoxLayout * m_tickets_layout;
 	QMap<QString, ParamTicket*> m_map_params_ticket;
+
+	QVBoxLayout * m_params_layout;
+	QPushButton * m_btn_params_show_all;
+	QList<ParamWidget*> m_params_widgets;
+	QList<ParamSeparator*> m_separatos;
+	bool m_params_show_all;
 };
 

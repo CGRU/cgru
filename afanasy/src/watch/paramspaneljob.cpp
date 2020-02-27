@@ -13,6 +13,7 @@
 
 #include "item.h"
 #include "itemjob.h"
+#include "param.h"
 #include "watch.h"
 
 #define AFOUTPUT
@@ -403,35 +404,76 @@ void BlockCaptionWidget::update()
 }
 
 BlockInfoWidget::BlockInfoWidget(const BlockInfo * i_info):
-	m_info(i_info)
+	m_info(i_info),
+	m_params_show_all(false)
 {
-	m_layout = new QVBoxLayout(this);
+	QVBoxLayout * layout = new QVBoxLayout(this);
 
 	// Tickets:
 	QHBoxLayout * tcaplayout = new QHBoxLayout();
-	m_layout->addLayout(tcaplayout);
-
-	QLabel * ltickets = new QLabel("<b>Tickets</b>:");
-	tcaplayout->addWidget(ltickets);
+	layout->addLayout(tcaplayout);
+	tcaplayout->addWidget(new QLabel("<b>Tickets</b>:"));
 
 	QPushButton * btn_ticket_add = new QPushButton("add");
 	btn_ticket_add->setFixedSize(36, 16);
 	connect(btn_ticket_add, SIGNAL(clicked()), m_info, SLOT(slot_BlockTicketAdd()));
 	tcaplayout->addWidget(btn_ticket_add);
 
-	QMapIterator<QString, int> it(m_info->tickets);
-	while (it.hasNext())
-	{
-		it.next();
-		ParamTicket * pt = new ParamTicket(it.key(), it.value());
-		m_map_params_ticket[it.key()] = pt;
-		m_layout->addWidget(pt);
-		connect(pt, SIGNAL(sig_Edit(QString)), m_info, SLOT(slot_BlockTicketEdit(QString)));
-	}
+	m_tickets_layout = new QVBoxLayout();
+	layout->addLayout(m_tickets_layout);
+
+	// Parameters:
+	QHBoxLayout * pcaplayout = new QHBoxLayout();
+	layout->addLayout(pcaplayout);
+	pcaplayout->addWidget(new QLabel("<b>Block Parameters</b>"));
+
+	m_btn_params_show_all = new QPushButton("show all");
+	m_btn_params_show_all->setFixedSize(64, 16);
+	connect(m_btn_params_show_all, SIGNAL(clicked()), this, SLOT(slot_BlockParamsShowAll()));
+	pcaplayout->addWidget(m_btn_params_show_all);
+
+	m_params_layout = new QVBoxLayout();
+	layout->addLayout(m_params_layout);
+
+	QListIterator<Param*> pIt(m_info->getParamsList());
+	while (pIt.hasNext())
+		addBlockParamWidget(pIt.next());
+
+	update();
 }
 
 BlockInfoWidget::~BlockInfoWidget()
 {
+}
+
+void BlockInfoWidget::addBlockParamWidget(Param * i_param)
+{
+	if (i_param->isSeparator())
+	{
+		ParamSeparator * ps = new ParamSeparator(i_param);
+		m_params_layout->addWidget(ps);
+		m_separatos.append(ps);
+		return;
+	}
+	ParamWidget * pw = new ParamWidget(i_param);
+	m_params_layout->addWidget(pw);
+	m_params_widgets.append(pw);
+	connect(pw, SIGNAL(sig_changeParam(const Param *)), m_info, SLOT(slot_BlockChangeParam(const Param *)));
+}
+
+void BlockInfoWidget::slot_BlockParamsShowAll()
+{
+	m_btn_params_show_all->setHidden(true);
+
+	QList<ParamWidget*>::iterator pIt;
+	for (pIt = m_params_widgets.begin(); pIt != m_params_widgets.end(); pIt++)
+		(*pIt)->setHidden(false);
+
+	QList<ParamSeparator*>::iterator sIt;
+	for (sIt = m_separatos.begin(); sIt != m_separatos.end(); sIt++)
+		(*sIt)->setHidden(false);
+
+	m_params_show_all = true;
 }
 
 void BlockInfoWidget::update()
@@ -462,9 +504,14 @@ void BlockInfoWidget::update()
 		{
 			ParamTicket * pt = new ParamTicket(bIt.key(), bIt.value());
 			m_map_params_ticket[bIt.key()] = pt;
-			m_layout->addWidget(pt);
+			m_tickets_layout->addWidget(pt);
 			connect(pt, SIGNAL(sig_Edit(QString)), m_info, SLOT(slot_BlockTicketEdit(QString)));
 		}
 		bIt++;
 	}
+
+	// Update parametes:
+	QList<ParamWidget*>::iterator wIt = m_params_widgets.begin();
+	for (; wIt != m_params_widgets.end(); wIt++)
+		(*wIt)->update(m_info->getParamsVars(), m_params_show_all);
 }

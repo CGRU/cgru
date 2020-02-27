@@ -36,6 +36,7 @@ public:
 	static const int HeightCompact;
 
 	inline const QList<Param*> & getParamsList() const {return m_params; }
+	inline const QMap<QString, QVariant> & getParamsVars() const {return m_var_map;}
 
 	void generateMenu(QMenu * i_menu, QMenu * i_params_submenu = NULL) const;
 

@@ -96,7 +96,8 @@ public:
 	ParamWidget(const Param * i_parm);
 	virtual ~ParamWidget();
 
-	void update(Item * i_item, int i_params_show);
+	void update(const Item * i_item, int i_params_show);
+	void update(const QMap<QString, QVariant> & i_var_map, bool i_show_all);
 
 signals:
 	void sig_changeParam(const Param *);

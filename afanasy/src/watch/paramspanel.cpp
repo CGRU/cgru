@@ -225,7 +225,7 @@ void ParamsPanel::addParamWidget(Param * i_param)
 	ParamWidget * pw = new ParamWidget(i_param);
 	m_params_layout->addWidget(pw);
 	m_params_list.append(pw);
-	pw->setHidden(true);
+
 	connect(pw, SIGNAL(sig_changeParam(const Param *)), this, SLOT(slot_changeParam(const Param *)));
 }
 
@@ -297,13 +297,15 @@ ParamWidget::ParamWidget(const Param * i_param):
 	btn->setFixedSize(24, 16);
 
 	connect(btn, SIGNAL(clicked()), this, SLOT(slot_Edit()));
+
+	setHidden(true);
 }
 
 ParamWidget::~ParamWidget()
 {
 }
 
-void ParamWidget::update(Item * i_item, int i_params_show)
+void ParamWidget::update(const Item * i_item, int i_params_show)
 {
 	if ((NULL == i_item) || (i_params_show == ParamsPanel::PS_NONE))
 	{
@@ -326,6 +328,24 @@ void ParamWidget::update(Item * i_item, int i_params_show)
 		else if (i_params_show == ParamsPanel::PS_CHANGED)
 			setHidden(is_default);
 	}
+}
+
+void ParamWidget::update(const QMap<QString, QVariant> & i_var_map, bool i_show_all)
+{
+	QMap<QString, QVariant>::const_iterator vIt = i_var_map.find(m_param->name);
+	if (vIt == i_var_map.end())
+	{
+		setHidden(true);
+		return;
+	}
+
+	bool is_default;
+	m_value_widget->setText(m_param->varToQStr(vIt.value(), &is_default));
+
+	if (i_show_all)
+		setHidden(false);
+	else
+		setHidden(is_default);
 }
 
 void ParamWidget::paintEvent(QPaintEvent * event)
