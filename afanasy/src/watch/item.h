@@ -111,6 +111,9 @@ public:
 			const QString & i_name, int i_count, int i_usage = -1);
 
 protected:
+	inline int getDepth() const { return m_depth; }
+	void setDepth(int i_depth);
+
 	void drawBack(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option, const QColor * i_clrItem = NULL, const QColor * i_clrBorder = NULL) const;
 
 	/// Print AFJOB::STATE informaton
@@ -134,9 +137,12 @@ protected:
 
 	mutable bool m_locked;
 
-	int m_margin_left;
 
 private:
+	int m_depth;
+	int m_margin_left;
+	static const int DepthOffset = 24;
+
 	/// Node "m_running" property.
 	mutable bool m_running;
 

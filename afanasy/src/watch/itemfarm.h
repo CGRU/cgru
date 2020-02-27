@@ -17,12 +17,7 @@ public:
 
 	void setParent(ItemPool * i_parent);
 
-	inline int getDepth() const { return m_depth; }
-	void setDepth(int i_depth);
-
 	static const int HeightServices = 24;
-
-	static const int DepthOffset = 32;
 
 	QList<QString> m_services;
 	QList<QString> m_services_disabled;
@@ -44,5 +39,4 @@ private:
 	int getTicketHostCount(const QString & i_name) const;
 
 private:
-	int m_depth;
 };

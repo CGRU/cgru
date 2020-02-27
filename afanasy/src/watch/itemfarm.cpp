@@ -13,8 +13,7 @@
 
 ItemFarm::ItemFarm(af::Node * i_afnode, Item::EType i_type, const CtrlSortFilter * i_ctrl_sf):
 	ItemNode(i_afnode, i_type, i_ctrl_sf),
-	m_parent(NULL),
-	m_depth(0)
+	m_parent(NULL)
 {
 }
 
@@ -62,18 +61,11 @@ void ItemFarm::setParent(ItemPool * i_parent)
 {
 	m_parent = i_parent;
 
+	int depth = 0;
 	if (m_parent)
-		m_depth = m_parent->m_depth + 1;
-	else
-		m_depth = 0;
+		depth = m_parent->getDepth() + 1;
 
-	m_margin_left = DepthOffset * m_depth;
-}
-
-void ItemFarm::setDepth(int i_depth)
-{
-	m_depth = i_depth;
-	m_margin_left = DepthOffset * m_depth;
+	setDepth(depth);
 }
 
 void ItemFarm::drawServices(QPainter * i_painter, int i_x, int i_y, int i_w, int i_h) const

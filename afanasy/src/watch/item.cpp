@@ -31,12 +31,19 @@ Item::Item(const QString &i_name, int i_id, EType i_type):
 	m_running( false),
 	m_id(i_id),
 	m_type(i_type),
-	m_hidden(false)
+	m_hidden(false),
+	m_depth(0)
 {
 }
 
 Item::~Item()
 {
+}
+
+void Item::setDepth(int i_depth)
+{
+	m_depth = i_depth;
+	m_margin_left = DepthOffset * m_depth;
 }
 
 const QVariant & Item::getParamVar(const QString & i_name) const
