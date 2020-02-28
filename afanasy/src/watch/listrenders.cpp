@@ -934,7 +934,7 @@ void ListRenders::actUser()
 	QString text = QInputDialog::getText(this, "Set User", "Enter User Name", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	setParameter(Item::TRender, "user_name", afqt::qtos( text));
+	setParameter(Item::TRender, "user_name", afqt::qtos(QString("\"%1\"").arg(text)));
 }
 
 void ListRenders::actEjectTasks()      { operation(Item::TRender, "eject_tasks"        ); }
