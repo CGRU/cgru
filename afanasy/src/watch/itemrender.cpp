@@ -195,6 +195,8 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 			m_info_text_render += "<br>IP: <b>" + m_address_ip_str + "</b>";
 		}
 
+		m_info_text_render += QString("<br>User: <b>%1</b>").arg(m_username);
+
 		bool becameOnline = false;
 	    if(((m_online == false) && (render->isOnline())) || (i_msgType == 0))
 		{
@@ -422,6 +424,20 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 		if( m_hres.swap_total_mb )
 			m_info_text_hres += QString(" Swap: <b>%1 Gb</b>").arg(m_hres.swap_total_mb>>10);
 
+		m_loggedin_users.clear();
+		if (m_hres.logged_in_users.size())
+		{
+			m_info_text_hres += QString("<br>Logged in:");
+			for (int i = 0 ; i < m_hres.logged_in_users.size() ; ++i)
+			{
+				if (i) m_loggedin_users += ",";
+				QString user = afqt::stoq(m_hres.logged_in_users[i]);
+				m_loggedin_users += user;
+				m_info_text_hres += QString("<br><b>%1</b>").arg(user);
+			}
+		}
+
+
 		break;
 	}
 	default:
@@ -602,20 +618,13 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 		return;
 	}
 
-	QString users = "";
-	for (int i = 0 ; i < m_hres.logged_in_users.size() ; ++i)
-	{
-		if (i) users += ",";
-		users += QString::fromStdString(m_hres.logged_in_users[i]);
-	}
-
 	switch (ListRenders::getDisplaySize())
 	{
 	case ListRenders::ESmallSize:
 		i_painter->setPen(clrTextInfo(i_option));
 		i_painter->setFont(afqt::QEnvironment::f_info);
 	    i_painter->drawText(left_text_x, y_cur, left_text_w, h, Qt::AlignTop | Qt::AlignLeft,
-				m_name + ' ' + m_capacity_usage + ' ' + users + ' ' + m_engine);
+				m_name + ' ' + m_capacity_usage + ' ' + m_loggedin_users + ' ' + m_engine);
 
 		i_painter->setPen(clrTextInfo(i_option));
 		i_painter->setFont(afqt::QEnvironment::f_info);
@@ -633,7 +642,7 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 
 		i_painter->setPen(clrTextInfo(i_option));
 		i_painter->setFont(afqt::QEnvironment::f_info);
-	    i_painter->drawText(left_text_x,  y_cur, left_text_w,  base_height+2, Qt::AlignBottom | Qt::AlignLeft,  m_capacity_usage + ' ' + users);
+	    i_painter->drawText(left_text_x,  y_cur, left_text_w,  base_height+2, Qt::AlignBottom | Qt::AlignLeft,  m_capacity_usage + ' ' + m_loggedin_users);
 	}
 	
 	// Print Bottom|Right
