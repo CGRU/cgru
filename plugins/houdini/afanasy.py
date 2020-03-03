@@ -84,6 +84,7 @@ class BlockParameters:
         self.depend_mask = ''
         self.depend_mask_global = ''
         self.min_memory = -1
+        self.generate_previews = self.afnode.parm('generate_previews').eval()
         self.preview_approval = afnode.parm('preview_approval').eval()
 
         if afnode.parm('enable_extended_parameters').eval():
@@ -165,8 +166,8 @@ class BlockParameters:
             roptype = ropnode.type().name()
 
             if roptype == 'ifd':
-                if ropnode.node(ropnode.parm('camera').eval())==None:
-                    hou.ui.displayMessage("Camera in "+ropnode.name()+" is not valid",severity = hou.severityType.Error)
+                if ropnode.node(ropnode.parm('camera').eval()) is None:
+                    hou.ui.displayMessage("Camera in %s is not valid" % ropnode.name(), severity=hou.severityType.Error)
                     return
 
                 if not ropnode.parm('soho_outputmode').eval():
@@ -346,7 +347,7 @@ class BlockParameters:
         block = af.Block(self.name, self.service)
         block.setParser(self.parser)
         block.setCommand(cmd, self.cmd_useprefix)
-        if self.preview != '':
+        if self.preview != '' and self.generate_previews:
             block.setFiles([self.preview])
 
         if self.numeric:
@@ -361,7 +362,7 @@ class BlockParameters:
             for cmd in self.tasks_cmds:
                 task = af.Task(self.tasks_names[t])
                 task.setCommand(cmd)
-                if len(self.tasks_previews):
+                if len(self.tasks_previews) and self.generate_previews:
                     task.setFiles([self.tasks_previews[t]])
                 block.tasks.append(task)
                 t += 1
@@ -379,7 +380,6 @@ class BlockParameters:
             block.setTaskMaxRunTime(int(self.maxruntime*3600.0))
         if self.progress_timeout > 0.01:
             block.setTaskProgressChangeTimeout(int(self.progress_timeout*3600.0))
-
 
         # Delete files in a block post command:
         if len(self.delete_files):
@@ -432,10 +432,10 @@ class BlockParameters:
             wait_sec = now_day + (hours * 3600) + (minutes * 60) + sec
             if wait_sec <= now_sec:
                 if hou.ui.displayMessage(
-                            ('Now is greater than %d:%d\nOffset by 1 day?' % (hours,minutes)),
+                            'Now is greater than %d:%d\nOffset by 1 day?' % (hours, minutes),
                             buttons=('Offset', 'Abort'),
                             default_choice=0, close_choice=1,
-                            title=('Wait Time')
+                            title='Wait Time'
                         ) == 0:
                     wait_sec += (24*3600)
                 else:
@@ -500,7 +500,7 @@ class BlockParameters:
         for blockparam in blockparams:
             job.blocks.append(blockparam.genBlock(renderhip))
 
-            # Set ouput folder from the first block with images to preview:
+            # Set output folder from the first block with images to preview:
             if images is None and blockparam.preview != '':
                 images = blockparam.preview
                 job.setFolder('output', os.path.dirname(images))
@@ -596,12 +596,12 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
             parm_files  = afnode.parm('sep_files')
 
         images = afcommon.patternFromPaths(
-            parm_images.evalAsStringAtFrame( block_generate.frame_first),
-            parm_images.evalAsStringAtFrame( block_generate.frame_last))
+            parm_images.evalAsStringAtFrame(block_generate.frame_first),
+            parm_images.evalAsStringAtFrame(block_generate.frame_last))
 
         files = afcommon.patternFromPaths(
-            parm_files.evalAsStringAtFrame( block_generate.frame_first),
-            parm_files.evalAsStringAtFrame( block_generate.frame_last))
+            parm_files.evalAsStringAtFrame(block_generate.frame_first),
+            parm_files.evalAsStringAtFrame(block_generate.frame_last))
 
         if run_rop:
             if join_render:
@@ -675,12 +675,12 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
 
             block_join.name = blockname + '-J'
             block_join.service = 'generic'
+            # block render might be referenced before assignment
             block_join.dependmask = block_render.name
             block_join.cmd = cmd
             block_join.cmd_useprefix = False
             block_join.preview = images
 
-        if tile_render:
             params.append(block_join)
 
         if not join_render:
@@ -848,7 +848,7 @@ def getJobParameters(afnode, subblock=False, frame_range=None, prefix=''):
                 hou.hscript('set WEDGE = ' + names[wedge])
                 hou.hscript('set WEDGENUM = ' + str(wedge))
                 hou.hscript('varchange')
-                #add wedged node to next block
+                # add wedged node to next block
                 block = getBlockParameters(afnode, wedgednode, subblock, "{}_{:02}".format(newprefix,wedge), frame_range)[0]
                 block.auxargs += " --wedge " + node.path() + " --wedgenum " + str(wedge)
                 newparams.append(block)
@@ -931,5 +931,5 @@ def computeWedge(ropnode, roptype):
             numWedgeJobs = len(takes)
 
         if not numWedgeJobs:
-            raise hou.OperationFailed("The specified wedge node does not compute anyting.")
+            raise hou.OperationFailed("The specified wedge node does not compute anything.")
     return numWedgeJobs

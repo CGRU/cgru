@@ -24,7 +24,6 @@ class redshift(parser.parser):
     def __init__(self):
         parser.parser.__init__(self)
         self.data_all = ''
-        #self.first_frame = True
 
         self.str_error = [
             '[Redshift]No devices found. Aborting rendering.',
@@ -54,11 +53,6 @@ class redshift(parser.parser):
         # catch new frame start
         match = re_frame_start.search(data)
         if match is not None:
-            #if not self.first_frame:
-            #    #self.frame += 1
-            #    pass
-            #else:
-            #    self.first_frame = False
             self.block = 0
             self.block_count = 0
             self.percentframe = 0
@@ -84,15 +78,15 @@ class redshift(parser.parser):
         if self.percentframe < percent:
             self.percentframe = int(percent)
 
-        # catch skipped frames
-        match = re_frame_skip.findall(data)
-        if match:
-            self.percentframe = 100
-            self.frame += len(match)
-
         match = re_frame_done.findall(data)
         if match:
             self.percentframe = 100
             self.frame += len(match)
+        else:
+            # try to match skip frame
+            match = re_frame_skip.findall(data)
+            if match:
+                self.percentframe = 100
+                self.frame += len(match)
 
         self.calculate()
