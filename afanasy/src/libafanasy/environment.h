@@ -112,6 +112,8 @@ public:
 	static inline const std::vector<std::string> & getAnnotations()     { return annotations;} ///< Get predefined annotations
 	static inline const std::vector<std::string> & getRenderCmds()      { return rendercmds; } ///< Get render commands
 	static inline const std::vector<std::string> & getRenderCmdsAdmin() { return rendercmds_admin; } ///< Get render commands for admin
+	static inline const std::vector<std::string> & getRenderLaunchCmds()     { return render_launch_cmds; }
+	static inline const std::vector<std::string> & getRenderLaunchCmdsExit() { return render_launch_cmds_exit; }
 
 	static inline int getMonitorZombieTime()             { return monitor_zombietime;           }
 
@@ -298,6 +300,8 @@ private:
 	static std::vector<std::string> annotations;      ///< Predefined annotations
 	static std::vector<std::string> rendercmds;       ///< Render commannds
 	static std::vector<std::string> rendercmds_admin; ///< Render commannds for admin only
+	static std::vector<std::string> render_launch_cmds;
+	static std::vector<std::string> render_launch_cmds_exit;
 	static int watch_get_events_sec;
 	static int watch_refresh_gui_sec;
 	static int watch_connection_lost_time;

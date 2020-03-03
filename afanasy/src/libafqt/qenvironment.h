@@ -2,7 +2,6 @@
 
 #include "name_afqt.h"
 #include "attr.h"
-#include "attrnumber.h"
 #include "attrcolor.h"
 
 #include <QtGui/QColor>
@@ -34,6 +33,8 @@ public:
 
 	static bool getRect( const QString & i_name, QRect & rect);
 	static void setRect( const QString & i_name, const QRect & rect);
+
+	static QMap<QString, AttrNumber> ms_attrs_panel;
 
 	static AttrNumber level;
 
@@ -146,6 +147,8 @@ public:
 	inline static const QHostAddress & getAfServerQHostAddress()  { return ms_qafserveraddress;}
 
 	static const QStringList getThemes();
+
+	static const QString & getDateTimeFormat();
 
 	static bool loadTheme( const QString & i_theme);
 

@@ -41,7 +41,7 @@
 #include "../libafanasy/logger.h"
 
 ListTasks::ListTasks( QWidget* parent, int JobId, const QString & JobName):
-	ListItems( parent),
+	ListItems( parent, "tasks"),
 	m_job_id( JobId),
 	m_job_name( JobName),
 	m_blocks_num(0),
@@ -50,7 +50,7 @@ ListTasks::ListTasks( QWidget* parent, int JobId, const QString & JobName):
 	m_tasks( NULL),
 	constructed( false)
 {
-	init();
+	initListItems();
 
 	m_view->setSpacing( 1);
 //   view->setUniformItemSizes( true);
@@ -180,7 +180,7 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
 			QMenu * submenu = new QMenu( "Change Block", this);
 
 			// Operations on the current block item
-			itemBlock->generateMenu( itemBlock->getNumBlock(), &o_menu, this, submenu);
+			itemBlock->getInfo()->generateMenu(&o_menu, submenu);
 
 			o_menu.addMenu( submenu);
 			
@@ -628,7 +628,7 @@ void ListTasks::actBlockCommand()
 	QString str = QInputDialog::getText(this, "Change Command", "Enter Command", QLineEdit::Normal, cur, &ok);
 	if( !ok) return;
 	str = afqt::stoq( af::strEscape( afqt::qtos( str)));
-	blockAction( 0, QString("\"params\":{\"command\":\"%1\"}").arg( str), false);
+	blockAction(QString("\"params\":{\"command\":\"%1\"}").arg(str));
 }
 void ListTasks::actBlockWorkingDir()
 {
@@ -637,7 +637,7 @@ void ListTasks::actBlockWorkingDir()
 	QString str = QInputDialog::getText(this, "Change Working Directory", "Enter Directory", QLineEdit::Normal, cur, &ok);
 	if( !ok) return;
 	str = afqt::stoq( af::strEscape( afqt::qtos( str)));
-	blockAction( 0, QString("\"params\":{\"working_directory\":\"%1\"}").arg( str), false);
+	blockAction(QString("\"params\":{\"working_directory\":\"%1\"}").arg(str));
 }
 void ListTasks::actBlockEnvironment()
 {
@@ -650,7 +650,7 @@ void ListTasks::actBlockEnvironment()
     {
         displayError( QString("Invalid name=value pair: ") + str);
     }
-	blockAction( 0, QString("\"params\":{\"environment\":{\"%1\":\"%2\"}}").arg( list[0], list[1]), false);
+	blockAction(QString("\"params\":{\"environment\":{\"%1\":\"%2\"}}").arg(list[0], list[1]));
 }
 void ListTasks::actBlockCmdPost()
 {
@@ -659,7 +659,7 @@ void ListTasks::actBlockCmdPost()
 	QString str = QInputDialog::getText(this, "Change Post Command", "Enter Command", QLineEdit::Normal, cur, &ok);
 	if( !ok) return;
 	str = afqt::stoq( af::strEscape( afqt::qtos( str)));
-	blockAction( 0, QString("\"params\":{\"command_post\":\"%1\"}").arg(str), false);
+	blockAction(QString("\"params\":{\"command_post\":\"%1\"}").arg(str));
 }
 void ListTasks::actBlockFiles()
 {
@@ -676,7 +676,7 @@ void ListTasks::actBlockFiles()
 	}
 	params += "]}";
 
-	blockAction( 0, params, false);
+	blockAction(params);
 }
 void ListTasks::actBlockService()
 {
@@ -684,7 +684,7 @@ void ListTasks::actBlockService()
 	QString cur = ((ItemJobBlock*)( getCurrentItem()))->service;
 	QString str = QInputDialog::getText(this, "Change Service", "Enter Type", QLineEdit::Normal, cur, &ok);
 	if( !ok) return;
-	blockAction( 0, QString("\"params\":{\"service\":\"%1\"}").arg(str.replace("\"","\\\"")), false);
+	blockAction(QString("\"params\":{\"service\":\"%1\"}").arg(str.replace("\"","\\\"")));
 }
 void ListTasks::actBlockParser()
 {
@@ -692,7 +692,7 @@ void ListTasks::actBlockParser()
 	QString cur = ((ItemJobBlock*)( getCurrentItem()))->parser;
 	QString str = QInputDialog::getText(this, "Change Parser", "Enter Type", QLineEdit::Normal, cur, &ok);
 	if( !ok) return;
-	blockAction( 0, QString("\"params\":{\"parser\":\"%1\"}").arg(str.replace("\"","\\\"")), false);
+	blockAction(QString("\"params\":{\"parser\":\"%1\"}").arg(str.replace("\"","\\\"")));
 }
 
 void ListTasks::actBrowseFolder()
@@ -806,15 +806,10 @@ void ListTasks::actBlockPreview( int num_cmd, int num_img)
     Watch::startProcess(cmdSplit.last(), afqt::stoq(blockitem->getWDir()));
 }
 
-void ListTasks::blockAction( int id_block, QString i_action) { blockAction( id_block, i_action, true); }
-void ListTasks::blockAction( int id_block, const QString & i_action, bool i_query)
+// Block number will be ignored here. Selected blocks will be processed.
+void ListTasks::slot_BlockAction(int i_bnum, QString i_json) {blockAction(i_json);}
+void ListTasks::blockAction(const QString & i_json)
 {
-	if( id_block >= m_blocks_num)
-	{
-		AFERRAR("ListTasks::blockAction: id_block >= m_blocks_num (%d>=%d)", id_block, m_blocks_num)
-		return;
-	}
-
 	std::ostringstream str;
 	af::jsonActionStart( str, "jobs", "", std::vector<int>( 1, m_job_id));
 
@@ -829,19 +824,11 @@ void ListTasks::blockAction( int id_block, const QString & i_action, bool i_quer
 			str << ((ItemJobBlock*)items[i])->getNumBlock();
 			counter++;
 		}
-	str << ']';
 
-	if( i_query )
-	{
-		if( false == m_blocks[id_block]->blockAction( str, id_block, i_action, this))
-			return;
-	}
-	else
-	{
-		str << ",\n" << i_action.toUtf8().data();
-	}
+	str << "],\n" << afqt::qtos(i_json);
 
 	af::jsonActionFinish( str);
+
 	Watch::sendMsg( af::jsonMsg( str));
 }
 
@@ -890,9 +877,9 @@ void ListTasks::sortBlock( int i_block_num)
 	int start = i_block_num+1;
 	for( int b = 0; b < i_block_num; b++) start += m_tasks_num[b];
 
-	const QList<Item*> selection = getSelectedItems();
+	storeSelection();
 	m_model->setItems( start, (Item**)array, m_tasks_num[i_block_num]);
-	setSelectedItems( selection);
+	reStoreSelection();
 
 	delete [] array;
 }

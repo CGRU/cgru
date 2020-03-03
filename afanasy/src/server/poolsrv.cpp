@@ -91,8 +91,8 @@ bool PoolSrv::initialize()
 		if (NULL == m_parent)
 		{
 			// The root pool is just created for the first time (not from store)
-			m_max_tasks_per_host = 4;
-			m_max_capacity_per_host = 1100;
+			m_host_max_tasks = AFPOOL::ROOT_HOST_MAX_TASKS;
+			m_host_capacity  = AFPOOL::ROOT_HOST_CAPACITY;
 		}
 
 		m_time_creation = time(NULL);
@@ -130,6 +130,11 @@ void PoolSrv::v_action(Action & i_action)
 		else if (type == "farm")
 		{
 			if (false == actionFarm(i_action))
+				return;
+		}
+		else if (type == "tickets")
+		{
+			if (false == actionTicket(i_action))
 				return;
 		}
 		else
@@ -341,6 +346,40 @@ bool PoolSrv::assignRender(RenderAf * i_render)
 	i_render->setPool(this);
 
 	return true;
+}
+
+void PoolSrv::taskAcuire(const af::TaskExec * i_taskexec, MonitorContainer * i_monitoring)
+{
+	for (auto const& eIt : i_taskexec->m_tickets)
+	{
+		std::map<std::string, af::Farm::Tiks>::iterator it = m_tickets_pool.find(eIt.first);
+		if (it != m_tickets_pool.end())
+		{
+			it->second.usage += eIt.second;
+			if (i_monitoring)
+				i_monitoring->addEvent(af::Monitor::EVT_pools_change, m_id);
+		}
+	}
+
+	if (m_parent)
+		m_parent->taskAcuire(i_taskexec, i_monitoring);
+}
+
+void PoolSrv::taskRelease(const af::TaskExec * i_taskexec, MonitorContainer * i_monitoring)
+{
+	for (auto const& eIt : i_taskexec->m_tickets)
+	{
+		std::map<std::string, af::Farm::Tiks>::iterator it = m_tickets_pool.find(eIt.first);
+		if (it != m_tickets_pool.end())
+		{
+			it->second.usage -= eIt.second;
+			if (i_monitoring)
+				i_monitoring->addEvent(af::Monitor::EVT_pools_change, m_id);
+		}
+	}
+
+	if (m_parent)
+		m_parent->taskRelease(i_taskexec, i_monitoring);
 }
 
 void PoolSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, MonitorContainer * i_monitoring)

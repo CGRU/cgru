@@ -70,14 +70,14 @@ Monitor::~Monitor()
 
 void Monitor::v_readwrite( Msg * msg)
 {
-   rw_int32_t( m_id,            msg);
-   rw_int32_t( m_uid,           msg);
-   rw_int64_t( m_time_launch,   msg);
-   rw_int64_t( m_time_register, msg);
-   rw_int64_t( m_time_activity, msg);
-   rw_String ( m_name,          msg);
-   rw_String ( m_user_name,     msg);
-	rw_String ( m_engine,        msg);
+	Node::v_readwrite(msg);
+
+	rw_int32_t(m_uid,           msg);
+	rw_int64_t(m_time_launch,   msg);
+	rw_int64_t(m_time_register, msg);
+	rw_int64_t(m_time_activity, msg);
+	rw_String (m_user_name,     msg);
+	rw_String (m_engine,        msg);
 
 	for( int e = 0; e < m_events.size(); e++)
 	{
@@ -86,9 +86,9 @@ void Monitor::v_readwrite( Msg * msg)
 		m_events[e] = b;
 	}
 
-   rw_Int32_List( m_jobsIds,      msg);
+	rw_Int32_List(m_jobsIds, msg);
 
-   m_address.v_readwrite( msg);
+	m_address.v_readwrite(msg);
 }
 
 void Monitor::v_jsonWrite( std::ostringstream & o_str, int i_type) const

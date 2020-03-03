@@ -56,7 +56,9 @@ private slots:
 	void actBlockService();
 	void actBlockParser();
 
-	void blockAction( int id_block, QString i_action);
+	// Block number will be ignored here. Selected blocks will be processed.
+	void slot_BlockAction(int i_bnum, QString i_json);
+
 	void actBlockPreview( int num_cmd, int num_img);
 
 	void actTaskOpen();
@@ -92,7 +94,8 @@ private:
 
 	int getRow( int block, int task = -1);
 
-	void blockAction( int id_block, const QString & i_action, bool i_query);
+	void blockAction(const QString & i_json);
+
 	void tasksOperation( const std::string & i_type);
 	void setWindowTitleProgress();
 };

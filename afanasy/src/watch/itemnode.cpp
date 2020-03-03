@@ -1,13 +1,9 @@
 #include "itemnode.h"
 
-#include "../include/afjob.h"
-
 #include "../libafqt/name_afqt.h"
 
 #include "ctrlsortfilter.h"
 
-#include <QtCore/QEvent>
-#include <QtCore/QTimer>
 #include <QtGui/QPainter>
 
 #define AFOUTPUT
@@ -15,8 +11,8 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-ItemNode::ItemNode( af::Node *node, const CtrlSortFilter * i_ctrl_sf):
-	Item( afqt::stoq( node->getName()), node->getId()),
+ItemNode::ItemNode(af::Node * node, EType i_type, const CtrlSortFilter * i_ctrl_sf):
+	Item(afqt::stoq(node->getName()), node->getId(), i_type),
 	m_ctrl_sf( i_ctrl_sf),
 	m_sort_int1( 0),
 	m_sort_int2( 0),
@@ -31,6 +27,9 @@ ItemNode::~ItemNode()
 
 void ItemNode::updateNodeValues( const af::Node * i_node)
 {
+	m_params["priority"]   = i_node->getPriority();
+	m_params["annotation"] = afqt::stoq(i_node->getAnnotation());
+
 	m_priority    = i_node->getPriority();
 	m_annotation  = afqt::stoq( i_node->getAnnotation());
 	m_custom_data = afqt::stoq( i_node->getCustomData());
@@ -48,32 +47,62 @@ bool ItemNode::compare( const ItemNode & other) const
 	bool result = false;
 	bool found = false;
 
+	// Sorting may be forced for hierarchy (branch, pool):
+	if ((false == m_sort_force.isEmpty()) && (false == other.m_sort_force.isEmpty()))
+	{
+		if (m_sort_force != other.m_sort_force)
+		{
+			result = m_sort_force > other.m_sort_force;
+			found = true;
+		}
+		else if (getType() != other.getType())
+		{
+			// If path is the same we should show parent node first:
+			switch(getType())
+			{
+				case TBranch:
+					result = false;
+					break;
+				case TPool:
+					result = false;
+					break;
+				default:
+					result = true;
+			}
+			found = true;
+		}
+	}
+
 	// Sort by the 1st parameter:
-	if(( false == m_sort_str1.isEmpty()) && ( false == other.m_sort_str1.isEmpty()))
+	if (false == found)
 	{
-		if( m_sort_str1 != other.m_sort_str1 )
+		if ((false == m_sort_str1.isEmpty()) && (false == other.m_sort_str1.isEmpty()))
 		{
-			result = m_sort_str1 > other.m_sort_str1;
-			found = true;
+			if(m_sort_str1 != other.m_sort_str1)
+			{
+				result = m_sort_str1 > other.m_sort_str1;
+				found = true;
+			}
 		}
-	}
-	else
-	{
-		if( m_sort_int1 != other.m_sort_int1 )
+		else
 		{
-			result = m_sort_int1 > other.m_sort_int1;
-			found = true;
+			if(m_sort_int1 != other.m_sort_int1)
+			{
+				result = m_sort_int1 > other.m_sort_int1;
+				found = true;
+			}
 		}
+
+		if (false == m_ctrl_sf->isSortAscending1())
+			result = (false == result);
 	}
-	if( false == m_ctrl_sf->isSortAscending1())
-		result = ( false == result );
 
 	// Sort by the 2nd parameter:
-	if( false == found )
+	if (false == found)
 	{
-		if(( false == m_sort_str2.isEmpty()) && ( false == other.m_sort_str2.isEmpty()))
+		if ((false == m_sort_str2.isEmpty()) && (false == other.m_sort_str2.isEmpty()))
 		{
-			if( m_sort_str2 != other.m_sort_str2 )
+			if (m_sort_str2 != other.m_sort_str2)
 			{
 				result = m_sort_str2 > other.m_sort_str2;
 				found = true;
@@ -81,19 +110,19 @@ bool ItemNode::compare( const ItemNode & other) const
 		}
 		else
 		{
-			if( m_sort_int2 != other.m_sort_int2 )
+			if (m_sort_int2 != other.m_sort_int2)
 			{
 				result = m_sort_int2 > other.m_sort_int2;
 				found = true;
 			}
 		}
 
-		if( false == m_ctrl_sf->isSortAscending2())
-			result = ( false == result );
+		if (false == m_ctrl_sf->isSortAscending2())
+			result = (false == result);
 	}
 
 	// Sort by the name:
-	if( false == found )
+	if (false == found)
 		result = m_name > other.m_name;
 
 	return result;

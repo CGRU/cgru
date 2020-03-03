@@ -14,7 +14,7 @@ public:
 
 	bool v_caseMessage( af::Msg * msg);
 
-	ItemNode * v_createNewItem( af::Node * i_node, bool i_subscibed);
+	ItemNode * v_createNewItemNode(af::Node * i_afnode, Item::EType i_type, bool i_notify);
 
 	virtual bool v_processEvents( const af::MonitorEvents & i_me);
 
@@ -25,15 +25,6 @@ private slots:
 
 	void userAdded( ItemNode * node, const QModelIndex & index);
 
-	void actHostsMask();
-	void actHostsMaskExclude();
-	void actMaxRunningTasks();
-	void actMaxRunTasksPerHost();
-	void actErrorsAvoidHost();
-	void actErrorRetries();
-	void actErrorsSameHost();
-	void actErrorsForgiveTime();
-	void actJobsLifeTime();
 	void actRequestLog();
 
 	void actSolveJobsByOrder();

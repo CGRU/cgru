@@ -352,6 +352,18 @@ function nw_MakeNews(i_news, i_args)
 	nw_SendNews([request], i_args);
 }
 
+function nw_FilterStatus(i_status)
+{
+	var st = {};
+	var keys = ['artists','flags','progress'];
+
+	for (let key of keys)
+		if (i_status[key])
+			st[key] = i_status[key];
+
+	return st;
+}
+
 function nw_StatusesChanged(i_statuses)
 {
 	var news_requests = [];
@@ -359,13 +371,15 @@ function nw_StatusesChanged(i_statuses)
 
 	for (let i = 0; i < i_statuses.length; i++)
 	{
+		let st = nw_FilterStatus(i_statuses[i].obj);
+
 		let request = nw_CreateNews(
-			{'title':'status','path':i_statuses[i].path,'status':i_statuses[i].obj});
+			{'title':'status','path':i_statuses[i].path,'status':st});
 		if (request)
 			news_requests.push(request);
 
 		let bm = {};
-		bm.status = i_statuses[i].obj;
+		bm.status = st;
 		bm.path = i_statuses[i].path;
 		bookmarks.push(bm);
 	}

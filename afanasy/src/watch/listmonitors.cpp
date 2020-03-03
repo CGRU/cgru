@@ -8,7 +8,7 @@
 #include "buttonpanel.h"
 #include "itemmonitor.h"
 #include "ctrlsortfilter.h"
-#include "modelitems.h"
+#include "modelnodes.h"
 #include "watch.h"
 
 #include <QtCore/QEvent>
@@ -54,16 +54,16 @@ ListMonitors::ListMonitors( QWidget* parent):
 	// Add left panel buttons:
 	ButtonPanel * bp;
 
-	bp = addButtonPanel("LOG","monitors_log","Show monitor log.");
+	bp = addButtonPanel(Item::TMonitor, "LOG","monitors_log","Show monitor log.");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestLog()));
 
-	bp = addButtonPanel("EXIT","monitors_exit","Exit monitor.","", true);
+	bp = addButtonPanel(Item::TMonitor, "EXIT","monitors_exit","Exit monitor.","", true);
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actExit()));
 
 
 	m_parentWindow->setWindowTitle("Monitors");
 
-	init();
+	initListNodes();
 }
 
 ListMonitors::~ListMonitors()
@@ -103,7 +103,7 @@ bool ListMonitors::v_caseMessage( af::Msg * msg)
 	{
 	case af::Msg::TMonitorsList:
 	{
-		updateItems( msg);
+		updateItems(msg, Item::TMonitor);
 		subscribe();
 		calcTitle();
 		break;
@@ -116,9 +116,9 @@ bool ListMonitors::v_caseMessage( af::Msg * msg)
 
 bool ListMonitors::v_processEvents( const af::MonitorEvents & i_me)
 {
-	if( i_me.m_events[af::Monitor::EVT_monitors_del].size())
+	if (i_me.m_events[af::Monitor::EVT_monitors_del].size())
 	{
-		deleteItems( i_me.m_events[af::Monitor::EVT_monitors_del]);
+		deleteItems(i_me.m_events[af::Monitor::EVT_monitors_del], Item::TMonitor);
 		calcTitle();
 		return true;
 	}
@@ -140,9 +140,9 @@ bool ListMonitors::v_processEvents( const af::MonitorEvents & i_me)
 	return false;
 }
 
-ItemNode* ListMonitors::v_createNewItem( af::Node * i_node, bool i_subscibed)
+ItemNode* ListMonitors::v_createNewItemNode(af::Node * i_afnode, Item::EType i_type, bool i_notify)
 {
-	return new ItemMonitor( (af::Monitor*)i_node, m_ctrl_sf);
+	return new ItemMonitor((af::Monitor*)i_afnode, m_ctrl_sf);
 }
 
 void ListMonitors::calcTitle()
@@ -167,7 +167,9 @@ void ListMonitors::actSendMessage()
 	if( !ok) return;
 
 	std::ostringstream str;
-	af::jsonActionOperationStart( str,"monitors","message","", getSelectedIds());
+	Item::EType type = Item::TAny;
+	std::vector<int> ids(getSelectedIds(type));
+	af::jsonActionOperationStart(str, "monitors", "message", "", ids);
 	str << ",\n\"text\":\"" << af::strEscape( afqt::qtos( text)) << "\"";
 	af::jsonActionOperationFinish( str);
 
@@ -175,7 +177,7 @@ void ListMonitors::actSendMessage()
 }
 
 
-void ListMonitors::actRequestLog() { getItemInfo("log"); }
+void ListMonitors::actRequestLog() { getItemInfo(Item::TAny, "log"); }
 
-void ListMonitors::actExit() { operation("exit"); }
+void ListMonitors::actExit() { operation(Item::TMonitor, "exit"); }
 

@@ -45,7 +45,6 @@ int main(int argc, char *argv[])
    actint.sa_handler = sig_int;
    sigaction( SIGINT,  &actint, NULL);
    sigaction( SIGTERM, &actint, NULL);
-   sigaction( SIGSEGV, &actint, NULL);
 // SIGPIPE signal catch:
    struct sigaction actpipe;
    bzero( &actpipe, sizeof(actpipe));

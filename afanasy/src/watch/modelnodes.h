@@ -6,6 +6,7 @@
 
 class Item;
 class ItemNode;
+class ListNodes;
 
 class ModelNodes : public ModelItems
 {
@@ -13,7 +14,7 @@ class ModelNodes : public ModelItems
 
 public:
 
-	ModelNodes( QObject * parent);
+	ModelNodes(ListNodes * i_list_nodes);
 
 	virtual ~ModelNodes();
 

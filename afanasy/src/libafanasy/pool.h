@@ -36,13 +36,25 @@ public:
 	inline bool isPaused() const { return (m_state & SPaused);}
 	inline void setPaused(bool set) { m_state = set ? m_state | SPaused : m_state & (~SPaused); }
 
-	inline int getRunTasks()        const { return m_run_tasks;         }
-	inline int getMaxTasks()        const { return m_max_tasks;         }
-	inline int getMaxTasksPerHost() const { return m_max_tasks_per_host;}
+	inline const std::string & getParentPath() const { return m_parent_path; }
 
-	inline int getRunCapacity()        const { return m_run_capacity;         }
-	inline int getMaxCapacity()        const { return m_max_capacity;         }
-	inline int getMaxCapacityPerHost() const { return m_max_capacity_per_host;}
+	inline const std::string & getPatternStr() const { return m_pattern.getPattern(); }
+
+	inline long long getTimeCreation() const { return m_time_creation; }
+
+	inline bool isNewRenderNimby()  const { return m_new_nimby;  }
+	inline bool isNewRenderPaused() const { return m_new_paused; }
+
+	inline int32_t getPoolsNum()     const { return m_pools_num;     }
+	inline int32_t getPoolsTotal()   const { return m_pools_total;   }
+	inline int32_t getRendersNum()   const { return m_renders_num;   }
+	inline int32_t getRendersTotal() const { return m_renders_total; }
+
+	inline int getRunTasks()    const { return m_run_tasks;   }
+	inline int getRunCapacity() const { return m_run_capacity;}
+
+	inline int getHostMaxTasks() const { return m_host_max_tasks;}
+	inline int getHostCapacity() const { return m_host_capacity; }
 
 public:
 	enum State
@@ -89,12 +101,10 @@ protected:
 	int64_t m_time_empty;
 
 	int32_t m_run_tasks;
-	int32_t m_max_tasks;
-	int32_t m_max_tasks_per_host;
-
 	int32_t m_run_capacity;
-	int32_t m_max_capacity;
-	int32_t m_max_capacity_per_host;
+
+	int32_t m_host_max_tasks;
+	int32_t m_host_capacity;
 
 	int64_t m_task_start_finish_time; ///< Task start or finish time.
 

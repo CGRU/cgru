@@ -134,9 +134,9 @@ function fileRead($i_filename, $i_lock = true, $i_verbose = false)
 
 	if ($i_verbose) error_log('fileRead: Opened: '.$i_filename);
 
-	if ($i_lock) flock($fHandle, LOCK_SH);
+	if ($i_lock) _flock_($fHandle, LOCK_SH);
 	$data = fread($fHandle, FILE_MAX_LENGTH);
-	if ($i_lock) flock($fHandle, LOCK_UN);
+	if ($i_lock) _flock_($fHandle, LOCK_UN);
 	fclose($fHandle);
 
 	if ($i_verbose) error_log('fileRead: Read '.strlen($data).' bytes from: '.$i_filename);
@@ -144,25 +144,56 @@ function fileRead($i_filename, $i_lock = true, $i_verbose = false)
 	return $data;
 }
 
-function fileWrite($i_filename, $i_data, $i_lock = true, $i_verbose = false)
+function readObj($i_file, &$o_out, $i_lock = true)
 {
-	$fHandle = fopen($i_filename, 'w');
-	if ($fHandle === false)
+	if (false == is_file($i_file))
 	{
-		if ($i_verbose)
-			error_log('fileWrite: Unable open for writing: '.$i_filename);
+		$o_out['error'] = 'No such file ' . $i_file;
 		return false;
 	}
 
-	if ($i_lock) flock($fHandle, LOCK_EX);
+	if ($data = fileRead($i_file, $i_lock))
+	{
+		$o_out = json_decode($data, true);
+		return true;
+	}
+	else
+	{
+		$o_out['error'] = 'Unable to load file ' . $i_file;
+		return false;
+	}
+}
+
+function fileWrite($i_filename, $i_data, $i_lock = true, $i_verbose = false)
+{
+	$tmp_name = $i_filename.'.'.getmypid();
+	$fHandle = fopen($tmp_name, 'w');
+	if ($fHandle === false)
+	{
+		if ($i_verbose)
+			error_log('fileWrite: Unable open for writing: '.$tmp_name);
+		return false;
+	}
+
+	if ($i_lock) _flock_($fHandle, LOCK_EX);
 	fwrite($fHandle, $i_data);
-	if ($i_lock) flock($fHandle, LOCK_UN);
+	if ($i_lock) _flock_($fHandle, LOCK_UN);
 	fclose($fHandle);
+
+	rename($tmp_name, $i_filename);
 
 	if ($i_verbose)
 		error_log('fileWrite: Written '.strlen($i_data).' bytes to: '.$i_filename);
 
 	return true;
+}
+
+function writeObj($i_filename, $i_obj, $i_lock = true, $i_verbose = false)
+{
+	if (fileWrite($i_filename, jsonEncode($i_obj), $i_lock, $i_verbose))
+		return true;
+
+	return false;
 }
 
 function jsf_start($i_arg, &$o_out)
@@ -245,7 +276,7 @@ function jsf_initialize($i_arg, &$o_out)
 		$user['id'] = $obj['id'];
 
 		// We do not send all users props to each user.
-		$props = array('title', 'role', 'states', 'disabled', 'signature');
+		$props = array('title', 'role', 'tag', 'states', 'disabled', 'signature');
 		foreach ($props as $prop)
 			if (isset($obj[$prop])) $user[$prop] = $obj[$prop];
 
@@ -269,10 +300,10 @@ function processUser($i_arg, &$o_out)
 	if (USER_ID == null) return;
 
 	$filename = $dirname . '/' . USER_ID . '.json';
-	$user = array();
+	$user = null;
+	if (false == readObj($filename, $user))
+		$user = array();
 
-	if (is_file($filename))
-		readObj($filename, $user);
 	if (array_key_exists('error', $user))
 		$o_out['error'] = $user['error'];
 
@@ -287,10 +318,11 @@ function processUser($i_arg, &$o_out)
 	// Delete nulls from some arrays:
 	$arrays = array('news', 'bookmarks', 'channels');
 	foreach ($arrays as $arr)
-		for ($i = 0; $i < count($user[$arr]);)
-			if (is_null($user[$arr][$i]))
-				array_splice($user[$arr], $i, 1);
-			else $i++;
+        if (is_array($user[$arr]))
+            for ($i = 0; $i < count($user[$arr]);)
+                if (is_null($user[$arr][$i]))
+                    array_splice($user[$arr], $i, 1);
+                else $i++;
 
 	if (false == writeUser($user))
 	{
@@ -328,7 +360,7 @@ function writeUser(&$i_user)
 {
 	$filename = 'users/' . $i_user['id'] . '.json';
 
-	if (fileWrite($filename, jsonEncode($i_user)))
+	if (writeObj($filename, $i_user))
 		return true;
 
 	return false;
@@ -595,9 +627,8 @@ function walkDir($i_recv, $i_dir, &$o_out, $i_depth)
 
 		$walk = null;
 		$walk_file = $i_dir . '/' . $rufolder . '/walk.json';
-		if (is_file($walk_file))
-			if ($wdata = fileRead($walk_file, false))
-				$walk = json_decode($wdata, true);
+		if (false == readObj($walk_file, $walk))
+			$walk = null;
 
 		while (false !== ($entry = readdir($handle)))
 		{
@@ -636,9 +667,13 @@ function walkDir($i_recv, $i_dir, &$o_out, $i_depth)
 						if ($access)
 							array_push($o_out['rufiles'], $ruentry);
 
-						if (strrpos($ruentry, '.json') === false) continue;
-
+						// No rufiles specified to read objects to
 						if (is_null($rufiles)) continue;
+
+						// Ensure in '.json' extension
+						if (substr($ruentry, -5) != '.json') continue;
+
+						// Check that file is specified in rufiles array
 						$found = false;
 						foreach ($rufiles as $rufile)
 							if (strpos($ruentry, $rufile) === 0)
@@ -648,8 +683,10 @@ function walkDir($i_recv, $i_dir, &$o_out, $i_depth)
 							}
 						if (false == $found) continue;
 
-						if ($rudata = fileRead($path . '/' . $ruentry, false))
-							$o_out['rules'][$ruentry] = json_decode($rudata, true);
+						// Read object from rufile
+						$obj = null;
+						if (readObj($path . '/' . $ruentry, $obj, false))
+							$o_out['rules'][$ruentry] = $obj;
 					}
 					closedir($rHandle);
 					sort($o_out['rufiles']);
@@ -676,9 +713,9 @@ function walkDir($i_recv, $i_dir, &$o_out, $i_depth)
 				foreach ($lookahead as $sfile)
 				{
 					$sfilepath = $path . '/' . $rufolder . '/' . $sfile . '.json';
-					if (is_file($sfilepath))
-						if ($data = fileRead($sfilepath, false))
-							mergeObjs($folderObj, json_decode($data, true));
+					$obj = null;
+					if (readObj($sfilepath, $obj, false))
+						mergeObjs($folderObj, $obj);
 				}
 
 			if ($i_depth < $i_recv['depth'])
@@ -696,9 +733,10 @@ function readConfig($i_file, &$o_out)
 	if (false == is_file($i_file))
 		return;
 
-	if ($data = fileRead($i_file))
+	$obj = null;
+	if (readObj($i_file, $obj))
 	{
-		$o_out[$i_file] = json_decode($data, true);
+		$o_out[$i_file] = $obj;
 		if (array_key_exists('include', $o_out[$i_file]['cgru_config']))
 			foreach ($o_out[$i_file]['cgru_config']['include'] as $file)
 				readConfig($file, $o_out);
@@ -754,13 +792,13 @@ function jsf_getobjects($i_args, &$o_out)
 		return;
 	}
 
-	if ($data = fileRead($file))
+	$obj = null;
+	if (readObj($file, $obj))
 	{
-		$data = json_decode($data, true);
 		foreach ($objects as $object)
 		{
-			if (false == is_null($data) && isset($data[$object]))
-				$o_out[$object] = $data[$object];
+			if (false == is_null($obj) && isset($obj[$object]))
+				$o_out[$object] = $obj[$object];
 			else
 				$o_out[$object] = null;
 		}
@@ -794,20 +832,6 @@ function jsf_readobj($i_file, &$o_out)
 		return;
 	}
 	readObj($i_file, $o_out);
-}
-
-function readObj($i_file, &$o_out)
-{
-	if (false == is_file($i_file))
-	{
-		$o_out['error'] = 'No such file ' . $i_file;
-		return;
-	}
-
-	if ($data = fileRead($i_file))
-		$o_out = json_decode($data, true);
-	else
-		$o_out['error'] = 'Unable to load file ' . $i_file;
 }
 
 function mergeObjs(&$o_obj, $i_obj)
@@ -998,7 +1022,9 @@ function jsf_editobj($i_edit, &$o_out)
 	}
 
 	// Read object:
-	$obj = json_decode(fileRead($i_edit['file']), true);
+	$obj = null;
+	if (false == readObj($i_edit['file'], $obj))
+		$obj = null;
 
 	// Edit object:
 	if (array_key_exists('add', $i_edit) && ($i_edit['add'] == true))
@@ -1039,7 +1065,7 @@ function jsf_editobj($i_edit, &$o_out)
 	}
 
 	// Write object:
-	if (fileWrite($i_edit['file'], jsonEncode($obj)))
+	if (writeObj($i_edit['file'], $obj))
 	{
 		$o_out['status'] = 'success';
 		$o_out['object'] = $obj;
@@ -1250,10 +1276,10 @@ function makenews($i_args, &$io_users, &$o_out)
 
 		// Get existing recent:
 		$rfile = $i_args['root'] . $path . '/' . $i_args['rufolder'] . '/' . $i_args['recent_file'];
-		if (is_file($rfile))
-			if ($rdata = fileRead($rfile))
+		$obj = null;
+		if (readObj($rfile, $obj))
 			{
-				$rarray = json_decode($rdata, true);
+				$rarray = $obj;
 				if (is_null($rarray))
 					$rarray = array();
 				$count = count($rarray);
@@ -1291,7 +1317,7 @@ function makenews($i_args, &$io_users, &$o_out)
 		// Save recent:
 		if (false == is_dir(dirname($rfile)))
 			mkdir(dirname($rfile));
-		fileWrite($rfile, jsonEncode($rarray));
+		writeObj($rfile, $rarray);
 
 		// Exit cycle if path is root:
 		if (strlen($path) == 0) break;
@@ -1330,7 +1356,7 @@ function makenews($i_args, &$io_users, &$o_out)
 		}
 
 		// If user is assigned, it should receive news:
-		if (array_key_exists('status', $news))
+		if (array_key_exists('status', $news) && is_array($news['status']))
 			if (array_key_exists('artists', $news['status']))
 				if (in_array($user['id'], $news['status']['artists']))
 				{
@@ -1359,6 +1385,10 @@ function makenews($i_args, &$io_users, &$o_out)
 		// Add uid to changed array:
 		if (false == in_array($user['id'], $changed_users))
 			array_push($changed_users, $user['id']);
+
+		// On empty news create an empty news array:
+		if (false == is_array($user['news']))
+			$user['news'] = [];
 
 		// Delete older news with the same path:
 		for ($i = 0; $i < count($user['news']); $i++)
@@ -1655,7 +1685,8 @@ function getallusers(&$o_out)
 		if (false === is_file("users/$entry")) continue;
 		if (strrpos($entry, '.json') !== (strlen($entry) - 5)) continue;
 
-		if ($user = json_decode(fileRead("users/$entry", true), true))
+		$user = null;
+		if (readObj("users/$entry", $user))
 			$o_out['users'][$user['id']] = $user;
 	}
 	closedir($dHandle);

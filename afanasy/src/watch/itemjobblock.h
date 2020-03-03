@@ -11,7 +11,7 @@ class ListTasks;
 class ItemJobBlock : public Item
 {
 public:
-   ItemJobBlock( const af::BlockData* block, ListTasks * list);
+	ItemJobBlock(const af::BlockData * i_block, ListTasks * i_listtasks);
    ~ItemJobBlock();
 
    virtual QSize sizeHint( const QStyleOptionViewItem &option) const;
@@ -20,7 +20,7 @@ public:
 
    inline int getNumBlock() const { return numblock; }
 
-   virtual inline const QVariant getToolTip()      const { return tooltip;      }
+   virtual const QVariant v_getToolTip() const { return m_tooltip;}
 
 	const std::string & getWDir();
 	const std::string & getWDirOriginal() const {return m_wdir_orig;}
@@ -56,12 +56,7 @@ public:
 
    bool tasksHidded;
 
-	inline void generateMenu( int id_block, QMenu * menu, QWidget * qwidget, QMenu * submenu = NULL)
-			{ info.generateMenu( id_block, menu, qwidget, submenu);}
-
-
-	inline bool blockAction( std::ostringstream & i_str, int id_block, const QString & i_action, ListItems * listitems) const
-		{ return info.blockAction( i_str, id_block, i_action, listitems);}
+	inline const BlockInfo * getInfo() const {return m_info;}
 
    bool mousePressed( const QPoint & pos,const QRect & rect);
 
@@ -75,11 +70,11 @@ public:
       SState
    };
 
-   inline int  getSortType()     const { return sort_type;     }
-   inline bool isSortAsceding()  const { return sort_ascending;}
+   inline int  getSortType()     const { return m_sort_type;     }
+   inline bool isSortAsceding()  const { return m_sort_ascending;}
 
    /// Return old sorting type:
-   inline int resetSortingParameters() { int value = sort_type; sort_type = 0; sort_ascending = false; return value;}
+   inline int resetSortingParameters() { int value = m_sort_type; m_sort_type = 0; m_sort_ascending = false; return value;}
 
    static const int WHost = 60;
    static const int WStarts = 40;
@@ -87,15 +82,13 @@ public:
    static const int WTime = 50;
 
 protected:
-   virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
+	virtual void v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const;
    
 private:
    static const int HeightHeader;
    static const int HeightFooter;
 
 private:
-   QString tooltip;
-
 	std::string m_wdir_orig;
 	std::string m_wdir;
 	bool m_wdir_ready;
@@ -103,19 +96,17 @@ private:
 	std::vector<std::string> m_files;
 	bool m_files_ready;
 
-   std::string tooltip_base;
-   std::string tooltip_properties;
-   std::string tooltip_progress;
+	QString m_tooltip;
+	std::string m_tooltip_base;
+	std::string m_tooltip_properties;
+	std::string m_tooltip_progress;
 
-   int height;
-   int width;
+	int m_height;
 
-   QString  blockToolTip;
+	BlockInfo * m_info;
 
-   BlockInfo info;
+	int  m_sort_type;
+	bool m_sort_ascending;
 
-   bool sort_ascending;
-   int sort_type;
-
-   ListTasks * listtasks;
+	ListTasks * m_listtasks;
 };

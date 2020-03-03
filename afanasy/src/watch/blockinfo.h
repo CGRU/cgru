@@ -4,45 +4,41 @@
 
 #include "../libafanasy/name_af.h"
 
+#include "item.h"
+
+#include <QtCore/QMap>
 #include <QtGui/QPainter>
 
 class QStyleOptionViewItem;
 class QMenu;
 
-class Item;
 class ListItems;
+class Param;
 
-class BlockInfo
+class BlockInfo: public QObject
 {
+	Q_OBJECT
+
 public:
-	BlockInfo( Item * qItem = NULL, int BlockNumer = -1, int JobId = -1);
+	BlockInfo(const af::BlockData * i_data, Item * i_item, ListItems * i_listitems);
 	~BlockInfo();
 
-	inline void setItem( Item *qItem) { item = qItem; }
-	inline void setBlockNumber( int BlockNumer) { blocknum = BlockNumer;}
-	inline void setJobId( int JobId) { jobid = JobId;}
+	inline const QString & getName() const {return m_name;}
 
 	bool update( const af::BlockData* block, int type);
-	void paint( QPainter * painter, const QStyleOptionViewItem &option,
+
+	void paint( QPainter * i_painter, const QStyleOptionViewItem &option,
 		int x, int y, int w,
-		bool compact_display = false,
-		const QColor * backcolor = NULL ) const;
-
-	inline int getErrorsAvoidHost()      const { return errors_avoidhost;   }
-	inline int getErrorsRetries()        const { return errors_retries;     }
-	inline int getErrorsTaskSameHost()   const { return errors_tasksamehost;}
-	inline int getTaskMaxRunTime()       const { return task_max_run_time;  }
-	inline int getTaskMinRunTime()       const { return task_min_run_time;  }
-
-	void setName( const QString & str) { name = str;}
-	inline const QString & getName() const { return name;}
+		bool i_compact_display = false,
+		const QColor * i_backcolor = NULL ) const;
 
 	static const int Height;
 	static const int HeightCompact;
 
-	void generateMenu( int id_block, QMenu * menu, QWidget * qwidget, QMenu * submenu = NULL);
+	inline const QList<Param*> & getParamsList() const {return m_params; }
+	inline const QMap<QString, QVariant> & getParamsVars() const {return m_var_map;}
 
-	bool blockAction( std::ostringstream & i_str, int id_block, const QString & i_action, ListItems * listitems) const;
+	void generateMenu(QMenu * i_menu, QMenu * i_params_submenu = NULL) const;
 
 	int p_percentage;
 	int p_tasksready;
@@ -57,11 +53,10 @@ public:
 	long long p_capacitytotal;
 	long long p_taskssumruntime;
 
-private:
+//private:
 	uint32_t state;
 
 
-	QString name;
 	QString service;
 
 	QString str_info;
@@ -83,9 +78,9 @@ private:
 	long long sequential;
 
 	int errors_retries;
-	int errors_avoidhost;
-	int errors_tasksamehost;
-	int errors_forgivetime;
+	int errors_avoid_host;
+	int errors_task_same_host;
+	int errors_forgive_time;
 	int task_progress_change_timeout;
 	int task_max_run_time;
 	int task_min_run_time;
@@ -93,8 +88,8 @@ private:
 	char progress[AFJOB::ASCII_PROGRESS_LENGTH];
 
 	int     capacity;
-	int     maxrunningtasks;
-	int     maxruntasksperhost;
+	int     max_running_tasks;
+	int     max_running_tasks_per_host;
 	int     need_memory;
 	int     need_power;
 	int     need_hdd;
@@ -109,27 +104,51 @@ private:
 	uint16_t multihost_waitmax;
 	uint16_t multihost_waitsrv;
 
-	QString dependmask;
-	QString tasksdependmask;
-	QString hostsmask;
-	QString hostsmask_exclude;
+	QString depend_mask;
+	QString tasks_depend_mask;
+	QString hosts_mask;
+	QString hosts_mask_exclude;
 
 	QString depends;
 
+	QMap<QString, int> tickets;
+
+signals:
+	void sig_BlockAction(int, QString);
+
+private slots:
+	void slot_BlockOperation(QString i_operation);
+	void slot_BlockChangeParam(const Param * i_param);
+	void slot_BlockTicketAdd();
+	void slot_BlockTicketEdit(QString i_name);
+
 private:
-	Item * item;
-	int blocknum;
-	int jobid;
-	bool injobslist;
+	void addParam_separator();
+	void addParam_Num(const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = 1<<30);
+	void addParam_Str(const QString & i_name, const QString & i_label, const QString & i_tip);
+	void addParam_REx(const QString & i_name, const QString & i_label, const QString & i_tip);
+	void addParam_Hrs(const QString & i_name, const QString & i_label, const QString & i_tip);
 
 	void drawProgress(
-		QPainter * painter,
+		QPainter * i_painter,
 		int posx, int posy, int width, int height,
-		const QColor * backcolor = NULL ) const;
+		const QColor * i_backcolor = NULL ) const;
 
 	void stdOutFlags( char* data, int size) const;
 	void refresh();
 
-	const QPixmap * icon_large;
-	const QPixmap * icon_small;
+private:
+	ListItems * m_listitems;
+	Item      * m_item;
+
+	int     m_blocknum;
+	int     m_jobid;
+	QString m_name;
+
+	QList<Param*> m_params;
+
+	QMap<QString, QVariant> m_var_map;
+
+	const QPixmap * m_icon_large;
+	const QPixmap * m_icon_small;
 };

@@ -5,13 +5,13 @@
 #include "../libafanasy/msgclasses/mcgeneral.h"
 #include "../libafanasy/msgclasses/mcafnodes.h"
 
+#include "item.h"
 #include "listitems.h"
 
 class QVBoxLayout;
 class QMouseEvent;
 
 class ItemNode;
-class CtrlSortFilter;
 
 class ListNodes : public ListItems
 {
@@ -39,6 +39,8 @@ public slots:
 
 protected:
 
+	void initListNodes();
+
 	virtual void showEvent( QShowEvent  * event );
 
 	virtual void v_showFunc();
@@ -49,16 +51,14 @@ protected:
 
 	virtual void v_connectionLost();
 
-	virtual bool init( bool createModelView = true);
-
-	virtual ItemNode * v_createNewItem( af::Node * i_node, bool i_subscibed) = 0;
+	virtual ItemNode * v_createNewItemNode(af::Node * i_afnode, Item::EType i_type, bool i_notify) = 0;
 
 	void get() const;
-	void get( const std::vector<int32_t> & i_ids) const;
+	void get(const std::vector<int32_t> & i_ids) const;
+	static void get(const std::vector<int32_t> & i_ids, const std::string & i_type);
 
-	bool updateItems( af::Msg* msg);
+	bool updateItems(af::Msg* msg, Item::EType i_type);
 
-	CtrlSortFilter * m_ctrl_sf;
 	void initSortFilterCtrl();
 
 	void sort();
@@ -66,6 +66,9 @@ protected:
 
 	/// Needed for jobs, to get user jobs list from server
 	virtual void v_resetSorting();
+
+protected:
+	std::vector<std::string> m_node_types;
 
 private slots:
 	void actAnnotate();

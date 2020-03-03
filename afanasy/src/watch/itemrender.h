@@ -2,30 +2,35 @@
 
 #include "../libafanasy/render.h"
 
-#include "itemnode.h"
+#include "itemfarm.h"
 #include "plotter.h"
 
-class ItemRender : public ItemNode
+class ListRenders;
+
+class ItemRender : public ItemFarm
 {
 public:
-	ItemRender( af::Render * i_render, const CtrlSortFilter * i_ctrl_sf);
+	ItemRender( af::Render * i_render, ListRenders * i_list_renders, const CtrlSortFilter * i_ctrl_sf);
 	~ItemRender();
 
-	void updateValues( af::Node * i_node, int i_type);
+	void v_updateValues(af::Node * i_afnode, int i_msgType);
+
+	inline const QString & getPool() const { return m_pool; }
 
 	inline const QString & getUserName()   const { return m_username;      }
 	inline const QString & getIPString()   const { return m_address_ip_str;}
 	inline int getCapacity() const { return m_capacity;  }
 	inline int getMaxTasks() const { return m_maxtasks;  }
 
-	void setSortType(   int i_type1, int i_type2 );
-	void setFilterType( int i_type );
+	void v_setSortType(   int i_type1, int i_type2 );
+	void v_setFilterType( int i_type );
 
 	inline bool isOnline()        const { return m_online;           }
 	inline bool isOffline()       const { return false == m_online;  }
 	inline bool isBusy()          const { return m_busy;             }
 	inline bool isNimby()         const { return m_nimby;            }
 	inline bool isNIMBY()         const { return m_NIMBY;            }
+	inline bool isFree()          const { return !m_NIMBY&&!m_nimby; }
 	inline bool isPaused()        const { return m_paused;           }
 	inline bool isDirty()         const { return m_dirty;            }
 	inline bool isWOLFalling()    const { return m_wolFalling;       }
@@ -44,26 +49,37 @@ public:
 	bool calcHeight();
 
 protected:
-	virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
+	virtual void v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const;
 
 private:
-	static const int ms_HeightHost;
-	static const int ms_HeightHostSmall;
-	static const int ms_HeightAnnotation;
-	static const int ms_HeightTask;
-	static const int ms_HeightOffline;
+	static const int HeightBase;
+	static const int HeightSmall;
+	static const int HeightOffline;
+	static const int HeightAnnotation;
+	static const int HeightTask;
 
 private:
 	void deleteTasks();
 	void deletePlots();
 
 private:
+	ListRenders * m_ListRenders;
+
+	// We need to keep two info strings,
+	// because render can update its properties w/o resources at one time,
+	// and at the other just resources.
+	// So the result string should be a combination of a two strings
+	// that are updating separately.
+	QString m_info_text_render;
+	QString m_info_text_hres;
 
 	af::HostRes m_hres;
 
+	QString m_pool;
 	QString m_os;
 	QString m_engine;
 	QString m_username;
+	QString m_loggedin_users;
 	QString m_tasksusers; ///< For sorting and filtering only
 	QString m_tasks_users_counts; ///< One string collection of all tasks users and counts
 	int m_capacity;
@@ -95,11 +111,9 @@ private:
 	QString  m_state;
 	std::list<af::TaskExec*> m_tasks;
 	std::vector<int32_t> m_tasks_percents;
-	std::list<const QPixmap*> m_tasksicons;
 	long long m_taskstartfinishtime;
 	QString m_taskstartfinishtime_str;
 	QString m_offlineState;
-	QString m_creationTime;
 
 	Plotter m_plotCpu;
 	Plotter m_plotMem;

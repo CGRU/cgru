@@ -186,6 +186,8 @@ std::vector<std::string> Environment::previewcmds;
 std::vector<std::string> Environment::annotations;
 std::vector<std::string> Environment::rendercmds;
 std::vector<std::string> Environment::rendercmds_admin;
+std::vector<std::string> Environment::render_launch_cmds;
+std::vector<std::string> Environment::render_launch_cmds_exit;
 std::vector<std::string> Environment::ip_trust;
 std::vector<std::string> Environment::render_resclasses;
 std::vector<std::string> Environment::m_cmdarguments;
@@ -291,6 +293,8 @@ void Environment::getVars( const JSON * i_obj)
 
 	getVar( i_obj, rendercmds,                        "af_rendercmds"                        );
 	getVar( i_obj, rendercmds_admin,                  "af_rendercmds_admin"                  );
+	getVar( i_obj, render_launch_cmds,                "af_render_launch_cmds"                );
+	getVar( i_obj, render_launch_cmds_exit,           "af_render_launch_cmds_exit"           );
 	getVar( i_obj, watch_get_events_sec,              "af_watch_get_events_sec"              );
 	getVar( i_obj, watch_refresh_gui_sec,             "af_watch_refresh_gui_sec"             );
 	getVar( i_obj, watch_connection_lost_time,        "af_watch_connection_lost_time"        );
@@ -861,7 +865,7 @@ bool Environment::initAfterLoad()
 	// Check whether server address is configured:
 	if(( servername == std::string(AFADDR::SERVER_NAME)) && ( isServer() != true ))
 	{
-		printf("WARNING: SERVER ADDRESS ID NOT CONFIGURED, USING %s\n", AFADDR::SERVER_NAME);
+		printf("WARNING: SERVER ADDRESS IS NOT CONFIGURED, USING %s\n", AFADDR::SERVER_NAME);
 	}
 
 	// Solve server name

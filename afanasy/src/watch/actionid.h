@@ -4,6 +4,8 @@
 
 #include <QAction>
 
+class Param;
+
 class ActionId : public QAction
 {
 
@@ -96,5 +98,23 @@ private slots:
 private:
 	int m_id;
 	QString m_string;
+};
+
+class ActionParam : public QAction
+{
+
+Q_OBJECT
+
+public:
+	ActionParam(const Param * i_param);
+
+signals:
+	void triggeredParam(const Param *);
+
+private slots:
+	void triggeredParam_Slot();
+
+private:
+	const Param * m_param;
 };
 

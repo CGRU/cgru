@@ -75,9 +75,9 @@ void CtrlRenders::contextMenuEvent(QContextMenuEvent *event)
 	connect( action_id, SIGNAL( triggeredId( int ) ), m_list, SLOT( actChangeSize( int) ));
 	menu.addAction( action_id);
 
-	action_id = new ActionId( int(ListRenders::ESMallSize), "Small", this);
+	action_id = new ActionId( int(ListRenders::ESmallSize), "Small", this);
 	action_id->setCheckable( true);
-	action_id->setChecked( ListRenders::getDisplaySize() == ListRenders::ESMallSize);
+	action_id->setChecked( ListRenders::getDisplaySize() == ListRenders::ESmallSize);
 	connect( action_id, SIGNAL( triggeredId( int ) ), m_list, SLOT( actChangeSize( int) ));
 	menu.addAction( action_id);
 

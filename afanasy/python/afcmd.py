@@ -196,16 +196,16 @@ class Job:
         return output
 
     def pause(self):
-        self.setJobState(self.State.pause)
+        self.setState(self.State.pause)
 
     def start(self):
-        self.setJobState(self.State.start)
+        self.setState(self.State.start)
 
     def stop(self):
-        self.setJobState(self.State.stop)
+        self.setState(self.State.stop)
 
     def delete(self):
-        self.setJobState(self.State.delete)
+        self.setState(self.State.delete)
 
     def getProgress(self, verbose=False,):
         action = 'get'
@@ -345,11 +345,150 @@ class Render:
         output = _sendRequest(action, data, verbose)
         return output
 
-    def setServiceState(self, serviceName, enabled, verbose=False):
+    def addService(self, serviceName, verbose=False):
         action = 'action'
         data = {'type': 'renders'}
-        data['mask'] = self.name
-        data['operation'] = {'type': 'service', 'name': serviceName, 'enable': enabled}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'farm', 'mode': 'service_add', 'name': serviceName, 'mask': serviceName}
+        output = _sendRequest(action, data, verbose)
+        return output
+
+    def removeService(self, serviceName, verbose=False):
+        action = 'action'
+        data = {'type': 'renders'}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'farm', 'mode': 'service_remove', 'name': serviceName, 'mask': serviceName}
+        output = _sendRequest(action, data, verbose)
+        return output
+
+    def disableService(self, serviceName, verbose=False):
+        action = 'action'
+        data = {'type': 'renders'}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'farm', 'mode': 'service_disable', 'name': serviceName, 'mask': serviceName}
+        output = _sendRequest(action, data, verbose)
+        return output
+
+    def enableService(self, serviceName, verbose=False):
+        action = 'action'
+        data = {'type': 'renders'}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'farm', 'mode': 'service_enable', 'name': serviceName, 'mask': serviceName}
+        output = _sendRequest(action, data, verbose)
+        return output
+
+    def clearServices(self, verbose=False):
+        action = 'action'
+        data = {'type': 'renders'}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'farm', 'mode': 'clear_services'}
+        output = _sendRequest(action, data, verbose)
+        return output
+
+    def setPool(self, poolName, verbose=False):
+        action = 'action'
+        data = {'type': 'renders'}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'set_pool', 'name': poolName}
+        output = _sendRequest(action, data, verbose)
+        return output
+
+    def reassignPool(self, verbose=False):
+        action = 'action'
+        data = {'type': 'renders'}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'reassign_pool'}
+        output = _sendRequest(action, data, verbose)
+        return output
+
+
+class Pool():
+    '''
+    Pool class for pool manipulation
+    '''
+    id = None
+    name = None
+    parent = None
+    services = None
+    priority = None
+    time_creation = None
+    pools_total = None
+    max_capacity_per_host = None
+    task_start_finish_time = None
+    run_tasks = None
+    max_tasks_per_host = None
+    renders_total = None
+    run_capacity = None
+    renders_num = None
+
+    def __init__(self, poolId, data=None):
+        '''
+        Constructor
+        '''
+        self.id = poolId
+
+        if data is not None:
+            self.fillPoolInfo(data)
+
+    def fillPoolInfo(self, data):
+        self.name = data.get('name')
+        self.parent = data.get('parent')
+        self.services = data.get('services')
+        self.priority = data.get('priority')
+        self.time_creation = data.get('time_creation')
+        self.pools_total = data.get('pools_total')
+        self.max_capacity_per_host = data.get('max_capacity_per_host')
+        self.task_start_finish_time = data.get('task_start_finish_time')
+        self.run_tasks = data.get('run_tasks')
+        self.max_tasks_per_host = data.get('max_tasks_per_host')
+        self.renders_total = data.get('renders_total')
+        self.run_capacity = data.get('run_capacity')
+
+    def addService(self, serviceName, verbose=False):
+        action = 'action'
+        data = {'type': 'pools'}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'farm', 'mode': 'service_add', 'name': serviceName, 'mask': serviceName}
+        output = _sendRequest(action, data, verbose)
+        return output
+
+    def removeService(self, serviceName, verbose=False):
+        action = 'action'
+        data = {'type': 'pools'}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'farm', 'mode': 'service_remove', 'name': serviceName, 'mask': serviceName}
+        output = _sendRequest(action, data, verbose)
+        return output
+
+    def disableService(self, serviceName, verbose=False):
+        action = 'action'
+        data = {'type': 'pools'}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'farm', 'mode': 'service_disable', 'name': serviceName, 'mask': serviceName}
+        output = _sendRequest(action, data, verbose)
+        return output
+
+    def enableService(self, serviceName, verbose=False):
+        action = 'action'
+        data = {'type': 'pools'}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'farm', 'mode': 'service_enable', 'name': serviceName, 'mask': serviceName}
+        output = _sendRequest(action, data, verbose)
+        return output
+
+    def clearServices(self, verbose=False):
+        action = 'action'
+        data = {'type': 'pools'}
+        data['ids'] = [self.id]
+        data['operation'] = {'type': 'farm', 'mode': 'clear_services'}
+        output = _sendRequest(action, data, verbose)
+        return output
+
+    def setMaxCapacity(self, capacity, verbose=False):
+        action = 'action'
+        data = {'type': 'pools'}
+        data['ids'] = [self.id]
+        data['params'] = {'max_capacity_per_host': capacity}
         output = _sendRequest(action, data, verbose)
         return output
 
@@ -462,10 +601,10 @@ def getRenderList(mask=None, ids=None, verbose=False):
     output = _sendRequest(action, data, verbose)
     renders = []
     if output is not None:
-            if 'renders' in output:
-                for renderData in output['renders']:
-                    render = Render(renderData['id'], renderData)
-                    renders.append(render)
+        if 'renders' in output:
+            for renderData in output['renders']:
+                render = Render(renderData['id'], renderData)
+                renders.append(render)
     return renders
 
 
@@ -478,3 +617,18 @@ def getRenderResources():
         if 'renders' in output:
             return output['renders']
     return None
+
+
+def getPoolList(ids=None, verbose=False):
+    action = 'get'
+    data = {'type': 'pools'}
+    if ids is not None:
+        data['ids'] = ids
+    output = _sendRequest(action, data, verbose)
+    pools = []
+    if output is not None:
+        if 'pools' in output:
+            for poolData in output['pools']:
+                pool = Pool(poolData['id'], poolData)
+                pools.append(pool)
+    return pools

@@ -1004,52 +1004,67 @@ Status.prototype.editArtistsEdit = function(i_args) {
 		elLabel.classList.add('label');
 		elLabel.textContent = roles[r].role + ':';
 
-		for (var a = 0; a < roles[r].artists.length; a++)
+		for (let t = 0; t < roles[r].tags.length; t++)
 		{
-			var artist = roles[r].artists[a];
+			let tag = roles[r].tags[t].tag;
 
-			var el = document.createElement('div');
-			elRole.appendChild(el);
-			el.classList.add('tag');
-			el.classList.add('artist');
-			el.m_item = artist.id;
-			if (artist.id == g_auth_user.id)
-				el.classList.add('me');
+			let elTag = document.createElement('div');
+			elTag.classList.add('role_tag');
+			elRole.appendChild(elTag);
 
-			if (g_users[artist.id] && g_users[artist.id].disabled)
-				el.classList.add('disabled');
+			let elLabel = document.createElement('div');
+			elLabel.textContent = c_GetTagTitle(tag) + ':';
+			elLabel.title = c_GetTagTip(tag);
+			elLabel.classList.add('label');
+			elTag.appendChild(elLabel);
 
-			if (artist.title)
-				el.textContent = artist.title;
-			else
-				el.textContent = artist.id;
-
-			if (artist.tip)
-				el.title = artist.tip;
-
-			var avatar = c_GetAvatar(artist.id);
-			if (avatar)
+			for (let a = 0; a < roles[r].tags[t].artists.length; a++)
 			{
-				el.classList.add('with_icon');
-				el.style.backgroundImage = 'url(' + avatar + ')';
-			}
+				let artist = roles[r].tags[t].artists[a];
 
-			if (i_args.list[artist.id])
-			{
-				if (i_args.list[artist.id].half)
-				{
-					el.m_half_selected = true;
-					el.classList.add('half_selected');
-				}
+				var el = document.createElement('div');
+				elTag.appendChild(el);
+				el.classList.add('tag');
+				el.classList.add('artist');
+				el.m_item = artist.id;
+				if (artist.id == g_auth_user.id)
+					el.classList.add('me');
+
+				if (g_users[artist.id] && g_users[artist.id].disabled)
+					el.classList.add('disabled');
+
+				if (artist.title)
+					el.textContent = artist.title;
 				else
-				{
-					el.m_selected = true;
-					el.classList.add('selected');
-				}
-			}
+					el.textContent = artist.id;
 
-			el.onclick = status_elToggleSelection;
-			i_args.elEdit[i_args.name].push(el);
+				if (artist.tip)
+					el.title = artist.tip;
+
+				var avatar = c_GetAvatar(artist.id);
+				if (avatar)
+				{
+					el.classList.add('with_icon');
+					el.style.backgroundImage = 'url(' + avatar + ')';
+				}
+
+				if (i_args.list[artist.id])
+				{
+					if (i_args.list[artist.id].half)
+					{
+						el.m_half_selected = true;
+						el.classList.add('half_selected');
+					}
+					else
+					{
+						el.m_selected = true;
+						el.classList.add('selected');
+					}
+				}
+
+				el.onclick = status_elToggleSelection;
+				i_args.elEdit[i_args.name].push(el);
+			}
 		}
 	}
 };
@@ -1494,7 +1509,7 @@ Status.prototype.editSave = function(i_args) {
 					}
 				}
 
-				// Add artist to status:
+				/*/ Add artist to status:
 				if (tasks[t].artists && tasks[t].artists.length)
 				{
 					if (statuses[i].obj.artists == null)
@@ -1507,7 +1522,7 @@ Status.prototype.editSave = function(i_args) {
 						if (statuses[i].obj.artists.indexOf(artist) == -1)
 							statuses[i].obj.artists.push(artist);
 					}
-				}
+				}*/
 			}
 
 			statuses[i].obj.tasks = tasks;
@@ -1543,12 +1558,21 @@ Status.prototype.save = function() {
 	st_Save(this.obj, this.path);
 };
 
+function st_FilterStatusForSave(i_status)
+{
+	delete i_status.error;
+	if (i_status.body)
+		delete i_status.body.data;
+}
+
 function st_Save(i_status, i_path, i_func, i_args, i_navig_params_update)
 {
 	if (i_status == null)
 		i_status = RULES.status;
 	if (i_path == null)
 		i_path = g_CurPath();
+
+	st_FilterStatusForSave(i_status);
 
 	g_FolderSetStatusPath(i_status, i_path, i_navig_params_update);
 	n_walks[i_path] = null;
@@ -1557,7 +1581,6 @@ function st_Save(i_status, i_path, i_func, i_args, i_navig_params_update)
 	obj.object = {"status": i_status};
 	obj.add = true;
 	obj.file = c_GetRuFilePath('status.json', i_path);
-
 	n_Request(
 		{"send": {"editobj": obj}, "func": i_func, "args": i_args, "wait": false, 'info': 'status save'});
 }

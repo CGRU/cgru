@@ -439,7 +439,7 @@ void JobAf::v_action( Action & i_action)
 			return;
 		}
 
-		bool job_progress_changed = false;
+		bool job_changed = false;
 		for( int b = 0; b < block_ids.size(); b++)
 		{
 			if(( block_ids[b] >= getBlocksNum()) || ( block_ids[b] < 0 ))
@@ -448,10 +448,10 @@ void JobAf::v_action( Action & i_action)
 				continue;
 			}
 			if( m_blocks[block_ids[b]]->action( i_action))
-				job_progress_changed = true;
+				job_changed = true;
 		}
 
-		if( job_progress_changed )
+		if (job_changed)
 			i_action.monitors->addJobEvent( af::Monitor::EVT_jobs_change, getId(), getUid());
 
 		if( i_action.log.size() )

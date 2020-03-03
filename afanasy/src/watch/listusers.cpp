@@ -57,34 +57,52 @@ ListUsers::ListUsers( QWidget* parent):
 	// Add left panel buttons:
 	ButtonPanel * bp; ButtonsMenu * bm;
 
-	bp = addButtonPanel("LOG","users_log","Get user log.");
+	bp = addButtonPanel(Item::TUser, "LOG","users_log","Get user log.");
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRequestLog()));
 
-	bm = addButtonsMenu("Solve","Choose jobs solving method.");
+	bm = addButtonsMenu(Item::TUser, "Solve","Choose jobs solving method.");
 	bm->openMenu();
 
-	bp = addButtonPanel("ORDER","users_solve_ordered","Solve jobs by order.");
+	bp = addButtonPanel(Item::TUser, "ORDER","users_solve_ordered","Solve jobs by order.");
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actSolveJobsByOrder()));
 
-	bp = addButtonPanel("PRIORITY","users_solve_priority","Solve jobs by priority.");
+	bp = addButtonPanel(Item::TUser, "PRIORITY","users_solve_priority","Solve jobs by priority.");
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actSolveJobsByPriority()));
 
 	resetButtonsMenu();
 
-	bm = addButtonsMenu("Need","Choose jobs solving need.");
+	bm = addButtonsMenu(Item::TUser, "Need","Choose jobs solving need.");
 	bm->openMenu();
 
-	bp = addButtonPanel("CAPACITY","users_solve_capacity","Solve jobs need by running tasks total capacity.");
+	bp = addButtonPanel(Item::TUser, "CAPACITY","users_solve_capacity","Solve jobs need by running tasks total capacity.");
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actSolveJobsByCapacity()));
 
-	bp = addButtonPanel("TASKS NUM","users_solve_tasksnum","Solve jobs need by running tasks number.");
+	bp = addButtonPanel(Item::TUser, "TASKS NUM","users_solve_tasksnum","Solve jobs need by running tasks number.");
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actSolveJobsByTasksNum()));
 
 	resetButtonsMenu();
 
+
+	// Add parameters:
+	if (af::Environment::VISOR() || (af::Environment::getPermUserModHisPriority()))
+	{
+		addParam_Num(Item::TUser, "priority", "Priority", "Priority number", 0, 250);
+	}
+	addParam_Str(Item::TUser, "annotation",                "Annotation",             "Annotation string");
+	addParam_Num(Item::TUser, "max_running_tasks",         "Maximum Running",        "Maximum running tasks number", -1, 1<<20);
+	addParam_Num(Item::TUser, "max_running_tasks_per_host","Max Run Per Host",       "Max run tasks on the same host", -1, 1<<20);
+	addParam_REx(Item::TUser, "hosts_mask",                "Hosts Mask",             "Host names pattern that job can run on");
+	addParam_REx(Item::TUser, "hosts_mask_exclude",        "Hosts Mask Exclude",     "Host names pattern that job will not run");
+	addParam_Num(Item::TUser, "errors_avoid_host",         "Errors Job  Avoid Host", "Number of errors for job to avoid host", -1, 1<<10);
+	addParam_Num(Item::TUser, "errors_task_same_host",     "Errors Task Avoid Host", "Number of errors for task to avoid host", -1, 1<<10);
+	addParam_Num(Item::TUser, "errors_retries",            "Errors Retries",         "Number of errors task retries", -1, 1<<10);
+	addParam_Hrs(Item::TUser, "errors_forgive_time",       "Errors Forgive Time",    "After this time host errors will be reset");
+	addParam_Hrs(Item::TUser, "jobs_life_time",            "Jobs Life Time",         "After this time job will be deleted");
+
+
 	m_parentWindow->setWindowTitle("Users");
 
-	init();
+	initListNodes();
 
 	if( false == af::Environment::VISOR()) setAllowSelection( false);
 
@@ -115,54 +133,11 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 	if( me || af::Environment::VISOR() )
 	{
 		menu.addSeparator();
+		submenu = new QMenu("Set Parameter", this);
 
-		action = new QAction( "Annotate", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actAnnotate() ));
-		menu.addAction( action);
+		addMenuParameters(submenu);
 
-		menu.addSeparator();
-
-		action = new QAction( "Set Max Running Tasks", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunningTasks() ));
-		menu.addAction( action);
-		action = new QAction( "Set Max Run Tasks Per Host", this);
-		connect(action, SIGNAL(triggered() ), this, SLOT(actMaxRunTasksPerHost()));
-		menu.addAction( action);
-		action = new QAction( "Set Hosts Mask", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actHostsMask() ));
-		menu.addAction( action);
-		action = new QAction( "Set Exclude Hosts Mask", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actHostsMaskExclude() ));
-		menu.addAction( action);
-
-		if(( af::Environment::VISOR()) || ( af::Environment::getPermUserModHisPriority()))
-		{
-			action = new QAction( "Set Priority", this);
-			connect( action, SIGNAL( triggered() ), this, SLOT( actPriority() ));
-			menu.addAction( action);
-		}
-
-		menu.addSeparator();
-
-		action = new QAction( "Set Job Avoid Errors", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actErrorsAvoidHost() ));
-		menu.addAction( action);
-		action = new QAction( "Set Task Avoid Errors", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actErrorsSameHost() ));
-		menu.addAction( action);
-		action = new QAction( "Set Task Error Retries", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actErrorRetries() ));
-		menu.addAction( action);
-		action = new QAction( "Set Errors Forgive Time", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actErrorsForgiveTime() ));
-		menu.addAction( action);
-
-		menu.addSeparator();
-
-		action = new QAction( "Set Jobs Life Time", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actJobsLifeTime() ));
-		menu.addAction( action);
-
+		menu.addMenu( submenu);
 		menu.addSeparator();
 
 		submenu = new QMenu("Jobs Solving Method", this);
@@ -211,7 +186,7 @@ bool ListUsers::v_caseMessage( af::Msg * msg)
 	{
 	case af::Msg::TUsersList:
 	{
-		updateItems( msg);
+		updateItems(msg, Item::TUser);
 		calcTitle();
 		subscribe();
 		break;
@@ -224,9 +199,9 @@ bool ListUsers::v_caseMessage( af::Msg * msg)
 
 bool ListUsers::v_processEvents( const af::MonitorEvents & i_me)
 {
-	if( i_me.m_events[af::Monitor::EVT_users_del].size())
+	if (i_me.m_events[af::Monitor::EVT_users_del].size())
 	{
-		deleteItems( i_me.m_events[af::Monitor::EVT_users_del]);
+		deleteItems(i_me.m_events[af::Monitor::EVT_users_del], Item::TUser);
 		calcTitle();
 		return true;
 	}
@@ -248,15 +223,17 @@ bool ListUsers::v_processEvents( const af::MonitorEvents & i_me)
 	return false;
 }
 
-ItemNode* ListUsers::v_createNewItem( af::Node * i_node, bool i_subscibed)
+ItemNode* ListUsers::v_createNewItemNode(af::Node * i_afnode, Item::EType i_type, bool i_notify)
 {
-	return new ItemUser( (af::User*)i_node, m_ctrl_sf);
+	return new ItemUser((af::User*)i_afnode, m_ctrl_sf);
 }
 
-void ListUsers::userAdded( ItemNode * node, const QModelIndex & index)
+void ListUsers::userAdded(ItemNode * node, const QModelIndex & index)
 {
-//printf("node->getId()=%d ,   Watch::getUid()=%d,  row=%d\n", node->getId(), Watch::getUid(), index.row());
-	if( node->getId() == MonitorHost::getUid()) m_view->selectionModel()->select( index, QItemSelectionModel::Select);
+	if (node->getId() == MonitorHost::getUid())
+	{
+		m_view->selectionModel()->setCurrentIndex(index, QItemSelectionModel::Select);
+	}
 }
 
 void ListUsers::calcTitle()
@@ -271,128 +248,11 @@ void ListUsers::calcTitle()
 	m_parentWindow->setWindowTitle(QString("U[%1]: %2R").arg( total).arg( running));
 }
 
-void ListUsers::actErrorsAvoidHost()
-{
-	ItemUser* useritem = (ItemUser*)getCurrentItem();
-	if( useritem == NULL ) return;
-	int current = useritem->errors_avoidhost;
+void ListUsers::actDelete() { operation(Item::TUser, "delete"); }
+void ListUsers::actSolveJobsByOrder()    {setParameter(Item::TUser, "solve_method", "\"solve_order\""   ); }
+void ListUsers::actSolveJobsByPriority() {setParameter(Item::TUser, "solve_method", "\"solve_priority\""); }
+void ListUsers::actSolveJobsByCapacity() {setParameter(Item::TUser, "solve_need",   "\"solve_capacity\""); }
+void ListUsers::actSolveJobsByTasksNum() {setParameter(Item::TUser, "solve_need",   "\"solve_tasksnum\""); }
 
-	bool ok;
-	int value = QInputDialog::getInt(this, "Errors to avoid host", "Enter Number of Errors", current, 0, 99, 1, &ok);
-	if( !ok) return;
-
-	setParameter("errors_avoid_host", value);
-}
-
-void ListUsers::actErrorsSameHost()
-{
-	ItemUser* useritem = (ItemUser*)getCurrentItem();
-	if( useritem == NULL ) return;
-	int current = useritem->errors_tasksamehost;
-
-	bool ok;
-	int value = QInputDialog::getInt(this, "Errors same host", "Enter Number of Errors", current, 0, 99, 1, &ok);
-	if( !ok) return;
-
-	setParameter("errors_task_same_host", value);
-}
-
-void ListUsers::actErrorRetries()
-{
-	ItemUser* useritem = (ItemUser*)getCurrentItem();
-	if( useritem == NULL ) return;
-	int current = useritem->errors_retries;
-
-	bool ok;
-	int value = QInputDialog::getInt(this, "Auto retry error tasks", "Enter Number of Errors", current, 0, 99, 1, &ok);
-	if( !ok) return;
-
-	setParameter("errors_retries", value);
-}
-
-void ListUsers::actErrorsForgiveTime()
-{
-	ItemUser* useritem = (ItemUser*)getCurrentItem();
-	if( useritem == NULL ) return;
-	double cur = double( useritem->errors_forgivetime ) / (60.0*60.0);
-
-	bool ok;
-	double hours = QInputDialog::getDouble( this, "Errors Forgive Time", "Enter number of hours (0=infinite)", cur, 0, 365*24, 3, &ok);
-	if( !ok) return;
-
-	setParameter("errors_forgive_time", int( hours * 60.0 * 60.0 ));
-}
-
-void ListUsers::actJobsLifeTime()
-{
-	ItemUser* useritem = (ItemUser*)getCurrentItem();
-	if( useritem == NULL ) return;
-	double cur = double( useritem->jobs_lifetime ) / (60.0*60.0);
-
-	bool ok;
-	double hours = QInputDialog::getDouble( this, "Jobs Life Time", "Enter number of hours (0=infinite)", cur, 0, 365*24, 3, &ok);
-	if( !ok) return;
-
-	setParameter("jobs_life_time", int( hours * 60.0 * 60.0 ));
-}
-
-void ListUsers::actMaxRunningTasks()
-{
-	ItemUser* useritem = (ItemUser*)getCurrentItem();
-	if( useritem == NULL ) return;
-	int current = useritem->max_running_tasks;
-
-	bool ok;
-	int max = QInputDialog::getInt(this, "Change Maximum Running Tasks", "Enter Number", current, -1, 9999, 1, &ok);
-	if( !ok) return;
-
-	setParameter("max_running_tasks", max);
-}
-
-void ListUsers::actMaxRunTasksPerHost()
-{
-	ItemUser * useritem = (ItemUser*)getCurrentItem();
-	if (useritem == NULL) return;
-	int current = useritem->max_running_tasks_per_host;
-
-	bool ok;
-	int max = QInputDialog::getInt(this, "Change Max Run Tasks Per Host", "Enter Number", current, -1, 9999, 1, &ok);
-	if( !ok) return;
-
-	setParameter("max_running_tasks_per_host", max);
-}
-
-void ListUsers::actHostsMask()
-{
-	ItemUser* useritem = (ItemUser*)getCurrentItem();
-	if( useritem == NULL ) return;
-	QString current = useritem->hostsmask;
-
-	bool ok;
-	QString mask = QInputDialog::getText(this, "Change Hosts Mask", "Enter Mask", QLineEdit::Normal, current, &ok);
-	if( !ok) return;
-
-	setParameterRE("hosts_mask", afqt::qtos( mask));
-}
-
-void ListUsers::actHostsMaskExclude()
-{
-	ItemUser* useritem = (ItemUser*)getCurrentItem();
-	if( useritem == NULL ) return;
-	QString current = useritem->hostsmask_exclude;
-
-	bool ok;
-	QString mask = QInputDialog::getText(this, "Change Exclude Mask", "Enter Mask", QLineEdit::Normal, current, &ok);
-	if( !ok) return;
-
-	setParameterRE("hosts_mask_exclude", afqt::qtos( mask));
-}
-
-void ListUsers::actDelete() { operation("delete"); }
-void ListUsers::actSolveJobsByOrder()    { setParameter("solve_method", "solve_order",    true); }
-void ListUsers::actSolveJobsByPriority() { setParameter("solve_method", "solve_priority", true); }
-void ListUsers::actSolveJobsByCapacity() { setParameter("solve_need",   "solve_capacity", true); }
-void ListUsers::actSolveJobsByTasksNum() { setParameter("solve_need",   "solve_tasksnum", true); }
-
-void ListUsers::actRequestLog() { getItemInfo("log"); }
+void ListUsers::actRequestLog() { getItemInfo(Item::TAny, "log"); }
 

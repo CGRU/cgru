@@ -210,27 +210,45 @@ bool Block::canRunOn( RenderAf * render)
 	if (false == render->hasCapacity(m_data->getCapMinResult()))
 		return false;
 
-   // render services:
-   if( false == render->canRunService( m_data->getService())) return false;
-   // check maximum hosts:
-   if(( m_data->getMaxRunningTasks() >= 0 ) && ( m_data->getRunningTasksNumber() >= m_data->getMaxRunningTasks() )) return false;
-   // Check block avoid hosts list:
-   if( avoidHostsCheck( render->getName()) ) return false;
-   // Check task avoid hosts list:
-   if( m_data->getNeedMemory() > render->getHostRes().mem_free_mb ) return false;
-   // Check needed hdd:
-   if( m_data->getNeedHDD()    > render->getHostRes().hdd_free_gb ) return false;
-   // Check needed power:
-//if( m_data->getNeedPower()  > render->getHost().m_power       ) return false;
+	// render services:
+	if (false == render->canRunService(m_data->getService()))
+		return false;
 
-   // check hosts mask:
-   if( false == m_data->checkHostsMask( render->getName())) return false;
-   // check exclude hosts mask:
-   if( false == m_data->checkHostsMaskExclude( render->getName())) return false;
-   // Check needed properties:
-//if( false == m_data->checkNeedProperties( render->getHost().m_properties)) return false;
+	// Check Tickets:
+	if (false == render->hasTickets(m_data->getTickets()))
+		return false;
 
-   return true;
+	// check maximum hosts:
+	if ((m_data->getMaxRunningTasks() >= 0) && (m_data->getRunningTasksNumber() >= m_data->getMaxRunningTasks()))
+		return false;
+
+	// Check block avoid hosts list:
+	if (avoidHostsCheck(render->getName()))
+		return false;
+
+	// Check task avoid hosts list:
+	if (m_data->getNeedMemory() > render->getHostRes().mem_free_mb)
+		return false;
+
+	// Check needed hdd:
+	if (m_data->getNeedHDD() > render->getHostRes().hdd_free_gb)
+		return false;
+
+	// Check needed power:
+	//if (m_data->getNeedPower() > render->getHost().m_power) return false;
+
+	// check hosts mask:
+	if (false == m_data->checkHostsMask(render->getName()))
+		return false;
+
+	// check exclude hosts mask:
+	if (false == m_data->checkHostsMaskExclude(render->getName()))
+		return false;
+
+	// Check needed properties:
+	//if (false == m_data->checkNeedProperties(render->getHost().m_properties)) return false;
+
+	return true;
 }
 
 void Block::addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
@@ -404,7 +422,7 @@ bool Block::checkDepends( MonitorContainer * i_monitoring)
 bool Block::action( Action & i_action)
 {
 	uint32_t blockchanged_type = 0;
-	bool job_progress_changed = false;
+	bool job_changed = false;
 
 	const JSON & operation = (*i_action.data)["operation"];
 	if( operation.IsObject())
@@ -415,7 +433,7 @@ bool Block::action( Action & i_action)
 		{
 			v_errorHostsReset();
 			if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
-			job_progress_changed = true;
+			job_changed = true;
 		}
 		else if( type == "skip")
 		{
@@ -447,9 +465,19 @@ bool Block::action( Action & i_action)
 			}
 			return false;
 		}
+		else if(type == "tickets")
+		{
+			if (editTickets(i_action, operation))
+			{
+				blockchanged_type = af::Msg::TBlocksProperties;
+				job_changed = true;
+			}
+		}
 		else
 		{
 			appendJobLog("Unknown block operation \"" + type + "\" by " + i_action.author);
+			i_action.answer_kind = "error";
+			i_action.answer = "Unknown operation: \"" + type + "\"";
 			return false;
 		}
 
@@ -469,7 +497,7 @@ bool Block::action( Action & i_action)
 			i_action.log += "\nBlock['" + m_data->getName() + "']:" + changes;
 
 			blockchanged_type = af::Msg::TBlocksProperties;
-			job_progress_changed = true;
+			job_changed = true;
 			constructDependBlocks();
 		}
 	}
@@ -480,7 +508,30 @@ bool Block::action( Action & i_action)
 		i_action.monitors->addBlock( af::Msg::TBlocksProperties, m_data);
 	}
 
-	return job_progress_changed;
+	return job_changed;
+}
+
+bool Block::editTickets(Action & i_action, const JSON & operation)
+{
+	std::string name;
+	if (false == af::jr_string("name", name, operation))
+	{
+		i_action.answer_kind = "error";
+		i_action.answer = "Ticket \"name\" string is not specified.";
+		return false;
+	}
+
+	int32_t count;
+	if (false == af::jr_int32("count", count, operation))
+	{
+		i_action.answer_kind = "error";
+		i_action.answer = "Ticket \"count\" integer is not specified.";
+		return false;
+	}
+
+	m_data->editTicket(name, count);
+
+	return true;
 }
 
 void Block::skipRestartTasks( bool i_skip, const std::string & i_message, const Action & i_action, const JSON & i_operation, uint32_t i_state)

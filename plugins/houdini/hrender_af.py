@@ -3,6 +3,8 @@
 
 import os
 import sys
+import time
+
 from optparse import OptionParser
 
 import parsers.hbatch
@@ -97,10 +99,8 @@ if ropnode is None:
 # except:
 # print 'Failed to set node blocking.'
 
-print wedge, wedgenum
-
 if wedge:
-    print 'working with wedges'
+    print('working with wedges', wedge, wedgenum)
     wedgenode = hou.node(wedge)
 
     # below code use use script from wedge node definition
@@ -275,14 +275,36 @@ if output is not None and len(output) > 0:
     render_output = output
 
 frame = start
+
+if drivertypename == "alembic":
+    ropnode.render(
+            output_file=render_output,
+            method=hou.renderMethod.FrameByFrame,
+            ignore_inputs=ignoreInputs
+        )
+
+time_prev = None
 while frame <= end:
-    render_range = (frame, frame, by)
-    print(parsers.hbatch.keyframe + str(frame))
+    # Ouput frame and time:
+    time_cur = time.time()
+    time_str = ''
+    if time_prev is not None:
+        seconds = time_cur-time_prev
+        minutes = int(seconds / 60)
+        seconds = int(round(seconds - 60*minutes))
+        time_str = '; Time: %d\'%02d' % (minutes, seconds)
+    time_prev = time_cur
+    print(parsers.hbatch.keyframe + str(frame) + '; Started at: ' + time.strftime('%X') + time_str)
     sys.stdout.flush()
+
+    # Launch render function:
+    render_range = (frame, frame, by)
     ropnode.render(
         frame_range=render_range,
         output_file=render_output,
         method=hou.renderMethod.FrameByFrame,
         ignore_inputs=ignoreInputs
     )
+
+    # Increment frame:
     frame += by

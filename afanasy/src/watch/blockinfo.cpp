@@ -9,8 +9,8 @@
 #include "../libafqt/qenvironment.h"
 
 #include "actionid.h"
-#include "item.h"
 #include "listitems.h"
+#include "param.h"
 #include "watch.h"
 
 #include <QtCore/QEvent>
@@ -20,12 +20,14 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
-const int BlockInfo::Height        = 44;
-const int BlockInfo::HeightCompact = 14;
+const int BlockInfo::Height        = 48;
+const int BlockInfo::HeightCompact = 16;
 
-BlockInfo::BlockInfo( Item * qItem, int BlockNumber, int JobId):
-	tasksnum(1),
+BlockInfo::BlockInfo(const af::BlockData * i_data, Item * i_item, ListItems * i_listitems):
+	m_item(i_item),
+	m_listitems(i_listitems),
 
 	p_percentage(0),
 	p_tasksready(0),
@@ -41,18 +43,40 @@ BlockInfo::BlockInfo( Item * qItem, int BlockNumber, int JobId):
 	p_taskssumruntime(0),
 
 	errors_retries(-1),
-	errors_avoidhost(-1),
-	errors_tasksamehost(-1),
+	errors_avoid_host(-1),
+	errors_task_same_host(-1),
 	task_max_run_time(0),
 	task_min_run_time(0),
 
-	item( qItem),
-	blocknum( BlockNumber),
-	jobid(JobId),
+	m_blocknum(i_data->getBlockNum()),
+	m_jobid(i_data->getJobId()),
+	m_name(afqt::stoq(i_data->getName())),
 
-	injobslist( false)
+	tasksnum(1)
 {
-	if(( blocknum == -1 ) && ( jobid == -1 )) injobslist = true;
+	addParam_Num("sequential",                   "Sequential",            "Tasks solving order", -(1<<30));
+	addParam_Num("capacity",                     "Capacity",              "Tasks capacity");
+	addParam_Num("max_running_tasks",            "Maximum Running",       "Maximum running tasks number");
+	addParam_Num("max_running_tasks_per_host",   "Max Run Per Host",      "Max run tasks on the same host");
+	addParam_separator();
+	addParam_Hrs("task_max_run_time",            "Task Max Run Time",     "Task maximum running time");
+	addParam_Hrs("task_min_run_time",            "Task Min Run Time",     "Task minimum running time");
+	addParam_Hrs("task_progress_change_timeout", "Task Progress Timeout", "Task progress change timeout");
+	addParam_separator();
+	addParam_Num("errors_retries",               "Errors Retries",        "Number of times to retry error tasks");
+	addParam_Num("errors_avoid_host",            "Errors Avoid Host",     "Number of errors for block to avoid host");
+	addParam_Num("errors_task_same_host",        "Errors Task Avoid",     "Number of errors for each task to avoid host");
+	addParam_Hrs("errors_forgive_time",          "Errors Forgive Time",   "After this time host errors will be forgived");
+	addParam_separator();
+	addParam_REx("hosts_mask",                   "Hosts Mask",            "Host names pattern that block can run on");
+	addParam_REx("hosts_mask_exclude",           "Hosts Mask Exclude",    "Host names pattern that block will not run");
+	addParam_Num("need_memory",                  "Need Memory",           "Host free memory needed to run tasks");
+	addParam_Num("need_hdd",                     "Need HDD Space",        "Host free HDD space needed to run tasks");
+	addParam_REx("need_properties",              "Need Properties",       "Host \"Properties\" needed to run tasks");
+	addParam_Num("need_power",                   "Need Power",            "Host \"Power\" needed to run tasks");
+	addParam_separator();
+	addParam_REx("depend_mask",                  "Depend Mask",           "Blocks name mask to wait to finish totally");
+	addParam_REx("tasks_depend_mask",            "Tasks Depend Mask",     "Blocks name mask to wait to finish tasks");
 }
 
 BlockInfo::~BlockInfo()
@@ -67,70 +91,101 @@ bool BlockInfo::update( const af::BlockData* block, int type)
 	case af::Msg::TJobsList:
 	case af::Msg::TBlocks:
 	case af::Msg::TBlocksProperties:
-		multihost                    = block->isMultiHost();
-		multihost_samemaster         = block->canMasterRunOnSlaveHost();
-		varcapacity                  = block->canVarCapacity();
+
+		tasksnum                     = block->getTasksNum();
 		numeric                      = block->isNumeric();
 
 		frame_first                  = block->getFrameFirst();
 		frame_last                   = block->getFrameLast();
 		frame_pertask                = block->getFramePerTask();
 		frame_inc                    = block->getFrameInc();
-		sequential                   = block->getSequential();
 
-		tasksnum                     = block->getTasksNum();
-		task_max_run_time            = block->getTaskMaxRunTime();
-		task_min_run_time            = block->getTaskMinRunTime();
-		task_progress_change_timeout = block->getTaskProgressChangeTimeout();
-		errors_retries               = block->getErrorsRetries();
-		errors_avoidhost             = block->getErrorsAvoidHost();
-		errors_tasksamehost          = block->getErrorsTaskSameHost();
-		errors_forgivetime           = block->getErrorsForgiveTime();
-		maxrunningtasks              = block->getMaxRunningTasks();
-		maxruntasksperhost           = block->getMaxRunTasksPerHost();
-		need_memory                  = block->getNeedMemory();
-		need_power                   = block->getNeedPower();
-		need_hdd                     = block->getNeedHDD();
-		need_properties              = afqt::stoq( block->getNeedProperties());
-		hostsmask                    = afqt::stoq(block->getHostsMask());
-		hostsmask_exclude            = afqt::stoq(block->getHostsMaskExclude());
-		need_properties              = afqt::stoq(block->getNeedProperties());
-		dependmask                   = afqt::stoq(block->getDependMask());
-		tasksdependmask              = afqt::stoq(block->getTasksDependMask());
-		capacity                     = block->getCapacity();
-		filesize_min                 = block->getFileSizeMin();
-		filesize_max                 = block->getFileSizeMax();
-		capcoeff_min                 = block->getCapCoeffMin();
-		capcoeff_max                 = block->getCapCoeffMax();
-		multihost_min                = block->getMultiHostMin();
-		multihost_max                = block->getMultiHostMax();
-		multihost_waitmax            = block->getMultiHostWaitMax();
-		multihost_waitsrv            = block->getMultiHostWaitSrv();
 		service                      = afqt::stoq( block->getService());
+		multihost                    = block->isMultiHost();
+		multihost_samemaster         = block->canMasterRunOnSlaveHost();
+		varcapacity                  = block->canVarCapacity();
 
+		// Ediable parameters stored in map
+		           sequential                     = block->getSequential();
+		m_var_map["sequential"]                   = int(block->getSequential());
+		           capacity                       = block->getCapacity();
+		m_var_map["capacity"]                     = block->getCapacity();
+		           max_running_tasks              = block->getMaxRunningTasks();
+		m_var_map["max_running_tasks"]            = block->getMaxRunningTasks();
+		           max_running_tasks_per_host     = block->getMaxRunTasksPerHost();
+		m_var_map["max_running_tasks_per_host"]   = block->getMaxRunTasksPerHost();
+
+		           task_max_run_time              = block->getTaskMaxRunTime();
+		m_var_map["task_max_run_time"]            = block->getTaskMaxRunTime();
+		           task_min_run_time              = block->getTaskMinRunTime();
+		m_var_map["task_min_run_time"]            = block->getTaskMinRunTime();
+		           task_progress_change_timeout   = block->getTaskProgressChangeTimeout();
+		m_var_map["task_progress_change_timeout"] = block->getTaskProgressChangeTimeout();
+
+		           errors_retries                 = block->getErrorsRetries();
+		m_var_map["errors_retries"]               = block->getErrorsRetries();
+		           errors_avoid_host              = block->getErrorsAvoidHost();
+		m_var_map["errors_avoid_host"]            = block->getErrorsAvoidHost();
+		           errors_task_same_host          = block->getErrorsTaskSameHost();
+		m_var_map["errors_task_same_host"]        = block->getErrorsTaskSameHost();
+		           errors_forgive_time            = block->getErrorsForgiveTime();
+		m_var_map["errors_forgive_time"]          = block->getErrorsForgiveTime();
+
+		           hosts_mask                     = afqt::stoq(block->getHostsMask());
+		m_var_map["hosts_mask"]                   = afqt::stoq(block->getHostsMask());
+		           hosts_mask_exclude             = afqt::stoq(block->getHostsMaskExclude());
+		m_var_map["hosts_mask_exclude"]           = afqt::stoq(block->getHostsMaskExclude());
+		           need_memory                    = block->getNeedMemory();
+		m_var_map["need_memory"]                  = block->getNeedMemory();
+		           need_hdd                       = block->getNeedHDD();
+		m_var_map["need_hdd"]                     = block->getNeedHDD();
+		           need_properties                = afqt::stoq(block->getNeedProperties());
+		m_var_map["need_properties"]              = afqt::stoq(block->getNeedProperties());
+		           need_power                     = block->getNeedPower();
+		m_var_map["need_power"]                   = block->getNeedPower();
+
+		           depend_mask                    = afqt::stoq(block->getDependMask());
+		m_var_map["depend_mask"]                  = afqt::stoq(block->getDependMask());
+		           tasks_depend_mask              = afqt::stoq(block->getTasksDependMask());
+		m_var_map["tasks_depend_mask"]            = afqt::stoq(block->getTasksDependMask());
+
+
+		filesize_min      = block->getFileSizeMin();
+		filesize_max      = block->getFileSizeMax();
+		capcoeff_min      = block->getCapCoeffMin();
+		capcoeff_max      = block->getCapCoeffMax();
+		multihost_min     = block->getMultiHostMin();
+		multihost_max     = block->getMultiHostMax();
+		multihost_waitmax = block->getMultiHostWaitMax();
+		multihost_waitsrv = block->getMultiHostWaitSrv();
+
+
+		tickets.clear();
+		for (auto const& it : block->getTickets())
+			tickets[afqt::stoq(it.first)] = it.second;
 
 		depends.clear();
 		if( Watch::isPadawan())
 		{
 			if( block->isDependSubTask()) depends += QString(" [Sub-Task Depends]");
-			if( false == dependmask.isEmpty()) depends += QString(" Depends(%1)").arg( dependmask);
-			if( false == tasksdependmask.isEmpty()) depends += QString(" TasksDepends[%1]").arg( tasksdependmask);
+			if( false == depend_mask.isEmpty()) depends += QString(" Depends(%1)").arg( depend_mask);
+			if( false == tasks_depend_mask.isEmpty()) depends += QString(" TasksDepends[%1]").arg( tasks_depend_mask);
 		}
 		else if( Watch::isJedi())
 		{
 			if( block->isDependSubTask()) depends += QString(" [SUB]");
-			if( false == dependmask.isEmpty()) depends += QString(" Dep(%1)").arg( dependmask);
-			if( false == tasksdependmask.isEmpty()) depends += QString(" TDep[%1]").arg( tasksdependmask);
+			if( false == depend_mask.isEmpty()) depends += QString(" Dep(%1)").arg( depend_mask);
+			if( false == tasks_depend_mask.isEmpty()) depends += QString(" TDep[%1]").arg( tasks_depend_mask);
 		}
 		else
 		{
 			if( block->isDependSubTask()) depends += QString(" [sub]");
-			if( false == dependmask.isEmpty()) depends += QString(" d(%1)").arg( dependmask);
-			if( false == tasksdependmask.isEmpty()) depends += QString(" t[%1]").arg( tasksdependmask);
+			if( false == depend_mask.isEmpty()) depends += QString(" d(%1)").arg( depend_mask);
+			if( false == tasks_depend_mask.isEmpty()) depends += QString(" t[%1]").arg( tasks_depend_mask);
 		}
 
-		icon_large = Watch::getServiceIconLarge( service);
-		icon_small = Watch::getServiceIconSmall( service);
+		m_icon_large = Watch::getServiceIconLarge( service);
+		m_icon_small = Watch::getServiceIconSmall( service);
 
 	case af::Msg::TBlocksProgress:
 
@@ -256,7 +311,7 @@ void BlockInfo::refresh()
 		}
 	}
 
-	str_info += QString(": %1").arg( name);
+	str_info += QString(": %1").arg(m_name);
 
 	if( false == depends.isEmpty())
 		str_info += depends;
@@ -270,17 +325,17 @@ void BlockInfo::refresh()
 			.arg( af::time2strHMS( p_taskssumruntime, true).c_str())
 			.arg( af::time2strHMS( p_taskssumruntime/p_tasksdone, true).c_str());
 
-		if(( errors_avoidhost >= 0 ) || ( errors_tasksamehost >= 0 ) || ( errors_retries >= 0 ))
-			str_params += Item::generateErrorsSolvingInfo( errors_avoidhost, errors_tasksamehost, errors_retries);
-		if( errors_forgivetime >= 0 ) str_params += QString(" ErrorsForgiveTime:%1").arg( af::time2strHMS( errors_forgivetime, true).c_str());
+		if(( errors_avoid_host >= 0 ) || ( errors_task_same_host >= 0 ) || ( errors_retries >= 0 ))
+			str_params += Item::generateErrorsSolvingInfo( errors_avoid_host, errors_task_same_host, errors_retries);
+		if( errors_forgive_time >= 0 ) str_params += QString(" ErrorsForgiveTime:%1").arg( af::time2strHMS( errors_forgive_time, true).c_str());
 
 		if(task_max_run_time > 0) str_params += QString(" MaxRunTime:%1").arg(af::time2strHMS(task_max_run_time, true).c_str());
 		if(task_min_run_time > 0) str_params += QString(" MinRunTime:%1").arg(af::time2strHMS(task_min_run_time, true).c_str());
 
-		if( maxrunningtasks    != -1 ) str_params += QString(" MaxRunTasks:%1").arg( maxrunningtasks);
-		if( maxruntasksperhost != -1 ) str_params += QString(" MaxPerHost:%1").arg( maxruntasksperhost);
-		if( false == hostsmask.isEmpty()          ) str_params += QString(" HostsMask(%1)").arg( hostsmask         );
-		if( false == hostsmask_exclude.isEmpty()  ) str_params += QString(" ExcludeHosts(%1)").arg( hostsmask_exclude );
+		if( max_running_tasks    != -1 ) str_params += QString(" MaxRunTasks:%1").arg( max_running_tasks);
+		if( max_running_tasks_per_host != -1 ) str_params += QString(" MaxPerHost:%1").arg( max_running_tasks_per_host);
+		if( false == hosts_mask.isEmpty()          ) str_params += QString(" HostsMask(%1)").arg( hosts_mask         );
+		if( false == hosts_mask_exclude.isEmpty()  ) str_params += QString(" ExcludeHosts(%1)").arg( hosts_mask_exclude );
 		if( false == need_properties.isEmpty()    ) str_params += QString(" Properties(%1)").arg( need_properties   );
 		if( need_memory > 0 ) str_params += QString(" Mem>%1").arg( need_memory);
 		if( need_hdd    > 0 ) str_params += QString(" HDD>%1").arg( need_hdd);
@@ -307,17 +362,17 @@ void BlockInfo::refresh()
 			.arg( af::time2strHMS( p_taskssumruntime, true).c_str())
 			.arg( af::time2strHMS( p_taskssumruntime/p_tasksdone, true).c_str());
 
-		if(( errors_avoidhost >= 0 ) || ( errors_tasksamehost >= 0 ) || ( errors_retries >= 0 ))
-			str_params += Item::generateErrorsSolvingInfo( errors_avoidhost, errors_tasksamehost, errors_retries);
-		if( errors_forgivetime >= 0 ) str_params += QString(" Forgive:%1").arg( af::time2strHMS( errors_forgivetime, true).c_str());
+		if(( errors_avoid_host >= 0 ) || ( errors_task_same_host >= 0 ) || ( errors_retries >= 0 ))
+			str_params += Item::generateErrorsSolvingInfo( errors_avoid_host, errors_task_same_host, errors_retries);
+		if( errors_forgive_time >= 0 ) str_params += QString(" Forgive:%1").arg( af::time2strHMS( errors_forgive_time, true).c_str());
 
 		if(task_max_run_time > 0) str_params += QString(" MaxTime:%1").arg(af::time2strHMS(task_max_run_time, true).c_str());
 		if(task_min_run_time > 0) str_params += QString(" MinTime:%1").arg(af::time2strHMS(task_min_run_time, true).c_str());
 
-		if( maxrunningtasks    != -1 ) str_params += QString(" Max:%1").arg( maxrunningtasks);
-		if( maxruntasksperhost != -1 ) str_params += QString(" PerHost:%1").arg( maxruntasksperhost);
-		if( false == hostsmask.isEmpty()          ) str_params += QString(" Hosts(%1)").arg( hostsmask         );
-		if( false == hostsmask_exclude.isEmpty()  ) str_params += QString(" Exclude(%1)").arg( hostsmask_exclude );
+		if( max_running_tasks    != -1 ) str_params += QString(" Max:%1").arg( max_running_tasks);
+		if( max_running_tasks_per_host != -1 ) str_params += QString(" PerHost:%1").arg( max_running_tasks_per_host);
+		if( false == hosts_mask.isEmpty()          ) str_params += QString(" Hosts(%1)").arg( hosts_mask         );
+		if( false == hosts_mask_exclude.isEmpty()  ) str_params += QString(" Exclude(%1)").arg( hosts_mask_exclude );
 		if( false == need_properties.isEmpty()    ) str_params += QString(" Props(%1)").arg( need_properties   );
 		if( need_memory > 0 ) str_params += QString(" Mem>%1").arg( need_memory);
 		if( need_hdd    > 0 ) str_params += QString(" HDD>%1").arg( need_hdd);
@@ -344,17 +399,17 @@ void BlockInfo::refresh()
 			.arg( af::time2strHMS( p_taskssumruntime, true).c_str())
 			.arg( af::time2strHMS( p_taskssumruntime/p_tasksdone, true).c_str());
 
-		if(( errors_avoidhost >= 0 ) || ( errors_tasksamehost >= 0 ) || ( errors_retries >= 0 ))
-			str_params += Item::generateErrorsSolvingInfo( errors_avoidhost, errors_tasksamehost, errors_retries);
-		if( errors_forgivetime >= 0 ) str_params += QString(" f%1").arg( af::time2strHMS( errors_forgivetime, true).c_str());
+		if(( errors_avoid_host >= 0 ) || ( errors_task_same_host >= 0 ) || ( errors_retries >= 0 ))
+			str_params += Item::generateErrorsSolvingInfo( errors_avoid_host, errors_task_same_host, errors_retries);
+		if( errors_forgive_time >= 0 ) str_params += QString(" f%1").arg( af::time2strHMS( errors_forgive_time, true).c_str());
 
 		if(task_max_run_time > 0) str_params += QString(" Mrt%1").arg(af::time2strHMS(task_max_run_time, true).c_str());
 		if(task_min_run_time > 0) str_params += QString(" mrt%1").arg(af::time2strHMS(task_min_run_time, true).c_str());
 
-		if( maxrunningtasks    != -1 ) str_params += QString(" m%1").arg( maxrunningtasks);
-		if( maxruntasksperhost != -1 ) str_params += QString(" mph%1").arg( maxruntasksperhost);
-		if( false == hostsmask.isEmpty()          ) str_params += QString(" h(%1)").arg( hostsmask         );
-		if( false == hostsmask_exclude.isEmpty()  ) str_params += QString(" e(%1)").arg( hostsmask_exclude );
+		if( max_running_tasks    != -1 ) str_params += QString(" m%1").arg( max_running_tasks);
+		if( max_running_tasks_per_host != -1 ) str_params += QString(" mph%1").arg( max_running_tasks_per_host);
+		if( false == hosts_mask.isEmpty()          ) str_params += QString(" h(%1)").arg( hosts_mask         );
+		if( false == hosts_mask_exclude.isEmpty()  ) str_params += QString(" e(%1)").arg( hosts_mask_exclude );
 		if( false == need_properties.isEmpty()    ) str_params += QString(" p(%1)").arg( need_properties   );
 		if( need_memory > 0 ) str_params += QString(" m>%1").arg( need_memory);
 		if( need_hdd    > 0 ) str_params += QString(" h>%1").arg( need_hdd);
@@ -410,7 +465,7 @@ void BlockInfo::refresh()
 		if (p_taskswaitrec ) str_progress += QString(" wrc%1").arg(p_taskswaitrec);
 	}
 
-	if( jobid == AFJOB::SYSJOB_ID ) str_progress += QString(" Ready:%1").arg( p_tasksready);
+	if (m_jobid == AFJOB::SYSJOB_ID ) str_progress += QString(" Ready:%1").arg( p_tasksready);
 
 
 	// Error Hosts:
@@ -445,14 +500,14 @@ void BlockInfo::stdOutFlags( char* data, int size) const
 	}
 }
 
-void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
+void BlockInfo::paint( QPainter * i_painter, const QStyleOptionViewItem &option,
 	int x, int y, int w,
-	bool compact_display,
-	const QColor * backcolor) const
+	bool i_compact_display,
+	const QColor * i_backcolor) const
 {
-	if( item == NULL)
+	if (m_item == NULL)
 	{
-		AFERROR("BlockInfo::drawBars: Item is not set.")
+		AF_ERR << "BlockInfo::drawBars: Item is not set.";
 		return;
 	}
 
@@ -463,11 +518,11 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
 
 	// Paint an icon and calculate an offset for further info:
 	int xoffset = 3;
-	if( compact_display)
+	if (i_compact_display)
 	{
-		if( icon_small )
+		if (m_icon_small)
 		{
-			painter->drawPixmap( x, y, *icon_small);
+			i_painter->drawPixmap(x, y, *m_icon_small);
 			xoffset += 16;
 		}
 	}
@@ -475,93 +530,108 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
 	{
 		xoffset = 7;
 
-		if( icon_large )
+		if (m_icon_large)
 		{
-			painter->drawPixmap( x, y, *icon_large);
+			i_painter->drawPixmap(x, y, *m_icon_large);
 			xoffset += 42;
 		}
 	}
 
 
 	// Paint border:
-	painter->setPen( afqt::QEnvironment::clr_outline.c );
-	painter->setBrush( Qt::NoBrush);
-	painter->drawRoundedRect( x+xoffset-3, y-1, w+4-xoffset, compact_display ? HeightCompact : Height, 3, 3);
+	i_painter->setPen(afqt::QEnvironment::clr_outline.c );
+	i_painter->setBrush(Qt::NoBrush);
+	i_painter->drawRoundedRect(x+xoffset-3, y-1, w+4-xoffset, i_compact_display ? HeightCompact : Height, 3, 3);
 
 
 	// Setup font size and color:
-	painter->setFont( afqt::QEnvironment::f_info);
-	QPen pen( Item::clrTextInfo( p_tasksrunning, option.state & QStyle::State_Selected, item->isLocked()));
-	painter->setPen( pen);
+	i_painter->setFont(afqt::QEnvironment::f_info);
+	QPen pen(Item::clrTextInfo(p_tasksrunning, option.state & QStyle::State_Selected, m_item->isLocked()));
 
+	// Draw tickets:
+	int tk_w = 0;
+	int tk_y = i_compact_display ? y+y_info : y+y_progress;
+	QMapIterator<QString, int> it(tickets);
+	while (it.hasNext())
+	{
+		it.next();
+
+		tk_w += Item::drawTicket(i_painter, pen, x+5 + xoffset, tk_y, w-10 - xoffset - tk_w,
+				Item::TKD_LEFT,
+				it.key(), it.value());
+
+		tk_w += 8;
+	}
+
+	i_painter->setPen(pen);
 
 	// Paint parameters:
 	QRect rect_params;
-	painter->drawText( x, y+y_info, w-5, 15, Qt::AlignRight | Qt::AlignTop, str_params, &rect_params );
+	i_painter->drawText(x, y+y_info, w-5-(i_compact_display?tk_w:0), 15, Qt::AlignRight | Qt::AlignTop, str_params, &rect_params);
 
 	// Paint general information:
-	painter->drawText( x+xoffset+5, y+y_info, w-rect_params.width()-10-xoffset, 15, Qt::AlignLeft | Qt::AlignTop, str_info);
+	i_painter->drawText(x+xoffset+5, y+y_info, w-rect_params.width()-10-xoffset, 15, Qt::AlignLeft | Qt::AlignTop, str_info);
 
 
 	// On compact display we dont show progress, error hosts and progress bars.
-	if( compact_display )
+	if (i_compact_display)
 		return;
 
 
 	// Paint error hosts:
 	int error_hosts_text_width = 0;
-	if( p_errorhosts )
+	if (p_errorhosts)
 	{
-		if( p_avoidhosts )
-			painter->setPen( afqt::QEnvironment::clr_error.c);
+		if (p_avoidhosts)
+			i_painter->setPen(afqt::QEnvironment::clr_error.c);
 		else
-			painter->setPen( afqt::QEnvironment::clr_errorready.c);
+			i_painter->setPen(afqt::QEnvironment::clr_errorready.c);
 
 		QRect rect_errorhosts;
-		painter->drawText( x+xoffset+5, y+y_progress, w-10-xoffset, 15, Qt::AlignRight | Qt::AlignTop, str_avoiderrors, &rect_errorhosts);
+		i_painter->drawText(x+xoffset+5, y+y_progress, w-10-xoffset-tk_w, 15, Qt::AlignRight | Qt::AlignTop, str_avoiderrors, &rect_errorhosts);
 		error_hosts_text_width = rect_errorhosts.width() + 10;
 	}
 
 
 	// Paint progress:
-	painter->setPen( pen);
-	painter->drawText( x+xoffset+5, y+y_progress, w-15-xoffset-error_hosts_text_width, 15, Qt::AlignLeft | Qt::AlignTop, str_progress);
+	i_painter->setPen(pen);
+	i_painter->drawText(x+xoffset+5, y+y_progress, w-15-xoffset-error_hosts_text_width, 15, Qt::AlignLeft | Qt::AlignTop, str_progress);
 
 
 	xoffset += 2;
 	// Paint progress bars:
 	Item::drawPercent
 	(
-		painter, x+xoffset, y+y_bars, w-xoffset-2, 4,
-		jobid == AFJOB::SYSJOB_ID ? p_tasksrunning + p_tasksready + p_taskserror : tasksnum,
-		jobid == AFJOB::SYSJOB_ID ? 0 : p_tasksdone, p_taskserror, p_tasksrunning,
+		i_painter, x+xoffset, y+y_bars, w-xoffset-2, 4,
+		m_jobid == AFJOB::SYSJOB_ID ? p_tasksrunning + p_tasksready + p_taskserror : tasksnum,
+		m_jobid == AFJOB::SYSJOB_ID ? 0 : p_tasksdone, p_taskserror, p_tasksrunning,
 		false
 	);
 	Item::drawPercent
 	(
-		painter, x+xoffset, y+y_bars+4, w-xoffset-2, 4,
+		i_painter, x+xoffset, y+y_bars+4, w-xoffset-2, 4,
 		100,
 		p_percentage, 0, 0,
 		false
 	);
 	drawProgress
 	(
-		painter, x+1+xoffset, y+y_bars+8, w-xoffset-2, 6,
-		backcolor
+		i_painter, x+1+xoffset, y+y_bars+8, w-xoffset-2, 6,
+		i_backcolor
 	);
 
-	painter->setPen( afqt::QEnvironment::clr_outline.c );
-	painter->setBrush( Qt::NoBrush);
-	painter->drawRoundedRect( x-1+xoffset, y+y_bars-1, w-1-xoffset, 15, 2, 2);
+	i_painter->setPen(afqt::QEnvironment::clr_outline.c);
+	i_painter->setBrush(Qt::NoBrush);
+	i_painter->drawRoundedRect(x-1+xoffset, y+y_bars-1, w-1-xoffset, 15, 2, 2);
 }
 
 void BlockInfo::drawProgress(
-			QPainter * painter,
+			QPainter * i_painter,
 			int posx, int posy, int width, int height,
-			const QColor * backcolor
+			const QColor * i_backcolor
 		) const
 {
-	painter->setPen( Qt::NoPen );
+	i_painter->setPen( Qt::NoPen );
 
 	int w = width / AFJOB::ASCII_PROGRESS_LENGTH;
 	if( w < 1) w = 1;
@@ -576,46 +646,46 @@ void BlockInfo::drawProgress(
 		switch( progress[i] )
 		{
 		case ' ': // 0
-			painter->setBrush( QBrush( afqt::QEnvironment::qclr_black, Qt::SolidPattern ));
-			painter->drawRect( x, posy, w+offset, height);
+			i_painter->setBrush( QBrush( afqt::QEnvironment::qclr_black, Qt::SolidPattern ));
+			i_painter->drawRect( x, posy, w+offset, height);
 			break;
 		case 'r': // STATE_READY_MASK
 			break;
 		case 'D': // STATE_DONE_MASK
-			painter->setBrush( QBrush( afqt::QEnvironment::clr_done.c, Qt::SolidPattern ));
-			painter->drawRect( x, posy, w+offset, height);
+			i_painter->setBrush( QBrush( afqt::QEnvironment::clr_done.c, Qt::SolidPattern ));
+			i_painter->drawRect( x, posy, w+offset, height);
 			break;
 		case 'R': // STATE_RUNNING_MASK
-			painter->setBrush( QBrush( afqt::QEnvironment::clr_running.c, Qt::SolidPattern ));
-			painter->drawRect( x, posy, w+offset, height);
+			i_painter->setBrush( QBrush( afqt::QEnvironment::clr_running.c, Qt::SolidPattern ));
+			i_painter->drawRect( x, posy, w+offset, height);
 			break;
 		case 'E': // STATE_ERROR_MASK
-			painter->setBrush( QBrush( afqt::QEnvironment::clr_error.c, Qt::SolidPattern ));
-			painter->drawRect( x, posy, w+offset, height);
+			i_painter->setBrush( QBrush( afqt::QEnvironment::clr_error.c, Qt::SolidPattern ));
+			i_painter->drawRect( x, posy, w+offset, height);
 			break;
 		case 'Y': // STATE_READY_MASK | STATE_ERROR_READY_MASK
-			painter->setBrush( QBrush( afqt::QEnvironment::clr_errorready.c, Qt::SolidPattern ));
-			painter->drawRect( x, posy, w+offset, height);
+			i_painter->setBrush( QBrush( afqt::QEnvironment::clr_errorready.c, Qt::SolidPattern ));
+			i_painter->drawRect( x, posy, w+offset, height);
 			break;
 		case 'W': // STATE_WAITDEP_MASK
-			painter->setBrush( QBrush( afqt::QEnvironment::clr_itemjobwdep.c, Qt::SolidPattern ));
-			painter->drawRect( x, posy, w+offset, height);
+			i_painter->setBrush( QBrush( afqt::QEnvironment::clr_itemjobwdep.c, Qt::SolidPattern ));
+			i_painter->drawRect( x, posy, w+offset, height);
 			break;
 		case 'C': // STATE_WAITRECONNECT_MASK
-			painter->setBrush( QBrush( afqt::QEnvironment::clr_taskwaitreconn.c, Qt::SolidPattern ));
-			painter->drawRect( x, posy, w+offset, height);
+			i_painter->setBrush( QBrush( afqt::QEnvironment::clr_taskwaitreconn.c, Qt::SolidPattern ));
+			i_painter->drawRect( x, posy, w+offset, height);
 			break;
 		case 'S': // STATE_SKIPPED_MASK | STATE_DONE_MASK
-			painter->setBrush( QBrush( afqt::QEnvironment::clr_taskskipped.c, Qt::SolidPattern ));
-			painter->drawRect( x, posy, w+offset, height);
+			i_painter->setBrush( QBrush( afqt::QEnvironment::clr_taskskipped.c, Qt::SolidPattern ));
+			i_painter->drawRect( x, posy, w+offset, height);
 			break;
 		case 'N': // STATE_RUNNING_MASK_MASK | STATE_WARNING_MASK
-			painter->setBrush( QBrush( afqt::QEnvironment::clr_taskwarningrun.c, Qt::SolidPattern ));
-			painter->drawRect( x, posy, w+offset, height);
+			i_painter->setBrush( QBrush( afqt::QEnvironment::clr_taskwarningrun.c, Qt::SolidPattern ));
+			i_painter->drawRect( x, posy, w+offset, height);
 			break;
 		case 'G': // STATE_DONE_MASK | STATE_WARNING_MASK
-			painter->setBrush( QBrush( afqt::QEnvironment::clr_itemjobwarning.c, Qt::SolidPattern ));
-			painter->drawRect( x, posy, w+offset, height);
+			i_painter->setBrush( QBrush( afqt::QEnvironment::clr_itemjobwarning.c, Qt::SolidPattern ));
+			i_painter->drawRect( x, posy, w+offset, height);
 			break;
 		}
 		last_x = x + w + offset;
@@ -624,355 +694,130 @@ void BlockInfo::drawProgress(
 //printf("\n");
 }
 
-void BlockInfo::generateMenu( int id_block, QMenu * menu, QWidget * qwidget, QMenu * submenu)
+void BlockInfo::generateMenu(QMenu * i_menu, QMenu * i_params_submenu) const
 {
-	ActionIdString *action;
+	static const QStringList operations = {
+		"reset_error_hosts", "Reset Error Hosts",
+		"skip",              "Skip Block Tasks",
+		"restart",           "Restart Block Tasks",
+		"restart_running",   "Restart Running",
+		"restart_skipped",   "Restart Skipped",
+		"restart_done",      "Restart Done"};
 
-	// There is no need to reset error hosts for all job blocks here.
-	// Job item has a special menuitem for it.
-	if( id_block != -1 )
+	QStringListIterator it(operations);
+	while (it.hasNext())
 	{
-		action = new ActionIdString( id_block, "reset_error_hosts", "Reset Error Hosts", qwidget);
-		QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-		menu->addAction( action);
-
-		menu->addSeparator();
+		ActionString * action = new ActionString(it.next(), it.next(), m_listitems);
+		connect(action, SIGNAL(triggeredString(QString)), this, SLOT(slot_BlockOperation(QString)));
+		i_menu->addAction(action);
 	}
 
-	// There is no way to skip and restart all job bloks.
-	if( id_block != -1 )
+	i_menu->addSeparator();
+
+	// Change block parameters menu (ListTasks shows it in other submenu):
+	if (i_params_submenu != NULL)
+		i_menu = i_params_submenu;
+
+	QList<Param*>::const_iterator pIt;
+	for (pIt = m_params.begin(); pIt != m_params.end(); pIt++)
 	{
-
-		action = new ActionIdString( id_block, "skip", "Skip Block", qwidget);
-		QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-		menu->addAction( action);
-
-		action = new ActionIdString( id_block, "restart", "Restart Block", qwidget);
-		QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-		menu->addAction( action);
-
-		action = new ActionIdString( id_block, "restart_running", "Restart Running", qwidget);
-		QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-		menu->addAction( action);
-
-		action = new ActionIdString( id_block, "restart_skipped", "Restart Skipped", qwidget);
-		QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-		menu->addAction( action);
-
-		action = new ActionIdString( id_block, "restart_done", "Restart Done", qwidget);
-		QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-		menu->addAction( action);
-
-		menu->addSeparator();
-	}
-
-	if( submenu != NULL )
-		 menu = submenu;
-
-	action = new ActionIdString( id_block, "sequential", "Set Sequential", qwidget);
-	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-	menu->addAction( action);
-
-	menu->addSeparator();
-
-	action = new ActionIdString( id_block, "errors_avoid_host", "Set Errors Avoid Host", qwidget);
-	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-	menu->addAction( action);
-
-	action = new ActionIdString( id_block, "errors_task_same_host", "Set Task Errors Same Host", qwidget);
-	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-	menu->addAction( action);
-
-	action = new ActionIdString( id_block, "errors_retries", "Set Task Error Retries", qwidget);
-	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-	menu->addAction( action);
-
-	action = new ActionIdString(id_block, "task_max_run_time", "Set Task MaxRunTime", qwidget);
-	QObject::connect(action, SIGNAL(triggeredId(int, QString)), qwidget, SLOT(blockAction(int, QString)));
-	menu->addAction(action);
-
-	action = new ActionIdString(id_block, "task_min_run_time", "Set Task MinRunTime", qwidget);
-	QObject::connect(action, SIGNAL(triggeredId(int, QString)), qwidget, SLOT(blockAction(int, QString)));
-	menu->addAction(action);
-
-	action = new ActionIdString( id_block, "errors_forgive_time", "Set Errors Forgive time", qwidget);
-	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-	menu->addAction( action);
-	
-	action = new ActionIdString( id_block, "task_progress_change_timeout", "Set Task Progress Change Timeout", qwidget);
-	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-	menu->addAction( action);
-
-	menu->addSeparator();
-
-	action = new ActionIdString( id_block, "depend_mask", "Set Depend Mask", qwidget);
-	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-	menu->addAction( action);
-
-	action = new ActionIdString( id_block, "tasks_depend_mask", "Set Tasks Depend Mask", qwidget);
-	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-	menu->addAction( action);
-
-	action = new ActionIdString( id_block, "hosts_mask", "Set Hosts Mask", qwidget);
-	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-	menu->addAction( action);
-
-	action = new ActionIdString( id_block, "hosts_mask_exclude", "Set Exclude Hosts Mask", qwidget);
-	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-	menu->addAction( action);
-
-	action = new ActionIdString( id_block, "max_running_tasks", "Set Max Running Tasks", qwidget);
-	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-	menu->addAction( action);
-
-	action = new ActionIdString( id_block, "max_running_tasks_per_host", "Set Max Tasks Per Host", qwidget);
-	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-	menu->addAction( action);
-
-	menu->addSeparator();
-
-	action = new ActionIdString( id_block, "capacity", "Set Capacity", qwidget);
-	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-	menu->addAction( action);
-
-	if( varcapacity)
-	{
-		action = new ActionIdString( id_block, "capacity_coeff_min", "Set Capacity Min Coeff", qwidget);
-		QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-		menu->addAction( action);
-
-		action = new ActionIdString( id_block, "capacity_coeff_max", "Set Capacity Max Coeff", qwidget);
-		QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-		menu->addAction( action);
-	}
-
-	menu->addSeparator();
-
-	if( multihost)
-	{
-		action = new ActionIdString( id_block, "multihost_min", "Set Hosts Minimum", qwidget);
-		QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-		menu->addAction( action);
-
-		action = new ActionIdString( id_block, "multihost_max", "Set Hosts Maximum", qwidget);
-		QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-		menu->addAction( action);
-
-		action = new ActionIdString( id_block, "multihost_max_wait", "Set Maximum Hosts Wait Time", qwidget);
-		QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-		menu->addAction( action);
-
-		action = new ActionIdString( id_block, "multihost_service_wait", "Set Service Wait Time", qwidget);
-		QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-		menu->addAction( action);
-
-		menu->addSeparator();
-	}
-
-	action = new ActionIdString( id_block, "need_memory", "Set Needed Memory", qwidget);
-	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-	menu->addAction( action);
-
-	action = new ActionIdString( id_block, "need_hdd", "Set Needed HDD", qwidget);
-	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-	menu->addAction( action);
-
-	action = new ActionIdString( id_block, "need_power", "Set Needed Power", qwidget);
-	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-	menu->addAction( action);
-
-	action = new ActionIdString( id_block, "need_properties", "Set Needed Properties", qwidget);
-	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-	menu->addAction( action);
-}
-
-bool BlockInfo::blockAction( std::ostringstream & i_str, int id_block, const QString & i_action, ListItems * listitems) const
-{
-	// Operations:
-
-	if( i_action == "skip" ||
-		i_action == "restart" ||
-		i_action == "restart_running" ||
-		i_action == "restart_skipped" ||
-		i_action == "restart_done" ||
-		i_action == "reset_error_hosts")
-	{
-		i_str << ",\n\"operation\":{\"type\":\"" << i_action.toUtf8().data() << "\"}";
-		return true;
-	}
-
-	// Parameter change:
-
-	i_str << ",\n\"params\":{\n";
-	i_str << '"' << i_action.toUtf8().data() << "\":";
-
-	// We should query some number or string:
-
-	bool ok = true;
-	int cur_number = 0;
-	QString cur_string;
-	int set_number = 0;
-	QString set_string;
-
-	if( i_action == "capacity" )
-	{
-		if( id_block == blocknum ) cur_number = capacity;
-		set_number = QInputDialog::getInt( listitems, "Change Capacity", "Enter Capacity", cur_number, -1, INT_MAX, 1, &ok);
-	}
-	else if( i_action == "sequential" )
-	{
-		if( id_block == blocknum ) cur_number = sequential;
-		set_number = QInputDialog::getInt( listitems, "Change Sequential", "Enter Sequential", cur_number, INT_MIN, INT_MAX, 1, &ok);
-	}
-	else if( i_action == "errors_retries" )
-	{
-		if( id_block == blocknum ) cur_number = errors_retries;
-		set_number = QInputDialog::getInt( listitems, "Set Retries Error", "Enter Number", cur_number, -1, INT_MAX, 1, &ok);
-	}
-	else if( i_action == "errors_avoid_host" )
-	{
-		if( id_block == blocknum ) cur_number = errors_avoidhost;
-		set_number = QInputDialog::getInt( listitems, "Set Errors Avoid Host", "Enter Number", cur_number, -1, INT_MAX, 1, &ok);
-	}
-	else if( i_action == "errors_task_same_host" )
-	{
-		if( id_block == blocknum ) cur_number = errors_tasksamehost;
-		set_number = QInputDialog::getInt( listitems, "Set Task Errors Same Host", "Enter Number", cur_number, -1, INT_MAX, 1, &ok);
-	}
-	else if( i_action == "errors_forgive_time" )
-	{
-		double cur = 0;
-		if( id_block == blocknum ) cur = double(errors_forgivetime) / (60*60);
-		double hours = QInputDialog::getDouble( listitems, "Set Errors forgive time", "Enter number of hours (0=infinite)", cur, -1, 365*24, 3, &ok);
-		set_number = int( hours * 60*60 );
-	}
-	else if( i_action == "task_progress_change_timeout" )
-	{
-		double cur = 0;
-		if( id_block == blocknum ) cur = double(task_progress_change_timeout) / (60*60);
-		double hours = QInputDialog::getDouble( listitems, "Set Task Progress Change Timeout", "Enter number of hours (0=infinite)", cur, -1, 365*24, 3, &ok);
-		set_number = int( hours * 60*60 );
-		if( set_number <= 0) set_number = -1;
-	}
-	else if( i_action == "task_max_run_time" )
-	{
-		double cur = 0;
-		if( id_block == blocknum ) cur = double(task_max_run_time) / (60*60);
-		double hours = QInputDialog::getDouble( listitems, "Task Maximum Run Time", "Enter number of hours (0=infinite)", cur, 0, 365*24, 4, &ok);
-		set_number = int( hours * 60*60 );
-	}
-	else if(i_action == "task_min_run_time")
-	{
-		if(id_block == blocknum) cur_number = task_min_run_time;
-		set_number = QInputDialog::getInt(listitems, "Task Minimum Run Time", "Enter number of seconds (0=infinite)", cur_number, 0, INT_MAX, 1, &ok);
-	}
-	else if( i_action == "max_running_tasks" )
-	{
-		if( id_block == blocknum ) cur_number = maxrunningtasks;
-		set_number = QInputDialog::getInt( listitems, "Change Maximum Running Tasks", "Enter Number", cur_number, -1, INT_MAX, 1, &ok);
-	}
-	else if( i_action == "max_running_tasks_per_host" )
-	{
-		if( id_block == blocknum ) cur_number = maxruntasksperhost;
-		set_number = QInputDialog::getInt( listitems, "Change Maximum Running Tasks Per Host", "Enter Number", cur_number, -1, INT_MAX, 1, &ok);
-	}
-	else if( i_action == "hosts_mask" )
-	{
-		if( id_block == blocknum ) cur_string = hostsmask;
-		set_string = QInputDialog::getText( listitems, "Change Hosts Mask", "Enter Mask", QLineEdit::Normal, cur_string, &ok);
-	}
-	else if( i_action == "hosts_mask_exclude" )
-	{
-		if( id_block == blocknum ) cur_string = hostsmask_exclude;
-		set_string = QInputDialog::getText( listitems, "Change Exclude Hosts Mask", "Enter Mask", QLineEdit::Normal, cur_string, &ok);
-	}
-	else if( i_action == "depend_mask" )
-	{
-		if( id_block == blocknum ) cur_string = dependmask;
-		set_string = QInputDialog::getText( listitems, "Change Depend Mask", "Enter Mask", QLineEdit::Normal, cur_string, &ok);
-	}
-	else if( i_action == "tasks_depend_mask" )
-	{
-		if( id_block == blocknum ) cur_string = tasksdependmask;
-		set_string = QInputDialog::getText( listitems, "Change Tasks Depend Mask", "Enter Mask", QLineEdit::Normal, cur_string, &ok);
-	}
-	else if( i_action == "need_properties" )
-	{
-		if( id_block == blocknum ) cur_string = need_properties;
-		set_string = QInputDialog::getText( listitems, "Change Needed Properties", "Enter Mask", QLineEdit::Normal, cur_string, &ok);
-	}
-	else if( i_action == "need_memory" )
-	{
-		if( id_block == blocknum ) cur_number = need_memory;
-		set_number = QInputDialog::getInt( listitems, "Change Needed Memory", "Enter MegaBytes", cur_number, -1, INT_MAX, 1, &ok);
-	}
-	else if( i_action == "need_hdd" )
-	{
-		if( id_block == blocknum ) cur_number = need_hdd;
-		set_number = QInputDialog::getInt( listitems, "Change Maximum Hosts", "Enter GigaBytes", cur_number, -1, INT_MAX, 1, &ok);
-	}
-	else if( i_action == "need_power" )
-	{
-		if( id_block == blocknum ) cur_number = need_power;
-		set_number = QInputDialog::getInt( listitems, "Change Maximum Hosts", "Enter Power", cur_number, -1, INT_MAX, 1, &ok);
-	}
-	else if( i_action == "capacity_coeff_min" )
-	{
-		if( id_block == blocknum ) cur_number = capcoeff_min;
-		set_number = QInputDialog::getInt( listitems, "Change Capacity min coeff", "Enter Coefficient", cur_number, 0, INT_MAX, 1, &ok);
-	}
-	else if( i_action == "capacity_coeff_max" )
-	{
-		if( id_block == blocknum ) cur_number = capcoeff_max;
-		set_number = QInputDialog::getInt( listitems, "Change Capacity max coeff", "Enter Coefficient", cur_number, 0, INT_MAX, 1, &ok);
-	}
-	else if( i_action == "multihost_min" )
-	{
-		if( id_block == blocknum ) cur_number = multihost_min;
-		set_number = QInputDialog::getInt( listitems, "Change Hosts Minimun", "Enter Quantity", cur_number, 1, AFJOB::TASK_MULTIHOSTMAXHOSTS, 1, &ok);
-	}
-	else if( i_action == "multihost_max" )
-	{
-		if( id_block == blocknum ) cur_number = multihost_max;
-		set_number = QInputDialog::getInt( listitems, "Change Hosts Maximum", "Enter Quantity", cur_number, 1, AFJOB::TASK_MULTIHOSTMAXHOSTS, 1, &ok);
-	}
-	else if( i_action == "multihost_max_wait" )
-	{
-		if( id_block == blocknum ) cur_number = multihost_waitmax;
-		set_number = QInputDialog::getInt( listitems, "Set Hosts Maximum Wait Time", "Enter Seconds", cur_number, 0, INT_MAX, 1, &ok);
-	}
-	else if( i_action == "multihost_service_wait" )
-	{
-		if( id_block == blocknum ) cur_number = multihost_waitsrv;
-		set_number = QInputDialog::getInt( listitems, "Set Service Start Wait", "Enter Seconds", cur_number, 0, INT_MAX, 1, &ok);
-	}
-	else
-	{
-		AFERRAR("BlockInfo::blockAction: Unknown action = '%s'", i_action.toUtf8().data())
-		return false;
-	}
-
-//printf("BlockInfo::blockAction: %s\n", af::Msg::TNAMES[id_action]);
-
-	if( ok == false) return false;
-
-	if( set_string.isNull())
-	{
-		i_str << set_number;
-	}
-	else
-	{
-		std::string err;
-		if( false == af::RegExp::Validate( afqt::qtos( set_string), &err))
+		if ((*pIt)->isSeparator())
 		{
-			listitems->displayError( afqt::stoq( err));
-			return false;
+			i_menu->addSeparator();
+			continue;
 		}
-		i_str << '"' << afqt::qtos( set_string) << '"';
+
+		ActionParam * action = new ActionParam(*pIt);
+		connect(action, SIGNAL(triggeredParam(const Param *)), this, SLOT(slot_BlockChangeParam(const Param *)));
+		i_menu->addAction(action);
+	}
+}
+
+void BlockInfo::slot_BlockOperation(QString i_operation)
+{
+	QString json = QString("\"operation\":{\"type\":\"%1\"}").arg(i_operation);
+
+	emit sig_BlockAction(m_blocknum, json);
+}
+
+void BlockInfo::slot_BlockChangeParam(const Param * i_param)
+{
+	if (false ==  m_var_map.contains(i_param->name))
+	{
+		AF_ERR << "No such parameter: " << i_param->name.toUtf8().data();
+		return;
 	}
 
-	i_str << '}';
+	QVariant cur_val = m_var_map[i_param->name];
 
-//printf("%d %s\n", id_block, i_action.toUtf8().data());
-	return true;
+	QString new_val_str;
+	if (false == i_param->getInputDialog(cur_val, new_val_str, m_listitems))
+	{
+		if (new_val_str.size())
+			m_listitems->displayError(new_val_str);
+		return;
+	}
+
+	QString json = QString("\"params\":{\"%1\":%2}").arg(i_param->name, new_val_str);
+
+	emit sig_BlockAction(m_blocknum, json);
 }
+
+void BlockInfo::slot_BlockTicketAdd()
+{
+	bool ok;
+	QString name = QInputDialog::getText(m_listitems, "Add Ticket", "Enter a new ticket name", QLineEdit::Normal, "", &ok);
+	if (false == ok)
+		return;
+
+	slot_BlockTicketEdit(name);
+}
+
+void BlockInfo::slot_BlockTicketEdit(QString i_name)
+{
+	if (i_name.isEmpty())
+	{
+		// If name is not provided, new ticket name should be asked
+		m_listitems->displayError("Empty ticket name.");
+		return;
+	}
+
+	int cur_count = 1;
+	// Find this ticket to get current cur_count
+	QMapIterator<QString, int> it(tickets);
+	while (it.hasNext())
+	{
+		it.next();
+		if (it.key() == i_name)
+		{
+			cur_count = it.value();
+			break;
+		}
+	}
+
+	bool ok;
+	int new_count = QInputDialog::getInt(m_listitems, "Edit Ticket",
+			QString("Enter %1 cur_count.\nType -1 to remove.").arg(i_name),
+			cur_count, -1, 1<<30, 1, &ok);
+
+	QString json = QString("\"operation\":{\"type\":\"tickets\",\"name\":\"%1\",\"count\":%2}")
+		.arg(i_name).arg(new_count);
+
+	emit sig_BlockAction(m_blocknum, json);
+}
+
+void BlockInfo::addParam_separator() {
+	m_params.append(new Param(Param::tsep, Item::TAny, "separator", "Separator", "This is parameters separator."));}
+
+void BlockInfo::addParam_Num(const QString & i_name, const QString & i_label, const QString & i_tip, int i_min, int i_max) {
+	m_params.append(new Param(Param::TNum, Item::TAny, i_name, i_label, i_tip, i_min, i_max));}
+
+void BlockInfo::addParam_Str(const QString & i_name, const QString & i_label, const QString & i_tip) {
+	m_params.append(new Param(Param::TStr, Item::TAny, i_name, i_label, i_tip));}
+
+void BlockInfo::addParam_REx(const QString & i_name, const QString & i_label, const QString & i_tip) {
+	m_params.append(new Param(Param::TREx, Item::TAny, i_name, i_label, i_tip));}
+
+void BlockInfo::addParam_Hrs(const QString & i_name, const QString & i_label, const QString & i_tip) {
+	m_params.append(new Param(Param::THrs, Item::TAny, i_name, i_label, i_tip));}
+

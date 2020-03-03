@@ -39,13 +39,16 @@ d_params.general = {
 	comments : {}
 };
 d_params.settings = {
-	audio_file /******/: {"label": 'Audio', "default": "REF/sound.flac", "tooltip": 'Sound file'},
-	af_depend_mask /**/: {"label": 'Depends', "tooltip": 'Afanasy job depend mask'},
-	af_hostsmask /****/: {'label': 'Hosts Mask'},
-	fffirst /*********/:
-		{"label": "F.F.First", "tooltip": 'First frame is "1"\nNo matter image file name number.'},
-	aspect_in /*******/: {"label": 'Aspect In'},
-	gamma /***********/: {}
+	audio_file     : {"label":'Audio', "default":"REF/sound.flac", "tooltip":'Sound file'},
+	af_depend_mask : {"label":'Depends', "tooltip":'Afanasy job depend mask'},
+	af_hostsmask   : {'label':'Hosts Mask'},
+	cacher_aspect  : {'width':'25%', 'lwidth':'160px', 'label':'Cacher Aspect',  'tooltip':'Cacher aspect (float aspect: 2.39)'},
+	cacher_opacity : {'width':'25%', 'lwidth':'160px', 'label':'Cacher Opacity', 'tooltip':'Cacher opacity (integer percentage: 100)'},
+	draw169        : {'width':'25%', 'lwidth':'160px', 'label':'Cacher 16x9',    'tooltip':'Cacher 16x9 opacity percentage.'},
+	draw235        : {'width':'25%', 'lwidth':'160px', 'label':'Cacher 2.35',    'tooltip':'Cacher 2.35 opacity percentage.'},
+	fffirst        : {"label":"F.F.First", "tooltip":'First frame is "1"\nNo matter image file name number.'},
+	aspect_in      : {"label":'Aspect In'},
+	gamma          : {}
 };
 
 function d_Make(i_path, i_outfolder)
@@ -139,7 +142,7 @@ function d_DailiesWalkReceived(i_data, i_args)
 		data = i_data.cmdexec[0].walk;
 
 	params.comments = '';
-	if (RULES.status.annotation && RULES.status.annotation.length)
+	if (RULES.status && RULES.status.annotation && RULES.status.annotation.length)
 		params.comments = RULES.status.annotation.trim();
 
 	//console.log(JSON.stringify(data));
@@ -293,7 +296,10 @@ function d_ProcessGUI(i_wnd)
 	// console.log( JSON.stringify(job));
 	n_SendJob(job);
 
-	nw_MakeNews({"title": 'dailies'});
+	let news_path = g_CurPath();
+	if (ASSET && ASSET.dailies && ASSET.dailies.paths)
+		news_path = ASSET.path;
+	nw_MakeNews({'title':'dailies','path':news_path});
 }
 
 function d_MakeCmd(i_params)
@@ -363,6 +369,15 @@ function d_MakeCmd(i_params)
 	if ((params.aspect_in != null) && (params.aspect_in != ''))
 		cmd += ' --aspect_in ' + params.aspect_in;
 
+	if ((params.cacher_aspect != null) && (params.cacher_aspect != ''))
+		cmd += ' --cacher_aspect ' + params.cacher_aspect;
+	if ((params.cacher_opacity != null) && (params.cacher_opacity != ''))
+		cmd += ' --cacher_opacity ' + params.cacher_opacity;
+	if ((params.draw169 != null) && (params.draw169 != ''))
+		cmd += ' --draw169 ' + params.draw169;
+	if ((params.draw235 != null) && (params.draw235 != ''))
+		cmd += ' --draw235 ' + params.draw235;
+
 	cmd += ' --createoutdir';
 
 	cmd += ' "' + input + '"';
@@ -388,16 +403,16 @@ var d_cvtguiparams = {
 	fps /**********/: {"label": 'FPS', "width": '20%'},
 	time_start /***/: {"default": '00:00:00', "width": '20%'},
 	duration /*****/: {"default": '00:00:00', "width": '20%'},
-	quality /******/: {"label": 'JPEG Quality', 'type': 'int', "default": 100, 'width': '20%'},
+	quality /******/: {"label": 'JPEG Quality', 'type': 'int', "default": 100, 'width': '20%',"lwidth":'160px'},
 	ipar /*********/: {"label": 'Input pixel aspect', "width": '20%',"lwidth":'160px'},
-	padding /******/: {"label": 'Padding', 'width': '20%'},
-	af_capacity /**/: {'label': 'Capacity', 'width': '20%', 'type': 'int'},
-	af_maxtasks /***/: {'label': 'Max Tasks', 'width': '20%', 'type': 'int', 'default': -1},
-	af_perhost /****/: {'label': 'Per Host', 'width': '20%', 'type': 'int', 'default': 1},
+	padding /******/: {"label": 'Padding', 'width': '20%', "default": 4},
+	first_frame /**/: {"label": 'First Frame', 'width': '20%'},
+	af_capacity /**/: {'label': 'Capacity', 'width': '15%', 'type': 'int'},
+	af_maxtasks /***/: {'label': 'Max Tasks', 'width': '15%', 'type': 'int', 'default': -1},
+	af_perhost /****/: {'label': 'Per Host', 'width': '15%', 'type': 'int', 'default': 1},
 	af_fpt /********/: {
-		'label': 'Frames Per Task',
-		'width': '20%',
-		'lwidth': '160px',
+		'label': 'FPT',
+		'width': '15%',
 		'type': 'int',
 		'default': 10,
 		'tooltip': 'Frames Per Task'
@@ -453,7 +468,7 @@ function d_Convert(i_args)
 		"keys": RULES.dailies.formats
 	});
 
-	gui_Create(wnd.elContent, d_cvtguiparams, [params, RULES.dailies]);
+	gui_Create(wnd.elContent, d_cvtguiparams, [params, RULES, RULES.dailies]);
 
 	gui_CreateChoices(
 		{"wnd": wnd.elContent, "name": 'imgtype', "value": 'jpg', "label": 'Image Type:', "keys": img_types});
@@ -650,6 +665,8 @@ function d_CvtImages(i_wnd, i_params)
 	cmd += ' -q ' + i_params.quality;
 	if (i_params.padding)
 		cmd += ' --renumpad ' + i_params.padding;
+	if (i_params.first_frame)
+		cmd += ' --renumfirst ' + i_params.first_frame;
 	if (i_params.format && (i_params.format != 'asis'))
 		cmd += ' -r ' + i_params.format;
 
@@ -806,6 +823,9 @@ function d_CvtMovies(i_wnd, i_params, i_to_sequence)
 
 		if (i_params.padding)
 			cmd += ' -p ' + i_params.padding;
+
+		if (i_params.first_frame)
+			cmd += ' --first ' + i_params.first_frame;
 	}
 	else
 	{

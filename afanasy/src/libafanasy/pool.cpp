@@ -61,12 +61,10 @@ void Pool::initDefaultValues()
 	m_new_paused = false;
 
 	m_run_tasks = 0;
-	m_max_tasks = -1;
-	m_max_tasks_per_host = -1;
-
 	m_run_capacity = 0;
-	m_max_capacity = -1;
-	m_max_capacity_per_host = -1;
+
+	m_host_max_tasks = -1;
+	m_host_capacity = -1;
 
 	m_task_start_finish_time = 0;
 
@@ -113,17 +111,13 @@ void Pool::v_jsonWrite(std::ostringstream & o_str, int i_type) const // Thread-s
 */
 	if (m_run_tasks >= 0)
 		o_str << ",\n\"run_tasks\":" << m_run_tasks;
-	if (m_max_tasks >= 0)
-		o_str << ",\n\"max_tasks\":" << m_max_tasks;
-	if (m_max_tasks_per_host >= 0)
-		o_str << ",\n\"max_tasks_per_host\":" << m_max_tasks_per_host;
-
 	if (m_run_capacity >= 0)
 		o_str << ",\n\"run_capacity\":" << m_run_capacity;
-	if (m_max_capacity >= 0)
-		o_str << ",\n\"max_capacity\":" << m_max_capacity;
-	if (m_max_capacity_per_host >= 0)
-		o_str << ",\n\"max_capacity_per_host\":" << m_max_capacity_per_host;
+
+	if (m_host_max_tasks >= 0)
+		o_str << ",\n\"host_max_tasks\":" << m_host_max_tasks;
+	if (m_host_capacity >= 0)
+		o_str << ",\n\"host_capacity\":" << m_host_capacity;
 
 	o_str << ",\n\"task_start_finish_time\":" << m_task_start_finish_time;
 
@@ -168,14 +162,12 @@ bool Pool::jsonRead(const JSON &i_object, std::string * io_changes)
 	jr_bool  ("new_nimby",             m_new_nimby,             i_object, io_changes);
 	jr_bool  ("new_paused",            m_new_paused,            i_object, io_changes);
 
-	jr_int32 ("max_tasks",             m_max_tasks,             i_object, io_changes);
-	jr_int32 ("max_tasks_per_host",    m_max_tasks_per_host,    i_object, io_changes);
-	jr_int32 ("max_capacity",          m_max_capacity,          i_object, io_changes);
-	jr_int32 ("max_capacity_per_host", m_max_capacity_per_host, i_object, io_changes);
+	jr_int32 ("host_max_tasks",        m_host_max_tasks,        i_object, io_changes);
+	jr_int32 ("host_capacity",         m_host_capacity,         i_object, io_changes);
 
 	jr_int32 ("idle_wolsleep_time",    m_idle_wolsleep_time,    i_object, io_changes);
 	jr_int32 ("idle_free_time",        m_idle_free_time,        i_object, io_changes);
-	jr_int32 ("busy_nimby_time",       m_busy_nimby_time,        i_object, io_changes);
+	jr_int32 ("busy_nimby_time",       m_busy_nimby_time,       i_object, io_changes);
 	jr_int32 ("idle_cpu",              m_idle_cpu,              i_object, io_changes);
 	jr_int32 ("busy_cpu",              m_busy_cpu,              i_object, io_changes);
 	jr_int32 ("idle_mem",              m_idle_mem,              i_object, io_changes);
@@ -194,8 +186,8 @@ bool Pool::jsonRead(const JSON &i_object, std::string * io_changes)
 		setPaused(paused);
 
 	// There can`t be infinite max tasks per host on farm (on root pool).
-	if (isRoot() && (m_max_tasks_per_host < 0))
-		m_max_tasks_per_host = 0;
+	if (isRoot() && (m_host_max_tasks < 0))
+		m_host_max_tasks = 0;
 
 	// Paramers below are not editable and read only on creation
 	// (but they can be changes by other actions, like disable service)
@@ -209,33 +201,54 @@ bool Pool::jsonRead(const JSON &i_object, std::string * io_changes)
 
 	Farm::jsonRead(i_object);
 
+	jr_int64 ("time_creation", m_time_creation, i_object);
+
 	return true;
 }
 
 void Pool::v_readwrite(Msg * msg)
 {
 	Node::v_readwrite(msg);
+	Farm::readwrite(msg);
 
 	if (notRoot())
-		rw_RegExp (m_pattern, msg);
+		rw_RegExp(m_pattern, msg);
 
-	// NEW_VERSION
-
-	rw_int64_t(m_state,                  msg);
-	rw_int64_t(m_flags,                  msg);
-	rw_String (m_annotation,             msg);
 	rw_String (m_parent_path,            msg);
 	rw_int64_t(m_time_creation,          msg);
 
-	rw_int32_t(m_run_tasks,              msg);
-	rw_int32_t(m_max_tasks,              msg);
-	rw_int32_t(m_max_tasks_per_host,     msg);
+	rw_bool   (m_new_nimby,              msg);
+	rw_bool   (m_new_paused,             msg);
 
+	rw_int32_t(m_pools_num,              msg);
+	rw_int32_t(m_pools_total,            msg);
+	rw_int32_t(m_renders_num,            msg);
+	rw_int32_t(m_renders_total,          msg);
+
+	rw_int32_t(m_run_tasks,              msg);
 	rw_int32_t(m_run_capacity,           msg);
-	rw_int32_t(m_max_capacity,           msg);
-	rw_int32_t(m_max_capacity_per_host,  msg);
+
+	rw_int32_t(m_host_max_tasks,         msg);
+	rw_int32_t(m_host_capacity,          msg);
 
 	rw_int64_t(m_task_start_finish_time, msg);
+
+	rw_int32_t(m_idle_wolsleep_time,     msg);
+	rw_int32_t(m_idle_free_time,         msg);
+	rw_int32_t(m_busy_nimby_time,        msg);
+
+	rw_int32_t(m_idle_cpu,               msg);
+	rw_int32_t(m_busy_cpu,               msg);
+	rw_int32_t(m_idle_mem,               msg);
+	rw_int32_t(m_busy_mem,               msg);
+	rw_int32_t(m_idle_swp,               msg);
+	rw_int32_t(m_busy_swp,               msg);
+	rw_int32_t(m_idle_hddgb,             msg);
+	rw_int32_t(m_busy_hddgb,             msg);
+	rw_int32_t(m_idle_hddio,             msg);
+	rw_int32_t(m_busy_hddio,             msg);
+	rw_int32_t(m_idle_netmbs,            msg);
+	rw_int32_t(m_busy_netmbs,            msg);
 }
 
 int Pool::v_calcWeight() const

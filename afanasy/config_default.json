@@ -42,6 +42,10 @@
 			"":"Try to use 'sudo wolsleep' and add a line in /etc/sudoers:",
 			"":"render ALL = (ALL) NOPASSWD: /opt/cgru/bin/wolsleep",
 			"":"Or configure your own way to sleep.",
+		"af_render_launch_cmds":["Free Mem|sudo free_mem.sh"],
+			"":"From GUI you can ask render to launch a command",
+		"af_render_launch_cmds_exit":["Update|sudo update.sh"],
+			"":"Ask render to launch a command and exit no waiting for finish",
 		"":""
 	},
 	"OS_windows":{
@@ -122,11 +126,11 @@
 		"":"if( nice <   0 ) priority = ABOVE_NORMAL_PRIORITY_CLASS;",
 		"":"if( nice < -10 ) priority = HIGH_PRIORITY_CLASS;",
 
-	"af_render_zombietime":60,
+	"af_render_zombietime":16,
 		"":"If render will not send update its resources for this time(seconds),",
 		"":"server will put it in 'OFFLINE' state.",
 
-	"af_render_connection_lost_time":10,
+	"af_render_connection_lost_time":20,
 		"":"If render can`t update server for this time, it considers that server connection lost and tries to register again.",
 
 	"af_render_exit_no_task_time":-1,
@@ -163,13 +167,13 @@
 	"af_jobs_life_time":0,
 
 "":"Monitor: (server side - any gui)",
-	"af_monitor_zombietime":40,
+	"af_monitor_zombietime":16,
     "af_monitor_render_idle_bar_max":3600,
 
 "":"Watch: (qt gui - client side)",
 	"af_watch_get_events_sec":1,
 	"af_watch_refresh_gui_sec":5,
-	"af_watch_connection_lost_time":10,
+	"af_watch_connection_lost_time":20,
 		"":"If watch can`t update server for this time, it considers that server connection lost and tries to register again.",
 	"af_watch_render_idle_bar_max":3600,
 

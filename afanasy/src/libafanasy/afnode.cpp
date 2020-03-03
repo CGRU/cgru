@@ -46,10 +46,17 @@ Node::~Node()
 
 void Node::v_readwrite(Msg *msg)
 {
-	rw_int32_t(m_id, msg);
+	rw_int32_t(m_id,       msg);
 	rw_uint8_t(m_priority, msg);
+
+	rw_String(m_name,        msg);
+	rw_String(m_annotation,  msg);
+	rw_String(m_custom_data, msg);
+
+	rw_int64_t(m_state, msg);
+	rw_int64_t(m_flags, msg);
+
 	rw_bool(m_locked, msg);
-	rw_String(m_name, msg);
 }
 
 void Node::v_priorityChanged(MonitorContainer *i_monitoring)

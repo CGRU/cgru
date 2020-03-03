@@ -40,7 +40,7 @@ public:
 
 	~BranchSrv();
 
-	bool setParent(BranchSrv * i_parent);
+	void setParent(BranchSrv * i_parent);
 
 	bool initialize();
 

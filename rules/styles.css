@@ -377,8 +377,11 @@ background-position: left;
 /*border-radius: 2px;*/
 /*padding: 0 2px;*/ }
 .artists .role { padding: 2px 4px; margin: 1px; border-bottom: 1px solid rgba(98,98,98,.5); }
-.artists .role .label { float: left; padding: 0px 6px; font-style: italic; }
+.artists .role .label { float: left; padding: 0px 6px; font-style: italic; font-weight: bold }
+.artists .role_tag { padding: 4px; }
+.artists .role_tag .label { font-weight: normal; }
 #search_artists .role .label { cursor: pointer; }
+#search_artists .tag { margin: 4px; }
 .tags { font-style:italic;}
 
 .new_line {
@@ -388,6 +391,8 @@ height: 6px;
 clear:both;
 float:none;
 }
+
+.file_bad_char { color: #FF0000; font-weight: bold; }
 
 .progress, .progressbar { /*border-radius: 3px;*/ box-shadow: 0 0 1px #000 inset; }
 .progress { position: relative; background-color: rgba(0,0,0,.5); }
@@ -514,7 +519,9 @@ display: none;
 }
 #bookmarks .project .label {
 text-align: center;
-font-size: 14px;
+font-size: 16px;
+padding: 0px 4px 0px 4px;
+margin: 0px 4px 0px 4px;
 cursor: pointer;
 }
 #bookmarks .project .label:hover {
@@ -524,8 +531,9 @@ text-shadow: 0 0 2px rgba( 100, 255, 255, .5);
 font-style: italic;
 }
 #bookmarks .project .bm_folder_label {
-font-size: 10px;
+font-size: 14px;
 padding: 6px 4px 0px 4px;
+margin: 0px 4px 0px 4px;
 font-weight: bold;
 opacity: .7;
 }
@@ -702,7 +710,7 @@ border-radius: 8px;
 .status_edit .edit_tasks .task .dur_label { float: left; padding: 2px 6px; }
 .status_edit .edit_tasks .task .duration { width: 60px; float: left; }
 .status_edit .edit_tasks .tags { clear: both; }
-.status_edit .tag { cursor: pointer; }
+.status_edit .tag { cursor: pointer; margin: 4px; }
 .status_edit .flag { border-width: 0px; margin: 7px; padding: 0px 2px; opacity: 0.5;}
 .status_edit .flag.selected { border-width: 4px; margin: 3px; opacity: 1.0; _border-color: rgba( 100, 255, 255, 1.0) }
 

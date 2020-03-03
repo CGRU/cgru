@@ -197,6 +197,65 @@ bool AfNodeFarm::actionFarm(Action & i_action)
 	i_action.answer = "Unknown farm operation mode: " + mode;
 }
 
+bool AfNodeFarm::actionTicket(Action & i_action)
+{
+	const JSON & operation = (*i_action.data)["operation"];
+
+	std::string tk_name;
+	if (false == af::jr_string("name", tk_name, operation))
+	{
+		appendLog("Ticket name is not specified by " + i_action.author);
+		i_action.answer_kind = "error";
+		i_action.answer = "Ticket name is not specified.";
+		return false;
+	}
+
+	int32_t tk_count;
+	if (false == af::jr_int32("count", tk_count, operation))
+	{
+		appendLog("Ticket count is not specified by " + i_action.author);
+		i_action.answer_kind = "error";
+		i_action.answer = "Ticket count is not specified.";
+		return false;
+	}
+
+	bool tk_host = false;
+	af::jr_bool("host", tk_host, operation);
+
+	std::map<std::string, af::Farm::Tiks> * tickets;
+	if (tk_host)
+	{
+		tickets = &m_farm->m_tickets_host;
+	}
+	else
+	{
+		if (m_type != TPool)
+		{
+			appendLog("This node['" + name() + "'] is not a pool (by " + i_action.author + ")");
+			i_action.answer_kind = "error";
+			i_action.answer = "Node['" + name() + "'] is not a pool.";
+			return false;
+		}
+		tickets = &m_farm->m_tickets_pool;
+	}
+
+	if (tk_count == -1)
+	{
+		size_t size = tickets->erase(tk_name);
+		if (size == 0)
+		{
+			appendLog("This node['" + name() + "'] has no '" + tk_name + "' ticket (by " + i_action.author + ")");
+			i_action.answer_kind = "error";
+			i_action.answer = "Node['" + name() + "'] has no '" + tk_name + "' ticket.";
+			return false;
+		}
+	}
+	else
+		(*tickets)[tk_name] = af::Farm::Tiks(tk_count, 0);
+
+	return true;
+}
+
 bool AfNodeFarm::hasService(const std::string & i_service_name) const
 {
 	for (const std::string & s : m_farm->m_services)
@@ -215,8 +274,6 @@ bool AfNodeFarm::isServiceDisabled(const std::string & i_service_name) const
 
 bool AfNodeFarm::canRunService(const std::string & i_service_name, bool i_hasServicesSetup) const
 {
-//printf("%s:can(%s):s(%d:",name().c_str(),i_service_name.c_str(),m_farm->m_services.size());for (const std::string & s : m_farm->m_services) printf(" %s",s.c_str());printf(")/d(%d:",m_farm->m_services_disabled.size());for (const std::string & s : m_farm->m_services_disabled) printf(" %s",s.c_str());printf("): ");if (hasService(i_service_name)) printf(" HAS");if (isServiceDisabled(i_service_name)) printf(" DIS");printf("\n");
-
 	if (isServiceDisabled(i_service_name))
 		return false;
 
@@ -236,3 +293,57 @@ bool AfNodeFarm::canRunService(const std::string & i_service_name, bool i_hasSer
 	return false == i_hasServicesSetup;
 }
 
+bool AfNodeFarm::hasTickets(const std::map<std::string, int32_t> & i_tickets) const
+{
+	for (auto const& it : i_tickets)
+	{
+		if (false == hasPoolTicket(it.first, it.second))
+			return false;
+
+		if (false == hasHostTicket(it.first, it.second))
+			return false;
+	}
+
+	return true;
+}
+
+bool AfNodeFarm::hasPoolTicket(const std::string & i_name, const int32_t & i_count) const
+{
+	std::map<std::string, af::Farm::Tiks>::const_iterator it = m_farm->m_tickets_pool.find(i_name);
+	if (it != m_farm->m_tickets_pool.end())
+	{
+		if ((it->second.count - it->second.usage) < i_count)
+			return false;
+	}
+	else if (m_parent)
+		return m_parent->hasPoolTicket(i_name, i_count);
+
+	return true;
+}
+
+bool AfNodeFarm::hasHostTicket(const std::string & i_name, const int32_t & i_count) const
+{
+	std::map<std::string, af::Farm::Tiks>::const_iterator it = m_farm->m_tickets_host.find(i_name);
+	if (it != m_farm->m_tickets_host.end())
+	{
+		if (it->second.count == -1)
+		{
+			// This means that render does not have such host ticket.
+			// It was created to store ticket usage for parent.
+			if (m_parent)
+			{
+				int count = i_count + it->second.usage;
+				return m_parent->hasHostTicket(i_name, count);
+			}
+
+			return true;
+		}
+
+		if ((it->second.count - it->second.usage) < i_count)
+			return false;
+	}
+	else if (m_parent)
+		return m_parent->hasHostTicket(i_name, i_count);
+
+	return true;
+}

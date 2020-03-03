@@ -493,7 +493,9 @@ FilesView.prototype.showAttrs = function(i_el, i_obj) {
 	if (i_obj)
 		i_el.m_obj = i_obj;
 
-	if (this.masks && this.masks.length)
+	// Highlight valid/error objects by given masks.
+	// Skip aux folders that starting with '_'.
+	if ((c_PathBase(i_el.m_path).charAt(0) != '_') && this.masks && this.masks.length)
 		for (var i = 0; i < this.masks.length; i++)
 			if (this.masks[i].re.test(c_PathBase(i_el.m_path)))
 			{
@@ -577,7 +579,9 @@ FilesView.prototype.showAttrs = function(i_el, i_obj) {
 			title += '\nFiles: ' + i_el.m_obj.num_files_total;
 		}
 
-		if (RULES.status && (RULES.status.frames_num != null))
+		// Highlight correct/error files number if it defined in status.
+		// Skip aux folders that starting with '_'.
+		if ((c_PathBase(i_el.m_path).charAt(0) != '_') && RULES.status && (RULES.status.frames_num != null))
 		{
 			i_el.m_el_num_files.classList.add('correct');
 			if (f_count != RULES.status.frames_num)
@@ -924,8 +928,9 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 	}
 
 	// Folder dailies button:
-	if (i_isFolder && (RULES.afanasy_enabled !== false) && ASSET && ASSET.subfolders_dailies_hide &&
-		(ASSET.path == g_CurPath()))
+	if (i_isFolder && (RULES.afanasy_enabled !== false) && ASSET &&
+		((ASSET.subfolders_dailies_hide && (ASSET.path == g_CurPath())) ||
+		 (ASSET.subfolders_dailies_hide == false)))
 	{
 		var out_path = c_PathDir(path);
 		if (ASSET && (ASSET.dailies))
@@ -1100,7 +1105,7 @@ FilesView.prototype.getSelected = function() {
 
 FilesView.prototype.countFiles = function(i_path, i_args) {
 	c_LoadingElSet(this.elRoot);
-	var cmd = 'rules/bin/walk.sh -m "' + RULES.root + i_path + '"';
+	var cmd = 'rules/bin/walk.sh --mediainfo --upparents 1 "' + RULES.root + i_path + '"';
 	n_Request({
 		"send": {"cmdexec": {"cmds": [cmd]}},
 		"func": this.countFilesFinished,

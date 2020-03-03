@@ -541,7 +541,8 @@ function c_CanExecuteSoft(i_user)
 function c_GetRolesArtists(i_users)
 {
 	var roles_obj = {};
-	for (var uid in g_users)
+	// Collect users by roles:
+	for (let uid in g_users)
 	{
 		// console.log(g_users[uid].states);
 		if ((i_users == null) || (i_users[uid] == null))
@@ -552,19 +553,52 @@ function c_GetRolesArtists(i_users)
 				continue;
 		}
 
-		var role = g_users[uid].role;
+		let role = g_users[uid].role;
 
 		if (roles_obj[role] == null)
-			roles_obj[role] = [];
+			roles_obj[role] = {'users':[]};
 
-		roles_obj[role].push(g_users[uid]);
+		roles_obj[role].users.push(g_users[uid]);
+	}
+
+	// Collect users by tag for earch role:
+	for (let role in roles_obj)
+	{
+		roles_obj[role].tags_obj = {};
+		for (let u in roles_obj[role].users)
+		{
+			let user = roles_obj[role].users[u];
+			let tag = user.tag;
+			if (tag == null) tag = '';
+
+			if (roles_obj[role].tags_obj[tag] == null)
+				roles_obj[role].tags_obj[tag] = [];
+
+			roles_obj[role].tags_obj[tag].push(user);
+		}
 	}
 
 	var roles = [];
-	for (var role in roles_obj)
+	for (let role in roles_obj)
 	{
-		roles_obj[role].sort(function(a, b) { return a.title > b.title });
-		roles.push({"role": role, "artists": roles_obj[role]});
+		roles_obj[role].users.sort(function(a, b) { return a.title > b.title });
+
+		let role_obj = {};
+		role_obj.role = role;
+		role_obj.artists = roles_obj[role].users;
+		role_obj.tags = [];
+
+		for (let tag in roles_obj[role].tags_obj)
+		{
+			roles_obj[role].tags_obj[tag].sort(function(a, b) { return a.title > b.title });
+
+			role_obj.tags.push({'tag':tag,'artists':roles_obj[role].tags_obj[tag]});
+		}
+
+		role_obj.tags.sort(function(a, b) { return a.tag > b.tag });
+
+		roles.push(role_obj);
+
 	}
 	roles.sort(function(a, b) { return a.role < b.role });
 
@@ -846,6 +880,56 @@ function c_MakeThumbnail(i_file, i_func)
 	cmd = cmd.replace(/@OUTPUT@/g, RULES.root + c_GetThumbFileName(i_file));
 	cmd += ' -c ' + RULES.thumbnail.colorspace;
 	n_Request({"send": {"cmdexec": {"cmds": [cmd]}}, "func": i_func, "file": i_file, "info": 'thumbnail'});
+}
+
+var c_file_good_symbols = ['_','-','.'];
+function c_IsFileGoodChar(i_char)
+{
+	var code = i_char.charCodeAt(0);
+
+	// Not ASCII
+	if (code >= 128)
+		return false;
+
+	// 0-9 (48-57)
+	if (code <= 57 && code >= 48)
+		return true;
+
+	// A-Z (65-90)
+	if (code <= 90 && code >= 65)
+		return true;
+
+	// A-Z (97-122)
+	if (code <= 122 && code >= 97)
+		return true;
+
+	if (c_file_good_symbols.indexOf(i_char) != -1)
+		return true;
+
+	return false;
+}
+
+function c_HighlightBadChars(i_file)
+{
+	var o_file = '';
+
+	for (let c = 0; c < i_file.length; c++)
+	{
+		let ch = i_file.charAt(c);
+		let bad = false == c_IsFileGoodChar(ch);
+
+		if (bad)
+		{
+			o_file += '<span class="file_bad_char">';
+			if (ch == ' ')
+				ch = '_';
+		}
+		o_file += ch;
+		if (bad)
+			o_file += '</span>';
+	}
+
+	return o_file;
 }
 
 /* ---------------- [ Path transposing functions ] ------------------------------------------------------- */

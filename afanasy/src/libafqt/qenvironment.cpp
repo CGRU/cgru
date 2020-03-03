@@ -19,7 +19,7 @@
 
 using namespace afqt;
 
-AttrNumber QEnvironment::level("level", "UI Level", AFGUI::PADAWAN );
+AttrNumber QEnvironment::level("level", "UI Level", AFGUI::PADAWAN);
 
 Attr       QEnvironment::theme("theme", "Theme", AFGUI::THEME );
 
@@ -129,6 +129,7 @@ QList<AttrRect*> QEnvironment::ms_attrs_wndrects;
 QList<Attr*>     QEnvironment::ms_attrs_gui;
 QMap<QString,Attr*> QEnvironment::ms_attrs_hotkeys;
 QStringList QEnvironment::ms_hotkeys_names;
+QMap<QString, AttrNumber> QEnvironment::ms_attrs_panel;
 
 bool QEnvironment::ms_valid = false;
 
@@ -157,7 +158,7 @@ QEnvironment::QEnvironment( const QString & i_name)
     ms_attrs_prefs.append( &ntf_job_error_alert );
     ms_attrs_prefs.append( &ntf_job_error_sound );
 
-    ms_attrs_gui.append( &image_back            );
+	ms_attrs_gui.append( &image_back            );
     ms_attrs_gui.append( &image_border_top      );
     ms_attrs_gui.append( &image_border_topleft  );
     ms_attrs_gui.append( &image_border_topright );
@@ -229,6 +230,49 @@ QEnvironment::QEnvironment( const QString & i_name)
     ms_attrs_gui.append( &clr_textdone        );
     ms_attrs_gui.append( &clr_textstars       );
 
+	ms_attrs_panel["branches_pos"]           = AttrNumber("panel_branches_pos",           AFGUI::RIGHT);
+	ms_attrs_panel["branches_size_right_0"]  = AttrNumber("panel_branches_size_right_0",  600);
+	ms_attrs_panel["branches_size_right_1"]  = AttrNumber("panel_branches_size_right_1",  200);
+	ms_attrs_panel["branches_size_bottom_0"] = AttrNumber("panel_branches_size_bottom_0", 600);
+	ms_attrs_panel["branches_size_bottom_1"] = AttrNumber("panel_branches_size_bottom_1", 200);
+	ms_attrs_panel["farm_pos"]               = AttrNumber("panel_farm_pos",               AFGUI::RIGHT);
+	ms_attrs_panel["farm_size_right_0"]      = AttrNumber("panel_farm_size_right_0",      600);
+	ms_attrs_panel["farm_size_right_1"]      = AttrNumber("panel_farm_size_right_1",      200);
+	ms_attrs_panel["farm_size_bottom_0"]     = AttrNumber("panel_farm_size_bottom_0",     600);
+	ms_attrs_panel["farm_size_bottom_1"]     = AttrNumber("panel_farm_size_bottom_1",     200);
+	ms_attrs_panel["jobs_pos"]               = AttrNumber("panel_jobs_pos",               AFGUI::RIGHT);
+	ms_attrs_panel["jobs_size_right_0"]      = AttrNumber("panel_jobs_size_right_0",      600);
+	ms_attrs_panel["jobs_size_right_1"]      = AttrNumber("panel_jobs_size_right_1",      200);
+	ms_attrs_panel["jobs_size_bottom_0"]     = AttrNumber("panel_jobs_size_bottom_0",     600);
+	ms_attrs_panel["jobs_size_bottom_1"]     = AttrNumber("panel_jobs_size_bottom_1",     200);
+	ms_attrs_panel["monitors_pos"]           = AttrNumber("panel_monitors_pos",           AFGUI::RIGHT);
+	ms_attrs_panel["monitors_size_right_0"]  = AttrNumber("panel_monitors_size_right_0",  600);
+	ms_attrs_panel["monitors_size_right_1"]  = AttrNumber("panel_monitors_size_right_1",  200);
+	ms_attrs_panel["monitors_size_bottom_0"] = AttrNumber("panel_monitors_size_bottom_0", 600);
+	ms_attrs_panel["monitors_size_bottom_1"] = AttrNumber("panel_monitors_size_bottom_1", 200);
+	ms_attrs_panel["renders_pos"]            = AttrNumber("panel_renders_pos",            AFGUI::RIGHT);
+	ms_attrs_panel["renders_size_right_0"]   = AttrNumber("panel_renders_size_right_0",   600);
+	ms_attrs_panel["renders_size_right_1"]   = AttrNumber("panel_renders_size_right_1",   200);
+	ms_attrs_panel["renders_size_bottom_0"]  = AttrNumber("panel_renders_size_bottom_0",  600);
+	ms_attrs_panel["renders_size_bottom_1"]  = AttrNumber("panel_renders_size_bottom_1",  200);
+	ms_attrs_panel["tasks_pos"]              = AttrNumber("panel_tasks_pos",              AFGUI::RIGHT);
+	ms_attrs_panel["tasks_size_right_0"]     = AttrNumber("panel_tasks_size_right_0",     600);
+	ms_attrs_panel["tasks_size_right_1"]     = AttrNumber("panel_tasks_size_right_1",     200);
+	ms_attrs_panel["tasks_size_bottom_0"]    = AttrNumber("panel_tasks_size_bottom_0",    600);
+	ms_attrs_panel["tasks_size_bottom_1"]    = AttrNumber("panel_tasks_size_bottom_1",    200);
+	ms_attrs_panel["users_pos"]              = AttrNumber("panel_users_pos",              AFGUI::RIGHT);
+	ms_attrs_panel["users_size_right_0"]     = AttrNumber("panel_users_size_right_0",     600);
+	ms_attrs_panel["users_size_right_1"]     = AttrNumber("panel_users_size_right_1",     200);
+	ms_attrs_panel["users_size_bottom_0"]    = AttrNumber("panel_users_size_bottom_0",    600);
+	ms_attrs_panel["users_size_bottom_1"]    = AttrNumber("panel_users_size_bottom_1",    200);
+	{
+		QMutableMapIterator<QString, AttrNumber> it(ms_attrs_panel);
+		while (it.hasNext())
+		{
+			it.next();
+			ms_attrs_prefs.append(&(it.value()));
+		}
+	}
 
 	// Hotkeys:
 	ms_hotkeys_names << "jobs_log";
@@ -616,3 +660,8 @@ void QEnvironment::setHotkey( const QString & i_name, const QString & i_str)
 		ms_attrs_hotkeys[i_name]->str = i_str;
 }
 
+const QString & QEnvironment::getDateTimeFormat()
+{
+	static const QString date_time_format("yyyy.MM.dd HH:mm:ss");
+	return date_time_format;
+}

@@ -62,7 +62,8 @@ parser.add_option(      '--mhservice',    dest='mhservice',    type='str',    de
 parser.add_option(      '--cmdpre',       dest='cmdpre',       type='string', default='', help='job pre command')
 parser.add_option(      '--cmdpost',      dest='cmdpost',      type='string', default='', help='job post command')
 parser.add_option(      '--parser',       dest='parser',       type='string', default=None, help='parser type, default if not set')
-parser.add_option(      '--env',          dest='environment',  type='string', default="CG_VAR=somevalue", help='add an evironment')
+parser.add_option(      '--env',          dest='environment',  type='string', default='CG_VAR=somevalue', help='add an evironment, example: "CG_VAR=somevalue"')
+parser.add_option(      '--tickets',      dest='tickets',      type='string', default='GPU:1,NET:100', help='add tickets, example: "MEM:32,NET:100"')
 parser.add_option(      '--folder',       dest='folder',       type='string', default=None, help='add a folder')
 parser.add_option(      '--nofolder',     dest='nofolder',     action='store_true', default=False, help='do not set any folders')
 parser.add_option(      '--pools',        dest='pools',        type='string', default=None, help='Set job render pools [/local/blender:90,/local/natron:10].')
@@ -179,8 +180,19 @@ for b in range(numblocks):
 
     if Options.environment:
         for env in Options.environment.split(';'):
-            val = env.split('=')
-            block.setEnv( val[0], val[1])
+            vals = env.split('=')
+            if len(vals) == 2:
+                block.setEnv(vals[0], vals[1])
+            else:
+                'Warning: Invalid environment: "%s"' % Options.environment
+
+    if Options.tickets:
+        for env in Options.tickets.split(','):
+            vals = env.split(':')
+            if len(vals) == 2:
+                block.addTicket(vals[0], int(vals[1]))
+            else:
+                'Warning: Invalid tickets: "%s"' % Options.environment
 
     str_capacity = ''
     if Options.capmin != -1 or Options.capmax != -1:

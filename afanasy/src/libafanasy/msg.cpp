@@ -578,6 +578,9 @@ const char * Msg::TNAMES[]=
 	/*- Branches messages -*/
 	"TBranchesList",              ///< Branches nodes list.
 
+	/*- Pools messages -*/
+	"TPoolsList",                 ///< Pools nodes list.
+
 	/*- Job messages -*/
 	"TJobsList",                  ///< Jobs list information.
 	"TJobProgress",               ///< Jobs progress.
@@ -591,10 +594,7 @@ const char * Msg::TNAMES[]=
 	"TTask",                      ///< A task of some job.
 	"TTaskFiles",                 ///< Task (or entire job) files
 
-	// NEW_VERSION
-	/*"TRESERVED10",*/
-	"TPoolsList",                 ///< Pools nodes list.
-
+	"TRESERVED10",
 	"TRESERVED11",
 	"TRESERVED12",
 	"TRESERVED13",

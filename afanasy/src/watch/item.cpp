@@ -23,18 +23,36 @@ QPolygonF Item::ms_star_pointsDraw;
 const int Item::Height = 14;
 const int Item::Width  = 100;
 
-Item::Item( const QString &itemname, int itemid):
-	m_name( itemname),
+Item::Item(const QString &i_name, int i_id, EType i_type):
+	m_name(i_name),
 	m_height( Height),
+	m_margin_left(0),
 	m_locked( false),
 	m_running( false),
-	m_id(itemid),
-	m_hidden(false)
+	m_id(i_id),
+	m_type(i_type),
+	m_hidden(false),
+	m_depth(0)
 {
 }
 
 Item::~Item()
 {
+}
+
+void Item::setDepth(int i_depth)
+{
+	m_depth = i_depth;
+	m_margin_left = DepthOffset * m_depth;
+}
+
+const QVariant & Item::getParamVar(const QString & i_name) const
+{
+	static const QVariant var;
+	QMap<QString, QVariant>::const_iterator it = m_params.find(i_name);
+	if (it == m_params.end())
+		return var;
+	return it.value();
 }
 
 QSize Item::sizeHint( const QStyleOptionViewItem &option) const
@@ -84,33 +102,41 @@ const QColor & Item::clrTextState( const QStyleOptionViewItem &option, bool on )
 	else   return (option.state & QStyle::State_Selected) ? afqt::QEnvironment::clr_textbright.c : afqt::QEnvironment::clr_textmuted.c;
 }
 
-void Item::drawBack( QPainter *painter, const QStyleOptionViewItem &option, const QColor * i_clrItem, const QColor * i_clrBorder) const
+void Item::drawBack(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option,
+		const QColor * i_clrItem, const QColor * i_clrBorder) const
 {
-	painter->setOpacity( 1.0);
-	painter->setRenderHint(QPainter::Antialiasing);
-	painter->setRenderHint(QPainter::TextAntialiasing);
+	i_painter->setOpacity(1.0);
+	i_painter->setRenderHint(QPainter::Antialiasing);
+	i_painter->setRenderHint(QPainter::TextAntialiasing);
 
-	if( option.state & QStyle::State_Selected )
+	if (i_option.state & QStyle::State_Selected)
 		i_clrItem = &afqt::QEnvironment::clr_selected.c;
-	else if( i_clrItem == NULL )
+	else if(i_clrItem == NULL)
 		i_clrItem = &afqt::QEnvironment::clr_item.c;
 
-	painter->setPen( i_clrBorder ? (*i_clrBorder) : (afqt::QEnvironment::clr_outline.c));
-	painter->setBrush( *i_clrItem);
-	painter->drawRoundedRect( option.rect, 2, 2);
+	i_painter->setPen(i_clrBorder ? (*i_clrBorder) : (afqt::QEnvironment::clr_outline.c));
+	i_painter->setBrush(*i_clrItem);
+	i_painter->drawRoundedRect(i_rect, 2, 2);
 }
 
-void Item::paint( QPainter *painter, const QStyleOptionViewItem &option) const
+void Item::paint(QPainter * i_painter, const QStyleOptionViewItem & i_option) const
 {
-	drawBack( painter, option);
+	QRect rect(i_option.rect);
+	rect.setLeft(rect.left() + m_margin_left);
+	v_paint(i_painter, rect, i_option);
+}
 
-	painter->setPen( afqt::QEnvironment::qclr_black );
+void Item::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const
+{
+	drawBack(i_painter, i_rect, i_option);
 
-	painter->setFont( afqt::QEnvironment::f_name);
-	painter->drawText( option.rect, Qt::AlignTop | Qt::AlignLeft, m_name);
+	i_painter->setPen(afqt::QEnvironment::qclr_black);
 
-	painter->setFont( afqt::QEnvironment::f_info);
-	painter->drawText( option.rect, Qt::AlignBottom | Qt::AlignRight, QString(" ( virtual Item painting ) "));
+	i_painter->setFont(afqt::QEnvironment::f_name);
+	i_painter->drawText(i_rect, Qt::AlignTop | Qt::AlignLeft, m_name);
+
+	i_painter->setFont(afqt::QEnvironment::f_info);
+	i_painter->drawText(i_rect, Qt::AlignBottom | Qt::AlignRight, QString(" ( virtual Item painting ) "));
 }
 
 void Item::v_filesReceived( const af::MCTaskUp & i_taskup) {}
@@ -293,3 +319,89 @@ void Item::drawStar( int size, int posx, int posy, QPainter * painter)
 	painter->setBrush( QBrush( afqt::QEnvironment::clr_star.c, Qt::SolidPattern ));
 	painter->drawPolygon( ms_star_pointsDraw);//, Qt::WindingFill);
 }
+
+int Item::drawTicket(QPainter * i_painter, const QPen & i_text_pen,
+		int i_x, int i_y, int i_w,
+		int i_opts,
+		const QString & i_name, int i_count, int i_usage)
+{
+	i_painter->setPen(i_text_pen);
+
+	QPen border_pen;
+	if (i_opts & TKD_BORDER)
+	{
+		i_x += 2;
+		i_y += 2;
+
+		if (i_usage >= i_count)
+			border_pen.setColor(afqt::QEnvironment::clr_error.c);
+		else if (i_usage > 0)
+			border_pen.setColor(afqt::QEnvironment::clr_running.c);
+		else
+			border_pen.setColor(afqt::QEnvironment::clr_done.c);
+
+		if (i_opts & TKD_DASH)
+			border_pen.setStyle(Qt::DashDotDotLine);
+	}
+
+	const QPixmap * icon = Watch::getTicketIcon(i_name);
+	QString text;
+	if (i_usage == -1)
+		text = QString("x%1").arg(i_count);
+	else
+		text = QString("x%1 / %2").arg(i_count).arg(i_usage);
+
+	QRect tk_rect;
+	int tk_width = 0;
+	if (i_opts & TKD_RIGHT)
+	{
+		if (icon)
+		{
+			i_painter->drawPixmap(i_x + tk_width, i_y-1, *icon);
+			tk_width += icon->width();
+		}
+		else
+		{
+			i_painter->drawText(i_x + tk_width, i_y, i_w, 15, Qt::AlignLeft | Qt::AlignTop, i_name, &tk_rect);
+			tk_width += tk_rect.width();
+		}
+
+		i_painter->drawText(i_x + tk_width, i_y, i_w, 15, Qt::AlignLeft | Qt::AlignTop, text, &tk_rect);
+		tk_width += tk_rect.width() + 1;
+
+		if (i_opts & TKD_BORDER)
+		{
+			i_painter->setPen(border_pen);
+			i_painter->setBrush(Qt::NoBrush);
+			i_painter->drawRect(i_x - 2, i_y - 2, tk_width + 4, HeightTickets - 5);
+			tk_width += 4;
+		}
+	}
+	else
+	{
+		i_painter->drawText(i_x, i_y, i_w - tk_width, 15, Qt::AlignRight | Qt::AlignTop, text, &tk_rect);
+		tk_width += tk_rect.width() + 1;
+
+		if (icon)
+		{
+			i_painter->drawPixmap(i_x + i_w - tk_width - icon->width(), i_y-1, *icon);
+			tk_width += icon->width();
+		}
+		else
+		{
+			i_painter->drawText(i_x, i_y, i_w - tk_width, 15, Qt::AlignRight | Qt::AlignTop, i_name, &tk_rect);
+			tk_width += tk_rect.width();
+		}
+
+		if (i_opts & TKD_BORDER)
+		{
+			i_painter->setPen(border_pen);
+			i_painter->setBrush(Qt::NoBrush);
+			i_painter->drawRect(i_x + i_w - 2 - tk_width, i_y - 2, tk_width + 4, HeightTickets - 5);
+			tk_width += 4;
+		}
+	}
+
+	return tk_width;
+}
+

@@ -137,6 +137,7 @@ namespace af
 	const std::string getenv( const char * i_name);
 	const std::string state2str( int state);
 	const std::string toKMG(long long i_number);
+	const std::string toLower(const std::string & i_str);
 	const std::string strStrip( const std::string & i_str, const std::string & i_characters = " \n");
 	const std::string strStripLeft( const std::string & i_str, const std::string & i_characters = " \n");
 	const std::string strStripRight( const std::string & i_str, const std::string & i_characters = " \n");
@@ -285,6 +286,7 @@ namespace af
 	void  w_StringList( const std::list<std::string> & stringList, Msg * msg);
 	void rw_StringVect(     std::vector<std::string> & stringVect, Msg * msg);
 	void rw_StringMap( std::map< std::string, std::string > & stringMap, Msg * msg);
+	void rw_IntMap(std::map<std::string, int32_t> & io_map, Msg * io_msg);
 
 	void rw_RegExp( RegExp & regExp, Msg * msg);
 

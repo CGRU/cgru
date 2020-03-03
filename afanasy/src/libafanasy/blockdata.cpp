@@ -82,9 +82,9 @@ void BlockData::initDefaults()
 	m_task_max_run_time /******/ = 0;
 	m_task_min_run_time /******/ = 0;
 	m_capacity = AFJOB::TASK_DEFAULT_CAPACITY;
-	m_need_memory /************/ = 0;
-	m_need_power /*************/ = 0;
-	m_need_hdd /***************/ = 0;
+	m_need_memory /************/ = -1;
+	m_need_power /*************/ = -1;
+	m_need_hdd /***************/ = -1;
 	m_errors_retries /*********/ = -1;
 	m_errors_avoid_host /******/ = -1;
 	m_errors_task_same_host /**/ = -1;
@@ -199,6 +199,7 @@ void BlockData::jsonRead(const JSON &i_object, std::string *io_changes)
 	jr_int64("time_started" /***********/, m_time_started /***********/, i_object, io_changes);
 	jr_int64("time_done" /**************/, m_time_done /**************/, i_object, io_changes);
 	jr_stringmap("environment" /********/, m_environment /************/, i_object, io_changes);
+	jr_intmap("tickets",                   m_tickets,                    i_object, io_changes);
 
 	if (m_capacity < 1) m_capacity = 1;
 
@@ -457,6 +458,8 @@ void BlockData::jsonWrite(std::ostringstream &o_str, int i_type) const
 				o_str << ",\n\"hosts_mask_exclude\":\"" << m_hosts_mask_exclude.getPattern() << "\"";
 			if (hasNeedProperties())
 				o_str << ",\n\"need_properties\":\"" << m_need_properties.getPattern() << "\"";
+			if (m_tickets.size()) af::jw_intmap("tickets", m_tickets, o_str);
+
 			o_str << ',';
 
 		case Msg::TBlocksProgress:
@@ -616,6 +619,7 @@ void BlockData::v_readwrite(Msg *msg)
 			rw_int32_t(m_task_progress_change_timeout, msg);
 			rw_int32_t(m_task_max_run_time, msg);
 			rw_int32_t(m_task_min_run_time, msg);
+			rw_IntMap(m_tickets, msg);
 
 		case Msg::TBlocksProgress:
 
@@ -1072,6 +1076,7 @@ TaskExec *BlockData::genTask(int num) const
 			m_job_id, m_block_num, m_flags, num);
 
 	taskExec->m_custom_data_block = m_custom_data;
+	taskExec->m_tickets = m_tickets;
 
 	if (isNotNumeric())
 	{
@@ -1514,4 +1519,12 @@ void BlockData::setTimeStarted(long long value, bool reset)
 void BlockData::setTimeDone(long long value)
 {
 	m_time_done = value;
+}
+
+void BlockData::editTicket(std::string & i_name, int32_t & i_count)
+{
+	if (i_count == -1)
+		m_tickets.erase(i_name);
+	else
+		m_tickets[i_name] = i_count;
 }

@@ -288,6 +288,18 @@ class Block:
 
         self.data["environment"][i_name] = i_value
 
+    def addTicket(self, i_name, i_count):
+        """Missing DocString
+
+        :param i_name:
+        :param i_count:
+        :return:
+        """
+        if "tickets" not in self.data:
+            self.data["tickets"] = dict()
+
+        self.data["tickets"][i_name] = i_count
+
     def setName(self, value):
         """Missing DocString
 

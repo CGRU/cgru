@@ -19,20 +19,30 @@ const int ItemUser::HeightUser = 32;
 const int ItemUser::HeightAnnotation = 14;
 
 ItemUser::ItemUser( af::User * i_user, const CtrlSortFilter * i_ctrl_sf):
-	ItemNode( (af::Node*)i_user, i_ctrl_sf)
+	ItemNode(i_user, TUser, i_ctrl_sf)
 {
-	updateValues( i_user, 0);
+	v_updateValues(i_user, 0);
 }
 
 ItemUser::~ItemUser()
 {
 }
 
-void ItemUser::updateValues( af::Node * i_node, int i_type)
+void ItemUser::v_updateValues(af::Node * i_afnode, int i_msgType)
 {
-	af::User * user = (af::User*)i_node;
+	af::User * user = (af::User*)i_afnode;
 
-	updateNodeValues( i_node);
+	updateNodeValues(i_afnode);
+
+	m_params["max_running_tasks"]          = user->getMaxRunningTasks();
+	m_params["max_running_tasks_per_host"] = user->getMaxRunTasksPerHost();
+	m_params["hosts_mask"]                 = afqt::stoq(user->getHostsMask());
+	m_params["hosts_mask_exclude"]         = afqt::stoq(user->getHostsMaskExclude());
+	m_params["errors_avoid_host"]          = user->getErrorsAvoidHost();
+	m_params["errors_task_same_host"]      = user->getErrorsTaskSameHost();
+	m_params["errors_retries"]             = user->getErrorsRetries();
+	m_params["errors_forgive_time"]        = user->getErrorsForgiveTime();
+	m_params["jobs_life_time"]             = user->getJobsLifeTime();
 
 	hostname                   = afqt::stoq(user->getHostName());
 	jobs_num                   = user->getNumJobs();
@@ -148,7 +158,25 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 
 	m_tooltip = user->v_generateInfoString( true).c_str();
 
+	updateInfo(user);
+
 	calcHeight();
+}
+
+void ItemUser::updateInfo(af::User * i_user)
+{
+	m_info_text.clear();
+
+	m_info_text = QString("Jobs total: <b>%1</b>").arg(i_user->getNumJobs());
+	m_info_text += QString(", running: <b>%1</b>").arg(i_user->getNumRunningJobs());
+	m_info_text += "<br>";
+
+	if (i_user->getHostName().size())
+		m_info_text += QString("<br>Activity host: <b>%1</b>").arg(afqt::stoq(i_user->getHostName()));
+
+	m_info_text += "<br>";
+	m_info_text += QString("<br>Registered: <b>%1</b>").arg(afqt::time2Qstr(i_user->getTimeRegister()));
+	m_info_text += QString("<br>Last activity: <b>%1</b>").arg(afqt::time2Qstr(i_user->getTimeActivity()));
 }
 
 bool ItemUser::calcHeight()
@@ -159,35 +187,35 @@ bool ItemUser::calcHeight()
 	return old_height == m_height;
 }
 
-void ItemUser::paint( QPainter *painter, const QStyleOptionViewItem &option) const
+void ItemUser::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const
 {
-	drawBack( painter, option);
-	int x = option.rect.x() + 5;
-	int y = option.rect.y() + 2;
-	int w = option.rect.width() - 10;
-	int h = option.rect.height() - 4;
+	drawBack(i_painter, i_rect, i_option);
+	int x = i_rect.x() + 5;
+	int y = i_rect.y() + 2;
+	int w = i_rect.width() - 10;
+	int h = i_rect.height() - 4;
 	int height_user = HeightUser-4;
 
-	painter->setPen( clrTextMain( option) );
-	painter->setFont( afqt::QEnvironment::f_name);
-	painter->drawText( x, y, w, h, Qt::AlignLeft | Qt::AlignTop,     strLeftTop);
+	i_painter->setPen(clrTextMain(i_option));
+	i_painter->setFont(afqt::QEnvironment::f_name);
+	i_painter->drawText(x, y, w, h, Qt::AlignLeft | Qt::AlignTop, strLeftTop);
 
-	painter->setPen( clrTextInfo( option) );
-	painter->setFont( afqt::QEnvironment::f_info);
-	painter->drawText( x, y, w, height_user, Qt::AlignLeft    | Qt::AlignBottom,  strLeftBottom  );
-	painter->drawText( x, y, w, height_user, Qt::AlignHCenter | Qt::AlignTop,     strHCenterTop  );
-	painter->drawText( x, y, w, height_user, Qt::AlignRight   | Qt::AlignBottom,  strRightBottom );
-	painter->setPen( afqt::QEnvironment::qclr_black );
-	painter->drawText( x, y, w, height_user, Qt::AlignRight   | Qt::AlignTop,     strRightTop    );
+	i_painter->setPen(clrTextInfo(i_option));
+	i_painter->setFont(afqt::QEnvironment::f_info);
+	i_painter->drawText(x, y, w, height_user, Qt::AlignLeft    | Qt::AlignBottom, strLeftBottom);
+	i_painter->drawText(x, y, w, height_user, Qt::AlignHCenter | Qt::AlignTop,    strHCenterTop);
+	i_painter->drawText(x, y, w, height_user, Qt::AlignRight   | Qt::AlignBottom, strRightBottom);
+	i_painter->setPen(afqt::QEnvironment::qclr_black );
+	i_painter->drawText(x, y, w, height_user, Qt::AlignRight   | Qt::AlignTop,    strRightTop);
 
-	if( false == m_annotation.isEmpty())
-		painter->drawText( x, y, w, h, Qt::AlignBottom | Qt::AlignHCenter, m_annotation );
+	if (false == m_annotation.isEmpty())
+		i_painter->drawText(x, y, w, h, Qt::AlignBottom | Qt::AlignHCenter, m_annotation);
 
 	//
 	// Draw stars:
 	//
 	int numstars = running_tasks_num;
-	if( numstars <= 0 )
+	if (numstars <= 0)
 		return;
 
 	static const int stars_size = 8;
@@ -199,12 +227,12 @@ void ItemUser::paint( QPainter *painter, const QStyleOptionViewItem &option) con
 	int stars_right = w - stars_border;
 	int stars_delta = (stars_right - stars_left) / numstars;
 
-	if( stars_delta < 1 )
+	if (stars_delta < 1)
 	{
 		stars_delta = 1;
 		numstars = stars_right - stars_left;
 	}
-	else if( stars_delta > stars_maxdelta )
+	else if (stars_delta > stars_maxdelta)
 		stars_delta = stars_maxdelta;
 
 	const int stars_width = numstars * stars_delta;
@@ -213,19 +241,19 @@ void ItemUser::paint( QPainter *painter, const QStyleOptionViewItem &option) con
 	int sx = x + stars_left;
 	for( int i = 0; i < numstars; i++)
 	{
-		drawStar( stars_size, sx, y + stars_height, painter);
+		drawStar( stars_size, sx, y + stars_height, i_painter);
 		sx += stars_delta;
 	}
 
 	QString running_str = QString("T:%1").arg(running_tasks_num);
 	running_str += QString(" / C:%1").arg(af::toKMG(running_capacity_total).c_str());
 
-	painter->setFont( afqt::QEnvironment::f_name);
-	painter->setPen( afqt::QEnvironment::clr_textstars.c);
-	painter->drawText( x, y, w, HeightUser, Qt::AlignHCenter | Qt::AlignBottom, running_str);
+	i_painter->setFont(afqt::QEnvironment::f_name);
+	i_painter->setPen(afqt::QEnvironment::clr_textstars.c);
+	i_painter->drawText(x, y, w, HeightUser, Qt::AlignHCenter | Qt::AlignBottom, running_str);
 }
 
-void ItemUser::setSortType( int i_type1, int i_type2 )
+void ItemUser::v_setSortType( int i_type1, int i_type2 )
 {
 	resetSorting();
 
@@ -288,7 +316,7 @@ void ItemUser::setSortType( int i_type1, int i_type2 )
 	}
 }
 
-void ItemUser::setFilterType( int i_type )
+void ItemUser::v_setFilterType( int i_type )
 {
 	resetFiltering();
 

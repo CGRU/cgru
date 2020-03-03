@@ -40,6 +40,7 @@ public:
 	inline void setWOLSleeping( bool value) { if( value ) m_state = m_state | SWOLSleeping; else m_state = m_state & (~SWOLSleeping);}
 	inline void setWOLWaking(   bool value) { if( value ) m_state = m_state | SWOLWaking;   else m_state = m_state & (~SWOLWaking);  }
 
+	inline const std::string & getPool() const { return m_pool;}
 	inline int getCapacityUsed() const { return m_capacity_used;}
 
    inline const HostRes & getHostRes() const { return m_hres;}

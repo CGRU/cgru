@@ -22,24 +22,30 @@
 const int ItemJobBlock::HeightHeader = 23;
 const int ItemJobBlock::HeightFooter = 14;
 
-ItemJobBlock::ItemJobBlock( const af::BlockData* block, ListTasks * list):
-   Item( afqt::stoq( block->getName()), ItemId),
-	job_id( block->getJobId()),
-   numblock( block->getBlockNum()),
-   info( this, block->getBlockNum(), block->getJobId()),
-   listtasks( list),
+ItemJobBlock::ItemJobBlock(const af::BlockData * i_block, ListTasks * i_listtasks):
+	Item(afqt::stoq(i_block->getName()), ItemId, TBlock),
+	job_id(i_block->getJobId()),
+	numblock(i_block->getBlockNum()),
+	m_listtasks(i_listtasks),
 	m_wdir_ready(false),
 	m_files_ready(false)
 {
-   info.setName( m_name);
-   resetSortingParameters();
-   update( block, af::Msg::TJob);
-   height = HeightHeader  + BlockInfo::Height + HeightFooter;
+	m_info = new BlockInfo(i_block, this, m_listtasks);
+	QObject::connect(m_info, SIGNAL(sig_BlockAction(int, QString)), m_listtasks, SLOT(slot_BlockAction(int, QString)));
+
+	resetSortingParameters();
+	update(i_block, af::Msg::TJob);
+	m_height = HeightHeader  + BlockInfo::Height + HeightFooter;
+}
+
+ItemJobBlock::~ItemJobBlock()
+{
+	delete m_info;
 }
 
 QSize ItemJobBlock::sizeHint( const QStyleOptionViewItem &option) const
 {
-   return QSize( Width, height);
+	return QSize(Width, m_height);
 }
 
 void ItemJobBlock::update( const af::BlockData* block, int type)
@@ -58,7 +64,7 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
       inc               = block->getFrameInc();
       multihost_service = afqt::stoq( block->getMultiHostService());
 
-      tooltip_base      = std::string("Block[") + block->getName() + "]:";
+		m_tooltip_base  = std::string("Block[") + block->getName() + "]:";
 
    case af::Msg::TBlocksProperties:
 //printf("Changing block properties.\n");
@@ -71,13 +77,13 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
       tasksname         = afqt::stoq( block->getTasksName());
       parser            = afqt::stoq( block->getParser());
 
-      tooltip_properties = block->generateInfoStringTyped( af::Msg::TBlocksProperties, true);
+		m_tooltip_properties = block->generateInfoStringTyped( af::Msg::TBlocksProperties, true);
 
    case af::Msg::TBlocksProgress:
 
       state = block->getState();
 
-      tooltip_progress = block->generateInfoStringTyped( af::Msg::TBlocksProgress, true);
+		m_tooltip_progress = block->generateInfoStringTyped( af::Msg::TBlocksProgress, true);
 
       break;
 
@@ -86,8 +92,10 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
       return;
    }
 
-   if( info.update( block, type)) setRunning();
-   else                           setNotRunning();
+   if (m_info->update(block, type))
+	   setRunning();
+   else
+	   setNotRunning();
 
    description = service;
    if( numeric)
@@ -96,12 +104,7 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
       description += QString(" (str:%1pertask)").arg(pertask);
    if( multihost && (multihost_service.isEmpty() == false)) description += QString(" MHS='%1'").arg( multihost_service);
 
-   tooltip = afqt::stoq( tooltip_base + "\n" + tooltip_progress + "\n" + tooltip_properties);
-}
-
-ItemJobBlock::~ItemJobBlock()
-{
-//printf("ItemJobBlock::~ItemJobBlock:\n");
+	m_tooltip = afqt::stoq(m_tooltip_base + "\n" + m_tooltip_progress + "\n" + m_tooltip_properties);
 }
 
 const std::string & ItemJobBlock::getWDir()
@@ -126,78 +129,83 @@ const std::vector<std::string> & ItemJobBlock::getFiles()
 	return m_files;
 }
 
-void ItemJobBlock::paint( QPainter *painter, const QStyleOptionViewItem &option) const
+void ItemJobBlock::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const
 {
-   drawBack( painter, option);
+	drawBack(i_painter, i_rect, i_option);
 
-   int x = option.rect.x(); int y = option.rect.y(); int w = option.rect.width(); int h = option.rect.height();
+	int x = i_rect.x(); int y = i_rect.y(); int w = i_rect.width(); int h = i_rect.height();
 
-   painter->setFont( afqt::QEnvironment::f_name);
-   painter->setPen(  clrTextMain( option));
-   painter->drawText( x+5, y+16, info.getName());
+	i_painter->setFont(afqt::QEnvironment::f_name);
+	i_painter->setPen(clrTextMain(i_option));
+	i_painter->drawText(x+5, y+16, m_info->getName());
 
-	printfState( state, x+w-125, y+8, painter, option);
+	printfState(state, x+w-125, y+8, i_painter, i_option);
 
-   painter->setFont( afqt::QEnvironment::f_info);
-   painter->setPen(  clrTextInfo( option));
-   painter->drawText( x+4, y+9, w-8, h, Qt::AlignRight | Qt::AlignTop, description );
+	i_painter->setFont(afqt::QEnvironment::f_info);
+	i_painter->setPen(clrTextInfo(i_option));
+	i_painter->drawText(x+4, y+9, w-8, h, Qt::AlignRight | Qt::AlignTop, description );
 
-   y += HeightHeader;
+	y += HeightHeader;
 
-   info.paint( painter, option, x+4, y, w-8);
+	m_info->paint(i_painter, i_option, x+4, y, w-8);
 
-   y += BlockInfo::Height;
+	y += BlockInfo::Height;
 
-   painter->setPen( afqt::QEnvironment::qclr_black );
-   painter->setBrush( Qt::NoBrush);
+	i_painter->setPen(afqt::QEnvironment::qclr_black);
+	i_painter->setBrush(Qt::NoBrush);
 
-   painter->setOpacity( .2);
-   painter->drawLine( x, y, x+w-1, y);
+	i_painter->setOpacity(.2);
+	i_painter->drawLine(x, y, x+w-1, y);
 
-   y += 1;
+	y += 1;
 
-   static const float sorting_fields_text_opacity = .7f;
-   static const float sorting_fields_line_opacity = .4f;
+	static const float sorting_fields_text_opacity = .7f;
+	static const float sorting_fields_line_opacity = .4f;
 
-   int linex = w-ItemJobTask::WidthInfo;
+	int linex = w - ItemJobTask::WidthInfo;
 
-   painter->setOpacity( sorting_fields_text_opacity);
-   if( sort_type == STime) painter->fillRect( linex, y, WTime, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
-   painter->drawText( linex, y, WTime, HeightFooter-1, Qt::AlignCenter, "time");
-   linex += WTime;
-   painter->setOpacity( sorting_fields_line_opacity);
-   painter->drawLine( linex, y, linex, y+HeightFooter-2);
-   painter->setOpacity( sorting_fields_text_opacity);
-   if( sort_type == SState) painter->fillRect( linex+1, y, ItemJobTask::WidthInfo-WTime-1, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
-   painter->drawText( linex, y, ItemJobTask::WidthInfo - WTime, HeightFooter-1, Qt::AlignCenter, "state");
+	i_painter->setOpacity(sorting_fields_text_opacity);
+	if (m_sort_type == STime)
+		i_painter->fillRect(linex, y, WTime, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
+	i_painter->drawText(linex, y, WTime, HeightFooter-1, Qt::AlignCenter, "time");
+	linex += WTime;
+	i_painter->setOpacity(sorting_fields_line_opacity);
+	i_painter->drawLine(linex, y, linex, y+HeightFooter-2);
+	i_painter->setOpacity(sorting_fields_text_opacity);
+	if (m_sort_type == SState)
+		i_painter->fillRect(linex+1, y, ItemJobTask::WidthInfo-WTime-1, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
+	i_painter->drawText(linex, y, ItemJobTask::WidthInfo - WTime, HeightFooter-1, Qt::AlignCenter, "state");
 
-   linex = w-ItemJobTask::WidthInfo-1;
-   painter->setOpacity( sorting_fields_line_opacity);
-   painter->drawLine( linex, y, linex, y+HeightFooter-2);
+	linex = w-ItemJobTask::WidthInfo-1;
+	i_painter->setOpacity(sorting_fields_line_opacity);
+	i_painter->drawLine(linex, y, linex, y+HeightFooter-2);
 
-   painter->setOpacity( sorting_fields_text_opacity);
-   painter->drawText( x+3, y, ItemJobTask::WidthInfo, HeightFooter-1, Qt::AlignLeft | Qt::AlignVCenter, "Tasks:");
+	i_painter->setOpacity(sorting_fields_text_opacity);
+	i_painter->drawText(x+3, y, ItemJobTask::WidthInfo, HeightFooter-1, Qt::AlignLeft | Qt::AlignVCenter, "Tasks:");
 
-   painter->setOpacity( sorting_fields_text_opacity);
-   if( sort_type == SErrors) painter->fillRect( linex-WErrors+1, y, WErrors-1, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
-   painter->drawText( linex - WErrors, y, WErrors, HeightFooter-1, Qt::AlignCenter, "errors");
-   linex -= WErrors;
-   painter->setOpacity( sorting_fields_line_opacity);
-   painter->drawLine( linex, y, linex, y+HeightFooter-2);
+	i_painter->setOpacity(sorting_fields_text_opacity);
+	if (m_sort_type == SErrors)
+		i_painter->fillRect(linex-WErrors+1, y, WErrors-1, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
+	i_painter->drawText(linex - WErrors, y, WErrors, HeightFooter-1, Qt::AlignCenter, "errors");
+	linex -= WErrors;
+	i_painter->setOpacity(sorting_fields_line_opacity);
+	i_painter->drawLine(linex, y, linex, y+HeightFooter-2);
 
-   painter->setOpacity( sorting_fields_text_opacity);
-   if( sort_type == SStarts) painter->fillRect( linex-WStarts+1, y, WStarts-1, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
-   painter->drawText( linex - WStarts, y, WStarts, HeightFooter-1, Qt::AlignCenter, "starts");
-   linex -= WStarts;
-   painter->setOpacity( sorting_fields_line_opacity);
-   painter->drawLine( linex, y, linex, y+HeightFooter-2);
+	i_painter->setOpacity(sorting_fields_text_opacity);
+	if (m_sort_type == SStarts)
+		i_painter->fillRect(linex-WStarts+1, y, WStarts-1, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
+	i_painter->drawText(linex - WStarts, y, WStarts, HeightFooter-1, Qt::AlignCenter, "starts");
+	linex -= WStarts;
+	i_painter->setOpacity(sorting_fields_line_opacity);
+	i_painter->drawLine(linex, y, linex, y+HeightFooter-2);
 
-   painter->setOpacity( sorting_fields_text_opacity);
-   if( sort_type == SHost) painter->fillRect( linex-WHost+1, y, WHost-1, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
-   painter->drawText( linex - WHost, y, WHost, HeightFooter-1, Qt::AlignCenter, "host");
-   linex -= WHost;
-   painter->setOpacity( sorting_fields_line_opacity);
-   painter->drawLine( linex, y, linex, y+HeightFooter-2);
+	i_painter->setOpacity(sorting_fields_text_opacity);
+	if (m_sort_type == SHost)
+		i_painter->fillRect(linex-WHost+1, y, WHost-1, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
+	i_painter->drawText(linex - WHost, y, WHost, HeightFooter-1, Qt::AlignCenter, "host");
+	linex -= WHost;
+	i_painter->setOpacity(sorting_fields_line_opacity);
+	i_painter->drawLine(linex, y, linex, y+HeightFooter-2);
 }
 
 bool ItemJobBlock::mousePressed( const QPoint & pos,const QRect & rect)
@@ -207,11 +215,11 @@ bool ItemJobBlock::mousePressed( const QPoint & pos,const QRect & rect)
    int mousex = pos.x() - rect.x();
    int mousey = pos.y() - rect.y();
 
-   if( mousey < height - HeightFooter) return false;
+	if(mousey < m_height - HeightFooter) return false;
 
    int x = rect.width() - ItemJobTask::WidthInfo;
    bool processed = false;
-   int sort_type_old = sort_type;
+   int sort_type_old = m_sort_type;
 
    x -= WHost + WErrors + WStarts;
    if( !processed && mousex < x )
@@ -223,51 +231,51 @@ bool ItemJobBlock::mousePressed( const QPoint & pos,const QRect & rect)
    x += WHost;
    if( !processed && mousex < x )
    {
-      sort_type = SHost;
+      m_sort_type = SHost;
       processed = true;
    }
 
    x += WStarts;
    if( !processed && mousex < x )
    {
-      sort_type = SStarts;
+      m_sort_type = SStarts;
       processed = true;
    }
 
    x += WErrors;
    if( !processed && mousex < x )
    {
-      sort_type = SErrors;
+      m_sort_type = SErrors;
       processed = true;
    }
 
    x += WTime;
    if( !processed && mousex < x )
    {
-      sort_type = STime;
+      m_sort_type = STime;
       processed = true;
    }
 
-   if( !processed ) sort_type = SState;
+   if( !processed ) m_sort_type = SState;
 
-   if( sort_type_old != sort_type )
-      sort_ascending = false;
+   if( sort_type_old != m_sort_type )
+      m_sort_ascending = false;
    else
-      sort_ascending = false == sort_ascending;
+      m_sort_ascending = false == m_sort_ascending;
 
 #ifdef AFOUTPUT
-switch( sort_type)
+switch(m_sort_type)
 {
-case 0:        printf("Tasks %d \n",   sort_ascending); break;
-case SHost:    printf("Host %d \n",    sort_ascending); break;
-case SStarts:  printf("Start %d \n",   sort_ascending); break;
-case SErrors:  printf("Errors %d \n",  sort_ascending); break;
-case STime:    printf("Time %d \n",    sort_ascending); break;
-case SState:   printf("State %d \n",   sort_ascending); break;
+case 0:        printf("Tasks %d \n",   m_sort_ascending); break;
+case SHost:    printf("Host %d \n",    m_sort_ascending); break;
+case SStarts:  printf("Start %d \n",   m_sort_ascending); break;
+case SErrors:  printf("Errors %d \n",  m_sort_ascending); break;
+case STime:    printf("Time %d \n",    m_sort_ascending); break;
+case SState:   printf("State %d \n",   m_sort_ascending); break;
 }
 #endif
 
-   listtasks->sortBlock( numblock);
+   m_listtasks->sortBlock( numblock);
 
    return true;
 }

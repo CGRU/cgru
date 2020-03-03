@@ -5,11 +5,12 @@
 #include <QtCore/QAbstractItemModel>
 
 class Item;
+class ListItems;
 
 class ModelItems : public QAbstractListModel
 {
 public:
-	ModelItems( QObject * parent);
+	ModelItems(ListItems * i_list_items);
 	virtual ~ModelItems();
 
 	int rowCount(  const QModelIndex & ) const;
@@ -38,4 +39,7 @@ public:
 
 protected:
 	QList<Item*> items;
+
+private:
+	ListItems * m_list_items;
 };

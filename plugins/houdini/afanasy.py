@@ -2,6 +2,7 @@
 
 import os
 import re
+import socket
 import time
 
 import hou
@@ -28,6 +29,8 @@ class BlockParameters:
         self.afnode = afnode
         self.ropnode = None
         self.subblock = subblock
+        self.single_task = False
+        self.local_render = False
         self.frame_pertask = 1
         self.frame_sequential = 1
         self.prefix = prefix
@@ -54,8 +57,14 @@ class BlockParameters:
         self.soho_outputmode = None
 
         # Get parameters:
-        self.frame_pertask = int(afnode.parm('frame_pertask').eval())
-        self.frame_sequential = int(afnode.parm('frame_sequential').eval())
+        self.single_task = bool(afnode.parm('single_task').eval())
+        if self.single_task:
+            self.frame_pertask = self.frame_last - self.frame_first + 1
+            self.frame_sequential = 1
+        else:
+            self.frame_pertask = int(afnode.parm('frame_pertask').eval())
+            self.frame_sequential = int(afnode.parm('frame_sequential').eval())
+        self.local_render = bool(afnode.parm('local_render').eval())
         self.job_name = str(afnode.parm('job_name').eval())
         self.job_branch = ''
         self.start_paused = int(afnode.parm('start_paused').eval())
@@ -66,6 +75,7 @@ class BlockParameters:
         self.maxperhost = -1
         self.maxruntime = -1
         self.minruntime = -1
+        self.progress_timeout = -1
         self.capacity = -1
         self.capacity_min = -1
         self.capacity_max = -1
@@ -74,6 +84,7 @@ class BlockParameters:
         self.depend_mask = ''
         self.depend_mask_global = ''
         self.min_memory = -1
+        self.generate_previews = self.afnode.parm('generate_previews').eval()
         self.preview_approval = afnode.parm('preview_approval').eval()
 
         if afnode.parm('enable_extended_parameters').eval():
@@ -82,8 +93,9 @@ class BlockParameters:
             self.priority = int(afnode.parm('priority').eval())
             self.max_runtasks = int(afnode.parm('max_runtasks').eval())
             self.maxperhost = int(afnode.parm('maxperhost').eval())
-            self.maxruntime = int(afnode.parm('maxruntime').eval())
+            self.maxruntime = float(afnode.parm('maxruntime').eval())
             self.minruntime = int(afnode.parm('minruntime').eval())
+            self.progress_timeout = float(afnode.parm('progress_timeout').eval())
             self.min_memory = int(afnode.parm('min_memory').eval())
             self.capacity = int(afnode.parm('capacity').eval())
             self.capacity_min = int(
@@ -96,6 +108,9 @@ class BlockParameters:
             self.depend_mask = str(afnode.parm('depend_mask').eval())
             self.depend_mask_global = str(
                 afnode.parm('depend_mask_global').eval())
+
+        if self.local_render:
+            self.hosts_mask = str(socket.gethostname())
 
         # Process frame range:
         opname = afnode.path()
@@ -151,8 +166,8 @@ class BlockParameters:
             roptype = ropnode.type().name()
 
             if roptype == 'ifd':
-                if ropnode.node(ropnode.parm('camera').eval())==None:
-                    hou.ui.displayMessage("Camera in "+ropnode.name()+" is not valid",severity = hou.severityType.Error)
+                if ropnode.node(ropnode.parm('camera').eval()) is None:
+                    hou.ui.displayMessage("Camera in %s is not valid" % ropnode.name(), severity=hou.severityType.Error)
                     return
 
                 if not ropnode.parm('soho_outputmode').eval():
@@ -201,6 +216,17 @@ class BlockParameters:
                             rs_picture.evalAsStringAtFrame(self.frame_last)
                         )
 
+            # For files menu in watcher
+            elif roptype == 'geometry':
+                file_geo = ropnode.parm('sopoutput')
+
+                if file_geo is not None:
+                    self.preview = \
+                        afcommon.patternFromPaths(
+                            file_geo.evalAsStringAtFrame(self.frame_first),
+                            file_geo.evalAsStringAtFrame(self.frame_last)
+                        )
+
             # Block command:
             self.cmd = 'hrender_af'
             if afnode.parm('ignore_inputs').eval():
@@ -212,14 +238,6 @@ class BlockParameters:
             self.cmd += ' -s @#@ -e @#@ --by %d -t "%s"' % (
                 self.frame_inc, afnode.parm('take').eval()
             )
-
-#            numWedges = computeWedge(ropnode, roptype)
-#            if numWedges:
-#                self.frame_first = 0
-#                self.frame_last = numWedges - 1
-#                self.frame_inc = 1
-#                self.frame_pertask = 1
-#                self.parser = "mantra"
 
             self.cmd += '%(auxargs)s'
             self.cmd += ' "%(hipfilename)s"'
@@ -329,7 +347,7 @@ class BlockParameters:
         block = af.Block(self.name, self.service)
         block.setParser(self.parser)
         block.setCommand(cmd, self.cmd_useprefix)
-        if self.preview != '':
+        if self.preview != '' and self.generate_previews:
             block.setFiles([self.preview])
 
         if self.numeric:
@@ -344,7 +362,7 @@ class BlockParameters:
             for cmd in self.tasks_cmds:
                 task = af.Task(self.tasks_names[t])
                 task.setCommand(cmd)
-                if len(self.tasks_previews):
+                if len(self.tasks_previews) and self.generate_previews:
                     task.setFiles([self.tasks_previews[t]])
                 block.tasks.append(task)
                 t += 1
@@ -356,9 +374,12 @@ class BlockParameters:
         if self.capacity_min != -1 or self.capacity_max != -1:
             block.setVariableCapacity(self.capacity_min, self.capacity_max)
 
-        block.setTaskMinRunTime(self.minruntime)
-        block.setTaskMaxRunTime(self.maxruntime*3600)
-
+        if self.minruntime > 0.01:
+            block.setTaskMinRunTime(self.minruntime)
+        if self.maxruntime > 0.01:
+            block.setTaskMaxRunTime(int(self.maxruntime*3600.0))
+        if self.progress_timeout > 0.01:
+            block.setTaskProgressChangeTimeout(int(self.progress_timeout*3600.0))
 
         # Delete files in a block post command:
         if len(self.delete_files):
@@ -411,10 +432,10 @@ class BlockParameters:
             wait_sec = now_day + (hours * 3600) + (minutes * 60) + sec
             if wait_sec <= now_sec:
                 if hou.ui.displayMessage(
-                            ('Now is greater than %d:%d\nOffset by 1 day?' % (hours,minutes)),
+                            'Now is greater than %d:%d\nOffset by 1 day?' % (hours, minutes),
                             buttons=('Offset', 'Abort'),
                             default_choice=0, close_choice=1,
-                            title=('Wait Time')
+                            title='Wait Time'
                         ) == 0:
                     wait_sec += (24*3600)
                 else:
@@ -479,7 +500,7 @@ class BlockParameters:
         for blockparam in blockparams:
             job.blocks.append(blockparam.genBlock(renderhip))
 
-            # Set ouput folder from the first block with images to preview:
+            # Set output folder from the first block with images to preview:
             if images is None and blockparam.preview != '':
                 images = blockparam.preview
                 job.setFolder('output', os.path.dirname(images))
@@ -575,12 +596,12 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
             parm_files  = afnode.parm('sep_files')
 
         images = afcommon.patternFromPaths(
-            parm_images.evalAsStringAtFrame( block_generate.frame_first),
-            parm_images.evalAsStringAtFrame( block_generate.frame_last))
+            parm_images.evalAsStringAtFrame(block_generate.frame_first),
+            parm_images.evalAsStringAtFrame(block_generate.frame_last))
 
         files = afcommon.patternFromPaths(
-            parm_files.evalAsStringAtFrame( block_generate.frame_first),
-            parm_files.evalAsStringAtFrame( block_generate.frame_last))
+            parm_files.evalAsStringAtFrame(block_generate.frame_first),
+            parm_files.evalAsStringAtFrame(block_generate.frame_last))
 
         if run_rop:
             if join_render:
@@ -654,12 +675,12 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
 
             block_join.name = blockname + '-J'
             block_join.service = 'generic'
+            # block render might be referenced before assignment
             block_join.dependmask = block_render.name
             block_join.cmd = cmd
             block_join.cmd_useprefix = False
             block_join.preview = images
 
-        if tile_render:
             params.append(block_join)
 
         if not join_render:
@@ -808,6 +829,10 @@ def getJobParameters(afnode, subblock=False, frame_range=None, prefix=''):
                 return None
 
         elif node and node.type().name() == "wedge":
+            newprefix = node.name()
+            if prefix != '':
+                newprefix = prefix + '_' + newprefix
+
             wedgednode = None
             if node.inputs():
                 wedgednode = node.inputs()[0]
@@ -823,14 +848,15 @@ def getJobParameters(afnode, subblock=False, frame_range=None, prefix=''):
                 hou.hscript('set WEDGE = ' + names[wedge])
                 hou.hscript('set WEDGENUM = ' + str(wedge))
                 hou.hscript('varchange')
-                #add wedged node to next block
-                block = getBlockParameters(afnode, wedgednode, subblock, "{}_{}".format(node.name(),wedge), frame_range)[0]
+                # add wedged node to next block
+                block = getBlockParameters(afnode, wedgednode, subblock, "{}_{:02}".format(newprefix,wedge), frame_range)[0]
                 block.auxargs += " --wedge " + node.path() + " --wedgenum " + str(wedge)
                 newparams.append(block)
             # clear environment
             hou.hscript('set WEDGE = ')
             hou.hscript('set WEDGENUM = ')
             hou.hscript('varchange')
+            dependmask = newprefix + '_.*'
 
         else:
             newparams = \
@@ -905,5 +931,5 @@ def computeWedge(ropnode, roptype):
             numWedgeJobs = len(takes)
 
         if not numWedgeJobs:
-            raise hou.OperationFailed("The specified wedge node does not compute anyting.")
+            raise hou.OperationFailed("The specified wedge node does not compute anything.")
     return numWedgeJobs

@@ -44,12 +44,28 @@ function sc_InitHTML( i_data)
 
 	if( sc_scenes )
 	{
-		scenes_Show();
+		$('scenes_load_btn').textContent = 'Load All Shots';
+		$('scenes_load_btn').onclick = function()
+		{
+			sc_Show_Loaded();
+			scenes_Show();
+		}
 	}
 	else
 	{
-		scene_Show();
+		$('scenes_load_btn').textContent = 'Load Scene Shots';
+		$('scenes_load_btn').onclick = function()
+		{
+			sc_Show_Loaded();
+			scene_Show();
+		}
 	}
+}
+
+function sc_Show_Loaded()
+{
+	$('scenes_load_btn').style.display = 'none';
+	$('scenes_show_loaded').style.display = 'block';
 }
 
 function sc_Post()
@@ -235,6 +251,13 @@ function sc_BodyReceived( i_data, i_args)
 	// Replace <br> with spaces through some pattern:
 	i_args.elShot.m_elBody.innerHTML = i_data.replace(/\<\s*br\s*\/?\s*\>/g,'@@BR@@');
 	i_args.elShot.m_elBody.innerHTML = i_args.elShot.m_elBody.textContent.replace(/@@BR@@/g,' ');
+
+	if (i_args.elShot.m_status && i_args.elShot.m_status.obj)
+	{
+		if (i_args.elShot.m_status.obj.body == null)
+			i_args.elShot.m_status.obj.body = {};
+		i_args.elShot.m_status.obj.body.data = i_data;
+	}
 }
 
 function scenes_Show()
@@ -279,7 +302,6 @@ function scenes_Received( i_data, i_args)
 		var elStatus = document.createElement('div');
 		elScene.appendChild( elStatus);
 		elStatus.classList.add('status');
-//window.console.log(JSON.stringify(fobj));
 		st_SetElLabel( fobj.status, elStatus);
 		st_SetElColor( fobj.status, elScene);
 
@@ -620,13 +642,22 @@ function sc_FilterShots( i_args)
 	var anns = null;
 	if( i_args.ann )
 	{
-		var anns_or = i_args.ann.split(',');
+		var anns_or = i_args.ann.split('|');
 		anns = [];
 		for( var o = 0; o < anns_or.length; o++)
-			anns.push( anns_or[o].split(' '));
+			anns.push( anns_or[o].split('+'));
 	}
 
-	for( var th = 0; th < sc_elShots.length; th++)
+	var bodies = null;
+	if (i_args.body)
+	{
+		let bodies_or = i_args.body.split('|');
+		bodies = [];
+		for (let o = 0; o < bodies_or.length; o++)
+			bodies.push(bodies_or[o].split('+'));
+	}
+
+	for (let th = 0; th < sc_elShots.length; th++)
 	{
 		var found = ( i_args == null );
 
@@ -635,7 +666,7 @@ function sc_FilterShots( i_args)
 		if( el.m_status && el.m_status.obj )
 			st_obj = el.m_status.obj;
 
-		if( anns )
+		if (anns)
 		{
 			if( st_obj.annotation )
 				for( var o = 0; o < anns.length; o++)
@@ -643,7 +674,7 @@ function sc_FilterShots( i_args)
 					var found_and = true;
 					for( var a = 0; a < anns[o].length; a++)
 					{
-						if( st_obj.annotation.indexOf( anns[o][a]) == -1 )
+						if (st_obj.annotation.toLowerCase().indexOf(anns[o][a].toLowerCase()) == -1)
 						{
 							found_and = false;
 							break;
@@ -657,6 +688,29 @@ function sc_FilterShots( i_args)
 				}
 		}
 		else found = true;
+
+		if (bodies && found)
+		{
+			found = false;
+			if (st_obj.body && st_obj.body.data)
+				for (let o = 0; o < bodies.length; o++)
+				{
+					let found_and = true;
+					for (let b = 0; b < bodies[o].length; b++)
+					{
+						if (st_obj.body.data.toLowerCase().indexOf(bodies[o][b].toLowerCase()) == -1)
+						{
+							found_and = false;
+							break;
+						}
+					}
+					if( found_and )
+					{
+						found = true;
+						break;
+					}
+				}
+		}
 
 		if( i_args.flags && found )
 		{
@@ -955,7 +1009,6 @@ function scenes_makeThumbnail( i_data, i_args)
 	cmd += ' -c ' + sc_thumb_params_values.colorspace;
 
 	c_Info('Generating thumbnail for ' + el.m_path + ' (' + num_updated + '/' + sc_elImgThumbs.length + ')');
-//console.log(cmd);
 
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":scenes_makeThumbnail,"elThumb":el,"info":'shot thumbnail',"local":true,"wait":false,"parse":true});
 }

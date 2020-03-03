@@ -36,8 +36,8 @@ public:
 /// Awake offline render
 	void online( RenderAf * render, JobContainer * i_jobs, MonitorContainer * monitoring);
 
-	inline int getMaxTasks()     const { return m_max_tasks == -1 ? m_parent->getMaxTasksPerHost()    : m_max_tasks;}
-	inline int getCapacity()     const { return m_capacity  == -1 ? m_parent->getMaxCapacityPerHost() : m_capacity;}
+	inline int getMaxTasks()     const { return m_max_tasks == -1 ? m_parent->getHostMaxTasks() : m_max_tasks;}
+	inline int getCapacity()     const { return m_capacity  == -1 ? m_parent->getHostCapacity() : m_capacity;}
 	inline int getCapacityFree() const { return getCapacity() - m_capacity_used;}
 	inline bool hasCapacity(int value) const {
 		int c = getCapacity(); if (c<0) return true; else return m_capacity_used + value <= c;}
@@ -130,10 +130,10 @@ private:
 
 	/// Add the task exec to this render and take over its ownership (meaning
 	/// one should not free taskexec after having provided it to this method).
-	void addTask( af::TaskExec * taskexec);
+	void addTask(af::TaskExec * i_taskexec, MonitorContainer * i_monitoring);
 	/// Remove the task exec from this render and give back its ownership to the
 	/// caller.
-	void removeTask( const af::TaskExec * taskexec);
+	void removeTask(const af::TaskExec * i_taskexec, MonitorContainer * i_monitoring);
 
 /// Stop tasks.
 	void ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus, const std::string * i_keeptasks_username = NULL);

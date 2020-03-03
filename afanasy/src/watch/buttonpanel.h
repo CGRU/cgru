@@ -1,5 +1,6 @@
 #pragma once
 
+#include "item.h"
 #include "watch.h"
 
 #include <QWidget>
@@ -14,6 +15,7 @@ class ButtonPanel : public QWidget
 public:
 	ButtonPanel(
 		ListItems * i_listitems,
+		Item::EType i_type,
 		const QString & i_label,
 		const QString & i_name,
 		const QString & i_description,
@@ -28,6 +30,10 @@ public:
 	void keyPressed( const QString & i_str);
 
 	static bool setHotkey( const QString & i_str);
+
+	inline Item::EType getType() const {return m_type;}
+
+	inline void setActive(bool i_active) {m_active = i_active; repaint();}
 
 signals:
 	void sigClicked();
@@ -50,7 +56,9 @@ private slots:
 	void listenHotkey();
 
 private:
+	Item::EType m_type;
 	int m_height;
+	bool m_active;
 	QString m_label;
 	QString m_name;
 	QString m_description;
