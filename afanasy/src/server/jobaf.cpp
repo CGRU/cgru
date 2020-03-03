@@ -299,6 +299,10 @@ bool JobAf::initialize()
 
 void JobAf::checkStates()
 {
+	// This function is called on a job initialization,
+	// When a new job created, or from database on server restart.
+	// Also it called on a block(s) appending.
+
 	for( int b = 0; b < m_blocks_num; b++)
 	{
 		int numtasks = m_blocks_data[b]->getTasksNum();
@@ -322,7 +326,8 @@ void JobAf::checkStates()
 			m_progress->tp[b][t]->state = taskstate;
 		}
 	}
-	
+
+	// If job is not done, just set WAITDEP state to not make it to run before a refresh.
 	if(( m_state & AFJOB::STATE_DONE_MASK) == false ) m_state = m_state | AFJOB::STATE_WAITDEP_MASK;
 }
 

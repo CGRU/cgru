@@ -94,7 +94,24 @@ bool Farm::jr_Tickets(const char * i_name, std::map<std::string, Tiks> & o_ticke
 			AF_ERR << "Ticket '" << name << "' values array size != 2.";
 			return false;
 		}
-		o_tickets[name] = Tiks(jArray[0u].GetInt(), jArray[1u].GetInt());
+
+		Tiks tks(jArray[0u].GetInt(), jArray[1u].GetInt());
+
+		if (tks.count == -1)
+		{
+			// This node was stored with a temporary ticket, that was added just to store Tiks summ.
+			continue;
+			// On task reconnectiong temporary ticked will be re-created, if needed.
+		}
+
+		if (tks.usage > 0)
+		{
+			// This node was stored when tasks(s) were running on it.
+			// If task(s) will be reconnected, tickets usage will be re-incremented.
+			tks.usage = 0;
+		}
+
+		o_tickets[name] = tks;
 	}
 
 	return true;
