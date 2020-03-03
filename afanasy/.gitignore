@@ -1,3 +1,6 @@
 # Afanasy binaries
 archives
 bin
+
+# TODO: Edit cmake lists so that this RelWithDebInfo is created in bin/
+service/RelWithDebInfo/

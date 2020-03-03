@@ -8,6 +8,7 @@ Contents:
 
     installation/index.rst
     software/index.rst
+    howto/index.rst
 
 
 Indices and tables

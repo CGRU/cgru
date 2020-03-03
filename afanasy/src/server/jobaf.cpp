@@ -133,11 +133,11 @@ void JobAf::initStoreDirs()
 	m_store_dir_tasks = getStoreDir() + AFGENERAL::PATH_SEPARATOR + "tasks";
 }
 
-void JobAf::construct()
+void JobAf::construct(int alreadyConstructed)
 {
 	AF_DEBUG << '"' << m_name << "\": from store: " << isFromStore();
 
-	if( NULL != m_blocks )
+	if( NULL != m_blocks && alreadyConstructed == 0 )
 	{
 		AF_ERR << "Already constructed.";
 		return;
@@ -149,14 +149,19 @@ void JobAf::construct()
 		return;
 	}
 
+	Block ** old_blocks = m_blocks;
+
 	m_blocks = new Block*[m_blocks_num];
 	if( NULL == m_blocks )
 	{
 		AF_ERR << "Can't allocate memory for blocks.";
 		return;
 	}
-	for( int b = 0; b < m_blocks_num; b++) m_blocks[b] = NULL;
 	for( int b = 0; b < m_blocks_num; b++)
+		m_blocks[b] = b < alreadyConstructed ? old_blocks[b] : NULL;
+	if( NULL != old_blocks)
+		delete [] old_blocks;
+	for( int b = alreadyConstructed; b < m_blocks_num; b++)
 	{
 		m_blocks[b] = v_newBlock(b);
 		if( m_blocks[b] == NULL )
@@ -285,8 +290,15 @@ bool JobAf::initialize()
 		appendLog("Initialized from database.");
 	}
 
-	//
-	// Checking states
+	checkStates();
+
+	v_refresh( time(NULL), NULL, NULL);
+
+	return true;
+}
+
+void JobAf::checkStates()
+{
 	for( int b = 0; b < m_blocks_num; b++)
 	{
 		int numtasks = m_blocks_data[b]->getTasksNum();
@@ -312,10 +324,6 @@ bool JobAf::initialize()
 	}
 	
 	if(( m_state & AFJOB::STATE_DONE_MASK) == false ) m_state = m_state | AFJOB::STATE_WAITDEP_MASK;
-	
-	v_refresh( time(NULL), NULL, NULL);
-	
-	return true;
 }
 
 int JobAf::getUid() const { return m_user->getId(); }
@@ -519,6 +527,10 @@ void JobAf::v_action( Action & i_action)
 			checkDepends();
 			m_state = m_state | AFJOB::STATE_OFFLINE_MASK;
 			m_time_started = 0;
+		}
+		else if( type == "append_blocks")
+		{
+			appendBlocks(operation["blocks"]);
 		}
 		else
 		{
@@ -1472,4 +1484,27 @@ int JobAf::v_calcWeight() const
 	weight += m_logsWeight;
 	
 	return weight;
+}
+
+void JobAf::appendBlocks( const JSON & i_blocks)
+{
+	int old_blocks_num = m_blocks_num;
+
+	jsonReadAndAppendBlocks( i_blocks);
+
+	m_progress->reconstruct( this);
+
+	// construct new blocks only (reuse the old_blocks_num existing ones)
+	construct( old_blocks_num);
+
+	// initialize
+	for( int b = old_blocks_num; b < m_blocks_num; b++)
+	{
+		m_blocks_data[b]->setJobId( m_id);
+		m_blocks[b]->storeTasks();
+		m_blocks[b]->setUser( m_user);
+	}
+
+	checkDepends();
+	checkStates();
 }

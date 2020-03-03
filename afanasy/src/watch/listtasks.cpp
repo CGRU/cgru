@@ -493,14 +493,14 @@ bool ListTasks::updateTasks(
 	int lastChangedRow = -1;
 	for( int i = 0; i < i_tps.size(); i++)
 	{
-		if( i_blocks[i] > m_blocks_num)
+		if( i_blocks[i] >= m_blocks_num)
 		{
-			AFERRAR("ListTasks::updateTasks: block > m_blocks_num (%d>%d)", i_blocks[i], m_blocks_num)
+			AFERRAR("ListTasks::updateTasks: block >= m_blocks_num (%d>=%d)", i_blocks[i], m_blocks_num)
 			return false;
 		}
-		if( i_tasks[i] > m_tasks_num[i_blocks[i]])
+		if( i_tasks[i] >= m_tasks_num[i_blocks[i]])
 		{
-			AFERRAR("ListTasks::updateTasks: task > m_tasks_num[%d] (%d>%d)", i_blocks[i], i_tasks[i], m_tasks_num[i_blocks[i]])
+			AFERRAR("ListTasks::updateTasks: task >= m_tasks_num[%d] (%d>=%d)", i_blocks[i], i_tasks[i], m_tasks_num[i_blocks[i]])
 			return false;
 		}
 		m_tasks[i_blocks[i]][i_tasks[i]]->upProgress( i_tps[i]);

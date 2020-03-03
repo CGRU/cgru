@@ -25,22 +25,8 @@ Block::Block( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * pro
    m_jobprogress( progress),
    m_initialized( false)
 {
-   m_tasks = new Task*[ m_data->getTasksNum()];
-   if( m_tasks == NULL )
-   {
-      AFERROR("Blocl::Block: Can't allocate memory for tasks.")
+   if (!allocateTasks())
       return;
-   }
-   for( int t = 0; t < m_data->getTasksNum(); t++) m_tasks[t] = NULL;
-   for( int t = 0; t < m_data->getTasksNum(); t++)
-   {
-	  m_tasks[t] = new Task( this, progress->tp[ m_data->getBlockNum()][t], t);
-	  if( m_tasks == NULL )
-      {
-		 AFERRAR("Blocl::Block: Can't allocate memory for task %d of %d.", t, m_data->getTasksNum())
-         return;
-      }
-   }
    constructDependBlocks();
    m_initialized = true;
 }
@@ -469,6 +455,16 @@ bool Block::action( Action & i_action)
 		{
 			skipRestartTasks( false, "Tasks restart done by " + i_action.author, i_action, operation, AFJOB::STATE_DONE_MASK);
 		}
+		else if (type == "append_tasks")
+		{
+			if (appendTasks(operation))
+			{
+				// Add a log line so that store() is called at the job level (a bit hacky)
+				i_action.log += "\nBlock['" + m_data->getName() + "']: Append tasks";
+				return true;
+			}
+			return false;
+		}
 		else if(type == "tickets")
 		{
 			if (editTickets(i_action, operation))
@@ -572,6 +568,33 @@ void Block::skipRestartTasks( bool i_skip, const std::string & i_message, const 
 	}
 }
 
+bool Block::allocateTasks(int alreadyAllocated)
+{
+	Task **old_tasks = m_tasks;
+	m_tasks = new Task *[m_data->getTasksNum()];
+	if (m_tasks == NULL)
+	{
+		AFERROR("Blocl::Block: Can't allocate memory for tasks.")
+		if (NULL != old_tasks)
+			delete [] old_tasks;
+		return false;
+	}
+	for (int t = 0; t < m_data->getTasksNum(); t++)
+		m_tasks[t] = t < alreadyAllocated ? old_tasks[t] : NULL;
+	if (NULL != old_tasks)
+		delete [] old_tasks;
+	for (int t = alreadyAllocated; t < m_data->getTasksNum(); t++)
+	{
+		m_tasks[t] = new Task(this, m_jobprogress->tp[m_data->getBlockNum()][t], t);
+		if (m_tasks == NULL)
+		{
+			AFERRAR("Blocl::Block: Can't allocate memory for task %d of %d.", t, m_data->getTasksNum())
+			return false;
+		}
+	}
+	return true;
+}
+
 void Block::constructDependBlocks()
 {
 	if( m_job->getBlocksNum() <= 1 )
@@ -638,4 +661,32 @@ int Block::blackListWeight() const
    weight += af::weigh( m_errorHosts);
    for( int t = 0; t < m_data->getTasksNum(); t++) weight += m_tasks[t]->blackListWeight();
    return weight;
+}
+
+bool Block::appendTasks(const JSON &operation)
+{
+	if (m_data->isNumeric())
+	{
+		appendJobLog("Appending tasks to numeric block is not allowed");
+		return false;
+	}
+	const JSON &tasks = operation["tasks"];
+	if (!tasks.IsArray())
+	{
+		appendJobLog("Operation \"append_tasks\" requires data in an array named \"tasks\"");
+		return false;
+	}
+
+	// Allocate new tasks
+	int old_tasks_num = m_data->getTasksNum();
+	m_data->jsonReadAndAppendTasks(operation);
+	m_jobprogress->appendTasks(m_data->getBlockNum(), m_data->getTasksNum() - old_tasks_num);
+	allocateTasks(old_tasks_num); // allocate only new tasks
+
+	// Store tasks
+	storeTasks();
+
+	// Set new tasks ready
+	m_job->checkStates();
+	return true;
 }

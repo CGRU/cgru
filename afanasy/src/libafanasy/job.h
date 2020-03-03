@@ -139,6 +139,11 @@ public:
 	void stdOutJobBlocksTasks() const;
 
 protected:
+	/// Read blocks data and append it to block list
+	/// (called by jsonRead and also when appending new blocks)
+	bool jsonReadAndAppendBlocks( const JSON & i_blocks);
+
+protected:
 	BlockData  ** m_blocks_data;    ///< Blocks pointer.
 	int32_t m_blocks_num;   ///< Number of blocks in job.
 
