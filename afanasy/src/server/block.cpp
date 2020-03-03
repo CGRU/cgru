@@ -469,10 +469,6 @@ bool Block::action( Action & i_action)
 		{
 			skipRestartTasks( false, "Tasks restart done by " + i_action.author, i_action, operation, AFJOB::STATE_DONE_MASK);
 		}
-		else if( type == "restart_done")
-		{
-			skipRestartTasks( false, "Tasks restart done by " + i_action.author, i_action, operation, AFJOB::STATE_DONE_MASK);
-		}
 		else if(type == "tickets")
 		{
 			if (editTickets(i_action, operation))
