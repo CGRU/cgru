@@ -57,10 +57,10 @@ public:
 	void taskAcuire (const af::TaskExec * i_taskexec, MonitorContainer * i_monitoring);
 	void taskRelease(const af::TaskExec * i_taskexec, MonitorContainer * i_monitoring);
 
-	inline int getHostMaxTasks()    const
-		{ if (m_host_max_tasks < 0 && m_parent) return m_parent->getHostMaxTasks(); else return m_host_max_tasks; }
-	inline int getHostMaxCapacity() const
-		{ if (m_host_capacity  < 0 && m_parent) return m_parent->getHostCapacity(); else return m_host_capacity;}
+	inline int findMaxTasksHost() const
+		{ if (m_max_tasks_host < 0 && m_parent) return m_parent->findMaxTasksHost(); else return m_max_tasks_host;}
+	inline int findCapacityHost() const
+		{ if (m_capacity_host  < 0 && m_parent) return m_parent->findCapacityHost(); else return m_capacity_host; }
 
 	inline bool newNimby()  const
 		{ if (!m_new_nimby  && m_parent) return m_parent->newNimby();  else return m_new_nimby; }

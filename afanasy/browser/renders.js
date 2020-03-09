@@ -354,25 +354,28 @@ RenderNode.prototype.update = function(i_obj) {
 	this.elPower.textContent = '';
 	this.elNewLine.style.display = 'block';
 
+	// Run tasks and capacity:
 	this.params.run_tasks = 0;
 	if (this.params.tasks)
 		this.params.run_tasks = this.params.tasks.length;
-
+	let tasks_html = 'T:<b>' + this.params.run_tasks + '</b>';
+	let cap_html = 'C:<b>' + this.params.capacity_used + '</b>';
 	if (cm_IsPadawan())
 	{
-		this.elRunTasks.innerHTML =	'Tasks: <b>' + this.params.run_tasks + '</b>';
-		this.elCapacity.innerHTML = 'Capacity: <b>' + this.params.capacity_used + '</b>';
+		tasks_html = 'Tasks: <b>' + this.params.run_tasks + '</b>';
+		cap_html = 'Capacity: <b>' + this.params.capacity_used + '</b>';
 	}
 	else if (cm_IsJedi())
 	{
-		this.elRunTasks.innerHTML =	'Tasks:<b>' + this.params.run_tasks + '</b>';
-		this.elCapacity.innerHTML = 'Cap:<b>' + this.params.capacity_used + '</b>';
+		tasks_html = 'Tasks:<b>' + this.params.run_tasks + '</b>';
+		cap_html = 'Cap:<b>' + this.params.capacity_used + '</b>';
 	}
-	else
-	{
-		this.elRunTasks.innerHTML =	'T:<b>' + this.params.run_tasks + '</b>';
-		this.elCapacity.innerHTML = 'C:<b>' + this.params.capacity_used + '</b>';
-	}
+	if (this.params.max_tasks_host != null)
+		tasks_html += '/<b>' + this.params.max_tasks_host + '</b>';
+	if (this.params.capacity_host != null)
+		cap_html += '/<b>' + this.params.capacity_host + '</b>';
+	this.elRunTasks.innerHTML =	tasks_html;
+	this.elCapacity.innerHTML = cap_html;
 
 	if (this.state.RUN == true)
 	{
@@ -909,11 +912,11 @@ RenderNode.createActions = function() {
 };
 
 RenderNode.params_render = {
-	priority   : {'type':'num', 'label':'Priority'},
-	capacity   : {'type':'num', 'label':'Capacity'},
-	max_tasks  : {'type':'num', 'label':'Maximum Tasks'},
-	user_name  : {'type':'str', 'label':'User Name'},
-	annotation : {'type':'str', 'label':'Annotation'}
+	priority        : {'type':'num', 'label':'Priority'},
+	capacity_host   : {'type':'num', 'label':'Capacity'},
+	max_tasks_host  : {'type':'num', 'label':'Maximum Tasks'},
+	user_name       : {'type':'str', 'label':'User Name'},
+	annotation      : {'type':'str', 'label':'Annotation'}
 };
 
 RenderNode.sort = ['priority', 'user_name', 'name'];

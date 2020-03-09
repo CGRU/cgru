@@ -43,8 +43,6 @@ Render::Render( Msg * msg):
 
 void Render::construct()
 {
-	m_max_tasks = -1;
-	m_capacity = -1;
 	m_capacity_used = 0;
 	m_wol_operation_time = 0;
 	m_idle_time = 0;
@@ -103,10 +101,6 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const // Threa
 
 	o_str << ",\n\"capacity_used\":" << m_capacity_used;
 	o_str << ",\n\"task_start_finish_time\":" << m_task_start_finish_time;
-	if( m_capacity  > 0 )
-		o_str << ",\n\"capacity\":" << m_capacity;
-	if( m_max_tasks  > 0 )
-		o_str << ",\n\"max_tasks\":" << m_max_tasks;
 	if( m_wol_operation_time > 0 )
 		o_str << ",\n\"wol_operation_time\":" << m_wol_operation_time;
 	o_str << ",\n\"idle_time\":" << m_idle_time;
@@ -144,9 +138,6 @@ bool Render::jsonRead( const JSON &i_object, std::string * io_changes)
 	}
 
 	jr_string("user_name",   m_user_name,   i_object, io_changes);
-	jr_int32 ("capacity",    m_capacity,    i_object, io_changes);
-	jr_int32 ("max_tasks",   m_max_tasks,   i_object, io_changes);
-	checkDirty();
 
 	bool nimby, NIMBY, paused;
 	if( jr_bool("nimby", nimby, i_object, io_changes))
@@ -164,6 +155,10 @@ bool Render::jsonRead( const JSON &i_object, std::string * io_changes)
 		setPaused( paused);
 	}
 
+	Farm::jsonRead(i_object, io_changes);
+
+	checkDirty();
+
 	// Paramers below are not editable and read only on creation
 	// ( but they can be changes by other actions, like disable service)
 	// When use edit parameters, log provided to store changes
@@ -177,8 +172,6 @@ bool Render::jsonRead( const JSON &i_object, std::string * io_changes)
 	jr_int64("st", m_state, i_object);
 
 	Client::jsonRead( i_object);
-
-	Farm::jsonRead(i_object);
 
 	return true;
 }
@@ -194,8 +187,6 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
 	  rw_bool   ( m_locked,                 msg);
 	  rw_String ( m_pool,                   msg);
 	  rw_int64_t( m_task_start_finish_time, msg);
-	  rw_int32_t( m_max_tasks,              msg);
-	  rw_int32_t( m_capacity,               msg);
 	  rw_int32_t( m_capacity_used,          msg);
 	  rw_int64_t( m_time_update,            msg);
 	  rw_int64_t( m_time_register,          msg);
@@ -278,7 +269,7 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
 
 void Render::checkDirty()
 {
-   if ((m_capacity == -1) && (m_max_tasks == -1))
+   if ((m_capacity_host == -1) && (m_max_tasks_host == -1))
 	  m_state = m_state & (~SDirty);
    else
 	  m_state = m_state | SDirty;

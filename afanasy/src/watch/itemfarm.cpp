@@ -23,6 +23,10 @@ ItemFarm::~ItemFarm()
 
 void ItemFarm::updateFarmValues(af::Farm * i_affarm)
 {
+	// Take common parameters:
+	m_params["max_tasks_host"] = i_affarm->getMaxTasksHost();
+	m_params["capacity_host"]  = i_affarm->getCapacityHost();
+
 	// Grab services:
 	m_services.clear();
 	for (const std::string & s : i_affarm->m_services)

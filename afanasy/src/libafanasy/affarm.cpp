@@ -24,7 +24,9 @@
 
 using namespace af;
 
-Farm::Farm()
+Farm::Farm():
+	m_max_tasks_host(-1),
+	m_capacity_host(-1)
 {
 }
 
@@ -39,6 +41,9 @@ void Farm::readwrite(Msg *msg)
 
 	rw_Tickets(m_tickets_pool, msg);
 	rw_Tickets(m_tickets_host, msg);
+
+	rw_int32_t(m_max_tasks_host, msg);
+	rw_int32_t(m_capacity_host,  msg);
 }
 
 void Farm::rw_Tickets(std::map<std::string, Tiks> & io_tickets, Msg * io_msg)
@@ -67,6 +72,9 @@ void Farm::rw_Tickets(std::map<std::string, Tiks> & io_tickets, Msg * io_msg)
 
 void Farm::jsonRead(const JSON &i_object, std::string *io_changes)
 {
+	jr_int32 ("capacity_host",  m_capacity_host,  i_object, io_changes);
+	jr_int32 ("max_tasks_host", m_max_tasks_host, i_object, io_changes);
+
 	jr_stringvec("services",          m_services,          i_object);
 	jr_stringvec("services_disabled", m_services_disabled, i_object);
 
@@ -131,6 +139,11 @@ void Farm::jsonWrite(std::ostringstream &o_str, int i_type) const
 
 	if (m_tickets_host.size())
 		jw_Tickets("tickets_host", m_tickets_host, o_str);
+
+	if (m_capacity_host >= 0)
+		o_str << ",\n\"capacity_host\":" << m_capacity_host;
+	if (m_max_tasks_host >= 0)
+		o_str << ",\n\"max_tasks_host\":" << m_max_tasks_host;
 }
 
 void Farm::jw_Tickets(const char * i_name, const std::map<std::string, Tiks> & i_tickets, std::ostringstream & o_str)

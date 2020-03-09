@@ -91,8 +91,8 @@ bool PoolSrv::initialize()
 		if (NULL == m_parent)
 		{
 			// The root pool is just created for the first time (not from store)
-			m_host_max_tasks = AFPOOL::ROOT_HOST_MAX_TASKS;
-			m_host_capacity  = AFPOOL::ROOT_HOST_CAPACITY;
+			m_max_tasks_host = AFPOOL::ROOT_HOST_MAX_TASKS;
+			m_capacity_host  = AFPOOL::ROOT_HOST_CAPACITY;
 		}
 
 		m_time_creation = time(NULL);

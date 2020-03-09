@@ -90,10 +90,10 @@ PoolNode.prototype.update = function(i_obj) {
 			params += ' NewRender:<b>Nimby</b>';
 		if (this.params.new_paused)
 			params += ' NewRender:<b>Paused</b>';
-		if (this.params.host_max_tasks != null)
-			params += ' HostMaxTasks:<b>' + this.params.host_max_tasks + '</b>';
-		if (this.params.host_capacity != null)
-			params += ' HostCapacity:<b>' + this.params.host_capacity + '</b>';
+		if (this.params.max_tasks_host != null)
+			params += ' HostMaxTasks:<b>' + this.params.max_tasks_host + '</b>';
+		if (this.params.capacity_host != null)
+			params += ' HostCapacity:<b>' + this.params.capacity_host + '</b>';
 		params += ' Priority:<b>' + this.params.priority + '</b>';
 	}
 	else if (cm_IsJedi())
@@ -102,10 +102,10 @@ PoolNode.prototype.update = function(i_obj) {
 			params += ' New:<b>Nimby</b>';
 		if (this.params.new_paused)
 			params += ' New:<b>Paused</b>';
-		if (this.params.host_max_tasks)
-			params += ' HostTasks:<b>' + this.params.host_max_tasks + '</b>';
-		if (this.params.host_capacity)
-			params += ' HostCapacity:<b>' + this.params.host_capacity + '</b>';
+		if (this.params.max_tasks_host)
+			params += ' HostTasks:<b>' + this.params.max_tasks_host + '</b>';
+		if (this.params.capacity_host)
+			params += ' HostCapacity:<b>' + this.params.capacity_host + '</b>';
 		params += ' Pri:<b>' + this.params.priority + '</b>';
 	}
 	else
@@ -114,10 +114,10 @@ PoolNode.prototype.update = function(i_obj) {
 			params += ' n:<b>n</b>';
 		if (this.params.new_paused)
 			params += ' n:<b>p</b>';
-		if (this.params.host_max_tasks)
-			params += ' ht:<b>' + this.params.host_max_tasks + '</b>';
-		if (this.params.host_capacity)
-			params += ' hc:<b>' + this.params.host_capacity + '</b>';
+		if (this.params.max_tasks_host)
+			params += ' ht:<b>' + this.params.max_tasks_host + '</b>';
+		if (this.params.capacity_host)
+			params += ' hc:<b>' + this.params.capacity_host + '</b>';
 		params += ' p<b>' + this.params.priority + '</b>';
 	}
 	this.elParams.innerHTML = params;
@@ -337,8 +337,8 @@ PoolNode.prototype.onDoubleClick = function(e) {
 PoolNode.params_pool = {
 	pattern               : {'type':'str', 'label':'Pattern'},
 	priority              : {'type':'num', 'label':'Priority'},
-	host_max_tasks        : {'type':'num', 'label':'Host Max Tasks'},
-	host_capacity         : {'type':'num', 'label':'Host Max Capacity'},
+	max_tasks_host        : {'type':'num', 'label':'Host Max Tasks'},
+	capacity_host         : {'type':'num', 'label':'Host Max Capacity'},
 	annotation            : {'type':'str', 'label':'Annotation'},
 
 	idle_wolsleep_time    : {'type':'num', 'label':'Idle WOL sleep time'},

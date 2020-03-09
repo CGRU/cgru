@@ -59,9 +59,6 @@ public:
 
    inline void setPriority( int value) { m_priority = value; }///< Set priority.
 
-   void setCapacity( int value) { m_capacity = value; checkDirty();}
-   void setMaxTasks( int value) { m_max_tasks = value; checkDirty();}
-
    virtual int v_calcWeight() const; ///< Calculate and return memory size.
 
    inline long long getTasksStartFinishTime() const { return m_task_start_finish_time; }///< Get tasks start or finish time.
@@ -99,9 +96,7 @@ protected:
 
 	std::string m_pool;
 
-	int32_t m_capacity;
 	int32_t m_capacity_used;
-	int32_t m_max_tasks;
 
 	HostRes  m_hres;
 

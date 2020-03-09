@@ -431,10 +431,15 @@ ParamTicket::~ParamTicket()
 
 void ParamTicket::update(int i_count, int i_usage)
 {
-	if (i_usage == -1)
-		m_count_label->setText(QString(" x %1").arg(i_count));
+	if (i_usage > 0)
+	{
+		if (i_count != -1)
+			m_count_label->setText(QString(" x %1 / %2").arg(i_count).arg(i_usage));
+		else
+			m_count_label->setText(QString(" / %1").arg(i_usage));
+	}
 	else
-		m_count_label->setText(QString(" x %1 / %2").arg(i_count).arg(i_usage));
+		m_count_label->setText(QString(" x %1").arg(i_count));
 }
 
 void ParamTicket::slot_Edit()

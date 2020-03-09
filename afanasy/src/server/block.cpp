@@ -175,7 +175,7 @@ bool Block::v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorCont
    // Set variable capacity to maximum value:
    if( m_data->canVarCapacity() && (taskexec->getCapacity() > 0))
    {
-      int cap_coeff = render->getCapacityFree() / taskexec->getCapacity();
+      int cap_coeff = render->findCapacityFree() / taskexec->getCapacity();
 	  if( cap_coeff < m_data->getCapCoeffMin())
       {
 		 AFERRAR("Block::startTask: cap_coeff < data->getCapCoeffMin(%d<%d)", cap_coeff, m_data->getCapCoeffMin())

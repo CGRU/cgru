@@ -29,6 +29,9 @@ public:
 
 	void drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int i_h) const;
 
+	int capacity_host;
+	int max_tasks_host;
+
 protected:
 	int calcHeightFarm() const;
 
