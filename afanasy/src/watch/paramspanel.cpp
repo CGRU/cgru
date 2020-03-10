@@ -290,6 +290,7 @@ ParamWidget::ParamWidget(const Param * i_param):
 	m_value_widget = new QLabel();
 	layout->addWidget(m_value_widget);
 	m_value_widget->setTextInteractionFlags(Qt::TextBrowserInteraction);
+	m_value_widget->setWordWrap(true);
 
 	QPushButton * btn = new QPushButton("[...]");
 	layout->addWidget(btn);
