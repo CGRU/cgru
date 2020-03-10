@@ -1,5 +1,9 @@
 #include "name_af.h"
 
+#ifdef WINNT
+#include <cctype>
+#endif
+
 #include "../include/afanasy.h"
 #include "../include/afjob.h"
 
