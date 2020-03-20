@@ -37,6 +37,7 @@ class BlockParameters:
         self.preview = ''
         self.name = ''
         self.service = ''
+        self.tickets = dict()
         self.parser = ''
         self.cmd = ''
         self.cmd_useprefix = True
@@ -84,6 +85,11 @@ class BlockParameters:
         self.depend_mask = ''
         self.depend_mask_global = ''
         self.min_memory = -1
+        self.tickets_use = int(afnode.parm('tickets_use').eval())
+        self.tickets_auto = int(afnode.parm('tickets_auto').eval())
+        self.ticket_mem = int(afnode.parm('ticket_mem').eval())
+        self.tickets_aux_use = int(afnode.parm('tickets_aux_use').eval())
+        self.tickets_aux_data = afnode.parm('tickets_aux_data').eval()
         self.generate_previews = self.afnode.parm('generate_previews').eval()
         self.preview_approval = afnode.parm('preview_approval').eval()
 
@@ -150,6 +156,7 @@ class BlockParameters:
         # Process output driver type to construct a command:
         if ropnode:
             self.service = 'hbatch'
+            self.tickets['HYTHON'] = 1
 
             if not isinstance(ropnode, hou.RopNode):
                 hou.ui.displayMessage(
@@ -172,6 +179,7 @@ class BlockParameters:
 
                 if not ropnode.parm('soho_outputmode').eval():
                     self.service = 'hbatch_mantra'
+                    self.tickets['MANTRA'] = 1
 
                 vm_picture = ropnode.parm('vm_picture')
 
@@ -183,6 +191,7 @@ class BlockParameters:
                         )
             elif roptype == 'rib':
                 self.service = 'hbatch_prman'
+                self.tickets['PRMAN'] = 1
 
             elif roptype == 'arnold':
                 if not ropnode.parm('soho_outputmode').eval():
@@ -207,6 +216,7 @@ class BlockParameters:
                 
             elif roptype == 'Redshift_ROP':
                 self.service = 'hbatch_redshift'
+                self.tickets['REDSHIFT'] = 1
                 rs_picture = ropnode.parm('RS_outputFileNamePrefix')
 
                 if rs_picture is not None:
@@ -406,6 +416,21 @@ class BlockParameters:
             block.setDependSubTask()
         if self.min_memory > -1:
             block.setNeedMemory(self.min_memory*1024)
+
+        # Process Tickets
+        if self.tickets_use:
+            if self.tickets_auto:
+                for ticket in self.tickets:
+                    block.addTicket(ticket, self.tickets[ticket])
+            if self.ticket_mem:
+                block.addTicket('MEM', self.ticket_mem)
+            if self.tickets_aux_use and self.tickets_aux_data is not None and len(self.tickets_aux_data):
+                for ticket in self.tickets_aux_data.split(','):
+                    ticket = ticket.strip().split(':')
+                    if len(ticket) != 2:
+                        hou.ui.displayMessage('Invalid ticket data: "%s".' % ticket)
+                        continue
+                    block.addTicket(ticket[0], int(ticket[1]))
 
         return block
 
