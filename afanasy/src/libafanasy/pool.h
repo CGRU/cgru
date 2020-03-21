@@ -53,9 +53,6 @@ public:
 	inline int getRunTasks()    const { return m_run_tasks;   }
 	inline int getRunCapacity() const { return m_run_capacity;}
 
-	inline int getHostMaxTasks() const { return m_host_max_tasks;}
-	inline int getHostCapacity() const { return m_host_capacity; }
-
 public:
 	enum State
 	{
@@ -102,9 +99,6 @@ protected:
 
 	int32_t m_run_tasks;
 	int32_t m_run_capacity;
-
-	int32_t m_host_max_tasks;
-	int32_t m_host_capacity;
 
 	int64_t m_task_start_finish_time; ///< Task start or finish time.
 

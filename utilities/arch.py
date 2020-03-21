@@ -85,7 +85,7 @@ Process = subprocess.Popen( Cmd, shell=False, stdout=subprocess.PIPE)
 ThumbTime = 0
 
 while True:
-	data = Process.stdout.readline()
+	data = cgruutils.toStr(Process.stdout.readline())
 	if data is None: break
 	if len(data) < 1: break
 

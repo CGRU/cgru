@@ -63,9 +63,6 @@ void Pool::initDefaultValues()
 	m_run_tasks = 0;
 	m_run_capacity = 0;
 
-	m_host_max_tasks = -1;
-	m_host_capacity = -1;
-
 	m_task_start_finish_time = 0;
 
 	m_idle_wolsleep_time = -1;
@@ -114,11 +111,6 @@ void Pool::v_jsonWrite(std::ostringstream & o_str, int i_type) const // Thread-s
 	if (m_run_capacity >= 0)
 		o_str << ",\n\"run_capacity\":" << m_run_capacity;
 
-	if (m_host_max_tasks >= 0)
-		o_str << ",\n\"host_max_tasks\":" << m_host_max_tasks;
-	if (m_host_capacity >= 0)
-		o_str << ",\n\"host_capacity\":" << m_host_capacity;
-
 	o_str << ",\n\"task_start_finish_time\":" << m_task_start_finish_time;
 
 
@@ -162,9 +154,6 @@ bool Pool::jsonRead(const JSON &i_object, std::string * io_changes)
 	jr_bool  ("new_nimby",             m_new_nimby,             i_object, io_changes);
 	jr_bool  ("new_paused",            m_new_paused,            i_object, io_changes);
 
-	jr_int32 ("host_max_tasks",        m_host_max_tasks,        i_object, io_changes);
-	jr_int32 ("host_capacity",         m_host_capacity,         i_object, io_changes);
-
 	jr_int32 ("idle_wolsleep_time",    m_idle_wolsleep_time,    i_object, io_changes);
 	jr_int32 ("idle_free_time",        m_idle_free_time,        i_object, io_changes);
 	jr_int32 ("busy_nimby_time",       m_busy_nimby_time,       i_object, io_changes);
@@ -186,8 +175,10 @@ bool Pool::jsonRead(const JSON &i_object, std::string * io_changes)
 		setPaused(paused);
 
 	// There can`t be infinite max tasks per host on farm (on root pool).
-	if (isRoot() && (m_host_max_tasks < 0))
-		m_host_max_tasks = 0;
+	if (isRoot() && (m_max_tasks_host < 0))
+		m_max_tasks_host = 1;
+
+	Farm::jsonRead(i_object, io_changes);
 
 	// Paramers below are not editable and read only on creation
 	// (but they can be changes by other actions, like disable service)
@@ -198,8 +189,6 @@ bool Pool::jsonRead(const JSON &i_object, std::string * io_changes)
 	Node::jsonRead(i_object);
 
 	jr_int64("st", m_state, i_object);
-
-	Farm::jsonRead(i_object);
 
 	jr_int64 ("time_creation", m_time_creation, i_object);
 
@@ -227,9 +216,6 @@ void Pool::v_readwrite(Msg * msg)
 
 	rw_int32_t(m_run_tasks,              msg);
 	rw_int32_t(m_run_capacity,           msg);
-
-	rw_int32_t(m_host_max_tasks,         msg);
-	rw_int32_t(m_host_capacity,          msg);
 
 	rw_int64_t(m_task_start_finish_time, msg);
 

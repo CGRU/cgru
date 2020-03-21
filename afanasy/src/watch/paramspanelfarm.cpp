@@ -303,7 +303,7 @@ void ParamsPanelFarm::updateTickets(
 		}
 	}
 
-	// Delete not exisintg tickets:
+	// Create not exisintg tickets:
 	QMap<QString, af::Farm::Tiks>::const_iterator tIt = i_tickets.begin();
 	while (tIt != i_tickets.end())
 	{

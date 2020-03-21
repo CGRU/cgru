@@ -290,18 +290,30 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 	    m_capacity_used = render->getCapacityUsed();
 		if( Watch::isPadawan())
 		{
-		    m_capacity_usage = QString("Tasks: %1 Capacity: %2")
-				.arg(m_tasks.size()).arg(m_capacity_used);
+		    m_capacity_usage = QString("Tasks: %1").arg(m_tasks.size());
+			if (render->getMaxTasksHost() != -1)
+				m_capacity_usage += QString("/%1").arg(render->getMaxTasksHost());
+		    m_capacity_usage += QString(" Capacity: %1").arg(m_capacity_used);
+			if (render->getCapacityHost() != -1)
+				m_capacity_usage += QString("/%1").arg(render->getCapacityHost());
 		}
 		else if( Watch::isJedi())
 		{
-		    m_capacity_usage = QString("T:%1 C:%2")
-				.arg(m_tasks.size()).arg(m_capacity_used);
+		    m_capacity_usage = QString("Tasks:%1").arg(m_tasks.size());
+			if (render->getMaxTasksHost() != -1)
+				m_capacity_usage += QString("/%1").arg(render->getMaxTasksHost());
+		    m_capacity_usage += QString(" Cap:%1").arg(m_capacity_used);
+			if (render->getCapacityHost() != -1)
+				m_capacity_usage += QString("/%1").arg(render->getCapacityHost());
 		}
 		else
 		{
-		    m_capacity_usage = QString("%1:%2")
-				.arg(m_tasks.size()).arg(m_capacity_used);
+		    m_capacity_usage = QString("t:%1").arg(m_tasks.size());
+			if (render->getMaxTasksHost() != -1)
+				m_capacity_usage += QString("/%1").arg(render->getMaxTasksHost());
+		    m_capacity_usage += QString(" c:%1").arg(m_capacity_used);
+			if (render->getCapacityHost() != -1)
+				m_capacity_usage += QString("/%1").arg(render->getCapacityHost());
 		}
 
 	    if( m_busy )

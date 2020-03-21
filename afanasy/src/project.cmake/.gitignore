@@ -23,3 +23,7 @@ Makefile
 Debug
 Release
 ipch
+x64/
+enc_temp_folder/
+
+override.cmd

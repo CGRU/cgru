@@ -329,6 +329,22 @@ void FValueWidget::paintEvent(QPaintEvent *event)
 
 
 //////////// Blocks:
+BlockNameLabel::BlockNameLabel(const QString & i_name): m_name(i_name) {}
+BlockNameLabel::~BlockNameLabel() {}
+void BlockNameLabel::paintEvent(QPaintEvent *event)
+{
+	QPainter painter(this);
+
+	QPen pen(Qt::SolidLine);
+	pen.setColor(afqt::QEnvironment::clr_Text.c);
+	painter.setPen(pen);
+
+	QFont font = painter.font();
+	font.setBold(true);
+	painter.setFont(font);
+
+	painter.drawText(rect(), Qt::AlignVCenter | Qt::AlignLeft, m_name);
+}
 
 BlockCaptionWidget::BlockCaptionWidget(const BlockInfo * i_info):
 	m_info(i_info),
@@ -346,7 +362,7 @@ BlockCaptionWidget::BlockCaptionWidget(const BlockInfo * i_info):
 	QHBoxLayout * h_layout = new QHBoxLayout(top_widget);
 	h_layout->setContentsMargins(10, 2, 10, 2);
 
-	QLabel * label = new QLabel(QString("<b>%1</b>").arg(m_info->getName()));
+	BlockNameLabel * label = new BlockNameLabel(m_info->getName());
 	h_layout->addWidget(label);
 
 	m_btn_open = new QPushButton("open");

@@ -190,8 +190,8 @@ ListRenders::ListRenders( QWidget* parent):
 	{
 		addParam_REx(Item::TPool, "pattern",        "Pattern",        "Host names pattern regular expression");
 		addParam_Num(Item::TAny,  "priority",       "Priority",       "Priority number", 0, 250);
-		addParam_Num(Item::TPool, "host_max_tasks", "Host Max Tasks", "Pool hosts Maximum running tasks", -1, 99);
-		addParam_Num(Item::TPool, "host_capacity",  "Host Capacity",  "Pool hosts Capacity", -1, 1<<30);
+		addParam_Num(Item::TAny,  "max_tasks_host", "Host Max Tasks", "Host maximum running tasks", -1, 99);
+		addParam_Num(Item::TAny,  "capacity_host",  "Host Capacity",  "Host capacity", -1, 1<<30);
 		addParam_Str(Item::TAny,  "annotation",     "Annotation",     "Annotation string");
 
 		addParam_Hrs(Item::TPool, "idle_free_time",     "Idle Free Time",  "Unset Nimby idle time.");

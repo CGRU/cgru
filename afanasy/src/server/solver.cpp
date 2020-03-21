@@ -72,8 +72,8 @@ class MostReadyRender : public std::binary_function <RenderAf*,RenderAf*,bool>
 		if( a->getTasksNumber() < b->getTasksNumber()) return true;
 		if( a->getTasksNumber() > b->getTasksNumber()) return false;
 
-		if( a->getCapacityFree() > b->getCapacityFree()) return true;
-		if( a->getCapacityFree() < b->getCapacityFree()) return false;
+		if( a->findCapacityFree() > b->findCapacityFree()) return true;
+		if( a->findCapacityFree() < b->findCapacityFree()) return false;
 
 		if( a->getPriority() > b->getPriority()) return true;
 		if( a->getPriority() < b->getPriority()) return false;
@@ -81,11 +81,11 @@ class MostReadyRender : public std::binary_function <RenderAf*,RenderAf*,bool>
 		if( a->getTasksStartFinishTime() < b->getTasksStartFinishTime()) return true;
 		if( a->getTasksStartFinishTime() > b->getTasksStartFinishTime()) return false;
 
-		if( a->getCapacity() > b->getCapacity()) return true;
-		if( a->getCapacity() < b->getCapacity()) return false;
+		if( a->findCapacity() > b->findCapacity()) return true;
+		if( a->findCapacity() < b->findCapacity()) return false;
 
-		if( a->getMaxTasks() > b->getMaxTasks()) return true;
-		if( a->getMaxTasks() < b->getMaxTasks()) return false;
+		if( a->findMaxTasks() > b->findMaxTasks()) return true;
+		if( a->findMaxTasks() < b->findMaxTasks()) return false;
 
 		return a->getName().compare( b->getName()) < 0;
 	}

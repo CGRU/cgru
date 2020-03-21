@@ -36,19 +36,22 @@ public:
 /// Awake offline render
 	void online( RenderAf * render, JobContainer * i_jobs, MonitorContainer * monitoring);
 
-	inline int getMaxTasks()     const { return m_max_tasks == -1 ? m_parent->getHostMaxTasks() : m_max_tasks;}
-	inline int getCapacity()     const { return m_capacity  == -1 ? m_parent->getHostCapacity() : m_capacity;}
-	inline int getCapacityFree() const { return getCapacity() - m_capacity_used;}
+	inline int findMaxTasks() const
+		{ if (m_max_tasks_host < 0 && m_parent) return m_parent->findMaxTasksHost(); else return m_max_tasks_host;}
+	inline int findCapacity() const
+		{ if (m_capacity_host  < 0 && m_parent) return m_parent->findCapacityHost(); else return m_capacity_host; }
+
+	inline int findCapacityFree() const { return findCapacity() - m_capacity_used;}
 	inline bool hasCapacity(int value) const {
-		int c = getCapacity(); if (c<0) return true; else return m_capacity_used + value <= c;}
+		int c = findCapacity(); if (c<0) return true; else return m_capacity_used + value <= c;}
 
 /// Whether Render is ready to render tasks.
 	inline bool isReady() const { return (
 			(m_parent != NULL) &&
 			(m_state & SOnline) &&
 			(m_priority > 0) &&
-			((getCapacity() < 0) || (m_capacity_used < getCapacity())) &&
-			((int)m_tasks.size() < getMaxTasks()) &&
+			((findCapacity() < 0) || (m_capacity_used < findCapacity())) &&
+			((int)m_tasks.size() < findMaxTasks()) &&
 			(false == isWOLFalling())
 		);}
 
@@ -56,8 +59,8 @@ public:
 			isOffline() &&
 			isWOLSleeping() &&
 			(false == isWOLWaking()) &&
-			(getCapacity() != 0) &&
-			(getMaxTasks() > 0) &&
+			(findCapacity() != 0) &&
+			(findMaxTasks() > 0) &&
 			(m_priority > 0)
 		);}
 

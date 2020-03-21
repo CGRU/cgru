@@ -150,6 +150,8 @@ class BlockParameters:
         self.tmpimage = 1
         self.pathsmap = 1
         self.imgfiles = []
+        self.tickets_use = 0
+        self.tickets_data = None
 
         # Just to add to the final job name some info, for example timecode
         self.jobname_suffix = ''
@@ -169,6 +171,8 @@ class BlockParameters:
             self.pathsmap = int(afnode.knob('pathsmap').value())
             self.hostsmask = afnode.knob('hostsmask').value()
             self.hostsmaskexclude = afnode.knob('hostsmaskexcl').value()
+            self.tickets_use = int(afnode.knob('tickets_use').value())
+            self.tickets_data = afnode.knob('tickets_data').value()
 
             if int(afnode.knob('timecode_use').value()):
                 timecode = afnode.knob('timecode').value()
@@ -352,6 +356,13 @@ class BlockParameters:
                 block.setCapacity(self.capacity)
             if self.maxruntime != -1:
                 block.setTasksMaxRunTime(self.maxruntime)
+            if self.tickets_use and self.tickets_data is not None and len(self.tickets_data):
+                for ticket in self.tickets_data.split(','):
+                    ticket = ticket.strip().split(':')
+                    if len(ticket) != 2:
+                        nuke.message('Invalid ticket data: "%s".' % ticket)
+                        continue
+                    block.addTicket(ticket[0], int(ticket[1]))
 
             cmd = os.getenv('NUKE_AF_RENDER', 'nuke -i')
             if self.tmpimage or self.pathsmap:

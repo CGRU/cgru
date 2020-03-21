@@ -91,6 +91,16 @@ private:
 	QString m_text;
 };
 
+class BlockNameLabel: public QWidget
+{
+public:
+	BlockNameLabel(const QString & i_name);
+	~BlockNameLabel();
+protected:
+	virtual void paintEvent(QPaintEvent *event);
+private:
+	QString m_name;
+};
 class BlockCaptionWidget: public QFrame
 {
 Q_OBJECT;

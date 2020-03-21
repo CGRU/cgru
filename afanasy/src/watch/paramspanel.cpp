@@ -290,6 +290,7 @@ ParamWidget::ParamWidget(const Param * i_param):
 	m_value_widget = new QLabel();
 	layout->addWidget(m_value_widget);
 	m_value_widget->setTextInteractionFlags(Qt::TextBrowserInteraction);
+	m_value_widget->setWordWrap(true);
 
 	QPushButton * btn = new QPushButton("[...]");
 	layout->addWidget(btn);
@@ -431,10 +432,15 @@ ParamTicket::~ParamTicket()
 
 void ParamTicket::update(int i_count, int i_usage)
 {
-	if (i_usage == -1)
-		m_count_label->setText(QString(" x %1").arg(i_count));
+	if (i_usage > 0)
+	{
+		if (i_count != -1)
+			m_count_label->setText(QString(" x %1 / %2").arg(i_count).arg(i_usage));
+		else
+			m_count_label->setText(QString(" / %1").arg(i_usage));
+	}
 	else
-		m_count_label->setText(QString(" x %1 / %2").arg(i_count).arg(i_usage));
+		m_count_label->setText(QString(" x %1").arg(i_count));
 }
 
 void ParamTicket::slot_Edit()

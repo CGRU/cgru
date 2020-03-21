@@ -46,8 +46,6 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 
 	if (false == m_root)
 		m_params["pattern"] = afqt::stoq(pool->getPatternStr());
-	m_params["host_max_tasks"] = pool->getHostMaxTasks();
-	m_params["host_capacity"]  = pool->getHostCapacity();
 
 	m_params["idle_free_time"]     = pool->m_idle_free_time;
 	m_params["busy_nimby_time"]    = pool->m_busy_nimby_time;
@@ -87,10 +85,10 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 			strRightTop += " NewRender:Nimby";
 		if (pool->isNewRenderPaused())
 			strRightTop += " NewRender:Paused";
-		if (pool->getHostMaxTasks() >= 0)
-			strRightTop += QString(" HostMaxTasks:%1").arg(pool->getHostMaxTasks());
-		if (pool->getHostCapacity() >= 0)
-			strRightTop += QString(" HostCapacity:%1").arg(pool->getHostCapacity());
+		if (pool->getMaxTasksHost() >= 0)
+			strRightTop += QString(" HostMaxTasks:%1").arg(pool->getMaxTasksHost());
+		if (pool->getCapacityHost() >= 0)
+			strRightTop += QString(" HostCapacity:%1").arg(pool->getCapacityHost());
 		strRightTop += QString(" Priority:%1").arg(pool->getPriority());
 	}
 	else if(Watch::isJedi())
@@ -104,10 +102,10 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 			strRightTop += " New:Nimby";
 		if (pool->isNewRenderPaused())
 			strRightTop += " New:Paused";
-		if (pool->getHostMaxTasks() >= 0)
-			strRightTop += QString(" HostMaxTasks:%1").arg(pool->getHostMaxTasks());
-		if (pool->getHostCapacity() >= 0)
-			strRightTop += QString(" HostCapacity:%1").arg(pool->getHostCapacity());
+		if (pool->getMaxTasksHost() >= 0)
+			strRightTop += QString(" HostMaxTasks:%1").arg(pool->getMaxTasksHost());
+		if (pool->getCapacityHost() >= 0)
+			strRightTop += QString(" HostCapacity:%1").arg(pool->getCapacityHost());
 		strRightTop += QString(" Priority:%1").arg(pool->getPriority());
 	}
 	else
@@ -121,10 +119,10 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 			strRightTop += " n:Nimby";
 		if (pool->isNewRenderPaused())
 			strRightTop += " n:Paused";
-		if (pool->getHostMaxTasks() >= 0)
-			strRightTop += QString(" ht:%1").arg(pool->getHostMaxTasks());
-		if (pool->getHostCapacity() >= 0)
-			strRightTop += QString(" hc:%1").arg(pool->getHostCapacity());
+		if (pool->getMaxTasksHost() >= 0)
+			strRightTop += QString(" ht:%1").arg(pool->getMaxTasksHost());
+		if (pool->getCapacityHost() >= 0)
+			strRightTop += QString(" hc:%1").arg(pool->getCapacityHost());
 		strRightTop += QString(" p:%1").arg(pool->getPriority());
 	}
 

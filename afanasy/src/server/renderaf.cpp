@@ -693,8 +693,8 @@ void RenderAf::addTask(af::TaskExec * i_taskexec, MonitorContainer * i_monitorin
 	m_capacity_used += i_taskexec->getCapResult();
 	// Just check capacity.
 	// It was checked before, when we run canRunOn function
-	if ((getCapacity() >= 0) && (m_capacity_used > getCapacity()))
-		AF_ERR << "Capacity_used > max capacity (" << m_capacity_used << " > " << getCapacity() << ")";
+	if ((findCapacity() >= 0) && (m_capacity_used > findCapacity()))
+		AF_ERR << "Capacity_used > max capacity (" << m_capacity_used << " > " << findCapacity() << ")";
 
 	// Add task tickets
 	for (auto & tIt : i_taskexec->m_tickets)
