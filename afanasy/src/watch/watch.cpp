@@ -32,9 +32,9 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-const QString Watch::BtnName[WLAST] = { "null","Jobs","Users","Renders","Monitors"};
-const QString Watch::WndName[WLAST] = { "null","Jobs","Users","Renders","Monitors"};
-WndList* Watch::opened[WLAST] = {0,0,0,0,0};
+const QString Watch::BtnName[WLAST] = {"null","Farm","Jobs","Monitors","Users","Work"};
+const QString Watch::WndName[WLAST] = {"null","Farm","Jobs","Monitors","Users","Work"};
+WndList* Watch::opened[WLAST] = {0,0,0,0,0,0};
 
 const int Watch::Icons_Size_Large = 48;
 const int Watch::Icons_Size_Small = 16;

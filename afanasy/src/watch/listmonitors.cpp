@@ -142,7 +142,7 @@ bool ListMonitors::v_processEvents( const af::MonitorEvents & i_me)
 
 ItemNode* ListMonitors::v_createNewItemNode(af::Node * i_afnode, Item::EType i_type, bool i_notify)
 {
-	return new ItemMonitor((af::Monitor*)i_afnode, m_ctrl_sf);
+	return new ItemMonitor(this, (af::Monitor*)i_afnode, m_ctrl_sf);
 }
 
 void ListMonitors::calcTitle()

@@ -5,6 +5,7 @@
 #include "../msg.h"
 
 #include "../blockdata.h"
+#include "../branch.h"
 #include "../job.h"
 #include "../monitor.h"
 #include "../pool.h"
@@ -67,6 +68,9 @@ Af* MCAfNodes::newNode( Msg * msg )
 {
    switch( msg->type())
    {
+	   case Msg::TBranchesList:
+		   return new Branch(msg);
+
 	   case Msg::TPoolsList:
 		   return new Pool(msg);
 

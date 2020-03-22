@@ -19,10 +19,9 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-uint32_t ListNodes::ms_flagsHideShow = e_HideHidden;
-
 ListNodes::ListNodes( QWidget * i_parent, const std::string & i_type):
 	ListItems( i_parent, i_type),
+	m_hide_flags(e_HideHidden),
 	m_subscribed( false)
 {
 	m_node_types.push_back(i_type);
@@ -52,12 +51,20 @@ void ListNodes::initListNodes()
 
 void ListNodes::get() const
 {
-	for (int i = 0; i < m_node_types.size(); i++)
+	if (m_node_types.empty())
 	{
-		std::string str = "\"type\":\"";
-		str += m_node_types[i] + "\"";
-		Watch::get(str);
+		AF_ERR << "ListNodes::get: '" << getType() << "' has an empty m_node_types list.";
+		return;
 	}
+
+	get(m_node_types[0]);
+}
+
+void ListNodes::get(const std::string & i_type) const
+{
+	std::string str = "\"type\":\"";
+	str += i_type + "\"";
+	Watch::get(str);
 }
 
 void ListNodes::get(const std::vector<int32_t> & i_ids) const
@@ -114,6 +121,7 @@ void ListNodes::v_showFunc()
 		get();
 }
 
+bool compareNodeName(const af::Node * n1, const af::Node * n2){return n1->getName() < n2->getName();}
 bool ListNodes::updateItems(af::Msg * msg, Item::EType i_type)
 {
 	QMutexLocker lock( &m_mutex);
@@ -172,7 +180,7 @@ bool ListNodes::updateItems(af::Msg * msg, Item::EType i_type)
 				}
 
 				// update node values
-				itemnode->v_updateValues(node, msg->type());
+				itemnode->updateValues(node, msg->type());
 
 				// update panels if this item is current:
 				if (itemnode == m_current_item)
@@ -222,6 +230,8 @@ bool ListNodes::updateItems(af::Msg * msg, Item::EType i_type)
 	//
 	// adding new items
 	bool newitemscreated = false;
+	// We need to add new items sorted by name for hierarchy:
+	qSort(newAfNodes.begin(), newAfNodes.end(), compareNodeName);
 	for (int i = 0; i < newAfNodes.size(); i++)
 	{
 		af::Node * node = newAfNodes[i];
@@ -248,6 +258,23 @@ bool ListNodes::updateItems(af::Msg * msg, Item::EType i_type)
 	return newitemscreated;
 }
 
+void ListNodes::hrStoreParent(ItemNode * i_item)
+{
+	m_hr_parents_map[i_item->getName()] = i_item;
+}
+
+void ListNodes::hrParentChanged(ItemNode * i_item)
+{
+	QMap<QString, ItemNode*>::iterator it = m_hr_parents_map.find(i_item->getParentPath());
+
+	if (it == m_hr_parents_map.end())
+	{
+		return;
+	}
+
+	(*it)->addChild(i_item);
+}
+
 void ListNodes::sort()
 {
 //printf("ListNodes::sort:\n");
@@ -270,7 +297,7 @@ void ListNodes::processHidden()
 		bool hidden = item->filter();
 
 		if (false == hidden)
-			hidden = item->getHiddenFlags(ms_flagsHideShow);
+			hidden = item->getHideFlags(m_hide_flags);
 
 		item->setHidded(hidden);
 
@@ -320,7 +347,7 @@ void ListNodes::filterSettingsChanged()
 
 void ListNodes::actHideShow( int i_type )
 {
-	ms_flagsHideShow ^= i_type;
+	m_hide_flags ^= i_type;
 	processHidden();
 }
 

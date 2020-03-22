@@ -617,6 +617,8 @@ bool ListRenders::v_caseMessage( af::Msg * msg)
 	case af::Msg::TPoolsList:
 	{
 		updateItems(msg, Item::TPool);
+		if (false == isSubscribed())
+			get("renders");
 		calcTitle();
 		break;
 	}
@@ -686,92 +688,12 @@ ItemNode * ListRenders::v_createNewItemNode(af::Node * i_afnode, Item::EType i_t
 	switch (i_type)
 	{
 	case Item::TRender:
-		return new ItemRender((af::Render*)i_afnode, this, m_ctrl_sf);
+		return new ItemRender(this, (af::Render*)i_afnode, m_ctrl_sf);
 	case Item::TPool:
-		return new ItemPool((af::Pool*)i_afnode, this, m_ctrl_sf);
+		return new ItemPool(this, (af::Pool*)i_afnode, m_ctrl_sf);
 	default:
 		AF_ERR << "Invalid Item::EType: " << i_type;
 		return NULL;
-	}
-}
-
-void ListRenders::offsetHierarchy(ItemPool * i_item_pool)
-{
-	// Store pool in "pool name" -> "pool item" map:
-	m_pools[i_item_pool->getName()] = i_item_pool;
-
-	// Offset pool:
-	ItemPool * pool = NULL;
-	QMap<QString, ItemPool*>::iterator pIt = m_pools.find(i_item_pool->getParentPath());
-	if (pIt != m_pools.end())
-		pool = (*pIt);
-	i_item_pool->setParent(pool);
-
-	// Offset its renders (as pool item can be created after it render items):
-	QMap<QString, QList<ItemRender*>>::iterator rIt = m_pool_renders.find(i_item_pool->getName());
-	if (rIt != m_pool_renders.end())
-		for (int i = 0; i < rIt.value().size(); i++)
-			offsetHierarchy(rIt.value()[i]);
-}
-
-void ListRenders::offsetHierarchy(ItemRender * i_item_render)
-{
-	// Store render in "pool name" -> "renders items list" map:
-	QMap<QString, QList<ItemRender*>>::iterator rIt = m_pool_renders.find(i_item_render->getPool());
-	if (rIt == m_pool_renders.end())
-		rIt = m_pool_renders.insert(i_item_render->getPool(), QList<ItemRender*>());
-	if (false == rIt.value().contains(i_item_render))
-		rIt.value().push_back(i_item_render);
-
-	// Offset:
-	ItemPool * pool = NULL;
-	QMap<QString, ItemPool*>::iterator pIt = m_pools.find(i_item_render->getPool());
-	if (pIt != m_pools.end())
-		pool = (*pIt);
-	i_item_render->setParent(pool);
-}
-
-void ListRenders::removeRender(ItemRender * i_item_render)
-{
-	QMap<QString, QList<ItemRender*>>::iterator rIt = m_pool_renders.find(i_item_render->getPool());
-	if (rIt == m_pool_renders.end())
-	{
-		AF_ERR << "ListRenders::removeRender: render['" << afqt::qtos(i_item_render->getName())
-			<< "'] pool['" << afqt::qtos(i_item_render->getPool()) << "'] not found";
-		return;
-	}
-
-	int count = rIt.value().removeAll(i_item_render);
-	if (count != 1)
-		AF_ERR << "ListRenders::removeRender: render['" << afqt::qtos(i_item_render->getName())
-			<< "'] pool['" << afqt::qtos(i_item_render->getPool()) << "'] count = " << count;
-}
-
-void ListRenders::removePool(ItemPool * i_item_pool)
-{
-	int count = m_pools.remove(i_item_pool->getName());
-	if (count != 1)
-		AF_ERR << "ListRenders::removePool: pool['" << afqt::qtos(i_item_pool->getName())
-			<< "'] m_pools count = " << count;
-
-	count = m_pool_renders.remove(i_item_pool->getName());
-	if (count > 1)
-		AF_ERR << "ListRenders::removePool: pool['" << afqt::qtos(i_item_pool->getName())
-			<< "'] m_pool_renders count = " << count;
-}
-
-void ListRenders::v_itemToBeDeleted(Item * i_item)
-{
-	switch(i_item->getType())
-	{
-	case Item::TRender:
-		removeRender((ItemRender*)i_item);
-		break;
-	case Item::TPool:
-		removePool((ItemPool*)i_item);
-		break;
-	default:
-		AF_ERR << "ListRenders::v_itemToBeDeleted: Invalid item type.";
 	}
 }
 

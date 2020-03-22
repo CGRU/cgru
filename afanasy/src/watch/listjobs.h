@@ -105,6 +105,8 @@ private:
 	static bool    ms_FilterMatch_SU;
 	static std::string ms_FilterString_SU;
 
+	static uint32_t ms_hide_flags;
+
 	// Needed to store where a menu for all blocks manipulation opened
 	bool m_all_blocks_menu_shown;
 };

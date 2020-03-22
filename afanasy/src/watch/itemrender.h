@@ -10,12 +10,10 @@ class ListRenders;
 class ItemRender : public ItemFarm
 {
 public:
-	ItemRender( af::Render * i_render, ListRenders * i_list_renders, const CtrlSortFilter * i_ctrl_sf);
+	ItemRender(ListRenders * i_list_renders, af::Render * i_render, const CtrlSortFilter * i_ctrl_sf);
 	~ItemRender();
 
 	void v_updateValues(af::Node * i_afnode, int i_msgType);
-
-	inline const QString & getPool() const { return m_pool; }
 
 	inline const QString & getUserName()   const { return m_username;      }
 	inline const QString & getIPString()   const { return m_address_ip_str;}
@@ -63,8 +61,6 @@ private:
 	void deletePlots();
 
 private:
-	ListRenders * m_ListRenders;
-
 	// We need to keep two info strings,
 	// because render can update its properties w/o resources at one time,
 	// and at the other just resources.
@@ -75,7 +71,6 @@ private:
 
 	af::HostRes m_hres;
 
-	QString m_pool;
 	QString m_os;
 	QString m_engine;
 	QString m_username;

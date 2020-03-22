@@ -20,17 +20,18 @@ const int ItemJob::Height = 30;
 const int ItemJob::HeightThumbName = 12;
 const int ItemJob::HeightAnnotation = 12;
 
-ItemJob::ItemJob(ListJobs * i_listjobs, af::Job * i_job, const CtrlSortFilter * i_ctrl_sf, bool i_notify):
-	ItemNode(i_job, TJob, i_ctrl_sf),
-	m_listjobs(i_listjobs),
+ItemJob::ItemJob(ListNodes * i_list_nodes, bool i_inworklist, af::Job * i_job, const CtrlSortFilter * i_ctrl_sf, bool i_notify):
+	ItemWork(i_list_nodes, i_job, TJob, i_ctrl_sf),
+	m_inworklist(i_inworklist),
 	m_tasks_done( -1),
 	state(0)
 {
 	for (int b = 0; b < i_job->getBlocksNum(); b++)
 	{
 		const af::BlockData * blockdata = i_job->getBlock(b);
-		BlockInfo * blockinfo = new BlockInfo(blockdata, this, m_listjobs);
-		QObject::connect(blockinfo, SIGNAL(sig_BlockAction(int, QString)), m_listjobs, SLOT(slot_BlockAction(int, QString)));
+		BlockInfo * blockinfo = new BlockInfo(blockdata, this, m_list_nodes);
+		if (false == m_inworklist)
+			QObject::connect(blockinfo, SIGNAL(sig_BlockAction(int, QString)), m_list_nodes, SLOT(slot_BlockAction(int, QString)));
 		m_blocks.append(blockinfo);
 	}
 
@@ -41,7 +42,7 @@ ItemJob::ItemJob(ListJobs * i_listjobs, af::Job * i_job, const CtrlSortFilter * 
 	}
 
 
-	v_updateValues((af::Node*)i_job, af::Msg::TJobsList);
+	updateValues((af::Node*)i_job, af::Msg::TJobsList);
 
 	if(i_notify)
 		Watch::ntf_JobAdded( this);
@@ -84,10 +85,12 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 	m_params["need_os"]                    = afqt::stoq(job->getNeedOS());
 	m_params["need_properties"]            = afqt::stoq(job->getNeedProperties());
 
-	setHidden(  job->isHidden()  );
-	setOffline( job->isOffline() );
-	setDone(    job->isDone()    );
-	setError(   job->isError()   );
+	// Set flags that will be used to hide/show node in list:
+	setHideFlag_Hidden(  job->isHidden()  );
+	setHideFlag_Offline( job->isOffline() );
+	setHideFlag_Done(    job->isDone()    );
+	setHideFlag_Error(   job->isError()   );
+	setHideFlag_System(  job->isSystem()  );
 
 	username             = afqt::stoq( job->getUserName().c_str());
 	hostname             = afqt::stoq( job->getHostName().c_str());
@@ -118,6 +121,9 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 	maintenance          = job->isMaintenanceFlag();
 	ignorenimby          = job->isIgnoreNimbyFlag();
 	ignorepaused         = job->isIgnorePausedFlag();
+
+	if (m_inworklist)
+		setParentPath(branch);
 
 	QString new_thumb_path = afqt::stoq( job->getThumbPath());
 
@@ -567,7 +573,10 @@ void ItemJob::v_setFilterType( int i_type )
 
 void ItemJob::getThumbnail() const
 {
-	if( afqt::QEnvironment::thumb_jobs_num.n < 1 )
+	if (isHidden())
+		return;
+
+	if (afqt::QEnvironment::thumb_jobs_num.n < 1)
 		return;
 
 	std::ostringstream str;
@@ -619,7 +628,7 @@ void ItemJob::v_filesReceived( const af::MCTaskUp & i_taskup)
 	}
 
 	if( false == calcHeight())
-		m_listjobs->itemsHeightChanged();
+		m_list_nodes->itemsHeightChanged();
 }
 
 const QString ItemJob::getRulesFolder()

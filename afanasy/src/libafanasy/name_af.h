@@ -183,6 +183,8 @@ namespace af
 //
 // Paths / Files related functions name_affile.cpp:
 //
+	const std::string pathBase(const std::string & i_path);
+
 	const std::string pathFilterFileName( const std::string & i_filename);
 
 	void pathFilter( std::string & path);

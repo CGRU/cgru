@@ -17,8 +17,8 @@
 #include "../libafanasy/logger.h"
 
 
-ItemMonitor::ItemMonitor( af::Monitor * i_monitor, const CtrlSortFilter * i_ctrl_sf):
-	ItemNode(i_monitor, TMonitor, i_ctrl_sf)
+ItemMonitor::ItemMonitor(ListNodes * i_list_nodes, af::Monitor * i_monitor, const CtrlSortFilter * i_ctrl_sf):
+	ItemNode(i_list_nodes, i_monitor, TMonitor, i_ctrl_sf)
 {
 	time_launch   = i_monitor->getTimeLaunch();
 	time_register = i_monitor->getTimeRegister();
@@ -44,7 +44,7 @@ ItemMonitor::ItemMonitor( af::Monitor * i_monitor, const CtrlSortFilter * i_ctrl
 
 	engine = i_monitor->getEngine().c_str();
 
-	v_updateValues(i_monitor, 0);
+	updateValues(i_monitor, 0);
 }
 
 ItemMonitor::~ItemMonitor()

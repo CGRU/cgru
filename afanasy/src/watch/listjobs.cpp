@@ -47,6 +47,8 @@ bool    ListJobs::ms_FilterInclude_SU  = true;
 bool    ListJobs::ms_FilterMatch_SU    = false;
 std::string ListJobs::ms_FilterString_SU = "";
 
+uint32_t ListJobs::ms_hide_flags = e_HideHidden;
+
 ListJobs::ListJobs(QWidget * i_parent):
 	ListNodes(i_parent, "jobs"),
 	m_all_blocks_menu_shown(false)
@@ -81,6 +83,9 @@ ListJobs::ListJobs(QWidget * i_parent):
 		m_ctrl_sf->addFilterType( CtrlSortFilter::THOSTNAME);
 		m_ctrl_sf->addFilterType( CtrlSortFilter::TUSERNAME);
 	}
+
+	// Get stored hide flags:
+	m_hide_flags = ms_hide_flags;
 
 	initSortFilterCtrl();
 
@@ -184,6 +189,8 @@ ListJobs::ListJobs(QWidget * i_parent):
 
 ListJobs::~ListJobs()
 {
+	// Store hide flags:
+	ms_hide_flags = m_hide_flags;
 }
 
 void ListJobs::v_showFunc()
@@ -543,7 +550,7 @@ bool ListJobs::v_processEvents( const af::MonitorEvents & i_me)
 
 ItemNode * ListJobs::v_createNewItemNode(af::Node * i_afnode, Item::EType i_type, bool i_notify)
 {
-	return new ItemJob(this, (af::Job*)i_afnode, m_ctrl_sf, i_notify);
+	return new ItemJob(this, false /*in work list*/, (af::Job*)i_afnode, m_ctrl_sf, i_notify);
 }
 
 void ListJobs::v_resetSorting()

@@ -55,6 +55,15 @@ public:
 	inline bool isSolveJobs() const { return m_flags_branch & SolveJobs; }
 	inline void setSolveJobs(bool i_on) { m_flags_branch = i_on ? m_flags_branch | SolveJobs : m_flags_branch & (~SolveJobs); }
 
+	inline int32_t getBranchesNum()   const { return m_branches_num;   }
+	inline int32_t getBranchesTotal() const { return m_branches_total; }
+
+	inline int32_t getJobsNum()   const { return m_jobs_num;   }
+	inline int32_t getJobsTotal() const { return m_jobs_total; }
+
+	inline int64_t getTimeCreated() const { return m_time_creation; }
+	inline int64_t getTimeEmpty()   const { return m_time_empty;    }
+
 protected:
 	std::string m_parent_path;
 

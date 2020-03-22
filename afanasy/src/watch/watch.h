@@ -33,10 +33,11 @@ public:
 	enum MonType{
 		WNONE,
 
+		WFarm,
 		WJobs,
-		WUsers,
-		WRenders,
 		WMonitors,
+		WUsers,
+		WWork,
 
 		WLAST
 	};

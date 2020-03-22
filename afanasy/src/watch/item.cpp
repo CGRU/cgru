@@ -16,9 +16,13 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 QPolygonF Item::ms_star_pointsInit;
 QPolygonF Item::ms_star_pointsDraw;
+
+const int Item::HeightAnnotation = 14;
+const int Item::HeightTickets = 24;
 
 const int Item::Height = 14;
 const int Item::Width  = 100;

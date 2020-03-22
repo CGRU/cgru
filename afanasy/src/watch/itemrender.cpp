@@ -24,9 +24,8 @@ const int ItemRender::HeightOffline = 15;
 const int ItemRender::HeightAnnotation = 14;
 const int ItemRender::HeightTask = 15;
 
-ItemRender::ItemRender(af::Render * i_render, ListRenders * i_list_renders, const CtrlSortFilter * i_ctrl_sf):
-	ItemFarm(i_render, TRender, i_ctrl_sf),
-	m_ListRenders(i_list_renders),
+ItemRender::ItemRender(ListRenders * i_list_renders, af::Render * i_render, const CtrlSortFilter * i_ctrl_sf):
+	ItemFarm(i_list_renders, i_render, TRender, i_ctrl_sf),
 	m_online( false),
 	m_taskstartfinishtime( 0),
 	m_plotCpu( 2),
@@ -89,7 +88,7 @@ ItemRender::ItemRender(af::Render * i_render, ListRenders * i_list_renders, cons
 	m_plotIO.setLabelValue( 1000);
 	m_plotIO.setAutoScaleMaxBGC( 100000);
 
-	v_updateValues(i_render, 0);
+	updateValues(i_render, 0);
 }
 
 ItemRender::~ItemRender()
@@ -167,18 +166,11 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 
 		updateFarmValues(render);
 
-		QString new_pool = afqt::stoq(render->getPool());
-		if (m_pool.size() && (m_pool != new_pool))
-		{
-			// Pool was changed:
-//			m_ListRenders->removeRender(this);
-		}
+		setParentPath(afqt::stoq(render->getPool()));
 
-		m_pool = new_pool;
-		m_sort_force = m_pool;
-
-		setHidden( render->isHidden() );
-		setOffline(render->isOffline());
+		// Set flags that will be used to hide/show node in list:
+		setHideFlag_Hidden(  render->isHidden()  );
+		setHideFlag_Offline( render->isOffline() );
 
 		m_engine          = afqt::stoq(render->getEngine());
 		m_username        = afqt::stoq(render->getUserName());
@@ -474,8 +466,6 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 	// Join info texts:
 	m_info_text = m_info_text_render;
 	m_info_text.replace("@HRES@", m_info_text_hres);
-
-	m_ListRenders->offsetHierarchy(this);
 }
 
 void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const
@@ -520,7 +510,7 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	    offlineState_time = m_offlineState + " " + afqt::stoq(af::time2strHMS(time(NULL) - m_wol_operation_time ));
 
 	// Draw busy/idle bar:
-	if (m_online && m_parent)
+	if (m_online && m_parent_pool)
 	{
 		int width = w/7;
 		static const int height = 3;
@@ -533,27 +523,27 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 		int max = af::Environment::getWatchRenderIdleBarMax();
 		i_painter->setBrush(QBrush(afqt::QEnvironment::clr_itemrenderoff.c, Qt::SolidPattern));
 
-		if ((m_parent->get_idle_free_time() > 0) && (isNimby() || isNIMBY()) && (false == isBusy()))
+		if ((m_parent_pool->get_idle_free_time() > 0) && (isNimby() || isNIMBY()) && (false == isBusy()))
 		{
 			// We have auto nimby off (free) enabled,
 			// Nimby is set and render has no tasks
-			max = m_parent->get_idle_free_time();
+			max = m_parent_pool->get_idle_free_time();
 			i_painter->setOpacity(.5);
 			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_error.c, Qt::SolidPattern));
 		}
-		else if ((m_parent->get_busy_nimby_time() > 0) && (busy_secs > 6) && isFree())
+		else if ((m_parent_pool->get_busy_nimby_time() > 0) && (busy_secs > 6) && isFree())
 		{
 			// We have auto nimby enabled,
 			// Nimby is not set (is free) and render is busy (for more 6 seconds - afwatch update interval)
 			bar_secs = busy_secs;
-			max = m_parent->get_busy_nimby_time();
+			max = m_parent_pool->get_busy_nimby_time();
 			i_painter->setOpacity(1.0);
 			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_itemrendernimby.c, Qt::SolidPattern));
 		}
-		else if (m_parent->get_idle_wolsleep_time() > 0)
+		else if (m_parent_pool->get_idle_wolsleep_time() > 0)
 		{
 			// We have auto sleep enabled
-			max = m_parent->get_idle_wolsleep_time();
+			max = m_parent_pool->get_idle_wolsleep_time();
 			i_painter->setOpacity(.5);
 			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_running.c, Qt::SolidPattern));
 		}

@@ -225,7 +225,7 @@ bool ListUsers::v_processEvents( const af::MonitorEvents & i_me)
 
 ItemNode* ListUsers::v_createNewItemNode(af::Node * i_afnode, Item::EType i_type, bool i_notify)
 {
-	return new ItemUser((af::User*)i_afnode, m_ctrl_sf);
+	return new ItemUser(this, (af::User*)i_afnode, m_ctrl_sf);
 }
 
 void ListUsers::userAdded(ItemNode * node, const QModelIndex & index)

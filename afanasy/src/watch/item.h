@@ -29,7 +29,8 @@ public:
 	Item(const QString &i_name, int i_id, EType i_type);
 	virtual ~Item();
 
-	static const int HeightTickets = 24;
+	static const int HeightAnnotation;
+	static const int HeightTickets;
 
 	virtual QSize sizeHint( const QStyleOptionViewItem &option) const;
 
