@@ -149,6 +149,7 @@ const int TASK_READ_BUFFER_SIZE /**/ = 1024 * 1024; ///< Task process read buffe
 /// Watch options:
 namespace AFWATCH
 {
+const bool WORK_USER_VISIBLE = true;
 const int GET_EVENTS_SEC /***/ = 1;  ///< Server connection & update status period ( seconds).
 const int CONNECTION_LOST_TIME = 30; ///< Connection lost, if watch can't update server for this time.
 const int REFRESH_GUI_SEC /**/ = 5;  ///< Node items update interval time in seconds.

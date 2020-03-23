@@ -67,6 +67,7 @@ int     Environment::watch_get_events_sec =            AFWATCH::GET_EVENTS_SEC;
 int     Environment::watch_connection_lost_time =      AFWATCH::CONNECTION_LOST_TIME;
 int     Environment::watch_refresh_gui_sec =           AFWATCH::REFRESH_GUI_SEC;
 int     Environment::watch_render_idle_bar_max =       AFWATCH::RENDER_IDLE_BAR_MAX;
+bool    Environment::watch_work_user_visible =         AFWATCH::WORK_USER_VISIBLE;
 
 int     Environment::render_heartbeat_sec =            AFRENDER::HEARTBEAT_SEC;
 int     Environment::render_up_resources_period =      AFRENDER::UP_RESOURCES_PERIOD;
@@ -299,6 +300,7 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, watch_refresh_gui_sec,             "af_watch_refresh_gui_sec"             );
 	getVar( i_obj, watch_connection_lost_time,        "af_watch_connection_lost_time"        );
 	getVar( i_obj, watch_render_idle_bar_max,         "af_watch_render_idle_bar_max"         );
+	getVar( i_obj, watch_work_user_visible,           "af_watch_work_user_visible"           );
 
 	getVar( i_obj, monitor_zombietime,                "af_monitor_zombietime"                );
 

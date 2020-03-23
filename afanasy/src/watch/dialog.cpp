@@ -101,7 +101,8 @@ Dialog::Dialog():
 
 	m_btnMonitor[Watch::WWork] = new ButtonMonitor(Watch::WWork, this);
 	m_hlayout_b->addWidget(m_btnMonitor[Watch::WWork]);
-	m_btnMonitor[Watch::WWork]->setHidden(true);
+	if (false == af::Environment::getWatchWorkUserVisible())
+		m_btnMonitor[Watch::WWork]->setHidden(true);
 
 	m_btnMonitor[Watch::WJobs] = new ButtonMonitor(Watch::WJobs, this);
 	m_hlayout_b->addWidget(m_btnMonitor[Watch::WJobs ]);
@@ -600,7 +601,8 @@ void Dialog::keyPressEvent( QKeyEvent * event)
 		{
 			MonitorHost::setUid(0);
 
-			m_btnMonitor[Watch::WWork]->setHidden(false);
+			if (false == af::Environment::getWatchWorkUserVisible())
+				m_btnMonitor[Watch::WWork]->setHidden(false);
 			m_btnMonitor[Watch::WMonitors]->setHidden(false);
 
 			m_topleft->setText("GOD MODE");
@@ -615,7 +617,8 @@ void Dialog::keyPressEvent( QKeyEvent * event)
 		{
 			MonitorHost::setUid(-1);
 
-			m_btnMonitor[Watch::WWork]->setHidden(true);
+			if (false == af::Environment::getWatchWorkUserVisible())
+				m_btnMonitor[Watch::WWork]->setHidden(true);
 			m_btnMonitor[Watch::WMonitors]->setHidden(true);
 
 			m_topleft->setText("");

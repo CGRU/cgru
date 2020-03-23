@@ -88,28 +88,27 @@ ListWork::ListWork(QWidget* parent):
 	// Add left panel buttons:
 	ButtonPanel * bp; ButtonsMenu * bm;
 
-	bp = addButtonPanel(Item::TJob, "LOG","jobs_log","Show job log.");
-	connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_RequestLog()));
+	if (af::Environment::VISOR())
+	{
+		bp = addButtonPanel(Item::TJob, "LOG","jobs_log","Show job log.");
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_RequestLog()));
+		bp = addButtonPanel(Item::TJob, "PAUSE","jobs_pause","Pause selected jobs.","P");
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_Pause()));
+		bp = addButtonPanel(Item::TJob, "START","jobs_start","Start selected jobs.","S");
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_Start()));
+		bp = addButtonPanel(Item::TJob, "STOP","jobs_stop","Stop selected jobs tasks and pause jobs.","", true);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_Stop()));
 
-	bp = addButtonPanel(Item::TJob, "PAUSE","jobs_pause","Pause selected jobs.","P");
-	connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_Pause()));
+		addParam_Num(Item::TAny,    "priority",                  "Priority",             "Priority number", 0, 250);
+		addParam_Str(Item::TAny,    "annotation",                "Annotation",           "Annotation string");
+		addParam_Num(Item::TAny,    "max_running_tasks",         "Maximum Running",      "Maximum running tasks number", -1, 1<<20);
+		addParam_Num(Item::TAny,    "max_running_tasks_per_host","Max Run Per Host",     "Max run tasks on the same host", -1, 1<<20);
+		addParam_REx(Item::TAny,    "hosts_mask",                "Hosts Mask",           "Host names pattern that job can run on");
+		addParam_REx(Item::TAny,    "hosts_mask_exclude",        "Hosts Mask Exclude",   "Host names pattern that job will not run");
+		addParam_Num(Item::TBranch, "max_tasks_per_second",      "Max Tasks Per Second", "Maximum tasks starts per second", -1, 1<<20);
+	}
 
-	bp = addButtonPanel(Item::TJob, "START","jobs_start","Start selected jobs.","S");
-	connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_Start()));
-
-	bp = addButtonPanel(Item::TJob, "STOP","jobs_stop","Stop selected jobs tasks and pause jobs.","", true);
-	connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_Stop()));
-
-
-	m_parentWindow->setWindowTitle("Jobs");
-
-	addParam_Num(Item::TAny,    "priority",                  "Priority",             "Priority number", 0, 250);
-	addParam_Str(Item::TAny,    "annotation",                "Annotation",           "Annotation string");
-	addParam_Num(Item::TAny,    "max_running_tasks",         "Maximum Running",      "Maximum running tasks number", -1, 1<<20);
-	addParam_Num(Item::TAny,    "max_running_tasks_per_host","Max Run Per Host",     "Max run tasks on the same host", -1, 1<<20);
-	addParam_REx(Item::TAny,    "hosts_mask",                "Hosts Mask",           "Host names pattern that job can run on");
-	addParam_REx(Item::TAny,    "hosts_mask_exclude",        "Hosts Mask Exclude",   "Host names pattern that job will not run");
-	addParam_Num(Item::TBranch, "max_tasks_per_second",      "Max Tasks Per Second", "Maximum tasks starts per second", -1, 1<<20);
+	m_parentWindow->setWindowTitle("Work");
 
 	initListNodes();
 
