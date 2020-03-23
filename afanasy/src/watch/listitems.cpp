@@ -471,9 +471,11 @@ ButtonPanel * ListItems::addButtonPanel(
 		const QString & i_name,
 		const QString & i_description,
 		const QString & i_hotkey,
-		bool i_dblclick)
+		bool i_dblclick,
+		bool i_always_active)
 {
-	ButtonPanel * bp = new ButtonPanel(this, i_type, i_label, i_name, i_description, i_hotkey, i_dblclick, m_current_buttons_menu);
+	ButtonPanel * bp = new ButtonPanel(this, i_type, i_label, i_name, i_description,
+			i_hotkey, i_dblclick, i_always_active, m_current_buttons_menu);
 
 	if (m_current_buttons_menu)
 		m_current_buttons_menu->addButton(bp);

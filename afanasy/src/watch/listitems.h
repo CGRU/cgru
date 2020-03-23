@@ -106,7 +106,8 @@ protected:
 		const QString & i_name,
 		const QString & i_description,
 		const QString & i_hotkey = "",
-		bool i_dblclick = false);
+		bool i_dblclick = false,
+		bool i_always_active = false);
 
 	void updatePanels(Item * i_item = NULL);
 

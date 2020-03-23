@@ -148,7 +148,8 @@ ListJobs::ListJobs(QWidget * i_parent):
 
 	if (false == af::Environment::VISOR())
 	{
-		bp = addButtonPanel(Item::TJob, "DEL DONE","jobs_delete_done","Delete all done jobs.","", true);
+		bp = addButtonPanel(Item::TJob, "DEL DONE","jobs_delete_done","Delete all done jobs.","",
+				true /*double click*/, true /*always active*/);
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(actDeleteDone()));
 	}
 
