@@ -1,5 +1,3 @@
 #!/bin/bash
 
-source $CGRU_LOCATION/software_setup/setup_houdini.sh
-
-python $HOUDINI_CGRU_PATH/hrender_separate.py "$@"
+"${CGRU_PYTHONEXE}" "${CGRU_LOCATION}/plugins/houdini/hrender_separate.py" "$@"

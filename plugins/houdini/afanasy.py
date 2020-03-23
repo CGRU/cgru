@@ -589,7 +589,7 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
         tile_render = afnode.parm('sep_tile').eval()
         tile_divx = afnode.parm('sep_tile_divx').eval()
         tile_divy = afnode.parm('sep_tile_divy').eval()
-        use_tmp_img_folder = afnode.parm('sep_use_tmp_img_folder').eval()
+        tiles_count = tile_divx * tile_divy
         del_rop_files = afnode.parm('sep_del_rop_files').eval()
 
         if read_rop or run_rop:
@@ -645,11 +645,7 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
                     'hrender_af', 'hrender_separate'
                 )
 
-                if use_tmp_img_folder:
-                    block_generate.cmd += ' --tmpimg'
-
         if not join_render:
-            tiles = tile_divx * tile_divy
             block_render = BlockParameters(afnode, ropnode, subblock, prefix,
                                            frame_range)
             block_render.name = blockname + '-R'
@@ -658,46 +654,40 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
             if run_rop:
                 block_render.dependmask = block_generate.name
 
-            if tile_render or del_rop_files or use_tmp_img_folder:
-                block_render.cmd = 'mantrarender '
-
             if del_rop_files:
                 block_render.delete_files.append(files)
 
-            if use_tmp_img_folder:
-                block_render.cmd += 't'
-
             if tile_render:
                 block_render.numeric = False
-                block_render.cmd += 'c %(tile_divx)d %(tile_divy)d' % vars()
-                block_render.cmd += ' @#@'
-                block_render.frame_pertask = -tiles
+                block_render.cmd += ' -t count=%(tile_divx)dx%(tile_divy)d,index=@#@' % vars()
+                block_render.frame_pertask = -tiles_count
                 for frame in range(block_generate.frame_first,
                                    block_generate.frame_last + 1,
                                    block_generate.frame_inc):
                     arguments = afnode.parm(
                         'sep_render_arguments').evalAsStringAtFrame(frame)
                     arguments = arguments.replace(
-                        '@FILES@', parm_files.evalAsStringAtFrame( frame))
+                        '@FILES@', parm_files.evalAsStringAtFrame(frame))
 
-                    for tile in range(0, tiles):
-                        block_render.tasks_names.append(
-                            '%d tile %d' % (frame, tile))
-                        block_render.tasks_cmds.append(
-                            '%d -R %s' % (tile, arguments))
+                    for tile in range(0, tiles_count):
+                        block_render.tasks_names.append('frame %d tile %d' % (frame, tile))
+                        block_render.tasks_cmds.append('%d %s' % (tile, arguments))
             else:
-                if del_rop_files or use_tmp_img_folder:
-                    block_render.cmd += ' -R '
-                else:
-                    block_render.cmd += ' -V a '
-                block_render.cmd += afcommon.patternFromPaths(
+                block_render.cmd += ' ' + afcommon.patternFromPaths(
                     afnode.parm('sep_render_arguments').evalAsStringAtFrame(block_generate.frame_first),
                     afnode.parm('sep_render_arguments').evalAsStringAtFrame(block_generate.frame_last)
                 ).replace('@FILES@', files)
                 block_render.preview = images
 
         if tile_render:
-            cmd = 'exrjoin %(tile_divx)d %(tile_divy)d %(images)s d' % vars()
+            cmd = 'itilestitch "%s"' % images
+            tile_suffix = '_tile%02d_'
+            timg = os.path.relpath(images)
+            tpos = timg.find('@')-1
+            timg = timg[:tpos] + tile_suffix + timg[tpos:]
+            name, ext = os.path.splitext(timg)
+            for i in range(0, tiles_count):
+                cmd += ' "%s"' % (timg % i)
 
             block_join = BlockParameters(
                 afnode, ropnode, subblock, prefix, frame_range
