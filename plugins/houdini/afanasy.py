@@ -91,6 +91,7 @@ class BlockParameters:
         self.tickets_aux_use = int(afnode.parm('tickets_aux_use').eval())
         self.tickets_aux_data = afnode.parm('tickets_aux_data').eval()
         self.generate_previews = self.afnode.parm('generate_previews').eval()
+        self.life_time = -1
         self.preview_approval = afnode.parm('preview_approval').eval()
 
         if afnode.parm('enable_extended_parameters').eval():
@@ -114,6 +115,7 @@ class BlockParameters:
             self.depend_mask = str(afnode.parm('depend_mask').eval())
             self.depend_mask_global = str(
                 afnode.parm('depend_mask_global').eval())
+            self.life_time = self.afnode.parm('life_time').eval()
 
         if self.local_render:
             self.hosts_mask = str(socket.gethostname())
@@ -518,6 +520,9 @@ class BlockParameters:
 
         if self.hosts_mask_exclude != '':
             job.setHostsMaskExclude(self.hosts_mask_exclude)
+
+        if self.life_time > -1:
+            job.setTimeLife(self.life_time * 3600)  # hours to seconds
 
         job.setFolder('input', os.path.dirname(hou.hipFile.name()))
 
