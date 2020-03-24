@@ -16,8 +16,8 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-const int ItemBranch::HeightBranch = 32;
-const int ItemBranch::HeightBranch_Empty = 16;
+const int ItemBranch::HeightBranch = 36;
+const int ItemBranch::HeightBranch_Idle = 20;
 
 ItemBranch::ItemBranch(ListWork * i_list_work, af::Branch * i_branch, const CtrlSortFilter * i_ctrl_sf):
 	ItemWork(i_list_work, i_branch, TBranch, i_ctrl_sf),
@@ -66,81 +66,75 @@ void ItemBranch::v_updateValues(af::Node * i_afnode, int i_msgType)
 		setNotRunning();
 
 	if (getName() == "/")
-		strLeftTop = "ROOT/";
+		strName = "ROOT/";
 	else
-		strLeftTop = afqt::stoq(af::pathBase(branch->getName()) + "/");
+		strName = afqt::stoq(af::pathBase(branch->getName()) + "/");
 
-	strRightTop.clear();
-	strRightTop.clear();
+	strParameters.clear();
+	strCounts.clear();
 
 	if (Watch::isPadawan())
 	{
-		strLeftBottom = QString("Jobs Count: %1").arg(jobs_num);
+		// Counts:
+		strCounts += QString(" JobsCount:%1").arg(jobs_total);
+		if (running_tasks_num)
+		{
+			strCounts += QString(" RunningTasks:%1").arg(running_tasks_num);
+			strCounts += QString(" CapacityTotal:%1").arg(afqt::stoq(af::toKMG(running_capacity_total)));
+		}
 
-		if (max_running_tasks != -1) strRightTop += QString(" MaxRuningTasks:%1").arg(max_running_tasks);
-		if (max_running_tasks_per_host != -1) strRightTop += QString(" MaxRunTasksPerHost:%1").arg(max_running_tasks_per_host);
-		if (false == hostsmask.isEmpty()) strRightTop += QString(" HostsMask(%1)").arg(hostsmask);
-		if (false == hostsmask_exclude.isEmpty()) strRightTop += QString(" ExcludeHosts(%1)").arg(hostsmask_exclude);
-		strRightTop += QString(" Priority:%1").arg(m_priority);
-
-		if (branch->isSolvePriority())
-			strRightBottom = "Solving: Priority";
-		else
-			strRightBottom = "Solving: Ordered";
-
-		if (branch->isSolveCapacity())
-			strRightBottom += ", Capacity";
-		else
-			strRightBottom += ", RunTasks";
+		// Parameters:
+		if (branch->isSolvePriority()) strParameters += " Solving:Priority"; else strParameters += " Solving:Ordered";
+		if (branch->isSolveCapacity()) strParameters +=         ",Capacity"; else strParameters +=        ",RunTasks";
+		if (max_running_tasks != -1) strParameters += QString(" MaxRuningTasks:%1").arg(max_running_tasks);
+		if (max_running_tasks_per_host != -1) strParameters += QString(" MaxRunTasksPerHost:%1").arg(max_running_tasks_per_host);
+		if (false == hostsmask.isEmpty()) strParameters += QString(" HostsMask(%1)").arg(hostsmask);
+		if (false == hostsmask_exclude.isEmpty()) strParameters += QString(" ExcludeHosts(%1)").arg(hostsmask_exclude);
+		strParameters += QString(" Priority:%1").arg(m_priority);
 	}
 	else if (Watch::isJedi())
 	{
-		strLeftBottom = QString("Jobs: %1").arg(jobs_num);
+		// Counts:
+		strCounts += QString(" Jobs:%1").arg(jobs_total);
+		if (running_tasks_num)
+		{
+			strCounts += QString(" RunTasks:%1").arg(running_tasks_num);
+			strCounts += QString(" Capacity:%1").arg(afqt::stoq(af::toKMG(running_capacity_total)));
+		}
 
-		if (max_running_tasks != -1) strRightTop += QString(" MaxTasks:%1").arg(max_running_tasks);
-		if (max_running_tasks_per_host != -1) strRightTop += QString(" MaxPerHost:%1").arg(max_running_tasks_per_host);
-		if (false == hostsmask.isEmpty()) strRightTop += QString(" Hosts(%1)").arg(hostsmask);
-		if (false == hostsmask_exclude.isEmpty()) strRightTop += QString(" Exclude(%1)").arg(hostsmask_exclude);
-		strRightTop += QString(" Pri:%1").arg(m_priority);
-
-		if (branch->isSolvePriority())
-			strRightBottom = "Priority";
-		else
-			strRightBottom = "Ordered";
-
-		if (branch->isSolveCapacity())
-			strRightBottom += " Capacity";
-		else
-			strRightBottom += " MaxTasks";
+		// Parameters:
+		if (branch->isSolvePriority()) strParameters += " Priority"; else strParameters += " Ordered";
+		if (branch->isSolveCapacity()) strParameters += ",Capacity"; else strParameters += ",MaxTasks";
+		if (max_running_tasks != -1) strParameters += QString(" MaxTasks:%1").arg(max_running_tasks);
+		if (max_running_tasks_per_host != -1) strParameters += QString(" MaxPerHost:%1").arg(max_running_tasks_per_host);
+		if (false == hostsmask.isEmpty()) strParameters += QString(" Hosts(%1)").arg(hostsmask);
+		if (false == hostsmask_exclude.isEmpty()) strParameters += QString(" Exclude(%1)").arg(hostsmask_exclude);
+		strParameters += QString(" Pri:%1").arg(m_priority);
 	}
 	else
 	{
-		strLeftBottom  = QString("j%1").arg(jobs_num);
+		// Counts:
+		strCounts += QString(" j:%1").arg(jobs_total);
+		if (running_tasks_num)
+		{
+			strCounts += QString(" t:%1").arg(running_tasks_num);
+			strCounts += QString(" c:%1").arg(afqt::stoq(af::toKMG(running_capacity_total)));
+		}
 
-		if (max_running_tasks != -1) strRightTop += QString("m%1").arg(max_running_tasks);
-		if (max_running_tasks_per_host != -1) strRightTop += QString(" mph%1").arg(max_running_tasks_per_host);
-		if (false == hostsmask.isEmpty()) strRightTop += QString(" h(%1)").arg(hostsmask);
-		if (false == hostsmask_exclude.isEmpty()) strRightTop += QString(" e(%1)").arg(hostsmask_exclude);
-		strRightTop += QString(" p:%1").arg(m_priority);
-
-		if (branch->isSolvePriority())
-			strRightBottom = "pri";
-		else
-			strRightBottom = "ord";
-
-		if (branch->isSolveCapacity())
-			strRightBottom += " cap";
-		else
-			strRightBottom += " mt";
+		// Parameters:
+		if (branch->isSolvePriority()) strParameters += " pri"; else strParameters += " ord";
+		if (branch->isSolveCapacity()) strParameters += ",cap"; else strParameters += ",mt";
+		if (max_running_tasks != -1) strParameters += QString("m%1").arg(max_running_tasks);
+		if (max_running_tasks_per_host != -1) strParameters += QString(" mph%1").arg(max_running_tasks_per_host);
+		if (false == hostsmask.isEmpty()) strParameters += QString(" h(%1)").arg(hostsmask);
+		if (false == hostsmask_exclude.isEmpty()) strParameters += QString(" e(%1)").arg(hostsmask_exclude);
+		strParameters += QString(" p:%1").arg(m_priority);
 	}
 
 	if (branch->getMaxTasksPerSecond() > 0)
-		strRightTop = QString("MTPS:%1 ").arg(branch->getMaxTasksPerSecond()) + strRightTop;
+		strParameters = QString("MTPS:%1 ").arg(branch->getMaxTasksPerSecond()) + strParameters;
 
-	if (isLocked()) strLeftTop = "(LOCKED) " + strLeftTop;
-
-	if (m_empty)
-		strRightTop = strRightBottom + " " + strRightTop;
+	if (isLocked()) strName = "(LOCKED) " + strName;
 
 	m_tooltip = branch->v_generateInfoString(true).c_str();
 
@@ -169,10 +163,10 @@ bool ItemBranch::calcHeight()
 {
 	int old_height = m_height;
 
-	if (m_empty)
-		m_height = HeightBranch_Empty;
-	else
+	if (isRunning())
 		m_height = HeightBranch;
+	else
+		m_height = HeightBranch_Idle;
 
 	if (false == m_annotation.isEmpty())
 		m_height += HeightAnnotation;
@@ -194,17 +188,18 @@ void ItemBranch::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 		i_painter->setFont(afqt::QEnvironment::f_name);
 	else
 		i_painter->setFont(afqt::QEnvironment::f_info);
-	i_painter->drawText(x, y, w, h, Qt::AlignLeft | Qt::AlignTop, strLeftTop);
+	QRect rect_name;
+	i_painter->drawText(x, y, w, h, Qt::AlignLeft | Qt::AlignTop, strName, &rect_name);
+	rect_name.adjust(0,0,10,0);
 
 	i_painter->setPen(clrTextInfo(i_option));
 	i_painter->setFont(afqt::QEnvironment::f_info);
 	if (false == m_empty)
 	{
-		i_painter->drawText(x, y, w, height_branch, Qt::AlignLeft    | Qt::AlignBottom, strLeftBottom);
-		i_painter->drawText(x, y, w, height_branch, Qt::AlignRight   | Qt::AlignBottom, strRightBottom);
+		i_painter->drawText(x + rect_name.width(), y+1, w - rect_name.width(), height_branch, Qt::AlignLeft | Qt::AlignTop, strCounts);
 	}
 	i_painter->setPen(afqt::QEnvironment::qclr_black);
-	i_painter->drawText(x, y, w, height_branch, Qt::AlignRight   | Qt::AlignTop,    strRightTop);
+	i_painter->drawText(x, y, w, height_branch, Qt::AlignRight | Qt::AlignTop, strParameters);
 
 	if (false == m_annotation.isEmpty())
 		i_painter->drawText(x, y, w, h, Qt::AlignBottom | Qt::AlignHCenter, m_annotation);
@@ -239,16 +234,9 @@ void ItemBranch::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	int sx = x + stars_left;
 	for (int i = 0; i < numstars; i++)
 	{
-		drawStar(stars_size, sx, y + stars_height, i_painter);
+		drawStar(stars_size, sx, y + stars_height + 2, i_painter);
 		sx += stars_delta;
 	}
-
-	QString running_str = QString("T:%1").arg(running_tasks_num);
-	running_str += QString(" / C:%1").arg(af::toKMG(running_capacity_total).c_str());
-
-	i_painter->setFont(afqt::QEnvironment::f_name);
-	i_painter->setPen(afqt::QEnvironment::clr_textstars.c);
-	i_painter->drawText(x, y, w, HeightBranch, Qt::AlignHCenter | Qt::AlignBottom, running_str);
 }
 
 void ItemBranch::v_setSortType(int i_type1, int i_type2)

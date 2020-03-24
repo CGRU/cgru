@@ -42,12 +42,11 @@ private:
 
 private:
 	static const int HeightBranch;
-	static const int HeightBranch_Empty;
+	static const int HeightBranch_Idle;
 
-	QString strLeftBottom;
-	QString strLeftTop;
-	QString strRightTop;
-	QString strRightBottom;
+	QString strName;
+	QString strCounts;
+	QString strParameters;
 
 	bool m_empty;
 };

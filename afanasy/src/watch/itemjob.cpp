@@ -200,7 +200,7 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 	}
 
 	user_eta.clear();
-	if( af::Environment::VISOR())
+	if (af::Environment::VISOR() || m_inworklist)
 		user_eta = username;
 
 	if( time_started && ((state & AFJOB::STATE_DONE_MASK) == false))
