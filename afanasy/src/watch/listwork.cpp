@@ -90,13 +90,13 @@ ListWork::ListWork(QWidget* parent):
 
 	if (af::Environment::VISOR())
 	{
-		bp = addButtonPanel(Item::TJob, "LOG","jobs_log","Show job log.");
+		bp = addButtonPanel(Item::TAny, "LOG","work_log","Show log.");
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_RequestLog()));
-		bp = addButtonPanel(Item::TJob, "PAUSE","jobs_pause","Pause selected jobs.","P");
+		bp = addButtonPanel(Item::TAny, "PAUSE","work_pause","Pause selected.","P");
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_Pause()));
-		bp = addButtonPanel(Item::TJob, "START","jobs_start","Start selected jobs.","S");
+		bp = addButtonPanel(Item::TAny, "START","work_start","Start selected.","S");
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_Start()));
-		bp = addButtonPanel(Item::TJob, "STOP","jobs_stop","Stop selected jobs tasks and pause jobs.","", true);
+		bp = addButtonPanel(Item::TAny, "STOP","work_stop","Stop selected jobs tasks and pause.","", true);
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_Stop()));
 
 		addParam_Num(Item::TAny,    "priority",                  "Priority",             "Priority number", 0, 250);
@@ -405,6 +405,9 @@ void ListWork::jobSetBranch(const QString & i_name)
 	af::jsonActionOperationFinish(str);
 	Watch::sendMsg(af::jsonMsg(str));
 }
+
+void ListWork::slot_Start() { operation(Item::TAny, "start");}
+void ListWork::slot_Pause() { operation(Item::TAny, "pause");}
 
 void ListWork::slot_MaxTasks()
 {

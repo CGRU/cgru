@@ -43,12 +43,12 @@ private slots:
 
 	void slot_ChangeSize( int i_size);
 
+	void slot_Start();
+	void slot_Pause();
+
 	void slot_JobSetBranch();
-
 	void slot_Delete();
-
 	void slot_MaxTasks();
-
 	void slot_RequestLog();
 
 private:
