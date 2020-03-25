@@ -317,7 +317,61 @@ bool ListWork::v_filesReceived(const af::MCTaskUp & i_taskup)
 
 void ListWork::calcTitle()
 {
-	m_parentWindow->setWindowTitle(QString("Count: %1").arg(count()));
+	int btotal = 0;
+	int bempty = 0;
+
+	int jtotal = 0;
+	int jpercent = 0;
+	int jdone = 0;
+	int jrunning = 0;
+	int jerror = 0;
+	int jblocksrun = 0;
+
+	for (int i = 0; i < count(); i++)
+	{
+		Item * item = m_model->item(i);
+
+		if (item->getType() == Item::TBranch)
+		{
+			btotal ++;
+			ItemBranch * branch = static_cast<ItemBranch*>(item);
+
+			if (branch->jobs_total == 0) bempty ++;
+
+			continue;
+		}
+
+		jtotal ++;
+		ItemJob * job = static_cast<ItemJob*>(item);
+
+		if (job->state & AFJOB::STATE_DONE_MASK)
+		{
+			jdone ++;
+		}
+		else
+		{
+			for (int b = 0; b < job->getBlocksNum(); b++)
+			{
+				jpercent += job->getBlockPercent(b);
+				jblocksrun ++;
+			}
+		}
+		if (job->state & AFJOB::STATE_RUNNING_MASK) jrunning ++;
+		if (job->state & AFJOB::STATE_ERROR_MASK  ) jerror   ++;
+	}
+
+	QString branches = QString(
+		"Branches: %1, Empty %2")
+		.arg(btotal).arg(bempty);
+
+	QString jobs;
+	if (jblocksrun)
+		jobs = QString("Jobs: %1, Run %2 (%3%), Error %4, Done %5")
+		.arg(jtotal).arg(jrunning).arg(jpercent / jblocksrun).arg(jerror).arg(jdone);
+	else
+		jobs = QString("Jobs: %1 Done").arg(jtotal);
+
+	m_parentWindow->setWindowTitle(jobs + "; " + branches);
 }
 
 void ListWork::slot_JobSetBranch()

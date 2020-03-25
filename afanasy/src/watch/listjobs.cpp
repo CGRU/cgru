@@ -569,58 +569,44 @@ void ListJobs::getUserJobsOrder()
 
 void ListJobs::calcTotals()
 {
+	int numjobs = count();
 	int percent = 0;
-	int blocksrun = 0;
-	int blocksdone = 0;
 	int done = 0;
 	int running = 0;
 	int error = 0;
+	int blocksrun = 0;
 
-	int numjobs = count();
-	if( numjobs == 0)
+	if (numjobs == 0)
 	{
 		m_parentWindow->setWindowTitle("Jobs: (none)");
 		return;
 	}
-	else
+
+	for (int i = 0; i < numjobs; i++)
 	{
-		for( int i = 0; i < numjobs; i++)
+		ItemJob * itemjob = static_cast<ItemJob*>(m_model->item(i));
+		if (itemjob->state & AFJOB::STATE_DONE_MASK)
 		{
-			ItemJob * itemjob = (ItemJob*)(m_model->item(i));
-			if( itemjob->state & AFJOB::STATE_DONE_MASK )
-			{
-				done++;
-				for( int b = 0; b < itemjob->getBlocksNum(); b++)
-				{
-					blocksdone++;
-				}
-			}
-			else
-			{
-				for( int b = 0; b < itemjob->getBlocksNum(); b++)
-				{
-					percent += itemjob->getBlockPercent( b);
-					blocksrun++;
-				}
-			}
-			if( itemjob->state & AFJOB::STATE_RUNNING_MASK) running ++;
-			if( itemjob->state & AFJOB::STATE_ERROR_MASK  ) error   ++;
+			done++;
 		}
+		else
+		{
+			for (int b = 0; b < itemjob->getBlocksNum(); b++)
+			{
+				percent += itemjob->getBlockPercent(b);
+				blocksrun++;
+			}
+		}
+		if (itemjob->state & AFJOB::STATE_RUNNING_MASK) running ++;
+		if (itemjob->state & AFJOB::STATE_ERROR_MASK  ) error   ++;
 	}
 
-	if( af::Environment::VISOR())
-	{
-		m_parentWindow->setWindowTitle(QString("J[%1]: R%2/%3D/%4E")
-			.arg( numjobs).arg( running).arg( done).arg( error));
-	}
+	if (blocksrun)
+		m_parentWindow->setWindowTitle(
+			QString("Jobs: %1, Run %2 (%3%), Error %4, Done %5")
+			.arg(numjobs).arg(running).arg(percent / blocksrun).arg(error).arg(done));
 	else
-	{
-		if( blocksrun )
-			m_parentWindow->setWindowTitle(QString("J[%1]: R%2/%3D/%4E B%5-%6%")
-				.arg( numjobs).arg( running).arg( done).arg( error).arg( blocksrun).arg( percent / blocksrun));
-		else
-			m_parentWindow->setWindowTitle(QString("J[%1]: Done").arg( numjobs));
-	}
+		m_parentWindow->setWindowTitle(QString("Jobs: %1 Done").arg(numjobs));
 }
 
 void ListJobs::actMoveUp()     { moveJobs("move_jobs_up"    ); }

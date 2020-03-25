@@ -706,20 +706,36 @@ void ListRenders::v_connectionLost()
 
 void ListRenders::calcTitle()
 {
-	int total = count();
-	int online = 0;
-	int busy = 0;
-	int nimby = 0;
-	int free = 0;
-	for( int i = 0; i < total; i++)
+	int ptotal = 0;
+
+	int rtotal = 0;
+	int ronline = 0;
+	int rbusy = 0;
+	int rnimby = 0;
+	int roffline = 0;
+
+	for (int i = 0; i < count(); i++)
 	{
-		ItemRender * itemrender = (ItemRender*)(m_model->item(i));
-		if( itemrender->isOnline()) online++;
-		if( itemrender->isBusy()) busy++;
-		if( itemrender->isNimby() || itemrender->isNIMBY()) nimby++;
-		else if( itemrender->isOnline() && (false == itemrender->isBusy())) free++;
+		Item * item = m_model->item(i);
+		if (item->getType() == Item::TPool)
+		{
+			ItemPool * itempool = static_cast<ItemPool*>(item);
+			ptotal++;
+		}
+		if (item->getType() == Item::TRender)
+		{
+			ItemRender * itemrender = static_cast<ItemRender*>(item);
+			if (itemrender->isOnline()) ronline++;
+			if (itemrender->isBusy()) rbusy++;
+			if (itemrender->isNimby() || itemrender->isNIMBY()) rnimby++;
+			if (itemrender->isOffline()) roffline++;
+			rtotal++;
+		}
 	}
-	m_parentWindow->setWindowTitle(QString("R[%1/%2]: B%3/%4F (n%5)").arg( total).arg( online).arg( busy).arg( free).arg( nimby));
+
+	m_parentWindow->setWindowTitle(
+			QString("Renders: %1 Online, %2 Busy, %3 Offline, %4 Nimby, %5 Total, %6 Pools")
+			.arg(ronline).arg(rbusy).arg(roffline).arg(rnimby).arg(rtotal).arg(ptotal));
 }
 
 void ListRenders::actAddPool()

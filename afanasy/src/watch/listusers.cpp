@@ -240,12 +240,12 @@ void ListUsers::calcTitle()
 {
 	int total = count();
 	int running = 0;
-	for( int i = 0; i < total; i++)
+	for (int i = 0; i < total; i++)
 	{
-		ItemUser * itemuser = (ItemUser*)(m_model->item(i));
+		ItemUser * itemuser = static_cast<ItemUser*>(m_model->item(i));
 		if (itemuser->running_tasks_num > 0) running++;
 	}
-	m_parentWindow->setWindowTitle(QString("U[%1]: %2R").arg( total).arg( running));
+	m_parentWindow->setWindowTitle(QString("Users: %1, Running %2").arg(total).arg(running));
 }
 
 void ListUsers::actDelete() { operation(Item::TUser, "delete"); }

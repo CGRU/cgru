@@ -149,12 +149,12 @@ void ListMonitors::calcTitle()
 {
 	int total = count();
 	int super = 0;
-	for( int i = 0; i < total; i++)
+	for (int i = 0; i < total; i++)
 	{
-		ItemMonitor * itemmonitor = (ItemMonitor*)(m_model->item(i));
-		if( itemmonitor->isSuperUser()) super++;
+		ItemMonitor * itemmonitor = static_cast<ItemMonitor*>(m_model->item(i));
+		if (itemmonitor->isSuperUser()) super++;
 	}
-	m_parentWindow->setWindowTitle(QString("M[%1]: %2S").arg( total).arg( super));
+	m_parentWindow->setWindowTitle(QString("Monitors: %1, Super users %2").arg(total).arg(super));
 }
 
 void ListMonitors::actSendMessage()
