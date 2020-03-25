@@ -82,6 +82,14 @@ ListUsers::ListUsers( QWidget* parent):
 
 	resetButtonsMenu();
 
+	if (af::Environment::GOD())
+	{
+		bp = addButtonPanel(Item::TUser, "DELETE","users_solve_tasksnum",
+				"Solve jobs need by running tasks number.",
+				"" /*hotkey*/, true /*double-click*/);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actDelete()));
+	}
+
 
 	// Add parameters:
 	if (af::Environment::VISOR() || (af::Environment::getPermUserModHisPriority()))
