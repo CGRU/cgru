@@ -194,6 +194,9 @@ void ListWork::slot_ChangeSize(int i_size)
 
 void ListWork::contextMenuEvent(QContextMenuEvent *event)
 {
+	if (false == af::Environment::GOD())
+		return;
+
 	Item * item = getCurrentItem();
 	if (item == NULL)
 		return;

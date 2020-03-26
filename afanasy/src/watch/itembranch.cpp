@@ -131,7 +131,7 @@ void ItemBranch::v_updateValues(af::Node * i_afnode, int i_msgType)
 		if (branch->isSolveJobs()) strParameters += " J:"; else strParameters += " U:";
 		if (branch->isSolvePriority()) strParameters += "pri";  else strParameters += "ord";
 		if (branch->isSolveCapacity()) strParameters += ",cap"; else strParameters += ",mt";
-		if (max_running_tasks != -1) strParameters += QString("m%1").arg(max_running_tasks);
+		if (max_running_tasks != -1) strParameters += QString(" m%1").arg(max_running_tasks);
 		if (max_running_tasks_per_host != -1) strParameters += QString(" mph%1").arg(max_running_tasks_per_host);
 		if (false == hostsmask.isEmpty()) strParameters += QString(" h(%1)").arg(hostsmask);
 		if (false == hostsmask_exclude.isEmpty()) strParameters += QString(" e(%1)").arg(hostsmask_exclude);

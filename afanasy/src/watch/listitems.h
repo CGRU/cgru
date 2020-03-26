@@ -112,10 +112,6 @@ protected:
 	void updatePanels(Item * i_item = NULL);
 
 protected:
-	//QHBoxLayout * m_hlayout;
-	QSplitter   * m_splitter;
-	QVBoxLayout * m_panel_l;
-	QVBoxLayout * m_vlayout;
 
 	Item * m_current_item;
 
@@ -139,6 +135,11 @@ private slots:
 
 private:
 	std::string m_type;
+
+	QVBoxLayout * m_vlayout;
+	QSplitter * m_splitter;
+	QWidget * m_panel_lelf_widget;
+	QVBoxLayout * m_panel_left_layout;
 
 	QList<Param*> m_params;
 
