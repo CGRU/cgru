@@ -34,8 +34,6 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-ListWork::EDisplaySize ListWork::ms_displaysize = ListWork::EVariableSize;
-
 int     ListWork::ms_SortType1      = CtrlSortFilter::TTIMECREATION;
 int     ListWork::ms_SortType2      = CtrlSortFilter::TTIMERUN;
 bool    ListWork::ms_SortAscending1 = false;
@@ -97,7 +95,6 @@ ListWork::ListWork(QWidget* parent):
 
 		bp = addButtonPanel(Item::TBranch, "AUTO","branch_childs_create","Automatically create branch childs.");
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_ACC_Enable()));
-
 		bp = addButtonPanel(Item::TBranch, "DISABLED","branch_childs_nocreate","Do not create branch childs.");
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_ACC_Disable()));
 
@@ -105,7 +102,6 @@ ListWork::ListWork(QWidget* parent):
 
 		bp = addButtonPanel(Item::TBranch, "PRIORITY","branch_solve_priority","Solve by priority.");
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_SolvePiority()));
-
 		bp = addButtonPanel(Item::TBranch, "ORDER","branch_solve_order","Solve by order.");
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_SolveOrder()));
 
@@ -113,7 +109,6 @@ ListWork::ListWork(QWidget* parent):
 
 		bp = addButtonPanel(Item::TBranch, "JOBS","branch_solve_jobs","Solve branch jobs.");
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_SolveJobs()));
-
 		bp = addButtonPanel(Item::TBranch, "USERS","branch_solve_users","Solve branch users.");
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_SolveUsers()));
 
@@ -123,11 +118,13 @@ ListWork::ListWork(QWidget* parent):
 
 		bp = addButtonPanel(Item::TBranch, "TASKS","branch_solve_tasks","Solve by running tasks number.");
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_SolveTasks()));
-
 		bp = addButtonPanel(Item::TBranch, "CAPACITY","branch_solve_capacity","Solve by running capacity total.");
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_SolveCapacity()));
 
 		resetButtonsMenu();
+
+		bp = addButtonPanel(Item::TJob, "SET BRANCH","job_change_branch","Change job branch.");
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_JobSetBranch()));
 
 		bp = addButtonPanel(Item::TAny, "PAUSE","work_pause","Pause selected.","P");
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_Pause()));
@@ -149,8 +146,6 @@ ListWork::ListWork(QWidget* parent):
 
 	initListNodes();
 
-	setSpacing();
-
 	QTimer * timer = new QTimer(this);
 	timer->start(1900 * af::Environment::getWatchRefreshGuiSec());
 	connect(timer, SIGNAL(timeout()), this, SLOT(repaintItems()));
@@ -160,36 +155,6 @@ ListWork::~ListWork()
 {
 	// Store hide flags:
 	ms_hide_flags = m_hide_flags;
-}
-
-void ListWork::setSpacing()
-{
-	 switch(ms_displaysize)
-	 {
-	 case  ListWork::ESmallSize:
-		  m_view->setSpacing(1);
-		  break;
-	 case  ListWork::ENormalSize:
-		  m_view->setSpacing(2);
-		  break;
-	 default:
-		  m_view->setSpacing(3);
-	 }
-}
-
-void ListWork::slot_ChangeSize(int i_size)
-{
-	 ListWork::EDisplaySize dsize = (ListWork::EDisplaySize)i_size;
-
-	 if (dsize == ms_displaysize)
-		  return;
-
-	 ms_displaysize = dsize;
-
-	 setSpacing();
-	 itemsHeightCalc();
-	 revertModel();
-	 repaintItems();
 }
 
 void ListWork::contextMenuEvent(QContextMenuEvent *event)
@@ -400,22 +365,26 @@ void ListWork::slot_SolveCapacity(){setParameter(Item::TBranch, "solve_need", "\
 void ListWork::slot_JobSetBranch()
 {
 	Item * item = getCurrentItem();
-	if (item == NULL)
+	if (NULL == item)
 		return;
 
 	if (item->getType() != Item::TJob)
 		return;
 
+	QString branch((static_cast<ItemJob*>(item))->branch);
+
 	bool ok;
-	QString name = QInputDialog::getText(this, "Set Job Branch",
-			"Enter job(s) new branch name",
-			QLineEdit::Normal, QString(), &ok);
+	branch = QInputDialog::getText(this, "Set Job Branch",
+			"Enter job(s) new branch branch",
+			QLineEdit::Normal, branch, &ok);
 	if (false == ok)
 		return;
 
-	displayInfo(QString("Setting branch to \"%1\"").arg(name));
+	branch = QString("\"%1\"").arg(branch);
 
-	jobSetBranch(name);
+	setParameter(Item::TJob, "branch", afqt::qtos(branch));
+
+	displayInfo(QString("Setting branch to %1").arg(branch));
 }
 
 void ListWork::jobSetBranch(const QString & i_name)
@@ -431,19 +400,6 @@ void ListWork::jobSetBranch(const QString & i_name)
 
 void ListWork::slot_Start() { operation(Item::TAny, "start");}
 void ListWork::slot_Pause() { operation(Item::TAny, "pause");}
-
-void ListWork::slot_MaxTasks()
-{
-/*	ItemJob* item = (ItemJob*)getCurrentItem();
-	if (item == NULL) return;
-	int current = item->getMaxRunningTasks();
-
-	bool ok;
-	int max_tasks = QInputDialog::getInt(this, "Change Maximum Tasksy", "Enter New Limit", current, -1, 1000000, 1, &ok);
-	if (!ok) return;
-	setParameter(Item::TJob, "max_tasks", af::itos(max_tasks));
-*/
-}
 
 void ListWork::slot_Delete() { operation(Item::TAny, "delete"); }
 

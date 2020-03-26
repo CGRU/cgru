@@ -29,20 +29,7 @@ public:
 protected:
 	void contextMenuEvent( QContextMenuEvent *event);
 
-public:
-	 enum EDisplaySize
-	 {
-		  EVariableSize,
-		  EBigSize,
-		  ENormalSize,
-		  ESmallSize
-	 };
-	 static EDisplaySize getDisplaySize() { return ms_displaysize; }
-
 private slots:
-
-	void slot_ChangeSize( int i_size);
-
 	void slot_ACC_Enable();
 	void slot_ACC_Disable();
 	void slot_SolveJobs();
@@ -57,7 +44,6 @@ private slots:
 
 	void slot_JobSetBranch();
 	void slot_Delete();
-	void slot_MaxTasks();
 	void slot_RequestLog();
 
 private:
@@ -67,14 +53,11 @@ private:
 	void launchCmdExit( bool i_exit);
 	void launchCmdStringExit(const QString & i_cmd, bool i_exit);
 	void calcTitle();
-	void setSpacing();
 
 	void ticketEdit(bool i_host_ticket);
 	void ticketEdit(const QString & i_name, bool i_host_ticket);
 
 private:
-	static EDisplaySize ms_displaysize;
-
 	static int     ms_SortType1;
 	static int     ms_SortType2;
 	static bool    ms_SortAscending1;
