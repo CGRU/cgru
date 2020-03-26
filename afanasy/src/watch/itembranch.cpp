@@ -76,16 +76,19 @@ void ItemBranch::v_updateValues(af::Node * i_afnode, int i_msgType)
 	if (Watch::isPadawan())
 	{
 		// Counts:
-		strCounts += QString(" JobsCount:%1").arg(jobs_total);
+		strCounts += QString(" Jobs:%1").arg(jobs_total);
 		if (running_tasks_num)
 		{
-			strCounts += QString(" RunningTasks:%1").arg(running_tasks_num);
-			strCounts += QString(" CapacityTotal:%1").arg(afqt::stoq(af::toKMG(running_capacity_total)));
+			strCounts += QString(" Tasks:%1").arg(running_tasks_num);
+			strCounts += QString(" Capacity:%1").arg(afqt::stoq(af::toKMG(running_capacity_total)));
 		}
 
 		// Parameters:
-		if (branch->isSolvePriority()) strParameters += " Solving:Priority"; else strParameters += " Solving:Ordered";
-		if (branch->isSolveCapacity()) strParameters +=         ",Capacity"; else strParameters +=        ",RunTasks";
+		if (branch->isCreateChilds()) strParameters += " AutoCreateChilds";
+		strParameters += " Solving:";
+		if (branch->isSolveJobs()) strParameters += "Jobs:"; else strParameters += "Users:";
+		if (branch->isSolvePriority()) strParameters += "Priority";  else strParameters += "Ordered";
+		if (branch->isSolveCapacity()) strParameters += ",Capacity"; else strParameters += ",RunTasks";
 		if (max_running_tasks != -1) strParameters += QString(" MaxRuningTasks:%1").arg(max_running_tasks);
 		if (max_running_tasks_per_host != -1) strParameters += QString(" MaxRunTasksPerHost:%1").arg(max_running_tasks_per_host);
 		if (false == hostsmask.isEmpty()) strParameters += QString(" HostsMask(%1)").arg(hostsmask);
@@ -98,12 +101,14 @@ void ItemBranch::v_updateValues(af::Node * i_afnode, int i_msgType)
 		strCounts += QString(" Jobs:%1").arg(jobs_total);
 		if (running_tasks_num)
 		{
-			strCounts += QString(" RunTasks:%1").arg(running_tasks_num);
+			strCounts += QString(" Tasks:%1").arg(running_tasks_num);
 			strCounts += QString(" Capacity:%1").arg(afqt::stoq(af::toKMG(running_capacity_total)));
 		}
 
 		// Parameters:
-		if (branch->isSolvePriority()) strParameters += " Priority"; else strParameters += " Ordered";
+		if (branch->isCreateChilds()) strParameters += " CreateChilds";
+		if (branch->isSolveJobs()) strParameters += " Jobs:"; else strParameters += " Users:";
+		if (branch->isSolvePriority()) strParameters += "Priority";  else strParameters += "Ordered";
 		if (branch->isSolveCapacity()) strParameters += ",Capacity"; else strParameters += ",MaxTasks";
 		if (max_running_tasks != -1) strParameters += QString(" MaxTasks:%1").arg(max_running_tasks);
 		if (max_running_tasks_per_host != -1) strParameters += QString(" MaxPerHost:%1").arg(max_running_tasks_per_host);
@@ -122,7 +127,9 @@ void ItemBranch::v_updateValues(af::Node * i_afnode, int i_msgType)
 		}
 
 		// Parameters:
-		if (branch->isSolvePriority()) strParameters += " pri"; else strParameters += " ord";
+		if (branch->isCreateChilds()) strParameters += " ACC";
+		if (branch->isSolveJobs()) strParameters += " J:"; else strParameters += " U:";
+		if (branch->isSolvePriority()) strParameters += "pri";  else strParameters += "ord";
 		if (branch->isSolveCapacity()) strParameters += ",cap"; else strParameters += ",mt";
 		if (max_running_tasks != -1) strParameters += QString("m%1").arg(max_running_tasks);
 		if (max_running_tasks_per_host != -1) strParameters += QString(" mph%1").arg(max_running_tasks_per_host);

@@ -51,7 +51,7 @@ void Branch::initDefaultValues()
 
 	setSolveJobs(false);
 	setSolvePriority();
-	setSolveCapacity();
+	setSolveTasksNum();
 
 	m_branches_num = 0;
 	m_branches_total = 0;

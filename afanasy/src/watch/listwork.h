@@ -43,6 +43,15 @@ private slots:
 
 	void slot_ChangeSize( int i_size);
 
+	void slot_ACC_Enable();
+	void slot_ACC_Disable();
+	void slot_SolveJobs();
+	void slot_SolveUsers();
+	void slot_SolvePiority();
+	void slot_SolveOrder();
+	void slot_SolveTasks();
+	void slot_SolveCapacity();
+
 	void slot_Start();
 	void slot_Pause();
 

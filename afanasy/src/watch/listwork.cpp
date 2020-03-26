@@ -86,12 +86,49 @@ ListWork::ListWork(QWidget* parent):
 	m_ctrl_sf->getLayout()->addWidget(control);
 
 	// Add left panel buttons:
-	ButtonPanel * bp; ButtonsMenu * bm;
+	ButtonPanel * bp;
 
 	if (af::Environment::VISOR())
 	{
 		bp = addButtonPanel(Item::TAny, "LOG","work_log","Show log.");
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_RequestLog()));
+
+		addButtonsMenu(Item::TBranch, "Create Childs","Create branch childs or not.");
+
+		bp = addButtonPanel(Item::TBranch, "AUTO","branch_childs_create","Automatically create branch childs.");
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_ACC_Enable()));
+
+		bp = addButtonPanel(Item::TBranch, "DISABLED","branch_childs_nocreate","Do not create branch childs.");
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_ACC_Disable()));
+
+		addButtonsMenu(Item::TBranch, "Solve Method","Solve by prority or order.");
+
+		bp = addButtonPanel(Item::TBranch, "PRIORITY","branch_solve_priority","Solve by priority.");
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_SolvePiority()));
+
+		bp = addButtonPanel(Item::TBranch, "ORDER","branch_solve_order","Solve by order.");
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_SolveOrder()));
+
+		addButtonsMenu(Item::TBranch, "Solve Type","Solve users or jobs.");
+
+		bp = addButtonPanel(Item::TBranch, "JOBS","branch_solve_jobs","Solve branch jobs.");
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_SolveJobs()));
+
+		bp = addButtonPanel(Item::TBranch, "USERS","branch_solve_users","Solve branch users.");
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_SolveUsers()));
+
+		resetButtonsMenu();
+
+		addButtonsMenu(Item::TBranch, "Solve Need","Solve need parameter (by capacity or tasks).");
+
+		bp = addButtonPanel(Item::TBranch, "TASKS","branch_solve_tasks","Solve by running tasks number.");
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_SolveTasks()));
+
+		bp = addButtonPanel(Item::TBranch, "CAPACITY","branch_solve_capacity","Solve by running capacity total.");
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_SolveCapacity()));
+
+		resetButtonsMenu();
+
 		bp = addButtonPanel(Item::TAny, "PAUSE","work_pause","Pause selected.","P");
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_Pause()));
 		bp = addButtonPanel(Item::TAny, "START","work_start","Start selected.","S");
@@ -164,7 +201,7 @@ void ListWork::contextMenuEvent(QContextMenuEvent *event)
 	if (item->getType() != Item::TJob)
 		return;
 
-	ItemJob * job = (ItemJob*)item;
+	ItemJob * job = static_cast<ItemJob*>(item);
 
 	QMenu menu(this);
 	QAction *action;
@@ -172,32 +209,6 @@ void ListWork::contextMenuEvent(QContextMenuEvent *event)
 	action = new QAction("Show Log", this);
 	connect(action, SIGNAL(triggered()), this, SLOT(slot_RequestLog()));
 	menu.addAction(action);
-
-	menu.addSeparator();
-
-/*
-	action = new QAction("Annotate", this);
-	connect(action, SIGNAL(triggered()), this, SLOT(slot_Annotate()));
-	submenu->addAction(action);
-	action = new QAction("Set Priority", this);
-	connect(action, SIGNAL(triggered()), this, SLOT(slot_Priority()));
-	submenu->addAction(action);
-
-	submenu->addSeparator();
-
-	action = new QAction("Set Paused", this);
-	connect(action, SIGNAL(triggered()), this, SLOT(slot_SetPaused()));
-	submenu->addAction(action);
-	action = new QAction("Unset Paused", this);
-	connect(action, SIGNAL(triggered()), this, SLOT(slot_UnsetPaused()));
-	submenu->addAction(action);
-
-	submenu->addSeparator();
-
-	action = new QAction("Change Max Tasks", this);
-	connect(action, SIGNAL(triggered()), this, SLOT(slot_MaxTasks()));
-	submenu->addAction(action);
-*/
 
 	menu.exec(event->globalPos());
 }
@@ -373,6 +384,15 @@ void ListWork::calcTitle()
 
 	m_parentWindow->setWindowTitle(jobs + "; " + branches);
 }
+
+void ListWork::slot_ACC_Enable()   {setParameter(Item::TBranch, "create_childs", "true" );}
+void ListWork::slot_ACC_Disable()  {setParameter(Item::TBranch, "create_childs", "false");}
+void ListWork::slot_SolveJobs()    {setParameter(Item::TBranch, "solve_jobs", "true" );}
+void ListWork::slot_SolveUsers()   {setParameter(Item::TBranch, "solve_jobs", "false");}
+void ListWork::slot_SolvePiority() {setParameter(Item::TBranch, "solve_method", "\"solve_priority\"");}
+void ListWork::slot_SolveOrder()   {setParameter(Item::TBranch, "solve_method", "\"solve_order\""   );}
+void ListWork::slot_SolveTasks()   {setParameter(Item::TBranch, "solve_need", "\"solve_tasks\""   );}
+void ListWork::slot_SolveCapacity(){setParameter(Item::TBranch, "solve_need", "\"solve_capacity\"");}
 
 void ListWork::slot_JobSetBranch()
 {
