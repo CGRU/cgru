@@ -45,52 +45,18 @@ std::string ListWork::ms_FilterString = "";
 
 uint32_t ListWork::ms_hide_flags = e_HideHidden | e_HideSystem | e_HideDone | e_HideEmpty;
 
-ListWork::ListWork(QWidget* parent):
-	ListNodes(parent, "jobs")
+ListWork::ListWork(QWidget * i_parent):
+	ListJobs(i_parent, true, "work")
 {
 	m_node_types.clear();
 	m_node_types.push_back("branches");
 	m_node_types.push_back("jobs");
-
-	m_ctrl_sf = new CtrlSortFilter(this,
-			&ms_SortType1, &ms_SortAscending1,
-			&ms_SortType2, &ms_SortAscending2,
-			&ms_FilterType, &ms_FilterInclude, &ms_FilterMatch, &ms_FilterString
-		);
-
-	m_ctrl_sf->addSortType(  CtrlSortFilter::TNONE);
-	m_ctrl_sf->addSortType(  CtrlSortFilter::TTIMECREATION);
-	m_ctrl_sf->addSortType(  CtrlSortFilter::TTIMERUN);
-	m_ctrl_sf->addSortType(  CtrlSortFilter::TTIMESTARTED);
-	m_ctrl_sf->addSortType(  CtrlSortFilter::TTIMEFINISHED);
-	m_ctrl_sf->addSortType(  CtrlSortFilter::TNUMRUNNINGTASKS);
-	m_ctrl_sf->addSortType(  CtrlSortFilter::TSERVICE);
-	m_ctrl_sf->addSortType(  CtrlSortFilter::TNAME);
-	m_ctrl_sf->addFilterType(CtrlSortFilter::TNONE);
-	m_ctrl_sf->addFilterType(CtrlSortFilter::TNAME);
-	m_ctrl_sf->addFilterType(CtrlSortFilter::TSERVICE);
-	m_ctrl_sf->addSortType(  CtrlSortFilter::TPRIORITY);
-	m_ctrl_sf->addSortType(  CtrlSortFilter::THOSTNAME);
-	m_ctrl_sf->addSortType(  CtrlSortFilter::TUSERNAME);
-	m_ctrl_sf->addFilterType(CtrlSortFilter::THOSTNAME);
-	m_ctrl_sf->addFilterType(CtrlSortFilter::TUSERNAME);
-
-	// Get stored hide flags:
-	m_hide_flags = ms_hide_flags;
-
-	initSortFilterCtrl();
-
-	CtrlWork * control = new CtrlWork(m_ctrl_sf, this);
-	m_ctrl_sf->getLayout()->addWidget(control);
 
 	// Add left panel buttons:
 	ButtonPanel * bp;
 
 	if (af::Environment::VISOR())
 	{
-		bp = addButtonPanel(Item::TAny, "LOG","work_log","Show log.");
-		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_RequestLog()));
-
 		addButtonsMenu(Item::TBranch, "Create Childs","Create branch childs or not.");
 
 		bp = addButtonPanel(Item::TBranch, "AUTO","branch_childs_create","Automatically create branch childs.");
@@ -125,30 +91,9 @@ ListWork::ListWork(QWidget* parent):
 
 		bp = addButtonPanel(Item::TJob, "SET BRANCH","job_change_branch","Change job branch.");
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_JobSetBranch()));
-
-		bp = addButtonPanel(Item::TAny, "PAUSE","work_pause","Pause selected.","P");
-		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_Pause()));
-		bp = addButtonPanel(Item::TAny, "START","work_start","Start selected.","S");
-		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_Start()));
-		bp = addButtonPanel(Item::TAny, "STOP","work_stop","Stop selected jobs tasks and pause.","", true);
-		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_Stop()));
-
-		addParam_Num(Item::TAny,    "priority",                  "Priority",             "Priority number", 0, 250);
-		addParam_Str(Item::TAny,    "annotation",                "Annotation",           "Annotation string");
-		addParam_Num(Item::TAny,    "max_running_tasks",         "Maximum Running",      "Maximum running tasks number", -1, 1<<20);
-		addParam_Num(Item::TAny,    "max_running_tasks_per_host","Max Run Per Host",     "Max run tasks on the same host", -1, 1<<20);
-		addParam_REx(Item::TAny,    "hosts_mask",                "Hosts Mask",           "Host names pattern that job can run on");
-		addParam_REx(Item::TAny,    "hosts_mask_exclude",        "Hosts Mask Exclude",   "Host names pattern that job will not run");
-		addParam_Num(Item::TBranch, "max_tasks_per_second",      "Max Tasks Per Second", "Maximum tasks starts per second", -1, 1<<20);
 	}
 
 	m_parentWindow->setWindowTitle("Work");
-
-	initListNodes();
-
-	QTimer * timer = new QTimer(this);
-	timer->start(1900 * af::Environment::getWatchRefreshGuiSec());
-	connect(timer, SIGNAL(timeout()), this, SLOT(repaintItems()));
 }
 
 ListWork::~ListWork()
@@ -166,10 +111,13 @@ void ListWork::contextMenuEvent(QContextMenuEvent *event)
 	if (item == NULL)
 		return;
 
-	if (item->getType() != Item::TJob)
+	if (item->getType() == Item::TJob)
+	{
+		ListJobs::contextMenuEvent(event);
 		return;
+	}
 
-	ItemJob * job = static_cast<ItemJob*>(item);
+	ItemBranch * itembranch = static_cast<ItemBranch*>(item);
 
 	QMenu menu(this);
 	QAction *action;
@@ -398,10 +346,5 @@ void ListWork::jobSetBranch(const QString & i_name)
 	Watch::sendMsg(af::jsonMsg(str));
 }
 
-void ListWork::slot_Start() { operation(Item::TAny, "start");}
-void ListWork::slot_Pause() { operation(Item::TAny, "pause");}
-
 void ListWork::slot_Delete() { operation(Item::TAny, "delete"); }
-
-void ListWork::slot_RequestLog() { getItemInfo(Item::TAny, "log"); }
 

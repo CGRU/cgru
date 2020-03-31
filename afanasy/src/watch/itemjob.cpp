@@ -30,8 +30,7 @@ ItemJob::ItemJob(ListNodes * i_list_nodes, bool i_inworklist, af::Job * i_job, c
 	{
 		const af::BlockData * blockdata = i_job->getBlock(b);
 		BlockInfo * blockinfo = new BlockInfo(blockdata, this, m_list_nodes);
-		if (false == m_inworklist)
-			QObject::connect(blockinfo, SIGNAL(sig_BlockAction(int, QString)), m_list_nodes, SLOT(slot_BlockAction(int, QString)));
+		QObject::connect(blockinfo, SIGNAL(sig_BlockAction(int, QString)), m_list_nodes, SLOT(slot_BlockAction(int, QString)));
 		m_blocks.append(blockinfo);
 	}
 

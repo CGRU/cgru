@@ -46,7 +46,7 @@ bool    ListRenders::ms_FilterMatch    = false;
 std::string ListRenders::ms_FilterString = "";
 
 ListRenders::ListRenders( QWidget* parent):
-	ListNodes( parent, "renders")
+	ListNodes(parent, "farm")
 {
 	m_node_types.clear();
 	m_node_types.push_back("pools");

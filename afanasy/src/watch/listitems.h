@@ -38,7 +38,7 @@ public:
 
 	static const std::string & itemTypeToAf(Item::EType i_type);
 
-	ListItems( QWidget* parent, const std::string & type = "");
+	ListItems(QWidget * i_parent, const std::string & i_type = "");
 	virtual ~ListItems();
 
 	int count() const;

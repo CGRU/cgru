@@ -49,11 +49,12 @@ std::string ListJobs::ms_FilterString_SU = "";
 
 uint32_t ListJobs::ms_hide_flags = e_HideHidden;
 
-ListJobs::ListJobs(QWidget * i_parent):
-	ListNodes(i_parent, "jobs"),
+ListJobs::ListJobs(QWidget * i_parent, bool i_listwork, const std::string & i_name):
+	ListNodes(i_parent, i_name),
+	m_listwork(i_listwork),
 	m_all_blocks_menu_shown(false)
 {
-	if( af::Environment::VISOR())
+	if( af::Environment::VISOR() || m_listwork)
 		m_ctrl_sf = new CtrlSortFilter( this,
 			&ms_SortType1_SU, &ms_SortAscending1_SU,
 			&ms_SortType2_SU, &ms_SortAscending2_SU,
@@ -94,9 +95,11 @@ ListJobs::ListJobs(QWidget * i_parent):
 
 
 	// Add left panel buttons:
+	if (af::Environment::VISOR() || (false == m_listwork))
+	{
 	ButtonPanel * bp;
 
-	bp = addButtonPanel(Item::TJob, "LOG","jobs_log","Show job log.");
+	bp = addButtonPanel(Item::TAny, "LOG","jobs_log","Show job log.");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestLog()));
 
 	bp = addButtonPanel(Item::TJob, "PAUSE","jobs_pause","Pause selected jobs.","P");
@@ -146,11 +149,12 @@ ListJobs::ListJobs(QWidget * i_parent):
 	bp = addButtonPanel(Item::TJob, "DELETE","jobs_delete","Delete selected jobs.","", true);
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actDelete()));
 
-	if (false == af::Environment::VISOR())
+	if (false == af::Environment::VISOR() && (false == m_listwork))
 	{
 		bp = addButtonPanel(Item::TJob, "DEL DONE","jobs_delete_done","Delete all done jobs.","",
 				true /*double click*/, true /*always active*/);
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(actDeleteDone()));
+	}
 	}
 
 	// Add parameters
@@ -173,7 +177,8 @@ ListJobs::ListJobs(QWidget * i_parent):
 	addParam_REx(Item::TJob, "depend_mask",               "Depend Mask",        "Jobs name mask to wait");
 	addParam_REx(Item::TJob, "depend_mask_global",        "Global Depend",      "Depend mask for jobs from any user");
 	addParam_separator();
-	addParam_Hrs(Item::TJob, "time_life",                 "Life Time",          "Time to be deleted after creation");
+	addParam_Num(Item::TBranch, "max_tasks_per_second",   "Max Tasks Per Second", "Maximum tasks starts per second", -1, 1<<20);
+	addParam_Hrs(Item::TJob,    "time_life",              "Life Time",            "Time to be deleted after creation");
 	addParam_separator();
 	addParam_REx(Item::TJob, "need_os",                   "OS Needed",          "Job will run only on this OS");
 	addParam_REx(Item::TJob, "need_properties",           "Properties Needed",  "Job need client that has such properties");
@@ -196,9 +201,9 @@ ListJobs::~ListJobs()
 
 void ListJobs::v_showFunc()
 {
-	if( Watch::isConnected() == false) return;
+	if (Watch::isConnected() == false) return;
 
-	if( af::Environment::VISOR())
+	if (af::Environment::VISOR() || m_listwork)
 		get();
 	else
 	{

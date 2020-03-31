@@ -1,6 +1,6 @@
 #pragma once
 
-#include "listnodes.h"
+#include "listjobs.h"
 
 #include "../libafanasy/msg.h"
 #include "../libafanasy/taskexec.h"
@@ -10,12 +10,12 @@ class QItemSelection;
 class ItemBranch;
 class ItemJob;
 
-class ListWork : public ListNodes
+class ListWork : public ListJobs
 {
 	Q_OBJECT
 
 public:
-	ListWork(QWidget* parent);
+	ListWork(QWidget * i_parent);
 	~ListWork();
 
 	bool v_caseMessage(af::Msg * msg);
@@ -39,12 +39,8 @@ private slots:
 	void slot_SolveTasks();
 	void slot_SolveCapacity();
 
-	void slot_Start();
-	void slot_Pause();
-
 	void slot_JobSetBranch();
 	void slot_Delete();
-	void slot_RequestLog();
 
 private:
 	void addBranch(int i_parent_id, const QString & i_child);

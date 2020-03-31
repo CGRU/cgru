@@ -63,14 +63,14 @@ const std::string & ListItems::itemTypeToAf(Item::EType i_type)
 	return invalid;
 }
 
-ListItems::ListItems( QWidget* parent, const std::string & type):
-	QWidget( parent),
-	m_type( type),
+ListItems::ListItems(QWidget * i_parent, const std::string & i_type):
+	QWidget(i_parent),
+	m_type(i_type),
 	m_model(NULL),
 	m_ctrl_sf(NULL),
 	m_paramspanel(NULL),
 	m_current_buttons_menu(NULL),
-	m_parentWindow(parent),
+	m_parentWindow(i_parent),
 	m_current_item(NULL)
 {
 	setAttribute ( Qt::WA_DeleteOnClose, true );

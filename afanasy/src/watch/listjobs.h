@@ -12,7 +12,7 @@ class ListJobs : public ListNodes
 	Q_OBJECT
 
 public:
-	ListJobs(QWidget * i_parent);
+	ListJobs(QWidget * i_parent, bool i_listwork = false, const std::string & i_name = "jobs");
 	~ListJobs();
 
 	bool v_caseMessage( af::Msg * msg);
@@ -29,8 +29,6 @@ protected:
 	void v_showFunc();
 
 	void doubleClicked( Item * item);
-
-//	void v_connectionLost();
 
 	void v_resetSorting();
 
@@ -85,6 +83,8 @@ private:
 	void calcTotals();
 
 private:
+	const bool m_listwork;
+
 	// Sorting filtering settings ordinary user:
 	static int     ms_SortType1;
 	static int     ms_SortType2;
