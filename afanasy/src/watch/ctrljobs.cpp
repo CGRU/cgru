@@ -5,9 +5,10 @@
 #include <QLabel>
 #include <QMenu>
 
-CtrlJobs::CtrlJobs( QWidget * i_parent, ListJobs * i_listjobs):
-	QLabel("View Options", i_parent ),
-	m_listjobs( i_listjobs)
+CtrlJobs::CtrlJobs( QWidget * i_parent, ListJobs * i_listjobs, bool i_inworklist):
+	QLabel("View Options", i_parent),
+	m_listjobs(i_listjobs),
+	m_inworklist(i_inworklist)
 {
 	setFrameShape(QFrame::StyledPanel);
 	setFrameShadow(QFrame::Raised);
@@ -58,6 +59,21 @@ void CtrlJobs::contextMenuEvent( QContextMenuEvent * i_event)
 	action_id->setChecked( m_listjobs->getFlagsHideShow() & ListNodes::e_HideOffline);
 	connect( action_id, SIGNAL( triggeredId( int ) ), m_listjobs, SLOT( actHideShow( int) ));
 	menu.addAction( action_id);
+
+	if (m_inworklist)
+	{
+		action_id = new ActionId(ListNodes::e_HideEmpty, "Empty", this);
+		action_id->setCheckable(true);
+		action_id->setChecked(m_listjobs->getFlagsHideShow() & ListNodes::e_HideEmpty);
+		connect(action_id, SIGNAL(triggeredId(int)), m_listjobs, SLOT(actHideShow(int)));
+		menu.addAction(action_id);
+
+		action_id = new ActionId(ListNodes::e_HideSystem, "System", this);
+		action_id->setCheckable(true);
+		action_id->setChecked(m_listjobs->getFlagsHideShow() & ListNodes::e_HideSystem);
+		connect(action_id, SIGNAL(triggeredId(int)), m_listjobs, SLOT(actHideShow(int)));
+		menu.addAction(action_id);
+	}
 
 	menu.exec( i_event->globalPos());
 }

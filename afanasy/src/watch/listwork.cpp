@@ -52,6 +52,10 @@ ListWork::ListWork(QWidget * i_parent):
 	m_node_types.push_back("branches");
 	m_node_types.push_back("jobs");
 
+	m_hide_flags = ms_hide_flags;
+
+	m_parentWindow->setWindowTitle("Work");
+
 	// Add left panel buttons:
 	ButtonPanel * bp;
 
@@ -92,8 +96,6 @@ ListWork::ListWork(QWidget * i_parent):
 		bp = addButtonPanel(Item::TJob, "SET BRANCH","job_change_branch","Change job branch.");
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_JobSetBranch()));
 	}
-
-	m_parentWindow->setWindowTitle("Work");
 }
 
 ListWork::~ListWork()

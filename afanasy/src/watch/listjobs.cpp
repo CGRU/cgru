@@ -90,8 +90,8 @@ ListJobs::ListJobs(QWidget * i_parent, bool i_listwork, const std::string & i_na
 
 	initSortFilterCtrl();
 
-	CtrlJobs * control = new CtrlJobs( m_ctrl_sf, this);
-	m_ctrl_sf->getLayout()->addWidget( control);
+	CtrlJobs * control = new CtrlJobs(m_ctrl_sf, this, m_listwork);
+	m_ctrl_sf->getLayout()->addWidget(control);
 
 
 	// Add left panel buttons:
