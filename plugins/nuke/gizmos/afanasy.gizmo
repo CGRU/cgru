@@ -53,6 +53,8 @@ Gizmo {
 
    addUserKnob { 20 "" Advanced }
    addUserKnob { 26 "" l "" }
+   addUserKnob {  6 tmpscene l "Create and render temporary scene file" }
+   addUserKnob { 26 "" l "" }
    addUserKnob {  6 tickets_use  l "Tickets" }
    addUserKnob {  1 tickets_data l ""    }
    addUserKnob { 26 "" l "" }
@@ -91,6 +93,7 @@ Gizmo {
 	forceframes     0
 	singlejob       1
 
+	tmpscene        1
 	tickets_use     0
 	tickets_data    NUKE:1,NET:100
 	tmpimage        1
