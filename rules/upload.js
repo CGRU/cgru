@@ -337,7 +337,7 @@ function up_Done(i_el, i_file_info)
 	// Refresh files views same path:
 	fv_RefreshPath(c_PathDir(i_el.m_uppath));
 
-	//	c_MakeThumbnail( i_el.m_uppath + '/' + i_el.m_upfile.name);
+	//c_MakeThumbnail(c_PathDir(i_el.m_uppath) + '/' + c_PathBase(i_file_info.path));
 }
 
 function up_Remove(i_el)

@@ -388,29 +388,30 @@ Comment.prototype.init = function() {
 
 	if (this.obj.uploads && (this.uploads_created != true))
 	{
-		// console.log( JSON.stringify( this.obj.uploads));
+		//console.log(JSON.stringify(this.obj.uploads));
 		this.uploads_created = true;
 		this.elUploads.style.display = 'block';
-		for (var i = 0; i < this.obj.uploads.length; i++)
+		for (let i = 0; i < this.obj.uploads.length; i++)
 		{
-			var up = this.obj.uploads[i];
+			let up = this.obj.uploads[i];
 
-			var el = document.createElement('div');
+			let el = document.createElement('div');
 			this.elUploads.appendChild(el);
 			el.classList.add('path');
 
 			c_CreateOpenButton(el, up.path);
 
-			var elLink = document.createElement('a');
+			let elLink = document.createElement('a');
 			el.appendChild(elLink);
 			elLink.href = '#' + up.path;
-			var dir = up.path.replace(g_CurPath(), '');
+			let dir = up.path.replace(g_CurPath(), '');
 			if (dir[0] == '/')
 				dir = dir.substr(1);
 			elLink.textContent = dir;
+			elLink.textContent = up.path;
 
-			for (var f = 0; f < up.files.length; f++)
-				this.showFile(up.path, up.files[f]);
+			for (let f = 0; f < up.files.length; f++)
+				this.showFile(el, up.path, up.files[f]);
 		}
 	}
 
@@ -774,9 +775,9 @@ Comment.prototype.updateStatus = function() {
 
 Comment.prototype.processUploads = function() {
 	var upfiles = [];
-	for (var i = 0; i < up_elFiles.length; i++)
+	for (let i = 0; i < up_elFiles.length; i++)
 	{
-		var el = up_elFiles[i];
+		let el = up_elFiles[i];
 		if (el.m_selected != true)
 			continue;
 		if (el.m_uploading == true)
@@ -784,8 +785,8 @@ Comment.prototype.processUploads = function() {
 
 		up_Start(el);
 
-		var path = c_PathDir(el.m_path);
-		var file = {};
+		let path = c_PathDir(el.m_uppath);
+		let file = {};
 		file.name = el.m_upfile.name;
 		file.size = el.m_upfile.size;
 		upfiles.push({"path": path, "file": file});
@@ -816,37 +817,30 @@ Comment.prototype.processUploads = function() {
 		uploads[u].files.push(upfiles[f].file);
 	}
 
-	// console.log( JSON.stringify( uploads));
 	this.obj.uploads = uploads;
 };
 
-Comment.prototype.showFile = function(i_path, i_file) {
+Comment.prototype.showFile = function(i_el, i_path, i_file) {
 	var el = document.createElement('div');
-	this.el.appendChild(el);
+	i_el.appendChild(el);
 	el.classList.add('file');
-
+/*
 	var elThumb = document.createElement('img');
 	el.appendChild(elThumb);
 	elThumb.classList.add('thumbnail');
 	elThumb.src = RULES.root + c_GetThumbFileName(i_path + '/' + i_file.name);
-
-	var elLink = document.createElement('a');
-	el.appendChild(elLink);
-	elLink.classList.add('link');
-	elLink.textContent = 'link';
-	elLink.target = '_blank';
-	elLink.href = RULES.root + i_path + '/' + i_file.name;
-
+*/
 	var elSize = document.createElement('div');
 	el.appendChild(elSize);
 	elSize.classList.add('size');
 	elSize.textContent = c_Bytes2KMG(i_file.size);
 
-	var elGoto = document.createElement('a');
-	el.appendChild(elGoto);
-	elGoto.classList.add('goto');
-	elGoto.textContent = i_file.name;
-	elGoto.href = '#' + i_path + '?' + JSON.stringify({"fv_Goto": i_path + '/' + i_file.name});
+	var elLink = document.createElement('a');
+	el.appendChild(elLink);
+	elLink.classList.add('link');
+	elLink.textContent = i_file.name;
+	elLink.target = '_blank';
+	elLink.href = RULES.root + i_path + '/' + i_file.name;
 };
 
 Comment.prototype.getLink = function(i_absolute) {

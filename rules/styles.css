@@ -996,13 +996,11 @@ width: 30px; height: 20px;
 border-radius: 2px;
 }
 /*.comment .uploads { margin:6px; padding:4px; border-radius: 6px; box-shadow: 0 0 4px #000 inset; }*/
-.comment .uploads .path { margin: 6px 4px; padding: 6px; border-radius: 2px; box-shadow: 0 0 2px #000 inset, 0 0 2px rgba(255,255,255,.5); }
+.comment .uploads .path { margin: 6px 4px; padding: 6px; border: 2px solid rgba(167,0,167,.5); border-radius: 2px;}
 .comment .uploads .path > a { margin: 3px 9px; }
 .comment .uploads .path .file { clear: both; margin: 2px 0px; padding: 2px 0px; border-top: 1px solid rgba(98,98,98,.5); }
 .comment .uploads .path .file .thumbnail { float: left; margin-right: 8px; }
-.comment .uploads .path .file .goto { /*display: block;*/ }
 .comment .uploads .path .file .size { float: right; margin: 0px 8px; }
-.comment .uploads .path .file .link { float: right; margin: 0px 8px; display: block; }
 .comment .uploads .cgru_cmdexec { float: left; padding: 2px 6px; font-size: 14px; }
 
 .comment_inserted_image_div {
