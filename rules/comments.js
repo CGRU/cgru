@@ -861,9 +861,7 @@ Comment.prototype.getLink = function(i_absolute) {
 
 function cm_OnPaste(i_evt)
 {
-	var data = i_evt.clipboardData;
     i_evt.preventDefault();
-
 	if (cm_process_image)
 		return;
 
@@ -873,25 +871,7 @@ function cm_OnPaste(i_evt)
 	if (text && text.length)
 		document.execCommand('insertHTML', false, text);
 
-	// Process images
-	let image = null;
-	for (let i = 0; i < data.items.length; i++)
-	{
-		let item = data.items[i];
-		if (item.type.indexOf('image') == -1)
-			continue;
-
-		if (image)
-		{
-			c_Error('You can paste only one image at once.');
-			return;
-		}
-
-		image = item.getAsFile();
-	}
-
-	if (image)
-		cm_ProcessImage(image);
+	cm_ProcessImageDataTransfer(i_evt.clipboardData);
 }
 
 function cm_OnDragEnter(i_evt)
@@ -911,38 +891,56 @@ function cm_OnDragLeave(i_evt)
 function cm_OnDrop(i_evt)
 {
 	i_evt.preventDefault();
+	if (cm_process_image)
+		return;
+
 	i_evt.target.classList.remove('drag');
 
-	var data = i_evt.dataTransfer;
-	//console.log(data);
-	if (null == data)
+	cm_ProcessImageDataTransfer(i_evt.dataTransfer);
+}
+
+function cm_ProcessImageDataTransfer(i_data)
+{
+//console.log(i_data);
+	if (null == i_data)
 	{
-		c_Error('Dropped data is null.');
+		c_Error('Transfered data is null.');
 		return;
 	}
-	if (null == data.items)
+	if (null == i_data.items)
 	{
-		c_Error('Dropped data has null items.');
+		c_Error('Transfered data has null items.');
 		return;
 	}
-	if (data.items.length == 0)
+	if (i_data.items.length == 0)
 	{
-		c_Error('Dropped data has zero items.');
-		return;
-	}
-	if (data.items.length > 1)
-	{
-		c_Error('You can drop only single file at once.');
+		c_Error('Transfered data has zero items.');
 		return;
 	}
 
-	var file = data.items[0];
-	if (file.type.indexOf('image') != -1)
+	let file = null;
+	for (let i = 0; i < i_data.items.length; i++)
+	{
+		let item = i_data.items[i];
+		if (item.type.indexOf('image') == -1)
+			continue;
+
+		if (file)
+		{
+			c_Error('You can paste only one image at once.');
+			return;
+		}
+
+		file = item.getAsFile();
+	}
+
+	if (file)
 		cm_ProcessImage(file);
 }
 
 function cm_ProcessImage(i_file)
 {
+	//console.log(i_file);
 	let name = (new Date()).toISOString().replace(/[:.Z]/g,'-') +  g_auth_user.id + '-' + i_file.name;
 	let path = c_GetRuFilePath(name);
 
