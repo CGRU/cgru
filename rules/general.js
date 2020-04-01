@@ -159,8 +159,21 @@ function g_CurPathDummy()
 
 function g_OnKeyDown(e)
 {
-	if (e.keyCode == 27)
-		cgru_EscapePopus();  // ESC
+	if (e.keyCode == 27)  // ESC
+	{
+		// Close all cgru popups
+		cgru_EscapePopus();
+
+		// Close comments images processing
+		if (cm_process_image && (cm_process_image.uploading != true))
+			cm_ProcessImageClose();
+	}
+	else if (e.keyCode == 13) // ENTER
+	{
+		// Close comments images processing
+		if (cm_process_image && (cm_process_image.uploading != true))
+			cm_ProcessImageUpload();
+	}
 }
 
 function g_GO(i_path)

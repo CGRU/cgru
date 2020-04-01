@@ -80,7 +80,7 @@ function FilesView(i_args)
 	else if (localStorage.background && localStorage.background.length)
 		this.elRoot.style.background = localStorage.background;
 	else
-		this.elRoot.style.backgroundColor = u_backgroundColor;
+		this.elRoot.style.background = u_background;
 
 	this.elPanel = document.createElement('div');
 	this.elRoot.appendChild(this.elPanel);

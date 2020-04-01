@@ -111,6 +111,7 @@ function up_FileSelected(e)
 
 		path = path.replace('@DATE@', c_DT_FormStrNow().split(' ')[0]);
 		path = path.replace('@USER@', g_auth_user.id);
+		path += '/' + files[i].name;
 
 		up_CreateFile({'file': files[i], 'path': path, 'title': title, 'el': el});
 	}
@@ -128,7 +129,7 @@ function up_CreateFile(i_args)
 	el.m_uppath = path;
 	el.m_uptitle = i_args.title;
 	el.m_curpath = g_CurPath();
-	el.title = path;
+	el.title = 'Upload path:\n' + path;
 
 	var elBtnAdd = document.createElement('div');
 	el.appendChild(elBtnAdd);
@@ -296,16 +297,17 @@ function up_Received(i_args, i_el)
 	}
 
 	var news = [];
-	for (var f = 0; f < i_args.files.length; f++)
+	for (let f = 0; f < i_args.files.length; f++)
 	{
 		up_Done(i_el, i_args.files[f]);
 
-		var filename = i_args.files[f].filename;
-		if (filename == null)
+		let path = i_args.files[f].path;
+		if (path == null)
 			continue;
 
-		var news_link = g_GetLocationArgs(
-			{"fv_Goto": i_el.m_uppath + '/' + c_PathBase(i_args.files[f].filename)}, false, i_el.m_curpath);
+		// File (path base) can be renamed during upload
+		path = c_PathDir(i_el.m_uppath) + '/' + c_PathBase(path);
+		let news_link = g_GetLocationArgs({"fv_Goto": path}, false, i_el.m_curpath);
 		news.push(nw_CreateNews({'title': i_el.m_uptitle, 'path': i_el.m_curpath, 'link': news_link}));
 	}
 
@@ -314,27 +316,26 @@ function up_Received(i_args, i_el)
 	// console.log( JSON.stringify( i_args));
 }
 
-function up_Done(i_el, i_msg)
+function up_Done(i_el, i_file_info)
 {
 	up_Finished(i_el);
 
 	i_el.m_done = true;
 	i_el.classList.remove('started');
 
-	if (i_msg.error)
+	if (i_file_info.error)
 	{
-		c_Error(
-			'Upload: ' + i_msg.error + ': file="' + i_el.m_upfile.name + '" path="' + i_el.m_uppath + '"');
+		c_Error('Upload: ' + i_file_info.error + ': "' + i_file_info.path + '"');
 		i_el.classList.add('error');
 		i_el.m_elProgress.textContent = i_msg.error;
 		return;
 	}
 
-	c_Info('Uploaded "' + i_el.m_upfile.name + '" to "' + i_el.m_uppath + '"');
+	c_Info('Uploaded: "' + i_file_info.path + '"');
 	i_el.classList.add('done');
 
 	// Refresh files views same path:
-	fv_RefreshPath(i_el.m_uppath);
+	fv_RefreshPath(c_PathDir(i_el.m_uppath));
 
 	//	c_MakeThumbnail( i_el.m_uppath + '/' + i_el.m_upfile.name);
 }

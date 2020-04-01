@@ -23,6 +23,8 @@ var cm_durations = [
 ];
 var cm_array = [];
 
+var cm_process_image = null;
+
 function View_comments_Open()
 {
 	cm_Load();
@@ -239,6 +241,7 @@ function Comment(i_obj)
 	this.elText.classList.add('text');
 	this.elText.m_obj = this;
 	this.elText.onkeydown = function(e) { e.currentTarget.m_obj.textOnKeyDown(e); };
+	this.elText.addEventListener('paste', cm_OnPaste);
 
 	this.elForEdit = document.createElement('div');
 	this.el.appendChild(this.elForEdit);
@@ -275,7 +278,7 @@ Comment.prototype.init = function() {
 	else if (localStorage.background && (localStorage.background != ''))
 		this.elText.style.background = localStorage.background;
 	else
-		this.elText.style.backgroundColor = u_backgroundColor;
+		this.elText.style.background = u_background;
 
 
 	if (this.obj == null)
@@ -849,3 +852,292 @@ Comment.prototype.showFile = function(i_path, i_file) {
 Comment.prototype.getLink = function(i_absolute) {
 	return g_GetLocationArgs({"cm_Goto": this.obj.key}, i_absolute);
 };
+
+
+function cm_OnPaste(i_evt)
+{
+	var data = i_evt.clipboardData;
+    i_evt.preventDefault();
+
+	if (cm_process_image)
+		return;
+
+	// Process text
+	let text = (i_evt.clipboardData || window.clipboardData).getData('text/plain');
+	text.replace('\n','<br>\n');
+	if (text && text.length)
+		document.execCommand('insertHTML', false, text);
+
+	// Process images
+	let image = null;
+	for (let i = 0; i < data.items.length; i++)
+	{
+		let item = data.items[i];
+		if (item.type.indexOf('image') == -1)
+			continue;
+
+		if (image)
+		{
+			c_Error('You can paste only one image at once.');
+			return;
+		}
+
+		image = item.getAsFile();
+	}
+
+	if (image)
+		cm_ProcessImage(image);
+}
+
+function cm_ProcessImage(i_file)
+{
+	let name = (new Date()).toISOString().replace(/[:.Z]/g,'-') +  g_auth_user.id + '-' + i_file.name;
+	let path = c_GetRuFilePath(name);
+
+	let elRoot = document.createElement('div');
+	document.body.appendChild(elRoot);
+	elRoot.classList.add('insert_image_root');
+
+	let elImg = document.createElement('img');
+	elRoot.appendChild(elImg);
+	elImg.classList.add('insert_image_img');
+	elImg.src = URL.createObjectURL(i_file);
+	elImg.m_file = i_file;
+	elImg.onload = cm_ProcessImageOnLoad;
+
+	let elWnd = document.createElement('div');
+	elRoot.appendChild(elWnd);
+	elWnd.classList.add('insert_image_wnd');
+
+	let elInfo = document.createElement('div');
+	elWnd.appendChild(elInfo);
+	elInfo.classList.add('insert_image_info');
+	elInfo.innerHTML = i_file.name + ': ' + c_Bytes2KMG(i_file.size);
+	elInfo.title = path;
+
+	let elStatus = document.createElement('div');
+	elWnd.appendChild(elStatus);
+	elStatus.classList.add('insert_image_status');
+
+	let btn_cancel = document.createElement('div');
+	elWnd.appendChild(btn_cancel);
+	btn_cancel.textContent = 'Cancel';
+	btn_cancel.classList.add('button');
+	btn_cancel.classList.add('insert_image_cancel');
+	btn_cancel.onclick = cm_ProcessImageClose;
+
+	let btn_upload = document.createElement('div');
+	elWnd.appendChild(btn_upload);
+	btn_upload.textContent = 'Upload Image';
+	btn_upload.classList.add('button');
+	btn_upload.classList.add('insert_image_upload');
+	btn_upload.onclick = cm_ProcessImageUpload;
+
+	let elProgress = document.createElement('div');
+	elWnd.appendChild(elProgress);
+	elWnd.style.background = u_background;
+	elProgress.classList.add('insert_image_progress');
+
+	cm_process_image = {};
+	cm_process_image.el_root = elRoot;
+	cm_process_image.file = i_file;
+	cm_process_image.path = path;
+	cm_process_image.btn_cancel = btn_cancel;
+	cm_process_image.btn_upload = btn_upload;
+	cm_process_image.el_info = elInfo;
+	cm_process_image.el_status = elStatus;
+	cm_process_image.el_progress = elProgress;
+	cm_process_image.up_percent = -1;
+	cm_process_image.uploading = false;
+}
+
+function cm_ProcessImageOnLoad()
+{
+	cm_process_image.width = this.naturalWidth;
+	cm_process_image.height = this.naturalHeight;
+
+	var info = cm_process_image.file.name + ':';
+	info += ' ' + this.naturalWidth + 'x' + this.naturalHeight;
+	info += ' ' + c_Bytes2KMG(cm_process_image.file.size);
+
+	cm_process_image.el_info.innerHTML = info;
+}
+
+function cm_ProcessImageUpload()
+{
+	cm_process_image.uploading = true;
+	cm_process_image.btn_cancel.style.display = 'none';
+	cm_process_image.btn_upload.style.display = 'none';
+	cm_process_image.up_time = (new Date() / 1000);
+
+	var formData = new FormData();
+	formData.append('upload_path', cm_process_image.path);
+	formData.append('upload_file', cm_process_image.file);
+
+	var xhr = new XMLHttpRequest();
+	xhr.upload.addEventListener('progress', cm_ProcessImageUploadProgress, false);
+	xhr.addEventListener('load',  cm_ProcessImageUpload_Load,  false);
+	xhr.addEventListener('error', cm_ProcessImageUpload_Error, false);
+	xhr.addEventListener('abort', cm_ProcessImageUpload_Abort, false);
+	xhr.open('POST', n_server);
+	xhr.send(formData);
+
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState == 4)
+		{
+			if (xhr.status == 200)
+			{
+				c_Log('<b style="color:#404"><i>upload:</i></b> ' + xhr.responseText);
+				cm_ProcessImageUploadFinished(c_Parse(xhr.responseText));
+				return;
+			}
+		}
+	};
+}
+
+function cm_ProcessImageUpload_Load()
+{
+	if (null == cm_process_image) return;
+	cm_process_image.el_status.innerHTML = 'Uploading';
+}
+function cm_ProcessImageUpload_Error()
+{
+	if (null == cm_process_image) return;
+	cm_process_image.el_status.innerHTML = 'Error';
+}
+function cm_ProcessImageUpload_Abort()
+{
+	if (null == cm_process_image) return;
+	cm_process_image.el_status.innerHTML = 'Aborting';
+}
+
+function cm_ProcessImageUploadProgress(i_evt)
+{
+	if (null == cm_process_image) return;
+
+	var dur = c_DT_DurFromNow(cm_process_image.up_time);
+	var text = dur;
+
+	if (i_evt.lengthComputable)
+	{
+		if (i_evt.total > 0)
+		{
+			let percent = Math.round(100 * i_evt.loaded / i_evt.total);
+			if (cm_process_image.up_percent > percent)
+			{
+				c_Error('Upload: New progress lowered (' + cm_process_image.up_percent + ' > ' + percent + ') at ' + dur);
+			}
+			text += ' ' + percent + '%';
+			cm_process_image.el_progress.style.width = percent + '%';
+			cm_process_image.up_percent = percent;
+		}
+	}
+
+	cm_process_image.el_status.innerHTML = text;
+}
+
+function cm_ProcessImageUploadFinished(i_args)
+{
+	if (i_args.files == null)
+	{
+		c_Error('Uploaded no files.');
+		cm_process_image.el_status.innerHTML = 'Uploaded no files.';
+		return;
+	}
+	if (i_args.files.length == 0)
+	{
+		c_Error('Uploaded zero files.');
+		cm_process_image.el_status.innerHTML = 'Uploaded zero files.';
+		return;
+	}
+	if (i_args.files.length > 1)
+	{
+		c_Error('Uploaded several files at once. Processing only the first one.');
+	}
+
+	cm_ProcessImageFileUploaded(i_args.files[0]);
+}
+
+function cm_ProcessImageFileUploaded(i_file)
+{
+	i_file.src = i_file.path;
+	if (i_file.size < 200000)
+	{
+		cm_ProcessImageInsertHTML(i_file);
+		return;
+	}
+
+	cm_process_image.el_status.innerHTML = 'Creating thumbnail...';
+
+	i_file.thumbnail = i_file.path + '-thumbnail.jpg';
+
+	var cmd = 'rules/bin/convert';
+	cmd += ' -verbose';
+	cmd += ' "' + i_file.path + '"';
+	cmd += ' -quality 85%';
+	cmd += ' -thumbnail 1280';
+	cmd += ' "' + i_file.thumbnail + '"';
+
+	n_Request({"send":{"cmdexec":{"cmds":[cmd]}}, "func": cm_ProcessImageTumbnailed, "file": i_file, "info":'thumbnail'});
+}
+
+function cm_ProcessImageTumbnailed(i_data, i_args)
+{
+//console.log(JSON.stringify(i_args));
+//console.log(JSON.stringify(i_data));
+	var file = i_args.file;
+
+	if ((null == i_data.cmdexec) || (i_data.cmdexec.length == 0))
+	{
+		c_Error('Error executing thumbnail creation.');
+	}
+	else if (i_data.cmdexec[0].search(/error/gi) != -1)
+	{
+		c_Error(i_data.cmdexec[0]);
+	}
+	else
+	{
+		file.src = file.thumbnail;
+	}
+
+	cm_ProcessImageInsertHTML(file);
+}
+
+function cm_ProcessImageInsertHTML(i_file)
+{
+	var info = i_file.name + ':';
+	info += ' ' + cm_process_image.width + 'x' + cm_process_image.height;
+	info += ' ' + c_Bytes2KMG(i_file.size);
+
+	var html = '';
+	html += '<div class="comment_inserted_image_div">'
+	html += '<a target="_blank"';
+	html += ' href="' + i_file.path + '"';
+	html += '>';
+	html += '<span class="comment_inserted_image_info">' + info + '</span>';
+	html += '<br>';
+	html += '<img class="comment_inserted_image"';
+	html += ' src="' + i_file.src + '"';
+	html += ' alt="' + i_file.name + '"';
+	if (i_file.thumbnail || cm_process_image.width > 600)
+		html += ' width=90%';
+	html += '>';
+	html += '</a>';
+	html += '</div>'
+	html += '<div></div>'
+
+	document.execCommand('insertHTML', false, html);
+
+	cm_ProcessImageClose();
+}
+
+function cm_ProcessImageClose()
+{
+	if (null == cm_process_image) return;
+
+	let elParent = cm_process_image.el_root.parentElement;
+	if (elParent)
+		elParent.removeChild(cm_process_image.el_root);
+
+	cm_process_image = null;
+}
