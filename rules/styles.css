@@ -1003,6 +1003,9 @@ border-radius: 2px;
 .comment .uploads .path .file .size { float: right; margin: 0px 8px; }
 .comment .uploads .cgru_cmdexec { float: left; padding: 2px 6px; font-size: 14px; }
 
+.comment .text.editing {border: 1px solid rgba(0,0,0,.5);}
+.comment .text.editing.drag {border: 1px solid rgba(255,255,255,.5);}
+
 .comment_inserted_image_div {
 text-align: center;
 margin: 8px;

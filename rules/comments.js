@@ -241,7 +241,6 @@ function Comment(i_obj)
 	this.elText.classList.add('text');
 	this.elText.m_obj = this;
 	this.elText.onkeydown = function(e) { e.currentTarget.m_obj.textOnKeyDown(e); };
-	this.elText.addEventListener('paste', cm_OnPaste);
 
 	this.elForEdit = document.createElement('div');
 	this.el.appendChild(this.elForEdit);
@@ -268,6 +267,11 @@ Comment.prototype.init = function() {
 	this.elEditBtnsDiv.style.display = 'none';
 
 	this.elText.contentEditable = 'false';
+	this.elText.removeEventListener('paste', cm_OnPaste);
+	this.elText.removeEventListener('dragenter', cm_OnDragEnter);
+	this.elText.removeEventListener('dragover',  cm_OnDragOver);
+	this.elText.removeEventListener('dragleave', cm_OnDragLeave);
+	this.elText.removeEventListener('drop', cm_OnDrop);
 	this.elText.classList.remove('editing');
 	if (localStorage.text_color && (localStorage.text_color != ''))
 		this.elText.style.color = localStorage.text_color;
@@ -561,7 +565,14 @@ Comment.prototype.edit = function() {
 	this.elText.classList.add('editing');
 	this.elText.style.backgroundColor = '#DDDDDD';
 	this.elText.style.color = '#000000';
+
 	this.elText.contentEditable = 'true';
+	this.elText.addEventListener('paste', cm_OnPaste);
+	this.elText.addEventListener('dragenter', cm_OnDragEnter);
+	this.elText.addEventListener('dragover',  cm_OnDragOver);
+	this.elText.addEventListener('dragleave', cm_OnDragLeave);
+	this.elText.addEventListener('drop', cm_OnDrop);
+
 	this.elText.focus();
 };
 
@@ -881,6 +892,53 @@ function cm_OnPaste(i_evt)
 
 	if (image)
 		cm_ProcessImage(image);
+}
+
+function cm_OnDragEnter(i_evt)
+{
+	i_evt.preventDefault();
+	i_evt.target.classList.add('drag');
+}
+function cm_OnDragOver(i_evt)
+{
+	i_evt.preventDefault();
+}
+function cm_OnDragLeave(i_evt)
+{
+	i_evt.preventDefault();
+	i_evt.target.classList.remove('drag');
+}
+function cm_OnDrop(i_evt)
+{
+	i_evt.preventDefault();
+	i_evt.target.classList.remove('drag');
+
+	var data = i_evt.dataTransfer;
+	//console.log(data);
+	if (null == data)
+	{
+		c_Error('Dropped data is null.');
+		return;
+	}
+	if (null == data.items)
+	{
+		c_Error('Dropped data has null items.');
+		return;
+	}
+	if (data.items.length == 0)
+	{
+		c_Error('Dropped data has zero items.');
+		return;
+	}
+	if (data.items.length > 1)
+	{
+		c_Error('You can drop only single file at once.');
+		return;
+	}
+
+	var file = data.items[0];
+	if (file.type.indexOf('image') != -1)
+		cm_ProcessImage(file);
 }
 
 function cm_ProcessImage(i_file)
