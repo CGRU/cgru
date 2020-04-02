@@ -1192,7 +1192,7 @@ function cm_ProcessImageInsertHTML(i_file)
 	html += '>';
 	html += '</a>';
 	html += '</div>'
-	html += '<div></div>'
+	html += '<div> <br> </div>'
 
 	document.execCommand('insertHTML', false, html);
 
