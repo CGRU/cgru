@@ -874,27 +874,45 @@ function cm_OnPaste(i_evt)
 	cm_ProcessImageDataTransfer(i_evt.clipboardData);
 }
 
-function cm_OnDragEnter(i_evt)
+function cm_OnDragEnter(i_evt){cm_DragSetStyle(i_evt, true);}
+function cm_OnDragOver( i_evt){cm_DragSetStyle(i_evt, true);}
+function cm_OnDragLeave(i_evt){cm_DragSetStyle(i_evt, false);}
+function cm_DragSetStyle(i_evt, i_on)
 {
+//console.log(i_evt);
+	// Preventing defaults means that element accept drop
 	i_evt.preventDefault();
-	i_evt.target.classList.add('drag');
-}
-function cm_OnDragOver(i_evt)
-{
-	i_evt.preventDefault();
-}
-function cm_OnDragLeave(i_evt)
-{
-	i_evt.preventDefault();
-	i_evt.target.classList.remove('drag');
+	i_evt.stopPropagation();
+
+	// This can be not element but element text node
+	let el = i_evt.target;
+	if (! el.classList)
+		return;
+
+	// Child element can accept this event too,
+	// so we should search text editing element.
+	while ((false == el.classList.contains('editing')) && el.parentElement)
+	{
+		// We are already at the top of the comment,
+		// we should exit in this case.
+		el.classList.contains('comment');
+			return;
+
+		el = el.parentElement;
+	}
+
+	// Add or remove drag class style
+	if (i_on)
+		el.classList.add('drag');
+	else
+		el.classList.remove('drag');
 }
 function cm_OnDrop(i_evt)
 {
-	i_evt.preventDefault();
+	cm_DragSetStyle(i_evt, false);
+
 	if (cm_process_image)
 		return;
-
-	i_evt.target.classList.remove('drag');
 
 	cm_ProcessImageDataTransfer(i_evt.dataTransfer);
 }
