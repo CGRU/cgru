@@ -86,7 +86,7 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 
 	// Set flags that will be used to hide/show node in list:
 	setHideFlag_Hidden(  job->isHidden()  );
-	setHideFlag_Offline( job->isOffline() );
+	setHideFlag_Offline( job->isOffline() && (false == isRunning()));
 	setHideFlag_Done(    job->isDone()    );
 	setHideFlag_Error(   job->isError()   );
 	setHideFlag_System(  job->isSystem()  );

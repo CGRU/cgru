@@ -11,7 +11,6 @@
 #include "actionid.h"
 #include "dialog.h"
 #include "buttonpanel.h"
-#include "ctrlwork.h"
 #include "ctrlsortfilter.h"
 #include "itemjob.h"
 #include "itembranch.h"
@@ -43,7 +42,7 @@ bool    ListWork::ms_FilterInclude  = true;
 bool    ListWork::ms_FilterMatch    = false;
 std::string ListWork::ms_FilterString = "";
 
-uint32_t ListWork::ms_hide_flags = e_HideHidden | e_HideSystem | e_HideDone | e_HideEmpty;
+uint32_t ListWork::ms_hide_flags = e_HideHidden | e_HideSystem | e_HideDone | e_HideOffline | e_HideEmpty;
 
 ListWork::ListWork(QWidget * i_parent):
 	ListJobs(i_parent, true, "work")
