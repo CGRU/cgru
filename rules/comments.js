@@ -895,7 +895,7 @@ function cm_DragSetStyle(i_evt, i_on)
 	{
 		// We are already at the top of the comment,
 		// we should exit in this case.
-		el.classList.contains('comment');
+		if (el.classList.contains('comment'))
 			return;
 
 		el = el.parentElement;
