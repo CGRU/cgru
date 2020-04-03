@@ -86,9 +86,9 @@ if rop[0] != '/':
 ropnode = hou.node(rop)
 
 if ropnode is None:
-    raise hou.InvalidNodeName(rop + ' rop node wasn`t found')
+    raise hou.InvalidNodeName(rop + " rop node wasn't found")
 
-# Trying to set ROP to block until render comletes
+# Trying to set ROP to block until render completes
 # block = ropnode.parm('soho_foreground')
 # if block != None:
 # value = block.eval()
@@ -225,6 +225,11 @@ elif drivertypename == "Redshift_ROP":
         hou.hscript("Redshift_setLogLevel -L 5")
     except:
         print('Failed, frame progress not available.')
+
+    # Try setting separate GPU masks
+    if 'GPU_MASK' in os.environ:
+        mask = os.environ['GPU_MASK']
+        hou.hscript('Redshift_setGPU -s %s' % mask)
 
 #
 # Distribute simulation:
