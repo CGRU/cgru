@@ -7,6 +7,7 @@ import traceback
 import cgruconfig
 import cgruutils
 
+RULES = dict()
 
 def hasRULES():
     return 'rules_url' in cgruconfig.VARS
@@ -103,7 +104,8 @@ def openShot( i_path, i_verbose = False):
 
 
 def getRules(i_path = None, i_verbose = False):
-    rules = dict()
+    global RULES
+    RULES = dict()
     for afile in getRuFiles(i_path):
         if i_verbose:
             print('File: "%s"' % afile)
@@ -124,9 +126,9 @@ def getRules(i_path = None, i_verbose = False):
         fobj.close()
 
         if obj:
-            mergeObjects(rules, obj)
+            mergeObjects(RULES, obj)
 
-    return rules
+    return RULES
 
 
 def getRuFiles(i_path = None, i_ruFolder = '.rules'):
@@ -170,3 +172,6 @@ def mergeObjects(o_obj, i_obj):
             mergeObjects(o_obj[key], i_obj[key])
         else:
             o_obj[key] = i_obj[key]
+
+if len(RULES) == 0:
+    getRules()
