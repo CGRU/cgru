@@ -458,12 +458,13 @@ class BlockParameters:
             sec = now_sec % 60
             wait_sec = now_day + (hours * 3600) + (minutes * 60) + sec
             if wait_sec <= now_sec:
-                if hou.ui.displayMessage(
-                            'Now is greater than %d:%d\nOffset by 1 day?' % (hours, minutes),
-                            buttons=('Offset', 'Abort'),
-                            default_choice=0, close_choice=1,
-                            title='Wait Time'
-                        ) == 0:
+                result = hou.ui.displayMessage(
+                    'Now is greater than %d:%d\nOffset by 1 day?' % (hours, minutes),
+                    buttons=('Offset', 'Abort'),
+                    default_choice=0, close_choice=1,
+                    title='Wait Time'
+                )
+                if result == 0:
                     wait_sec += (24*3600)
                 else:
                     return

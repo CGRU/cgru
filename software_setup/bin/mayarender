@@ -2,4 +2,9 @@
 
 source $CGRU_LOCATION/software_setup/setup_maya.sh
 
-"$APP_DIR/bin/Render" "$@"
+
+if [ -z "$GPU_LIST" ]; then
+        "$APP_DIR/bin/Render" "$@"
+else
+        "$APP_DIR/bin/Render" -r redshift -gpu $GPU_LIST "$@"
+fi
