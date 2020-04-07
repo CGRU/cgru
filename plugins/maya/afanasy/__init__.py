@@ -509,8 +509,8 @@ class UI(object):
 
         project_path = pm.workspace(q=1, rootDirectory=1)
 
-        outputs = \
-            pm.renderSettings(fullPath=1, firstImageName=1, lastImageName=1)
+        # outputs = \
+        #     pm.renderSettings(fullPath=1, firstImageName=1, lastImageName=1)
 
         # get output paths, set the RenderPass token to Beauty,
         # this will at least guarantee to get something
@@ -617,17 +617,15 @@ class UI(object):
                         layer_name.replace('rs_', '')
                     )
 
-                # disable output generation
-                # outputs_split = afcommon.patternFromDigits(
-                #     afcommon.patternFromStdC(
-                #         afcommon.patternFromPaths(
-                #             layer_outputs[0],
-                #             layer_outputs[0]
-                #         )
-                #     )
-                # ).split(';')
+                outputs_split = afcommon.patternFromDigits(
+                    afcommon.patternFromStdC(
+                        afcommon.patternFromPaths(
+                            layer_outputs[0], layer_outputs[1]
+                        )
+                    )
+                ).split(';')
 
-                # block.setFiles(outputs_split)
+                block.setFiles(outputs_split)
 
                 block.setNumeric(
                     start_frame, end_frame, frames_per_task, by_frame
