@@ -316,6 +316,14 @@ class UI(object):
 #                 )
 
             with pm.rowLayout(nc=2, adj=2, cl2=('right', 'left'), cw2=(labels_width, 40)):
+                pm.text(l='<b>Generate Previews</b>', al='right')
+                pm.checkBox(
+                    'cgru_afanasy__generate_previews',
+                    l='',
+                    v=pm.optionVar.get('cgru_afanasy__generate_previews_ov', 1)
+                )
+
+            with pm.rowLayout(nc=2, adj=2, cl2=('right', 'left'), cw2=(labels_width, 40)):
                 pm.text(l='<b>Close After</b>', al='right')
                 pm.checkBox(
                     'cgru_afanasy__close',
@@ -465,6 +473,8 @@ class UI(object):
         errors_task_same_host = pm.intField('cgru_afanasy__errors_task_same_host', q=1, v=1)
         errors_forgive_time = pm.intField('cgru_afanasy__errors_forgive_time', q=1, v=1)
 
+        generate_previews = pm.checkBox('cgru_afanasy__generate_previews', q=1, v=1)
+
         # check values
         if start_frame > end_frame:
             temp = end_frame
@@ -497,6 +507,8 @@ class UI(object):
         pm.optionVar['cgru_afanasy__errors_task_same_host_ov'] = errors_task_same_host
         pm.optionVar['cgru_afanasy__errors_errors_forgive_time_ov'] = errors_forgive_time
         pm.optionVar['cgru_afanasy__paused_ov'] = pause
+
+        pm.optionVar['cgru_afanasy__generate_previews_ov'] = generate_previews
 
         # get paths
         scene_name = pm.sceneName()
@@ -534,6 +546,7 @@ class UI(object):
         logger.debug('errors_retries        = %s' % errors_retries)
         logger.debug('errors_task_same_host = %s' % errors_task_same_host)
         logger.debug('errors_forgive_time   = %s' % errors_forgive_time)
+        logger.debug('generate_previews     = %s' % generate_previews)
 
         if pm.checkBox('cgru_afanasy__close', q=1, v=1):
             pm.deleteUI(self.window)
@@ -617,15 +630,15 @@ class UI(object):
                         layer_name.replace('rs_', '')
                     )
 
-                outputs_split = afcommon.patternFromDigits(
-                    afcommon.patternFromStdC(
-                        afcommon.patternFromPaths(
-                            layer_outputs[0], layer_outputs[1]
+                if generate_previews:
+                    outputs_split = afcommon.patternFromDigits(
+                        afcommon.patternFromStdC(
+                            afcommon.patternFromPaths(
+                                layer_outputs[0], layer_outputs[1]
+                            )
                         )
-                    )
-                ).split(';')
-
-                block.setFiles(outputs_split)
+                    ).split(';')
+                    block.setFiles(outputs_split)
 
                 block.setNumeric(
                     start_frame, end_frame, frames_per_task, by_frame
@@ -654,13 +667,15 @@ class UI(object):
                 renderer_to_block_type.get(render_engine, 'maya')
             )
 
-            block.setFiles(
-                afcommon.patternFromDigits(
-                    afcommon.patternFromStdC(
-                        afcommon.patternFromPaths(outputs[0], outputs[1])
-                    )
-                ).split(';')
-            )
+            if generate_previews:
+                block.setFiles(
+                    afcommon.patternFromDigits(
+                        afcommon.patternFromStdC(
+                            afcommon.patternFromPaths(outputs[0], outputs[1])
+                        )
+                    ).split(';')
+                )
+
             block.setNumeric(
                 start_frame, end_frame, frames_per_task, by_frame
             )
