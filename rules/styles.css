@@ -330,6 +330,7 @@ min-height: 19px;
 }
 .editing.error { background: #FBA; }
 .editing.disabled { background: #BBB; }
+.editing.drag {border: 1px solid rgba(255,255,255,.5);}
 
 .waiting { cursor: wait; }
 .waiting * { cursor: wait; }
@@ -1004,20 +1005,19 @@ border-radius: 2px;
 .comment .uploads .cgru_cmdexec { float: left; padding: 2px 6px; font-size: 14px; }
 
 .comment .text.editing {border: 1px solid rgba(0,0,0,.5);}
-.comment .text.editing.drag {border: 1px solid rgba(255,255,255,.5);}
 
-.comment_inserted_image_div {
+.inserted_image_div {
 text-align: center;
 margin: 8px;
 padding: 8px;
 }
-.comment_inserted_image_info {
+.inserted_image_info {
 border: 2px solid rgba(0,0,0,.3);
 border-bottom: 0;
 border-radius: 8px 8px 0 0;
 padding: 2px;
 }
-.comment_inserted_image {
+.inserted_image {
 border: 2px solid rgba(0,0,0,.3);
 border-radius: 4px;
 }

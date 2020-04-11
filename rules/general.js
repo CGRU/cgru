@@ -165,14 +165,14 @@ function g_OnKeyDown(e)
 		cgru_EscapePopus();
 
 		// Close comments images processing
-		if (cm_process_image && (cm_process_image.uploading != true))
-			cm_ProcessImageClose();
+		if (ec_process_image && (ec_process_image.uploading != true))
+			ec_ProcessImageClose();
 	}
 	else if (e.keyCode == 13) // ENTER
 	{
 		// Close comments images processing
-		if (cm_process_image && (cm_process_image.uploading != true))
-			cm_ProcessImageUpload();
+		if (ec_process_image && (ec_process_image.uploading != true))
+			ec_ProcessImageUpload();
 	}
 }
 

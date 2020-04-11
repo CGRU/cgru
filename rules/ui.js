@@ -673,9 +673,8 @@ function u_BodyEditStart()
 	$('body_btn_edit_cancel').style.display = 'block';
 	$('body_panel').style.display = 'none';
 	$('body_panel_edit').style.display = 'block';
-	$('body_body').contentEditable = 'true';
-	$('body_body').classList.add('editing');
-	$('body_body').focus();
+
+	ec_EditingStart($('body_body'));
 
 	u_body_editing = true;
 }
@@ -695,8 +694,8 @@ function u_BodyEditCancel(i_text)
 	$('body_btn_edit_cancel').style.display = 'none';
 	$('body_panel').style.display = 'block';
 	$('body_panel_edit').style.display = 'none';
-	$('body_body').classList.remove('editing');
-	$('body_body').contentEditable = 'false';
+
+	ec_EditingFinish($('body_body'));
 }
 
 function u_BodyEditSave()
