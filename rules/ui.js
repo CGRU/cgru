@@ -674,7 +674,7 @@ function u_BodyEditStart()
 	$('body_panel').style.display = 'none';
 	$('body_panel_edit').style.display = 'block';
 
-	ec_EditingStart($('body_body'));
+	ec_EditingStart({'el':$('body_body'),'form':'body'});
 
 	u_body_editing = true;
 }
@@ -695,7 +695,7 @@ function u_BodyEditCancel(i_text)
 	$('body_panel').style.display = 'block';
 	$('body_panel_edit').style.display = 'none';
 
-	ec_EditingFinish($('body_body'));
+	ec_EditingFinish({'el':$('body_body')});
 }
 
 function u_BodyEditSave()

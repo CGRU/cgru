@@ -266,7 +266,7 @@ Comment.prototype.init = function() {
 	this.el.classList.remove('edit');
 	this.elEditBtnsDiv.style.display = 'none';
 
-	ec_EditingFinish(this.elText);
+	ec_EditingFinish({'el':this.elText});
 
 	if (localStorage.text_color && (localStorage.text_color != ''))
 		this.elText.style.color = localStorage.text_color;
@@ -560,7 +560,7 @@ Comment.prototype.edit = function() {
 	this.elText.style.backgroundColor = '#DDDDDD';
 	this.elText.style.color = '#000000';
 
-	ec_EditingStart(this.elText);
+	ec_EditingStart({'el':this.elText,'form':'comment'});
 };
 
 Comment.prototype.setColor = function(i_clr) {

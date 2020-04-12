@@ -18,32 +18,40 @@
 
 "use strict";
 
+var ec_form = null;
 var ec_process_image = null;
 
-function ec_EditingStart(i_el)
+function ec_EditingStart(i_args)
 {
-	i_el.contentEditable = 'true';
-	i_el.classList.add('editing');
+	var el = i_args.el;
+	ec_form = null;
+	if (i_args.form)
+		ec_form = i_args.form;
 
-	i_el.addEventListener('paste', ec_OnPaste);
-	i_el.addEventListener('dragenter', ec_OnDragEnter);
-	i_el.addEventListener('dragover',  ec_OnDragOver);
-	i_el.addEventListener('dragleave', ec_OnDragLeave);
-	i_el.addEventListener('drop', ec_OnDrop);
+	el.contentEditable = 'true';
+	el.classList.add('editing');
 
-	i_el.focus();
+	el.addEventListener('paste', ec_OnPaste);
+	el.addEventListener('dragenter', ec_OnDragEnter);
+	el.addEventListener('dragover',  ec_OnDragOver);
+	el.addEventListener('dragleave', ec_OnDragLeave);
+	el.addEventListener('drop', ec_OnDrop);
+
+	el.focus();
 };
 
-function ec_EditingFinish(i_el)
+function ec_EditingFinish(i_args)
 {
-	i_el.contentEditable = 'false';
-	i_el.classList.remove('editing');
+	var el = i_args.el;
 
-	i_el.removeEventListener('paste', ec_OnPaste);
-	i_el.removeEventListener('dragenter', ec_OnDragEnter);
-	i_el.removeEventListener('dragover',  ec_OnDragOver);
-	i_el.removeEventListener('dragleave', ec_OnDragLeave);
-	i_el.removeEventListener('drop', ec_OnDrop);
+	el.contentEditable = 'false';
+	el.classList.remove('editing');
+
+	el.removeEventListener('paste', ec_OnPaste);
+	el.removeEventListener('dragenter', ec_OnDragEnter);
+	el.removeEventListener('dragover',  ec_OnDragOver);
+	el.removeEventListener('dragleave', ec_OnDragLeave);
+	el.removeEventListener('drop', ec_OnDrop);
 };
 
 function ec_OnPaste(i_evt)
@@ -52,13 +60,15 @@ function ec_OnPaste(i_evt)
 	if (ec_process_image)
 		return;
 
+	// Process data
+	if (ec_DataTransfer(i_evt.clipboardData))
+		return;
+
 	// Process text
 	let text = (i_evt.clipboardData || window.clipboardData).getData('text/plain');
 	text.replace('\n','<br>\n');
 	if (text && text.length)
 		document.execCommand('insertHTML', false, text);
-
-	ec_DataTransfer(i_evt.clipboardData);
 }
 
 function ec_OnDragEnter(i_evt){ec_DragSetStyle(i_evt, true);}
@@ -113,17 +123,17 @@ function ec_DataTransfer(i_data)
 	if (null == i_data)
 	{
 		c_Error('Transfered data is null.');
-		return;
+		return false;
 	}
 	if (null == i_data.items)
 	{
 		c_Error('Transfered data has null items.');
-		return;
+		return false;
 	}
 	if (i_data.items.length == 0)
 	{
 		c_Error('Transfered data has zero items.');
-		return;
+		return false;
 	}
 
 	let file = null;
@@ -136,7 +146,7 @@ function ec_DataTransfer(i_data)
 		if (file)
 		{
 			c_Error('You can paste only one image at once.');
-			return;
+			return false;
 		}
 
 		file = item.getAsFile();
@@ -144,13 +154,22 @@ function ec_DataTransfer(i_data)
 
 	if (file)
 		ec_ProcessImage(file);
+
+	return true;
 }
 
 function ec_ProcessImage(i_file)
 {
 	//console.log(i_file);
 	let name = (new Date()).toISOString().replace(/[:.Z]/g,'-') +  g_auth_user.id + '-' + i_file.name;
-	let path = c_GetRuFilePath(name);
+	// By default, image will be uploaded in the current folder
+	let path = RULES.root + g_CurPath();
+	// Asset can specify folder to place images (body and comment form)
+	if (ASSET && ASSET.inserted_images && ASSET.inserted_images.forms)
+		if (ec_form && ASSET.inserted_images.forms[ec_form])
+			if (ASSET.inserted_images.forms[ec_form].folder)
+				path += '/' + ASSET.inserted_images.forms[ec_form].folder;
+	path += '/' + name;
 
 	let elRoot = document.createElement('div');
 	document.body.appendChild(elRoot);
@@ -199,6 +218,7 @@ function ec_ProcessImage(i_file)
 	ec_process_image = {};
 	ec_process_image.el_root = elRoot;
 	ec_process_image.file = i_file;
+	ec_process_image.name = name;
 	ec_process_image.path = path;
 	ec_process_image.btn_cancel = btn_cancel;
 	ec_process_image.btn_upload = btn_upload;
@@ -318,8 +338,12 @@ function ec_ProcessImageUploadFinished(i_args)
 
 function ec_ProcessImageFileUploaded(i_file)
 {
+	var size_make_thumbnail = 200000;
+	if (RULES.inserted_images && RULES.inserted_images.size_make_thumbnail)
+		size_make_thumbnail = RULES.inserted_images.size_make_thumbnail;
+
 	i_file.src = i_file.path;
-	if (i_file.size < 200000)
+	if (i_file.size < size_make_thumbnail)
 	{
 		ec_ProcessImageInsertHTML(i_file);
 		return;
@@ -327,14 +351,11 @@ function ec_ProcessImageFileUploaded(i_file)
 
 	ec_process_image.el_status.innerHTML = 'Creating thumbnail...';
 
-	i_file.thumbnail = i_file.path + '-thumbnail.jpg';
+	i_file.thumbnail = c_PathDir(i_file.path) + '/' + c_PathBase(i_file.path) + '-thumbnail.jpg';
 
-	var cmd = 'rules/bin/convert';
-	cmd += ' -verbose';
-	cmd += ' "' + i_file.path + '"';
-	cmd += ' -quality 85%';
-	cmd += ' -thumbnail 1280';
-	cmd += ' "' + i_file.thumbnail + '"';
+	var cmd = RULES.inserted_images.thumbnail_cmd;
+	cmd = cmd.replace('@INPUT@', i_file.path);
+	cmd = cmd.replace('@OUTPUT@', i_file.thumbnail);
 
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}}, "func": ec_ProcessImageTumbnailed, "file": i_file, "info":'thumbnail'});
 }
