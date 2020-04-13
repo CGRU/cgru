@@ -153,9 +153,12 @@ function ec_DataTransfer(i_data)
 	}
 
 	if (file)
+	{
 		ec_ProcessImage(file);
+		return true;
+	}
 
-	return true;
+	return false;
 }
 
 function ec_ProcessImage(i_file)
