@@ -1070,6 +1070,18 @@ class Cmd:
         self.data['operation'] = {'type': 'eject_tasks'}
         self._sendRequest()
 
+    def renderEjectAndNIMBY(self):
+        """Missing DocString
+
+        :return:
+        """
+        self.action = 'action'
+        self.data['type'] = 'renders'
+        self.data['mask'] = cgruconfig.VARS['HOSTNAME']
+        self.data['operation'] = {'type': 'eject_tasks'}
+        self.data['params'] = {'NIMBY': True}
+        self._sendRequest()
+
     def renderEjectNotMyTasks(self):
         """Missing DocString
 
