@@ -33,6 +33,10 @@ def ejectTasks():
 	cmd = af.Cmd().renderEjectTasks()
 	render.refreshAfter()
 
+def ejectAndNIMBY():
+	cmd = af.Cmd().renderEjectAndNIMBY()
+	render.refreshAfter()
+
 
 def ejectNotMyTasks():
 	cmd = af.Cmd().renderEjectNotMyTasks()

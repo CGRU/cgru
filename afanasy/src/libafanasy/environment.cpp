@@ -732,19 +732,19 @@ void Environment::load()
 void Environment::loadFile( const std::string & i_filename)
 {
 	// Check that file is not alreadt loaded, to prevent cyclic include
-	for( int i = 0; i < m_config_files.size(); i++)
-		if( m_config_files[i] == i_filename )
+	for(int i = 0; i < m_config_files.size(); i++)
+		if(m_config_files[i] == i_filename)
 		{
-			AFERRAR("Config file already included:\n%s", i_filename.c_str())
+			AF_ERR << "Config file already included: " << i_filename;
 			return;
 		}
 
 	// Add file to store loaded:
 	m_config_files.push_back( i_filename);
 
-	if( false == pathFileExists( i_filename))
+	if(false == pathFileExists(i_filename))
 	{
-		printf("Config file does not exist:\n%s\n", i_filename.c_str());
+		AF_WARN << "Config file does not exist: " << i_filename;
 		return;
 	}
 
@@ -755,9 +755,13 @@ void Environment::loadFile( const std::string & i_filename)
 	if( buffer == NULL )
 		return;
 
+	std::string err;
 	rapidjson::Document doc;
-	char * data = jsonParseData( doc, buffer, filesize);
-	if( data == NULL )
+	char * data = jsonParseData(doc, buffer, filesize, &err);
+	if (err.size())
+		AF_ERR << "Config file \"" << i_filename << "\" has error:\n" << err;
+
+	if (data == NULL)
 	{
 		delete [] buffer;
 		return;

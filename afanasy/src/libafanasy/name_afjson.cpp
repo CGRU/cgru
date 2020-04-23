@@ -31,18 +31,18 @@ char * af::jsonParseData( rapidjson::Document & o_doc, const char * i_data, int 
 //printf("af::jsonParseMsg:\n");printf("%s\n", data);
 
 	std::string err;
-	if( o_doc.ParseInsitu<0>(data).HasParseError())
+	if (o_doc.ParseInsitu<0>(data).HasParseError())
 	{
 		int pos = o_doc.GetErrorOffset();
-		err = err + "JSON: " + o_doc.GetParseError();
-		err = err + " (at character " + af::itos( pos) + " of " + af::itos( i_data_len)  + "):\n";
-		if(( pos >= 0 ) && ( pos < i_data_len ))
+		err = o_doc.GetParseError();
+		err += " (at character " + af::itos(pos) + " of " + af::itos(i_data_len)  + "):\n";
+		if ((pos >= 0) && (pos < i_data_len))
 		{
 			static const int offset = 50;
 			int begin = pos - offset;
-			if( begin < 0 ) begin = 0;
+			if (begin < 0) begin = 0;
 			int end = pos + offset;
-			if( end >= i_data_len ) end = i_data_len - 1;
+			if (end >= i_data_len) end = i_data_len - 1;
 			err += std::string( offset, ' ') + "!\n";
 			err += af::strReplace( af::strReplace( std::string( i_data + begin, end - begin), '\n', ' '), '\t', ' ');
 		}
@@ -65,7 +65,7 @@ char * af::jsonParseData( rapidjson::Document & o_doc, const char * i_data, int 
 		if( o_err )
 			*o_err = err;
 		else
-			AFERRAR("%s", err.c_str())
+			AF_ERR << "JSON parsing error:\n" << err;
 	}
 
 	return data;
