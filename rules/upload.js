@@ -18,6 +18,8 @@
 
 var up_elFiles = [];
 var up_counter = 0;
+var up_max_filesize = 0;
+var up_max_filesize_str = 0;
 
 function up_Init()
 {
@@ -28,6 +30,26 @@ function up_Init()
 		up_Close();
 
 	up_CreateInput();
+}
+
+function up_InitConfigured()
+{
+	if (RULES.upload_max_filesize == null)
+		return;
+
+	up_max_filesize = parseInt(RULES.upload_max_filesize);
+	if ( ! up_max_filesize)
+		return;
+
+	if (RULES.upload_max_filesize.includes('G'))
+		up_max_filesize *= 1000000000;
+	else if(RULES.upload_max_filesize.includes('M'))
+		up_max_filesize *= 1000000;
+	else if(RULES.upload_max_filesize.includes('K'))
+		up_max_filesize *= 1000;
+
+	up_max_filesize_str = c_Bytes2KMG(up_max_filesize);
+	$('upload_global_info').textContent = 'Maximum file size = ' + up_max_filesize_str;
 }
 
 function up_Close()
@@ -153,8 +175,16 @@ function up_CreateFile(i_args)
 	el.appendChild(elInfo);
 	el.m_elInfo = elInfo;
 	elInfo.classList.add('info');
-	elInfo.innerHTML = c_Bytes2KMG(file.size) + ' ' + file.name;
-	elInfo.href = '#' + path;
+	let info = c_Bytes2KMG(file.size) + ' ' + file.name;
+	if (file.size > up_max_filesize)
+	{
+		info = "Size too big: "+ info;
+		el.classList.add('error');
+		elBtnAdd.style.display = 'none';
+	}
+	else
+		elInfo.href = '#' + path;
+	elInfo.innerHTML = info;
 
 	var elProgress = document.createElement('div');
 	el.appendChild(elProgress);
