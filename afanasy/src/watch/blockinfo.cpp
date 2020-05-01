@@ -150,8 +150,11 @@ bool BlockInfo::update( const af::BlockData* block, int type)
 		m_var_map["tasks_depend_mask"]            = afqt::stoq(block->getTasksDependMask());
 
 
-		filesize_min      = block->getFileSizeMin();
-		filesize_max      = block->getFileSizeMax();
+		skip_existing_files  = block->isSkippingExistingFiles();
+		check_rendered_files = block->isCheckingRenderedFiles();
+		filesize_min = block->getFileSizeMin();
+		filesize_max = block->getFileSizeMax();
+
 		capcoeff_min      = block->getCapCoeffMin();
 		capcoeff_max      = block->getCapCoeffMax();
 		multihost_min     = block->getMultiHostMin();
@@ -347,8 +350,25 @@ void BlockInfo::refresh()
 			if( multihost_waitmax) str_params += QString(":WaitMax(%1)").arg(multihost_waitmax);
 			if( multihost_waitsrv) str_params += QString(":WaitService(%1)").arg(multihost_waitsrv);
 		}
-		if((filesize_min != -1) || (filesize_max != -1))
-			str_params += QString(" FileSize(%1,%2)").arg( filesize_min).arg( filesize_max);
+
+		if (skip_existing_files || check_rendered_files)
+		{
+			str_params += " Files";
+			if (skip_existing_files)
+				str_params += "Skip";
+			if ((filesize_min > 0) || (filesize_max > 0))
+			{
+				str_params += QString("(");
+				if (filesize_min > 0)
+					str_params += afqt::stoq(af::toKMG(filesize_min));
+				str_params += QString(",");
+				if (filesize_max > 0)
+					str_params += afqt::stoq(af::toKMG(filesize_max));
+				str_params += QString(")");
+			}
+			if (check_rendered_files)
+				str_params += "Check";
+		}
 
 		str_params += " Capacity:";
 		if( varcapacity   ) str_params += QString("(%1-%2)*").arg( capcoeff_min).arg( capcoeff_max);
@@ -384,8 +404,25 @@ void BlockInfo::refresh()
 			if( multihost_waitmax) str_params += QString(":%1WM").arg(multihost_waitmax);
 			if( multihost_waitsrv) str_params += QString(":%1WS").arg(multihost_waitsrv);
 		}
-		if((filesize_min != -1) || (filesize_max != -1))
-			str_params += QString(" FSize(%1,%2)").arg( filesize_min).arg( filesize_max);
+
+		if (skip_existing_files || check_rendered_files)
+		{
+			str_params += " F";
+			if (skip_existing_files)
+				str_params += "Skp";
+			if ((filesize_min > 0) || (filesize_max > 0))
+			{
+				str_params += QString("(");
+				if (filesize_min > 0)
+					str_params += afqt::stoq(af::toKMG(filesize_min));
+				str_params += QString(",");
+				if (filesize_max > 0)
+					str_params += afqt::stoq(af::toKMG(filesize_max));
+				str_params += QString(")");
+			}
+			if (check_rendered_files)
+				str_params += "Chk";
+		}
 
 		str_params += " Cap[";
 		if( varcapacity   ) str_params += QString("(%1-%2)*").arg( capcoeff_min).arg( capcoeff_max);
@@ -421,8 +458,25 @@ void BlockInfo::refresh()
 			if( multihost_waitmax) str_params += QString(":%1wm").arg(multihost_waitmax);
 			if( multihost_waitsrv) str_params += QString(":%1ws").arg(multihost_waitsrv);
 		}
-		if((filesize_min != -1) || (filesize_max != -1))
-			str_params += QString(" fs(%1,%2)").arg( filesize_min).arg( filesize_max);
+
+		if (skip_existing_files || check_rendered_files)
+		{
+			str_params += " f";
+			if (skip_existing_files)
+				str_params += "s";
+			if ((filesize_min > 0) || (filesize_max > 0))
+			{
+				str_params += QString("(");
+				if (filesize_min > 0)
+					str_params += afqt::stoq(af::toKMG(filesize_min));
+				str_params += QString(",");
+				if (filesize_max > 0)
+					str_params += afqt::stoq(af::toKMG(filesize_max));
+				str_params += QString(")");
+			}
+			if (check_rendered_files)
+				str_params += "c";
+		}
 
 		str_params += " [";
 		if( varcapacity   ) str_params += QString("(%1-%2)*").arg( capcoeff_min).arg( capcoeff_max);

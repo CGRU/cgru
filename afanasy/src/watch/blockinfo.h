@@ -95,8 +95,11 @@ public:
 	int     need_hdd;
 	QString need_properties;
 
+	bool check_rendered_files;
+	bool skip_existing_files;
 	long long filesize_min;
 	long long filesize_max;
+
 	int  capcoeff_min;
 	int  capcoeff_max;
 	uint8_t  multihost_min;

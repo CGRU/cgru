@@ -49,6 +49,10 @@ class BlockParameters:
         self.tasks_names = []
         self.tasks_cmds = []
         self.tasks_previews = []
+        self.file_check_enable = False
+        self.file_check_size_mb_min = -1
+        self.file_check_size_mb_max = -1
+        self.file_check_skip_existing = True
         # Fill in this array with files to delete in a block post command.
         # Files should have a common afanasy "@#*@" pattern,
         # it will be replaced with "*" for shell.
@@ -116,6 +120,12 @@ class BlockParameters:
             self.depend_mask_global = str(
                 afnode.parm('depend_mask_global').eval())
             self.life_time = self.afnode.parm('life_time').eval()
+
+        if afnode.parm('file_check_enable').eval():
+            self.file_check_enable = True
+            self.file_check_size_mb_min = int(1024.0 * 1024.0 * afnode.parm('file_check_size_mb_min').eval())
+            self.file_check_size_mb_max = int(1024.0 * 1024.0 * afnode.parm('file_check_size_mb_max').eval())
+            self.file_check_skip_existing = afnode.parm('file_check_skip_existing').eval()
 
         if self.local_render:
             self.hosts_mask = str(socket.gethostname())
@@ -392,6 +402,11 @@ class BlockParameters:
             block.setTaskMaxRunTime(int(self.maxruntime*3600.0))
         if self.progress_timeout > 0.01:
             block.setTaskProgressChangeTimeout(int(self.progress_timeout*3600.0))
+
+        if self.file_check_enable:
+            block.checkRenderedFiles(self.file_check_size_mb_min, self.file_check_size_mb_max)
+            if self.file_check_skip_existing:
+                block.skipExistingFiles()
 
         # Delete files in a block post command:
         if len(self.delete_files):
