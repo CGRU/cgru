@@ -23,7 +23,7 @@ if [ -z "$HOUDINI_LOCATION" ]; then
 	echo "Can't find houdini in '$HOUDINI_INSTALL_DIR'"
 	exit 1
 fi
-echo "Houdni location = '$HOUDINI_LOCATION'"
+echo "Houdini location = '$HOUDINI_LOCATION'"
 
 # Source Houdini setup shell script:
 pushd $HOUDINI_LOCATION >> /dev/null
