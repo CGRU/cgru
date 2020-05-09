@@ -155,6 +155,7 @@ void BranchSrv::v_action(Action & i_action)
 	if (i_action.log.size())
 	{
 		store();
+		i_action.answer = "Branch(es) parameter(s) changed.";
 		i_action.monitors->addEvent(af::Monitor::EVT_branches_change, m_id);
 	}
 }

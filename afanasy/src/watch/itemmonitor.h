@@ -4,10 +4,12 @@
 
 #include "itemnode.h"
 
+class ListNodes;
+
 class ItemMonitor : public ItemNode
 {
 public:
-   ItemMonitor( af::Monitor * i_monitor, const CtrlSortFilter * i_ctrl_sf);
+	ItemMonitor(ListNodes * i_list_nodes, af::Monitor * i_monitor, const CtrlSortFilter * i_ctrl_sf);
    ~ItemMonitor();
 
 	void v_updateValues(af::Node * i_afnode, int i_msgType);

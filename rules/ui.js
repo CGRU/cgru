@@ -31,7 +31,7 @@ var u_body_text = '';
 var u_body_editing = false;
 var u_body_edit_markup = 0;
 
-var u_backgroundColor = '#A0A0A0';
+var u_background = '#A0A0A0';
 var u_textColor = '#000000';
 cgru_params.push(['back_asset', 'Asset', '', 'Enter background style']);
 cgru_params.push(['back_body', 'Body', '', 'Enter background style']);
@@ -372,6 +372,7 @@ function u_ApplyStyles()
 
 	if (localStorage.background && localStorage.background.length)
 	{
+		u_background = localStorage.background;
 		document.body.style.background = localStorage.background;
 		var backs =
 			['header', 'footer', 'navig_div', 'sidepanel_div', 'content', 'navig_handle', 'sidepanel_handle'];
@@ -380,7 +381,10 @@ function u_ApplyStyles()
 	}
 
 	if (localStorage.text_color && localStorage.text_color.length)
+	{
+		u_textColor = localStorage.text_color;
 		document.body.style.color = localStorage.text_color;
+	}
 
 	var backs = ['asset', 'body', 'files', 'comments'];
 	for (var i = 0; i < backs.length; i++)
@@ -669,9 +673,8 @@ function u_BodyEditStart()
 	$('body_btn_edit_cancel').style.display = 'block';
 	$('body_panel').style.display = 'none';
 	$('body_panel_edit').style.display = 'block';
-	$('body_body').contentEditable = 'true';
-	$('body_body').classList.add('editing');
-	$('body_body').focus();
+
+	ec_EditingStart({'el':$('body_body'),'form':'body'});
 
 	u_body_editing = true;
 }
@@ -691,8 +694,8 @@ function u_BodyEditCancel(i_text)
 	$('body_btn_edit_cancel').style.display = 'none';
 	$('body_panel').style.display = 'block';
 	$('body_panel_edit').style.display = 'none';
-	$('body_body').classList.remove('editing');
-	$('body_body').contentEditable = 'false';
+
+	ec_EditingFinish({'el':$('body_body')});
 }
 
 function u_BodyEditSave()

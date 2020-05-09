@@ -21,6 +21,7 @@ public:
 		const QString & i_description,
 		const QString & i_hotkey,
 		bool i_dblclick,
+		bool i_always_active,
 		ButtonsMenu * i_bm);
 
 	~ButtonPanel();
@@ -33,7 +34,7 @@ public:
 
 	inline Item::EType getType() const {return m_type;}
 
-	inline void setActive(bool i_active) {m_active = i_active; repaint();}
+	inline void setActive(bool i_active) {if(m_always_active) return; m_active = i_active; repaint();}
 
 signals:
 	void sigClicked();
@@ -64,6 +65,7 @@ private:
 	QString m_description;
 	QString m_hotkey;
 	bool m_dblclick;
+	bool m_always_active;
 
 	bool m_hovered;
 	bool m_activated;

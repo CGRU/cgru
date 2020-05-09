@@ -18,6 +18,8 @@
 
 var up_elFiles = [];
 var up_counter = 0;
+var up_max_filesize = 0;
+var up_max_filesize_str = 0;
 
 function up_Init()
 {
@@ -28,6 +30,26 @@ function up_Init()
 		up_Close();
 
 	up_CreateInput();
+}
+
+function up_InitConfigured()
+{
+	if (RULES.upload_max_filesize == null)
+		return;
+
+	up_max_filesize = parseInt(RULES.upload_max_filesize);
+	if ( ! up_max_filesize)
+		return;
+
+	if (RULES.upload_max_filesize.includes('G'))
+		up_max_filesize *= 1000000000;
+	else if(RULES.upload_max_filesize.includes('M'))
+		up_max_filesize *= 1000000;
+	else if(RULES.upload_max_filesize.includes('K'))
+		up_max_filesize *= 1000;
+
+	up_max_filesize_str = c_Bytes2KMG(up_max_filesize);
+	$('upload_global_info').textContent = 'Maximum file size = ' + up_max_filesize_str;
 }
 
 function up_Close()
@@ -111,6 +133,7 @@ function up_FileSelected(e)
 
 		path = path.replace('@DATE@', c_DT_FormStrNow().split(' ')[0]);
 		path = path.replace('@USER@', g_auth_user.id);
+		path += '/' + files[i].name;
 
 		up_CreateFile({'file': files[i], 'path': path, 'title': title, 'el': el});
 	}
@@ -128,7 +151,7 @@ function up_CreateFile(i_args)
 	el.m_uppath = path;
 	el.m_uptitle = i_args.title;
 	el.m_curpath = g_CurPath();
-	el.title = path;
+	el.title = 'Upload path:\n' + path;
 
 	var elBtnAdd = document.createElement('div');
 	el.appendChild(elBtnAdd);
@@ -152,8 +175,16 @@ function up_CreateFile(i_args)
 	el.appendChild(elInfo);
 	el.m_elInfo = elInfo;
 	elInfo.classList.add('info');
-	elInfo.innerHTML = c_Bytes2KMG(file.size) + ' ' + file.name;
-	elInfo.href = '#' + path;
+	let info = c_Bytes2KMG(file.size) + ' ' + file.name;
+	if (file.size > up_max_filesize)
+	{
+		info = "Size too big: "+ info;
+		el.classList.add('error');
+		elBtnAdd.style.display = 'none';
+	}
+	else
+		elInfo.href = '#' + path;
+	elInfo.innerHTML = info;
 
 	var elProgress = document.createElement('div');
 	el.appendChild(elProgress);
@@ -296,16 +327,17 @@ function up_Received(i_args, i_el)
 	}
 
 	var news = [];
-	for (var f = 0; f < i_args.files.length; f++)
+	for (let f = 0; f < i_args.files.length; f++)
 	{
 		up_Done(i_el, i_args.files[f]);
 
-		var filename = i_args.files[f].filename;
-		if (filename == null)
+		let path = i_args.files[f].path;
+		if (path == null)
 			continue;
 
-		var news_link = g_GetLocationArgs(
-			{"fv_Goto": i_el.m_uppath + '/' + c_PathBase(i_args.files[f].filename)}, false, i_el.m_curpath);
+		// File (path base) can be renamed during upload
+		path = c_PathDir(i_el.m_uppath) + '/' + c_PathBase(path);
+		let news_link = g_GetLocationArgs({"fv_Goto": path}, false, i_el.m_curpath);
 		news.push(nw_CreateNews({'title': i_el.m_uptitle, 'path': i_el.m_curpath, 'link': news_link}));
 	}
 
@@ -314,29 +346,28 @@ function up_Received(i_args, i_el)
 	// console.log( JSON.stringify( i_args));
 }
 
-function up_Done(i_el, i_msg)
+function up_Done(i_el, i_file_info)
 {
 	up_Finished(i_el);
 
 	i_el.m_done = true;
 	i_el.classList.remove('started');
 
-	if (i_msg.error)
+	if (i_file_info.error)
 	{
-		c_Error(
-			'Upload: ' + i_msg.error + ': file="' + i_el.m_upfile.name + '" path="' + i_el.m_uppath + '"');
+		c_Error('Upload: ' + i_file_info.error + ': "' + i_file_info.path + '"');
 		i_el.classList.add('error');
 		i_el.m_elProgress.textContent = i_msg.error;
 		return;
 	}
 
-	c_Info('Uploaded "' + i_el.m_upfile.name + '" to "' + i_el.m_uppath + '"');
+	c_Info('Uploaded: "' + i_file_info.path + '"');
 	i_el.classList.add('done');
 
 	// Refresh files views same path:
-	fv_RefreshPath(i_el.m_uppath);
+	fv_RefreshPath(c_PathDir(i_el.m_uppath));
 
-	//	c_MakeThumbnail( i_el.m_uppath + '/' + i_el.m_upfile.name);
+	//c_MakeThumbnail(c_PathDir(i_el.m_uppath) + '/' + c_PathBase(i_file_info.path));
 }
 
 function up_Remove(i_el)

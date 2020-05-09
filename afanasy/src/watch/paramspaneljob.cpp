@@ -73,10 +73,10 @@ ParamsPanelJob::~ParamsPanelJob()
 
 void ParamsPanelJob::v_updatePanel(Item * i_item)
 {
-	ItemJob * job_item = (ItemJob*)(i_item);
-
-	if (job_item)
+	if (i_item && (i_item->getType() == Item::TJob))
 	{
+		ItemJob * job_item = static_cast<ItemJob*>(i_item);
+
 		m_blocks_label->setHidden(true);
 		constructFolders(job_item);
 		updateBlocks(job_item);
@@ -88,7 +88,7 @@ void ParamsPanelJob::v_updatePanel(Item * i_item)
 		clearBlocks();
 	}
 
-	ParamsPanel::v_updatePanel(job_item);
+	ParamsPanel::v_updatePanel(i_item);
 }
 
 void ParamsPanelJob::constructFolders(ItemJob * i_item_job)

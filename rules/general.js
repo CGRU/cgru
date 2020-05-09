@@ -64,6 +64,9 @@ function g_Init_Server(i_data)
 	if (SERVER.version)
 		$('version').innerHTML = c_Strip(SERVER.version);
 
+	if (SERVER.upload_max_filesize)
+		RULES_TOP.upload_max_filesize = SERVER.upload_max_filesize;
+
 	var url = decodeURI(document.location.href);
 
 	n_log_responses = false;
@@ -119,6 +122,7 @@ function g_Init_Rules(i_data)
 	u_InitConfigured();
 	nw_InitConfigured();
 	bm_InitConfigured();
+	up_InitConfigured();
 
 	$('afanasy_webgui').href = 'http://' + cgru_Config.af_servername + ':' + cgru_Config.af_serverport;
 	$('rules_label').textContent = RULES_TOP.company + '-RULES';
@@ -159,8 +163,21 @@ function g_CurPathDummy()
 
 function g_OnKeyDown(e)
 {
-	if (e.keyCode == 27)
-		cgru_EscapePopus();  // ESC
+	if (e.keyCode == 27)  // ESC
+	{
+		// Close all cgru popups
+		cgru_EscapePopus();
+
+		// Close comments images processing
+		if (ec_process_image && (ec_process_image.uploading != true))
+			ec_ProcessImageClose();
+	}
+	else if (e.keyCode == 13) // ENTER
+	{
+		// Close comments images processing
+		if (ec_process_image && (ec_process_image.uploading != true))
+			ec_ProcessImageUpload();
+	}
 }
 
 function g_GO(i_path)

@@ -2,15 +2,15 @@
 
 #include "../libafanasy/job.h"
 
-#include "itemnode.h"
+#include "itemwork.h"
 #include "blockinfo.h"
 
 class ListJobs;
 
-class ItemJob : public ItemNode
+class ItemJob : public ItemWork
 {
 public:
-	ItemJob(ListJobs * i_listjobs, af::Job *job, const CtrlSortFilter * i_ctrl_sf, bool i_notify);
+	ItemJob(ListNodes * i_listnodes, bool i_inworklist, af::Job *job, const CtrlSortFilter * i_ctrl_sf, bool i_notify);
 	~ItemJob();
 
 	void v_updateValues(af::Node * i_afnode, int i_msgType);
@@ -84,7 +84,7 @@ private:
 	void updateInfo(const af::Job * i_job);
 
 private:
-	ListJobs * m_listjobs;
+	bool m_inworklist;
 
 	bool compact_display;
 

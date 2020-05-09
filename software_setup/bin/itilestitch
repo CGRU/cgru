@@ -1,0 +1,5 @@
+#!/bin/bash
+
+source "${CG_TANK}/exec_soft.sh" houdini
+
+"${HOUDINI_LOCATION}/bin/itilestitch" "$@"

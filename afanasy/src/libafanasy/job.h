@@ -45,6 +45,8 @@ public:
 
 	bool isValid( std::string * o_err = NULL ) const;
 
+	bool isSystem() const {return AFJOB::SYSJOB_ID == m_id;}
+
     void v_generateInfoStream( std::ostringstream & o_str, bool full = false) const; /// Generate information.
 
 	// First 32 flags are reserved for af::Node (zombie, hidden, ...)

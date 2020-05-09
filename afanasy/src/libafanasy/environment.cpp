@@ -67,6 +67,7 @@ int     Environment::watch_get_events_sec =            AFWATCH::GET_EVENTS_SEC;
 int     Environment::watch_connection_lost_time =      AFWATCH::CONNECTION_LOST_TIME;
 int     Environment::watch_refresh_gui_sec =           AFWATCH::REFRESH_GUI_SEC;
 int     Environment::watch_render_idle_bar_max =       AFWATCH::RENDER_IDLE_BAR_MAX;
+bool    Environment::watch_work_user_visible =         AFWATCH::WORK_USER_VISIBLE;
 
 int     Environment::render_heartbeat_sec =            AFRENDER::HEARTBEAT_SEC;
 int     Environment::render_up_resources_period =      AFRENDER::UP_RESOURCES_PERIOD;
@@ -299,6 +300,7 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, watch_refresh_gui_sec,             "af_watch_refresh_gui_sec"             );
 	getVar( i_obj, watch_connection_lost_time,        "af_watch_connection_lost_time"        );
 	getVar( i_obj, watch_render_idle_bar_max,         "af_watch_render_idle_bar_max"         );
+	getVar( i_obj, watch_work_user_visible,           "af_watch_work_user_visible"           );
 
 	getVar( i_obj, monitor_zombietime,                "af_monitor_zombietime"                );
 
@@ -730,19 +732,19 @@ void Environment::load()
 void Environment::loadFile( const std::string & i_filename)
 {
 	// Check that file is not alreadt loaded, to prevent cyclic include
-	for( int i = 0; i < m_config_files.size(); i++)
-		if( m_config_files[i] == i_filename )
+	for(int i = 0; i < m_config_files.size(); i++)
+		if(m_config_files[i] == i_filename)
 		{
-			AFERRAR("Config file already included:\n%s", i_filename.c_str())
+			AF_ERR << "Config file already included: " << i_filename;
 			return;
 		}
 
 	// Add file to store loaded:
 	m_config_files.push_back( i_filename);
 
-	if( false == pathFileExists( i_filename))
+	if(false == pathFileExists(i_filename))
 	{
-		printf("Config file does not exist:\n%s\n", i_filename.c_str());
+		AF_WARN << "Config file does not exist: " << i_filename;
 		return;
 	}
 
@@ -753,9 +755,13 @@ void Environment::loadFile( const std::string & i_filename)
 	if( buffer == NULL )
 		return;
 
+	std::string err;
 	rapidjson::Document doc;
-	char * data = jsonParseData( doc, buffer, filesize);
-	if( data == NULL )
+	char * data = jsonParseData(doc, buffer, filesize, &err);
+	if (err.size())
+		AF_ERR << "Config file \"" << i_filename << "\" has error:\n" << err;
+
+	if (data == NULL)
 	{
 		delete [] buffer;
 		return;

@@ -119,6 +119,9 @@ public:
 		return m_flags & FDependSubTask;
 	} ///< Other block can depend this block sub task
 
+	inline bool isSkippingExistingFiles() const {return m_flags & FSkipExistingFiles;}
+	inline bool isCheckingRenderedFiles() const {return m_flags & FCheckRenderedFiles;}
+
 	inline bool isSequential() const { return m_sequential == 1; }
 	inline bool notSequential() const { return m_sequential != 1; }
 	inline void setSequential(int64_t i_value) { m_sequential = i_value; } ///< Used in afcmd cmd_numeric

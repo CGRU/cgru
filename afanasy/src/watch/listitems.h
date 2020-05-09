@@ -38,7 +38,7 @@ public:
 
 	static const std::string & itemTypeToAf(Item::EType i_type);
 
-	ListItems( QWidget* parent, const std::string & type = "");
+	ListItems(QWidget * i_parent, const std::string & i_type = "");
 	virtual ~ListItems();
 
 	int count() const;
@@ -106,15 +106,12 @@ protected:
 		const QString & i_name,
 		const QString & i_description,
 		const QString & i_hotkey = "",
-		bool i_dblclick = false);
+		bool i_dblclick = false,
+		bool i_always_active = false);
 
 	void updatePanels(Item * i_item = NULL);
 
 protected:
-	//QHBoxLayout * m_hlayout;
-	QSplitter   * m_splitter;
-	QVBoxLayout * m_panel_l;
-	QVBoxLayout * m_vlayout;
 
 	Item * m_current_item;
 
@@ -138,6 +135,11 @@ private slots:
 
 private:
 	std::string m_type;
+
+	QVBoxLayout * m_vlayout;
+	QSplitter * m_splitter;
+	QWidget * m_panel_lelf_widget;
+	QVBoxLayout * m_panel_left_layout;
 
 	QList<Param*> m_params;
 

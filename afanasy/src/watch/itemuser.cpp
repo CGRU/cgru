@@ -16,12 +16,11 @@
 #include "../libafanasy/logger.h"
 
 const int ItemUser::HeightUser = 32;
-const int ItemUser::HeightAnnotation = 14;
 
-ItemUser::ItemUser( af::User * i_user, const CtrlSortFilter * i_ctrl_sf):
-	ItemNode(i_user, TUser, i_ctrl_sf)
+ItemUser::ItemUser(ListNodes * i_list_nodes, af::User * i_user, const CtrlSortFilter * i_ctrl_sf):
+	ItemNode(i_list_nodes, i_user, TUser, i_ctrl_sf)
 {
-	v_updateValues(i_user, 0);
+	updateValues(i_user, 0);
 }
 
 ItemUser::~ItemUser()

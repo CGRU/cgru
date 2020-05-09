@@ -485,7 +485,7 @@ function st_SetElColor(i_status, i_elBack, i_elColor, i_setNone)
 		if (localStorage.background && localStorage.background.length)
 			i_elBack.style.background = localStorage.background;
 		else
-			i_elBack.style.backgroundColor = u_backgroundColor;
+			i_elBack.style.background = u_background;
 
 		if (localStorage.text_color && localStorage.text_color.length)
 			i_elColor.style.color = localStorage.text_color;
@@ -864,7 +864,7 @@ Status.prototype.editListShow = function(i_args) {
 	if (localStorage.background && localStorage.background.length)
 		elRoot.style.background = localStorage.background;
 	else
-		elRoot.style.backgroundColor = u_backgroundColor;
+		elRoot.style.background = u_background;
 	if (localStorage.text_color && localStorage.text_color.length)
 		elRoot.style.color = localStorage.text_color;
 	else

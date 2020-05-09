@@ -63,28 +63,28 @@ const std::string & ListItems::itemTypeToAf(Item::EType i_type)
 	return invalid;
 }
 
-ListItems::ListItems( QWidget* parent, const std::string & type):
-	QWidget( parent),
-	m_type( type),
+ListItems::ListItems(QWidget * i_parent, const std::string & i_type):
+	QWidget(i_parent),
+	m_type(i_type),
 	m_model(NULL),
 	m_ctrl_sf(NULL),
 	m_paramspanel(NULL),
 	m_current_buttons_menu(NULL),
-	m_parentWindow(parent),
+	m_parentWindow(i_parent),
 	m_current_item(NULL)
 {
 	setAttribute ( Qt::WA_DeleteOnClose, true );
 
 	QHBoxLayout * hlayout = new QHBoxLayout(this);
 
-	QWidget * panel_l_widget = new QWidget();
-	hlayout->addWidget(panel_l_widget);
-	m_panel_l = new QVBoxLayout();
-	panel_l_widget->setLayout(m_panel_l);
-	panel_l_widget->setFixedWidth(100);
-	m_panel_l->setAlignment(Qt::AlignTop);
-	m_panel_l->setContentsMargins(0, 5, 0, 5);
-	m_panel_l->setSpacing(5);
+	m_panel_lelf_widget = new QWidget();
+	hlayout->addWidget(m_panel_lelf_widget);
+	m_panel_left_layout = new QVBoxLayout();
+	m_panel_lelf_widget->setLayout(m_panel_left_layout);
+	m_panel_lelf_widget->setFixedWidth(100);
+	m_panel_left_layout->setAlignment(Qt::AlignTop);
+	m_panel_left_layout->setContentsMargins(0, 5, 0, 5);
+	m_panel_left_layout->setSpacing(5);
 
 	m_splitter = new QSplitter();
 	hlayout->addWidget(m_splitter);
@@ -124,6 +124,10 @@ void ListItems::initListItems()
 		m_vlayout->addWidget(m_ctrl_sf);
 	m_vlayout->addWidget(m_view);
 	m_vlayout->addWidget(m_infoline);
+
+	// Hide left panel if there is no buttons
+	if (m_btns.size() == 0)
+		m_panel_lelf_widget->setHidden(true);
 
 	connect(m_view, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(doubleClicked_slot(const QModelIndex &)));
 
@@ -455,7 +459,7 @@ ButtonsMenu * ListItems::addButtonsMenu(Item::EType i_type, const QString & i_la
 
 	m_btn_menus.push_back(m_current_buttons_menu);
 
-	m_panel_l->addWidget(m_current_buttons_menu);
+	m_panel_left_layout->addWidget(m_current_buttons_menu);
 
 	return m_current_buttons_menu;
 }
@@ -471,14 +475,16 @@ ButtonPanel * ListItems::addButtonPanel(
 		const QString & i_name,
 		const QString & i_description,
 		const QString & i_hotkey,
-		bool i_dblclick)
+		bool i_dblclick,
+		bool i_always_active)
 {
-	ButtonPanel * bp = new ButtonPanel(this, i_type, i_label, i_name, i_description, i_hotkey, i_dblclick, m_current_buttons_menu);
+	ButtonPanel * bp = new ButtonPanel(this, i_type, i_label, i_name, i_description,
+			i_hotkey, i_dblclick, i_always_active, m_current_buttons_menu);
 
 	if (m_current_buttons_menu)
 		m_current_buttons_menu->addButton(bp);
 	else
-		m_panel_l->addWidget(bp);
+		m_panel_left_layout->addWidget(bp);
 
 	m_btns.push_back(bp);
 

@@ -117,10 +117,11 @@ public:
 
 	static inline int getMonitorZombieTime()             { return monitor_zombietime;           }
 
-	static inline int getWatchGetEventsSec()           { return watch_get_events_sec;      }
-	static inline int getWatchRefreshGuiSec()          { return watch_refresh_gui_sec;     }
-	static inline int getWatchConnectionLostTime()     { return watch_connection_lost_time;}
-	static inline int getWatchRenderIdleBarMax()       { return watch_render_idle_bar_max; }
+	static inline int  getWatchGetEventsSec()       { return watch_get_events_sec;      }
+	static inline int  getWatchRefreshGuiSec()      { return watch_refresh_gui_sec;     }
+	static inline int  getWatchConnectionLostTime() { return watch_connection_lost_time;}
+	static inline int  getWatchRenderIdleBarMax()   { return watch_render_idle_bar_max; }
+	static inline bool getWatchWorkUserVisible()    { return watch_work_user_visible;   }
 
 	static inline const char * getTimeFormat()         { return timeformat.c_str();       } ///< Get default time format.
 
@@ -302,10 +303,12 @@ private:
 	static std::vector<std::string> rendercmds_admin; ///< Render commannds for admin only
 	static std::vector<std::string> render_launch_cmds;
 	static std::vector<std::string> render_launch_cmds_exit;
-	static int watch_get_events_sec;
-	static int watch_refresh_gui_sec;
-	static int watch_connection_lost_time;
-	static int watch_render_idle_bar_max;
+
+	static int  watch_get_events_sec;
+	static int  watch_refresh_gui_sec;
+	static int  watch_connection_lost_time;
+	static int  watch_render_idle_bar_max;
+	static bool watch_work_user_visible;
 
 	static int monitor_zombietime;
 

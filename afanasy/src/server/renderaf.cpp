@@ -345,6 +345,16 @@ void RenderAf::startTask( af::TaskExec *taskexec)
 
 void RenderAf::v_action( Action & i_action)
 {
+	const JSON & params = (*i_action.data)["params"];
+	if (params.IsObject())
+		jsonRead(params, &i_action.log);
+
+	if (i_action.log.size())
+	{
+		store();
+		i_action.monitors->addEvent( af::Monitor::EVT_renders_change, m_id);
+	}
+
 	const JSON & operation = (*i_action.data)["operation"];
 	if( operation.IsObject())
 	{
@@ -455,15 +465,6 @@ void RenderAf::v_action( Action & i_action)
 		return;
 	}
 
-	const JSON & params = (*i_action.data)["params"];
-	if( params.IsObject())
-		jsonRead( params, &i_action.log);
-
-	if( i_action.log.size() )
-	{
-		store();
-		i_action.monitors->addEvent( af::Monitor::EVT_renders_change, m_id);
-	}
 }
 
 void RenderAf::actionSetPool(const std::string & i_pool_name, Action & i_action)

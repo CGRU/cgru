@@ -142,19 +142,19 @@ bool ListMonitors::v_processEvents( const af::MonitorEvents & i_me)
 
 ItemNode* ListMonitors::v_createNewItemNode(af::Node * i_afnode, Item::EType i_type, bool i_notify)
 {
-	return new ItemMonitor((af::Monitor*)i_afnode, m_ctrl_sf);
+	return new ItemMonitor(this, (af::Monitor*)i_afnode, m_ctrl_sf);
 }
 
 void ListMonitors::calcTitle()
 {
 	int total = count();
 	int super = 0;
-	for( int i = 0; i < total; i++)
+	for (int i = 0; i < total; i++)
 	{
-		ItemMonitor * itemmonitor = (ItemMonitor*)(m_model->item(i));
-		if( itemmonitor->isSuperUser()) super++;
+		ItemMonitor * itemmonitor = static_cast<ItemMonitor*>(m_model->item(i));
+		if (itemmonitor->isSuperUser()) super++;
 	}
-	m_parentWindow->setWindowTitle(QString("M[%1]: %2S").arg( total).arg( super));
+	m_parentWindow->setWindowTitle(QString("Monitors: %1, Super users %2").arg(total).arg(super));
 }
 
 void ListMonitors::actSendMessage()

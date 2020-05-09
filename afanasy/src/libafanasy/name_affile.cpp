@@ -41,6 +41,22 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
+const std::string af::pathBase(const std::string & i_path)
+{
+	if (i_path.size() == 0)
+		return i_path;
+
+	std::string::size_type slash_pos = i_path.rfind("/");
+	if (slash_pos == std::string::npos)
+		slash_pos = i_path.rfind("\\");
+	if (slash_pos == std::string::npos)
+		return i_path;
+
+	std::string base = i_path.substr(slash_pos+1);
+
+	return base;
+}
+
 void af::pathFilter( std::string & path)
 {
 	if( path.size() <= 2 ) return;

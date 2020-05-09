@@ -639,15 +639,15 @@ function walkDir($i_recv, $i_dir, &$o_out, $i_depth)
 			{
 				if (is_file($path))
 				{
-					$fileObj = array();
+					$file_info = array();
 					if (false == is_null($walk) && isset($walk['files']) && isset($walk['files'][$entry]))
-						$fileObj = $walk['files'][$entry];
-					$fileObj['name'] = $entry;
+						$file_info = $walk['files'][$entry];
+					$file_info['name'] = $entry;
 					$st = stat($path);
-					$fileObj['size'] = $st['size'];
-					$fileObj['mtime'] = $st['mtime'];
-					$fileObj['space'] = $st['blocks'] * 512;
-					array_push($o_out['files'], $fileObj);
+					$file_info['size'] = $st['size'];
+					$file_info['mtime'] = $st['mtime'];
+					$file_info['space'] = $st['blocks'] * 512;
+					array_push($o_out['files'], $file_info);
 				}
 				continue;
 			}
@@ -2014,93 +2014,101 @@ function searchComment(&$i_args, &$i_obj)
 function upload($i_path, &$o_out)
 {
 	$o_out['path'] = $i_path;
+	$path_dir = dirname($i_path);
+	$path_base = basename($i_path);
 
-	if (false == is_dir($i_path))
+	if (false == is_dir($path_dir))
 	{
-		if (false == mkdir($i_path, 0777, true))
+		if (false == mkdir($path_dir, 0777, true))
 		{
 			$o_out['error'] = 'Unable to create directory';
+			return;
 		}
 	}
-	if (false == is_writable($i_path))
+
+	if (false == is_writable($path_dir))
+	{
 		$o_out['error'] = 'Destination not writeable';
+		return;
+	}
 
 	$o_out['files'] = array();
 
 	foreach ($_FILES as $key => $file)
 	{
-		$fileObj = array();
-		$fileObj['path'] = $i_path;
-		$fileObj['name'] = $_FILES[$key]['name'];
+		$file_info = array();
+		$file_info['key']  = $key;
+		$file_info['path'] = $i_path;
+		$file_info['name'] = $file['name'];
+		$file_info['size'] = $file['size'];
 
 		if (isset($o_out['error']))
 		{
-			$fileObj['error'] = $o_out['error'];
+			$file_info['error'] = $o_out['error'];
 		}
-		else if ($_FILES[$key]['error'] != UPLOAD_ERR_OK)
+		else if ($file['error'] != UPLOAD_ERR_OK)
 		{
-			switch ($_FILES[$key]['error'])
+			switch ($file['error'])
 			{
 				case UPLOAD_ERR_INI_SIZE:
-					$fileObj['error'] = 'ERROR: Max files size reached (php.ini)';
+					$file_info['error'] = 'ERROR: Max files size reached (php.ini)';
 					break;
 				case UPLOAD_ERR_FORM_SIZE:
-					$fileObj['error'] = 'ERROR: Max files size reached (HTML form)';
+					$file_info['error'] = 'ERROR: Max files size reached (HTML form)';
 					break;
 				case UPLOAD_ERR_PARTIAL:
-					$fileObj['error'] = 'ERROR: Files was only partially uploaded';
+					$file_info['error'] = 'ERROR: Files was only partially uploaded';
 					break;
 				case UPLOAD_ERR_NO_FILE:
-					$fileObj['error'] = 'ERROR: No file was uploaded';
+					$file_info['error'] = 'ERROR: No file was uploaded';
 					break;
 				case UPLOAD_ERR_NO_TMP_DIR:
-					$fileObj['error'] = 'ERROR: Missing a temporary folder';
+					$file_info['error'] = 'ERROR: Missing a temporary folder';
 					break;
 				case UPLOAD_ERR_CANT_WRITE:
-					$fileObj['error'] = 'ERROR: Failed to write file to disk';
+					$file_info['error'] = 'ERROR: Failed to write file to disk';
 					break;
 				case UPLOAD_ERR_EXTENSION:
-					$fileObj['error'] = 'ERROR: A PHP extension stopped the file upload';
+					$file_info['error'] = 'ERROR: A PHP extension stopped the file upload';
 					break;
 				default:
-					$fileObj['error'] = 'Unknown error';
+					$file_info['error'] = 'Unknown error';
 			}
 		}
-		else if (false == is_uploaded_file($_FILES[$key]['tmp_name']))
+		else if (false == is_uploaded_file($file['tmp_name']))
 		{
-			$fileObj['error'] = 'Invalid upload';
+			$file_info['error'] = 'Invalid upload';
 		}
 		else
 		{
-			$basename = $_FILES[$key]['name'];
-			$path = $i_path . '/' . $basename;
+			$path = $i_path;
 
 			// If such file already exists, we rename the upload:
-			$dot = strrpos($basename, '.');
+			$dot = strrpos($path_base, '.');
 			$i = 1;
 			while (is_file($path))
 			{
 				if ($dot)
 				{
-					$base = substr($basename, 0, $dot);
-					$ext = substr($basename, $dot);
-					$path = $i_path . '/' . $base . '-' . $i . $ext;
+					$base = substr($path_base, 0, $dot);
+					$ext = substr($path_base, $dot);
+					$path = $path_dir . '/' . $base . '-' . $i . $ext;
 				}
 				else
-					$path = $i_path . '/' . $basename . '-' . $i;
+					$path = $path_dir . '/' . $path_base . '-' . $i;
 				$i++;
 			}
 
 			// Move uploaded file to the desired place:
-			if (false == move_uploaded_file($_FILES[$key]['tmp_name'], $path))
+			if (false == move_uploaded_file($file['tmp_name'], $path))
 			{
-				$fileObj['error'] = 'Can`t save upload';
+				$file_info['error'] = 'Can`t save upload';
 			}
 
-			$fileObj['filename'] = $path;
+			$file_info['path'] = $path;
 		}
 
-		array_push($o_out['files'], $fileObj);
+		array_push($o_out['files'], $file_info);
 	}
 }
 

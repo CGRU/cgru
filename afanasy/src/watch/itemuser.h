@@ -4,10 +4,12 @@
 
 #include "itemnode.h"
 
+class ListNodes;
+
 class ItemUser : public ItemNode
 {
 public:
-	ItemUser( af::User * i_user, const CtrlSortFilter * i_ctrl_sf);
+	ItemUser(ListNodes * i_list_nodes, af::User * i_user, const CtrlSortFilter * i_ctrl_sf);
 	~ItemUser();
 
 	void v_updateValues(af::Node * i_afnode, int i_msgType);
@@ -42,9 +44,7 @@ private:
 	void updateInfo(af::User * i_user);
 
 private:
-
 	static const int HeightUser;
-	static const int HeightAnnotation;
 
 	QString strLeftBottom;
 	QString strLeftTop;

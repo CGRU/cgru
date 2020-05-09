@@ -142,6 +142,10 @@ class Tray(QtWidgets.QSystemTrayIcon):
         action.triggered.connect( nimby.ejectTasks)
         self.menu['AFANASY'].addAction(action)
 
+        action = QtWidgets.QAction('Eject And NIMBY', self)
+        action.triggered.connect(nimby.ejectAndNIMBY)
+        self.menu['AFANASY'].addAction(action)
+
         action = QtWidgets.QAction('Eject Not My Tasks', self)
         action.triggered.connect( nimby.ejectNotMyTasks)
         self.menu['AFANASY'].addAction(action)

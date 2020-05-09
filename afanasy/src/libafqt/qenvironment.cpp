@@ -230,11 +230,6 @@ QEnvironment::QEnvironment( const QString & i_name)
     ms_attrs_gui.append( &clr_textdone        );
     ms_attrs_gui.append( &clr_textstars       );
 
-	ms_attrs_panel["branches_pos"]           = AttrNumber("panel_branches_pos",           AFGUI::RIGHT);
-	ms_attrs_panel["branches_size_right_0"]  = AttrNumber("panel_branches_size_right_0",  600);
-	ms_attrs_panel["branches_size_right_1"]  = AttrNumber("panel_branches_size_right_1",  200);
-	ms_attrs_panel["branches_size_bottom_0"] = AttrNumber("panel_branches_size_bottom_0", 600);
-	ms_attrs_panel["branches_size_bottom_1"] = AttrNumber("panel_branches_size_bottom_1", 200);
 	ms_attrs_panel["farm_pos"]               = AttrNumber("panel_farm_pos",               AFGUI::RIGHT);
 	ms_attrs_panel["farm_size_right_0"]      = AttrNumber("panel_farm_size_right_0",      600);
 	ms_attrs_panel["farm_size_right_1"]      = AttrNumber("panel_farm_size_right_1",      200);
@@ -250,11 +245,6 @@ QEnvironment::QEnvironment( const QString & i_name)
 	ms_attrs_panel["monitors_size_right_1"]  = AttrNumber("panel_monitors_size_right_1",  200);
 	ms_attrs_panel["monitors_size_bottom_0"] = AttrNumber("panel_monitors_size_bottom_0", 600);
 	ms_attrs_panel["monitors_size_bottom_1"] = AttrNumber("panel_monitors_size_bottom_1", 200);
-	ms_attrs_panel["renders_pos"]            = AttrNumber("panel_renders_pos",            AFGUI::RIGHT);
-	ms_attrs_panel["renders_size_right_0"]   = AttrNumber("panel_renders_size_right_0",   600);
-	ms_attrs_panel["renders_size_right_1"]   = AttrNumber("panel_renders_size_right_1",   200);
-	ms_attrs_panel["renders_size_bottom_0"]  = AttrNumber("panel_renders_size_bottom_0",  600);
-	ms_attrs_panel["renders_size_bottom_1"]  = AttrNumber("panel_renders_size_bottom_1",  200);
 	ms_attrs_panel["tasks_pos"]              = AttrNumber("panel_tasks_pos",              AFGUI::RIGHT);
 	ms_attrs_panel["tasks_size_right_0"]     = AttrNumber("panel_tasks_size_right_0",     600);
 	ms_attrs_panel["tasks_size_right_1"]     = AttrNumber("panel_tasks_size_right_1",     200);
@@ -265,6 +255,11 @@ QEnvironment::QEnvironment( const QString & i_name)
 	ms_attrs_panel["users_size_right_1"]     = AttrNumber("panel_users_size_right_1",     200);
 	ms_attrs_panel["users_size_bottom_0"]    = AttrNumber("panel_users_size_bottom_0",    600);
 	ms_attrs_panel["users_size_bottom_1"]    = AttrNumber("panel_users_size_bottom_1",    200);
+	ms_attrs_panel["work_pos"]               = AttrNumber("panel_work_pos",           AFGUI::RIGHT);
+	ms_attrs_panel["work_size_right_0"]      = AttrNumber("panel_work_size_right_0",  600);
+	ms_attrs_panel["work_size_right_1"]      = AttrNumber("panel_work_size_right_1",  200);
+	ms_attrs_panel["work_size_bottom_0"]     = AttrNumber("panel_work_size_bottom_0", 600);
+	ms_attrs_panel["work_size_bottom_1"]     = AttrNumber("panel_work_size_bottom_1", 200);
 	{
 		QMutableMapIterator<QString, AttrNumber> it(ms_attrs_panel);
 		while (it.hasNext())

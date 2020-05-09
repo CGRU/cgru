@@ -11,18 +11,54 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-ItemNode::ItemNode(af::Node * node, EType i_type, const CtrlSortFilter * i_ctrl_sf):
+ItemNode::ItemNode(ListNodes * i_list_nodes, af::Node * node, EType i_type, const CtrlSortFilter * i_ctrl_sf):
 	Item(afqt::stoq(node->getName()), node->getId(), i_type),
+	m_list_nodes(i_list_nodes),
 	m_ctrl_sf( i_ctrl_sf),
 	m_sort_int1( 0),
 	m_sort_int2( 0),
-	m_flagshidden( 0)
+	m_hide_flags( 0),
+	m_parent_item(NULL)
 {
 	m_locked = node->isLocked();
 }
 
 ItemNode::~ItemNode()
 {
+	for (int i = 0; i < m_child_list.size(); i++)
+		m_child_list[i]->m_parent_item = NULL;
+
+	if (m_parent_item)
+		m_parent_item->m_child_list.removeAll(this);
+}
+
+void ItemNode::updateValues(af::Node * i_afnode, int i_msgType)
+{
+	switch (getType())
+	{
+		case TBranch:
+		case TPool:
+			// This nodes can have childs.
+			// We store them in a map for a quick find for hierarchy.
+			m_list_nodes->hrStoreParent(this);
+			break;
+		default:
+			break;
+	}
+
+	// Store parent path before update.
+	QString old_parent_path = getParentPath();
+
+	v_updateValues(i_afnode, i_msgType);
+
+	if (old_parent_path != getParentPath())
+	{
+		// Node parent path was changed.
+		m_list_nodes->hrParentChanged(this);
+	}
+
+	// We can't call updateNodeValues here, as there can be only specific node information.
+	// For example renders resources message does not contain priority and annotation.
 }
 
 void ItemNode::updateNodeValues( const af::Node * i_node)
@@ -35,12 +71,36 @@ void ItemNode::updateNodeValues( const af::Node * i_node)
 	m_custom_data = afqt::stoq( i_node->getCustomData());
 }
 
-void ItemNode::paint( QPainter *painter, const QStyleOptionViewItem &option) const
+void ItemNode::addChild(ItemNode * i_item)
 {
-	Item::paint( painter, option);
+	if (m_child_list.contains(i_item))
+	{
+		AF_ERR << "Node '" << afqt::qtos(getName()) << "' already has child '" << afqt::qtos(i_item->getName()) << "'.";
+		return;
+	}
 
-	painter->drawText( option.rect, Qt::AlignVCenter | Qt::AlignHCenter, QString(" node "));
+	m_child_list.append(i_item);
+
+	i_item->setParentItem(this);
 }
+
+void ItemNode::setParentItem(ItemNode * i_parent_item)
+{
+	if (m_parent_item)
+		m_parent_item->m_child_list.removeAll(this);
+
+	m_parent_item = i_parent_item;
+
+	int depth = 0;
+	if (m_parent_item)
+		depth = m_parent_item->getDepth() + 1;
+
+	setDepth(depth);
+
+	v_parentItemChanged();
+}
+
+void ItemNode::v_parentItemChanged() {}
 
 bool ItemNode::compare( const ItemNode & other) const
 {
@@ -141,11 +201,11 @@ bool ItemNode::filter()
 	return ( false == m_ctrl_sf->getFilterRE().match( m_filter_str));
 }
 
-bool ItemNode::getHiddenFlags(int32_t i_flags) const
+bool ItemNode::getHideFlags(int32_t i_hide_flags) const
 {
-	bool result = m_flagshidden & i_flags;
+	bool result = m_hide_flags & i_hide_flags;
 
-	if (i_flags & ListNodes::e_HideInvert)
+	if (i_hide_flags & ListNodes::e_HideInvert)
 		result = !result;
 
 	return result;

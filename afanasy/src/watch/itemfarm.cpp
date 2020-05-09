@@ -3,7 +3,6 @@
 #include <QtGui/QPainter>
 
 #include "itempool.h"
-#include "listrenders.h"
 #include "watch.h"
 
 #define AFOUTPUT
@@ -11,9 +10,9 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-ItemFarm::ItemFarm(af::Node * i_afnode, Item::EType i_type, const CtrlSortFilter * i_ctrl_sf):
-	ItemNode(i_afnode, i_type, i_ctrl_sf),
-	m_parent(NULL)
+ItemFarm::ItemFarm(ListNodes * i_list_nodes, af::Node * i_afnode, Item::EType i_type, const CtrlSortFilter * i_ctrl_sf):
+	ItemNode(i_list_nodes, i_afnode, i_type, i_ctrl_sf),
+	m_parent_pool(NULL)
 {
 }
 
@@ -48,6 +47,19 @@ void ItemFarm::updateFarmValues(af::Farm * i_affarm)
 		m_tickets_host[afqt::stoq(i.first)] = i.second;
 }
 
+void ItemFarm::v_parentItemChanged()
+{
+	ItemNode * node = getParentItem();
+
+	if (node->getType() != Item::TPool)
+	{
+		AF_ERR << "Farm item '" << afqt::qtos(getName()) << "' parent is not a pool '" << afqt::qtos(node->getName()) << "'.";
+		return;
+	}
+
+	m_parent_pool = static_cast<ItemPool*>(node);
+}
+
 int ItemFarm::calcHeightFarm() const
 {
 	int height = 0;
@@ -59,17 +71,6 @@ int ItemFarm::calcHeightFarm() const
 		height += HeightTickets;
 
 	return height;
-}
-
-void ItemFarm::setParent(ItemPool * i_parent)
-{
-	m_parent = i_parent;
-
-	int depth = 0;
-	if (m_parent)
-		depth = m_parent->getDepth() + 1;
-
-	setDepth(depth);
 }
 
 void ItemFarm::drawServices(QPainter * i_painter, int i_x, int i_y, int i_w, int i_h) const
@@ -176,9 +177,9 @@ void ItemFarm::drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int 
 			int count = tkh_it.value().count;
 			if (count == -1)
 			{
-				if (NULL == m_parent)
+				if (NULL == m_parent_pool)
 					continue;
-				count = m_parent->getTicketHostCount(tkh_it.key());
+				count = m_parent_pool->getTicketHostCount(tkh_it.key());
 				if (count == -1)
 					continue;
 				draw_flags |= Item::TKD_DASH;
@@ -199,8 +200,8 @@ int ItemFarm::getTicketHostCount(const QString & i_name) const
 	if (it != m_tickets_host.end())
 		return it.value().count;
 
-	if (m_parent)
-		return m_parent->getTicketHostCount(i_name);
+	if (m_parent_pool)
+		return m_parent_pool->getTicketHostCount(i_name);
 
 	return -1;
 }

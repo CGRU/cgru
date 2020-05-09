@@ -478,18 +478,18 @@ class Block:
     def skipThumbnails(self):
         self.data['flags'] = afcommon.setBlockFlag(self.data['flags'], 'skipthumbnails')
 
-    def skipExistingFiles(self, i_size_min=-1, i_size_max=-1):
+    def skipExistingFiles(self, i_size_min = -1, i_size_max = -1):
         self.data['flags'] = afcommon.setBlockFlag(self.data['flags'], 'skipexistingfiles')
-        if i_size_min != -1:
+        if i_size_min > 0:
             self.data['file_size_min'] = i_size_min
-        if i_size_min != -1:
+        if i_size_max > 0:
             self.data['file_size_max'] = i_size_max
 
-    def checkRenderedFiles(self, i_size_min=-1, i_size_max=-1):
+    def checkRenderedFiles(self, i_size_min = -1, i_size_max = -1):
         self.data['flags'] = afcommon.setBlockFlag(self.data['flags'], 'checkrenderedfiles')
-        if i_size_min != -1:
+        if i_size_min > 0:
             self.data['file_size_min'] = i_size_min
-        if i_size_min != -1:
+        if i_size_max > 0:
             self.data['file_size_max'] = i_size_max
 
     def setMultiHost(self, h_min, h_max, h_max_wait, master_on_slave=False,
@@ -1068,6 +1068,18 @@ class Cmd:
         self.data['type'] = 'renders'
         self.data['mask'] = cgruconfig.VARS['HOSTNAME']
         self.data['operation'] = {'type': 'eject_tasks'}
+        self._sendRequest()
+
+    def renderEjectAndNIMBY(self):
+        """Missing DocString
+
+        :return:
+        """
+        self.action = 'action'
+        self.data['type'] = 'renders'
+        self.data['mask'] = cgruconfig.VARS['HOSTNAME']
+        self.data['operation'] = {'type': 'eject_tasks'}
+        self.data['params'] = {'NIMBY': True}
         self._sendRequest()
 
     def renderEjectNotMyTasks(self):

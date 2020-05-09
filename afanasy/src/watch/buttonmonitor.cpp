@@ -52,21 +52,24 @@ void ButtonMonitor::createImage()
    static const QString img_extension = ".png";
    QString img_filename = afqt::stoq( af::Environment::getAfRoot())
            + "/icons/watch/" + afqt::QEnvironment::theme.str + "/buttons/";
-   switch( type)
-   {
-      case Watch::WJobs:
-         img_filename += "jobs";
-         break;
-      case Watch::WRenders:
-         img_filename += "renders";
-         break;
-      case Watch::WUsers:
-         img_filename += "users";
-         break;
-      case Watch::WMonitors:
-         img_filename += "monitors";
-         break;
-   }
+	switch( type)
+	{
+	case Watch::WWork:
+		img_filename += "work";
+		break;
+	case Watch::WJobs:
+		img_filename += "jobs";
+		break;
+	case Watch::WFarm:
+		img_filename += "renders";
+		break;
+	case Watch::WUsers:
+		img_filename += "users";
+		break;
+	case Watch::WMonitors:
+		img_filename += "monitors";
+		break;
+	}
 
    // Load button images:
    useimages = true;

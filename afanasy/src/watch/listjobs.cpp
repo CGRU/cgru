@@ -47,11 +47,14 @@ bool    ListJobs::ms_FilterInclude_SU  = true;
 bool    ListJobs::ms_FilterMatch_SU    = false;
 std::string ListJobs::ms_FilterString_SU = "";
 
-ListJobs::ListJobs(QWidget * i_parent):
-	ListNodes(i_parent, "jobs"),
+uint32_t ListJobs::ms_hide_flags = e_HideHidden;
+
+ListJobs::ListJobs(QWidget * i_parent, bool i_listwork, const std::string & i_name):
+	ListNodes(i_parent, i_name),
+	m_listwork(i_listwork),
 	m_all_blocks_menu_shown(false)
 {
-	if( af::Environment::VISOR())
+	if( af::Environment::VISOR() || m_listwork)
 		m_ctrl_sf = new CtrlSortFilter( this,
 			&ms_SortType1_SU, &ms_SortAscending1_SU,
 			&ms_SortType2_SU, &ms_SortAscending2_SU,
@@ -82,16 +85,21 @@ ListJobs::ListJobs(QWidget * i_parent):
 		m_ctrl_sf->addFilterType( CtrlSortFilter::TUSERNAME);
 	}
 
+	// Get stored hide flags:
+	m_hide_flags = ms_hide_flags;
+
 	initSortFilterCtrl();
 
-	CtrlJobs * control = new CtrlJobs( m_ctrl_sf, this);
-	m_ctrl_sf->getLayout()->addWidget( control);
+	CtrlJobs * control = new CtrlJobs(m_ctrl_sf, this, m_listwork);
+	m_ctrl_sf->getLayout()->addWidget(control);
 
 
 	// Add left panel buttons:
+	if (af::Environment::VISOR() || (false == m_listwork))
+	{
 	ButtonPanel * bp;
 
-	bp = addButtonPanel(Item::TJob, "LOG","jobs_log","Show job log.");
+	bp = addButtonPanel(Item::TAny, "LOG","jobs_log","Show job log.");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestLog()));
 
 	bp = addButtonPanel(Item::TJob, "PAUSE","jobs_pause","Pause selected jobs.","P");
@@ -141,10 +149,12 @@ ListJobs::ListJobs(QWidget * i_parent):
 	bp = addButtonPanel(Item::TJob, "DELETE","jobs_delete","Delete selected jobs.","", true);
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actDelete()));
 
-	if (false == af::Environment::VISOR())
+	if (false == af::Environment::VISOR() && (false == m_listwork))
 	{
-		bp = addButtonPanel(Item::TJob, "DEL DONE","jobs_delete_done","Delete all done jobs.","", true);
+		bp = addButtonPanel(Item::TJob, "DEL DONE","jobs_delete_done","Delete all done jobs.","",
+				true /*double click*/, true /*always active*/);
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(actDeleteDone()));
+	}
 	}
 
 	// Add parameters
@@ -167,7 +177,8 @@ ListJobs::ListJobs(QWidget * i_parent):
 	addParam_REx(Item::TJob, "depend_mask",               "Depend Mask",        "Jobs name mask to wait");
 	addParam_REx(Item::TJob, "depend_mask_global",        "Global Depend",      "Depend mask for jobs from any user");
 	addParam_separator();
-	addParam_Hrs(Item::TJob, "time_life",                 "Life Time",          "Time to be deleted after creation");
+	addParam_Num(Item::TBranch, "max_tasks_per_second",   "Max Tasks Per Second", "Maximum tasks starts per second", -1, 1<<20);
+	addParam_Hrs(Item::TJob,    "time_life",              "Life Time",            "Time to be deleted after creation");
 	addParam_separator();
 	addParam_REx(Item::TJob, "need_os",                   "OS Needed",          "Job will run only on this OS");
 	addParam_REx(Item::TJob, "need_properties",           "Properties Needed",  "Job need client that has such properties");
@@ -184,13 +195,15 @@ ListJobs::ListJobs(QWidget * i_parent):
 
 ListJobs::~ListJobs()
 {
+	// Store hide flags:
+	ms_hide_flags = m_hide_flags;
 }
 
 void ListJobs::v_showFunc()
 {
-	if( Watch::isConnected() == false) return;
+	if (Watch::isConnected() == false) return;
 
-	if( af::Environment::VISOR())
+	if (af::Environment::VISOR() || m_listwork)
 		get();
 	else
 	{
@@ -543,7 +556,7 @@ bool ListJobs::v_processEvents( const af::MonitorEvents & i_me)
 
 ItemNode * ListJobs::v_createNewItemNode(af::Node * i_afnode, Item::EType i_type, bool i_notify)
 {
-	return new ItemJob(this, (af::Job*)i_afnode, m_ctrl_sf, i_notify);
+	return new ItemJob(this, false /*in work list*/, (af::Job*)i_afnode, m_ctrl_sf, i_notify);
 }
 
 void ListJobs::v_resetSorting()
@@ -561,58 +574,44 @@ void ListJobs::getUserJobsOrder()
 
 void ListJobs::calcTotals()
 {
+	int numjobs = count();
 	int percent = 0;
-	int blocksrun = 0;
-	int blocksdone = 0;
 	int done = 0;
 	int running = 0;
 	int error = 0;
+	int blocksrun = 0;
 
-	int numjobs = count();
-	if( numjobs == 0)
+	if (numjobs == 0)
 	{
 		m_parentWindow->setWindowTitle("Jobs: (none)");
 		return;
 	}
-	else
+
+	for (int i = 0; i < numjobs; i++)
 	{
-		for( int i = 0; i < numjobs; i++)
+		ItemJob * itemjob = static_cast<ItemJob*>(m_model->item(i));
+		if (itemjob->state & AFJOB::STATE_DONE_MASK)
 		{
-			ItemJob * itemjob = (ItemJob*)(m_model->item(i));
-			if( itemjob->state & AFJOB::STATE_DONE_MASK )
-			{
-				done++;
-				for( int b = 0; b < itemjob->getBlocksNum(); b++)
-				{
-					blocksdone++;
-				}
-			}
-			else
-			{
-				for( int b = 0; b < itemjob->getBlocksNum(); b++)
-				{
-					percent += itemjob->getBlockPercent( b);
-					blocksrun++;
-				}
-			}
-			if( itemjob->state & AFJOB::STATE_RUNNING_MASK) running ++;
-			if( itemjob->state & AFJOB::STATE_ERROR_MASK  ) error   ++;
+			done++;
 		}
+		else
+		{
+			for (int b = 0; b < itemjob->getBlocksNum(); b++)
+			{
+				percent += itemjob->getBlockPercent(b);
+				blocksrun++;
+			}
+		}
+		if (itemjob->state & AFJOB::STATE_RUNNING_MASK) running ++;
+		if (itemjob->state & AFJOB::STATE_ERROR_MASK  ) error   ++;
 	}
 
-	if( af::Environment::VISOR())
-	{
-		m_parentWindow->setWindowTitle(QString("J[%1]: R%2/%3D/%4E")
-			.arg( numjobs).arg( running).arg( done).arg( error));
-	}
+	if (blocksrun)
+		m_parentWindow->setWindowTitle(
+			QString("Jobs: %1, Run %2 (%3%), Error %4, Done %5")
+			.arg(numjobs).arg(running).arg(percent / blocksrun).arg(error).arg(done));
 	else
-	{
-		if( blocksrun )
-			m_parentWindow->setWindowTitle(QString("J[%1]: R%2/%3D/%4E B%5-%6%")
-				.arg( numjobs).arg( running).arg( done).arg( error).arg( blocksrun).arg( percent / blocksrun));
-		else
-			m_parentWindow->setWindowTitle(QString("J[%1]: Done").arg( numjobs));
-	}
+		m_parentWindow->setWindowTitle(QString("Jobs: %1 Done").arg(numjobs));
 }
 
 void ListJobs::actMoveUp()     { moveJobs("move_jobs_up"    ); }

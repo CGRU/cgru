@@ -10,12 +10,10 @@ class ListRenders;
 class ItemFarm : public ItemNode
 {
 public:
-	ItemFarm(af::Node * i_afnode, Item::EType i_type, const CtrlSortFilter * i_ctrl_sf);
+	ItemFarm(ListNodes * i_list_nodes, af::Node * i_afnode, Item::EType i_type, const CtrlSortFilter * i_ctrl_sf);
 	~ItemFarm();
 
 	void updateFarmValues(af::Farm * i_affarm);
-
-	void setParent(ItemPool * i_parent);
 
 	static const int HeightServices = 24;
 
@@ -35,8 +33,10 @@ public:
 protected:
 	int calcHeightFarm() const;
 
+	virtual void v_parentItemChanged();
+
 protected:
-	ItemPool * m_parent;
+	ItemPool * m_parent_pool;
 
 private:
 	int getTicketHostCount(const QString & i_name) const;

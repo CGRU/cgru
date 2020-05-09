@@ -176,6 +176,7 @@
 	"af_watch_connection_lost_time":20,
 		"":"If watch can`t update server for this time, it considers that server connection lost and tries to register again.",
 	"af_watch_render_idle_bar_max":3600,
+	"af_watch_work_user_visible":true,
 
 "":"Database:",
 		"":"sting to pass to PQconnectdb http://www.postgresql.org/docs/current/static/libpq-connect.html",

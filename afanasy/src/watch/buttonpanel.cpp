@@ -25,18 +25,21 @@ ButtonPanel::ButtonPanel(
 		const QString & i_description,
 		const QString & i_hotkey,
 		bool i_dblclick,
+		bool i_always_active,
 		ButtonsMenu * i_bm):
-	m_listitems( i_listitems),
-	m_type(i_type),
-	m_label( i_label),
-	m_name( i_name),
-	m_description( i_description),
-	m_hotkey( i_hotkey),
-	m_dblclick( i_dblclick),
-	m_buttonsmenu(i_bm),
-	m_hovered( false),
-	m_active(false),
-	m_activated( false)
+	m_listitems(    i_listitems),
+	m_type(         i_type),
+	m_label(        i_label),
+	m_name(         i_name),
+	m_description(  i_description),
+	m_hotkey(       i_hotkey),
+	m_dblclick(     i_dblclick),
+	m_always_active(i_always_active),
+	m_buttonsmenu(  i_bm),
+
+	m_hovered(  false),
+	m_active(   i_always_active),
+	m_activated(false)
 {
 	afqt::QEnvironment::getHotkey( m_name, m_hotkey);
 

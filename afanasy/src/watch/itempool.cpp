@@ -19,12 +19,11 @@
 const int ItemPool::HeightPool = 32;
 const int ItemPool::HeightAnnotation = 14;
 
-ItemPool::ItemPool(af::Pool * i_pool, ListRenders * i_list_renders, const CtrlSortFilter * i_ctrl_sf):
-	ItemFarm(i_pool, TPool, i_ctrl_sf),
-	m_ListRenders(i_list_renders),
+ItemPool::ItemPool(ListRenders * i_list_renders, af::Pool * i_pool, const CtrlSortFilter * i_ctrl_sf):
+	ItemFarm(i_list_renders, i_pool, TPool, i_ctrl_sf),
 	m_root(false)
 {
-	v_updateValues(i_pool, 0);
+	updateValues(i_pool, 0);
 }
 
 ItemPool::~ItemPool()
@@ -39,10 +38,10 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 
 	updateFarmValues(pool);
 
-	m_sort_force = m_name;
-
 	m_root = pool->isRoot();
-	m_parent_path = afqt::stoq(pool->getParentPath());
+
+	setParentPath(afqt::stoq(pool->getParentPath()));
+	m_sort_force = m_name;
 
 	if (false == m_root)
 		m_params["pattern"] = afqt::stoq(pool->getPatternStr());
@@ -150,8 +149,6 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 	updateInfo(pool);
 
 	calcHeight();
-
-	m_ListRenders->offsetHierarchy(this);
 }
 
 void ItemPool::updateInfo(af::Pool * i_pool)

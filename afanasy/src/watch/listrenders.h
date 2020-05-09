@@ -24,12 +24,6 @@ public:
 
 	virtual bool v_processEvents( const af::MonitorEvents & i_me);
 
-	void offsetHierarchy(ItemPool   * i_item_pool);
-	void offsetHierarchy(ItemRender * i_item_render);
-
-	void removeRender(ItemRender * i_item_render);
-	void removePool(ItemPool * i_item_pool);
-
 public slots:
 	void slot_ServiceAdd();
 	void slot_ServiceDisable();
@@ -45,8 +39,6 @@ protected:
 	void doubleClicked( Item * item);
 
 	virtual void v_connectionLost();
-
-	virtual void v_itemToBeDeleted(Item * i_item);
 
 public:
 	 enum EDisplaySize

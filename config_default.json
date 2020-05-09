@@ -10,6 +10,20 @@
 	"":"'OS_linux': Linix specific settings",
 	"":"'OS_macosx': MacOSX specific settings",
 
+	"":"Can be used globally for windows titles",
+	"-company":"CGRU-DEVEL",
+
+	"":"Keeper system tray icon",
+	"-tray_icon":"cgru-devel",
+
+	"":"Path where custom icons will be searched",
+	"-icons_path":"/cg/icons;/local/icons",
+		"":"Can be ; or : separated",
+
+	"":"Keeper menu custom path",
+	"-menu_path":"/cg/apps",
+
+
 		"":"Digest authentication realm",
 	"realm":"CGRU",
 

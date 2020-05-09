@@ -1,5 +1,6 @@
 rem Name=Start Watch...
 rem Icon=afwatch.png
+rem Separator
 
 call %0\..\_setup.cmd
 if defined AF_WATCH_CMD (

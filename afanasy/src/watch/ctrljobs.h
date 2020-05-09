@@ -11,7 +11,7 @@ class CtrlJobs : public QLabel
 {
 Q_OBJECT
 public:
-	CtrlJobs( QWidget * i_parent, ListJobs * i_listjobs);
+	CtrlJobs(QWidget * i_parent, ListJobs * i_listjobs, bool i_inworklist);
 	~CtrlJobs();
 
 protected:
@@ -19,4 +19,5 @@ protected:
 
 private:
 	ListJobs * m_listjobs;
+	const bool m_inworklist;
 };

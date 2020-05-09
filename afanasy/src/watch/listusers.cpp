@@ -82,6 +82,14 @@ ListUsers::ListUsers( QWidget* parent):
 
 	resetButtonsMenu();
 
+	if (af::Environment::GOD())
+	{
+		bp = addButtonPanel(Item::TUser, "DELETE","users_solve_tasksnum",
+				"Solve jobs need by running tasks number.",
+				"" /*hotkey*/, true /*double-click*/);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actDelete()));
+	}
+
 
 	// Add parameters:
 	if (af::Environment::VISOR() || (af::Environment::getPermUserModHisPriority()))
@@ -225,7 +233,7 @@ bool ListUsers::v_processEvents( const af::MonitorEvents & i_me)
 
 ItemNode* ListUsers::v_createNewItemNode(af::Node * i_afnode, Item::EType i_type, bool i_notify)
 {
-	return new ItemUser((af::User*)i_afnode, m_ctrl_sf);
+	return new ItemUser(this, (af::User*)i_afnode, m_ctrl_sf);
 }
 
 void ListUsers::userAdded(ItemNode * node, const QModelIndex & index)
@@ -240,12 +248,12 @@ void ListUsers::calcTitle()
 {
 	int total = count();
 	int running = 0;
-	for( int i = 0; i < total; i++)
+	for (int i = 0; i < total; i++)
 	{
-		ItemUser * itemuser = (ItemUser*)(m_model->item(i));
+		ItemUser * itemuser = static_cast<ItemUser*>(m_model->item(i));
 		if (itemuser->running_tasks_num > 0) running++;
 	}
-	m_parentWindow->setWindowTitle(QString("U[%1]: %2R").arg( total).arg( running));
+	m_parentWindow->setWindowTitle(QString("Users: %1, Running %2").arg(total).arg(running));
 }
 
 void ListUsers::actDelete() { operation(Item::TUser, "delete"); }
