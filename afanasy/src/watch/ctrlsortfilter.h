@@ -92,7 +92,7 @@ private slots:
 	void actSortAscending2();
 	void actFilter( const QString & i_str);
 	void actFilterInclude();
-	void actFilterMacth();
+	void actFilterMatch();
 	void actFilterType( int i_type);
 
 private:
