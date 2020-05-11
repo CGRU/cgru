@@ -114,6 +114,6 @@ def refresh(reset=False):
 			free_set = False
 	elif toset_free:
 		if not free_set:
-			setFree('(keeper nimby schedule)')
+			setFree()
 			free_set = True
 			nimby_set = False
