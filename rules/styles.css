@@ -714,6 +714,7 @@ border-radius: 8px;
 .status_edit .tag { cursor: pointer; margin: 4px; }
 .status_edit .flag { border-width: 0px; margin: 7px; padding: 0px 2px; opacity: 0.5;}
 .status_edit .flag.selected { border-width: 4px; margin: 3px; opacity: 1.0; _border-color: rgba( 100, 255, 255, 1.0) }
+.status_edit .flag.half_selected { border-width: 0px; margin: 7px; opacity: 1.0; _border-color: rgba( 100, 255, 255, 1.0) }
 
 table.statistics { border-collapse: collapse; }
 table.statistics th { font-weight: normal; font-style: italic; }
