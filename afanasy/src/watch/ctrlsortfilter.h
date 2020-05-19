@@ -29,6 +29,7 @@ public:
 	void init();
 
 	inline bool isSortEnabled()     const { return  (*m_sorttype1 != TNONE ) || (*m_sorttype2 != TNONE );}
+	inline bool isSortDisabled()    const { return  (*m_sorttype1 == TNONE ) && (*m_sorttype2 == TNONE );}
 	inline int  getSortType1()      const { return   *m_sorttype1;       }
 	inline int  getSortType2()      const { return   *m_sorttype2;       }
 	inline bool isSortAscending1()  const { return   *m_sortascending1;  }

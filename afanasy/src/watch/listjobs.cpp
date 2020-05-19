@@ -482,18 +482,21 @@ void ListJobs::slot_BlocksMenuNotAll() {m_all_blocks_menu_shown = false;}
 
 bool ListJobs::v_caseMessage( af::Msg * msg)
 {
-	switch( msg->type())
+	switch (msg->type())
 	{
 	case af::Msg::TJobsList:
 	{
-		if(updateItems(msg, Item::TJob) && (af::Environment::VISOR() == false))
+		if (updateItems(msg, Item::TJob))
 		{
-			getUserJobsOrder();
+			// We should get user jobs order only if:
+			// user is not admin, it is not list work (it inherits this class) and sorting is disabled
+			if ((af::Environment::VISOR() == false) && (false == m_listwork) && (m_ctrl_sf->isSortDisabled()))
+				getUserJobsOrder();
 		}
 
-		if( false == isSubscribed() )
+		if (false == isSubscribed())
 		{
-			if( af::Environment::VISOR() == false )
+			if (af::Environment::VISOR() == false)
 			{
 				m_view->scrollToBottom();
 			}
@@ -506,10 +509,10 @@ bool ListJobs::v_caseMessage( af::Msg * msg)
 	}
 	case af::Msg::TUserJobsOrder:
 	{
-		af::MCGeneral ids( msg);
-		AF_DEBUG << "Jobs order received: " << ids.v_generateInfoString( true);
-		if( ids.getId() == MonitorHost::getUid())
-			sortMatch( ids.getList());
+		af::MCGeneral ids(msg);
+		AF_DEBUG << "Jobs order received: " << ids.v_generateInfoString(true);
+		if (ids.getId() == MonitorHost::getUid())
+			sortMatch(ids.getList());
 		break;
 	}
 
@@ -561,7 +564,7 @@ ItemNode * ListJobs::v_createNewItemNode(af::Node * i_afnode, Item::EType i_type
 
 void ListJobs::v_resetSorting()
 {
-	if( af::Environment::VISOR() == false )
+	if ((af::Environment::VISOR() == false) && (m_listwork == false))
 		getUserJobsOrder();
 }
 
