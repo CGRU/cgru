@@ -33,14 +33,6 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-int     ListWork::ms_SortType1      = CtrlSortFilter::TTIMECREATION;
-int     ListWork::ms_SortType2      = CtrlSortFilter::TTIMERUN;
-bool    ListWork::ms_SortAscending1 = false;
-bool    ListWork::ms_SortAscending2 = false;
-int     ListWork::ms_FilterType     = CtrlSortFilter::TUSERNAME;
-bool    ListWork::ms_FilterInclude  = true;
-bool    ListWork::ms_FilterMatch    = false;
-std::string ListWork::ms_FilterString = "";
 
 uint32_t ListWork::ms_hide_flags = e_HideHidden | e_HideSystem | e_HideDone | e_HideOffline | e_HideEmpty;
 

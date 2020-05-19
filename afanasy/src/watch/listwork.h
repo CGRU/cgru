@@ -54,16 +54,5 @@ private:
 	void ticketEdit(const QString & i_name, bool i_host_ticket);
 
 private:
-	static int     ms_SortType1;
-	static int     ms_SortType2;
-	static bool    ms_SortAscending1;
-	static bool    ms_SortAscending2;
-	static int     ms_FilterType;
-	static bool    ms_FilterInclude;
-	static bool    ms_FilterMatch;
-	static std::string ms_FilterString;
-
 	static uint32_t ms_hide_flags;
-
-	QTimer * timer;
 };
