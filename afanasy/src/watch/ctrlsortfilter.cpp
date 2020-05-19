@@ -187,13 +187,13 @@ void CtrlSortFilter::contextMenuEvent(QContextMenuEvent *i_event)
 	action = new QAction( "Filter Match", this);
 	action->setCheckable( true);
 	action->setChecked( *m_filtermatch);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actFilterMacth() ));
+	connect( action, SIGNAL( triggered() ), this, SLOT( actFilterMatch() ));
 	menu.addAction( action);
 
 	action = new QAction( "Filter Contain", this);
 	action->setCheckable( true);
 	action->setChecked( *m_filtermatch == false);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actFilterMacth() ));
+	connect( action, SIGNAL( triggered() ), this, SLOT( actFilterMatch() ));
 	menu.addAction( action);
 
 	menu.exec( i_event->globalPos());
@@ -232,7 +232,7 @@ void CtrlSortFilter::actFilterInclude()
 	emit filterSettingsChanged();
 }
 
-void CtrlSortFilter::actFilterMacth()
+void CtrlSortFilter::actFilterMatch()
 {
 	if( *m_filtermatch )
 	{

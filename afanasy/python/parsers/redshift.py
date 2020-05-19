@@ -80,13 +80,13 @@ class redshift(parser.parser):
 
         match = re_frame_done.findall(data)
         if match:
-            self.percentframe = 100
+            self.percentframe = 0
             self.frame += len(match)
         else:
             # try to match skip frame
             match = re_frame_skip.findall(data)
             if match:
-                self.percentframe = 100
+                self.percentframe = 0
                 self.frame += len(match)
 
         self.calculate()

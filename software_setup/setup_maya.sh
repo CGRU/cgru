@@ -41,7 +41,7 @@ export TMPDIR=/tmp
 export PATH="${MAYA_LOCATION}/bin:${PATH}"
 
 # Add CGRU icons to Maya:
-export XBMLANGPATH="${MAYA_CGRU_LOCATION}/icons/%B"
+export XBMLANGPATH="${MAYA_CGRU_LOCATION}/icons/%B:${XBMLANGPATH}"
 
 # Add CGRU scripts to Maya scripts path:
 export MAYA_SCRIPT_PATH="${MAYA_CGRU_LOCATION}/mel/AETemplates:${MAYA_SCRIPT_PATH}"
