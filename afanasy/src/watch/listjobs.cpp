@@ -610,9 +610,14 @@ void ListJobs::calcTotals()
 	}
 
 	if (blocksrun)
-		m_parentWindow->setWindowTitle(
-			QString("Jobs: %1, Run %2 (%3%), Error %4, Done %5")
-			.arg(numjobs).arg(running).arg(percent / blocksrun).arg(error).arg(done));
+	{
+		QString title = QString("Jobs:%1").arg(numjobs);
+		if (error)
+			title += QString(" ERROR:%1").arg(error);
+		title += QString(" Run:%1 %2%").arg(running).arg(percent / blocksrun);
+		title += QString(" Done:%1").arg(done);
+		m_parentWindow->setWindowTitle(title);
+	}
 	else
 		m_parentWindow->setWindowTitle(QString("Jobs: %1 Done").arg(numjobs));
 }
