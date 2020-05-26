@@ -1336,27 +1336,27 @@ Status.prototype.editSave = function(i_args) {
 	{
 		tasks = [];
 
-		for (var t = 0; t < this.elEdit_tasks.elTasks.length; t++)
+		for (let t = 0; t < this.elEdit_tasks.elTasks.length; t++)
 		{
-			var elTask = this.elEdit_tasks.elTasks[t];
-			var task = {};
+			let elTask = this.elEdit_tasks.elTasks[t];
+			let task = {};
 
-			var duration = parseFloat(c_Strip(elTask.m_elDur.textContent));
+			let duration = parseFloat(c_Strip(elTask.m_elDur.textContent));
 			if (!isNaN(duration))
 				task.duration = duration;
 
-			var price = parseFloat(c_Strip(elTask.m_elPrice.textContent));
+			let price = parseFloat(c_Strip(elTask.m_elPrice.textContent));
 			if (!isNaN(price))
 				task.price = price;
 
 			if (elTask.m_elTags.tags)
 			{
 				task.tags = [];
-				elList = elTask.m_elTags.tags;
-				for (var i = 0; i < elList.length; i++)
+				let elList = elTask.m_elTags.tags;
+				for (let i = 0; i < elList.length; i++)
 					if (elList[i].m_selected)
 					{
-						var tag = elList[i].m_item;
+						let tag = elList[i].m_item;
 						task.tags.push(tag);
 					}
 			}
@@ -1366,11 +1366,11 @@ Status.prototype.editSave = function(i_args) {
 			if (elTask.m_elArtists && elTask.m_elArtists.artists)
 			{
 				task.artists = [];
-				elList = elTask.m_elArtists.artists;
-				for (var i = 0; i < elList.length; i++)
+				let elList = elTask.m_elArtists.artists;
+				for (let i = 0; i < elList.length; i++)
 					if (elList[i].m_selected)
 					{
-						var artist = elList[i].m_item;
+						let artist = elList[i].m_item;
 						task.artists.push(artist);
 					}
 			}

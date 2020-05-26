@@ -400,7 +400,7 @@ class BlockParameters:
             block.setTaskMinRunTime(self.minruntime)
         if self.maxruntime > 0.01:
             block.setTaskMaxRunTime(int(self.maxruntime*3600.0))
-        if self.progress_timeout > 0.01:
+        if self.progress_timeout > 0.001:
             block.setTaskProgressChangeTimeout(int(self.progress_timeout*3600.0))
 
         if self.file_check_enable:
