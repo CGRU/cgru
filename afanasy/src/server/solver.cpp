@@ -59,9 +59,11 @@ Solver::Solver(
 
 Solver::~Solver(){}
 
-class MostReadyRender : public std::binary_function <RenderAf*,RenderAf*,bool>
+struct MostReadyRender : public std::binary_function <RenderAf*,RenderAf*,bool>
 {
-	public:
+	const AfNodeSolve * m_node;
+	MostReadyRender(const AfNodeSolve * i_node) {m_node = i_node;}
+
 	inline bool operator()( const RenderAf * a, const RenderAf * b)
 	{
 		// Offline renders needed for Wake-On-Lan.
@@ -213,7 +215,7 @@ RenderAf * Solver::SolveList(std::list<AfNodeSolve*> & i_list, std::list<RenderA
 		}
 
 		// Sort renders:
-		renders.sort(MostReadyRender());
+		renders.sort(MostReadyRender(*it));
 
 		RenderAf * render = (*it)->solve(renders, ms_monitorcontaier, i_branch);
 

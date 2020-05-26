@@ -18,6 +18,7 @@
 
 var work_params = {
 	priority /***************/: {'type': 'num', 'label': 'Priority'},
+	pools                     : {"type": 'msi', "label": 'Pools'},
 	max_running_tasks /******/: {'type': 'num', 'label': 'Max Running Tasks'},
 	max_running_tasks_per_host: {'type': 'num', 'label': 'Max Running Tasks Per Host'},
 	hosts_mask /*************/: {'type': 'reg', 'label': 'Hosts Mask'},
@@ -210,6 +211,7 @@ function work_ResetPanels(i_monitor)
 	var elPanelR = i_monitor.elPanelR;
 
 	// Pools:
+	return;
 	var elPools = elPanelR.m_elPools;
 	for (var i = 0; i < elPools.m_elArray.length; i++)
 		elPools.removeChild(elPools.m_elArray[i]);
@@ -225,6 +227,7 @@ function work_UpdatePanels(i_monitor, i_node)
 	var work = i_node.params;
 
 	// Pools:
+	return;
 	var elPools = elPanelR.m_elPools;
 	var pools = work.pools;
 	if (pools)

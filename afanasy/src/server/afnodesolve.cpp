@@ -127,7 +127,7 @@ void AfNodeSolve::v_preSolve(time_t i_curtime, MonitorContainer * i_monitors)
 /// Solving function should be implemented in child classes (if solving needed):
 RenderAf *AfNodeSolve::v_solve(std::list<RenderAf *> &i_renders_list, MonitorContainer *i_monitoring, BranchSrv * i_branch)
 {
-	AF_ERR << "AfNodeSrv::solve(): Not implemented: " << m_node->getName();
+	AF_ERR << "AfNodeSrv::v_solve(): Not implemented: " << m_node->getName();
 	return NULL;
 }
 void AfNodeSolve::calcNeed(int i_flags, int i_resourcesquantity)
