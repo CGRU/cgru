@@ -86,7 +86,8 @@ ListJobs::ListJobs(QWidget * i_parent, bool i_listwork, const std::string & i_na
 	}
 
 	// Get stored hide flags:
-	m_hide_flags = ms_hide_flags;
+	if (false == m_listwork)
+		m_hide_flags = ms_hide_flags;
 
 	initSortFilterCtrl();
 
@@ -196,7 +197,8 @@ ListJobs::ListJobs(QWidget * i_parent, bool i_listwork, const std::string & i_na
 ListJobs::~ListJobs()
 {
 	// Store hide flags:
-	ms_hide_flags = m_hide_flags;
+	if (false == m_listwork)
+		ms_hide_flags = m_hide_flags;
 }
 
 void ListJobs::v_showFunc()
