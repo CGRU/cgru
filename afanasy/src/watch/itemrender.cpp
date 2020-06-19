@@ -172,6 +172,10 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 		setHideFlag_Hidden(  render->isHidden()  );
 		setHideFlag_Offline( render->isOffline() );
 
+		m_capacity        = render->getCapacityHost();
+		m_maxtasks        = render->getMaxTasksHost();
+		m_power           = render->getPowerHost();
+		m_properties      = afqt::stoq(render->getPropertiesHost());
 		m_engine          = afqt::stoq(render->getEngine());
 		m_username        = afqt::stoq(render->getUserName());
 		m_time_launched   = render->getTimeLaunch();
@@ -229,6 +233,15 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 		}
 
 		m_info_text_render += "<br>@HRES@";
+
+		if (m_capacity != -1)
+			m_info_text_render += QString("<br>Capacity: %1").arg(m_capacity);
+		if (m_maxtasks != -1)
+			m_info_text_render += QString("<br>Maximum Tasks: %1").arg(m_maxtasks);
+		if (m_power != -1)
+			m_info_text_render += QString("<br>Custom \"power\": %1").arg(m_power);
+		if (m_properties.size())
+			m_info_text_render += QString("<br>Custom \"properties\": %1").arg(m_properties);
 
 	    m_online = render->isOnline();
 		m_info_text_render += "<br>";
@@ -449,15 +462,26 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 		return;
 	}
 
-	if( m_taskstartfinishtime )
+	// Construct properties and time busy state string
+	m_props_state.clear();
+
+	if (m_power != -1)
+		m_props_state += QString(" %1").arg(m_power);
+	if (m_properties.size())
+		m_props_state += QString(" %1").arg(m_properties);
+
+	if (m_taskstartfinishtime)
 	{
-	    m_taskstartfinishtime_str = af::time2strHMS( time(NULL) - m_taskstartfinishtime ).c_str();
-	    if( m_busy == false ) m_taskstartfinishtime_str += " free";
-	    else m_taskstartfinishtime_str += " busy";
+		m_props_state += QString(" %1").arg(af::time2strHMS(time(NULL) - m_taskstartfinishtime).c_str());
+		if (m_busy) m_props_state += " busy";
+		//else m_props_state += " free";
 	}
-	else m_taskstartfinishtime_str = "NEW";
+	else
+		m_props_state += " NEW";
+
 
 	calcHeight();
+
 
 	if( m_wolWaking ) m_offlineState = "Waking Up";
 	else if( m_wolSleeping || m_wolFalling) m_offlineState = "Sleeping";
@@ -661,7 +685,7 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 		break;
 	default:
 		i_painter->drawText(right_text_x, y, right_text_w, base_height+2, Qt::AlignBottom | Qt::AlignRight,
-	        m_taskstartfinishtime_str);
+	        m_props_state);
 	}
 
 	// Print information under plotters:

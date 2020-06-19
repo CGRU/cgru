@@ -72,6 +72,12 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 		strLeftTop += QString(": %1").arg(afqt::stoq(pool->getPatternStr()));
 	strLeftBottom.clear();
 	strRightTop.clear();
+	strRightBottom.clear();
+
+	if (pool->getPowerHost() != -1)
+		strRightBottom += QString(" %1").arg(pool->getPowerHost());
+	if (pool->getPropertiesHost().size())
+		strRightBottom += QString(" %1").arg(afqt::stoq(pool->getPropertiesHost()));
 
 	if (Watch::isPadawan())
 	{

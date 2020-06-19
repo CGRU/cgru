@@ -192,7 +192,12 @@ ListRenders::ListRenders( QWidget* parent):
 		addParam_Num(Item::TAny,  "priority",       "Priority",       "Priority number", 0, 250);
 		addParam_Num(Item::TAny,  "max_tasks_host", "Host Max Tasks", "Host maximum running tasks", -1, 99);
 		addParam_Num(Item::TAny,  "capacity_host",  "Host Capacity",  "Host capacity", -1, 1<<30);
+		addParam_separator();
 		addParam_Str(Item::TAny,  "annotation",     "Annotation",     "Annotation string");
+		addParam_separator();
+		addParam_Num(Item::TAny,  "power_host",      "Host Power",      "Host some custom \"power\" integer", -1, 1<<30);
+		addParam_Str(Item::TAny,  "properties_host", "Host Properties", "Host some custom \"properties\" string");
+		addParam_separator();
 
 		addParam_Hrs(Item::TPool, "idle_free_time",     "Idle Free Time",  "Unset Nimby idle time.");
 		addParam_Hrs(Item::TPool, "busy_nimby_time",    "Busy Nimby Time", "Set Nimby busy time.");
@@ -734,7 +739,7 @@ void ListRenders::calcTitle()
 	}
 
 	m_parentWindow->setWindowTitle(
-			QString("Renders: %1 Online, %2 Busy, %3 Offline, %4 Nimby, %5 Total, %6 Pools")
+			QString("Farm: %1 On, %2 Busy, %3 Off, %4 Nimby, %5 Total, %6 Pools")
 			.arg(ronline).arg(rbusy).arg(roffline).arg(rnimby).arg(rtotal).arg(ptotal));
 }
 

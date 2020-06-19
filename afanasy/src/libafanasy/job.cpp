@@ -71,8 +71,6 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 
 	jr_regexp("depend_mask",        m_depend_mask,         i_object, io_changes);
 	jr_regexp("depend_mask_global", m_depend_mask_global,  i_object, io_changes);
-	jr_regexp("need_os",            m_need_os,             i_object, io_changes);
-	jr_regexp("need_properties",    m_need_properties,     i_object, io_changes);
 
 	jr_string("user_name",     m_user_name,     i_object, io_changes);
 
@@ -231,10 +229,6 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\n\"depend_mask\":\""        << af::strEscape( m_depend_mask.getPattern()        ) << "\"";
 	if( hasDependMaskGlobal())
 		o_str << ",\n\"depend_mask_global\":\"" << af::strEscape( m_depend_mask_global.getPattern() ) << "\"";
-	if( hasNeedOS())
-		o_str << ",\n\"need_os\":\""            << af::strEscape( m_need_os.getPattern()            ) << "\"";
-	if( hasNeedProperties())
-		o_str << ",\n\"need_properties\":\""    << af::strEscape( m_need_properties.getPattern()    ) << "\"";
 
 	if( m_blocks_data == NULL )
 	{
@@ -271,10 +265,6 @@ void Job::initDefaultValues()
 
 	m_depend_mask.setCaseSensitive();
 	m_depend_mask_global.setCaseSensitive();
-	m_need_os.setCaseInsensitive();
-	m_need_os.setContain();
-	m_need_properties.setCaseSensitive();
-	m_need_properties.setContain();
 }
 
 bool Job::isValid( std::string * o_err) const
@@ -352,8 +342,6 @@ void Job::v_readwrite( Msg * msg)
 
 	rw_RegExp(m_depend_mask,        msg);
 	rw_RegExp(m_depend_mask_global, msg);
-	rw_RegExp(m_need_os,            msg);
-	rw_RegExp(m_need_properties,    msg);
 
 	rw_StringMap(m_folders, msg);
 
@@ -431,8 +419,6 @@ int Job::v_calcWeight() const
 	weight += weigh( m_folders);
 	weight += m_depend_mask.weigh();
 	weight += m_depend_mask_global.weigh();
-	weight += m_need_os.weigh();
-	weight += m_need_properties.weigh();
 	return weight;
 }
 
@@ -501,6 +487,8 @@ void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
       return;
    }
 
+	Work::generateInfoStream(o_str, full);
+
 	if (m_branch.size()) o_str << "\n Branch = " << m_branch;
    if( m_annotation.size())  o_str << "\n    " << m_annotation;
    if( m_report.size())      o_str << "\n    " << m_report;
@@ -524,14 +512,9 @@ void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
    if( m_max_running_tasks == -1 ) o_str << " (no limit)";
    o_str << "\n Maximum running tasks per host = " << m_max_running_tasks_per_host;
    if( m_max_running_tasks_per_host == -1 ) o_str << " (no limit)";
-   o_str << "\n Hosts mask: \"" << m_hosts_mask.getPattern() << "\"";
-   if( m_hosts_mask.empty()) o_str << " (any host)";
-   if( m_hosts_mask_exclude.notEmpty()) o_str << "\n Exclude hosts mask: \"" << m_hosts_mask_exclude.getPattern() << "\"";
    if( m_depend_mask.notEmpty()) o_str << "\n Depend mask = \"" << m_depend_mask.getPattern() << "\"";
    if( m_depend_mask_global.notEmpty()) o_str << "\n Global depend mask = \"" << m_depend_mask_global.getPattern() << "\"";
    if( m_time_wait ) o_str << "\n Wait time = " << af::time2str( m_time_wait);
-   if( m_need_os.notEmpty()) o_str << "\n Needed OS: \"" << m_need_os.getPattern() << "\"";
-   if( m_need_properties.notEmpty()) o_str << "\n Needed properties: \"" << m_need_properties.getPattern() << "\"";
    if( m_command_pre.size()) o_str << "\n Pre command:\n" << m_command_pre;
    if( m_command_post.size()) o_str << "\n Post command:\n" << m_command_post;
 

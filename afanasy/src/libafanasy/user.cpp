@@ -170,8 +170,8 @@ void User::v_generateInfoStream( std::ostringstream & stream, bool full) const
       if( m_max_running_tasks < 1 ) stream << " (no limit)";
       stream << "\n Running Tasks Number = " << m_running_tasks_num;
       stream << "\n Running Tasks Capacity Total = " << m_running_capacity_total;
-      if( hasHostsMask())        stream << "\n Hosts Mask = \"" << m_hosts_mask.getPattern() << "\"";
-      if( hasHostsMaskExclude()) stream << "\n Exclude Hosts Mask = \"" << m_hosts_mask_exclude.getPattern() << "\"";
+
+		Work::generateInfoStream(stream, full);
 
       stream << "\n Errors Solving: ";
       stream << "\n    Errors To Avoid Host = " << int(m_errors_avoid_host);

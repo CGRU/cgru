@@ -168,6 +168,8 @@ ListJobs::ListJobs(QWidget * i_parent, bool i_listwork, const std::string & i_na
 	}
 	addParam_Str(Item::TAny, "annotation",                "Annotation",         "Annotation string");
 	addParam_separator();
+	addParam_MSI(Item::TJob, "pools",                     "Pools",              "Pools priorities");
+	addParam_separator();
 	addParam_Tim(Item::TJob, "time_wait",                 "Wait Time",          "Time to wait to start");
 	addParam_separator();
 	addParam_Num(Item::TAny, "max_running_tasks",         "Maximum Running",    "Maximum running tasks number", -1, 1<<20);
@@ -181,8 +183,11 @@ ListJobs::ListJobs(QWidget * i_parent, bool i_listwork, const std::string & i_na
 	addParam_Num(Item::TBranch, "max_tasks_per_second",   "Max Tasks Per Second", "Maximum tasks starts per second", -1, 1<<20);
 	addParam_Hrs(Item::TJob,    "time_life",              "Life Time",            "Time to be deleted after creation");
 	addParam_separator();
-	addParam_REx(Item::TJob, "need_os",                   "OS Needed",          "Job will run only on this OS");
-	addParam_REx(Item::TJob, "need_properties",           "Properties Needed",  "Job need client that has such properties");
+	addParam_Num(Item::TJob, "need_power",      "Power Needed",       "Job need client that has at least this power", -1, 1<<30);
+	addParam_REx(Item::TJob, "need_os",         "OS Needed",          "Job will run only on this OS");
+	addParam_Num(Item::TJob, "need_memory",     "Memory Needed",      "Job need client to have at least this free memory (MB)", -1, 1<<30);
+	addParam_Num(Item::TJob, "need_hdd",        "HDD Needed",         "Job need client to have at least this free HDD space (GB)", -1, 1<<30);
+	addParam_REx(Item::TJob, "need_properties", "Properties Needed",  "Job need client that has such properties");
 
 	m_paramspanel = new ParamsPanelJob();
 	initListNodes();

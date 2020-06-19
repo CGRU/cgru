@@ -45,6 +45,13 @@ public:
 	inline bool hasCapacity(int value) const {
 		int c = findCapacity(); if (c<0) return true; else return m_capacity_used + value <= c;}
 
+	inline int calcPoolPriority() const {if (m_parent) return m_parent->calcPriority(); else return 0;}
+
+	inline const std::string & findProperties() const
+		{if (m_properties_host.empty() && m_parent) return m_parent->findPropertiesHost(); else return m_properties_host;}
+	inline int findPower() const
+		{if (m_power_host < 0 && m_parent) return m_parent->findPowerHost(); else return m_power_host;}
+
 /// Whether Render is ready to render tasks.
 	inline bool isReady() const { return (
 			(m_parent != NULL) &&
@@ -52,15 +59,18 @@ public:
 			(m_priority > 0) &&
 			((findCapacity() < 0) || (m_capacity_used < findCapacity())) &&
 			((int)m_tasks.size() < findMaxTasks()) &&
+			(m_parent->isReady()) &&
 			(false == isWOLFalling())
 		);}
 
 	inline bool isWOLWakeAble() const { return (
+			(m_parent != NULL) &&
 			isOffline() &&
 			isWOLSleeping() &&
 			(false == isWOLWaking()) &&
 			(findCapacity() != 0) &&
 			(findMaxTasks() > 0) &&
+			(m_parent->isReady()) &&
 			(m_priority > 0)
 		);}
 

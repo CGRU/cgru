@@ -13,9 +13,10 @@ public:
 		tsep = 0,
 		TNum = 1,
 		TStr = 2,
-		TREx = 3,
-		Time = 4,
-		THrs = 5
+		TMSI = 3,
+		TREx = 4,
+		Time = 5,
+		THrs = 6
 	};
 
 	Param(EType i_type, Item::EType i_itemtype, const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = -1);

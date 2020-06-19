@@ -88,7 +88,7 @@ public:
 	TaskExec *genTask(int num) const;
 
 	bool genNumbers(long long &start, long long &end, int num,
-		long long *frames_num = NULL) const; ///< Generate fisrt and last frame numbers for \c num task.
+		long long *frames_num = NULL) const; ///< Generate first and last frame numbers for \c num task.
 	int calcTaskNumber(long long i_frame, bool &o_valid_range) const;
 	int getReadyTaskNumber(TaskProgress **i_tp, const int64_t &i_job_flags, const Render *i_render);
 	const std::string genTaskName(int num, long long *fstart = NULL, long long *fend = NULL) const;

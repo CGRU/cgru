@@ -79,6 +79,8 @@ private:
 	QString m_tasks_users_counts; ///< One string collection of all tasks users and counts
 	int m_capacity;
 	int m_maxtasks;
+	int m_power;
+	QString m_properties;
 
 	long long m_time_registered;
 	long long m_time_launched;
@@ -107,7 +109,7 @@ private:
 	std::list<af::TaskExec*> m_tasks;
 	std::vector<int32_t> m_tasks_percents;
 	long long m_taskstartfinishtime;
-	QString m_taskstartfinishtime_str;
+	QString m_props_state;
 	QString m_offlineState;
 
 	Plotter m_plotCpu;

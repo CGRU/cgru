@@ -108,25 +108,15 @@ public:
 		{ return setRegExp( m_depend_mask, str, "job depend mask", errOutput);}
 	inline bool setDependMaskGlobal(  const std::string & str, std::string * errOutput = NULL)
 		{ return setRegExp( m_depend_mask_global, str, "job global depend mask", errOutput);}
-	inline bool setNeedOS(            const std::string & str, std::string * errOutput = NULL)
-		{ return setRegExp( m_need_os, str, "job need os mask", errOutput);}
-	inline bool setNeedProperties(    const std::string & str, std::string * errOutput = NULL)
-		{ return setRegExp( m_need_properties, str, "job need properties mask", errOutput);}
 
 	inline bool hasDependMask()         const { return m_depend_mask.notEmpty();        }
 	inline bool hasDependMaskGlobal()   const { return m_depend_mask_global.notEmpty(); }
-	inline bool hasNeedOS()             const { return m_need_os.notEmpty();            }
-	inline bool hasNeedProperties()     const { return m_need_properties.notEmpty();    }
 
 	inline const std::string & getDependMask()         const { return m_depend_mask.getPattern();        }
 	inline const std::string & getDependMaskGlobal()   const { return m_depend_mask_global.getPattern(); }
-	inline const std::string & getNeedOS()             const { return m_need_os.getPattern();            }
-	inline const std::string & getNeedProperties()     const { return m_need_properties.getPattern();    }
 
 	inline bool checkDependMask(        const std::string & str ) const { return m_depend_mask.match( str);        }
 	inline bool checkDependMaskGlobal(  const std::string & str ) const { return m_depend_mask_global.match( str );}
-	inline bool checkNeedOS(            const std::string & str ) const { return m_need_os.match( str);           }
-	inline bool checkNeedProperties(    const std::string & str ) const { return m_need_properties.match( str);   }
 
 //	const std::string & getTasksOutputDir() const { return m_tasks_output_dir; }
 
@@ -193,8 +183,6 @@ protected:
 	RegExp m_depend_mask;
 	/// Jobs names mask current job depends on ( wait until they will be done).
 	RegExp m_depend_mask_global;
-	RegExp m_need_os;
-	RegExp m_need_properties;
 	
 	// Here are coming a couple of metadata just use for display
 	/// Project to which this job is associated

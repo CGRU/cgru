@@ -71,6 +71,11 @@ struct MostReadyRender : public std::binary_function <RenderAf*,RenderAf*,bool>
 		if( a->isOnline() && b->isOffline()) return true;
 		if( a->isOffline() && b->isOnline()) return false;
 
+		int pool_priority_a = m_node->getPoolPriority(a);
+		int pool_priority_b = m_node->getPoolPriority(b);
+		if(pool_priority_a > pool_priority_b) return true;
+		if(pool_priority_a < pool_priority_b) return false;
+
 		if( a->getTasksNumber() < b->getTasksNumber()) return true;
 		if( a->getTasksNumber() > b->getTasksNumber()) return false;
 
