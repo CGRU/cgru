@@ -109,7 +109,7 @@ def drawIconState( i_painter):
     online = state.find('OFF') == -1
     busy   = state.find('RUN') != -1
     NIMBY  = state.find('NBY') != -1
-    nimby  = state.find('NbY') != -1 or NIMBY
+    nimby  = state.find('NbY') != -1
     paused = state.find('PAU') != -1
 
     icon_size = i_painter.viewport().width()
@@ -134,10 +134,17 @@ def drawIconState( i_painter):
         elif nimby:
             if busy:
                 text_color = QtGui.QColor(255, 0, 0)
-                back_color = QtGui.QColor(50, 50, 250)
+                back_color = QtGui.QColor(50,150, 250)
             else:
                 text_color = QtGui.QColor(190, 190, 190)
-                back_color = QtGui.QColor(40, 40, 240)
+                back_color = QtGui.QColor(40,120, 240)
+        elif NIMBY:
+            if busy:
+                text_color = QtGui.QColor(255, 0, 0)
+                back_color = QtGui.QColor(20, 20, 190)
+            else:
+                text_color = QtGui.QColor(190, 190, 190)
+                back_color = QtGui.QColor(10, 10, 150)
         else:
             if busy:
                 text_color = QtGui.QColor(255, 0, 0)
