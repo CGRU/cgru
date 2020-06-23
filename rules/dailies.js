@@ -218,6 +218,22 @@ function d_DailiesWalkReceived(i_data, i_args)
 		"keys": RULES.dailies.containers
 	});
 
+	gui_CreateChoices({
+		"wnd": wnd.elTabs.settings,
+		"name": 'slate',
+		"value": RULES.dailies.slate,
+		"label": 'Slate:',
+		"keys": RULES.dailies.slates
+	});
+
+	gui_CreateChoices({
+		"wnd": wnd.elTabs.settings,
+		"name": 'template',
+		"value": RULES.dailies.template,
+		"label": 'Template:',
+		"keys": RULES.dailies.templates
+	});
+
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild(elBtns);
 	elBtns.style.clear = 'both';
