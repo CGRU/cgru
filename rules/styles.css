@@ -665,7 +665,7 @@ overflow-y: scroll;
 #annotations .name { float: left; }
 #annotations .text { float: right; }
 
-#status_percentage, #status_annotation, #status_artists, #status_tags, #status_finish
+#status_percentage, #status_annotation, #status_artists, #status_flags, #status_tags, #status_finish
 { margin: 0px 5px; float:left;}
 #status_progress { clear: both; border-radius: 2px; }
 #status_progressbar { height: 10px; /*border-radius: 4px;*/ }
