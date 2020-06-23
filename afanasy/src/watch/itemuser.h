@@ -2,11 +2,11 @@
 
 #include "../libafanasy/user.h"
 
-#include "itemnode.h"
+#include "itemwork.h"
 
 class ListNodes;
 
-class ItemUser : public ItemNode
+class ItemUser : public ItemWork
 {
 public:
 	ItemUser(ListNodes * i_list_nodes, af::User * i_user, const CtrlSortFilter * i_ctrl_sf);

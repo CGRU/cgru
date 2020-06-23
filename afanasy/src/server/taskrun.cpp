@@ -302,6 +302,7 @@ bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
 	int no_progress_for = currentTime - m_progress->last_percent_change;
 	if ((timeout > 0 ) && (no_progress_for > timeout))
 	{
+		m_progress->state = m_progress->state | AFJOB::STATE_ERROR_MASK;
 		m_progress->errors_count++;
 		stop("Task run time without progress reached (no progress for " + af::itos(no_progress_for) + "s).", renders, monitoring);
 		errorHostId = m_hostId;

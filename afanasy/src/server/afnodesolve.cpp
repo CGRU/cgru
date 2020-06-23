@@ -127,7 +127,7 @@ void AfNodeSolve::v_preSolve(time_t i_curtime, MonitorContainer * i_monitors)
 /// Solving function should be implemented in child classes (if solving needed):
 RenderAf *AfNodeSolve::v_solve(std::list<RenderAf *> &i_renders_list, MonitorContainer *i_monitoring, BranchSrv * i_branch)
 {
-	AF_ERR << "AfNodeSrv::solve(): Not implemented: " << m_node->getName();
+	AF_ERR << "AfNodeSrv::v_solve(): Not implemented: " << m_node->getName();
 	return NULL;
 }
 void AfNodeSolve::calcNeed(int i_flags, int i_resourcesquantity)
@@ -216,6 +216,42 @@ bool AfNodeSolve::canRunOn(RenderAf *i_render)
 		return false;
 	}
 
+	// check needed os:
+	if (false == m_work->checkNeedOS(i_render->getOS()))
+	{
+		return false;
+	}
+
+	// Check needed properties:
+	if (false == m_work->checkNeedProperties(i_render->findProperties()))
+	{
+		return false;
+	}
+
+	// Check needed power:
+	if (false == m_work->checkNeedPower(i_render->findPower()))
+	{
+		return false;
+	}
+
+	// Checa needed memory:
+	if (false == m_work->checkNeedMemory(i_render->getHostRes().mem_free_mb))
+	{
+		return false;
+	}
+
+	// Check needed hdd:
+	if (false == m_work->checkNeedHDD(i_render->getHostRes().hdd_free_gb))
+	{
+		return false;
+	}
+
+
+	bool canrunon;
+	int priority = m_work->getPoolPriority(i_render->getPool(), canrunon);
+	if (false == canrunon)
+		return false;
+
 	// Perform each node type scpecific check
 	return v_canRunOn(i_render);
 }
@@ -223,6 +259,16 @@ bool AfNodeSolve::v_canRunOn(RenderAf *i_render)
 {
 	AF_ERR << "AfNodeSolve::canRunOn(): Not implememted: " << m_node->getName().c_str();
 	return false;
+}
+
+int AfNodeSolve::getPoolPriority(const RenderAf * i_render) const
+{
+	int priority = i_render->calcPoolPriority();
+
+	bool canrunon;
+	priority += m_work->getPoolPriority(i_render->getPool(), canrunon);
+
+	return priority;
 }
 
 /// Compare nodes need for solve:

@@ -499,7 +499,8 @@ void Dialog::idReceived( int i_id, int i_uid)
 
 void Dialog::closeList()
 {
-    if( m_listitems != NULL) m_listitems->close();
+    if( m_listitems != NULL) //m_listitems->close();
+		delete m_listitems;
     m_listitems = NULL;
     m_monitorType = Watch::WNONE;
 }

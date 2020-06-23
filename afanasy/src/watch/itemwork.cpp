@@ -23,8 +23,17 @@ ItemWork::~ItemWork()
 void ItemWork::updateWorkValues(af::Work * i_afwork)
 {
 	// Take common parameters:
-	m_params["max_running_tasks"] = i_afwork->getMaxRunningTasks();
+	m_params["max_running_tasks"]          = i_afwork->getMaxRunningTasks();
 	m_params["max_running_tasks_per_host"] = i_afwork->getMaxRunTasksPerHost();
+
+	m_params["hosts_mask"]                 = afqt::stoq(i_afwork->getHostsMask());
+	m_params["hosts_mask_exclude"]         = afqt::stoq(i_afwork->getHostsMaskExclude());
+
+	m_params["need_os"]                    = afqt::stoq(i_afwork->getNeedOS());
+	m_params["need_properties"]            = afqt::stoq(i_afwork->getNeedProperties());
+	m_params["need_power"]                 = i_afwork->getNeedPower();
+	m_params["need_memory"]                = i_afwork->getNeedMemory();
+	m_params["need_hdd"]                   = i_afwork->getNeedHDD();
 }
 
 int ItemWork::calcHeightWork() const

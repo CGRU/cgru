@@ -62,10 +62,23 @@ public:
 	inline int findCapacityHost() const
 		{ if (m_capacity_host  < 0 && m_parent) return m_parent->findCapacityHost(); else return m_capacity_host; }
 
+	inline const std::string & findPropertiesHost() const
+		{if (m_properties_host.empty() && m_parent) return m_parent->findPropertiesHost(); else return m_properties_host;}
+	inline int findPowerHost() const
+		{if (m_power_host < 0 && m_parent) return m_parent->findPowerHost(); else return m_power_host;}
+
 	inline bool newNimby()  const
 		{ if (!m_new_nimby  && m_parent) return m_parent->newNimby();  else return m_new_nimby; }
 	inline bool newPaused() const
 		{ if (!m_new_paused && m_parent) return m_parent->newPaused(); else return m_new_paused;}
+
+	inline int calcPriority() const {if (m_parent) return (m_priority + m_parent->calcPriority())/2; else return m_priority;}
+
+	inline bool isReady() const {
+		if ((m_priority == 0) || isPaused()) return false;
+		if (m_parent) return m_parent->isReady();
+		return true;
+	}
 
 	inline int get_idle_wolsleep_time() const
 		{ if (m_idle_wolsleep_time < 0 && m_parent) return m_parent->get_idle_wolsleep_time(); else return m_idle_wolsleep_time;}

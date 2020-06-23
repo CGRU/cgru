@@ -72,17 +72,27 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 
 	updateNodeValues(i_afnode);
 
+	updateWorkValues(job);
+
 	// Changeable parameters:
-	m_params["max_running_tasks"]          = job->getMaxRunningTasks();
-	m_params["max_running_tasks_per_host"] = job->getMaxRunTasksPerHost();
-	m_params["hosts_mask"]                 = afqt::stoq(job->getHostsMask());
-	m_params["hosts_mask_exclude"]         = afqt::stoq(job->getHostsMaskExclude());
 	m_params["depend_mask"]                = afqt::stoq(job->getDependMask());
 	m_params["depend_mask_global"]         = afqt::stoq(job->getDependMaskGlobal());
 	m_params["time_wait"]                  = job->getTimeWait();
 	m_params["time_life"]                  = job->getTimeLife();
-	m_params["need_os"]                    = afqt::stoq(job->getNeedOS());
-	m_params["need_properties"]            = afqt::stoq(job->getNeedProperties());
+
+	// Collect pools
+	pools.clear();
+	QMap<QString, QVariant> qv_pools;
+	for (auto const & it : job->getPools())
+	{
+		if (pools.size()) pools += ",";
+		pools += QString("%1:%2").arg(afqt::stoq(it.first)).arg(it.second);
+
+		qv_pools[afqt::stoq(it.first)] = it.second;
+	}
+	if (pools.size())
+		pools = QString("{%1}").arg(pools);
+	m_params["pools"] = qv_pools;
 
 	// Set flags that will be used to hide/show node in list:
 	setHideFlag_Hidden(  job->isHidden()  );
@@ -152,6 +162,7 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 	if( state & AFJOB::STATE_DONE_MASK) runningTime = af::time2strHMS( time_run).c_str();
 
 	properties.clear();
+	properties += pools;
 	if( Watch::isPadawan())
 	{
 		if( false == dependmask_global.isEmpty()) properties += QString(" Global Depends(%1)").arg( dependmask_global);

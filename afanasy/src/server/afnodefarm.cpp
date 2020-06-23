@@ -195,6 +195,8 @@ bool AfNodeFarm::actionFarm(Action & i_action)
 	appendLog("Unknown farm operation mode \"" + mode + "\" by " + i_action.author);
 	i_action.answer_kind = "error";
 	i_action.answer = "Unknown farm operation mode: " + mode;
+
+	return false;
 }
 
 bool AfNodeFarm::actionTicket(Action & i_action)

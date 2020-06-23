@@ -18,7 +18,7 @@
 const int ItemUser::HeightUser = 32;
 
 ItemUser::ItemUser(ListNodes * i_list_nodes, af::User * i_user, const CtrlSortFilter * i_ctrl_sf):
-	ItemNode(i_list_nodes, i_user, TUser, i_ctrl_sf)
+	ItemWork(i_list_nodes, i_user, TUser, i_ctrl_sf)
 {
 	updateValues(i_user, 0);
 }
@@ -33,10 +33,8 @@ void ItemUser::v_updateValues(af::Node * i_afnode, int i_msgType)
 
 	updateNodeValues(i_afnode);
 
-	m_params["max_running_tasks"]          = user->getMaxRunningTasks();
-	m_params["max_running_tasks_per_host"] = user->getMaxRunTasksPerHost();
-	m_params["hosts_mask"]                 = afqt::stoq(user->getHostsMask());
-	m_params["hosts_mask_exclude"]         = afqt::stoq(user->getHostsMaskExclude());
+	updateWorkValues(user);
+
 	m_params["errors_avoid_host"]          = user->getErrorsAvoidHost();
 	m_params["errors_task_same_host"]      = user->getErrorsTaskSameHost();
 	m_params["errors_retries"]             = user->getErrorsRetries();

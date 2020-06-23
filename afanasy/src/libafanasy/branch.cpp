@@ -82,9 +82,6 @@ void Branch::v_readwrite(Msg *msg)
 	rw_int32_t(m_branches_total, msg);
 	rw_int32_t(m_jobs_num,       msg);
 	rw_int32_t(m_jobs_total,     msg);
-
-	// NEW_VERSION
-	// RW Active jobs and active users.
 }
 
 void Branch::v_jsonWrite(std::ostringstream &o_str, int i_type) const

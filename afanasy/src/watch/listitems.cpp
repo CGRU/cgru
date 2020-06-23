@@ -513,9 +513,9 @@ void ListItems::addParam(Param * i_param)
 	m_params.append(i_param);
 }
 
-void ListItems::addParam_separator()
+void ListItems::addParam_separator(Item::EType i_type)
 {
-	addParam(new Param(Param::tsep, Item::TAny, "separator", "Separator", "This is parameters separator."));
+	addParam(new Param(Param::tsep, i_type, "separator", "Separator", "This is parameters separator."));
 }
 
 void ListItems::addParam_Num(
@@ -535,6 +535,15 @@ void ListItems::addParam_Str(
 		const QString & i_tip)
 {
 	addParam(new Param(Param::TStr, i_type, i_name, i_label, i_tip));
+}
+
+void ListItems::addParam_MSI(
+		Item::EType i_type,
+		const QString & i_name,
+		const QString & i_label,
+		const QString & i_tip)
+{
+	addParam(new Param(Param::TMSI, i_type, i_name, i_label, i_tip));
 }
 
 void ListItems::addParam_REx(

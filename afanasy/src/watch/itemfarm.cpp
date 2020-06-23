@@ -23,8 +23,10 @@ ItemFarm::~ItemFarm()
 void ItemFarm::updateFarmValues(af::Farm * i_affarm)
 {
 	// Take common parameters:
-	m_params["max_tasks_host"] = i_affarm->getMaxTasksHost();
-	m_params["capacity_host"]  = i_affarm->getCapacityHost();
+	m_params["max_tasks_host"]  = i_affarm->getMaxTasksHost();
+	m_params["capacity_host"]   = i_affarm->getCapacityHost();
+	m_params["power_host"]      = i_affarm->getPowerHost();
+	m_params["properties_host"] = afqt::stoq(i_affarm->getPropertiesHost());
 
 	// Grab services:
 	m_services.clear();

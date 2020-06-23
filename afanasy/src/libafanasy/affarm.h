@@ -35,8 +35,10 @@ public:
 	void jsonRead(const JSON &i_object, std::string *io_changes = NULL);
 	void jsonWrite(std::ostringstream &o_str, int i_type) const;
 
-	inline int getMaxTasksHost() const { return m_max_tasks_host;}
-	inline int getCapacityHost() const { return m_capacity_host; }
+	inline int getMaxTasksHost() const {return m_max_tasks_host; }
+	inline int getCapacityHost() const {return m_capacity_host;  }
+	inline int getPowerHost()    const {return m_power_host;     }
+	inline const std::string & getPropertiesHost() const {return m_properties_host;}
 
 struct Tiks
 {
@@ -63,6 +65,9 @@ protected:
 
 	int32_t m_max_tasks_host;
 	int32_t m_capacity_host;
+
+	int32_t m_power_host;
+	std::string m_properties_host;
 
 private:
 	static void rw_Tickets(std::map<std::string, Tiks> & io_tickets, Msg * io_msg);

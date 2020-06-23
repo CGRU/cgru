@@ -226,16 +226,13 @@ bool Block::canRunOn( RenderAf * render)
 	if (avoidHostsCheck(render->getName()))
 		return false;
 
-	// Check task avoid hosts list:
-	if (m_data->getNeedMemory() > render->getHostRes().mem_free_mb)
+	// Check needed memory:
+	if (m_data->getNeedMemory() >= render->getHostRes().mem_free_mb)
 		return false;
 
 	// Check needed hdd:
-	if (m_data->getNeedHDD() > render->getHostRes().hdd_free_gb)
+	if (m_data->getNeedHDD() >= render->getHostRes().hdd_free_gb)
 		return false;
-
-	// Check needed power:
-	//if (m_data->getNeedPower() > render->getHost().m_power) return false;
 
 	// check hosts mask:
 	if (false == m_data->checkHostsMask(render->getName()))
@@ -245,8 +242,13 @@ bool Block::canRunOn( RenderAf * render)
 	if (false == m_data->checkHostsMaskExclude(render->getName()))
 		return false;
 
+	// Check needed power:
+	if (m_data->getNeedPower() >= render->findPower())
+		return false;
+
 	// Check needed properties:
-	//if (false == m_data->checkNeedProperties(render->getHost().m_properties)) return false;
+	if (false == m_data->checkNeedProperties(render->findProperties()))
+		return false;
 
 	return true;
 }

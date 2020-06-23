@@ -59,15 +59,22 @@ Solver::Solver(
 
 Solver::~Solver(){}
 
-class MostReadyRender : public std::binary_function <RenderAf*,RenderAf*,bool>
+struct MostReadyRender : public std::binary_function <RenderAf*,RenderAf*,bool>
 {
-	public:
+	const AfNodeSolve * m_node;
+	MostReadyRender(const AfNodeSolve * i_node) {m_node = i_node;}
+
 	inline bool operator()( const RenderAf * a, const RenderAf * b)
 	{
 		// Offline renders needed for Wake-On-Lan.
 		// Offline render is less ready.
 		if( a->isOnline() && b->isOffline()) return true;
 		if( a->isOffline() && b->isOnline()) return false;
+
+		int pool_priority_a = m_node->getPoolPriority(a);
+		int pool_priority_b = m_node->getPoolPriority(b);
+		if(pool_priority_a > pool_priority_b) return true;
+		if(pool_priority_a < pool_priority_b) return false;
 
 		if( a->getTasksNumber() < b->getTasksNumber()) return true;
 		if( a->getTasksNumber() > b->getTasksNumber()) return false;
@@ -213,7 +220,7 @@ RenderAf * Solver::SolveList(std::list<AfNodeSolve*> & i_list, std::list<RenderA
 		}
 
 		// Sort renders:
-		renders.sort(MostReadyRender());
+		renders.sort(MostReadyRender(*it));
 
 		RenderAf * render = (*it)->solve(renders, ms_monitorcontaier, i_branch);
 

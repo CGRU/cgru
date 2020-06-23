@@ -1037,6 +1037,13 @@ Monitor.prototype.updatePanels = function(i_item, i_args) {
 			value = value.replace(/\|/g, '|&shy;');
 			value = value.replace(/\)/g, ')&shy;');
 		}
+		else if (this.nodeConstructor.params[p].type == 'msi')
+		{
+			let msi = value;
+			value = '';
+			for (let s in msi)
+				value += ' <b>' + s + '</b>:' + msi[s];
+		}
 
 		elParams[p].m_elValue.innerHTML = value;
 		elParams[p].style.display = 'block';

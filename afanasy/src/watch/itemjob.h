@@ -30,6 +30,7 @@ public:
 	bool ignorenimby;
 	bool ignorepaused;
 
+	QString pools;
 	QString service;
 	QString hostname;
 	QString username;

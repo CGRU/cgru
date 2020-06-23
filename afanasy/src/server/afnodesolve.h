@@ -45,6 +45,8 @@ public:
 	/// Virtual function to tune for each node type:
 	virtual bool v_canRunOn(RenderAf *i_render);
 
+	int getPoolPriority(const RenderAf * i_render) const;
+
 	/// Calc node need for solving.
 	/// i_flags - solving flags (to use running_capacity_total or running_tasks_num)
 	/// i_resourcesquantity - to use specified resources quantinity (if != -1), i_flags will be ignored
