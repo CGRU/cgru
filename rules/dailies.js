@@ -273,6 +273,8 @@ function d_ProcessGUI(i_wnd)
 
 	for (var key in i_wnd.elTabs.general.m_choises)
 		params[key] = i_wnd.elTabs.general.m_choises[key].value;
+	for (var key in i_wnd.elTabs.settings.m_choises)
+		params[key] = i_wnd.elTabs.settings.m_choises[key].value;
 
 	i_wnd.destroy();
 
@@ -308,8 +310,9 @@ function d_ProcessGUI(i_wnd)
 	task.command = d_MakeCmd(params);
 	block.tasks = [task];
 
-	// console.log( task.command);
-	// console.log( JSON.stringify(job));
+	//console.log(task.command);
+	//console.log(JSON.stringify(job));
+	//return;
 	n_SendJob(job);
 
 	let news_path = g_CurPath();
@@ -336,7 +339,7 @@ function d_MakeCmd(i_params)
 	cmd += ' -f ' + params.fps;
 	cmd += ' -r ' + params.format;
 
-	if (params.slate && params.slate.length)
+	if (params.slate && params.slate.length && params.slate != "noslate")
 		cmd += ' -s ' + params.slate;
 
 	cmd += ' -t ' + params.template;
@@ -398,13 +401,6 @@ function d_MakeCmd(i_params)
 
 	cmd += ' "' + input + '"';
 	cmd += ' "' + output + '"';
-
-	// python "/cgru/utilities/moviemaker/makemovie.py" -c \
-	//  "/cgru/utilities/moviemaker/codecs/photojpg_best.ffmpeg" -f 25 -n mov --fs 1 --fe 20 -r 720x576x1.09 -g \
-	//  1.00 -s "dailies_slate" -t "dailies_withlogo" --project "ENCODE" --shot "preview" --ver "preview" \
-	//  --artist "Timurhai" --activity "comp" --tmpformat tga --lgspath "logo.png" --lgssize 25 --lgsgrav \
-	//  SouthEast --lgfpath "logo.png" --lgfsize 10 --lgfgrav North \
-	//  "/data/tools/encode/preview/preview.####.jpg" "/data/tools/encode/preview_preview_121226"
 
 	return cmd;
 }

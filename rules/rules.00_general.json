@@ -274,13 +274,13 @@
 	"activity":"comp",
 
 	"slates":{
-		"none":         {"name":"No Slate",        "value":null,            "tooltip":"Do not draw first informative frame."},
-		"dailies_slate":{"name":"Dailies Slate",   "value":"dailies_slate", "tooltip":"Common dailies first inforative frame."},
-		"slate_noatist":{"name":"Slate No Artist", "value":"slate_noatist", "tooltip":"Dailies first informative frame with no artist."}
+		"noslate":      {"name":"No Slate",        "tooltip":"Do not draw first informative frame."},
+		"dailies_slate":{"name":"Dailies Slate",   "tooltip":"Common dailies first inforative frame."},
+		"slate_noatist":{"name":"Slate No Artist", "tooltip":"Dailies first informative frame with no artist."}
 	},
 	"templates":{
-		"dailies":         {"name":"Dailies",           "value":"dailies",          "tooltip":"Common dailies."},
-		"dailies_withlogo":{"name":"Dailies With Logo", "value":"dailies_withlogo", "tooltip":"Dailies with a logo image."}
+		"dailies":         {"name":"Dailies",           "tooltip":"Common dailies."},
+		"dailies_withlogo":{"name":"Dailies With Logo", "tooltip":"Dailies with a logo image."}
 	},
 
 	"colorspaces":{
