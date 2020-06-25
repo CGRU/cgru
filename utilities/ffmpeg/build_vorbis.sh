@@ -7,7 +7,7 @@ if [ ! -z "$1" ]; then
    ./configure --help
 else
    ./configure --prefix=$libogg --enable-shared=
-   make && make install
+   make $@ && make install $@
 fi
 
 cd ..
@@ -20,7 +20,7 @@ if [ ! -z "$1" ]; then
    ./configure --help
 else
    ./configure --prefix=$libvorbis --enable-shared=
-   make && make install
+   make $@ && make install $@
 fi
 
 cd ..
@@ -33,5 +33,5 @@ if [ ! -z "$1" ]; then
    ./configure --help
 else
    ./configure --prefix=$libtheora --enable-shared=
-   make && make install
+   make $@ && make install $@
 fi

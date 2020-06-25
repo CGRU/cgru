@@ -21,7 +21,7 @@ if [ ! -z "$1" ]; then
 else
 #   ./configure --enable-gpl --enable-nonfree --enable-libx264 --enable-libmp3lame --enable-libtheora --enable-libvorbis
    ./configure --enable-gpl --enable-nonfree
-   make
+   make  $@
 fi
 
 cp -v ffmpeg ../../../bin

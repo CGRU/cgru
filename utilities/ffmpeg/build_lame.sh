@@ -11,5 +11,5 @@ if [ ! -z "$1" ]; then
    exit
 else
    ./configure --prefix=$prefix --enable-shared=
-   make && make install
+   make  $@ && make install $@
 fi

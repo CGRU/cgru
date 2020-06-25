@@ -41,6 +41,6 @@ if [ "$2" == "-h" ]; then
 else
    echo "FLAGS = \"$flags\""
    ./configure $flags
-   make
-   make install
+   make $@
+   make install $@
 fi

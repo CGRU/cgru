@@ -1,3 +1,3 @@
 #!/bin/bash
 
-./build_ilmbase.sh && ./build_openexr.sh
+./build_ilmbase.sh $@ && ./build_openexr.sh $@

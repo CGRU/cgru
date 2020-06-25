@@ -33,6 +33,6 @@ if [ ! -z "$help" ]; then
 else
    echo "Flags: $flags"
    ./configure $flags
-   make
-   make install
+   make $@
+   make install $@
 fi

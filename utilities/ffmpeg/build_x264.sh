@@ -17,5 +17,5 @@ if [ ! -z "$1" ]; then
 fi
 
 ./configure --enable-static --prefix=$prefix --exec-prefix=$prefix
-make
+make $@
 #make install

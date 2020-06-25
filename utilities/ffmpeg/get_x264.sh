@@ -5,5 +5,5 @@ if [ -d x264 ]; then
    git pull -v
    cd ..
 else
-   git clone git://git.videolan.org/x264.git
+   git clone https://code.videolan.org/videolan/x264.git
 fi

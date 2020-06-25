@@ -42,5 +42,5 @@ export CPPFLAGS=$CFLAGS
 cd $sip
 
 $python configure.py $flags
-make
-make install
+make $@
+make install $@
