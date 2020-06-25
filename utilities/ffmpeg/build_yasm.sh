@@ -7,4 +7,4 @@ prefix=$PWD/yasm
 
 cd $folder
 ./configure --prefix=$prefix
-make && make install
+make $@ && make install $@

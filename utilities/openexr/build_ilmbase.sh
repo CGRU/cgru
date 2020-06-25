@@ -14,6 +14,6 @@ make clean
 
 ./configure --prefix=$prefix --exec-prefix=$prefix --enable-shared=
 
-make
+make $@
 
-make install
+make install $@

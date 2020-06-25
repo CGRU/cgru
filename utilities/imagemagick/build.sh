@@ -35,7 +35,7 @@ configure="$configure --enable-shared="
 if [ -z "$1" ]; then
    #make clean
    $configure
-   make
+   make $@
    convert='utilities/convert'
    [ -f $convert ] && mv -vf $convert ../../../bin
 else

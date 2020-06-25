@@ -19,6 +19,6 @@ make clean
 
 ./configure --disable-ilmbasetest --prefix=$prefix --exec-prefix=$prefix --enable-shared=
 
-make
+make $@
 
-make install
+make install $@
