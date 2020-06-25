@@ -56,6 +56,8 @@ void Node::v_readwrite(Msg *msg)
 	rw_int64_t(m_state, msg);
 	rw_int64_t(m_flags, msg);
 
+	rw_IntMap(m_running_services, msg);
+
 	rw_bool(m_locked, msg);
 }
 
@@ -91,6 +93,8 @@ void Node::jsonRead(const JSON &i_object, std::string *io_changes, MonitorContai
 	jr_string("name", m_name, i_object);
 	jr_int32("id", m_id, i_object);
 	jr_bool("locked", m_locked, i_object);
+
+	jr_intmap("running_services", m_running_services, i_object);
 }
 
 void Node::v_jsonWrite(std::ostringstream &o_str, int i_type) const
@@ -102,6 +106,9 @@ void Node::v_jsonWrite(std::ostringstream &o_str, int i_type) const
 	if (isHidden()) o_str << ",\n\"hidden\":true";
 	if (m_annotation.size()) o_str << ",\n\"annotation\":\"" << af::strEscape(m_annotation) << "\"";
 	if (m_custom_data.size()) o_str << ",\n\"custom_data\":\"" << af::strEscape(m_custom_data) << "\"";
+
+	if (m_running_services.size())
+		jw_intmap("running_services", m_running_services, o_str);
 }
 
 Msg *Node::jsonWrite(const std::string &i_type, const std::string &i_name) const
@@ -111,6 +118,40 @@ Msg *Node::jsonWrite(const std::string &i_type, const std::string &i_name) const
 	v_jsonWrite(str, 0);
 	str << "\n}";
 	return jsonMsg(str);
+}
+
+void Node::incrementService(const std::string & i_name)
+{
+	std::map<std::string, int32_t>::iterator it = m_running_services.begin();
+	while (it != m_running_services.end())
+	{
+		if (it->first == i_name)
+		{
+			it->second++;
+			return;
+		}
+
+		it++;
+	}
+
+	m_running_services[i_name] = 1;
+}
+
+void Node::decrementService(const std::string & i_name)
+{
+	std::map<std::string, int32_t>::iterator it = m_running_services.begin();
+	while (it != m_running_services.end())
+	{
+		if (it->first == i_name)
+		{
+			it->second--;
+			if (it->second <= 0)
+				m_running_services.erase(it);
+			return;
+		}
+
+		it++;
+	}
 }
 
 int Node::v_calcWeight() const

@@ -32,24 +32,14 @@ ItemBranch::~ItemBranch()
 
 void ItemBranch::v_updateValues(af::Node * i_afnode, int i_msgType)
 {
-	af::Branch * branch = (af::Branch*)i_afnode;
+	af::Branch * branch = static_cast<af::Branch*>(i_afnode);
 
-	updateNodeValues(i_afnode);
+	updateNodeValues(branch);
 
-	m_params["max_running_tasks"]          = branch->getMaxRunningTasks();
-	m_params["max_running_tasks_per_host"] = branch->getMaxRunTasksPerHost();
-	m_params["hosts_mask"]                 = afqt::stoq(branch->getHostsMask());
-	m_params["hosts_mask_exclude"]         = afqt::stoq(branch->getHostsMaskExclude());
-	m_params["max_tasks_per_second"]       = branch->getMaxTasksPerSecond();
+	updateWorkValues(branch);
 
 	jobs_num                   = branch->getJobsNum();
 	jobs_total                 = branch->getJobsTotal();
-	running_tasks_num          = branch->getRunningTasksNum();
-	running_capacity_total     = branch->getRunningCapacityTotal();
-	max_running_tasks          = branch->getMaxRunningTasks();
-	max_running_tasks_per_host = branch->getMaxRunTasksPerHost();
-	hostsmask                  = afqt::stoq(branch->getHostsMask());
-	hostsmask_exclude          = afqt::stoq(branch->getHostsMaskExclude());
 
 	m_empty = (0 == jobs_total);
 
@@ -211,39 +201,7 @@ void ItemBranch::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	if (false == m_annotation.isEmpty())
 		i_painter->drawText(x, y, w, h, Qt::AlignBottom | Qt::AlignHCenter, m_annotation);
 
-	//
-	// Draw stars:
-	//
-	int numstars = running_tasks_num;
-	if (numstars <= 0)
-		return;
-
-	static const int stars_size = 8;
-	static const int stars_border = 150;
-	static const int stars_height = 21;
-	static const int stars_maxdelta = stars_size * 2 + 5;
-
-	int stars_left = stars_border;
-	int stars_right = w - stars_border;
-	int stars_delta = (stars_right - stars_left) / numstars;
-
-	if (stars_delta < 1)
-	{
-		stars_delta = 1;
-		numstars = stars_right - stars_left;
-	}
-	else if (stars_delta > stars_maxdelta)
-		stars_delta = stars_maxdelta;
-
-	const int stars_width = numstars * stars_delta;
-	stars_left = w/2 - stars_width/2;
-
-	int sx = x + stars_left;
-	for (int i = 0; i < numstars; i++)
-	{
-		drawStar(stars_size, sx, y + stars_height + 2, i_painter);
-		sx += stars_delta;
-	}
+	drawRunningServices(i_painter, x+w/16, y+15, w-w/8, 16);
 }
 
 void ItemBranch::v_setSortType(int i_type1, int i_type2)

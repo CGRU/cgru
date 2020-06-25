@@ -61,6 +61,18 @@ public:
 	QString m_custom_data;
 
 protected:
+	void updateNodeValues( const af::Node * i_node);
+
+	void updateInfo(const af::Node * i_node);
+
+	inline void setParentPath(const QString & i_path){m_parent_path = i_path; m_sort_force = i_path;}
+
+	void setParentItem(ItemNode * i_item);
+	virtual void v_parentItemChanged();
+
+	void drawRunningServices(QPainter * i_painter, int i_x, int i_y, int i_w, int i_h) const;
+
+protected:
 	QString m_tooltip;
 
 	QString m_sort_force;     ///< Force sorting for hierarchy (branch, pool)
@@ -69,13 +81,6 @@ protected:
 	QString  m_sort_str1;     ///< For sorting by some string
 	QString  m_sort_str2;     ///< For sorting by some string
 	std::string m_filter_str; ///< For filtering by some string
-
-	void updateNodeValues( const af::Node * i_node);
-
-	inline void setParentPath(const QString & i_path){m_parent_path = i_path; m_sort_force = i_path;}
-
-	void setParentItem(ItemNode * i_item);
-	virtual void v_parentItemChanged();
 
 	ListNodes * m_list_nodes;
 
@@ -89,4 +94,6 @@ private:
 	const CtrlSortFilter * m_ctrl_sf;
 
 	QList<ItemNode*> m_child_list;
+
+	QMap<QString, int> m_running_services;
 };

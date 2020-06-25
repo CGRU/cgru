@@ -262,6 +262,12 @@ void UserAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContai
 {
 	bool changed = refreshCounters();
 
+	if ((m_running_jobs_num == 0) && getRunnigServices().size())
+	{
+		AF_ERR << m_name << ": No running jobs, but running services size = " << getRunnigServices().size();
+		clearRunningServices();
+	}
+
 	if( changed && monitoring )
 		monitoring->addEvent( af::Monitor::EVT_users_change, m_id);
 }
@@ -306,7 +312,7 @@ bool UserAf::v_canRunOn( RenderAf * i_render)
 	return true;
 	//^No more checks above AfNodeSolve::canRunOn() needed
 }
-#include "branchsrv.h"
+
 RenderAf * UserAf::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring, BranchSrv * i_branch)
 {
 	std::list<AfNodeSolve*> solve_list;

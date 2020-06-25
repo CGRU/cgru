@@ -15,7 +15,7 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-const int ItemUser::HeightUser = 32;
+const int ItemUser::HeightUser = 34;
 
 ItemUser::ItemUser(ListNodes * i_list_nodes, af::User * i_user, const CtrlSortFilter * i_ctrl_sf):
 	ItemWork(i_list_nodes, i_user, TUser, i_ctrl_sf)
@@ -29,9 +29,9 @@ ItemUser::~ItemUser()
 
 void ItemUser::v_updateValues(af::Node * i_afnode, int i_msgType)
 {
-	af::User * user = (af::User*)i_afnode;
+	af::User * user = static_cast<af::User*>(i_afnode);
 
-	updateNodeValues(i_afnode);
+	updateNodeValues(user);
 
 	updateWorkValues(user);
 
@@ -43,12 +43,6 @@ void ItemUser::v_updateValues(af::Node * i_afnode, int i_msgType)
 
 	hostname                   = afqt::stoq(user->getHostName());
 	jobs_num                   = user->getNumJobs();
-	running_tasks_num          = user->getRunningTasksNum();
-	running_capacity_total     = user->getRunningCapacityTotal();
-	max_running_tasks          = user->getMaxRunningTasks();
-	max_running_tasks_per_host = user->getMaxRunTasksPerHost();
-	hostsmask                  = afqt::stoq(user->getHostsMask());
-	hostsmask_exclude          = afqt::stoq(user->getHostsMaskExclude());
 	errors_avoidhost           = user->getErrorsAvoidHost();
 	errors_tasksamehost        = user->getErrorsTaskSameHost();
 	errors_retries             = user->getErrorsRetries();
@@ -166,10 +160,11 @@ void ItemUser::updateInfo(af::User * i_user)
 
 	m_info_text = QString("Jobs total: <b>%1</b>").arg(i_user->getNumJobs());
 	m_info_text += QString(", running: <b>%1</b>").arg(i_user->getNumRunningJobs());
-	m_info_text += "<br>";
-
 	if (i_user->getHostName().size())
 		m_info_text += QString("<br>Activity host: <b>%1</b>").arg(afqt::stoq(i_user->getHostName()));
+	m_info_text += "<br>";
+	ItemWork::updateInfo(i_user);
+	ItemNode::updateInfo(i_user);
 
 	m_info_text += "<br>";
 	m_info_text += QString("<br>Registered: <b>%1</b>").arg(afqt::time2Qstr(i_user->getTimeRegister()));
@@ -208,46 +203,7 @@ void ItemUser::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleO
 	if (false == m_annotation.isEmpty())
 		i_painter->drawText(x, y, w, h, Qt::AlignBottom | Qt::AlignHCenter, m_annotation);
 
-	//
-	// Draw stars:
-	//
-	int numstars = running_tasks_num;
-	if (numstars <= 0)
-		return;
-
-	static const int stars_size = 8;
-	static const int stars_border = 150;
-	static const int stars_height = 21;
-	static const int stars_maxdelta = stars_size * 2 + 5;
-
-	int stars_left = stars_border;
-	int stars_right = w - stars_border;
-	int stars_delta = (stars_right - stars_left) / numstars;
-
-	if (stars_delta < 1)
-	{
-		stars_delta = 1;
-		numstars = stars_right - stars_left;
-	}
-	else if (stars_delta > stars_maxdelta)
-		stars_delta = stars_maxdelta;
-
-	const int stars_width = numstars * stars_delta;
-	stars_left = w/2 - stars_width/2;
-
-	int sx = x + stars_left;
-	for( int i = 0; i < numstars; i++)
-	{
-		drawStar( stars_size, sx, y + stars_height, i_painter);
-		sx += stars_delta;
-	}
-
-	QString running_str = QString("T:%1").arg(running_tasks_num);
-	running_str += QString(" / C:%1").arg(af::toKMG(running_capacity_total).c_str());
-
-	i_painter->setFont(afqt::QEnvironment::f_name);
-	i_painter->setPen(afqt::QEnvironment::clr_textstars.c);
-	i_painter->drawText(x, y, w, HeightUser, Qt::AlignHCenter | Qt::AlignBottom, running_str);
+	drawRunningServices(i_painter, x+w/6, y+14, w-w/3, 16);
 }
 
 void ItemUser::v_setSortType( int i_type1, int i_type2 )

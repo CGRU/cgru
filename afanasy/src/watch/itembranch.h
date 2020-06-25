@@ -14,15 +14,8 @@ public:
 
 	void v_updateValues(af::Node * i_afnode, int i_msgType);
 
-	int max_running_tasks;
-	int max_running_tasks_per_host;
-	QString hostsmask;
-	QString hostsmask_exclude;
-
 	int jobs_num;
 	int jobs_total;
-	int running_tasks_num;
-	int64_t running_capacity_total;
 
 	int64_t time_creation;
 	int64_t time_empty;

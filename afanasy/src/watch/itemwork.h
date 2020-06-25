@@ -17,8 +17,17 @@ public:
 
 	void setParentBranch(ItemBranch * i_parent_branch);
 
+	int max_running_tasks;
+	int max_running_tasks_per_host;
+	QString hostsmask;
+	QString hostsmask_exclude;
+
+	int running_tasks_num;
+	int64_t running_capacity_total;
+
 protected:
 	int calcHeightWork() const;
+	void updateInfo(const af::Work * i_afwork);
 
 protected:
 	ItemBranch * m_parent_branch;

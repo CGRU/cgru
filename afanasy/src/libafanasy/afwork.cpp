@@ -235,6 +235,8 @@ void Work::addRunTasksCounts(const TaskExec *i_exec)
 {
 	m_running_tasks_num++;
 	m_running_capacity_total += i_exec->getCapResult();
+
+	incrementService(i_exec->getServiceType());
 }
 
 void Work::remRunTasksCounts(const TaskExec *i_exec)
@@ -242,6 +244,11 @@ void Work::remRunTasksCounts(const TaskExec *i_exec)
 	m_running_tasks_num--;
 	m_running_capacity_total -= i_exec->getCapResult();
 	checkNegativeRunningCounts();
+
+//	if (m_running_tasks_num == 0)
+//		clearRunningServices();
+//	else
+		decrementService(i_exec->getServiceType());
 }
 
 void Work::checkNegativeRunningCounts()

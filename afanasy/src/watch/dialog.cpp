@@ -499,10 +499,18 @@ void Dialog::idReceived( int i_id, int i_uid)
 
 void Dialog::closeList()
 {
-    if( m_listitems != NULL) //m_listitems->close();
-		delete m_listitems;
-    m_listitems = NULL;
-    m_monitorType = Watch::WNONE;
+	if (m_listitems != NULL)
+	{
+		//delete m_listitems;
+		// Better not delete qt widgets manually, let qt to delete them.
+		// There still can be events queue.
+		// But we should keep in mind, that qt can delete it with some delay.
+		// New list item class constructor can be called before old list items class destructor.
+		m_listitems->close();
+	}
+
+	m_listitems = NULL;
+	m_monitorType = Watch::WNONE;
 }
 
 bool Dialog::openMonitor( int type, bool open)

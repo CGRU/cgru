@@ -3,6 +3,7 @@
 #include "../libafqt/name_afqt.h"
 
 #include "ctrlsortfilter.h"
+#include "watch.h"
 
 #include <QtGui/QPainter>
 
@@ -69,6 +70,24 @@ void ItemNode::updateNodeValues( const af::Node * i_node)
 	m_priority    = i_node->getPriority();
 	m_annotation  = afqt::stoq( i_node->getAnnotation());
 	m_custom_data = afqt::stoq( i_node->getCustomData());
+
+	m_running_services.clear();
+	for (auto const & it : i_node->getRunnigServices())
+		m_running_services[afqt::stoq(it.first)] = it.second;
+}
+
+void ItemNode::updateInfo(const af::Node * i_node)
+{
+	if (m_running_services.size() == 0)
+		return;
+
+	m_info_text += "Running services:";
+	QMapIterator<QString, int> it(m_running_services);
+	while (it.hasNext())
+	{
+		it.next();
+		m_info_text += QString("<br><b>%1: %2</b>").arg(it.key()).arg(it.value());
+	}
 }
 
 void ItemNode::addChild(ItemNode * i_item)
@@ -210,3 +229,74 @@ bool ItemNode::getHideFlags(int32_t i_hide_flags) const
 
 	return result;
 }
+
+void ItemNode::drawRunningServices(QPainter * i_painter, int i_x, int i_y, int i_w, int i_h) const
+{
+	if (m_running_services.size() == 0)
+		return;
+
+	// Calculate icons total count
+	int total_count = 0;
+	{
+		QMapIterator<QString, int> it(m_running_services);
+		while (it.hasNext()) {it.next(); total_count += it.value();}
+	}
+
+	static const int icons_size = 16;
+	static const int dx_max = icons_size + 5;
+
+	// Calculate distance between each icon (delta x)
+	int dx = dx_max;
+	if (total_count > m_running_services.size())
+	{
+		dx = (i_w - m_running_services.size() * dx_max) / (total_count - m_running_services.size());
+	}
+	// Clamp dx
+	if (dx < 2)
+	{
+		dx = 2;
+		total_count = i_w / 2 - (m_running_services.size() * dx_max);
+	}
+	else if (dx > dx_max)
+		dx = dx_max;
+
+	// Calculate x_offset, due maximum distance between icons
+	const int total_width = (total_count - m_running_services.size()) * dx + m_running_services.size() * dx_max;
+	const int x_offset = (i_w - total_width)/2;
+
+	// Draw
+	int x = i_x + x_offset;
+	QMapIterator<QString, int> it(m_running_services);
+	while (it.hasNext())
+	{
+		it.next();
+
+		for (int i = 0; i < it.value(); i++)
+		{
+			const QPixmap * icon = Watch::getServiceIconSmall(it.key());
+			if (icon)
+				i_painter->drawPixmap(x, i_y, *icon);
+			else
+				drawStar(icons_size/2, x, i_y+icons_size/2, i_painter);
+
+			x += dx;
+		}
+
+		// Show service icon full
+		x = x - dx + dx_max;
+	}
+/*
+	// Draw total count text
+	QString running_str = QString("T:%1").arg(total_count);
+	i_painter->setFont(afqt::QEnvironment::f_name);
+	i_painter->setPen(afqt::QEnvironment::clr_textstars.c);
+	i_painter->drawText(i_x, i_y, i_w, i_h, Qt::AlignHCenter | Qt::AlignBottom, running_str);
+*/
+/*
+	// Draw border rectangle
+	i_painter->setPen(afqt::QEnvironment::clr_outline.c);
+	i_painter->setBrush(Qt::NoBrush);
+	i_painter->drawRect(i_x, i_y, i_w, i_h);
+*/
+}
+

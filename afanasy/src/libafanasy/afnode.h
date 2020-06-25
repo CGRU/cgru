@@ -80,10 +80,17 @@ public:
 
 	Msg *jsonWrite(const std::string &i_type, const std::string &i_name) const;
 
+	inline const std::map<std::string, int32_t> & getRunnigServices() const {return m_running_services;}
+
 protected:
 	virtual void v_readwrite(Msg *msg); ///< Read or write node attributes in message
 
 	virtual void v_priorityChanged(MonitorContainer *i_monitoring);
+
+	void incrementService(const std::string & i_name);
+	void decrementService(const std::string & i_name);
+
+	inline void clearRunningServices() {m_running_services.clear();}
 
 protected:
 	/// Node id, unique for nodes of the same type. It is a position in container where node is stored.
@@ -110,5 +117,7 @@ protected:
 
 private:
 	std::list<std::string> m_log; ///< Log.
+
+	std::map<std::string, int32_t> m_running_services;
 };
 }
