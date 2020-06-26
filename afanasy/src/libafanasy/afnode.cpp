@@ -52,6 +52,7 @@ void Node::v_readwrite(Msg *msg)
 	rw_String(m_name,        msg);
 	rw_String(m_annotation,  msg);
 	rw_String(m_custom_data, msg);
+	rw_String(m_srv_info,    msg);
 
 	rw_int64_t(m_state, msg);
 	rw_int64_t(m_flags, msg);
@@ -67,8 +68,9 @@ void Node::v_priorityChanged(MonitorContainer *i_monitoring)
 
 void Node::jsonRead(const JSON &i_object, std::string *io_changes, MonitorContainer *i_monitoring)
 {
-	jr_string("annotation", m_annotation, i_object, io_changes);
+	jr_string("annotation",  m_annotation,  i_object, io_changes);
 	jr_string("custom_data", m_custom_data, i_object, io_changes);
+	jr_string("srv_info",    m_srv_info,    i_object, io_changes);
 
 	int32_t priority = -1;
 	jr_int32("priority", priority, i_object, io_changes);
@@ -93,8 +95,6 @@ void Node::jsonRead(const JSON &i_object, std::string *io_changes, MonitorContai
 	jr_string("name", m_name, i_object);
 	jr_int32("id", m_id, i_object);
 	jr_bool("locked", m_locked, i_object);
-
-	jr_intmap("running_services", m_running_services, i_object);
 }
 
 void Node::v_jsonWrite(std::ostringstream &o_str, int i_type) const
@@ -104,8 +104,9 @@ void Node::v_jsonWrite(std::ostringstream &o_str, int i_type) const
 	o_str << ",\n\"priority\":" << int(m_priority);
 	if (m_locked) o_str << ",\n\"locked\":true";
 	if (isHidden()) o_str << ",\n\"hidden\":true";
-	if (m_annotation.size()) o_str << ",\n\"annotation\":\"" << af::strEscape(m_annotation) << "\"";
+	if (m_annotation.size())  o_str << ",\n\"annotation\":\""  << af::strEscape(m_annotation)  << "\"";
 	if (m_custom_data.size()) o_str << ",\n\"custom_data\":\"" << af::strEscape(m_custom_data) << "\"";
+	if (m_srv_info.size())    o_str << ",\n\"m_srv_info\":\""  << af::strEscape(m_srv_info)    << "\"";
 
 	if (m_running_services.size())
 		jw_intmap("running_services", m_running_services, o_str);

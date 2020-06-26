@@ -193,6 +193,7 @@ void BlockData::jsonRead(const JSON &i_object, std::string *io_changes)
 	}
 	jr_int32("max_running_tasks" /******/, m_max_running_tasks /******/, i_object, io_changes);
 	jr_int32("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object, io_changes);
+	jr_string("srv_info" /**************/, m_srv_info /***************/, i_object, io_changes);
 	jr_string("custom_data" /***********/, m_custom_data /************/, i_object, io_changes);
 	jr_int32("parser_coeff" /***********/, m_parser_coeff /***********/, i_object, io_changes);
 	jr_int64("sequential" /*************/, m_sequential /*************/, i_object, io_changes);
@@ -493,6 +494,9 @@ void BlockData::jsonWrite(std::ostringstream &o_str, int i_type) const
 			if (p_tasks_waitrec > 0) o_str << ",\n\"p_tasks_waitrec\":" << p_tasks_waitrec;
 			if (p_tasks_run_time > 0) o_str << ",\n\"p_tasks_run_time\":" << p_tasks_run_time;
 
+			if (m_srv_info.size())
+				o_str << ",\n\"srv_info\":\"" << m_srv_info << "\"";
+
 			//		if(( p_tasks_done < m_tasks_num ) ||
 			//		     p_tasks_error || m_running_tasks_counter )
 			{
@@ -642,6 +646,8 @@ void BlockData::v_readwrite(Msg *msg)
 			rw_int32_t(m_block_num, msg);
 			rw_int64_t(m_time_started, msg);
 			rw_int64_t(m_time_done, msg);
+
+			rw_String(m_srv_info, msg);
 
 			rw_data(p_progressbar, msg, AFJOB::ASCII_PROGRESS_LENGTH);
 
@@ -1334,13 +1340,15 @@ void BlockData::v_generateInfoStream(std::ostringstream &o_str, bool full) const
 	generateInfoStreamTyped(o_str, Msg::TBlocksProperties, full);
 }
 
-void BlockData::addSolveCounts(TaskExec *i_exec)
+void BlockData::addSolveCounts(TaskExec *i_exec, Render * i_render)
 {
 	m_running_tasks_counter++;
 	m_running_capacity_counter += i_exec->getCapResult();
+
+	m_srv_info = i_render->getName();
 }
 
-void BlockData::remSolveCounts(TaskExec *i_exec)
+void BlockData::remSolveCounts(TaskExec *i_exec, Render * i_render)
 {
 	if (m_running_tasks_counter <= 0)
 		AF_ERR << "Tasks counter is zero or negative: " << m_running_tasks_counter;
@@ -1351,6 +1359,9 @@ void BlockData::remSolveCounts(TaskExec *i_exec)
 		AF_ERR << "Tasks capacity counter is zero or negative: " << m_running_capacity_counter;
 	else
 		m_running_capacity_counter -= i_exec->getCapResult();
+
+	if (m_running_tasks_counter == 0)
+		m_srv_info = i_render->getName();
 }
 
 // Functions to update tasks progress and block progress bar:

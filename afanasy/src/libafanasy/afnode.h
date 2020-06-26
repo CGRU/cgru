@@ -48,8 +48,9 @@ public:
 	inline int64_t getFlags() const { return m_flags; }
 	inline int64_t getState() const { return m_state; }
 
-	inline const std::string &getAnnotation() const { return m_annotation; }
-	inline const std::string &getCustomData() const { return m_custom_data; }
+	inline const std::string & getAnnotation() const {return m_annotation; }
+	inline const std::string & getCustomData() const {return m_custom_data;}
+	inline const std::string & getSrvInfo()    const {return m_srv_info;   }
 
 	friend class ::AfContainer;
 	friend class ::AfList;
@@ -114,6 +115,7 @@ protected:
 
 	std::string m_annotation;
 	std::string m_custom_data;
+	std::string m_srv_info;       ///< Some info that server can show to user.
 
 private:
 	std::list<std::string> m_log; ///< Log.

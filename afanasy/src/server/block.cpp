@@ -257,7 +257,7 @@ void Block::addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exe
 {
 	addRenderCount(i_render);
 
-	m_data->addSolveCounts(i_exec);
+	m_data->addSolveCounts(i_exec, i_render);
 
 	m_job->addSolveCounts(i_monitoring, i_exec, i_render);
 }
@@ -266,7 +266,7 @@ void Block::remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exe
 {
 	remRenderCount(i_render);
 
-	m_data->remSolveCounts(i_exec);
+	m_data->remSolveCounts(i_exec, i_render);
 
 	m_job->remSolveCounts(i_monitoring, i_exec, i_render);
 }

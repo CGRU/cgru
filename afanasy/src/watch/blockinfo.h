@@ -59,10 +59,12 @@ public:
 
 	QString service;
 
-	QString str_info;
-	QString str_params;
-	QString str_progress;
-	QString str_avoiderrors;
+	QString str_left_top;
+	QString str_right_top;
+	QString str_left_bottom;
+	QString str_right_bottom;
+
+	QString server_info;
 
 	int tasksnum;
 

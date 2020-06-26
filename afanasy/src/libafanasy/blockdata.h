@@ -244,8 +244,8 @@ public:
 	inline int32_t getRunningTasksNumber() const { return m_running_tasks_counter; }
 	inline int64_t getRunningCapacityTotal() const { return m_running_capacity_counter; }
 
-	void addSolveCounts(TaskExec *i_exec);
-	void remSolveCounts(TaskExec *i_exec);
+	void addSolveCounts(TaskExec * i_exec, Render * i_render);
+	void remSolveCounts(TaskExec * i_exec, Render * i_render);
 
 	bool updateProgress(JobProgress *progress);
 	inline const char *getProgressBar() const { return p_progressbar; }
@@ -289,6 +289,9 @@ public:
 	const TaskData * getTaskData(int i_num_task) const;
 
 	void editTicket(std::string & i_name, int32_t & i_count);
+
+	inline const std::string & getSrvInfo() const {return m_srv_info;}
+	inline void setSrvInfo(const std::string & i_str) {m_srv_info = i_str;}
 
 protected:
 	/// Read or write block.
@@ -379,6 +382,10 @@ protected:
 
 	int64_t m_time_started;
 	int64_t m_time_done;
+
+	// Some info that server can show to user.
+	// Here it used to show running host.
+	std::string m_srv_info;
 
 private:
 	void initDefaults(); ///< Initialize default values

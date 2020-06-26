@@ -149,6 +149,9 @@ protected:
 
 	std::map< std::string, std::string > m_folders;
 
+	// Report can be set from task parser.
+	// Useful for a job of a single task.
+	// For example rules walk disk space, encoding/decoding stream info
 	std::string m_report;
 
 	std::string m_thumb_path;

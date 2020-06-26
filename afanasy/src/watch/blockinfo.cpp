@@ -207,6 +207,8 @@ bool BlockInfo::update( const af::BlockData* block, int type)
 		p_errorhosts      = block->getProgressErrorHostsNum();
 		p_taskssumruntime = block->getProgressTasksSumRunTime();
 
+		server_info = afqt::stoq(block->getSrvInfo());
+
 		memcpy( progress, block->getProgressBar(), AFJOB::ASCII_PROGRESS_LENGTH);
 
 		break;
@@ -240,303 +242,305 @@ void BlockInfo::refresh()
 	// General information:
 	if( Watch::isPadawan())
 	{
-		str_info = QString("Frames[%1]").arg( tasksnum);
+		str_left_top = QString("Frames[%1]").arg( tasksnum);
 		if( numeric )
 		{
-			str_info += QString("( %1 - %2 ").arg( frame_first).arg( frame_last);
+			str_left_top += QString("( %1 - %2 ").arg( frame_first).arg( frame_last);
 			if(( frame_pertask > 1 ) || ( frame_inc > 1 ))
 			{
-				str_info += QString(" : PerTask(%1)").arg( frame_pertask);
+				str_left_top += QString(" : PerTask(%1)").arg( frame_pertask);
 				if( frame_inc > 1 )
-					str_info += QString(" / Increment(%1)").arg( frame_inc);
+					str_left_top += QString(" / Increment(%1)").arg( frame_inc);
 			}
 			if( sequential != 1 )
-				str_info += QString(" % Sequential(%1)").arg( sequential);
-			str_info += ")";
+				str_left_top += QString(" % Sequential(%1)").arg( sequential);
+			str_left_top += ")";
 		}
 		else if( frame_pertask > 1)
 		{
-			str_info += QString(" * PerTask:%1").arg( frame_pertask);
+			str_left_top += QString(" * PerTask:%1").arg( frame_pertask);
 		}
 		else if( frame_pertask < 0)
 		{
-			str_info += QString(" / PerTask:%1").arg( -frame_pertask);
+			str_left_top += QString(" / PerTask:%1").arg( -frame_pertask);
 		}
 	}
 	else if( Watch::isJedi())
 	{
-		str_info = QString("Tasks[%1]").arg( tasksnum);
+		str_left_top = QString("Tasks[%1]").arg( tasksnum);
 		if( numeric )
 		{
-			str_info += QString("(%1-%2").arg( frame_first).arg( frame_last);
+			str_left_top += QString("(%1-%2").arg( frame_first).arg( frame_last);
 			if(( frame_pertask > 1 ) || ( frame_inc > 1 ))
 			{
-				str_info += QString(":%1").arg( frame_pertask);
+				str_left_top += QString(":%1").arg( frame_pertask);
 				if( frame_inc > 1 )
-					str_info += QString("/inc(%1)").arg( frame_inc);
+					str_left_top += QString("/inc(%1)").arg( frame_inc);
 			}
 			if( sequential != 1 )
-				str_info += "seq(%)" + QString::number( sequential);
-			str_info += ")";
+				str_left_top += "seq(%)" + QString::number( sequential);
+			str_left_top += ")";
 		}
 		else if( frame_pertask > 1)
 		{
-			str_info += QString("*%1").arg( frame_pertask);
+			str_left_top += QString("*%1").arg( frame_pertask);
 		}
 		else if( frame_pertask < 0)
 		{
-			str_info += QString("/%1").arg( -frame_pertask);
+			str_left_top += QString("/%1").arg( -frame_pertask);
 		}
 	}
 	else
 	{
-		str_info = QString("t%1").arg( tasksnum);
+		str_left_top = QString("t%1").arg( tasksnum);
 		if( numeric )
 		{
-			str_info += QString("(%1-%2").arg( frame_first).arg( frame_last);
+			str_left_top += QString("(%1-%2").arg( frame_first).arg( frame_last);
 			if(( frame_pertask > 1 ) || ( frame_inc > 1 ))
 			{
-				str_info += QString(":%1").arg( frame_pertask);
+				str_left_top += QString(":%1").arg( frame_pertask);
 				if( frame_inc > 1 )
-					str_info += QString("/%1").arg( frame_inc);
+					str_left_top += QString("/%1").arg( frame_inc);
 			}
 			if( sequential != 1 )
-				str_info += "%" + QString::number( sequential);
-			str_info += ")";
+				str_left_top += "%" + QString::number( sequential);
+			str_left_top += ")";
 		}
 		else if( frame_pertask > 1)
 		{
-			str_info += QString("*%1").arg( frame_pertask);
+			str_left_top += QString("*%1").arg( frame_pertask);
 		}
 		else if( frame_pertask < 0)
 		{
-			str_info += QString("/%1").arg( -frame_pertask);
+			str_left_top += QString("/%1").arg( -frame_pertask);
 		}
 	}
 
-	str_info += QString(": %1").arg(m_name);
+	str_left_top += QString(": %1").arg(m_name);
 
 	if( false == depends.isEmpty())
-		str_info += depends;
+		str_left_top += depends;
 
 
 	// Parameters:
-	str_params.clear();
+	str_right_top.clear();
 	if( Watch::isPadawan())
 	{
-		if( p_tasksdone) str_params += QString(" Render Timings: Sum:%1 / Average:%2")
+		if( p_tasksdone) str_right_top += QString(" Render Timings: Sum:%1 / Average:%2")
 			.arg( af::time2strHMS( p_taskssumruntime, true).c_str())
 			.arg( af::time2strHMS( p_taskssumruntime/p_tasksdone, true).c_str());
 
 		if(( errors_avoid_host >= 0 ) || ( errors_task_same_host >= 0 ) || ( errors_retries >= 0 ))
-			str_params += Item::generateErrorsSolvingInfo( errors_avoid_host, errors_task_same_host, errors_retries);
-		if( errors_forgive_time >= 0 ) str_params += QString(" ErrorsForgiveTime:%1").arg( af::time2strHMS( errors_forgive_time, true).c_str());
+			str_right_top += Item::generateErrorsSolvingInfo( errors_avoid_host, errors_task_same_host, errors_retries);
+		if( errors_forgive_time >= 0 ) str_right_top += QString(" ErrorsForgiveTime:%1").arg( af::time2strHMS( errors_forgive_time, true).c_str());
 
-		if(task_max_run_time > 0) str_params += QString(" MaxRunTime:%1").arg(af::time2strHMS(task_max_run_time, true).c_str());
-		if(task_min_run_time > 0) str_params += QString(" MinRunTime:%1").arg(af::time2strHMS(task_min_run_time, true).c_str());
+		if(task_max_run_time > 0) str_right_top += QString(" MaxRunTime:%1").arg(af::time2strHMS(task_max_run_time, true).c_str());
+		if(task_min_run_time > 0) str_right_top += QString(" MinRunTime:%1").arg(af::time2strHMS(task_min_run_time, true).c_str());
 
-		if( max_running_tasks    != -1 ) str_params += QString(" MaxRunTasks:%1").arg( max_running_tasks);
-		if( max_running_tasks_per_host != -1 ) str_params += QString(" MaxPerHost:%1").arg( max_running_tasks_per_host);
-		if( false == hosts_mask.isEmpty()          ) str_params += QString(" HostsMask(%1)").arg( hosts_mask         );
-		if( false == hosts_mask_exclude.isEmpty()  ) str_params += QString(" ExcludeHosts(%1)").arg( hosts_mask_exclude );
-		if( false == need_properties.isEmpty()    ) str_params += QString(" Properties(%1)").arg( need_properties   );
-		if( need_memory > 0 ) str_params += QString(" Mem>%1").arg( need_memory);
-		if( need_hdd    > 0 ) str_params += QString(" HDD>%1").arg( need_hdd);
-		if( need_power  > 0 ) str_params += QString(" Power>%1").arg( need_power);
+		if( max_running_tasks    != -1 ) str_right_top += QString(" MaxRunTasks:%1").arg( max_running_tasks);
+		if( max_running_tasks_per_host != -1 ) str_right_top += QString(" MaxPerHost:%1").arg( max_running_tasks_per_host);
+		if( false == hosts_mask.isEmpty()          ) str_right_top += QString(" HostsMask(%1)").arg( hosts_mask         );
+		if( false == hosts_mask_exclude.isEmpty()  ) str_right_top += QString(" ExcludeHosts(%1)").arg( hosts_mask_exclude );
+		if( false == need_properties.isEmpty()    ) str_right_top += QString(" Properties(%1)").arg( need_properties   );
+		if( need_memory > 0 ) str_right_top += QString(" Mem>%1").arg( need_memory);
+		if( need_hdd    > 0 ) str_right_top += QString(" HDD>%1").arg( need_hdd);
+		if( need_power  > 0 ) str_right_top += QString(" Power>%1").arg( need_power);
 		if( multihost )
 		{
-			str_params += QString(" Multi-Host(%1,%2)").arg( multihost_min).arg( multihost_max);
-			if( multihost_samemaster) str_params += "SameMaster";
-			if( multihost_waitmax) str_params += QString(":WaitMax(%1)").arg(multihost_waitmax);
-			if( multihost_waitsrv) str_params += QString(":WaitService(%1)").arg(multihost_waitsrv);
+			str_right_top += QString(" Multi-Host(%1,%2)").arg( multihost_min).arg( multihost_max);
+			if( multihost_samemaster) str_right_top += "SameMaster";
+			if( multihost_waitmax) str_right_top += QString(":WaitMax(%1)").arg(multihost_waitmax);
+			if( multihost_waitsrv) str_right_top += QString(":WaitService(%1)").arg(multihost_waitsrv);
 		}
 
 		if (skip_existing_files || check_rendered_files)
 		{
-			str_params += " Files";
+			str_right_top += " Files";
 			if (skip_existing_files)
-				str_params += "Skip";
+				str_right_top += "Skip";
 			if ((filesize_min > 0) || (filesize_max > 0))
 			{
-				str_params += QString("(");
+				str_right_top += QString("(");
 				if (filesize_min > 0)
-					str_params += afqt::stoq(af::toKMG(filesize_min));
-				str_params += QString(",");
+					str_right_top += afqt::stoq(af::toKMG(filesize_min));
+				str_right_top += QString(",");
 				if (filesize_max > 0)
-					str_params += afqt::stoq(af::toKMG(filesize_max));
-				str_params += QString(")");
+					str_right_top += afqt::stoq(af::toKMG(filesize_max));
+				str_right_top += QString(")");
 			}
 			if (check_rendered_files)
-				str_params += "Check";
+				str_right_top += "Check";
 		}
 
-		str_params += " Capacity:";
-		if( varcapacity   ) str_params += QString("(%1-%2)*").arg( capcoeff_min).arg( capcoeff_max);
-		str_params += QString("%1").arg( capacity);
+		str_right_top += " Capacity:";
+		if( varcapacity   ) str_right_top += QString("(%1-%2)*").arg( capcoeff_min).arg( capcoeff_max);
+		str_right_top += QString("%1").arg( capacity);
 		
-		if( task_progress_change_timeout != -1) str_params += QString(" TasksProgessTimeout:%1").arg(af::time2strHMS( task_progress_change_timeout, true).c_str());
+		if( task_progress_change_timeout != -1) str_right_top += QString(" TasksProgessTimeout:%1").arg(af::time2strHMS( task_progress_change_timeout, true).c_str());
 	}
 	else if( Watch::isJedi())
 	{
-		if( p_tasksdone) str_params += QString(" Timings: Sum:%1/Avg:%2")
+		if( p_tasksdone) str_right_top += QString(" Timings: Sum:%1/Avg:%2")
 			.arg( af::time2strHMS( p_taskssumruntime, true).c_str())
 			.arg( af::time2strHMS( p_taskssumruntime/p_tasksdone, true).c_str());
 
 		if(( errors_avoid_host >= 0 ) || ( errors_task_same_host >= 0 ) || ( errors_retries >= 0 ))
-			str_params += Item::generateErrorsSolvingInfo( errors_avoid_host, errors_task_same_host, errors_retries);
-		if( errors_forgive_time >= 0 ) str_params += QString(" Forgive:%1").arg( af::time2strHMS( errors_forgive_time, true).c_str());
+			str_right_top += Item::generateErrorsSolvingInfo( errors_avoid_host, errors_task_same_host, errors_retries);
+		if( errors_forgive_time >= 0 ) str_right_top += QString(" Forgive:%1").arg( af::time2strHMS( errors_forgive_time, true).c_str());
 
-		if(task_max_run_time > 0) str_params += QString(" MaxTime:%1").arg(af::time2strHMS(task_max_run_time, true).c_str());
-		if(task_min_run_time > 0) str_params += QString(" MinTime:%1").arg(af::time2strHMS(task_min_run_time, true).c_str());
+		if(task_max_run_time > 0) str_right_top += QString(" MaxTime:%1").arg(af::time2strHMS(task_max_run_time, true).c_str());
+		if(task_min_run_time > 0) str_right_top += QString(" MinTime:%1").arg(af::time2strHMS(task_min_run_time, true).c_str());
 
-		if( max_running_tasks    != -1 ) str_params += QString(" Max:%1").arg( max_running_tasks);
-		if( max_running_tasks_per_host != -1 ) str_params += QString(" PerHost:%1").arg( max_running_tasks_per_host);
-		if( false == hosts_mask.isEmpty()          ) str_params += QString(" Hosts(%1)").arg( hosts_mask         );
-		if( false == hosts_mask_exclude.isEmpty()  ) str_params += QString(" Exclude(%1)").arg( hosts_mask_exclude );
-		if( false == need_properties.isEmpty()    ) str_params += QString(" Props(%1)").arg( need_properties   );
-		if( need_memory > 0 ) str_params += QString(" Mem>%1").arg( need_memory);
-		if( need_hdd    > 0 ) str_params += QString(" HDD>%1").arg( need_hdd);
-		if( need_power  > 0 ) str_params += QString(" Pow>%1").arg( need_power);
+		if( max_running_tasks    != -1 ) str_right_top += QString(" Max:%1").arg( max_running_tasks);
+		if( max_running_tasks_per_host != -1 ) str_right_top += QString(" PerHost:%1").arg( max_running_tasks_per_host);
+		if( false == hosts_mask.isEmpty()          ) str_right_top += QString(" Hosts(%1)").arg( hosts_mask         );
+		if( false == hosts_mask_exclude.isEmpty()  ) str_right_top += QString(" Exclude(%1)").arg( hosts_mask_exclude );
+		if( false == need_properties.isEmpty()    ) str_right_top += QString(" Props(%1)").arg( need_properties   );
+		if( need_memory > 0 ) str_right_top += QString(" Mem>%1").arg( need_memory);
+		if( need_hdd    > 0 ) str_right_top += QString(" HDD>%1").arg( need_hdd);
+		if( need_power  > 0 ) str_right_top += QString(" Pow>%1").arg( need_power);
 		if( multihost )
 		{
-			str_params += QString(" MH(%1,%2)").arg( multihost_min).arg( multihost_max);
-			if( multihost_samemaster) str_params += 'S';
-			if( multihost_waitmax) str_params += QString(":%1WM").arg(multihost_waitmax);
-			if( multihost_waitsrv) str_params += QString(":%1WS").arg(multihost_waitsrv);
+			str_right_top += QString(" MH(%1,%2)").arg( multihost_min).arg( multihost_max);
+			if( multihost_samemaster) str_right_top += 'S';
+			if( multihost_waitmax) str_right_top += QString(":%1WM").arg(multihost_waitmax);
+			if( multihost_waitsrv) str_right_top += QString(":%1WS").arg(multihost_waitsrv);
 		}
 
 		if (skip_existing_files || check_rendered_files)
 		{
-			str_params += " F";
+			str_right_top += " F";
 			if (skip_existing_files)
-				str_params += "Skp";
+				str_right_top += "Skp";
 			if ((filesize_min > 0) || (filesize_max > 0))
 			{
-				str_params += QString("(");
+				str_right_top += QString("(");
 				if (filesize_min > 0)
-					str_params += afqt::stoq(af::toKMG(filesize_min));
-				str_params += QString(",");
+					str_right_top += afqt::stoq(af::toKMG(filesize_min));
+				str_right_top += QString(",");
 				if (filesize_max > 0)
-					str_params += afqt::stoq(af::toKMG(filesize_max));
-				str_params += QString(")");
+					str_right_top += afqt::stoq(af::toKMG(filesize_max));
+				str_right_top += QString(")");
 			}
 			if (check_rendered_files)
-				str_params += "Chk";
+				str_right_top += "Chk";
 		}
 
-		str_params += " Cap[";
-		if( varcapacity   ) str_params += QString("(%1-%2)*").arg( capcoeff_min).arg( capcoeff_max);
-		str_params += QString("%1]").arg( capacity);
+		str_right_top += " Cap[";
+		if( varcapacity   ) str_right_top += QString("(%1-%2)*").arg( capcoeff_min).arg( capcoeff_max);
+		str_right_top += QString("%1]").arg( capacity);
 		
-		if( task_progress_change_timeout != -1) str_params += QString(" NoProgress:%1").arg(af::time2strHMS( task_progress_change_timeout, true).c_str());
+		if( task_progress_change_timeout != -1) str_right_top += QString(" NoProgress:%1").arg(af::time2strHMS( task_progress_change_timeout, true).c_str());
 	}
 	else
 	{
-		if( p_tasksdone) str_params += QString(" rt:s%1/a%2")
+		if( p_tasksdone) str_right_top += QString(" rt:s%1/a%2")
 			.arg( af::time2strHMS( p_taskssumruntime, true).c_str())
 			.arg( af::time2strHMS( p_taskssumruntime/p_tasksdone, true).c_str());
 
 		if(( errors_avoid_host >= 0 ) || ( errors_task_same_host >= 0 ) || ( errors_retries >= 0 ))
-			str_params += Item::generateErrorsSolvingInfo( errors_avoid_host, errors_task_same_host, errors_retries);
-		if( errors_forgive_time >= 0 ) str_params += QString(" f%1").arg( af::time2strHMS( errors_forgive_time, true).c_str());
+			str_right_top += Item::generateErrorsSolvingInfo( errors_avoid_host, errors_task_same_host, errors_retries);
+		if( errors_forgive_time >= 0 ) str_right_top += QString(" f%1").arg( af::time2strHMS( errors_forgive_time, true).c_str());
 
-		if(task_max_run_time > 0) str_params += QString(" Mrt%1").arg(af::time2strHMS(task_max_run_time, true).c_str());
-		if(task_min_run_time > 0) str_params += QString(" mrt%1").arg(af::time2strHMS(task_min_run_time, true).c_str());
+		if(task_max_run_time > 0) str_right_top += QString(" Mrt%1").arg(af::time2strHMS(task_max_run_time, true).c_str());
+		if(task_min_run_time > 0) str_right_top += QString(" mrt%1").arg(af::time2strHMS(task_min_run_time, true).c_str());
 
-		if( max_running_tasks    != -1 ) str_params += QString(" m%1").arg( max_running_tasks);
-		if( max_running_tasks_per_host != -1 ) str_params += QString(" mph%1").arg( max_running_tasks_per_host);
-		if( false == hosts_mask.isEmpty()          ) str_params += QString(" h(%1)").arg( hosts_mask         );
-		if( false == hosts_mask_exclude.isEmpty()  ) str_params += QString(" e(%1)").arg( hosts_mask_exclude );
-		if( false == need_properties.isEmpty()    ) str_params += QString(" p(%1)").arg( need_properties   );
-		if( need_memory > 0 ) str_params += QString(" m>%1").arg( need_memory);
-		if( need_hdd    > 0 ) str_params += QString(" h>%1").arg( need_hdd);
-		if( need_power  > 0 ) str_params += QString(" p>%1").arg( need_power);
+		if( max_running_tasks    != -1 ) str_right_top += QString(" m%1").arg( max_running_tasks);
+		if( max_running_tasks_per_host != -1 ) str_right_top += QString(" mph%1").arg( max_running_tasks_per_host);
+		if( false == hosts_mask.isEmpty()          ) str_right_top += QString(" h(%1)").arg( hosts_mask         );
+		if( false == hosts_mask_exclude.isEmpty()  ) str_right_top += QString(" e(%1)").arg( hosts_mask_exclude );
+		if( false == need_properties.isEmpty()    ) str_right_top += QString(" p(%1)").arg( need_properties   );
+		if( need_memory > 0 ) str_right_top += QString(" m>%1").arg( need_memory);
+		if( need_hdd    > 0 ) str_right_top += QString(" h>%1").arg( need_hdd);
+		if( need_power  > 0 ) str_right_top += QString(" p>%1").arg( need_power);
 		if( multihost )
 		{
-			str_params += QString(" mh(%1,%2)").arg( multihost_min).arg( multihost_max);
-			if( multihost_samemaster) str_params += 's';
-			if( multihost_waitmax) str_params += QString(":%1wm").arg(multihost_waitmax);
-			if( multihost_waitsrv) str_params += QString(":%1ws").arg(multihost_waitsrv);
+			str_right_top += QString(" mh(%1,%2)").arg( multihost_min).arg( multihost_max);
+			if( multihost_samemaster) str_right_top += 's';
+			if( multihost_waitmax) str_right_top += QString(":%1wm").arg(multihost_waitmax);
+			if( multihost_waitsrv) str_right_top += QString(":%1ws").arg(multihost_waitsrv);
 		}
 
 		if (skip_existing_files || check_rendered_files)
 		{
-			str_params += " f";
+			str_right_top += " f";
 			if (skip_existing_files)
-				str_params += "s";
+				str_right_top += "s";
 			if ((filesize_min > 0) || (filesize_max > 0))
 			{
-				str_params += QString("(");
+				str_right_top += QString("(");
 				if (filesize_min > 0)
-					str_params += afqt::stoq(af::toKMG(filesize_min));
-				str_params += QString(",");
+					str_right_top += afqt::stoq(af::toKMG(filesize_min));
+				str_right_top += QString(",");
 				if (filesize_max > 0)
-					str_params += afqt::stoq(af::toKMG(filesize_max));
-				str_params += QString(")");
+					str_right_top += afqt::stoq(af::toKMG(filesize_max));
+				str_right_top += QString(")");
 			}
 			if (check_rendered_files)
-				str_params += "c";
+				str_right_top += "c";
 		}
 
-		str_params += " [";
-		if( varcapacity   ) str_params += QString("(%1-%2)*").arg( capcoeff_min).arg( capcoeff_max);
-		str_params += QString("%1]").arg( capacity);
+		str_right_top += " [";
+		if( varcapacity   ) str_right_top += QString("(%1-%2)*").arg( capcoeff_min).arg( capcoeff_max);
+		str_right_top += QString("%1]").arg( capacity);
 		
-		if( task_progress_change_timeout != -1) str_params += QString(" tpt%1").arg(af::time2strHMS( task_progress_change_timeout, true).c_str());
+		if( task_progress_change_timeout != -1) str_right_top += QString(" tpt%1").arg(af::time2strHMS( task_progress_change_timeout, true).c_str());
 	}
 
 
 	// Progress:
-	str_progress = QString::number( p_percentage) + "%";
+	str_left_bottom = QString::number( p_percentage) + "%";
 	if( Watch::isPadawan())
 	{
-		if (p_tasksrunning ) str_progress += QString(" Running:%1"         ).arg(p_tasksrunning);
-		if (p_capacitytotal) str_progress += QString(" Capacity:%1"        ).arg(af::toKMG(p_capacitytotal).c_str());
-		if (p_tasksdone    ) str_progress += QString(" Done:%1"            ).arg(p_tasksdone);
-		if (p_taskserror   ) str_progress += QString(" Errors:%1"          ).arg(p_taskserror);
-		if (p_tasksskipped ) str_progress += QString(" Skipped:%1"         ).arg(p_tasksskipped);
-		if (p_taskswarning ) str_progress += QString(" Warnings:%1"        ).arg(p_taskswarning);
-		if (p_taskswaitrec ) str_progress += QString(" WaitingReconnect:%1").arg(p_taskswaitrec);
+		if (p_tasksrunning ) str_left_bottom += QString(" Running:%1"         ).arg(p_tasksrunning);
+		if (p_capacitytotal) str_left_bottom += QString(" Capacity:%1"        ).arg(af::toKMG(p_capacitytotal).c_str());
+		if (p_tasksdone    ) str_left_bottom += QString(" Done:%1"            ).arg(p_tasksdone);
+		if (p_taskserror   ) str_left_bottom += QString(" Errors:%1"          ).arg(p_taskserror);
+		if (p_tasksskipped ) str_left_bottom += QString(" Skipped:%1"         ).arg(p_tasksskipped);
+		if (p_taskswarning ) str_left_bottom += QString(" Warnings:%1"        ).arg(p_taskswarning);
+		if (p_taskswaitrec ) str_left_bottom += QString(" WaitingReconnect:%1").arg(p_taskswaitrec);
 	}
 	else if( Watch::isJedi())
 	{
-		if (p_tasksrunning ) str_progress += QString(" Run:%1" ).arg(p_tasksrunning);
-		if (p_capacitytotal) str_progress += QString(" Cap:%1" ).arg(af::toKMG(p_capacitytotal).c_str());
-		if (p_tasksdone    ) str_progress += QString(" Done:%1").arg(p_tasksdone);
-		if (p_taskserror   ) str_progress += QString(" Err:%1" ).arg(p_taskserror);
-		if (p_tasksskipped ) str_progress += QString(" Skp:%1" ).arg(p_tasksskipped);
-		if (p_taskswarning ) str_progress += QString(" Wrn:%1" ).arg(p_taskswarning);
-		if (p_taskswaitrec ) str_progress += QString(" WRC:%1" ).arg(p_taskswaitrec);
+		if (p_tasksrunning ) str_left_bottom += QString(" Run:%1" ).arg(p_tasksrunning);
+		if (p_capacitytotal) str_left_bottom += QString(" Cap:%1" ).arg(af::toKMG(p_capacitytotal).c_str());
+		if (p_tasksdone    ) str_left_bottom += QString(" Done:%1").arg(p_tasksdone);
+		if (p_taskserror   ) str_left_bottom += QString(" Err:%1" ).arg(p_taskserror);
+		if (p_tasksskipped ) str_left_bottom += QString(" Skp:%1" ).arg(p_tasksskipped);
+		if (p_taskswarning ) str_left_bottom += QString(" Wrn:%1" ).arg(p_taskswarning);
+		if (p_taskswaitrec ) str_left_bottom += QString(" WRC:%1" ).arg(p_taskswaitrec);
 	}
 	else
 	{
-		if (p_tasksrunning ) str_progress += QString(" r%1"  ).arg(p_tasksrunning);
-		if (p_capacitytotal) str_progress += QString(" c%1"  ).arg(af::toKMG(p_capacitytotal).c_str());
-		if (p_tasksdone    ) str_progress += QString(" d%1"  ).arg(p_tasksdone);
-		if (p_taskserror   ) str_progress += QString(" e%1"  ).arg(p_taskserror);
-		if (p_tasksskipped ) str_progress += QString(" s%1"  ).arg(p_tasksskipped);
-		if (p_taskswarning ) str_progress += QString(" w%1"  ).arg(p_taskswarning);
-		if (p_taskswaitrec ) str_progress += QString(" wrc%1").arg(p_taskswaitrec);
+		if (p_tasksrunning ) str_left_bottom += QString(" r%1"  ).arg(p_tasksrunning);
+		if (p_capacitytotal) str_left_bottom += QString(" c%1"  ).arg(af::toKMG(p_capacitytotal).c_str());
+		if (p_tasksdone    ) str_left_bottom += QString(" d%1"  ).arg(p_tasksdone);
+		if (p_taskserror   ) str_left_bottom += QString(" e%1"  ).arg(p_taskserror);
+		if (p_tasksskipped ) str_left_bottom += QString(" s%1"  ).arg(p_tasksskipped);
+		if (p_taskswarning ) str_left_bottom += QString(" w%1"  ).arg(p_taskswarning);
+		if (p_taskswaitrec ) str_left_bottom += QString(" wrc%1").arg(p_taskswaitrec);
 	}
 
-	if (m_jobid == AFJOB::SYSJOB_ID ) str_progress += QString(" Ready:%1").arg( p_tasksready);
+	if (m_jobid == AFJOB::SYSJOB_ID ) str_left_bottom += QString(" Ready:%1").arg( p_tasksready);
 
 
-	// Error Hosts:
-	if( Watch::isPadawan())
+	// Right bottom: server info, errors&avoids
+	str_right_bottom.clear();
+	if (server_info.size()) str_right_bottom += QString(" %1").arg(server_info);
+	if(Watch::isPadawan())
 	{
-		if( p_errorhosts ) str_avoiderrors  = QString("Error Hosts:%1").arg( p_errorhosts);
-		if( p_avoidhosts ) str_avoiderrors += QString("/%1:Avoiding").arg( p_avoidhosts);
+		if(p_errorhosts) str_right_bottom += QString(" Error Hosts:%1").arg(p_errorhosts);
+		if(p_avoidhosts) str_right_bottom += QString("/%1:Avoiding").arg(p_avoidhosts);
 	}
-	else if( Watch::isJedi())
+	else if(Watch::isJedi())
 	{
-		if( p_errorhosts ) str_avoiderrors  = QString("ErrHosts:%1").arg( p_errorhosts);
-		if( p_avoidhosts ) str_avoiderrors += QString("/%1:Avoid").arg( p_avoidhosts);
+		if(p_errorhosts) str_right_bottom += QString(" ErrHosts:%1").arg(p_errorhosts);
+		if(p_avoidhosts) str_right_bottom += QString("/%1:Avoid").arg(p_avoidhosts);
 	}
 	else
 	{
-		if( p_errorhosts ) str_avoiderrors  = QString("eh:%1").arg( p_errorhosts);
-		if( p_avoidhosts ) str_avoiderrors += QString("/%1:a").arg( p_avoidhosts);
+		if(p_errorhosts) str_right_bottom += QString(" eh:%1").arg(p_errorhosts);
+		if(p_avoidhosts) str_right_bottom += QString("/%1:a").arg(p_avoidhosts);
 	}
 }
 
@@ -621,10 +625,10 @@ void BlockInfo::paint( QPainter * i_painter, const QStyleOptionViewItem &option,
 
 	// Paint parameters:
 	QRect rect_params;
-	i_painter->drawText(x, y+y_info, w-5-(i_compact_display?tk_w:0), 15, Qt::AlignRight | Qt::AlignTop, str_params, &rect_params);
+	i_painter->drawText(x, y+y_info, w-5-(i_compact_display?tk_w:0), 15, Qt::AlignRight | Qt::AlignTop, str_right_top, &rect_params);
 
 	// Paint general information:
-	i_painter->drawText(x+xoffset+5, y+y_info, w-rect_params.width()-10-xoffset, 15, Qt::AlignLeft | Qt::AlignTop, str_info);
+	i_painter->drawText(x+xoffset+5, y+y_info, w-rect_params.width()-10-xoffset, 15, Qt::AlignLeft | Qt::AlignTop, str_left_top);
 
 
 	// On compact display we dont show progress, error hosts and progress bars.
@@ -633,23 +637,23 @@ void BlockInfo::paint( QPainter * i_painter, const QStyleOptionViewItem &option,
 
 
 	// Paint error hosts:
-	int error_hosts_text_width = 0;
-	if (p_errorhosts)
+	int right_bottom_text_width = 0;
+	if (str_right_bottom.size())
 	{
 		if (p_avoidhosts)
 			i_painter->setPen(afqt::QEnvironment::clr_error.c);
-		else
+		else if (p_errorhosts)
 			i_painter->setPen(afqt::QEnvironment::clr_errorready.c);
 
-		QRect rect_errorhosts;
-		i_painter->drawText(x+xoffset+5, y+y_progress, w-10-xoffset-tk_w, 15, Qt::AlignRight | Qt::AlignTop, str_avoiderrors, &rect_errorhosts);
-		error_hosts_text_width = rect_errorhosts.width() + 10;
+		QRect rect;
+		i_painter->drawText(x+xoffset+5, y+y_progress, w-10-xoffset-tk_w, 15, Qt::AlignRight | Qt::AlignTop, str_right_bottom, &rect);
+		right_bottom_text_width = rect.width() + 10;
 	}
 
 
 	// Paint progress:
 	i_painter->setPen(pen);
-	i_painter->drawText(x+xoffset+5, y+y_progress, w-15-xoffset-error_hosts_text_width, 15, Qt::AlignLeft | Qt::AlignTop, str_progress);
+	i_painter->drawText(x+xoffset+5, y+y_progress, w-15-xoffset-right_bottom_text_width, 15, Qt::AlignLeft | Qt::AlignTop, str_left_bottom);
 
 
 	xoffset += 2;
