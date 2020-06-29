@@ -140,7 +140,7 @@ class BlockParameters:
         self.framespertask = 1
         self.framesequential = 1
         self.skipexisting = 0
-        self.maxhosts = -1
+        self.maxruntasks = -1
         self.capacity = -1
         self.maxperhost = -1
         self.maxruntime = -1
@@ -163,7 +163,7 @@ class BlockParameters:
             self.framespertask = int(afnode.knob('framespertask').value())
             self.framesequential = int(afnode.knob('framesequential').value())
             self.skipexisting = int(afnode.knob('skipexisting').value())
-            self.maxhosts = int(afnode.knob('maxhosts').value())
+            self.maxruntasks = int(afnode.knob('maxruntasks').value())
             self.capacity = int(afnode.knob('capacity').value())
             self.maxperhost = int(afnode.knob('maxperhost').value())
             self.maxruntime = int(afnode.knob('maxruntime').value())
@@ -421,8 +421,8 @@ class BlockParameters:
             block.setTasksDependMask(self.tasksdependmask)
 
         if self.subblock:
-            if self.maxhosts != -1:
-                block.setMaxHosts(self.maxhosts)
+            if self.maxruntasks != -1:
+                block.setMaxRunningTasks(self.maxruntasks)
             if self.maxperhost != -1:
                 block.setMaxRunTasksPerHost(self.maxperhost)
             if self.hostsmask is not None:
@@ -550,7 +550,7 @@ class JobParameters:
             print('Initializing job parameters: "%s"' % nodename)
 
         self.startpaused = 0
-        self.maxhosts = -1
+        self.maxruntasks = -1
         self.maxperhost = -1
         self.priority = -1
         self.platform = None
@@ -564,7 +564,7 @@ class JobParameters:
         self.pathsmap = 1
         if afnode is not None:
             self.startpaused = int(afnode.knob('startpaused').value())
-            self.maxhosts = int(afnode.knob('maxhosts').value())
+            self.maxruntasks = int(afnode.knob('maxruntasks').value())
             self.maxperhost = int(afnode.knob('maxperhost').value())
             self.priority = int(afnode.knob('priority').value())
             self.platform = afnode.knob('platform').value()
@@ -655,8 +655,8 @@ class JobParameters:
         job = af.Job( jobname)
         if self.priority != -1:
             job.setPriority(self.priority)
-        if self.maxhosts != -1:
-            job.setMaxHosts(self.maxhosts)
+        if self.maxruntasks != -1:
+            job.setMaxRunningTasks(self.maxruntasks)
         if self.maxperhost != -1:
             job.setMaxRunTasksPerHost(self.maxperhost)
         if self.hostsmask is not None:
