@@ -131,16 +131,15 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
 	menu.exec(event->globalPos());
 }
 
-void ListTasks::generateMenu(QMenu &o_menu, Item *item)
+void ListTasks::generateMenu(QMenu &o_menu, Item * i_item)
 {
 	QAction *action;
 
-	int id = item->getId();
-	switch (id)
+	switch (i_item->getType())
 	{
-		case ItemJobBlock::ItemId:
+		case Item::TBlock:
 		{
-			ItemJobBlock *itemBlock = static_cast<ItemJobBlock*>(item);
+			ItemJobBlock *itemBlock = static_cast<ItemJobBlock*>(i_item);
 			
 			if (itemBlock->hasFiles())
 			{
@@ -220,13 +219,15 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
 
 			break;
 		}
-		case ItemJobTask::ItemId:
+		case Item::TTask:
 		{
-			ItemJobTask *itemTask = static_cast<ItemJobTask*>(item);
+			ItemJobTask *itemTask = static_cast<ItemJobTask*>(i_item);
 
 			action = new QAction("Open Task", this);
 			connect(action, SIGNAL(triggered() ), this, SLOT(actTaskOpen()));
 			o_menu.addAction(action);
+
+			o_menu.addSeparator();
 
 			if (itemTask->hasFiles())
 			{
@@ -266,6 +267,24 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
                 o_menu.addSeparator();
 			}
 
+			if ((itemTask->taskprogress.state & AFJOB::STATE_READY_MASK) &&
+				(false == (itemTask->taskprogress.state & AFJOB::STATE_TRYTHISTASKNEXT_MASK)))
+			{
+				action = new QAction("Try This Task Next", this);
+				connect(action, SIGNAL(triggered()), this, SLOT(actTaskTryNext()));
+				o_menu.addAction(action);
+
+				o_menu.addSeparator();
+			}
+			if (itemTask->taskprogress.state & AFJOB::STATE_TRYTHISTASKNEXT_MASK)
+			{
+				action = new QAction("Do Not Try Next", this);
+				connect(action, SIGNAL(triggered()), this, SLOT(actTaskDoNotTry()));
+				o_menu.addAction(action);
+
+				o_menu.addSeparator();
+			}
+
 			o_menu.addSeparator();
 			
 			action = new QAction( "Skip Tasks", this);
@@ -280,7 +299,7 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
 		}
 		default:
 		{
-			AF_ERR << "ListTasks::contextMenuEvent: unknown item id = " << id;
+			AF_ERR << "ListTasks::contextMenuEvent: unknown item type = " << i_item->getType();
 		}
 	}
 }
@@ -546,14 +565,16 @@ void ListTasks::setWindowTitleProgress()
 void ListTasks::actTaskOpen()
 {
 	Item * item = getCurrentItem();
-	if( item->getId() != ItemJobTask::ItemId )
+	if (item->getType() != Item::TTask)
 		return;
 
-	openTask( (ItemJobTask*)item);
+	openTask(static_cast<ItemJobTask*>(item));
 }
 
-void ListTasks::actTasksSkip()    { tasksOperation("skip"); }
-void ListTasks::actTasksRestart() { tasksOperation("restart"); }
+void ListTasks::actTasksSkip()   {tasksOperation("skip");   }
+void ListTasks::actTasksRestart(){tasksOperation("restart");}
+void ListTasks::actTaskTryNext() {tasksOperation("trynext","append");}
+void ListTasks::actTaskDoNotTry(){tasksOperation("trynext","remove");}
 
 void ListTasks::openTask( ItemJobTask * i_itemTask)
 {
@@ -572,13 +593,13 @@ void ListTasks::taskWindowClosed( WndTask * i_wndtask)
 
 void ListTasks::doubleClicked( Item * item)
 {
-	if( item->getId() == ItemJobTask::ItemId )
+	if (item->getType() == Item::TTask)
 	{
-		openTask( (ItemJobTask*)item);
+		openTask(static_cast<ItemJobTask*>(item));
 	}
-	else if( item->getId() == ItemJobBlock::ItemId )
+	else if (item->getType() == Item::TBlock)
 	{
-		ItemJobBlock * block = (ItemJobBlock*)item;
+		ItemJobBlock * block = static_cast<ItemJobBlock*>(item);
 		int blockNum = block->getNumBlock();
 		bool hide = false == m_blocks[blockNum]->tasksHidded;
 		m_blocks[blockNum]->tasksHidded = hide;
@@ -590,21 +611,25 @@ void ListTasks::doubleClicked( Item * item)
 	}
 }
 
-void ListTasks::tasksOperation( const std::string & i_type)
+void ListTasks::tasksOperation(const std::string & i_type, const std::string & i_mode)
 {
 	std::ostringstream str;
 	af::jsonActionStart( str, "jobs", "", std::vector<int>( 1, m_job_id));
 	str << ",\n\"operation\":{\n\"type\":\"" << i_type << '"';
+	if (i_mode.size())
+		str << ",\n\"mode\":\"" << i_mode << '"';
 	str << ",\n\"task_ids\":[";
 
 	int blockId = -1;
 	// Collect tasks of the same block:
-	const QList<Item*> items( getSelectedItems());
-	for( int i = 0; i < items.count(); i++)
+	const QList<Item*> items(getSelectedItems());
+	for (int i = 0; i < items.count(); i++)
 	{
-		if( items[i]->getId() != ItemJobTask::ItemId ) continue;
+		if (items[i]->getType() != Item::TTask)
+			continue;
+		else
 		{
-			ItemJobTask *itemTask = (ItemJobTask*)items[i];
+			ItemJobTask * itemTask = static_cast<ItemJobTask*>(items[i]);
 			if( blockId == -1 )
 				blockId = itemTask->getBlockNum();
 			else if( blockId != itemTask->getBlockNum())
@@ -704,19 +729,18 @@ void ListTasks::actBrowseFolder()
 	QString image;
 	QString wdir;
 
-	int id = item->getId();
-	switch( id)
+	switch (item->getType())
 	{
-	case ItemJobBlock::ItemId:
+	case Item::TBlock:
 	{
-		ItemJobBlock *itemBlock = (ItemJobBlock*)item;
+		ItemJobBlock * itemBlock = static_cast<ItemJobBlock*>(item);
 		image = afqt::stoq(itemBlock->getFiles()[0]);
 		wdir = afqt::stoq(itemBlock->getWDir());
 		break;
 	}
-	case ItemJobTask::ItemId:
+	case Item::TTask:
 	{
-		ItemJobTask* itemTask = (ItemJobTask*)item;
+		ItemJobTask* itemTask = static_cast<ItemJobTask*>(item);
 		image = afqt::stoq(itemTask->getFiles()[0]);
 		wdir = afqt::stoq(itemTask->getWDir());
 		break;
@@ -736,7 +760,7 @@ void ListTasks::actTaskPreview(int i_num_cmd, int i_num_img)
 		displayError("No items selected.");
 		return;
 	}
-	if (item->getId() != ItemJobTask::ItemId)
+	if (item->getType() != Item::TTask)
 	{
 		displayWarning("This action for task only.");
 		return;
@@ -775,7 +799,7 @@ void ListTasks::actBlockPreview( int num_cmd, int num_img)
         displayError("No items selected.");
         return;
     }
-    if (item->getId() != ItemJobBlock::ItemId)
+    if (item->getType() != Item::TBlock)
     {
         displayWarning("This action for block only.");
         return;
@@ -817,8 +841,8 @@ void ListTasks::blockAction(const QString & i_json)
 	str << ",\n\"block_ids\":[";
 	const QList<Item*> items( getSelectedItems());
 	int counter = 0;
-	for( int i = 0; i < items.count(); i++)
-		if( items[i]->getId() == ItemJobBlock::ItemId )
+	for (int i = 0; i < items.count(); i++)
+		if (items[i]->getType() == Item::TBlock)
 		{
 			if( counter ) str << ',';
 			str << ((ItemJobBlock*)items[i])->getNumBlock();
@@ -838,7 +862,7 @@ bool ListTasks::mousePressed( QMouseEvent * event)
 	if( Item::isItemP( index.data()) == false ) return false;
 
 	Item * item = Item::toItemP( index.data());
-	if( item->getId() == ItemJobBlock::ItemId)
+	if (item->getType() == Item::TBlock)
 		return ((ItemJobBlock*)item)->mousePressed( event->pos(), m_view->visualRect( index));
 
 	if(( QApplication::mouseButtons() == Qt::MidButton ) || ( QApplication::keyboardModifiers() == Qt::AltModifier ))

@@ -119,7 +119,10 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	jr_int64 ("time_creation", m_time_creation, i_object);
 	jr_int64 ("time_started",  m_time_started,  i_object);
 	jr_int64 ("time_done",     m_time_done,     i_object);
-	
+
+	jr_int32vec("try_this_tasks_num",  m_try_this_tasks_num,  i_object);
+	jr_int32vec("try_this_blocks_num", m_try_this_blocks_num, i_object);
+
 	jr_string("project",    m_project,    i_object);
 	jr_string("department", m_department, i_object);
 
@@ -221,6 +224,9 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\n\"time_done\":"                  << m_time_done;
 	if( m_time_life != -1 )
 		o_str << ",\n\"time_life\":"                  << m_time_life;
+
+	if (m_try_this_tasks_num.size() ) af::jw_int32vec("try_this_tasks_num",  m_try_this_tasks_num,  o_str);
+	if (m_try_this_blocks_num.size()) af::jw_int32vec("try_this_blocks_num", m_try_this_blocks_num, o_str);
 
 	if( m_folders.size())
 		af::jw_stringmap("folders", m_folders, o_str);
@@ -343,6 +349,9 @@ void Job::v_readwrite( Msg * msg)
 	rw_RegExp(m_depend_mask,        msg);
 	rw_RegExp(m_depend_mask_global, msg);
 
+	rw_Int32_Vect(m_try_this_tasks_num,  msg);
+	rw_Int32_Vect(m_try_this_blocks_num, msg);
+
 	rw_StringMap(m_folders, msg);
 
 	rw_blocks(msg);
@@ -429,6 +438,34 @@ void Job::stdOutJobBlocksTasks() const
 	o_str << std::endl;
 	generateInfoStreamBlocks( o_str, true);
 	std::cout << o_str.str() << std::endl;
+}
+
+const std::string Job::tryNextTasksToStr(int i_limit) const
+{
+	if (m_try_this_tasks_num.size() != m_try_this_blocks_num.size())
+	{
+		AF_ERR << "Try tasks and blocks size mismatch: "
+			<< m_try_this_tasks_num.size() << " != " << m_try_this_blocks_num.size();
+		return std::string();
+	}
+
+	if (m_try_this_tasks_num.size() == 0)
+		return std::string();
+
+	std::ostringstream o_str;
+	for (int i = 0; i < m_try_this_tasks_num.size(); i++)
+	{
+		if (i) o_str << ',';
+		if (i == i_limit)
+		{
+			o_str << "...";
+			break;
+		}
+
+		o_str << m_try_this_blocks_num[i] << ':' << m_try_this_tasks_num[i];
+	}
+
+	return o_str.str();
 }
 
 void Job::generateInfoStreamBlocks( std::ostringstream & o_str, bool full) const

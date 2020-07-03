@@ -366,7 +366,7 @@ void af::jw_stringmap( const char * i_name, const std::map<std::string,std::stri
 
 void af::jw_int32list( const char * i_name, const std::list<int32_t> & i_list, std::ostringstream & o_str)
 {
-	o_str << "\n,\"" << i_name << "\":[";
+	o_str << ",\n\"" << i_name << "\":[";
 	std::list<int32_t>::const_iterator it = i_list.begin();
 	for( ; it != i_list.end(); it++)
 	{
@@ -378,7 +378,7 @@ void af::jw_int32list( const char * i_name, const std::list<int32_t> & i_list, s
 
 void af::jw_int32vec( const char * i_name, const std::vector<int32_t> & i_vec, std::ostringstream & o_str)
 {
-	o_str << "\n,\"" << i_name << "\":[";
+	o_str << ",\n\"" << i_name << "\":[";
 	for( int i = 0; i < i_vec.size(); i++)
 	{
 		if( i ) o_str << ',';
@@ -423,6 +423,7 @@ void af::jw_state( const int64_t & i_state, std::ostringstream & o_str, bool i_r
 		if( i_state & AFJOB::STATE_PPAPPROVAL_MASK      ) o_str << " PPA";
 		if( i_state & AFJOB::STATE_ERROR_READY_MASK     ) o_str << " RER";
 		if( i_state & AFJOB::STATE_WAITRECONNECT_MASK   ) o_str << " WRC";
+		if (i_state & AFJOB::STATE_TRYTHISTASKNEXT_MASK) o_str << " TRY";
 	}
 
 	o_str << "\"";

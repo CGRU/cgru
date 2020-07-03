@@ -69,6 +69,7 @@ parser.add_option(      '--folder',       dest='folder',       type='string', de
 parser.add_option(      '--nofolder',     dest='nofolder',     action='store_true', default=False, help='do not set any folders')
 parser.add_option(      '--pools',        dest='pools',        type='string', default=None, help='Set job render pools [/local/blender:90,/local/natron:10].')
 parser.add_option(      '--branch',       dest='branch',       type='string', default=None, help='Set job branch.')
+parser.add_option(      '--try',          dest='trytasks',     type='string', default=None, help='Try tasks "0:3,0:5"')
 parser.add_option(      '--seq',          dest='sequential',   type='int',    default=None, help='Sequential running')
 parser.add_option(      '--ppa',          dest='ppapproval',   action='store_true', default=False, help='Preview pending approval')
 parser.add_option('-e', '--exitstatus',   dest='exitstatus',   type='int',    default=0,  help='good exit status')
@@ -121,6 +122,12 @@ if Options.branch is not None:
     job.setBranch( Options.branch)
 else:
     job.setBranch( os.getcwd())
+
+if Options.trytasks:
+    for pair in Options.trytasks.split(','):
+        bt = pair.split(':')
+        if len(bt) == 2:
+            job.tryTask(int(bt[0]), int(bt[1]))
 
 blocknames = []
 if Options.labels != '':

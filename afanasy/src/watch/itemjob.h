@@ -30,6 +30,8 @@ public:
 	bool ignorenimby;
 	bool ignorepaused;
 
+	bool has_tasks_trying_next;
+
 	QString pools;
 	QString service;
 	QString hostname;

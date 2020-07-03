@@ -55,6 +55,7 @@ private slots:
 	void actRestartSkipped();
 	void actRestartDone();
 	void actResetErrorHosts();
+	void actResetTryingNextTasks();
 	void actPause();
 	void actRestartPause();
 	void actDelete();

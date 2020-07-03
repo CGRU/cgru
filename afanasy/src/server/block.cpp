@@ -457,6 +457,14 @@ bool Block::action( Action & i_action)
 		{
 			skipRestartTasks( false, "Tasks restart done by " + i_action.author, i_action, operation, AFJOB::STATE_DONE_MASK);
 		}
+		else if (type == "trynext")
+		{
+			if (tryTasksNext(i_action, operation))
+			{
+				blockchanged_type = af::Msg::TBlocksProgress;
+				job_changed = true;
+			}
+		}
 		else if (type == "append_tasks")
 		{
 			if (appendTasks(operation))
@@ -568,6 +576,73 @@ void Block::skipRestartTasks( bool i_skip, const std::string & i_message, const 
 			m_tasks[t]->restart( i_message, i_action.renders, i_action.monitors, i_state);
 		}
 	}
+}
+
+bool Block::tryTasksNext(Action & i_action, const JSON & i_operation)
+{
+	if (m_job->isMaintenanceFlag())
+	{
+		i_action.answer_kind = "error";
+		i_action.answer = "Maintenance job can't try tasks next.";
+		return false;
+	}
+
+	std::vector<int32_t> tasks_vec;
+	af::jr_int32vec("task_ids", tasks_vec, i_operation);
+	std::string mode;
+	af::jr_string("mode", mode, i_operation);
+
+	if (tasks_vec.size() == 0)
+	{
+		i_action.answer_kind = "error";
+		i_action.answer = "\"task_ids\" array is not specified.";
+		return false;
+	}
+
+	bool append;
+	if (mode == "append")
+		append = true;
+	else if (mode == "remove")
+		append = false;
+	else
+	{
+		i_action.answer_kind = "error";
+		i_action.answer = "Invalid \"mode\" = \"" + mode + "\".";
+		return false;
+	}
+
+	bool success = false;
+	for (int i = 0; i < tasks_vec.size(); i++)
+	{
+		int t = tasks_vec[i];
+
+		if ((t >= m_data->getTasksNum()) || ( t < 0 ))
+		{
+			i_action.answer_kind = "error";
+			i_action.answer = "Invalid operation task numer = " + af::itos(t);
+			appendJobLog(i_action.answer);
+			break;
+		}
+
+		if (m_tasks[t]->tryNext(append, i_action.monitors))
+		{
+			m_job->tryTaskNext(append, m_data->getBlockNum(), t);
+			success = true;
+		}
+	}
+
+	if (success)
+	{
+		i_action.answer_kind = "info";
+		i_action.answer = "Tasks to try next processed.";
+	}
+	else
+	{
+		i_action.answer_kind = "error";
+		i_action.answer = "Unable to find valid tasks.";
+	}
+
+	return success;
 }
 
 bool Block::allocateTasks(int alreadyAllocated)

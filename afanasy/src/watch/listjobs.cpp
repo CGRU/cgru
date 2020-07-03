@@ -270,6 +270,13 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	connect( action, SIGNAL( triggered() ), this, SLOT( actRequestLog() ));
 	menu.addAction( action);
 
+	if (jobitem->has_tasks_trying_next)
+	{
+		action = new QAction("Reset Trying Tasks", this);
+		connect(action, SIGNAL(triggered()), this, SLOT(actResetTryingNextTasks()));
+		menu.addAction(action);
+	}
+
 	action = new QAction( "Show Error Hosts", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actRequestErrorHostsList() ));
 	menu.addAction( action);
@@ -665,6 +672,7 @@ void ListJobs::actResetErrorHosts() { operation(Item::TJob, "reset_error_hosts")
 void ListJobs::actPause()           { operation(Item::TJob, "pause"            );}
 void ListJobs::actRestartPause()    { operation(Item::TJob, "restart_pause"    );}
 void ListJobs::actDelete()          { operation(Item::TJob, "delete"           );}
+void ListJobs::actResetTryingNextTasks(){operation(Item::TJob, "reset_trying_next_tasks");}
 
 void ListJobs::actDeleteDone()
 {

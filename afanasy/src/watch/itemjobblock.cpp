@@ -23,7 +23,7 @@ const int ItemJobBlock::HeightHeader = 23;
 const int ItemJobBlock::HeightFooter = 14;
 
 ItemJobBlock::ItemJobBlock(const af::BlockData * i_block, ListTasks * i_listtasks):
-	Item(afqt::stoq(i_block->getName()), ItemId, TBlock),
+	Item(afqt::stoq(i_block->getName()), 0, TBlock),
 	job_id(i_block->getJobId()),
 	numblock(i_block->getBlockNum()),
 	m_listtasks(i_listtasks),

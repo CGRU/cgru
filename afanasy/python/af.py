@@ -647,6 +647,13 @@ class Job:
     def setPools(self, i_pools):
         self.data['pools'] = i_pools
 
+    def tryTask(self, i_block, i_task):
+        if 'try_this_tasks_num' not in self.data:
+            self.data['try_this_tasks_num'] = []
+            self.data['try_this_blocks_num'] = []
+        self.data['try_this_tasks_num'].append(i_task)
+        self.data['try_this_blocks_num'].append(i_block)
+
     def setBranch(self, i_branch, i_transferToServer=True):
         if i_transferToServer:
             i_branch = Pathmap.toServer(i_branch)

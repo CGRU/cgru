@@ -162,7 +162,17 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 	if( state & AFJOB::STATE_DONE_MASK) runningTime = af::time2strHMS( time_run).c_str();
 
 	properties.clear();
-	properties += pools;
+
+	// Trying Task Next:
+	if (job->hasTasksToTryNext())
+	{
+		properties += QString(" TRY[%1]").arg(afqt::stoq(job->tryNextTasksToStr()));
+		has_tasks_trying_next = true;
+	}
+	else
+		has_tasks_trying_next = false;
+
+	properties += " " + pools;
 	if( Watch::isPadawan())
 	{
 		if( false == dependmask_global.isEmpty()) properties += QString(" Global Depends(%1)").arg( dependmask_global);

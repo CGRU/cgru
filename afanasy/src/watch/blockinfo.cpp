@@ -709,6 +709,10 @@ void BlockInfo::drawProgress(
 			break;
 		case 'r': // STATE_READY_MASK
 			break;
+		case 'T': // STATE_TRYTHISTASKNEXT_MASK
+			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_tasktrynext.c, Qt::SolidPattern));
+			i_painter->drawRect(x, posy, w+offset, height);
+			break;
 		case 'D': // STATE_DONE_MASK
 			i_painter->setBrush( QBrush( afqt::QEnvironment::clr_done.c, Qt::SolidPattern ));
 			i_painter->drawRect( x, posy, w+offset, height);

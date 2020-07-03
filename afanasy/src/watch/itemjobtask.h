@@ -48,7 +48,6 @@ public:
 
 	void showThumbnail();
 
-	static const int ItemId = 2;
 	static const int WidthInfo;
 
 	bool compare( int type, const ItemJobTask & other, bool ascending) const;

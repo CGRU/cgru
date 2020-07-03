@@ -114,6 +114,8 @@ public:
 	void addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
 	void remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
 
+	void tryTaskNext(bool i_append, int i_block_num, int i_task_num);
+
 public:
 	/// Set Jobs Container.
 	inline static void setJobContainer( JobContainer *Jobs){ ms_jobs = Jobs;}
@@ -156,6 +158,8 @@ private:
 
 	bool solveOnRender( RenderAf * i_render, MonitorContainer * i_monitoring);
 
+	bool solveTaskOnRender(RenderAf * i_render, int i_block_num, int i_task_num, MonitorContainer * i_monitoring, bool & o_continue);
+
 	virtual void v_priorityChanged( MonitorContainer * i_monitoring);
 
 	/// Check whether job has not done depend jobs.
@@ -164,6 +168,9 @@ private:
 	
 	/// Restart tasks, can restart only matching state mask.
 	void restartAllTasks( const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state = 0);
+
+	bool checkTryTasksNext();
+	void resetTryTasksNext();
 
 	void appendBlocks( const JSON & i_blocks);
 

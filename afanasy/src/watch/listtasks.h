@@ -65,6 +65,8 @@ private slots:
 	void actTaskPreview(int i_num_cmd, int i_num_img);
 	void actTasksRestart();
 	void actTasksSkip();
+	void actTaskTryNext();
+	void actTaskDoNotTry();
 
 	void actBrowseFolder();
 
@@ -96,6 +98,6 @@ private:
 
 	void blockAction(const QString & i_json);
 
-	void tasksOperation( const std::string & i_type);
+	void tasksOperation(const std::string & i_type, const std::string & i_mode = std::string());
 	void setWindowTitleProgress();
 };

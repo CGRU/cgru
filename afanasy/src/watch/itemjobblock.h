@@ -52,8 +52,6 @@ public:
 
    QString description;
 
-   static const int ItemId = 1;
-
    bool tasksHidded;
 
 	inline const BlockInfo * getInfo() const {return m_info;}

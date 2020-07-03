@@ -303,6 +303,29 @@ void Task::skip( const std::string & message, RenderContainer * renders, Monitor
    }
 }
 
+bool Task::tryNext(bool i_enable, MonitorContainer * i_monitoring)
+{
+	if (i_enable)
+	{
+		if (m_progress->state & AFJOB::STATE_TRYTHISTASKNEXT_MASK)
+			return false;
+
+		m_progress->state |= AFJOB::STATE_TRYTHISTASKNEXT_MASK;
+	}
+	else
+	{
+		if (m_progress->state & AFJOB::STATE_TRYTHISTASKNEXT_MASK)
+			m_progress->state &= (~AFJOB::STATE_TRYTHISTASKNEXT_MASK);
+		else
+			return false;
+	}
+
+	v_monitor(i_monitoring);
+	v_store();
+
+	return true;
+}
+
 void Task::errorHostsAppend( const std::string & hostname)
 {
    std::list<std::string>::iterator hIt = m_errorHosts.begin();

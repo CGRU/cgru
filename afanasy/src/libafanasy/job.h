@@ -130,6 +130,9 @@ public:
 
 	void stdOutJobBlocksTasks() const;
 
+	inline bool hasTasksToTryNext() const {return m_try_this_tasks_num.size();}
+	const std::string tryNextTasksToStr(int i_limit = 10) const;
+
 protected:
 	/// Read blocks data and append it to block list
 	/// (called by jsonRead and also when appending new blocks)
@@ -192,6 +195,10 @@ protected:
 	std::string m_project;
 	/// Department responsible for this job
 	std::string m_department;
+
+	// "Try this task next"
+	std::vector<int32_t> m_try_this_tasks_num;
+	std::vector<int32_t> m_try_this_blocks_num;
 
 private:
 	void initDefaultValues();
