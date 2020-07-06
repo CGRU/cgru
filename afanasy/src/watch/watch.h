@@ -92,8 +92,8 @@ public:
 
 	static void listenJob(  int id, const QString & name);
 	inline static void listenJob_rem(  int id) { ms_listenjobids.removeAll(id);}
-	static void watchJodTasksWindowAdd( int id, const QString & name);
-	static void watchJodTasksWindowRem( int id);
+	static void watchJobTasksWindowAdd( int id, const QString & name);
+	static void watchJobTasksWindowRem( int id);
 	static void listenTask( int jobid, int block, int task, const QString & name);
 
 	static void keyPressEvent( QKeyEvent * event);

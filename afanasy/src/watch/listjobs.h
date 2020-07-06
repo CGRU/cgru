@@ -28,7 +28,7 @@ protected:
 
 	void v_showFunc();
 
-	void doubleClicked( Item * item);
+	void v_doubleClicked(Item * i_item);
 
 	void v_resetSorting();
 

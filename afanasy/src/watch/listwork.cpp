@@ -339,5 +339,3 @@ void ListWork::jobSetBranch(const QString & i_name)
 	Watch::sendMsg(af::jsonMsg(str));
 }
 
-void ListWork::slot_Delete() { operation(Item::TAny, "delete"); }
-

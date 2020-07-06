@@ -607,7 +607,7 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 	menu.exec( event->globalPos());
 }
 
-void ListRenders::doubleClicked( Item * item)
+void ListRenders::v_doubleClicked(Item * i_item)
 {
 	actRequestInfo();
 }

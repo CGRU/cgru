@@ -36,7 +36,7 @@ public slots:
 protected:
 	void contextMenuEvent( QContextMenuEvent *event);
 
-	void doubleClicked( Item * item);
+	void v_doubleClicked(Item * i_item);
 
 	virtual void v_connectionLost();
 

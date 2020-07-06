@@ -147,8 +147,16 @@ ListJobs::ListJobs(QWidget * i_parent, bool i_listwork, const std::string & i_na
 
 	resetButtonsMenu();
 
-	bp = addButtonPanel(Item::TJob, "DELETE","jobs_delete","Delete selected jobs.","", true);
-	connect(bp, SIGNAL(sigClicked()), this, SLOT(actDelete()));
+	if (m_listwork)
+	{
+		bp = addButtonPanel(Item::TAny, "DELETE","work_delete","Delete selected jobs or branches.","", true);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actDelete()));
+	}
+	else
+	{
+		bp = addButtonPanel(Item::TAny, "DELETE","jobs_delete","Delete selected jobs.","", true);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actDelete()));
+	}
 
 	if (false == af::Environment::VISOR() && (false == m_listwork))
 	{
@@ -671,7 +679,7 @@ void ListJobs::actRestartDone()     { operation(Item::TJob, "restart_done"     )
 void ListJobs::actResetErrorHosts() { operation(Item::TJob, "reset_error_hosts");}
 void ListJobs::actPause()           { operation(Item::TJob, "pause"            );}
 void ListJobs::actRestartPause()    { operation(Item::TJob, "restart_pause"    );}
-void ListJobs::actDelete()          { operation(Item::TJob, "delete"           );}
+void ListJobs::actDelete()          { operation(Item::TAny, "delete"           );}
 void ListJobs::actResetTryingNextTasks(){operation(Item::TJob, "reset_trying_next_tasks");}
 
 void ListJobs::actDeleteDone()
@@ -743,9 +751,13 @@ void ListJobs::actPostCommand()
 	setParameter(Item::TJob, "command_post", afqt::qtos( cmd));
 }
 
-void ListJobs::doubleClicked( Item * item)
+void ListJobs::v_doubleClicked(Item * i_item)
 {
-	if( item ) Watch::watchJodTasksWindowAdd( item->getId(), item->getName());
+	if (i_item == NULL)
+		return;
+
+	if (i_item->getType() == Item::TJob)
+		Watch::watchJobTasksWindowAdd(i_item->getId(), i_item->getName());
 }
 
 void ListJobs::actListenJob()

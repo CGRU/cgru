@@ -40,7 +40,6 @@ private slots:
 	void slot_SolveCapacity();
 
 	void slot_JobSetBranch();
-	void slot_Delete();
 
 private:
 	void addBranch(int i_parent_id, const QString & i_child);

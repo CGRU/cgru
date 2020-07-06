@@ -112,7 +112,7 @@ ListTasks::~ListTasks()
 	delete [] m_blocks;
 	delete [] m_tasks;
 
-	Watch::watchJodTasksWindowRem( m_job_id);
+	Watch::watchJobTasksWindowRem( m_job_id);
 }
 
 void ListTasks::v_connectionLost()
@@ -591,15 +591,15 @@ void ListTasks::taskWindowClosed( WndTask * i_wndtask)
 			it++;
 }
 
-void ListTasks::doubleClicked( Item * item)
+void ListTasks::v_doubleClicked(Item * i_item)
 {
-	if (item->getType() == Item::TTask)
+	if (i_item->getType() == Item::TTask)
 	{
-		openTask(static_cast<ItemJobTask*>(item));
+		openTask(static_cast<ItemJobTask*>(i_item));
 	}
-	else if (item->getType() == Item::TBlock)
+	else if (i_item->getType() == Item::TBlock)
 	{
-		ItemJobBlock * block = static_cast<ItemJobBlock*>(item);
+		ItemJobBlock * block = static_cast<ItemJobBlock*>(i_item);
 		int blockNum = block->getNumBlock();
 		bool hide = false == m_blocks[blockNum]->tasksHidded;
 		m_blocks[blockNum]->tasksHidded = hide;

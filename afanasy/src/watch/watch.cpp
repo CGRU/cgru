@@ -320,7 +320,7 @@ void Watch::listenTask( int jobid, int block, int task, const QString & name)
    new WndListenTask( jobid, block, task, name);
 }
 
-void Watch::watchJodTasksWindowAdd( int id, const QString & name)
+void Watch::watchJobTasksWindowAdd( int id, const QString & name)
 {
 AFINFA("Watch::watchTasks: trying to open job \"%s\"[%d] tasks window.", name.toUtf8().data(), id)
    QLinkedList<int>::const_iterator iIt = ms_watchtasksjobids.begin();
@@ -345,7 +345,7 @@ AFINFA("Watch::watchTasks: trying to open job \"%s\"[%d] tasks window.", name.to
 AFINFA("Watch::watchTasks: \"%s\" window opened.", name.toUtf8().data())
 }
 
-void Watch::watchJodTasksWindowRem( int id)
+void Watch::watchJobTasksWindowRem( int id)
 {
    QLinkedList<int>::iterator iIt = ms_watchtasksjobids.begin();
    QLinkedList<QWidget*>::iterator wIt = ms_watchtaskswindows.begin();

@@ -153,7 +153,7 @@ int ListItems::count() const { return m_model->count();}
 bool ListItems::mousePressed( QMouseEvent * event) { return false;}
 
 void ListItems::deleteAllItems() { m_model->deleteAllItems();}
-void ListItems::doubleClicked( Item * item) {}
+void ListItems::v_doubleClicked(Item * i_item) {}
 void ListItems::revertModel()  { m_model->revert();}
 void ListItems::itemsHeightChanged() { m_model->itemsHeightChanged();}
 void ListItems::itemsHeightCalc() { m_model->itemsHeightCalc();}
@@ -255,8 +255,8 @@ void ListItems::reStoreSelection()
 
 void ListItems::doubleClicked_slot( const QModelIndex & index )
 {
-	if( Item::isItemP( index.data()))
-		doubleClicked( Item::toItemP( index.data()));
+	if (Item::isItemP(index.data()))
+		v_doubleClicked(Item::toItemP(index.data()));
 }
 
 void ListItems::currentItemChanged( const QModelIndex & current, const QModelIndex & previous )

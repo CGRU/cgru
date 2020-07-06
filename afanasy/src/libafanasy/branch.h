@@ -43,6 +43,9 @@ public:
 
 	static const std::string FilterPath(const std::string &i_path);
 
+	inline bool isRoot()    const {return m_name == "/";}
+	inline bool isNotRoot() const {return m_name != "/";}
+
 	enum FlagsBranch
 	{
 		CreateChilds = 1 << 0,

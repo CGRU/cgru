@@ -76,7 +76,7 @@ void BranchSrv::setParent(BranchSrv * i_parent)
 		return;
 	}
 
-	if (m_name == "/")
+	if (isRoot())
 	{
 		AF_ERR << "BranchSrv::setParent: Root branch should not have any parent.";
 		return;
@@ -88,7 +88,7 @@ void BranchSrv::setParent(BranchSrv * i_parent)
 bool BranchSrv::initialize()
 {
 	// Non root branch should have a parent
-	if ((m_name != "/") && (NULL == m_parent))
+	if (isNotRoot() && (NULL == m_parent))
 	{
 		AF_ERR << "BranchSrv::initialize: Branch['" << m_name << "'] has NULL parent.";
 		return false;
@@ -117,6 +117,22 @@ bool BranchSrv::initialize()
 			setCreateChilds(true);
 			setSolveJobs(true);
 			m_max_tasks_per_second = AFBRANCH::TASKSPERSECOND_ROOT;
+			AF_LOG << "Root branch constructed.";
+		}
+		else
+		{
+			// This is a new non-root branch.
+			// We should inherit some parameters from parent branch.
+			if (m_parent->isSolveCapacity()) setSolveCapacity();
+			if (m_parent->isSolveTasksNum()) setSolveTasksNum();
+
+			if (m_parent->isSolvePriority()) setSolvePriority();
+			if (m_parent->isSolveOrder())    setSolveOrder();
+
+			if (m_parent->isNotRoot())
+			{
+				setSolveJobs(m_parent->isSolveJobs());
+			}
 		}
 
 		m_time_creation = time(NULL);
@@ -170,7 +186,7 @@ void BranchSrv::logAction(const Action & i_action, const std::string & i_node_na
 
 void BranchSrv::deleteBranch(Action & o_action, MonitorContainer * i_monitoring)
 {
-	if (NULL == m_parent)
+	if (isRoot())
 	{
 		o_action.answer_kind = "error";
 		o_action.answer = "Can`t delete ROOT branch.";

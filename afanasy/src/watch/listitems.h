@@ -80,7 +80,7 @@ protected:
 
 	void addMenuParameters(QMenu * i_menu);
 
-	virtual void doubleClicked( Item * item);
+	virtual void v_doubleClicked(Item * i_item);
 
 	void getItemInfo(Item::EType i_type, const std::string & i_mode);
 
