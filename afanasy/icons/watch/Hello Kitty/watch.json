@@ -43,6 +43,7 @@
 	"clr_HighlightedText"   :"D2D2D2",
 	"clr_Link"              :"F7B312",
 	"clr_LinkVisited"       :"CAFFB9",
+
 	"clr_item"              :"828282",
 	"clr_selected"          :"FF98E0",
 	"clr_itemjob"           :"886D7F",
@@ -54,8 +55,8 @@
 	"clr_itemrender"        :"767676",
 	"clr_itemrenderoff"     :"50544C",
 	"clr_itemrenderbusy"    :"8B5E89",
-	"clr_itemrendernimby"   :"5E778F",
 	"clr_itemrenderpltclr"  :"FAFA32",
+
 	"clr_running"           :"DC97EF",
 	"clr_done"              :"4A234C",
 	"clr_error"             :"FA320A",

@@ -528,10 +528,11 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	// Draw back with render state specific color (if it is not selected)
 	const QColor * itemColor = &(afqt::QEnvironment::clr_itemrender.c);
 	if      (m_online == false) itemColor = &(afqt::QEnvironment::clr_itemrenderoff.c);
-	else if (m_sick) itemColor = &(afqt::QEnvironment::clr_itemrendersick.c);
+	else if (m_sick  ) itemColor = &(afqt::QEnvironment::clr_itemrendersick.c);
 	else if (m_paused) itemColor = &(afqt::QEnvironment::clr_itemrenderpaused.c);
-	else if (m_NIMBY || m_nimby) itemColor = &(afqt::QEnvironment::clr_itemrendernimby.c);
-	else if (m_busy            ) itemColor = &(afqt::QEnvironment::clr_itemrenderbusy.c);
+	else if (m_NIMBY ) itemColor = &(afqt::QEnvironment::clr_itemrenderNIMBY.c);
+	else if (m_nimby ) itemColor = &(afqt::QEnvironment::clr_itemrendernimby.c);
+	else if (m_busy  ) itemColor = &(afqt::QEnvironment::clr_itemrenderbusy.c);
 
 	// Draw standart backgroud
 	drawBack(i_painter, i_rect, i_option, itemColor, m_dirty ? &(afqt::QEnvironment::clr_error.c) : NULL);

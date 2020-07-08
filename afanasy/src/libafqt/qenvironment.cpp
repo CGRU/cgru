@@ -95,7 +95,8 @@ AttrColor QEnvironment::clr_tasktrynext(     "clr_tasktrynext",      "Trying Thi
 AttrColor QEnvironment::clr_itemrender(      "clr_itemrender",       "Render Item",             AFGUI::CLR_ITEMRENDER          );
 AttrColor QEnvironment::clr_itemrenderoff(   "clr_itemrenderoff",    "Offine Render",           AFGUI::CLR_ITEMRENDEROFF       );
 AttrColor QEnvironment::clr_itemrenderbusy(  "clr_itemrenderbusy",   "Busy Render",             AFGUI::CLR_ITEMRENDERBUSY      );
-AttrColor QEnvironment::clr_itemrendernimby( "clr_itemrendernimby",  "Render With Nimby",       AFGUI::CLR_ITEMRENDERNIMBY     );
+AttrColor QEnvironment::clr_itemrendernimby( "clr_itemrendernimby",  "Render With nimby",       AFGUI::CLR_ITEMRENDERnimby     );
+AttrColor QEnvironment::clr_itemrenderNIMBY( "clr_itemrenderNIMBY",  "Render With NIMBY",       AFGUI::CLR_ITEMRENDERNIMBY     );
 AttrColor QEnvironment::clr_itemrenderpaused("clr_itemrenderpaused", "Paused Render",           AFGUI::CLR_ITEMRENDERPAUSED    );
 AttrColor QEnvironment::clr_itemrendersick(  "clr_itemrendersick",   "Sick Render",             AFGUI::CLR_ITEMRENDERSICK      );
 AttrColor QEnvironment::clr_itemrenderpltclr("clr_itemrenderpltclr", "Plotter Text Label",      AFGUI::CLR_ITEMRENDERPLTCLR    );
@@ -217,6 +218,7 @@ QEnvironment::QEnvironment( const QString & i_name)
     ms_attrs_gui.append( &clr_itemrenderoff   );
     ms_attrs_gui.append( &clr_itemrenderbusy  );
     ms_attrs_gui.append( &clr_itemrendernimby );
+    ms_attrs_gui.append( &clr_itemrenderNIMBY );
     ms_attrs_gui.append( &clr_itemrenderpaused);
     ms_attrs_gui.append( &clr_itemrendersick  );
     ms_attrs_gui.append( &clr_itemrenderpltclr);
@@ -314,7 +316,9 @@ QEnvironment::QEnvironment( const QString & i_name)
 
     ms_valid = true;
 
+AF_DEV << "nimby attrcolor: " << afqt::qtos(afqt::QEnvironment::clr_itemrendernimby.v_writeData());
     loadAttrs( ms_filename);
+AF_DEV << "nimby attrcolor: " << afqt::qtos(afqt::QEnvironment::clr_itemrendernimby.v_writeData());
 	bool theme_loaded = true;
     if( false == loadTheme( theme.str))
 	{
