@@ -291,6 +291,13 @@ void ListTasks::generateMenu(QMenu &o_menu, Item * i_item)
 			connect( action, SIGNAL( triggered() ), this, SLOT( actTasksSkip() ));
 			o_menu.addAction( action);
 
+			if (af::Environment::VISOR())
+			{
+				action = new QAction("Done Tasks", this);
+				connect(action, SIGNAL(triggered()), this, SLOT(actTasksDone()));
+				o_menu.addAction(action);
+			}
+
 			action = new QAction( "Restart Tasks", this);
 			connect( action, SIGNAL( triggered() ), this, SLOT( actTasksRestart() ));
 			o_menu.addAction( action);
@@ -572,6 +579,7 @@ void ListTasks::actTaskOpen()
 }
 
 void ListTasks::actTasksSkip()   {tasksOperation("skip");   }
+void ListTasks::actTasksDone()   {tasksOperation("done");   }
 void ListTasks::actTasksRestart(){tasksOperation("restart");}
 void ListTasks::actTaskTryNext() {tasksOperation("trynext","append");}
 void ListTasks::actTaskDoNotTry(){tasksOperation("trynext","remove");}

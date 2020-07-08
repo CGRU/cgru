@@ -289,18 +289,21 @@ void Task::restart( const std::string & i_message, RenderContainer * i_renders, 
 	v_appendLog( i_message);
 }
 
-void Task::skip( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
+void Task::skip(const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state)
 {
-   if( m_progress->state & AFJOB::STATE_DONE_MASK) return;
-   if( m_run ) m_run->skip( message, renders, monitoring);
-   else
-   {
-      m_progress->state = AFJOB::STATE_DONE_MASK | AFJOB::STATE_SKIPPED_MASK;
-      m_progress->errors_count = 0;
-      v_store();
-      v_monitor( monitoring);
-      v_appendLog( message);
-   }
+	if (m_progress->state & AFJOB::STATE_DONE_MASK)
+		return;
+
+	if (m_run)
+		m_run->skip(i_message, i_renders, i_monitoring, i_state);
+	else
+	{
+		m_progress->state = i_state;
+		m_progress->errors_count = 0;
+		v_store();
+		v_monitor(i_monitoring);
+		v_appendLog(i_message);
+	}
 }
 
 bool Task::tryNext(bool i_enable, MonitorContainer * i_monitoring)

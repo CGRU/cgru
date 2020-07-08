@@ -439,11 +439,15 @@ bool Block::action( Action & i_action)
 		}
 		else if( type == "skip")
 		{
-			skipRestartTasks( true, "Tasks skip by " + i_action.author, i_action, operation);
+			skipRestartTasks(true, "Tasks skip by " + i_action.author, i_action, operation, AFJOB::STATE_SKIPPED_MASK | AFJOB::STATE_DONE_MASK);
+		}
+		else if(type == "done")
+		{
+			skipRestartTasks(true, "Tasks done by " + i_action.author, i_action, operation, AFJOB::STATE_DONE_MASK);
 		}
 		else if( type == "restart")
 		{
-			skipRestartTasks( false, "Tasks restart by " + i_action.author, i_action, operation);
+			skipRestartTasks( false, "Tasks restart by " + i_action.author, i_action, operation, 0 /*any task*/);
 		}
 		else if( type == "restart_running")
 		{
@@ -544,7 +548,7 @@ bool Block::editTickets(Action & i_action, const JSON & operation)
 	return true;
 }
 
-void Block::skipRestartTasks( bool i_skip, const std::string & i_message, const Action & i_action, const JSON & i_operation, uint32_t i_state)
+void Block::skipRestartTasks(bool i_skip, const std::string & i_message, const Action & i_action, const JSON & i_operation, uint32_t i_state)
 {
 	std::vector<int32_t> tasks_vec;
 	af::jr_int32vec("task_ids", tasks_vec, i_operation);
@@ -567,13 +571,13 @@ void Block::skipRestartTasks( bool i_skip, const std::string & i_message, const 
 			}
 		}
 
-		if( i_skip )
-			m_tasks[t]->skip( i_message, i_action.renders, i_action.monitors);
+		if (i_skip)
+			m_tasks[t]->skip(i_message, i_action.renders, i_action.monitors, i_state);
 		else
 		{
 			m_data->setTimeStarted(time(NULL), true);
 			m_data->setTimeDone(0);
-			m_tasks[t]->restart( i_message, i_action.renders, i_action.monitors, i_state);
+			m_tasks[t]->restart(i_message, i_action.renders, i_action.monitors, i_state);
 		}
 	}
 }

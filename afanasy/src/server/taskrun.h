@@ -42,10 +42,10 @@ public:
    virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId);
 
 /// Restrart running task, it generate 'stop' message to remote host and send it (do nothing if it is already a zombie).
-   virtual void restart( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
+	void restart(const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring);
 
-/// Same as 'retart' function but with switch to 'skipped' state.
-   virtual void skip(    const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
+/// Same as 'restart' function but with switch to given i_state.
+	void skip(const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state);
 
 /// Return running render id:
 	virtual int v_getRunningRenderID( std::string & o_error) const;

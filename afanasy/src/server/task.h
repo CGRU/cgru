@@ -39,7 +39,7 @@ public:
 
 	void restart( const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state = 0);
 
-	void skip( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
+	void skip(const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state);
 
 	bool tryNext(bool i_enable, MonitorContainer * i_monitoring);
 

@@ -366,18 +366,17 @@ void TaskRun::finish( const std::string & message, RenderContainer * renders, Mo
    m_zombie = true;
 }
 
-void TaskRun::restart( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
+void TaskRun::restart(const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring)
 {
-   if( m_zombie ) return;
-   stop( message+" Is running.", renders, monitoring);
+	if (m_zombie) return;
+	stop(i_message + " Is running.", i_renders, i_monitoring);
 }
 
-void TaskRun::skip( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
+void TaskRun::skip(const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state)
 {
-   if( m_zombie ) return;
-   m_progress->state = m_progress->state | AFJOB::STATE_SKIPPED_MASK;
-   m_progress->state = m_progress->state | AFJOB::STATE_DONE_MASK;
-   stop( message+" Is running.", renders, monitoring);
+   if (m_zombie) return;
+   m_progress->state |= i_state;
+   stop(i_message + " Is running.", i_renders, i_monitoring);
 }
 
 int TaskRun::v_getRunningRenderID( std::string & o_error) const
