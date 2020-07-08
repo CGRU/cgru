@@ -72,6 +72,9 @@ public:
 	inline bool newPaused() const
 		{ if (!m_new_paused && m_parent) return m_parent->newPaused(); else return m_new_paused;}
 
+	inline int getSickErrorsCount() const
+		{if (m_sick_errors_count < 0 && m_parent) return m_parent->getSickErrorsCount(); else return m_sick_errors_count;}
+
 	inline int calcPriority() const {if (m_parent) return (m_priority + m_parent->calcPriority())/2; else return m_priority;}
 
 	inline bool isReady() const {
@@ -119,9 +122,10 @@ private:
 	bool hasPool(const PoolSrv * i_pool) const;
 	void removePool(PoolSrv * i_pool);
 
-	void actionAddPool(Action & i_action);
-	void actionDelete (Action & i_action);
-	void actionService(Action & i_action);
+	void actionAddPool (Action & i_action);
+	void actionDelete  (Action & i_action);
+	void actionService (Action & i_action);
+	void actionHealSick(Action & i_action);
 
 private:
 	std::list<PoolSrv*> m_pools_list;

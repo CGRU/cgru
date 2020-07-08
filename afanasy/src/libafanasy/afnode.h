@@ -22,7 +22,6 @@
 
 #include "af.h"
 
-class MCGeneral;
 class AfContainer;
 class AfContainerIt;
 class AfList;

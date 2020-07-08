@@ -407,7 +407,7 @@ void TaskRunMulti::stop( const std::string & message, RenderContainer * renders,
 		else
 		{
 			// Finish tasks on slaves if there is no service
-			render->taskFinished( *tIt, monitoring);
+			render->taskFinished(*tIt, m_progress->state, monitoring);
 			m_task->v_appendLog( std::string("Finished task[") + af::itos((*tIt)->getNumber()) +
 					"] on host \"" + render->getName() + "\"");
 			delete *tIt;
@@ -488,7 +488,7 @@ void TaskRunMulti::releaseHost( RenderContainer * renders, MonitorContainer * mo
 		}
 		else
 		{
-			render->taskFinished( *tIt, monitoring);
+			render->taskFinished(*tIt, m_progress->state, monitoring);
 			m_task->v_appendLog( std::string("Releasing task[") + af::itos((*tIt)->getNumber()) +
 				"] on host \"" + render->getName() + "\"");
 		}

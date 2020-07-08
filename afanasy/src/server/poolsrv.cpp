@@ -132,6 +132,11 @@ void PoolSrv::v_action(Action & i_action)
 			if (false == actionFarm(i_action))
 				return;
 		}
+		else if (type == "heal_sick")
+		{
+			actionHealSick(i_action);
+			return;
+		}
 		else if (type == "tickets")
 		{
 			if (false == actionTicket(i_action))
@@ -346,6 +351,17 @@ bool PoolSrv::assignRender(RenderAf * i_render)
 	i_render->setPool(this);
 
 	return true;
+}
+
+void PoolSrv::actionHealSick(Action & i_action)
+{
+	for (auto & it : m_renders_list)
+		it->actionHealSick(i_action);
+
+	for (auto & it : m_pools_list)
+		it->actionHealSick(i_action);
+
+	appendLog(std::string("Healed by ") + i_action.author);
 }
 
 void PoolSrv::taskAcuire(const af::TaskExec * i_taskexec, MonitorContainer * i_monitoring)

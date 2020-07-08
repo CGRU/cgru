@@ -338,6 +338,7 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 	    m_wolWaking   = render->isWOLWaking();
 	    m_wol_operation_time = render->getWOLTime();
 
+		m_sick = render->isSick();
 	    m_NIMBY = render->isNIMBY();
 	    m_nimby = render->isNimby();
 		m_paused = render->isPaused();
@@ -362,7 +363,12 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 	         m_state = m_username;
 
 	    m_state += '-' + QString::number( m_priority);
-		if( isLocked() ) m_state += " (LOCK)";
+
+		if (m_sick)
+			m_state += " SICK!";
+
+		if (isLocked())
+			m_state += " (LOCK)";
 
 		if( false == becameOnline)
 		{
@@ -522,7 +528,8 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	// Draw back with render state specific color (if it is not selected)
 	const QColor * itemColor = &(afqt::QEnvironment::clr_itemrender.c);
 	if      (m_online == false) itemColor = &(afqt::QEnvironment::clr_itemrenderoff.c);
-	else if (m_paused ) itemColor = &(afqt::QEnvironment::clr_itemrenderpaused.c);
+	else if (m_sick) itemColor = &(afqt::QEnvironment::clr_itemrendersick.c);
+	else if (m_paused) itemColor = &(afqt::QEnvironment::clr_itemrenderpaused.c);
 	else if (m_NIMBY || m_nimby) itemColor = &(afqt::QEnvironment::clr_itemrendernimby.c);
 	else if (m_busy            ) itemColor = &(afqt::QEnvironment::clr_itemrenderbusy.c);
 

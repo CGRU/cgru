@@ -367,6 +367,11 @@ void RenderAf::v_action( Action & i_action)
 			exitClient("exit", i_action.jobs, i_action.monitors);
 			return;
 		}
+		else if (type == "heal_sick")
+		{
+			actionHealSick(i_action);
+			return;
+		}
 		else if( type == "launch_cmd")
 		{
 			if( false == isOnline()) return;
@@ -654,24 +659,96 @@ void RenderAf::stopTask( int jobid, int blocknum, int tasknum, int number)
 	m_re.addTaskStop( af::MCTaskPos( jobid, blocknum, tasknum, number));
 }
 
-void RenderAf::taskFinished( const af::TaskExec * taskexec, MonitorContainer * monitoring)
+void RenderAf::taskFinished(const af::TaskExec * i_exec, int64_t i_state, MonitorContainer * i_monitoring)
 {
-	removeTask(taskexec, monitoring);
+	removeTask(i_exec, i_monitoring);
 
-	if( taskexec->getNumber())
+	if (i_state & AFJOB::STATE_ERROR_MASK)
+		addErrorTask(i_exec);
+	else
+		clearErrorTasks();
+
+	if (i_exec->getNumber())
 	{
 		std::string str = "Finished service: ";
-		str += taskexec->v_generateInfoString( false);
-		appendTasksLog( str);
+		str += i_exec->v_generateInfoString(false);
+		appendTasksLog(str);
 	}
 	else
 	{
 		std::string str = "Finished task: ";
-		str += taskexec->v_generateInfoString( false);
-		appendTasksLog( str);
+		str += i_exec->v_generateInfoString(false);
+		appendTasksLog(str);
 	}
 
-	if( monitoring ) monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
+	if (i_monitoring)
+		i_monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
+}
+
+void RenderAf::addErrorTask(const af::TaskExec * i_exec)
+{
+	const int SickErrorsCount = m_parent->getSickErrorsCount();
+
+	if (SickErrorsCount <= 0)
+	{
+		if (m_error_tasks.size())
+			clearErrorTasks();
+		return;
+	}
+
+	std::list<ErrorTaskData*>::iterator it = m_error_tasks.begin();
+	int i = 0;
+	while (it != m_error_tasks.end())
+	{
+		if (((*it)->user_name == i_exec->getUserName()) ||
+			(i + 1 == SickErrorsCount))
+		{
+			delete *it;
+			it = m_error_tasks.erase(it);
+			continue;
+		}
+
+		it++; i++;
+	}
+
+	ErrorTaskData * etd = new ErrorTaskData;
+
+	etd->when = time(NULL);
+	etd->service = i_exec->getServiceType();
+	etd->user_name = i_exec->getUserName();
+
+	m_error_tasks.push_front(etd);
+
+	if (m_error_tasks.size() >= SickErrorsCount)
+	{
+		setSick();
+		std::string msg = std::string("Got sick after ") + af::itos(SickErrorsCount) + " errors:";
+		for (const auto & it : m_error_tasks)
+			msg += "\n" +  it->user_name + " - " + it->service + ": " + af::time2str(it->when);
+		appendLog(msg);
+	}
+}
+
+void RenderAf::clearErrorTasks()
+{
+	for (auto & it : m_error_tasks)
+		delete it;
+
+	m_error_tasks.clear();
+}
+
+void RenderAf::actionHealSick(Action & i_action)
+{
+	if (isNotSick())
+		return;
+
+	clearErrorTasks();
+
+	unsetSick();
+
+	i_action.monitors->addEvent(af::Monitor::EVT_renders_change, m_id);
+
+	appendLog(std::string("Healed by ") + i_action.author);
 }
 
 void RenderAf::addTask(af::TaskExec * i_taskexec, MonitorContainer * i_monitoring)
@@ -1000,15 +1077,23 @@ void RenderAf::closeLostTask( const af::MCTaskUp &taskup)
 
 af::Msg * RenderAf::writeFullInfo( bool i_binary) const
 {
-	if( i_binary )
+	if (i_binary)
 	{
 		af::Msg * o_msg = new af::Msg();
 
-		std::string str = v_generateInfoString( true);
-		if( m_custom_data.size())
-		str += "\nCustom Data:\n" + m_custom_data;
+		std::string str = v_generateInfoString(true);
 
-		o_msg->setString( str);
+		if (m_custom_data.size())
+			str += "\nCustom Data:\n" + m_custom_data;
+
+		if (m_error_tasks.size())
+		{
+			str += "\nError tasks:";
+			for(const auto & etd : m_error_tasks)
+				str += "\n" + af::time2str(etd->when) + ": " + etd->user_name + " - " + etd->service;
+		}
+
+		o_msg->setString(str);
 
 		return o_msg;
 	}

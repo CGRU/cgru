@@ -92,6 +92,7 @@ private slots:
 	void actServiceEnable();
 	void actClearServices();
 
+	void actHealSick();
 	void actExit();
 	void actDelete();
 

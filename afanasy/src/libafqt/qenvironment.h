@@ -108,6 +108,7 @@ public:
 	static AttrColor clr_itemrenderbusy;
 	static AttrColor clr_itemrendernimby;
 	static AttrColor clr_itemrenderpaused;
+	static AttrColor clr_itemrendersick;
 	static AttrColor clr_itemrenderpltclr;
 	static AttrColor clr_error;
 	static AttrColor clr_errorready;

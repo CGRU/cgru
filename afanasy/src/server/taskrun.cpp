@@ -347,7 +347,7 @@ void TaskRun::finish( const std::string & message, RenderContainer * renders, Mo
 		RenderAf * render = rendersIt.getRender( m_hostId);
 		if( render )
 		{
-			render->taskFinished( m_exec, monitoring);
+			render->taskFinished(m_exec, m_progress->state, monitoring);
 			m_block->remSolveCounts(monitoring, m_exec, render);
 		}
 

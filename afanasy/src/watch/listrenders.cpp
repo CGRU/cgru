@@ -113,6 +113,9 @@ ListRenders::ListRenders( QWidget* parent):
 
 	resetButtonsMenu();
 
+	bp = addButtonPanel(Item::TAny, "HEAL","farm_heal_sick","Heal sick renders.","H");
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actHealSick()));
+
 	if( af::Environment::GOD())
 	{
 		bm = addButtonsMenu(Item::TRender, "Pool","Change render pool.");
@@ -188,15 +191,17 @@ ListRenders::ListRenders( QWidget* parent):
 
 	if (af::Environment::GOD())
 	{
-		addParam_REx(Item::TPool, "pattern",        "Pattern",        "Host names pattern regular expression");
-		addParam_Num(Item::TAny,  "priority",       "Priority",       "Priority number", 0, 250);
-		addParam_Num(Item::TAny,  "max_tasks_host", "Host Max Tasks", "Host maximum running tasks", -1, 99);
-		addParam_Num(Item::TAny,  "capacity_host",  "Host Capacity",  "Host capacity", -1, 1<<30);
+		addParam_REx(Item::TPool, "pattern",           "Pattern",           "Host names pattern regular expression");
+		addParam_Num(Item::TAny,  "priority",          "Priority",          "Priority number", 0, 250);
+		addParam_Num(Item::TAny,  "max_tasks_host",    "Host Max Tasks",    "Host maximum running tasks", -1, 99);
+		addParam_Num(Item::TAny,  "capacity_host",     "Host Capacity",     "Host capacity", -1, 1<<30);
+		addParam_Num(Item::TPool, "sick_errors_count", "Sick Errors Count", "Number or errors for render to get sick.", -1, 1<<10);
 		addParam_separator();
 		addParam_Str(Item::TAny,  "annotation",     "Annotation",     "Annotation string");
 		addParam_separator();
 		addParam_Num(Item::TAny,  "power_host",      "Host Power",      "Host some custom \"power\" integer", -1, 1<<30);
 		addParam_Str(Item::TAny,  "properties_host", "Host Properties", "Host some custom \"properties\" string");
+		addParam_separator();
 		addParam_separator();
 
 		addParam_Hrs(Item::TPool, "idle_free_time",     "Idle Free Time",  "Unset Nimby idle time.");
@@ -887,6 +892,7 @@ void ListRenders::actReboot()          { operation(Item::TRender, "reboot"      
 void ListRenders::actShutdown()        { operation(Item::TRender, "shutdown"           ); }
 void ListRenders::actWOLSleep()        { operation(Item::TRender, "wol_sleep"          ); }
 void ListRenders::actWOLWake()         { operation(Item::TRender, "wol_wake"           ); }
+void ListRenders::actHealSick()        { operation(Item::TAny,    "heal_sick"          ); }
 void ListRenders::actDelete()          { operation(Item::TAny,    "delete"             ); }
 
 void ListRenders::actRequestLog()      { getItemInfo(Item::TAny,    "log"      ); }

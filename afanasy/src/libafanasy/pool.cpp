@@ -60,6 +60,8 @@ void Pool::initDefaultValues()
 	m_new_nimby = false;
 	m_new_paused = false;
 
+	m_sick_errors_count = -1;
+
 	m_run_tasks = 0;
 	m_run_capacity = 0;
 
@@ -119,6 +121,9 @@ void Pool::v_jsonWrite(std::ostringstream & o_str, int i_type) const // Thread-s
 	if (m_new_paused)
 		o_str << ",\n\"new_paused\": true";
 
+	if (m_sick_errors_count >= 0)
+		o_str << ",\n\"sick_errors_count\":" << m_sick_errors_count;
+
 	Farm::jsonWrite(o_str, i_type);
 
 	if (m_idle_wolsleep_time >= 0) o_str << ",\n\"idle_wolsleep_time\":" << m_idle_wolsleep_time;
@@ -153,6 +158,8 @@ bool Pool::jsonRead(const JSON &i_object, std::string * io_changes)
 
 	jr_bool  ("new_nimby",             m_new_nimby,             i_object, io_changes);
 	jr_bool  ("new_paused",            m_new_paused,            i_object, io_changes);
+
+	jr_int32 ("sick_errors_count",     m_sick_errors_count,     i_object, io_changes);
 
 	jr_int32 ("idle_wolsleep_time",    m_idle_wolsleep_time,    i_object, io_changes);
 	jr_int32 ("idle_free_time",        m_idle_free_time,        i_object, io_changes);
@@ -208,6 +215,8 @@ void Pool::v_readwrite(Msg * msg)
 
 	rw_bool   (m_new_nimby,              msg);
 	rw_bool   (m_new_paused,             msg);
+
+	rw_int32_t(m_sick_errors_count,      msg);
 
 	rw_int32_t(m_pools_num,              msg);
 	rw_int32_t(m_pools_total,            msg);

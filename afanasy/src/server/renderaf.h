@@ -55,6 +55,7 @@ public:
 /// Whether Render is ready to render tasks.
 	inline bool isReady() const { return (
 			(m_parent != NULL) &&
+			(isNotSick()) &&
 			(m_state & SOnline) &&
 			(m_priority > 0) &&
 			((findCapacity() < 0) || (m_capacity_used < findCapacity())) &&
@@ -65,6 +66,7 @@ public:
 
 	inline bool isWOLWakeAble() const { return (
 			(m_parent != NULL) &&
+			(isNotSick()) &&
 			isOffline() &&
 			isWOLSleeping() &&
 			(false == isWOLWaking()) &&
@@ -94,7 +96,7 @@ public:
 
 /// Make Render to finish task.
 /// Releases the ownership of taskexec (Render will not own it any more)
-	void taskFinished( const af::TaskExec * taskexec, MonitorContainer * monitoring);
+	void taskFinished(const af::TaskExec * i_exec, int64_t i_state, MonitorContainer * i_monitoring);
 
 	/// Refresh parameters.
 	void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
@@ -126,6 +128,8 @@ public:
 	inline void listenTask( const af::MCTaskPos & i_tp, bool i_subscribe)
 		{ if( i_subscribe) m_re.taskListenAdd( i_tp); else m_re.taskListenRem( i_tp); }
 
+	void actionHealSick(Action & i_action);
+
 public:
 	/// Set container:
 	inline static void setRenderContainer( RenderContainer * i_container){ ms_renders = i_container;}
@@ -148,6 +152,9 @@ private:
 	/// caller.
 	void removeTask(const af::TaskExec * i_taskexec, MonitorContainer * i_monitoring);
 
+	void addErrorTask(const af::TaskExec * i_exec);
+	void clearErrorTasks();
+
 /// Stop tasks.
 	void ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus, const std::string * i_keeptasks_username = NULL);
 
@@ -166,6 +173,15 @@ private:
 	std::list<std::string> m_tasks_log;							///< Tasks Log.
 
 	af::RenderEvents m_re;
+
+	struct ErrorTaskData
+	{
+		int64_t when;
+		std::string service;
+		std::string user_name;
+	};
+
+	std::list<ErrorTaskData*> m_error_tasks;
 
 private:
 	static RenderContainer * ms_renders;

@@ -30,6 +30,11 @@ public:
 	inline bool isOffline() const { return false == (m_state & SOnline );}///< Whether Render is offline.
 	inline bool isDirty()   const { return m_state & SDirty;}  ///< Whether Render is dirty.
 
+	inline bool isSick()    const {return m_state & SSick;  }
+	inline bool isNotSick() const {return false == isSick();}
+	inline void setSick()   {m_state |=  SSick;}
+	inline void unsetSick() {m_state &= ~SSick;}
+
 	inline bool isWOLFalling()     const { return m_state & SWOLFalling;  }
 	inline bool isWOLSleeping()    const { return m_state & SWOLSleeping; }
 	inline bool isWOLWaking()      const { return m_state & SWOLWaking;   }
@@ -85,7 +90,8 @@ public:
 		SWOLFalling  = 1ULL << 5,
 		SWOLSleeping = 1ULL << 6,
 		SWOLWaking   = 1ULL << 7,
-		SPaused  = 1ULL << 8, ///< Paused mode is a kind of "super nimby" mode that cannot be left automatically
+		SPaused      = 1ULL << 8, ///< Paused mode is a kind of "super nimby" mode that cannot be left automatically
+		SSick        = 1ULL << 9, ///< When render produces errors only
 	};
 
 protected:

@@ -101,6 +101,7 @@ private:
 	bool m_wolFalling;
 	bool m_wolSleeping;
 	bool m_wolWaking;
+	bool m_sick;
 
 	int m_capacity_used;
 	QString m_capacity_usage;

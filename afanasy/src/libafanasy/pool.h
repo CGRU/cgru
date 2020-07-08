@@ -53,6 +53,8 @@ public:
 	inline int getRunTasks()    const { return m_run_tasks;   }
 	inline int getRunCapacity() const { return m_run_capacity;}
 
+	inline int getSickErrorsCount() const {return m_sick_errors_count;}
+
 public:
 	enum State
 	{
@@ -88,6 +90,8 @@ protected:
 
 	bool m_new_nimby;
 	bool m_new_paused;
+
+	int32_t m_sick_errors_count;
 
 	int32_t m_pools_num;
 	int32_t m_pools_total;

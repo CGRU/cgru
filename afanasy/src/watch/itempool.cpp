@@ -46,6 +46,8 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 	if (false == m_root)
 		m_params["pattern"] = afqt::stoq(pool->getPatternStr());
 
+	m_params["sick_errors_count"]  = pool->getSickErrorsCount();
+
 	m_params["idle_free_time"]     = pool->m_idle_free_time;
 	m_params["busy_nimby_time"]    = pool->m_busy_nimby_time;
 	m_params["idle_cpu"]           = pool->m_idle_cpu;
@@ -94,6 +96,8 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 			strRightTop += QString(" HostMaxTasks:%1").arg(pool->getMaxTasksHost());
 		if (pool->getCapacityHost() >= 0)
 			strRightTop += QString(" HostCapacity:%1").arg(pool->getCapacityHost());
+		if (pool->getSickErrorsCount() >= 0)
+			strRightTop += QString(" SickErrors:%1").arg(pool->getSickErrorsCount());
 		strRightTop += QString(" Priority:%1").arg(pool->getPriority());
 	}
 	else if(Watch::isJedi())
@@ -111,6 +115,8 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 			strRightTop += QString(" HostMaxTasks:%1").arg(pool->getMaxTasksHost());
 		if (pool->getCapacityHost() >= 0)
 			strRightTop += QString(" HostCapacity:%1").arg(pool->getCapacityHost());
+		if (pool->getSickErrorsCount() >= 0)
+			strRightTop += QString(" SickErr:%1").arg(pool->getSickErrorsCount());
 		strRightTop += QString(" Priority:%1").arg(pool->getPriority());
 	}
 	else
@@ -128,6 +134,8 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 			strRightTop += QString(" ht:%1").arg(pool->getMaxTasksHost());
 		if (pool->getCapacityHost() >= 0)
 			strRightTop += QString(" hc:%1").arg(pool->getCapacityHost());
+		if (pool->getSickErrorsCount() >= 0)
+			strRightTop += QString(" se:%1").arg(pool->getSickErrorsCount());
 		strRightTop += QString(" p:%1").arg(pool->getPriority());
 	}
 
