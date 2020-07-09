@@ -60,6 +60,8 @@ private:
 	void deleteTasks();
 	void deletePlots();
 
+	int drawTasks(QPainter * i_painter, const QStyleOptionViewItem & i_option, int i_x, int i_y, int i_w) const;
+
 private:
 	// We need to keep two info strings,
 	// because render can update its properties w/o resources at one time,

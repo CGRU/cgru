@@ -62,19 +62,6 @@ void ItemFarm::v_parentItemChanged()
 	m_parent_pool = static_cast<ItemPool*>(node);
 }
 
-int ItemFarm::calcHeightFarm() const
-{
-	int height = 0;
-
-	if (m_services.size() || m_services_disabled.size())
-		height += HeightServices;
-
-	if (m_tickets_pool.size() || m_tickets_host.size())
-		height += HeightTickets;
-
-	return height;
-}
-
 void ItemFarm::drawServices(QPainter * i_painter, int i_x, int i_y, int i_w, int i_h) const
 {
 	int x = i_x;
@@ -134,14 +121,16 @@ void ItemFarm::drawServices(QPainter * i_painter, int i_x, int i_y, int i_w, int
 	}
 }
 
-void ItemFarm::drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int i_h) const
+void ItemFarm::drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int i_h, int * o_tkhost_width) const
 {
 	i_painter->setFont(afqt::QEnvironment::f_info);
 	QPen pen(afqt::QEnvironment::qclr_black);
 
+	int tkh_w = 0;
+	int tkp_w = 0;
+
 	if (getType() == Item::TPool)
 	{
-		int tkp_w = 0;
 		QMapIterator<QString, af::Farm::Tiks> tkp_it(m_tickets_pool);
 		while (tkp_it.hasNext())
 		{
@@ -154,7 +143,6 @@ void ItemFarm::drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int 
 			tkp_w += 8;
 		}
 
-		int tkh_w = 0;
 		QMapIterator<QString, af::Farm::Tiks> tkh_it(m_tickets_host);
 		while (tkh_it.hasNext())
 		{
@@ -169,7 +157,6 @@ void ItemFarm::drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int 
 	}
 	else
 	{
-		int tkh_w = 0;
 		QMapIterator<QString, af::Farm::Tiks> tkh_it(m_tickets_host);
 		while (tkh_it.hasNext())
 		{
@@ -181,9 +168,13 @@ void ItemFarm::drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int 
 			{
 				if (NULL == m_parent_pool)
 					continue;
+
 				count = m_parent_pool->getTicketHostCount(tkh_it.key());
+
+				// Skip drawing host ticket, if farm has no limit (no ticket)
 				if (count == -1)
 					continue;
+
 				draw_flags |= Item::TKD_DASH;
 			}
 
@@ -194,6 +185,9 @@ void ItemFarm::drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int 
 			tkh_w += 8;
 		}
 	}
+
+	if (o_tkhost_width)
+		*o_tkhost_width = tkh_w;
 }
 
 int ItemFarm::getTicketHostCount(const QString & i_name) const

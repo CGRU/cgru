@@ -182,7 +182,11 @@ bool ItemPool::calcHeight()
 
 	m_height = HeightPool;
 
-	m_height += calcHeightFarm();
+	if (m_services.size() || m_services_disabled.size())
+		m_height += HeightServices;
+
+	if (m_tickets_pool.size() || m_tickets_host.size())
+		m_height += HeightTickets;
 
 	if (m_annotation.size())
 		m_height += HeightAnnotation;

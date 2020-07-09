@@ -22,7 +22,7 @@ const int ItemRender::HeightBase = 27;
 const int ItemRender::HeightSmall = 12;
 const int ItemRender::HeightOffline = 15;
 const int ItemRender::HeightAnnotation = 14;
-const int ItemRender::HeightTask = 15;
+const int ItemRender::HeightTask = 18;
 
 ItemRender::ItemRender(ListRenders * i_list_renders, af::Render * i_render, const CtrlSortFilter * i_ctrl_sf):
 	ItemFarm(i_list_renders, i_render, TRender, i_ctrl_sf),
@@ -146,7 +146,11 @@ bool ItemRender::calcHeight()
 			m_height += HeightAnnotation;
 	}
 
-	m_height += calcHeightFarm();
+	if (m_services.size() || m_services_disabled.size())
+		m_height += HeightServices;
+
+//	if (m_tickets_pool.size() || m_tickets_host.size())
+//		m_height += HeightTickets;
 
 	return old_height == m_height;
 }
@@ -745,77 +749,13 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 			drawServices(i_painter, x+6, y_cur+2, w-12, HeightServices-4);
 			y_cur += HeightServices;
 		}
+
+		int tkhost_width = 0;
 		if (m_tickets_pool.size() || m_tickets_host.size())
-		{
-			drawTickets(i_painter, x+6, y_cur+2, w-12, HeightTickets-4);
-			y_cur += HeightTickets;
-		}
+			drawTickets(i_painter, x+6, y_cur-2, w-12, HeightTickets-4, &tkhost_width);
 
-	    std::list<af::TaskExec*>::const_iterator it = m_tasks.begin();
-	    for (int numtask = 0; it != m_tasks.end(); it++, numtask++)
-		{
-			int tw = 0;
-			// Prepare strings
-			QString taskstr = QString("%1").arg((*it)->getCapacity());
-			if ((*it)->getCapCoeff())
-				taskstr += QString("x%1").arg((*it)->getCapCoeff());
-			taskstr += QString(": %1[%2][%3]").arg( QString::fromUtf8((*it)->getJobName().c_str()))
-				.arg(QString::fromUtf8((*it)->getBlockName().c_str()))
-				.arg(QString::fromUtf8((*it)->getName().c_str()));
-			if ((*it)->getNumber())
-				taskstr += QString("(%1)").arg((*it)->getNumber());
+		y_cur += drawTasks(i_painter, i_option, x, y_cur, w - tkhost_width - 5);
 
-			QString user_time = QString("%1 - %2")
-				.arg(QString::fromUtf8((*it)->getUserName().c_str()))
-				.arg( af::time2strHMS( time(NULL) - (*it)->getTimeStart()).c_str());
-
-			// Show task percent
-			if (m_tasks_percents.size() >= numtask+1)
-			if (m_tasks_percents[numtask] > 0)
-			{
-				user_time += QString(" %1%").arg( m_tasks_percents[numtask]);
-
-				// Draw task percent bar:
-				i_painter->setPen(Qt::NoPen );
-				i_painter->setOpacity(.5);
-				i_painter->setBrush(QBrush( afqt::QEnvironment::clr_done.c, Qt::SolidPattern));
-				i_painter->drawRect(x, y_cur+2, (w-5)*m_tasks_percents[numtask]/100, HeightTask - 2);
-				i_painter->setOpacity(1.0);
-			}
-
-			// Draw an icon if exists:
-			const QPixmap * icon = Watch::getServiceIconSmall(afqt::stoq((*it)->getServiceType()));
-			if (icon)
-			{
-				i_painter->drawPixmap(x+5, y_cur, *icon);
-				tw += icon->width() + 2;
-			}
-
-			// Setup pen color
-			QPen pen(clrTextInfo(i_option));
-
-			// Draw tickets
-			for (auto const & tIt : (*it)->m_tickets)
-			{
-				tw += Item::drawTicket(i_painter, pen, x+5 + tw, y_cur, w-10 - tw,
-						Item::TKD_RIGHT,
-						afqt::stoq(tIt.first), tIt.second);
-
-				tw += 8;
-			}
-
-			i_painter->setPen(pen);
-
-			// Draw informatin strings
-			QRect rect_usertime;
-			i_painter->drawText(x+5, y_cur, w-10, HeightTask,
-					Qt::AlignVCenter | Qt::AlignRight, user_time, &rect_usertime );
-
-			i_painter->drawText(x+5 + tw, y_cur, w-10-10 - tw - rect_usertime.width(), HeightTask,
-					Qt::AlignVCenter | Qt::AlignLeft, taskstr);
-
-			y_cur += HeightTask;
-		}
 
 		if (m_annotation.size())
 		{
@@ -885,6 +825,79 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 		i_painter->setPen(afqt::QEnvironment::clr_star.c);
 		i_painter->drawText(x, y, w, h, Qt::AlignCenter, offlineState_time);
 	}
+}
+
+int ItemRender::drawTasks(QPainter * i_painter, const QStyleOptionViewItem & i_option, int i_x, int i_y, int i_w) const
+{
+	int y_cur = i_y;
+
+	std::list<af::TaskExec*>::const_iterator it = m_tasks.begin();
+	for (int numtask = 0; it != m_tasks.end(); it++, numtask++)
+	{
+		int tw = 0;
+		// Prepare strings
+		QString taskstr = QString("%1").arg((*it)->getCapacity());
+		if ((*it)->getCapCoeff())
+			taskstr += QString("x%1").arg((*it)->getCapCoeff());
+		taskstr += QString(": %1[%2][%3]").arg( QString::fromUtf8((*it)->getJobName().c_str()))
+			.arg(QString::fromUtf8((*it)->getBlockName().c_str()))
+			.arg(QString::fromUtf8((*it)->getName().c_str()));
+		if ((*it)->getNumber())
+			taskstr += QString("(%1)").arg((*it)->getNumber());
+
+		QString user_time = QString("%1 - %2")
+			.arg(QString::fromUtf8((*it)->getUserName().c_str()))
+			.arg( af::time2strHMS( time(NULL) - (*it)->getTimeStart()).c_str());
+
+		// Show task percent
+		if (m_tasks_percents.size() >= numtask+1)
+		if (m_tasks_percents[numtask] > 0)
+		{
+			user_time += QString(" %1%").arg( m_tasks_percents[numtask]);
+
+			// Draw task percent bar:
+			i_painter->setPen(Qt::NoPen );
+			i_painter->setOpacity(.5);
+			i_painter->setBrush(QBrush( afqt::QEnvironment::clr_done.c, Qt::SolidPattern));
+			i_painter->drawRect(i_x, y_cur+2, i_w*m_tasks_percents[numtask]/100, HeightTask - 2);
+			i_painter->setOpacity(1.0);
+		}
+
+		// Draw an icon if exists:
+		const QPixmap * icon = Watch::getServiceIconSmall(afqt::stoq((*it)->getServiceType()));
+		if (icon)
+		{
+			i_painter->drawPixmap(i_x+5, y_cur, *icon);
+			tw += icon->width() + 2;
+		}
+
+		// Setup pen color
+		QPen pen(clrTextInfo(i_option));
+
+		// Draw tickets
+		for (auto const & tIt : (*it)->m_tickets)
+		{
+			tw += Item::drawTicket(i_painter, pen, i_x+5 + tw, y_cur, i_w-5 - tw,
+					Item::TKD_RIGHT,
+					afqt::stoq(tIt.first), tIt.second);
+
+			tw += 8;
+		}
+
+		i_painter->setPen(pen);
+
+		// Draw informatin strings
+		QRect rect_usertime;
+		i_painter->drawText(i_x+5, y_cur, i_w-5, HeightTask,
+				Qt::AlignVCenter | Qt::AlignRight, user_time, &rect_usertime );
+
+		i_painter->drawText(i_x+5 + tw, y_cur, i_w-15 - tw - rect_usertime.width(), HeightTask,
+				Qt::AlignVCenter | Qt::AlignLeft, taskstr);
+
+		y_cur += HeightTask;
+	}
+
+	return y_cur - i_y;
 }
 
 void ItemRender::v_setSortType( int i_type1, int i_type2 )

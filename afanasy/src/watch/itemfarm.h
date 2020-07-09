@@ -25,11 +25,9 @@ public:
 	QMap<QString, af::Farm::Tiks> m_tickets_pool;
 	QMap<QString, af::Farm::Tiks> m_tickets_host;
 
-	void drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int i_h) const;
+	void drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int i_h, int * o_tkhost_width = NULL) const;
 
 protected:
-	int calcHeightFarm() const;
-
 	virtual void v_parentItemChanged();
 
 protected:
