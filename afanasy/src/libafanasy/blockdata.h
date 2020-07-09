@@ -193,7 +193,9 @@ public:
 	{
 		return m_hosts_mask_exclude.match(str);
 	}
+
 	inline bool checkNeedProperties(const std::string &str) const { return m_need_properties.match(str); }
+	inline bool checkNeedPower(int i_val) const {if (m_need_power <= 0) return true; return m_need_power <= i_val;}
 
 	inline int getCapacity() const { return m_capacity; }
 	inline int getNeedMemory() const { return m_need_memory; }

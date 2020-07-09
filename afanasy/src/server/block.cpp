@@ -243,7 +243,7 @@ bool Block::canRunOn( RenderAf * render)
 		return false;
 
 	// Check needed power:
-	if (m_data->getNeedPower() >= render->findPower())
+	if (false == m_data->checkNeedPower(render->findPower()))
 		return false;
 
 	// Check needed properties:
