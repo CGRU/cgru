@@ -703,9 +703,10 @@ RenderNode.prototype.setPoolDo = function(i_value, i_name) {
 RenderNode.createPanels = function(i_monitor) {
 	// Create pool buttons first
 	PoolNode.createPanels(i_monitor);
+	var acts;
 
 	// Info:
-	var acts = {};
+	acts = {};
 	acts.tasks_log = {'label': 'TasksLog', 'tooltip': 'Get tasks Log.'};
 	acts.full = {'label': 'FullInfo', 'tooltip': 'Request full render node info.'};
 	i_monitor.createCtrlBtn({
@@ -718,7 +719,7 @@ RenderNode.createPanels = function(i_monitor) {
 	});
 
 	// Pools:
-	var acts = {};
+	acts = {};
 	acts.set_pool =      {'label':'Set',      'handle':'setPoolDialog', 'tooltip':'Set pool'};
 	acts.reassign_pool = {'label':'ReAssign', 'handle':'mh_Oper',       'tooltip':'Reassign pool'};
 	i_monitor.createCtrlBtn({
@@ -730,7 +731,7 @@ RenderNode.createPanels = function(i_monitor) {
 	});
 
 	// Nimby:
-	var acts = {
+	acts = {
 		free: {
 			'name': 'nimby',
 			'value': false,
@@ -758,8 +759,13 @@ RenderNode.createPanels = function(i_monitor) {
 	};
 	i_monitor.createCtrlBtns(acts);
 
+	// Heal:
+	acts = {};
+	acts.heal_sick = {'label': 'HEAL', 'tooltip': 'Heal sick renders.'};
+	i_monitor.createCtrlBtns(acts);
+
 	// Eject tasks:
-	var acts = {};
+	acts = {};
 	acts.eject_tasks = {'label': 'All Tasks', 'tooltip': 'Eject all running tasks.'};
 	acts.eject_tasks_keep_my = {'label': 'Not My', 'tooltip': 'Eject not my tasks.'};
 	i_monitor.createCtrlBtn(
@@ -767,7 +773,7 @@ RenderNode.createPanels = function(i_monitor) {
 
 
 	// Custom commands:
-	var el = document.createElement('div');
+	let el = document.createElement('div');
 	i_monitor.elPanelL.appendChild(el);
 	el.classList.add('ctrl_button');
 	el.textContent = 'CUSTOM';
@@ -785,7 +791,7 @@ RenderNode.createPanels = function(i_monitor) {
 		return;
 
 	// Paused:
-	var acts = {};
+	acts = {};
 	acts.pause = {
 		'name': 'paused',
 		'value': true,
@@ -804,7 +810,7 @@ RenderNode.createPanels = function(i_monitor) {
 
 
 	// Services:
-	var acts = {};
+	acts = {};
 	acts.service_add     = {'handle':'setService', 'label':'Add',     'tooltip':'Add service.'};
 	acts.service_remove  = {'handle':'setService', 'label':'Remove',  'tooltip':'Remove service.'};
 	acts.service_enable  = {'handle':'setService', 'label':'Enable',  'tooltip':'Enable service.'};
@@ -820,7 +826,7 @@ RenderNode.createPanels = function(i_monitor) {
 
 
 	// Power/WOL:
-	var acts = {
+	acts = {
 		wol_sleep /**/: {'label': 'WOLSleep', 'tooltip': 'Wake-On-Lan sleep.'},
 		wol_wake /***/: {'label': 'WOLWake',  'tooltip': 'Wake-On-Lan wake.'},
 		exit /*******/: {'label': 'Exit',     'tooltip': 'Exit client.'},
@@ -831,7 +837,7 @@ RenderNode.createPanels = function(i_monitor) {
 		{'name': 'power', 'label': 'POWER', 'tooltip': 'Power / Exit / Delete.', 'sub_menu': acts});
 
 	// Launch and Exit:
-	var acts = {};
+	acts = {};
 	acts.lcmd = {'name': 'lcmd', 'label': 'Command',  'handle': 'launchCmdExit', 'tooltip': 'Launch command.'};
 	acts.lcex = {'name': 'lcex', 'label': 'Cmd&Exit', 'handle': 'launchCmdExit', 'tooltip': 'Launch command and exit.'};
 	i_monitor.createCtrlBtn({
@@ -841,7 +847,7 @@ RenderNode.createPanels = function(i_monitor) {
 		'sub_menu': acts
 	});
 
-	var acts = {};
+	acts = {};
 	acts.delete = {"label": "DELETE", "tooltip": 'Double click to delete.', "ondblclick": true};
 	i_monitor.createCtrlBtns(acts);
 };

@@ -36,7 +36,7 @@ var cm_UILevels = ['Padawan', 'Jedi', 'Sith'];
 
 var cm_States = [
 	'ONL', 'RDY', 'RUN', 'DON', 'WRN', 'ERR', 'SKP', 'OFF', 'WDP', 'WTM', 'DRT', 'NbY',
-	'NBY', 'PAU', 'PER', 'PBR', 'PSC', 'WFL', 'WSL', 'WWK', 'PPA', 'RER', 'WRC'
+	'NBY', 'PAU', 'PER', 'PBR', 'PSC', 'WFL', 'WSL', 'WWK', 'PPA', 'RER', 'WRC', 'SIC'
 ];
 
 var cm_SoftwareIcons = [];

@@ -60,6 +60,7 @@ parser.add_option(      '--mhwaitsrv',    dest='mhwaitsrv',    type='int',    de
 parser.add_option(      '--mhsame',       dest='mhsame',       type='int',    default=0,  help='multi host tasks same host slave and master')
 parser.add_option(      '--mhignorelost', dest='mhignorelost', type='int',    default=0,  help='multi host mosater will ignore slave lost')
 parser.add_option(      '--mhservice',    dest='mhservice',    type='str',    default='', help='multi host tasks service command')
+parser.add_option(      '--cmd',          dest='cmd',          type='string', default=None, help='Tasks command')
 parser.add_option(      '--cmdpre',       dest='cmdpre',       type='string', default='', help='job pre command')
 parser.add_option(      '--cmdpost',      dest='cmdpost',      type='string', default='', help='job post command')
 parser.add_option(      '--parser',       dest='parser',       type='string', default=None, help='parser type, default if not set')
@@ -248,6 +249,9 @@ for b in range(numblocks):
                '-i %(increment)d -t %(timesec)g -r %(randtime)g --pkp %(pkp)d ' \
                '-v %(verbose)d @####@ @#####@ @#####@ @#####@' % vars()
 
+        if Options.cmd:
+            cmd = Options.cmd
+
         block.setCommand(cmd, False)
 
         if Options.frames != '':
@@ -270,6 +274,9 @@ for b in range(numblocks):
             block.setFiles(files)
             block.skipExistingFiles()
             block.checkRenderedFiles(100)
+
+        if Options.cmd:
+            cmd = Options.cmd
 
         block.setCommand( cmd, False)
 
