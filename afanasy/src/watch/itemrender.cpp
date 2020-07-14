@@ -754,8 +754,17 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 		if (m_tickets_pool.size() || m_tickets_host.size())
 			drawTickets(i_painter, x+6, y_cur-2, w-12, HeightTickets-4, &tkhost_width);
 
-		y_cur += drawTasks(i_painter, i_option, x, y_cur, w - tkhost_width - 5);
+		std::list<af::TaskExec*>::const_iterator it = m_tasks.begin();
+		for (int numtask = 0; it != m_tasks.end(); it++, numtask++)
+		{
+			int task_percent = 0;
+			if (m_tasks_percents.size() >= numtask+1)
+				task_percent = m_tasks_percents[numtask];
 
+			drawTask(i_painter, i_option, *it, task_percent, x + 5, y_cur, w - tkhost_width - 5, HeightTask - 2);
+
+			y_cur += HeightTask;
+		}
 
 		if (m_annotation.size())
 		{
@@ -827,77 +836,73 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	}
 }
 
-int ItemRender::drawTasks(QPainter * i_painter, const QStyleOptionViewItem & i_option, int i_x, int i_y, int i_w) const
+void ItemRender::drawTask(QPainter * i_painter, const QStyleOptionViewItem & i_option,
+		const af::TaskExec * i_exec, int i_percent,
+		int i_x, int i_y, int i_w, int i_h) const
 {
-	int y_cur = i_y;
+	int tw = 0;
+	// Prepare strings
+	QString taskstr = QString("%1").arg(i_exec->getCapacity());
+	if (i_exec->getCapCoeff())
+		taskstr += QString("x%1").arg(i_exec->getCapCoeff());
+	taskstr += QString(": %1[%2][%3]").arg( QString::fromUtf8(i_exec->getJobName().c_str()))
+		.arg(QString::fromUtf8(i_exec->getBlockName().c_str()))
+		.arg(QString::fromUtf8(i_exec->getName().c_str()));
+	if (i_exec->getNumber())
+		taskstr += QString("(%1)").arg(i_exec->getNumber());
 
-	std::list<af::TaskExec*>::const_iterator it = m_tasks.begin();
-	for (int numtask = 0; it != m_tasks.end(); it++, numtask++)
+	QString user_time = QString("%1 - %2")
+		.arg(QString::fromUtf8(i_exec->getUserName().c_str()))
+		.arg( af::time2strHMS( time(NULL) - i_exec->getTimeStart()).c_str());
+
+	// Show task percent
+	if (i_percent > 0)
 	{
-		int tw = 0;
-		// Prepare strings
-		QString taskstr = QString("%1").arg((*it)->getCapacity());
-		if ((*it)->getCapCoeff())
-			taskstr += QString("x%1").arg((*it)->getCapCoeff());
-		taskstr += QString(": %1[%2][%3]").arg( QString::fromUtf8((*it)->getJobName().c_str()))
-			.arg(QString::fromUtf8((*it)->getBlockName().c_str()))
-			.arg(QString::fromUtf8((*it)->getName().c_str()));
-		if ((*it)->getNumber())
-			taskstr += QString("(%1)").arg((*it)->getNumber());
+		user_time += QString(" %1%").arg(i_percent);
 
-		QString user_time = QString("%1 - %2")
-			.arg(QString::fromUtf8((*it)->getUserName().c_str()))
-			.arg( af::time2strHMS( time(NULL) - (*it)->getTimeStart()).c_str());
-
-		// Show task percent
-		if (m_tasks_percents.size() >= numtask+1)
-		if (m_tasks_percents[numtask] > 0)
-		{
-			user_time += QString(" %1%").arg( m_tasks_percents[numtask]);
-
-			// Draw task percent bar:
-			i_painter->setPen(Qt::NoPen );
-			i_painter->setOpacity(.5);
-			i_painter->setBrush(QBrush( afqt::QEnvironment::clr_done.c, Qt::SolidPattern));
-			i_painter->drawRect(i_x, y_cur+2, i_w*m_tasks_percents[numtask]/100, HeightTask - 2);
-			i_painter->setOpacity(1.0);
-		}
-
-		// Draw an icon if exists:
-		const QPixmap * icon = Watch::getServiceIconSmall(afqt::stoq((*it)->getServiceType()));
-		if (icon)
-		{
-			i_painter->drawPixmap(i_x+5, y_cur, *icon);
-			tw += icon->width() + 2;
-		}
-
-		// Setup pen color
-		QPen pen(clrTextInfo(i_option));
-
-		// Draw tickets
-		for (auto const & tIt : (*it)->m_tickets)
-		{
-			tw += Item::drawTicket(i_painter, pen, i_x+5 + tw, y_cur, i_w-5 - tw,
-					Item::TKD_RIGHT,
-					afqt::stoq(tIt.first), tIt.second);
-
-			tw += 8;
-		}
-
-		i_painter->setPen(pen);
-
-		// Draw informatin strings
-		QRect rect_usertime;
-		i_painter->drawText(i_x+5, y_cur, i_w-5, HeightTask,
-				Qt::AlignVCenter | Qt::AlignRight, user_time, &rect_usertime );
-
-		i_painter->drawText(i_x+5 + tw, y_cur, i_w-15 - tw - rect_usertime.width(), HeightTask,
-				Qt::AlignVCenter | Qt::AlignLeft, taskstr);
-
-		y_cur += HeightTask;
+		// Draw task percent bar:
+		i_painter->setPen(Qt::NoPen);
+		i_painter->setOpacity(.5);
+		i_painter->setBrush(QBrush(afqt::QEnvironment::clr_done.c, Qt::SolidPattern));
+		i_painter->drawRect(i_x+1, i_y+1, (i_w-2)*i_percent/100, i_h-2);
+		i_painter->setOpacity(1.0);
 	}
 
-	return y_cur - i_y;
+	// Draw an icon if exists:
+	const QPixmap * icon = Watch::getServiceIconSmall(afqt::stoq(i_exec->getServiceType()));
+	if (icon)
+	{
+		i_painter->drawPixmap(i_x+5, i_y, *icon);
+		tw += icon->width() + 2;
+	}
+
+	// Setup pen color
+	QPen pen(clrTextInfo(i_option));
+
+	// Draw tickets
+	for (auto const & tIt : i_exec->m_tickets)
+	{
+		tw += Item::drawTicket(i_painter, pen, i_x+5 + tw, i_y+1, i_w-5 - tw,
+				Item::TKD_RIGHT,
+				afqt::stoq(tIt.first), tIt.second);
+
+		tw += 8;
+	}
+
+	i_painter->setPen(pen);
+
+	// Draw informatin strings
+	QRect rect_usertime;
+	i_painter->drawText(i_x+5, i_y, i_w-5, i_h,
+			Qt::AlignVCenter | Qt::AlignRight, user_time, &rect_usertime );
+
+	i_painter->drawText(i_x+5 + tw, i_y, i_w-15 - tw - rect_usertime.width(), i_h,
+			Qt::AlignVCenter | Qt::AlignLeft, taskstr);
+
+	// Draw task border:
+	i_painter->setPen(afqt::QEnvironment::clr_outline.c);
+	i_painter->setBrush(Qt::NoBrush);
+	i_painter->drawRoundedRect(i_x, i_y, i_w, i_h, 1.0, 1.0);
 }
 
 void ItemRender::v_setSortType( int i_type1, int i_type2 )

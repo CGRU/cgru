@@ -60,7 +60,9 @@ private:
 	void deleteTasks();
 	void deletePlots();
 
-	int drawTasks(QPainter * i_painter, const QStyleOptionViewItem & i_option, int i_x, int i_y, int i_w) const;
+	void drawTask(QPainter * i_painter, const QStyleOptionViewItem & i_option,
+			const af::TaskExec * i_exec, int i_percent,
+			int i_x, int i_y, int i_w, int i_h) const;
 
 private:
 	// We need to keep two info strings,
