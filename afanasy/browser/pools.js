@@ -94,6 +94,8 @@ PoolNode.prototype.update = function(i_obj) {
 			params += ' HostMaxTasks:<b>' + this.params.max_tasks_host + '</b>';
 		if (this.params.capacity_host != null)
 			params += ' HostCapacity:<b>' + this.params.capacity_host + '</b>';
+		if (this.params.sick_errors_count != null)
+			params += ' SickErrors:<b>' + this.params.sick_errors_count + '</b>';
 		params += ' Priority:<b>' + this.params.priority + '</b>';
 	}
 	else if (cm_IsJedi())
@@ -106,6 +108,8 @@ PoolNode.prototype.update = function(i_obj) {
 			params += ' HostTasks:<b>' + this.params.max_tasks_host + '</b>';
 		if (this.params.capacity_host)
 			params += ' HostCapacity:<b>' + this.params.capacity_host + '</b>';
+		if (this.params.sick_errors_count != null)
+			params += ' SickErr:<b>' + this.params.sick_errors_count + '</b>';
 		params += ' Pri:<b>' + this.params.priority + '</b>';
 	}
 	else
@@ -118,6 +122,8 @@ PoolNode.prototype.update = function(i_obj) {
 			params += ' ht:<b>' + this.params.max_tasks_host + '</b>';
 		if (this.params.capacity_host)
 			params += ' hc:<b>' + this.params.capacity_host + '</b>';
+		if (this.params.sick_errors_count != null)
+			params += ' se:<b>' + this.params.sick_errors_count + '</b>';
 		params += ' p<b>' + this.params.priority + '</b>';
 	}
 	this.elParams.innerHTML = params;
@@ -339,6 +345,7 @@ PoolNode.params_pool = {
 	priority              : {'type':'num', 'label':'Priority'},
 	max_tasks_host        : {'type':'num', 'label':'Host Max Tasks'},
 	capacity_host         : {'type':'num', 'label':'Host Max Capacity'},
+	sick_errors_count     : {'type':'num', 'label':'Sick Errors Count'},
 	annotation            : {'type':'str', 'label':'Annotation'},
 
 	idle_wolsleep_time    : {'type':'num', 'label':'Idle WOL sleep time'},
