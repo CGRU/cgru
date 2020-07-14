@@ -761,7 +761,7 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 			if (m_tasks_percents.size() >= numtask+1)
 				task_percent = m_tasks_percents[numtask];
 
-			drawTask(i_painter, i_option, *it, task_percent, x + 5, y_cur, w - tkhost_width - 5, HeightTask - 2);
+			drawTask(i_painter, i_option, *it, task_percent, x + 5, y_cur, w - tkhost_width - 10, HeightTask - 2);
 
 			y_cur += HeightTask;
 		}
@@ -893,7 +893,7 @@ void ItemRender::drawTask(QPainter * i_painter, const QStyleOptionViewItem & i_o
 
 	// Draw informatin strings
 	QRect rect_usertime;
-	i_painter->drawText(i_x+5, i_y, i_w-5, i_h,
+	i_painter->drawText(i_x+5, i_y, i_w-10, i_h,
 			Qt::AlignVCenter | Qt::AlignRight, user_time, &rect_usertime );
 
 	i_painter->drawText(i_x+5 + tw, i_y, i_w-15 - tw - rect_usertime.width(), i_h,
