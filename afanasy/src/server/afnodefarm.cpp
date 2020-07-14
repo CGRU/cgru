@@ -204,6 +204,7 @@ bool AfNodeFarm::actionTicket(Action & i_action)
 	const JSON & operation = (*i_action.data)["operation"];
 
 	std::string tk_name;
+	// Check that ticket name is specified:
 	if (false == af::jr_string("name", tk_name, operation))
 	{
 		appendLog("Ticket name is not specified by " + i_action.author);
@@ -213,6 +214,7 @@ bool AfNodeFarm::actionTicket(Action & i_action)
 	}
 
 	int32_t tk_count;
+	// Check that ticket count is specified:
 	if (false == af::jr_int32("count", tk_count, operation))
 	{
 		appendLog("Ticket count is not specified by " + i_action.author);
@@ -224,6 +226,7 @@ bool AfNodeFarm::actionTicket(Action & i_action)
 	bool tk_host = false;
 	af::jr_bool("host", tk_host, operation);
 
+	// Choose to pool or host tickets to operate
 	std::map<std::string, af::Farm::Tiks> * tickets;
 	if (tk_host)
 	{
@@ -241,6 +244,7 @@ bool AfNodeFarm::actionTicket(Action & i_action)
 		tickets = &m_farm->m_tickets_pool;
 	}
 
+	// Erasing ticket if -1 count specified:
 	if (tk_count == -1)
 	{
 		size_t size = tickets->erase(tk_name);
@@ -251,9 +255,24 @@ bool AfNodeFarm::actionTicket(Action & i_action)
 			i_action.answer = "Node['" + name() + "'] has no '" + tk_name + "' ticket.";
 			return false;
 		}
+
+		return true;
+	}
+
+	// Find ticket:
+	std::map<std::string, af::Farm::Tiks>::iterator it = tickets->find(tk_name);
+
+	if (it == tickets->end())
+	{
+		// Add a new ticket:
+		(*tickets)[tk_name] = af::Farm::Tiks(tk_count, 0);
 	}
 	else
-		(*tickets)[tk_name] = af::Farm::Tiks(tk_count, 0);
+	{
+		// Modify existing ticket:
+		it->second.count = tk_count;
+	}
+
 
 	return true;
 }

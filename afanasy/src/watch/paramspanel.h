@@ -148,5 +148,8 @@ protected slots:
 protected:
 	QString m_name;
 
+	QLabel * m_name_label;
 	QLabel * m_count_label;
+
+	QPushButton * m_edit_btn;
 };

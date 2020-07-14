@@ -389,6 +389,15 @@ void PoolSrv::taskRelease(const af::TaskExec * i_taskexec, MonitorContainer * i_
 		if (it != m_tickets_pool.end())
 		{
 			it->second.usage -= eIt.second;
+
+			if (it->second.usage < 0)
+			{
+				AF_ERR << "Pool \"" << getName()
+					<< "\" has got a negative ticket \"" << it->first
+					<< "\" count. Resetting to zero.";
+				it->second.usage = 0;
+			}
+
 			if (i_monitoring)
 				i_monitoring->addEvent(af::Monitor::EVT_pools_change, m_id);
 		}

@@ -401,9 +401,9 @@ ParamTicket::ParamTicket(const QString & i_name, int i_count, int i_usage):
 	QHBoxLayout * layout = new QHBoxLayout(this);
 	layout->setContentsMargins(0,0,0,0);
 
-	QLabel * lname = new QLabel(m_name);
-	lname->setTextInteractionFlags(Qt::TextBrowserInteraction);
-	layout->addWidget(lname);
+	m_name_label = new QLabel(m_name);
+	m_name_label->setTextInteractionFlags(Qt::TextBrowserInteraction);
+	layout->addWidget(m_name_label);
 
 	const QPixmap * icon = Watch::getTicketIcon(m_name);
 	if (icon)
@@ -418,10 +418,10 @@ ParamTicket::ParamTicket(const QString & i_name, int i_count, int i_usage):
 
 	layout->addStretch();
 
-	QPushButton * btn = new QPushButton("[...]");
-	btn->setFixedSize(22, 16);
-	layout->addWidget(btn);
-	connect(btn, SIGNAL(clicked()), this, SLOT(slot_Edit()));
+	m_edit_btn = new QPushButton("[...]");
+	m_edit_btn->setFixedSize(22, 16);
+	layout->addWidget(m_edit_btn);
+	connect(m_edit_btn, SIGNAL(clicked()), this, SLOT(slot_Edit()));
 
 	update(i_count, i_usage);
 }
@@ -434,13 +434,24 @@ void ParamTicket::update(int i_count, int i_usage)
 {
 	if (i_usage > 0)
 	{
-		if (i_count != -1)
-			m_count_label->setText(QString(" x %1 / %2").arg(i_count).arg(i_usage));
-		else
+		if (i_count < 0)
 			m_count_label->setText(QString(" / %1").arg(i_usage));
+		else
+			m_count_label->setText(QString(" x %1 / %2").arg(i_count).arg(i_usage));
 	}
 	else
 		m_count_label->setText(QString(" x %1").arg(i_count));
+
+	if (i_count < 0)
+	{
+		m_name_label->setText(QString("<i>%1</i>").arg(m_name));
+		m_edit_btn->setHidden(true);
+	}
+	else
+	{
+		m_name_label->setText(QString("<b>%1</b>").arg(m_name));
+		m_edit_btn->setHidden(false);
+	}
 }
 
 void ParamTicket::slot_Edit()

@@ -820,7 +820,16 @@ void RenderAf::removeTask(const af::TaskExec * i_taskexec, MonitorContainer * i_
 	{
 		std::map<std::string, af::Farm::Tiks>::iterator hIt = m_tickets_host.find(tIt.first);
 		if (hIt != m_tickets_host.end())
+		{
 			hIt->second.usage -= tIt.second;
+			if (hIt->second.usage < 0)
+			{
+				AF_ERR << "Render \"" << getName()
+					<< "\" has got a negative ticket \"" << hIt->first
+					<< "\" count. Resetting to zero.";
+				hIt->second.usage = 0;
+			}
+		}
 	}
 
 	m_parent->taskRelease(i_taskexec, i_monitoring);
