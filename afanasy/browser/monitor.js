@@ -118,7 +118,7 @@ function Monitor(i_args)
 
 		this.createCtrlBtn({
 			'name': 'view_opts',
-			'label': 'VIEW',
+			'label': 'View',
 			'tooltip': 'View options.',
 			'sub_menu': this.nodeConstructor.view_opts,
 			'handle': 'mh_Opt',
@@ -1448,6 +1448,8 @@ Monitor.prototype.createCtrlBtn = function(i_args) {
 
 	if (i_args.sub_menu)
 	{
+		elBtn.textContent = i_args.label + '...';
+
 		elBtn.onclick = function(e) {
 			e.currentTarget.classList.toggle('hide_childs');
 			return false;

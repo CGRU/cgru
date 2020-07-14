@@ -1440,7 +1440,7 @@ JobNode.createPanels = function(i_monitor) {
 	acts.reset_error_hosts = {'label':'Reset',   'handle':'mh_Oper', 'tooltip':'Reset error hosts.'};
 	acts.restart_errors    = {'label':'Restart', 'handle':'mh_Oper', 'tooltip':'Restart error tasks.'};
 	i_monitor.createCtrlBtn(
-		{'name': 'errors', 'label': 'ERRORS', 'tooltip': 'Error tasks and hosts.', 'sub_menu': acts});
+		{'name': 'errors', 'label': 'Errors', 'tooltip': 'Error tasks and hosts.', 'sub_menu': acts});
 
 
 	// Restart:
@@ -1452,7 +1452,7 @@ JobNode.createPanels = function(i_monitor) {
 	acts.restart_skipped = {'label':'Skipped',   'tooltip':'Restart skipped tasks.'};
 	acts.restart_done    = {'label':'Done',      'tooltip':'Restart done task.'};
 	i_monitor.createCtrlBtn(
-		{'name': 'restart_tasks', 'label': 'RESTART', 'tooltip': 'Restart job tasks.', 'sub_menu': acts});
+		{'name': 'restart_tasks', 'label': 'Restart', 'tooltip': 'Restart job tasks.', 'sub_menu': acts});
 
 
 	// Move:
@@ -1465,7 +1465,7 @@ JobNode.createPanels = function(i_monitor) {
 		acts.move_jobs_bottom = {'label':'Bottom', 'tooltip':'Move jobs bottom.'};
 		i_monitor.createCtrlBtn({
 			'name': 'move_jobs',
-			'label': 'MOVE',
+			'label': 'Move',
 			'tooltip': 'Move jobs.',
 			'sub_menu': acts,
 			'handle': 'moveJobs'

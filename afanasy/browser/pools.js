@@ -281,7 +281,7 @@ PoolNode.createPanels = function(i_monitor) {
 	};
 	i_monitor.createCtrlBtn({
 		'name': 'new_render',
-		'label': 'NEW RENDER',
+		'label': 'New Render',
 		'node_type': 'pools',
 		'tooltip': 'New render status.',
 		'sub_menu': acts

@@ -711,7 +711,7 @@ RenderNode.createPanels = function(i_monitor) {
 	acts.full = {'label': 'FullInfo', 'tooltip': 'Request full render node info.'};
 	i_monitor.createCtrlBtn({
 		'name': 'info',
-		'label': 'INFO',
+		'label': 'Info',
 		'tooltip': 'Get render info.',
 		'handle': 'mh_Get',
 		'node_type': 'renders',
@@ -724,7 +724,7 @@ RenderNode.createPanels = function(i_monitor) {
 	acts.reassign_pool = {'label':'ReAssign', 'handle':'mh_Oper',       'tooltip':'Reassign pool'};
 	i_monitor.createCtrlBtn({
 		'name': 'pool',
-		'label': 'POOL',
+		'label': 'Pool',
 		'tooltip': 'Manipulate render pool.',
 		'node_type': 'renders',
 		'sub_menu': acts
@@ -769,7 +769,7 @@ RenderNode.createPanels = function(i_monitor) {
 	acts.eject_tasks = {'label': 'All Tasks', 'tooltip': 'Eject all running tasks.'};
 	acts.eject_tasks_keep_my = {'label': 'Not My', 'tooltip': 'Eject not my tasks.'};
 	i_monitor.createCtrlBtn(
-		{'name': 'eject', 'label': 'EJECT', 'tooltip': 'Eject tasks from render.', 'sub_menu': acts});
+		{'name': 'eject', 'label': 'Eject', 'tooltip': 'Eject tasks from render.', 'sub_menu': acts});
 
 
 	// Custom commands:
@@ -819,7 +819,7 @@ RenderNode.createPanels = function(i_monitor) {
 		{'handle':'clearServices','label':'Clear','tooltip':'Double click to clear services.','ondblclick':true};
 	i_monitor.createCtrlBtn({
 		'name': 'services',
-		'label': 'SERVICES',
+		'label': 'Services',
 		'tooltip': 'Enable/Disable services.',
 		'sub_menu': acts
 	});
@@ -834,7 +834,7 @@ RenderNode.createPanels = function(i_monitor) {
 		shutdown /***/: {'label': 'Shutdown', 'tooltip': 'Shutdown machine.'}
 	};
 	i_monitor.createCtrlBtn(
-		{'name': 'power', 'label': 'POWER', 'tooltip': 'Power / Exit / Delete.', 'sub_menu': acts});
+		{'name': 'power', 'label': 'Power', 'tooltip': 'Power / Exit / Delete.', 'sub_menu': acts});
 
 	// Launch and Exit:
 	acts = {};
@@ -842,7 +842,7 @@ RenderNode.createPanels = function(i_monitor) {
 	acts.lcex = {'name': 'lcex', 'label': 'Cmd&Exit', 'handle': 'launchCmdExit', 'tooltip': 'Launch command and exit.'};
 	i_monitor.createCtrlBtn({
 		'name': 'launch',
-		'label': 'LAUNCH',
+		'label': 'Launch',
 		'tooltip': 'Launch command by afrender.',
 		'sub_menu': acts
 	});
