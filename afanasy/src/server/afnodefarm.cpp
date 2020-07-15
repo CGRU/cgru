@@ -244,8 +244,14 @@ bool AfNodeFarm::actionTicket(Action & i_action)
 		tickets = &m_farm->m_tickets_pool;
 	}
 
-	// Erasing ticket if -1 count specified:
-	if (tk_count == -1)
+	// Find ticket and get usage:
+	std::map<std::string, af::Farm::Tiks>::iterator it = tickets->find(tk_name);
+	int32_t tk_usage = 0;
+	if (it != tickets->end())
+		tk_usage = it->second.usage;
+
+	// Erasing ticket if -1 count specified and it is not used:
+	if ((tk_count == -1) && (tk_usage <= 0))
 	{
 		size_t size = tickets->erase(tk_name);
 		if (size == 0)
@@ -258,9 +264,6 @@ bool AfNodeFarm::actionTicket(Action & i_action)
 
 		return true;
 	}
-
-	// Find ticket:
-	std::map<std::string, af::Farm::Tiks>::iterator it = tickets->find(tk_name);
 
 	if (it == tickets->end())
 	{
@@ -333,11 +336,27 @@ bool AfNodeFarm::hasPoolTicket(const std::string & i_name, const int32_t & i_cou
 	std::map<std::string, af::Farm::Tiks>::const_iterator it = m_farm->m_tickets_pool.find(i_name);
 	if (it != m_farm->m_tickets_pool.end())
 	{
+		if (it->second.count == -1)
+		{
+			// This means that pool does not have such host ticket.
+			// It was created to store ticket usage only.
+			if (m_parent)
+			{
+				return m_parent->hasPoolTicket(i_name, i_count);
+			}
+
+			return true;
+		}
+
 		if ((it->second.count - it->second.usage) < i_count)
+		{
 			return false;
+		}
 	}
 	else if (m_parent)
+	{
 		return m_parent->hasPoolTicket(i_name, i_count);
+	}
 
 	return true;
 }
@@ -353,6 +372,9 @@ bool AfNodeFarm::hasHostTicket(const std::string & i_name, const int32_t & i_cou
 			// It was created to store ticket usage for parent.
 			if (m_parent)
 			{
+				// For host we should add current dummy ticket usage,
+				// This usage is from other running tasks,
+				// as host can run several tasks.
 				int count = i_count + it->second.usage;
 				return m_parent->hasHostTicket(i_name, count);
 			}

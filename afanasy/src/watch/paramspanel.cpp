@@ -445,12 +445,14 @@ void ParamTicket::update(int i_count, int i_usage)
 	if (i_count < 0)
 	{
 		m_name_label->setText(QString("<i>%1</i>").arg(m_name));
-		m_edit_btn->setHidden(true);
+		// Do we need to hide edit button on a dummy ticket?
+		// May be needed make dummy ticket not dummy?
+		//m_edit_btn->setHidden(true);
 	}
 	else
 	{
 		m_name_label->setText(QString("<b>%1</b>").arg(m_name));
-		m_edit_btn->setHidden(false);
+		//m_edit_btn->setHidden(false);
 	}
 }
 

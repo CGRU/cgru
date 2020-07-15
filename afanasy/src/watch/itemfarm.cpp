@@ -136,9 +136,12 @@ void ItemFarm::drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int 
 		{
 			tkp_it.next();
 
+			int draw_flags = Item::TKD_RIGHT | Item::TKD_BORDER;
+			if (tkp_it.value().count == -1)
+				draw_flags |= Item::TKD_DUMMY;
+
 			tkp_w += drawTicket(i_painter, pen, i_x + 5 + tkp_w, i_y, i_w - 10,
-					Item::TKD_RIGHT | Item::TKD_BORDER,
-					tkp_it.key(), tkp_it.value().count, tkp_it.value().usage);
+					draw_flags, tkp_it.key(), tkp_it.value().count, tkp_it.value().usage);
 
 			tkp_w += 8;
 		}
@@ -149,8 +152,7 @@ void ItemFarm::drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int 
 			tkh_it.next();
 
 			tkh_w += drawTicket(i_painter, pen, i_x + 5, i_y + 3, i_w - 10 - tkh_w,
-					Item::TKD_LEFT,
-					tkh_it.key(), tkh_it.value().count);
+					Item::TKD_LEFT, tkh_it.key(), tkh_it.value().count);
 
 			tkh_w += 8;
 		}
@@ -179,8 +181,7 @@ void ItemFarm::drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int 
 			}
 
 			tkh_w += drawTicket(i_painter, pen, i_x + 5, i_y, i_w - 10 - tkh_w,
-					draw_flags,
-					tkh_it.key(), count, tkh_it.value().usage);
+					draw_flags, tkh_it.key(), count, tkh_it.value().usage);
 
 			tkh_w += 8;
 		}

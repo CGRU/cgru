@@ -344,16 +344,25 @@ int Item::drawTicket(QPainter * i_painter, const QPen & i_text_pen,
 		else
 			border_pen.setColor(afqt::QEnvironment::clr_done.c);
 
-		if (i_opts & TKD_DASH)
+		if (i_opts & TKD_DUMMY)
+			border_pen.setColor(afqt::QEnvironment::clr_outline.c);
+		else if (i_opts & TKD_DASH)
 			border_pen.setStyle(Qt::DashDotDotLine);
 	}
 
 	const QPixmap * icon = Watch::getTicketIcon(i_name);
 	QString text;
-	if (i_usage == -1)
-		text = QString("x%1").arg(i_count);
+	if (i_count != -1)
+	{
+		if (i_usage == -1)
+			text = QString("x%1").arg(i_count);
+		else
+			text = QString("x%1 / %2").arg(i_count).arg(i_usage);
+	}
 	else
-		text = QString("x%1 / %2").arg(i_count).arg(i_usage);
+	{
+		text = QString("x%1").arg(i_usage);
+	}
 
 	QRect tk_rect;
 	int tk_width = 0;

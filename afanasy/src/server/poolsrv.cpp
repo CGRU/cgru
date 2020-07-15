@@ -370,12 +370,13 @@ void PoolSrv::taskAcuire(const af::TaskExec * i_taskexec, MonitorContainer * i_m
 	{
 		std::map<std::string, af::Farm::Tiks>::iterator it = m_tickets_pool.find(eIt.first);
 		if (it != m_tickets_pool.end())
-		{
 			it->second.usage += eIt.second;
-			if (i_monitoring)
-				i_monitoring->addEvent(af::Monitor::EVT_pools_change, m_id);
-		}
+		else
+			m_tickets_pool[eIt.first] = Tiks(-1, eIt.second);
 	}
+
+	if (i_monitoring)
+		i_monitoring->addEvent(af::Monitor::EVT_pools_change, m_id);
 
 	if (m_parent)
 		m_parent->taskAcuire(i_taskexec, i_monitoring);
@@ -390,18 +391,20 @@ void PoolSrv::taskRelease(const af::TaskExec * i_taskexec, MonitorContainer * i_
 		{
 			it->second.usage -= eIt.second;
 
+			// Check a negative usage.
 			if (it->second.usage < 0)
 			{
+				// It should never happen!
 				AF_ERR << "Pool \"" << getName()
 					<< "\" has got a negative ticket \"" << it->first
 					<< "\" count. Resetting to zero.";
 				it->second.usage = 0;
 			}
-
-			if (i_monitoring)
-				i_monitoring->addEvent(af::Monitor::EVT_pools_change, m_id);
 		}
 	}
+
+	if (i_monitoring)
+		i_monitoring->addEvent(af::Monitor::EVT_pools_change, m_id);
 
 	if (m_parent)
 		m_parent->taskRelease(i_taskexec, i_monitoring);
@@ -471,6 +474,24 @@ void PoolSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, Monitor
 	// Emit events on changes
 	if (changed && i_monitoring)
 		i_monitoring->addEvent(af::Monitor::EVT_pools_change, m_id);
+
+	// Remove dummy tickets that were needed to store usage only
+	std::map<std::string, Tiks>::iterator pIt = m_tickets_pool.begin();
+	while (pIt != m_tickets_pool.end())
+	{
+		if ((pIt->second.count < 0) && (pIt->second.usage <= 0))
+			pIt = m_tickets_pool.erase(pIt);
+		else
+			pIt++;
+	}
+	std::map<std::string, Tiks>::iterator hIt = m_tickets_host.begin();
+	while (hIt != m_tickets_host.end())
+	{
+		if ((hIt->second.count < 0) && (hIt->second.usage <= 0))
+			hIt = m_tickets_host.erase(hIt);
+		else
+			hIt++;
+	}
 
 	// Store if needed
 	if (tostore)

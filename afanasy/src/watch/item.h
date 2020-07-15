@@ -102,7 +102,8 @@ public:
 		TKD_LEFT   = 0,
 		TKD_RIGHT  = 1,
 		TKD_BORDER = 1 << 1,
-		TKD_DASH   = 1 << 2
+		TKD_DASH   = 1 << 2,
+		TKD_DUMMY  = 1 << 3
 	};
 
 	/// Draw ticket and return its width

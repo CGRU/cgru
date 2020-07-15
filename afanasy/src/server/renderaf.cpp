@@ -1005,7 +1005,7 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 		}
 	}
 
-	// Remove not used tickets
+	// Remove dummy tickets that were needed to store usage only
 	std::map<std::string, Tiks>::iterator hIt = m_tickets_host.begin();
 	while (hIt != m_tickets_host.end())
 	{
