@@ -58,6 +58,9 @@ Gizmo {
    addUserKnob {  6 tickets_use  l "Tickets" }
    addUserKnob {  1 tickets_data l ""    }
    addUserKnob { 26 "" l "" }
+   addUserKnob {  6 pools_use  l "Pools" }
+   addUserKnob {  1 pools_data l "" }
+   addUserKnob { 26 "" l "" }
    addUserKnob {  6 tmpimage l "Render to temporary image" }
    addUserKnob { 26 "" l "" }
    addUserKnob {  6 pathsmap l "Apply paths map to scene" }
@@ -96,6 +99,8 @@ Gizmo {
 	tmpscene        1
 	tickets_use     0
 	tickets_data    NUKE:1,NET:100
+	pools_use       0
+	pools_data      farm:10,work:-10,comp:10,sim:-10
 	tmpimage        1
 	pathsmap        1
 

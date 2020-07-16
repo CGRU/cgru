@@ -562,6 +562,9 @@ class JobParameters:
         self.tmpscene = 1
         self.tmpimage = 1
         self.pathsmap = 1
+        self.pools_use = 0
+        self.pools_data = None
+
         if afnode is not None:
             self.startpaused = int(afnode.knob('startpaused').value())
             self.maxruntasks = int(afnode.knob('maxruntasks').value())
@@ -576,6 +579,8 @@ class JobParameters:
             self.tmpscene = int(afnode.knob('tmpscene').value())
             self.tmpimage = int(afnode.knob('tmpimage').value())
             self.pathsmap = int(afnode.knob('pathsmap').value())
+            self.pools_use = int(afnode.knob('pools_use').value())
+            self.pools_data = afnode.knob('pools_data').value()
 
         self.blocksparameters = []
 
@@ -675,6 +680,16 @@ class JobParameters:
             self.dependmaskglobal = str(self.dependmaskglobal)
             if self.dependmaskglobal != '':
                 job.setDependMaskGlobal(self.dependmaskglobal)
+
+        if self.pools_use and self.pools_data is not None and len(self.pools_data):
+            pools = dict()
+            for pool in self.pools_data.split(','):
+                pool = pool.split(':')
+                if len(pool) != 2:
+                    continue
+                pools[pool[0]] = int(pool[1])
+            job.setPools(pools)
+
         if self.startpaused:
             job.offline()
         if self.platform is None or self.platform == 'Any':
