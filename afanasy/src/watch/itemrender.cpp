@@ -890,6 +890,7 @@ void ItemRender::drawTask(QPainter * i_painter, const QStyleOptionViewItem & i_o
 	}
 
 	i_painter->setPen(pen);
+	i_painter->setFont(afqt::QEnvironment::f_info);
 
 	// Draw informatin strings
 	QRect rect_usertime;
