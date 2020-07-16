@@ -640,13 +640,13 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 
 		if (m_services.size() || m_services_disabled.size())
 		{
-			drawServices(i_painter, x+6, y_cur+2, w-12, HeightServices-4);
+			drawServices(i_painter, i_option, x+6, y_cur+2, w-12, HeightServices-4);
 			y_cur += HeightServices;
 		}
 
 		if (m_tickets_pool.size() || m_tickets_host.size())
 		{
-			drawTickets(i_painter, x+6, y_cur+2, w-12, HeightTickets-4);
+			drawTickets(i_painter, i_option, x+6, y_cur+2, w-12, HeightTickets-4);
 			y_cur += HeightTickets;
 		}
 
@@ -708,12 +708,12 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	case  ListRenders::ENormalSize:
 		if (m_services.size() || m_services_disabled.size())
 		{
-			drawServices(i_painter, x+6, y_cur+2, w-12, HeightServices-4);
+			drawServices(i_painter, i_option, x+6, y_cur+2, w-12, HeightServices-4);
 			y_cur += HeightServices;
 		}
 		if (m_tickets_pool.size() || m_tickets_host.size())
 		{
-			drawTickets(i_painter, x+6, y_cur+2, w-12, HeightTickets-4);
+			drawTickets(i_painter, i_option, x+6, y_cur+2, w-12, HeightTickets-4);
 			y_cur += HeightTickets;
 		}
 		break;
@@ -724,12 +724,12 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 
 		if (m_services.size() || m_services_disabled.size())
 		{
-			drawServices(i_painter, x+6, y_cur, w-12, HeightServices-4);
+			drawServices(i_painter, i_option, x+6, y_cur, w-12, HeightServices-4);
 			y_cur += HeightServices;
 		}
 		if (m_tickets_pool.size() || m_tickets_host.size())
 		{
-			drawTickets(i_painter, x+6, y_cur, w-12, HeightTickets-4);
+			drawTickets(i_painter, i_option, x+6, y_cur, w-12, HeightTickets-4);
 			y_cur += HeightTickets;
 		}
 
@@ -746,13 +746,13 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	{
 		if (m_services.size() || m_services_disabled.size())
 		{
-			drawServices(i_painter, x+6, y_cur+2, w-12, HeightServices-4);
+			drawServices(i_painter, i_option, x+6, y_cur+2, w-12, HeightServices-4);
 			y_cur += HeightServices;
 		}
 
 		int tkhost_width = 0;
 		if (m_tickets_pool.size() || m_tickets_host.size())
-			drawTickets(i_painter, x+6, y_cur-2, w-12, HeightTickets-4, &tkhost_width);
+			drawTickets(i_painter, i_option, x+6, y_cur-2, w-12, HeightTickets-4, &tkhost_width);
 
 		std::list<af::TaskExec*>::const_iterator it = m_tasks.begin();
 		for (int numtask = 0; it != m_tasks.end(); it++, numtask++)
@@ -883,7 +883,7 @@ void ItemRender::drawTask(QPainter * i_painter, const QStyleOptionViewItem & i_o
 	for (auto const & tIt : i_exec->m_tickets)
 	{
 		tw += Item::drawTicket(i_painter, pen, i_x+5 + tw, i_y+1, i_w-5 - tw,
-				Item::TKD_RIGHT,
+				Item::TKD_LEFT,
 				afqt::stoq(tIt.first), tIt.second);
 
 		tw += 8;

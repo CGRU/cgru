@@ -84,6 +84,8 @@ protected:
 
 	ListNodes * m_list_nodes;
 
+	QMap<QString, int> m_running_services;
+
 private:
 	int32_t m_hide_flags;
 
@@ -94,6 +96,4 @@ private:
 	const CtrlSortFilter * m_ctrl_sf;
 
 	QList<ItemNode*> m_child_list;
-
-	QMap<QString, int> m_running_services;
 };

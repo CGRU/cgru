@@ -615,7 +615,7 @@ void BlockInfo::paint( QPainter * i_painter, const QStyleOptionViewItem &option,
 		it.next();
 
 		tk_w += Item::drawTicket(i_painter, pen, x+5 + xoffset, tk_y, w-10 - xoffset - tk_w,
-				Item::TKD_LEFT,
+				Item::TKD_RIGHT,
 				it.key(), it.value());
 
 		tk_w += 8;

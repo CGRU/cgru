@@ -784,6 +784,10 @@ void RenderAf::addTask(af::TaskExec * i_taskexec, MonitorContainer * i_monitorin
 			m_tickets_host[tIt.first] = Tiks(-1, tIt.second);
 	}
 
+	// Increment service on af::Node
+	incrementService(i_taskexec->getServiceType());
+
+	// Acuire task on pool
 	m_parent->taskAcuire(i_taskexec, i_monitoring);
 }
 
@@ -832,6 +836,10 @@ void RenderAf::removeTask(const af::TaskExec * i_taskexec, MonitorContainer * i_
 		}
 	}
 
+	// Decrement service on af::Node
+	decrementService(i_taskexec->getServiceType());
+
+	// Release task on pool
 	m_parent->taskRelease(i_taskexec, i_monitoring);
 }
 

@@ -65,7 +65,7 @@ public:
 	const QColor & clrTextMuted(     const QStyleOptionViewItem &option)           const;
 	const QColor & clrTextState(     const QStyleOptionViewItem &option, bool on ) const;
 
-	static const QColor & clrTextInfo( bool running, bool selected, bool locked);
+	static const QColor & clrTextInfo(bool running, bool selected, bool locked = false);
 
 	inline void      setRunning() const { m_running = true;  } ///< Set item m_running ( to change text colors only).
 	inline void   setNotRunning() const { m_running = false; } ///< Set item not m_running ( to change text colors only).
@@ -99,10 +99,9 @@ public:
 	const QVariant & getParamVar(const QString & i_name) const;
 
 	enum ETK_DRAW_OPTS {
-		TKD_LEFT   = 0,
-		TKD_RIGHT  = 1,
-		TKD_BORDER = 1 << 1,
-		TKD_DASH   = 1 << 2,
+		TKD_LEFT   = 1 << 0,
+		TKD_RIGHT  = 1 << 1,
+		TKD_BORDER = 1 << 2,
 		TKD_DUMMY  = 1 << 3
 	};
 

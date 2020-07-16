@@ -182,7 +182,7 @@ bool ItemPool::calcHeight()
 
 	m_height = HeightPool;
 
-	if (m_services.size() || m_services_disabled.size())
+	if (m_services.size() || m_services_disabled.size() || m_running_services.size())
 		m_height += HeightServices;
 
 	if (m_tickets_pool.size() || m_tickets_host.size())
@@ -216,15 +216,15 @@ void ItemPool::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleO
 
 	y += HeightPool;
 
-	if (m_services.size() || m_services_disabled.size())
+	if (m_services.size() || m_services_disabled.size() || m_running_services.size())
 	{
-		drawServices(i_painter, x+6, y, w-6, HeightServices-6);
+		drawServices(i_painter, i_option, x+6, y, w-6, HeightServices-6);
 		y += HeightServices;
 	}
 
 	if (m_tickets_pool.size() || m_tickets_host.size())
 	{
-		drawTickets(i_painter, x+6, y, w-6, HeightTickets-6);
+		drawTickets(i_painter, i_option, x+6, y, w-6, HeightTickets-6);
 		y += HeightTickets;
 	}
 

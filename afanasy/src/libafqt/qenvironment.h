@@ -136,6 +136,7 @@ public:
 
 	static QFont f_name;
 	static QFont f_info;
+	static QFont f_muted;
 	static QFont f_plotter;
 	static QFont f_min;
 

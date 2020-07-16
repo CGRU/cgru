@@ -375,6 +375,9 @@ void PoolSrv::taskAcuire(const af::TaskExec * i_taskexec, MonitorContainer * i_m
 			m_tickets_pool[eIt.first] = Tiks(-1, eIt.second);
 	}
 
+	// Increment service on af::Node
+	incrementService(i_taskexec->getServiceType());
+
 	if (i_monitoring)
 		i_monitoring->addEvent(af::Monitor::EVT_pools_change, m_id);
 
@@ -402,6 +405,9 @@ void PoolSrv::taskRelease(const af::TaskExec * i_taskexec, MonitorContainer * i_
 			}
 		}
 	}
+
+	// Decrement service on af::Node
+	decrementService(i_taskexec->getServiceType());
 
 	if (i_monitoring)
 		i_monitoring->addEvent(af::Monitor::EVT_pools_change, m_id);

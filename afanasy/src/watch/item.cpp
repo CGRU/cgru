@@ -330,6 +330,7 @@ int Item::drawTicket(QPainter * i_painter, const QPen & i_text_pen,
 		const QString & i_name, int i_count, int i_usage)
 {
 	i_painter->setPen(i_text_pen);
+	i_painter->setFont(afqt::QEnvironment::f_info);
 
 	QPen border_pen;
 	if (i_opts & TKD_BORDER)
@@ -337,17 +338,18 @@ int Item::drawTicket(QPainter * i_painter, const QPen & i_text_pen,
 		i_x += 2;
 		i_y += 2;
 
-		if (i_usage >= i_count)
+		if (i_opts & TKD_DUMMY)
+		{
+			i_painter->setFont(afqt::QEnvironment::f_muted);
+			border_pen.setStyle(Qt::DashDotDotLine);
+		}
+
+		if ((i_count != -1) && (i_usage >= i_count))
 			border_pen.setColor(afqt::QEnvironment::clr_error.c);
 		else if (i_usage > 0)
 			border_pen.setColor(afqt::QEnvironment::clr_running.c);
 		else
 			border_pen.setColor(afqt::QEnvironment::clr_done.c);
-
-		if (i_opts & TKD_DUMMY)
-			border_pen.setColor(afqt::QEnvironment::clr_outline.c);
-		else if (i_opts & TKD_DASH)
-			border_pen.setStyle(Qt::DashDotDotLine);
 	}
 
 	const QPixmap * icon = Watch::getTicketIcon(i_name);
@@ -355,18 +357,18 @@ int Item::drawTicket(QPainter * i_painter, const QPen & i_text_pen,
 	if (i_count != -1)
 	{
 		if (i_usage == -1)
-			text = QString("x%1").arg(i_count);
+			text = QString(" x%1").arg(i_count);
 		else
-			text = QString("x%1 / %2").arg(i_count).arg(i_usage);
+			text = QString(" x%1 / %2").arg(i_count).arg(i_usage);
 	}
 	else
 	{
-		text = QString("x%1").arg(i_usage);
+		text = QString(" x%1").arg(i_usage);
 	}
 
 	QRect tk_rect;
 	int tk_width = 0;
-	if (i_opts & TKD_RIGHT)
+	if (i_opts & TKD_LEFT)
 	{
 		if (icon)
 		{

@@ -132,13 +132,13 @@ if Options.trytasks:
 
 blocknames = []
 if Options.labels != '':
-    blocknames = Options.labels.split(':')
+    blocknames = Options.labels.split(',')
 else:
     blocknames.append('block')
 
 blocktypes = []
 if Options.services is not None:
-    blocktypes = Options.services.split(':')
+    blocktypes = Options.services.split(',')
 else:
     blocktypes.append('test')
 

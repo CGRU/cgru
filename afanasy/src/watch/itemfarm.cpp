@@ -62,7 +62,7 @@ void ItemFarm::v_parentItemChanged()
 	m_parent_pool = static_cast<ItemPool*>(node);
 }
 
-void ItemFarm::drawServices(QPainter * i_painter, int i_x, int i_y, int i_w, int i_h) const
+void ItemFarm::drawServices(QPainter * i_painter, const QStyleOptionViewItem & i_option, int i_x, int i_y, int i_w, int i_h) const
 {
 	int x = i_x;
 	// Iterate services:
@@ -78,16 +78,67 @@ void ItemFarm::drawServices(QPainter * i_painter, int i_x, int i_y, int i_w, int
 			w += 16;
 		}
 
+		// Check if it exists in running services:
+		int running_count = 0;
+		QMap<QString, int>::const_iterator it = m_running_services.find(m_services[i]);
+		if (it != m_running_services.end())
+			running_count = it.value();
+
 		// Draw name:
+		QString name = m_services[i];
+		if (running_count)
+			name += QString(" x%1").arg(running_count);
 		i_painter->setFont(afqt::QEnvironment::f_info);
-		QPen pen(afqt::QEnvironment::qclr_black);
+		QPen pen(Item::clrTextInfo(running_count, i_option.state & QStyle::State_Selected));
 		i_painter->setPen(pen);
 		QRect bound;
-		i_painter->drawText(x+w, i_y, i_w, i_h, Qt::AlignLeft | Qt::AlignVCenter, m_services[i], &bound);
+		i_painter->drawText(x+w, i_y, i_w, i_h, Qt::AlignLeft | Qt::AlignVCenter, name, &bound);
 		w += bound.width() + 4;
 
 		// Draw border:
-		i_painter->setPen(afqt::QEnvironment::clr_outline.c);
+		if (running_count)
+			i_painter->setPen(afqt::QEnvironment::clr_running.c);
+		else
+			i_painter->setPen(afqt::QEnvironment::clr_outline.c);
+		i_painter->setBrush(Qt::NoBrush);
+		i_painter->drawRect(x, i_y, w, i_h);
+
+		x += w + 8;
+	}
+
+	// Iterate running services:
+	QMapIterator<QString, int> it(m_running_services);
+	while (it.hasNext())
+	{
+		it.next();
+
+		// Skip drawing, if it was shown above
+		if (m_services.contains(it.key()))
+			continue;
+
+		int w = 4;
+
+		// Draw icon:
+		const QPixmap * icon = Watch::getServiceIconSmall(it.key());
+		if (icon)
+		{
+			i_painter->drawPixmap(x+2, i_y+2, *icon);
+			w += 16;
+		}
+
+		// Draw name:
+		QString name = QString("%1 x%2").arg(it.key()).arg(it.value());
+		i_painter->setFont(afqt::QEnvironment::f_muted);
+		QPen pen(Item::clrTextInfo(it.value(), i_option.state & QStyle::State_Selected));
+		i_painter->setPen(pen);
+		QRect bound;
+		i_painter->drawText(x+w, i_y, i_w, i_h, Qt::AlignLeft | Qt::AlignVCenter, name, &bound);
+		w += bound.width() + 4;
+
+		// Draw border:
+		QPen borderPen(Qt::DashDotDotLine);
+		borderPen.setColor(afqt::QEnvironment::clr_running.c);
+		i_painter->setPen(borderPen);
 		i_painter->setBrush(Qt::NoBrush);
 		i_painter->drawRect(x, i_y, w, i_h);
 
@@ -121,11 +172,9 @@ void ItemFarm::drawServices(QPainter * i_painter, int i_x, int i_y, int i_w, int
 	}
 }
 
-void ItemFarm::drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int i_h, int * o_tkhost_width) const
+void ItemFarm::drawTickets(QPainter * i_painter, const QStyleOptionViewItem & i_option,
+		int i_x, int i_y, int i_w, int i_h, int * o_tkhost_width) const
 {
-	i_painter->setFont(afqt::QEnvironment::f_info);
-	QPen pen(afqt::QEnvironment::qclr_black);
-
 	int tkh_w = 0;
 	int tkp_w = 0;
 
@@ -136,23 +185,25 @@ void ItemFarm::drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int 
 		{
 			tkp_it.next();
 
-			int draw_flags = Item::TKD_RIGHT | Item::TKD_BORDER;
+			int draw_flags = Item::TKD_LEFT | Item::TKD_BORDER;
 			if (tkp_it.value().count == -1)
 				draw_flags |= Item::TKD_DUMMY;
 
+			QPen pen(Item::clrTextInfo(tkp_it.value().usage, i_option.state & QStyle::State_Selected));
 			tkp_w += drawTicket(i_painter, pen, i_x + 5 + tkp_w, i_y, i_w - 10,
 					draw_flags, tkp_it.key(), tkp_it.value().count, tkp_it.value().usage);
 
 			tkp_w += 8;
 		}
 
+		QPen pen(afqt::QEnvironment::qclr_black);
 		QMapIterator<QString, af::Farm::Tiks> tkh_it(m_tickets_host);
 		while (tkh_it.hasNext())
 		{
 			tkh_it.next();
 
 			tkh_w += drawTicket(i_painter, pen, i_x + 5, i_y + 3, i_w - 10 - tkh_w,
-					Item::TKD_LEFT, tkh_it.key(), tkh_it.value().count);
+					Item::TKD_RIGHT, tkh_it.key(), tkh_it.value().count);
 
 			tkh_w += 8;
 		}
@@ -164,7 +215,8 @@ void ItemFarm::drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int 
 		{
 			tkh_it.next();
 
-			int draw_flags = Item::TKD_LEFT | Item::TKD_BORDER;
+			int draw_flags = Item::TKD_RIGHT | Item::TKD_BORDER;
+
 			int count = tkh_it.value().count;
 			if (count == -1)
 			{
@@ -177,8 +229,10 @@ void ItemFarm::drawTickets(QPainter * i_painter, int i_x, int i_y, int i_w, int 
 				if (count == -1)
 					continue;
 
-				draw_flags |= Item::TKD_DASH;
+				draw_flags |= Item::TKD_DUMMY;
 			}
+
+			QPen pen(Item::clrTextInfo(tkh_it.value().usage, i_option.state & QStyle::State_Selected));
 
 			tkh_w += drawTicket(i_painter, pen, i_x + 5, i_y, i_w - 10 - tkh_w,
 					draw_flags, tkh_it.key(), count, tkh_it.value().usage);
