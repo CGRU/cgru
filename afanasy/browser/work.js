@@ -152,21 +152,6 @@ function work_CreatePanels(i_monitor, i_type)
 	var elPanelR = i_monitor.elPanelR;
 
 
-	// Pools:
-	var el = document.createElement('div');
-	el.classList.add('section');
-	elPanelR.appendChild(el);
-	elPanelR.m_elPools = el;
-	el.style.display = 'none';
-
-	var elPools = elPanelR.m_elPools;
-	el = document.createElement('div');
-	el.classList.add('caption');
-	el.textContent = 'Pools:';
-	elPools.appendChild(el);
-	elPools.m_elArray = [];
-
-
 	// Work parameters below are not available for jobs
 	if (i_type == 'jobs')
 		return;
@@ -203,71 +188,4 @@ function work_CreatePanels(i_monitor, i_type)
 		'handle': 'mh_Param'
 	};
 	i_monitor.createCtrlBtns(acts);
-}
-
-function work_ResetPanels(i_monitor)
-{
-	var elPanelL = i_monitor.elPanelL;
-	var elPanelR = i_monitor.elPanelR;
-
-	// Pools:
-	return;
-	var elPools = elPanelR.m_elPools;
-	for (var i = 0; i < elPools.m_elArray.length; i++)
-		elPools.removeChild(elPools.m_elArray[i]);
-	elPools.m_elArray = [];
-	elPools.style.display = 'none';
-}
-
-function work_UpdatePanels(i_monitor, i_node)
-{
-	var elPanelL = i_monitor.elPanelL;
-	var elPanelR = i_monitor.elPanelR;
-
-	var work = i_node.params;
-
-	// Pools:
-	return;
-	var elPools = elPanelR.m_elPools;
-	var pools = work.pools;
-	if (pools)
-	{
-		elPools.style.display = 'block';
-		for (var pool in pools)
-		{
-			var el = document.createElement('div');
-			elPools.appendChild(el);
-			elPools.m_elArray.push(el);
-			el.textContent = pool + ':' + pools[pool];
-
-			el.m_node = i_node;
-			el.m_pname = pool;
-			el.m_pval = pools[pool];
-			el.ondblclick = function(e) { work_PoolDblClicked(e.currentTarget) }
-		}
-	}
-}
-
-function work_PoolDblClicked(i_el)
-{
-	var value = i_el.m_pname + ':' + i_el.m_pval;
-
-	var args = {};
-
-	//	args.param    = 'pools';
-	args.type = 'str';
-	args.receiver = this.window;
-	args.wnd = this.window;
-	args.handle = 'work_PoolSet';
-	args.value = value;
-	args.name = 'pool_parameter';
-	args.info = 'Edit pool:';
-
-	new cgru_Dialog(args);
-}
-
-function work_PoolSet(i_value, i_param)
-{
-	console.log('i_value = ' + i_value);
-	console.log('i_param = ' + i_param);
 }
