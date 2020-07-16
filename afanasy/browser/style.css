@@ -45,11 +45,10 @@ font: 16px Arial;
 font-weight: bold;
 float: left;
 border: 2px solid #575757;
-border-radius: 2px 2px 16px 16px;
+border-radius: 2px 2px 4px 4px;
 margin: -8px 10px;
-padding: 6px 8px 3px 8px;
+padding: 6px 12px 3px 12px;
 cursor: pointer;
-text-transform: uppercase;
 text-align: center;
 color: #222;
 }

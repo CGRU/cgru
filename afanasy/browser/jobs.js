@@ -707,6 +707,8 @@ JobBlock.prototype.constructFull = function() {
 	this.elTasksWrc = cm_ElCreateText(this.elFull, 'Waiting Reconnect Tasks Counter');
 	this.elTasksErr = cm_ElCreateText(this.elFull, 'Error Tasks Counter');
 
+	this.elSrvInfo = cm_ElCreateText(this.elFull, 'Server Information String');
+
 	//	this.elTasksDon.classList.add('font-done');
 	//	this.elTasksRdy.classList.add('font-ready');
 	//	this.elTasksRun.classList.add('font-run');
@@ -1249,6 +1251,11 @@ JobBlock.prototype.update = function(i_displayFull) {
 			this.elErrHosts.innerHTML = he_txt;
 		}
 
+		if (this.params.srv_info)
+			this.elSrvInfo.innerHTML = '<b>' + this.params.srv_info + '</b>';
+		else
+			this.elSrvInfo.textContent = '';
+
 		// Show/Hire error hosts counter as it has a special style.
 		// And set an empty string (like on other counters) is not enough.
 		if (tasks_err)
@@ -1426,8 +1433,6 @@ JobNode.resetPanels = function(i_monitor) {
 			elFolders.removeChild(elFolders.m_elFolders[i]);
 	elFolders.m_elFolders = [];
 	elFolders.m_elRules.style.display = 'none';
-
-	work_ResetPanels(i_monitor);
 };
 
 JobNode.createPanels = function(i_monitor) {
@@ -1647,8 +1652,8 @@ JobNode.createParams = function() {
 };
 
 JobNode.view_opts = {
-	jobs_thumbs_num: {"type": 'num', "label": "TQU", "tooltip": 'Thumbnails quantity.', "default": 12},
-	jobs_thumbs_height: {"type": 'num', "label": "THE", "tooltip": 'Thumbnails height.', "default": 100}
+	jobs_thumbs_num: {"type": 'num', "label": "THUMBNAIS COUNT", "tooltip": 'Thumbnails quantity.', "default": 12},
+	jobs_thumbs_height: {"type": 'num', "label": "THUMBNAIS SIZE", "tooltip": 'Thumbnails height.', "default": 100}
 };
 
 

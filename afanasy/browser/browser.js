@@ -67,8 +67,9 @@ function g_Init()
 	g_monitor_buttons = header.getElementsByClassName('mbutton');
 	for (var i = 0; i < g_monitor_buttons.length; i++)
 	{
+		g_monitor_buttons[i].mtype = g_monitor_buttons[i].getAttribute('mtype');
 		g_monitor_buttons[i].onclick = function(e) {
-			return g_MButtonClicked(e.currentTarget.textContent, e);
+			return g_MButtonClicked(e.currentTarget.mtype, e);
 		};
 	}
 	g_GetConfig();
@@ -381,7 +382,7 @@ function g_ConnectionLost()
 function g_MButtonClicked(i_type, i_evt)
 {
 	for (var i = 0; i < g_monitor_buttons.length; i++)
-		if (g_monitor_buttons[i].textContent == i_type)
+		if (g_monitor_buttons[i].mtype == i_type)
 			if (g_monitor_buttons[i].classList.contains('pushed'))
 				return;
 			else
@@ -394,7 +395,7 @@ function g_MButtonClicked(i_type, i_evt)
 function g_MonitorClosed(i_monitor)
 {
 	for (var i = 0; i < g_monitor_buttons.length; i++)
-		if (g_monitor_buttons[i].textContent == i_monitor.name)
+		if (g_monitor_buttons[i].mtype == i_monitor.name)
 			g_monitor_buttons[i].classList.remove('pushed');
 	if (g_main_monitor == i_monitor)
 		g_main_monitor = null;
