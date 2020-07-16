@@ -521,12 +521,13 @@ void BlockInfo::refresh()
 		if (p_taskswaitrec ) str_left_bottom += QString(" wrc%1").arg(p_taskswaitrec);
 	}
 
+	if (server_info.size()) str_left_bottom += QString(" %1").arg(server_info);
+
 	if (m_jobid == AFJOB::SYSJOB_ID ) str_left_bottom += QString(" Ready:%1").arg( p_tasksready);
 
 
 	// Right bottom: server info, errors&avoids
 	str_right_bottom.clear();
-	if (server_info.size()) str_right_bottom += QString(" %1").arg(server_info);
 	if(Watch::isPadawan())
 	{
 		if(p_errorhosts) str_right_bottom += QString(" Error Hosts:%1").arg(p_errorhosts);
@@ -591,7 +592,7 @@ void BlockInfo::paint( QPainter * i_painter, const QStyleOptionViewItem &option,
 		if (m_icon_large)
 		{
 			i_painter->drawPixmap(x, y, *m_icon_large);
-			xoffset += 42;
+			xoffset += 48;
 		}
 	}
 
