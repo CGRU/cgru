@@ -108,12 +108,12 @@ void Pool::v_jsonWrite(std::ostringstream & o_str, int i_type) const // Thread-s
 	o_str << ",\n";
 	jw_state(m_state, o_str);
 */
-	if (m_run_tasks >= 0)
+	if (m_run_tasks > 0)
 		o_str << ",\n\"run_tasks\":" << m_run_tasks;
-	if (m_run_capacity >= 0)
+	if (m_run_capacity > 0)
 		o_str << ",\n\"run_capacity\":" << m_run_capacity;
-
-	o_str << ",\n\"task_start_finish_time\":" << m_task_start_finish_time;
+	if (m_task_start_finish_time > 0)
+		o_str << ",\n\"task_start_finish_time\":" << m_task_start_finish_time;
 
 
 	if (m_new_nimby)
