@@ -40,6 +40,7 @@ var cm_States = [
 ];
 
 var cm_SoftwareIcons = [];
+var cm_TicketsIcons = [];
 
 var cm_blockFlags = {
 	numeric /*************/: 1 << 0,
@@ -505,9 +506,16 @@ function cm_CheckPermissions(i_perm)
 
 function cm_SoftwareIconsReceived(i_obj)
 {
-	//console.log(JSON.stringify(i_obj));
 	if (i_obj.files && i_obj.files.length)
 		cm_SoftwareIcons = i_obj.files;
+	else
+		g_Error('Invalid softwate icons: ' + JSON.stringify(i_obj));
+}
+
+function cm_TicketsIconsReceived(i_obj)
+{
+	if (i_obj.files && i_obj.files.length)
+		cm_TicketsIcons = i_obj.files;
 	else
 		g_Error('Invalid softwate icons: ' + JSON.stringify(i_obj));
 }

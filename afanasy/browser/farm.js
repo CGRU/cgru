@@ -18,6 +18,7 @@
 
 function farm_showServices(i_el, i_params, i_type)
 {
+	// Show services
 	if (i_params.services && i_params.services.length)
 	{
 		for (let srv of i_params.services)
@@ -33,19 +34,62 @@ function farm_showServices(i_el, i_params, i_type)
 				elIcon.src = 'icons/software/' + srv + '.png';
 			}
 
-			let elName = document.createElement('div');
-			elSrv.appendChild(elName);
-			elName.textContent = srv;
-
 			if (i_params.services_disabled && i_params.services_disabled.includes(srv))
 			{
 				elSrv.classList.add('disabled');
-				elSrv.title = 'Service is disabled'
+				elSrv.title = 'Service is disabled';
 			}
 			else
-				elSrv.title = 'Service'
+				elSrv.title = 'Service';
+
+			// If serivce is runnint we show its count
+			if (i_params.running_services)
+			{
+				for (let rs in i_params.running_services)
+				{
+					if (rs == srv)
+					{
+						elSrv.classList.add('running');
+						srv += ' :' + i_params.running_services[rs];
+						break;
+					}
+				}
+			}
+
+			let elName = document.createElement('div');
+			elSrv.appendChild(elName);
+			elName.textContent = srv;
 		}
 	}
+
+	// Show running services that not exists in services (dummy):
+	if (i_params.running_services)
+	{
+		for (let srv in i_params.running_services)
+		{
+			if (i_params.services && i_params.services.includes(srv))
+				continue;
+
+			let elSrv = document.createElement('div');
+			i_el.appendChild(elSrv);
+			elSrv.classList.add('service');
+			elSrv.classList.add('running');
+			elSrv.classList.add('dummy');
+
+			if (cm_SoftwareIcons.includes(srv + '.png'))
+			{
+				let elIcon = document.createElement('img');
+				elSrv.appendChild(elIcon);
+				elIcon.src = 'icons/software/' + srv + '.png';
+			}
+
+			let elName = document.createElement('div');
+			elSrv.appendChild(elName);
+			elName.textContent = srv + ' :' + i_params.running_services[srv];
+		}
+	}
+
+	// Show disabled services
 	if (i_params.services_disabled && i_params.services_disabled.length)
 	{
 		for (let srv of i_params.services_disabled)
@@ -194,3 +238,42 @@ function farm_showServicesInfo(i_node)
 	}
 }
 
+function farm_showTickets(i_el, i_params, i_type)
+{
+	// Show pool tickets:
+	if (i_params.tickets_pool)
+	{
+		for (let tk in i_params.tickets_pool)
+		{
+			let count = i_params.tickets_pool[tk][0];
+			let usage = i_params.tickets_pool[tk][1];
+
+			let elTk = document.createElement('div');
+			i_el.appendChild(elTk);
+			elTk.classList.add('service');
+			elTk.classList.add('ticket');
+			elTk.classList.add('pool');
+			if (count < 0)
+				elTk.classList.add('dummy');
+			if (usage > 0)
+				elTk.classList.add('running');
+
+			let label = '';
+			if (cm_TicketsIcons.includes(tk + '.png'))
+			{
+				let elIcon = document.createElement('img');
+				elTk.appendChild(elIcon);
+				elIcon.src = 'icons/tickets/' + tk + '.png';
+			}
+			else
+				label = tk + ' ';
+
+			if (count >= 0) label += 'x' + count;
+			if (usage >  0) label += ':' + usage;
+
+			let elLabel = document.createElement('div');
+			elTk.appendChild(elLabel);
+			elLabel.textContent = label;
+		}
+	}
+}

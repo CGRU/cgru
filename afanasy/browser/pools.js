@@ -40,11 +40,18 @@ PoolNode.prototype.init = function() {
 
 	this.element.appendChild(document.createElement('br'));
 
-	this.elFlags = cm_ElCreateFloatText(this.element, 'left', 'Flags');
 	this.elPoolsCounts = cm_ElCreateFloatText(this.element, 'left', 'Pools: All/Running');
 	this.elRendersCounts = cm_ElCreateFloatText(this.element, 'left', 'Renders: All/Running');
 
-	this.elRunningCounts = cm_ElCreateFloatText(this.element, 'right');
+	this.elHostProperties = cm_ElCreateFloatText(this.element, 'right');
+
+	this.element.appendChild(document.createElement('br'));
+
+	this.elServices = document.createElement('div');
+	this.element.appendChild(this.elServices);
+
+	this.elTickets = document.createElement('div');
+	this.element.appendChild(this.elTickets);
 
 	this.elAnnotation = document.createElement('div');
 	this.element.appendChild(this.elAnnotation);
@@ -133,12 +140,10 @@ PoolNode.prototype.update = function(i_obj) {
 	if (this.params.renders_total == null)
 	{
 		this.element.classList.add('empty');
-		this.elFlags.style.display = 'none';
 	}
 	else
 	{
 		this.element.classList.remove('empty');
-		this.elFlags.style.display = 'block';
 	}
 	if (this.params.running_tasks_num)
 		this.element.classList.add('running');
@@ -151,20 +156,6 @@ PoolNode.prototype.update = function(i_obj) {
 		name += ' [' + this.params.pattern + ']';
 	this.elName.innerHTML = name;
 
-	var flags = '';
-	var flags_tip = 'Flags:';
-	if (this.params.create_childs)
-	{
-		flags += ' <b>ACC</b>';
-		flags_tip += '\nAuto create childs';
-	}
-	else
-	{
-		flags_tip += '\nDo not create childs';
-	}
-
-	this.elFlags.innerHTML = flags;
-	this.elFlags.title = flags_tip;
 
 	if (cm_IsPadawan())
 	{
@@ -217,9 +208,21 @@ PoolNode.prototype.update = function(i_obj) {
 		this.elPoolsCounts.innerHTML = counts;
 	}
 
-	// Running counts:
-	this.elRunningCounts.textContent = '';
-	farm_showServices(this.elRunningCounts, this.params,'pools');
+	// Host properites
+	let hostProps = '';
+	if (this.params.power_host != null)
+		hostProps += this.params.power_host;
+	if (this.params.properties_host)
+		hostProps += this.params.properties_host;
+	this.elHostProperties.innerHTML = '<b>' + hostProps + '</b>';
+
+	// Show servives:
+	this.elServices.textContent = '';
+	farm_showServices(this.elServices, this.params,'pools');
+
+	// Show tickets:
+	this.elTickets.textContent = '';
+	farm_showTickets(this.elTickets, this.params,'pools');
 
 	// Annotation
 	if (this.params.annotation)

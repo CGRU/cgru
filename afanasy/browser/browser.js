@@ -141,6 +141,7 @@ function g_ConfigReceived(i_obj)
 	cm_ApplyStyles();
 
 	nw_GetSoftwareIcons();
+	nw_GetTicketsIcons();
 	g_RegisterSend();
 	g_Refresh();
 }

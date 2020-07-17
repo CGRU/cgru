@@ -347,22 +347,37 @@ text-transform: lowercase;
 }
 
 .service, .disabled_service {
-float: left;
 margin: 1px 4px;
 padding: 1px 4px;
 border-radius: 2px;
+}
+.service {
+font-weight: bold;
+float: left;
 border: 1px solid #555;
+}
+.service.running {
+border: 1px solid #FF5;
+font-style: italic;
+}
+.disabled_service {
+float: right;
+border: 1px solid #F55;
+}
+.service.dummy {
+font-weight: normal;
+border: 1px dashed #FF5;
 }
 /*
 	.service.disabled is a configured service that is temporary disabled
 	.disabled_service is not a service that is disabled, it is not a service
  */
-.service { font-weight: bold;}
-.service img { width: 12px; height: 12px; float: left;}
+.service img { width: 14px; height: 14px; float: left; margin: 1px 2px;}
+.service.ticket img { width: auto;}
 .info_services .service .name { padding: 4px; }
 .info_services .disabled_service .name { padding: 2px 4px; }
 .info_services .service img { width: 24px; height: 24px; }
-.service.disabled { opacity: 0.7;}
+.service.disabled { opacity: 0.7; border: 1px solid #F55;}
 .service.disabled div { text-decoration: line-through; font-style: italic;}
 .disabled_service { text-decoration: line-through;}
 .service .button.delete, .disabled_service .button.delete { float: right;}
