@@ -354,17 +354,9 @@ int Item::drawTicket(QPainter * i_painter, const QPen & i_text_pen,
 
 	const QPixmap * icon = Watch::getTicketIcon(i_name);
 	QString text;
-	if (i_count != -1)
-	{
-		if (i_usage == -1)
-			text = QString(" x%1").arg(i_count);
-		else
-			text = QString(" x%1 / %2").arg(i_count).arg(i_usage);
-	}
-	else
-	{
-		text = QString(" x%1").arg(i_usage);
-	}
+
+	if (i_count >= 0) text += QString("x%1").arg(i_count);
+	if (i_usage >  0) text += QString(":%1").arg(i_usage);
 
 	QRect tk_rect;
 	int tk_width = 0;

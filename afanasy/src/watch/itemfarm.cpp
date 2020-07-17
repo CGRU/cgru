@@ -87,7 +87,7 @@ void ItemFarm::drawServices(QPainter * i_painter, const QStyleOptionViewItem & i
 		// Draw name:
 		QString name = m_services[i];
 		if (running_count)
-			name += QString(" x%1").arg(running_count);
+			name += QString(": %1").arg(running_count);
 		i_painter->setFont(afqt::QEnvironment::f_info);
 		QPen pen(Item::clrTextInfo(running_count, i_option.state & QStyle::State_Selected));
 		i_painter->setPen(pen);
@@ -127,7 +127,7 @@ void ItemFarm::drawServices(QPainter * i_painter, const QStyleOptionViewItem & i
 		}
 
 		// Draw name:
-		QString name = QString("%1 x%2").arg(it.key()).arg(it.value());
+		QString name = QString("%1: %2").arg(it.key()).arg(it.value());
 		i_painter->setFont(afqt::QEnvironment::f_muted);
 		QPen pen(Item::clrTextInfo(it.value(), i_option.state & QStyle::State_Selected));
 		i_painter->setPen(pen);
