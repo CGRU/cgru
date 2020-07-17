@@ -50,7 +50,7 @@ function farm_showServices(i_el, i_params, i_type)
 					if (rs == srv)
 					{
 						elSrv.classList.add('running');
-						srv += ' :' + i_params.running_services[rs];
+						srv += ': ' + i_params.running_services[rs];
 						break;
 					}
 				}
@@ -63,7 +63,7 @@ function farm_showServices(i_el, i_params, i_type)
 	}
 
 	// Show running services that not exists in services (dummy):
-	if (i_params.running_services)
+	if (i_params.running_services && (i_type == 'pool'))
 	{
 		for (let srv in i_params.running_services)
 		{
@@ -85,7 +85,7 @@ function farm_showServices(i_el, i_params, i_type)
 
 			let elName = document.createElement('div');
 			elSrv.appendChild(elName);
-			elName.textContent = srv + ' :' + i_params.running_services[srv];
+			elName.textContent = srv + ': ' + i_params.running_services[srv];
 		}
 	}
 
@@ -266,10 +266,10 @@ function farm_showTickets(i_el, i_params, i_type)
 				elIcon.src = 'icons/tickets/' + tk + '.png';
 			}
 			else
-				label = tk + ' ';
+				label = tk;
 
-			if (count >= 0) label += 'x' + count;
-			if (usage >  0) label += ':' + usage;
+			if (count >= 0) label += ' x' + count;
+			if (usage >  0) label += ': ' + usage;
 
 			let elLabel = document.createElement('div');
 			elTk.appendChild(elLabel);

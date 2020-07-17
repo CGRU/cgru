@@ -218,11 +218,11 @@ PoolNode.prototype.update = function(i_obj) {
 
 	// Show servives:
 	this.elServices.textContent = '';
-	farm_showServices(this.elServices, this.params,'pools');
+	farm_showServices(this.elServices, this.params,'pool');
 
 	// Show tickets:
 	this.elTickets.textContent = '';
-	farm_showTickets(this.elTickets, this.params,'pools');
+	farm_showTickets(this.elTickets, this.params,'pool');
 
 	// Annotation
 	if (this.params.annotation)
