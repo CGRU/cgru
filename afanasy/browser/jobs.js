@@ -1333,13 +1333,9 @@ JobBlock.prototype.update = function(i_displayFull) {
 JobNode.prototype.updatePanels = function() {
 	var elPanelR = this.monitor.elPanelR;
 
-	work_UpdatePanels(this.monitor, this);
-
-
 	// Blocks:
 	JobBlock.deselectAll(this.monitor);
 	elPanelR.m_elBlocks.classList.remove('active');
-
 
 	// Errors control buttons:
 	var errors = 0;
