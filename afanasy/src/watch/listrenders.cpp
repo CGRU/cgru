@@ -970,7 +970,7 @@ void ListRenders::ticketEdit(bool i_host_ticket)
 	bool ok;
 	QString name = QInputDialog::getText(this,
 			QString("Edit %1 Ticket").arg(i_host_ticket ? "Host" : "Pool"),
-			"Enter a new ticket name", QLineEdit::Normal, "", &ok);
+			"Enter ticket name", QLineEdit::Normal, "", &ok);
 	if (false == ok)
 		return;
 

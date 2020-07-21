@@ -356,6 +356,9 @@ font-weight: bold;
 float: left;
 border: 1px solid #555;
 }
+.service.ticket.host {
+float: right;
+}
 .service.running {
 border: 1px solid #FF5;
 font-style: italic;
@@ -377,6 +380,7 @@ border: 1px dashed #FF5;
 .info_services .service .name { padding: 4px; }
 .info_services .disabled_service .name { padding: 2px 4px; }
 .info_services .service img { width: 24px; height: 24px; }
+.info_services .service.ticket img { width: auto; height: 24px; }
 .service.disabled { opacity: 0.7; border: 1px solid #F55;}
 .service.disabled div { text-decoration: line-through; font-style: italic;}
 .disabled_service { text-decoration: line-through;}

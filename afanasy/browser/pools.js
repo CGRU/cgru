@@ -222,7 +222,8 @@ PoolNode.prototype.update = function(i_obj) {
 
 	// Show tickets:
 	this.elTickets.textContent = '';
-	farm_showTickets(this.elTickets, this.params,'pool');
+	farm_showTickets(this.elTickets, this.params.tickets_pool, 'pool');
+	farm_showTickets(this.elTickets, this.params.tickets_host, 'host');
 
 	// Annotation
 	if (this.params.annotation)
@@ -305,6 +306,9 @@ PoolNode.prototype.updatePanels = function() {
 	this.monitor.setPanelInfo(info);
 
 	farm_showServicesInfo(this);
+
+	farm_showTicketsInfo(this, 'pool');
+	farm_showTicketsInfo(this, 'host');
 };
 
 // RenderNode here! This not an error!
@@ -326,7 +330,7 @@ PoolNode.prototype.addPoolDo = function(i_value, i_name) {
 	var operation = {};
 	operation.type = 'add_pool';
 	operation.name = i_value;
-	nw_Action('pools', [this.monitor.getSelectedIds()[0]], operation, null);
+	nw_Action('pools', [this.monitor.getSelectedIds()[0]], operation);
 };
 
 PoolNode.prototype.serviceApply = function(i_value, i_name) {
@@ -336,8 +340,29 @@ PoolNode.prototype.serviceApply = function(i_value, i_name) {
 	operation.mode = i_name;
 	operation.name = i_value;
 	operation.mask = i_value;
-	nw_Action('pools', this.monitor.getSelectedIds(), operation, null);
+	nw_Action('pools', this.monitor.getSelectedIds(), operation);
 };
+
+PoolNode.prototype.editTicket = function(i_value, i_param) {
+	var type;
+	var count = 1;
+
+	if (i_param == 'ticket_edit_host')
+	{
+		type = 'host';
+		if (this.params.tickets_host && this.params.tickets_host[i_value])
+			count = this.params.tickets_host[i_value][0];
+	}
+	else
+	{
+		type = 'pool';
+		if (this.params.tickets_pool && this.params.tickets_pool[i_value])
+			count = this.params.tickets_pool[i_value][0];
+	}
+
+	farm_ticketEditDialog(i_value, count, type, this);
+};
+
 
 PoolNode.prototype.onDoubleClick = function(e) {
 	g_ShowObject({"object": this.params}, {"evt": e, "wnd": this.monitor.window});

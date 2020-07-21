@@ -238,42 +238,136 @@ function farm_showServicesInfo(i_node)
 	}
 }
 
-function farm_showTickets(i_el, i_params, i_type)
+function farm_showTickets(i_el, i_tickets, i_type)
 {
-	// Show pool tickets:
-	if (i_params.tickets_pool)
+	if (i_tickets == null)
+		return;
+
+	for (let tk in i_tickets)
 	{
-		for (let tk in i_params.tickets_pool)
+		let count = i_tickets[tk][0];
+		let usage = i_tickets[tk][1];
+
+		let elTk = document.createElement('div');
+		i_el.appendChild(elTk);
+		elTk.classList.add('service');
+		elTk.classList.add('ticket');
+		elTk.classList.add(i_type);
+		if (count < 0)
+			elTk.classList.add('dummy');
+		if (usage > 0)
+			elTk.classList.add('running');
+
+		let label = '';
+		if (cm_TicketsIcons.includes(tk + '.png'))
 		{
-			let count = i_params.tickets_pool[tk][0];
-			let usage = i_params.tickets_pool[tk][1];
+			let elIcon = document.createElement('img');
+			elTk.appendChild(elIcon);
+			elIcon.src = 'icons/tickets/' + tk + '.png';
+		}
+		else
+			label = tk;
 
-			let elTk = document.createElement('div');
-			i_el.appendChild(elTk);
-			elTk.classList.add('service');
-			elTk.classList.add('ticket');
-			elTk.classList.add('pool');
-			if (count < 0)
-				elTk.classList.add('dummy');
-			if (usage > 0)
-				elTk.classList.add('running');
+		if (count >= 0) label += ' x' + count;
+		if (usage >  0) label += ': ' + usage;
 
-			let label = '';
-			if (cm_TicketsIcons.includes(tk + '.png'))
-			{
-				let elIcon = document.createElement('img');
-				elTk.appendChild(elIcon);
-				elIcon.src = 'icons/tickets/' + tk + '.png';
-			}
-			else
-				label = tk;
+		let elLabel = document.createElement('div');
+		elTk.appendChild(elLabel);
+		elLabel.textContent = label;
+	}
+}
 
-			if (count >= 0) label += ' x' + count;
-			if (usage >  0) label += ': ' + usage;
+function farm_showTicketsInfo(i_node, i_type)
+{
+	var tickets = i_node.params['tickets_' + i_type];
+	if (tickets == null)
+		return;
 
-			let elLabel = document.createElement('div');
-			elTk.appendChild(elLabel);
-			elLabel.textContent = label;
+	let elTickets = document.createElement('div');
+	i_node.monitor.getElPanelInfo().appendChild(elTickets);
+	elTickets.classList.add('info_services');
+	elTickets.classList.add('info_tickets');
+
+	let elTicketsLabel = document.createElement('div');
+	elTickets.appendChild(elTicketsLabel);
+	elTicketsLabel.classList.add('info_services_label');
+	elTicketsLabel.textContent = 'Tickets ' + i_type + ':';
+
+	for (let tk in tickets)
+	{
+		let count = tickets[tk][0];
+		let usage = tickets[tk][1];
+
+		let elTk = document.createElement('div');
+		elTickets.appendChild(elTk);
+		elTk.classList.add('service');
+		elTk.classList.add('ticket');
+		elTk.classList.add(i_type);
+		if (count < 0)
+			elTk.classList.add('dummy');
+		if (usage > 0)
+			elTk.classList.add('running');
+
+		if (cm_TicketsIcons.includes(tk + '.png'))
+		{
+			let elIcon = document.createElement('img');
+			elTk.appendChild(elIcon);
+			elIcon.src = ('icons/tickets/' + tk + '.png');
+		}
+
+		let label = tk;
+		if (count > 0) label += ' x' + count;
+		if (usage > 0) label += ': ' + usage;
+
+		let elLabel = document.createElement('div');
+		elTk.appendChild(elLabel);
+		elLabel.classList.add('name');
+		elLabel.textContent = label;
+
+		elTk.m_name = tk;
+		elTk.m_count = count;
+		elTk.m_type = i_type;
+		elTk.m_node = i_node;
+		elTk.ondblclick = function(e){
+			var el = e.currentTarget;
+			farm_ticketEditDialog(el.m_name, el.m_count, el.m_type, el.m_node);
 		}
 	}
+}
+
+function farm_ticketEditDialog(i_name, i_count, i_type, i_node)
+{
+	var args = {};
+
+	if ((i_name == null) || (i_name.length == 0))
+	{
+		g_Error('Invalid ticket name');
+		return;
+	}
+
+	args.param = {};
+	args.param.name = i_name;
+	args.param.type = i_type;
+	args.param.node = i_node;
+
+	args.type = 'num';
+	args.receiver = i_node.monitor.window;
+	args.handle = 'farm_ticketEditApply';
+	args.value = i_count;
+	args.name = 'ticket_edit';
+	args.title = 'Edit Ticket';
+	args.info = 'Enter a new "' + i_name + '" ' + i_type + ' ticket number:<br>Type -1 to remove ticket.';
+
+	new cgru_Dialog(args);
+}
+
+function farm_ticketEditApply(i_value, i_param)
+{
+	var operation = {};
+	operation.type = 'tickets';
+	operation.name = i_param.name;
+	operation.count = i_value;
+	if (i_param.type == 'host')
+		operation.host = true;
+	nw_Action(i_param.node.node_type, [i_param.node.params.id], operation);
 }

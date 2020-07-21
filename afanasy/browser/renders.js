@@ -589,6 +589,18 @@ RenderNode.clearServices = function(i_args) {
 	nw_Action(i_args.monitor.cur_item.node_type, i_args.monitor.getSelectedIds(), operation, null);
 };
 
+RenderNode.editTicket = function(i_args) {
+	new cgru_Dialog({
+		"wnd": i_args.monitor.window,
+		"receiver": i_args.monitor.cur_item,
+		"handle": 'editTicket',
+		"param": i_args.name,
+		"name": i_args.name,
+		"title": i_args.tooltip,
+		"info": 'Enter Ticket Name:'
+	});
+};
+
 function RenderTask(i_task, i_elParent)
 {
 	this.elParent = i_elParent;
@@ -821,6 +833,18 @@ RenderNode.createPanels = function(i_monitor) {
 		'name': 'services',
 		'label': 'Services',
 		'tooltip': 'Enable/Disable services.',
+		'sub_menu': acts
+	});
+
+
+	// Tickets:
+	acts = {};
+	acts.ticket_edit_pool = {'handle':'editTicket', 'label':'Add/Edit Pool', 'tooltip':'Add or edit pool ticket.'};
+	acts.ticket_edit_host = {'handle':'editTicket', 'label':'Add/Edit Host', 'tooltip':'Add or edit pool ticket.'};
+	i_monitor.createCtrlBtn({
+		'name': 'tickets',
+		'label': 'Tickets',
+		'tooltip': 'Edit tickets.',
 		'sub_menu': acts
 	});
 
