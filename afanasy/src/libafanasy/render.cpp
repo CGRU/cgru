@@ -97,7 +97,7 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const // Threa
 
 	o_str << ",\n\"st\":" << m_state;
 	o_str << ",\n";
-	jw_state( m_state, o_str, true /*it is render node state type*/);
+	jw_stateRender(m_state, o_str);
 
 	o_str << ",\n\"capacity_used\":" << m_capacity_used;
 	o_str << ",\n\"task_start_finish_time\":" << m_task_start_finish_time;

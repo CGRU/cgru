@@ -77,9 +77,17 @@ RenderNode.prototype.init = function() {
 	this.elCapacity = cm_ElCreateText(this.element, 'Capacity');
 	this.elStateTime = cm_ElCreateFloatText(this.element, 'right', 'Busy/Free Status and Time');
 
-	this.elFarm = document.createElement('div');
-	this.element.appendChild(this.elFarm);
-	this.elFarm.classList.add('farm');
+	this.elServices = document.createElement('div');
+	this.element.appendChild(this.elServices);
+	this.elServices.classList.add('serivces');
+
+	this.elTickets = document.createElement('div');
+	this.element.appendChild(this.elTickets);
+	this.elTickets.classList.add('tickets');
+
+	this.elTasks = document.createElement('div');
+	this.element.appendChild(this.elTasks);
+	this.elTasks.classList.add('tasks');
 
 	this.elAnnotation = document.createElement('div');
 	this.element.appendChild(this.elAnnotation);
@@ -154,7 +162,7 @@ RenderNode.prototype.update = function(i_obj) {
 		if (r == null)
 			return;
 
-		if ((this.state.ONL != true) || (this.params.host_resources == null))
+		if ((this.state.ONL != true) || (this.host_resources == null))
 		{
 			// If render just become online,
 			// or resources received first time,
@@ -193,7 +201,7 @@ RenderNode.prototype.update = function(i_obj) {
 		}
 
 
-		this.params.host_resources = r;
+		this.host_resources = r;
 
 		var usr = r.cpu_user + r.cpu_nice;
 		var sys = r.cpu_system + r.cpu_iowait + r.cpu_irq + r.cpu_softirq;
@@ -343,7 +351,7 @@ RenderNode.prototype.update = function(i_obj) {
 		this.clearTasks();
 		this.plottersCsDelete();
 		this.elResources.style.display = 'none';
-		this.params.host_resources = null;
+		this.host_resources = null;
 		this.elCapacity.textContent = '';
 		this.elRunTasks.textContent = '';
 		this.state.textContent = '';
@@ -386,15 +394,18 @@ RenderNode.prototype.update = function(i_obj) {
 		this.elStar.style.display = 'none';
 
 
-	// Running counts:
-	this.elFarm.textContent = '';
-	farm_showServices(this.elFarm, this.params,'renders');
+	// Show servives:
+	this.elServices.textContent = '';
+	farm_showServices(this.elServices, this.params,'renders');
 
+	// Show tickets:
+	this.elTickets.textContent = '';
+	farm_showTickets(this.elTickets, this.params.tickets_host, 'host', this);
 
 	this.clearTasks();
 	if (this.params.tasks != null)
 		for (var t = 0; t < this.params.tasks.length; t++)
-			this.tasks.push(new RenderTask(this.params.tasks[t], this.element));
+			this.tasks.push(new RenderTask(this.params.tasks[t], this.elTasks));
 
 	this.updateTasksPercents();
 	this.refresh();
@@ -406,6 +417,7 @@ RenderNode.prototype.offsetHierarchy = function() {
 	if (parent_pool)
 		depth = parent_pool.pool_depth + 1;
 	this.element.style.marginLeft = (depth * 32 + 2) + 'px';
+	this.m_parent_pool = parent_pool;
 }
 
 RenderNode.prototype.plottersCsDelete = function() {
@@ -599,6 +611,16 @@ RenderNode.editTicket = function(i_args) {
 		"title": i_args.tooltip,
 		"info": 'Enter Ticket Name:'
 	});
+};
+
+RenderNode.prototype.editTicket = function(i_value, i_param) {
+	var type;
+	var count = 1;
+
+	if (this.params.tickets_host && this.params.tickets_host[i_value])
+		count = this.params.tickets_host[i_value][0];
+
+	farm_ticketEditDialog(i_value, count, 'host', this);
 };
 
 function RenderTask(i_task, i_elParent)
@@ -839,14 +861,15 @@ RenderNode.createPanels = function(i_monitor) {
 
 	// Tickets:
 	acts = {};
-	acts.ticket_edit_pool = {'handle':'editTicket', 'label':'Add/Edit Pool', 'tooltip':'Add or edit pool ticket.'};
-	acts.ticket_edit_host = {'handle':'editTicket', 'label':'Add/Edit Host', 'tooltip':'Add or edit pool ticket.'};
-	i_monitor.createCtrlBtn({
-		'name': 'tickets',
-		'label': 'Tickets',
-		'tooltip': 'Edit tickets.',
-		'sub_menu': acts
-	});
+	acts.ticket_edit_pool = {'handle':'editTicket', 'label':'Ticket Pool', 'tooltip':'Add or edit pool ticket.','node_type':'pools'};
+	acts.ticket_edit_host = {'handle':'editTicket', 'label':'Ticket Host', 'tooltip':'Add or edit host ticket.'};
+	i_monitor.createCtrlBtns(acts);
+//	i_monitor.createCtrlBtn({
+//		'name': 'tickets',
+//		'label': 'Tickets',
+//		'tooltip': 'Edit tickets.',
+//		'sub_menu': acts
+//	});
 
 
 	// Power/WOL:
@@ -884,14 +907,16 @@ RenderNode.prototype.updatePanels = function() {
 
 	info += '<p>Pool: <b>' + this.params.pool + '</b></p>';
 
-	info += '<p>IP: ' + this.params.address.ip + '</p>';
+	info += '<p>IP: <b>' + this.params.address.ip + '</b></p>';
 
-	var r = this.params.host_resources;
+	var r = this.host_resources;
 	if (r)
 	{
-		info += '<p>' + r.cpu_mhz + 'x' + r.cpu_num + 'MHz';
-		info += ' ' + Math.round(r.mem_total_mb / 1024) + 'Gb';
-		info += ' HDD' + r.hdd_total_gb + 'Gb';
+		info += '<p>';
+		info += ' CPU: <b>' + r.cpu_mhz + '</b>x<b>' + r.cpu_num + '</b> MHz';
+		info += ' MEM: <b>' + Math.round(r.mem_total_mb / 1024) + '</b> Gb';
+		info += ' SWP: <b>' + Math.round(r.swap_total_mb / 1024) + '</b> Gb';
+		info += ' HDD: <b>' + r.hdd_total_gb + '</b> Gb';
 		info += '</p>';
 	}
 
@@ -908,6 +933,8 @@ RenderNode.prototype.updatePanels = function() {
 	this.monitor.setPanelInfo(info);
 
 	farm_showServicesInfo(this);
+
+	farm_showTicketsInfo(this, 'host');
 };
 
 RenderNode.actions = [];

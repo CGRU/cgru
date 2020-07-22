@@ -330,7 +330,9 @@ namespace af
 	void jw_stringmap( const char * i_name, const std::map<std::string,std::string> & i_map, std::ostringstream & o_str);
 	void jw_int32list( const char * i_name, const std::list<int32_t> & i_list, std::ostringstream & o_str);
 	void jw_int32vec( const char * i_name, const std::vector<int32_t> & i_vec, std::ostringstream & o_str);
-	void jw_state( const int64_t & i_state, std::ostringstream & o_str, bool i_render = false);
+	void jw_stateJob(   const int64_t & i_state, std::ostringstream & o_str);
+	void jw_statePool(  const int64_t & i_state, std::ostringstream & o_str);
+	void jw_stateRender(const int64_t & i_state, std::ostringstream & o_str);
 
 	af::Msg * jsonMsg( const std::string & i_str);
 	af::Msg * jsonMsg( const std::ostringstream & i_stream);

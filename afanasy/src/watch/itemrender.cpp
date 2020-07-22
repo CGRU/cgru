@@ -149,8 +149,8 @@ bool ItemRender::calcHeight()
 	if (m_services.size() || m_services_disabled.size())
 		m_height += HeightServices;
 
-//	if (m_tickets_pool.size() || m_tickets_host.size())
-//		m_height += HeightTickets;
+	if (m_tickets_host.size() && (m_tasks.size() == 0))
+		m_height += HeightTickets - 4;
 
 	return old_height == m_height;
 }
@@ -447,9 +447,10 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 
 		m_info_text_hres.clear();
 		m_info_text_hres += QString("CPU: <b>%1</b> x<b>%2</b> MHz").arg(m_hres.cpu_mhz).arg(m_hres.cpu_num);
-		m_info_text_hres += QString("<br>MEM: <b>%1 Gb</b>").arg(m_hres.mem_total_mb>>10);
+		m_info_text_hres += QString("<br>MEM: <b>%1</b> Gb").arg(m_hres.mem_total_mb>>10);
 		if( m_hres.swap_total_mb )
-			m_info_text_hres += QString(" Swap: <b>%1 Gb</b>").arg(m_hres.swap_total_mb>>10);
+			m_info_text_hres += QString(" Swap: <b>%1</b> Gb").arg(m_hres.swap_total_mb>>10);
+		m_info_text_hres += QString("<br>HDD: <b>%1</b> Gb").arg(m_hres.hdd_total_gb);
 
 		m_loggedin_users.clear();
 		if (m_hres.logged_in_users.size())

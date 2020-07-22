@@ -21,7 +21,8 @@ const int ItemPool::HeightAnnotation = 14;
 
 ItemPool::ItemPool(ListRenders * i_list_renders, af::Pool * i_pool, const CtrlSortFilter * i_ctrl_sf):
 	ItemFarm(i_list_renders, i_pool, TPool, i_ctrl_sf),
-	m_root(false)
+	m_root(false),
+	m_paused(false)
 {
 	updateValues(i_pool, 0);
 }
@@ -38,7 +39,14 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 
 	updateFarmValues(pool);
 
-	m_root = pool->isRoot();
+	m_root   = pool->isRoot();
+	m_busy   = pool->isBusy();
+	m_paused = pool->isPaused();
+
+	if( m_busy )
+		setRunning();
+	else
+		setNotRunning();
 
 	setParentPath(afqt::stoq(pool->getParentPath()));
 	m_sort_force = m_name;
@@ -63,12 +71,7 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 	m_params["idle_netmbs"]        = pool->m_idle_netmbs;
 	m_params["busy_netmbs"]        = pool->m_busy_netmbs;
 	m_params["idle_wolsleep_time"] = pool->m_idle_wolsleep_time;
-/*
-	if (running_tasks_num)
-		setRunning();
-	else
-		setNotRunning();
-*/
+
 	strLeftTop = m_name;
 	if (false == m_root)
 		strLeftTop += QString(": %1").arg(afqt::stoq(pool->getPatternStr()));
@@ -87,6 +90,10 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 			strLeftBottom += QString(" Pools Total: %1").arg(pool->getPoolsTotal());
 		if (pool->getRendersTotal())
 			strLeftBottom += QString(" Renders Total: %1").arg(pool->getRendersTotal());
+		if (pool->getRunTasks())
+			strLeftBottom += QString(" Running Tasks: %1").arg(pool->getRunTasks());
+		if (pool->getRunCapacity())
+			strLeftBottom += QString(" Running Capacity: %1").arg(pool->getRunCapacity());
 
 		if (pool->isNewRenderNimby())
 			strRightTop += " NewRender:Nimby";
@@ -106,6 +113,10 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 			strLeftBottom += QString(" Pools: %1").arg(pool->getPoolsTotal());
 		if (pool->getRendersTotal())
 			strLeftBottom += QString(" Renders: %1").arg(pool->getRendersTotal());
+		if (pool->getRunTasks())
+			strLeftBottom += QString(" Tasks: %1").arg(pool->getRunTasks());
+		if (pool->getRunCapacity())
+			strLeftBottom += QString(" Capacity: %1").arg(pool->getRunCapacity());
 
 		if (pool->isNewRenderNimby())
 			strRightTop += " New:Nimby";
@@ -125,6 +136,10 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 			strLeftBottom += QString(" p:%1").arg(pool->getPoolsTotal());
 		if (pool->getRendersTotal())
 			strLeftBottom += QString(" r:%1").arg(pool->getRendersTotal());
+		if (pool->getRunTasks())
+			strLeftBottom += QString(" t:%1").arg(pool->getRunTasks());
+		if (pool->getRunCapacity())
+			strLeftBottom += QString(" c:%1").arg(pool->getRunCapacity());
 
 		if (pool->isNewRenderNimby())
 			strRightTop += " n:Nimby";
@@ -138,6 +153,9 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 			strRightTop += QString(" se:%1").arg(pool->getSickErrorsCount());
 		strRightTop += QString(" p:%1").arg(pool->getPriority());
 	}
+
+	if (m_paused)
+		strRightTop += " PAUSED";
 
 	m_idle_wolsleep_time = pool->m_idle_wolsleep_time;
 	m_idle_free_time     = pool->m_idle_free_time;
@@ -196,7 +214,16 @@ bool ItemPool::calcHeight()
 
 void ItemPool::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const
 {
-	drawBack(i_painter, i_rect, i_option);
+	QColor c("#737770");
+	QColor cb("#838780");
+	QColor cp("#555555");
+//	const QColor * itemColor = &(afqt::QEnvironment::clr_itemrender.c);
+//	if (m_running_services.size()) itemColor = &(afqt::QEnvironment::clr_itemrenderbusy.c);
+	const QColor     * itemColor = &c;
+	if      (m_paused) itemColor = &cp;
+	else if (m_busy  ) itemColor = &cb;
+
+	drawBack(i_painter, i_rect, i_option, itemColor);
 	int x = i_rect.x() + 5;
 	int y = i_rect.y() + 2;
 	int w = i_rect.width() - 10;

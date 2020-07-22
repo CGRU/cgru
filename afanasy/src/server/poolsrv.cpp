@@ -65,6 +65,10 @@ PoolSrv::PoolSrv(const std::string & i_store_dir):
 
 bool PoolSrv::initialize()
 {
+	m_run_tasks = 0;
+	m_run_capacity = 0;
+	setBusy(false);
+
 	// Non root pool should have a parent
 	if ((m_name != "/") && (NULL == m_parent))
 	{
@@ -378,6 +382,11 @@ void PoolSrv::taskAcuire(const af::TaskExec * i_taskexec, MonitorContainer * i_m
 	// Increment service on af::Node
 	incrementService(i_taskexec->getServiceType());
 
+	// Increment running tasks and capacity:
+	m_run_tasks ++;
+	m_run_capacity += i_taskexec->getCapacity();
+	setBusy(true);
+
 	if (i_monitoring)
 		i_monitoring->addEvent(af::Monitor::EVT_pools_change, m_id);
 
@@ -409,6 +418,12 @@ void PoolSrv::taskRelease(const af::TaskExec * i_taskexec, MonitorContainer * i_
 	// Decrement service on af::Node
 	decrementService(i_taskexec->getServiceType());
 
+	// Decrement running tasks and capacity:
+	m_run_tasks --;
+	m_run_capacity -= i_taskexec->getCapacity();
+	if (m_run_tasks == 0)
+		setBusy(false);
+
 	if (i_monitoring)
 		i_monitoring->addEvent(af::Monitor::EVT_pools_change, m_id);
 
@@ -426,8 +441,6 @@ void PoolSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, Monitor
 	int32_t _pools_total = 0;
 	int32_t _renders_num = 0;
 	int32_t _renders_total = 0;
-	// Store values:
-	int64_t _time_empty = m_time_empty;
 
 	// Iterate pools
 	for (std::list<PoolSrv*>::const_iterator it = m_pools_list.begin(); it != m_pools_list.end(); it++)
@@ -445,37 +458,18 @@ void PoolSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, Monitor
 		_renders_total++;
 	}
 
-	// Store empty time (total renders == 0)
-	if (_renders_total == 0)
-	{
-		// Store only if it was not stored later
-		if (m_time_empty == 0)
-			_time_empty = i_currentTime;
-	}
-	else
-	{
-		// If there is some renders (pool not empty)
-		// time empty should be zero
-		_time_empty = 0;
-	}
-
 	// Compare changes
 	if ((_pools_num     != m_pools_num    ) ||
 		(_pools_total   != m_pools_total  ) ||
 		(_renders_num   != m_renders_num  ) ||
-		(_renders_total != m_renders_total) ||
-		(_time_empty    != m_time_empty   ))
+		(_renders_total != m_renders_total))
 		changed = true;
-
-	if (_time_empty != m_time_empty)
-		tostore = true;
 
 	// Store new calculations
 	m_pools_num     = _pools_num;
 	m_pools_total   = _pools_total;
 	m_renders_num   = _renders_num;
 	m_renders_total = _renders_total;
-	m_time_empty    = _time_empty;
 
 	// Emit events on changes
 	if (changed && i_monitoring)

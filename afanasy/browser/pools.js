@@ -57,6 +57,8 @@ PoolNode.prototype.init = function() {
 	this.element.appendChild(this.elAnnotation);
 	this.elAnnotation.classList.add('annotation');
 	this.elAnnotation.title = 'Annotation';
+
+	this.state = {};
 };
 
 PoolNode.prototype.getParmParent = function(i_parm) {
@@ -64,7 +66,17 @@ PoolNode.prototype.getParmParent = function(i_parm) {
 		return pools[this.params.parent].params[i_parm];
 	else
 		return this.params[i_parm];
-}
+};
+
+PoolNode.prototype.getTicketHostCount = function(i_tk) {
+	if (this.params.tickets_host && this.params.tickets_host[i_tk])
+		return this.params.tickets_host[i_tk][0];
+
+	if (this.m_parent_pool)
+		return this.m_parent_pool.getTicketHostCount(i_tk);
+
+	return -1;
+};
 
 PoolNode.prototype.update = function(i_obj) {
 	if (i_obj)
@@ -82,6 +94,7 @@ PoolNode.prototype.update = function(i_obj) {
 	if (parent_pool)
 		this.pool_depth = parent_pool.pool_depth + 1;
 	this.element.style.marginLeft = (this.pool_depth * 32 + 2) + 'px';
+	this.m_parent_pool = parent_pool;
 
 
 	// Offset child renders hierarchy:
@@ -89,6 +102,8 @@ PoolNode.prototype.update = function(i_obj) {
 		for (let render of renders_pools[this.params.name])
 			render.offsetHierarchy();
 			//^ this function requires filled in pools object
+
+	cm_GetState(this.params.state, this.state, this.element);
 
 	var params = '';
 	if (cm_IsPadawan())
@@ -133,6 +148,10 @@ PoolNode.prototype.update = function(i_obj) {
 			params += ' se:<b>' + this.params.sick_errors_count + '</b>';
 		params += ' p<b>' + this.params.priority + '</b>';
 	}
+
+	if (this.state.PAU)
+		params += ' <b>PAUSED</b>';
+
 	this.elParams.innerHTML = params;
 
 
@@ -222,8 +241,8 @@ PoolNode.prototype.update = function(i_obj) {
 
 	// Show tickets:
 	this.elTickets.textContent = '';
-	farm_showTickets(this.elTickets, this.params.tickets_pool, 'pool');
-	farm_showTickets(this.elTickets, this.params.tickets_host, 'host');
+	farm_showTickets(this.elTickets, this.params.tickets_pool, 'pool', this);
+	farm_showTickets(this.elTickets, this.params.tickets_host, 'host', this);
 
 	// Annotation
 	if (this.params.annotation)

@@ -14,11 +14,6 @@ public:
 
 	void v_updateValues(af::Node * i_afnode, int i_msgType);
 
-	int64_t running_capacity_total;
-
-	int64_t time_register;
-	int64_t time_activity;
-
 	void v_setSortType(   int i_type1, int i_type2 );
 	void v_setFilterType( int i_type );
 
@@ -43,6 +38,8 @@ private:
 
 private:
 	bool m_root;
+	bool m_busy;
+	bool m_paused;
 
 	QString strLeftBottom;
 	QString strLeftTop;

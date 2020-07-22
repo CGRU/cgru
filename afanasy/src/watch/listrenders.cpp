@@ -172,13 +172,13 @@ ListRenders::ListRenders( QWidget* parent):
 
 		resetButtonsMenu();
 
-		bp = addButtonPanel(Item::TRender, "PAUSE","renders_pause","Pause selected renders.","P");
-		connect( bp, SIGNAL( sigClicked()), this, SLOT( actSetPaused()));
+		bp = addButtonPanel(Item::TAny, "PAUSE","farm_pause","Pause selected renders.","P");
+		connect( bp, SIGNAL( sigClicked()), this, SLOT(actSetPaused()));
 
-		bp = addButtonPanel(Item::TRender, "START","renders_unpause","Start (Unpause) selected renders.","S");
-		connect( bp, SIGNAL( sigClicked()), this, SLOT( actUnsetPaused()));
+		bp = addButtonPanel(Item::TAny, "START","farm_unpause","Start (Unpause) selected renders.","S");
+		connect( bp, SIGNAL( sigClicked()), this, SLOT(actUnsetPaused()));
 
-		bp = addButtonPanel(Item::TAny, "DELETE","renders_delete","Delete pool or render.","", true);
+		bp = addButtonPanel(Item::TAny, "DELETE","farm_delete","Delete pool or render.","", true);
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(actDelete()));
 	}
 
@@ -871,8 +871,8 @@ void ListRenders::actMaxTasks()
 void ListRenders::actNIMBY()       {setParameter(Item::TRender, "NIMBY",  "true" );}
 void ListRenders::actNimby()       {setParameter(Item::TRender, "nimby",  "true" );}
 void ListRenders::actFree()        {setParameter(Item::TRender, "nimby",  "false");}
-void ListRenders::actSetPaused()   {setParameter(Item::TRender, "paused", "true" );}
-void ListRenders::actUnsetPaused() {setParameter(Item::TRender, "paused", "false");}
+void ListRenders::actSetPaused()   {setParameter(Item::TAny,    "paused", "true" );}
+void ListRenders::actUnsetPaused() {setParameter(Item::TAny,    "paused", "false");}
 
 void ListRenders::actUser()
 {

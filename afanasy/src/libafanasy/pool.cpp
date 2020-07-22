@@ -49,8 +49,6 @@ void Pool::initDefaultValues()
 	m_pattern.setCaseInsensitive();
 
 	m_time_creation = 0;
-	m_time_offline = 0;
-	m_time_empty = 0;
 
 	m_pools_num = 0;
 	m_pools_total = 0;
@@ -103,11 +101,11 @@ void Pool::v_jsonWrite(std::ostringstream & o_str, int i_type) const // Thread-s
 	o_str << ",\n\"pools_total\":"    << m_pools_total;
 	o_str << ",\n\"renders_num\":"    << m_renders_num;
 	o_str << ",\n\"renders_total\":"  << m_renders_total;
-/*
+
 	o_str << ",\n\"st\":" << m_state;
 	o_str << ",\n";
-	jw_state(m_state, o_str);
-*/
+	jw_statePool(m_state, o_str);
+
 	if (m_run_tasks > 0)
 		o_str << ",\n\"run_tasks\":" << m_run_tasks;
 	if (m_run_capacity > 0)

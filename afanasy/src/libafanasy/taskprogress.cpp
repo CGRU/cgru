@@ -54,7 +54,7 @@ void TaskProgress::jsonRead( const JSON & i_obj)
 void TaskProgress::jsonWrite( std::ostringstream & o_str) const
 {
 	o_str << "{";
-	jw_state( state, o_str);
+	jw_stateJob(state, o_str);
 	o_str << ",\"st\":" << state;
 	if( percent      > 0 ) o_str << ",\"per\":" << int(percent);
 	if( frame        > 0 ) o_str << ",\"frm\":" << frame;

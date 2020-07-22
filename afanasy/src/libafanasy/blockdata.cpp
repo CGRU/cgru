@@ -474,7 +474,7 @@ void BlockData::jsonWrite(std::ostringstream &o_str, int i_type) const
 			if (m_state != 0)
 			{
 				o_str << ",\n";
-				jw_state(m_state, o_str);
+				jw_stateJob(m_state, o_str);
 			}
 			if (m_job_id != 0) o_str << ",\n\"job_id\":" << m_job_id;
 

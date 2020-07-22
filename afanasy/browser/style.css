@@ -394,11 +394,6 @@ margin-top: 4px;
 padding-top: 4px;
 }
 
-.render .farm {
-clear: both;
-float: right;
-}
-
 .render .resources {
 background: #EEEE99;
 position: absolute;
@@ -406,6 +401,10 @@ top: 0;
 left: 54%;
 width: 0;
 overflow: visible;
+}
+
+.item.render .tickets {
+float: right;
 }
 
 .item.render .plotter {

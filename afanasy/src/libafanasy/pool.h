@@ -33,6 +33,9 @@ public:
 
 	bool jsonRead(const JSON & i_object, std::string * io_changes = NULL);
 
+	inline bool isBusy() const {return (m_state & SBusy);}
+	inline void setBusy(bool set) {m_state = set ? m_state | SBusy : m_state & (~SBusy); }
+
 	inline bool isPaused() const { return (m_state & SPaused);}
 	inline void setPaused(bool set) { m_state = set ? m_state | SPaused : m_state & (~SPaused); }
 
@@ -58,8 +61,8 @@ public:
 public:
 	enum State
 	{
-		SPaused  = 1ULL << 0,
-		SBusy    = 1ULL << 1
+		SBusy    = 1ULL << 0,
+		SPaused  = 1ULL << 1,
 	};
 
 	int32_t m_idle_wolsleep_time;
@@ -97,9 +100,6 @@ protected:
 	int32_t m_pools_total;
 	int32_t m_renders_num;
 	int32_t m_renders_total;
-
-	int64_t m_time_offline;
-	int64_t m_time_empty;
 
 	int32_t m_run_tasks;
 	int32_t m_run_capacity;

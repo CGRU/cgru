@@ -435,12 +435,12 @@ void ParamTicket::update(int i_count, int i_usage)
 	if (i_usage > 0)
 	{
 		if (i_count < 0)
-			m_count_label->setText(QString(" / %1").arg(i_usage));
+			m_count_label->setText(QString(": %1").arg(i_usage));
 		else
-			m_count_label->setText(QString(" x %1 / %2").arg(i_count).arg(i_usage));
+			m_count_label->setText(QString("x%1: %2").arg(i_count).arg(i_usage));
 	}
 	else
-		m_count_label->setText(QString(" x %1").arg(i_count));
+		m_count_label->setText(QString("x%1").arg(i_count));
 
 	if (i_count < 0)
 	{

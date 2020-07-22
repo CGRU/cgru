@@ -238,7 +238,7 @@ function farm_showServicesInfo(i_node)
 	}
 }
 
-function farm_showTickets(i_el, i_tickets, i_type)
+function farm_showTickets(i_el, i_tickets, i_type, i_node)
 {
 	if (i_tickets == null)
 		return;
@@ -247,13 +247,23 @@ function farm_showTickets(i_el, i_tickets, i_type)
 	{
 		let count = i_tickets[tk][0];
 		let usage = i_tickets[tk][1];
+		let dummy = false;
+
+		if ((i_node.node_type == 'renders') && (count == -1) && (i_node.m_parent_pool))
+		{
+			count = i_node.m_parent_pool.getTicketHostCount(tk);
+			if (count == -1)
+				continue;
+
+			dummy = true;
+		}
 
 		let elTk = document.createElement('div');
 		i_el.appendChild(elTk);
 		elTk.classList.add('service');
 		elTk.classList.add('ticket');
 		elTk.classList.add(i_type);
-		if (count < 0)
+		if ((count < 0) || dummy)
 			elTk.classList.add('dummy');
 		if (usage > 0)
 			elTk.classList.add('running');
