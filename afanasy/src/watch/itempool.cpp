@@ -237,8 +237,8 @@ void ItemPool::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleO
 	i_painter->setPen(clrTextInfo(i_option));
 	i_painter->setFont(afqt::QEnvironment::f_info);
 	i_painter->drawText(x, y, w, height_pool, Qt::AlignLeft  | Qt::AlignBottom, strLeftBottom);
-	i_painter->drawText(x, y, w, height_pool, Qt::AlignRight | Qt::AlignBottom, strRightBottom);
 	i_painter->setPen(afqt::QEnvironment::qclr_black);
+	i_painter->drawText(x, y, w, height_pool, Qt::AlignRight | Qt::AlignBottom, strRightBottom);
 	i_painter->drawText(x, y, w, height_pool, Qt::AlignRight | Qt::AlignTop,    strRightTop);
 
 	y += HeightPool;
