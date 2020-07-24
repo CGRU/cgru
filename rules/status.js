@@ -1435,7 +1435,6 @@ Status.prototype.editSave = function(i_args) {
 			if (statuses[i].obj.flags == null)
 				statuses[i].obj.flags = [];
 
-console.log(JSON.stringify(flags));
 			for (let a = 0; a < statuses[i].obj.flags.length;)
 				if (flags[statuses[i].obj.flags[a]] == null)
 					statuses[i].obj.flags.splice(a, 1);
