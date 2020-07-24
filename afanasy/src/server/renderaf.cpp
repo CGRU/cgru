@@ -849,7 +849,6 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 
 	JobContainer * jobs = (JobContainer*)pointer;
 
-
 	if ((NULL == m_parent) && isOnline())
 	{
 		AF_ERR << "Render '" + getName() + "' has no pool.";
@@ -865,6 +864,22 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 		offline( jobs, af::TaskExec::UPRenderZombie, monitoring);
 		return;
 	}
+
+	// Remove dummy tickets that were needed to store usage only
+	bool dummy_ticket_found = false;
+	std::map<std::string, Tiks>::iterator hIt = m_tickets_host.begin();
+	while (hIt != m_tickets_host.end())
+	{
+		if ((hIt->second.count < 0) && (hIt->second.usage <= 0))
+		{
+			hIt = m_tickets_host.erase(hIt);
+			dummy_ticket_found = true;
+		}
+		else
+			hIt++;
+	}
+	if (dummy_ticket_found)
+		monitoring->addEvent(af::Monitor::EVT_renders_change, m_id);
 
 	// Later auto nimby operations not needed if render is not online:
 	if( isOffline())
@@ -1011,16 +1026,6 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 				store();
 			}
 		}
-	}
-
-	// Remove dummy tickets that were needed to store usage only
-	std::map<std::string, Tiks>::iterator hIt = m_tickets_host.begin();
-	while (hIt != m_tickets_host.end())
-	{
-		if ((hIt->second.count < 0) && (hIt->second.usage <= 0))
-			hIt = m_tickets_host.erase(hIt);
-		else
-			hIt++;
 	}
 }
 
