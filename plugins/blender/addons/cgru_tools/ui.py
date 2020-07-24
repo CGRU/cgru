@@ -2,9 +2,11 @@
 import bpy
 from . import operators
 from . import utils
-
+from . import addon_prefs
 
 class RENDER_PT_Afanasy(bpy.types.Panel):
+
+    bl_idname = "CGRU_props"
     bl_label = "Afanasy"
     bl_category = 'CGRU_props'
     bl_space_type = 'PROPERTIES'
@@ -69,8 +71,8 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
         row = layout.row(align=True)
         row.operator(operators.CGRU_Submit.bl_idname, icon='RENDER_STILL')
         row.operator(operators.CGRU_Browse.bl_idname)
+        prefs = utils.get_preferences()
 
-        prefs = context.user_preferences.addons[__package__].preferences
         if prefs.cgru_version == utils.CGRU_NOT_FOUND:
             row.enabled = False
             layout.label(

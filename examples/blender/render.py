@@ -12,7 +12,7 @@ block.setNumeric(1, 20, 2)
 job.blocks.append(block)
 
 print('')
-job.output(True)
+job.output()
 print('')
 
 job.send()

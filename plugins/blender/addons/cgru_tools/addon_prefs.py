@@ -13,13 +13,14 @@ def update_location(self, context):
 
 class CGRUAddonPreferences(AddonPreferences):
     bl_idname = __package__
+    bl_label = "CGRUAddonPreferences"
 
-    cgru_location = StringProperty(
+    cgru_location : StringProperty(
         name="CGRU Root location",
         subtype="DIR_PATH",
         update=update_location)
 
-    cgru_version = StringProperty(
+    cgru_version : StringProperty(
         name="CGRU version",
         default="NOT FOUND")
 

@@ -5,7 +5,7 @@ bl_info = {
     "name": "CGRU Tools",
     "author": "Timur Hairulin, Paul Geraskin, Sylvain Maziere",
     "version": (1, 0, 0),
-    "blender": (2, 7, 1),
+    "blender": (2, 80, 0),
     "location": "Properties > Render > Afanasy",
     "description": "CGRU Tools",
     "warning": "",
@@ -31,26 +31,31 @@ else:
 
 import bpy
 
-
 def register():
-    bpy.utils.register_module(__package__)
-    bpy.types.Scene.cgru = bpy.props.PointerProperty(
-        type=properties.CGRUProperties,
-        name='CGRU Settings',
-        description='CGRU Settings'
-    )
+    from bpy.types import Scene
 
-    prefs = bpy.context.user_preferences.addons[__name__].preferences
-    if "CGRU_LOCATION" in os.environ:
-        prefs.cgru_location = os.environ["CGRU_LOCATION"]
+    bpy.utils.register_class(addon_prefs.CGRUAddonPreferences)
+    bpy.utils.register_class(properties.CGRUProperties)
+    bpy.utils.register_class(ui.RENDER_PT_Afanasy)
+    bpy.utils.register_class(operators.CGRU_Browse)
+    bpy.utils.register_class(operators.CGRU_Submit)
+    Scene.cgru = bpy.props.PointerProperty(type=properties.CGRUProperties)
+
+    prefs = bpy.context.preferences.addons[__name__].preferences
+    location=os.environ.get("CGRU_LOCATION")
+    if location is not None:
+        prefs.cgru_location = location
     else:
         utils.add_cgru_module_to_syspath(prefs.cgru_location)
 
-
 def unregister():
     del bpy.types.Scene.cgru
-    bpy.utils.unregister_module(__name__)
 
+    bpy.utils.unregister_class(addon_prefs.CGRUAddonPreferences)
+    bpy.utils.unregister_class(properties.CGRUProperties)
+    bpy.utils.unregister_class(ui.RENDER_PT_Afanasy)
+    bpy.utils.unregister_class(operators.CGRU_Browse)
+    bpy.utils.unregister_class(operators.CGRU_Submit)
 
 if __name__ == "__main__":
     register()

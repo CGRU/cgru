@@ -6,9 +6,10 @@ import os
 import sys
 import re
 
+from . import utils
+
 import bpy
 
-from . import utils
 
 LAYER_TEXT_BLOCK = '''#
 # layer '{0}'
@@ -107,7 +108,18 @@ class CGRU_Submit(bpy.types.Operator):
 
         servicename = 'blender'
         renderlayer_names = []
-        layers = bpy.context.scene.render.layers
+        #layers = bpy.context.scene.render.layers
+        active_scene = bpy.context.active_object
+
+        layers = utils.layers_get(active_scene)
+
+        #if hasattr(active_scene, "layers"):
+        #    layers = active_scene.layers
+        #else:
+        #    obj_colls = active_scene.users_collection # get all collections object is in
+        #    collection_names = [coll.name for coll in obj_colls]
+        #    layers = [str(i) in collection_names for i in range(20)] # ordered bool list
+
 
         if cgru_props.splitRenderLayers and len(layers) > 1:
             for layer in layers:
@@ -236,6 +248,7 @@ class CGRU_Submit(bpy.types.Operator):
 
         #  Send job to server:
         result = job.send()
+
         if not result[0]:
             msg = (
                 "An error occurred when submitting job to Afanasy."
