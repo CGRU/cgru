@@ -131,7 +131,7 @@ bool ItemRender::calcHeight()
 		break;
 
 	case  ListRenders::EBigSize:
-	    m_height = m_plots_height + HeightAnnotation;
+	    m_height = m_plots_height + HeightTickets;
 		if(false == m_annotation.isEmpty())
 			m_height += HeightAnnotation;
 		break;
@@ -142,15 +142,15 @@ bool ItemRender::calcHeight()
 	    else
 			m_height = HeightOffline;
 
+		if (m_tickets_host.size() && (m_tasks.size() == 0))
+			m_height += HeightTickets - 4;
+
 	    if(false == m_annotation.isEmpty())
 			m_height += HeightAnnotation;
 	}
 
 	if (m_services.size() || m_services_disabled.size())
 		m_height += HeightServices;
-
-	if (m_tickets_host.size() && (m_tasks.size() == 0))
-		m_height += HeightTickets - 4;
 
 	return old_height == m_height;
 }
@@ -712,33 +712,33 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 			drawServices(i_painter, i_option, x+6, y_cur+2, w-12, HeightServices-4);
 			y_cur += HeightServices;
 		}
+		/*
 		if (m_tickets_pool.size() || m_tickets_host.size())
 		{
 			drawTickets(i_painter, i_option, x+6, y_cur+2, w-12, HeightTickets-4);
 			y_cur += HeightTickets;
 		}
+		*/
 		break;
 	case  ListRenders::EBigSize:
 	{
-		i_painter->drawText(x+5, y_cur, w-10, HeightAnnotation, Qt::AlignBottom | Qt::AlignLeft, m_tasks_users_counts);
-		y_cur += HeightAnnotation;
+		i_painter->drawText(x+5, y_cur+4, w-10, HeightAnnotation, Qt::AlignBottom | Qt::AlignLeft, m_tasks_users_counts);
+
+		if (m_tickets_host.size())
+			drawTickets(i_painter, i_option, x+6, y_cur, w-12, HeightTickets-4);
+
+		y_cur += HeightTickets;
 
 		if (m_services.size() || m_services_disabled.size())
 		{
 			drawServices(i_painter, i_option, x+6, y_cur, w-12, HeightServices-4);
 			y_cur += HeightServices;
 		}
-		if (m_tickets_pool.size() || m_tickets_host.size())
-		{
-			drawTickets(i_painter, i_option, x+6, y_cur, w-12, HeightTickets-4);
-			y_cur += HeightTickets;
-		}
-
 	    if (m_annotation.size())
 		{
 			i_painter->setPen(afqt::QEnvironment::qclr_black);
 			i_painter->setFont( afqt::QEnvironment::f_info);
-			i_painter->drawText(x+5, y_cur, w-10, h, Qt::AlignVCenter | Qt::AlignRight, m_annotation);
+			i_painter->drawText(x+5, y_cur, w-10, HeightAnnotation, Qt::AlignVCenter | Qt::AlignHCenter, m_annotation);
 		}
 
 		break;

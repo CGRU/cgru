@@ -15,7 +15,7 @@ public:
 
 	void updateFarmValues(af::Farm * i_affarm);
 
-	static const int HeightServices = 24;
+	static const int HeightServices;
 
 	QList<QString> m_services;
 	QList<QString> m_services_disabled;

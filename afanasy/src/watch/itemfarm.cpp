@@ -10,6 +10,8 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
+const int ItemFarm::HeightServices = 24;
+
 ItemFarm::ItemFarm(ListNodes * i_list_nodes, af::Node * i_afnode, Item::EType i_type, const CtrlSortFilter * i_ctrl_sf):
 	ItemNode(i_list_nodes, i_afnode, i_type, i_ctrl_sf),
 	m_parent_pool(NULL)
