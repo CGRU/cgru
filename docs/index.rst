@@ -1,9 +1,9 @@
 Welcome to CGRU - AFANASY documentation!
 ========================================
 
-.. sidebar:: Beta version
+.. sidebar:: Aplha version
 
-    Documenttaion is under construction.
+    Documentation is under construction.
 
     .. note:: *Last edit:* |today|
 
