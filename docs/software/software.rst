@@ -4,5 +4,5 @@ Software Integration
 .. toctree::
     :maxdepth: 2
 
-    nuke/index.rst
-    houdini/index.rst
+    nuke/nuke.rst
+    houdini/houdini.rst

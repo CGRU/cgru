@@ -13,10 +13,10 @@ Contents:
 .. toctree::
     :maxdepth: 2
 
-    installation/index.rst
-    configuration/index.rst
-    keeper/index.rst
-    software/index.rst
+    installation/installation.rst
+    configuration/configuration.rst
+    keeper/keeper.rst
+    software/software.rst
     examples/examples.rst
     howto/index.rst
 
