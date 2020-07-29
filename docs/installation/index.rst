@@ -48,8 +48,8 @@ CGRU will be installed in **/opt/cgru** folder.
  - The best way is to put this packages in you local company Linux repository. And to use native Linux ways to install and update software. In this way Linux system solves packages dependences itself.
 
 
-MS Windows
-----------
+MS Windows Archives
+-------------------
 
 Download_ the latest release and unpack. Use Keeper to launch applications.
 
@@ -62,6 +62,65 @@ Mac OS X
 --------
 
 There is no release for this platform, yet. But you can build project yourself.
+
+
+Manual Project Build
+--------------------
+
+You can build project using cmake.
+
+The project is hosted on GitHub: https://github.com/CGRU/cgru
+
+If you want just to compile (not to develop) better to use tags.
+
+You can simple Download_ an archive with the latests release sources.
+
+Needed libraries:
+
+ - Python: >= 2.6
+ - Qt: Needed for Qt-GUI only
+ - PostgreSQL: Optional, Needed by server for statistcs only
+
+
+Linux
+~~~~~
+
+All needed libraries can be installed by a script:
+
+.. code-block:: bash
+
+	cd cgru/utilities
+	./install_depends_devel.sh
+
+Run build script:
+
+.. code-block:: bash
+
+	cd cgru/afanasy/src/project.cmake
+	./build.sh
+
+
+MS Windows
+~~~~~~~~~~
+
+You need MS Visual Studio 2015 and cmake.
+Cmake will generate Visual Studio project.
+
+Go to ``cgru/afanasy/src/project.cmake`` and run ``win_build_msvc.cmd``.
+
+
+Mac OS X
+~~~~~~~~
+
+You should be familiar with building projects on Mac.
+
+You can use *macports* or *homebrew* to install needed libraries and cmake.
+
+.. code-block:: bash
+
+	cd cgru/afanasy/src/project.cmake
+	./build.sh
+
 
 .. _Download: http://cgru.info/downloads
 

@@ -14,7 +14,9 @@ Contents:
     :maxdepth: 2
 
     installation/index.rst
+    configuration/index.rst
     keeper/index.rst
     software/index.rst
+    examples/examples.rst
     howto/index.rst
 
