@@ -21,4 +21,5 @@ Contents:
     regexp/regexp.rst
     examples/examples.rst
     howto/index.rst
+    coding_rules/coding_rules.rst
 
