@@ -15,8 +15,10 @@ Contents:
 
     installation/installation.rst
     configuration/configuration.rst
-    keeper/keeper.rst
     software/software.rst
+    keeper/keeper.rst
+    afstarter/afstarter.rst
+    regexp/regexp.rst
     examples/examples.rst
     howto/index.rst
 
