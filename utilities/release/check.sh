@@ -14,11 +14,7 @@ cgru=$PWD
 popd > /dev/null
 
 dirs_nonempty="plugins/maya/mll"
-cgru_bins="exrjoin"
 afanasy_bins="afserver afcmd afrender afwatch"
-
-cgru_bin="$cgru/bin"
-afanasy_bin="$cgru/afanasy/bin"
 
 # Check non-empty folders:
 for dir in $dirs_nonempty; do
@@ -35,7 +31,6 @@ done
 
 # Check binaries:
 bins=""
-for bin in $cgru_bins; do bins="$cgru/bin/$bin $bins"; done
 for bin in $afanasy_bins; do bins="$cgru/afanasy/bin/$bin $bins"; done
 for bin in $bins; do
 	if [ ! -x "$bin" ]; then
