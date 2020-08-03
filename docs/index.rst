@@ -15,6 +15,7 @@ Contents:
 
     installation/installation.rst
     configuration/configuration.rst
+    afanasy/afanasy.rst
     software/software.rst
     keeper/keeper.rst
     afstarter/afstarter.rst
@@ -22,4 +23,5 @@ Contents:
     examples/examples.rst
     howto/index.rst
     coding_rules/coding_rules.rst
+    license/license.rst
 
