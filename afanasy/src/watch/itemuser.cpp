@@ -164,6 +164,7 @@ void ItemUser::updateInfo(af::User * i_user)
 		m_info_text += QString("<br>Activity host: <b>%1</b>").arg(afqt::stoq(i_user->getHostName()));
 	m_info_text += "<br>";
 	ItemWork::updateInfo(i_user);
+	m_info_text += "<br>";
 	ItemNode::updateInfo(i_user);
 
 	m_info_text += "<br>";
