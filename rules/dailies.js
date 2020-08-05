@@ -55,6 +55,24 @@ function d_Make(i_path, i_outfolder)
 {
 	c_Log('Make Dailies: ' + i_path);
 
+	var out_path = c_PathDir(i_path);
+	if (ASSET && (ASSET.dailies))
+	{
+		out_path = ASSET.path + '/' + ASSET.dailies.path[0];
+
+		if (ASSET.dailies.folders)
+		{
+			for (let f in ASSET.dailies.folders)
+			{
+				if (i_path.toLowerCase().indexOf(f.toLowerCase()) !== -1)
+				{
+					out_path = ASSET.path + '/' + ASSET.dailies.folders[f];
+					break;
+				}
+			}
+		}
+	}
+
 	var params = {};
 
 	params.fps = RULES.fps;
@@ -75,7 +93,7 @@ function d_Make(i_path, i_outfolder)
 		params.version = match[match.length - 1].substr(1);
 
 	params.input = i_path;
-	params.output = c_PathPM_Rules2Client(i_outfolder);
+	params.output = c_PathPM_Rules2Client(out_path);
 	params.activity = RULES.dailies.activity;
 
 	d_params.general.artist = {"width": '50%'};

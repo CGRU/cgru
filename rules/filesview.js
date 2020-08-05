@@ -932,10 +932,6 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 		((ASSET.subfolders_dailies_hide && (ASSET.path == g_CurPath())) ||
 		 (ASSET.subfolders_dailies_hide == false)))
 	{
-		var out_path = c_PathDir(path);
-		if (ASSET && (ASSET.dailies))
-			out_path = ASSET.path + '/' + ASSET.dailies.path[0];
-
 		var el = document.createElement('div');
 		elBody.appendChild(el);
 		el.classList.add('button');
@@ -944,7 +940,7 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 		el.m_path = path;
 		el.onclick = function(e) {
 			e.stopPropagation();
-			d_Make(e.currentTarget.m_path, out_path)
+			d_Make(e.currentTarget.m_path);
 		};
 	}
 

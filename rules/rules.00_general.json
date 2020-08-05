@@ -161,7 +161,10 @@
 			"path":["RESULT/JPG","RESULT/PNG","RESULT/DPX","RESULT/TIF","RESULT/EXR","RESULT/ANIM"]
 		},
 		"dailies":{
-			"path":["RESULT/DAILIES"]
+			"path":["RESULT/DAILIES"],
+			"folders":{
+				"result/anim":"RESULT/ANIM"
+			}
 		},
 		"template":"rules/assets/shot",
 
