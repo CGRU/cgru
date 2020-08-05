@@ -94,6 +94,8 @@ class BlockParameters:
         self.ticket_mem = int(afnode.parm('ticket_mem').eval())
         self.tickets_aux_use = int(afnode.parm('tickets_aux_use').eval())
         self.tickets_aux_data = afnode.parm('tickets_aux_data').eval()
+        self.pools_use = int(afnode.parm('pools_use').eval())
+        self.pools_data = afnode.parm('pools_data').eval()
         self.generate_previews = self.afnode.parm('generate_previews').eval()
         self.life_time = -1
         self.preview_approval = afnode.parm('preview_approval').eval()
@@ -539,6 +541,18 @@ class BlockParameters:
 
         if self.life_time > -1:
             job.setTimeLife(self.life_time * 3600)  # hours to seconds
+
+        # Process Pools
+        if self.pools_use and self.pools_data is not None and len(self.pools_data):
+            pools = dict()
+            for pool in self.pools_data.split(','):
+                pool = pool.strip().split(':')
+                if len(pool) != 2:
+                    hou.ui.displayMessage('Invalid pool data: "%s".' % pool)
+                    continue
+                pools[pool[0]] = int(pool[1])
+            if len(pools):
+                job.setPools(pools)
 
         job.setFolder('input', os.path.dirname(hou.hipFile.name()))
 
