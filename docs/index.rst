@@ -11,7 +11,7 @@ Welcome to CGRU - AFANASY documentation!
 Contents:
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 4
 
     installation/installation.rst
     configuration/configuration.rst
@@ -23,5 +23,6 @@ Contents:
     examples/examples.rst
     howto/index.rst
     coding_rules/coding_rules.rst
+    fun/index.rst
     license/license.rst
 
