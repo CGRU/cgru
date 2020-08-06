@@ -133,12 +133,14 @@ For example you can install software this way.
 ignorenimby
 -----------
 ``af.Job.setIgnoreNimby()``
+
 Job tasks will run on render even it has "Nimby" state.
 Useful for "Maintenance" jobs.
 
 ignorepaused
 ------------
 ``af.Job.setIgnorePaused()``
+
 Job tasks will run on render even it has "Paused" state.
 Useful for "Maintenance" jobs.
 
