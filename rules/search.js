@@ -28,7 +28,7 @@ function s_SearchOnClick()
 		$('search_artists').m_show_not_artists = false;
 
 		// Construct artists just once, as they are not depending on location:
-		var roles = c_GetRolesArtists(g_users);
+		let roles = c_GetRolesArtists(g_users);
 
 		for (let r = 0; r < roles.length; r++)
 		{
@@ -84,7 +84,7 @@ function s_SearchOnClick()
 				{
 					let artist = roles[r].tags[t].artists[a];
 
-					el = document.createElement('div');
+					let el = document.createElement('div');
 					el.m_hidden = false;
 					//elRole.appendChild(el);
 					elTag.appendChild(el);
@@ -124,7 +124,7 @@ function s_SearchOnClick()
 			s_ShowHideRoles();
 		}
 
-		var el = $('search_artists_notassigned');
+		let el = $('search_artists_notassigned');
 		$('search_artists').m_elArtists.push(el);
 		el.m_user = {'id':'_null_'};
 		el.classList.add('tag');
@@ -158,17 +158,19 @@ function s_SearchOnClick()
 		$('search').style.display = 'block';
 		$('search_btn_process').style.display = 'block';
 
+		let specialElements = [];
+
 		// Flags:
 		// Remove old:
 		if ($('search_flags').m_elFlags)
-			for (var i = 0; i < $('search_flags').m_elFlags.length; i++)
+			for (let i = 0; i < $('search_flags').m_elFlags.length; i++)
 				$('search_flags').removeChild($('search_flags').m_elFlags[i]);
 		$('search_flags').m_elFlags = [];
 
 		// Create new:
-		for (var flag in RULES.flags)
+		for (let flag in RULES.flags)
 		{
-			el = document.createElement('div');
+			let el = document.createElement('div');
 			$('search_flags').appendChild(el);
 			el.style.cssFloat = 'left';
 			el.textContent = c_GetFlagTitle(flag);
@@ -177,7 +179,7 @@ function s_SearchOnClick()
 			el.classList.add('flag');
 			if (RULES.flags[flag].clr)
 			{
-				var c = RULES.flags[flag].clr;
+				let c = RULES.flags[flag].clr;
 				el.style.borderColor = 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
 			}
 			el.onclick = function(e) {
@@ -187,23 +189,27 @@ function s_SearchOnClick()
 			};
 			$('search_flags').m_elFlags.push(el);
 		}
-		var el = $('search_noflags');
-		$('search_flags').m_elFlags.push(el);
-		el.m_flag = '_null_';
-		el.onclick = function(e) {
-			c_ElToggleSelected(e);
-			if (ASSET && ASSET.filter)
-				s_ProcessGUI();
-		};
+		{// Search no flags:
+			let el = $('search_noflags');
+			$('search_flags').m_elFlags.push(el);
+			el.m_flag = '_null_';
+			specialElements.push(el);
+		}
+		{// Search AND flags:
+			let el = $('search_flags_and');
+			$('search_flags').m_elFlags.push(el);
+			el.m_flag = '_AND_';
+			specialElements.push(el);
+		}
 
 		// Tags:
 		if ($('search_tags').m_elTags)
-			for (var i = 0; i < $('search_tags').m_elTags.length; i++)
+			for (let i = 0; i < $('search_tags').m_elTags.length; i++)
 				$('search_tags').removeChild($('search_tags').m_elTags[i]);
 		$('search_tags').m_elTags = [];
-		for (var tag in RULES.tags)
+		for (let tag in RULES.tags)
 		{
-			el = document.createElement('div');
+			let el = document.createElement('div');
 			$('search_tags').appendChild(el);
 			el.style.cssFloat = 'left';
 			el.textContent = c_GetTagTitle(tag);
@@ -216,14 +222,28 @@ function s_SearchOnClick()
 			};
 			$('search_tags').m_elTags.push(el);
 		}
-		var el = $('search_notags');
-		$('search_tags').m_elTags.push(el);
-		el.m_tag = '_null_';
-		el.onclick = function(e) {
-			c_ElToggleSelected(e);
-			if (ASSET && ASSET.filter)
-				s_ProcessGUI();
-		};
+		{// Search no tags
+			let el = $('search_notags');
+			$('search_tags').m_elTags.push(el);
+			el.m_tag = '_null_';
+			specialElements.push(el);
+		}
+		{// Search AND tags
+			let el = $('search_tags_and');
+			$('search_tags').m_elTags.push(el);
+			el.m_tag = '_AND_';
+			specialElements.push(el);
+		}
+
+		for (let el of specialElements)
+		{
+			el.onclick = function(e)
+			{
+				c_ElToggleSelected(e);
+				if (ASSET && ASSET.filter)
+					s_ProcessGUI();
+			};
+		}
 
 		if (ASSET && (ASSET.thumbnails != null))
 			$('search_comment_div').style.display = 'none';
@@ -335,14 +355,14 @@ function s_ProcessGUI()
 		if (args.artists == null)
 			args.artists = [];
 
-		for (var i = 0; i < $('search_artists').m_elArtists.length; i++)
+		for (let i = 0; i < $('search_artists').m_elArtists.length; i++)
 			c_ElSetSelected($('search_artists').m_elArtists[i], false);
 		c_ElSetSelected($('search_artists_notassigned'), true);
 
 		args.artists.push($('search_artists_notassigned').m_user.id);
 	}
 	else
-		for (var i = 0; i < $('search_artists').m_elArtists.length; i++)
+		for (let i = 0; i < $('search_artists').m_elArtists.length; i++)
 			if ($('search_artists').m_elArtists[i].m_selected)
 			{
 				if (args.artists == null)
@@ -356,14 +376,14 @@ function s_ProcessGUI()
 	{
 		if (args.flags == null)
 			args.flags = [];
-		for (var i = 0; i < $('search_flags').m_elFlags.length; i++)
+		for (let i = 0; i < $('search_flags').m_elFlags.length; i++)
 			c_ElSetSelected($('search_flags').m_elFlags[i], false);
 		c_ElSetSelected($('search_noflags'), true);
 
 		args.flags.push($('search_noflags').m_flag);
 	}
 	else
-		for (var i = 0; i < $('search_flags').m_elFlags.length; i++)
+		for (let i = 0; i < $('search_flags').m_elFlags.length; i++)
 			if ($('search_flags').m_elFlags[i].m_selected)
 			{
 				if (args.flags == null)
@@ -376,14 +396,14 @@ function s_ProcessGUI()
 	{
 		if (args.tags == null)
 			args.tags = [];
-		for (var i = 0; i < $('search_tags').m_elTags.length; i++)
+		for (let i = 0; i < $('search_tags').m_elTags.length; i++)
 			c_ElSetSelected($('search_tags').m_elTags[i], false);
 		c_ElSetSelected($('search_notags'), true);
 
 		args.tags.push($('search_notags').m_tag);
 	}
 	else
-		for (var i = 0; i < $('search_tags').m_elTags.length; i++)
+		for (let i = 0; i < $('search_tags').m_elTags.length; i++)
 			if ($('search_tags').m_elTags[i].m_selected)
 			{
 				if (args.tags == null)
@@ -392,10 +412,10 @@ function s_ProcessGUI()
 			}
 
 	var parm = ['percent', 'finish', 'statmod', 'bodymod'];
-	for (var i = 0; i < parm.length; i++)
+	for (let i = 0; i < parm.length; i++)
 	{
-		var min = c_GetElInteger($('search_' + parm[i] + 'min'));
-		var max = c_GetElInteger($('search_' + parm[i] + 'max'));
+		let min = c_GetElInteger($('search_' + parm[i] + 'min'));
+		let max = c_GetElInteger($('search_' + parm[i] + 'max'));
 		if ((min != null) || (max != null))
 			args[parm[i]] = [min, max];
 	}
@@ -563,7 +583,8 @@ function s_Found(i_args)
 	{
 		let el = elArtists[e];
 		let artist = el.m_user.id;
-		if (artist == '_null_') continue;
+		// Skip special elements:
+		if (artist.charAt(0) == '_') continue;
 
 		if (artists.indexOf(artist) == -1)
 			el.classList.add('notfound');
@@ -575,7 +596,8 @@ function s_Found(i_args)
 	{
 		let el = elFlags[e];
 		let flag = el.m_flag;
-		if (flag == '_null_') continue;
+		// Skip special elements:
+		if (flag.charAt(0) == '_') continue;
 
 		if (flags.indexOf(flag) == -1)
 			el.classList.add('notfound');
@@ -587,7 +609,8 @@ function s_Found(i_args)
 	{
 		let el = elTags[e];
 		let tag = el.m_tag;
-		if (tag == '_null_') continue;
+		// Skip special elements:
+		if (tag.charAt(0) == '_') continue;
 
 		if (tags.indexOf(tag) == -1)
 			el.classList.add('notfound');

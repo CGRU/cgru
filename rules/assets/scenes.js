@@ -625,7 +625,7 @@ function scenes_GetSelectedShots()
 	return shots;
 }
 
-function sc_FilterShots( i_args)
+function sc_FilterShots(i_args)
 {
 	var o_res = {};
 	o_res.found = {};
@@ -640,11 +640,11 @@ function sc_FilterShots( i_args)
 		i_args = {};
 
 	var anns = null;
-	if( i_args.ann )
+	if (i_args.ann )
 	{
-		var anns_or = i_args.ann.split('|');
+		let anns_or = i_args.ann.split('|');
 		anns = [];
-		for( var o = 0; o < anns_or.length; o++)
+		for (let o = 0; o < anns_or.length; o++)
 			anns.push( anns_or[o].split('+'));
 	}
 
@@ -659,20 +659,20 @@ function sc_FilterShots( i_args)
 
 	for (let th = 0; th < sc_elShots.length; th++)
 	{
-		var found = ( i_args == null );
+		let found = (i_args == null);
 
-		var el = sc_elShots[th];
-		var st_obj = {};
-		if( el.m_status && el.m_status.obj )
+		let el = sc_elShots[th];
+		let st_obj = {};
+		if (el.m_status && el.m_status.obj)
 			st_obj = el.m_status.obj;
 
 		if (anns)
 		{
-			if( st_obj.annotation )
-				for( var o = 0; o < anns.length; o++)
+			if (st_obj.annotation)
+				for (let o = 0; o < anns.length; o++)
 				{
-					var found_and = true;
-					for( var a = 0; a < anns[o].length; a++)
+					let found_and = true;
+					for (let a = 0; a < anns[o].length; a++)
 					{
 						if (st_obj.annotation.toLowerCase().indexOf(anns[o][a].toLowerCase()) == -1)
 						{
@@ -680,7 +680,7 @@ function sc_FilterShots( i_args)
 							break;
 						}
 					}
-					if( found_and )
+					if (found_and)
 					{
 						found = true;
 						break;
@@ -704,7 +704,7 @@ function sc_FilterShots( i_args)
 							break;
 						}
 					}
-					if( found_and )
+					if (found_and)
 					{
 						found = true;
 						break;
@@ -712,67 +712,99 @@ function sc_FilterShots( i_args)
 				}
 		}
 
-		if( i_args.flags && found )
+		if (i_args.flags && found)
 		{
 			found = false;
-			if( st_obj.flags && st_obj.flags.length )
+			if (st_obj.flags && st_obj.flags.length)
 			{
-				for( i = 0; i < i_args.flags.length; i++ )
-					if( st_obj.flags.indexOf( i_args.flags[i]) != -1 )
-						{ found = true; break; }
+				let flags_and = i_args.flags.includes('_AND_');
+				for (let f of i_args.flags)
+				{
+					// skip special flags
+					if (f.charAt(0) == '_') continue;
+
+					if (st_obj.flags.includes(f))
+					{
+						found = true;
+						if (false == flags_and)
+							break;
+					}
+					else
+					{
+						found = false;
+						if (flags_and)
+							break;
+					}
+				}
 			}
-			else if( i_args.flags.indexOf('_null_') != -1)
+			else if (i_args.flags.indexOf('_null_') != -1)
 				found = true;
 		}
 
-		if( i_args.tags && found )
+		if (i_args.tags && found)
 		{
 			found = false;
-			if( st_obj.tags && st_obj.tags.length )
+			if (st_obj.tags && st_obj.tags.length)
 			{
-				for( i = 0; i < i_args.tags.length; i++ )
-					if( st_obj.tags.indexOf( i_args.tags[i]) != -1 )
-						{ found = true; break; }
+				let tags_and = i_args.tags.includes('_AND_');
+				for (let t of i_args.tags)
+				{
+					// skip special tags
+					if (t.charAt(0) == '_') continue;
+
+					if (st_obj.tags.includes(t))
+					{
+						found = true;
+						if (false == tags_and)
+							break;
+					}
+					else
+					{
+						found = false;
+						if (tags_and)
+							break;
+					}
+				}
 			}
-			else if( i_args.tags.indexOf('_null_') != -1)
+			else if (i_args.tags.indexOf('_null_') != -1)
 				found = true;
 		}
 
-		if( i_args.artists && found )
+		if (i_args.artists && found)
 		{
 			found = false;
-			if( st_obj.artists && st_obj.artists.length )
+			if (st_obj.artists && st_obj.artists.length)
 			{
-				for( i = 0; i < i_args.artists.length; i++ )
-					if( st_obj.artists.indexOf( i_args.artists[i]) != -1 )
+				for (let i = 0; i < i_args.artists.length; i++)
+					if (st_obj.artists.indexOf(i_args.artists[i]) != -1)
 						{ found = true; break; }
 			}
-			else if( i_args.artists.indexOf('_null_') != -1)
+			else if (i_args.artists.indexOf('_null_') != -1)
 				found = true;
 		}
 
 		if( i_args.percent && found )
 		{
 			found = false;
-			if(( st_obj.progress != null ) &&
-				(( i_args.percent[0] == null ) || ( st_obj.progress >= i_args.percent[0] )) &&
-				(( i_args.percent[1] == null ) || ( st_obj.progress <= i_args.percent[1] )))
+			if ((st_obj.progress != null) &&
+				((i_args.percent[0] == null) || (st_obj.progress >= i_args.percent[0])) &&
+				((i_args.percent[1] == null) || (st_obj.progress <= i_args.percent[1])))
 				found = true;
 		}
 
-		if( i_args.finish && found )
+		if (i_args.finish && found)
 		{
 			found = false;
-			if( st_obj.finish )
+			if (st_obj.finish)
 			{
-				var days = c_DT_DaysLeft( st_obj.finish);
-				if( (( i_args.finish[0] == null ) ||  days >= i_args.finish[0] ) &&
-					(( i_args.finish[1] == null ) ||  days <= i_args.finish[1] ))
+				let days = c_DT_DaysLeft(st_obj.finish);
+				if (((i_args.finish[0] == null) ||  days >= i_args.finish[0]) &&
+					((i_args.finish[1] == null) ||  days <= i_args.finish[1]))
 					found = true;
 			}
 		}
 
-		if( found )
+		if (found)
 		{
 			el.style.display = 'block';
 			el.m_filtered = false;
@@ -797,19 +829,20 @@ function sc_FilterShots( i_args)
 		}
 	}
 
-	if( sc_elScenes )
-		for( var f = 0; f < sc_elScenes.length; f++)
+	// Hide scenes where are no shots to show
+	if (sc_elScenes)
+		for (let f = 0; f < sc_elScenes.length; f++)
 		{
-			var oneShown = false;
-			for( var t = 0; t < sc_elScenes[f].m_elThumbnails.length; t++)
+			let oneShown = false;
+			for (var t = 0; t < sc_elScenes[f].m_elThumbnails.length; t++)
 			{
-				if( sc_elScenes[f].m_elThumbnails[t].m_filtered != true )
+				if (sc_elScenes[f].m_elThumbnails[t].m_filtered != true)
 				{
 					oneShown = true;
 					break;
 				}
 			}
-			if( oneShown )
+			if (oneShown)
 			{
 				sc_elScenes[f].style.display = 'block';
 				sc_elScenes[f].m_filtered = false;
