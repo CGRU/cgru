@@ -3,12 +3,16 @@ Afanasy
 =======
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 3
 
-    server/server.rst
-    api/api.rst
-    watch/watch.rst
-    webgui/webgui.rst
-    branch/branch.rst
-    job/job.rst
-    afcmd/afcmd.rst
+    server.rst
+    render.rst
+    watch.rst
+    webgui.rst
+    job.rst
+    job_block.rst
+    job_task.rst
+    branch.rst
+    user.rst
+    api.rst
+    afcmd.rst

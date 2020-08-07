@@ -10,7 +10,7 @@ No other software or plugins needed.
 Too see Afanasy page, type ``server_name:51000`` in a browser address bar,
 where 5100 is the default Afanasy server port.
 
-.. image:: webgui_farm.png
+.. image:: images/webgui_farm.png
 
 Web GUI is useful for administrators to manage farm
 from some special machines (devices) where CGRU can't be installed.

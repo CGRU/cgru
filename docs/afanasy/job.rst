@@ -8,6 +8,14 @@ Blocks are needed to store some same parameters for all tasks it consists of.
 For example all block tasks have the same working directory, capacity, service and parser type.
 But commands are differ.
 
+Jobs are created by Python API by some submission script:
+
+.. code-block:: python
+
+   import af
+
+   job = af.Job(job_name)
+
 
 Attributes
 ==========
@@ -92,6 +100,13 @@ hosts_mask_exclude
 ``af.Job.setHostsMaskExclude(str)``
 
 Job can not run on renders which host name matches this mask.
+
+pools
+-----
+``af.Job.setPools(dict)``
+
+Pools is a string and number pairs (map<sting,int>).
+Each pair represents pool name string and pool priority number.
 
 depend_mask
 -----------

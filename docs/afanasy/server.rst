@@ -38,11 +38,11 @@ When server needs to execute some command it appends system job with a task.
 You can explore system job by Watch GUI in super user mode,
 to manipulate it's parameters to control its running.
 
-.. figure:: sysjob_job.png
+.. figure:: images/sysjob_job.png
 
     System Job
 
-.. figure:: sysjob_tasks.png
+.. figure:: images/sysjob_tasks.png
 
     System Job Tasks
 
@@ -228,7 +228,7 @@ Web GUI
 
 There is a Web interface to Afanasy SQL statistics database.
 
-.. figure:: stat_tasks.png
+.. figure:: images/stat_tasks.png
 
     Statistics Tasks Graph Page
 

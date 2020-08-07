@@ -53,7 +53,7 @@ But later it begin to grow and got several UI levels to display brief or full in
 Jobs
 ====
 
-.. image:: afwatch_jobs.png
+.. image:: images/afwatch_jobs.png
 
 This is a list of user jobs.
 
@@ -61,7 +61,7 @@ This is a list of user jobs.
 Work
 ====
 
-.. image:: afwatch_work.png
+.. image:: images/afwatch_work.png
 
 This is a hierarchy of branches and jobs from all users.
 Obly VISOR can make changes here.
@@ -71,7 +71,7 @@ For a common user this list is read only.
 Farm
 ====
 
-.. image:: afwatch_farm.png
+.. image:: images/afwatch_farm.png
 
 This is a hierarchy of pools and renders.
 Obly admin can make changes here.
@@ -81,7 +81,7 @@ For a common user this list is read only.
 Users
 =====
 
-.. image:: afwatch_users.png
+.. image:: images/afwatch_users.png
 
 This is a list of all Afanasy users.
 User can manipulate only own node.
@@ -96,17 +96,17 @@ Watch GUI has a several Color Themes:
 Light
 -----
 
-.. image:: afwatch_style_light.png
+.. image:: images/afwatch_style_light.png
 
 Dark
 ----
 
-.. image:: afwatch_style_dark.png
+.. image:: images/afwatch_style_dark.png
 
 Military
 --------
 
-.. image:: afwatch_style_military.png
+.. image:: images/afwatch_style_military.png
 
 First versions has no Color Themes and UI Levels.
 Afwatch GUI always had Military theme and Jedi level.
@@ -114,10 +114,10 @@ Afwatch GUI always had Military theme and Jedi level.
 Hello Kitty
 -----------
 
-.. image:: afwatch_style_hello_kitty.png
+.. image:: images/afwatch_style_hello_kitty.png
 
 Hello Kitty Hell
 ----------------
 
-.. image:: afwatch_style_hello_kitty_hell.png
+.. image:: images/afwatch_style_hello_kitty_hell.png
 
