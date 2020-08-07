@@ -59,7 +59,7 @@ function View_files_Open()
 {
 	if (g_elCurFolder)
 		new FilesView(
-			{"el": $('files'), "path": g_elCurFolder.m_path, "walk": g_elCurFolder.m_dir, "limits": false});
+			{"el": $('files'), "path": g_elCurFolder.m_path, "walk": g_elCurFolder.m_dir, "limits": false, 'name':'files'});
 }
 
 function View_files_Close()

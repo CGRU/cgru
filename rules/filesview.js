@@ -22,9 +22,6 @@ var fv_thumbnails_tomake_files = [];
 var fv_cur_item = null;
 var fv_first_created = false;
 
-if (localStorage.filesview == null)
-	localStorage.filesview = '0';
-
 function fv_Finish()
 {
 	fv_views = [];
@@ -59,6 +56,9 @@ function FilesView(i_args)
 	this.walk = i_args.walk;
 	this.masks = i_args.masks;
 	this.count_images = i_args.count_images;
+	this.name = i_args.name;
+	if (this.name == null)
+		this.name = 'files';
 
 	this.can_refresh = !(i_args.can_refresh === false);
 	this.can_count = i_args.can_count;
@@ -300,8 +300,18 @@ FilesView.prototype.destroy = function() {
 	this.elParent.removeChild(this.elRoot);
 };
 
+FilesView.prototype.getLocalStorageName = function(i_attr_name) {
+	return 'filesview_' + this.name + '_' + i_attr_name;
+};
+FilesView.prototype.getLocalStorageAttr = function(i_attr_name) {
+	return localStorage[this.getLocalStorageName(i_attr_name)];
+};
+FilesView.prototype.setLocalStorageAttr = function(i_attr_name, i_attr_value) {
+	localStorage[this.getLocalStorageName(i_attr_name)] = '' + i_attr_value;
+};
+
 FilesView.prototype.limitsAdd = function() {
-	var limits = [3, 10, 30, 0];
+	var limits = [1, 3, 10, 30, 0];
 
 	this.elLimits = [];
 
@@ -326,8 +336,9 @@ FilesView.prototype.limitsAdd = function() {
 		elLimit.m_limit = limits[i];
 		elLimit.m_view = this;
 		elLimit.onclick = function(e) {
-			localStorage.filesview = '' + e.currentTarget.m_limit;
-			e.currentTarget.m_view.limitApply();
+			var fv = e.currentTarget.m_view;
+			fv.setLocalStorageAttr('limit', e.currentTarget.m_limit);
+			fv.limitApply();
 		}
 	}
 };
@@ -340,7 +351,7 @@ FilesView.prototype.limitApply = function() {
 	for (var j = 0; j < this.elLimits.length; j++)
 	{
 		var el = this.elLimits[j];
-		if (parseInt(localStorage.filesview) == el.m_limit)
+		if (parseInt(this.getLocalStorageAttr('limit')) === el.m_limit)
 		{
 			limit = el.m_limit;
 			if (limit)
