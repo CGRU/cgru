@@ -724,7 +724,7 @@ void ListJobs::actSetUser()
 	QString text = QInputDialog::getText(this, "Change Owner", "Enter New User Name", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	setParameter(Item::TJob, "user_name", afqt::qtos( text));
+	setParameter(Item::TJob, "user_name", afqt::qtos(QString("\"%1\"").arg(text)));
 }
 
 void ListJobs::actChangeBranch()
@@ -735,7 +735,7 @@ void ListJobs::actChangeBranch()
 	bool ok;
 	QString branch = QInputDialog::getText(this, "Change Branch", "Branch", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
-	setParameter(Item::TJob, "branch", afqt::qtos( branch));
+	setParameter(Item::TJob, "branch", afqt::qtos(QString("\"%1\"").arg(branch)));
 }
 
 void ListJobs::actPostCommand()
