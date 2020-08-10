@@ -16,7 +16,7 @@ Installation
 
   *Preferences - General - Allow scripts to Write Files and Access Network*
 
-.. image:: afterfx_scripts_menu.png
+.. image:: images/afterfx_scripts_menu.png
 
 Tool Dialog
 -----------
@@ -25,19 +25,19 @@ General Tab
 ...........
 Here are general job parameters.
 
-.. image:: dialog_general.png
+.. image:: images/afterfx_dialog_general.png
 
 Movie Tab
 .........
 Here you can ask Afanasy to create a small preview movie.
 
-.. image:: dialog_movie.png
+.. image:: images/afterfx_dialog_movie.png
 
 Watch Job
 ---------
 This is how a job will be displayed in the Watch GUI.
 
-.. image:: afwatch_job.png
+.. image:: images/afterfx_afwatch_job.png
 
 
 Shared Script Location
