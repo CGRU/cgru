@@ -4,6 +4,15 @@ Software Integration
 .. toctree::
     :maxdepth: 2
 
+    max.rst
     afterfx.rst
-    nuke.rst
+    blender.rst
+    cinema4d.rst
+    clarisse.rst
+    fusion.rst
     houdini.rst
+    maya.rst
+    natron.rst
+    nuke.rst
+    softimage.rst
+
