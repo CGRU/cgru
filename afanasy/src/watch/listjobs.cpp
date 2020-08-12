@@ -637,7 +637,8 @@ void ListJobs::calcTotals()
 		if (error)
 			title += QString(" ERROR:%1").arg(error);
 		title += QString(" Run:%1 %2%").arg(running).arg(percent / blocksrun);
-		title += QString(" Done:%1").arg(done);
+		if (done)
+			title += QString(" Done:%1").arg(done);
 		m_parentWindow->setWindowTitle(title);
 	}
 	else
