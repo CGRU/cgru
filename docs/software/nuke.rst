@@ -4,18 +4,22 @@ Nuke
 
 .. warning:: Documentation is outdated.
 
+CGRU Menu
+=========
+
+.. figure:: images/nuke_cgru_menu.png
+
+	Nuke CGRU Menu
+
 Nuke Afanasy interface consists of **afanasy** nodes (gizmos) and menu items in main CGRU menu.
 
-.. figure:: images/nuke_complex_network.png
+.. figure:: images/nuke_simple_network.png
 
 	Complex Node Network
 
-**afanasy** nodes need to render connected **Write** nodes and to store render settings.
-You can connect one **afanasy** node to other **afanasy** node to render other **Write** node with different settings at the same time.
-Each connected node will produce a block - an array of tasks (frames) to render.
-You can specify dependence between connected nodes.
+Just create **afanasy** gizmo *(F10)* and connect it to **Write** node to render.
 
-.. figure:: images/nuke_complex_job.png
+.. figure:: images/nuke_simple_job.png
 
 	Complex Job (AfWatch)
 
@@ -32,18 +36,40 @@ General
 - Job Name
     Name to add to job or blocks names.
     If empty, 'afanasy' node name will be used.
-- Use Time Range
+- Use Root Time Range
     Set 'First Frame' and 'Last Frame' fields to project settings.
 - First Frame
     First frame to render.
-- Last Frame
+- Last
     Last frame to render.
+- Increment
+    Frame increment.
 - Frames Per Task
     Number of frames in task.
+- Sequential
+	===== =====
+	   1   Render frames one by one from the first to the last
+	  10   Render every 10 frame at first, than render last other frames
+	  -1   Render frames backwards from the last to the first
+	 -10   Render every 10 frame at first backwards, than render last other frames backwards
+	   0   Render the first, the last, the middle, the middle of the middle and so on
+	===== =====
+- Skip Existing Files
+	Skip existing files works fine, when *Frames Per Task* is 1
 - Render
     Send job to Afanasy server.
 - Start Paused
-    Job will be paused.
+    Job will be sent in offline state.
+- Time Code
+	Two Time Codes from - to.
+
+	- Use
+		Use Time Code instead of frame range.
+		If Time Code is empty, frame range will be used.
+	- Get
+		Get Time Code from frame range.
+	- Set
+		Set frame range from Time Code.
 
 
 Parameters
@@ -56,8 +82,8 @@ Parameters
 - Platform
     OS type the job can launch tasks on: *Any* - any OS,
     *Native* - the same as the script was launched on.
-- Maximum Hosts
-    Maximum number of hosts to run job tasks on.
+- Max Running Tasks
+    Maximum number of running tasks at the same time.
     *-1* means no limit.
 - Priority
     Job priority.
@@ -73,6 +99,12 @@ Parameters
 - Capacity
     Tasks capacity.
     *-1* - use default value.
+- Max Tasks Pet Host
+	Maximum running tasks on the same host at the same time.
+- Max Task Run Time
+	Maximum task running time in seconds.
+	After this time, running task will be restarted.
+	Useful if script can hang.
 
 
 MultiWrite
@@ -95,14 +127,56 @@ MultiWrite
     All upstream connected nodes will use this node frame range.
     Connected upstream node can re-force it, if this parameter is checked too.
 - Construct single job from all connected write nodes
-    Constuct a block from each connected 'Write' node and put them into one job.
+    Construct a block from each connected 'Write' node and put them into one job.
     If not checked, each connected 'Write' node will produce a job.
+
+
+Advanced
+--------
+
+.. figure:: images/nuke_afanasy_advanced.png
+
+	Afanasy Gizmo Advanced Tab
+
+- Create and render temporary scene
+	On job creation, nuke submission script saves scene to temporary name.
+	That temporary scene will be rendered and deleted on a job deletion.
+	This way artist can continue to modify and save working scene.
+	And all frame will be rendered from the same modified scene.
+- Tickets
+	Job Block tickets.
+- Pools
+	Pools that job will run on with priorities.
+- Render to temporary image
+	This can save network traffic, as the entire image will be saved at once.
+	By default Nuke writes a portions of rendered frame.
+- Apply paths map to scene
+	Transfer all scene files paths from client to server.
+	Using CGRU Path Map you can work and render on different platforms.
+
+
+Complex Job (Precomps)
+======================
+
+.. figure:: images/nuke_complex_network.png
+
+	Complex Node Network
+
+You can connect one **afanasy** node to several **Write** and **afanasy** nodes.
+Each connected node will produce a block - an array of tasks (frames) to render.
+You can specify dependence between connected nodes.
+This is useful to re-render precomps and the final result in a single job.
+
+.. figure:: images/nuke_complex_job.png
+
+	Complex Job (AfWatch)
+
 
 
 Render Selected
 ===============
 
-You can send to farm selected node(s) using a simple dialog. 
+You can send to farm selected node(s) using a simple dialog *(F11)*. 
 
 .. image:: images/nuke_render_selected_1.png
 
