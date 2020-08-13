@@ -7,6 +7,8 @@ Afanasy
 
     server.rst
     render.rst
+    pools.rst
+    tickets.rst
     watch.rst
     webgui.rst
     job.rst

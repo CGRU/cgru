@@ -2,8 +2,6 @@
 Nuke
 ====
 
-.. warning:: Documentation is outdated.
-
 CGRU Menu
 =========
 
@@ -144,9 +142,15 @@ Advanced
 	This way artist can continue to modify and save working scene.
 	And all frame will be rendered from the same modified scene.
 - Tickets
-	Job Block tickets.
+	Job Block tickets counts.
+	Syntax like: ``NAME1:count1,NAME2:count2``.
+	Tasks will run only on pools that has enough free tickets.
+	See :ref:`afanasy-tickets` documentation for details.
 - Pools
 	Pools that job will run on with priorities.
+	Syntax like: ``name1:priority,name2:priority2``.
+	Tasks will prefer pools with a greater priority.
+	See :ref:`afanasy-pools` documentation for details.
 - Render to temporary image
 	This can save network traffic, as the entire image will be saved at once.
 	By default Nuke writes a portions of rendered frame.

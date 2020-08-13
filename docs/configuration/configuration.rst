@@ -73,6 +73,8 @@ To setup a console you should go to CGRU root folder and source setup script.
 	source ./setup.sh
 
 
+.. _manual-environment-setup:
+
 Manual Environment Setup
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
