@@ -6,7 +6,7 @@ Houdini
 
 Afanasy is represented by a special multi-functional ROP.
 You can connect several other ROPs to Afanasy ROP to render.
-You can connect several Afanasy ROPs to Afanasy ROP for a job with a complex denendences.
+You can connect several Afanasy ROPs to Afanasy ROP for a job with a complex denendencies.
 
 Afanasy ROP
 ===========
@@ -258,7 +258,7 @@ So it begins to render as first frames of a simulation completed, while the simu
 Complex
 -------
 
-You can constuct a comples Afanasy ROP network to construct a complex job.
+You can construct a complex Afanasy ROP network to construct a complex job.
 
 .. figure:: images/houdini_complex_network.png
 
