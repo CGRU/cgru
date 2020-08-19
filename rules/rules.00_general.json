@@ -63,6 +63,8 @@
 	"fullcg"  :{"title":"FullCG",   "short":"FCG", "tip":"Full CG Shot"},
 	"titles"  :{"title":"Titles",   "short":"Tt",  "tip":"Titles"},
 
+	"frlnc"   :{"title":"Freelance","short":"Fl",  "tip":"Freelance"},
+
 	"other"   :{"title":"Other",    "short":"Ot",  "tip":"Something else"}
 },
 
