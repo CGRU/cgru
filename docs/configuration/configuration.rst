@@ -100,6 +100,8 @@ Optional Variables
    - ``cgru/afanasy/bin`` - AFANASY applications.
 
 
+.. _config-overrides:
+
 Config Overrides
 ----------------
 

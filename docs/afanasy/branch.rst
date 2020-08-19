@@ -1,3 +1,5 @@
+.. _afanasy-branch:
+
 ======
 Branch
 ======
