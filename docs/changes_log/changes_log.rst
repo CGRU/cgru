@@ -85,7 +85,7 @@ v2.3.0
 	- Job block/task command and files pattern frame replacement is processed in a Python service class.
 	  Later it was coded in libafanasy and processed by afserver, and you could not alter it.
 	  Now you can use custom frame patterns.
-	  Afrender receives a pattern and frame settings (first, last, increment) instead of a ready command/files.
+	  AfRender receives a pattern and frame settings (first, last, increment) instead of a ready command/files.
 	  This is much more flexible.
 	  For example, now in a Python service class we can check all numeric task files for existence and size.
 	  And decide to skip task execution if all files are fine.
@@ -102,7 +102,7 @@ v2.3.0
 	- Shots export to table *frames_num* column added.
 - Bugfixes:
 	- Afanasy:
-		Server - Python API communitation invalid JSON answer fixed:
+		Server - Python API communication invalid JSON answer fixed:
 			- Server JSON answer will never contain extra ``A`` character after JSON object finish (latest ``}``).
 			- Python API will never try to read JSON data over message size.
 	- Server JSON answer *task_files* fixed, now it escape file names.
@@ -136,7 +136,7 @@ v2.2.3
 	- Houdini submission:
 		- Shorter names for afanasy temporary .hip files.
 		- Camera verification for Mantra submission.
-		- Support for *Alembic* submission with progressbar.
+		- Support for *Alembic* submission with progress.
 		- Support for *Wedge* submission with block per wedge.
 - Bugfixes:
 	- Afanasy:
@@ -185,7 +185,7 @@ v2.2.1
 	- Artists got automatic bookmarks on assigned shots.
 - Bugfixes:
 	- Afanasy:
-		- MS Windows AfServer WebGui hosting fixed.
+		- MS Windows AfServer WebGUI hosting fixed.
 	- Blender parser fixed to work with new versions (previous still supported).
 	- VRay parser fixed to work with new versions (previous still supported).
 
@@ -208,11 +208,11 @@ v2.2.0
 	  Only admins can change this state.
 	  Designed to disable render permanently while "Auto Nimby" is enabled.
 	- Parsers got "tagHTML" function.
-	  It designed to mark task output for AfWatch gui.
+	  It designed to mark task output for AfWatch GUI.
 	  For example replace terminal escape sequences, highlight errors.
 	- AfWatch GUI nodes list has a second sorting parameter.
 	- Houdini submission:
-    	- Added minimum memory, PPA settings, render temp HIP and wedges support.</li>
+    	- Added minimum memory, PPA settings, render temp HIP and wedges support.
     	- *Separate Render* deletes ROP files not after render, but on job deletion (you can re-render w/o re-generation).
     	- Distributed simulations support.
 	- Job Block *environment* parameter added. Render can run task process with some extra environment.
@@ -279,7 +279,7 @@ v2.0.8
 	- AfWatch desktop notifications.
 	- Server waits client have closed network connection first.
 	  This way there is no TCP socket TIME_WAIT state on server.
-	  It can be needed for a big amout of clients.
+	  It can be needed for a big amount of clients.
 - RULES:
 	- Shot tasks price.
 	- Auxiliary folders.
@@ -334,14 +334,14 @@ v2.0.5
 	- You can add scene(s) selected shots to playlist.
 - Afanasy:
 	- Preview Pending Approval ``PPA`` flag.
-	  Now job can render just tasks that descibed with a sequential parameter (every 10 frame, for example).
+	  Now job can render just tasks that described with a sequential parameter (every 10 frame, for example).
 	  Then job falls in a PPA state and stops to solve tasks.
 	  Artist can check that every 10 frame and unset PPA to continue or delete a job.
 	- Sequential behavior slightly changed.
 	  Now it renders first and last frames at first, then sequential frames.
 	- AfStarter and afjob.py supports Natron.
 	- AfRender can generate <a href="afanasy/render#thumbnails" target="_blank">thumbnails</a>
-	  while task process is still runnning.
+	  while task process is still running.
 	  Was designed and now used in dailies creation.
 - Bugfixes:
 	- Afanasy:
@@ -443,7 +443,7 @@ v2.0.1
 - Movie Maker: AV conversion tool is configurable.
   You can set a custom command or executable path.
   The default is *ffmpeg*.
-  Some Linux distrubutions swithced from *ffmpeg* to *avconv*. For now, they are fully compatible.
+  Some Linux distributions switched from *ffmpeg* to *avconv*. For now, they are fully compatible.
 - Afanasy JSON protocol:
 	- Jobs list can be generated providing to server an array of user names.
 	- Server configuration and farm setup can be reloaded via JSON message.
@@ -543,7 +543,7 @@ v2.0.0
 	- No auto project seek.
 	- No Outliner and Channels menus custom items.
 
-	Since Maya2014 CGRU main menu appears on load *cgru.mll* plugin.
+	Since Maya 2014 CGRU main menu appears on load *cgru.mll* plugin.
 	For auto load, enable it in plugins manager window.
 	Or you can source *cgru.mel* from a shelf or *userSetup.mel*.
 - Movie Maker
@@ -568,7 +568,7 @@ v2.0.0
 
 - Bugfixes:
 	- Server hung when a job with no blocks sent.
-	- Change job bock (tasks) command (working folder) change from watch gui.
+	- Change job bock (tasks) command (working folder) change from watch GUI.
 	- Post command ignore when job json file send with afcmd.
 	- Change any user parameter resets jobs solving method to 'order'.
 
@@ -621,7 +621,7 @@ v1.6.12
   By default user can change his own priority and his jobs priority.
   Set this parameters to *false<* and only admin will be allowed to change priorities.
 - Movie Maker: Apple ProRes codec presets.
-- Tested with Nuke7 - works fine.
+- Tested with Nuke 7 - works fine.
 - Bugfixes:
 	- Movie Maker: H264 (ffmpeg-libx264) uses 420 pixel format instead of 444 to work on most players.
 	- Nuke Submission: Fixed to render Write-nodes inside group.
@@ -633,16 +633,16 @@ v1.6.11
 2013.02.15
 
 - Maya users should look at  `meTools for Afanasy <http://meshstudio.blogspot.ru/2013/01/metools-for-afanasy.html>`__. And use it.
-- Nuke and PathsMap: Filename filter can be added to always have valid paths on any OS in the same script.
+- Nuke and Paths Map: Filename filter can be added to always have valid paths on any OS in the same script.
   You can configure to add or not to add it - not to break you potential in-house filters.
-- Tested on Windows8 - works fine.
+- Tested on Windows 8 - works fine.
 - Bugfixes:
 	- Nuke Submission: Negative frame range fixed.
 	- Nuke Render Script: Fixed to render several views in one file (you can write stereo in a singe EXR).
 	- AfStarter Blender: Now does not ignore output images parameter.
-	- PathsMap: Now works with big files thousands times faster.
+	- Paths Map: Now works with big files thousands times faster.
 	- AfServer: Enable/Disable service fixed (was broken in last versions while json protocol switch).
-	- PyQt: Open file dialog fixed to work with old PyQt versions (4.6.2 - CentOS6).
+	- PyQt: Open file dialog fixed to work with old PyQt versions (4.6.2 - CentOS 6).
 
 v1.6.10
 =======
@@ -672,7 +672,7 @@ v1.6.8
 
 2012.12.10
 
-- Automatic Wake-On-Lan.
+- Automatic Wake-On-LAN.
 - Bugfixes:
 	- Nuke: It does not really use render script when it should not (when there is no paths map or temporary images).
 
@@ -731,7 +731,7 @@ v1.6.5
 
 - Movie Maker can fake dailies date and time.
 - Python Parser class can consider that task is already done and ask render to stop a task.
-  AfRende sends to server that it was finished with a success.
+  AfRender sends to server that it was finished with a success.
 - Bugfixes:
 	- Movie Maker open/save parameters and non ASCII characters bug fixed, all operations uses UTF-8 encoding.
 	- AfStarter and negative frame values (actually the bug was in afjob.py).
@@ -872,7 +872,7 @@ v1.5.4
   So now you can set for example for Monday that *time begin* is 14:00 and *time end* is 1:00, and it makes render free at Tuesday 1:00.
 - Afanasy stand-alone starter has an ability customize command, preview images and OS needed for render.
 - Blender Cycles render engine support.
-- Windows version switched on MSVC 10 SP1.
+- Windows version switched on MSVC 10 SP 1.
 - Release archives switched on Qt 4.8.0.
 - Bugfixes:
 	- Error messages in standard output fixed opening Movie Maker and Afanasy Starter dialogs.
@@ -1105,7 +1105,7 @@ v1.3.1
   This rules works for Nuke *dailies* node too.
 - Server Farm Setup changed.
   Now host get setup form every matched pattern.
-  And in each pattern you can concretize host settings.
+  And in each pattern you can precise host settings.
 - Render reboot and shutdown commands can be configured.
 - Bugfixes:
 	- Watch job tasks window: Task item: Task host name string may overlap task name strings if this strings are long enough.
@@ -1154,7 +1154,7 @@ v1.2.2
 
 - Movie Maker works with folders with spaces.
 - MS Windows:
-	- Afanasy Render prefix commands with "<kbd>cmd.exe /c </kbd>".
+	- Afanasy Render prefix commands with *cmd.exe /c*.
 	- Afrender kills all child tasks in any case.
 	  (There was still some cases when it did not do it. Warning! QtCore4.dll patched, do not use it.)
 	- Afrender measures network and disk traffic.
@@ -1186,7 +1186,7 @@ v1.2.0
   It finds and kills windows with specified names.
   When process crashes, MS Windows can raise a window with apologizes.
   This can hang process until someone closes the window.
-  (afRender periodically sends WM_CLOSE signal to windows listed in special file.)
+  (AfRender periodically sends WM_CLOSE signal to windows listed in special file.)
 - Houdini Separate Render
   ROP to separate Mantra ROP render process on 'ifd' files generation and 'mantra' command render.
   It can also split one frame into tiles and render them simultaneous,
@@ -1202,7 +1202,7 @@ v1.2.0
 - Movie Maker works on MS Windows.
   Linux releases has *ffmpeg* binary compiled with *x264* library to encode 'H.264' codec.
   Windows users need to install `ImageMagick <http://www.imagemagick.org>`__, which contains 'ffmpeg' with 'x264'.
-- Softimage XSI submit to Afanasy scripts.
+- SoftImage XSI submit to Afanasy scripts.
   XSI Afanasy service and parser.
 - Lots of bug-fixes for MS Windows platform. Windows version can be called 'beta'.
 
@@ -1260,7 +1260,7 @@ v2009.09.16
 
 - Watch renders colors customization.
 - **Multi Host Tasks** - tasks can run on several hosts.
-- Python Class *Block* got *setMultiHost* method to describe multihosts tasks.
+- Python Class *Block* got *setMultiHost* method to describe multi-host tasks.
 
 v2009.08.24
 ===========
