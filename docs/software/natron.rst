@@ -50,7 +50,7 @@ General
 
 
 Scheduling
----------
+----------
 
 .. image:: images/natron_afanasy_scheduling.png
 
