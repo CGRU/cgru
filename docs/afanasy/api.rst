@@ -4,7 +4,7 @@ API
 
 Afanasy can communicate via JSON protocol.
 And only JSON protocol.
-Any GUI, CLI or Python script (API) contructs JSON objects to send to server.
+Any GUI, CLI or Python script (API) constructs JSON objects to send to server.
 
 
 Python API
@@ -163,7 +163,7 @@ Get
 
 Get request are used to get information from server.
 
-Here are some exaples:
+Here are some examples:
 
  - Get a list with all jobs:
 

@@ -6,7 +6,7 @@ Houdini
 
 Afanasy is represented by a special multi-functional ROP.
 You can connect several other ROPs to Afanasy ROP to render.
-You can connect several Afanasy ROPs to Afanasy ROP for a job with a complex denendencies.
+You can connect several Afanasy ROPs to Afanasy ROP for a job with a complex dependencies.
 
 Afanasy ROP
 ===========

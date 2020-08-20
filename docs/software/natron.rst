@@ -49,7 +49,7 @@ General
     Job will be send paused.
 
 
-Sheduling
+Scheduling
 ---------
 
 .. image:: images/natron_afanasy_scheduling.png

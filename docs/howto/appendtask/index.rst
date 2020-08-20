@@ -151,7 +151,7 @@ Known limitations
 Numeric block
 *************
 
-It does not makes sense to append tasks to numeric blocks, only non-numeric block can have tasks appent.
+It does not makes sense to append tasks to numeric blocks, only non-numeric block can have tasks appended.
 
 afwatch
 *******

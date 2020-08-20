@@ -719,7 +719,7 @@ v1.6.6
   PySide has LGPL license, PyQt - only GPL.
   So now <b>all components in CGRU has LGPL license</b> or similar.
 - New Linux package *afanasy-qtgui* appeared.
-  Needed only to remove *libqt* dependence from *afanasy-render* and *afansy-server* packages
+  Needed only to remove *libqt* dependence from *afanasy-render* and *afanasy-server* packages
   (to not to install huge Qt on render nodes).
 - Bugfixes:
 	- ``afcmd uadd`` works fine (is was broken in v1.6.5 - it added users that can't run any tasks)
