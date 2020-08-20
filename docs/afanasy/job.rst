@@ -166,13 +166,13 @@ need_os
 ``af.Job.setNativeOS()``
 
 Job will run only on hosts which name contains this mask.
-Python *setNativeOS()* function will automatically set needed os the same that it run.
+Python *setNativeOS()* function will automatically set needed OS the same that it run.
 
 need_properties
 ---------------
 ``af.Job.setNeedProperties(str)``
 
-Job will run only on hosts with custom properties contans this mask. It's custom host parameter can be defined in farm description.
+Job will run only on hosts with custom properties contains this mask. It's custom host parameter can be defined in farm description.
 
 command_pre
 -----------

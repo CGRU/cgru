@@ -472,7 +472,7 @@ v2.0.0
 		You will loose all jobs, renders and users settings if any.
 
 	*So now on MS Windows OS, Afanasy server does not needs any installation/configuration procedures to work.
-	Just run (double ckick) cgru/start/AFANASY/_afserver.cmd.
+	Just run (double click) cgru/start/AFANASY/_afserver.cmd.
 	Or drag a link to Startup menu for auto launch at logon.*
 
 - Authentication

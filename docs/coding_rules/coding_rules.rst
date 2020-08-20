@@ -2,7 +2,7 @@ Coding Rules
 ============
 
  - Indentation: TAB. You can vary tab length, default 4 spaces length is normal. Except Python.
- - Python identation: 4 SPACES.
+ - Python indentation: 4 SPACES.
  - Code alignment: SPACES, it should not break on various tab length.
  - Variable names: ``variable_name``.
  - Function names: ``functionName``.

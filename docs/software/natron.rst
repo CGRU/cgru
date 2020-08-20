@@ -44,7 +44,7 @@ General
 - Sequential
     Frames solving method.
 - Send Afanasy Job
-    Constuct and send job to Afanasy server.
+    Construct and send job to Afanasy server.
 - Start Job Paused
     Job will be send paused.
 
