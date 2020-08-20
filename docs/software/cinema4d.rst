@@ -34,15 +34,15 @@ Submission
     The submitted job is then paused and has to be started manually
 
 
-Sheduling
-=========
+Scheduling
+==========
 
 - Frames per Task
     Number of frames in each task
 - Max Hosts
     Maximum number of Hosts to use (0 means to keep the default value)
 - Max Runtime (min)
-    How long a frame is allowed to render maximum before it gets requed
+    How long a frame is allowed to render maximum before it gets re-queued
 - Capacity
     Tasks capacity value
 

@@ -16,7 +16,7 @@ CGRU will be installed in **/opt/cgru** folder.
 
 +----------------------+-----------------------------+--------------------------+
 |                      |                             |                          |
-|  Strucure            |  Description                | Depends                  |
+|  Structure           |  Description                | Depends                  |
 |                      |                             |                          |
 +======================+=============================+==========================+
 | * cgru               | **cgru**: Start menu item.  | PySide(1-2) or PyQt(4-5) |
@@ -79,7 +79,7 @@ Needed libraries:
 
  - Python: >= 2.6
  - Qt: Needed for Qt-GUI only
- - PostgreSQL: Optional, Needed by server for statistcs only
+ - PostgreSQL: Optional, Needed by server for statistics only
 
 
 Linux

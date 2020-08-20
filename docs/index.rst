@@ -25,4 +25,5 @@ Contents:
     coding_rules/coding_rules.rst
     fun/index.rst
     license/license.rst
+    changes_log/changes_log.rst
 

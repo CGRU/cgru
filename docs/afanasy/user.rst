@@ -2,9 +2,9 @@
 User
 ====
 
-aUser is created on a new job from user that does not exist.
+User is created on a new job from user that does not exist.
 
-Or you can create user manually unsing CLI:
+Or you can create user manually using CLI:
 
 .. code-block:: bash
 

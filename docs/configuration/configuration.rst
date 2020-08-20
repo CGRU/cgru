@@ -100,6 +100,8 @@ Optional Variables
    - ``cgru/afanasy/bin`` - AFANASY applications.
 
 
+.. _config-overrides:
+
 Config Overrides
 ----------------
 
@@ -107,7 +109,7 @@ You can override any config parameter.
 
 **By Command Argument:**
 
-Use ``--[param_name] param_value`` argumets to an Afanasy executable. For example to make afwatch to connect to other afanasy server type:
+Use ``--[param_name] param_value`` arguments to an Afanasy executable. For example to make afwatch to connect to other afanasy server type:
 
 .. code-block:: bash
 
@@ -115,7 +117,7 @@ Use ``--[param_name] param_value`` argumets to an Afanasy executable. For exampl
 
 **By Environment Variable:**
 
-Set ``CGRU_[PARAM_NAME]`` environemt variable. For example to setup console to use other server port type:
+Set ``CGRU_[PARAM_NAME]`` environment variable. For example to setup console to use other server port type:
 
 .. code-block:: bash
 

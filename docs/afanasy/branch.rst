@@ -1,3 +1,5 @@
+.. _afanasy-branch:
+
 ======
 Branch
 ======
@@ -66,7 +68,7 @@ Root branch name is always ``/``.
 parent_path
 -----------
 Parent branch path (name).
-It is an empty string fot the root branch.
+It is an empty string for the root branch.
 
 time_creation
 -------------
@@ -74,7 +76,7 @@ Time when branch was created.
 
 branches_num
 ------------
-Number of child brinches (direct childs, not childs of childs).
+Number of child branches (direct childs, not childs of childs).
 
 branches_total
 --------------
@@ -106,7 +108,7 @@ Branch solving priority.
 
 max_tasks_per_second
 --------------------
-Maximum tasks limit that branch can procude per second.
+Maximum tasks limit that branch can produce per second.
 
 max_running_tasks
 -----------------

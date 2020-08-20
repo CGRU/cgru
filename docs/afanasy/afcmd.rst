@@ -26,5 +26,5 @@ Check database connection.
 afcmd db_reset_all
 ------------------
 Drop tables in Afanasy database if any, and create new.
-This command should be executed before first Afanasy server start to create needed tables for statustics (if you need any).
+This command should be executed before first Afanasy server start to create needed tables for statistics (if you need any).
 

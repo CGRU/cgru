@@ -119,7 +119,7 @@ State
 
 =========== ======= ===
 Online      ``ONL`` Is online. 
-Offine      ``OFF`` Is offset. 
+Offline     ``OFF`` Is offline.
 nimby       ``Nby`` Is taken by his user. Only render user can render on it.
 NIMBY       ``NBY`` Is taken by his user and he don't want to render on it.
 Busy        ``RUN`` Executing one or more tasks.
@@ -299,16 +299,16 @@ and based from
 The class stands for:
 
 - Define default service parser, that you can override.
-- Instance needed parser and pass task ouput data it.
+- Instance needed parser and pass task output data it.
 - Method to fill in numeric block pattern with frames.
 - Method to transfer commands and paths from server to client (different OS-es can have different paths).
 - Check rendered files.
 - Generate thumbnails.
 - Check exit status for tasks that can return non zero exit status on success.
 - Method to insert in task command variable capacity coefficient.
-- Method to fill in multihost task command with captured hosts.
+- Method to fill in multi-host task command with captured hosts.
 
-You can write custom serivice class based on ``serivce.py`` to override any functions for customization.
+You can write custom service class based on ``service.py`` to override any functions for customization.
 
 
 Parsers
@@ -327,8 +327,8 @@ and based from
 Parser class stands for:
 
 - Parse task progress frame and percent of a current frame and a total(all frames) percentage.
-- Parse ouput for rendered file to make thumbnails, that render will send to server.
-- Stop task on bad ouput.
+- Parse output for rendered file to make thumbnails, that render will send to server.
+- Stop task on bad output.
 - Produce a warning just for user notification.
 - Mark success finish as error on bad output.
 - Append some string to task log for some useful info.
@@ -359,7 +359,7 @@ In string case this string will be stored instead of incoming data.
 You can use it to produce some message, by appending incoming data with your information.
 Or you can cut some useless information.
 
-All parser notifications and actions are transfered by setting class members:
+All parser notifications and actions are transferred by setting class members:
 
 self.percent(int)
 -----------------
@@ -408,7 +408,7 @@ self.report(str)
 Some info string for an entire job.
 GUIs will show it a job item(not task).
 Some most important info should be here.
-Most suitable fo a job with one or several big tasks. For eample you can put big file on FTP and show speed here.
+Most suitable for a job with one or several big tasks. For example you can put big file on FTP and show speed here.
 
 
 Thumbnails
@@ -424,7 +424,7 @@ Thumbnail files binary data is send by afrender to afserver along with task outp
 Server stores all files that afrender sends on task finis.
 You can get tasks thumbnails from afserver by HTTP GET method.
 
-If parser found some image during ouput parsing it can call a special function:
+If parser found some image during output parsing it can call a special function:
 
 appendFile(i_file, i_onthefly)
 ------------------------------

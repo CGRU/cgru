@@ -45,7 +45,7 @@ Scheduling
 
 .. figure:: images/xsi_afwindow_scheduling.png
 
-	Sheduling Tab
+	Scheduling Tab
 
 
 - Priority

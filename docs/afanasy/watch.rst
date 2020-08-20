@@ -42,7 +42,7 @@ But later it begin to grow and got several UI levels to display brief or full in
 	Useful when you know most parameters.
  - **Sith**
 	You will see parameters with a abbreviated names.
-	It is like on hand watches, where you see "TU 4", intsead of "Today it is Tuesday, 4th August 2020 Year",
+	It is like on hand watches, where you see "TU 4", instead of "Today it is Tuesday, 4th August 2020 Year",
 	as you are definitely know that it is August 2020,
 	"TU" is Tuesday, and next "4" number means the day of month.
 
@@ -64,7 +64,7 @@ Work
 .. image:: images/afwatch_work.png
 
 This is a hierarchy of branches and jobs from all users.
-Obly VISOR can make changes here.
+Only VISOR can make changes here.
 For a common user this list is read only.
 
 
@@ -74,7 +74,7 @@ Farm
 .. image:: images/afwatch_farm.png
 
 This is a hierarchy of pools and renders.
-Obly admin can make changes here.
+Only admin can make changes here.
 For a common user this list is read only.
 
 
@@ -109,7 +109,7 @@ Military
 .. image:: images/afwatch_style_military.png
 
 First versions has no Color Themes and UI Levels.
-Afwatch GUI always had Military theme and Jedi level.
+AfWatch GUI always had Military theme and Jedi level.
 
 Hello Kitty
 -----------
