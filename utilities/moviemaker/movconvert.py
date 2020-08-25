@@ -60,30 +60,29 @@ if Output is None:
     Output = Input
 
 Sequence = []
-StartNumber = None
+Pattern = None
 if os.path.isdir(Input):
-    InDir = Input
-    allfiles = os.listdir(InDir)
+    allfiles = os.listdir(Input)
     allfiles.sort()
     for afile in allfiles:
         if afile[0] == '.': continue
-        afile = os.path.join( InDir, afile)
-        if os.path.isdir( afile): continue
+        afile = os.path.join(Input, afile)
+        if os.path.isdir(afile): continue
 
-        Sequence.append( afile)
+        Sequence.append(afile)
 
-        if StartNumber is not None: continue
+        if Pattern is not None: continue
 
-        afile = os.path.basename( afile)
+        afile = os.path.basename(afile)
         digits = re.findall(r'\d+', afile)
         if len(digits) == 0: continue
         digits = digits[-1]
-        StartNumber = int(digits)
-        Input = afile[:afile.rfind(digits)]
-        Input += '%0' + str(len(digits)) + 'd'
-        Input += afile[afile.rfind(digits) + len(digits):]
-        Input = os.path.join(argv[0], Input)
+        Pattern = afile[:afile.rfind(digits)]
+        Pattern += '*'
+        Pattern += afile[afile.rfind(digits) + len(digits):]
+        Pattern = os.path.join(argv[0], Pattern)
         continue
+    Input = Pattern
 else:
     if not os.path.isfile(Input):
         print('ERROR: Input does not exist: ' + Input)
@@ -214,8 +213,8 @@ else:
         auxargs += ' -i "%s" -shortest -codec:a %s' % (Options.audio,Options.acodec)
 
     avcmd = Options.avcmd
-    if StartNumber:
-        avcmd += ' -start_number ' + str(StartNumber)
+    if Pattern:
+        avcmd += ' -pattern_type glob'
 
     cmd = cmd.replace('@AVCMD@', avcmd)
     cmd = cmd.replace('@INPUT@', Input)
