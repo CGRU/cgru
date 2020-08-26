@@ -2,7 +2,7 @@
 Houdini
 =======
 
-.. warning:: Documentation is outdated.
+.. warning:: Documentation is not finished.
 
 Afanasy is represented by a special multi-functional ROP.
 You can connect several other ROPs to Afanasy ROP to render.
@@ -269,7 +269,7 @@ You can construct a complex Afanasy ROP network to construct a complex job.
 	Complex Job
 
 This job consists of a simulation with sub-task dependence.
-Two caches waiting the simulation, but cat run independently from each other.
+Two caches waiting the simulation, but can run independently from each other.
 Mantra tile render which produces three blocks which wait all the cache.
 Two blocks for preview which can run independently but wait tile render tasks.
 One to convert EXR files to JPEGs and one to generate a preview movie form EXRs. 
@@ -279,7 +279,7 @@ Setup
 =====
 
 CGRU setup should be sourced before.
-To do this you can source setup.sh script in CGRU root folder.
+To do this you can source *setup.sh* script in CGRU root folder.
 Afanasy houdini operator library and Python module are located in:
 
 ``cgru/plugins/houdini``
