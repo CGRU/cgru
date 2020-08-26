@@ -82,6 +82,9 @@ ListUsers::ListUsers( QWidget* parent):
 
 	resetButtonsMenu();
 
+	bp = addButtonPanel(Item::TAny, "CUSTOM DATA","node_custom_data","Edit node custom data.");
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actCustomData()));
+
 	if (af::Environment::GOD())
 	{
 		bp = addButtonPanel(Item::TUser, "DELETE","users_solve_tasksnum",
@@ -124,65 +127,7 @@ ListUsers::~ListUsers()
 
 void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 {
-	ItemUser* useritem = (ItemUser*)getCurrentItem();
-	if( useritem == NULL ) return;
-	bool me = false;
-	if( useritem->getId() == MonitorHost::getUid()) me = true;
-
-
-	QMenu menu(this);
-	QMenu * submenu;
-	QAction *action;
-
-	action = new QAction( "Show Log", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actRequestLog() ));
-	menu.addAction( action);
-
-	if( me || af::Environment::VISOR() )
-	{
-		menu.addSeparator();
-		submenu = new QMenu("Set Parameter", this);
-
-		addMenuParameters(submenu);
-
-		menu.addMenu( submenu);
-		menu.addSeparator();
-
-		submenu = new QMenu("Jobs Solving Method", this);
-
-		action = new QAction("Method By Order", this);
-		connect(action, SIGNAL(triggered()), this, SLOT(actSolveJobsByOrder()));
-		submenu->addAction(action);
-
-		action = new QAction("Method By Priority", this);
-		connect(action, SIGNAL(triggered()), this, SLOT(actSolveJobsByPriority()));
-		submenu->addAction(action);
-
-		action = new QAction("Need By Capacity", this);
-		connect(action, SIGNAL(triggered()), this, SLOT(actSolveJobsByCapacity()));
-		submenu->addAction(action);
-
-		action = new QAction("Need By Run Tasks", this);
-		connect(action, SIGNAL(triggered()), this, SLOT(actSolveJobsByTasksNum()));
-		submenu->addAction(action);
-
-		menu.addMenu( submenu);
-
-		menu.addSeparator();
-
-		action = new QAction( "Custom Data", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actCustomData() ));
-		menu.addAction( action);
-
-		menu.addSeparator();
-
-		action = new QAction( "Delete", this);
-		action->setEnabled(useritem->jobs_num == 0);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actDelete() ));
-		menu.addAction( action);
-	}
-
-	menu.exec( event->globalPos());
+    return;
 }
 
 bool ListUsers::v_caseMessage( af::Msg * msg)

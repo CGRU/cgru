@@ -83,7 +83,6 @@ void ItemBranch::v_updateValues(af::Node * i_afnode, int i_msgType)
 		if (max_running_tasks_per_host != -1) strParameters += QString(" MaxRunTasksPerHost:%1").arg(max_running_tasks_per_host);
 		if (false == hostsmask.isEmpty()) strParameters += QString(" HostsMask(%1)").arg(hostsmask);
 		if (false == hostsmask_exclude.isEmpty()) strParameters += QString(" ExcludeHosts(%1)").arg(hostsmask_exclude);
-		strParameters += QString(" Priority:%1").arg(m_priority);
 	}
 	else if (Watch::isJedi())
 	{
@@ -104,7 +103,6 @@ void ItemBranch::v_updateValues(af::Node * i_afnode, int i_msgType)
 		if (max_running_tasks_per_host != -1) strParameters += QString(" MaxPerHost:%1").arg(max_running_tasks_per_host);
 		if (false == hostsmask.isEmpty()) strParameters += QString(" Hosts(%1)").arg(hostsmask);
 		if (false == hostsmask_exclude.isEmpty()) strParameters += QString(" Exclude(%1)").arg(hostsmask_exclude);
-		strParameters += QString(" Pri:%1").arg(m_priority);
 	}
 	else
 	{
@@ -125,8 +123,9 @@ void ItemBranch::v_updateValues(af::Node * i_afnode, int i_msgType)
 		if (max_running_tasks_per_host != -1) strParameters += QString(" mph%1").arg(max_running_tasks_per_host);
 		if (false == hostsmask.isEmpty()) strParameters += QString(" h(%1)").arg(hostsmask);
 		if (false == hostsmask_exclude.isEmpty()) strParameters += QString(" e(%1)").arg(hostsmask_exclude);
-		strParameters += QString(" p:%1").arg(m_priority);
 	}
+
+	ItemNode::updateStrParameters(strParameters);
 
 	if (branch->getMaxTasksPerSecond() > 0)
 		strParameters = QString("MTPS:%1 ").arg(branch->getMaxTasksPerSecond()) + strParameters;
@@ -154,6 +153,8 @@ void ItemBranch::updateInfo(af::Branch * i_branch)
 		m_info_text += QString("<br>Empty: <b>%1</b>").arg(afqt::time2Qstr(i_branch->getTimeEmpty()));
 		m_info_text += QString("<br>Empty for: <b>%1</b>").arg(afqt::stoq(af::time2strHMS(time(NULL) - i_branch->getTimeEmpty())));
 	}
+
+    ItemNode::updateInfo();
 }
 
 bool ItemBranch::calcHeight()

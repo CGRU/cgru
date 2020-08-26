@@ -56,14 +56,13 @@ void ItemUser::v_updateValues(af::Node * i_afnode, int i_msgType)
 	else
 		setNotRunning();
 
+	strLeftTop = m_name;
+
 	if( Watch::isPadawan())
 	{
-		strLeftTop = m_name;
-
 		strLeftBottom = QString("Jobs Count: %1 / %2 Running").arg(jobs_num).arg(user->getNumRunningJobs());
 
 		strHCenterTop.clear();
-		strHCenterTop = QString("Priority:%1").arg(m_priority);
 		if (max_running_tasks != -1) strHCenterTop += QString(" MaxRuningTasks:%1").arg(max_running_tasks);
 		if (max_running_tasks_per_host != -1) strHCenterTop += QString(" MaxRunTasksPerHost:%1").arg(max_running_tasks_per_host);
 		if( false == hostsmask.isEmpty()) strHCenterTop += QString(" HostsMask(%1)").arg( hostsmask);
@@ -88,12 +87,9 @@ void ItemUser::v_updateValues(af::Node * i_afnode, int i_msgType)
 	}
 	else if( Watch::isJedi())
 	{
-		strLeftTop = m_name;
-
 		strLeftBottom = QString("Jobs: %1 / %2 Run").arg(jobs_num).arg(user->getNumRunningJobs());
 
 		strHCenterTop.clear();
-		strHCenterTop = QString("Pri:%1").arg(m_priority);
 		if (max_running_tasks != -1) strHCenterTop += QString(" MaxTasks:%1").arg(max_running_tasks);
 		if (max_running_tasks_per_host != -1) strHCenterTop += QString(" MaxPerHost:%1").arg(max_running_tasks_per_host);
 		if( false == hostsmask.isEmpty()) strHCenterTop += QString(" Hosts(%1)").arg( hostsmask);
@@ -118,8 +114,6 @@ void ItemUser::v_updateValues(af::Node * i_afnode, int i_msgType)
 	}
 	else
 	{
-		strLeftTop = QString("%1-%2").arg(m_name).arg( m_priority);
-
 		strLeftBottom  = 'j' + QString::number(jobs_num) + '/' + QString::number(user->getNumRunningJobs());
 
 		strHCenterTop.clear();
@@ -145,6 +139,8 @@ void ItemUser::v_updateValues(af::Node * i_afnode, int i_msgType)
 			strRightBottom += " mt";
 	}
 
+	ItemNode::updateStrParameters(strHCenterTop);
+
 	if( isLocked()) strLeftTop = "(LOCK) " + strLeftTop;
 
 	m_tooltip = user->v_generateInfoString( true).c_str();
@@ -164,12 +160,12 @@ void ItemUser::updateInfo(af::User * i_user)
 		m_info_text += QString("<br>Activity host: <b>%1</b>").arg(afqt::stoq(i_user->getHostName()));
 	m_info_text += "<br>";
 	ItemWork::updateInfo(i_user);
-	m_info_text += "<br>";
-	ItemNode::updateInfo(i_user);
 
-	m_info_text += "<br>";
+    m_info_text += "<br>";
 	m_info_text += QString("<br>Registered: <b>%1</b>").arg(afqt::time2Qstr(i_user->getTimeRegister()));
 	m_info_text += QString("<br>Last activity: <b>%1</b>").arg(afqt::time2Qstr(i_user->getTimeActivity()));
+
+	ItemNode::updateInfo();
 }
 
 bool ItemUser::calcHeight()

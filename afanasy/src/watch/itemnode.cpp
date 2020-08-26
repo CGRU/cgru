@@ -76,18 +76,40 @@ void ItemNode::updateNodeValues( const af::Node * i_node)
 		m_running_services[afqt::stoq(it.first)] = it.second;
 }
 
-void ItemNode::updateInfo(const af::Node * i_node)
+void ItemNode::updateStrParameters(QString & o_str)
 {
-	if (m_running_services.size() == 0)
-		return;
-
-	m_info_text += "Running services:";
-	QMapIterator<QString, int> it(m_running_services);
-	while (it.hasNext())
+	if (Watch::isPadawan())
 	{
-		it.next();
-		m_info_text += QString("<br><b>%1: %2</b>").arg(it.key()).arg(it.value());
+		o_str += QString(" Priority:%1").arg(m_priority);
 	}
+	else if (Watch::isJedi())
+	{
+		o_str += QString(" Pri:%1").arg(m_priority);
+	}
+	else
+	{
+		o_str += QString(" p%1").arg(m_priority);
+	}
+
+	if (m_custom_data.size())
+		o_str += " CD*";
+}
+
+void ItemNode::updateInfo()
+{
+	if (m_running_services.size())
+    {
+        m_info_text += "<br>Running services:";
+        QMapIterator<QString, int> it(m_running_services);
+        while (it.hasNext())
+        {
+            it.next();
+            m_info_text += QString("<br><b>%1: %2</b>").arg(it.key()).arg(it.value());
+        }
+    }
+
+    if (m_custom_data.size())
+        m_info_text += QString("<br><br><i><b>Custom Data</b>:<br>%1</i>").arg(m_custom_data);
 }
 
 void ItemNode::addChild(ItemNode * i_item)

@@ -63,7 +63,8 @@ public:
 protected:
 	void updateNodeValues( const af::Node * i_node);
 
-	void updateInfo(const af::Node * i_node);
+	void updateInfo();
+	void updateStrParameters(QString & o_str);
 
 	inline void setParentPath(const QString & i_path){m_parent_path = i_path; m_sort_force = i_path;}
 

@@ -501,6 +501,8 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 	// Join info texts:
 	m_info_text = m_info_text_render;
 	m_info_text.replace("@HRES@", m_info_text_hres);
+
+    ItemNode::updateInfo();
 }
 
 void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const

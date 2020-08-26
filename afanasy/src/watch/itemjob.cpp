@@ -182,7 +182,6 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 		if( false == need_properties.isEmpty()  ) properties += QString(" Properities(%1)").arg( need_properties);
 		if( maxrunningtasks != -1 ) properties += QString(" MaxTasks:%1").arg( maxrunningtasks);
 		if( maxruntasksperhost != -1 ) properties += QString(" MaxPerHost:%1").arg( maxruntasksperhost);
-		properties += QString(" Priority:%1").arg( m_priority);
 		if( ppapproval ) properties += " PPA";
 		if( maintenance ) properties += " MNT";
 		if( ignorenimby ) properties += " INB";
@@ -197,7 +196,6 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 		if( false == need_properties.isEmpty()  ) properties += QString(" Props(%1)").arg( need_properties);
 		if( maxrunningtasks != -1 ) properties += QString(" Max:%1").arg( maxrunningtasks);
 		if( maxruntasksperhost != -1 ) properties += QString(" PerHost:%1").arg( maxruntasksperhost);
-		properties += QString(" Pri:%1").arg( m_priority);
 		if( ppapproval ) properties += " PPA";
 		if( maintenance ) properties += " MNT";
 		if( ignorenimby ) properties += " INB";
@@ -212,12 +210,13 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 		if( false == need_properties.isEmpty()  ) properties += QString(" p(%1)").arg( need_properties  );
 		if( maxrunningtasks != -1 ) properties += QString(" m%1").arg( maxrunningtasks);
 		if( maxruntasksperhost != -1 ) properties += QString(" mph%1").arg( maxruntasksperhost);
-		properties += QString(" p%1").arg( m_priority);
 		if( ppapproval ) properties += " ppa";
 		if( maintenance ) properties += " mnt";
 		if( ignorenimby ) properties += " inb";
 		if( ignorepaused ) properties += " ips";
 	}
+
+	ItemNode::updateStrParameters(properties);
 
 	user_eta.clear();
 	if (af::Environment::VISOR() || m_inworklist)
@@ -273,6 +272,8 @@ void ItemJob::updateInfo(const af::Job * i_job)
 		m_info_text += "<br>Done: <b>" + afqt::time2Qstr(time_done) + "</b>";
 	else if (time_wait)
 		m_info_text += "<br>Waiting: <b>" + afqt::time2Qstr(time_wait) + "</b>";
+
+	ItemNode::updateInfo();
 }
 
 bool ItemJob::calcHeight()

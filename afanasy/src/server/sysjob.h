@@ -104,6 +104,9 @@ public:
 	static void AddWOLCommand( const std::string & i_cmd, const std::string & i_wdir, const std::string & i_user_name, const std::string & i_job_name);
 	static void AddEventCommand( const std::string & i_cmd, const std::string & i_wdir, const std::string & i_user_name, const std::string & i_job_name, const std::string & i_task_name);
 
+	inline static const JobAf  * GetJob()  {return ms_sysjob;}
+	inline static const UserAf * GetUser() {return ms_sysjob->m_user;}
+
 	enum BlocksEnum
 	{
 		BlockPostCmdIndex,

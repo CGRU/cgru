@@ -40,6 +40,8 @@ public:
 
 	bool addPool(PoolSrv * i_pool);
 
+	inline const PoolSrv * getParent() const {return m_parent;}
+
 	void v_refresh(time_t i_current_time, AfContainer * i_container, MonitorContainer * i_monitoring);
 
 	virtual void v_action(Action & i_action);

@@ -405,5 +405,5 @@ void ListNodes::actCustomData()
 
 void ListNodes::customDataSet( const QString & text)
 {
-	setParameter(Item::TAny, "custom_data", af::strEscape(afqt::qtos( text)));
+	setParameter(Item::TAny, "custom_data", "\"" + af::strEscape(afqt::qtos(text)) + "\"");
 }

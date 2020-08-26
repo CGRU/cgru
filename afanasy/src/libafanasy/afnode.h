@@ -47,11 +47,14 @@ public:
 	inline int64_t getFlags() const { return m_flags; }
 	inline int64_t getState() const { return m_state; }
 
-	inline const std::string & getAnnotation() const {return m_annotation; }
+	inline bool hasCustomData() const {return m_custom_data.size() != 0;}
+	inline bool  noCustomData() const {return m_custom_data.size() == 0;}
+
+    inline const std::string & getAnnotation() const {return m_annotation; }
 	inline const std::string & getCustomData() const {return m_custom_data;}
 	inline const std::string & getSrvInfo()    const {return m_srv_info;   }
 
-	friend class ::AfContainer;
+    friend class ::AfContainer;
 	friend class ::AfList;
 
 	virtual int v_calcWeight() const; ///< Calculate and return memory size.

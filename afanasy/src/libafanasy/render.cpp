@@ -184,14 +184,19 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
 
 		Farm::readwrite(msg);
 
-	  rw_bool   ( m_locked,                 msg);
-	  rw_String ( m_pool,                   msg);
-	  rw_int64_t( m_task_start_finish_time, msg);
-	  rw_int32_t( m_capacity_used,          msg);
-	  rw_int64_t( m_time_update,            msg);
-	  rw_int64_t( m_time_register,          msg);
-	  rw_int64_t( m_wol_operation_time,     msg);
-	  rw_String ( m_annotation,             msg);
+		rw_bool   (m_locked,                 msg);
+		rw_String (m_pool,                   msg);
+		rw_int64_t(m_task_start_finish_time, msg);
+		rw_int32_t(m_capacity_used,          msg);
+		rw_int64_t(m_time_update,            msg);
+		rw_int64_t(m_time_register,          msg);
+		rw_int64_t(m_wol_operation_time,     msg);
+		rw_String (m_annotation,             msg);
+
+		/* NEW_VERSION
+		rw_String (m_custom_data,            msg);
+		rw_String (m_srv_info,               msg);
+		*/
 
 	case Msg::TRenderRegister:
  

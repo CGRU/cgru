@@ -33,6 +33,9 @@ class events(service.service):
         if objects is None:
             return
 
+        print('Event object:')
+        print(json.dumps(objects, sort_keys=True, indent=4))
+
         # Check received events:
         if 'events' not in objects:
             print('ERROR: Received data does not contain events.')
@@ -47,48 +50,32 @@ class events(service.service):
             print('Event data:\n%s' % data)
             return
 
-        # Combine objects:
-        obj = dict()
-        # Update with user custom object in any:
-        if 'custom_data' in objects['user']:
-            try:
-                obj.update(json.loads(objects['user']['custom_data']))
-            except:  # TODO: too broad exception clause
-                print('JSON error in user custom data:')
-                print(objects['user']['custom_data'])
-                print(sys.exc_info()[1])
-                return
-        # Update with job custom object in any:
-        if 'custom_data' in objects['job']:
-            try:
-                obj.update(json.loads(objects['job']['custom_data']))
-            except:  # TODO: too broad exception clause
-                print('JSON error in job custom data:')
-                print(objects['job']['custom_data'])
-                print(sys.exc_info()[1])
-                return
+        # Get and combine custom data objects:
+        custom_obj = dict()
+        for key in objects:
+            self.combineCustomObj(custom_obj, objects[key])
 
-            # print('Custom data:')
-        # print(json.dumps(obj))
+        print('Combined custom data:')
+        print(json.dumps(custom_obj, sort_keys=True, indent=4))
 
-        if len(obj) == 0:
+        if len(custom_obj) == 0:
             # print('No configured data found.')
             return
 
-        if 'events' not in obj:
+        if 'events' not in custom_obj:
             # print('No configured events found.')
             return
 
         email_events = []
 
         # Iterate all interested events:
-        for event in obj['events']:
+        for event in custom_obj['events']:
 
             if event not in objects['events']:
                 # print('Skipping not received event "%s"' % event)
                 continue
 
-            event_obj = obj['events'][event]
+            event_obj = custom_obj['events'][event]
 
             # Event should be a dictionary:
             if not isinstance(event_obj, dict):
@@ -107,10 +94,10 @@ class events(service.service):
                 print('Event data:\n%s' % data)
                 continue
 
-            if 'email' in methods and 'email' in obj:
+            if 'email' in methods and 'emails' in custom_obj and len(custom_obj['emails']):
                 print('EVENT: %s:%s %s:%s' %
                       (event, task_info['job_name'], task_info['user_name'],
-                       obj['email'])
+                       custom_obj['emails'])
                       )
                 email_events.append(event)
 
@@ -121,12 +108,70 @@ class events(service.service):
         if len(email_events):
             cmd = cgruconfig.VARS['email_send_cmd']
             cmd += ' -V'  # Verbose mode
-            cmd += ' -f "noreply@%s"' % cgruconfig.VARS[
-                'email_sender_address_host']
-            cmd += ' -t "%s"' % obj['email']
+            cmd += ' -f "noreply@%s"' % cgruconfig.VARS['email_sender_address_host']
+            for addr in custom_obj['emails']:
+                cmd += ' -t "%s"' % addr
             cmd += ' -s "%s"' % (','.join(email_events))
             cmd += ' "Events: %s<br>"' % (','.join(email_events))
+            if 'render' in objects:
+                cmd += ' "Render Name: %s<br>"' % objects['render']['name']
+            cmd += ' "Job Name: %s<br>"' % task_info['job_name']
             cmd += ' "User Name: %s<br>"' % task_info['user_name']
-            cmd += ' "Job Name: %s"' % task_info['job_name']
             print(cmd)
             self.taskInfo['command'] = cmd
+
+
+    def combineCustomObj(self, o_output_obj, i_input_obj):
+
+        if isinstance(i_input_obj, list):
+            for obj in i_input_obj:
+                self.combineCustomObj(o_output_obj, obj)
+            return
+
+        if not isinstance(i_input_obj, dict):
+            return
+
+        if not 'custom_data' in i_input_obj:
+            # Object does not contain any custom_data, nothing to combine
+            return
+
+        custom_obj = None
+
+        try:
+            custom_obj = json.loads(i_input_obj['custom_data'])
+        except:  # TODO: too broad exception clause
+            print('JSON error in custom data:')
+            print(i_input_obj['custom_data'])
+            print(sys.exc_info()[1])
+            return
+
+        if not isinstance(custom_obj, dict):
+            print('ERROR: "%s" custom data is not an object:')
+            print(custom_obj)
+            return
+
+        self.updateObj(o_output_obj, custom_obj)
+
+
+    def updateObj(self, o_obj, i_obj):
+
+        for key in i_obj:
+            if len(key) == 0:
+                continue
+
+            if key[0] == '-':
+                continue
+
+            if isinstance(i_obj[key], dict):
+                if key in o_obj:
+                    if isinstance(o_obj[key], dict):
+                        self.updateObj(o_obj[key], i_obj[key])
+                        continue
+
+            if isinstance(i_obj[key], list):
+                if key in o_obj:
+                    if isinstance(o_obj[key], list):
+                        o_obj[key].extend(i_obj[key])
+                        continue
+
+            o_obj[key] = i_obj[key]

@@ -178,6 +178,9 @@ ListRenders::ListRenders( QWidget* parent):
 		bp = addButtonPanel(Item::TAny, "START","farm_unpause","Start (Unpause) selected renders.","S");
 		connect( bp, SIGNAL( sigClicked()), this, SLOT(actUnsetPaused()));
 
+        bp = addButtonPanel(Item::TPool, "CUSTOM DATA","node_custom_data","Edit node custom data.");
+        connect(bp, SIGNAL(sigClicked()), this, SLOT(actCustomData()));
+
 		bp = addButtonPanel(Item::TAny, "DELETE","farm_delete","Delete pool or render.","", true);
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(actDelete()));
 	}

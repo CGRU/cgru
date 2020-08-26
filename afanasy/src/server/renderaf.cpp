@@ -722,6 +722,7 @@ void RenderAf::addErrorTask(const af::TaskExec * i_exec)
 	if (m_error_tasks.size() >= SickErrorsCount)
 	{
 		setSick();
+		emitEvents(std::vector<std::string>(1, "RENDER_SICK"));
 		std::string msg = std::string("Got sick after ") + af::itos(SickErrorsCount) + " errors:";
 		for (const auto & it : m_error_tasks)
 			msg += "\n" +  it->user_name + " - " + it->service + ": " + af::time2str(it->when);
@@ -861,6 +862,7 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 	{
 		appendLog( std::string("ZOMBIETIME: ") + af::itos(af::Environment::getRenderZombieTime()) + " seconds.");
 		AFCommon::QueueLog( std::string("Render: \"") + getName() + "\" - ZOMBIETIME");
+		emitEvents(std::vector<std::string>(1, "RENDER_ZOMBIE"));
 		offline( jobs, af::TaskExec::UPRenderZombie, monitoring);
 		return;
 	}
@@ -1095,6 +1097,67 @@ void RenderAf::closeLostTask( const af::MCTaskUp &taskup)
 	AFCommon::QueueLogError( stream.str());
 
 	render->m_re.addTaskClose( taskup);
+}
+
+void RenderAf::emitEvents(const std::vector<std::string> & i_events) const
+{
+	// Processing command for system job if some events happened:
+	if (i_events.empty())
+		return;
+
+	// Check that some custom data exists:
+	if (noCustomData() && SysJob::GetUser()->noCustomData() && SysJob::GetJob()->noCustomData())
+	{
+		// Check all parent pools custom data exists:
+		bool found = false;
+		const PoolSrv * pool = m_parent;
+		while (pool)
+		{
+			if (pool->hasCustomData())
+				found = true;
+			pool = pool->getParent();
+		}
+
+		if (false == found)
+			return;
+	}
+
+	std::ostringstream str;
+	str << "{";
+
+	str << "\n\"render\":";
+	v_jsonWrite(str, af::Msg::TRendersList);
+
+	str << ",\n\"pools\":[";
+	const PoolSrv * pool = m_parent;
+	while (pool)
+	{
+		str << "\n";
+		pool->v_jsonWrite(str, af::Msg::TPoolsList);
+		pool = pool->getParent();
+		if (pool)
+			str << ",";
+	}
+	str << "\n]";
+
+	str << ",\n\"user\":";
+	SysJob::GetUser()->v_jsonWrite(str, af::Msg::TUsersList);
+
+	str << ",\n\"job\":";
+	SysJob::GetJob()->v_jsonWrite(str, af::Msg::TJobsList);
+
+	str << ",\n\"events\":[";
+
+	for (int i = 0; i < i_events.size(); i++)
+	{
+		if (i) str << ',';
+		str << '"' << i_events[i] << '"';
+	}
+	str << "]\n}";
+
+	SysJob::AddEventCommand(str.str(),
+		"", // working directory - no matter
+		m_user_name, m_name, i_events[0]);
 }
 
 af::Msg * RenderAf::writeFullInfo( bool i_binary) const

@@ -147,6 +147,9 @@ ListJobs::ListJobs(QWidget * i_parent, bool i_listwork, const std::string & i_na
 
 	resetButtonsMenu();
 
+	bp = addButtonPanel(Item::TAny, "CUSTOM DATA","node_custom_data","Edit node custom data.");
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actCustomData()));
+
 	if (m_listwork)
 	{
 		bp = addButtonPanel(Item::TAny, "DELETE","work_delete","Delete selected jobs or branches.","", true);
@@ -421,12 +424,6 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 
 	action = new QAction( "Post Command", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actPostCommand() ));
-	submenu->addAction( action);
-
-	submenu->addSeparator();
-
-	action = new QAction( "Custom Data", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actCustomData() ));
 	submenu->addAction( action);
 
 	menu.addMenu( submenu);

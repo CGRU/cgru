@@ -349,7 +349,7 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 		lock();
 		m_deletion = true;
 		
-		if (m_custom_data.size() || m_user->getCustomData().size())
+		if (hasCustomData() || m_user->hasCustomData())
 		{
 			std::vector<std::string> events;
 			events.push_back("JOB_DELETED");
@@ -1280,7 +1280,7 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 		
 		// Proccess events:
 		if( m_id != AFJOB::SYSJOB_ID ) // skip system job
-			if( m_custom_data.size() || m_user->getCustomData().size())
+			if (hasCustomData() || m_user->hasCustomData())
 			{
 				std::vector<std::string> events;
 				
@@ -1319,33 +1319,33 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 	if(( monitoring ) &&  ( jobchanged )) monitoring->addJobEvent( jobchanged, getId(), getUid());
 }
 
-void JobAf::emitEvents(std::vector<std::string> events)
+void JobAf::emitEvents(const std::vector<std::string> & i_events) const
 {
 	// Processing command for system job if some events happened:
-	if( events.empty())
+	if (i_events.empty())
 		return;
 	
 	std::ostringstream str;
 	str << "{";
 
 	str << "\n\"user\":";
-	m_user->v_jsonWrite( str, af::Msg::TUsersList);
+	m_user->v_jsonWrite(str, af::Msg::TUsersList);
 
 	str << ",\n\"job\":";
-	v_jsonWrite( str, af::Msg::TJobsList);
+	v_jsonWrite(str, af::Msg::TJobsList);
 
 	str << ",\n\"events\":[";
 
-	for( int i = 0; i < events.size(); i++ )
+	for (int i = 0; i < i_events.size(); i++)
 	{
-		if( i ) str << ',';
-		str << '"' << events[i] << '"';
+		if (i) str << ',';
+		str << '"' << i_events[i] << '"';
 	}
 	str << "]\n}";
 	
-	SysJob::AddEventCommand( str.str(),
+	SysJob::AddEventCommand(str.str(),
 		"", // working directory - no matter
-		m_user_name, m_name, events[0]);
+		m_user_name, m_name, i_events[0]);
 }
 
 void JobAf::restartAllTasks( const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state)

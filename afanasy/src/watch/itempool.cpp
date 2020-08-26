@@ -105,7 +105,6 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 			strRightTop += QString(" HostCapacity:%1").arg(pool->getCapacityHost());
 		if (pool->getSickErrorsCount() >= 0)
 			strRightTop += QString(" SickErrors:%1").arg(pool->getSickErrorsCount());
-		strRightTop += QString(" Priority:%1").arg(pool->getPriority());
 	}
 	else if(Watch::isJedi())
 	{
@@ -128,7 +127,6 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 			strRightTop += QString(" HostCapacity:%1").arg(pool->getCapacityHost());
 		if (pool->getSickErrorsCount() >= 0)
 			strRightTop += QString(" SickErr:%1").arg(pool->getSickErrorsCount());
-		strRightTop += QString(" Priority:%1").arg(pool->getPriority());
 	}
 	else
 	{
@@ -151,11 +149,12 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 			strRightTop += QString(" hc:%1").arg(pool->getCapacityHost());
 		if (pool->getSickErrorsCount() >= 0)
 			strRightTop += QString(" se:%1").arg(pool->getSickErrorsCount());
-		strRightTop += QString(" p:%1").arg(pool->getPriority());
 	}
 
 	if (m_paused)
 		strRightTop += " PAUSED";
+
+	ItemNode::updateStrParameters(strRightTop);
 
 	m_idle_wolsleep_time = pool->m_idle_wolsleep_time;
 	m_idle_free_time     = pool->m_idle_free_time;
@@ -192,6 +191,8 @@ void ItemPool::updateInfo(af::Pool * i_pool)
 
 	m_info_text += "<br>";
 	m_info_text += QString("Created: <b>%1</b>").arg(afqt::time2Qstr(i_pool->getTimeCreation()));
+
+    ItemNode::updateInfo();
 }
 
 bool ItemPool::calcHeight()

@@ -169,6 +169,12 @@ private:
 
 	void appendTasksLog( const std::string & message);  ///< Append tasks log with a \c message .
 
+	/**
+	 * @brief Emit events and submit them to the system job
+	 * @param events: event types, e.g. RENDER_ZOMBIE or RENDER_SICK
+	 */
+	void emitEvents(const std::vector<std::string> & i_events) const;
+
 private:
 	std::list<std::string> m_tasks_log;							///< Tasks Log.
 
