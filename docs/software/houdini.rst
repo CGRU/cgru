@@ -151,6 +151,30 @@ Distribute Simulation
 
 	Afanasy ROP Separate Render tab
 
+- Controls Node
+	Distributed simulation control node.
+
+- Number Of Slices
+	Distributed simulation slices number.
+
+- Tracker Parameters
+
+	Distributed simulation slices tasks should communicate via tracker service.
+
+	- Capacity
+		Tracker task capacity.
+
+	- Host Mask
+		Tracker will run only hosts that names match this regular expression.
+
+	- Service
+		Tracker task service.
+
+	- Parser
+		Tracker task parser.
+
+	- Manual Tracker
+		Use manual launched tracker service at specified **Address** and **Port**
 
 Separate Render
 ---------------
@@ -189,8 +213,8 @@ Separate render generates a job that can:
 	Usually files and may be some other options.
 - Files
 	Files to generate.
-- Delete ROP Files
-	Delete ROP generated files (IFD) after render.
+- Delete ROP Files On Job Deletion
+	ROP files (IFD-s) can be deleted when user will delete the job.
 - Images
 	Images which render will produce. Needed for tile render, AfWatch preview/thumbnails.
 - Tile Render
