@@ -4,7 +4,7 @@
 Branch
 ======
 
-A branch is like a folder in a filesystem.
+A branch is like a folder in a file-system.
 A branch can contain child branches (folders) and jobs (files),
 so there is a hierarchy of branches (folders) and jobs (files).
 Branches are designed to combine and manipulate a set of similar (department, project, scene, asset) jobs.

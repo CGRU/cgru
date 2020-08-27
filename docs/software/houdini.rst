@@ -12,9 +12,12 @@ Afanasy ROP
 ===========
 
 - Submit
-    Generate a job and send it to server.
+	Generate a job and send it to server.
 - Start Paused
-    Send a job in off-line state.
+	Send a job in off-line state.
+- Preview Approval
+	Set job *preview approval* flag.
+	For example, if sequential is 10, it will render every 10 frame and wait for approve.
 
 General
 -------
@@ -24,24 +27,47 @@ General
 	Afanasy ROP General tab
 
 - Job Name
-    Afanasy job name.
-- Connected Nodes Are Independent
-    Allow run the same frames of all connected nodes at the same time.
+	Afanasy job name.
+- Output Driver
+	You can not (don't want) to connect Afanasy ROP to render ROP, you can specify it.
+
 - Valid Frame Range:
-    - Render Any Frame
-        Use frame range form downstream node. Or render current frame if no range in network defined.
-    - Render Frame Range
-        Render this specified frame range.
-    - Render Frame Range Only (Strict)
-        Render this specified frame range. Other ROPs will wait this whole frame range rendered.
+	- Render Any Frame
+		Use frame range form downstream node. Or render current frame if no range in network defined.
+	- Render Frame Range
+		Render this specified frame range.
+	- Render Frame Range Only (Strict)
+		Render this specified frame range. Other ROPs will wait this whole frame range rendered.
+- Single Task
+	- Generate single task for whole frame range, useful for simulations.
+- Local Render
+	Render on the local render client.
+	Job host mask will be automatically set to the local host name.
 - Frames Per Task
-    Number of frames in each task.
-- Allow Sub-Task Dependence
-    Tasks can wait other tasks to be done partially.
+	Number of frames in each task.
+- Sequential
+	===== =====
+	   1   Render frames one by one from the first to the last
+	  10   Render every 10 frame at first, than render last other frames
+	  -1   Render frames backwards from the last to the first
+	 -10   Render every 10 frame at first backwards, than render last other frames backwards
+	   0   Render the first, the last, the middle, the middle of the middle and so on
+	===== =====
+
+- Wait Time
+	Set job *time_wait* parameter to the current day *Hours* and *Minutes*.
+	If current time will be greater than specified, the next day will be used.
+
 - Render With Take
-    Specify take to render.
+	Specify take to render.
+- Connected Nodes Are Independent
+	Allow run the same frames of all connected nodes at the same time.
+- Allow Sub-Task Dependence
+	Tasks can wait other tasks to be done partially.
+	Useful for simulations.
+	Frames render can start w/o waiting the whole simulation is finished.
 - Ignore ROP Inputs
-    Do not execute input ROPs.
+	Do not execute input ROPs.
 
 Parameters
 ----------
@@ -51,30 +77,80 @@ Parameters
 	Afanasy ROP Parameters tab
 
 - Platform
-    OS type the job can launch tasks on:
-    ``any`` - any OS,
-    ``Native`` - the same as the script was launched on.
+	OS type the job can launch tasks on:
+		- **Any**: any OS.
+		- **Native**: the same as this OTL was launched on.
+
+- Tickets
+	Use :ref:`afanasy-tickets`:
+		- *Auto*: Submission script will try to set tickets automatically, depending on the ROP to render.
+		- *Memory*: If not zero, this amount of *MEM* tickets will be set.
+		- *Aux*: Any other tickets string as ``TICKET:COUNT`` comma separated list.
+
+- Tickets
+	Use :ref:`afanasy-pools` that are specified as ``pool:priority`` comma separated list.
+
 - Enable Extended Parameters
-    To switch ON/OFF it fast.
-- Depend Mask
-    Same user jobs names pattern to wait to be done to start
-    (empty value means not to wait any job).
-- Global Depend Mask
-    Same as Depend Mask, but waits for a jobs from any user.
-- Priority
-    Job order in user jobs list
-    (``-1`` means to use default value).
-- Maximum Running Tasks
-    Maximum tasks job can run at the same time
-    (``-1`` means no limit).
-- Capacity
-    Tasks capacity value (``-1`` means use default value).
-    Render must have enough free capacity to run it.
+	To switch ON/OFF it fast.
+- Job :ref:`afanasy-branch`
+	``$HIP`` should be used in most cases.
+	No matter how deep you placed *hip* file in file-system.
+	It just help to find server an existing parent branch (department, project, scene).
 - Hosts Mask
-    Hosts names pattern where job can run on
-    (empty value means that job can run on host with any name).
-- Hosts Mask Exclude
-    Hosts names pattern where job can not run on.
+	Hosts names pattern where job can run on (empty value means that job can run on host with any name).
+- Exclude
+	Hosts Mask Exclude: Hosts names pattern where job can not to run on.
+- Depend Mask
+	Same user jobs names pattern to wait to be done to start
+- Global
+	Depend Mask Global: Same as Depend Mask, but waits for a jobs from any user.
+- Priority
+	Job order in user jobs list
+	(``-1`` means to use default value).
+- Maximum Running Tasks
+	Maximum tasks job can run at the same time
+	(``-1`` means no limit).
+- Per Host
+	Maximum Running Tasks Per Host: Maximum running tasks on the same host.
+	(``-1`` means no limit).
+- Capacity
+	Tasks capacity value (``-1`` means use default value).
+	Render must have enough free capacity to run it.
+- Render Time Min
+	Minimum time task should run (seconds).
+	Sometimes tasks finishes with a good exit status too early.
+- Max
+	Task maximum running time (in hours).
+	If task will not finish after this time,
+	it will considered as an error and will be restarted.
+- Progress Timeout
+	If a task will not produce any output for this time (in hours),
+	it will be considered as an error.
+- Min RAM
+	Minimum free memory (Gigabytes) should have render client to be able to start a task.
+- Override Service
+	This will be any custom service name for a job block tasks.
+- Parser
+	Override Parser: This will be any custom parser name for a job block tasks.
+- Life Time
+	*DONE* job will be automatically deleted after this time (in hours).
+	Useful for some auxiliary jobs.
+- Files Check
+	Service (task instanced Python class) can check rendered files for existence.
+	Submitter (script) should know file names that task should produce.
+	Can not work on expressions/*takes*/overrides.
+
+	- Skip Existing
+		Render can check files for existence before run task command.
+
+
+Distribute Simulation
+---------------------
+
+.. figure:: images/houdini_afrop_distributed.png
+
+	Afanasy ROP Separate Render tab
+
 
 Separate Render
 ---------------
@@ -82,7 +158,7 @@ Separate Render
 Separate Render allows to separate render process on IFD files generation and render it by ``mantra``.
 It can give several advantages on some *heavy* scenes.
 
-Separate render generates a job which can:
+Separate render generates a job that can:
 
 - Render images locally in temporary folder and copy whole image after successful render.
   It can save your network traffic as render do not send small portions of an image during render process.
@@ -102,6 +178,10 @@ Separate render generates a job which can:
 - Run ROP
 	Run ROP to generate files to render.
 	Houdini will generate IFD files for mantra.
+- Join Render Stages
+	Generate IFD files and render in the same task.
+	In this case IFD files will be generated to local temporary folder.
+	It can save and memory usage and network traffic.
 - Read Parameters from ROP
 	Read files to generate and images to render parameters from specified ROP.
 - Render Arguments
@@ -109,20 +189,14 @@ Separate render generates a job which can:
 	Usually files and may be some other options.
 - Files
 	Files to generate.
-- Images
-	Images which render will produce. Needed for tile render, AfWatch preview/thumbnails.
-- Use Temp Images Folder
-	Render locally in temp directory and then copy entire image in destination folder.
 - Delete ROP Files
 	Delete ROP generated files (IFD) after render.
+- Images
+	Images which render will produce. Needed for tile render, AfWatch preview/thumbnails.
 - Tile Render
 	Enable rendering tiles and then combine them.
 - Divisions
 	Tiles divisions.
-- Join Render Stages
-	Generate IFD files and render in the same task.
-	In this case IFD files will be generated to local temporary folder.
-	It can save and memory usage and network traffic.
 
 Custom Command
 --------------
@@ -135,23 +209,43 @@ generate a preview movie with ``ffmpeg``.
 
 	Afanasy ROP Custom Command tab
 
-- Add Custom Command
+- Custom Command Mode
 	Add custom command tasks block to a job.
 - Name
 	Tasks block name.
 	If empty the first word of the command will be used.
 - Command
 	The command.
-- Service
-	Tasks block service.
-	If empty the first word of the command will be used.
-- Files
-	Some files you can point to use in command.
-- Preview
-	Specify result picture here to enable tasks preview.
 - Prefix with $AF_CMD_PREFIX
 	Add ``$AF_CMD_PREFIX`` environment variable value to the beginning of the command.
 	This may be needed for some software (environment) setup.
+- Files
+	Some files you can point to use in command.
+- Delete Files On Job Deletion
+	Delete this files when user will delete job.
+- Preview
+	Specify result picture here to enable tasks preview.
+- Service
+	Tasks block service.
+	If empty the first word of the command will be used.
+- Parser
+	Tasks block parser.
+
+
+SOHO
+----
+
+This can be used to explain other ROP network what to do with Afanasy node.
+
+.. figure:: images/houdini_afrop_soho.png
+
+	Afanasy ROP SOHO tab
+
+- Afanasy ROP
+	Specify Afanasy ROP to execute by SOHO.
+- Program
+	Script that will be executed on SOHO demand.
+	That default script will execute *Submit* button on a specified Afanasy ROP.
 
 
 Examples
@@ -241,18 +335,21 @@ This option is designed to start to render simulation without waiting the whole 
 
 	Sub-Task Dependence Network
 
-.. figure:: images/houdini_subtask_job.png
-
-	Sub-Task Dependence Job
-
-.. figure:: images/houdini_subtask_tasks.png
-
-	Sub-Task Dependence Job Tasks
-
 The first block of a job is a simulation.
 It consists of a single task (*Frames Per Task* parameter is set to the whole frame range).
 The second block set to wait the first one with sub-task dependence.
 So it begins to render as first frames of a simulation completed, while the simulation task is still running. 
+
+.. figure:: images/houdini_subtask_job.png
+
+	Sub-Task Dependence Job
+
+We also can notice here, that the render block got *HYTHON* and *MANTRA* tickets,
+while the simulation block got only *HYTHON* ticket
+
+.. figure:: images/houdini_subtask_tasks.png
+
+	Sub-Task Dependence Job Tasks
 
 
 Complex
@@ -272,7 +369,7 @@ This job consists of a simulation with sub-task dependence.
 Two caches waiting the simulation, but can run independently from each other.
 Mantra tile render which produces three blocks which wait all the cache.
 Two blocks for preview which can run independently but wait tile render tasks.
-One to convert EXR files to JPEGs and one to generate a preview movie form EXRs. 
+One to convert EXR files to JPEG-s and one to generate a preview movie form EXR-s.
 
 
 Setup
@@ -280,7 +377,7 @@ Setup
 
 CGRU setup should be sourced before.
 To do this you can source *setup.sh* script in CGRU root folder.
-Afanasy houdini operator library and Python module are located in:
+Afanasy Houdini operator library and Python module are located in:
 
 ``cgru/plugins/houdini``
 

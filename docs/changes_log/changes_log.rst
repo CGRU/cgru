@@ -511,7 +511,7 @@ v2.0.0
 	That old plugins location came from SVN age, when Afanasy has branches, tags, trunk. Within Git it is not needed.
 	So now there is no mess where to put or find files in *cgru/plugins/* or *cgru/afanasy/plugins*.
 - You can add new user via JSON. An example is located in *cgru/examples/json/*.
-- Windowsmustdie function configures via general configure system (json files).
+- WindowsMustDie function configures via general configure system (json files).
   So there is no a special *windowsmustdie.txt* file now.
 - Python service class now instance parser class itself.
   So you can exchange information between service and parser classes.
@@ -1119,7 +1119,7 @@ v1.3.0
 
 - AfWatch shows services icons, it is common programs icons for users to recognize jobs type.
 - Every Afanasy client has compiled revision number, startup version string and sends them to server.
-  Most dialogs in CGRU show version, Afanasy GUI also shows clients build revision.
+  Most dialogues in CGRU show version, Afanasy GUI also shows clients build revision.
 - Nuke *dailies* node to generate movies locally or on Afanasy farm.
 - *movgen* service added. It will be used for movies generation: annotate frames, encode, make dailies.
 - Bugfixes:
