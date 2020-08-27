@@ -385,12 +385,12 @@ void ListNodes::actAnnotate()
 	QString text = QInputDialog::getText( this, "Annotate", "Enter Annotation", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	setParameter(Item::TAny, "annotation", afqt::qtos( text));
+	actAnnotate(text);
 }
 
 void ListNodes::actAnnotate(QString text)
 {
-	setParameter(Item::TAny, "annotation", afqt::qtos( text));
+	setParameter(Item::TAny, "annotation", "\"" + af::strEscape(afqt::qtos(text)) + "\"");
 }
 
 void ListNodes::actCustomData()
