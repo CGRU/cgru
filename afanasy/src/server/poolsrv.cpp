@@ -385,7 +385,11 @@ void PoolSrv::taskAcuire(const af::TaskExec * i_taskexec, MonitorContainer * i_m
 	// Increment running tasks and capacity:
 	m_run_tasks ++;
 	m_run_capacity += i_taskexec->getCapacity();
-	setBusy(true);
+	if (false == isBusy())
+	{
+		setBusy(true);
+		m_task_start_finish_time = time(NULL);
+	}
 
 	if (i_monitoring)
 		i_monitoring->addEvent(af::Monitor::EVT_pools_change, m_id);
@@ -422,7 +426,10 @@ void PoolSrv::taskRelease(const af::TaskExec * i_taskexec, MonitorContainer * i_
 	m_run_tasks --;
 	m_run_capacity -= i_taskexec->getCapacity();
 	if (m_run_tasks == 0)
+	{
 		setBusy(false);
+		m_task_start_finish_time = time(NULL);
+	}
 
 	if (i_monitoring)
 		i_monitoring->addEvent(af::Monitor::EVT_pools_change, m_id);

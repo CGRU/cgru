@@ -26,6 +26,31 @@ To switch user mode you need to type password in active Watch window
 (you do not need to re-login to switch between modes).
 To reset super user mode you can type password again.
 
+You can configure passwords in a CGRU config JSON file by variables:
+
+pswd_visor
+----------
+
+	Visor passwords *md5* sum.
+	Password must be 5 characters length.
+
+	Default value is *1832116180fdc61b64fd978401e462e9*
+
+	It is ``IDKFA``
+
+pswd_god
+--------
+
+	God password *md5* sum
+	Password must be 5 characters length.
+
+	Default value is *73bcaaa458bff0d27989ed331b68b64d*
+
+	It is ``IDDQD``
+
+
+.. image:: images/doom2.jpg
+
 
 UI Levels
 =========

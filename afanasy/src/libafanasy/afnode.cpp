@@ -89,7 +89,7 @@ void Node::jsonRead(const JSON &i_object, std::string *io_changes, MonitorContai
 		return;
 	}
 
-	// Paramers below are not editable and read only on creation
+	// Parameters below are not editable and read only on creation
 	// When use edit parameters, log provided to store changes
 
 	jr_string("name", m_name, i_object);
