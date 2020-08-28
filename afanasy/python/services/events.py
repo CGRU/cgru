@@ -3,6 +3,7 @@
 import json
 import sys
 
+import cgruutils
 import cgruconfig
 
 from services import service
@@ -112,11 +113,11 @@ class events(service.service):
             for addr in custom_obj['emails']:
                 cmd += ' -t "%s"' % addr
             cmd += ' -s "%s"' % (','.join(email_events))
-            cmd += ' "Events: %s<br>"' % (','.join(email_events))
+            cmd += ' "Events: <b>%s</b><br>"' % (','.join(email_events))
             if 'render' in objects:
-                cmd += ' "Render Name: %s<br>"' % objects['render']['name']
-            cmd += ' "Job Name: %s<br>"' % task_info['job_name']
-            cmd += ' "User Name: %s<br>"' % task_info['user_name']
+                cmd += ' "Render Name: <b>%s</b><br>"' % objects['render']['name']
+            cmd += ' "Job Name: <b>%s</b><br>"' % cgruutils.toStr(task_info['job_name'])
+            cmd += ' "User Name: <b>%s</b><br>"' % cgruutils.toStr(task_info['user_name'])
             print(cmd)
             self.taskInfo['command'] = cmd
 
