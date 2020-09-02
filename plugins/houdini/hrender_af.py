@@ -52,7 +52,7 @@ ignoreInputs = options.ignore_inputs
 
 
 # Loading HIP file, and force HIP variable:
-force_hip = True  # not sure, we need to force HIP variable.
+force_hip = False  # not sure, we need to force HIP variable.
 # May be this code is obsolete
 if force_hip:
     envhip = os.path.abspath(hip)
