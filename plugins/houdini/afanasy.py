@@ -253,6 +253,11 @@ class BlockParameters:
 
             # Block command:
             self.cmd = 'hrender_af'
+
+            if self.single_task:
+                # On a single task we can see progress as job report
+                self.cmd += ' --report'
+
             if afnode.parm('ignore_inputs').eval():
                 self.cmd += ' -i'
 

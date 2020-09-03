@@ -25,6 +25,7 @@ parser.add_option(      '--ds_node',       dest='ds_node',       type='string', 
 parser.add_option(      '--ds_address',    dest='ds_address',    type='string', help='Distribute simulation tracker address.')
 parser.add_option(      '--ds_port',       dest='ds_port',       type='int',    help='Distribute simulation tracker port.')
 parser.add_option(      '--ds_slice',      dest='ds_slice',      type='int',    help='Distribute simulation slice number.')
+parser.add_option(      '--report',        dest='report',        action='store_true', default=False, help='Ouput frame progress as job report.')
 parser.add_option('-i', '--ignore_inputs', dest='ignore_inputs', action='store_true', default=False, help='Ignore inputs')
 
 options, args = parser.parse_args()
@@ -297,9 +298,12 @@ while frame <= end:
         seconds = time_cur-time_prev
         minutes = int(seconds / 60)
         seconds = int(round(seconds - 60*minutes))
-        time_str = '; Time: %d\'%02d' % (minutes, seconds)
+        time_str = '; Last Frame: %d\'%02d' % (minutes, seconds)
     time_prev = time_cur
-    print(parsers.hbatch.keyframe + str(frame) + '; Started at: ' + time.strftime('%X') + time_str)
+    report = ropnode.path() + ': ' + parsers.hbatch.keyframe + str(frame) + '; Started at: ' + time.strftime('%X') + time_str
+    if options.report:
+        report = 'REPORT: ' + report
+    print(report)
     sys.stdout.flush()
 
     # Launch render function:

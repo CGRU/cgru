@@ -5,6 +5,8 @@ import traceback
 
 import cgruutils
 
+ACTIVITY = 'ACTIVITY: '
+REPORT   = 'REPORT: '
 
 # TODO: Class names should follow CamelCase naming convention
 class parser(object):
@@ -116,6 +118,16 @@ class parser(object):
         for string in self.str_finishedsuccess:
             if lower.find(string.lower()) != -1:
                 self.finishedsuccess = True
+
+        activity_pos = data.rfind(ACTIVITY)
+        if activity_pos > -1:
+            activity_pos += len(ACTIVITY)
+            self.activity = data[activity_pos: data.find('\n', activity_pos)]
+
+        report_pos = data.rfind(REPORT)
+        if report_pos > -1:
+            report_pos += len(REPORT)
+            self.report = data[report_pos: data.find('\n', report_pos)]
 
         lines = data.split('\n')
         for line in lines:
