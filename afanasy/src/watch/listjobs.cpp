@@ -147,6 +147,9 @@ ListJobs::ListJobs(QWidget * i_parent, bool i_listwork, const std::string & i_na
 
 	resetButtonsMenu();
 
+	bp = addButtonPanel(Item::TJob, "LISTEN","jobs_listen","Listen job running tasks ouput.");
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actListenJob()));
+
 	bp = addButtonPanel(Item::TAny, "CUSTOM DATA","node_custom_data","Edit node custom data.");
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actCustomData()));
 
