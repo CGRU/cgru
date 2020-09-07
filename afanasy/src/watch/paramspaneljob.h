@@ -110,7 +110,7 @@ public:
 
 	void update();
 
-private slots:
+public slots:
 	void slot_OpenInfo();
 	void slot_CloseInfo();
 

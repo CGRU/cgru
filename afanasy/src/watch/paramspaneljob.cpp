@@ -214,6 +214,11 @@ void ParamsPanelJob::constructBlocks(ItemJob * i_item)
 	for (int b = 0; b < i_item->getBlocksNum(); b++)
 	{
 		BlockCaptionWidget * bw = new BlockCaptionWidget(i_item->getBlockInfo(b));
+
+		// Open block, if job has only one
+		if (i_item->getBlocksNum() == 1)
+			bw->slot_OpenInfo();
+
 		m_blocks_widgets.push_back(bw);
 		m_blocks_layout->addWidget(bw);
 	}
@@ -375,8 +380,6 @@ BlockCaptionWidget::BlockCaptionWidget(const BlockInfo * i_info):
 	m_btn_close->setHidden(true);
 	h_layout->addWidget(m_btn_close);
 	connect(m_btn_close, SIGNAL(clicked()), this, SLOT(slot_CloseInfo()));
-
-//slot_OpenInfo();
 }
 
 BlockCaptionWidget::~BlockCaptionWidget()
