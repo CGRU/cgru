@@ -5,8 +5,8 @@ Houdini
 .. warning:: Documentation is not finished.
 
 Afanasy is represented by a special multi-functional ROP.
-You can connect several other ROPs to Afanasy ROP to render.
-You can connect several Afanasy ROPs to Afanasy ROP for a job with a complex dependencies.
+You can connect several other ROP-s to Afanasy ROP to render.
+You can connect several Afanasy ROP-s to Afanasy ROP for a job with a complex dependencies.
 
 Afanasy ROP
 ===========
@@ -37,7 +37,7 @@ General
 	- Render Frame Range
 		Render this specified frame range.
 	- Render Frame Range Only (Strict)
-		Render this specified frame range. Other ROPs will wait this whole frame range rendered.
+		Render this specified frame range. Other ROP-s will wait this whole frame range rendered.
 - Single Task
 	- Generate single task for whole frame range, useful for simulations.
 - Local Render
@@ -67,7 +67,7 @@ General
 	Useful for simulations.
 	Frames render can start w/o waiting the whole simulation is finished.
 - Ignore ROP Inputs
-	Do not execute input ROPs.
+	Do not execute input ROP-s.
 
 Parameters
 ----------
@@ -394,6 +394,162 @@ Two caches waiting the simulation, but can run independently from each other.
 Mantra tile render which produces three blocks which wait all the cache.
 Two blocks for preview which can run independently but wait tile render tasks.
 One to convert EXR files to JPEG-s and one to generate a preview movie form EXR-s.
+
+
+Distributed Simulations
+=======================
+
+Houdini can calculate the same simulation on several machines.
+
+How It Works
+------------
+
+Simulation can be split on slices, so each machine calculates own slice.
+But different slices simulations should exchange information to pass data from slice to slice.
+Houdini has a special Python script *simtracker.py* for it.
+It needs to launch a server that simulations will connect to.
+So each slice simulation should know tracker address and port.
+Also tracker has a simple web interface to see logs.
+
+What We Should Do
+-----------------
+
+- Prepare distributed simulation, setup slices.
+- Launch tracker server and get its address and port.
+- Open several Houdini applications with simulation scene (on different machines or not).
+- Specify tracker and port.
+- Start each Houdini instance to simulate own slice.
+- Stop tracker.
+
+So, you can distribute Houdini simulation without any render farm manager.
+
+Step-By-Step
+------------
+
+#. Create a sphere.
+#. Create simulation via Wispy Smoke shelf tool.
+#. Apply Distribute Container shelf tool.
+#. You will be moved to */out/* network.
+#. Create Afanasy ROP node.
+#. Set *Output Driver* to */obj/distribute_pyro/save_slices*
+   and in the *Distributed Simulation* tab set *Controls Node* to */obj/AutoDopNetwork/DISRIBUTE_pyro_CONTROLS*.
+   You can copy this values from *HQueue Simulation* ROP that was automatically created.
+	.. figure:: images/houdini_distribpyro_afgeneral.png
+         :scale: 22%
+         :align: left
+	
+         Genetal Tab
+
+	.. figure:: images/houdini_distribpyro_afdistrib.png
+         :scale: 30%
+
+         Distributed Simulation Tab
+
+#. Uncheck *Render Temporary HIP File* option on Afanasy ROP.
+   By default, Afanasy renders a temporary scene to allow user to continue working with original file.
+   But in this case *$HIPNAME* variable will change, and it widely used in shelf tools and examples.
+#. Go to */obj/AutoDopNetwork/*.
+#. Remove resize_container node.
+#. Disconnect *distribute_pyro* node from *merge* node (do not merge it with source). And connect it to the solver *Velocity Update* input.
+	.. figure:: images/houdini_distribpyro_dop_orig.png
+		:scale: 20%
+		:align: left
+
+		Original network
+
+	.. figure:: images/houdini_distribpyro_dop_adjust.png
+		:scale: 20%
+
+		Adjusted network
+
+#. Set slices divisions 1 x 2 x 1.
+#. Now you can submit simulation by Afanasy ROP in */out/* network.
+
+Afanasy Job
+-----------
+
+Afanasy will create a job that consists of four blocks each contains just one task.
+First block task to start tracker.
+A block (task) for each slice that waits tracker start.
+And the last block task to stop the tracker.
+
+.. figure:: images/houdini_distribpyro_job_running.png
+
+	Distributed Simulation Job Running
+
+#. **tracker**
+
+   The first task block has a special service *htracker*.
+   This service just adds job ID to the task command.
+   Job ID is needed to manipulate job using JSON protocol.
+   The command calls a special CGRU Python script ``plugins/houdini/htracker.py``.
+
+   .. code-block:: bash
+
+	htracker --start --envblocks "save_slices.*|tracker-stop" --depblocks "save_slices.*"
+	
+   - It starts Houdini *simtracker* in a separate thread and gets its address and port.
+   - Set other job blocks environment variables ``TRACKER_ADDRESS`` and ``TRACKER_PORT``
+     to blocks specified by *--envblocks* argument.
+   - Set slices job blocks depend masks to an empty string
+     to blocks specified by *--depblocks* argument,
+     So that blocks will wait nothing and can to start.
+   - Waits *simtracker* for completion.
+
+#. **save_slices-s0**
+
+   The first slice simulation.
+   Slices are simulated by CGRU multi-functional Hython script
+   ``cgru/plugins/houdini/hrendef_af.py`` that Afanasy uses for almost everything.
+
+   .. code-block:: bash
+
+	hrender_af -s 1001 -e 1133 --by 1 -t "_current_" --ds_node "/obj/AutoDopNetwork/DISTRIBUTE_pyro_CONTROLS" --ds_address "localhost" --ds_port 8000 --ds_slice 0 "/opt/cgru/examples/houdini/distrib_pyro.hip" "/obj/distribute_pyro/save_slices"
+
+   Control node, tracker address and tracker port,
+   that was specified in Afanasy ROP and passed by command line argument,
+   will be overridden by environment variables.
+
+   Script will open HIP file, set control node tracker address and port parameters.
+   Set *SLICE* variable to the specified slice number.
+
+   Run simulation ROP.
+
+#. **save_slices-s1**
+
+   The second slice simulation. It is the same as the first, but with one key difference.
+   Slice will be equal to 1.
+
+   .. code-block:: bash
+
+	hrender_af -s 1001 -e 1133 --by 1 -t "_current_" --ds_node "/obj/AutoDopNetwork/DISTRIBUTE_pyro_CONTROLS" --ds_address "localhost" --ds_port 8000 --ds_slice 1 "/opt/cgru/examples/houdini/distrib_pyro.hip" "/obj/distribute_pyro/save_slices"
+
+#. **tracker-stop**
+
+   Stop tracker. It will be performed by the same script that starts tracker.
+
+   .. code-block:: bash
+	
+	htracker --stop
+
+   It just sends ``quit`` string to tracker_address:tracker_port socket.
+
+.. figure:: images/houdini_distribpyro_job_done.png
+	:scale: 20%
+	:align: right
+
+	Distributed Job Done
+
+.. figure:: images/houdini_distribpyro_job_stopping.png
+	:scale: 20%
+	:align: right
+
+	Distributed Job Stopping
+
+.. figure:: images/houdini_distribpyro_tasks.png
+	:scale: 25%
+
+	Distributed Job Tasks
 
 
 Setup
