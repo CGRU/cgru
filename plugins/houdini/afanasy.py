@@ -718,9 +718,32 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
             cmd = 'itilestitch "%s"' % images
             tile_suffix = '_tile%02d_'
             timg = os.path.relpath(images)
-            tpos = timg.find('@')-1
+
+            # Now we should find a dot before frame number,
+            # as matra places tile_suffix there.
+            tpos = timg.find('@')
+            if tpos > 0:
+                # We found Afanasy digits pattern start
+                tpos -= 1
+            else:
+                # We do not have Afanay numeric pattern.
+                # May be aftist sent just one frame to render.
+                name, ext = os.path.splitext(timg)
+                # Shitf to name w/o extension
+                tpos = len(name) - 1
+                # Shift frame digits
+                while name[tpos].isdigit() and tpos > 0:
+                    tpos -= 1
+                # Shitf a dot before frame digits
+                if name[tpos] == '.':
+                    tpos -= 1
+                # It will be used as a length to cut, not as index
+                tpos += 1
+
+            # Insert tile suffix
             timg = timg[:tpos] + tile_suffix + timg[tpos:]
-            name, ext = os.path.splitext(timg)
+
+            # List all tiles in the command
             for i in range(0, tiles_count):
                 cmd += ' "%s"' % (timg % i)
 
@@ -735,6 +758,10 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
             block_join.cmd = cmd
             block_join.cmd_useprefix = False
             block_join.preview = images
+
+            # Disable minimum running time as it can be set on Afanasy ROP.
+            # As tile stich can be much fast
+            block_join.minruntime = 0
 
             params.append(block_join)
 
