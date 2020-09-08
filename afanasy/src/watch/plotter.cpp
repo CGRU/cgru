@@ -7,7 +7,7 @@
 Plotter::Plotter( int NumGraphs, int Scale, int NumLinesWidth):
 	height(0),
 	label("%1"),
-	label_value( 1),
+	label_value(0),
 	autoscale( false),
 	autoscale_lines( 32),
 	autoscale_maxscale( 1<<30),
@@ -185,9 +185,9 @@ void Plotter::addValue( int grp, int val, bool store)
 	}
 
 	// Append value to label
-	if (label.contains("%1"))
+	if (label_value)
 	{
-		float scale_val = float(scale) / (label_value != 0 ? label_value : 1);
+		float scale_val = float(scale) / float(label_value);
 
 		int precision = 3;
 		if (scale_val > 10)
@@ -254,7 +254,6 @@ void Plotter::paint( QPainter * painter, int x, int y, int w, int h) const
 		painter->setPen(  afqt::QEnvironment::clr_itemrenderpltclr.c);
 	painter->setFont( label_font);
 
-//	if( autoscale == false ) label_text = label;//.contains("%1") ? label.arg( label_value) : label;
 	painter->drawText( x+1, y+1, w, h, Qt::AlignLeft | Qt::AlignTop, label_text.isEmpty() ? label : label_text);
 
 	x -= 1; y -= 1; w += 2; h +=2;

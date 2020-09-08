@@ -394,7 +394,6 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 		m_plotCpu.setLabel(QString("C %1*%2").arg(m_hres.cpu_num).arg(double(m_hres.cpu_mhz) / 1024.0, 0, 'f', 1));
 	    m_plotCpu.addValue( 0, m_hres.cpu_system + m_hres.cpu_iowait + m_hres.cpu_irq + m_hres.cpu_softirq);
 	    m_plotCpu.addValue( 1, m_hres.cpu_user + m_hres.cpu_nice);
-	    m_plotCpu.setLabelValue( cpubusy);
 
 	    m_plotMem.addValue( 0, mem_used);
 	    m_plotMem.addValue( 1, m_hres.mem_cached_mb + m_hres.mem_buffers_mb);
