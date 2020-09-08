@@ -79,7 +79,7 @@ namespace AFGUI
 	const char CLR_ITEMRENDERNIMBY[] = "556699";
 	const char CLR_ITEMRENDERPAUSED[]= "777777";
 	const char CLR_ITEMRENDERSICK[]  = "FF7777";
-	const char CLR_ITEMRENDERPLTCLR[]= "FAFA32";
+	const char CLR_ITEMRENDERPLTCLR[]= "DADA32";
 	const char CLR_RUNNING[]         = "FFFFFF";
 	const char CLR_DONE[]            = "D67F00";
 	const char CLR_ERROR[]           = "B92803";
@@ -143,7 +143,7 @@ namespace AFGUI
 	const char CLR_ITEMRENDERNIMBY[] = "556699";
 	const char CLR_ITEMRENDERPAUSED[]= "777777";
 	const char CLR_ITEMRENDERSICK[]  = "FF7777";
-	const char CLR_ITEMRENDERPLTCLR[]= "FAFA32";
+	const char CLR_ITEMRENDERPLTCLR[]= "DADA32";
 	const char CLR_RUNNING[]         = "A0D26E";
 	const char CLR_DONE[]            = "14320A";
 	const char CLR_ERROR[]           = "FA320A";

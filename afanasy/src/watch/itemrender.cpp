@@ -40,22 +40,23 @@ ItemRender::ItemRender(ListRenders * i_list_renders, af::Render * i_render, cons
 	m_plotCpu.setColor( 200,   0,  0, 0);
 	m_plotCpu.setColor(  50, 200, 20, 1);
 
-//   plotMem.setLabel("M%1");
-	m_plotMem.setLabel("M");
+	m_plotMem.setLabel("M %1");
+	m_plotMem.setLabelValue(1000);
 	m_plotMem.setColor(  50, 200, 20, 0);
 	m_plotMem.setColor(   0,  50,  0, 1);
 	m_plotMem.setColorHot( 255, 0, 0);
 
-//   plotSwp.setLabel("S%1");
+	m_plotSwp.setLabel("S %1");
+	m_plotSwp.setLabelValue(1000);
 	m_plotSwp.setColor( 100, 200, 30);
 	m_plotSwp.setColorHot( 255, 0, 0);
 
-//   plotHDD.setLabel("H%1");
-	m_plotHDD.setLabel("H");
+	m_plotHDD.setLabel("H %1");
+	m_plotHDD.setLabelValue(1000);
 	m_plotHDD.setColor(  50, 200, 20);
 	m_plotHDD.setColorHot( 255, 0, 0);
 
-	m_plotNet.setLabel("N%1");
+	m_plotNet.setLabel("N %1");
 	m_plotNet.setLabelValue( 1000);
 	m_plotNet.setColor(  90, 200, 20, 0);
 	m_plotNet.setColor(  20, 200, 90, 1);
@@ -84,7 +85,7 @@ ItemRender::ItemRender(ListRenders * i_list_renders, af::Render * i_render, cons
 	m_plotIO_wh_g =  50;
 	m_plotIO_wh_b =  90;
 
-	m_plotIO.setLabel("D%1");
+	m_plotIO.setLabel("D %1");
 	m_plotIO.setLabelValue( 1000);
 	m_plotIO.setAutoScaleMaxBGC( 100000);
 
@@ -214,15 +215,12 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 	        m_plotSwp.setScale( m_hres.swap_total_mb);
 	        if( m_hres.swap_total_mb )
 			{
-	            m_plotSwp.setLabel("S");
 	            m_plotSwp.setHotMin(( 10*m_hres.swap_total_mb)/100);
 	            m_plotSwp.setHotMax((100*m_hres.swap_total_mb)/100);
 
 			}
 			else
 			{
-	            m_plotSwp.setLabel("S%1");
-	            m_plotSwp.setLabelValue( 1000);
 	            m_plotSwp.setHotMin( 100);
 	            m_plotSwp.setHotMax( 10000);
 	            m_plotSwp.setAutoScaleMaxBGC( 100000);
@@ -393,6 +391,7 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 	    int mem_used = m_hres.mem_total_mb - m_hres.mem_free_mb;
 	    int hdd_used = m_hres.hdd_total_gb - m_hres.hdd_free_gb;
 
+		m_plotCpu.setLabel(QString("C %1*%2").arg(m_hres.cpu_num).arg(double(m_hres.cpu_mhz) / 1024.0, 0, 'f', 1));
 	    m_plotCpu.addValue( 0, m_hres.cpu_system + m_hres.cpu_iowait + m_hres.cpu_irq + m_hres.cpu_softirq);
 	    m_plotCpu.addValue( 1, m_hres.cpu_user + m_hres.cpu_nice);
 	    m_plotCpu.setLabelValue( cpubusy);
