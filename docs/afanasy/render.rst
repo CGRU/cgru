@@ -18,7 +18,7 @@ Launch Methods
     
     ``start/AFANASY/_afrender.sh``
 
- -  Linux daemon when linux packages are installed
+ -  Linux daemon when packages are installed
 
     ``sudo systemctl start afrender``
 
@@ -70,7 +70,7 @@ Last time the render has update its resources usage.
 
 wol_operation_time
 ------------------
-Time the last any Wake-On-Lan operation was performed.
+Time the last any Wake-On-LAN operation was performed.
 
 tasks[]
 -------
@@ -128,7 +128,7 @@ WOLFalling  ``WFL`` Is falling a sleep. It was asked to sleep, but still online.
 WOLSleeping ``WSL`` Is sleeping.
 WOLWaking   ``WWK`` Is waking up. It was asked to wake up but still is not online.
 Paused      ``PAU`` Is paused, like super-Nimby, never will be free automatically.
-Sick        ``SIC`` Is seek, produced error only.
+Sick        ``SIC`` Is seek, produced errors only from different users.
 =========== ======= ===
 
 

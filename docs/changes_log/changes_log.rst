@@ -32,8 +32,8 @@ v3.0.0
 	You can set some pool MEM:64 host tickets to limit RAM.
 	And set corresponding tickets to your job blocks.
 
-- Sick Render node.
-
+- Render node becomes *Sick*, when it produces errors only from different users.
+- ``RENDER_SICK`` and ``RENDER_ZOMBIE`` events.
 - AfWatch got side panel to manipulate nodes.
 - AfWatch admin mode let you to mark task as DONE w/o SKIP state.
 - Block got a server information string.

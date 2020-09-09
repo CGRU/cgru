@@ -1,11 +1,9 @@
 Welcome to CGRU - AFANASY documentation!
 ========================================
 
-.. sidebar:: Beta version
+.. sidebar:: Read The Funny Manuals!
 
-    Documentation is under construction.
-
-    .. note:: *Last edit:* |today|
+	*Last edit* |today|
 
 
 Contents:
