@@ -13,7 +13,7 @@ pushd $cgru > /dev/null
 cgru=$PWD
 popd > /dev/null
 
-dirs_nonempty="plugins/maya/mll"
+dirs_nonempty=""
 afanasy_bins="afserver afcmd afrender afwatch"
 
 # Check non-empty folders:
