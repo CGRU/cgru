@@ -3,6 +3,6 @@
 echo "Afanasy Qt GUI pre remove, exiting Afanasy Qt GUI applications:"
 
 # Quit applications:
-for p in afwatch aftalk afmonitor; do pkill $p || true; done
+pkill afwatch || true
 
 exit 0

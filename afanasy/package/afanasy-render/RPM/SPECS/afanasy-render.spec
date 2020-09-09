@@ -36,7 +36,13 @@ exit 0
 
 %post
 echo "Afanasy render POST INSTALL"
-id render || useradd render -m
+if ! id render; then
+	if getent group render; then
+		useradd render -g render -m
+	else
+		useradd render -m
+	fi
+fi
 systemctl enable /opt/cgru/afanasy/systemd/afrender.service || true
 systemctl daemon-reload || true
 systemctl start afrender.service || true

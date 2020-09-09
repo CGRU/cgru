@@ -38,5 +38,5 @@ done
 %preun
 echo "Afanasy common pre remove, exiting Afanasy applications: $1"
 [ "$1" != "0" ] && exit 0
-for p in afcmd afwatch aftalk afmonitor; do pkill $p || true; done
+pkill afwatch || true
 exit 0
