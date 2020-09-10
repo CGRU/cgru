@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 filename = 'common/mp4v2/mpeg4ip.h'
