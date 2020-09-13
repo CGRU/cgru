@@ -18,6 +18,7 @@ Contents:
     keeper/keeper.rst
     afstarter/afstarter.rst
     regexp/regexp.rst
+    rules/rules.rst
     examples/examples.rst
     howto/index.rst
     coding_rules/coding_rules.rst
