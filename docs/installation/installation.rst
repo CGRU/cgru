@@ -4,7 +4,8 @@ Installation
 Linux Packages
 --------------
 
-Download_ the latest release and unpack.
+:ref:`Download <downloads-linux>`
+the latest release and unpack.
 
 - **Server**: You need to install **afanasy-server** package. Also you can to install **afanasy-render** package to monitor its resources, and should limit some heavy tasks not to run on server machine.
 
@@ -51,7 +52,8 @@ CGRU will be installed in **/opt/cgru** folder.
 MS Windows Archives
 -------------------
 
-Download_ the latest release and unpack. Use Keeper to launch applications.
+:ref:`Download <downloads-windows>`
+the latest release and unpack. Use Keeper to launch applications.
 
  - **Server**: Launch afserver.
  - **Render**: Launch afrender.
@@ -73,7 +75,9 @@ The project is hosted on GitHub: https://github.com/CGRU/cgru
 
 If you want just to compile (not to develop) better to use tags.
 
-You can simple Download_ an archive with the latests release sources.
+You can simple
+:ref:`Download <downloads-sources>`
+an archive with the latests release sources.
 
 Needed libraries:
 

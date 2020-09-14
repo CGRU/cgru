@@ -11,6 +11,7 @@ Contents:
 .. toctree::
     :maxdepth: 4
 
+    downloads/downloads.rst
     installation/installation.rst
     configuration/configuration.rst
     afanasy/afanasy.rst
@@ -24,5 +25,7 @@ Contents:
     coding_rules/coding_rules.rst
     fun/index.rst
     license/license.rst
+    about/about.rst
+    contacts/contacts.rst
     changes_log/changes_log.rst
 
