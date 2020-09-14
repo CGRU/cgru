@@ -550,6 +550,9 @@ function htaccessFolder($i_folder)
 
 	if (in_array(USER_ID, $out['users'])) return true;
 
+	if ($out['merge'])
+		return null;
+
 	return false;
 }
 
@@ -1758,7 +1761,11 @@ function jsf_permissionsset($i_args, &$o_out)
 	if (false == in_array('admins', $i_args['groups'])) array_unshift($i_args['groups'], 'admins');
 
 	$lines = array();
-	array_push($lines, 'Require group ' . implode(' ', $i_args['groups']));
+	array_push($lines, 'AuthMerging Or');
+	if (array_key_exists('groups', $i_args) && count($i_args['groups']))
+	{
+		array_push($lines, 'Require group ' . implode(' ', $i_args['groups']));
+	}
 	if (array_key_exists('users', $i_args) && count($i_args['users']))
 	{
 		array_push($lines, 'Require user ' . implode(' ', $i_args['users']));
@@ -1798,6 +1805,7 @@ function permissionsGet($i_args, &$o_out)
 {
 	$o_out['groups'] = array();
 	$o_out['users'] = array();
+	$o_out['merge'] = false;
 
 	if (false == is_dir($i_args['path']))
 	{
@@ -1818,21 +1826,40 @@ function permissionsGet($i_args, &$o_out)
 	$lines = explode("\n", $data);
 	foreach ($lines as $line)
 	{
-		if (strlen($line) <= 1) continue;
+		if (strlen($line) <= 1)
+			continue;
+
 		$words = explode(' ', $line);
-		if ($words[0] != 'Require') continue;
+
+		if (count($words) < 2)
+		{
+			$o_out['error'] = 'Invalid line: "'.$line.'"';
+			return;
+		}
+
+		if ($words[0] == 'AuthMerging')
+		{
+			if ($words[1] == 'Or')
+				$o_out['merge'] = true;
+			continue;
+		}
+
+		if ($words[0] != 'Require')
+			continue;
 
 		unset($words[0]);
 		//error_log( implode(' ',$words));
 		if ($words[1] == 'group')
 		{
 			unset($words[1]);
-			foreach ($words as $group) array_push($o_out['groups'], $group);
+			foreach ($words as $group)
+				array_push($o_out['groups'], $group);
 		}
 		else if ($words[1] == 'user')
 		{
 			unset($words[1]);
-			foreach ($words as $user) array_push($o_out['users'], $user);
+			foreach ($words as $user)
+				array_push($o_out['users'], $user);
 		}
 		else if ($words[1] == 'valid-user')
 		{
