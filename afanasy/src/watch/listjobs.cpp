@@ -112,6 +112,25 @@ ListJobs::ListJobs(QWidget * i_parent, bool i_listwork, const std::string & i_na
 	bp = addButtonPanel(Item::TJob, "STOP","jobs_stop","Stop selected jobs tasks and pause jobs.","", true);
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actStop()));
 
+	if (false == af::Environment::VISOR())
+	{
+		addButtonsMenu(Item::TJob, "Move","Move job(s).");
+
+		bp = addButtonPanel(Item::TJob, "Up", "move_up", "Move job(s) up.","u");
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actMoveUp()));
+
+		bp = addButtonPanel(Item::TJob, "Down", "move_down", "Move job(s) down.","d");
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actMoveDown()));
+
+		bp = addButtonPanel(Item::TJob, "Top", "move_top", "Move job(s) top.","t");
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actMoveTop()));
+
+		bp = addButtonPanel(Item::TJob, "Bottom", "move_bottom", "Move job(s) bottom.","b");
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actMoveBottom()));
+
+		resetButtonsMenu();
+	}
+
 	addButtonsMenu(Item::TJob, "Restart","Restart jobs tasks menu.");
 
 	bp = addButtonPanel(Item::TJob, "ALL TASKS","jobs_restart","Restart all tasks of all selected jobs.","", true);
