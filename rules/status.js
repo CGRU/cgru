@@ -128,9 +128,17 @@ function Status(i_obj, i_args)
 	this.show();
 }
 
-Status.prototype.show = function(i_status) {
+Status.prototype.show = function(i_status, i_update = false) {
 	if (i_status)
-		this.obj = i_status;
+	{
+		if (i_update && this.obj)
+		{
+			for (let k in i_status)
+				this.obj[k] = i_status[k];
+		}
+		else
+			this.obj = i_status;
+	}
 
 	this.editCancel();
 

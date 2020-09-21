@@ -355,7 +355,7 @@ function nw_MakeNews(i_news, i_args)
 function nw_FilterStatus(i_status)
 {
 	var st = {};
-	var keys = ['artists','flags','progress'];
+	var keys = ['artists','flags','progress','tags','color','frames_num','annotation'];
 
 	for (let key of keys)
 		if (i_status[key])
@@ -724,7 +724,7 @@ function nw_NewsShow(i_update_folders)
 
 			// Update current location status:
 			if ((news.path == g_CurPath()) && st_Status)
-				st_Status.show(news.status);
+				st_Status.show(news.status, /*update = */ true);
 
 			// Remove walk cache:
 			if (n_walks[news.path])
