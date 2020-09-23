@@ -102,27 +102,30 @@ bool Farm::jr_Tickets(const char * i_name, std::map<std::string, Tiks> & o_ticke
 			AF_ERR << "Ticket '" << name << "' is not an array.";
 			return false;
 		}
-		if (jArray.Size() != 2)
+		if (jArray.Size() == 0)
 		{
-			AF_ERR << "Ticket '" << name << "' values array size != 2.";
+			AF_ERR << "Ticket '" << name << "' has an empty array.";
 			return false;
 		}
 
-		Tiks tks(jArray[0u].GetInt(), jArray[1u].GetInt());
-
-		if (tks.count == -1)
+		if (jArray[0u].GetInt() == -1)
 		{
 			// This node was stored with a temporary ticket, that was added just to store Tiks summ.
 			continue;
 			// On task reconnectiong temporary ticked will be re-created, if needed.
 		}
 
-		if (tks.usage > 0)
-		{
-			// This node was stored when tasks(s) were running on it.
-			// If task(s) will be reconnected, tickets usage will be re-incremented.
-			tks.usage = 0;
-		}
+		// We do not need to read usage from store.
+		// If this node was stored when tasks(s) were running on it.
+		// If task(s) will be reconnected, tickets usage will be re-incremented.
+
+		Tiks tks(jArray[0u].GetInt(), 0);
+
+		// If max hosts stored:
+		if ((jArray.Size() == 4) && (jArray[3u].GetInt() != -1))
+			tks.max_hosts = jArray[3u].GetInt();
+
+		// For the same reason as usage, we do not need to read hosts stored number
 
 		o_tickets[name] = tks;
 	}
@@ -162,7 +165,10 @@ void Farm::jw_Tickets(const char * i_name, const std::map<std::string, Tiks> & i
 	{
 		if (it != i_tickets.begin())
 			o_str << "\n,";
-		o_str << "\n\"" << it->first << "\":[" << it->second.count << ", " << it->second.usage << "]";
+		o_str << "\n\"" << it->first << "\":[" << it->second.count << "," << it->second.usage << "," << it->second.hosts;
+		if (it->second.max_hosts >= 0)
+			o_str << "," << it->second.max_hosts;
+		o_str << "]";
 	}
 	o_str << "\n}";
 }

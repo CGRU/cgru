@@ -453,6 +453,7 @@ function JobBlock(i_elParent, i_block)
 	this.elName = cm_ElCreateText(this.element, 'Block Name');
 	this.elDepends = cm_ElCreateText(this.element);
 
+	this.elTickets = cm_ElCreateFloatText(this.element, 'right', 'Task Tickets');
 	this.elCapacity = cm_ElCreateFloatText(this.element, 'right', 'Tasks Capacity');
 	this.elErrSolving = cm_ElCreateFloatText(this.element, 'right');
 	this.elForgiveTime = cm_ElCreateFloatText(this.element, 'right', 'Errors Forgive Time');
@@ -716,6 +717,7 @@ JobBlock.prototype.constructFull = function() {
 	this.elTasksErr.classList.add('ERR');
 	this.elTasksErr.style.display = 'none';
 
+	this.elTickets = cm_ElCreateFloatText(this.elFull, 'right', 'Tasks Tickets');
 	this.elErrHosts = cm_ElCreateFloatText(this.elFull, 'right');
 };
 
@@ -1099,6 +1101,8 @@ JobBlock.prototype.update = function(i_displayFull) {
 			this.elRunTime.textContent = '';
 			this.elRunTime.title = '';
 		}
+
+		this.updateTickets();
 	}
 
 	if (this.displayFull)
@@ -1329,6 +1333,37 @@ JobBlock.prototype.update = function(i_displayFull) {
 		}
 	}
 };
+
+JobBlock.prototype.updateTickets = function() {
+	this.elTickets.textContent = '';
+
+	var tickets = this.params.tickets;
+	if (tickets == null)
+		return;
+
+	for (let tk in tickets)
+	{
+		let elTk = document.createElement('div');
+		elTk.classList.add('ticket');
+		this.elTickets.appendChild(elTk);
+
+		let label = '';
+
+		if (cm_TicketsIcons.includes(tk + '.png'))
+		{
+			let elIcon = document.createElement('img');
+			elTk.appendChild(elIcon);
+			elIcon.src = ('icons/tickets/' + tk + '.png');
+		}
+		else
+			label += tk;
+
+		let elLabel = document.createElement('div');
+		elTk.appendChild(elLabel);
+		elLabel.classList.add('label');
+		elLabel.textContent = label + 'x' + tickets[tk];
+	}
+}
 
 JobNode.prototype.updatePanels = function() {
 	var elPanelR = this.monitor.elPanelR;

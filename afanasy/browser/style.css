@@ -363,6 +363,9 @@ float: right;
 border: 1px solid #FF5;
 font-style: italic;
 }
+.service.limit_reached {
+border: 1px solid #F55;
+}
 .disabled_service {
 float: right;
 border: 1px solid #F55;
@@ -450,6 +453,10 @@ border: 1px solid #575757;
 .jobblock.selected {
 background: #DFD;
 }
+
+.jobblock .ticket { float: left; margin: 0px 4px; }
+.jobblock .ticket img { width: auto; height: 14px; float: left; }
+.jobblock .ticket .label { font-size: 12px; }
 
 .item.block {
 margin: 4px 4px 0px 4px;
@@ -561,6 +568,9 @@ position: absolute;
 background: #55AA44;
 left: 0; top: 0; bottom: 0;
 }
+.rendertask .ticket { float: left; margin: 0px 3px; }
+.rendertask .ticket img { float: left; width: auto; height: 14px; }
+.rendertask .ticket .label { float: right; font-size: 10px; font-weight: normal; margin: 1px; }
 /*
 .rendertask .icon {
 position: absolute;

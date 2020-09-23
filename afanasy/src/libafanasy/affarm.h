@@ -23,6 +23,8 @@
 
 class AfNodeFarm;
 class ItemFarm;
+class PoolSrv;
+class RenderAf;
 
 namespace af
 {
@@ -42,10 +44,12 @@ public:
 
 struct Tiks
 {
-	Tiks(): count(-1), usage(-1) {}
-	Tiks(const int32_t & i_count, const int32_t & i_usage): count(i_count), usage(i_usage) {}
+	Tiks(): count(-1), usage(0), hosts(0), max_hosts(-1) {}
+	Tiks(const int32_t & i_count, const int32_t & i_usage): count(i_count), usage(i_usage), hosts(0), max_hosts(-1) {}
 	int32_t count;
 	int32_t usage;
+	int32_t hosts;
+	int32_t max_hosts;
 };
 
 protected:
@@ -56,6 +60,8 @@ protected:
 protected:
 	friend class ::AfNodeFarm;
 	friend class ::ItemFarm;
+	friend class ::PoolSrv;
+	friend class ::RenderAf;
 
 	std::vector<std::string> m_services;
 	std::vector<std::string> m_services_disabled;

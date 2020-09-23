@@ -56,8 +56,8 @@ public:
 
 	bool assignRender(RenderAf * i_render);
 
-	void taskAcuire (const af::TaskExec * i_taskexec, MonitorContainer * i_monitoring);
-	void taskRelease(const af::TaskExec * i_taskexec, MonitorContainer * i_monitoring);
+	void taskAcuire (const af::TaskExec * i_taskexec, const std::list<std::string> & i_new_tickets, MonitorContainer * i_monitoring);
+	void taskRelease(const af::TaskExec * i_taskexec, const std::list<std::string> & i_exp_tickets, MonitorContainer * i_monitoring);
 
 	inline int findMaxTasksHost() const
 		{ if (m_max_tasks_host < 0 && m_parent) return m_parent->findMaxTasksHost(); else return m_max_tasks_host;}
@@ -84,6 +84,8 @@ public:
 		if (m_parent) return m_parent->isReady();
 		return true;
 	}
+
+	bool hasPoolTicket(const std::string & i_name, const int32_t & i_count, const bool i_ticket_running) const;
 
 	inline int get_idle_wolsleep_time() const
 		{ if (m_idle_wolsleep_time < 0 && m_parent) return m_parent->get_idle_wolsleep_time(); else return m_idle_wolsleep_time;}

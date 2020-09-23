@@ -76,6 +76,8 @@ public:
 			(m_priority > 0)
 		);}
 
+	bool hasTickets(const std::map<std::string, int32_t> & i_tickets) const;
+
 /// Add task \c taskexec to render, \c start or only capture it
 /// Takes over the taskexec ownership
 	void setTask( af::TaskExec *taskexec, MonitorContainer * monitoring, bool start = true);

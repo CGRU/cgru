@@ -966,9 +966,9 @@ void ListRenders::actClearServices()
 	Watch::sendMsg(af::jsonMsg(str));
 }
 
-void ListRenders::slot_TicketPoolEdit(){ticketEdit(false);}
-void ListRenders::slot_TicketHostEdit(){ticketEdit(true );}
-void ListRenders::ticketEdit(bool i_host_ticket)
+void ListRenders::slot_TicketPoolEdit(){ticketEdit_DialogName(false);}
+void ListRenders::slot_TicketHostEdit(){ticketEdit_DialogName(true );}
+void ListRenders::ticketEdit_DialogName(bool i_host_ticket)
 {
 	bool ok;
 	QString name = QInputDialog::getText(this,
@@ -977,12 +977,12 @@ void ListRenders::ticketEdit(bool i_host_ticket)
 	if (false == ok)
 		return;
 
-	ticketEdit(name, i_host_ticket);
+	ticketEdit_DialogCount(name, i_host_ticket);
 }
 
-void ListRenders::slot_TicketPoolEdit(const QString & i_name){ticketEdit(i_name, false);}
-void ListRenders::slot_TicketHostEdit(const QString & i_name){ticketEdit(i_name, true );}
-void ListRenders::ticketEdit(const QString & i_name, bool i_host_ticket)
+void ListRenders::slot_TicketPoolEdit(const QString & i_name){ticketEdit_DialogCount(i_name, false);}
+void ListRenders::slot_TicketHostEdit(const QString & i_name){ticketEdit_DialogCount(i_name, true );}
+void ListRenders::ticketEdit_DialogCount(const QString & i_name, bool i_host_ticket)
 {
 	if (i_name.isEmpty())
 	{
@@ -995,13 +995,14 @@ void ListRenders::ticketEdit(const QString & i_name, bool i_host_ticket)
 		return;
 	ItemFarm * item_farm = (ItemFarm*)(item);
 
-	int cur_count = 1;
+	int count = 1;
+	int max_hosts = -1;
 
 	if (i_host_ticket)
 	{
 		QMap<QString, af::Farm::Tiks>::const_iterator it = item_farm->m_tickets_host.find(i_name);
 		if (it != item_farm->m_tickets_host.end())
-			cur_count = it.value().count;
+			count = it.value().count;
 	}
 	else
 	{
@@ -1013,23 +1014,40 @@ void ListRenders::ticketEdit(const QString & i_name, bool i_host_ticket)
 
 		QMap<QString, af::Farm::Tiks>::const_iterator it = item_farm->m_tickets_pool.find(i_name);
 		if (it != item_farm->m_tickets_pool.end())
-			cur_count = it.value().count;
+		{
+			count = it.value().count;
+			max_hosts = it.value().max_hosts;
+		}
 	}
 
 	bool ok;
-	int new_count = QInputDialog::getInt(this,
+	count = QInputDialog::getInt(this,
 			QString("Edit %1 Ticket").arg(i_host_ticket ? "Host" : "Pool"),
-			QString("Enter %1 cur_count.\nType -1 to remove.").arg(i_name),
-			cur_count, -1, 1<<30, 1, &ok);
+			QString("Enter %1 count.\nType -1 to remove.").arg(i_name),
+			count, -1, 1<<30, 1, &ok);
+	if (false == ok)
+		return;
+
+	if ((false == i_host_ticket) && (count != -1))
+	{
+		max_hosts = QInputDialog::getInt(this,
+				QString("Edit Pool Ticket"),
+				QString("Enter %1 max hosts.\nType -1 to disable limit.").arg(i_name),
+				max_hosts, -1, 1<<30, 1, &ok);
+	}
+	if (false == ok)
+		return;
 
 	std::ostringstream str;
 	Item::EType type = Item::TAny;
 	std::vector<int> ids(getSelectedIds(type));
 	af::jsonActionOperationStart(str, itemTypeToAf(type), "tickets", "", ids);
 	str << ",\n\"name\":\"" << afqt::qtos(i_name) << "\"";
-	str << ",\n\"count\":" << new_count;
+	str << ",\n\"count\":" << count;
 	if (i_host_ticket)
 		str << ",\n\"host\":true";
+	else
+		str << ",\n\"max_hosts\":" << max_hosts;
 	af::jsonActionOperationFinish(str);
 	Watch::sendMsg(af::jsonMsg(str));
 }

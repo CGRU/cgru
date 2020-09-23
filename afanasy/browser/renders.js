@@ -616,11 +616,12 @@ RenderNode.editTicket = function(i_args) {
 RenderNode.prototype.editTicket = function(i_value, i_param) {
 	var type;
 	var count = 1;
+	var max_hosts = null;
 
 	if (this.params.tickets_host && this.params.tickets_host[i_value])
 		count = this.params.tickets_host[i_value][0];
 
-	farm_ticketEditDialog(i_value, count, 'host', this);
+	farm_ticketEditDialog(i_value, count, max_hosts, 'host', this);
 };
 
 function RenderTask(i_task, i_elParent)
@@ -653,7 +654,34 @@ function RenderTask(i_task, i_elParent)
 	this.element.appendChild(this.elBody);
 	this.elBody.classList.add('body');
 
-	this.elCapacity = cm_ElCreateText(this.elBody, 'Task Capacity');
+	if (i_task.tickets)
+	{
+		this.elTickets = cm_ElCreateText(this.elBody, 'Tickets');
+		for (let tk in i_task.tickets)
+		{
+			let elTk = document.createElement('div');
+			this.elTickets.appendChild(elTk);
+			elTk.classList.add('ticket');
+
+			let label = '';
+
+			if (cm_TicketsIcons.includes(tk + '.png'))
+			{
+				let elIcon = document.createElement('img');
+				elTk.appendChild(elIcon);
+				elIcon.src = ('icons/tickets/' + tk + '.png');
+			}
+			else
+				label = tk;
+
+			let elLabel = document.createElement('div');
+			elTk.appendChild(elLabel);
+			elLabel.classList.add('label');
+			elLabel.textContent = label + 'x' + i_task.tickets[tk];
+		}
+	}
+
+	this.elCapacity = cm_ElCreateText(this.elBody, 'Capacity');
 	this.elCapacity.textContent = '[' + i_task.capacity + ']';
 
 	this.elJob = cm_ElCreateText(this.elBody, 'Job Name');

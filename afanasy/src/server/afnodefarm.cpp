@@ -223,6 +223,12 @@ bool AfNodeFarm::actionTicket(Action & i_action)
 		return false;
 	}
 
+	int32_t tk_max_hosts;
+	bool tk_max_hosts_specified = false;
+	// Check that ticket count is specified:
+	if (af::jr_int32("max_hosts", tk_max_hosts, operation))
+		tk_max_hosts_specified = true;
+
 	bool tk_host = false;
 	af::jr_bool("host", tk_host, operation);
 
@@ -269,11 +275,15 @@ bool AfNodeFarm::actionTicket(Action & i_action)
 	{
 		// Add a new ticket:
 		(*tickets)[tk_name] = af::Farm::Tiks(tk_count, 0);
+		if ((false == tk_host) && tk_max_hosts_specified)
+			(*tickets)[tk_name].max_hosts = tk_max_hosts;
 	}
 	else
 	{
 		// Modify existing ticket:
 		it->second.count = tk_count;
+		if ((false == tk_host) && tk_max_hosts_specified)
+			it->second.max_hosts = tk_max_hosts;
 	}
 
 
@@ -315,50 +325,6 @@ bool AfNodeFarm::canRunService(const std::string & i_service_name, bool i_hasSer
 	// If no child node has any service, that means that no services was set at all.
 	// Assuming that there is no matter what service to run.
 	return false == i_hasServicesSetup;
-}
-
-bool AfNodeFarm::hasTickets(const std::map<std::string, int32_t> & i_tickets) const
-{
-	for (auto const& it : i_tickets)
-	{
-		if (false == hasPoolTicket(it.first, it.second))
-			return false;
-
-		if (false == hasHostTicket(it.first, it.second))
-			return false;
-	}
-
-	return true;
-}
-
-bool AfNodeFarm::hasPoolTicket(const std::string & i_name, const int32_t & i_count) const
-{
-	std::map<std::string, af::Farm::Tiks>::const_iterator it = m_farm->m_tickets_pool.find(i_name);
-	if (it != m_farm->m_tickets_pool.end())
-	{
-		if (it->second.count == -1)
-		{
-			// This means that pool does not have such host ticket.
-			// It was created to store ticket usage only.
-			if (m_parent)
-			{
-				return m_parent->hasPoolTicket(i_name, i_count);
-			}
-
-			return true;
-		}
-
-		if ((it->second.count - it->second.usage) < i_count)
-		{
-			return false;
-		}
-	}
-	else if (m_parent)
-	{
-		return m_parent->hasPoolTicket(i_name, i_count);
-	}
-
-	return true;
 }
 
 bool AfNodeFarm::hasHostTicket(const std::string & i_name, const int32_t & i_count) const

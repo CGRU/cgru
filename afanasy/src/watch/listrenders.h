@@ -113,8 +113,8 @@ private:
 	void calcTitle();
 	void setSpacing();
 
-	void ticketEdit(bool i_host_ticket);
-	void ticketEdit(const QString & i_name, bool i_host_ticket);
+	void ticketEdit_DialogName(bool i_host_ticket);
+	void ticketEdit_DialogCount(const QString & i_name, bool i_host_ticket);
 
 private:
 	QMap<QString, ItemPool*> m_pools;

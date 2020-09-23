@@ -752,6 +752,31 @@ void RenderAf::actionHealSick(Action & i_action)
 	appendLog(std::string("Healed by ") + i_action.author);
 }
 
+bool RenderAf::hasTickets(const std::map<std::string, int32_t> & i_tickets) const
+{
+	for (auto const& it : i_tickets)
+	{
+		if (false == hasHostTicket(it.first, it.second))
+			return false;
+
+		if (m_parent)
+		{
+			bool ticket_running = false;
+			std::map<std::string, af::Farm::Tiks>::const_iterator rIt = m_farm->m_tickets_host.find(it.first);
+			if (rIt != m_tickets_host.end())
+			{
+				if (rIt->second.usage > 0)
+					ticket_running = true;
+			}
+
+			if (false == m_parent->hasPoolTicket(it.first, it.second, ticket_running))
+				return false;
+		}
+	}
+
+	return true;
+}
+
 void RenderAf::addTask(af::TaskExec * i_taskexec, MonitorContainer * i_monitoring)
 {
 	// If render was not busy it has become busy now
@@ -776,20 +801,28 @@ void RenderAf::addTask(af::TaskExec * i_taskexec, MonitorContainer * i_monitorin
 		AF_ERR << "Capacity_used > max capacity (" << m_capacity_used << " > " << findCapacity() << ")";
 
 	// Add task tickets
+	std::list<std::string> new_tickets;
 	for (auto & tIt : i_taskexec->m_tickets)
 	{
 		std::map<std::string, af::Farm::Tiks>::iterator hIt = m_tickets_host.find(tIt.first);
 		if (hIt != m_tickets_host.end())
+		{
+			if (hIt->second.usage == 0)
+				new_tickets.push_back(hIt->first);
 			hIt->second.usage += tIt.second;
+		}
 		else
+		{
+			new_tickets.push_back(tIt.first);
 			m_tickets_host[tIt.first] = Tiks(-1, tIt.second);
+		}
 	}
 
 	// Increment service on af::Node
 	incrementService(i_taskexec->getServiceType());
 
 	// Acuire task on pool
-	m_parent->taskAcuire(i_taskexec, i_monitoring);
+	m_parent->taskAcuire(i_taskexec, new_tickets, i_monitoring);
 }
 
 void RenderAf::removeTask(const af::TaskExec * i_taskexec, MonitorContainer * i_monitoring)
@@ -812,7 +845,7 @@ void RenderAf::removeTask(const af::TaskExec * i_taskexec, MonitorContainer * i_
 	// Remove exec pointer from events:
 	m_re.remTaskExec(i_taskexec);
 
-	// Remove task capacty
+	// Remove task capacity
 	if (m_capacity_used < i_taskexec->getCapResult())
 	{
 		AF_ERR << "Capacity_used < getCapResult() (" << m_capacity_used << " < " << i_taskexec->getCapResult() << ")";
@@ -821,6 +854,7 @@ void RenderAf::removeTask(const af::TaskExec * i_taskexec, MonitorContainer * i_
 	else m_capacity_used -= i_taskexec->getCapResult();
 
 	// Remove task tickets
+	std::list<std::string> exp_tickets;
 	for (auto & tIt : i_taskexec->m_tickets)
 	{
 		std::map<std::string, af::Farm::Tiks>::iterator hIt = m_tickets_host.find(tIt.first);
@@ -834,6 +868,9 @@ void RenderAf::removeTask(const af::TaskExec * i_taskexec, MonitorContainer * i_
 					<< "\" count. Resetting to zero.";
 				hIt->second.usage = 0;
 			}
+
+			if (hIt->second.usage == 0)
+				exp_tickets.push_back(hIt->first);
 		}
 	}
 
@@ -841,7 +878,7 @@ void RenderAf::removeTask(const af::TaskExec * i_taskexec, MonitorContainer * i_
 	decrementService(i_taskexec->getServiceType());
 
 	// Release task on pool
-	m_parent->taskRelease(i_taskexec, i_monitoring);
+	m_parent->taskRelease(i_taskexec, exp_tickets, i_monitoring);
 }
 
 void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorContainer * monitoring)

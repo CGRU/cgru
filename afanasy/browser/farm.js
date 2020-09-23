@@ -247,6 +247,8 @@ function farm_showTickets(i_el, i_tickets, i_type, i_node)
 	{
 		let count = i_tickets[tk][0];
 		let usage = i_tickets[tk][1];
+		let hosts = i_tickets[tk][2];
+		let max_hosts = i_tickets[tk][3];
 		let dummy = false;
 
 		if ((i_node.node_type == 'renders') && (count == -1) && (i_node.m_parent_pool))
@@ -267,6 +269,10 @@ function farm_showTickets(i_el, i_tickets, i_type, i_node)
 			elTk.classList.add('dummy');
 		if (usage > 0)
 			elTk.classList.add('running');
+		if (usage >= count)
+			elTk.classList.add('limit_reached')
+		if ((max_hosts != null) && (max_hosts != -1) && (hosts >= max_hosts))
+			elTk.classList.add('limit_reached');
 
 		let label = '';
 		if (cm_TicketsIcons.includes(tk + '.png'))
@@ -280,6 +286,8 @@ function farm_showTickets(i_el, i_tickets, i_type, i_node)
 
 		if (count >= 0) label += ' x' + count;
 		if (usage >  0) label += ': ' + usage;
+		if (hosts     ) label += '/'  + hosts;
+		if (max_hosts ) label += '/'  + max_hosts;
 
 		let elLabel = document.createElement('div');
 		elTk.appendChild(elLabel);
@@ -307,6 +315,8 @@ function farm_showTicketsInfo(i_node, i_type)
 	{
 		let count = tickets[tk][0];
 		let usage = tickets[tk][1];
+		let hosts = tickets[tk][2];
+		let max_hosts = tickets[tk][3];
 
 		let elTk = document.createElement('div');
 		elTickets.appendChild(elTk);
@@ -317,6 +327,10 @@ function farm_showTicketsInfo(i_node, i_type)
 			elTk.classList.add('dummy');
 		if (usage > 0)
 			elTk.classList.add('running');
+		if (usage >= count)
+			elTk.classList.add('limit_reached');
+		if ((max_hosts != null) && (max_hosts != -1) && (hosts >= max_hosts))
+			elTk.classList.add('limit_reached');
 
 		if (cm_TicketsIcons.includes(tk + '.png'))
 		{
@@ -325,9 +339,11 @@ function farm_showTicketsInfo(i_node, i_type)
 			elIcon.src = ('icons/tickets/' + tk + '.png');
 		}
 
-		let label = tk;
-		if (count > 0) label += ' x' + count;
-		if (usage > 0) label += ': ' + usage;
+		let label = tk + ':';
+		if (count > 0) label += ' count:' + count;
+		if (usage > 0) label += ' usage:' + usage;
+		if (hosts    ) label += ' hosts:' + hosts;
+		if (max_hosts) label += ' max:' + max_hosts;
 
 		let elLabel = document.createElement('div');
 		elTk.appendChild(elLabel);
@@ -336,16 +352,17 @@ function farm_showTicketsInfo(i_node, i_type)
 
 		elTk.m_name = tk;
 		elTk.m_count = count;
+		elTk.m_max_hosts = max_hosts;
 		elTk.m_type = i_type;
 		elTk.m_node = i_node;
 		elTk.ondblclick = function(e){
 			var el = e.currentTarget;
-			farm_ticketEditDialog(el.m_name, el.m_count, el.m_type, el.m_node);
+			farm_ticketEditDialog(el.m_name, el.m_count, el.m_max_hosts, el.m_type, el.m_node);
 		}
 	}
 }
 
-function farm_ticketEditDialog(i_name, i_count, i_type, i_node)
+function farm_ticketEditDialog(i_name, i_count, i_max_hosts, i_type, i_node)
 {
 	var args = {};
 
@@ -359,14 +376,38 @@ function farm_ticketEditDialog(i_name, i_count, i_type, i_node)
 	args.param.name = i_name;
 	args.param.type = i_type;
 	args.param.node = i_node;
+	args.param.max_hosts = i_max_hosts;
 
 	args.type = 'num';
 	args.receiver = i_node.monitor.window;
 	args.handle = 'farm_ticketEditApply';
+	// On 'pool' thicket we should ask for max hosts
+	if (i_type == 'pool')
+		args.handle = 'farm_ticketEditDialog2';
 	args.value = i_count;
 	args.name = 'ticket_edit';
 	args.title = 'Edit Ticket';
-	args.info = 'Enter a new "' + i_name + '" ' + i_type + ' ticket number:<br>Type -1 to remove ticket.';
+	args.info = 'Enter  "' + i_name + '" ' + i_type + ' ticket count:<br>Type -1 to remove ticket.';
+
+	new cgru_Dialog(args);
+}
+
+function farm_ticketEditDialog2(i_value, i_param)
+{
+	i_param.count = i_value;
+
+	var args = {};
+	args.param = i_param;
+	args.type = 'num';
+	args.receiver = i_param.node.monitor.window;
+	args.handle = 'farm_ticketEditApply';
+	args.value = i_param.max_hosts;
+	// If not set, limit is disabled (value == -1)
+	if (args.value == null)
+		args.value = -1;
+	args.name = 'ticket_edit';
+	args.title = 'Edit Ticket';
+	args.info = 'Enter  "' + i_param.name + '" ' + i_param.type + ' ticket max hosts:<br>Type -1 to disable limit.';
 
 	new cgru_Dialog(args);
 }
@@ -377,7 +418,16 @@ function farm_ticketEditApply(i_value, i_param)
 	operation.type = 'tickets';
 	operation.name = i_param.name;
 	operation.count = i_value;
+
+	if (i_param.count != null)
+	{
+		// If count is stored, we here from max hosts dialog (farm_ticketEditDialog2)
+		operation.count = i_param.count;
+		operation.max_hosts = i_value;
+	}
+
 	if (i_param.type == 'host')
 		operation.host = true;
+
 	nw_Action(i_param.node.node_type, [i_param.node.params.id], operation);
 }

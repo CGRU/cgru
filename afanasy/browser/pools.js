@@ -365,6 +365,7 @@ PoolNode.prototype.serviceApply = function(i_value, i_name) {
 PoolNode.prototype.editTicket = function(i_value, i_param) {
 	var type;
 	var count = 1;
+	var max_hosts = null;
 
 	if (i_param == 'ticket_edit_host')
 	{
@@ -376,10 +377,13 @@ PoolNode.prototype.editTicket = function(i_value, i_param) {
 	{
 		type = 'pool';
 		if (this.params.tickets_pool && this.params.tickets_pool[i_value])
+		{
 			count = this.params.tickets_pool[i_value][0];
+			max_hosts = this.params.tickets_pool[i_value][3];
+		}
 	}
 
-	farm_ticketEditDialog(i_value, count, type, this);
+	farm_ticketEditDialog(i_value, count, max_hosts, type, this);
 };
 
 

@@ -368,8 +368,52 @@ void PoolSrv::actionHealSick(Action & i_action)
 	appendLog(std::string("Healed by ") + i_action.author);
 }
 
-void PoolSrv::taskAcuire(const af::TaskExec * i_taskexec, MonitorContainer * i_monitoring)
+bool PoolSrv::hasPoolTicket(const std::string & i_name, const int32_t & i_count, const bool i_ticket_running) const
 {
+	std::map<std::string, af::Farm::Tiks>::const_iterator it = m_farm->m_tickets_pool.find(i_name);
+	if (it != m_farm->m_tickets_pool.end())
+	{
+		if (it->second.count == -1)
+		{
+			// This means that pool does not have such host ticket.
+			// It was created to store ticket usage only.
+			if (m_parent)
+			{
+				return m_parent->hasPoolTicket(i_name, i_count, i_ticket_running);
+			}
+
+			return true;
+		}
+
+		// Check ticket max hosts
+		if (it->second.max_hosts != -1)
+		{
+			if (it->second.hosts > it->second.max_hosts)
+				return false;
+
+			if (it->second.hosts == it->second.max_hosts)
+				if (false == i_ticket_running)
+					return false;
+		}
+
+		// Check count
+		if ((it->second.count - it->second.usage) < i_count)
+		{
+			return false;
+		}
+	}
+	else if (m_parent)
+	{
+		// There is no such ticket, just ask parent node, if any
+		return m_parent->hasPoolTicket(i_name, i_count, i_ticket_running);
+	}
+
+	return true;
+}
+
+void PoolSrv::taskAcuire(const af::TaskExec * i_taskexec, const std::list<std::string> & i_new_tickets, MonitorContainer * i_monitoring)
+{
+	// Increment tickets:
 	for (auto const& eIt : i_taskexec->m_tickets)
 	{
 		std::map<std::string, af::Farm::Tiks>::iterator it = m_tickets_pool.find(eIt.first);
@@ -377,6 +421,10 @@ void PoolSrv::taskAcuire(const af::TaskExec * i_taskexec, MonitorContainer * i_m
 			it->second.usage += eIt.second;
 		else
 			m_tickets_pool[eIt.first] = Tiks(-1, eIt.second);
+
+		// Increment hosts if ticket was new for the render that accepted the task
+		if (std::find(i_new_tickets.begin(), i_new_tickets.end(), eIt.first) != i_new_tickets.end())
+			m_tickets_pool[eIt.first].hosts++;
 	}
 
 	// Increment service on af::Node
@@ -395,11 +443,12 @@ void PoolSrv::taskAcuire(const af::TaskExec * i_taskexec, MonitorContainer * i_m
 		i_monitoring->addEvent(af::Monitor::EVT_pools_change, m_id);
 
 	if (m_parent)
-		m_parent->taskAcuire(i_taskexec, i_monitoring);
+		m_parent->taskAcuire(i_taskexec, i_new_tickets, i_monitoring);
 }
 
-void PoolSrv::taskRelease(const af::TaskExec * i_taskexec, MonitorContainer * i_monitoring)
+void PoolSrv::taskRelease(const af::TaskExec * i_taskexec, const std::list<std::string> & i_exp_tickets, MonitorContainer * i_monitoring)
 {
+	// Decrement tickets
 	for (auto const& eIt : i_taskexec->m_tickets)
 	{
 		std::map<std::string, af::Farm::Tiks>::iterator it = m_tickets_pool.find(eIt.first);
@@ -407,7 +456,7 @@ void PoolSrv::taskRelease(const af::TaskExec * i_taskexec, MonitorContainer * i_
 		{
 			it->second.usage -= eIt.second;
 
-			// Check a negative usage.
+			// Check for negative usage
 			if (it->second.usage < 0)
 			{
 				// It should never happen!
@@ -416,6 +465,21 @@ void PoolSrv::taskRelease(const af::TaskExec * i_taskexec, MonitorContainer * i_
 					<< "\" count. Resetting to zero.";
 				it->second.usage = 0;
 			}
+
+			// Decrement hosts if ticket was expired for the render that finished the task
+			if (std::find(i_exp_tickets.begin(), i_exp_tickets.end(), it->first) != i_exp_tickets.end())
+				it->second.hosts--;
+
+			// Check for negative hosts
+			if (it->second.hosts < 0)
+			{
+				// It should never happen!
+				AF_ERR << "Pool \"" << getName()
+					<< "\" has got a negative ticket \"" << it->first
+					<< "\" hosts. Resetting to zero.";
+				it->second.hosts = 0;
+			}
+
 		}
 	}
 
@@ -435,7 +499,7 @@ void PoolSrv::taskRelease(const af::TaskExec * i_taskexec, MonitorContainer * i_
 		i_monitoring->addEvent(af::Monitor::EVT_pools_change, m_id);
 
 	if (m_parent)
-		m_parent->taskRelease(i_taskexec, i_monitoring);
+		m_parent->taskRelease(i_taskexec, i_exp_tickets, i_monitoring);
 }
 
 void PoolSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, MonitorContainer * i_monitoring)
