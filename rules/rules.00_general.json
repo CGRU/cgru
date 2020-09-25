@@ -160,12 +160,13 @@
 			"path":["SRC","SOURCE"]
 		},
 		"result":{
-			"path":["RESULT/JPG","RESULT/PNG","RESULT/DPX","RESULT/TIF","RESULT/EXR","RESULT/ANIM"]
+			"path":["RESULT/JPG","RESULT/PNG","RESULT/DPX","RESULT/TIF","RESULT/EXR","RESULT/ANIM","RESULT/RENDER"]
 		},
 		"dailies":{
 			"path":["RESULT/DAILIES"],
 			"folders":{
-				"result/anim":"RESULT/ANIM"
+				"result/anim":"RESULT/ANIM",
+				"render":"RESULT/RENDER"
 			}
 		},
 		"template":"rules/assets/shot",
