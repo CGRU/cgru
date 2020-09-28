@@ -287,7 +287,8 @@ function farm_showTickets(i_el, i_tickets, i_type, i_node)
 		if (count >= 0) label += ' x' + count;
 		if (usage >  0) label += ': ' + usage;
 		if (hosts     ) label += '/'  + hosts;
-		if (max_hosts ) label += '/'  + max_hosts;
+		if ((max_hosts != null) && (max_hosts != -1))
+			label += '/'  + max_hosts;
 
 		let elLabel = document.createElement('div');
 		elTk.appendChild(elLabel);
@@ -340,10 +341,11 @@ function farm_showTicketsInfo(i_node, i_type)
 		}
 
 		let label = tk + ':';
-		if (count > 0) label += ' count:' + count;
-		if (usage > 0) label += ' usage:' + usage;
-		if (hosts    ) label += ' hosts:' + hosts;
-		if (max_hosts) label += ' max:' + max_hosts;
+		if (count !=-1) label += ' count:' + count;
+		if (usage  > 0) label += ' usage:' + usage;
+		if (hosts     ) label += ' hosts:' + hosts;
+		if ((max_hosts != null) && (max_hosts != -1))
+			label += ' max:' + max_hosts;
 
 		let elLabel = document.createElement('div');
 		elTk.appendChild(elLabel);

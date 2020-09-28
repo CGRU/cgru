@@ -11,6 +11,14 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
 - The third number versions are fully compatible.
   You can upgrade only one client or server for changes.
 
+v3.1.0
+======
+
+**New Afanasy network protocol version.**
+
+- Afanasy pool tickets got maximum hosts property.
+  This is mostly needed for licence hosts limits.
+
 v3.0.0
 ======
 

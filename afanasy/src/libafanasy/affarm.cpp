@@ -60,16 +60,20 @@ void Farm::rw_Tickets(std::map<std::string, Tiks> & io_tickets, Msg * io_msg)
 			w_String  (it->first,        io_msg);
 			rw_int32_t(it->second.count, io_msg);
 			rw_int32_t(it->second.usage, io_msg);
+			rw_int32_t(it->second.hosts, io_msg);
+			rw_int32_t(it->second.max_hosts, io_msg);
 		}
 	else
 		for (unsigned i = 0; i < size; i++)
 		{
 			std::string key;
 			rw_String(key, io_msg);
-			int32_t count, usage;
+			int32_t count, usage, hosts, max_hosts;
 			rw_int32_t(count, io_msg);
 			rw_int32_t(usage, io_msg);
-			io_tickets[key] = Tiks(count, usage);
+			rw_int32_t(hosts, io_msg);
+			rw_int32_t(max_hosts, io_msg);
+			io_tickets[key] = Tiks(count, usage, hosts, max_hosts);
 		}
 }
 

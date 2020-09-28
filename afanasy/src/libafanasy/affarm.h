@@ -46,6 +46,8 @@ struct Tiks
 {
 	Tiks(): count(-1), usage(0), hosts(0), max_hosts(-1) {}
 	Tiks(const int32_t & i_count, const int32_t & i_usage): count(i_count), usage(i_usage), hosts(0), max_hosts(-1) {}
+	Tiks(const int32_t & i_count, const int32_t & i_usage, const int32_t & i_hosts, const int32_t & i_max_hosts):
+		count(i_count), usage(i_usage), hosts(i_hosts), max_hosts(i_max_hosts) {}
 	int32_t count;
 	int32_t usage;
 	int32_t hosts;

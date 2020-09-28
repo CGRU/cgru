@@ -395,7 +395,7 @@ void ParamSeparator::paintEvent(QPaintEvent * event)
 	painter.drawLine(0, 0, width(), 0);
 }
 
-ParamTicket::ParamTicket(const QString & i_name, int i_count, int i_usage):
+ParamTicket::ParamTicket(const QString & i_name, int i_count, int i_usage, int i_hosts, int i_max_hosts):
 	m_name(i_name)
 {
 	QHBoxLayout * layout = new QHBoxLayout(this);
@@ -423,25 +423,15 @@ ParamTicket::ParamTicket(const QString & i_name, int i_count, int i_usage):
 	layout->addWidget(m_edit_btn);
 	connect(m_edit_btn, SIGNAL(clicked()), this, SLOT(slot_Edit()));
 
-	update(i_count, i_usage);
+	update(i_count, i_usage, i_hosts, i_max_hosts);
 }
 
 ParamTicket::~ParamTicket()
 {
 }
 
-void ParamTicket::update(int i_count, int i_usage)
+void ParamTicket::update(int i_count, int i_usage, int i_hosts, int i_max_hosts)
 {
-	if (i_usage > 0)
-	{
-		if (i_count < 0)
-			m_count_label->setText(QString(": %1").arg(i_usage));
-		else
-			m_count_label->setText(QString("x%1: %2").arg(i_count).arg(i_usage));
-	}
-	else
-		m_count_label->setText(QString("x%1").arg(i_count));
-
 	if (i_count < 0)
 	{
 		m_name_label->setText(QString("<i>%1</i>").arg(m_name));
@@ -454,6 +444,17 @@ void ParamTicket::update(int i_count, int i_usage)
 		m_name_label->setText(QString("<b>%1</b>").arg(m_name));
 		//m_edit_btn->setHidden(false);
 	}
+
+	QString counts;
+	if (i_count != -1)
+		counts += QString("x<b>%1</b>").arg(i_count);
+	if (i_usage > 0)
+		counts += QString(" :%1").arg(i_usage);
+	if (i_hosts > 0)
+		counts += QString("/%1").arg(i_hosts);
+	if (i_max_hosts > 0)
+		counts += QString(" max:<b>%1</b>").arg(i_max_hosts);
+	m_count_label->setText(counts);
 }
 
 void ParamTicket::slot_Edit()

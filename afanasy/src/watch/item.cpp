@@ -327,7 +327,8 @@ void Item::drawStar( int size, int posx, int posy, QPainter * painter)
 int Item::drawTicket(QPainter * i_painter, const QPen & i_text_pen,
 		int i_x, int i_y, int i_w,
 		int i_opts,
-		const QString & i_name, int i_count, int i_usage)
+		const QString & i_name,
+		int i_count, int i_usage, int i_hosts, int i_max_hosts)
 {
 	i_painter->setPen(i_text_pen);
 	i_painter->setFont(afqt::QEnvironment::f_info);
@@ -346,6 +347,8 @@ int Item::drawTicket(QPainter * i_painter, const QPen & i_text_pen,
 
 		if ((i_count != -1) && (i_usage >= i_count))
 			border_pen.setColor(afqt::QEnvironment::clr_error.c);
+		else if ((i_max_hosts != -1) && (i_hosts >= i_max_hosts))
+			border_pen.setColor(afqt::QEnvironment::clr_error.c);
 		else if (i_usage > 0)
 			border_pen.setColor(afqt::QEnvironment::clr_running.c);
 		else
@@ -357,6 +360,8 @@ int Item::drawTicket(QPainter * i_painter, const QPen & i_text_pen,
 
 	if (i_count >= 0) text += QString("x%1").arg(i_count);
 	if (i_usage >  0) text += QString(":%1").arg(i_usage);
+	if (i_hosts >  0) text += QString("/%1").arg(i_hosts);
+	if (i_max_hosts >= 0) text += QString("/%1").arg(i_max_hosts);
 
 	QRect tk_rect;
 	int tk_width = 0;

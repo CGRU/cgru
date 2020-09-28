@@ -193,7 +193,8 @@ void ItemFarm::drawTickets(QPainter * i_painter, const QStyleOptionViewItem & i_
 
 			QPen pen(Item::clrTextInfo(tkp_it.value().usage, i_option.state & QStyle::State_Selected));
 			tkp_w += drawTicket(i_painter, pen, i_x + 5 + tkp_w, i_y, i_w - 10,
-					draw_flags, tkp_it.key(), tkp_it.value().count, tkp_it.value().usage);
+					draw_flags, tkp_it.key(),
+					tkp_it.value().count, tkp_it.value().usage, tkp_it.value().hosts, tkp_it.value().max_hosts);
 
 			tkp_w += 8;
 		}

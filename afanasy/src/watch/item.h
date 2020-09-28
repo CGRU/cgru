@@ -109,7 +109,8 @@ public:
 	static int drawTicket(QPainter * i_painter, const QPen & i_text_pen,
 			int i_x, int i_y, int i_w,
 			int i_opts,
-			const QString & i_name, int i_count, int i_usage = -1);
+			const QString & i_name,
+			int i_count, int i_usage = -1, int i_hosts = -1, int i_max_hosts = -1);
 
 protected:
 	inline int getDepth() const { return m_depth; }

@@ -134,10 +134,10 @@ class ParamTicket: public QWidget
 {
 Q_OBJECT
 public:
-	ParamTicket(const QString & i_name, int i_count, int i_usage = -1);
+	ParamTicket(const QString & i_name, int i_count, int i_usage = -1, int i_hosts = -1, int i_max_hosts = -1);
 	~ParamTicket();
 
-	void update(int i_count, int i_usage = -1);
+	void update(int i_count, int i_usage = -1, int i_hosts = -1, int i_max_hosts = -1);
 
 signals:
 	void sig_Edit(QString i_name);
