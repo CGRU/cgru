@@ -22,11 +22,8 @@ Companies
 - **Kiev Postproduction** | http://www.kievpostproduction.com
 - **Postmodern** | http://postmodern.com.ua/
 - **R-Studios** | http://www.r-studios.ru
-- **Shotty** | http://shotty.ru
 - **Terminal FX** | http://terminalfx.com
-- **The Chimney Pot Kiev** | http://thechimneypot.com/kiev
 - **Unit Five** | http://u5fx.ru
-- **Umedia visual effects - Belgium** | http://www.umedia.eu/fr/ufx.html
 
 
 Projects
