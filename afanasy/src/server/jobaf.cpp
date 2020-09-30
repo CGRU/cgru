@@ -944,8 +944,8 @@ void JobAf::tryTaskNext(bool i_append, int i_block_num, int i_task_num)
 	if (false == checkTryTasksNext())
 		return;
 
-	std::vector<int32_t>::const_iterator tIt = m_try_this_tasks_num.begin();
-	std::vector<int32_t>::const_iterator bIt = m_try_this_blocks_num.begin();
+	std::vector<int32_t>::iterator tIt = m_try_this_tasks_num.begin();
+	std::vector<int32_t>::iterator bIt = m_try_this_blocks_num.begin();
 
 	while (tIt != m_try_this_tasks_num.end())
 	{

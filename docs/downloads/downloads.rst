@@ -34,6 +34,9 @@ Linux
 - AltLinux 9 (Simply Linux)
 	https://sourceforge.net/projects/cgru/files/3.0.0/cgru.3.0.0.alt9.0_x86_64.tar.gz/download
 
+- CentOS 7 (RHEL 7)
+	https://sourceforge.net/projects/cgru/files/3.0.0/cgru.3.0.0.CentOS-7_x86_64.tar.gz/download
+
 - CentOS 8 (RHEL 8)
 	https://sourceforge.net/projects/cgru/files/3.0.0/cgru.3.0.0.CentOS-8_x86_64.tar.gz/download
 
