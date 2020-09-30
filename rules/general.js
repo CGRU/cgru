@@ -32,7 +32,7 @@ var g_arguments = null;
 
 var g_navig_infos = {
 	all     : ['annotation', 'size', 'flags', 'artists', 'tags', 'duration', 'price', 'frames', 'percent'],
-	default : ['annotation', 'flags', 'artists', 'percent'],
+	default : ['annotation', 'flags', 'tags', 'artists', 'percent'],
 	current : []
 };
 
