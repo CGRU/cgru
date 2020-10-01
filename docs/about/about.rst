@@ -20,6 +20,7 @@ Companies
 - **Ghost A/S** | http://ghost.dk
 - **Istudios Visuals** | http://www.istudios.se
 - **Kiev Postproduction** | http://www.kievpostproduction.com
+- **Overmind Studios** | http://www.overmind-studios.de
 - **Postmodern** | http://postmodern.com.ua/
 - **R-Studios** | http://www.r-studios.ru
 - **Terminal FX** | http://terminalfx.com
