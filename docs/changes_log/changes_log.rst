@@ -18,6 +18,7 @@ v3.1.0
 
 - Afanasy pool tickets got maximum hosts property.
   This is mostly needed for licence hosts limits.
+  There is a common type of licensing where you can run multiple instances of software on same host, occupying only single license.
 
 v3.0.0
 ======
