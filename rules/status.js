@@ -151,11 +151,11 @@ Status.prototype.show = function(i_status, i_update = false) {
 	if (this.elProgress)
 		st_SetElProgress(this.obj, this.elProgressBar, this.elProgress, this.elPercentage);
 	if (this.elArtists)
-		st_SetElArtists(this.obj, this.elArtists);
+		st_SetElArtists(this.obj, this.elArtists, this.args.display_short);
 	if (this.elFlags)
-		st_SetElFlags(this.obj, this.elFlags);
+		st_SetElFlags(this.obj, this.elFlags, this.args.display_short);
 	if (this.elTags)
-		st_SetElTags(this.obj, this.elTags);
+		st_SetElTags(this.obj, this.elTags, this.args.display_short);
 	if (this.elFramesNum)
 		st_SetElFramesNum(this.obj, this.elFramesNum);
 	if (this.elFinish)
