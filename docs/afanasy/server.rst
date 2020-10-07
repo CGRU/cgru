@@ -227,10 +227,10 @@ In most Linux-es all this can be provided by packages:
 The site is located in ``cgru/afanasy/statistics`` folder. 
 
 
-Web GUI
-~~~~~~~
+Web Page
+~~~~~~~~
 
-There is a Web interface to Afanasy SQL statistics database.
+There is a Web page to view Afanasy SQL statistics database.
 
 .. figure:: images/stat_tasks.png
 
