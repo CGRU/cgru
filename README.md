@@ -10,9 +10,11 @@ like _dailies encoding scripts_ and _software submission plug-ins_.
 
 **Rules** is a Web based CG projects tracker.
 
-[Documentation](http://cgru.info)
+[Site](https://cgru.info)
 
-[Forum](http://forum.cgru.info)
+[Documentation](https://cgru.readthedocs.io)
+
+[Forum](https://forum.cgru.info)
 
 You can ask any questions on the CGRU forum.
 
