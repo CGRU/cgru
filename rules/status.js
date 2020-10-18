@@ -151,11 +151,11 @@ Status.prototype.show = function(i_status, i_update = false) {
 	if (this.elProgress)
 		st_SetElProgress(this.obj, this.elProgressBar, this.elProgress, this.elPercentage);
 	if (this.elArtists)
-		st_SetElArtists(this.obj, this.elArtists, this.args.display_short);
+		st_SetElArtists(this.obj, this.elArtists, this.args.display_short, true);
 	if (this.elFlags)
-		st_SetElFlags(this.obj, this.elFlags, this.args.display_short);
+		st_SetElFlags(this.obj, this.elFlags, this.args.display_short, true);
 	if (this.elTags)
-		st_SetElTags(this.obj, this.elTags, this.args.display_short);
+		st_SetElTags(this.obj, this.elTags, this.args.display_short, true);
 	if (this.elFramesNum)
 		st_SetElFramesNum(this.obj, this.elFramesNum);
 	if (this.elFinish)
@@ -356,16 +356,16 @@ function st_SetElText(i_status, i_el, i_field, i_full)
 	else
 		i_el.innerHTML = '';
 }
-function st_SetElArtists(i_status, i_el, i_short)
+function st_SetElArtists(i_status, i_el, i_short, i_clickable)
 {
 	i_el.textContent = '';
 
 	if ((i_status == null) || (i_status.artists == null))
 		return;
 
-	for (var i = 0; i < i_status.artists.length; i++)
+	for (let i = 0; i < i_status.artists.length; i++)
 	{
-		var el = document.createElement('div');
+		let el = document.createElement('div');
 		i_el.appendChild(el);
 		el.classList.add('tag');
 		el.classList.add('artist');
@@ -393,15 +393,24 @@ function st_SetElArtists(i_status, i_el, i_short)
 			}
 		}
 
-		var avatar = c_GetAvatar(i_status.artists[i]);
+		let avatar = c_GetAvatar(i_status.artists[i]);
 		if (avatar)
 		{
 			el.classList.add('with_icon');
 			el.style.backgroundImage = 'url(' + avatar + ')';
 		}
+
+		el.m_name = i_status.artists[i];
+		st_TagHilight(el, 'artist');
+
+		if (i_clickable)
+		{
+			el.onclick = st_TagClicked;
+			el.ondblclick = st_ArtistDblClicked;
+		}
 	}
 }
-function st_SetElFlags(i_status, i_elFlags, i_short)
+function st_SetElFlags(i_status, i_elFlags, i_short, i_clickable)
 {
 	if (i_elFlags.m_elFlags)
 		for (let el of i_elFlags.m_elFlags)
@@ -420,6 +429,14 @@ function st_SetElFlags(i_status, i_elFlags, i_short)
 			else
 				el.textContent = c_GetFlagTitle(flag);
 			el.title = c_GetFlagTip(flag);
+			el.m_name = flag;
+			st_TagHilight(el, 'flag');
+
+			if (i_clickable)
+			{
+				el.onclick = st_TagClicked;
+				el.ondblclick = st_FlagDblClicked;
+			}
 
 			let clr = null;
 			if (RULES.flags[flag] && RULES.flags[flag].clr)
@@ -428,37 +445,94 @@ function st_SetElFlags(i_status, i_elFlags, i_short)
 				st_SetElColor({"color": clr}, el);
 		}
 }
-function st_SetElTags(i_status, i_elTags, i_short)
+function st_SetElTags(i_status, i_elTags, i_short, i_clickable)
 {
-	if (i_short)
-	{
-		var tags = '';
-		if (i_status && i_status.tags)
-			for (var i = 0; i < i_status.tags.length; i++)
-			{
-				if (i)
-					tags += ' ';
-				tags += c_GetTagShort(i_status.tags[i]);
-			}
-		i_elTags.textContent = tags;
-		return;
-	}
-
 	if (i_elTags.m_elTags)
-		for (i = 0; i < i_elTags.m_elTags.length; i++)
+		for (let i = 0; i < i_elTags.m_elTags.length; i++)
 			i_elTags.removeChild(i_elTags.m_elTags[i]);
 	i_elTags.m_elTags = [];
 
 	if (i_status && i_status.tags)
-		for (var i = 0; i < i_status.tags.length; i++)
+		for (let i = 0; i < i_status.tags.length; i++)
 		{
-			var el = document.createElement('div');
+			let el = document.createElement('div');
 			i_elTags.appendChild(el);
 			i_elTags.m_elTags.push(el);
 			el.classList.add('tag');
-			el.textContent = c_GetTagTitle(i_status.tags[i]);
+			if (i_short)
+				el.textContent = c_GetTagShort(i_status.tags[i]);
+			else
+				el.textContent = c_GetTagTitle(i_status.tags[i]);
 			el.title = c_GetTagTip(i_status.tags[i]);
+			el.m_name = i_status.tags[i];
+
+			st_TagHilight(el, 'tag');
+
+			if (i_clickable)
+			{
+				el.onclick = st_TagClicked;
+				el.ondblclick = st_TagDblClicked;
+			}
 		}
+}
+function st_TagHilight(i_el, i_type)
+{
+	let storageValue = localStorage['highlighted_' + i_type + 's'];
+	if (storageValue && storageValue.length && (storageValue.indexOf(i_el.m_name) != -1))
+		i_el.classList.add('highlighted');
+}
+function st_TagClicked(i_evt)
+{
+	i_evt.stopPropagation();
+	return false;
+}
+function st_TagDblClicked(i_evt)
+{
+	st_TagClicked(i_evt);
+	st_TagHilightToggle(i_evt.currentTarget, 'tag');
+}
+function st_FlagDblClicked(i_evt)
+{
+	st_TagClicked(i_evt);
+	st_TagHilightToggle(i_evt.currentTarget, 'flag');
+}
+function st_ArtistDblClicked(i_evt)
+{
+	st_TagClicked(i_evt);
+	st_TagHilightToggle(i_evt.currentTarget, 'artist');
+}
+function st_TagHilightToggle(i_el, i_type)
+{
+	let name = i_el.m_name;
+	let storageName = 'highlighted_' + i_type + 's';
+	let storageValue = localStorage[storageName];
+	let storageArray = [];
+	if (storageValue && storageValue.length)
+		storageArray = storageValue.split(',');
+
+	if (i_el.classList.contains('highlighted'))
+	{
+		let i = 0;
+		while (i < storageArray.length)
+			if (storageArray[i] === name)
+				storageArray.splice(i, 1);
+			else
+				++i;
+	}
+	else
+	{
+		if (storageArray.indexOf(name) == -1)
+			storageArray.push(name)
+	}
+
+	storageValue = storageArray.join(',');
+	localStorage[storageName] = storageValue;
+
+	for (let el of document.getElementsByClassName(i_type))
+		if (storageArray.indexOf(el.m_name) != -1)
+			el.classList.add('highlighted');
+		else
+			el.classList.remove('highlighted');
 }
 function st_SetElColor(i_status, i_elBack, i_elColor, i_setNone)
 {
