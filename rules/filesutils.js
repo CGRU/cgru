@@ -633,7 +633,7 @@ function fu_ArchivateProcessGUI(i_wnd)
 	if (i_wnd.m_args.archive)
 	{
 		job.name = 'Archive ' + params.type;
-		arch_cmd = c_PathPM_Client2Server('/cgru/utilities/arch.py', true);
+		arch_cmd = c_PathPM_Client2Server(RULES.archive.cmd, true);
 		arch_cmd += ' -t ' + params.type;
 		if (params.split != '')
 			arch_cmd += ' -s ' + params.split;
@@ -641,7 +641,7 @@ function fu_ArchivateProcessGUI(i_wnd)
 	else
 	{
 		job.name = 'Extract';
-		arch_cmd = c_PathPM_Client2Server('/cgru/utilities/arch_x.py', true);
+		arch_cmd = c_PathPM_Client2Server(RULES.archive.cmd_x, true);
 	}
 
 	// Output path for thumbnails frequency:
