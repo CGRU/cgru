@@ -48,7 +48,10 @@ function g_Init()
 	cgru_Init();
 	u_Init();
 	c_Init();
+	st_Init();
 	n_Request({"send": {"start": {}}, "func": g_Init_Server, "info": 'start'});
+
+	window.onbeforeunload = g_OnClose;
 }
 
 function g_Init_Server(i_data)
@@ -140,6 +143,11 @@ function g_Init_Rules(i_data)
 	g_PathChanged();
 
 	$('navigate_root').href = document.location.href.replace(/#.*/, '');
+}
+
+function g_OnClose()
+{
+	st_OnClose();
 }
 
 /* ---------------- [ path functions ] ------------------------------------------------------------------- */

@@ -19,6 +19,14 @@
 var st_Status = null;
 var st_MultiValue = '[...]';
 
+var st_Hilighted = {};
+var st_HilightedKeys = ['tag','flag','artist'];
+
+function st_Init()
+{
+	st_HilightedStoreRead();
+}
+
 function st_InitAuth()
 {
 	$('status_edit_btn').style.display = 'block';
@@ -30,6 +38,33 @@ function st_Finish()
 		st_Status.editCancel();
 
 	st_Status = null;
+}
+
+function st_OnClose()
+{
+	st_HilightedStoreWrite();
+}
+
+function st_HilightedStoreRead()
+{
+	for (let key of st_HilightedKeys)
+	{
+		let storageName = 'highlighted_' + key + 's';
+		let storageValue = localStorage[storageName];
+		st_Hilighted[key] = [];
+		if (storageValue && storageValue.length)
+			st_Hilighted[key] = storageValue.split(',');
+	}
+}
+
+function st_HilightedStoreWrite()
+{
+	for (let key of st_HilightedKeys)
+	{
+		let storageName = 'highlighted_' + key + 's';
+		let storageValue = st_Hilighted[key].join(',');
+		localStorage[storageName] = storageValue;
+	}
 }
 
 function st_BodyModified(i_st_obj, i_path)
@@ -475,10 +510,9 @@ function st_SetElTags(i_status, i_elTags, i_short, i_clickable)
 			}
 		}
 }
-function st_TagHilight(i_el, i_type)
+function st_TagHilight(i_el, i_key)
 {
-	let storageValue = localStorage['highlighted_' + i_type + 's'];
-	if (storageValue && storageValue.length && (storageValue.indexOf(i_el.m_name) != -1))
+	if (st_Hilighted[i_key].indexOf(i_el.m_name) != -1)
 		i_el.classList.add('highlighted');
 }
 function st_TagClicked(i_evt)
@@ -501,39 +535,32 @@ function st_ArtistDblClicked(i_evt)
 	st_TagClicked(i_evt);
 	st_TagHilightToggle(i_evt.currentTarget, 'artist');
 }
-function st_TagHilightToggle(i_el, i_type)
+function st_TagHilightToggle(i_el, i_key)
 {
 	let name = i_el.m_name;
-	let storageName = 'highlighted_' + i_type + 's';
-	let storageValue = localStorage[storageName];
-	let storageArray = [];
-	if (storageValue && storageValue.length)
-		storageArray = storageValue.split(',');
 
 	if (i_el.classList.contains('highlighted'))
 	{
 		let i = 0;
-		while (i < storageArray.length)
-			if (storageArray[i] === name)
-				storageArray.splice(i, 1);
+		while (i < st_Hilighted[i_key].length)
+			if (st_Hilighted[i_key][i] === name)
+				st_Hilighted[i_key].splice(i, 1);
 			else
 				++i;
 	}
 	else
 	{
-		if (storageArray.indexOf(name) == -1)
-			storageArray.push(name)
+		if (st_Hilighted[i_key].indexOf(name) == -1)
+			st_Hilighted[i_key].push(name)
 	}
 
-	storageValue = storageArray.join(',');
-	localStorage[storageName] = storageValue;
-
-	for (let el of document.getElementsByClassName(i_type))
-		if (storageArray.indexOf(el.m_name) != -1)
+	for (let el of document.getElementsByClassName(i_key))
+		if (st_Hilighted[i_key].indexOf(el.m_name) != -1)
 			el.classList.add('highlighted');
 		else
 			el.classList.remove('highlighted');
 }
+
 function st_SetElColor(i_status, i_elBack, i_elColor, i_setNone)
 {
 	if (i_elColor == null)
