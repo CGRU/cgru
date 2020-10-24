@@ -744,27 +744,21 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 	}
 	elItem.classList.add(type);
 
-	// Anchor Icon:
-	var elAnchor = null;
+	// Draw item icon
+	let elIcon = document.createElement('a');
+	elItem.appendChild(elIcon);
+	elIcon.classList.add('icon');
+	elIcon.style.backgroundImage = 'url(rules/icons/' + fv_GetFileIcon(path, i_isFolder) + ')';
+	elIcon.title = 'Icon: Click to select an item.';
+
+	// Create open folder button when item is folder and has filesystem
 	if (i_isFolder)
 	{
-		elAnchor = c_CreateOpenButton({"parent": elItem, "path": path, "type": 'a'});
-		if (elAnchor)
-			elAnchor.style.cssFloat = 'left';
+		let elOpenFoolder = c_CreateOpenButton({"parent": elItem, "path": path, "type": 'a'});
+		if (elOpenFoolder)
+			elOpenFoolder.style.cssFloat = 'left';
 	}
-	if (elAnchor == null)
-	{
-		elAnchor = document.createElement('a');
-		elItem.appendChild(elAnchor);
-		elAnchor.classList.add('anchor');
 
-		var icon = fv_GetFileIcon(path, i_isFolder);
-		if (icon)
-			elAnchor.style.backgroundImage = 'url(rules/icons/' + icon + ')';
-		else
-			elAnchor.textContent = '@';
-	}
-	elAnchor.href = g_GetLocationArgs({"fv_Goto": path});
 
 	// Thumbnail:
 	if (this.has_thumbs)
@@ -845,6 +839,13 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 			e.currentTarget.m_view.countFiles(e.currentTarget.m_path);
 		};
 	}
+
+	// Anchor link to the item:
+	var elAnchor = document.createElement('a');
+	elItem.m_elMenu.appendChild(elAnchor);
+	elAnchor.classList.add('anchor');
+	elAnchor.href = g_GetLocationArgs({"fv_Goto": path});
+	elAnchor.title = 'Anchor: Click to get link to the item.';
 
 	// Generate location (asset-shot) thumbnail from a folder or a movie:
 	if (elItem.m_isFolder || (c_FileIsMovie(elItem.m_path)))

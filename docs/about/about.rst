@@ -20,13 +20,11 @@ Companies
 - **Ghost A/S** | http://ghost.dk
 - **Istudios Visuals** | http://www.istudios.se
 - **Kiev Postproduction** | http://www.kievpostproduction.com
+- **Overmind Studios** | http://www.overmind-studios.de
 - **Postmodern** | http://postmodern.com.ua/
 - **R-Studios** | http://www.r-studios.ru
-- **Shotty** | http://shotty.ru
 - **Terminal FX** | http://terminalfx.com
-- **The Chimney Pot Kiev** | http://thechimneypot.com/kiev
 - **Unit Five** | http://u5fx.ru
-- **Umedia visual effects - Belgium** | http://www.umedia.eu/fr/ufx.html
 
 
 Projects
@@ -62,6 +60,14 @@ Projects
 - **Nobody from Nowhere** (2014) http://www.imdb.com/title/tt3161960/
 - **Papa ou maman** (2015) http://www.imdb.com/title/tt4080672/
 - **Robin des Bois, la véritable histoire** (2015) http://www.imdb.com/title/tt4032428/
+- **Stavka na lyubov** (2016) https://www.imdb.com/title/tt5179324/
+- **Strana chudes** (2016) https://www.imdb.com/title/tt5430020/
+- **Super Family** (2016) https://www.imdb.com/title/tt5576334/
+- **Posledniy bogatyr** (2017) https://www.imdb.com/title/tt6175394/
+- **Super Family 2** (2018) https://www.imdb.com/title/tt9398222/
+- **Tobol** (2019) https://www.imdb.com/title/tt9795368/
+- **Streltsov** (2020) https://www.imdb.com/title/tt12058242/
+- **Chernobyl** (2020) https://www.imdb.com/title/tt10648714/
 
 History
 =======

@@ -348,6 +348,11 @@ margin:1px 4px;
 padding:0 4px;
 /*background-color: rgba(0,0,255,.1);*/
 }
+.tag.highlighted, .flag.highlighted, .artists.highlighted {
+border: 4px solid #7FF;
+border-radius: 4:px;
+box-shadow: 0 0 8px #7FF, 0 0 4px #8FF inset;
+}
 .flag {
 -moz-user-select: none;
 -webkit-user-select: none;
@@ -834,20 +839,40 @@ float: right;
 padding: 2px 6px;
 margin: 0px 4px;
 }
-.filesview .item .cgru_cmdexec.open { padding: 0; margin: 0px 2px; }
+.filesview .item .cgru_cmdexec.open {
+padding: 0;
+margin: 0px 2px;
+}
 .filesview .item .button {
 float: right;
 width: 18px; height: 18px;
 padding: 0px;
 margin: 0px 4px;
 }
-.filesview .item .anchor {
-float: left;
-width: 18px; height: 18px;
-margin: 2px;
+.filesview .item .anchor, .filesview .item .icon {
 background-size: 100%;
 background-repeat: no-repeat;
 background-position: center;
+cursor: pointer;
+}
+.filesview .item .anchor {
+float: right;
+width: 20px; height: 20px;
+margin: 0px;
+padding: 0px;
+background-image: url(icons/link.png);
+background-size: 80%;
+opacity: 0.7;
+}
+.filesview .item .icon {
+float: left;
+width: 18px; height: 18px;
+margin: 2px;
+opacity: 0.7;
+}
+.filesview .item .anchor:hover, .filesview .item .icon:hover {
+box-shadow: 0 0 2px #0FF, 0 0 2px #0FF inset;
+opacity: 0.9;
 }
 .filesview .item .thumbnail {
 border: 1px solid #000;

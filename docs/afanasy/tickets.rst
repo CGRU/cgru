@@ -25,7 +25,11 @@ Just one side effect will appear in this case,
 pools will count total ``MEM`` tickets and renders will count ``NUKE`` tickets too.
 
 Ticket can be displayed as some custom image,
-if a png file with the same name exists in the direcory:
+if a png file with the same name exists in the directory:
 
 ``cgru/icons/tickets``
+
+Also pool tickets has a maximum hosts limit.
+This is mostly needed for licence hosts limits.
+There is a common type of licensing where you can run multiple instances of software on same host, occupying only single license.
 

@@ -46,7 +46,7 @@ height: 64px;
 clear: both;
 width: 100%;
 left: 0; right: 0;
-height: 170px;
+height: auto;
 border: 2px solid #FF0;
 }
 .scene .shot .status {
@@ -65,8 +65,8 @@ height: 64px;
 .scene .shot .status .annotation { float:right;}
 .scene .shot .status .progress { clear:both;}
 .scene .shot .status .progressbar { height: 6px; margin-top: 0px;}
-.scene .shot .status .flags { clear:both; float:left; opacity: .7;}
-.scene .shot .status .flags .flag { font-size: 8px; text-shadow: none; padding: 0px 4px; border: 1px; border-radius: 1px;}
+.scene .shot .status .flags { clear:both; float:left; opacity: .8;}
+.scene .shot .status .flags .flag { font-size: 10px; text-shadow: none; padding: 0px 4px; border: 1px; border-radius: 1px;}
 .scene .shot .status .artists, .scene .shot .status .tags { clear:none; float:left; font-size: 10px;}
 .scene .shot .status .finish { position: absolute; top: 10px; }
 .scene .shot img {
@@ -79,6 +79,9 @@ margin-top: 24px;
 border: 1px solid #000;
 box-shadow: 0 0 4px rgba(255,255,255,.7);
 opacity:.9;
+}
+.scene .shot.status_editing img {
+margin-top: 4px;
 }
 
 .shot.selected { border: 2px solid #7FF; box-shadow: 0 0 4px #7FF inset, 0 0 4px #7FF;}

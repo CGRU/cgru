@@ -478,6 +478,7 @@ function p_CreateElement(i_obj, i_elParent)
 	elDel.classList.add('button');
 	elDel.classList.add('delete');
 	elDel.title = 'Double click to remove this item.';
+	elDel.onclick = function(e) {e.stopPropagation(); return false;}
 	elDel.ondblclick = p_ItemDelOnClick;
 
 	el.m_title = title;
@@ -489,8 +490,10 @@ function p_CreateElement(i_obj, i_elParent)
 
 function p_ItemDelOnClick(i_evt)
 {
+	i_evt.stopPropagation();
 	var obj = i_evt.currentTarget.m_obj;
 	p_Action([{"id": obj.id}], 'del');
+	return false;
 }
 
 function p_GetCurrentShots()

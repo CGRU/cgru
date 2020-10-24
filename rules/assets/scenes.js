@@ -385,7 +385,7 @@ function scenes_Received( i_data, i_args)
 				for( var f = 0; f < fobj.status.flags.length; f++)
 					elShot.classList.add( fobj.status.flags[f]);
 
-			var st_obj = new Status( fobj.status, {"path":elShot.m_path,"createGUI": st_CreateSceneShot});
+			let st_obj = new Status(fobj.status, {"path":elShot.m_path,"createGUI": st_CreateSceneShot,"display_short":true});
 			elShot.m_status = st_obj;
 
 			elShot.ondblclick = sc_EditStatus;

@@ -22,7 +22,7 @@
 	"hold"        :{"title":"HOLD",        "clr":[111,111,111], "short":"Hl",                          "excl":true,  "tip":"On hold"},
 	"question"    :{"title":"QUESTION",    "clr":[210,140,140], "short":"Que",                         "excl":false, "tip":"Question"},
 	"error"       :{"title":"ERROR",       "clr":[255, 55, 55], "short":"Err",             "p_max":50, "excl":false, "tip":"Error"},
-	"inprogress"  :{"title":"INPROGRESS",  "clr":[250,250,250], "short":"IP",  "p_min":1,  "p_max":90, "excl":false, "tip":"In progress"},
+	"inprogress"  :{"title":"INPROGRESS",  "clr":[210,210,210], "short":"IP",  "p_min":1,  "p_max":90, "excl":false, "tip":"In progress"},
 	"on_farm"     :{"title":"ONFARM",      "clr":[250,150,100], "short":"OF",  "p_min":20, "p_max":20, "excl":false, "tip":"On farm"},
 	"check"       :{"title":"CHECK",       "clr":[ 77, 77,177], "short":"Chk", "p_min":60, "p_max":90, "excl":true,  "tip":"To check"},
 	"comment"     :{"title":"COMMENT",     "clr":[222,111,222], "short":"Cmm",             "p_max":50, "excl":true,  "tip":"Comment"},
@@ -36,7 +36,7 @@
 		"new_line":true},
 
 	"render_ready":{"title":"RENDERREADY", "clr":[177,157,136], "short":"RR",  "p_min":10, "p_max":50, "excl":false, "tip":"Ready to render"},
-	"compoz_ready":{"title":"COMPOZREADY", "clr":[215,211,157], "short":"CR",  "p_min":30, "p_max":30, "excl":false, "tip":"Ready to compoz"}
+	"compoz_ready":{"title":"COMPOZREADY", "clr":[180,200,130], "short":"CR",  "p_min":30, "p_max":30, "excl":false, "tip":"Ready to compoz"}
 },
 
 "tags":{
@@ -392,8 +392,8 @@
 		"7z" : {"name":"7Z",  "tooltip":"Slowest, but small archive size"}
 	},
 	"default":"zip",
-	"cmd":"python /cgru/utilities/arch.py",
-	"cmd_x":"python /cgru/utilities/arch_x.py",
+	"cmd":"python3 /cgru/utilities/arch.py",
+	"cmd_x":"python3 /cgru/utilities/arch_x.py",
 	"dest":"",
 	"af_service":"arch",
 	"af_parser":"generic",
