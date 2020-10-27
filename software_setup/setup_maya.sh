@@ -35,6 +35,7 @@ export MAYA_CGRU_MENUS_NAME="CGRU"
 export TMPDIR=/tmp
 
 # overrides (set custom values there):
+[ -f override.sh ] && source override.sh
 [ -f override_maya.sh ] && source override_maya.sh
 
 # Add Maya binary to PATH:
