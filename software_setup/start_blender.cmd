@@ -1,3 +1,3 @@
 call %0\..\start__all.cmd
 
-blender %*
+blender --python-use-system-env %*

@@ -36,6 +36,7 @@ export TMPDIR=/tmp
 
 # overrides (set custom values there):
 [ -f override.sh ] && source override.sh
+[ -f override_maya.sh ] && source override_maya.sh
 
 # Add Maya binary to PATH:
 export PATH="${MAYA_LOCATION}/bin:${PATH}"
