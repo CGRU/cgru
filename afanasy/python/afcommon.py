@@ -13,7 +13,17 @@ BlockFlags = {
     'skipthumbnails':     1 << 5,
     'skipexistingfiles':  1 << 6,
     'checkrenderedfiles': 1 << 7,
-    'slavelostignore':    1 << 8
+    'slavelostignore':    1 << 8,
+    'appendedtasks':      1 << 9
+}
+
+JobFlags = {
+	# First 32 flags are reserved for af::Node (zombie, hidden, ...)
+    'ppapproval':     1 << 32,
+    'maintenance':    1 << 33,
+    'ignorenimby':    1 << 34,
+    'ignorepaused':   1 << 35,
+    'appendedblocks': 1 << 36
 }
 
 
@@ -29,6 +39,26 @@ def setBlockFlag(i_flags, i_name):
     if i_name not in BlockFlags:
         print('AFERROR: block flag "%s" does not exist.' % i_name)
         print('Existing flags are: ' + str(BlockFlags))
+        return i_flags
+    elif i_name == 'appendedtasks':
+        print('AFERROR: block flag "%s" is read-only.' % i_name)
+        return i_flags
+    return i_flags | BlockFlags[i_name]
+
+def checkJobFlag(i_flags, i_name):
+    if i_name not in JobFlags:
+        print('AFERROR: block flag "%s" does not exist.' % i_name)
+        print('Existing flags are: ' + str(BlockFlags))
+        return False
+    return i_flags & BlockFlags[i_name]
+
+def setJobFlag(i_flags, i_name):
+    if i_name not in JobFlags:
+        print('AFERROR: job flag "%s" does not exist.' % i_name)
+        print('Existing flags are: ' + str(JobFlags))
+        return i_flags
+    elif i_name == 'appendedblocks':
+        print('AFERROR: job flag "%s" is read-only.' % i_name)
         return i_flags
     return i_flags | BlockFlags[i_name]
 

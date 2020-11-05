@@ -3,6 +3,7 @@
 import json
 import cgruconfig
 import afnetwork
+import afcommon
 
 
 class Block:
@@ -90,7 +91,10 @@ class Block:
         self.setState(self.State.skip, taskIds=taskIds)
 
     def isNumeric(self):
-        return bool(self.flags >> 0)
+        return afcommon.checkBlockFlag(self.flags, 'numeric')
+
+    def hasAppendedTasks(self):
+        return afcommon.checkBlockFlag(self.flags, 'appendedtasks')
 
     def appendTasks(self, tasks, verbose=False):
         """Append new tasks to an existing block
@@ -100,7 +104,7 @@ class Block:
         :return: server response
         """
         output = "The block is numeric and cannot have tasks appended"
-        if self.isNumeric() is False:
+        if not self.isNumeric():
             tasks_data = []
             for t in tasks:
                 tasks_data.append(t.data)
@@ -216,6 +220,9 @@ class Job:
             if 'job_progress' in output:
                 return output['job_progress']
         return None
+
+    def hasAppendedBlocks(self):
+        return afcommon.checkJobFlag(self.flags, 'appendedblocks')
 
     def appendBlocks(self, blocks, verbose=False):
         """Append new blocks to an existing job
