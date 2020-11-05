@@ -91,6 +91,7 @@ public:
 
 	/// Set state of new tasks
 	void checkStates();
+	void checkStatesOnAppend();
 
 	int getUid() const;
 
