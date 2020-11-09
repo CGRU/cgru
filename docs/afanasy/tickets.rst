@@ -15,6 +15,10 @@ Each block task will be produced with block tickets.
 When render starting task with tickets, it counts tickets usage.
 Pool counts total tickets usage.
 
+.. figure:: images/afwatch_tickets_jobs.png
+
+	AfWatch job block tickets
+
 For example if you want to limit licenses on the entire farm,
 you can set ``NUKE:20`` *pool* tickets on the root pool.
 If you want to limit RAM usage on each pool host,
@@ -28,6 +32,12 @@ Ticket can be displayed as some custom image,
 if a png file with the same name exists in the directory:
 
 ``cgru/icons/tickets``
+
+If a ticket icon file exists, GUI will replace ticket name with its icon.
+Unlike serivce, where icon is painted along with name.
+Also ticket icon will not be resized to a square image, so ticket can be painted as a rectangle.
+This is done to make tickets and services more differ in a GUI, to not to mess them.
+And they will be differ more, if tickets names will be uppercase, unlike services, that are all lowercase.
 
 Also pool tickets has a maximum hosts limit.
 This is mostly needed for licence hosts limits.

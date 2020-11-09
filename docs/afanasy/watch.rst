@@ -5,6 +5,44 @@ Watch
 Watch is a Qt GUI for Afanasy.
 
 
+Jobs
+====
+
+.. image:: images/afwatch_jobs.png
+
+This is a list of user jobs.
+
+
+Work
+====
+
+.. image:: images/afwatch_work.png
+
+This is a hierarchy of branches and jobs from all users.
+Only VISOR can make changes here.
+For a common user this list is read only.
+
+
+Farm
+====
+
+.. image:: images/afwatch_farm.png
+
+This is a hierarchy of pools and renders.
+Only admin can make changes here.
+For a common user this list is read only.
+
+
+Users
+=====
+
+.. image:: images/afwatch_users.png
+
+This is a list of all Afanasy users.
+User can manipulate only own node.
+Admin can manipulate any user node.
+
+
 Modes
 =====
 
@@ -73,44 +111,6 @@ But later it begin to grow and got several UI levels to display brief or full in
 
 	Main window menu will disappear for space economy.
 	It will be available on RMB menu at window top.
-
-
-Jobs
-====
-
-.. image:: images/afwatch_jobs.png
-
-This is a list of user jobs.
-
-
-Work
-====
-
-.. image:: images/afwatch_work.png
-
-This is a hierarchy of branches and jobs from all users.
-Only VISOR can make changes here.
-For a common user this list is read only.
-
-
-Farm
-====
-
-.. image:: images/afwatch_farm.png
-
-This is a hierarchy of pools and renders.
-Only admin can make changes here.
-For a common user this list is read only.
-
-
-Users
-=====
-
-.. image:: images/afwatch_users.png
-
-This is a list of all Afanasy users.
-User can manipulate only own node.
-Admin can manipulate any user node.
 
 
 Styles
