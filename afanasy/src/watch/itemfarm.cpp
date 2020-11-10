@@ -64,7 +64,10 @@ void ItemFarm::v_parentItemChanged()
 	m_parent_pool = static_cast<ItemPool*>(node);
 }
 
-void ItemFarm::drawServices(QPainter * i_painter, const QStyleOptionViewItem & i_option, int i_x, int i_y, int i_w, int i_h) const
+int ItemFarm::drawServices(QPainter * i_painter,
+		const QStyleOptionViewItem & i_option,
+		int i_x, int i_y, int i_w, int i_h,
+		bool i_draw_disabled) const
 {
 	int x = i_x;
 	// Iterate services:
@@ -76,7 +79,7 @@ void ItemFarm::drawServices(QPainter * i_painter, const QStyleOptionViewItem & i
 		const QPixmap * icon = Watch::getServiceIconSmall(m_services[i]);
 		if (icon)
 		{
-			i_painter->drawPixmap(x+2, i_y+2, *icon);
+			i_painter->drawPixmap(x+2, i_y+(i_h/9), *icon);
 			w += 16;
 		}
 
@@ -124,7 +127,7 @@ void ItemFarm::drawServices(QPainter * i_painter, const QStyleOptionViewItem & i
 		const QPixmap * icon = Watch::getServiceIconSmall(it.key());
 		if (icon)
 		{
-			i_painter->drawPixmap(x+2, i_y+2, *icon);
+			i_painter->drawPixmap(x+2, i_y+(i_h/9), *icon);
 			w += 16;
 		}
 
@@ -146,6 +149,9 @@ void ItemFarm::drawServices(QPainter * i_painter, const QStyleOptionViewItem & i
 
 		x += w + 8;
 	}
+
+	if (false == i_draw_disabled)
+		return x - i_x;
 
 	int w = i_w;
 	// Iterate disabled services:
@@ -172,10 +178,12 @@ void ItemFarm::drawServices(QPainter * i_painter, const QStyleOptionViewItem & i
 
 		w -= x + 8;
 	}
+
+	return x - i_x;
 }
 
 void ItemFarm::drawTickets(QPainter * i_painter, const QStyleOptionViewItem & i_option,
-		int i_x, int i_y, int i_w, int i_h, int * o_tkhost_width) const
+		int i_x, int i_y, int i_w, int i_h, int * o_tkhost_width, bool i_draw_host) const
 {
 	int tkh_w = 0;
 	int tkp_w = 0;
@@ -192,23 +200,26 @@ void ItemFarm::drawTickets(QPainter * i_painter, const QStyleOptionViewItem & i_
 				draw_flags |= Item::TKD_DUMMY;
 
 			QPen pen(Item::clrTextInfo(tkp_it.value().usage, i_option.state & QStyle::State_Selected));
-			tkp_w += drawTicket(i_painter, pen, i_x + 5 + tkp_w, i_y, i_w - 10,
+			tkp_w += drawTicket(i_painter, pen, i_x + 5 + tkp_w, i_y, i_w - 10, i_h,
 					draw_flags, tkp_it.key(),
 					tkp_it.value().count, tkp_it.value().usage, tkp_it.value().hosts, tkp_it.value().max_hosts);
 
 			tkp_w += 8;
 		}
 
-		QPen pen(afqt::QEnvironment::qclr_black);
-		QMapIterator<QString, af::Farm::Tiks> tkh_it(m_tickets_host);
-		while (tkh_it.hasNext())
+		if (i_draw_host)
 		{
-			tkh_it.next();
+			QPen pen(afqt::QEnvironment::qclr_black);
+			QMapIterator<QString, af::Farm::Tiks> tkh_it(m_tickets_host);
+			while (tkh_it.hasNext())
+			{
+				tkh_it.next();
 
-			tkh_w += drawTicket(i_painter, pen, i_x + 5, i_y + 3, i_w - 10 - tkh_w,
-					Item::TKD_RIGHT, tkh_it.key(), tkh_it.value().count);
+				tkh_w += drawTicket(i_painter, pen, i_x + 5, i_y + 3, i_w - 10 - tkh_w, i_h,
+						Item::TKD_RIGHT, tkh_it.key(), tkh_it.value().count);
 
-			tkh_w += 8;
+				tkh_w += 8;
+			}
 		}
 	}
 	else
@@ -237,7 +248,7 @@ void ItemFarm::drawTickets(QPainter * i_painter, const QStyleOptionViewItem & i_
 
 			QPen pen(Item::clrTextInfo(tkh_it.value().usage, i_option.state & QStyle::State_Selected));
 
-			tkh_w += drawTicket(i_painter, pen, i_x + 5, i_y, i_w - 10 - tkh_w,
+			tkh_w += drawTicket(i_painter, pen, i_x + 5, i_y, i_w - 10 - tkh_w, i_h,
 					draw_flags, tkh_it.key(), count, tkh_it.value().usage);
 
 			tkh_w += 8;

@@ -30,6 +30,7 @@ public:
 		e_HideEmpty      = 1<<5,
 		e_HideError      = 1<<6,
 		e_HideSystem     = 1<<7,
+		e_HidePools      = 1<<8,
 	};
 
 	int32_t getFlagsHideShow() const { return m_hide_flags; }

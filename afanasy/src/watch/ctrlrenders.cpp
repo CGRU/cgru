@@ -50,6 +50,12 @@ void CtrlRenders::contextMenuEvent(QContextMenuEvent *event)
 	connect( action_id, SIGNAL( triggeredId( int ) ), m_list, SLOT( actHideShow( int) ));
 	menu.addAction( action_id);
 
+	action_id = new ActionId(ListNodes::e_HidePools, "Pools", this);
+	action_id->setCheckable(true);
+	action_id->setChecked(m_list->getFlagsHideShow() & ListNodes::e_HidePools);
+	connect(action_id, SIGNAL(triggeredId(int)), m_list, SLOT(actHideShow( int) ));
+	menu.addAction(action_id);
+
 	menu.addSeparator();
 
 	action = new QAction("Size:", this);

@@ -20,15 +20,16 @@ public:
 	QList<QString> m_services;
 	QList<QString> m_services_disabled;
 
-	void drawServices(QPainter * i_painter, const QStyleOptionViewItem & i_option,
-			int i_x, int i_y, int i_w, int i_h) const;
+	// Return value: drawn services width, w/o disabled, as they are drawn on right side
+	int drawServices(QPainter * i_painter, const QStyleOptionViewItem & i_option,
+			int i_x, int i_y, int i_w, int i_h, bool i_draw_disabled = true) const;
 
 	QMap<QString, af::Farm::Tiks> m_tickets_pool;
 	QMap<QString, af::Farm::Tiks> m_tickets_host;
 
 	void drawTickets(QPainter * i_painter, const QStyleOptionViewItem & i_option,
 			int i_x, int i_y, int i_w, int i_h,
-			int * o_tkhost_width = NULL) const;
+			int * o_tkhost_width = NULL, bool i_draw_host = true) const;
 
 protected:
 	virtual void v_parentItemChanged();

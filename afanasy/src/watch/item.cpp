@@ -325,7 +325,7 @@ void Item::drawStar( int size, int posx, int posy, QPainter * painter)
 }
 
 int Item::drawTicket(QPainter * i_painter, const QPen & i_text_pen,
-		int i_x, int i_y, int i_w,
+		int i_x, int i_y, int i_w, int i_h,
 		int i_opts,
 		const QString & i_name,
 		int i_count, int i_usage, int i_hosts, int i_max_hosts)
@@ -385,7 +385,7 @@ int Item::drawTicket(QPainter * i_painter, const QPen & i_text_pen,
 		{
 			i_painter->setPen(border_pen);
 			i_painter->setBrush(Qt::NoBrush);
-			i_painter->drawRect(i_x - 2, i_y - 2, tk_width + 4, HeightTickets - 5);
+			i_painter->drawRect(i_x - 2, i_y - 2, tk_width + 4, i_h);
 			tk_width += 4;
 		}
 	}
@@ -409,7 +409,7 @@ int Item::drawTicket(QPainter * i_painter, const QPen & i_text_pen,
 		{
 			i_painter->setPen(border_pen);
 			i_painter->setBrush(Qt::NoBrush);
-			i_painter->drawRect(i_x + i_w - 2 - tk_width, i_y - 2, tk_width + 4, HeightTickets - 5);
+			i_painter->drawRect(i_x + i_w - 2 - tk_width, i_y - 2, tk_width + 4, i_h);
 			tk_width += 4;
 		}
 	}
