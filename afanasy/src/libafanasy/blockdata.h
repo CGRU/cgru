@@ -58,7 +58,8 @@ public:
 		FSkipThumbnails = 1ULL << 5,
 		FSkipExistingFiles = 1ULL << 6,
 		FCheckRenderedFiles = 1ULL << 7,
-		FSlaveLostIgnore = 1ULL << 8
+		FSlaveLostIgnore = 1ULL << 8,
+		FAppendedTasks = 1ULL << 9
 	};
 
 	static const char DataMode_Progress[];
@@ -118,6 +119,15 @@ public:
 	{
 		return m_flags & FDependSubTask;
 	} ///< Other block can depend this block sub task
+	inline bool hasAppendedTasks() const
+	{
+		return m_flags & FAppendedTasks;
+	} ///< Wether the block has appended tasks
+
+	inline void setHasAppendedTasks()
+	{
+		m_flags |= FAppendedTasks;
+	} ///< Set flag on the block signaling that it has tasks appended
 
 	inline bool isSkippingExistingFiles() const {return m_flags & FSkipExistingFiles;}
 	inline bool isCheckingRenderedFiles() const {return m_flags & FCheckRenderedFiles;}

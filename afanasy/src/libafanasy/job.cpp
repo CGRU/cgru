@@ -161,6 +161,9 @@ bool Job::jsonReadAndAppendBlocks( const JSON &i_blocks)
 			return false;
 		}
 	}
+
+	setAppendedBlocksFlag();
+
 	return true;
 }
 

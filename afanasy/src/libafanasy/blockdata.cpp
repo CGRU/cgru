@@ -339,6 +339,8 @@ void BlockData::jsonReadAndAppendTasks(const JSON &i_object)
 
 	if (NULL != old_tasks_data)
 		delete [] old_tasks_data;
+
+	setHasAppendedTasks();
 }
 
 void BlockData::jsonWrite(std::ostringstream &o_str, const std::string &i_datamode) const
