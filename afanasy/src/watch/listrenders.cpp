@@ -45,12 +45,17 @@ bool    ListRenders::ms_FilterInclude  = true;
 bool    ListRenders::ms_FilterMatch    = false;
 std::string ListRenders::ms_FilterString = "";
 
+uint32_t ListRenders::ms_hide_flags = e_HideHidden;
+
 ListRenders::ListRenders( QWidget* parent):
 	ListNodes(parent, "farm")
 {
 	m_node_types.clear();
 	m_node_types.push_back("pools");
 	m_node_types.push_back("renders");
+
+	// Get stored hide flags:
+	m_hide_flags = ms_hide_flags;
 
 	m_ctrl_sf = new CtrlSortFilter( this,
 			&ms_SortType1, &ms_SortAscending1,
@@ -244,7 +249,12 @@ ListRenders::ListRenders( QWidget* parent):
 
 ListRenders::~ListRenders()
 {
-AFINFO("ListRenders::~ListRenders.")
+}
+
+void ListRenders::v_hideChanged()
+{
+	// Store hide flags:
+	ms_hide_flags = m_hide_flags;
 }
 
 void ListRenders::setSpacing()

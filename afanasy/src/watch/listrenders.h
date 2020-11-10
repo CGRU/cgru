@@ -24,6 +24,8 @@ public:
 
 	virtual bool v_processEvents( const af::MonitorEvents & i_me);
 
+	virtual void v_hideChanged();
+
 public slots:
 	void slot_ServiceAdd();
 	void slot_ServiceDisable();
@@ -130,6 +132,9 @@ private:
 	static bool    ms_FilterInclude;
 	static bool    ms_FilterMatch;
 	static std::string ms_FilterString;
+
+	// To store what to hide
+	static uint32_t ms_hide_flags;
 
 	QTimer * timer;
 };

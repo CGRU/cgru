@@ -76,6 +76,8 @@ protected:
 	/// Needed for jobs, to get user jobs list from server
 	virtual void v_resetSorting();
 
+	virtual void v_hideChanged();
+
 protected:
 	std::vector<std::string> m_node_types;
 

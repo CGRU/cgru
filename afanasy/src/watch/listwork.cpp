@@ -91,9 +91,14 @@ ListWork::ListWork(QWidget * i_parent):
 
 ListWork::~ListWork()
 {
+}
+
+void ListWork::v_hideChanged()
+{
 	// Store hide flags:
 	ms_hide_flags = m_hide_flags;
 }
+
 
 void ListWork::contextMenuEvent(QContextMenuEvent *event)
 {

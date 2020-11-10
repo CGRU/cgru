@@ -26,6 +26,8 @@ public:
 
 	bool v_filesReceived(const af::MCTaskUp & i_taskup);
 
+	virtual void v_hideChanged();
+
 protected:
 	void contextMenuEvent( QContextMenuEvent *event);
 
