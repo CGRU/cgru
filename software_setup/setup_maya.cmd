@@ -24,6 +24,7 @@ set "MAYA_CGRU_MENUS_NAME=CGRU"
 
 rem Set custom values if needed here:
 IF EXIST override.cmd CALL override.cmd
+IF EXIST override_maya.cmd CALL override_maya.cmd
 
 rem path to modelling, animation, rendering ... menu items
 rem if not set default MAYA_CGRU_LOCATION/mel will be used

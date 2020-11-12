@@ -348,8 +348,10 @@ void ListNodes::filterSettingsChanged()
 void ListNodes::actHideShow( int i_type )
 {
 	m_hide_flags ^= i_type;
+	v_hideChanged();
 	processHidden();
 }
+void ListNodes::v_hideChanged() {}
 
 void ListNodes::sortMatch( const std::vector<int32_t> & i_list)
 {

@@ -34,6 +34,7 @@ private:
 
 private:
 	static const int HeightPool;
+	static const int HeightPool_Small;
 	static const int HeightAnnotation;
 
 private:

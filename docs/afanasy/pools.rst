@@ -14,6 +14,11 @@ It designed to manipulate properties (abilities) of group of render clients.
 - Make new renders to register in *Nimby* or *Paused* state to have some time for software installation.
 
 
+.. figure:: images/afwatch_farm_services_tickets.png
+
+	AfWatch pools services and tickets
+
+
 Creation
 ========
 

@@ -768,6 +768,6 @@ bool Block::appendTasks(const JSON &operation)
 	storeTasks();
 
 	// Set new tasks ready
-	m_job->checkStates();
+	m_job->checkStatesOnAppend();
 	return true;
 }

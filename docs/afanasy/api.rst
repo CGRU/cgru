@@ -253,7 +253,7 @@ Here are some examples:
             "type"       : "users",
             "params"     :
             {
-                "priority"  : "50"
+                "priority"  : 50
             }
         }
     }

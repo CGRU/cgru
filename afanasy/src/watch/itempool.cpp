@@ -17,6 +17,7 @@
 #include "../libafanasy/logger.h"
 
 const int ItemPool::HeightPool = 32;
+const int ItemPool::HeightPool_Small = 18;
 const int ItemPool::HeightAnnotation = 14;
 
 ItemPool::ItemPool(ListRenders * i_list_renders, af::Pool * i_pool, const CtrlSortFilter * i_ctrl_sf):
@@ -34,6 +35,8 @@ ItemPool::~ItemPool()
 void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 {
 	af::Pool * pool = (af::Pool*)i_afnode;
+
+	setHideFlag_Pools(true);
 
 	updateNodeValues(pool);
 
@@ -199,14 +202,20 @@ bool ItemPool::calcHeight()
 {
 	int old_height = m_height;
 
-	m_height = HeightPool;
+	if (ListRenders::getDisplaySize() == ListRenders::ESmallSize)
+	{
+		m_height = HeightPool_Small;
+	}
+	else
+	{
+		m_height = HeightPool;
 
-	if (m_services.size() || m_services_disabled.size() || m_running_services.size())
-		m_height += HeightServices;
+		if (m_services.size() || m_services_disabled.size() || m_running_services.size())
+			m_height += HeightServices;
 
-	if (m_tickets_pool.size() || m_tickets_host.size())
-		m_height += HeightTickets;
-
+		if (m_tickets_pool.size() || m_tickets_host.size())
+			m_height += HeightTickets;
+	}
 	if (m_annotation.size())
 		m_height += HeightAnnotation;
 
@@ -230,30 +239,54 @@ void ItemPool::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleO
 	int w = i_rect.width() - 10;
 	int h = i_rect.height() - 4;
 	int height_pool = HeightPool-2;
+	if (ListRenders::getDisplaySize() == ListRenders::ESmallSize)
+	{
+		y = i_rect.y();
+		h = i_rect.height();
+		height_pool = HeightPool_Small;
+	}
 
+	QRect qr_LeftTop;
 	i_painter->setPen(clrTextMain(i_option));
 	i_painter->setFont(afqt::QEnvironment::f_name);
-	i_painter->drawText(x, y, w, h, Qt::AlignLeft | Qt::AlignTop, strLeftTop);
+	i_painter->drawText(x, y, w, h, Qt::AlignLeft | Qt::AlignTop, strLeftTop, &qr_LeftTop);
 
 	i_painter->setPen(clrTextInfo(i_option));
 	i_painter->setFont(afqt::QEnvironment::f_info);
-	i_painter->drawText(x, y, w, height_pool, Qt::AlignLeft  | Qt::AlignBottom, strLeftBottom);
+	if (ListRenders::getDisplaySize() != ListRenders::ESmallSize)
+		i_painter->drawText(x, y, w, height_pool, Qt::AlignLeft  | Qt::AlignBottom, strLeftBottom);
 	i_painter->setPen(afqt::QEnvironment::qclr_black);
-	i_painter->drawText(x, y, w, height_pool, Qt::AlignRight | Qt::AlignBottom, strRightBottom);
+	if (ListRenders::getDisplaySize() != ListRenders::ESmallSize)
+		i_painter->drawText(x, y, w, height_pool, Qt::AlignRight | Qt::AlignBottom, strRightBottom);
 	i_painter->drawText(x, y, w, height_pool, Qt::AlignRight | Qt::AlignTop,    strRightTop);
 
-	y += HeightPool;
-
-	if (m_services.size() || m_services_disabled.size() || m_running_services.size())
+	if (ListRenders::getDisplaySize() != ListRenders::ESmallSize)
 	{
-		drawServices(i_painter, i_option, x+6, y, w-6, HeightServices-6);
-		y += HeightServices;
+		y += HeightPool;
+
+		if (m_services.size() || m_services_disabled.size() || m_running_services.size())
+		{
+			drawServices(i_painter, i_option, x+6, y, w-6, HeightServices-6);
+			y += HeightServices;
+		}
+
+		if (m_tickets_pool.size() || m_tickets_host.size())
+		{
+			drawTickets(i_painter, i_option, x+6, y, w-6, HeightTickets-6);
+			y += HeightTickets;
+		}
 	}
-
-	if (m_tickets_pool.size() || m_tickets_host.size())
+	else
 	{
-		drawTickets(i_painter, i_option, x+6, y, w-6, HeightTickets-6);
-		y += HeightTickets;
+		int srv_w = 0;
+
+		if (m_services.size() || m_running_services.size())
+			srv_w += drawServices(i_painter, i_option, x+qr_LeftTop.width()+6, y+1, w-6, HeightServices-8, false);
+
+		if (m_tickets_pool.size() || m_tickets_host.size())
+			drawTickets(i_painter, i_option, x+qr_LeftTop.width()+6+srv_w+6, y+1, w-6, HeightTickets-8, NULL, false);
+
+		y += HeightPool_Small;
 	}
 
 	if (m_annotation.size())

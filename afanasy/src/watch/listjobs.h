@@ -23,6 +23,8 @@ public:
 
 	bool v_filesReceived( const af::MCTaskUp & i_taskup );
 
+	virtual void v_hideChanged();
+
 protected:
 	void contextMenuEvent(QContextMenuEvent *event);
 
@@ -106,6 +108,7 @@ private:
 	static bool    ms_FilterMatch_SU;
 	static std::string ms_FilterString_SU;
 
+	// To store what to hide
 	static uint32_t ms_hide_flags;
 
 	// Needed to store where a menu for all blocks manipulation opened

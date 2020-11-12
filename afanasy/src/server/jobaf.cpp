@@ -331,6 +331,26 @@ void JobAf::checkStates()
 	if(( m_state & AFJOB::STATE_DONE_MASK) == false ) m_state = m_state | AFJOB::STATE_WAITDEP_MASK;
 }
 
+void JobAf::checkStatesOnAppend()
+{
+	for( int b = 0; b < m_blocks_num; b++)
+	{
+		int numtasks = m_blocks_data[b]->getTasksNum();
+		for( int t = 0; t < numtasks; t++)
+		{
+			uint32_t taskstate = m_progress->tp[b][t]->state;
+
+			if( taskstate == 0 )
+			{
+				taskstate = AFJOB::STATE_READY_MASK;
+				m_progress->tp[b][t]->state = taskstate;
+			}
+		}
+	}
+
+	if(( m_state & AFJOB::STATE_DONE_MASK) == false ) m_state = m_state | AFJOB::STATE_WAITDEP_MASK;
+}
+
 int JobAf::getUid() const { return m_user->getId(); }
 
 void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring)
@@ -1651,5 +1671,5 @@ void JobAf::appendBlocks( const JSON & i_blocks)
 	}
 
 	checkDepends();
-	checkStates();
+	checkStatesOnAppend();
 }
