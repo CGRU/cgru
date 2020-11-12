@@ -298,6 +298,14 @@ function bm_CreateBookmark(i_bm)
 			elBar.classList.add('bar');
 			st_SetElProgress(i_bm.status, elBar);
 		}
+
+		// Status color:
+		if (i_bm.status.color)
+		{
+			let c = i_bm.status.color;
+			el.style.backgroundColor = 'rgba('+c[0]+','+c[1]+','+c[2]+')';
+			st_SetElColorTextFromBack(c, el);
+		}
 	}
 
 	var elPath = document.createElement('a');
