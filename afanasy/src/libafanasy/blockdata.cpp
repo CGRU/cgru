@@ -814,14 +814,16 @@ bool BlockData::genNumbers(long long &start, long long &end, int num, long long 
 		{
 			start = num * m_frames_per_task;
 			end = start + m_frames_per_task - 1;
-			if (frames_num) *frames_num = m_frames_per_task;
 		}
 		else
 		{
 			start = num / (-m_frames_per_task);
 			end = start; //( num + 1 ) / (-frame_pertask);
-			if (frames_num) *frames_num = -m_frames_per_task;
 		}
+
+		if (frames_num)
+			*frames_num = m_frames_per_task;
+
 		return true;
 	}
 
