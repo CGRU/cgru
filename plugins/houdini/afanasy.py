@@ -612,7 +612,7 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
         block_generate = \
             BlockParameters(afnode, ropnode, subblock, prefix, frame_range)
         blockname = block_generate.name
-        block_generate.name += '-G'
+        block_generate.name += '-GenIFD'
 
         if not block_generate.valid:
             block_generate.doPost()
@@ -625,6 +625,8 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
         tile_divx = afnode.parm('sep_tile_divx').eval()
         tile_divy = afnode.parm('sep_tile_divy').eval()
         tiles_count = tile_divx * tile_divy
+        tiles_stitch_service = afnode.parm('tiles_stitch_service').eval()
+        tiles_stitch_capacity = afnode.parm('tiles_stitch_capacity').eval()
         del_rop_files = afnode.parm('sep_del_rop_files').eval()
 
         if read_rop or run_rop:
@@ -683,7 +685,7 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
         if not join_render:
             block_render = BlockParameters(afnode, ropnode, subblock, prefix,
                                            frame_range)
-            block_render.name = blockname + '-R'
+            block_render.name = blockname + '-TileRender'
             block_render.cmd = 'mantra'
             block_render.service = block_render.cmd
             if run_rop:
@@ -751,8 +753,10 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
                 afnode, ropnode, subblock, prefix, frame_range
             )
 
-            block_join.name = blockname + '-J'
-            block_join.service = 'generic'
+            block_join.name = blockname + '-TilesStitch'
+            block_join.service = tiles_stitch_service
+            block_join.capacity = tiles_stitch_capacity
+            block_join.tickets = dict()
             # block render might be referenced before assignment
             block_join.dependmask = block_render.name
             block_join.cmd = cmd
