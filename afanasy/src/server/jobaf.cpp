@@ -655,6 +655,9 @@ void JobAf::setUserListOrder( int index, bool updateDtabase)
 void JobAf::checkDepends()
 {
 	m_state = m_state & (~AFJOB::STATE_WAITDEP_MASK);
+
+	if ( ( m_state & AFJOB::STATE_DONE_MASK ) == AFJOB::STATE_DONE_MASK )
+		return;
 	
 	bool depend_local = false;
 	bool depend_global = false;
