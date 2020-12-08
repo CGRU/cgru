@@ -30,6 +30,7 @@ public:
 		e_HideEmpty      = 1<<5,
 		e_HideError      = 1<<6,
 		e_HideSystem     = 1<<7,
+		e_HidePools      = 1<<8,
 	};
 
 	int32_t getFlagsHideShow() const { return m_hide_flags; }
@@ -74,6 +75,8 @@ protected:
 
 	/// Needed for jobs, to get user jobs list from server
 	virtual void v_resetSorting();
+
+	virtual void v_hideChanged();
 
 protected:
 	std::vector<std::string> m_node_types;

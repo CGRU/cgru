@@ -334,13 +334,22 @@ void Task::errorHostsAppend( const std::string & hostname)
    std::list<std::string>::iterator hIt = m_errorHosts.begin();
    std::list<int>::iterator cIt = m_errorHostsCounts.begin();
    std::list<time_t>::iterator tIt = m_errorHostsTime.begin();
+
+   std::string blockName = m_block->m_data->getName();
+   std::string jobLog = "B[\"" + blockName + "\"]"
+                      + " Task[" + std::to_string(m_number) + "]: "
+                      + hostname + " - AVOIDING HOST!";
+
    for( ; hIt != m_errorHosts.end(); hIt++, tIt++, cIt++ )
       if( *hIt == hostname )
       {
          (*cIt)++;
          *tIt = time(NULL);
          if( *cIt >= m_block->getErrorsTaskSameHost() )
+         {
             v_appendLog( hostname + " - AVOIDING HOST !");
+            m_block->m_job->appendLog(jobLog);
+         }
          return;
       }
 

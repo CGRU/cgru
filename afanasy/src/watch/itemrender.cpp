@@ -176,6 +176,7 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 		// Set flags that will be used to hide/show node in list:
 		setHideFlag_Hidden(  render->isHidden()  );
 		setHideFlag_Offline( render->isOffline() );
+		setHideFlag_Pools(false);
 
 		m_capacity        = render->getCapacityHost();
 		m_maxtasks        = render->getMaxTasksHost();
@@ -883,7 +884,7 @@ void ItemRender::drawTask(QPainter * i_painter, const QStyleOptionViewItem & i_o
 	// Draw tickets
 	for (auto const & tIt : i_exec->m_tickets)
 	{
-		tw += Item::drawTicket(i_painter, pen, i_x+5 + tw, i_y+1, i_w-5 - tw,
+		tw += Item::drawTicket(i_painter, pen, i_x+5 + tw, i_y+1, i_w-5 - tw, Item::HeightTickets - 5,
 				Item::TKD_LEFT,
 				afqt::stoq(tIt.first), tIt.second);
 

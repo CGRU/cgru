@@ -49,6 +49,8 @@ public:
 		{if(i_value) m_hide_flags |=ListNodes::e_HideError;    else m_hide_flags &= ~ListNodes::e_HideError;   }
 	inline void setHideFlag_System( bool i_value)
 		{if(i_value) m_hide_flags |= ListNodes::e_HideSystem;  else m_hide_flags &= ~ListNodes::e_HideSystem;  }
+	inline void setHideFlag_Pools(  bool i_value)
+		{if(i_value) m_hide_flags |= ListNodes::e_HidePools;   else m_hide_flags &= ~ListNodes::e_HidePools;   }
 
 	bool getHideFlags(int32_t i_hide_flags) const;
 

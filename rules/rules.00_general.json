@@ -19,13 +19,13 @@
 },
 
 "flags":{
-	"hold"        :{"title":"HOLD",        "clr":[111,111,111], "short":"Hl",                          "excl":true,  "tip":"On hold"},
+	"hold"        :{"title":"HOLD",        "clr":[111,111,111], "short":"Hl",                          "excl":false, "tip":"On hold"},
 	"question"    :{"title":"QUESTION",    "clr":[210,140,140], "short":"Que",                         "excl":false, "tip":"Question"},
 	"error"       :{"title":"ERROR",       "clr":[255, 55, 55], "short":"Err",             "p_max":50, "excl":false, "tip":"Error"},
 	"inprogress"  :{"title":"INPROGRESS",  "clr":[210,210,210], "short":"IP",  "p_min":1,  "p_max":90, "excl":false, "tip":"In progress"},
 	"on_farm"     :{"title":"ONFARM",      "clr":[250,150,100], "short":"OF",  "p_min":20, "p_max":20, "excl":false, "tip":"On farm"},
-	"check"       :{"title":"CHECK",       "clr":[ 77, 77,177], "short":"Chk", "p_min":60, "p_max":90, "excl":true,  "tip":"To check"},
-	"comment"     :{"title":"COMMENT",     "clr":[222,111,222], "short":"Cmm",             "p_max":50, "excl":true,  "tip":"Comment"},
+	"check"       :{"title":"CHECK",       "clr":[ 77, 77,177], "short":"Chk", "p_min":60, "p_max":90, "excl":false, "tip":"To check"},
+	"comment"     :{"title":"COMMENT",     "clr":[222,111,222], "short":"Cmm",             "p_max":50, "excl":false, "tip":"Comment"},
 	"send_ready"  :{"title":"SENDREADY",   "clr":[ 77,177,177], "short":"SR",  "p_min":70, "p_max":90, "excl":true,  "tip":"Ready to send."},
 	"sent"        :{"title":"SENT",        "clr":[222,222,191], "short":"SNT", "p_min":80, "p_max":90, "excl":true,  "tip":"Was sent"},
 	"omit"        :{"title":"OMIT",        "clr":[ 99, 99, 99], "short":"Om",              "p_max":-1, "excl":true,  "tip":"Omit"},
