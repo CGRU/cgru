@@ -31,7 +31,8 @@ class redshift(parser.parser):
             'Frame rendering aborted',
             'Bad node type found: Redshift_ROP',
             'Bad node type found: redshift_vopnet',
-            'Fatal Error'
+            'Fatal Error',
+            'Error an illegal memory access was encountered',
         ]
         self.str_badresult = ['License error']
         self.str_warning = []
