@@ -160,11 +160,12 @@
 			"path":["SRC","SOURCE"]
 		},
 		"result":{
-			"path":["RESULT/JPG","RESULT/PNG","RESULT/DPX","RESULT/TIF","RESULT/EXR","RESULT/ANIM","RESULT/RENDER"]
+			"path":["RESULT/JPG","RESULT/PNG","RESULT/DPX","RESULT/TIF","RESULT/EXR","RESULT/FREELANCE","RESULT/ANIM","RESULT/RENDER"]
 		},
 		"dailies":{
 			"path":["RESULT/DAILIES"],
 			"folders":{
+				"result/freelance":"RESULT/FREELANCE",
 				"result/anim":"RESULT/ANIM",
 				"render":"RESULT/RENDER"
 			}
