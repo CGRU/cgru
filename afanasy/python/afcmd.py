@@ -91,7 +91,7 @@ class Block:
         self.setState(self.State.skip, taskIds=taskIds)
 
     def isNumeric(self):
-        return afcommon.checkBlockFlag(self.flags, 'numeric')
+        return bool(afcommon.checkBlockFlag(self.flags, 'numeric'))
 
     def hasAppendedTasks(self):
         return afcommon.checkBlockFlag(self.flags, 'appendedtasks')
