@@ -348,7 +348,7 @@ function d_MakeCmd(i_params)
 	var input = c_PathPM_Client2Server(params.input);
 	var output = c_PathPM_Client2Server(params.output) + '/' + params.filename;
 
-	var cmd = 'python';
+	var cmd = 'python3';
 
 	cmd += ' "' + c_PathPM_Client2Server(d_makemovie) + '"';
 
