@@ -653,7 +653,11 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 		}
 
 		if (m_annotation.size())
+		{
+			i_painter->setPen(afqt::QEnvironment::qclr_black);
+			i_painter->setFont(afqt::QEnvironment::f_info);
 			i_painter->drawText( x+5, y_cur, w-10, HeightAnnotation-2, Qt::AlignVCenter | Qt::AlignHCenter, m_annotation);
+		}
 
 		return;
 	}
