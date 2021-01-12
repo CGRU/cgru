@@ -56,7 +56,7 @@ public:
 
 	inline const BlockInfo * getInfo() const {return m_info;}
 
-   bool mousePressed( const QPoint & pos,const QRect & rect);
+	virtual bool v_mousePressed(int i_x, int i_y, int i_w, int i_h, const Qt::MouseButtons & i_buttons);
 
    enum SortType
    {

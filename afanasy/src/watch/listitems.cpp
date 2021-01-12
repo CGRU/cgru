@@ -150,7 +150,24 @@ ListItems::~ListItems()
 
 int ListItems::count() const { return m_model->count();}
 
-bool ListItems::mousePressed( QMouseEvent * event) { return false;}
+bool ListItems::mousePressed(QMouseEvent * i_event)
+{
+	QModelIndex index = m_view->indexAt(i_event->pos());
+	if (Item::isItemP(index.data()) == false)
+		return false;
+
+	return (Item::toItemP(index.data()))->mousePressed(i_event->pos(), m_view->visualRect(index), i_event->buttons());
+/*
+	Item * item = Item::toItemP( index.data());
+	if (item->getType() == Item::TBlock)
+		return ((ItemJobBlock*)item)->mousePressed( event->pos(), m_view->visualRect( index));
+
+	if(( QApplication::mouseButtons() == Qt::MidButton ) || ( QApplication::keyboardModifiers() == Qt::AltModifier ))
+		((ItemJobTask*)item)->showThumbnail();
+
+	return false;
+*/
+}
 
 void ListItems::deleteAllItems() { m_model->deleteAllItems();}
 void ListItems::v_doubleClicked(Item * i_item) {}

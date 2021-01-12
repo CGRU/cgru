@@ -39,6 +39,9 @@ public:
 	void paint(QPainter * i_painter, const QStyleOptionViewItem & i_option) const;
 	virtual void v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const;
 
+	bool mousePressed(const QPoint & i_point, const QRect & i_rect, const Qt::MouseButtons & i_buttons);
+	virtual bool v_mousePressed(int i_x, int i_y, int i_w, int i_h, const Qt::MouseButtons & i_buttons);
+
 	inline const QString& getName()              const { return m_name;}   ///< Get item name.
 
 	virtual const QVariant v_getToolTip()      const { return QVariant();  }

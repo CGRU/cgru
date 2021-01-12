@@ -29,7 +29,6 @@
 #include <QtCore/QProcess>
 #include <QtCore/QTimer>
 #include <QtGui/QContextMenuEvent>
-#include <QApplication>
 #include <QBoxLayout>
 #include <QInputDialog>
 #include <QListWidget>
@@ -862,21 +861,6 @@ void ListTasks::blockAction(const QString & i_json)
 	af::jsonActionFinish( str);
 
 	Watch::sendMsg( af::jsonMsg( str));
-}
-
-bool ListTasks::mousePressed( QMouseEvent * event)
-{
-	QModelIndex index = m_view->indexAt( event->pos());
-	if( Item::isItemP( index.data()) == false ) return false;
-
-	Item * item = Item::toItemP( index.data());
-	if (item->getType() == Item::TBlock)
-		return ((ItemJobBlock*)item)->mousePressed( event->pos(), m_view->visualRect( index));
-
-	if(( QApplication::mouseButtons() == Qt::MidButton ) || ( QApplication::keyboardModifiers() == Qt::AltModifier ))
-		((ItemJobTask*)item)->showThumbnail();
-
-	return false;
 }
 
 void ListTasks::sortBlock( int i_block_num)

@@ -15,6 +15,7 @@
 #include "actionid.h"
 #include "monitorhost.h"
 
+#include <QApplication>
 #include <QtCore/QEvent>
 #include <QtGui/QPainter>
 
@@ -295,6 +296,17 @@ bool ItemJobTask::compare( int type, const ItemJobTask & other, bool ascending) 
 		AFERROR("ItemJobTask::compare: Invalid sort type.\n");
 	}
 	return result;
+}
+
+bool ItemJobTask::v_mousePressed(int i_x, int i_y, int i_w, int i_h, const Qt::MouseButtons & i_buttons)
+{
+	if ((i_buttons == Qt::MidButton) || (QApplication::keyboardModifiers() == Qt::AltModifier))
+	{
+		showThumbnail();
+		return true;
+	}
+
+	return false;
 }
 
 void ItemJobTask::showThumbnail()

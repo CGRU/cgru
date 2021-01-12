@@ -28,8 +28,6 @@ public:
 
 	virtual bool v_processEvents( const af::MonitorEvents & i_me);
 
-	bool mousePressed( QMouseEvent * event);
-
 	void sortBlock( int numblock);
 
 	bool v_filesReceived( const af::MCTaskUp & i_taskup );

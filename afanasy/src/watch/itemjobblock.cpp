@@ -208,49 +208,48 @@ void ItemJobBlock::v_paint(QPainter * i_painter, const QRect & i_rect, const QSt
 	i_painter->drawLine(linex, y, linex, y+HeightFooter-2);
 }
 
-bool ItemJobBlock::mousePressed( const QPoint & pos,const QRect & rect)
+bool ItemJobBlock::v_mousePressed(int i_x, int i_y, int i_w, int i_h, const Qt::MouseButtons & i_buttons)
 {
-   if( tasksHidded ) return false;
+   if (tasksHidded)
+	   return false;
 
-   int mousex = pos.x() - rect.x();
-   int mousey = pos.y() - rect.y();
+	if (i_y < m_height - HeightFooter)
+		return false;
 
-	if(mousey < m_height - HeightFooter) return false;
-
-   int x = rect.width() - ItemJobTask::WidthInfo;
+	int x = i_w - ItemJobTask::WidthInfo;
    bool processed = false;
    int sort_type_old = m_sort_type;
 
    x -= WHost + WErrors + WStarts;
-   if( !processed && mousex < x )
+	if (!processed && i_x < x)
    {
       if( resetSortingParameters() == 0) return true;
       processed = true;
    }
 
    x += WHost;
-   if( !processed && mousex < x )
+	if (!processed && i_x < x)
    {
       m_sort_type = SHost;
       processed = true;
    }
 
    x += WStarts;
-   if( !processed && mousex < x )
+	if (!processed && i_x < x)
    {
       m_sort_type = SStarts;
       processed = true;
    }
 
    x += WErrors;
-   if( !processed && mousex < x )
+	if (!processed && i_x < x)
    {
       m_sort_type = SErrors;
       processed = true;
    }
 
    x += WTime;
-   if( !processed && mousex < x )
+	if (!processed && i_x < x)
    {
       m_sort_type = STime;
       processed = true;

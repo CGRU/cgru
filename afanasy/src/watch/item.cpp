@@ -143,6 +143,22 @@ void Item::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptio
 	i_painter->drawText(i_rect, Qt::AlignBottom | Qt::AlignRight, QString(" ( virtual Item painting ) "));
 }
 
+bool Item::mousePressed(const QPoint & i_point, const QRect & i_rect, const Qt::MouseButtons & i_buttons)
+{
+	int x = i_point.x() - i_rect.x() - m_margin_left;
+	int y = i_point.y() - i_rect.y();
+
+	int w = i_rect.width() - m_margin_left;
+	int h = i_rect.height();
+
+	return v_mousePressed(x, y, w, h, i_buttons);
+}
+
+bool Item::v_mousePressed(int i_x, int i_y, int i_w, int i_h, const Qt::MouseButtons & i_buttons)
+{
+	return false;
+}
+
 void Item::v_filesReceived( const af::MCTaskUp & i_taskup) {}
 
 void Item::printfState( const uint32_t state, int posx, int posy, QPainter * painter, const QStyleOptionViewItem &option) const

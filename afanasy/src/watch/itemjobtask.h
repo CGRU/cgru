@@ -45,6 +45,7 @@ public:
 	virtual const QString  v_getSelectString() const;
 	virtual const QString  v_getInfoText()     const;
 
+	virtual bool v_mousePressed(int i_x, int i_y, int i_w, int i_h, const Qt::MouseButtons & i_buttons);
 
 	void showThumbnail();
 

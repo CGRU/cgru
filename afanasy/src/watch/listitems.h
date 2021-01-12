@@ -51,7 +51,8 @@ public:
 	void itemsHeightChanged();
 	void itemsHeightCalc();
 
-	virtual bool mousePressed( QMouseEvent * event);
+	bool mousePressed(QMouseEvent * i_event);
+
 	virtual void keyPressEvent( QKeyEvent * i_evt);
 
 	inline const std::string & getType() const { return m_type; }
