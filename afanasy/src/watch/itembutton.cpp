@@ -29,11 +29,15 @@ void ItemButton::paint(QPainter * i_painter, const QRect & i_item_rect) const
 	int y = i_item_rect.y() + m_pos_y;
 
 	i_painter->setOpacity(.7);
-
+	i_painter->setFont(afqt::QEnvironment::f_info);
 	i_painter->setPen(afqt::QEnvironment::qclr_black);
+	i_painter->setPen(Qt::SolidLine);
 
+	i_painter->setBrush(Qt::SolidPattern);
 	i_painter->drawText(x, y, m_size, m_size, Qt::AlignCenter, m_label);
 
+	i_painter->setOpacity(.5);
+	i_painter->setBrush(Qt::NoBrush);
 	i_painter->drawRect(x, y, m_size, m_size);
 }
 

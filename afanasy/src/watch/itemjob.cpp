@@ -52,9 +52,9 @@ ItemJob::ItemJob(ListNodes * i_list_nodes, bool i_inworklist, af::Job * i_job, c
 	{
 		m_buttons_width = 16;
 
-		m_btn_item_collapse = new ItemButton("item_collapse", 2, 2, 12, "^", "Collapse item.");
+		m_btn_item_collapse = new ItemButton("item_collapse", 2, 2, 12, "▲", "Collapse item.");
 		m_btn_item_collapse->setHidded(m_item_collapsed);
-		m_btn_item_expand   = new ItemButton("item_expand",   2, 2, 12, ">", "Expand item.");
+		m_btn_item_expand   = new ItemButton("item_expand",   2, 2, 12, "▼", "Expand item.");
 		m_btn_item_expand->setHidded(false == m_item_collapsed);
 
 		addButton(m_btn_item_collapse);

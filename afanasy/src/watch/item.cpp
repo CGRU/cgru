@@ -43,6 +43,8 @@ Item::Item(const QString &i_name, int i_id, EType i_type):
 
 Item::~Item()
 {
+	for (int b = 0; b < m_buttons.size(); b++)
+		delete m_buttons[b];
 }
 
 void Item::setDepth(int i_depth)
