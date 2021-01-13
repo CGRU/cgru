@@ -15,7 +15,7 @@ rem Default number of threads for rendering:
 rem SET NUKE_AF_RENDERTHREADS=2
 
 rem Nuke render launcher:
-SET NUKE_AF_RENDER=nuke -i
+SET NUKE_AF_RENDER=nuke
 
 For /F "Tokens=*" %%I in ('dir /b "C:\Program Files\Nuke*"') Do set "NUKE_DIR=C:\Program Files\%%I"
 rem echo %NUKE_DIR%

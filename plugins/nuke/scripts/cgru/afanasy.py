@@ -364,7 +364,7 @@ class BlockParameters:
                         continue
                     block.addTicket(ticket[0], int(ticket[1]))
 
-            cmd = os.getenv('NUKE_AF_RENDER', 'nuke -i')
+            cmd = os.getenv('NUKE_AF_RENDER', 'nuke')
             if self.tmpimage or self.pathsmap:
                 cgru_location = os.getenv('CGRU_LOCATION')
                 if cgru_location is None:
