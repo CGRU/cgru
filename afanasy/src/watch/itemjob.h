@@ -62,16 +62,16 @@ public:
 		return NULL;}
 
 	inline int getBlockPercent(int i_bnum) const
-		{if(i_bnum < m_blocks.size()) return m_blocks[i_bnum]->p_percentage; else return 0;}
+		{if (i_bnum < m_blocks.size()) return m_blocks[i_bnum]->p_percentage; else return 0;}
 
-	void v_setSortType(   int type1, int i_type2 );
-	void v_setFilterType( int type );
+	void v_setSortType(int type1, int i_type2);
+	void v_setFilterType(int type);
 
 	inline const QString & getBlockName(int i_bnum) const {return m_blocks[i_bnum]->getName();}
 
 	bool calcHeight();
 
-	virtual void v_filesReceived( const af::MCTaskUp & i_taskup);
+	virtual void v_filesReceived(const af::MCTaskUp & i_taskup);
 
 	void getThumbnail() const;
 
@@ -86,27 +86,25 @@ private:
 private:
 	void updateInfo(const af::Job * i_job);
 
+	int drawButtons(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option, const QColor * i_clrItem) const;
+
 private:
 	bool m_inworklist;
 
-	bool compact_display;
+	bool m_compact_display;
 
-	QString properties;
+	QString m_str_props;
+	QString m_str_user_eta;
+	QString m_str_runningTime;
 
-	QStringList blocksinfo;
-	QString user_eta;
-
-	QString runningTime;
-
-	int     num_runningtasks;
-	QString num_runningtasks_str;
+	int m_num_runningtasks;
 
 	int m_tasks_done;
 
 	QList<QImage*> m_thumbs;
 	QList<QString> m_thumbs_paths;
 
-	int block_height;
+	int m_block_height;
 
 	QVector<BlockInfo*> m_blocks;
 };
