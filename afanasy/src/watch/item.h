@@ -6,6 +6,7 @@
 #include <QStyleOption>
 #include <QMenu>
 
+class ItemButton;
 class MainWidget;
 
 class Item
@@ -41,6 +42,8 @@ public:
 
 	bool mousePressed(const QPoint & i_point, const QRect & i_rect, const Qt::MouseButtons & i_buttons);
 	virtual bool v_mousePressed(int i_x, int i_y, int i_w, int i_h, const Qt::MouseButtons & i_buttons);
+
+	virtual void v_buttonClicked(ItemButton * i_b);
 
 	inline const QString& getName()              const { return m_name;}   ///< Get item name.
 
@@ -115,6 +118,8 @@ public:
 			const QString & i_name,
 			int i_count, int i_usage = -1, int i_hosts = -1, int i_max_hosts = -1);
 
+	inline void addButton(ItemButton * i_ib) {m_buttons.append(i_ib);}
+
 protected:
 	inline int getDepth() const { return m_depth; }
 	void setDepth(int i_depth);
@@ -150,6 +155,8 @@ private:
 
 	/// Node "m_running" property.
 	mutable bool m_running;
+
+	QVector<ItemButton*> m_buttons;
 
 	/// Points contains star coordinates.
 	static QPolygonF ms_star_pointsInit;

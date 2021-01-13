@@ -156,17 +156,20 @@ bool ListItems::mousePressed(QMouseEvent * i_event)
 	if (Item::isItemP(index.data()) == false)
 		return false;
 
-	return (Item::toItemP(index.data()))->mousePressed(i_event->pos(), m_view->visualRect(index), i_event->buttons());
-/*
-	Item * item = Item::toItemP( index.data());
-	if (item->getType() == Item::TBlock)
-		return ((ItemJobBlock*)item)->mousePressed( event->pos(), m_view->visualRect( index));
+	Item * item = Item::toItemP(index.data());
 
-	if(( QApplication::mouseButtons() == Qt::MidButton ) || ( QApplication::keyboardModifiers() == Qt::AltModifier ))
-		((ItemJobTask*)item)->showThumbnail();
+	int old_height = item->getHeight();
+
+	if (item->mousePressed(i_event->pos(), m_view->visualRect(index), i_event->buttons()))
+	{
+		if (item->getHeight() != old_height)
+			m_view->emitSizeHintChanged(index);
+		else
+			m_view->update(index);
+		return true;
+	}
 
 	return false;
-*/
 }
 
 void ListItems::deleteAllItems() { m_model->deleteAllItems();}

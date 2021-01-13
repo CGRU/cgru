@@ -7,6 +7,7 @@
 
 #include "../libafqt/qenvironment.h"
 
+#include "itembutton.h"
 #include "watch.h"
 
 #include <QtCore/QEvent>
@@ -127,7 +128,11 @@ void Item::paint(QPainter * i_painter, const QStyleOptionViewItem & i_option) co
 {
 	QRect rect(i_option.rect);
 	rect.setLeft(rect.left() + m_margin_left);
+
 	v_paint(i_painter, rect, i_option);
+
+	for (int b = 0; b < m_buttons.size(); b++)
+		m_buttons[b]->paint(i_painter, rect);
 }
 
 void Item::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const
@@ -151,6 +156,13 @@ bool Item::mousePressed(const QPoint & i_point, const QRect & i_rect, const Qt::
 	int w = i_rect.width() - m_margin_left;
 	int h = i_rect.height();
 
+	for (int b = 0; b < m_buttons.size(); b++)
+		if (m_buttons[b]->isClicked(x, y))
+		{
+			v_buttonClicked(m_buttons[b]);
+			return true;
+		}
+
 	return v_mousePressed(x, y, w, h, i_buttons);
 }
 
@@ -158,6 +170,8 @@ bool Item::v_mousePressed(int i_x, int i_y, int i_w, int i_h, const Qt::MouseBut
 {
 	return false;
 }
+
+void Item::v_buttonClicked(ItemButton * i_b) {}
 
 void Item::v_filesReceived( const af::MCTaskUp & i_taskup) {}
 

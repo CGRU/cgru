@@ -6,6 +6,7 @@
 
 #include "ctrlsortfilter.h"
 #include "listjobs.h"
+#include "itembutton.h"
 #include "watch.h"
 
 #include <QtCore/QEvent>
@@ -23,6 +24,12 @@ const int ItemJob::HeightAnnotation = 12;
 ItemJob::ItemJob(ListNodes * i_list_nodes, bool i_inworklist, af::Job * i_job, const CtrlSortFilter * i_ctrl_sf, bool i_notify):
 	ItemWork(i_list_nodes, i_job, TJob, i_ctrl_sf),
 	m_inworklist(i_inworklist),
+	m_buttons_width(0),
+	m_item_collapsed(false),
+
+	m_btn_item_collapse(NULL),
+	m_btn_item_expand(NULL),
+
 	m_tasks_done(-1),
 	state(0)
 {
@@ -38,6 +45,20 @@ ItemJob::ItemJob(ListNodes * i_list_nodes, bool i_inworklist, af::Job * i_job, c
 	{
 		AF_ERR << "ItemJob::ItemJob: Zero blocks numer.";
 		return;
+	}
+
+	// Add buttons:
+	if ((false == m_inworklist) && (false == af::Environment::VISOR()))
+	{
+		m_buttons_width = 16;
+
+		m_btn_item_collapse = new ItemButton("item_collapse", 2, 2, 12, "^", "Collapse item.");
+		m_btn_item_collapse->setHidded(m_item_collapsed);
+		m_btn_item_expand   = new ItemButton("item_expand",   2, 2, 12, ">", "Expand item.");
+		m_btn_item_expand->setHidded(false == m_item_collapsed);
+
+		addButton(m_btn_item_collapse);
+		addButton(m_btn_item_expand);
 	}
 
 
@@ -274,9 +295,43 @@ void ItemJob::updateInfo(const af::Job * i_job)
 	ItemNode::updateInfo();
 }
 
+void ItemJob::v_buttonClicked(ItemButton * i_b)
+{
+	if (i_b == m_btn_item_collapse)
+	{
+		setItemCollapsed(true);
+		return;
+	}
+	if (i_b == m_btn_item_expand)
+	{
+		setItemCollapsed(false);
+		return;
+	}
+
+	AF_ERR << "Uncknown button pressed.";
+}
+
+void ItemJob::setItemCollapsed(bool i_collapse)
+{
+	if (m_item_collapsed == i_collapse) return;
+
+	m_item_collapsed = i_collapse;
+
+	m_btn_item_collapse->setHidded(m_item_collapsed);
+	m_btn_item_expand->setHidded(false == m_item_collapsed);
+
+	calcHeight();
+}
+
 bool ItemJob::calcHeight()
 {
 	int old_height = m_height;
+
+	if (m_item_collapsed)
+	{
+		m_height = Height;
+		return old_height == m_height;
+	}
 
 	if (m_compact_display)
 	{
@@ -326,14 +381,8 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 	// Draw standart backgroud
 	drawBack(i_painter, i_rect, i_option, itemColor);
 
-	// Draw buttons
-	if (false == m_inworklist)
-	{
-		int buttons_width = drawButtons(i_painter, i_rect, i_option, itemColor);
-		x += buttons_width;
-		w -= buttons_width;
-
-	}
+	x += m_buttons_width;
+	w -= m_buttons_width;
 
 	uint32_t currenttime = time(NULL);
 
@@ -431,11 +480,7 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 		i_painter->drawText(x+3, y+26, m_str_runningTime);
 	}
 
-	for (int b = 0; b < m_blocks.size(); b++)
-		m_blocks[b]->paint(i_painter, i_option,
-			x+5, y + Height + m_block_height*b + 3, w-12,
-			m_compact_display, itemColor);
-
+	// Running tasks and a star:
 	if (state & AFJOB::STATE_RUNNING_MASK)
 	{
 		drawStar(m_num_runningtasks>=10 ? 14:10, x+15, y+16, i_painter);
@@ -443,6 +488,15 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 		i_painter->setPen(afqt::QEnvironment::clr_textstars.c);
 		i_painter->drawText(x+0, y+0, 30, 34, Qt::AlignHCenter | Qt::AlignVCenter, QString::number(m_num_runningtasks));
 	}
+
+	if (m_item_collapsed)
+		return;
+
+	// Blocks:
+	for (int b = 0; b < m_blocks.size(); b++)
+		m_blocks[b]->paint(i_painter, i_option,
+			x+5, y + Height + m_block_height*b + 3, w-12,
+			m_compact_display, itemColor);
 
 
 	// Thumbnails:
@@ -491,11 +545,6 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 		i_painter->setFont(afqt::QEnvironment::f_info);
 		i_painter->drawText(x, y, w, h, Qt::AlignHCenter | Qt::AlignBottom, m_annotation);
 	}
-}
-
-int ItemJob::drawButtons(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option, const QColor * i_clrItem) const
-{
-	return 2;
 }
 
 void ItemJob::v_setSortType(int i_type1, int i_type2)

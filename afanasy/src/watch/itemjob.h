@@ -5,6 +5,7 @@
 #include "itemwork.h"
 #include "blockinfo.h"
 
+class ItemButton;
 class ListJobs;
 
 class ItemJob : public ItemWork
@@ -75,6 +76,8 @@ public:
 
 	void getThumbnail() const;
 
+	void v_buttonClicked(ItemButton * i_b);
+
 protected:
 	virtual void v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const;
 
@@ -88,8 +91,16 @@ private:
 
 	int drawButtons(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option, const QColor * i_clrItem) const;
 
+	void setItemCollapsed(bool i_collapse);
+
 private:
 	bool m_inworklist;
+
+	int m_buttons_width;
+
+	bool m_item_collapsed;
+	ItemButton * m_btn_item_collapse;
+	ItemButton * m_btn_item_expand;
 
 	bool m_compact_display;
 
