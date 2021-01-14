@@ -23,9 +23,9 @@ const int ItemJob::HeightAnnotation = 12;
 
 ItemJob::ItemJob(ListNodes * i_list_nodes, bool i_inworklist, af::Job * i_job, const CtrlSortFilter * i_ctrl_sf, bool i_notify):
 	ItemWork(i_list_nodes, i_job, TJob, i_ctrl_sf),
+	m_serial(i_job->getSerial()),
 	m_inworklist(i_inworklist),
 	m_buttons_width(0),
-	m_item_collapsed(false),
 
 	m_btn_item_collapse(NULL),
 	m_btn_item_expand(NULL),
@@ -47,20 +47,21 @@ ItemJob::ItemJob(ListNodes * i_list_nodes, bool i_inworklist, af::Job * i_job, c
 		return;
 	}
 
+	m_item_collapsed = afqt::QEnvironment::hasCollapsedJobSerial(m_serial);
+
 	// Add buttons:
 	if ((false == m_inworklist) && (false == af::Environment::VISOR()))
 	{
 		m_buttons_width = 16;
 
-		m_btn_item_collapse = new ItemButton("item_collapse", 2, 2, 12, "▲", "Collapse item.");
+		m_btn_item_collapse = new ItemButton("item_collapse", 2, 2, 12, "▼", "Collapse item.");
 		m_btn_item_collapse->setHidded(m_item_collapsed);
-		m_btn_item_expand   = new ItemButton("item_expand",   2, 2, 12, "▼", "Expand item.");
+		m_btn_item_expand   = new ItemButton("item_expand",   2, 2, 12, "▶", "Expand item.");
 		m_btn_item_expand->setHidded(false == m_item_collapsed);
 
 		addButton(m_btn_item_collapse);
 		addButton(m_btn_item_expand);
 	}
-
 
 	updateValues((af::Node*)i_job, af::Msg::TJobsList);
 
@@ -316,6 +317,11 @@ void ItemJob::setItemCollapsed(bool i_collapse)
 	if (m_item_collapsed == i_collapse) return;
 
 	m_item_collapsed = i_collapse;
+
+	if (m_item_collapsed)
+		afqt::QEnvironment::addCollapsedJobSerial(m_serial);
+	else
+		afqt::QEnvironment::delCollapsedJobSerial(m_serial);
 
 	m_btn_item_collapse->setHidded(m_item_collapsed);
 	m_btn_item_expand->setHidded(false == m_item_collapsed);

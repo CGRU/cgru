@@ -94,6 +94,8 @@ private:
 	void setItemCollapsed(bool i_collapse);
 
 private:
+	int64_t m_serial;
+
 	bool m_inworklist;
 
 	int m_buttons_width;

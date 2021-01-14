@@ -27,7 +27,6 @@ public:
 	static const QString & getFileName() { return ms_filename; }
 
 	static bool save();
-	static void saveWndRects( QByteArray & data);
 	static void saveGUI( QByteArray & data);
 	static void saveHotkeys( QByteArray & data);
 
@@ -161,8 +160,18 @@ public:
 	static void getHotkey( const QString & i_name, QString & o_str);
 	static void setHotkey( const QString & i_name, const QString & i_str);
 
+	static bool hasCollapsedJobSerial(int64_t i_serial);
+	static void addCollapsedJobSerial(int64_t i_serial);
+	static void delCollapsedJobSerial(int64_t i_serial);
+
 private:
    static void solveServerAddress();
+
+	static void loadWndRects(const JSON & i_obj);
+	static void saveWndRects(QByteArray & o_data);
+
+	static void loadCollapsedJobsSerials(const JSON & i_obj);
+	static void saveCollapsedJobsSerials(QByteArray & o_data);
 
 private:
 	static bool ms_valid;
@@ -181,4 +190,5 @@ private:
 	static QList<Attr*> ms_attrs_gui;
 	static QMap<QString, Attr*> ms_attrs_hotkeys;
 	static QStringList ms_hotkeys_names;
+	static QList<int64_t> ms_jobs_serials_collapsed;
 };

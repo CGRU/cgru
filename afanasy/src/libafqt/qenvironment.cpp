@@ -134,6 +134,7 @@ QList<Attr*>     QEnvironment::ms_attrs_gui;
 QMap<QString,Attr*> QEnvironment::ms_attrs_hotkeys;
 QStringList QEnvironment::ms_hotkeys_names;
 QMap<QString, AttrNumber> QEnvironment::ms_attrs_panel;
+QList<int64_t> QEnvironment::ms_jobs_serials_collapsed;
 
 bool QEnvironment::ms_valid = false;
 
@@ -340,14 +341,10 @@ AF_DEV << "nimby attrcolor: " << afqt::qtos(afqt::QEnvironment::clr_itemrenderni
 		if( buffer )
 		{
 			const JSON & obj = doc["watch"];
-			const JSON & wndrects = obj["wnd_rects"];
-			if( wndrects.IsArray())
-				for( int i = 0; i < wndrects.Size(); i++)
-		        {
-		            AttrRect * attrrect = AttrRect::readObj( wndrects[i]);
-		            if( attrrect == NULL) continue;
-		            ms_attrs_wndrects.append( attrrect);
-		        }
+
+			loadWndRects(obj);
+			loadCollapsedJobsSerials(obj);
+
 			delete [] buffer;
 		}
 		delete [] data;
@@ -449,7 +446,10 @@ bool QEnvironment::save()
 		saveWndRects( data);
 	}
 
-	data.append("}}\n");
+	data.append(",\n");
+	saveCollapsedJobsSerials(data);
+
+	data.append("\n}}\n");
 
    QFile file( ms_filename);
    if( file.open( QIODevice::WriteOnly) == false)
@@ -484,16 +484,30 @@ void QEnvironment::saveHotkeys( QByteArray & data)
 		(i.value())->v_write( data);
 	}
 }
-void QEnvironment::saveWndRects( QByteArray & data)
+void QEnvironment::saveWndRects(QByteArray & o_data)
 {
-	data.append("    \"wnd_rects\":[");
-	for( int i = 0; i < ms_attrs_wndrects.size(); i++)
+	o_data.append("    \"wnd_rects\":[");
+	for (int i = 0; i < ms_attrs_wndrects.size(); i++)
 	{
-		if( i ) data.append(",");
-		data.append("\n        ");
-		ms_attrs_wndrects[i]->v_write( data);
+		if (i) o_data.append(",");
+		o_data.append("\n        ");
+		ms_attrs_wndrects[i]->v_write(o_data);
 	}
-	data.append("\n    ]\n");
+	o_data.append("\n    ]");
+}
+
+void QEnvironment::loadWndRects(const JSON & i_obj)
+{
+	const JSON & wndrects = i_obj["wnd_rects"];
+	if (false == wndrects.IsArray())
+		return;
+
+	for (int i = 0; i < wndrects.Size(); i++)
+	{
+		AttrRect * attrrect = AttrRect::readObj(wndrects[i]);
+		if (attrrect == NULL) continue;
+		ms_attrs_wndrects.append(attrrect);
+	}
 }
 
 bool QEnvironment::getRect( const QString & i_name, QRect & rect)
@@ -672,3 +686,44 @@ const QString & QEnvironment::getDateTimeFormat()
 	static const QString date_time_format("yyyy.MM.dd HH:mm:ss");
 	return date_time_format;
 }
+
+bool QEnvironment::hasCollapsedJobSerial(int64_t i_serial)
+{
+	return ms_jobs_serials_collapsed.indexOf(i_serial) != -1;
+}
+
+void QEnvironment::addCollapsedJobSerial(int64_t i_serial)
+{
+	if (hasCollapsedJobSerial(i_serial))
+		return;
+
+	ms_jobs_serials_collapsed.append(i_serial);
+}
+
+void QEnvironment::delCollapsedJobSerial(int64_t i_serial)
+{
+	ms_jobs_serials_collapsed.removeAll(i_serial);
+}
+
+void QEnvironment::saveCollapsedJobsSerials(QByteArray & o_data)
+{
+	o_data.append("    \"jobs_serials_collapsed\":[");
+	for (int i = 0; i < ms_jobs_serials_collapsed.size(); i++)
+	{
+		if (i) o_data.append(",");
+		o_data.append(QString("\n        %1").arg(ms_jobs_serials_collapsed.at(i)));
+	}
+	o_data.append("\n    ]");
+}
+
+void QEnvironment::loadCollapsedJobsSerials(const JSON & i_obj)
+{
+	const JSON & serials = i_obj["jobs_serials_collapsed"];
+	if (false == serials.IsArray())
+		return;
+
+	for (int i = 0; i < serials.Size(); i++)
+		if (serials[i].IsInt64())
+			ms_jobs_serials_collapsed.append(serials[i].GetInt64());
+}
+
