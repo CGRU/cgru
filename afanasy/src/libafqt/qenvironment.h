@@ -163,6 +163,7 @@ public:
 	static bool hasCollapsedJobSerial(int64_t i_serial);
 	static void addCollapsedJobSerial(int64_t i_serial);
 	static void delCollapsedJobSerial(int64_t i_serial);
+	static void clearCollapsedJobSerials();
 
 private:
    static void solveServerAddress();

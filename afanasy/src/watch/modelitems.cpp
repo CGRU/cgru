@@ -68,7 +68,10 @@ void ModelItems::delItem( int row)
    beginRemoveRows( QModelIndex(), row, row);
    Item * item = items.takeAt( row);
    endRemoveRows();
+
 	m_list_items->v_itemToBeDeleted(item);
+	item->v_toBeDeleted();
+
    delete item;
 }
 

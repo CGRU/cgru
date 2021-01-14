@@ -59,6 +59,8 @@ public:
 	inline bool isTypeJobs()  const { return m_type == "jobs";  }
 	inline bool isTypeUsers() const { return m_type == "users"; }
 
+	// Called on delete ids event.
+	// Not called on list dtor.
 	virtual void v_itemToBeDeleted(Item * i_item);
 
 public slots:

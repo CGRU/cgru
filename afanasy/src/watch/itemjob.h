@@ -16,6 +16,8 @@ public:
 
 	void v_updateValues(af::Node * i_afnode, int i_msgType);
 
+	void v_toBeDeleted();
+
 	int maxrunningtasks;
 	int maxruntasksperhost;
 	int64_t state;

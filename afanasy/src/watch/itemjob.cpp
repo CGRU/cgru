@@ -329,6 +329,11 @@ void ItemJob::setItemCollapsed(bool i_collapse)
 	calcHeight();
 }
 
+void ItemJob::v_toBeDeleted()
+{
+	afqt::QEnvironment::delCollapsedJobSerial(m_serial);
+}
+
 bool ItemJob::calcHeight()
 {
 	int old_height = m_height;

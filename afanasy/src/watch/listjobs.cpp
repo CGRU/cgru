@@ -605,6 +605,15 @@ ItemNode * ListJobs::v_createNewItemNode(af::Node * i_afnode, Item::EType i_type
 	return new ItemJob(this, false /*in work list*/, (af::Job*)i_afnode, m_ctrl_sf, i_notify);
 }
 
+void ListJobs::v_itemToBeDeleted(Item * i_item)
+{
+	// If there is not more items we can delete all collapsed jobs serials.
+	// On a job deletion we remove its serial, but deletion can happen by other GUI when this GUI is closed.
+	// So w/o clearing collapsed jobs serials list can grow unlimited with time.
+	if (count() == 0)
+		afqt::QEnvironment::clearCollapsedJobSerials();
+}
+
 void ListJobs::v_resetSorting()
 {
 	if ((af::Environment::VISOR() == false) && (m_listwork == false))

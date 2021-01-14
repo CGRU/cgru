@@ -47,6 +47,8 @@ Item::~Item()
 		delete m_buttons[b];
 }
 
+void Item::v_toBeDeleted() {}
+
 void Item::setDepth(int i_depth)
 {
 	m_depth = i_depth;

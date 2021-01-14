@@ -705,6 +705,11 @@ void QEnvironment::delCollapsedJobSerial(int64_t i_serial)
 	ms_jobs_serials_collapsed.removeAll(i_serial);
 }
 
+void QEnvironment::clearCollapsedJobSerials()
+{
+	ms_jobs_serials_collapsed.clear();
+}
+
 void QEnvironment::saveCollapsedJobsSerials(QByteArray & o_data)
 {
 	o_data.append("    \"jobs_serials_collapsed\":[");

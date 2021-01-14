@@ -120,6 +120,10 @@ public:
 
 	inline void addButton(ItemButton * i_ib) {m_buttons.append(i_ib);}
 
+	// Called on delete ids event.
+	// Not called on list dtor.
+	virtual void v_toBeDeleted();
+
 protected:
 	inline int getDepth() const { return m_depth; }
 	void setDepth(int i_depth);

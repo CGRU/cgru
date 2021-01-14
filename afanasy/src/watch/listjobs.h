@@ -25,6 +25,10 @@ public:
 
 	virtual void v_hideChanged();
 
+	// Called on delete ids event.
+	// Not called on list dtor.
+	void v_itemToBeDeleted(Item * i_item);
+
 protected:
 	void contextMenuEvent(QContextMenuEvent *event);
 
