@@ -174,6 +174,8 @@ void WndTask::closeEvent( QCloseEvent * i_evt)
 			it = ms_wndtasks.erase(it);
 		else
 			it++;
+
+	Wnd::closeEvent(i_evt);
 }
 
 void WndTask::parentClosed()

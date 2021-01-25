@@ -318,9 +318,8 @@ QEnvironment::QEnvironment( const QString & i_name)
 
     ms_valid = true;
 
-AF_DEV << "nimby attrcolor: " << afqt::qtos(afqt::QEnvironment::clr_itemrendernimby.v_writeData());
     loadAttrs( ms_filename);
-AF_DEV << "nimby attrcolor: " << afqt::qtos(afqt::QEnvironment::clr_itemrendernimby.v_writeData());
+
 	bool theme_loaded = true;
     if( false == loadTheme( theme.str))
 	{
