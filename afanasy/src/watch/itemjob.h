@@ -108,13 +108,16 @@ private:
 
 	bool m_compact_display;
 
+	int m_tasks_total;
+	int m_tasks_done;
+	int m_tasks_running;
+	int m_tasks_error;
+
 	QString m_str_props;
 	QString m_str_user_eta;
 	QString m_str_runningTime;
 
 	int m_num_runningtasks;
-
-	int m_tasks_done;
 
 	QList<QImage*> m_thumbs;
 	QList<QString> m_thumbs_paths;

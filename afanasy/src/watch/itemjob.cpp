@@ -30,7 +30,11 @@ ItemJob::ItemJob(ListNodes * i_list_nodes, bool i_inworklist, af::Job * i_job, c
 	m_btn_item_collapse(NULL),
 	m_btn_item_expand(NULL),
 
+	m_tasks_total(-1),
 	m_tasks_done(-1),
+	m_tasks_running(-1),
+	m_tasks_error(-1),
+
 	state(0)
 {
 	for (int b = 0; b < i_job->getBlocksNum(); b++)
@@ -160,7 +164,10 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 
 	m_compact_display = true;
 
-	m_tasks_done = 0;
+	m_tasks_total   = 0;
+	m_tasks_done    = 0;
+	m_tasks_running = 0;
+	m_tasks_error   = 0;
 	for (int b = 0; b < m_blocks.size(); b++)
 	{
 		const af::BlockData * block = job->getBlock(b);
@@ -172,7 +179,10 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 		if (b == 0)
 			service = afqt::stoq(block->getService());
 
-		m_tasks_done += m_blocks[b]->p_tasksdone;
+		m_tasks_total   += m_blocks[b]->tasksnum;
+		m_tasks_done    += m_blocks[b]->p_tasksdone;
+		m_tasks_running += m_blocks[b]->p_tasksrunning;
+		m_tasks_error   += m_blocks[b]->p_taskserror;
 	}
 
 	if (time_started) m_compact_display = false;
@@ -391,6 +401,20 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 
 	// Draw standart backgroud
 	drawBack(i_painter, i_rect, i_option, itemColor);
+
+	if (m_item_collapsed)
+	{
+		Item::drawPercent
+		(
+			i_painter, x+1, y+18, w-2, 12,
+			m_tasks_total, m_tasks_done, m_tasks_error, m_tasks_running,
+			false
+		);
+
+		i_painter->setFont(afqt::QEnvironment::f_info);
+		i_painter->setPen(clrTextInfo(i_option));
+		i_painter->drawText(x+54, y+18, w, h, Qt::AlignTop | Qt::AlignLeft, QString("%1%").arg(100*m_tasks_done/m_tasks_total));
+	}
 
 	x += m_buttons_width;
 	w -= m_buttons_width;
