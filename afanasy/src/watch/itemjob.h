@@ -80,6 +80,8 @@ public:
 
 	void v_buttonClicked(ItemButton * i_b);
 
+	void setItemCollapsed(bool i_collapse);
+
 protected:
 	virtual void v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const;
 
@@ -92,8 +94,6 @@ private:
 	void updateInfo(const af::Job * i_job);
 
 	int drawButtons(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option, const QColor * i_clrItem) const;
-
-	void setItemCollapsed(bool i_collapse);
 
 private:
 	int64_t m_serial;
@@ -112,9 +112,10 @@ private:
 	int m_tasks_done;
 	int m_tasks_running;
 	int m_tasks_error;
+	int m_tasks_percent;
 
 	QString m_str_props;
-	QString m_str_user_eta;
+	QString m_str_user;
 	QString m_str_runningTime;
 
 	int m_num_runningtasks;

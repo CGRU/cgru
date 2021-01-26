@@ -38,6 +38,7 @@ WndList* Watch::opened[WLAST] = {0,0,0,0,0,0};
 
 const int Watch::Icons_Size_Large = 48;
 const int Watch::Icons_Size_Small = 16;
+const int Watch::Icons_Size_Tiny  = 10;
 
 QLinkedList<Wnd*>      Watch::ms_windows;
 QLinkedList<Receiver*> Watch::ms_receivers;
@@ -47,6 +48,7 @@ QLinkedList<QWidget*>  Watch::ms_watchtaskswindows;
 
 QMap<QString, QPixmap *> Watch::ms_services_icons_large;
 QMap<QString, QPixmap *> Watch::ms_services_icons_small;
+QMap<QString, QPixmap *> Watch::ms_services_icons_tiny;
 QMap<QString, QPixmap *> Watch::ms_tickets_icons;
 
 QApplication * Watch::ms_app = NULL;
@@ -60,6 +62,7 @@ Watch::Watch( Dialog * pDialog, QApplication * pApplication)
 	// Load icons:
 	QString icons_path = afqt::stoq(af::Environment::getCGRULocation()) + "/icons";
 	// Load services icons:
+	loadIcons(ms_services_icons_tiny,  icons_path + "/software", Icons_Size_Tiny );
 	loadIcons(ms_services_icons_small, icons_path + "/software", Icons_Size_Small);
 	loadIcons(ms_services_icons_large, icons_path + "/software", Icons_Size_Large);
 
@@ -72,6 +75,7 @@ Watch::~Watch()
 	// Delete icons:
 	deleteIcons(ms_services_icons_large);
 	deleteIcons(ms_services_icons_small);
+	deleteIcons(ms_services_icons_tiny);
 	deleteIcons(ms_tickets_icons);
 }
 

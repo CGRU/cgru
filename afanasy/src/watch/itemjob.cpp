@@ -34,6 +34,7 @@ ItemJob::ItemJob(ListNodes * i_list_nodes, bool i_inworklist, af::Job * i_job, c
 	m_tasks_done(-1),
 	m_tasks_running(-1),
 	m_tasks_error(-1),
+	m_tasks_percent(-1),
 
 	state(0)
 {
@@ -54,7 +55,7 @@ ItemJob::ItemJob(ListNodes * i_list_nodes, bool i_inworklist, af::Job * i_job, c
 	m_item_collapsed = afqt::QEnvironment::hasCollapsedJobSerial(m_serial);
 
 	// Add buttons:
-	if ((false == m_inworklist) && (false == af::Environment::VISOR()))
+	//if ((false == m_inworklist) && (false == af::Environment::VISOR()))
 	{
 		m_buttons_width = 16;
 
@@ -168,6 +169,7 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 	m_tasks_done    = 0;
 	m_tasks_running = 0;
 	m_tasks_error   = 0;
+	m_tasks_percent = 0;
 	for (int b = 0; b < m_blocks.size(); b++)
 	{
 		const af::BlockData * block = job->getBlock(b);
@@ -183,7 +185,9 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 		m_tasks_done    += m_blocks[b]->p_tasksdone;
 		m_tasks_running += m_blocks[b]->p_tasksrunning;
 		m_tasks_error   += m_blocks[b]->p_taskserror;
+		m_tasks_percent += m_blocks[b]->p_percentage;
 	}
+	m_tasks_percent /= m_blocks.size();
 
 	if (time_started) m_compact_display = false;
 	if (state == AFJOB::STATE_DONE_MASK) m_compact_display = true;
@@ -248,9 +252,9 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 
 	ItemNode::updateStrParameters(m_str_props);
 
-	m_str_user_eta.clear();
+	m_str_user.clear();
 	if (af::Environment::VISOR() || m_inworklist)
-		m_str_user_eta = username;
+		m_str_user = username;
 
 	if (time_started && ((state & AFJOB::STATE_DONE_MASK) == false))
 		setRunning();
@@ -259,7 +263,7 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 
 	if (isLocked())
 	{
-		m_str_user_eta += " (LOCK)";
+		m_str_user += " (LOCK)";
 	}
 
 	m_tooltip = job->v_generateInfoString(true).c_str();
@@ -404,24 +408,50 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 
 	if (m_item_collapsed)
 	{
+		// Draw progress bar:
 		Item::drawPercent
 		(
-			i_painter, x+1, y+18, w-2, 12,
+			i_painter, x+64, y+18, w-2, 6,
 			m_tasks_total, m_tasks_done, m_tasks_error, m_tasks_running,
 			false
 		);
+		Item::drawPercent
+		(
+			i_painter, x+64, y+24, w-2, 6,
+			100, m_tasks_percent, 0, 0,
+			false
+		);
 
-		i_painter->setFont(afqt::QEnvironment::f_info);
-		i_painter->setPen(clrTextInfo(i_option));
-		i_painter->drawText(x+54, y+18, w, h, Qt::AlignTop | Qt::AlignLeft, QString("%1%").arg(100*m_tasks_done/m_tasks_total));
+		// Draw percentage:
+		if ((m_tasks_percent > 0) && (m_tasks_percent < 100))
+		{
+			i_painter->setFont(afqt::QEnvironment::f_info);
+			i_painter->setPen(clrTextInfo(i_option));
+			i_painter->drawText(x+2, y+18, w, h, Qt::AlignTop | Qt::AlignLeft, QString("%1%").arg(m_tasks_percent));
+		}
+
+		// Draw services icons:
+		for (int b = 0; b < m_blocks.size(); b++)
+		{
+			if ((b == 1) && ((m_tasks_percent > 0) || (m_tasks_done > 0)))
+				i_painter->setOpacity(0.5);
+
+			const QPixmap * icon = Watch::getServiceIconTiny(m_blocks[b]->service);
+			if (NULL == icon)
+				continue;
+
+			i_painter->drawPixmap(x+50+(b*18), y+19, *icon);
+		}
 	}
+
+	i_painter->setOpacity(1.0);
 
 	x += m_buttons_width;
 	w -= m_buttons_width;
 
 	uint32_t currenttime = time(NULL);
 
-	QString user_time = m_str_user_eta;
+	QString user_eta = m_str_user;
 	QString properties_time = m_str_props;
 	if (time_started && ((state & AFJOB::STATE_DONE_MASK) == false))
 	{
@@ -446,11 +476,11 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 				int eta = sec_all - sec_run;
 				if (eta > 0)
 				{
-					QString etas = afqt::stoq(af::time2strHMS(eta)) + " " + m_str_user_eta;
+					QString etas = afqt::stoq(af::time2strHMS(eta)) + " " + m_str_user;
 					if (Watch::isPadawan() || Watch::isJedi())
-						user_time = QString::fromUtf8("ETA: ~") + etas;
+						user_eta = QString::fromUtf8("ETA: ~") + etas;
 					else
-						user_time = QString::fromUtf8("eta: ~") + etas;
+						user_eta = QString::fromUtf8("eta: ~") + etas;
 				}
 			}
 		}
@@ -460,26 +490,42 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 	{
 		QString wait = af::time2strHMS(time_wait - currenttime).c_str();
 		if (Watch::isPadawan())
-			user_time = m_str_user_eta + " Waiting Time:" + wait;
+			user_eta = m_str_user + " Waiting Time:" + wait;
 		else if (Watch::isJedi())
-			user_time = m_str_user_eta + " Wait:" + wait;
+			user_eta = m_str_user + " Wait:" + wait;
 		else
-			user_time = m_str_user_eta + " w:" + wait;
+			user_eta = m_str_user + " w:" + wait;
 	}
-
-	printfState(state, x+35+(w>>3), y+25, i_painter, i_option);
-
-	i_painter->setFont(afqt::QEnvironment::f_info);
-	i_painter->setPen(clrTextInfo(i_option));
-
-	int cy = y-10; int dy = 13;
-	QRect rect_user;
-	i_painter->drawText(x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, user_time, &rect_user);
 
 	if (lifetime > 0)
 		properties_time += QString(" L%1-%2")
 			.arg(af::time2strHMS(lifetime, true).c_str()).arg(af::time2strHMS(lifetime - (currenttime - time_creation)).c_str());
-	i_painter->drawText(x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, properties_time);
+
+	printfState(state, x+35+(w>>3), y+25, i_painter, i_option);
+
+	QRect rect_done_time;
+	if (state & AFJOB::STATE_DONE_MASK)
+	{
+		i_painter->setFont(afqt::QEnvironment::f_name);
+		i_painter->setPen(clrTextDone(i_option));
+		i_painter->drawText(x, y, w-5, h, Qt::AlignTop | Qt::AlignRight, m_str_runningTime, &rect_done_time);
+	}
+
+	int cy = y-10; int dy = 13;
+	i_painter->setFont(afqt::QEnvironment::f_info);
+	i_painter->setPen(clrTextInfo(i_option));
+	QRect rect_top_right;
+	if (m_item_collapsed)
+	{
+		i_painter->drawText(x, cy+=dy, w-5-rect_done_time.width(), h, Qt::AlignTop | Qt::AlignRight,
+				QString("%1 %2").arg(properties_time, user_eta), &rect_top_right);
+	}
+	else
+	{
+		i_painter->drawText(x, cy+=dy, w-5-rect_done_time.width(), h, Qt::AlignTop | Qt::AlignRight, user_eta, &rect_top_right);
+		i_painter->drawText(x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, properties_time);
+	}
+	rect_top_right.setWidth(rect_top_right.width() + rect_done_time.width());
 
 	int offset = 30;
 
@@ -487,18 +533,18 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 	i_painter->setFont(afqt::QEnvironment::f_name);
 	QFontMetrics fm(afqt::QEnvironment::f_name);
 	QString id_str = QString("#%1").arg(getId());
-	i_painter->drawText(x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, id_str);
+	i_painter->drawText(x+offset, y, w-10-offset-rect_top_right.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, id_str);
 	offset += fm.width(id_str) + 10;
 	
 	if (project.size())
 	{
 		i_painter->setPen(afqt::QEnvironment::clr_textbright.c);
 		i_painter->setFont(afqt::QEnvironment::f_name);
-		i_painter->drawText(x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, project);
+		i_painter->drawText(x+offset, y, w-10-offset-rect_top_right.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, project);
 		offset += fm.width(project);
 		if (department.size())
 		{
-			i_painter->drawText(x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, "(" + department + ")");
+			i_painter->drawText(x+offset, y, w-10-offset-rect_top_right.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, "(" + department + ")");
 			offset += fm.width(department);
 		}
 		offset += 25;
@@ -506,26 +552,30 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 	
 	i_painter->setPen(clrTextMain(i_option));
 	i_painter->setFont(afqt::QEnvironment::f_name);
-	i_painter->drawText(x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, m_name);
-
-	if (state & AFJOB::STATE_DONE_MASK)
-	{
-		i_painter->setFont(afqt::QEnvironment::f_name);
-		i_painter->setPen(clrTextDone(i_option));
-		i_painter->drawText(x+3, y+26, m_str_runningTime);
-	}
+	i_painter->drawText(x+offset, y, w-10-offset-rect_top_right.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, m_name);
 
 	// Running tasks and a star:
 	if (state & AFJOB::STATE_RUNNING_MASK)
 	{
-		drawStar(m_num_runningtasks>=10 ? 14:10, x+15, y+16, i_painter);
+		int star_size = 10;
+		int star_y = 16;
+		if ((m_num_runningtasks >= 10) && (false == m_item_collapsed))
+			star_size = 14;
+		if (m_item_collapsed)
+			star_y = 12;
+
+		drawStar(star_size, x+15, y+star_y, i_painter);
+
 		i_painter->setFont(afqt::QEnvironment::f_name);
 		i_painter->setPen(afqt::QEnvironment::clr_textstars.c);
-		i_painter->drawText(x+0, y+0, 30, 34, Qt::AlignHCenter | Qt::AlignVCenter, QString::number(m_num_runningtasks));
+		i_painter->drawText(x+0, y+0, 30, m_item_collapsed ? 24 : 34, Qt::AlignHCenter | Qt::AlignVCenter, QString::number(m_num_runningtasks));
 	}
 
 	if (m_item_collapsed)
 		return;
+
+	x -= m_buttons_width;
+	w += m_buttons_width;
 
 	// Blocks:
 	for (int b = 0; b < m_blocks.size(); b++)

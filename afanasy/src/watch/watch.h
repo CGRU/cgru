@@ -116,8 +116,10 @@ public:
 
 	static const int Icons_Size_Large;
 	static const int Icons_Size_Small;
+	static const int Icons_Size_Tiny;
 	inline static const QPixmap * getServiceIconLarge(const QString & i_name) { return ms_services_icons_large.value(i_name, NULL);}
 	inline static const QPixmap * getServiceIconSmall(const QString & i_name) { return ms_services_icons_small.value(i_name, NULL);}
+	inline static const QPixmap * getServiceIconTiny (const QString & i_name) { return ms_services_icons_tiny.value (i_name, NULL);}
 	inline static const QPixmap * getTicketIcon(const QString & i_name) { return ms_tickets_icons.value(i_name, NULL);}
 
 	void static refreshGui();
@@ -147,5 +149,6 @@ private:
 
 	static QMap<QString, QPixmap *> ms_services_icons_large;
 	static QMap<QString, QPixmap *> ms_services_icons_small;
+	static QMap<QString, QPixmap *> ms_services_icons_tiny;
 	static QMap<QString, QPixmap *> ms_tickets_icons;
 };

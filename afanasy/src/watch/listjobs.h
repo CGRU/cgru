@@ -75,6 +75,9 @@ private slots:
 	void actBrowseFolder( QString i_folder);
 	void actOpenRULES();
 
+	void slot_CollapseJobs();
+	void slot_ExpandJobs();
+
 	// Needed to store where a menu for all blocks manipulation opened
 	void slot_BlocksMenuForAll();
 	void slot_BlocksMenuNotAll();
@@ -88,6 +91,8 @@ private:
 	void getUserJobsOrder();
 
 	void calcTotals();
+
+	void collapseJobs(bool i_collapse);
 
 private:
 	const bool m_listwork;

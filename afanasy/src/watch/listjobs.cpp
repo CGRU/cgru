@@ -820,6 +820,18 @@ void ListJobs::actOpenRULES()
 	Watch::startProcess( cmd);
 }
 
+void ListJobs::slot_CollapseJobs() {collapseJobs(true );}
+void ListJobs::slot_ExpandJobs()   {collapseJobs(false);}
+void ListJobs::collapseJobs(bool i_collapse)
+{
+	for( int i = 0; i < m_model->count(); i++)
+	{
+		ItemJob * item_job = static_cast<ItemJob*>(m_model->item(i));
+		item_job->setItemCollapsed(i_collapse);
+		m_view->emitSizeHintChanged(m_model->index(i));
+	}
+}
+
 void ListJobs::slot_BlockAction(int i_bnum, QString i_json)
 {
 	ItemJob* jobitem = (ItemJob*)getCurrentItem();

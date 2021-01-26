@@ -75,5 +75,15 @@ void CtrlJobs::contextMenuEvent( QContextMenuEvent * i_event)
 		menu.addAction(action_id);
 	}
 
+	menu.addSeparator();
+
+	action = new QAction("Collapse Jobs", this);
+	connect(action, SIGNAL(triggered()), m_listjobs, SLOT(slot_CollapseJobs()));
+	menu.addAction(action);
+
+	action = new QAction("Expand Jobs", this);
+	connect(action, SIGNAL(triggered()), m_listjobs, SLOT(slot_ExpandJobs()));
+	menu.addAction(action);
+
 	menu.exec( i_event->globalPos());
 }
