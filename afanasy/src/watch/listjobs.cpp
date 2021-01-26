@@ -826,7 +826,11 @@ void ListJobs::collapseJobs(bool i_collapse)
 {
 	for( int i = 0; i < m_model->count(); i++)
 	{
-		ItemJob * item_job = static_cast<ItemJob*>(m_model->item(i));
+		Item * item = m_model->item(i);
+		if (item->getType() != Item::TJob)
+			continue;
+
+		ItemJob * item_job = static_cast<ItemJob*>(item);
 		item_job->setItemCollapsed(i_collapse);
 		m_view->emitSizeHintChanged(m_model->index(i));
 	}
