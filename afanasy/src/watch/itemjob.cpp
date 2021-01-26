@@ -409,25 +409,12 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 	if (m_item_collapsed)
 	{
 		// Draw progress bar:
-		Item::drawPercent
-		(
-			i_painter, x+64, y+18, w-2, 6,
-			m_tasks_total, m_tasks_done, m_tasks_error, m_tasks_running,
-			false
-		);
-		Item::drawPercent
-		(
-			i_painter, x+64, y+24, w-2, 6,
-			100, m_tasks_percent, 0, 0,
-			false
-		);
-
-		// Draw percentage:
-		if ((m_tasks_percent > 0) && (m_tasks_percent < 100))
+		if ((m_tasks_done != m_tasks_total) && (m_tasks_done || m_tasks_error || m_tasks_running || m_tasks_percent))
 		{
-			i_painter->setFont(afqt::QEnvironment::f_info);
-			i_painter->setPen(clrTextInfo(i_option));
-			i_painter->drawText(x+2, y+18, w, h, Qt::AlignTop | Qt::AlignLeft, QString("%1%").arg(m_tasks_percent));
+			Item::drawPercent(i_painter, x+64, y+18, w-66, 6,
+				m_tasks_total, m_tasks_done, m_tasks_error, m_tasks_running, false);
+			Item::drawPercent(i_painter, x+64, y+24, w-66, 6,
+				100, m_tasks_percent, 0, 0, false);
 		}
 
 		// Draw services icons:
@@ -461,7 +448,7 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 		else
 			properties_time += " " + runtime;
 
-		// ETA (but not for the system job):
+		// ETA and percent, but not for the system job:
 		if (getId() != AFJOB::SYSJOB_ID)
 		{
 			int percentage = 0;
@@ -483,6 +470,8 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 						user_eta = QString::fromUtf8("eta: ~") + etas;
 				}
 			}
+
+			user_eta += QString(" %1%").arg(m_tasks_percent);
 		}
 	}
 
@@ -509,22 +498,15 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 		i_painter->setFont(afqt::QEnvironment::f_name);
 		i_painter->setPen(clrTextDone(i_option));
 		i_painter->drawText(x, y, w-5, h, Qt::AlignTop | Qt::AlignRight, m_str_runningTime, &rect_done_time);
+		rect_done_time.setWidth(rect_done_time.width() + 6);
 	}
 
 	int cy = y-10; int dy = 13;
 	i_painter->setFont(afqt::QEnvironment::f_info);
 	i_painter->setPen(clrTextInfo(i_option));
 	QRect rect_top_right;
-	if (m_item_collapsed)
-	{
-		i_painter->drawText(x, cy+=dy, w-5-rect_done_time.width(), h, Qt::AlignTop | Qt::AlignRight,
-				QString("%1 %2").arg(properties_time, user_eta), &rect_top_right);
-	}
-	else
-	{
-		i_painter->drawText(x, cy+=dy, w-5-rect_done_time.width(), h, Qt::AlignTop | Qt::AlignRight, user_eta, &rect_top_right);
-		i_painter->drawText(x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, properties_time);
-	}
+	i_painter->drawText(x, cy+=dy, w-5-rect_done_time.width(), h, Qt::AlignTop | Qt::AlignRight, user_eta, &rect_top_right);
+	i_painter->drawText(x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, properties_time);
 	rect_top_right.setWidth(rect_top_right.width() + rect_done_time.width());
 
 	int offset = 30;
@@ -557,18 +539,11 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 	// Running tasks and a star:
 	if (state & AFJOB::STATE_RUNNING_MASK)
 	{
-		int star_size = 10;
-		int star_y = 16;
-		if ((m_num_runningtasks >= 10) && (false == m_item_collapsed))
-			star_size = 14;
-		if (m_item_collapsed)
-			star_y = 12;
-
-		drawStar(star_size, x+15, y+star_y, i_painter);
+		drawStar(m_num_runningtasks < 10 ? 10 : 14, x+15, y+16, i_painter);
 
 		i_painter->setFont(afqt::QEnvironment::f_name);
 		i_painter->setPen(afqt::QEnvironment::clr_textstars.c);
-		i_painter->drawText(x+0, y+0, 30, m_item_collapsed ? 24 : 34, Qt::AlignHCenter | Qt::AlignVCenter, QString::number(m_num_runningtasks));
+		i_painter->drawText(x+0, y+0, 30, 34, Qt::AlignHCenter | Qt::AlignVCenter, QString::number(m_num_runningtasks));
 	}
 
 	if (m_item_collapsed)
