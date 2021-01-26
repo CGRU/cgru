@@ -164,6 +164,8 @@ public:
 	static void addCollapsedJobSerial(int64_t i_serial);
 	static void delCollapsedJobSerial(int64_t i_serial);
 	static void clearCollapsedJobSerials();
+	inline static bool collapseNewJobs() {return ms_jobs_collapse_new;}
+	inline static void setCollapseNewJobs(bool i_collapse) {ms_jobs_collapse_new = i_collapse;}
 
 private:
    static void solveServerAddress();
@@ -192,4 +194,5 @@ private:
 	static QMap<QString, Attr*> ms_attrs_hotkeys;
 	static QStringList ms_hotkeys_names;
 	static QList<int64_t> ms_jobs_serials_collapsed;
+	static bool ms_jobs_collapse_new;
 };

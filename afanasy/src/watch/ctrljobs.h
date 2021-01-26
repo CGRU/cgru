@@ -17,6 +17,9 @@ public:
 protected:
 	void contextMenuEvent( QContextMenuEvent * i_event);
 
+private slots:
+	void slot_CollapseNewJobs(bool i_collapse);
+
 private:
 	ListJobs * m_listjobs;
 	const bool m_inworklist;

@@ -52,7 +52,13 @@ ItemJob::ItemJob(ListNodes * i_list_nodes, bool i_inworklist, af::Job * i_job, c
 		return;
 	}
 
-	m_item_collapsed = afqt::QEnvironment::hasCollapsedJobSerial(m_serial);
+	if (afqt::QEnvironment::collapseNewJobs())
+	{
+		afqt::QEnvironment::addCollapsedJobSerial(m_serial);
+		m_item_collapsed = true;
+	}
+	else
+		m_item_collapsed = afqt::QEnvironment::hasCollapsedJobSerial(m_serial);
 
 	// Add buttons:
 	//if ((false == m_inworklist) && (false == af::Environment::VISOR()))

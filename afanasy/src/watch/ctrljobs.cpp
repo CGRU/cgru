@@ -5,6 +5,8 @@
 #include <QLabel>
 #include <QMenu>
 
+#include "../libafqt/qenvironment.h"
+
 CtrlJobs::CtrlJobs( QWidget * i_parent, ListJobs * i_listjobs, bool i_inworklist):
 	QLabel("View Options", i_parent),
 	m_listjobs(i_listjobs),
@@ -77,13 +79,25 @@ void CtrlJobs::contextMenuEvent( QContextMenuEvent * i_event)
 
 	menu.addSeparator();
 
-	action = new QAction("Collapse Jobs", this);
+	action = new QAction("Collapse All Jobs", this);
 	connect(action, SIGNAL(triggered()), m_listjobs, SLOT(slot_CollapseJobs()));
 	menu.addAction(action);
 
-	action = new QAction("Expand Jobs", this);
+	action = new QAction("Expand All Jobs", this);
 	connect(action, SIGNAL(triggered()), m_listjobs, SLOT(slot_ExpandJobs()));
+	menu.addAction(action);
+
+	action = new QAction("Collapse New Jobs", this);
+	action->setCheckable(true);
+	action->setChecked(afqt::QEnvironment::collapseNewJobs());
+	connect(action, SIGNAL(triggered(bool)), this, SLOT(slot_CollapseNewJobs(bool)));
 	menu.addAction(action);
 
 	menu.exec( i_event->globalPos());
 }
+
+void CtrlJobs::slot_CollapseNewJobs(bool i_collapse)
+{
+	afqt::QEnvironment::setCollapseNewJobs(i_collapse);
+}
+

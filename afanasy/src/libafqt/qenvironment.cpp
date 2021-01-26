@@ -135,6 +135,7 @@ QMap<QString,Attr*> QEnvironment::ms_attrs_hotkeys;
 QStringList QEnvironment::ms_hotkeys_names;
 QMap<QString, AttrNumber> QEnvironment::ms_attrs_panel;
 QList<int64_t> QEnvironment::ms_jobs_serials_collapsed;
+bool QEnvironment::ms_jobs_collapse_new = false;
 
 bool QEnvironment::ms_valid = false;
 
@@ -711,7 +712,9 @@ void QEnvironment::clearCollapsedJobSerials()
 
 void QEnvironment::saveCollapsedJobsSerials(QByteArray & o_data)
 {
-	o_data.append("    \"jobs_serials_collapsed\":[");
+	o_data.append(QString("    \"jobs_collapsed_new\":%1").arg(ms_jobs_collapse_new ? "true":"false"));
+
+	o_data.append(",\n    \"jobs_serials_collapsed\":[");
 	for (int i = 0; i < ms_jobs_serials_collapsed.size(); i++)
 	{
 		if (i) o_data.append(",");
@@ -722,6 +725,8 @@ void QEnvironment::saveCollapsedJobsSerials(QByteArray & o_data)
 
 void QEnvironment::loadCollapsedJobsSerials(const JSON & i_obj)
 {
+	af::jr_bool("jobs_collapsed_new", ms_jobs_collapse_new, i_obj);
+
 	const JSON & serials = i_obj["jobs_serials_collapsed"];
 	if (false == serials.IsArray())
 		return;
