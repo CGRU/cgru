@@ -824,6 +824,8 @@ void ListJobs::slot_CollapseJobs() {collapseJobs(true );}
 void ListJobs::slot_ExpandJobs()   {collapseJobs(false);}
 void ListJobs::collapseJobs(bool i_collapse)
 {
+	afqt::QEnvironment::clearCollapsedJobSerials();
+
 	for( int i = 0; i < m_model->count(); i++)
 	{
 		Item * item = m_model->item(i);
@@ -834,9 +836,6 @@ void ListJobs::collapseJobs(bool i_collapse)
 		item_job->setItemCollapsed(i_collapse);
 		m_view->emitSizeHintChanged(m_model->index(i));
 	}
-
-	if (false == i_collapse)
-		afqt::QEnvironment::clearCollapsedJobSerials();
 }
 
 void ListJobs::slot_BlockAction(int i_bnum, QString i_json)
