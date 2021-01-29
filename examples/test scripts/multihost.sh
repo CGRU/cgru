@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 ./job.sh --pkp 0 --mhmin 3 --mhmax 5 --mhwaitmax 5 --mhignorelost 1 "$@"
 

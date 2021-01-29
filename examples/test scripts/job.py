@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 '''
 /* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
@@ -52,6 +53,7 @@ parser.add_option(      '--capmax',       dest='capmax',       type='int',    de
 parser.add_option('-f', '--filesout',     dest='filesout',     type='string', default=None, help='Tasks out file [render/img.%04d.jpg]')
 parser.add_option(      '--filemin',      dest='filemin',      type='int',    default=-1, help='tasks output file size min')
 parser.add_option(      '--filemax',      dest='filemax',      type='int',    default=-1, help='tasks output file size max')
+parser.add_option(      '--stdoutfile',   dest='stdoutfile',   type='string', default=None, help='Read tasks stdout from file')
 parser.add_option(      '--mhmin',        dest='mhmin',        type='int',    default=-1, help='multi host tasks min hosts')
 parser.add_option(      '--mhmax',        dest='mhmax',        type='int',    default=-1, help='multi host tasks max hosts')
 parser.add_option(      '--mhwaitmax',    dest='mhwaitmax',    type='int',    default=0,  help='multi host tasks max hosts wait time seconds')
@@ -205,23 +207,8 @@ for b in range(numblocks):
             else:
                 'Warning: Invalid tickets: "%s"' % Options.environment
 
-    str_capacity = ''
-    if Options.capmin != -1 or Options.capmax != -1:
-        block.setVariableCapacity(Options.capmin, Options.capmax)
-        str_capacity = ' -c ' + services.service.str_capacity
-
     if Options.filemin != -1 or Options.filemax != -1:
         block.setFileSizeCheck(Options.filemin, Options.filemax)
-
-    str_hosts = ''
-    if Options.mhmin != -1 or Options.mhmax != -1:
-        block.setMultiHost(
-            Options.mhmin, Options.mhmax, Options.mhwaitmax,
-            Options.mhsame, Options.mhservice, Options.mhwaitsrv
-        )
-        if Options.mhignorelost:
-            block.setSlaveLostIgnore()
-        str_hosts = ' ' + services.service.str_hosts
 
     negative_pertask = False
     if Options.frames != '':
@@ -229,29 +216,43 @@ for b in range(numblocks):
         if int(fr[2]) < 0:
             negative_pertask = True
 
+    cmd = 'task.py'
+    cmd = "\"%s\"" % os.path.join(os.getcwd(), cmd)
+    cmd = "%s %s" % (os.getenv('CGRU_PYTHONEXE','python3'), cmd)
+    cmd += ' --exitstatus %d ' % Options.exitstatus
+
+    if Options.capmin != -1 or Options.capmax != -1:
+        block.setVariableCapacity(Options.capmin, Options.capmax)
+        cmd += ' -c ' + services.service.str_capacity
+
+    if Options.mhmin != -1 or Options.mhmax != -1:
+        block.setMultiHost(
+            Options.mhmin, Options.mhmax, Options.mhwaitmax,
+            Options.mhsame, Options.mhservice, Options.mhwaitsrv
+        )
+        if Options.mhignorelost:
+            block.setSlaveLostIgnore()
+        cmd += ' ' + services.service.str_hosts
+
+    if Options.filesout:
+        cmd += ' --filesout "%s"' % Options.filesout
+        block.skipExistingFiles()
+        block.checkRenderedFiles(100)
+        files = []
+        for afile in Options.filesout.split(';'):
+            files.append(afcommon.patternFromStdC(afile))
+        block.setFiles(files)
+
+    if Options.stdoutfile:
+        if not os.path.isfile(Options.stdoutfile):
+            print('ERROR: File "%s" does not exist.')
+            sys.exit(1)
+        cmd += ' --stdoutfile "%s"' % Options.stdoutfile
+
     if not Options.stringtype and not negative_pertask:
-        cmd = 'task.py'
-        cmd = "\"%s\"" % os.path.join(os.getcwd(), cmd)
-        cmd = "%s %s" % (os.getenv('CGRU_PYTHONEXE','python'), cmd)
-        cmd += ' --exitstatus %d ' % Options.exitstatus
-
-        if Options.filesout:
-            cmd += ' --filesout "%s"' % Options.filesout
-            block.skipExistingFiles()
-            block.checkRenderedFiles(100)
-            files = []
-            for afile in Options.filesout.split(';'):
-                files.append(afcommon.patternFromStdC(afile))
-            block.setFiles(files)
-
-        cmd += '%(str_capacity)s%(str_hosts)s -s @#@ -e @#@ ' \
-               '-i %(increment)d -t %(timesec)g -r %(randtime)g --pkp %(pkp)d ' \
-               '-v %(verbose)d @####@ @#####@ @#####@ @#####@' % vars()
-
-        if Options.cmd:
-            cmd = Options.cmd
-
-        block.setCommand(cmd, False)
+        cmd += ' -s @#@ -e @#@ -i %(increment)d' \
+               ' -t %(timesec)g -r %(randtime)g --pkp %(pkp)d' \
+               ' -v %(verbose)d @####@ @#####@ @#####@ @#####@' % vars()
 
         if Options.frames != '':
             fr = frames[b].split('/')
@@ -260,24 +261,10 @@ for b in range(numblocks):
             block.setNumeric(1, numtasks, Options.pertask, increment)
 
     else:
-        cmd = 'task.py%(str_capacity)s @#@ -v %(verbose)d' % vars()
-        cmd = "%s %s" % (os.getenv('CGRU_PYTHONEXE','python'), cmd)
+        cmd += ' -v %(verbose)d' % vars()
+        cmd += ' @#@'
 
         block.setTasksName('task @#@')
-
-        if Options.filesout:
-            cmd += ' --filesout "%s"' % Options.filesout
-            files = []
-            for afile in Options.filesout.split(';'):
-                files.append(afile.replace('%04d','@#@'))
-            block.setFiles(files)
-            block.skipExistingFiles()
-            block.checkRenderedFiles(100)
-
-        if Options.cmd:
-            cmd = Options.cmd
-
-        block.setCommand( cmd, False)
 
         if Options.frames != '':
             fr = frames[b].split('/')
@@ -293,6 +280,11 @@ for b in range(numblocks):
                 task.setFiles(['%04d' % t])
 
             block.tasks.append(task)
+
+    if Options.cmd:
+        cmd = Options.cmd
+
+    block.setCommand(cmd, False)
 
 if Options.cmdpre != '':
     job.setCmdPre(Options.cmdpre)

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 pg_conf=`find /etc/postgresql -name "pg_hba.conf"`
 pg_user="postgres"

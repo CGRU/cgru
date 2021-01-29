@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 pushd ../.. >> /dev/null
 source ./setup.sh

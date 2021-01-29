@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -7,7 +8,8 @@ import sys
 import time
 
 
-print('Started at ' + time.strftime('%A %d %B %H:%M:%S'))
+time_start = time.time()
+print('Started at: %s' % time.ctime(time_start))
 print('COMMAND:')
 print(sys.argv)
 print('WORKING DIRECTORY:')
@@ -35,6 +37,7 @@ Parser.add_option('-i', '--increment', dest='increment', type='int',    default=
 Parser.add_option('-t', '--time',      dest='timesec',   type='float',  default=2,    help='Time per frame in seconds')
 Parser.add_option('-r', '--randtime',  dest='randtime',  type='float',  default=0,    help='Random time per frame in seconds')
 Parser.add_option('-f', '--filesout',  dest='filesout',  type='string', default=None, help='File(s) to write (";" separated)')
+Parser.add_option(      '--stdoutfile',dest='stdoutfile',type='string', default=None, help='File to read stdout from')
 Parser.add_option('-v', '--verbose',   dest='verbose',   type='int',    default=0,    help='Verbose')
 Parser.add_option('-p', '--pkp',       dest='pkp',       type='int',    default=1,    help='Parser key percentage')
 Parser.add_option('-H', '--hosts',     dest='hosts',     type='string', default=None, help='Hosts list for mutihost tasks')
@@ -49,6 +52,15 @@ frame_inc = Options.increment
 ParserKeys = ['[ PARSER WARNING ]', '[ PARSER ERROR ]',
               '[ PARSER BAD RESULT ]', '[ PARSER FINISHED SUCCESS ]']
 
+StdOut = None
+if Options.stdoutfile:
+    if not os.path.isfile(Options.stdoutfile):
+        print('ERROR: File "%s" does not exist.')
+        sys.exit(1)
+    print('Reading stdout from "%s"' % Options.stdoutfile)
+    with open(Options.stdoutfile) as file:
+        StdOut = file.readlines()
+
 # Check frame range settings:
 if frame_end < frame_start:
     print('Error: frame_end(%d) < frame_start(%d)' % (frame_end, frame_start))
@@ -60,46 +72,46 @@ if frame_inc < 1:
     frame_inc = 1
     print('[ PARSER WARNING ]')
 
-sleepsec = .01 * (Options.timesec + Options.randtime * random.random())
-
 frame = frame_start
 parserKey_CurIndex = int(random.random() * 100) % len(ParserKeys)
-
-time_start = time.time()
-print('Started at: %s' % time.ctime(time_start))
 
 while frame <= frame_end:
     print('FRAME: %s' % frame)
 
-    for p in range(100):
-        print('PROGRESS: {progress}%'.format(progress=p + 1))
+    if StdOut is None:
+        for p in range(100):
+            print('PROGRESS: {progress}%'.format(progress=p + 1))
 
-        if p == 10:
-            print('ACTIVITY: Generating')
+            if p == 10:
+                print('ACTIVITY: Generating')
 
-        if p == 50:
-            print('ACTIVITY: Rendering')
-            print('REPORT: ' + str(random.random()))
+            if p == 50:
+                print('ACTIVITY: Rendering')
+                print('REPORT: ' + str(random.random()))
 
-        if p == 90:
-            print('ACTIVITY: Finalizing')
+            if p == 90:
+                print('ACTIVITY: Finalizing')
 
-        if random.random() * 100 * 100 < Options.pkp:
-            print(ParserKeys[parserKey_CurIndex])
-            parserKey_CurIndex += 1
-            if parserKey_CurIndex >= len(ParserKeys):
-                parserKey_CurIndex = 0
+            if random.random() * 100 * 100 < Options.pkp:
+                print(ParserKeys[parserKey_CurIndex])
+                parserKey_CurIndex += 1
+                if parserKey_CurIndex >= len(ParserKeys):
+                    parserKey_CurIndex = 0
 
-        for v in range(Options.verbose):
-            print(
-                '%s: %s: %s: QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasd'
-                'fghjklzxcvbnm' % (frame, p, v)
-            )
-            # sys.stdout.flush()
-            # time.sleep(sleepsec)
+            for v in range(Options.verbose):
+                print(
+                    '%s: %s: %s: QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasd'
+                    'fghjklzxcvbnm' % (frame, p, v)
+                )
 
-        sys.stdout.flush()
-        time.sleep(sleepsec)
+            sys.stdout.flush()
+            time.sleep(.01 * (Options.timesec + Options.randtime * random.random()))
+
+    else:
+        for line in StdOut:
+            print(line, end='')
+            sys.stdout.flush()
+            time.sleep(Options.timesec / len(StdOut))
 
     if Options.filesout:
         files = Options.filesout.split(';')
@@ -121,7 +133,6 @@ while frame <= frame_end:
 
 time_finish = time.time()
 print('Finished at: %s' % time.ctime(time_finish))
-print('Sleeping = %f seconds.' % sleepsec)
 print('Running time = %d seconds.' % (time_finish - time_start))
 
 sys.stdout.flush()

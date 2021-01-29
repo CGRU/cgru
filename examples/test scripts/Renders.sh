@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 RENDER="afrender"
 export AF_USERNAME="renderer"
