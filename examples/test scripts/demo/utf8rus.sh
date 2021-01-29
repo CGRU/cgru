@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 if [ -z $CGRU_LOCATION ]; then
    pwd=$PWD

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 script="$PWD/emulate.py"
 
