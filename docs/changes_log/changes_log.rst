@@ -11,6 +11,14 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
 - The third number versions are fully compatible.
   You can upgrade only one client or server for changes.
 
+v3.1.1
+======
+
+ - AfWatch job item can collapse blocks.
+   Useful for UI space economy, especially on jobs with a big blocks count.
+ - Houdini submission ROP works with Python 3.
+   Now you can choose to download Houdini with internal Python 3.
+
 v3.1.0
 ======
 
