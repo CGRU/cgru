@@ -12,7 +12,7 @@ Parser = OptionParser(
 		  "help", version="%prog 1.  0"
 )
 
-Parser.add_option('-u', '--utility',    dest='utility',        type  ='string',     default='convert',   help='Image convert and draw utility')
+Parser.add_option('-i', '--imgcmd',     dest='imgcmd',         type  ='string',     default='convert',   help='Image convert and draw command')
 Parser.add_option('-d', '--datetime',   dest='datetime',       type  ='string',     default='',          help='Draw date & time')
 Parser.add_option('-c', '--company',    dest='company',        type  ='string',     default='',          help='Draw company')
 Parser.add_option('-p', '--project',    dest='project',        type  ='string',     default='project',   help='Draw project')
@@ -177,7 +177,7 @@ def reformatAnnotate(infile, outfile):
 		else:
 			Parser.error('Output folder doos not exit:\n' + outdir)
 
-	cmd = Options.utility
+	cmd = Options.imgcmd
 
 	FILEIN = os.path.basename(infile)
 	# Input file indentify:
@@ -399,7 +399,7 @@ for f in range( 0, Options.frames_num):
 			reformatAnnotate( file_in_2, file_out_2)
 		else:
 			Annotate2 = Annotate1
-		cmd = Options.utility
+		cmd = Options.imgcmd
 		cmd += ' -size %(Width)dx%(Height)d -colorspace RGB xc:black -antialias' % globals()
 		cmd += ' "%s" -compose over -gravity West -composite' % file_out_1
 		cmd += ' "%s" -compose over -gravity East -composite' % file_out_2
