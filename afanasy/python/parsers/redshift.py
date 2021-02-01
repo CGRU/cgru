@@ -25,7 +25,7 @@ class redshift(parser.parser):
         parser.parser.__init__(self)
         self.data_all = ''
 
-        self.str_error = [
+        self.str_error += [
             '[Redshift]No devices found. Aborting rendering.',
             'Frame aborted',
             'Frame rendering aborted',
@@ -34,7 +34,8 @@ class redshift(parser.parser):
             'Fatal Error',
             'Error an illegal memory access was encountered',
         ]
-        self.str_badresult = ['License error']
+
+        self.str_badresult += ['License error']
         self.str_warning = []
 
         self.block = 0

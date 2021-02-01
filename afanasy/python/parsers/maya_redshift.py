@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from parsers import redshift
+from parsers import maya, redshift
 
 
-class maya_redshift(redshift.redshift):
+class maya_redshift(maya.maya, redshift.redshift):
     """Maya Redshift parser
     """
-    pass
+
+    def __init__(self):
+        maya.maya.__init__(self)
+        redshift.redshift.__init__(self)
