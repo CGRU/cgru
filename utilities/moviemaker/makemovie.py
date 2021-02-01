@@ -67,6 +67,7 @@ Parser.add_option('--audio',            dest='audio',       type  ='string',    
 Parser.add_option('--acodec',           dest='acodec',      type  ='string',     default='aac',       help='Audio codec')
 
 # Options to makeframe:
+Parser.add_option('-u', '--utility',    dest='utility',        type  ='string',     default='convert',   help='Image convert and draw utility')
 Parser.add_option('-r', '--resolution', dest='resolution',     type  ='string',     default='',          help='Format: 768x576, if empty images format used')
 Parser.add_option('-g', '--gamma',      dest='gamma',          type  ='float',      default=-1.0,        help='Apply gamma correction')
 Parser.add_option('--aspect_in',        dest='aspect_in',      type  ='float',      default=-1.0,        help='Input image aspect, -1 = no changes')
@@ -380,7 +381,7 @@ def getImages(inpattern):
 		print('Files fonded: %d, start_number=%d' % (len(allFiles), start_number))
 
 	# Input files indentify:
-	identify = 'convert -identify "%s"'
+	identify = Options.utility + ' -identify "%s"'
 	if sys.platform.find('win') == 0:
 		identify += ' nul'
 	else:
@@ -483,7 +484,7 @@ else:
 				FrameRange = '0' + FrameRange
 
 # Construct frame conversion command arguments:
-cmd_args = ''
+cmd_args = ' -u ' + Options.utility
 if Options.resolution != '':
 	cmd_args += ' -r %s' % Options.resolution
 if AspectIn > 0:
@@ -559,7 +560,7 @@ for i in range(2):
 					exit(1)
 			logow = int(Width * logosize[i] / 100)
 			logoh = int(Height * logosize[i] / 100)
-			cmd = 'convert'
+			cmd = Options.utility
 			cmd += ' "%s"' % logopath[i]
 			cmd += ' -gravity %s -background "rgba(0,0,0,0)"' % logograv[i]
 			cmd += ' -resize %dx%d' % ( logow, logoh)

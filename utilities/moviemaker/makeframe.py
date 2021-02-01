@@ -12,6 +12,7 @@ Parser = OptionParser(
 		  "help", version="%prog 1.  0"
 )
 
+Parser.add_option('-u', '--utility',    dest='utility',        type  ='string',     default='convert',   help='Image convert and draw utility')
 Parser.add_option('-d', '--datetime',   dest='datetime',       type  ='string',     default='',          help='Draw date & time')
 Parser.add_option('-c', '--company',    dest='company',        type  ='string',     default='',          help='Draw company')
 Parser.add_option('-p', '--project',    dest='project',        type  ='string',     default='project',   help='Draw project')
@@ -176,6 +177,8 @@ def reformatAnnotate(infile, outfile):
 		else:
 			Parser.error('Output folder doos not exit:\n' + outdir)
 
+	cmd = Options.utility
+
 	FILEIN = os.path.basename(infile)
 	# Input file indentify:
 	if infile != '':
@@ -225,11 +228,10 @@ def reformatAnnotate(infile, outfile):
 			correction += Options.correction
 
 
-		cmd = 'convert'
 		cmd += ' "%s"' % infile
 		if correction != '':
 			cmd += ' %s' % correction
-		cmd += ' +matte'
+		cmd += ' -alpha Off'
 		cmd += ' -resize %d' % Width
 		if Options.aspect_in > 0 or Options.aspect_out > 0:
 			scale = 100.0
@@ -269,7 +271,7 @@ def reformatAnnotate(infile, outfile):
 			draw235_h, Width, draw235_h + 1)
 
 	else:
-		cmd = 'convert -size %(Width)dx%(Height)d -colorspace RGB xc:black -alpha Transparent -antialias' % globals()
+		cmd += ' -size %(Width)dx%(Height)d -colorspace RGB xc:black -alpha Transparent -antialias' % globals()
 
 	# Apply font:
 	if Options.font != '':
@@ -397,7 +399,8 @@ for f in range( 0, Options.frames_num):
 			reformatAnnotate( file_in_2, file_out_2)
 		else:
 			Annotate2 = Annotate1
-		cmd = 'convert -size %(Width)dx%(Height)d -colorspace RGB xc:black -antialias' % globals()
+		cmd = Options.utility
+		cmd += ' -size %(Width)dx%(Height)d -colorspace RGB xc:black -antialias' % globals()
 		cmd += ' "%s" -compose over -gravity West -composite' % file_out_1
 		cmd += ' "%s" -compose over -gravity East -composite' % file_out_2
 		cmd += ' -alpha Off -strip -density 72x72 -units PixelsPerInch -sampling-factor 1x1'
