@@ -5,8 +5,7 @@ import os
 import subprocess
 import sys
 
-sys.path.append(os.path.abspath(sys.argv[0]))
-
+import cgruutils
 
 def UsageExit(message=''):
     """Missing DocString
@@ -46,13 +45,10 @@ for i in range(3, len(sys.argv)):
     arguments.append(sys.argv[i])
 
 process = subprocess.Popen(arguments, shell=False, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-# process = subprocess.Popen(' '.join(arguments), shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 process.stdin.close()
 
 stdout = process.stdout
 stderr = process.stderr
-# stdout = process.stderr
-# stderr = process.stdout
 
 
 def printMuted(i_str):
@@ -70,7 +66,7 @@ while True:
     if len(data) < 1:
         break
 
-    printMuted(data)
+    printMuted(cgruutils.toStr(data))
 
     parser.parse(data, 'mode', 0)
 
@@ -95,5 +91,5 @@ if len(parser.files):
 sys.stdout.write('%s\n' % info)
 sys.stdout.flush()
 
-print(stderr.read().replace('\r', ''))
+print(cgruutils.toStr(stderr.read()).replace('\r', ''))
 
