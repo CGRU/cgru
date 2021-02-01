@@ -225,9 +225,9 @@ function bm_Show()
 		el.classList.add('label');
 		el.onclick = bm_ProjectClicked;
 		el.m_project = project;
-		el.textContent = project.name + ' - ' + project.bms.length;
 
 		// Project bookmarks:
+		let highlighted = 0;
 		let folder_label = null;
 		for (let b = 0; b < project.bms.length; b++)
 		{
@@ -251,7 +251,14 @@ function bm_Show()
 			let el = bm_CreateBookmark(bm);
 			bm_elements.push(el);
 			project.el.appendChild(el);
+			if (el.highlighted)
+				highlighted++;
 		}
+
+		let label = project.name + ' - ' + project.bms.length;
+		if (highlighted)
+			label += ' (' + highlighted + ')';
+		project.elLabel.textContent = label;
 	}
 
 	bm_HighlightCurrent();
@@ -265,6 +272,7 @@ function bm_CreateBookmark(i_bm)
 
 	let el = document.createElement('div');
 	el.classList.add('bookmark');
+	el.highlighted = false;
 
 	let elDel = document.createElement('div');
 	el.appendChild(elDel);
@@ -287,7 +295,7 @@ function bm_CreateBookmark(i_bm)
 			let elFlags = document.createElement('div');
 			elStatus.appendChild(elFlags);
 			elFlags.classList.add('flags');
-			st_SetElFlags(i_bm.status, elFlags);
+			el.highlighted = st_SetElFlags(i_bm.status, elFlags);
 		}
 
 		// Show progress bar:
