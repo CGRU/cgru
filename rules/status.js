@@ -447,6 +447,8 @@ function st_SetElArtists(i_status, i_el, i_short, i_clickable)
 }
 function st_SetElFlags(i_status, i_elFlags, i_short, i_clickable)
 {
+	var highlighted = false;
+
 	if (i_elFlags.m_elFlags)
 		for (let el of i_elFlags.m_elFlags)
 			i_elFlags.removeChild(el);
@@ -465,7 +467,8 @@ function st_SetElFlags(i_status, i_elFlags, i_short, i_clickable)
 				el.textContent = c_GetFlagTitle(flag);
 			el.title = c_GetFlagTip(flag);
 			el.m_name = flag;
-			st_TagHilight(el, 'flag');
+			if (st_TagHilight(el, 'flag'))
+				highlighted = true;
 
 			if (i_clickable)
 			{
@@ -479,6 +482,8 @@ function st_SetElFlags(i_status, i_elFlags, i_short, i_clickable)
 			if (clr)
 				st_SetElColor({"color": clr}, el);
 		}
+
+	return highlighted;
 }
 function st_SetElTags(i_status, i_elTags, i_short, i_clickable)
 {
@@ -513,7 +518,12 @@ function st_SetElTags(i_status, i_elTags, i_short, i_clickable)
 function st_TagHilight(i_el, i_key)
 {
 	if (st_Hilighted[i_key].indexOf(i_el.m_name) != -1)
+	{
 		i_el.classList.add('highlighted');
+		return true;
+	}
+
+	return false;
 }
 function st_TagClicked(i_evt)
 {
