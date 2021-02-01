@@ -396,6 +396,9 @@ function d_MakeCmd(i_params)
 	cmd += ' --artist "' + params.artist + '"';
 	cmd += ' --activity "' + params.activity + '"';
 
+	if (RULES.dailies.utility)
+		cmd += ' -u ' + RULES.dailies.utility;
+
 	if (RULES.dailies.preview)
 	{
 		cmd += ' --pcodec "' + RULES.dailies.preview.codec + '"';
