@@ -69,6 +69,7 @@ Projects
 - **Tobol** (2019) https://www.imdb.com/title/tt9795368/
 - **Streltsov** (2020) https://www.imdb.com/title/tt12058242/
 - **Chernobyl** (2020) https://www.imdb.com/title/tt10648714/
+- **Posledniy bogatyr. Koren' Zla** (2021) https://www.imdb.com/title/tt13606158/
 
 History
 =======
