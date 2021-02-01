@@ -1,7 +1,7 @@
 #!/bin/bash
 
 package="ImageMagick"
-location="ftp://ftp.imagemagick.org/pub/ImageMagick"
+location="https://download.imagemagick.org/ImageMagick/download"
 
 allfiles=`ls`
 for afile in $allfiles; do
