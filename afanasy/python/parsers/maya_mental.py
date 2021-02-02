@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from parsers import parser
+from parsers import maya
 
 import re
 
@@ -13,12 +13,12 @@ re_percent = re.compile(
 re_number = re.compile(r'[0-9]+')
 
 
-class maya_mental(parser.parser):
+class maya_mental(maya.maya):
     """Maya To Mental Ray plugin
     """
 
     def __init__(self):
-        parser.parser.__init__(self)
+        maya.maya.__init__(self)
         self.buffer = ""
         self.numinseq = 0
 

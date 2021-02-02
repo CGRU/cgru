@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from parsers import parser
+from parsers import maya, arnold
 
 FRAME = 'writing scene to'
 
 
-class mayatoarnold(parser.parser):
+class mayatoarnold(maya.maya, arnold.arnold):
     """Maya to Arnold
     """
-
     def __init__(self):
-        print('mayatoarnold(parser.parser)')
-        parser.parser.__init__(self)
+        maya.maya.__init__(self)
+        arnold.arnold.__init__(self)
 
     def do(self, data, mode):
         """Missing DocString
@@ -20,7 +19,7 @@ class mayatoarnold(parser.parser):
         :param mode:
         :return:
         """
-        # print(data)
+        # TODO: This method may need to be inherited directly from the arnold.arnold.do() method
         needcalc = False
 
         if data.find(FRAME) > -1:
