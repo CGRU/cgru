@@ -168,8 +168,6 @@ for b in range(numblocks):
 
     if Options.parser is not None:
         block.setParser(Options.parser)
-    else:
-        block.setParser('generic')
 
     if b > 0:
         job.blocks[b - 1].setTasksDependMask(blockname)

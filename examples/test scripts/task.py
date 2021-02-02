@@ -131,6 +131,9 @@ while frame <= frame_end:
 
     frame += frame_inc
 
+    if StdOut is not None:
+        break
+
 time_finish = time.time()
 print('Finished at: %s' % time.ctime(time_finish))
 print('Running time = %d seconds.' % (time_finish - time_start))
