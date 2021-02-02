@@ -280,8 +280,8 @@
 	"logo_frame_grav":"North",
 	"activity":"comp",
 
-	"-utility":"convert",
-		"":"Specify image convert and draw utility, default is 'convert'",
+	"-imgcmd":"convert",
+		"":"Specify image convert and draw command, default is 'convert'",
 
 	"slates":{
 		"noslate":      {"name":"No Slate",        "tooltip":"Do not draw first informative frame."},
