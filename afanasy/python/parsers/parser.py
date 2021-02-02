@@ -14,10 +14,6 @@ class parser(object):
     """
 
     def __init__(self):
-        self.str_warning = []
-        self.str_error = []
-        self.str_badresult = []
-        self.str_finishedsuccess = []
         self.percent = 0
         self.frame = 0
         self.percentframe = 0
@@ -32,6 +28,15 @@ class parser(object):
         self.numframes = 0
         self.taskInfo = {}
         self.pid = 0
+
+        if not hasattr(self, 'str_warning'):
+            self.str_warning = []
+        if not hasattr(self, 'str_error'):
+            self.str_error = []
+        if not hasattr(self, 'str_badresult'):
+            self.str_badresult = []
+        if not hasattr(self, 'str_finishedsuccess'):
+            self.str_finishedsuccess = []
 
         self.files = []
         self.files_onthefly = []

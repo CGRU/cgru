@@ -19,6 +19,6 @@ class hbatch_mantra(hbatch.hbatch, mantra.mantra):
         :param mode:
         :return:
         """
-        # print data
+
         mantra.mantra.do(self, data, mode)
         hbatch.hbatch.do(self, data, mode)

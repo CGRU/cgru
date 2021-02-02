@@ -57,6 +57,9 @@ def printMuted(i_str):
     sys.stdout.write('\033[0m')
     sys.stdout.flush()
 
+Parser_Error = False
+Parser_BadResult = False
+Parser_Warning = False
 
 while True:
     stdout.flush()
@@ -79,17 +82,44 @@ while True:
     if len(parser.report):
         info += ' Report: %s;' % parser.report
 
+    if parser.warning:
+        info += '\nPARSER WARNING'
+        Parser_Warning = True
+
+    if parser.error:
+        info += '\nPARSER ERROR'
+        Parser_Error = True
+
+    if parser.badresult:
+        info += '\nPARSER BAD RESULT'
+        Parser_BadResult = True
+
     sys.stdout.write('%s\n' % info)
     sys.stdout.flush()
 
-info = ''
-if len(parser.files):
-    info += '\nFiles:'
-    for afile in parser.files:
-        info += '\n' + afile
-
-sys.stdout.write('%s\n' % info)
 sys.stdout.flush()
 
-print(cgruutils.toStr(stderr.read()).replace('\r', ''))
+print('\nResult:')
+
+if len(parser.files_all):
+    print('Files:')
+    for afile in parser.files_all:
+        print(afile)
+
+if Parser_Warning:
+    print('\nPARSER WARNING')
+
+if Parser_Error:
+    print('\nPARSER ERROR')
+
+if Parser_BadResult:
+    print('\nPARSER BAD RESULT')
+
+if not Parser_Warning and not Parser_Error and not Parser_BadResult:
+    print('\nSUCCESS')
+
+StrErr = cgruutils.toStr(stderr.read()).replace('\r', '')
+if len(StrErr):
+    print('\nSTDERR:')
+    print(StrErr)
 
