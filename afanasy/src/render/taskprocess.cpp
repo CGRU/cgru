@@ -417,8 +417,8 @@ void TaskProcess::readProcess( const std::string & i_mode)
 		m_update_status = af::TaskExec::UPWarning;
 	}
 
-	// if task is not in "stopping" state
-	if( m_stop_time == 0 )
+	// If task is running and not in the "stopping" state
+	if ((m_pid != 0) && (m_stop_time == 0))
 	{
 		// ckeck parser reasons to force to stop a task
 	    if( m_parser->hasError())
@@ -569,7 +569,12 @@ void TaskProcess::processFinished( int i_exitCode)
 			     m_update_status  = af::TaskExec::UPFinishedKilled;
 		}
 	}
-	else if( m_parser->isBadResult())
+	else if(m_parser->hasError())
+	{
+		m_update_status = af::TaskExec::UPFinishedParserError;
+		AF_LOG << "Error from parser.";
+	}
+	else if(m_parser->isBadResult())
 	{
 		m_update_status = af::TaskExec::UPFinishedParserBadResult;
 		AF_LOG << "Bad result from parser.";
