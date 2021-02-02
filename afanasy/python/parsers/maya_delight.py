@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from parsers import parser
-
 import re
+from parsers import maya
 
 re_frame = re.compile(r'Frame ([0-9]+)(: caching geometry:)')
 
@@ -12,12 +11,12 @@ re_frame = re.compile(r'Frame ([0-9]+)(: caching geometry:)')
 # is not the highest priority.
 
 
-class maya_delight(parser.parser):
+class maya_delight(maya):
     """3Delight For Maya plugin
     """
 
     def __init__(self):
-        parser.parser.__init__(self)
+        maya.maya.__init__(self)
         self.firstframe = True
 
     def do(self, data, mode):

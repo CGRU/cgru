@@ -14,15 +14,19 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
 v3.1.1
 ======
 
- - AfWatch job item can collapse blocks.
-   Useful for UI space economy, especially on jobs with a big blocks count.
-   In a View Options menu you can collapse/expand all jobs,
-   and set an option to collapse new jobs.
- - Houdini submission ROP works with Python 3.
-   Now you can choose to download Houdini with internal Python 3.
+2021.01.31
+
+- AfWatch job item can collapse blocks.
+  Useful for UI space economy, especially on jobs with a big blocks count.
+  In a View Options menu you can collapse/expand all jobs,
+  and set an option to collapse new jobs.
+- Houdini submission ROP works with Python 3.
+  Now you can choose to download Houdini with internal Python 3.
 
 v3.1.0
 ======
+
+2020.10.05
 
 **New Afanasy network protocol version.**
 
@@ -32,6 +36,8 @@ v3.1.0
 
 v3.0.0
 ======
+
+2020.09.13
 
 **New Afanasy network protocol version.**
 
