@@ -14,5 +14,7 @@ class maya(parser.parser):
             'Frame aborted',
             'Frame rendering aborted',
             'Fatal Error',
+            'Maya exited with status 210',
+            'failed to render',
             '(kFailure)',
         ]
