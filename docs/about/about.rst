@@ -22,6 +22,7 @@ Companies
 - **Kiev Postproduction** | http://www.kievpostproduction.com
 - **Main Road Post** | https://mrpost.ru
 - **Overmind Studios** | http://www.overmind-studios.de
+- **Platige Image** | https://www.platige.com
 - **Postmodern** | http://postmodern.com.ua/
 - **R-Studios** | http://www.r-studios.ru
 - **Terminal FX** | http://terminalfx.com
