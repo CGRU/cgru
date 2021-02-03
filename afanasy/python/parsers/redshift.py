@@ -31,10 +31,8 @@ class redshift(parser.parser):
             'Bad node type found: Redshift_ROP',
             'Bad node type found: redshift_vopnet',
             'Error an illegal memory access was encountered',
+            'License error',
         ]
-
-        self.str_badresult += ['License error']
-        self.str_warning = []
 
         self.block = 0
         self.block_count = 0
