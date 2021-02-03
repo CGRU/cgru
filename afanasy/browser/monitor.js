@@ -479,7 +479,7 @@ Monitor.prototype.processMsg = function(obj) {
 		}
 
 		// Jobs order:
-		if (this.type == 'jobs')
+		if ((this.type == 'jobs') && (false == g_VISOR()) && (this.sortParm == 'order'))
 		{
 			if (obj.events.jobs_order_ids && obj.events.jobs_order_ids.length)
 				this.sortByIds(obj.events.jobs_order_ids);

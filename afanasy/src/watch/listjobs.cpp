@@ -552,10 +552,13 @@ bool ListJobs::v_caseMessage( af::Msg * msg)
 	}
 	case af::Msg::TUserJobsOrder:
 	{
-		af::MCGeneral ids(msg);
-		AF_DEBUG << "Jobs order received: " << ids.v_generateInfoString(true);
-		if (ids.getId() == MonitorHost::getUid())
-			sortMatch(ids.getList());
+		if ((af::Environment::VISOR() == false) && (false == m_listwork) && (m_ctrl_sf->isSortDisabled()))
+		{
+			af::MCGeneral ids(msg);
+			AF_DEBUG << "Jobs order received: " << ids.v_generateInfoString(true);
+			if (ids.getId() == MonitorHost::getUid())
+				sortMatch(ids.getList());
+		}
 		break;
 	}
 
@@ -593,7 +596,11 @@ bool ListJobs::v_processEvents( const af::MonitorEvents & i_me)
 
 	if( i_me.m_jobs_order_ids.size())
 	{
-		sortMatch( i_me.m_jobs_order_ids);
+		if ((af::Environment::VISOR() == false) && (false == m_listwork) && (m_ctrl_sf->isSortDisabled()))
+		{
+			sortMatch( i_me.m_jobs_order_ids);
+		}
+
 		processed = true;
 	}
 
