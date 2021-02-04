@@ -183,13 +183,10 @@ font-weight: normal;
 border-right: 0;
 }
 #navig.waiting .folder { cursor: wait; }
-#navig .folder.opened > .fbody {
-padding-top: 4px;
-padding-bottom: 4px;
-font-weight: bold;
-}
+#navig .folder.opened > .fbody {padding-top: 4px; padding-bottom: 4px;}
+#navig .folder.opened > .fbody > .fname {font-weight: bold;}
 #navig .folder.hidden { display: none; }
-#navig .folder .fbody {
+#navig .folder > .fbody {
 padding: 0px 0px 0px 16px;
 border: 2px solid rgba(98,98,98,.5);
 border-right: 0;
@@ -219,6 +216,26 @@ width: 30px; height: 14px;
 border: 1px solid rgba(0,0,0,.3);
 /*border-radius: 4px;*/
 }
+
+#navig .group {
+clear: both;
+position: relative;
+cursor: pointer;
+border: 1px solid rgba(20,200,2000,.7);
+border-right: 0;
+border-radius: 8px 0px 0px 8px;
+margin:  1px 0px 1px -10px;
+padding: 1px 0px 1px   0px;
+}
+#navig .group > .fbody {
+padding: 0px 0px 0px 10px;
+}
+#navig .group.opened {
+border-radius: 20px 0px 0px 8px;
+}
+#navig .group .name {text-align: center; font-style: italic;}
+#navig .group.opened > .name {font-weight: bold;}
+
 #navig.navig_show_flags      .folder .flags      { display: inline; }
 #navig.navig_show_tags       .folder .tags       { display: inline; }
 #navig.navig_show_artists    .folder .artists    { display: inline; }

@@ -18,6 +18,8 @@
 	"refresh":300
 },
 
+"-group_folders_levels":[3,4],
+
 "flags":{
 	"hold"        :{"title":"HOLD",        "clr":[111,111,111], "short":"Hl",                          "excl":false, "tip":"On hold"},
 	"question"    :{"title":"QUESTION",    "clr":[210,140,140], "short":"Que",                         "excl":false, "tip":"Question"},
