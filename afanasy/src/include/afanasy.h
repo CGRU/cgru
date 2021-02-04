@@ -129,7 +129,7 @@ const char CMD_SHELL[] = "/bin/bash -c";
 #endif
 const int TERMINATEWAITKILL = 10; ///< Seconds to wait task task finish after termination, then perform kill
 const int HEARTBEAT_SEC /********/ = 1;		 ///< Heartbeat seconds.
-const int UP_RESOURCES_PERIOD /**/ = 5;		 ///< Query machine resourcs period.
+const int UP_RESOURCES_PERIOD /**/ = 5;		 ///< Query machine resources period.
 const int ZOMBIETIME /***********/ = 60;	 ///< Seconds to wait for update to Render is zombie.
 const int EXIT_NO_TASK_TIME /****/ = -1;	 ///< Seconds to exit if no tasks.
 const int CONNECTION_LOST_TIME     = 30;     ///< Connection lost, if render can't update server for this time.

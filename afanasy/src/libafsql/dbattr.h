@@ -104,6 +104,7 @@ public:
 			_macaddresses,
 			_need_os,
 			_need_properties,
+			_resources,
 			_services_disabled,
 			_tasksdependmask,
 			_wdir,

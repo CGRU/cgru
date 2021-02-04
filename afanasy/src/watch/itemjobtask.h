@@ -41,7 +41,6 @@ public:
 
 	af::TaskProgress taskprogress;
 
-	virtual const QVariant v_getToolTip()      const;
 	virtual const QString  v_getSelectString() const;
 	virtual const QString  v_getInfoText()     const;
 

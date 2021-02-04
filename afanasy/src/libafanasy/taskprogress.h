@@ -36,6 +36,7 @@ public:
 
 	std::string hostname; ///< Host, last event occurs where.
 	std::string activity; ///< Task activity that was parsed.
+	std::string resources; ///< Parsed resources
 
 	void v_readwrite( Msg * msg); ///< Read or write progress in buffer.
 

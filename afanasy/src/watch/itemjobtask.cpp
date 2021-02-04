@@ -81,9 +81,18 @@ bool ItemJobTask::calcHeight()
 const QString ItemJobTask::v_getInfoText() const
 {
 	QString info;
+
 	info += QString("Times started: <b>%1</b> / <b>%2</b> with errors").arg(taskprogress.starts_count).arg(taskprogress.errors_count);
+
 	if (false == taskprogress.hostname.empty())
 		info += QString("<br>Last started host: <b>%1</b>").arg(afqt::stoq(taskprogress.hostname));
+
+	if (taskprogress.activity.size())
+		info += QString("<br>Activity: <b>%1</b>").arg(afqt::stoq(taskprogress.activity));
+
+	if (taskprogress.resources.size())
+		info += QString("<br>Resources: <b>%1</b>").arg(afqt::stoq(taskprogress.resources));
+
 	if (taskprogress.time_start != 0)
 	{
 		info += QString("<br>Started at <b>%1</b>").arg(afqt::time2Qstr(taskprogress.time_start));
@@ -91,20 +100,6 @@ const QString ItemJobTask::v_getInfoText() const
 			info += QString("<br>Finished at <b>%1</b>").arg(afqt::time2Qstr(taskprogress.time_done));
 	}
 	return info;
-}
-
-const QVariant ItemJobTask::v_getToolTip() const
-{
-	QString tooltip = QString("Task #%1:").arg( m_tasknum);
-	tooltip += QString("\nTimes started: %1 / %2 with errors").arg(taskprogress.starts_count).arg(taskprogress.errors_count);
-	if( false == taskprogress.hostname.empty()) tooltip += QString("\nLast started host: %1").arg( afqt::stoq( taskprogress.hostname));
-	if( taskprogress.time_start != 0)
-	{
-		tooltip += QString("\nStarted at %1").arg( afqt::time2Qstr( taskprogress.time_start));
-		if(((taskprogress.state & AFJOB::STATE_RUNNING_MASK) == false) && taskprogress.time_done)
-			tooltip += QString("\nFinished at %1").arg( afqt::time2Qstr( taskprogress.time_done));
-	}
-	return tooltip;
 }
 
 const QString ItemJobTask::v_getSelectString() const

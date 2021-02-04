@@ -25,6 +25,7 @@ public:
 			int i_percent_frame = -1,
 			const std::string & i_log      = std::string(),
 			const std::string & i_activity = std::string(),
+			const std::string & i_resources= std::string(),
 			const std::string & i_report   = std::string(),
 			const std::string & i_listened = std::string(),
 			int i_datalen = 0,
@@ -46,9 +47,12 @@ public:
 	inline int getPercent()                  const { return m_percent;       }
 	inline int getFrame()                    const { return m_frame;         }
 	inline int getPercentFrame()             const { return m_percent_frame; }
-  	inline const std::string & getActivity() const { return m_activity;      }
-  	inline const std::string & getReport()   const { return m_report;        }
-  	inline const std::string & getLog()      const { return m_log;           }
+	inline const bool          hasActivity() const { return m_activity.size(); }
+	inline const std::string & getActivity() const { return m_activity;      }
+	inline const bool          hasResources()const { return m_resources.size();}
+	inline const std::string & getResources()const { return m_resources;     }
+	inline const std::string & getReport()   const { return m_report;        }
+	inline const std::string & getLog()      const { return m_log;           }
 	inline int getDataLen()                  const { return m_datalen;       }
 	inline const char * getData()            const { return m_data;          }
 
@@ -83,6 +87,7 @@ private:
 	int8_t  m_percent_frame;
 
 	std::string m_activity;
+	std::string m_resources;
 	std::string m_report;
 	std::string m_log;
 

@@ -27,6 +27,7 @@ MCTaskUp::MCTaskUp
 
 	const std::string & i_log,
 	const std::string & i_activity,
+	const std::string & i_resources,
 	const std::string & i_report,
 	const std::string & i_listened,
 
@@ -47,6 +48,7 @@ MCTaskUp::MCTaskUp
 
 	m_log           ( i_log),
 	m_activity      ( i_activity),
+	m_resources     ( i_resources),
 	m_report        ( i_report),
 
 	m_listened      ( i_listened),
@@ -100,6 +102,12 @@ void MCTaskUp::v_readwrite( Msg * msg)
 	rw_int8_t ( m_percent_frame,  msg);
 
 	rw_String ( m_activity,       msg);
+
+/* NEW_VERSION
+	rw_String ( m_resources,      msg);
+*/
+	m_resources = "triangles:18290255";
+
 	rw_String ( m_report,         msg);
 	rw_String ( m_log,            msg);
 
@@ -205,6 +213,7 @@ void MCTaskUp::v_generateInfoStream( std::ostringstream & stream, bool full) con
 			<< ", task="     << m_numtask
 			<< ", number="   << m_number
 			<< ", activity=" << m_activity
+			<< ", resources="<< m_resources
 			<< ", report="   << m_report
 			<< ", log="      << m_log
 			<< ", datalen="  << m_datalen
@@ -222,6 +231,7 @@ void MCTaskUp::v_generateInfoStream( std::ostringstream & stream, bool full) con
 			<< " T" << m_numtask
 			<< " #" << m_number
 			<< " A" << m_activity
+			<< " R" << m_resources
 			<< " R" << m_report
 			<< " L" << m_log
 			<< " D" << m_datalen

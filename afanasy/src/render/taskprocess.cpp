@@ -461,6 +461,7 @@ void TaskProcess::sendTaskSate()
 	int frame            = m_parser->getFrame();
 	int percentframe     = m_parser->getPercentFrame();
 	std::string activity = m_parser->getActivity();
+	std::string resources= m_parser->getResources();
 	std::string report   = m_parser->getReport();
 
 
@@ -503,6 +504,7 @@ void TaskProcess::sendTaskSate()
 
 		log,
 		activity,
+		resources,
 		report,
 
 		m_listened,

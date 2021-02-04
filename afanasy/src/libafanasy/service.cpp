@@ -329,7 +329,7 @@ bool Service::hasParser() const
 
 void Service::parse( const std::string & i_mode, std::string & i_data, int pid,
 							int & percent, int & frame, int & percentframe,
-							std::string & activity, std::string & report,
+							std::string & activity, std::string & resources, std::string & report,
 							bool & warning, bool & error, bool & badresult, bool & finishedsuccess) const
 {
 	PyObject * pArgs = PyTuple_New( 3);
@@ -354,6 +354,7 @@ void Service::parse( const std::string & i_mode, std::string & i_data, int pid,
 			af::PyGetAttrBool( pClass,"finishedsuccess", finishedsuccess, err);
 
 			af::PyGetAttrStr( pClass,"activity", activity, err);
+			af::PyGetAttrStr( pClass,"resources",resources,err);
 			af::PyGetAttrStr( pClass,"report",   report,   err);
 
 			PyObject * pAttr = PyObject_GetAttrString( pClass, "result");

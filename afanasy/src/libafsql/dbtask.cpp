@@ -20,14 +20,15 @@ DBTask::DBTask()
 	dbAddAttr( new DBAttrInt32 ( DBAttr::_error,        &m_error        ));
 	dbAddAttr( new DBAttrInt32 ( DBAttr::_errors_count, &m_errors_count ));
 	dbAddAttr( new DBAttrString( DBAttr::_folder,       &m_folder       ));
+	dbAddAttr( new DBAttrInt32 ( DBAttr::_frame_pertask,&m_frame_pertask));
 	dbAddAttr( new DBAttrString( DBAttr::_hostname,     &m_hostname     ));
 	dbAddAttr( new DBAttrString( DBAttr::_jobname,      &m_jobname      ));
+	dbAddAttr( new DBAttrString( DBAttr::_resources,    &m_resources    ));
 	dbAddAttr( new DBAttrString( DBAttr::_service,      &m_service      ));
 	dbAddAttr( new DBAttrInt32 ( DBAttr::_starts_count, &m_starts_count ));
 	dbAddAttr( new DBAttrInt64 ( DBAttr::_time_done,    &m_time_done    ));
 	dbAddAttr( new DBAttrInt64 ( DBAttr::_time_started, &m_time_start   ));
 	dbAddAttr( new DBAttrString( DBAttr::_username,     &m_username     ));
-	dbAddAttr( new DBAttrInt32 ( DBAttr::_frame_pertask, &m_frame_pertask ));
 }
 
 DBTask::~DBTask()
@@ -50,11 +51,12 @@ void DBTask::add(
 	m_capacity  = i_exec->getCapacity();
 	m_frame_pertask = i_exec->getFramesNumber();
 
+	m_resources    = i_progress->resources;
 	m_starts_count = i_progress->starts_count;
 	m_errors_count = i_progress->errors_count;
 	m_time_start   = i_progress->time_start;
 	m_time_done    = i_progress->time_done;
-	m_error      = ( i_progress->state & AFJOB::STATE_ERROR_MASK ) ? 1 : 0;
+	m_error        =(i_progress->state & AFJOB::STATE_ERROR_MASK) ? 1 : 0;
 
 	m_hostname = i_render->getName();
 

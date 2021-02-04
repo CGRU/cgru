@@ -53,7 +53,7 @@ public:
 				std::string & data,
 				int pid,
 				int & percent, int & frame, int & percentframe,
-				std::string & activity, std::string & report,
+				std::string & activity, std::string & resources, std::string & report,
 				bool & warning, bool & error, bool & badresult, bool & finishedsuccess) const;
 
 	const std::string toHTML( const std::string & i_data) const;

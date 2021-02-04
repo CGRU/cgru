@@ -60,6 +60,9 @@ def printMuted(i_str):
 Parser_Error = False
 Parser_BadResult = False
 Parser_Warning = False
+Parser_Activity = None
+Parser_Resources = None
+Parser_Report = None
 
 while True:
     stdout.flush()
@@ -78,9 +81,15 @@ while True:
 
     if len(parser.activity):
         info += ' Activity: %s;' % parser.activity
+        Parser_Activity = parser.activity
+
+    if len(parser.resources):
+        info += ' Resources: %s;' % parser.resources
+        Parser_Resources = parser.resources
 
     if len(parser.report):
         info += ' Report: %s;' % parser.report
+        Parser_Report = parser.report
 
     if parser.warning:
         info += '\nPARSER WARNING'
@@ -106,20 +115,28 @@ if len(parser.files_all):
     for afile in parser.files_all:
         print(afile)
 
-if Parser_Warning:
-    print('\nPARSER WARNING')
-
-if Parser_Error:
-    print('\nPARSER ERROR')
-
-if Parser_BadResult:
-    print('\nPARSER BAD RESULT')
-
-if not Parser_Warning and not Parser_Error and not Parser_BadResult:
-    print('\nSUCCESS')
-
 StrErr = cgruutils.toStr(stderr.read()).replace('\r', '')
 if len(StrErr):
     print('\nSTDERR:')
     print(StrErr)
 
+if Parser_Activity:
+    print('Activity: ' + Parser_Activity)
+
+if Parser_Resources:
+    print('Resources: ' + Parser_Resources)
+
+if Parser_Report:
+    print('Report: ' + Parser_Report)
+
+if Parser_Warning:
+    print('PARSER WARNING')
+
+if Parser_Error:
+    print('PARSER ERROR')
+
+if Parser_BadResult:
+    print('PARSER BAD RESULT')
+
+if not Parser_Warning and not Parser_Error and not Parser_BadResult:
+    print('\nSUCCESS')

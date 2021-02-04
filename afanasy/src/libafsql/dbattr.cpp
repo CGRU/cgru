@@ -79,6 +79,7 @@ void DBAttr::init()
 	DBName[_parsercoeff           ] = "parsercoeff";
 	DBName[_password              ] = "password";
 	DBName[_priority              ] = "priority";
+	DBName[_resources             ] = "resources";
 	DBName[_run_time_sum          ] = "run_time_sum";
 	DBName[_service               ] = "service";
 	DBName[_services_disabled     ] = "services_disabled";

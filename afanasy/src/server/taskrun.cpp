@@ -44,6 +44,7 @@ TaskRun::TaskRun( Task * runningTask,
    m_progress->percentframe = -1;
    m_progress->hostname.clear();
 	m_progress->activity.clear();
+	m_progress->resources.clear();
 
 	// Skip starting task if executable is not set (multihost task)
 	if( m_exec == NULL) return;
@@ -104,6 +105,8 @@ void TaskRun::update(const af::MCTaskUp& taskup, RenderContainer * renders, Moni
 	}
 	
 	m_progress->time_done = time( NULL);
+	if (taskup.hasActivity() ) m_progress->activity  = taskup.getActivity();
+	if (taskup.hasResources()) m_progress->resources = taskup.getResources();
 	
 	std::string message;
 	
@@ -124,7 +127,6 @@ void TaskRun::update(const af::MCTaskUp& taskup, RenderContainer * renders, Moni
 		m_progress->percent      = new_percent;
 		m_progress->frame        = taskup.getFrame();
 		m_progress->percentframe = taskup.getPercentFrame();
-		if( taskup.getActivity().size() > 0 ) m_progress->activity = taskup.getActivity();
 		m_task->v_monitor( monitoring );
 	}
 	case af::TaskExec::UPStarted:

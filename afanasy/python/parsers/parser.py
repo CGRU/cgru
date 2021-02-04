@@ -22,6 +22,7 @@ class parser(object):
         self.badresult = False
         self.finishedsuccess = False
         self.activity = ''
+        self.resources = ''
         self.report = ''
         self.result = None
         self.log = None

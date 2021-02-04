@@ -170,7 +170,7 @@ void ParserHost::parse( const std::string & i_mode, std::string & output, int pi
 	bool _finishedsuccess = false;
 
 	m_service->parse( i_mode, output, pid, m_percent, m_frame, m_percentframe,
-		m_activity, m_report,
+		m_activity, m_resources, m_report,
 		_warning, _error, _badresult, _finishedsuccess);
 
 	if ( _error           ) m_error           = true;
