@@ -137,9 +137,8 @@
 		"":"Program will exit if there will be no tasks for this time(seconds),",
 		"":"Negative value disables this feature",
 
-	"af_task_update_timeout":30,
-		"":"If task progress (state or percentage) has not been updated for this period,",
-		"":"It wiil considered as an error, and render will be push in error hosts list.",
+	"af_task_reconnect_timeout":30,
+		"":"After server restart, running tasks will wait renders to reconnect.",
 
 	"af_task_stop_timeout":30,
 		"":"If render was asked to stop a task, but it did not send task finish message,",

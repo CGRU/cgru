@@ -54,10 +54,9 @@ int     Environment::max_run_tasks_per_host =          AFGENERAL::MAX_RUN_TASKS_
 int     Environment::file_name_size_max =              AFGENERAL::FILE_NAME_SIZE_MAX;
 
 int     Environment::task_default_capacity =           AFJOB::TASK_DEFAULT_CAPACITY;
-int     Environment::task_update_timeout =             AFJOB::TASK_UPDATE_TIMEOUT;
-int     Environment::task_stop_timeout =               AFJOB::TASK_STOP_TIMEOUT;
 int     Environment::task_log_linesmax =               AFJOB::TASK_LOG_LINESMAX;
 int     Environment::task_progress_change_timeout =    AFJOB::TASK_PROGRESS_CHANGE_TIMEOUT;
+int     Environment::task_reconnect_timeout =          AFJOB::TASK_RECONNECT_TIMEOUT;
 
 int     Environment::serverport =                      AFADDR::SERVER_PORT;
 
@@ -269,12 +268,10 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, so_client_TCP_NODELAY,             "af_so_client_TCP_NODELAY"             );
 	getVar( i_obj, so_client_TCP_CORK,                "af_so_client_TCP_CORK"                );
 
-
 	getVar( i_obj, task_default_capacity,             "af_task_default_capacity"             );
-	getVar( i_obj, task_update_timeout,               "af_task_update_timeout"               );
-	getVar( i_obj, task_stop_timeout,                 "af_task_stop_timeout"                 );
 	getVar( i_obj, task_log_linesmax,                 "af_task_log_linesmax"                 );
 	getVar( i_obj, task_progress_change_timeout,      "af_task_progress_change_timeout"      );
+	getVar( i_obj, task_reconnect_timeout,            "af_task_reconnect_timeout"            );
 
 	getVar( i_obj, render_heartbeat_sec,              "af_render_heartbeat_sec"              );
 	getVar( i_obj, render_up_resources_period,        "af_render_up_resources_period"        );

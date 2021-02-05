@@ -201,13 +201,13 @@ void Task::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCont
 
 
 	// Check reconnect timeout:
-	if( m_progress->state & AFJOB::STATE_WAITRECONNECT_MASK )
+	if (m_progress->state & AFJOB::STATE_WAITRECONNECT_MASK)
 	{
-		if( currentTime - m_progress->time_done > af::Environment::getTaskUpdateTimeout())
+		if (currentTime - m_progress->time_done > af::Environment::getTaskReconnectTimeout())
 		{
 			v_appendLog("Reconnect timeout reached. Setting state to READY.");
 			m_progress->state = AFJOB::STATE_READY_MASK;
-            if( false == changed ) changed = true;
+            if (false == changed) changed = true;
 		}
 	}
 

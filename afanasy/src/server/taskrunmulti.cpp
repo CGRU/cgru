@@ -334,13 +334,6 @@ bool TaskRunMulti::refresh( time_t currentTime, RenderContainer * renders, Monit
 	// There is no need to do something with zombie. It soon will be deleted.
 	if( isZombie() ) return changed;
 
-	// Slaves service stop timeout check:
-	if( m_time_services_started && m_time_services_stopped &&( currentTime - m_time_services_stopped > AFJOB::TASK_STOP_TIMEOUT ))
-	{
-		m_task->v_appendLog("Service stop timeout.");
-		releaseHost( renders, monitoring);
-		if( changed == false) changed = true;
-	}
 
 	// Start services and master if time and hosts are enough
 	if((m_master_running == false) && (m_stopping == false))

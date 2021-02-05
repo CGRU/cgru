@@ -18,10 +18,9 @@ namespace AFJOB
 	const char TASK_DEFAULT_NAME[]      = "task";
 
 	const int TASK_DEFAULT_CAPACITY        = 1000;
-	const int TASK_UPDATE_TIMEOUT          = 30;   ///< Seconds for task to have no update to produce error.
-	const int TASK_STOP_TIMEOUT            = 30;   ///< Time after running task was asked to stop, it become not running itself.
 	const int TASK_LOG_LINESMAX            = 100;  ///< Maximum number of lines in task log.
 	const int TASK_PROGRESS_CHANGE_TIMEOUT = -1;   ///< If task progress did not change within this time, consider that it is erroneous
+	const int TASK_RECONNECT_TIMEOUT       = 30;
 
 	const int TASK_MULTIHOSTMAXHOSTS = 100;
 
