@@ -140,9 +140,6 @@
 	"af_task_reconnect_timeout":30,
 		"":"After server restart, running tasks will wait renders to reconnect.",
 
-	"af_render_exec":"afrender",
-		"":"Was used, will be needed, but not used for now",
-
 	"af_render_cmd_wolwake":"wolwake",
 	"":"",
 
