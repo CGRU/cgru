@@ -198,6 +198,9 @@ def getStatus(i_path = None, i_ruFolder = '.rules'):
 
     fobj.close()
 
+    if 'status' in obj:
+        return obj['status']
+
     return obj
 
 
