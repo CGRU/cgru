@@ -269,14 +269,6 @@ bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
 	//printf("TaskRun::refresh: %s[%d][%d]\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum);
 	bool changed = false;
 
-	// Tasks stop timeout check:
-	if( m_stopTime && ( currentTime - m_stopTime > af::Environment::getTaskStopTimeout()))
-	{
-		finish("Task stop timeout.", renders, monitoring);
-		if( changed == false) changed = true;
-		errorHostId = m_hostId;
-	}
-
 	// Next checks not needed it the task is stopping:
 	if (m_stopTime)
 		return changed;
@@ -288,14 +280,6 @@ bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
 		m_progress->state = m_progress->state | AFJOB::STATE_ERROR_MASK;
 		m_progress->errors_count++;
 		stop("Task maximum run time reached.", renders, monitoring);
-		errorHostId = m_hostId;
-	}
-
-	// Tasks update timeout check:
-	if (currentTime > (m_progress->time_done + af::Environment::getTaskUpdateTimeout()))
-	{
-		//printf("Task update timeout: %d > %d+%d\n", currentTime, m_progress->time_done, af::Environment::getTaskUpdateTimeout());
-		stop("Task update timeout.", renders, monitoring);
 		errorHostId = m_hostId;
 	}
 

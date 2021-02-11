@@ -137,16 +137,8 @@
 		"":"Program will exit if there will be no tasks for this time(seconds),",
 		"":"Negative value disables this feature",
 
-	"af_task_update_timeout":30,
-		"":"If task progress (state or percentage) has not been updated for this period,",
-		"":"It wiil considered as an error, and render will be push in error hosts list.",
-
-	"af_task_stop_timeout":30,
-		"":"If render was asked to stop a task, but it did not send task finish message,",
-		"":"it wiil be considered as not running any way.",
-
-	"af_render_exec":"afrender",
-		"":"Was used, will be needed, but not used for now",
+	"af_task_reconnect_timeout":30,
+		"":"After server restart, running tasks will wait renders to reconnect.",
 
 	"af_render_cmd_wolwake":"wolwake",
 	"":"",
@@ -154,9 +146,6 @@
 "":"Thumbnail:",
 	"af_thumbnail_extensions":["exr","dpx","jpg","jpeg","png","tif","tiff","tga"],
 	"af_thumbnail_cmd":"convert -identify \"%(image)s\" %(pre_args)s -thumbnail \"100x100^\" -alpha Deactivate -gravity center -extent 100x100 -colorspace sRGB \"%(thumbnail)s\"",
-	"-af_thumbnail_naming":"%(job_id)d.%(block_id)d.%(task_id)d.%(thumbnail_filename)s",
-	"-af_thumbnail_http":"http://localhost:80/thumbnails/",
-	"-af_thumbnail_file":"//servername/sharename/thumbnails/",
 
 "":"User:",
 	"af_errors_avoid_host":3,

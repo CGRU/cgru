@@ -173,5 +173,36 @@ def mergeObjects(o_obj, i_obj):
         else:
             o_obj[key] = i_obj[key]
 
+
+def getStatus(i_path = None, i_ruFolder = '.rules'):
+    if i_path is None: i_path = os.getcwd()
+
+    st_file = os.path.join(i_path, i_ruFolder)
+    st_file = os.path.join(st_file, 'status.json')
+    if not os.path.isfile(st_file):
+        return None
+
+    fobj = None
+    try:
+        fobj = open(st_file, 'r')
+    except:
+        print(traceback.format_exc())
+        return None
+
+    obj = None
+    try:
+        obj = json.load(fobj)
+    except:
+        print(traceback.format_exc())
+        return None
+
+    fobj.close()
+
+    if 'status' in obj:
+        return obj['status']
+
+    return obj
+
+
 if len(RULES) == 0:
     getRules()

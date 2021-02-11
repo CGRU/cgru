@@ -135,10 +135,9 @@ public:
 	static inline int getMaxRunningTasksPerHost() { return max_run_tasks_per_host; } ///< Get default maximium running tasks per host.
 
 	static inline int getTaskDefaultCapacity()           { return task_default_capacity;        }
-	static inline int getTaskUpdateTimeout()             { return task_update_timeout;          }
-	static inline int getTaskStopTimeout()               { return task_stop_timeout;            }
 	static inline int getTaskLogLinesMax()               { return task_log_linesmax;            }
 	static inline int getTaskProgressChangeTimeout()     { return task_progress_change_timeout; }
+	static inline int getTaskReconnectTimeout()          { return task_reconnect_timeout;       }
 
 	static inline int getErrorsForgiveTime()             { return errors_forgivetime;           }
 	static inline int getErrorsAvoidHost()               { return errors_avoid_host;            }
@@ -314,11 +313,10 @@ private:
 
 	static std::string timeformat;    ///< Default time format.
 
-	static int task_update_timeout;
-	static int task_stop_timeout;
 	static int task_default_capacity;
 	static int task_log_linesmax;
 	static int task_progress_change_timeout; ///< If task progress did not change within this time, consider that it is erroneous
+	static int task_reconnect_timeout;
 
 	static int render_heartbeat_sec;
 	static int render_up_resources_period;

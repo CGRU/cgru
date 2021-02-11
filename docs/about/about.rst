@@ -14,6 +14,7 @@ Companies
 =========
 
 - **Algous** | http://www.algousstudio.ru
+- **Artjail** | https://www.artjail.com/
 - **Asymmetric VFX** | http://www.a-vfx.ru/
 - **Cinnamon VFX** | http://cinnamon.com.ua
 - **EMG** | http://emg.fm
@@ -23,12 +24,15 @@ Companies
 - **Main Road Post** | https://mrpost.ru
 - **Overmind Studios** | http://www.overmind-studios.de
 - **Platige Image** | https://www.platige.com
+- **Post Kino** | https://postkino.ru/
 - **Postmodern** | http://postmodern.com.ua/
+- **Redchillies VFX** | http://redchilliesvfx.com/
 - **R-Studios** | http://www.r-studios.ru
-- **RISE FX** | https://risefx.com
+- **Rise FX** | https://risefx.com
 - **Terminal FX** | http://terminalfx.com
 - **TurboRender** | https://turborender.com
 - **Unit Five** | https://u5fx.ru
+- **Virtual Republic** | https://virtualrepublic.org/
 
 
 Projects
