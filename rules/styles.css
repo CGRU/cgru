@@ -696,17 +696,17 @@ overflow-y: scroll;
 #status_framesnum_div.updated { border: 1px solid #FFFF00; }
 #status_framesnum { font: 16px monospace; padding: 1px 6px; float: left; }
 
-#status_tasks_div, #status_reports_div {
+#status_tasks_div_old, #status_reports_div {
 margin: 4px 8px;
 padding: 4px 8px;
 border: 1px solid rgba(98,98,98,.5);
 border-radius: 8px;
 }
-#status_tasks_div { float: left; }
+#status_tasks_div_old { float: left; }
 #status_reports_div { float:right; }
 
-#status_tasks .task { margin: 2px; border: 1px solid rgba(98,98,98,.5); }
-#status_tasks .task > div { float: left; margin: 2px 4px; }
+#status_tasks_old .task { margin: 2px; border: 1px solid rgba(98,98,98,.5); }
+#status_tasks_old .task > div { float: left; margin: 2px 4px; }
 
 .status_edit { clear: both; }
 .status_edit .buttons_div { float: right; }
@@ -737,6 +737,22 @@ border-radius: 8px;
 .status_edit .flag { border-width: 0px; margin: 7px; padding: 0px 2px; opacity: 0.5;}
 .status_edit .flag.selected { border-width: 4px; margin: 3px; opacity: 1.0; _border-color: rgba( 100, 255, 255, 1.0) }
 .status_edit .flag.half_selected { border-width: 0px; margin: 7px; opacity: 1.0; _border-color: rgba( 100, 255, 255, 1.0) }
+
+#status_tasks .task {
+margin: 4px;
+padding: 4px;
+border-radius: 4px;
+border: 1px solid rgba(98,98,98,.5);
+}
+#status_tasks .task .show .tags    {float: left;}
+#status_tasks .task .show .artists {float: left;}
+#status_tasks .task .show .flags   {float: left;}
+#status_tasks .task .show .percent {float: right;}
+#status_tasks .task .edit .percent {float: right; width: 64px;}
+#status_tasks .task .edit .percent .label {float: right;}
+#status_tasks .task .button        {float: right;}
+#status_tasks .task .progress      { clear: both; border-radius: 4px; }
+#status_tasks .task .progressbar   { height: 6px; border-radius: 2px; }
 
 table.statistics { border-collapse: collapse; }
 table.statistics th { font-weight: normal; font-style: italic; }

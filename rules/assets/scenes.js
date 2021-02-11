@@ -957,6 +957,7 @@ function sc_DisplayStatistics()
 
 	$('scenes_info').innerHTML = info;
 
+return;
 	// Statistics:
 	//
 	var args = {};

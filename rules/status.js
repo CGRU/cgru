@@ -140,8 +140,8 @@ function Status(i_obj, i_args)
 		this.elModified = $('status_modified');
 		this.elReportsDiv = $('status_reports_div');
 		this.elReports = $('status_reports');
-		this.elTasksDiv = $('status_tasks_div');
-		this.elTasks = $('status_tasks');
+		this.elTasksDiv = $('status_tasks_div_old');
+		this.elTasks = $('status_tasks_old');
 	}
 
 	if (this.elEditBtn)
@@ -227,6 +227,8 @@ Status.prototype.show = function(i_status, i_update = false) {
 			this.elAdinfo.style.display = 'none';
 		}
 	}
+
+	task_ShowTasks(this);
 
 	var args = {};
 	args.statuses = [this.obj];
