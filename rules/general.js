@@ -130,7 +130,7 @@ function g_Init_Rules(i_data)
 	$('afanasy_webgui').href = 'http://' + cgru_Config.af_servername + ':' + cgru_Config.af_serverport;
 	$('rules_label').textContent = RULES_TOP.company + '-RULES';
 
-	$('panel_logo_img').src = RULES_TOP.panel_logo_img;
+	$('panel_logo').style.backgroundImage = 'url(' + RULES_TOP.panel_logo_img + ')';
 
 	u_el.navig.m_folder = '/';
 	u_el.navig.m_path = '/';

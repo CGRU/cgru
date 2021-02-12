@@ -146,7 +146,12 @@ padding: 2px 8px;
 
 #panel_logo {
 float: right;
+width: 140px; height: 34px;
 margin: 2px 10px;
+background-position: center;
+background-size: 100%;
+background-repeat: no-repeat;
+_border: 1px solid #F00;
 }
 
 #navig_div, #sidepanel_div {
@@ -269,6 +274,9 @@ a.link_auto { text-decoration: none; }
 -moz-user-select: none;
 -webkit-user-select: none;
 }
+
+.right {float: right;}
+.left  {float: left; }
 
 .button {
 -moz-user-select: none;
@@ -721,8 +729,6 @@ border-radius: 8px;
 .status_edit_div .finish_div .label { cursor: pointer;}
 .status_edit_div .finish_div .editing { text-align: center;}
 .status_edit .color { clear:both;}
-.status_edit .list { padding: 4px; margin: 4px; border-top: 1px solid rgba(98,98,98,.5); }
-.status_edit .list .button { margin:0 4px; padding:0 4px; width: 50px; float: left; }
 .status_edit .edit_tasks .task_add { float: left; }
 .status_edit .edit_tasks .tasks_multiedit_message { float: right; background-color: #F33; padding: 2px 6px; margin: 2px 6px; border-radius: 2px; }
 .status_edit .edit_tasks { border-top: 1px solid rgba(98,98,98,.5); margin-top: 8px; padding-top: 4px; }
@@ -733,26 +739,31 @@ border-radius: 8px;
 .status_edit .edit_tasks .task .dur_label { float: left; padding: 2px 6px; }
 .status_edit .edit_tasks .task .duration { width: 60px; float: left; }
 .status_edit .edit_tasks .tags { clear: both; }
-.status_edit .tag { cursor: pointer; margin: 4px; }
-.status_edit .flag { border-width: 0px; margin: 7px; padding: 0px 2px; opacity: 0.5;}
-.status_edit .flag.selected { border-width: 4px; margin: 3px; opacity: 1.0; _border-color: rgba( 100, 255, 255, 1.0) }
-.status_edit .flag.half_selected { border-width: 0px; margin: 7px; opacity: 1.0; _border-color: rgba( 100, 255, 255, 1.0) }
 
 #status_tasks .task {
-margin: 4px;
-padding: 4px;
+margin: 8px 4px;
+padding: 8px 4px;
 border-radius: 4px;
-border: 1px solid rgba(98,98,98,.5);
+border: 2px solid rgba(98,98,98,.5);
 }
-#status_tasks .task .show .tags    {float: left;}
-#status_tasks .task .show .artists {float: left;}
-#status_tasks .task .show .flags   {float: left;}
-#status_tasks .task .show .percent {float: right;}
-#status_tasks .task .edit .percent {float: right; width: 64px;}
-#status_tasks .task .edit .percent .label {float: right;}
-#status_tasks .task .button        {float: right;}
-#status_tasks .task .progress      { clear: both; border-radius: 4px; }
-#status_tasks .task .progressbar   { height: 6px; border-radius: 2px; }
+#status_tasks .task .show_div          {clear: both;}
+#status_tasks .task .show_div .tags    {float: left;}
+#status_tasks .task .show_div .artists {float: left;}
+#status_tasks .task .show_div .flags   {float: left;}
+#status_tasks .task .show_div .percent {float: right;}
+#status_tasks .task .edit_div          {clear: both;}
+#status_tasks .task .edit_div .tags    {float: left;}
+#status_tasks .task .edit_div .percent {float: right; width: 64px;}
+#status_tasks .task .edit_div .percent .label {float: right; padding: 2px; margin: 2px; margin-right: 8px;}
+#status_tasks .task .progress          {clear: both; border-radius: 4px;}
+#status_tasks .task .progressbar       {height: 6px; border-radius: 2px;}
+
+.edit_tags_list { clear: both; padding: 4px; margin: 4px; border-top: 1px solid rgba(98,98,98,.5); }
+.edit_tags_list .button { margin:0 4px; padding:0 4px; width: 50px; float: left; }
+.edit_tags_list .tag { cursor: pointer; margin: 4px; }
+.edit_tags_list .flag { border-width: 0px; margin: 7px; padding: 0px 2px; opacity: 0.5;}
+.edit_tags_list .flag.selected { border-width: 4px; margin: 3px; opacity: 1.0; _border-color: rgba( 100, 255, 255, 1.0) }
+.edit_tags_list .flag.half_selected { border-width: 0px; margin: 7px; opacity: 1.0; _border-color: rgba( 100, 255, 255, 1.0) }
 
 table.statistics { border-collapse: collapse; }
 table.statistics th { font-weight: normal; font-style: italic; }

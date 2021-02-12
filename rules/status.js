@@ -752,27 +752,23 @@ Status.prototype.edit = function(i_args) {
 	this.elEdit_annotation.classList.add('editing');
 	this.elEdit_annotation.contentEditable = 'true';
 
+	// Objects needed to store half selected state,
+	// when several statuses selected.
 	var artists = {};
 	var flags = {};
 	var tags = {};
 
 	if (this.obj.artists)
 		for (var a = 0; a < this.obj.artists.length; a++)
-			artists[this.obj.artists[a]] = {"title": c_GetUserTitle(this.obj.artists[a])};
+			artists[this.obj.artists[a]] = {};
 
 	if (this.obj.flags)
 		for (var a = 0; a < this.obj.flags.length; a++)
-			flags[this.obj.flags[a]] = {
-				"title": c_GetFlagTitle(this.obj.flags[a]),
-				"tooltip": c_GetFlagTip(this.obj.flags[a])
-			};
+			flags[this.obj.flags[a]] = {};
 
 	if (this.obj.tags)
 		for (var a = 0; a < this.obj.tags.length; a++)
-			tags[this.obj.tags[a]] = {
-				"title": c_GetTagTitle(this.obj.tags[a]),
-				"tooltip": c_GetTagTip(this.obj.tags[a])
-			};
+			tags[this.obj.tags[a]] = {};
 
 
 	// If several statuses selected, we check/set "half" state
@@ -789,7 +785,7 @@ Status.prototype.edit = function(i_args) {
 				{
 					let id = i_args.statuses[s].obj.artists[a];
 					if (artists[id] == null)
-						artists[id] = {"title": c_GetUserTitle(id), "half": true};
+						artists[id] = {"half": true};
 				}
 			}
 			else
@@ -807,7 +803,7 @@ Status.prototype.edit = function(i_args) {
 
 					let id = i_args.statuses[s].obj.flags[a];
 					if (flags[id] == null)
-						flags[id] = {"title": c_GetFlagTitle(id), "half": true, "tooltip": c_GetFlagTip(id)};
+						flags[id] = {"half": true};
 				}
 			}
 			else
@@ -824,7 +820,7 @@ Status.prototype.edit = function(i_args) {
 				{
 					let id = i_args.statuses[s].obj.tags[a];
 					if (tags[id] == null)
-						tags[id] = {"title": c_GetTagTitle(id), "half": true, "tooltip": c_GetTagTip(id)};
+						tags[id] = {"half": true};
 				}
 			}
 			else
@@ -833,18 +829,18 @@ Status.prototype.edit = function(i_args) {
 		}
 
 	if (c_CanAssignArtists())
-		this.editListShow({
+		this.editAtrists = new EditList({
 			"name": 'artists',
 			"label": 'Artists:',
 			"list": artists,
 			"list_all": g_users,
-			"elEdit": this.elEdit
+			"elParent": this.elEdit
 		});
 
-	this.editListShow(
-		{"name": 'flags', "label": 'Flags:', "list": flags, "list_all": RULES.flags, "elEdit": this.elEdit});
-	this.editListShow(
-		{"name": 'tags', "label": 'Tags:', "list": tags, "list_all": RULES.tags, "elEdit": this.elEdit});
+	this.editFlags = new EditList(
+		{"name": 'flags', "label": 'Flags:', "list": flags, "list_all": RULES.flags, "elParent": this.elEdit});
+	this.editTags = new EditList(
+		{"name": 'tags', "label": 'Tags:', "list": tags, "list_all": RULES.tags, "elParent": this.elEdit});
 
 	this.elEdit_Color = document.createElement('div');
 	this.elEdit.appendChild(this.elEdit_Color);
@@ -989,243 +985,6 @@ Status.prototype.getMultiVale = function(i_key, i_statuses) {
 	}
 	return value;
 };
-Status.prototype.editListShow = function(i_args) {
-	var elRoot = document.createElement('div');
-	i_args.elEdit.appendChild(elRoot);
-	i_args.elRoot = elRoot;
-	elRoot.classList.add('list');
-	elRoot.classList.add(i_args.name);
-	if (localStorage.background && localStorage.background.length)
-		elRoot.style.background = localStorage.background;
-	else
-		elRoot.style.background = u_background;
-	if (localStorage.text_color && localStorage.text_color.length)
-		elRoot.style.color = localStorage.text_color;
-	else
-		elRoot.style.color = u_textColor;
-
-	elRoot.m_elBtn = document.createElement('div');
-	elRoot.appendChild(elRoot.m_elBtn);
-	elRoot.m_elBtn.classList.add('button');
-	elRoot.m_elBtn.textContent = i_args.label;
-	elRoot.m_elBtn.m_status = this;
-	elRoot.m_elBtn.onclick = function(e) { e.currentTarget.m_status.editListEdit(i_args); };
-	elRoot.m_elList = document.createElement('div');
-	elRoot.appendChild(elRoot.m_elList);
-	for (var id in i_args.list)
-	{
-		var el = document.createElement('div');
-		elRoot.m_elList.appendChild(el);
-		el.textContent = i_args.list[id].title;
-		el.classList.add('tag');
-		if (i_args.name == 'flags')
-		{
-			el.classList.add('flag');
-			if (RULES.flags[id])
-				st_SetElColor({"color": RULES.flags[id].clr}, el);
-		}
-		if (i_args.name == 'artists')
-		{
-			el.classList.add('artist');
-			if (id == g_auth_user.id)
-				el.classList.add('me');
-		}
-
-		var icon = null;
-		if (i_args.name == 'artists')
-			icon = c_GetAvatar(id);
-		if (icon)
-		{
-			el.classList.add('with_icon');
-			el.style.backgroundImage = 'url(' + icon + ')';
-		}
-
-		if (i_args.list_all[id] && i_args.list_all[id].disabled)
-			el.classList.add('disabled');
-
-		if (i_args.list[id].tooltip)
-			el.title = i_args.list[id].tooltip;
-
-		if (i_args.list[id].half)
-			el.classList.add('half_selected');
-		else
-			el.classList.add('selected');
-	}
-};
-Status.prototype.editListEdit = function(i_args) {
-	if (i_args.elRoot.m_edit)
-		return;
-	i_args.elRoot.m_edit = true;
-	i_args.elRoot.m_elBtn.classList.remove('button');
-	i_args.elRoot.m_elList.style.display = 'none';
-	i_args.elRoot.classList.add('edit');
-
-	i_args.elEdit[i_args.name] = [];
-
-	if (i_args.name == 'artists')
-	{
-		this.editArtistsEdit(i_args);
-		return;
-	}
-
-	let new_line = false;
-	for (let item in i_args.list_all)
-	{
-		if (new_line)
-		{
-			let el = document.createElement('div');
-			i_args.elRoot.appendChild(el);
-			el.classList.add('new_line');
-			new_line = false;
-		}
-
-		let el = document.createElement('div');
-		i_args.elRoot.appendChild(el);
-		el.classList.add('tag');
-		if (i_args.name == 'flags')
-		{
-			el.classList.add('flag');
-			if (RULES.flags[item] && RULES.flags[item].clr)
-			{
-				let c = RULES.flags[item].clr;
-				el.style.borderColor = 'rgb(' + c[0]*0.5 + ',' + c[1]*0.5 + ',' + c[2]*0.5 + ')';
-				el.style.backgroundColor = 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
-			}
-
-			if (RULES.flags[item] && RULES.flags[item].new_line)
-				new_line = true;
-		}
-
-		el.m_item = item;
-
-		if (i_args.list_all[item].title)
-			el.textContent = i_args.list_all[item].title;
-		else
-			el.textContent = item;
-
-		if (i_args.list_all[item].tip)
-			el.title = i_args.list_all[item].tip;
-
-		if (i_args.list[item])
-		{
-			if (i_args.list[item].half)
-			{
-				el.m_half_selected = true;
-				el.classList.add('half_selected');
-			}
-			else
-			{
-				el.m_selected = true;
-				el.classList.add('selected');
-			}
-		}
-
-		el.onclick = status_elToggleSelection;
-		i_args.elEdit[i_args.name].push(el);
-	}
-};
-Status.prototype.editArtistsEdit = function(i_args) {
-	var roles = c_GetRolesArtists(i_args.list);
-
-	for (var r = 0; r < roles.length; r++)
-	{
-		var elRole = document.createElement('div');
-		i_args.elRoot.appendChild(elRole);
-		elRole.classList.add('role');
-
-		var elLabel = document.createElement('div');
-		elRole.appendChild(elLabel);
-		elLabel.classList.add('label');
-		elLabel.textContent = roles[r].role + ':';
-
-		for (let t = 0; t < roles[r].tags.length; t++)
-		{
-			let tag = roles[r].tags[t].tag;
-
-			let elTag = document.createElement('div');
-			elTag.classList.add('role_tag');
-			elRole.appendChild(elTag);
-
-			let elLabel = document.createElement('div');
-			elLabel.textContent = c_GetTagTitle(tag) + ':';
-			elLabel.title = c_GetTagTip(tag);
-			elLabel.classList.add('label');
-			elTag.appendChild(elLabel);
-
-			for (let a = 0; a < roles[r].tags[t].artists.length; a++)
-			{
-				let artist = roles[r].tags[t].artists[a];
-
-				var el = document.createElement('div');
-				elTag.appendChild(el);
-				el.classList.add('tag');
-				el.classList.add('artist');
-				el.m_item = artist.id;
-				if (artist.id == g_auth_user.id)
-					el.classList.add('me');
-
-				if (g_users[artist.id] && g_users[artist.id].disabled)
-					el.classList.add('disabled');
-
-				if (artist.title)
-					el.textContent = artist.title;
-				else
-					el.textContent = artist.id;
-
-				if (artist.tip)
-					el.title = artist.tip;
-
-				var avatar = c_GetAvatar(artist.id);
-				if (avatar)
-				{
-					el.classList.add('with_icon');
-					el.style.backgroundImage = 'url(' + avatar + ')';
-				}
-
-				if (i_args.list[artist.id])
-				{
-					if (i_args.list[artist.id].half)
-					{
-						el.m_half_selected = true;
-						el.classList.add('half_selected');
-					}
-					else
-					{
-						el.m_selected = true;
-						el.classList.add('selected');
-					}
-				}
-
-				el.onclick = status_elToggleSelection;
-				i_args.elEdit[i_args.name].push(el);
-			}
-		}
-	}
-};
-function status_elToggleSelection(e)
-{
-	var el = e.currentTarget;
-	if (el.m_selected)
-	{
-		el.m_selected = false;
-		el.classList.remove('selected');
-	}
-	else if (el.classList.contains('half_selected'))
-	{
-		el.m_selected = true;
-		el.classList.add('selected');
-		el.classList.remove('half_selected');
-	}
-	else if (el.m_half_selected)
-	{
-		el.classList.add('half_selected');
-	}
-	else
-	{
-		el.m_selected = true;
-		el.classList.add('selected');
-	}
-}
 
 Status.prototype.addTaskOnClick = function() {
 	if (this.obj.tasks == null)
@@ -1314,8 +1073,8 @@ Status.prototype.editTasksShowTasks = function(i_args) {
 		var elTags = document.createElement('div');
 		elTags.classList.add('tags');
 		el.appendChild(elTags);
-		this.editListShow(
-			{"name": 'tags', "label": 'Tags:', "list": tags, "list_all": RULES.tags, "elEdit": elTags});
+		elTags.m_editTags = new EditList(
+			{"name": 'tags', "label": 'Tags:', "list": tags, "list_all": RULES.tags, "elParent": elTags});
 
 		if (c_CanAssignArtists())
 		{
@@ -1330,12 +1089,12 @@ Status.prototype.editTasksShowTasks = function(i_args) {
 			}
 			var elArtists = document.createElement('div');
 			el.appendChild(elArtists);
-			this.editListShow({
+			elArtists.m_editArtists = new EditList({
 				"name": 'artists',
 				"label": 'Artists:',
 				"list": artists,
 				"list_all": g_users,
-				"elEdit": elArtists
+				"elParent": elArtists
 			});
 		}
 
@@ -1414,10 +1173,10 @@ Status.prototype.editSave = function(i_args) {
 		adinfo = btoa(adinfo);
 	}
 
-	if (this.elEdit.artists)
+	if (this.editAtrists && (null !== this.editAtrists.getItems()))
 	{
 		artists = {};
-		let elList = this.elEdit.artists;
+		let elList = this.editAtrists.getItems();
 		for (let i = 0; i < elList.length; i++)
 		{
 			if (elList[i].m_selected)
@@ -1427,10 +1186,10 @@ Status.prototype.editSave = function(i_args) {
 		}
 	}
 
-	if (this.elEdit.flags)
+	if (this.editFlags && (null !== this.editFlags.getItems()))
 	{
 		flags = {};
-		let elList = this.elEdit.flags;
+		let elList = this.editFlags.getItems();
 		for (let i = 0; i < elList.length; i++)
 		{
 			if (elList[i].m_selected)
@@ -1440,10 +1199,10 @@ Status.prototype.editSave = function(i_args) {
 		}
 	}
 
-	if (this.elEdit.tags)
+	if (this.editTags && (null !== this.editTags.getItems()))
 	{
 		tags = {};
-		let elList = this.elEdit.tags;
+		let elList = this.editTags.getItems();
 		for (let i = 0; i < elList.length; i++)
 		{
 			if (elList[i].m_selected)
@@ -1470,10 +1229,10 @@ Status.prototype.editSave = function(i_args) {
 			if (!isNaN(price))
 				task.price = price;
 
-			if (elTask.m_elTags.tags)
+			if (null !== elTask.m_elTags.m_editTags.getItems())
 			{
 				task.tags = [];
-				let elList = elTask.m_elTags.tags;
+				let elList = elTask.m_elTags.m_editTags.getItems();
 				for (let i = 0; i < elList.length; i++)
 					if (elList[i].m_selected)
 					{
@@ -1484,10 +1243,10 @@ Status.prototype.editSave = function(i_args) {
 			else if (elTask.m_task.tags)
 				task.tags = elTask.m_task.tags;
 
-			if (elTask.m_elArtists && elTask.m_elArtists.artists)
+			if (elTask.m_elArtists && (null !== elTask.m_elArtists.m_editArtists.getItems()))
 			{
 				task.artists = [];
-				let elList = elTask.m_elArtists.artists;
+				let elList = elTask.m_elArtists.m_editArtists.getItems();
 				for (let i = 0; i < elList.length; i++)
 					if (elList[i].m_selected)
 					{
@@ -1709,6 +1468,8 @@ function st_Save(i_status, i_path, i_func, i_args, i_navig_params_update)
 	st_FilterStatusForSave(i_status);
 
 	g_FolderSetStatusPath(i_status, i_path, i_navig_params_update);
+
+	// Clear network walks cache
 	n_walks[i_path] = null;
 
 	var obj = {};

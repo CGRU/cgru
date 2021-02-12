@@ -39,7 +39,6 @@ function Task(i_statusClass, i_task, i_args)
 {
 	this.statusClass = i_statusClass;
 	this.obj = i_task;
-console.log(this.obj);
 
 	if (null == this.obj.artists)
 		this.obj.artists = [];
@@ -58,7 +57,7 @@ console.log(this.obj);
 
 
 	this.elShow = document.createElement('div');
-	this.elShow.classList.add('show');
+	this.elShow.classList.add('show_div');
 	this.elRoot.appendChild(this.elShow);
 
 
@@ -69,37 +68,23 @@ console.log(this.obj);
 
 	this.elArtists = document.createElement('div');
 	this.elArtists.classList.add('artists');
-	for (let artist of this.obj.artists)
-	{
-		let el = document.createElement('div');
-		el.classList.add('artist');
-		this.elArtists.appendChild(el);
-
-		let elName = document.createElement('div');
-		elName.classList.add('name');
-		elName.textContent = c_GetUserTitle(artist);
-		el.appendChild(elName);
-	}
 	this.elShow.appendChild(this.elArtists);
 
 
 	this.elFlags = document.createElement('div');
 	this.elFlags.classList.add('flags');
-	for (let flag of this.obj.flags)
-	{
-		let el = document.createElement('div');
-		el.classList.add('flag');
-		el.textContent = c_GetFlagTitle(flag);
-		el.title = c_GetFlagTip(flag);
-		this.elFlags.appendChild(el);
-	}
 	this.elShow.appendChild(this.elFlags);
 
-	this.elBtnEdit = document.createElement('button');
-	this.elBtnEdit.classList.add('button','edit');
-	this.elBtnEdit.m_task = this;
-	this.elBtnEdit.onclick = function(e){e.currentTarget.m_task.edit();}
-	this.elShow.appendChild(this.elBtnEdit);
+
+	if (c_CanEditTasks())
+	{
+		this.elBtnEdit = document.createElement('button');
+		this.elBtnEdit.classList.add('button','edit','right');
+		this.elBtnEdit.m_task = this;
+		this.elBtnEdit.onclick = function(e){e.currentTarget.m_task.edit();}
+		this.elShow.appendChild(this.elBtnEdit);
+	}
+
 
 	this.elPercent = document.createElement('div');
 	this.elPercent.classList.add('percent');
@@ -116,7 +101,7 @@ console.log(this.obj);
 
 
 	this.elEdit = document.createElement('div');
-	this.elEdit.classList.add('edit');
+	this.elEdit.classList.add('edit_div');
 	this.elRoot.appendChild(this.elEdit);
 
 
@@ -128,8 +113,8 @@ console.log(this.obj);
 Task.prototype.show = function()
 {
 	st_SetElTags(this.obj, this.elTags);
-	st_SetElArtists(this.obj, this.elArtists);
-	st_SetElFlags(this.obj, this.elFlags);
+	st_SetElArtists(this.obj, this.elArtists,/*short = */false,/*clickable = */true);
+	st_SetElFlags(this.obj, this.elFlags,/*short = */false,/*clickable = */true);
 	st_SetElProgress(this.obj, this.elProgressBar, this.elProgress, this.elPercent);
 }
 
@@ -154,7 +139,7 @@ Task.prototype.edit = function()
 
 
 	this.elBtnCancel = document.createElement('div');
-	this.elBtnCancel.classList.add('button');
+	this.elBtnCancel.classList.add('button','right');
 	this.elBtnCancel.textContent = 'Cancel';
 	this.elBtnCancel.m_task = this;
 	this.elBtnCancel.onclick = function(e){e.currentTarget.m_task.editCancel();}
@@ -162,7 +147,7 @@ Task.prototype.edit = function()
 
 
 	this.elBtnSave = document.createElement('div');
-	this.elBtnSave.classList.add('button');
+	this.elBtnSave.classList.add('button','right');
 	this.elBtnSave.textContent = 'Save';
 	this.elBtnSave.m_task = this;
 	this.elBtnSave.onclick = function(e){e.currentTarget.m_task.editSave();}
@@ -183,6 +168,21 @@ Task.prototype.edit = function()
 	this.elEditPercentContent.contentEditable = true;
 	this.elEditPercentContent.textContent = this.obj.progress;
 	this.elEditPercentDiv.appendChild(this.elEditPercentContent);
+
+	if (c_CanAssignArtists())
+		this.editAritsts = new EditList({
+			"name"    : 'artists',
+			"label"   : 'Artists:',
+			"list"    : this.obj.artists,
+			"list_all": g_users,
+			"elParent": this.elEdit});
+
+	this.editFlags = new EditList({
+			"name"    : 'flags',
+			"label"   : 'Flags:',
+			"list"    : this.obj.flags,
+			"list_all": RULES.flags,
+			"elParent": this.elEdit});
 }
 
 Task.prototype.editCancel = function()
@@ -199,6 +199,12 @@ Task.prototype.editSave = function()
 {
 	// Iint nulls
 	let progress = null;
+	let artists = null;
+	let flags = null;
+
+	// Set values to statuses
+	let progress_changed = false;
+	let progresses = {};
 
 	// Get values
 	let progress_edit = this.elEditPercentContent.textContent;
@@ -217,16 +223,80 @@ Task.prototype.editSave = function()
 			progress = 100;
 	}
 
+	artists = this.editAritsts.getSelectedNames();
+	flags   = this.editFlags.getSelectedNames();
+
+
 	// Set values:
-	if (progress !== null)
+	// Flags min, max progress and exclusiveness:
+	if (null !== flags){
+		this.obj.flags = [];
+		let p_min = null;
+		let p_max = null;
+		for (let f of flags)
+		{
+			let rFlag = RULES.flags[f];
+			if (rFlag)
+			{
+				if (rFlag.excl)
+					this.obj.flags = [];
+				if (rFlag.p_min && ((null === p_min) || (p_min > rFlag.p_min)))
+					p_min = rFlag.p_min;
+				if (rFlag.p_max && ((null === p_max) || (p_max > rFlag.p_max)))
+					p_max = rFlag.p_max;
+			}
+			this.obj.flags.push(f);
+		}
+
+		if ((progress === null) && p_min)
+			progress = p_min;
+		else if (progress && p_min && (progress < p_min))
+			progress = p_min;
+		else if (progress && p_max && (progress > p_max))
+			progress = p_max;
+	}
+	// Progress:
+	if ((null !== progress) && (this.obj.progress != progress))
 	{
 		this.obj.progress = progress;
-console.log(this.obj);
+		progress_changed = true;
 	}
+	// Artists:
+	if (null !== artists )
+		this.obj.artists = artists;
 
-	this.editCancel();
-	this.show();
 
-	this.statusClass.save();
+	// Set modification user and time:
+	this.obj.muser = g_auth_user.id;
+	this.obj.mtime = c_DT_CurSeconds();
+
+
+	// Save constructed status
+	//this.statusClass.save();
+	let obj = {};
+	obj.tasks  = this.statusClass.obj.tasks;
+	if (progress_changed)
+	{
+		let avg_progress = 0;
+		for (let i = 0; i < this.statusClass.obj.tasks.length; i++)
+			if (this.statusClass.obj.tasks[i].progress)
+				avg_progress += this.statusClass.obj.tasks[i].progress;
+		avg_progress = Math.floor(avg_progress / this.statusClass.obj.tasks.length);
+		progresses[this.statusClass.path] = avg_progress;
+		this.statusClass.obj.progress = avg_progress;
+		obj.progress = avg_progress;
+	}
+	st_Save(obj);
+
+	// Task will be recreated on status show
+	//	this.editCancel();
+	//	this.show();
+	this.statusClass.show();
+
+	if (progress_changed)
+		st_UpdateProgresses(this.statusClass.path, progresses);
+
+	// News & Bookmarks:
+	nw_StatusesChanged([this.statusClass]);
 }
 
