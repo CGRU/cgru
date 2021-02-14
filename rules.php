@@ -1514,6 +1514,8 @@ function isUserAssignedInStatus(&$i_user, &$i_status)
 	if (array_key_exists('tasks', $i_status))
 		foreach ($i_status['tasks'] as $tname => $task)
 		{
+			if (array_key_exists('deleted', $task) && $task['deleted'])
+				continue;
 			if (false == array_key_exists('artists', $task))
 				continue;
 			if (false == in_array($i_user['id'], $task['artists']))

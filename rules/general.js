@@ -31,8 +31,8 @@ var g_navigating_path = null;
 var g_arguments = null;
 
 var g_navig_infos = {
-	all     : ['annotation', 'size', 'flags', 'artists', 'tags', 'duration', 'price', 'frames', 'percent'],
-	default : ['annotation', 'flags', 'tags', 'artists', 'percent'],
+	all     : ['annotation', 'size', 'flags', 'artists', 'tags', 'tasks', 'duration', 'price', 'frames', 'percent'],
+	default : ['annotation', 'flags', 'tags', 'artists', 'tasks', 'percent'],
 	current : []
 };
 
@@ -784,6 +784,12 @@ function g_AppendFolder(i_elParent, i_fobject)
 	elFlags.classList.add('flags');
 	elFlags.classList.add('info');
 
+	var elTasks = document.createElement('div');
+	elFBody.appendChild(elTasks);
+	elFolder.m_elTasks = elTasks;
+	elTasks.classList.add('tasks');
+	elTasks.classList.add('info');
+
 	elFolder.m_elProgress = document.createElement('div');
 	elFBody.appendChild(elFolder.m_elProgress);
 	elFolder.m_elProgress.classList.add('progress');
@@ -947,6 +953,8 @@ function g_FolderSetStatus(i_status, i_elFolder, i_up_params)
 		st_SetElTags(i_status, i_elFolder.m_elTags, true);
 	if ((i_up_params == null) || i_up_params.flags)
 		st_SetElFlags(i_status, i_elFolder.m_elFlags, true);
+	if ((i_up_params == null) || i_up_params.tasks)
+		task_DrawBadges(i_status, i_elFolder.m_elTasks);
 
 	if (i_elFolder.m_fobject.auxiliary)
 	{

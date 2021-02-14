@@ -85,6 +85,8 @@ function Task(i_statusClass, i_task)
 	this.statusClass = i_statusClass;
 	if (this.statusClass == null)
 		this.statusClass = st_Status;
+	if (this.statusClass == null)
+		this.statusClass = {};
 
 	this.obj = i_task;
 	if (this.obj == null)
@@ -345,7 +347,11 @@ Task.prototype.editProcess = function()
 
 		// Add this new task object to status object
 		if (null == this.statusClass.obj)
+		{
+			// There was not any status at all
 			this.statusClass.obj = {};
+			RULES.status = this.statusClass.obj;
+		}
 		if (null == this.statusClass.obj.tasks)
 			this.statusClass.obj.tasks = {};
 		this.statusClass.obj.tasks[this.obj.name] = this.obj;
@@ -482,5 +488,39 @@ Task.prototype.editDelete = function()
 	this.obj.deleted = true;
 
 	this.save(this.obj.progress);
+}
+
+function task_DrawBadges(i_status, i_el)
+{
+	i_el.textContent = '';
+
+	if (null == i_status)
+		return;
+	if (null == i_status.tasks)
+		return;
+
+	for (let t in i_status.tasks)
+	{
+		let task = i_status.tasks[t];
+		if (task.deleted)
+			continue;
+
+		let elTask = document.createElement('div');
+		elTask.classList.add('task');
+		i_el.appendChild(elTask);
+
+		let elName = document.createElement('div');
+		elName.classList.add('name');
+		elName.textContent = task.tags.join('_');
+		elTask.appendChild(elName);
+
+		let elArtists = document.createElement('div');
+		st_SetElArtists(task, elArtists, true);
+		elTask.appendChild(elArtists);
+
+		let elFlags = document.createElement('div');
+		st_SetElFlags(task, elFlags, true);
+		elTask.appendChild(elFlags);
+	}
 }
 

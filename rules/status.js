@@ -632,22 +632,37 @@ function st_SetElStatus(i_el, i_status)
 	i_el.appendChild(elStatus);
 	elStatus.classList.add('status');
 
+	let stat = i_status;
+
+	if (i_status.tasks)
+	{
+		for (let t in i_status.tasks)
+		{
+			let task = i_status.tasks[t];
+			if (task.deleted)
+				continue;
+
+			if (task.artists && (task.artists.indexOf(g_auth_user.id) != -1))
+				stat = task;
+		}
+	}
+
 	// Flags:
-	if (i_status.flags && i_status.flags.length)
+	if (stat.flags && stat.flags.length)
 	{
 		let elFlags = document.createElement('div');
 		elStatus.appendChild(elFlags);
 		elFlags.classList.add('flags');
-		i_el.highlighted = st_SetElFlags(i_status, elFlags);
+		i_el.highlighted = st_SetElFlags(stat, elFlags);
 	}
 
 	// Show progress bar:
-	if (i_status.progress)
+	if (stat.progress)
 	{
 		let elBar = document.createElement('div');
 		i_el.appendChild(elBar);
 		elBar.classList.add('bar');
-		st_SetElProgress(i_status, elBar);
+		st_SetElProgress(stat, elBar);
 	}
 
 	// Status color:

@@ -349,6 +349,8 @@ function bm_ActualStatus(i_status)
 		{
 			let task = i_status.tasks[t];
 
+			if (task.deleted)
+				continue;
 			if (task.artists && (task.artists.indexOf(g_auth_user.id) == -1))
 				continue;
 			if (task.progress && (task.progress >= 100))

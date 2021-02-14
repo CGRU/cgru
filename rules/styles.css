@@ -221,6 +221,15 @@ width: 30px; height: 14px;
 border: 1px solid rgba(0,0,0,.3);
 /*border-radius: 4px;*/
 }
+#navig .folder .tasks {}
+#navig .folder .tasks .task {
+float: left;
+margin: 1px 2px;
+border: 2px solid rgba(98, 98, 98, 0.5);
+border-radius: 4px;
+}
+#navig .folder .tasks .task div {float: left;}
+#navig .folder .tasks .task .name {padding: 2px;}
 
 #navig .group {
 clear: both;
@@ -242,6 +251,7 @@ border-radius: 20px 0px 0px 8px;
 #navig .group.opened > .name {font-weight: bold;}
 
 #navig.navig_show_flags      .folder .flags      { display: inline; }
+#navig.navig_show_tasks      .folder .tasks      { display: inline; }
 #navig.navig_show_tags       .folder .tags       { display: inline; }
 #navig.navig_show_artists    .folder .artists    { display: inline; }
 #navig.navig_show_annotation .folder .annotation { display: inline; }
