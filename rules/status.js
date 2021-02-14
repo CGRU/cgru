@@ -623,6 +623,42 @@ function st_SetElColorTextFromBack(i_clr, i_el)
 		i_el.style.color = '#FFF';
 }
 
+function st_SetElStatus(i_el, i_status)
+{
+	if (null == i_el)
+		return;
+
+	let elStatus = document.createElement('div');
+	i_el.appendChild(elStatus);
+	elStatus.classList.add('status');
+
+	// Flags:
+	if (i_status.flags && i_status.flags.length)
+	{
+		let elFlags = document.createElement('div');
+		elStatus.appendChild(elFlags);
+		elFlags.classList.add('flags');
+		i_el.highlighted = st_SetElFlags(i_status, elFlags);
+	}
+
+	// Show progress bar:
+	if (i_status.progress)
+	{
+		let elBar = document.createElement('div');
+		i_el.appendChild(elBar);
+		elBar.classList.add('bar');
+		st_SetElProgress(i_status, elBar);
+	}
+
+	// Status color:
+	if (i_status.color)
+	{
+		let c = i_status.color;
+		i_el.style.backgroundColor = 'rgba('+c[0]+','+c[1]+','+c[2]+')';
+		st_SetElColorTextFromBack(c, i_el);
+	}
+}
+
 function st_SetElFinish(i_status, i_elFinish, i_full)
 {
 	if (i_full == null)

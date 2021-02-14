@@ -18,6 +18,8 @@
 
 var CurTasks = [];
 
+var _old_tasks_ = false;
+
 function task_ShowTasks(i_statusClass)
 {
 	$('status_tasks_div').style.display = 'none';
@@ -25,14 +27,53 @@ function task_ShowTasks(i_statusClass)
 		task.destroy();
 	CurTasks = [];
 
+	$('status_tasks').textContent = '';
+
 	if ((null == i_statusClass) || (null == i_statusClass.obj) || (null == i_statusClass.obj.tasks))
 		return;
 
-	for (let task of i_statusClass.obj.tasks)
-		CurTasks.push(new Task(i_statusClass, task));
+	// OLD TASKS
+	if (Array.isArray(i_statusClass.obj.tasks))
+	{
+		_old_tasks_ = true;
+		let new_tasks = {};
+		for (let task of i_statusClass.obj.tasks)
+		{
+			let tags = task.tags;
+			if ((null == tags) || (tags.length == 0))
+			{
+				$('status_tasks').innerHTML = '<b style="color:darkred;font-size:32px;">TASK(s) HAS NO TAG(s)!!!</b>';
+				$('status_tasks_div').style.display = 'block';
+				return;
+			}
+			let task_name = tags.join('_');
+			task.name = task_name;
+			new_tasks[task_name] = task;
+		}
+		for (let task in new_tasks)
+			CurTasks.push(new Task(i_statusClass, new_tasks[task]));
+
+		let el = document.createElement('div');
+		el.classList.add('button');
+		el.textContent = 'DOUBLE CLICK TO CONVERT OLD TASKS';
+		el.ondblclick = task_CONVERT_OLD_TASKS;
+		$('status_tasks').appendChild(el);
+	}
+	else
+	for (let task in i_statusClass.obj.tasks)
+		CurTasks.push(new Task(i_statusClass, i_statusClass.obj.tasks[task]));
 
 	if (CurTasks.length)
 		$('status_tasks_div').style.display = 'block';
+}
+
+function task_CONVERT_OLD_TASKS()
+{
+	let statusClass = CurTasks[0].statusClass;
+	statusClass.obj.tasks = {};
+	for (let task of CurTasks)
+		statusClass.obj.tasks[task.obj.name] = task.obj;
+	statusClass.save();
 }
 
 function Task(i_statusClass, i_task, i_args)
@@ -76,6 +117,7 @@ function Task(i_statusClass, i_task, i_args)
 	this.elShow.appendChild(this.elFlags);
 
 
+if ( ! _old_tasks_ )
 	if (c_CanEditTasks())
 	{
 		this.elBtnEdit = document.createElement('button');
@@ -274,14 +316,19 @@ Task.prototype.editSave = function()
 	// Save constructed status
 	//this.statusClass.save();
 	let obj = {};
-	obj.tasks  = this.statusClass.obj.tasks;
+	obj.tasks = {};
+	obj.tasks[this.obj.name] = this.obj;
 	if (progress_changed)
 	{
 		let avg_progress = 0;
-		for (let i = 0; i < this.statusClass.obj.tasks.length; i++)
-			if (this.statusClass.obj.tasks[i].progress)
-				avg_progress += this.statusClass.obj.tasks[i].progress;
-		avg_progress = Math.floor(avg_progress / this.statusClass.obj.tasks.length);
+		let num_tasks = 0;
+		for (let t in this.statusClass.obj.tasks)
+			if (this.statusClass.obj.tasks[t].progress)
+			{
+				avg_progress += this.statusClass.obj.tasks[t].progress;
+				num_tasks += 1;
+			}
+		avg_progress = Math.floor(avg_progress / num_tasks);
 		progresses[this.statusClass.path] = avg_progress;
 		this.statusClass.obj.progress = avg_progress;
 		obj.progress = avg_progress;

@@ -355,7 +355,7 @@ function nw_MakeNews(i_news, i_args)
 function nw_FilterStatus(i_status)
 {
 	var st = {};
-	var keys = ['artists','flags','progress','tags','color','frames_num','annotation'];
+	var keys = ['artists','flags','progress','tags','color','frames_num','annotation','tasks'];
 
 	for (let key of keys)
 		if (i_status[key])
@@ -629,30 +629,8 @@ function nw_NewsShow(i_update_folders)
 		}
 
 		// Display news status:
-		if (news.status)
-		{
-			let elStatus = document.createElement('div');
-			el.appendChild(elStatus);
-			elStatus.classList.add('status');
+		st_SetElStatus(el, news.status);
 
-			// Flags:
-			if (news.status.flags && news.status.flags.length)
-			{
-				let elFlags = document.createElement('div');
-				elStatus.appendChild(elFlags);
-				elFlags.classList.add('flags');
-				st_SetElFlags(news.status, elFlags);
-			}
-
-			// Progress:
-			if (news.status.progress)
-			{
-				let elBar = document.createElement('div');
-				el.appendChild(elBar);
-				elBar.classList.add('bar');
-				st_SetElProgress(news.status, elBar);
-			}
-		}
 
 		let elBtn = document.createElement('div');
 		el.appendChild(elBtn);

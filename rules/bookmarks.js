@@ -283,38 +283,7 @@ function bm_CreateBookmark(i_bm)
 	elDel.title = 'Double click to delete.';
 
 	// Display status:
-	if (i_bm.status)
-	{
-		let elStatus = document.createElement('div');
-		el.appendChild(elStatus);
-		elStatus.classList.add('status');
-
-		// Flags:
-		if (i_bm.status.flags && i_bm.status.flags.length)
-		{
-			let elFlags = document.createElement('div');
-			elStatus.appendChild(elFlags);
-			elFlags.classList.add('flags');
-			el.highlighted = st_SetElFlags(i_bm.status, elFlags);
-		}
-
-		// Show progress bar:
-		if (i_bm.status.progress)
-		{
-			let elBar = document.createElement('div');
-			el.appendChild(elBar);
-			elBar.classList.add('bar');
-			st_SetElProgress(i_bm.status, elBar);
-		}
-
-		// Status color:
-		if (i_bm.status.color)
-		{
-			let c = i_bm.status.color;
-			el.style.backgroundColor = 'rgba('+c[0]+','+c[1]+','+c[2]+')';
-			st_SetElColorTextFromBack(c, el);
-		}
-	}
+	st_SetElStatus(el, i_bm.status);
 
 	var elPath = document.createElement('a');
 	el.appendChild(elPath);
@@ -332,7 +301,7 @@ function bm_CreateBookmark(i_bm)
 		tooltip += 'Modified at: ' + c_DT_StrFromSec(i_bm.mtime) + '\n';
 	el.title = tooltip;
 
-	if (bm_ObsoleteStatus(i_bm.status))
+	if (false == bm_ActualStatus(i_bm.status))
 		el.classList.add('obsolete');
 
 	el.m_bookmark = i_bm;
@@ -369,30 +338,47 @@ function bm_NavigatePost()
 	bm_HighlightCurrent();
 }
 
-function bm_ObsoleteStatus(i_status)
+function bm_ActualStatus(i_status)
 {
 	if (i_status == null)
-		return true;
+		return false;
+
+	if (i_status.tasks && (typeof i_status.tasks == 'object'))
+	{
+		for (let t in i_status.tasks)
+		{
+			let task = i_status.tasks[t];
+
+			if (task.artists && (task.artists.indexOf(g_auth_user.id) == -1))
+				continue;
+			if (task.progress && (task.progress >= 100))
+				continue;
+			if (task.flags && (task.flags.indexOf('omit')) != -1)
+				continue;
+
+			return true;
+		}
+	}
 
 	if (i_status.artists == null)
-		return true;
+		return false;
 
 	if (i_status.artists.indexOf(g_auth_user.id) == -1)
-		return true;
+		return false;
 
 	if (i_status.progress)
 	{
 		if (i_status.progress >= 100)
-			return true;
+			return false;
 	}
 
 	if (i_status.flags)
 	{
 		if (i_status.flags.indexOf('omit') != -1)
-			return true;
+			return false;
 	}
 
-	return false;
+	return true;
 }
 
 function bm_StatusesChanged(i_args)
@@ -409,7 +395,7 @@ function bm_HighlightCurrent()
 		if (path == bm_elements[i].m_bookmark.path)
 		{
 			bm_elements[i].classList.add('cur_path');
-			if (g_CurPathDummy() || bm_ObsoleteStatus(RULES.status))
+			if (g_CurPathDummy() || (false == bm_ActualStatus(RULES.status)))
 			{
 				bm_elements[i].classList.add('obsolete');
 			}

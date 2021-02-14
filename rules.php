@@ -1360,8 +1360,7 @@ function makenews($i_args, &$io_users, &$o_out)
 
 		// If user is assigned, it should receive news:
 		if (array_key_exists('status', $news) && is_array($news['status']))
-			if (array_key_exists('artists', $news['status']))
-				if (in_array($user['id'], $news['status']['artists']))
+			if (isUserAssignedInStatus($user, $news['status']))
 				{
 					if (false == in_array($user['id'], $sub_users))
 						array_push($sub_users, $user['id']);
@@ -1460,11 +1459,8 @@ function makebookmarks($i_bm, &$io_users, &$o_out)
 		if ($bm_index == -1)
 		{
 			// Check whether the bookmark is needed:
-			if (is_null($i_bm['status'])) continue;
-			if (false == isset($i_bm['status']['artists'])) continue;
-			if (false == in_array($user['id'], $i_bm['status']['artists'])) continue;
-			if (isset($i_bm['status']['progress']) && ($i_bm['status']['progress'] >= 100)) continue;
-			if (isset($i_bm['status']['flags']) && in_array('omit', $i_bm['status']['flags'])) continue;
+			if (false == isUserAssignedInStatus($user, $i_bm['status']))
+				continue;
 
 			// Initialize parameters:
 			$i_bm['cuser'] = USER_ID;
@@ -1472,11 +1468,13 @@ function makebookmarks($i_bm, &$io_users, &$o_out)
 		}
 		else
 		{
-			// Copy paramters:
+			// Bookmark exists
+			// Copy creation paramters
 			$i_bm['cuser'] = $user['bookmarks'][$i]['cuser'];
 			$i_bm['ctime'] = $user['bookmarks'][$i]['ctime'];
 
-			// Delete existing bookmark:
+			// Delete existing bookmark,
+			// no updating, just new will be created
 			array_splice($user['bookmarks'], $i, 1);
 		}
 
@@ -1488,6 +1486,49 @@ function makebookmarks($i_bm, &$io_users, &$o_out)
 	}
 
 	return $changed_users;
+}
+
+function isUserAssignedInStatus(&$i_user, &$i_status)
+{
+	if (false == isset($i_status))
+		return false;
+	if (is_null($i_status))
+		return false;
+
+	// Check user is assigned in status
+	if (array_key_exists('artists', $i_status))
+		if (in_array($i_user['id'], $i_status['artists']))
+		{
+			$no_need = false;
+			// There is no need of news/bookmark if shot is done or omitted
+			if (isset($i_status['progress']) && ($i_status['progress'] >= 100))
+				$no_need = true;
+			if (isset($i_status['flags']) && in_array('omit', $i_status['flags']))
+				$no_need = true;
+
+			if (false == $no_need)
+				return true;
+		}
+
+	// Check user is assigned is some task
+	if (array_key_exists('tasks', $i_status))
+		foreach ($i_status['tasks'] as $tname => $task)
+		{
+			if (false == array_key_exists('artists', $task))
+				continue;
+			if (false == in_array($i_user['id'], $task['artists']))
+				continue;
+
+			// There is no need of news/bookmark if shot is done or omitted
+			if (isset($task['progress']) && ($task['progress'] >= 100))
+				continue;
+			if (isset($task['flags']) && in_array('omit', $task['flags']))
+				continue;
+
+			return true;
+		}
+
+	return false;
 }
 
 function isAdmin(&$o_out)
