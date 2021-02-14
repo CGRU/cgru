@@ -22,7 +22,9 @@ var _old_tasks_ = false;
 
 function task_ShowTasks(i_statusClass)
 {
-	$('status_tasks_div').style.display = 'none';
+_old_tasks_ = false;
+
+	$('status_tasks_label').style.display = 'none';
 	for (let task of CurTasks)
 		task.destroy();
 	CurTasks = [];
@@ -36,6 +38,7 @@ function task_ShowTasks(i_statusClass)
 	if (Array.isArray(i_statusClass.obj.tasks))
 	{
 		_old_tasks_ = true;
+		$('status_tasks_btn_add').style.display = 'none';
 		let new_tasks = {};
 		for (let task of i_statusClass.obj.tasks)
 		{
@@ -43,7 +46,6 @@ function task_ShowTasks(i_statusClass)
 			if ((null == tags) || (tags.length == 0))
 			{
 				$('status_tasks').innerHTML = '<b style="color:darkred;font-size:32px;">TASK(s) HAS NO TAG(s)!!!</b>';
-				$('status_tasks_div').style.display = 'block';
 				return;
 			}
 			let task_name = tags.join('_');
@@ -62,9 +64,6 @@ function task_ShowTasks(i_statusClass)
 	else
 	for (let task in i_statusClass.obj.tasks)
 		CurTasks.push(new Task(i_statusClass, i_statusClass.obj.tasks[task]));
-
-	if (CurTasks.length)
-		$('status_tasks_div').style.display = 'block';
 }
 
 function task_CONVERT_OLD_TASKS()
@@ -76,10 +75,26 @@ function task_CONVERT_OLD_TASKS()
 	statusClass.save();
 }
 
-function Task(i_statusClass, i_task, i_args)
+function task_AddTask()
+{
+	CurTasks.push(new Task());
+}
+
+function Task(i_statusClass, i_task)
 {
 	this.statusClass = i_statusClass;
+	if (this.statusClass == null)
+		this.statusClass = st_Status;
+
 	this.obj = i_task;
+	if (this.obj == null)
+	{
+		// This is a new added task
+		this.obj = {};
+	}
+
+	// If at least one task exists we should unhide tasks label, as it is hidden by default.
+	$('status_tasks_label').style.display = 'block';
 
 	if (null == this.obj.artists)
 		this.obj.artists = [];
@@ -147,9 +162,25 @@ if ( ! _old_tasks_ )
 	this.elRoot.appendChild(this.elEdit);
 
 
+	this.elInfoLeft = document.createElement('div');
+	this.elInfoLeft.classList.add('info','left');
+	this.elRoot.appendChild(this.elInfoLeft);
+
+	this.elInfoRight = document.createElement('div');
+	this.elInfoRight.classList.add('info','right');
+	this.elRoot.appendChild(this.elInfoRight);
+
+
 	this.editing = false;
 
-	this.show();
+	// We should start to edit new added task
+	if (this.obj.name == null)
+		this.edit();
+	else
+		this.show();
+
+	if (this.obj.deleted)
+		this.elRoot.classList.add('deleted');
 }
 
 Task.prototype.show = function()
@@ -158,6 +189,20 @@ Task.prototype.show = function()
 	st_SetElArtists(this.obj, this.elArtists,/*short = */false,/*clickable = */true);
 	st_SetElFlags(this.obj, this.elFlags,/*short = */false,/*clickable = */true);
 	st_SetElProgress(this.obj, this.elProgressBar, this.elProgress, this.elPercent);
+
+	let info_left = '';
+	if (this.obj.cuser)
+		info_left += 'By ' + c_GetUserTitle(this.obj.cuser);
+	if (this.obj.cuser)
+		info_left += ' ' + c_DT_StrFromSec(this.obj.ctime);
+	this.elInfoLeft.textContent = info_left;
+
+	let info_right = '';
+	if (this.obj.muser)
+		info_right += 'Edit: ' + c_GetUserTitle(this.obj.muser);
+	if (this.obj.mtime)
+		info_right += ' ' + c_DT_StrFromSec(this.obj.mtime);
+	this.elInfoRight.textContent = info_right;
 }
 
 Task.prototype.destroy = function()
@@ -174,12 +219,6 @@ Task.prototype.edit = function()
 	this.elShow.style.display = 'none';
 
 
-	this.elEditTags = document.createElement('div');
-	this.elEditTags.classList.add('tags');
-	this.elEdit.appendChild(this.elEditTags);
-	st_SetElTags(this.obj, this.elEditTags);
-
-
 	this.elBtnCancel = document.createElement('div');
 	this.elBtnCancel.classList.add('button','right');
 	this.elBtnCancel.textContent = 'Cancel';
@@ -192,7 +231,7 @@ Task.prototype.edit = function()
 	this.elBtnSave.classList.add('button','right');
 	this.elBtnSave.textContent = 'Save';
 	this.elBtnSave.m_task = this;
-	this.elBtnSave.onclick = function(e){e.currentTarget.m_task.editSave();}
+	this.elBtnSave.onclick = function(e){e.currentTarget.m_task.editProcess();}
 	this.elEdit.appendChild(this.elBtnSave);
 
 
@@ -211,6 +250,29 @@ Task.prototype.edit = function()
 	this.elEditPercentContent.textContent = this.obj.progress;
 	this.elEditPercentDiv.appendChild(this.elEditPercentContent);
 
+	if (this.obj.tags == null)
+	{
+		this.obj.tags = [];
+		// This is a new just added task
+		this.editTags = new EditList({
+				"name"    : 'tags',
+				"label"   : 'Tags:',
+				"list"    : this.obj.tags,
+				"list_all": RULES.tags,
+				"elParent": this.elEdit});
+		// Start to edit tags immediately
+		this.editTags.edit();
+	}
+	else
+	{
+		// We should not edit tags of an existing task
+		this.elEditTags = document.createElement('div');
+		this.elEditTags.classList.add('tags');
+		this.elEdit.appendChild(this.elEditTags);
+		st_SetElTags(this.obj, this.elEditTags);
+	}
+
+
 	if (c_CanAssignArtists())
 		this.editAritsts = new EditList({
 			"name"    : 'artists',
@@ -225,6 +287,15 @@ Task.prototype.edit = function()
 			"list"    : this.obj.flags,
 			"list_all": RULES.flags,
 			"elParent": this.elEdit});
+
+
+	this.elBtnDelete = document.createElement('div');
+	this.elBtnDelete.classList.add('button','right');
+	this.elBtnDelete.textContent = 'Delete';
+	this.elBtnDelete.title = 'Double click to delete task.';
+	this.elBtnDelete.m_task = this;
+	this.elBtnDelete.ondblclick = function(e){e.currentTarget.m_task.editDelete();}
+	this.elEdit.appendChild(this.elBtnDelete);
 }
 
 Task.prototype.editCancel = function()
@@ -232,21 +303,64 @@ Task.prototype.editCancel = function()
 	if ( ! this.editing)
 		return;
 
+	if (this.obj.name == null)
+	{
+		// New just added task was cancelled
+		let index = CurTasks.indexOf(this);
+		if (index != -1)
+			CurTasks.splice(index, 1);
+		this.destroy();
+		return;
+	}
+
 	this.editing = false;
 	this.elEdit.textContent = '';
 	this.elShow.style.display = 'block';
 }
 
-Task.prototype.editSave = function()
+Task.prototype.editProcess = function()
 {
-	// Iint nulls
+	// Initialize nulls
 	let progress = null;
 	let artists = null;
 	let flags = null;
 
 	// Set values to statuses
 	let progress_changed = false;
-	let progresses = {};
+
+	if (this.obj.name == null)
+	{
+		// This is a new added task
+		this.obj.tags = this.editTags.getSelectedNames();
+		if ((null == this.obj.tags) || (this.obj.tags.length == 0))
+		{
+			// Tag(s) must be selected.
+			// It is a mandatory attribute.
+			this.elInfoLeft.innerHTML = '<b style="font-size: 14px; color: darkred">You should select task tag(s).<b>';
+			return;
+		}
+
+		// Construct name from tags
+		this.obj.name = this.obj.tags.join('_');
+
+		// Add this new task object to status object
+		if (null == this.statusClass.obj)
+			this.statusClass.obj = {};
+		if (null == this.statusClass.obj.tasks)
+			this.statusClass.obj.tasks = {};
+		this.statusClass.obj.tasks[this.obj.name] = this.obj;
+
+		// Set creation user and time:
+		this.obj.cuser = g_auth_user.id;
+		this.obj.ctime = c_DT_CurSeconds();
+	}
+	else
+	{
+		// Set modification user and time:
+		this.obj.muser = g_auth_user.id;
+		this.obj.mtime = c_DT_CurSeconds();
+	}
+
 
 	// Get values
 	let progress_edit = this.elEditPercentContent.textContent;
@@ -281,7 +395,11 @@ Task.prototype.editSave = function()
 			if (rFlag)
 			{
 				if (rFlag.excl)
+				{
 					this.obj.flags = [];
+					p_min = null;
+					p_max = null;
+				}
 				if (rFlag.p_min && ((null === p_min) || (p_min > rFlag.p_min)))
 					p_min = rFlag.p_min;
 				if (rFlag.p_max && ((null === p_max) || (p_max > rFlag.p_max)))
@@ -290,11 +408,9 @@ Task.prototype.editSave = function()
 			this.obj.flags.push(f);
 		}
 
-		if ((progress === null) && p_min)
+		if (p_min && (progress < p_min))
 			progress = p_min;
-		else if (progress && p_min && (progress < p_min))
-			progress = p_min;
-		else if (progress && p_max && (progress > p_max))
+		else if (p_max && (progress > p_max))
 			progress = p_max;
 	}
 	// Progress:
@@ -307,27 +423,33 @@ Task.prototype.editSave = function()
 	if (null !== artists )
 		this.obj.artists = artists;
 
+	this.save(progress_changed);
+}
 
-	// Set modification user and time:
-	this.obj.muser = g_auth_user.id;
-	this.obj.mtime = c_DT_CurSeconds();
-
-
+Task.prototype.save = function(i_progress_changed)
+{
 	// Save constructed status
 	//this.statusClass.save();
 	let obj = {};
 	obj.tasks = {};
 	obj.tasks[this.obj.name] = this.obj;
-	if (progress_changed)
+	let progresses = {};
+	if (i_progress_changed)
 	{
 		let avg_progress = 0;
 		let num_tasks = 0;
 		for (let t in this.statusClass.obj.tasks)
-			if (this.statusClass.obj.tasks[t].progress)
+		{
+			let task = this.statusClass.obj.tasks[t];
+			if (task.deleted)
+				continue;
+
+			if (task.progress)
 			{
-				avg_progress += this.statusClass.obj.tasks[t].progress;
+				avg_progress += task.progress;
 				num_tasks += 1;
 			}
+		}
 		avg_progress = Math.floor(avg_progress / num_tasks);
 		progresses[this.statusClass.path] = avg_progress;
 		this.statusClass.obj.progress = avg_progress;
@@ -340,10 +462,25 @@ Task.prototype.editSave = function()
 	//	this.show();
 	this.statusClass.show();
 
-	if (progress_changed)
+	if (i_progress_changed)
 		st_UpdateProgresses(this.statusClass.path, progresses);
 
 	// News & Bookmarks:
 	nw_StatusesChanged([this.statusClass]);
+}
+
+Task.prototype.editDelete = function()
+{
+	let index = CurTasks.indexOf(this);
+	if (index != -1)
+		CurTasks.splice(index, 1);
+
+	// Set modification user and time:
+	this.obj.muser = g_auth_user.id;
+	this.obj.mtime = c_DT_CurSeconds();
+
+	this.obj.deleted = true;
+
+	this.save(this.obj.progress);
 }
 
