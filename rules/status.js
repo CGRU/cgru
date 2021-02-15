@@ -634,7 +634,7 @@ function st_SetElStatus(i_el, i_status)
 
 	let stat = i_status;
 
-	if (i_status.tasks)
+	if (i_status && i_status.tasks)
 	{
 		for (let t in i_status.tasks)
 		{
@@ -648,7 +648,7 @@ function st_SetElStatus(i_el, i_status)
 	}
 
 	// Flags:
-	if (stat.flags && stat.flags.length)
+	if (stat && stat.flags && stat.flags.length)
 	{
 		let elFlags = document.createElement('div');
 		elStatus.appendChild(elFlags);
@@ -657,7 +657,7 @@ function st_SetElStatus(i_el, i_status)
 	}
 
 	// Show progress bar:
-	if (stat.progress)
+	if (stat && stat.progress)
 	{
 		let elBar = document.createElement('div');
 		i_el.appendChild(elBar);
@@ -666,7 +666,7 @@ function st_SetElStatus(i_el, i_status)
 	}
 
 	// Status color:
-	if (i_status.color)
+	if (stat && stat.color)
 	{
 		let c = i_status.color;
 		i_el.style.backgroundColor = 'rgba('+c[0]+','+c[1]+','+c[2]+')';
