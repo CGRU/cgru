@@ -57,8 +57,8 @@ _old_tasks_ = false;
 
 		let el = document.createElement('div');
 		el.classList.add('button');
-		el.textContent = 'DOUBLE CLICK TO CONVERT OLD TASKS';
-		el.ondblclick = task_CONVERT_OLD_TASKS;
+		el.textContent = 'CONVERT OLD TASKS';
+		el.onclick = task_CONVERT_OLD_TASKS;
 		$('status_tasks').appendChild(el);
 	}
 	else
@@ -89,10 +89,50 @@ function task_CONVERT_OLD_TASKS(i_evt)
 				if (index != -1)
 					statusClass.obj.tags.splice(index, 1);
 			}
-	}
-	statusClass.save();
 
-	i_evt.currentTarget.parentElement.removeChild(i_evt.currentTarget);
+		// Grab flags:
+		if (statusClass.obj.flags && statusClass.obj.flags.length)
+		{
+			let f = 0;
+			while (f < statusClass.obj.flags.length)
+			{
+				let flag = statusClass.obj.flags[f];
+
+				if (flag.indexOf(task.obj.name) == 0)
+				{
+					flag = flag.replace(task.obj.name, '');
+					flag = flag.replace('_','');
+
+					if (flag in RULES.flags)
+					{
+						task.obj.flags.push(flag);
+						if (RULES.flags[flag].p_min)
+							task.obj.progress = RULES.flags[flag].p_min;
+
+						statusClass.obj.flags.splice(f, 1);
+					}
+				}
+
+				f++;
+			}
+		}
+	}
+
+	statusClass.show();
+
+	let elBtn = document.createElement('div');
+	elBtn.classList.add('button');
+	elBtn.textContent = 'SAVE NEW STATUS';
+	elBtn.onclick = task_CONVERT_OLD_TASKS_save;
+	$('status_tasks').appendChild(elBtn);
+}
+
+function task_CONVERT_OLD_TASKS_save(i_evt)
+{
+	let statusClass = CurTasks[0].statusClass;
+
+	statusClass.save();
+	statusClass.show();
 }
 
 function task_AddTask()
