@@ -55,6 +55,7 @@
 	"matte"   :{"title":"MtPaint",  "short":"Mp",  "tip":"Matte painting"},
 	"textur"  :{"title":"Textur",   "short":"Tx",  "tip":"Texturing"},
 
+	"layout"  :{"title":"Layout",   "short":"Lay", "tip":"Layout"},
 	"model"   :{"title":"Model",    "short":"Md",  "tip":"Modeling"},
 	"anim"    :{"title":"Anim",     "short":"Am",  "tip":"Animation"},
 	"track"   :{"title":"Track",    "short":"Tr",  "tip":"Tracking"},
