@@ -34,6 +34,12 @@ _old_tasks_ = false;
 	if ((null == i_statusClass) || (null == i_statusClass.obj) || (null == i_statusClass.obj.tasks))
 		return;
 
+	if (Array.isArray(i_statusClass.obj.tasks) && (i_statusClass.obj.tasks.length == 0))
+	{
+		delete i_statusClass.obj.tasks;
+		return;
+	}
+
 	// OLD TASKS
 	if (Array.isArray(i_statusClass.obj.tasks))
 	{
@@ -66,7 +72,7 @@ _old_tasks_ = false;
 		CurTasks.push(new Task(i_statusClass, i_statusClass.obj.tasks[task]));
 }
 
-var tasks_flags_map = {'roto':['masks']};
+var tasks_flags_map = {'roto':['masks'],'sim':['fx']};
 function task_CONVERT_OLD_TASKS(i_evt)
 {
 	let statusClass = CurTasks[0].statusClass;
@@ -103,7 +109,6 @@ function task_CONVERT_OLD_TASKS(i_evt)
 				let tag = names[0];
 				let flag = names[1];
 				let name = task.obj.name;
-console.log(tasks_flags_map[name], flag);
 				if (name != tag)
 					if ((null == tasks_flags_map[name]) || (tasks_flags_map[name].indexOf(tag) == -1))
 						{f++;continue;}
@@ -511,11 +516,8 @@ Task.prototype.save = function(i_progress_changed)
 			if (task.deleted)
 				continue;
 
-			if (task.progress)
-			{
-				avg_progress += task.progress;
-				num_tasks += 1;
-			}
+			avg_progress += task.progress;
+			num_tasks += 1;
 		}
 		avg_progress = Math.floor(avg_progress / num_tasks);
 		progresses[this.statusClass.path] = avg_progress;
