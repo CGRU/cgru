@@ -506,7 +506,7 @@ function task_DrawBadges(i_status, i_el)
 			continue;
 
 		let elTask = document.createElement('div');
-		elTask.classList.add('task');
+		elTask.classList.add('task_badge');
 		i_el.appendChild(elTask);
 
 		let elName = document.createElement('div');
@@ -521,6 +521,16 @@ function task_DrawBadges(i_status, i_el)
 		let elFlags = document.createElement('div');
 		st_SetElFlags(task, elFlags, true);
 		elTask.appendChild(elFlags);
+
+		let elProgress = document.createElement('div');
+		elProgress.classList.add('progress');
+		elTask.appendChild(elProgress);
+
+		let elProgressBar = document.createElement('div');
+		elProgressBar.classList.add('progressbar');
+		elProgress.appendChild(elProgressBar);
+
+		st_SetElProgress(task, elProgressBar, elProgress);
 	}
 }
 

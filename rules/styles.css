@@ -222,14 +222,6 @@ border: 1px solid rgba(0,0,0,.3);
 /*border-radius: 4px;*/
 }
 #navig .folder .tasks {}
-#navig .folder .tasks .task {
-float: left;
-margin: 1px 2px;
-border: 2px solid rgba(98, 98, 98, 0.5);
-border-radius: 4px;
-}
-#navig .folder .tasks .task div {float: left;}
-#navig .folder .tasks .task .name {padding: 2px;}
 
 #navig .group {
 clear: both;
@@ -447,6 +439,20 @@ float:none;
 .gui_size_handle { cursor: col-resize; border: 2px solid rgba(98,98,98,.5);}
 .gui_size_handle:hover { border: 2px solid #555555;}
 
+
+.task_badge {
+position: relative;
+float: left;
+margin: 1px 2px;
+border: 2px solid rgba(98, 98, 98, 0.5);
+border-radius: 4px;
+}
+.task_badge div {float: left;}
+.task_badge .name {padding: 2px;}
+.task_badge .progress {clear: both; width: 100%}
+.task_badge .progressbar {height: 6px;}
+
+
 /* ========================================================= */
 /* =============== SIDE PANEL: ============================= */
 #sidepanel_div { position: absolute; right: 0; }
@@ -626,8 +632,10 @@ padding-bottom: 4px;
 position: relative;
 }
 #recent .recent > div { margin: 2px 4px; }
+#recent .recent .title {}
 #recent .recent .status {float: right; font-size: 10px;}
 #recent .recent .status .flag {float: none;}
+#recent .recent .link {clear: both;}
 #recent .recent .bar {
 position: absolute;
 bottom: 0px;
@@ -645,8 +653,9 @@ border-top: 0;
 border-right: 0;
 border-radius: 0 0 0 4px;
 }
-#recent .user { float: left; margin-right: 4px;}
-
+#recent ._user { float: left; margin-right: 4px;}
+#recent .tasks {float: left;}
+#recent .task_badge {float: left;}
 
 /* ============= PLAYLIST: =============== */
 .playlist_ctrl { padding-left: 6px; }

@@ -985,6 +985,11 @@ function nw_RecentReceived(i_data, i_args)
 				st_SetElFlags(news.status, elFlags);
 			}
 
+			let elTasks = document.createElement('div');
+			el.appendChild(elTasks);
+			elTasks.classList.add('tasks');
+			task_DrawBadges(news.status, elTasks);
+
 			// Progress:
 			if (news.status.progress)
 			{
