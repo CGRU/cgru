@@ -66,6 +66,7 @@ _old_tasks_ = false;
 		CurTasks.push(new Task(i_statusClass, i_statusClass.obj.tasks[task]));
 }
 
+var tasks_flags_map = {'roto':['masks']};
 function task_CONVERT_OLD_TASKS(i_evt)
 {
 	let statusClass = CurTasks[0].statusClass;
@@ -96,24 +97,24 @@ function task_CONVERT_OLD_TASKS(i_evt)
 			let f = 0;
 			while (f < statusClass.obj.flags.length)
 			{
-				let flag = statusClass.obj.flags[f];
+				let names = statusClass.obj.flags[f].split('_');
+				if (names.length != 2) {f++;continue;}
 
-				if (flag.indexOf(task.obj.name) == 0)
-				{
-					flag = flag.replace(task.obj.name, '');
-					flag = flag.replace('_','');
+				let tag = names[0];
+				let flag = names[1];
+				let name = task.obj.name;
+console.log(tasks_flags_map[name], flag);
+				if (name != tag)
+					if ((null == tasks_flags_map[name]) || (tasks_flags_map[name].indexOf(tag) == -1))
+						{f++;continue;}
 
-					if (flag in RULES.flags)
-					{
-						task.obj.flags.push(flag);
-						if (RULES.flags[flag].p_min)
-							task.obj.progress = RULES.flags[flag].p_min;
+				if ( ! RULES.flags[flag]) {f++;continue;}
 
-						statusClass.obj.flags.splice(f, 1);
-					}
-				}
+				task.obj.flags.push(flag);
+				if (RULES.flags[flag].p_min)
+					task.obj.progress = RULES.flags[flag].p_min;
 
-				f++;
+				statusClass.obj.flags.splice(f, 1);
 			}
 		}
 	}
