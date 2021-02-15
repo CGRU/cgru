@@ -66,13 +66,33 @@ _old_tasks_ = false;
 		CurTasks.push(new Task(i_statusClass, i_statusClass.obj.tasks[task]));
 }
 
-function task_CONVERT_OLD_TASKS()
+function task_CONVERT_OLD_TASKS(i_evt)
 {
 	let statusClass = CurTasks[0].statusClass;
 	statusClass.obj.tasks = {};
 	for (let task of CurTasks)
+	{
 		statusClass.obj.tasks[task.obj.name] = task.obj;
+
+		// Steal tags and aritsts from status:
+		if (statusClass.obj.artists && statusClass.obj.artists.length)
+			for (let artist of task.obj.artists)
+			{
+				let index = statusClass.obj.artists.indexOf(artist);
+				if (index != -1)
+					statusClass.obj.artists.splice(index, 1);
+			}
+		if (statusClass.obj.tags && statusClass.obj.tags.length)
+			for (let tag of task.obj.tags)
+			{
+				let index = statusClass.obj.tags.indexOf(tag);
+				if (index != -1)
+					statusClass.obj.tags.splice(index, 1);
+			}
+	}
 	statusClass.save();
+
+	i_evt.currentTarget.parentElement.removeChild(i_evt.currentTarget);
 }
 
 function task_AddTask()
