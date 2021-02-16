@@ -683,7 +683,6 @@ function nw_NewsShow(i_update_folders)
 	// Update folders statuses:
 	if (i_update_folders !== false)
 	{
-		// Update only if news time > folder status mtime
 		for (let i = 0; i < g_auth_user.news.length; i++)
 		{
 			let news = g_auth_user.news[i];
@@ -695,14 +694,19 @@ function nw_NewsShow(i_update_folders)
 
 			let fstat = el.m_fobject.status;
 			if (fstat == null) continue;
-			if (fstat.mtime >= news.time) continue;
+
+			// Update only if news time > folder status time
+			//console.log(JSON.stringify(fstat));
+			//console.log(fstat.mtime, news.time);
+			if (fstat.ctime && (fstat.ctime >= news.time)) continue;
+			if (fstat.mtime && (fstat.mtime >= news.time)) continue;
 
 			// Update folder status:
 			g_FolderSetStatus(news.status, el);
 
 			// Update current location status:
 			if ((news.path == g_CurPath()) && st_Status)
-				st_Status.show(news.status, /*update = */ true);
+				st_Status.show(news.status);
 
 			// Remove walk cache:
 			if (n_walks[news.path])

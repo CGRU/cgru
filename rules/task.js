@@ -18,13 +18,14 @@
 
 var CurTasks = [];
 
-var _old_tasks_ = false;
+var _OLD_TASTKS_ = false;
 
 function task_ShowTasks(i_statusClass)
 {
-_old_tasks_ = false;
-
+_OLD_TASTKS_ = false;
 	$('status_tasks_label').style.display = 'none';
+	$('status_tasks_btn_add').style.display = 'block';
+
 	for (let task of CurTasks)
 		task.destroy();
 	CurTasks = [];
@@ -43,7 +44,7 @@ _old_tasks_ = false;
 	// OLD TASKS
 	if (Array.isArray(i_statusClass.obj.tasks))
 	{
-		_old_tasks_ = true;
+		_OLD_TASTKS_ = true;
 		$('status_tasks_btn_add').style.display = 'none';
 		let new_tasks = {};
 		for (let task of i_statusClass.obj.tasks)
@@ -200,7 +201,7 @@ function Task(i_statusClass, i_task)
 	this.elShow.appendChild(this.elFlags);
 
 
-if ( ! _old_tasks_ )
+if ( ! _OLD_TASTKS_ )
 	if (c_CanEditTasks())
 	{
 		this.elBtnEdit = document.createElement('button');
@@ -357,13 +358,18 @@ Task.prototype.edit = function()
 			"elParent": this.elEdit});
 
 
-	this.elBtnDelete = document.createElement('div');
-	this.elBtnDelete.classList.add('button','right');
-	this.elBtnDelete.textContent = 'Delete';
-	this.elBtnDelete.title = 'Double click to delete task.';
-	this.elBtnDelete.m_task = this;
-	this.elBtnDelete.ondblclick = function(e){e.currentTarget.m_task.editDelete();}
-	this.elEdit.appendChild(this.elBtnDelete);
+	// If there is no name, we just adding this task.
+	// So we should not delete it, we can cancel adding.
+	if (this.obj.name)
+	{
+		this.elBtnDelete = document.createElement('div');
+		this.elBtnDelete.classList.add('button','right');
+		this.elBtnDelete.textContent = 'Delete';
+		this.elBtnDelete.title = 'Double click to delete task.';
+		this.elBtnDelete.m_task = this;
+		this.elBtnDelete.ondblclick = function(e){e.currentTarget.m_task.editDelete();}
+		this.elEdit.appendChild(this.elBtnDelete);
+	}
 }
 
 Task.prototype.editCancel = function()
@@ -505,6 +511,43 @@ Task.prototype.save = function(i_progress_changed)
 	let obj = {};
 	obj.tasks = {};
 	obj.tasks[this.obj.name] = this.obj;
+
+
+	// Set status modification time
+	obj.muser = g_auth_user.id;
+	obj.mtime = c_DT_CurSeconds();
+	this.statusClass.obj.muser = obj.muser;
+	this.statusClass.obj.mtime = obj.mtime;
+
+
+	// Grab ready and done flags (OLD style TRACKDONE, ANIMREADY)
+	if (this.statusClass.obj.flags && this.statusClass.obj.flags.length)
+	{
+		let found = false;
+		let f = 0;
+		while (f < this.statusClass.obj.flags.length)
+		{
+			let keys = this.statusClass.obj.flags[f].split('_');
+			if ((keys.length == 2) && (this.obj.name == keys[0]) && (RULES.flags[keys[1]]))
+			{
+				this.obj.flags.push(keys[1]);
+				this.statusClass.obj.flags.splice(f, 1);
+				if (RULES.flags[keys[1]].p_min)
+				{
+					this.obj.progress = RULES.flags[keys[1]].p_min;
+					i_progress_changed = true;
+				}
+				found = true;
+				continue;
+			}
+			f++;
+		}
+
+		obj.flags = this.statusClass.obj.flags;
+	}
+
+
+	// Progress
 	let progresses = {};
 	if (i_progress_changed)
 	{
@@ -524,6 +567,26 @@ Task.prototype.save = function(i_progress_changed)
 		this.statusClass.obj.progress = avg_progress;
 		obj.progress = avg_progress;
 	}
+
+	// Remove status tags, artists and flags if the same has task
+	for (let arr of ['tags','artists','flags'])
+		if (this.statusClass.obj[arr] && this.statusClass.obj[arr].length)
+		{
+			let found = false;
+			for (let item of this.obj[arr])
+			{
+				let index = this.statusClass.obj[arr].indexOf(item);
+				if (index != -1)
+				{
+					this.statusClass.obj[arr].splice(index, 1);
+					found = true;
+				}
+			}
+			if (found)
+				obj[arr] = this.statusClass.obj[arr];
+		}
+
+	// Save constucted status object
 	st_Save(obj);
 
 	// Task will be recreated on status show
@@ -553,24 +616,32 @@ Task.prototype.editDelete = function()
 	this.save(this.obj.progress);
 }
 
-function task_DrawBadges(i_status, i_el)
+function task_DrawBadges(i_status, i_el, i_update)
 {
-	i_el.textContent = '';
+	if ( ! i_update)
+		i_el.textContent = '';
 
 	if (null == i_status)
 		return;
 	if (null == i_status.tasks)
 		return;
 
+	if (null == i_el.m_elTasks)
+		i_el.m_elTasks = {};
+
 	for (let t in i_status.tasks)
 	{
 		let task = i_status.tasks[t];
+		if (i_update && i_el.m_elTasks[task.name])
+			i_el.m_elTasks.removeChild(i_el.m_elTasks[task.name]);
+
 		if (task.deleted)
 			continue;
 
 		let elTask = document.createElement('div');
 		elTask.classList.add('task_badge');
 		i_el.appendChild(elTask);
+		i_el.m_elTasks[task.name] = this;
 
 		let elName = document.createElement('div');
 		elName.classList.add('name');

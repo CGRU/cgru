@@ -1518,7 +1518,9 @@ function st_Save(i_status, i_path, i_func, i_args, i_navig_params_update)
 
 	st_FilterStatusForSave(i_status);
 
-	g_FolderSetStatusPath(i_status, i_path, i_navig_params_update);
+	// If path is current, we take status global current status.
+	// As only some part of status object can be edited and provided for save.
+	g_FolderSetStatusPath(i_path == g_CurPath() ? RULES.status : i_status, i_path, i_navig_params_update);
 
 	// Clear network walks cache
 	n_walks[i_path] = null;

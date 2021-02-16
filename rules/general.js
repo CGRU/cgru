@@ -934,8 +934,20 @@ function g_FolderSetStatus(i_status, i_elFolder, i_up_params)
 		i_elFolder.m_fobject.status = {};
 
 	if (i_up_params)
+		// Update only specified parameters:
 		for (let parm in i_up_params)
-			i_elFolder.m_fobject.status[parm] = i_status[parm];
+		{
+			if (parm == 'tasks')
+			{
+				// On tasks, update each task
+				if (null == i_elFolder.m_fobject.status.tasks)
+					i_elFolder.m_fobject.status.tasks = {};
+				for (let t in i_status.tasks)
+					i_elFolder.m_fobject.status.tasks[t] = i_status.tasks[t];
+			}
+			else
+				i_elFolder.m_fobject.status[parm] = i_status[parm];
+		}
 	else
 		i_elFolder.m_fobject.status = i_status;
 
@@ -954,7 +966,7 @@ function g_FolderSetStatus(i_status, i_elFolder, i_up_params)
 	if ((i_up_params == null) || i_up_params.flags)
 		st_SetElFlags(i_status, i_elFolder.m_elFlags, true);
 	if ((i_up_params == null) || i_up_params.tasks)
-		task_DrawBadges(i_status, i_elFolder.m_elTasks);
+		task_DrawBadges(i_status, i_elFolder.m_elTasks, (i_up_params && i_up_params.tasks));
 
 	if (i_elFolder.m_fobject.auxiliary)
 	{
