@@ -530,7 +530,8 @@ Task.prototype.save = function(i_progress_changed)
 			let keys = this.statusClass.obj.flags[f].split('_');
 			if ((keys.length == 2) && (this.obj.name == keys[0]) && (RULES.flags[keys[1]]))
 			{
-				this.obj.flags.push(keys[1]);
+				if (this.obj.flags.indexOf(keys[1]) == -1)
+					this.obj.flags.push(keys[1]);
 				this.statusClass.obj.flags.splice(f, 1);
 				if (RULES.flags[keys[1]].p_min)
 				{
