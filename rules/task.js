@@ -539,6 +539,7 @@ Task.prototype.save = function(i_progress_changed)
 			let keys = this.statusClass.obj.flags[f].split('_');
 
 			if (keys[0] == 'compoz') keys[0] = 'comp';
+			if (keys[0] == 'masks')  keys[0] = 'roto';
 
 			if ((keys.length == 2) && (this.obj.name == keys[0]) && (RULES.flags[keys[1]]))
 			{
