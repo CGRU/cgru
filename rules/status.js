@@ -646,41 +646,61 @@ function st_SetElStatus(i_el, i_status)
 	i_el.appendChild(elStatus);
 	elStatus.classList.add('status');
 
-	let stat = i_status;
 
+	// If user has tasks, we should draw tasks only
 	if (i_status && i_status.tasks)
 	{
+		let found = false;
+
+		let stat = {};
+		stat.tasks = {};
+
 		for (let t in i_status.tasks)
 		{
 			let task = i_status.tasks[t];
 			if (task.deleted)
 				continue;
 
-			if (task.artists && (task.artists.indexOf(g_auth_user.id) != -1))
-				stat = task;
+			if (task.artists && (task.artists.indexOf(g_auth_user.id) == -1))
+				continue;
+
+			stat.tasks[task.name] = task;
+
+			found = true;
+		}
+
+		if (found)
+		{
+			let elTasks = document.createElement('div');
+			elStatus.appendChild(elTasks);
+			elTasks.classList.add('tasks');
+
+			task_DrawBadges(stat, elTasks, {'hide_artists':true,'full_names':true});
+
+			return;
 		}
 	}
 
 	// Flags:
-	if (stat && stat.flags && stat.flags.length)
+	if (i_status && i_status.flags && i_status.flags.length)
 	{
 		let elFlags = document.createElement('div');
 		elStatus.appendChild(elFlags);
 		elFlags.classList.add('flags');
-		i_el.highlighted = st_SetElFlags(stat, elFlags);
+		i_el.highlighted = st_SetElFlags(i_status, elFlags);
 	}
 
 	// Show progress bar:
-	if (stat && stat.progress)
+	if (i_status && i_status.progress)
 	{
 		let elBar = document.createElement('div');
 		i_el.appendChild(elBar);
 		elBar.classList.add('bar');
-		st_SetElProgress(stat, elBar);
+		st_SetElProgress(i_status, elBar);
 	}
 
 	// Status color:
-	if (stat && stat.color)
+	if (i_status && i_status.color)
 	{
 		let c = i_status.color;
 		i_el.style.backgroundColor = 'rgba('+c[0]+','+c[1]+','+c[2]+')';

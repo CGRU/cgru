@@ -966,7 +966,7 @@ function g_FolderSetStatus(i_status, i_elFolder, i_up_params)
 	if ((i_up_params == null) || i_up_params.flags)
 		st_SetElFlags(i_status, i_elFolder.m_elFlags, true);
 	if ((i_up_params == null) || i_up_params.tasks)
-		task_DrawBadges(i_status, i_elFolder.m_elTasks, (i_up_params && i_up_params.tasks));
+		task_DrawBadges(i_status, i_elFolder.m_elTasks, {'update':(i_up_params && i_up_params.tasks)});
 
 	if (i_elFolder.m_fobject.auxiliary)
 	{

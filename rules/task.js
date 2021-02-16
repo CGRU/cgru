@@ -630,9 +630,15 @@ Task.prototype.editDelete = function()
 	this.save(this.obj.progress);
 }
 
-function task_DrawBadges(i_status, i_el, i_update)
+function task_DrawBadges(i_status, i_el, i_args)
 {
-	if ( ! i_update)
+	if (null == i_args)
+		i_args = {};
+
+	let update = i_args.update;
+	let short_names = ! i_args.full_names;
+
+	if ( ! update)
 		i_el.textContent = '';
 
 	if (null == i_status)
@@ -646,7 +652,7 @@ function task_DrawBadges(i_status, i_el, i_update)
 	for (let t in i_status.tasks)
 	{
 		let task = i_status.tasks[t];
-		if (i_update && i_el.m_elTasks[task.name])
+		if (update && i_el.m_elTasks[task.name])
 			i_el.m_elTasks.removeChild(i_el.m_elTasks[task.name]);
 
 		if (task.deleted)
@@ -662,12 +668,16 @@ function task_DrawBadges(i_status, i_el, i_update)
 		elName.textContent = task.tags.join('_');
 		elTask.appendChild(elName);
 
-		let elArtists = document.createElement('div');
-		st_SetElArtists(task, elArtists, true);
-		elTask.appendChild(elArtists);
+		if ( ! i_args.hide_artists)
+		{
+			let elArtists = document.createElement('div');
+			elArtists.classList.add('artists');
+			st_SetElArtists(task, elArtists, short_names);
+			elTask.appendChild(elArtists);
+		}
 
 		let elFlags = document.createElement('div');
-		st_SetElFlags(task, elFlags, true);
+		st_SetElFlags(task, elFlags, short_names);
 		elTask.appendChild(elFlags);
 
 		let elProgress = document.createElement('div');
