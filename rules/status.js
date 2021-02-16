@@ -444,6 +444,8 @@ function st_SetElArtists(i_status, i_el, i_short, i_clickable)
 		{
 			el.onclick = st_TagClicked;
 			el.ondblclick = st_ArtistDblClicked;
+
+			el.onmousedown = st_ArtistMouseDown;
 		}
 	}
 }
@@ -514,6 +516,8 @@ function st_SetElTags(i_status, i_elTags, i_short, i_clickable)
 			{
 				el.onclick = st_TagClicked;
 				el.ondblclick = st_TagDblClicked;
+
+				el.onmousedown = st_TagMouseDown;
 			}
 		}
 }
@@ -537,10 +541,20 @@ function st_TagDblClicked(i_evt)
 	st_TagClicked(i_evt);
 	st_TagHilightToggle(i_evt.currentTarget, 'tag');
 }
+function st_TagMouseDown(i_evt)
+{
+	if (i_evt.button == 1)
+		task_StatusTagClicked(i_evt.currentTarget.m_name);
+}
 function st_FlagDblClicked(i_evt)
 {
 	st_TagClicked(i_evt);
 	st_TagHilightToggle(i_evt.currentTarget, 'flag');
+}
+function st_ArtistMouseDown(i_evt)
+{
+	if (i_evt.button == 1)
+		task_StatusArtistClicked(i_evt.currentTarget.m_name);
 }
 function st_ArtistDblClicked(i_evt)
 {

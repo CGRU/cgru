@@ -60,7 +60,7 @@ _OLD_TASTKS_ = false;
 			new_tasks[task_name] = task;
 		}
 		for (let task in new_tasks)
-			CurTasks.push(new Task(i_statusClass, new_tasks[task]));
+			new Task(i_statusClass, new_tasks[task]);
 
 		let el = document.createElement('div');
 		el.classList.add('button');
@@ -70,7 +70,7 @@ _OLD_TASTKS_ = false;
 	}
 	else
 	for (let task in i_statusClass.obj.tasks)
-		CurTasks.push(new Task(i_statusClass, i_statusClass.obj.tasks[task]));
+		new Task(i_statusClass, i_statusClass.obj.tasks[task]);
 }
 
 var tasks_flags_map = {'roto':['masks'],'sim':['fx']};
@@ -144,11 +144,13 @@ function task_CONVERT_OLD_TASKS_save(i_evt)
 
 function task_AddTask()
 {
-	CurTasks.push(new Task());
+	new Task();
 }
 
 function Task(i_statusClass, i_task)
 {
+	CurTasks.push(this);
+
 	this.statusClass = i_statusClass;
 	if (this.statusClass == null)
 		this.statusClass = st_Status;
@@ -165,6 +167,10 @@ function Task(i_statusClass, i_task)
 	// If at least one task exists we should unhide tasks label, as it is hidden by default.
 	$('status_tasks_label').style.display = 'block';
 
+
+	// Init
+	if (null == this.obj.tags)
+		this.obj.tags = [];
 	if (null == this.obj.artists)
 		this.obj.artists = [];
 	if (null == this.obj.flags)
@@ -319,9 +325,8 @@ Task.prototype.edit = function()
 	this.elEditPercentContent.textContent = this.obj.progress;
 	this.elEditPercentDiv.appendChild(this.elEditPercentContent);
 
-	if (this.obj.tags == null)
+	if (this.obj.name == null)
 	{
-		this.obj.tags = [];
 		// This is a new just added task
 		this.editTags = new EditList({
 				"name"    : 'tags',
@@ -329,8 +334,10 @@ Task.prototype.edit = function()
 				"list"    : this.obj.tags,
 				"list_all": RULES.tags,
 				"elParent": this.elEdit});
-		// Start to edit tags immediately
-		this.editTags.edit();
+		// Start to edit tags immediately, if no tags provided.
+		// As task can't exit without tag(s)
+		if (this.obj.tags.length == 0)
+			this.editTags.edit();
 	}
 	else
 	{
@@ -405,7 +412,9 @@ Task.prototype.editProcess = function()
 	if (this.obj.name == null)
 	{
 		// This is a new added task
-		this.obj.tags = this.editTags.getSelectedNames();
+		let selected_tags = this.editTags.getSelectedNames();
+		if (selected_tags)
+			this.obj.tags = selected_tags;
 		if ((null == this.obj.tags) || (this.obj.tags.length == 0))
 		{
 			// Tag(s) must be selected.
@@ -528,6 +537,9 @@ Task.prototype.save = function(i_progress_changed)
 		while (f < this.statusClass.obj.flags.length)
 		{
 			let keys = this.statusClass.obj.flags[f].split('_');
+
+			if (keys[0] == 'compoz') keys[0] = 'comp';
+
 			if ((keys.length == 2) && (this.obj.name == keys[0]) && (RULES.flags[keys[1]]))
 			{
 				if (this.obj.flags.indexOf(keys[1]) == -1)
@@ -667,5 +679,26 @@ function task_DrawBadges(i_status, i_el, i_update)
 
 		st_SetElProgress(task, elProgressBar, elProgress);
 	}
+}
+
+function task_StatusTagClicked(i_name)
+{
+	let artists = [];
+
+	if (st_Status && st_Status.obj && st_Status.obj.artists && st_Status.obj.artists.length)
+		for (let art of st_Status.obj.artists)
+			if (g_users[art] && (g_users[art].tag == i_name))
+				artists.push(art);
+
+	new Task(null, {'tags':[i_name],'artists':artists});
+}
+function task_StatusArtistClicked(i_name)
+{
+	let tags = [];
+
+	if (g_users[i_name] && g_users[i_name].tag)
+		tags.push(g_users[i_name].tag);
+
+	new Task(null, {'artists':[i_name],'tags':tags});
 }
 
