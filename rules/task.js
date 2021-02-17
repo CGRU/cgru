@@ -337,7 +337,7 @@ Task.prototype.edit = function()
 		// Start to edit tags immediately, if no tags provided.
 		// As task can't exit without tag(s)
 		if (this.obj.tags.length == 0)
-			this.editTags.edit();
+			this.editTags.showAllItems();
 	}
 	else
 	{

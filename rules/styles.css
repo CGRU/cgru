@@ -784,11 +784,34 @@ border: 2px solid rgba(98,98,98,.5);
 #status_tasks .task .info              {font-style: italic; font-size: 10px;}
 
 .edit_tags_list { clear: both; padding: 4px; margin: 4px; border-top: 1px solid rgba(98,98,98,.5); }
-.edit_tags_list .button { margin:0 4px; padding:0 4px; width: 50px; float: left; }
+.edit_tags_list > .button { margin:0 4px; padding:0 4px; width: 50px; float: left; }
 .edit_tags_list .tag { cursor: pointer; margin: 4px; }
+.edit_tags_list .tag .button.delete { margin: 1px 1px 1px 6px; width: 10px; height: 10px;}
 .edit_tags_list .flag { border-width: 0px; margin: 7px; padding: 0px 2px; opacity: 0.5;}
 .edit_tags_list .flag.selected { border-width: 4px; margin: 3px; opacity: 1.0; _border-color: rgba( 100, 255, 255, 1.0) }
 .edit_tags_list .flag.half_selected { border-width: 0px; margin: 7px; opacity: 1.0; _border-color: rgba( 100, 255, 255, 1.0) }
+.edit_tags_list .editing { width: 96px; height: 18px;}
+.edit_tags_list .menu {
+clear: both;
+margin: 4px;
+_border: 1px solid rgba(255,255,255,.5);
+border-radius: 12px;
+_box-shadow: 0px 0px 3px #000, 0px 0px 5px rgba(255,255,255,.7) inset;
+box-shadow: 0px 0px 5px rgba(0,0,0,0.5);
+}
+.edit_tags_list .menu .item {
+cursor: pointer;
+border: 1px solid rgba(98,98,98,.5);
+margin: 4px;
+padding: 1px 4px;
+border-radius: 8px;
+box-shadow: 0px 0px 3px #000, 0px 0px 5px rgba(255,255,255,.7) inset;
+background-color: rgba(255,255,255,0.2);
+opacity: 0.7;
+}
+.edit_tags_list .menu .item:hover {
+opacity: 1.0;
+}
 
 table.statistics { border-collapse: collapse; }
 table.statistics th { font-weight: normal; font-style: italic; }

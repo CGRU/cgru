@@ -24,9 +24,7 @@ function EditList(i_args)
 	this.list_all = i_args.list_all;
 	this.elParent = i_args.elParent;
 
-	this.elItems  = null;
-
-	// List should be an objects not an array to store half selected state,
+	// List should be an objects not an array to store half_selected state,
 	// when several statuses selected.
 	// But when when it is not needed (on tasks, as several tasks can't be selected),
 	// simple array can be passed.
@@ -34,9 +32,18 @@ function EditList(i_args)
 	if (Array.isArray(this.list))
 	{
 		let objects = {};
-		for (let uid of this.list) objects[uid] = {};
-		this.list = objects
+		for (let id of this.list)
+			objects[id] = {'selected':true};
+		this.list = objects;
 	}
+	else
+	{
+		// Prepare items list
+		for (let id in this.list)
+			if ( ! this.list[id].half_selected)
+				this.list[id].selected = true;
+	}
+
 
 	this.elRoot = document.createElement('div');
 	this.elParent.appendChild(this.elRoot);
@@ -51,72 +58,195 @@ function EditList(i_args)
 	else
 		this.elRoot.style.color = u_textColor;
 
-	this.elBtn = document.createElement('div');
-	this.elRoot.appendChild(this.elBtn);
-	this.elBtn.classList.add('button');
-	this.elBtn.textContent = this.label;
-	this.elBtn.m_editlist = this;
-	this.elBtn.onclick = function(e) {e.currentTarget.m_editlist.edit();};
-	this.elList = document.createElement('div');
-	this.elRoot.appendChild(this.elList);
+	this.elAllShowBtn = document.createElement('div');
+	this.elRoot.appendChild(this.elAllShowBtn);
+	this.elAllShowBtn.classList.add('button');
+	this.elAllShowBtn.textContent = this.label;
+	this.elAllShowBtn.m_editlist = this;
+	this.elAllShowBtn.onclick = function(e) {e.currentTarget.m_editlist.showAllItems();};
+	this.elItems = document.createElement('div');
+	this.elRoot.appendChild(this.elItems);
+
+	this.elAddItem = document.createElement('div');
+	this.elItems.appendChild(this.elAddItem);
+	this.elAddItem.classList.add('editing');
+	this.elAddItem.contentEditable = 'true';
+	this.elAddItem.m_editlist = this;
+	this.elAddItem.oninput = function(e){e.currentTarget.m_editlist.addInputProcess();}
+
 	for (let id in this.list)
-	{
-		let el = document.createElement('div');
-		el.classList.add('tag');
-		this.elList.appendChild(el);
-		if (this.list_all[id] && this.list_all[id].title)
-			el.textContent = this.list_all[id].title;
-		else
-			el.textContent = id;
-		if (this.list_all[id] && this.list_all[id].tip)
-			el.title = this.list_all[id].tip;
-
-		if (this.name == 'flags')
-		{
-			el.classList.add('flag');
-			if (RULES.flags[id])
-				st_SetElColor({"color": RULES.flags[id].clr}, el);
-		}
-		if (this.name == 'artists')
-		{
-			el.classList.add('artist');
-			if (id == g_auth_user.id)
-				el.classList.add('me');
-		}
-
-		let icon = null;
-		if (this.name == 'artists')
-			icon = c_GetAvatar(id);
-		if (icon)
-		{
-			el.classList.add('with_icon');
-			el.style.backgroundImage = 'url(' + icon + ')';
-		}
-
-		if (this.list_all[id] && this.list_all[id].disabled)
-			el.classList.add('disabled');
-
-		if (this.list[id].tooltip)
-			el.title = this.list[id].tooltip;
-
-		if (this.list[id].half)
-			el.classList.add('half_selected');
-		else
-			el.classList.add('selected');
-	}
+		this.appendItem(id, this.list[id]);
 };
 
-EditList.prototype.edit = function()
+EditList.prototype.appendItem = function(i_id, i_item)
 {
-	if (this.m_editing)
+	let el = document.createElement('div');
+	el.classList.add('tag');
+	this.elItems.insertBefore(el, this.elAddItem);
+	el.m_id = i_id;
+	if (this.list_all[i_id] && this.list_all[i_id].title)
+		el.textContent = this.list_all[i_id].title;
+	else
+		el.textContent = i_id;
+	if (this.list_all[i_id] && this.list_all[i_id].tip)
+		el.title = this.list_all[i_id].tip;
+
+	if (this.name == 'flags')
+	{
+		el.classList.add('flag');
+		if (RULES.flags[i_id])
+			st_SetElColor({"color": RULES.flags[i_id].clr}, el);
+	}
+	if (this.name == 'artists')
+	{
+		el.classList.add('artist');
+		if (i_id == g_auth_user.id)
+			el.classList.add('me');
+	}
+
+	let icon = null;
+	if (this.name == 'artists')
+		icon = c_GetAvatar(i_id);
+	if (icon)
+	{
+		el.classList.add('with_icon');
+		el.style.backgroundImage = 'url(' + icon + ')';
+	}
+
+	if (this.list_all[i_id] && this.list_all[i_id].disabled)
+		el.classList.add('disabled');
+
+	if (i_item.half_selected)
+		el.classList.add('half_selected');
+	else
+		el.classList.add('selected');
+
+	// Delete button
+	let elBtnDel = document.createElement('div');
+	elBtnDel.classList.add('button','delete','right');
+	elBtnDel.m_el = el;
+	elBtnDel.m_editlist = this;
+	elBtnDel.onclick = function(e){e.currentTarget.m_editlist.deleteItem(e.currentTarget.m_el);}
+	el.appendChild(elBtnDel);
+
+	this.addInputProcess();
+}
+
+EditList.prototype.deleteItem = function(i_el)
+{
+	i_el.parentNode.removeChild(i_el);
+	this.list[i_el.m_id].selected = false;
+	this.addInputProcess();
+}
+
+EditList.prototype.addInputProcess = function()
+{
+	let text = this.elAddItem.textContent.toLowerCase();
+	//console.log(text);
+
+	if (this.elMenu)
+	{
+		this.elRoot.removeChild(this.elMenu);
+		this.elMenu.textContent = '';
+		this.elMenu = null;
+	}
+
+	if (text.length < 1)
+	{
+		return;
+	}
+
+	if (null == this.elMenu)
+	{
+		this.elMenu = document.createElement('div');
+		this.elRoot.appendChild(this.elMenu);
+		this.elMenu.classList.add('menu');
+	}
+
+	let array = [];
+	for (let id in this.list_all)
+	{
+		if (this.list[id] && this.list[id].selected)
+			continue;
+
+		if (this.list_all[id] && this.list_all[id].disabled)
+			continue;
+
+		let item = {};
+		item.id = id;
+
+		if (this.list_all[id] && this.list_all[id].title)
+			item.title = this.list_all[id].title;
+		else
+			item.title = id;
+
+		if (item.title.toLowerCase().indexOf(text) == -1)
+			continue;
+
+		array.push(item);
+	}
+
+	array.sort(function(a,b) {return a.title < b.title});
+
+	let ids = []
+	for (let i = 0; i < array.length; i++)
+		ids.push(array[i].id);
+
+	let elements = [];
+
+	if (this.name == 'artists')
+		elements = st_SetElArtists({'artists':ids}, this.elMenu);
+	else if (this.name == 'tags')
+		elements = st_SetElTags({'tags':ids}, this.elMenu);
+	else if (this.name == 'flags')
+		elements = st_SetElFlags({'flags':ids}, this.elMenu);
+	else
+		for (let i = 0; i < array.length; i++)
+		{
+			let el = document.createElement('span');
+			el.classList.add('item');
+			el.textContent = array[i].title;
+			el.m_name = array[i].id;
+
+			this.elMenu.appendChild(el);
+			elements.push(el);
+		}
+
+	for (let i = 0; i < elements.length; i++)
+	{
+		let el = elements[i];
+		el.classList.add('item');
+
+		el.m_editlist = this;
+		el.onclick = function(e){e.currentTarget.m_editlist.menuItemOnclick(e.currentTarget.m_name);};
+	}
+}
+
+EditList.prototype.menuItemOnclick = function(i_id)
+{
+	let item = {'selected':true};
+	this.list[i_id] = item;
+	this.appendItem(i_id, item);
+}
+
+EditList.prototype.showAllItems = function()
+{
+	if (this.m_showing_all)
 		return;
 
-	this.m_editing = true;
-	this.elBtn.classList.remove('button');
-	this.elList.style.display = 'none';
+	if (this.elMenu)
+	{
+		this.elRoot.removeChild(this.elMenu);
+		this.elMenu.textContent = '';
+		this.elMenu = null;
+	}
+
+	this.m_showing_all = true;
+	this.elAllShowBtn.classList.remove('button');
+	this.elItems.style.display = 'none';
 	this.elRoot.classList.add('editing');
 
-	this.elItems = [];
+	this.elAllItems = [];
 
 	if (this.name == 'artists')
 	{
@@ -164,12 +294,12 @@ EditList.prototype.edit = function()
 
 		if (this.list[item])
 		{
-			if (this.list[item].half)
+			if (this.list[item].half_selected)
 			{
 				el.m_half_selected = true;
 				el.classList.add('half_selected');
 			}
-			else
+			else if(this.list[item].selected)
 			{
 				el.m_selected = true;
 				el.classList.add('selected');
@@ -178,7 +308,7 @@ EditList.prototype.edit = function()
 
 		el.onclick = editlist_ToggleSelection;
 
-		this.elItems.push(el);
+		this.elAllItems.push(el);
 	}
 };
 
@@ -243,12 +373,12 @@ EditList.prototype.editArtists = function()
 
 				if (this.list[artist.id])
 				{
-					if (this.list[artist.id].half)
+					if (this.list[artist.id].half_selected)
 					{
 						el.m_half_selected = true;
 						el.classList.add('half_selected');
 					}
-					else
+					else if (this.list[artist.id].selected)
 					{
 						el.m_selected = true;
 						el.classList.add('selected');
@@ -257,26 +387,54 @@ EditList.prototype.editArtists = function()
 
 				el.onclick = editlist_ToggleSelection;
 
-				this.elItems.push(el);
+				this.elAllItems.push(el);
 			}
 		}
 	}
 };
 
-EditList.prototype.getItems = function()
+EditList.prototype.getSelectedObjects = function()
 {
-	return this.elItems;
+	let objects = {};
+
+	if (this.elAllItems)
+	{
+		for (let i = 0; i < this.elAllItems.length; i++)
+		{
+			if (this.elAllItems[i].m_selected)
+				objects[this.elAllItems[i].m_item] = {'selected':true};
+			else if (this.elAllItems[i].classList.contains('half_selected'))
+				objects[this.elAllItems[i].m_item] = {'half_selected':true};
+		}
+	}
+	else
+	{
+		for (let id in this.list)
+			if (this.list[id].selected)
+				objects[id] = {'selected':true};
+			else if (this.list[id].half_selected)
+				objects[id] = {'half_selected':true};
+	}
+
+	return objects;
 }
 
 EditList.prototype.getSelectedNames = function ()
 {
-	if ( ! this.elItems)
-		return null;
-
 	let names = [];
-	for (let i = 0; i < this.elItems.length; i++)
-		if (this.elItems[i].m_selected)
-			names.push(this.elItems[i].m_item);
+
+	if (this.elAllItems)
+	{
+		for (let i = 0; i < this.elAllItems.length; i++)
+			if (this.elAllItems[i].m_selected)
+				names.push(this.elAllItems[i].m_item);
+	}
+	else
+	{
+		for (let id in this.list)
+			if (this.list[id].selected)
+				names.push(id);
+	}
 
 	return names;
 }

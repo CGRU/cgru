@@ -393,16 +393,18 @@ function st_SetElText(i_status, i_el, i_field, i_full)
 	else
 		i_el.innerHTML = '';
 }
-function st_SetElArtists(i_status, i_el, i_short, i_clickable)
+function st_SetElArtists(i_status, i_el, i_short, i_clickable, i_onclick)
 {
 	i_el.textContent = '';
+	let elements = [];
 
 	if ((i_status == null) || (i_status.artists == null))
-		return;
+		return elements;
 
 	for (let i = 0; i < i_status.artists.length; i++)
 	{
 		let el = document.createElement('div');
+		elements.push(el);
 		i_el.appendChild(el);
 		el.classList.add('tag');
 		el.classList.add('artist');
@@ -448,10 +450,12 @@ function st_SetElArtists(i_status, i_el, i_short, i_clickable)
 			el.onmousedown = st_ArtistMouseDown;
 		}
 	}
+
+	return elements;
 }
 function st_SetElFlags(i_status, i_elFlags, i_short, i_clickable)
 {
-	var highlighted = false;
+	let elements = [];
 
 	if (i_elFlags.m_elFlags)
 		for (let el of i_elFlags.m_elFlags)
@@ -462,6 +466,7 @@ function st_SetElFlags(i_status, i_elFlags, i_short, i_clickable)
 		for (let flag of i_status.flags)
 		{
 			let el = document.createElement('div');
+			elements.push(el);
 			i_elFlags.appendChild(el);
 			i_elFlags.m_elFlags.push(el);
 			el.classList.add('flag');
@@ -471,8 +476,7 @@ function st_SetElFlags(i_status, i_elFlags, i_short, i_clickable)
 				el.textContent = c_GetFlagTitle(flag);
 			el.title = c_GetFlagTip(flag);
 			el.m_name = flag;
-			if (st_TagHilight(el, 'flag'))
-				highlighted = true;
+			st_TagHilight(el, 'flag');
 
 			if (i_clickable)
 			{
@@ -487,10 +491,12 @@ function st_SetElFlags(i_status, i_elFlags, i_short, i_clickable)
 				st_SetElColor({"color": clr}, el);
 		}
 
-	return highlighted;
+	return elements;
 }
 function st_SetElTags(i_status, i_elTags, i_short, i_clickable)
 {
+	let elements = [];
+
 	if (i_elTags.m_elTags)
 		for (let i = 0; i < i_elTags.m_elTags.length; i++)
 			i_elTags.removeChild(i_elTags.m_elTags[i]);
@@ -500,6 +506,7 @@ function st_SetElTags(i_status, i_elTags, i_short, i_clickable)
 		for (let i = 0; i < i_status.tags.length; i++)
 		{
 			let el = document.createElement('div');
+			elements.push(el);
 			i_elTags.appendChild(el);
 			i_elTags.m_elTags.push(el);
 			el.classList.add('tag');
@@ -520,6 +527,8 @@ function st_SetElTags(i_status, i_elTags, i_short, i_clickable)
 				el.onmousedown = st_TagMouseDown;
 			}
 		}
+
+	return elements;
 }
 function st_TagHilight(i_el, i_key)
 {
@@ -837,7 +846,7 @@ Status.prototype.edit = function(i_args) {
 	this.elEdit_annotation.classList.add('editing');
 	this.elEdit_annotation.contentEditable = 'true';
 
-	// Objects needed to store half selected state,
+	// Objects needed to store half_selected state,
 	// when several statuses selected.
 	var artists = {};
 	var flags = {};
@@ -856,7 +865,7 @@ Status.prototype.edit = function(i_args) {
 			tags[this.obj.tags[a]] = {};
 
 
-	// If several statuses selected, we check/set "half" state
+	// If several statuses selected, we check/set "half_selected" state
 	if (i_args && i_args.statuses)
 		for (let s = 0; s < i_args.statuses.length; s++)
 		{
@@ -864,53 +873,53 @@ Status.prototype.edit = function(i_args) {
 			{
 				for (let id in artists)
 					if (i_args.statuses[s].obj.artists.indexOf(id) == -1)
-						artists[id].half = true;
+						artists[id].half_selected = true;
 
 				for (let a = 0; a < i_args.statuses[s].obj.artists.length; a++)
 				{
 					let id = i_args.statuses[s].obj.artists[a];
 					if (artists[id] == null)
-						artists[id] = {"half": true};
+						artists[id] = {"half_selected": true};
 				}
 			}
 			else
 				for (let id in artists)
-					artists[id].half = true;
+					artists[id].half_selected = true;
 
 			if (i_args.statuses[s].obj && i_args.statuses[s].obj.flags)
 			{
 				for (let id in flags)
 					if (i_args.statuses[s].obj.flags.indexOf(id) == -1)
-						flags[id].half = true;
+						flags[id].half_selected = true;
 
 				for (let a = 0; a < i_args.statuses[s].obj.flags.length; a++)
 				{
 
 					let id = i_args.statuses[s].obj.flags[a];
 					if (flags[id] == null)
-						flags[id] = {"half": true};
+						flags[id] = {"half_selected": true};
 				}
 			}
 			else
 				for (let id in flags)
-					flags[id].half = true;
+					flags[id].half_selected = true;
 
 			if (i_args.statuses[s].obj && i_args.statuses[s].obj.tags)
 			{
 				for (let id in tags)
 					if (i_args.statuses[s].obj.tags.indexOf(id) == -1)
-						tags[id].half = true;
+						tags[id].half_selected = true;
 
 				for (let a = 0; a < i_args.statuses[s].obj.tags.length; a++)
 				{
 					let id = i_args.statuses[s].obj.tags[a];
 					if (tags[id] == null)
-						tags[id] = {"half": true};
+						tags[id] = {"half_selected": true};
 				}
 			}
 			else
 				for (let id in tags)
-					tags[id].half = true;
+					tags[id].half_selected = true;
 		}
 
 	if (c_CanAssignArtists())
@@ -1258,44 +1267,14 @@ Status.prototype.editSave = function(i_args) {
 		adinfo = btoa(adinfo);
 	}
 
-	if (this.editAtrists && (null !== this.editAtrists.getItems()))
-	{
-		artists = {};
-		let elList = this.editAtrists.getItems();
-		for (let i = 0; i < elList.length; i++)
-		{
-			if (elList[i].m_selected)
-				artists[elList[i].m_item] = 'selected';
-			else if (elList[i].classList.contains('half_selected'))
-				artists[elList[i].m_item] = 'half_selected';
-		}
-	}
 
-	if (this.editFlags && (null !== this.editFlags.getItems()))
-	{
-		flags = {};
-		let elList = this.editFlags.getItems();
-		for (let i = 0; i < elList.length; i++)
-		{
-			if (elList[i].m_selected)
-				flags[elList[i].m_item] = 'selected';
-			else if (elList[i].classList.contains('half_selected'))
-				flags[elList[i].m_item] = 'half_selected';
-		}
-	}
+	if (this.editAtrists)
+		artists = this.editAtrists.getSelectedObjects();
+	if (this.editFlags)
+		flags = this.editFlags.getSelectedObjects();
+	if (this.editTags)
+		tags = this.editTags.getSelectedObjects();
 
-	if (this.editTags && (null !== this.editTags.getItems()))
-	{
-		tags = {};
-		let elList = this.editTags.getItems();
-		for (let i = 0; i < elList.length; i++)
-		{
-			if (elList[i].m_selected)
-				tags[elList[i].m_item] = 'selected';
-			else if (elList[i].classList.contains('half_selected'))
-				tags[elList[i].m_item] = 'half_selected';
-		}
-	}
 
 	if (this.elEdit_tasks.elTasks)
 	{
@@ -1314,33 +1293,10 @@ Status.prototype.editSave = function(i_args) {
 			if (!isNaN(price))
 				task.price = price;
 
-			if (null !== elTask.m_elTags.m_editTags.getItems())
-			{
-				task.tags = [];
-				let elList = elTask.m_elTags.m_editTags.getItems();
-				for (let i = 0; i < elList.length; i++)
-					if (elList[i].m_selected)
-					{
-						let tag = elList[i].m_item;
-						task.tags.push(tag);
-					}
-			}
-			else if (elTask.m_task.tags)
-				task.tags = elTask.m_task.tags;
+			task.tags = elTask.m_elTags.m_editTags.getSelectedNames();
 
-			if (elTask.m_elArtists && (null !== elTask.m_elArtists.m_editArtists.getItems()))
-			{
-				task.artists = [];
-				let elList = elTask.m_elArtists.m_editArtists.getItems();
-				for (let i = 0; i < elList.length; i++)
-					if (elList[i].m_selected)
-					{
-						let artist = elList[i].m_item;
-						task.artists.push(artist);
-					}
-			}
-			else if (elTask.m_task.artists)
-				task.artists = elTask.m_task.artists;
+			if (elTask.m_elArtists)
+				task.artists = elTask.m_elArtists.m_editArtists.getSelectedNames();
 
 			tasks.push(task);
 		}
@@ -1391,7 +1347,7 @@ Status.prototype.editSave = function(i_args) {
 					a++;
 
 			for (let id in artists)
-				if ((artists[id] == 'selected') && (statuses[i].obj.artists.indexOf(id) == -1))
+				if ((artists[id].selected) && (statuses[i].obj.artists.indexOf(id) == -1))
 					statuses[i].obj.artists.push(id);
 		}
 
@@ -1412,7 +1368,7 @@ Status.prototype.editSave = function(i_args) {
 				_flags.push(statuses[i].obj.flags[a]);
 
 			for (let id in flags)
-				if ((flags[id] == 'selected') && (_flags.indexOf(id) == -1))
+				if ((flags[id].selected) && (_flags.indexOf(id) == -1))
 				{
 					if (RULES.flags[id])
 					{
@@ -1457,7 +1413,7 @@ Status.prototype.editSave = function(i_args) {
 					a++;
 
 			for (let id in tags)
-				if ((tags[id] == 'selected') && (statuses[i].obj.tags.indexOf(id) == -1))
+				if ((tags[id].selected) && (statuses[i].obj.tags.indexOf(id) == -1))
 					statuses[i].obj.tags.push(id);
 		}
 
