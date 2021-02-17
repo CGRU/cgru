@@ -803,7 +803,7 @@ box-shadow: 0px 0px 5px rgba(0,0,0,0.5);
 cursor: pointer;
 border: 1px solid rgba(98,98,98,.5);
 margin: 4px;
-padding: 1px 4px;
+_padding: 1px 4px; /*padding-left is used for an artist avatar*/
 border-radius: 8px;
 box-shadow: 0px 0px 3px #000, 0px 0px 5px rgba(255,255,255,.7) inset;
 background-color: rgba(255,255,255,0.2);
