@@ -282,13 +282,14 @@ function bm_CreateBookmark(i_bm)
 	elDel.ondblclick = function(e) { bm_Delete([e.currentTarget.m_path]); };
 	elDel.title = 'Double click to delete.';
 
-	// Display status:
-	st_SetElStatus(el, i_bm.status);
-
 	var elPath = document.createElement('a');
 	el.appendChild(elPath);
+	elPath.classList.add('name');
 	elPath.textContent = name;
 	elPath.href = '#' + i_bm.path;
+
+	// Display status:
+	st_SetElStatus(el, i_bm.status);
 
 	var tooltip = '';
 	if (i_bm.cuser)

@@ -967,6 +967,21 @@ function c_PathPM_Server2Client(i_path)
 	return cgru_PM(i_path);
 }
 
+function c_IsUserSubsribedOnPath(i_path)
+{
+	if ((null == g_auth_user) || (null == g_auth_user.channels))
+		return false;
+
+	if (null == i_path)
+		i_path = g_CurPath();
+
+	for (let chan of g_auth_user.channels)
+		if (c_PathIsInFolder(chan.id, i_path))
+			return true;
+
+	return false;
+}
+
 // Check where i_subfolder is located in i_folder
 function c_PathIsInFolder(i_folder, i_subfolder)
 {

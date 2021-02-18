@@ -171,18 +171,7 @@ function nw_Process()
 
 	nw_HighlightChannels();
 
-	var subscribed = false;
-	var path = g_CurPath();
-	for (let chan of g_auth_user.channels)
-	{
-		if (c_PathIsInFolder(chan.id, path))
-		{
-			subscribed = true;
-			break;
-		}
-	}
-
-	if (subscribed)
+	if (c_IsUserSubsribedOnPath())
 	{
 		$('subscribe_btn').style.display = 'none';
 	}
@@ -628,9 +617,6 @@ function nw_NewsShow(i_update_folders)
 			elAvatar.ondblclick = function(e) { nw_DeleteNewsUser(e.currentTarget.m_news); };
 		}
 
-		// Display news status:
-		st_SetElStatus(el, news.status);
-
 
 		let elBtn = document.createElement('div');
 		el.appendChild(elBtn);
@@ -656,6 +642,9 @@ function nw_NewsShow(i_update_folders)
 		else
 			elLink.href = '#' + news.path;
 		elLink.textContent = news.path;
+
+		// Display news status:
+		st_SetElStatus(el, news.status);
 
 		let prj = news.path.split('/')[1];
 		if (projects.indexOf(prj) == -1)
@@ -973,6 +962,28 @@ function nw_RecentReceived(i_data, i_args)
 			elAvatar.src = avatar;
 		}
 
+		var elUser = document.createElement('div');
+		el.appendChild(elUser);
+		elUser.classList.add('user');
+		elUser.textContent = c_GetUserTitle(news.user, news.guest);
+
+		var elTitle = document.createElement('div');
+		el.appendChild(elTitle);
+		elTitle.classList.add('title');
+		elTitle.innerHTML = news.title;
+
+		var elLinkDiv = document.createElement('div');
+		el.appendChild(elLinkDiv);
+		elLinkDiv.classList.add('link');
+
+		var elLink = document.createElement('a');
+		elLinkDiv.appendChild(elLink);
+		if (news.link)
+			elLink.href = news.link;
+		else
+			elLink.href = '#' + news.path;
+		elLink.textContent = news.path;
+
 		// Display status:
 		if (news.status)
 		{
@@ -1003,28 +1014,6 @@ function nw_RecentReceived(i_data, i_args)
 				st_SetElProgress(news.status, elBar);
 			}
 		}
-
-		var elUser = document.createElement('div');
-		el.appendChild(elUser);
-		elUser.classList.add('user');
-		elUser.textContent = c_GetUserTitle(news.user, news.guest);
-
-		var elTitle = document.createElement('div');
-		el.appendChild(elTitle);
-		elTitle.classList.add('title');
-		elTitle.innerHTML = news.title;
-
-		var elLinkDiv = document.createElement('div');
-		el.appendChild(elLinkDiv);
-		elLinkDiv.classList.add('link');
-
-		var elLink = document.createElement('a');
-		elLinkDiv.appendChild(elLink);
-		if (news.link)
-			elLink.href = news.link;
-		else
-			elLink.href = '#' + news.path;
-		elLink.textContent = news.path;
 
 		var elTime = document.createElement('div');
 		el.appendChild(elTime);

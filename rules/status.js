@@ -34,6 +34,8 @@ function st_InitAuth()
 
 function st_Finish()
 {
+	tasks_Finish();
+
 	if (st_Status)
 		st_Status.editCancel();
 
@@ -656,7 +658,13 @@ function st_SetElStatus(i_el, i_status)
 	elStatus.classList.add('status');
 
 
-	// If user has tasks, we should draw tasks only
+	let elTasks = document.createElement('div');
+	elStatus.appendChild(elTasks);
+	elTasks.classList.add('tasks');
+
+
+	// If user has tasks, we should draw only tasks that user is assigned on
+	//if ((false == c_IsUserSubsribedOnPath()) && i_status && i_status.tasks)
 	if (i_status && i_status.tasks)
 	{
 		let found = false;
@@ -680,15 +688,15 @@ function st_SetElStatus(i_el, i_status)
 
 		if (found)
 		{
-			let elTasks = document.createElement('div');
-			elStatus.appendChild(elTasks);
-			elTasks.classList.add('tasks');
-
 			task_DrawBadges(stat, elTasks, {'hide_artists':true,'full_names':true});
-
 			return;
 		}
 	}
+
+	// Draw all tasks if user received new, but was not assigned on any task.
+	// This situation when supervisor subscribed on location,
+	// and receiving news but does not assigned.
+	task_DrawBadges(i_status, elTasks);
 
 	// Flags:
 	if (i_status && i_status.flags && i_status.flags.length)

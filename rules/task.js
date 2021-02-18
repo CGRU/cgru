@@ -20,17 +20,24 @@ var CurTasks = [];
 
 var _OLD_TASTKS_ = false;
 
-function task_ShowTasks(i_statusClass)
+// Called on location leave (change)
+function tasks_Finish()
 {
 _OLD_TASTKS_ = false;
-	$('status_tasks_label').style.display = 'none';
-	$('status_tasks_btn_add').style.display = 'block';
+$('status_tasks_btn_add').style.display = 'block';
 
 	for (let task of CurTasks)
 		task.destroy();
 	CurTasks = [];
 
+	$('status_tasks_label').style.display = 'none';
+
 	$('status_tasks').textContent = '';
+}
+
+function task_ShowTasks(i_statusClass)
+{
+	tasks_Finish();
 
 	if ((null == i_statusClass) || (null == i_statusClass.obj) || (null == i_statusClass.obj.tasks))
 		return;
@@ -192,9 +199,11 @@ function Task(i_statusClass, i_task)
 	this.elRoot.appendChild(this.elShow);
 
 
-	this.elTags = document.createElement('div');
-	this.elTags.classList.add('tags');
-	this.elShow.appendChild(this.elTags);
+	this.elName = document.createElement('div');
+	this.elName.classList.add('name','notselectable');
+	this.elName.m_task = this;
+	this.elName.onclick = function(e){e.currentTarget.m_task.select()};
+	this.elShow.appendChild(this.elName);
 
 
 	this.elArtists = document.createElement('div');
@@ -260,7 +269,9 @@ if ( ! _OLD_TASTKS_ )
 
 Task.prototype.show = function()
 {
-	st_SetElTags(this.obj, this.elTags);
+	//st_SetElTags(this.obj, this.elName);
+	this.elName.textContent = this.obj.name;
+
 	st_SetElArtists(this.obj, this.elArtists,/*short = */false,/*clickable = */true);
 	st_SetElFlags(this.obj, this.elFlags,/*short = */false,/*clickable = */true);
 	st_SetElProgress(this.obj, this.elProgressBar, this.elProgress, this.elPercent);
@@ -283,6 +294,19 @@ Task.prototype.show = function()
 Task.prototype.destroy = function()
 {
 	this.elParent.removeChild(this.elRoot);
+}
+
+Task.prototype.select = function()
+{
+	for (let task of CurTasks)
+		task.deselect();
+
+	this.elRoot.classList.add('selected');
+}
+
+Task.prototype.deselect = function()
+{
+	this.elRoot.classList.remove('selected');
 }
 
 Task.prototype.edit = function()

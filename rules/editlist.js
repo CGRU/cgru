@@ -226,8 +226,8 @@ EditList.prototype.menuItemOnclick = function(i_id)
 {
 	let item = {'selected':true};
 	this.list[i_id] = item;
-	this.appendItem(i_id, item);
 	this.elAddItem.textContent = '';
+	this.appendItem(i_id, item);
 	this.elAddItem.focus();
 }
 

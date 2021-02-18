@@ -449,6 +449,7 @@ border-radius: 4px;
 }
 .task_badge div {float: left;}
 .task_badge .name {padding: 2px;}
+.task_badge .artist {margin: 0px; padding-top: 2px;; padding-bottom: 2px;}
 .task_badge .progress {clear: both; width: 100%}
 .task_badge .progressbar {height: 6px;}
 
@@ -517,7 +518,7 @@ padding-bottom: 2px;
 #news .news .status {float: right; font-size: 10px;}
 #news .news .status .flag {float: none;}
 #news .news .bar {
-position: absolute;
+_position: absolute;
 bottom: 4px;
 left: 0px;
 height: 4px;
@@ -604,7 +605,7 @@ float: right;
 font-size: 10px;
 }
 #bookmarks .bookmark .bar {
-position: absolute;
+_position: absolute;
 bottom: 1px;
 left: 0px;
 height: 4px;
@@ -635,9 +636,9 @@ position: relative;
 #recent .recent .title {}
 #recent .recent .status {float: right; font-size: 10px;}
 #recent .recent .status .flag {float: none;}
-#recent .recent .link {clear: both;}
+#recent .recent .link {_clear: both;}
 #recent .recent .bar {
-position: absolute;
+_position: absolute;
 bottom: 0px;
 left: 0px;
 height: 4px;
@@ -653,8 +654,8 @@ border-top: 0;
 border-right: 0;
 border-radius: 0 0 0 4px;
 }
-#recent ._user { float: left; margin-right: 4px;}
-#recent .tasks {float: left;}
+#recent .user { float: left; margin-right: 4px;}
+#recent .tasks {clear: both;}
 #recent .task_badge {float: left;}
 
 /* ============= PLAYLIST: =============== */
@@ -769,9 +770,9 @@ padding: 8px 4px 0px 4px;
 border-radius: 4px;
 border: 2px solid rgba(98,98,98,.5);
 }
+#status_tasks .task.selected {}
 #status_tasks .task.deleted            {display: none;}
 #status_tasks .task .show_div          {clear: both;}
-#status_tasks .task .show_div .tags    {float: left;}
 #status_tasks .task .show_div .artists {float: left;}
 #status_tasks .task .show_div .flags   {float: left;}
 #status_tasks .task .show_div .percent {float: right;}
@@ -782,6 +783,14 @@ border: 2px solid rgba(98,98,98,.5);
 #status_tasks .task .progress          {clear: both; border-radius: 4px;}
 #status_tasks .task .progressbar       {height: 6px; border-radius: 2px;}
 #status_tasks .task .info              {font-style: italic; font-size: 10px;}
+#status_tasks .task .show_div .name {
+float: left;
+cursor: pointer;
+margin: 1px 4px;
+padding: 1px 4px;
+border: 1px solid rgba(98,98,98,.5);
+}
+#status_tasks .task .show_div .name:hover {border: 1px solid rgba( 100, 255, 255);}
 
 .edit_tags_list { clear: both; padding: 4px; margin: 4px; border-top: 1px solid rgba(98,98,98,.5); }
 .edit_tags_list > .button { margin:0 4px; padding:0 4px; width: 50px; float: left; }
@@ -794,9 +803,7 @@ border: 2px solid rgba(98,98,98,.5);
 .edit_tags_list .menu {
 clear: both;
 margin: 4px;
-_border: 1px solid rgba(255,255,255,.5);
 border-radius: 12px;
-_box-shadow: 0px 0px 3px #000, 0px 0px 5px rgba(255,255,255,.7) inset;
 box-shadow: 0px 0px 5px rgba(0,0,0,0.5);
 }
 .edit_tags_list .menu .item {
