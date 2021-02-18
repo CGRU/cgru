@@ -648,7 +648,7 @@ function st_SetElColorTextFromBack(i_clr, i_el)
 		i_el.style.color = '#FFF';
 }
 
-function st_SetElStatus(i_el, i_status)
+function st_SetElStatus(i_el, i_status, i_path)
 {
 	if (null == i_el)
 		return;
@@ -663,9 +663,9 @@ function st_SetElStatus(i_el, i_status)
 	elTasks.classList.add('tasks');
 
 
-	// If user has tasks, we should draw only tasks that user is assigned on
-	//if ((false == c_IsUserSubsribedOnPath()) && i_status && i_status.tasks)
-	if (i_status && i_status.tasks)
+	// If user has tasks, we should draw only tasks that user is assigned on.
+	// But if user subscribed on location, he should see all tasks.
+	if ((false == c_IsUserSubsribedOnPath(i_path)) && i_status && i_status.tasks)
 	{
 		let found = false;
 

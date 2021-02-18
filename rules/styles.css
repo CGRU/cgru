@@ -516,7 +516,7 @@ padding-bottom: 2px;
 #news .news.assigned.cur_path { background: rgba(   0, 255, 150, .2); }
 #news .news_label { font-size: 12px; margin: 4px 0 0 0; }
 #news .news .status {float: right; font-size: 10px;}
-#news .news .status .flag {float: none;}
+#news .news .status .flag {_float: none;}
 #news .news .bar {
 _position: absolute;
 bottom: 4px;
@@ -635,7 +635,7 @@ position: relative;
 #recent .recent > div { margin: 2px 4px; }
 #recent .recent .title {}
 #recent .recent .status {float: right; font-size: 10px;}
-#recent .recent .status .flag {float: none;}
+#recent .recent .status .flag {_float: none;}
 #recent .recent .link {_clear: both;}
 #recent .recent .bar {
 _position: absolute;

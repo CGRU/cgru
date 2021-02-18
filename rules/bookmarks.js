@@ -289,7 +289,7 @@ function bm_CreateBookmark(i_bm)
 	elPath.href = '#' + i_bm.path;
 
 	// Display status:
-	st_SetElStatus(el, i_bm.status);
+	st_SetElStatus(el, i_bm.status, i_bm.path);
 
 	var tooltip = '';
 	if (i_bm.cuser)
