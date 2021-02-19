@@ -67,6 +67,35 @@ width: 40px; height: 20px;
 margin: 3px 4px;
 float: left;
 }
+
+#activity {
+float: right;
+padding: 2px 8px;
+}
+#activity > div {
+cursor: pointer;
+float: left;
+margin: 0px 4px;
+box-shadow: 0 0 4px rgba(0,0,0,.5), 0 0 4px rgba(255,255,255,.5) inset;
+border: 2px solid rgba(98,98,98,.5);
+border-radius: 6px;
+}
+#activity > div:hover {
+border: 2px solid rgba(255,98,98,.5);
+}
+#activity > div.pinned {
+border: 2px solid rgb(100,255,255);
+box-shadow: 0 0 6px rgb(100,255,255), 0 0 4px rgba(255,255,255,.5) inset;
+}
+#activity > div .name {padding: 2px 6px;}
+#activity > div .button.delete {display: none; width: 10px; height: 10px; margin: 2px;}
+#activity > div.pinned .button.delete {display: block;}
+#activity > div.pinned.selected .button.delete {display: none;}
+#activity > div.filter {
+border: 2px solid rgb(255,255,120);
+box-shadow: 0 0 8px rgb(255,255,120), 0 0 4px rgba(255,255,255,.5) inset;
+}
+
 #profile_settings {
 display: none;
 float: right;

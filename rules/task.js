@@ -254,7 +254,6 @@ if ( ! _OLD_TASTKS_ )
 	this.elInfoRight.classList.add('info','right');
 	this.elRoot.appendChild(this.elInfoRight);
 
-
 	this.editing = false;
 
 	// We should start to edit new added task
@@ -269,6 +268,9 @@ if ( ! _OLD_TASTKS_ )
 
 Task.prototype.show = function()
 {
+	if (activity_Current == this.obj.name)
+		this.select();
+
 	//st_SetElTags(this.obj, this.elName);
 	this.elName.textContent = this.obj.name;
 
@@ -302,6 +304,8 @@ Task.prototype.select = function()
 		task.deselect();
 
 	this.elRoot.classList.add('selected');
+
+	activity_Set(this.obj.name);
 }
 
 Task.prototype.deselect = function()
@@ -684,6 +688,7 @@ function task_DrawBadges(i_status, i_el, i_args)
 
 		let elTask = document.createElement('div');
 		elTask.classList.add('task_badge');
+		elTask.m_name = task.name;
 		i_el.appendChild(elTask);
 		i_el.m_elTasks[task.name] = this;
 
@@ -713,6 +718,8 @@ function task_DrawBadges(i_status, i_el, i_args)
 		elProgress.appendChild(elProgressBar);
 
 		st_SetElProgress(task, elProgressBar, elProgress);
+
+		activity_TaskBadgeFilter(elTask);
 	}
 }
 

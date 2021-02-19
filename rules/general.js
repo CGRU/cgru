@@ -48,6 +48,7 @@ function g_Init()
 	cgru_Init();
 	u_Init();
 	c_Init();
+	activity_Init();
 	st_Init();
 	n_Request({"send": {"start": {}}, "func": g_Init_Server, "info": 'start'});
 
