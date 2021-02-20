@@ -270,6 +270,7 @@ EditList.prototype.showAllItems = function()
 		let el = document.createElement('div');
 		this.elRoot.appendChild(el);
 		el.classList.add('tag');
+
 		if (this.name == 'flags')
 		{
 			el.classList.add('flag');
@@ -279,9 +280,6 @@ EditList.prototype.showAllItems = function()
 				el.style.borderColor = 'rgb(' + c[0]*0.5 + ',' + c[1]*0.5 + ',' + c[2]*0.5 + ')';
 				el.style.backgroundColor = 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
 			}
-
-			if (RULES.flags[item] && RULES.flags[item].new_line)
-				new_line = true;
 		}
 
 		el.m_item = item;
@@ -311,6 +309,9 @@ EditList.prototype.showAllItems = function()
 		el.onclick = editlist_ToggleSelection;
 
 		this.elAllItems.push(el);
+
+		if (RULES[this.name][item] && RULES[this.name][item].new_line)
+			new_line = true;
 	}
 };
 

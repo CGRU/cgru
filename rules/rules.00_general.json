@@ -62,14 +62,10 @@
 	"sim"     :{"title":"Sim",      "short":"Sm",  "tip":"Simulating"},
 	"render"  :{"title":"Render",   "short":"Rn",  "tip":"Rendering"},
 
-	"rnd"     :{"title":"R&D",      "short":"RnD", "tip":"Research and development"},
-	"animatic":{"title":"Animatic", "short":"Ac",  "tip":"Animiatic"},
-	"fullcg"  :{"title":"FullCG",   "short":"FCG", "tip":"Full CG Shot"},
-	"titles"  :{"title":"Titles",   "short":"Tt",  "tip":"Titles"},
-
+	"rnd"     :{"title":"R&D",      "short":"RnD", "tip":"Research and development"}
 	"frlnc"   :{"title":"Freelance","short":"Fl",  "tip":"Freelance"},
-
-	"other"   :{"title":"Other",    "short":"Ot",  "tip":"Something else"}
+	"other"   :{"title":"Other",    "short":"Ot",  "tip":"Something else"},
+		"new_line":true}
 },
 
 "comments":{
