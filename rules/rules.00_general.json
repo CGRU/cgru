@@ -62,9 +62,9 @@
 	"sim"     :{"title":"Sim",      "short":"Sm",  "tip":"Simulating"},
 	"render"  :{"title":"Render",   "short":"Rn",  "tip":"Rendering"},
 
-	"rnd"     :{"title":"R&D",      "short":"RnD", "tip":"Research and development"}
+	"rnd"     :{"title":"R&D",      "short":"RnD", "tip":"Research and development"},
 	"frlnc"   :{"title":"Freelance","short":"Fl",  "tip":"Freelance"},
-	"other"   :{"title":"Other",    "short":"Ot",  "tip":"Something else"},
+	"other"   :{"title":"Other",    "short":"Ot",  "tip":"Something else",
 		"new_line":true}
 },
 
