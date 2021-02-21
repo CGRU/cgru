@@ -52,6 +52,32 @@ function c_Init()
 	u_ApplyStyles();
 }
 
+function cgru_CmdExecFilter(i_cmd)
+{
+	let cmd = i_cmd;
+
+	cmd = activity_ChangeCmd(cmd);
+
+	// '@arg@' will be replaced with '--arg [arg value]'
+	// Value will be the first defined in action, ASSET, RULES
+	// For example: '@fps@' will be replaces with '--fps 24'
+	let matches = cmd.match(/@\w*@/g);
+	if (matches && matches.length)
+		for (let i = 0; i < matches.length; i++)
+		{
+			let match = matches[i];
+			let arg = match.replace(/@/g,'');
+			let val = action[arg];
+			if (null == val) val = ASSET[arg];
+			if (null == val) val = RULES[arg];
+			if (val) val = '--' + arg + ' ' + val;
+			else val = '';
+			cmd = cmd.replace(match, val);
+		}
+
+	return cmd;
+}
+
 function c_GetHash()
 {
 	var path = decodeURI(document.location.hash);

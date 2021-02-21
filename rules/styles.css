@@ -81,7 +81,7 @@ border: 2px solid rgba(98,98,98,.5);
 border-radius: 6px;
 }
 #activity > div:hover {
-border: 2px solid rgba(255,98,98,.5);
+border: 2px solid rgba(98,255,98,.5);
 }
 #activity > div.pinned {
 border: 2px solid rgb(100,255,255);

@@ -32,6 +32,20 @@ function activity_Init()
 		activity_AddItem(item);
 }
 
+function activity_ChangeCmd(i_cmd)
+{
+	if (null == i_cmd)
+		return null;
+
+	let activity = '--activity '
+	if (activity_Current)
+		activity += activity_Current;
+	else
+		activity = '';
+
+	return i_cmd.replace(/@ACTIVITY@/g, activity);
+}
+
 function activity_Set(i_activity)
 {
 	if (activity_Current == i_activity)
@@ -51,6 +65,12 @@ function activity_Set(i_activity)
 
 		$('activity').removeChild(item.el);
 		delete activity_Items[a];
+	}
+
+	if (null == i_activity)
+	{
+		activity_Changed();
+		return;
 	}
 
 	let item = activity_Items[i_activity];
@@ -139,6 +159,7 @@ function activity_Delete(i_activity)
 
 function activity_Changed()
 {
+	activity_Current = null;
 	activity_Filter = [];
 
 	let array = [];
