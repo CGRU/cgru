@@ -658,20 +658,27 @@ function st_SetElStatus(i_el, i_status, i_path)
 	elStatus.classList.add('status');
 
 
+	// Flags:
+	if (i_status && i_status.flags && i_status.flags.length)
+	{
+		let elFlags = document.createElement('div');
+		elStatus.appendChild(elFlags);
+		elFlags.classList.add('flags');
+		i_el.highlighted = st_SetElFlags(i_status, elFlags);
+	}
+
+
 	let elTasks = document.createElement('div');
 	elStatus.appendChild(elTasks);
 	elTasks.classList.add('tasks');
 
 
+	let tasks = {};
+	let found = false;
 	// If user has tasks, we should draw only tasks that user is assigned on.
 	// But if user subscribed on location, he should see all tasks.
 	if ((false == c_IsUserSubsribedOnPath(i_path)) && i_status && i_status.tasks)
 	{
-		let found = false;
-
-		let stat = {};
-		stat.tasks = {};
-
 		for (let t in i_status.tasks)
 		{
 			let task = i_status.tasks[t];
@@ -681,30 +688,22 @@ function st_SetElStatus(i_el, i_status, i_path)
 			if (task.artists && (task.artists.indexOf(g_auth_user.id) == -1))
 				continue;
 
-			stat.tasks[task.name] = task;
+			tasks[task.name] = task;
 
 			found = true;
 		}
-
-		if (found)
-		{
-			task_DrawBadges(stat, elTasks, {'hide_artists':true,'full_names':true});
-			return;
-		}
 	}
 
-	// Draw all tasks if user received new, but was not assigned on any task.
-	// This situation when supervisor subscribed on location,
-	// and receiving news but does not assigned.
-	task_DrawBadges(i_status, elTasks);
-
-	// Flags:
-	if (i_status && i_status.flags && i_status.flags.length)
+	if (found)
 	{
-		let elFlags = document.createElement('div');
-		elStatus.appendChild(elFlags);
-		elFlags.classList.add('flags');
-		i_el.highlighted = st_SetElFlags(i_status, elFlags);
+		task_DrawBadges({'tasks':tasks}, elTasks, {'hide_artists':true,'full_names':true});
+	}
+	else
+	{
+		// Draw all tasks if user received new, but was not assigned on any task.
+		// This situation when supervisor subscribed on location,
+		// and receiving news but does not assigned.
+		task_DrawBadges(i_status, elTasks);
 	}
 
 	// Show progress bar:
