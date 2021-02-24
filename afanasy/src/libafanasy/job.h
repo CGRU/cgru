@@ -55,7 +55,8 @@ public:
 		FPPApproval   = 1ULL << 32,
 		FMaintenance  = 1ULL << 33,
 		FIgnoreNimby  = 1ULL << 34,
-		FIgnorePaused = 1ULL << 35
+		FIgnorePaused = 1ULL << 35,
+		FAppendedBlocks = 1ULL << 36
 	};
 
 	inline int64_t getSerial() const { return m_serial; }
@@ -103,6 +104,9 @@ public:
 
     inline bool isIgnorePausedFlag() const { return ( m_flags & FIgnorePaused ); }
     inline void setIgnorePausedFlag( bool i_on = true) { if( i_on ) m_flags = m_flags | FIgnorePaused; else m_flags = m_flags & (~FIgnorePaused); }
+
+    inline bool isAppendedBlocksFlags() const { return ( m_flags & FAppendedBlocks ); }
+    inline void setAppendedBlocksFlag() { m_flags |= FAppendedBlocks; }
 
 	inline bool setDependMask(        const std::string & str, std::string * errOutput = NULL)
 		{ return setRegExp( m_depend_mask, str, "job depend mask", errOutput);}
