@@ -300,6 +300,7 @@ Task.prototype.destroy = function()
 
 Task.prototype.select = function()
 {
+	// NULL activity set, on task deselect
 	if (this.elRoot.classList.contains('selected'))
 	{
 		for (let task of CurTasks) task.deselect();
