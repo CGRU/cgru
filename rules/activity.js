@@ -17,12 +17,13 @@
 "use strict";
 
 var activity_Current = null;
+var activity_Selected = null;
 var activity_Filter = [];
 var activity_Items = {};
 
 function activity_Init()
 {
-	//console.log(localStorage.activity);
+//console.log(localStorage.activity);
 
 	let array = c_Parse(localStorage.activity);
 	if (null == array)
@@ -32,14 +33,24 @@ function activity_Init()
 		activity_AddItem(item);
 }
 
+function activity_Finish()
+{
+//console.log('activity_Finish')
+	if (activity_Selected)
+	{
+		activity_Items[activity_Selected].el.classList.remove('selected');
+		activity_Selected = null;
+	}
+}
+
 function activity_ChangeCmd(i_cmd)
 {
 	if (null == i_cmd)
 		return null;
 
 	let activity = '--activity '
-	if (activity_Current)
-		activity += activity_Current;
+	if (activity_Selected)
+		activity += activity_Selected;
 	else
 		activity = '';
 
@@ -48,7 +59,7 @@ function activity_ChangeCmd(i_cmd)
 
 function activity_Set(i_activity)
 {
-	if (activity_Current == i_activity)
+	if (activity_Selected == i_activity)
 		return;
 
 
@@ -160,6 +171,7 @@ function activity_Delete(i_activity)
 function activity_Changed()
 {
 	activity_Current = null;
+	activity_Selected = null;
 	activity_Filter = [];
 
 	let array = [];
@@ -169,7 +181,10 @@ function activity_Changed()
 		let item = activity_Items[i];
 
 		if (item.selected)
+		{
 			activity_Current = item.name;
+			activity_Selected = item.name;
+		}
 
 		if (item.filter)
 			activity_Filter.push(item.name);
@@ -185,6 +200,13 @@ function activity_Changed()
 
 	for (let elBadge of document.getElementsByClassName('task_badge'))
 		activity_TaskBadgeFilter(elBadge);
+
+
+	for (let el of document.getElementsByClassName('show_on_activity'))
+		if (activity_Selected)
+			el.style.display = 'block';
+		else
+			el.style.display = 'none';
 
 	//console.log(JSON.stringify(array));
 	localStorage.activity = JSON.stringify(array);

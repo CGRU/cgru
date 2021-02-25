@@ -85,7 +85,18 @@ function shot_InitHTML( i_data)
 
 	// Create shot process buttons:
     if (c_CanExecuteSoft())
-    	u_CreateActions(ASSET.shot_process, $('shot_process_div')); 
+	{
+		let elements = u_CreateActions(ASSET.shot_process, $('shot_process_div'));
+
+		for (let el of elements)
+		{
+if (g_CurPath().indexOf('/SWORD_III/') == 0)
+			if (activity_Selected == null)
+				el.style.display = 'none';
+
+			el.classList.add('show_on_activity');
+		}
+	}
 
 	shot_ResultsRead( true);
 }

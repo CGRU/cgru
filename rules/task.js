@@ -16,7 +16,7 @@
 
 "use strict";
 
-var CurTasks = [];
+var task_CurrentTasks = [];
 
 var _OLD_TASTKS_ = false;
 
@@ -26,12 +26,12 @@ function tasks_Finish()
 _OLD_TASTKS_ = false;
 $('status_tasks_btn_add').style.display = 'block';
 
-	for (let task of CurTasks)
+	for (let task of task_CurrentTasks)
 		task.destroy();
-	CurTasks = [];
+
+	task_CurrentTasks = [];
 
 	$('status_tasks_label').style.display = 'none';
-
 	$('status_tasks').textContent = '';
 }
 
@@ -83,9 +83,9 @@ function task_ShowTasks(i_statusClass)
 var tasks_flags_map = {'roto':['masks'],'sim':['fx']};
 function task_CONVERT_OLD_TASKS(i_evt)
 {
-	let statusClass = CurTasks[0].statusClass;
+	let statusClass = task_CurrentTasks[0].statusClass;
 	statusClass.obj.tasks = {};
-	for (let task of CurTasks)
+	for (let task of task_CurrentTasks)
 	{
 		statusClass.obj.tasks[task.obj.name] = task.obj;
 
@@ -143,7 +143,7 @@ function task_CONVERT_OLD_TASKS(i_evt)
 
 function task_CONVERT_OLD_TASKS_save(i_evt)
 {
-	let statusClass = CurTasks[0].statusClass;
+	let statusClass = task_CurrentTasks[0].statusClass;
 
 	statusClass.save();
 	statusClass.show();
@@ -156,7 +156,7 @@ function task_AddTask()
 
 function Task(i_statusClass, i_task)
 {
-	CurTasks.push(this);
+	task_CurrentTasks.push(this);
 
 	this.statusClass = i_statusClass;
 	if (this.statusClass == null)
@@ -295,20 +295,25 @@ Task.prototype.show = function()
 
 Task.prototype.destroy = function()
 {
+	this.deselect();
+
 	this.elParent.removeChild(this.elRoot);
 }
 
 Task.prototype.select = function()
 {
+	//console.log('Task.prototype.select = ' + this.obj.name);
 	// NULL activity set, on task deselect
 	if (this.elRoot.classList.contains('selected'))
 	{
-		for (let task of CurTasks) task.deselect();
+		for (let task of task_CurrentTasks)
+			task.deselect();
+
 		activity_Set(null);
 		return;
 	}
 
-	for (let task of CurTasks)
+	for (let task of task_CurrentTasks)
 		task.deselect();
 
 	this.elRoot.classList.add('selected');
@@ -423,9 +428,9 @@ Task.prototype.editCancel = function()
 	if (this.obj.name == null)
 	{
 		// New just added task was cancelled
-		let index = CurTasks.indexOf(this);
+		let index = task_CurrentTasks.indexOf(this);
 		if (index != -1)
-			CurTasks.splice(index, 1);
+			task_CurrentTasks.splice(index, 1);
 		this.destroy();
 		return;
 	}
@@ -653,9 +658,9 @@ Task.prototype.save = function(i_progress_changed)
 
 Task.prototype.editDelete = function()
 {
-	let index = CurTasks.indexOf(this);
+	let index = task_CurrentTasks.indexOf(this);
 	if (index != -1)
-		CurTasks.splice(index, 1);
+		task_CurrentTasks.splice(index, 1);
 
 	// Set modification user and time:
 	this.obj.muser = g_auth_user.id;

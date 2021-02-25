@@ -221,6 +221,7 @@ function u_Finish()
 	$('annotations').textContent = '';
 	u_el.thumbnail.style.display = 'none';
 
+	activity_Finish();
 	st_Finish();
 	nw_Finish();
 	a_Finish();
@@ -1092,6 +1093,8 @@ function u_ExecuteShow(i_show)
 
 function u_CreateActions(i_actions, i_el)
 {
+	let elements = [];
+
 	for (let n = 0; n < i_actions.length; n++)
 	{
 		let action = i_actions[n];
@@ -1129,5 +1132,9 @@ function u_CreateActions(i_actions, i_el)
 
 		// Make an executable button:
 		cgru_CmdExecProcess({'element':el,'cmd':cmd,'open':open,'terminal':terminal});
+
+		elements.push(el);
 	}
+
+	return elements;
 }

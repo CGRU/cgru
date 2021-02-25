@@ -91,6 +91,7 @@ box-shadow: 0 0 6px rgb(100,255,255), 0 0 4px rgba(255,255,255,.5) inset;
 #activity > div .button.delete {_display: none; width: 10px; height: 10px; margin: 2px;}
 #activity > div.pinned .button.delete {display: block;}
 #activity > div.pinned.selected .button.delete {_display: none;}
+#activity > div.selected .button.delete {display: none;}
 #activity > div.filter {
 border: 2px solid rgb(255,255,120);
 box-shadow: 0 0 8px rgb(255,255,120), 0 0 4px rgba(255,255,255,.5) inset;
