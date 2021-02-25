@@ -791,9 +791,10 @@ border-radius: 8px;
 .status_edit .edit_tasks .tags { clear: both; }
 
 #status_tasks_div     {clear: both;}
-#status_tasks_btn_add {float: right; margin: 1px 12px; padding: 1px 12px;}
-#status_tasks_label   {float: left; margin: 1px 12px; padding: 1px 12px;}
-#status_tasks         {clear: both;margin: 4px;}
+#status_tasks_buttons {float: right; margin: 1px 12px; padding: 1px 12px;}
+#status_tasks_buttons .button {float: right; margin: 1px 12px; padding: 1px 12px;}
+#status_tasks_label   {float: left; margin: 6px 12px; padding: 1px 12px;}
+#status_tasks         {clear: both; margin: 4px;}
 #status_tasks .task {
 margin: 8px 4px;
 padding: 8px 4px 0px 4px;

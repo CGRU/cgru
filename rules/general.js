@@ -49,7 +49,6 @@ function g_Init()
 	u_Init();
 	c_Init();
 	activity_Init();
-	st_Init();
 	n_Request({"send": {"start": {}}, "func": g_Init_Server, "info": 'start'});
 
 	window.onbeforeunload = g_OnClose;
@@ -110,6 +109,7 @@ function g_Init_Config(i_data)
 
 	nw_Init();
 	bm_Init();
+	st_Init();
 
 	n_WalkDir({"paths": ['.'], "wfunc": g_Init_Rules, "info": 'walk config', "rufiles": ['rules']});
 }

@@ -25,6 +25,7 @@ var st_HilightedKeys = ['tag','flag','artist'];
 function st_Init()
 {
 	st_HilightedStoreRead();
+	tasks_Init();
 }
 
 function st_InitAuth()

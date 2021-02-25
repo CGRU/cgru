@@ -20,11 +20,17 @@ var task_CurrentTasks = [];
 
 var _OLD_TASTKS_ = false;
 
+function tasks_Init()
+{
+	if (c_IsNotAnArtist())
+		$('status_tasks_btn_add_artist').style.display = 'none';
+}
+
 // Called on location leave (change)
 function tasks_Finish()
 {
 _OLD_TASTKS_ = false;
-$('status_tasks_btn_add').style.display = 'block';
+$('status_tasks_buttons').style.display = 'block';
 
 	for (let task of task_CurrentTasks)
 		task.destroy();
@@ -52,7 +58,7 @@ function task_ShowTasks(i_statusClass)
 	if (Array.isArray(i_statusClass.obj.tasks))
 	{
 		_OLD_TASTKS_ = true;
-		$('status_tasks_btn_add').style.display = 'none';
+		$('status_tasks_buttons').style.display = 'none';
 		let new_tasks = {};
 		for (let task of i_statusClass.obj.tasks)
 		{
@@ -152,6 +158,21 @@ function task_CONVERT_OLD_TASKS_save(i_evt)
 function task_AddTask()
 {
 	new Task();
+}
+
+function task_AddArtistTask()
+{
+	let task = {};
+	task.artists = [g_auth_user.id];
+	task.tags = [];
+
+	if (g_auth_user.tag)
+		task.tags = [g_auth_user.tag];
+
+	if (activity_Current)
+		task.tags = [activity_Current];
+
+	new Task(null, task);
 }
 
 function Task(i_statusClass, i_task)
