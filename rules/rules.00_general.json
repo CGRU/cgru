@@ -40,28 +40,24 @@
 },
 
 "tags":{
-	"rnd"     :{"title":"R&D",      "short":"RnD", "tip":"Research and development"},
-
-	"roto"    :{"title":"Roto",     "short":"Ro",  "tip":"Rotoscoping"},
-	"key"     :{"title":"Keying",   "short":"Key", "tip":"Keying"},
+	"anim"    :{"title":"Anim",     "short":"Am",  "tip":"Animation"},
 	"cleanup" :{"title":"CleanUp",  "short":"Cl",  "tip":"Cleanup"},
 	"comp"    :{"title":"Comp",     "short":"Cp",  "tip":"Compositing"},
-
 	"concept" :{"title":"Concept",  "short":"Cc",  "tip":"Concept"},
-	"paint"   :{"title":"Paint",    "short":"Pt",  "tip":"Painting"},
-	"matte"   :{"title":"MtPaint",  "short":"Mp",  "tip":"Matte painting"},
-	"textur"  :{"title":"Textur",   "short":"Tx",  "tip":"Texturing"},
-
-	"layout"  :{"title":"Layout",   "short":"Lay", "tip":"Layout"},
-	"model"   :{"title":"Model",    "short":"Md",  "tip":"Modeling"},
-	"anim"    :{"title":"Anim",     "short":"Am",  "tip":"Animation"},
-	"mimic"   :{"title":"Mimic",    "short":"Mim", "tip":"Mimic"},
-	"track"   :{"title":"Track",    "short":"Tr",  "tip":"Tracking"},
-	"rig"     :{"title":"Rig",      "short":"Rig", "tip":"Rigging"},
-	"fx"      :{"title":"FX",       "short":"FX",  "tip":"FX"},
-	"render"  :{"title":"Render",   "short":"Rn",  "tip":"Rendering"},
-
 	"frlnc"   :{"title":"Freelance","short":"Fl",  "tip":"Freelance"},
+	"fx"      :{"title":"FX",       "short":"FX",  "tip":"FX"},
+	"key"     :{"title":"Keying",   "short":"Key", "tip":"Keying"},
+	"layout"  :{"title":"Layout",   "short":"Lay", "tip":"Layout"},
+	"mimic"   :{"title":"Mimic",    "short":"Mim", "tip":"Mimic"},
+	"model"   :{"title":"Model",    "short":"Md",  "tip":"Modeling"},
+	"paint"   :{"title":"Paint",    "short":"Pt",  "tip":"Painting"},
+	"render"  :{"title":"Render",   "short":"Rn",  "tip":"Rendering"},
+	"rig"     :{"title":"Rig",      "short":"Rig", "tip":"Rigging"},
+	"roto"    :{"title":"Roto",     "short":"Ro",  "tip":"Rotoscoping"},
+	"rnd"     :{"title":"R&D",      "short":"RnD", "tip":"Research and development"},
+	"textur"  :{"title":"Textur",   "short":"Tx",  "tip":"Texturing"},
+	"track"   :{"title":"Track",    "short":"Tr",  "tip":"Tracking"},
+
 	"other"   :{"title":"Other",    "short":"Ot",  "tip":"Something else",
 		"new_line":true}
 },
