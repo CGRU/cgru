@@ -172,6 +172,9 @@ EditList.prototype.addInputProcess = function()
 		if (this.list_all[id] && this.list_all[id].disabled)
 			continue;
 
+		if ((this.name == 'artists') && c_IsNotAnArtist(g_users[id]))
+			continue;
+
 		let item = {};
 		item.id = id;
 
