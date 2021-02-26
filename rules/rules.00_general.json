@@ -43,10 +43,8 @@
 },
 
 "tags":{
-	"wirem"   :{"title":"WiRem",    "short":"WR",  "tip":"Wire remove"},
 	"roto"    :{"title":"Roto",     "short":"Ro",  "tip":"Rotoscoping"},
 	"key"     :{"title":"Keying",   "short":"Key", "tip":"Keying"},
-	"back"    :{"title":"Back",     "short":"Bk",  "tip":"Back placement"},
 	"cleanup" :{"title":"CleanUp",  "short":"Cl",  "tip":"Cleanup"},
 	"comp"    :{"title":"Comp",     "short":"Cp",  "tip":"Compositing"},
 
