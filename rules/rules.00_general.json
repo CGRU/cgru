@@ -36,13 +36,12 @@
 	"done"        :{"title":"DONE",        "clr":[121,155,121], "short":"DON", "p_min":100,            "excl":true,  "tip":"Done"},
 	"closed"      :{"title":"CLOSED",      "clr":[ 11, 55, 11], "short":"CLS", "p_min":100,            "excl":true,  "tip":"Closed"},
 	"aux"         :{"title":"AUX",         "clr":[127,127,127], "short":"AUX",             "p_max":-1, "excl":true,  "tip":"Auxiliary",
-		"new_line":true},
-
-	"render_ready":{"title":"RENDERREADY", "clr":[177,157,136], "short":"RR",  "p_min":10, "p_max":50, "excl":false, "tip":"Ready to render"},
-	"compoz_ready":{"title":"COMPOZREADY", "clr":[180,200,130], "short":"CR",  "p_min":30, "p_max":30, "excl":false, "tip":"Ready to compoz"}
+		"new_line":true}
 },
 
 "tags":{
+	"rnd"     :{"title":"R&D",      "short":"RnD", "tip":"Research and development"},
+
 	"roto"    :{"title":"Roto",     "short":"Ro",  "tip":"Rotoscoping"},
 	"key"     :{"title":"Keying",   "short":"Key", "tip":"Keying"},
 	"cleanup" :{"title":"CleanUp",  "short":"Cl",  "tip":"Cleanup"},
@@ -56,12 +55,12 @@
 	"layout"  :{"title":"Layout",   "short":"Lay", "tip":"Layout"},
 	"model"   :{"title":"Model",    "short":"Md",  "tip":"Modeling"},
 	"anim"    :{"title":"Anim",     "short":"Am",  "tip":"Animation"},
+	"mimic"   :{"title":"Mimic",    "short":"Mim", "tip":"Mimic"},
 	"track"   :{"title":"Track",    "short":"Tr",  "tip":"Tracking"},
 	"rig"     :{"title":"Rig",      "short":"Rig", "tip":"Rigging"},
 	"fx"      :{"title":"FX",       "short":"FX",  "tip":"FX"},
 	"render"  :{"title":"Render",   "short":"Rn",  "tip":"Rendering"},
 
-	"rnd"     :{"title":"R&D",      "short":"RnD", "tip":"Research and development"},
 	"frlnc"   :{"title":"Freelance","short":"Fl",  "tip":"Freelance"},
 	"other"   :{"title":"Other",    "short":"Ot",  "tip":"Something else",
 		"new_line":true}
