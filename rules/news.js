@@ -644,7 +644,7 @@ function nw_NewsShow(i_update_folders)
 		elLink.textContent = news.path;
 
 		// Display news status:
-		st_SetElStatus(el, news.status, news.path);
+		st_SetElStatus(el, news.status, c_IsUserSubsribedOnPath(news.path));
 
 		let prj = news.path.split('/')[1];
 		if (projects.indexOf(prj) == -1)
