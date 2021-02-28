@@ -168,6 +168,7 @@ void PoolSrv::v_action(Action & i_action)
 	{
 		store();
 		i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_id);
+		dispatchFarmConfig();
 	}
 }
 
@@ -177,6 +178,15 @@ void PoolSrv::logAction(const Action & i_action, const std::string & i_node_name
 		return;
 
 	appendLog(std::string("Action[") + i_action.type + "][" +  i_node_name + "]: " + i_action.log);
+}
+
+void PoolSrv::dispatchFarmConfig()
+{
+	for (auto & it : m_pools_list)
+		it->dispatchFarmConfig();
+
+	for (auto & it : m_renders_list)
+		it->getPoolConfig();
 }
 
 void PoolSrv::actionDelete(Action & i_action)

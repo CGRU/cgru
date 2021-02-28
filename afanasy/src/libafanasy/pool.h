@@ -65,6 +65,10 @@ public:
 		SPaused  = 1ULL << 1,
 	};
 
+	int32_t m_heartbeat_sec;
+	int32_t m_resources_update_period;
+	int32_t m_zombie_time;
+
 	int32_t m_idle_wolsleep_time;
 	int32_t m_idle_free_time;
 	int32_t m_busy_nimby_time;

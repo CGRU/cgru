@@ -75,6 +75,10 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 	m_params["busy_netmbs"]        = pool->m_busy_netmbs;
 	m_params["idle_wolsleep_time"] = pool->m_idle_wolsleep_time;
 
+	m_params["heartbeat_sec"]           = pool->m_heartbeat_sec;
+	m_params["resources_update_period"] = pool->m_resources_update_period;
+	m_params["zombie_time"]             = pool->m_zombie_time;
+
 	strLeftTop = m_name;
 	if (false == m_root)
 		strLeftTop += QString(": %1").arg(afqt::stoq(pool->getPatternStr()));

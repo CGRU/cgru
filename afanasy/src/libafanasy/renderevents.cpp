@@ -11,13 +11,23 @@
 
 using namespace af;
 
-RenderEvents::RenderEvents()
+RenderEvents::RenderEvents():
+	m_id(0),
+	m_heartbeat_sec(0),
+	m_resources_update_period(0),
+	m_zombie_time(0)
 {
 }
 
 RenderEvents::RenderEvents( Msg * msg)
 {
 	read( msg);
+}
+
+RenderEvents::RenderEvents(RE_Status i_status, const std::string & i_log):
+	m_id(i_status),
+	m_log(i_log)
+{
 }
 
 RenderEvents::~RenderEvents()
@@ -70,6 +80,12 @@ void RenderEvents::rw_texecs( std::vector<TaskExec*> & io_vec, Msg * io_msg)
 
 void RenderEvents::v_readwrite( Msg * msg)
 {
+	rw_int32_t(m_id, msg);
+
+	rw_int32_t(m_heartbeat_sec,           msg);
+	rw_int32_t(m_resources_update_period, msg);
+	rw_int32_t(m_zombie_time,             msg);
+
 	rw_texecs( m_tasks,       msg);
 	rw_tp_vec( m_closes,      msg);
 	rw_tp_vec( m_stops,       msg);
@@ -78,10 +94,17 @@ void RenderEvents::v_readwrite( Msg * msg)
 	rw_tp_vec( m_listens_rem, msg);
 	rw_String( m_instruction, msg);
 	rw_String( m_command,     msg);
+	rw_String( m_log,         msg);
 }
 
 void RenderEvents::clear()
 {
+	m_id = 0;
+
+	m_heartbeat_sec           = 0;
+	m_resources_update_period = 0;
+	m_zombie_time             = 0;
+
 	m_tasks.clear();
 
 	m_closes.clear();
@@ -92,10 +115,17 @@ void RenderEvents::clear()
 
 	m_instruction.clear();
 	m_command.clear();
+	m_log.clear();
 }
 
 bool RenderEvents::isEmpty() const
 {
+	if(m_id) return false;
+
+	if(m_heartbeat_sec)           return false;
+	if(m_resources_update_period) return false;
+	if(m_zombie_time)             return false;
+
 	if( m_tasks.size()) return false;
 
 	if( m_closes.size()) return false;
@@ -106,6 +136,7 @@ bool RenderEvents::isEmpty() const
 
 	if( m_instruction.size()) return false;
 	if( m_command.size()) return false;
+	if (m_log.size()) return false;
 
 	return true;
 }
@@ -113,6 +144,16 @@ bool RenderEvents::isEmpty() const
 void RenderEvents::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
 	stream << " >>> RenderEvents:";
+
+	if (m_id)
+		stream << " ID[" << m_id << "]";
+
+	if (m_heartbeat_sec)
+		stream << " HBS[" << m_heartbeat_sec << "]";
+	if (m_resources_update_period)
+		stream << " RUP[" << m_resources_update_period << "]";
+	if (m_zombie_time)
+		stream << " ZT[" << m_zombie_time << "]";
 
 	if( m_tasks.size())
 		stream << " Exec["  << m_tasks.size()  << "]";

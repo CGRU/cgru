@@ -18,6 +18,8 @@
 
 extern bool AFRunning;
 
+extern int ZombieTime;
+
 RenderHost::RenderHost():
 	af::Render( Client::GetEnvironment),
 	m_updateMsgType( af::Msg::TRenderRegister),
@@ -127,10 +129,9 @@ void RenderHost::serverUpdateFailed()
 	AF_LOG << "Failed to connect to server."
 			<< " Last success connect time: " << af::time2str(m_server_update_time);
 	AF_LOG << "Last connect was: " << (time(NULL) - m_server_update_time) << " seconds ago"
-			<< ", Connection lost time: " << af::Environment::getRenderConnectionLostTime() << "s"
-			<< ", Zombie time: " << af::Environment::getRenderZombieTime() << "s";
+			<< ", Zombie time: " << ZombieTime << "s";
 
-	if (time(NULL) >= (m_server_update_time + af::Environment::getRenderConnectionLostTime()))
+	if (time(NULL) >= (m_server_update_time + ZombieTime))
 	{
 		connectionLost();
 	}

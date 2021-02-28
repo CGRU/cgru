@@ -39,11 +39,7 @@ void TaskProgress::v_readwrite( Msg * msg)
    rw_int64_t ( time_done,    msg);
    rw_String  ( hostname,     msg);
 	rw_String ( activity,     msg);
-
-/* NEW_VERSION
 	rw_String ( resources,      msg);
-*/
-	resources = "triangles:18290255";
 }
 
 void TaskProgress::jsonRead( const JSON & i_obj)
@@ -62,18 +58,18 @@ void TaskProgress::jsonWrite( std::ostringstream & o_str) const
 	o_str << "{";
 	jw_stateJob(state, o_str);
 	o_str << ",\"st\":" << state;
-	if( percent      > 0 ) o_str << ",\"per\":" << int(percent);
-	if( frame        > 0 ) o_str << ",\"frm\":" << frame;
-	if( percentframe > 0 ) o_str << ",\"pfr\":" << int(percentframe);
-	if( starts_count > 0 ) o_str << ",\"str\":" << starts_count;
-	if( errors_count > 0 ) o_str << ",\"err\":" << errors_count;
-	if( time_start   > 0 ) o_str << ",\"tst\":" << time_start;
-	if( time_done    > 0 ) o_str << ",\"tdn\":" << time_done;
-	if( hostname.size()  ) o_str << ",\"hst\":\"" << hostname << "\"";
-	if( activity.size()  ) o_str << ",\"act\":\"" << activity << "\"";
-	if(resources.size()) o_str << ",\"res\":\"" << resources << "\"";
+	if (percent      > 0) o_str << ",\"per\":" << int(percent);
+	if (frame        > 0) o_str << ",\"frm\":" << frame;
+	if (percentframe > 0) o_str << ",\"pfr\":" << int(percentframe);
+	if (starts_count > 0) o_str << ",\"str\":" << starts_count;
+	if (errors_count > 0) o_str << ",\"err\":" << errors_count;
+	if (time_start   > 0) o_str << ",\"tst\":" << time_start;
+	if (time_done    > 0) o_str << ",\"tdn\":" << time_done;
+	if (hostname.size() ) o_str << ",\"hst\":\"" << hostname << "\"";
+	if (activity.size() ) o_str << ",\"act\":\"" << activity << "\"";
+	if (resources.size()) o_str << ",\"res\":\"" << resources << "\"";
 	int no_progress_for = last_percent_change - time( NULL );
-	if( no_progress_for > 0 ) o_str << ",\"npf\":" << no_progress_for;
+	if (no_progress_for > 0) o_str << ",\"npf\":" << no_progress_for;
 	o_str << "}";
 }
 

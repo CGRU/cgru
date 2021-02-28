@@ -44,8 +44,9 @@ af::Msg * RenderContainer::addRender(RenderAf * newRender, PoolsContainer * i_po
                errLog += render->v_generateInfoString( false);
                AFCommon::QueueLogError( errLog);
                delete newRender;
-               // Return -1 ID to render to tell that there is already registered render with the same name:
-               return new af::Msg( af::Msg::TRenderId, -1);
+
+					af::RenderEvents re(af::RenderEvents::RE_Status_Exit, "Render with the same name exists.");
+					return new af::Msg(af::Msg::TRenderEvents, &re);
             }
             // Offline render with the same hostname found:
             else
@@ -54,8 +55,8 @@ af::Msg * RenderContainer::addRender(RenderAf * newRender, PoolsContainer * i_po
                int id = render->getId();
                AFCommon::QueueLog("Render: " + render->v_generateInfoString( false));
                delete newRender;
-               // Return new render ID to render to tell that it was successfully registered:
-               return new af::Msg( af::Msg::TRenderId, id);
+
+					return render->writeConnectedMsg("Render became online.");
             }
          }
       }
@@ -69,14 +70,16 @@ af::Msg * RenderContainer::addRender(RenderAf * newRender, PoolsContainer * i_po
 				monitoring->addEvent( af::Monitor::EVT_renders_add, id);
 
 			AFCommon::QueueLog("New Render registered: " + newRender->v_generateInfoString());
-		}
-		else
-		{
-			delete newRender;
+
+			return newRender->writeConnectedMsg("New render registered.");
 		}
 
-		// Return new render ID to render to tell that it was successfully registered:
-		return new af::Msg( af::Msg::TRenderId, id);
+		// Server is unable to add a new render to container.
+		// This should never happen.
+		delete newRender;
+
+		af::RenderEvents re(af::RenderEvents::RE_Status_Exit, "Unable to add render. See server log for details.");
+		return new af::Msg(af::Msg::TRenderEvents, &re);
 	}
 
 	// Adding offline render from database:
@@ -87,6 +90,8 @@ af::Msg * RenderContainer::addRender(RenderAf * newRender, PoolsContainer * i_po
 	}
 	else
 	{
+		// Server is unable to add a new render to container.
+		// This should never happen.
 		delete newRender;
 	}
 

@@ -58,6 +58,10 @@ void Pool::initDefaultValues()
 	m_new_nimby = false;
 	m_new_paused = false;
 
+	m_heartbeat_sec           = -1;
+	m_resources_update_period = -1;
+	m_zombie_time             = -1;
+
 	m_sick_errors_count = -1;
 
 	m_run_tasks = 0;
@@ -113,6 +117,12 @@ void Pool::v_jsonWrite(std::ostringstream & o_str, int i_type) const // Thread-s
 	if (m_task_start_finish_time > 0)
 		o_str << ",\n\"task_start_finish_time\":" << m_task_start_finish_time;
 
+	if (m_heartbeat_sec > 0)
+		o_str << ",\n\"heartbeat_sec\":"           << m_heartbeat_sec;
+	if (m_resources_update_period > 0)
+		o_str << ",\n\"resources_update_period\":" << m_resources_update_period;
+	if (m_zombie_time > 0)
+		o_str << ",\n\"zombie_time\":"             << m_zombie_time;
 
 	if (m_new_nimby)
 		o_str << ",\n\"new_nimby\": true";
@@ -153,6 +163,10 @@ bool Pool::jsonRead(const JSON &i_object, std::string * io_changes)
 
 	if (notRoot())
 		jr_regexp("pattern", m_pattern, i_object, io_changes);
+
+	jr_int32 ("heartbeat_sec",           m_heartbeat_sec,           i_object, io_changes);
+	jr_int32 ("resources_update_period", m_resources_update_period, i_object, io_changes);
+	jr_int32 ("zombie_time",             m_zombie_time,             i_object, io_changes);
 
 	jr_bool  ("new_nimby",             m_new_nimby,             i_object, io_changes);
 	jr_bool  ("new_paused",            m_new_paused,            i_object, io_changes);
@@ -210,6 +224,10 @@ void Pool::v_readwrite(Msg * msg)
 
 	rw_String (m_parent_path,            msg);
 	rw_int64_t(m_time_creation,          msg);
+
+	rw_int32_t(m_heartbeat_sec,          msg);
+	rw_int32_t(m_resources_update_period,msg);
+	rw_int32_t(m_zombie_time,            msg);
 
 	rw_bool   (m_new_nimby,              msg);
 	rw_bool   (m_new_paused,             msg);

@@ -89,8 +89,6 @@ void RenderAf::setRegistered(PoolsContainer * i_pools)
 {
 	findPool(i_pools);
 
-//getFarmHost();
-
 	if( isFromStore())
 	{
 		appendLog("Initialized from store.");
@@ -195,6 +193,36 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
 	}
 }
 
+void RenderAf::getPoolConfig()
+{
+	if (NULL == m_parent)
+		return;
+
+	m_re.m_heartbeat_sec           = m_parent->getHeartBeatSec();
+	m_re.m_resources_update_period = m_parent->getResourcesUpdatePeriod();
+	m_re.m_zombie_time             = m_parent->getZombieTime();
+}
+
+af::Msg * RenderAf::writeRenderEventsMsg()
+{
+	m_re.m_id = m_id;
+
+	af::Msg * msg = new af::Msg(af::Msg::TRenderEvents, &m_re);
+
+	m_re.clear();
+
+	return msg;
+}
+
+af::Msg * RenderAf::writeConnectedMsg(const std::string & i_log)
+{
+	m_re.m_log = i_log;
+
+	getPoolConfig();
+
+	return writeRenderEventsMsg();
+}
+
 af::Msg * RenderAf::update( const af::RenderUpdate & i_up)
 {
 	updateTime();
@@ -213,11 +241,7 @@ af::Msg * RenderAf::update( const af::RenderUpdate & i_up)
 		return new af::Msg( af::Msg::TRenderId, getId());
 	}
 
-	af::Msg * msg = new af::Msg( af::Msg::TRenderEvents, &m_re);
-
-	m_re.clear();
-
-	return msg;
+	return writeRenderEventsMsg();
 }
 
 void RenderAf::online( RenderAf * render, JobContainer * i_jobs, MonitorContainer * monitoring)
@@ -245,7 +269,6 @@ void RenderAf::online( RenderAf * render, JobContainer * i_jobs, MonitorContaine
 	m_engine = render->m_engine;
 	m_address.copy(render->getAddress());
 	grabNetIFs(render->m_netIFs);
-//getFarmHost(&render->m_host);
 	m_hres.copy(render->getHostRes());
 
 
@@ -893,11 +916,15 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 		offline(jobs, af::TaskExec::UPRenderZombie, monitoring);
 		appendLog("Has no pool");
 		monitoring->addEvent(af::Monitor::EVT_renders_change, m_id);
+		return;
 	}
 
-	if( isOnline() && (getTimeUpdate() < (currentTime - af::Environment::getRenderZombieTime())))
+	int zombie_time = m_parent->getZombieTime();
+	if (zombie_time <= 0)
+		zombie_time = AFRENDER::ZOMBIETIME;
+	if (isOnline() && (getTimeUpdate() < (currentTime - zombie_time)))
 	{
-		appendLog( std::string("ZOMBIETIME: ") + af::itos(af::Environment::getRenderZombieTime()) + " seconds.");
+		appendLog( std::string("ZOMBIETIME: ") + af::itos(zombie_time) + " seconds.");
 		AFCommon::QueueLog( std::string("Render: \"") + getName() + "\" - ZOMBIETIME");
 		emitEvents(std::vector<std::string>(1, "RENDER_ZOMBIE"));
 		offline( jobs, af::TaskExec::UPRenderZombie, monitoring);

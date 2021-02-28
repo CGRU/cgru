@@ -18,6 +18,10 @@
 
 extern bool AFRunning;
 
+int HeartBeatSec          = AFRENDER::HEARTBEAT_SEC;
+int ResourcesUpdatePeriod = AFRENDER::RESOURCES_UPDATE_PERIOD;
+int ZombieTime            = AFRENDER::ZOMBIETIME;
+
 //######################### Signal handlers ############################################
 #ifdef WINNT
 BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
@@ -149,7 +153,7 @@ int main(int argc, char *argv[])
 	while( AFRunning)
 	{
 		// Update machine resources:
-		if( cycle % af::Environment::getRenderUpResourcesPeriod() == 0)
+		if ((cycle % ResourcesUpdatePeriod) == 0)
 			render->getResources();
 
 		// Let tasks to do their work:
@@ -174,7 +178,7 @@ int main(int argc, char *argv[])
 
 		// Sleep till the next heartbeat:
 		if( AFRunning )
-			af::sleep_sec( af::Environment::getRenderHeartbeatSec());
+			af::sleep_sec(HeartBeatSec);
 	}
 
 	delete render;
@@ -204,33 +208,28 @@ AF_LOG << " >>> " << i_msg;
 	{
 	case af::Msg::TRenderId:
 	{
-		int new_id = i_msg->int32();
+		// If there is no render events, server just returns render ID.
+		int id = i_msg->int32();
+
 		// Server sends back -1 id if a render with the same hostname already exists:
-		if( new_id == -1)
+		if (id == -1)
 		{
 			AF_ERR << "Render with this hostname '" << af::Environment::getHostName() << "' already registered.";
 			AFRunning = false;
 		}
-		// Render was trying to register (its id==0) and server has send id>0
-		// This is the situation when client was successfully registered
-		else if((new_id > 0) && i_render.notConnected())
-		{
-			i_render.setRegistered( new_id);
-		}
 		// Server sends back zero id on any error
-		else if (new_id == 0)
+		else if (id == 0)
 		{
 			AF_WARN << "Zero ID received, no such online render, re-connecting...";
 			i_render.connectionLost();
 		}
 		// Bad case, should not ever happen, try to re-register.
-		else if (i_render.getId() != new_id)
+		else if (i_render.getId() != id)
 		{
-			AF_ERR << "IDs mismatch: this " << i_render.getId() << " != " << new_id << " new, re-connecting...";
+			AF_ERR << "IDs mismatch: this " << i_render.getId() << " != " << id << " new, re-connecting...";
 			i_render.connectionLost();
 		}
-		// Id, that returns from server is equals to stored on client.
-		// This is a normal case.
+		// Id, that returns from server equals to stored on client.
 		else
 		{
 			i_render.connectionEstablished();
@@ -265,20 +264,89 @@ void processEvents( const af::RenderEvents & i_re, RenderHost & i_render)
 AF_LOG << i_re;
 #endif
 
+	// Server can send some special IDs
+	switch (i_re.m_id)
+	{
+		case af::RenderEvents::RE_Status_Reconnect:
+			if (i_re.m_log.size())
+				AF_WARN << "SERVER: " << i_re.m_log;
+			else
+				AF_WARN << "Reconnect signal received from server.";
+			i_render.connectionLost();
+			return;
+
+		case af::RenderEvents::RE_Status_Exit:
+			if (i_re.m_log.size())
+				AF_ERR << "SERVER: " << i_re.m_log;
+			else
+				AF_ERR << "Exit signal received from server.";
+			AFRunning = false;
+			return;
+	}
+
+
+	// Just prints some log message from server.
+	if (i_re.m_log.size())
+		AF_LOG << "SERVER: " << i_re.m_log;
+
+
+	if (i_re.m_id > 0)
+	{
+		// Render is not connected and a new ID received.
+		// This means that server has successfully registered it.
+		if (i_render.notConnected())
+		{
+			i_render.setRegistered(i_re.m_id);
+		}
+		else if (i_render.getId() != i_re.m_id)
+		{
+			// Bad case, should not ever happen, try to re-register.
+			AF_ERR << "IDs mismatch: this " << i_render.getId() << " != " << i_re.m_id << " new, trying to reconnect...";
+			i_render.connectionLost();
+			return;
+		}
+	}
+
+
+	if (i_re.m_heartbeat_sec)
+	{
+		if (i_re.m_heartbeat_sec > 0)
+			HeartBeatSec = i_re.m_heartbeat_sec;
+		else
+			HeartBeatSec = AFRENDER::HEARTBEAT_SEC;
+		AF_LOG << "Heart beat seconds set to " << HeartBeatSec;
+	}
+
+	if (i_re.m_resources_update_period)
+	{
+		if (i_re.m_resources_update_period > 0)
+			ResourcesUpdatePeriod = i_re.m_resources_update_period;
+		else
+			ResourcesUpdatePeriod = AFRENDER::RESOURCES_UPDATE_PERIOD;;
+		AF_LOG << "Resources update period set to " << ResourcesUpdatePeriod;
+	}
+
+	if (i_re.m_zombie_time)
+	{
+		if (i_re.m_zombie_time > 0)
+			ZombieTime = i_re.m_zombie_time;
+		else
+			ZombieTime = AFRENDER::ZOMBIETIME;
+		AF_LOG << "Zombie time set to " << ZombieTime << " seconds";
+	}
+
+
 	// Tasks to execute:
 	for( int i = 0; i < i_re.m_tasks.size(); i++)
 		i_render.runTask( i_re.m_tasks[i]);
-
 
 	// Tasks to close:
 	for( int i = 0; i < i_re.m_closes.size(); i++)
 		i_render.closeTask( i_re.m_closes[i]);
 
-
 	// Tasks to stop:
 	for( int i = 0; i < i_re.m_stops.size(); i++)
 		i_render.stopTask( i_re.m_stops[i]);
-
 
 	// Tasks to outputs:
 	for( int i = 0; i < i_re.m_outputs.size(); i++)
@@ -291,6 +359,7 @@ AF_LOG << i_re;
 	// Listens remove:
 	for( int i = 0; i < i_re.m_listens_rem.size(); i++)
 		i_render.listenTask( i_re.m_listens_rem[i], false);
+
 
 	// Instructions:
 	if( i_re.m_instruction.size())

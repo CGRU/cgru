@@ -192,11 +192,8 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
 		rw_int64_t(m_time_register,          msg);
 		rw_int64_t(m_wol_operation_time,     msg);
 		rw_String (m_annotation,             msg);
-
-		/* NEW_VERSION
 		rw_String (m_custom_data,            msg);
 		rw_String (m_srv_info,               msg);
-		*/
 
 	case Msg::TRenderRegister:
  

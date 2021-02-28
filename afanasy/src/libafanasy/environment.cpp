@@ -68,12 +68,8 @@ int     Environment::watch_refresh_gui_sec =           AFWATCH::REFRESH_GUI_SEC;
 int     Environment::watch_render_idle_bar_max =       AFWATCH::RENDER_IDLE_BAR_MAX;
 bool    Environment::watch_work_user_visible =         AFWATCH::WORK_USER_VISIBLE;
 
-int     Environment::render_heartbeat_sec =            AFRENDER::HEARTBEAT_SEC;
-int     Environment::render_up_resources_period =      AFRENDER::UP_RESOURCES_PERIOD;
 int     Environment::render_nice =                     AFRENDER::TASKPROCESSNICE;
-int     Environment::render_zombietime =               AFRENDER::ZOMBIETIME;
 int     Environment::render_exit_no_task_time =        AFRENDER::EXIT_NO_TASK_TIME;
-int     Environment::render_connection_lost_time =     AFRENDER::CONNECTION_LOST_TIME;
 
 
 std::string Environment::rules_url;
@@ -273,8 +269,6 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, task_progress_change_timeout,      "af_task_progress_change_timeout"      );
 	getVar( i_obj, task_reconnect_timeout,            "af_task_reconnect_timeout"            );
 
-	getVar( i_obj, render_heartbeat_sec,              "af_render_heartbeat_sec"              );
-	getVar( i_obj, render_up_resources_period,        "af_render_up_resources_period"        );
 	getVar( i_obj, render_cmd_reboot,                 "af_render_cmd_reboot"                 );
 	getVar( i_obj, render_cmd_shutdown,               "af_render_cmd_shutdown"               );
 	getVar( i_obj, render_cmd_wolsleep,               "af_render_cmd_wolsleep"               );
@@ -284,9 +278,7 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, render_iostat_device,              "af_render_iostat_device"              );
 	getVar( i_obj, render_resclasses,                 "af_render_resclasses"                 );
 	getVar( i_obj, render_nice,                       "af_render_nice"                       );
-	getVar( i_obj, render_zombietime,                 "af_render_zombietime"                 );
 	getVar( i_obj, render_exit_no_task_time,          "af_render_exit_no_task_time"          );
-	getVar( i_obj, render_connection_lost_time,       "af_render_connection_lost_time"       );
 	getVar( i_obj, render_windowsmustdie,             "af_render_windowsmustdie"             );
 
 	getVar( i_obj, rendercmds,                        "af_rendercmds"                        );

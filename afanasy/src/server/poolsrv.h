@@ -87,6 +87,19 @@ public:
 
 	bool hasPoolTicket(const std::string & i_name, const int32_t & i_count, const bool i_ticket_running) const;
 
+
+	// Farm config
+	inline int32_t getHeartBeatSec() const
+		{if (m_heartbeat_sec <= 0 && m_parent) return m_parent->getHeartBeatSec(); else return m_heartbeat_sec;}
+
+	inline int32_t getResourcesUpdatePeriod() const
+		{if (m_resources_update_period <= 0 && m_parent) return m_parent->getResourcesUpdatePeriod(); else return m_resources_update_period;}
+
+	inline int32_t getZombieTime() const
+		{if (m_zombie_time <= 0 && m_parent) return m_parent->getZombieTime(); else return m_zombie_time;}
+
+
+	// Idle & Busy
 	inline int get_idle_wolsleep_time() const
 		{ if (m_idle_wolsleep_time < 0 && m_parent) return m_parent->get_idle_wolsleep_time(); else return m_idle_wolsleep_time;}
 	inline int get_idle_free_time()     const
@@ -130,6 +143,8 @@ private:
 	void actionDelete  (Action & i_action);
 	void actionService (Action & i_action);
 	void actionHealSick(Action & i_action);
+
+	void dispatchFarmConfig();
 
 private:
 	std::list<PoolSrv*> m_pools_list;

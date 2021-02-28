@@ -193,7 +193,7 @@ ListRenders::ListRenders( QWidget* parent):
 
 	timer = new QTimer( this);
 	connect(timer, SIGNAL(timeout()), this, SLOT( requestResources()));
-	timer->start( 990 * af::Environment::getRenderHeartbeatSec() * af::Environment::getRenderUpResourcesPeriod());
+	timer->start(1000 * AFRENDER::HEARTBEAT_SEC * AFRENDER::RESOURCES_UPDATE_PERIOD);
 
 	m_parentWindow->setWindowTitle("Renders");
 
@@ -227,6 +227,15 @@ ListRenders::ListRenders( QWidget* parent):
 		addParam_Num(Item::TPool, "idle_netmbs",        "Idle NET MB/s",   "Idle network usage (MBytes/second).", -1, 1<<30);
 		addParam_Num(Item::TPool, "busy_netmbs",        "Busy NET MB/s",   "Busy network usage (MBytes/second).", -1, 1<<30);
 		addParam_Hrs(Item::TPool, "idle_wolsleep_time", "Idle WOL Sleep",  "WOL sleep after this idle time.");
+
+		addParam_separator();
+
+		addParam_Num(Item::TPool, "heartbeat_sec", "Heart Beat Sec",
+				QString("Render heart beat seconds (default is %1).)").arg(AFRENDER::HEARTBEAT_SEC), -1, 1<<6);
+		addParam_Num(Item::TPool, "resources_update_period", "Res. update period",
+				QString("Render resources update period (default is %1).)").arg(AFRENDER::RESOURCES_UPDATE_PERIOD), -1, 1<<4);
+		addParam_Num(Item::TPool, "zombie_time", "Zombie Time",
+				QString("Render zombie time.").arg(AFRENDER::ZOMBIETIME), -1, 1<<10);
 	}
 
 	ParamsPanelFarm * paramspanelfarm = new ParamsPanelFarm(this);

@@ -33,6 +33,8 @@ public:
 
 	void setPool(PoolSrv * i_pool);
 
+	void getPoolConfig();
+
 /// Awake offline render
 	void online( RenderAf * render, JobContainer * i_jobs, MonitorContainer * monitoring);
 
@@ -117,6 +119,9 @@ public:
 
 	virtual int v_calcWeight() const; ///< Calculate and return memory size.
 
+	// Write this message back to the new launched render
+	af::Msg * writeConnectedMsg(const std::string & i_log);
+
 	// Update render and send instructions back:
 	af::Msg * update( const af::RenderUpdate & i_up);
 
@@ -146,6 +151,9 @@ private:
 
 	void actionSetPool(const std::string & i_pool_name, Action & i_action);
 	void actionReassignPool(Action & i_action);
+
+	// Write this message back to the new launched render
+	af::Msg * writeRenderEventsMsg();
 
 	/// Add the task exec to this render and take over its ownership (meaning
 	/// one should not free taskexec after having provided it to this method).

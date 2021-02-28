@@ -129,7 +129,8 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 			{
 				// If there is not such online render, a zero id will be send.
 				// It is a signal for client to register again (may be server was restarted).
-				o_msg_response = new af::Msg( af::Msg::TRenderId, 0);
+				af::RenderEvents re(af::RenderEvents::RE_Status_Reconnect, "No such render.");
+				o_msg_response = new af::Msg(af::Msg::TRenderEvents, &re);
 			}
 			else if ( render->isOffline())
 			{
@@ -139,7 +140,8 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 				// server have been restarted (maybe because it crashed).
 				// We ask the render to send a list of the tasks it is in charge
 				// of to reconnect it. It should then send a TRenderReconnect.
-				o_msg_response = new af::Msg( af::Msg::TRenderId, 0);
+				af::RenderEvents re(af::RenderEvents::RE_Status_Reconnect, "Render is offline.");
+				o_msg_response = new af::Msg(af::Msg::TRenderEvents, &re);
 			}
 			else
 			{

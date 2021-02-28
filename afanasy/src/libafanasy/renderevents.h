@@ -16,6 +16,14 @@ public:
 	RenderEvents();
 	RenderEvents( Msg * msg);
 
+	enum RE_Status
+	{
+		RE_Status_Reconnect = -1,
+		RE_Status_Exit      = -2
+	};
+	// On error, server constructs a log message with a special status ID
+	RenderEvents(RE_Status i_status, const std::string & i_log);
+
 	~RenderEvents();
 
 	inline void addTaskExec( TaskExec * i_exec ) { m_tasks.push_back( i_exec);}
@@ -31,6 +39,11 @@ public:
 	void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
 public:
+	int32_t m_id;
+
+	int32_t m_heartbeat_sec;
+	int32_t m_resources_update_period;
+	int32_t m_zombie_time;
 
 	// This is job solving tasks.
 	std::vector<TaskExec*> m_tasks;
@@ -54,6 +67,9 @@ public:
 	// Command to execute.
 	// This not job solving (not a task), for example to sleep
 	std::string m_command;
+
+	// Render client just prints this string in stdout
+	std::string m_log;
 
 public:
 

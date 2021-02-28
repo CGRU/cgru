@@ -154,12 +154,8 @@ public:
 
 	static inline std::string & getCmdShell()          { return cmd_shell;}
  
-	static inline int getRenderHeartbeatSec()       { return render_heartbeat_sec;        }
-	static inline int getRenderUpResourcesPeriod()  { return render_up_resources_period;  }
 	static inline int getRenderNice()               { return render_nice;                 }
-	static inline int getRenderZombieTime()         { return render_zombietime;           }
 	static inline int getRenderExitNoTaskTime()     { return render_exit_no_task_time;    }
-	static inline int getRenderConnectionLostTime() { return render_connection_lost_time; }
 
 	static inline bool hasRULES() { return rules_url.size(); }
 	static inline std::vector<std::string> & getRenderWindowsMustDie() { return render_windowsmustdie; }
@@ -318,12 +314,8 @@ private:
 	static int task_progress_change_timeout; ///< If task progress did not change within this time, consider that it is erroneous
 	static int task_reconnect_timeout;
 
-	static int render_heartbeat_sec;
-	static int render_up_resources_period;
 	static int render_nice;       ///< Render task process nice factor.
-	static int render_zombietime;
 	static int render_exit_no_task_time;
-	static int render_connection_lost_time;
 	static std::vector<std::string> render_windowsmustdie;
 
 	static std::string cmd_shell;
