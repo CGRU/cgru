@@ -83,7 +83,7 @@ Needed libraries:
 
  - Python: >= 2.6
  - Qt: Needed for Qt-GUI only
- - PostgreSQL: Optional, Needed by server for statistics only
+ - PostgreSQL: Optional, needed by server for statistics only
 
 
 Linux

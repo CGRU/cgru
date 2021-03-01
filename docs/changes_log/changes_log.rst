@@ -11,6 +11,23 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
 - The third number versions are fully compatible.
   You can upgrade only one client or server for changes.
 
+v3.2.0
+======
+
+2021.03.01
+
+**New Afanasy network protocol version.**
+
+- Such config parameters as *af_render_heartbeat_sec*, *af_render_up_resources_period* and *af_render_zombietime*
+  moved to pool parameters. On change they will be dispatched to all pool renders.
+  This way you can tune farm "onnder_connecti-the-fly". Parameter *af_reon_lost_time* removed.
+  Now render just uses the same *zombie_time* parameter as server for connection lost.
+
+- :ref:`afanasy-render-parsers` **do** function takes arguments via dictionary.
+  I hope that is was the last time we needed to change all parsers classes on a function interface change.
+- Parser takes resources string and can return resources string. Takes host resurces as JSON, that afrender gets for server and GUIs.
+  Can return any custom resources, for example peak memory usage or (and) triangles count.
+
 v3.1.1
 ======
 

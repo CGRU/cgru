@@ -311,6 +311,8 @@ The class stands for:
 You can write custom service class based on ``service.py`` to override any functions for customization.
 
 
+.. _afanasy-render-parsers:
+
 Parsers
 =======
 
@@ -333,6 +335,7 @@ Parser class stands for:
 - Mark success finish as error on bad output.
 - Append some string to task log for some useful info.
 - Make some job report what will be shown in GUI job item as something important.
+- Parse some resources, for example triangles count or pear memory usage.
 
 To write a custom parser you should inherit base parser class and override main function:
 
@@ -341,18 +344,27 @@ do
 
 .. code-block:: python
 
-    def do(self, data, mode):
+    def do(self, i_args):
 
-Input arguments:
+Input arguments are passed via dictionary:
 
-data(str)
----------
-Current portion of a task process output.
+- **i_args['mode']** (str)
 
-mode(str)
----------
-- ``RUN``: Task is running.
-- ``EXIT_CODE:STOP_TIME``: Task is not running, process exit status and stop time if task was asked to stop (zero if was not).
+  - ``RUN``: Task is running.
+  - ``EXIT_CODE:STOP_TIME``: Task is not running, process exit status and stop time if task was asked to stop (zero if was not).
+
+- **i_args['pid']** (int)
+
+  Task process identifier.
+
+- **i_args['data']** (str)
+
+  Current portion of a task process output.
+
+- **i_args['resources']** (str)
+
+  Host resources JSON.
+  Designed to query/modify for **self.resources** construction.
 
 This method can return nothing or a string.
 In string case this string will be stored instead of incoming data.
@@ -397,6 +409,10 @@ self.activity(str)
 ------------------
 Some string to inform user about task running stage.
 For example: Nuke current rendering view when stereo, Movie Maker convert or encode stage.
+
+self.resources(str)
+-------------------
+Any custom resources string. For example: ``triangles:155000000``.
 
 self.log(str)
 -------------
