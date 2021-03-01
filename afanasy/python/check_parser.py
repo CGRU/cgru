@@ -74,7 +74,7 @@ while True:
 
     printMuted(cgruutils.toStr(data))
 
-    parser.parse(data, 'mode', 0)
+    parser.parse({'data':data})
 
     info = 'Parse:'
     info += ' %d%%: %d frame %d%%;' % (parser.percent, parser.frame, parser.percentframe)

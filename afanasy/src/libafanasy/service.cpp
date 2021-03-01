@@ -327,47 +327,55 @@ bool Service::hasParser() const
 	return result;
 }
 
-void Service::parse( const std::string & i_mode, std::string & i_data, int pid,
-							int & percent, int & frame, int & percentframe,
-							std::string & activity, std::string & resources, std::string & report,
-							bool & warning, bool & error, bool & badresult, bool & finishedsuccess) const
+void Service::parse(const std::string & i_mode, int i_pid,
+		std::string & io_data, std::string & io_resources,
+		int & o_percent, int & o_frame, int & o_percentframe,
+		std::string & o_activity, std::string & o_report,
+		bool & o_warning, bool & o_error, bool & o_badresult, bool & o_finishedsuccess) const
 {
-	PyObject * pArgs = PyTuple_New( 3);
-	PyTuple_SetItem( pArgs, 0, PyBytes_FromStringAndSize( i_data.data(), i_data.size()));
-	PyTuple_SetItem( pArgs, 1, PyBytes_FromStringAndSize( i_mode.data(), i_mode.size()));
-	PyTuple_SetItem( pArgs, 2, PyLong_FromLong( pid ));
+	PyObject * pArgs = PyTuple_New(1);
+	PyObject * dict = PyDict_New();
+	PyTuple_SetItem(pArgs, 0, dict);
 
-	PyObject * pClass = PyObject_CallObject( m_PyObj_FuncParse, pArgs);
-	if( pClass != NULL)
+	PyDict_SetItemString(dict, "mode",      PyBytes_FromStringAndSize(i_mode.data(), i_mode.size()));
+	PyDict_SetItemString(dict, "pid",       PyLong_FromLong(i_pid));
+	PyDict_SetItemString(dict, "data",      PyBytes_FromStringAndSize(io_data.data(), io_data.size()));
+	PyDict_SetItemString(dict, "resources", PyBytes_FromStringAndSize(io_resources.data(), io_resources.size()));
+
+	io_resources.clear();
+
+	PyObject * pClass = PyObject_CallObject(m_PyObj_FuncParse, pArgs);
+	if (pClass != NULL)
 	{
-		if( pClass != Py_None )
+		if (pClass != Py_None )
 		{
 			std::string err = std::string("Service::parse[" + m_parser_type + "]: ");
 
-			af::PyGetAttrInt( pClass,"percent",      percent,      err);
-			af::PyGetAttrInt( pClass,"frame",        frame,        err);
-			af::PyGetAttrInt( pClass,"percentframe", percentframe, err);
+			af::PyGetAttrInt(pClass,"percent",      o_percent,      err);
+			af::PyGetAttrInt(pClass,"frame",        o_frame,        err);
+			af::PyGetAttrInt(pClass,"percentframe", o_percentframe, err);
 
-			af::PyGetAttrBool( pClass,"warning",         warning,         err);
-			af::PyGetAttrBool( pClass,"error",           error,           err);
-			af::PyGetAttrBool( pClass,"badresult",       badresult,       err);
-			af::PyGetAttrBool( pClass,"finishedsuccess", finishedsuccess, err);
+			af::PyGetAttrBool(pClass,"warning",         o_warning,         err);
+			af::PyGetAttrBool(pClass,"error",           o_error,           err);
+			af::PyGetAttrBool(pClass,"badresult",       o_badresult,       err);
+			af::PyGetAttrBool(pClass,"finishedsuccess", o_finishedsuccess, err);
 
-			af::PyGetAttrStr( pClass,"activity", activity, err);
-			af::PyGetAttrStr( pClass,"resources",resources,err);
-			af::PyGetAttrStr( pClass,"report",   report,   err);
+			af::PyGetAttrStr(pClass,"activity",  o_activity,  err);
+			af::PyGetAttrStr(pClass,"resources",io_resources, err);
+			af::PyGetAttrStr(pClass,"report",    o_report,    err);
 
-			PyObject * pAttr = PyObject_GetAttrString( pClass, "result");
-			if( pAttr && ( pAttr != Py_None ))
-				af::PyGetString( pAttr, i_data, "Service::parse: result");
+			PyObject * pAttr = PyObject_GetAttrString(pClass, "result");
+			if (pAttr && (pAttr != Py_None))
+				af::PyGetString(pAttr, io_data, "Service::parse: result");
 		}
 	}
 	else
 	{
-		if( PyErr_Occurred()) PyErr_Print();
+		if (PyErr_Occurred())
+			PyErr_Print();
 	}
 
-	Py_DECREF( pArgs);
+	Py_DECREF(pArgs);
 }
 
 const std::string Service::toHTML( const std::string & i_data) const

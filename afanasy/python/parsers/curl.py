@@ -14,13 +14,8 @@ class curl(parser.parser):
     def __init__(self):
         parser.parser.__init__(self)
 
-    def do(self, data, mode):
-        """Missing DocString
-
-        :param data:
-        :param mode:
-        :return:
-        """
+    def do(self, i_args):
+        data = i_args['data']
 
         data = re_progress.findall(data)
         if len(data) == 0:

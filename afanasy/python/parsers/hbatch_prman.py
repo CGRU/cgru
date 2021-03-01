@@ -12,14 +12,7 @@ class hbatch_prman(hbatch.hbatch, prman.prman):
         hbatch.hbatch.__init__(self)
         prman.prman.__init__(self)
 
-    def do(self, data, mode):
-        """Missing DocString
-
-        :param data:
-        :param mode:
-        :return:
-        """
-        # print data
-        if prman.prman.do(self, data, mode):
+    def do(self, i_args):
+        if prman.prman.do(self, i_args):
             self.calculate()
-        hbatch.hbatch.do(self, data, mode)
+        hbatch.hbatch.do(self, i_args)

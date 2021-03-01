@@ -12,7 +12,9 @@ class blender_render(blender.blender):
     def __init__(self):
         blender.blender.__init__(self)
 
-    def do(self, data, mode):
+    def do(self, i_args):
+        data = i_args['data']
+
         lines = data.split('\n')
         need_calc = False
         for line in lines:
@@ -35,4 +37,4 @@ class blender_render(blender.blender):
         if need_calc:
             self.calculate()
 
-        blender.blender.do(self, data, mode)
+        blender.blender.do(self, i_args)

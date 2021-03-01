@@ -17,13 +17,11 @@ class arnold(parser.parser):
         self.firstframe = True
         self.data_all = ''
 
-    def do(self, data, mode):
+    def do(self, i_args):
         """Missing DocString
-
-        :param data:
-        :param mode:
-        :return:
         """
+        data = i_args['data']
+
         if len(data) < 1:
             return
 

@@ -17,14 +17,9 @@ class mayatovray(parser.parser):
         self.firstframe = True
         self.layer = 1
 
-    def do(self, data, mode):
-        """Missing DocString
+    def do(self, i_args):
+        data = i_args['data']
 
-        :param data:
-        :param mode:
-        :return:
-        """
-        # print(data)
         needcalc = False
         if data.find(FRAME) > -1:
             if self.firstframe:

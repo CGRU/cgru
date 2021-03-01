@@ -402,7 +402,7 @@ void TaskProcess::readProcess( const std::string & i_mode)
 	if( readsize > 0 )
 		output += std::string( m_readbuffer, readsize);
 
-	m_parser->read( i_mode, output, m_pid);
+	m_parser->read(i_mode, m_pid, output, m_render->getResourcesString());
 
 	if( output.size() && m_taskexec->isListening())
 	{

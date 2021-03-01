@@ -18,13 +18,9 @@ class natron(parser.parser):
         self.str_error = ['Worker process failed']
         self.filename = ''
 
-    def do(self, data, mode):
-        """Missing DocString
+    def do(self, i_args):
+        data = i_args['data']
 
-        :param data:
-        :param mode:
-        :return:
-        """
         data_len = len(data)
         if data_len < 1:
             return

@@ -12,15 +12,9 @@ class blender_yafray(blender.blender, yafray.yafray):
         blender.blender.__init__(self)
         yafray.yafray.__init__(self)
 
-    def do(self, data, mode):
-        """Missing DocString
+    def do(self, i_args):
 
-        :param data:
-        :param mode:
-        :return:
-        """
-        # print data
-        if yafray.yafray.do(self, data):
+        if yafray.yafray.do(self, i_args):
             self.calculate()
 
-        blender.blender.do(self, data, mode)
+        blender.blender.do(self, i_args)

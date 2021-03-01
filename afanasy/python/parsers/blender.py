@@ -19,13 +19,11 @@ class blender(parser.parser):
         self.firstframe = True
         self.framestring = keyframe
 
-    def do(self, data, mode):
+    def do(self, i_args):
         """Missing DocString
-
-        :param data:
-        :param mode:
-        :return:
         """
+        data = i_args['data']
+
         lines = data.split('\n')
         need_calc = False
 

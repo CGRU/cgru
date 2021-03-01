@@ -23,13 +23,8 @@ class hbatch(parser.parser):
             'OpenCL Exception',
             'Failed to create']
 
-    def do(self, data, mode):
-        """Missing DocString
-
-        :param data:
-        :param mode:
-        :return:
-        """
+    def do(self, i_args):
+        data = i_args['data']
 
         count = data.count(keyframe)
         if count > 0:

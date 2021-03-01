@@ -14,13 +14,9 @@ class mayafumefx(maya.maya):
         self.firstframe = True
         self.str_error += ['Error: FumeFX is not authorized']
 
-    def do(self, data, mode):
-        """Missing DocString
+    def do(self, i_args):
+        data = i_args['data']
 
-        :param data:
-        :param mode:
-        :return:
-        """
         needcalc = False
         index = 0
         while index < len(data):

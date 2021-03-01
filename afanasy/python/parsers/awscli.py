@@ -14,14 +14,10 @@ class awscli(parser.parser):
 
     # print('awscli parser instanced')
 
-    def do(self, data, mode):
+    def do(self, i_args):
         """Missing DocString
-
-        :param data:
-        :param mode:
-        :return:
         """
-        # print(data)
+        data = i_args['data']
 
         data = re.findall(r'\d+ of \d+ part', data)
         if len(data) == 0:

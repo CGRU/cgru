@@ -13,13 +13,8 @@ class prman(parser.parser):
     def __init__(self):
         parser.parser.__init__(self)
 
-    def do(self, data, mode):
-        """Missing DocString
-
-        :param data:
-        :param mode:
-        :return:
-        """
+    def do(self, i_args):
+        data = i_args['data']
 
         lines = data.split('\n')
         for line in lines:
@@ -43,5 +38,3 @@ class prman(parser.parser):
                     self.percentframe = percent
                     self.percent = percent
                     # print 'PERCENT='+str(self.percent)
-                    return True
-        return False

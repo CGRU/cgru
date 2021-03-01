@@ -64,14 +64,14 @@ ParserHost::~ParserHost()
 	if( m_data != NULL) delete [] m_data;
 }
 
-void ParserHost::read( const std::string & i_mode, std::string & output, int pid)
+void ParserHost::read(const std::string & i_mode, int i_pid, std::string & io_output, const std::string & i_resources)
 {
-	parse( i_mode, output, pid);
+	parse(i_mode, i_pid, io_output, i_resources);
 
 	// writing output in buffer:
 	//
-	const char * copy_data = output.data();
-	int          copy_size = output.size();
+	const char * copy_data = io_output.data();
+	int          copy_size = io_output.size();
 //printf("\nParserHost::read: size = %d ( datasize = %d )\n", copy_size, m_datasize);
 #ifdef AFOUTPUT
 printf("\"");for(int c=0;c<out_size;c++)if(copy_size[c]>=32)printf("%c", copy_size[c]);printf("\":\n");
@@ -162,16 +162,20 @@ fflush( stdout);
 //printf("end: datasize = %d\n", datasize);
 }
 
-void ParserHost::parse( const std::string & i_mode, std::string & output, int pid)
+void ParserHost::parse(const std::string & i_mode, int i_pid, std::string & io_output, const std::string & i_resources)
 {
 	bool _warning         = false;
 	bool _error           = false;
 	bool _badresult       = false;
 	bool _finishedsuccess = false;
 
-	m_service->parse( i_mode, output, pid, m_percent, m_frame, m_percentframe,
-		m_activity, m_resources, m_report,
-		_warning, _error, _badresult, _finishedsuccess);
+	m_resources = i_resources;
+
+	m_service->parse(i_mode, i_pid,
+			io_output, m_resources,
+			m_percent, m_frame, m_percentframe,
+			m_activity, m_report,
+			_warning, _error, _badresult, _finishedsuccess);
 
 	if ( _error           ) m_error           = true;
 	if ( _warning         ) m_warning         = true;

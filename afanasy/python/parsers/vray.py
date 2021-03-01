@@ -21,16 +21,8 @@ class vray(parser.parser):
         self.buffer = ""
         self.numinseq = 0
 
-    def do(self, data, mode):
-        """Missing DocString
-
-        :param data:
-        :param mode:
-        :return:
-        """
-        # self.buffer += data
-        # needcalc = False
-        # frame = False
+    def do(self, i_args):
+        data = i_args['data']
 
         if len(data) < 1:
             return

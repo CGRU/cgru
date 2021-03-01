@@ -22,13 +22,9 @@ class maya_mental(maya.maya):
         self.buffer = ""
         self.numinseq = 0
 
-    def do(self, data, mode):
-        """Missing DocString
+    def do(self, i_args):
+        data = i_args['data']
 
-        :param data:
-        :param mode:
-        :return:
-        """
         self.buffer += data
         needcalc = False
         # frame = False

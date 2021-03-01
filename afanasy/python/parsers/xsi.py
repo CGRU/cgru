@@ -17,13 +17,9 @@ class xsi(parser.parser):
         parser.parser.__init__(self)
         self.firstframe = True
 
-    def do(self, data, mode):
-        """Missing DocString
+    def do(self, i_args):
+        data = i_args['data']
 
-        :param data:
-        :param mode:
-        :return:
-        """
         needcalc = False
         frame = False
 

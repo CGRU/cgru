@@ -43,7 +43,9 @@ class blender_cycles(blender.blender):
         return False, 0
 
     
-    def do(self, data, mode):
+    def do(self, i_args):
+        data = i_args['data']
+
         lines = data.split('\n')
         need_calc = False
         for line in lines:
@@ -60,4 +62,4 @@ class blender_cycles(blender.blender):
                         
         if need_calc:
             self.calculate()
-        blender.blender.do(self, data, mode)
+        blender.blender.do(self, i_args)

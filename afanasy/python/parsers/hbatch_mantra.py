@@ -12,13 +12,6 @@ class hbatch_mantra(hbatch.hbatch, mantra.mantra):
         hbatch.hbatch.__init__(self)
         mantra.mantra.__init__(self)
 
-    def do(self, data, mode):
-        """Missing DocString
-
-        :param data:
-        :param mode:
-        :return:
-        """
-
-        mantra.mantra.do(self, data, mode)
-        hbatch.hbatch.do(self, data, mode)
+    def do(self, i_args):
+        mantra.mantra.do(self, i_args)
+        hbatch.hbatch.do(self, i_args)

@@ -19,13 +19,9 @@ class clarisse(parser.parser):
     def __init__(self):
         parser.parser.__init__(self)
 
-    def do(self, data, mode):
-        """Missing DocString
+    def do(self, i_args):
+        data = i_args['data']
 
-        :param data:
-        :param mode:
-        :return:
-        """
         need_calc = False
 
         # Search for frame percent:

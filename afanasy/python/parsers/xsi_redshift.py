@@ -19,13 +19,8 @@ class xsi_redshift(parser.parser):
         self.firstframe = True
         self.data_all = ''
 
-    def do(self, data, mode):
-        """Missing DocString
-
-        :param data:
-        :param mode:
-        :return:
-        """
+    def do(self, i_args):
+        data = i_args['data']
 
         if len(data) < 1:
             return

@@ -14,14 +14,8 @@ class redline(parser.parser):
 
     # print('redline parser instanced')
 
-    def do(self, data, mode):
-        """Missing DocString
-
-        :param data:
-        :param mode:
-        :return:
-        """
-        # print(data)
+    def do(self, i_args):
+        data = i_args['data']
 
         data = re.findall(r'\b 0\.\d\d', data)
         if len(data) == 0:

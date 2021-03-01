@@ -169,7 +169,7 @@ void RenderHost::refreshTasks()
         m_taskprocesses[t]->refresh();
     }
 
-	// Time render has task(s):
+	// Check exit with no task time:
 	if( m_taskprocesses.size())
 	{
 		m_has_tasks_time = time(NULL);
@@ -211,6 +211,10 @@ void RenderHost::getResources()
 
 	//hres.stdOut();
 	m_up.setResources( &m_hres);
+
+	std::ostringstream str;
+	m_hres.jsonWrite(str);
+	m_resources_string = str.str();
 }
 
 af::Msg * RenderHost::updateServer()

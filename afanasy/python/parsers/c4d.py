@@ -21,13 +21,9 @@ class c4d(parser.parser):
         self.firstFrame = True
         self.firstFrameNumber = 0
 
-    def do(self, data, mode):
-        """Missing DocString
+    def do(self, i_args):
+        data = i_args['data']
 
-        :param data:
-        :param mode:
-        :return:
-        """
         need_calc = False
 
         # Search for frame percent:

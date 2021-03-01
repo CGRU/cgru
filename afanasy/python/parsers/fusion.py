@@ -47,13 +47,9 @@ class fusion(parser.parser):
         except (OSError, IOError):
             pass
 
-    def do(self, data, mode):
-        """Missing DocString
+    def do(self, i_args):
+        data = i_args['data']
 
-        :param data:
-        :param mode:
-        :return:
-        """
         # the data is always empty
         # use the %TEMP%/fusion_render.log
         # file

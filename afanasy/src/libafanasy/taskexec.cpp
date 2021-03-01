@@ -236,7 +236,7 @@ void TaskExec::listenOutput( bool i_subscribe)
 
 void TaskExec::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
-	stream << "[" << m_service << ":" << getCapResult() << "] " << m_user_name << ": ";
+	stream << "[" << m_service << "(" << m_parser << "):" << getCapResult() << "] " << m_user_name << ": ";
 	stream << m_job_name;
 	stream << "[" << m_block_name << "]";
 	stream << "[" << m_name << "]";

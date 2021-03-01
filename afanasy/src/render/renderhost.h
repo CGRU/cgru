@@ -57,6 +57,8 @@ public:
 	*/
 	void getResources();
 
+	inline const std::string & getResourcesString() const {return m_resources_string;}
+
 	#ifdef WINNT
 	/**
 	* @brief Close windows on windows.
@@ -151,6 +153,9 @@ private:
 
 	/// Class to collect data to send to server on update.
 	af::RenderUpdate m_up;
+
+	/// Render resources string
+	std::string m_resources_string;
 
 	/// Time when render has at least on task:
 	time_t m_has_tasks_time;

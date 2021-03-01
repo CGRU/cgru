@@ -49,12 +49,11 @@ public:
 
 	bool hasParser() const;
 
-	void parse( const std::string & i_mode,
-				std::string & data,
-				int pid,
-				int & percent, int & frame, int & percentframe,
-				std::string & activity, std::string & resources, std::string & report,
-				bool & warning, bool & error, bool & badresult, bool & finishedsuccess) const;
+	void parse (const std::string & i_mode, int i_pid,
+				std::string & io_data, std::string & io_resources,
+				int & o_percent, int & o_frame, int & o_percentframe,
+				std::string & o_activity, std::string & o_report,
+				bool & o_warning, bool & o_error, bool & o_badresult, bool & o_finishedsuccess) const;
 
 	const std::string toHTML( const std::string & i_data) const;
 

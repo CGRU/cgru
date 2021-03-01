@@ -32,13 +32,8 @@ class ffmpeg(parser.parser):
         time = int(hours) * 3600 + int(minutes) * 60 + int(seconds) + int(cents) * 0.01
         return time
 
-    def do(self, data, mode):
-        """Missing DocString
-
-        :param data:
-        :param mode:
-        :return:
-        """
+    def do(self, i_args):
+        data = i_args['data']
 
         res = re_frames.findall(data)
         if len(res):

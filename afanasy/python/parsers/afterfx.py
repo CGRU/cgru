@@ -21,7 +21,12 @@ class afterfx(parser.parser):
         self.firstframe = True
         self.data_all = ''
 
-    def do(self, data, mode):
+    def do(self, i_args):
+        """Missing DocString
+        """
+        data = i_args['data']
+        mode = i_args['mode']
+
         self.data_all += data
 
         # Check whether was any progress:

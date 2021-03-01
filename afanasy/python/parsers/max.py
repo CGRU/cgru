@@ -18,13 +18,8 @@ class max(parser.parser):
         self.str_error = ['Error occured while rendering job.']
         self.firstframe = True
 
-    def do(self, data, mode):
-        """Missing DocString
-
-        :param data:
-        :param mode:
-        :return:
-        """
+    def do(self, i_args):
+        data = i_args['data']
 
         needcalc = False
         frame = False

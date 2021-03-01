@@ -22,13 +22,9 @@ class maya_arnold(maya.maya):
             '[mtoa] Failed batch render'
         ]
 
-    def do(self, data, mode):
-        """Missing DocString
+    def do(self, i_args):
+        data = i_args['data']
 
-        :param data:
-        :param mode:
-        :return:
-        """
         if len(data) < 1:
             return
 

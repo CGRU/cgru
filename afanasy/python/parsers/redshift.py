@@ -44,13 +44,8 @@ class redshift(parser.parser):
 
         self.triangles = None
 
-    def do(self, data, mode):
-        """Missing DocString
-
-        :param data:
-        :param mode:
-        :return:
-        """
+    def do(self, i_args):
+        data = i_args['data']
 
         if len(data) < 1:
             return

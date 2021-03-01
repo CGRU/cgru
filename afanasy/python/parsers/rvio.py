@@ -14,16 +14,8 @@ class rvio(parser.parser):
     def __init__(self):
         parser.parser.__init__(self)
 
-    def do(self, data, mode):
-        """Missing DocString
-
-        :param data:
-        :param mode:
-        :return:
-        """
-        # self.buffer += data
-        # needcalc = False
-        # frame = False
+    def do(self, i_args):
+        data = i_args['data']
 
         if len(data) < 1:
             return

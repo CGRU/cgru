@@ -36,13 +36,8 @@ class mantra(parser.parser):
             'Failed to create file',
             ParserErrorStr]
 
-    def do(self, data, mode):
-        """Missing DocString
-
-        :param data:
-        :param mode:
-        :return:
-        """
+    def do(self, i_args):
+        data = i_args['data']
 
         for errorRE in ErrorsRE:
             if errorRE.search(data) is not None:

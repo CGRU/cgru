@@ -14,14 +14,8 @@ class rsync(parser.parser):
 
     # print('rsync parser instanced')
 
-    def do(self, data, mode):
-        """Missing DocString
-
-        :param data:
-        :param mode:
-        :return:
-        """
-        # print(data)
+    def do(self, i_args):
+        data = i_args['data']
 
         data = re.findall(r'\d*%', data)
         if len(data) == 0:

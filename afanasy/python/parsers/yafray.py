@@ -16,29 +16,21 @@ class yafray(parser.parser):
         self.passing = False
         self.passcount = 0
 
-    def do(self, data, mode):
-        """Missing DocString
-
-        :param data:
-        :param mode:
-        :return:
-        """
-        # print data
+    def do(self, i_args):
+        data = i_args['data']
 
         if self.passing:
             # print 'Passing ' + data[:1]
             if data[:1] != pass_char:
-                return False
+                return
             self.passcount += 1
             if self.passcount >= pass_quantity:
                 self.passing = False
             percent = 100 * self.passcount / pass_quantity
             self.percentframe = percent
             self.percent = percent
-            return True
+            return
 
         if data.find(keyframe) > -1:
             self.passing = True
             self.passcount = 0
-
-        return False

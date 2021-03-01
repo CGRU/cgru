@@ -93,17 +93,12 @@ class parser(object):
         """
         return self.log
 
-    def do(self, data, mode):
+    def do(self, i_args):
         """Missing DocString
-
-        :param data:
-        :param mode:
-        :return:
         """
-        print('Error: parser.do: Invalid call, this method must be '
-              'implemented.')
+        pass
 
-    def doBaseCheck(self, data, mode):
+    def doBaseCheck(self, data):
         self.activity = ''
         self.report = ''
         self.warning = False
@@ -151,24 +146,23 @@ class parser(object):
                 line = line[8:]
                 self.appendFile(line.strip(), True)
 
-    def parse(self, data, mode, pid=0):
+    def parse(self, i_args):
         """Missing DocString
-
-        :param data:
-        :param mode:
-        :param pid:
         :return:
         """
 
-        data = cgruutils.toStr(data)
-        mode = cgruutils.toStr(mode)
-        self.pid = pid
+        i_args['data'] = cgruutils.toStr(i_args['data'])
+        if 'mode' in i_args:
+            i_args['mode'] = cgruutils.toStr(i_args['mode'])
+        if 'resources' in i_args:
+            i_args['resources'] = cgruutils.toStr(i_args['resources'])
+        if 'pid' in i_args:
+            self.pid = i_args['pid']
 
-        if len(data):
-            self.doBaseCheck(data, mode)
-
+        if len(i_args['data']):
+            self.doBaseCheck(i_args['data'])
         try:
-            self.result = self.do(data, mode)
+            self.result = self.do(i_args)
         except:  # TODO: too broad exception clause
             print('Error parsing output:')
             # print(str(sys.exc_info()[1]))
@@ -216,7 +210,8 @@ class parser(object):
         :param i_line: input line
         :return: converted line
         """
-        self.parse(i_line, 'html')
+
+        self.parse({'data':i_line})
 
         if self.error:
             i_line = '<span style="background-color:#FF0000"><b>' + i_line + '</b></span>'

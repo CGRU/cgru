@@ -23,13 +23,6 @@ class hbatch_redshift(hbatch.hbatch, redshift.redshift):
         self.str_warning += temp_str_warning
         self.str_badresult += temp_str_badresult
 
-    def do(self, data, mode):
-        """Missing DocString
-
-        :param data:
-        :param mode:
-        :return:
-        """
-        # print data
-        redshift.redshift.do(self, data, mode)
-        # hbatch.hbatch.do(self, data, mode)
+    def do(self, i_args):
+        redshift.redshift.do(self, i_args)
+        # hbatch.hbatch.do(self, i_args)
