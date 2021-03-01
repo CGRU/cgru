@@ -207,12 +207,9 @@ function Task(i_statusClass, i_task)
 		this.obj.progress = 0;
 
 
-	this.elParent = $('status_tasks');
-
-
 	this.elRoot = document.createElement('div');
 	this.elRoot.classList.add('task');
-	this.elParent.appendChild(this.elRoot);
+	$('status_tasks').appendChild(this.elRoot);
 
 
 	this.elShow = document.createElement('div');
