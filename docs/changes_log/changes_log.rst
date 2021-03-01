@@ -25,8 +25,10 @@ v3.2.0
 
 - :ref:`afanasy-render-parsers` **do** function takes arguments via dictionary.
   I hope that is was the last time we needed to change all parsers classes on a function interface change.
-- Parser takes resources string and can return resources string. Takes host resurces as JSON, that afrender gets for server and GUIs.
+- Parser takes resources string and can return resources string.
+  Takes host resurces as JSON, that afrender gets for server and GUIs.
   Can return any custom resources, for example peak memory usage or (and) triangles count.
+  Server stores this string in statistics databaes and dispatches to GUIs.
 
 v3.1.1
 ======
