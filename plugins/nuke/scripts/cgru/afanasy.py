@@ -949,7 +949,7 @@ def render(node=None):
             else:
                 framefirst = nuke.root().firstFrame()
                 framelast = nuke.root().lastFrame()
-                framespertask = 1
+                framespertask = 1 + int((framelast - framefirst) / 10.0)
                 framesequential = 1
 
             if framefirst_min is None:
