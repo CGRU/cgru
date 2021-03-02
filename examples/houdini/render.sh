@@ -7,4 +7,4 @@ popd
 [ -d render ] || mkdir -v -m 777 render
 
 # Launch render script:
-python ./render.py
+python3 ./render.py
