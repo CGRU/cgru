@@ -10,6 +10,7 @@ root
 users
 playlist.json
 walk.json
+rules_panel.png
 
 # Access
 .htaccess

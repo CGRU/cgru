@@ -1,5 +1,6 @@
-# Specific local files:
-*_local*
+# Specific config files:
+rules.*_local.json
+rules.*_company.json
 
 # FTP login and password:
 export_credentials.sh
