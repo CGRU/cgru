@@ -824,7 +824,10 @@ margin: 1px 4px;
 padding: 1px 4px;
 border: 1px solid rgba(98,98,98,.5);
 }
-#status_tasks .task .show_div .name:hover {border: 1px solid rgba( 100, 255, 255);}
+#status_tasks .task .show_div:hover .name {
+border: 1px solid rgba( 100, 255, 255);
+box-shadow: 0 0 4px rgba(100,255,255,1), 0 0 4px rgba(100,255,255,1) inset;
+}
 
 .edit_tags_list { clear: both; padding: 4px; margin: 4px; border-top: 1px solid rgba(98,98,98,.5); }
 .edit_tags_list > .button { margin:0 4px; padding:0 4px; width: 50px; float: left; }

@@ -209,6 +209,8 @@ function Task(i_statusClass, i_task)
 
 	this.elRoot = document.createElement('div');
 	this.elRoot.classList.add('task');
+	this.elRoot.m_task = this;
+	this.elRoot.onclick = function(e){e.currentTarget.m_task.select()};
 	$('status_tasks').appendChild(this.elRoot);
 
 
@@ -219,8 +221,8 @@ function Task(i_statusClass, i_task)
 
 	this.elName = document.createElement('div');
 	this.elName.classList.add('name','notselectable');
-	this.elName.m_task = this;
-	this.elName.onclick = function(e){e.currentTarget.m_task.select()};
+	//this.elName.m_task = this;
+	//this.elName.onclick = function(e){e.currentTarget.m_task.select()};
 	this.elShow.appendChild(this.elName);
 
 
@@ -240,7 +242,7 @@ if ( ! _OLD_TASTKS_ )
 		this.elBtnEdit = document.createElement('button');
 		this.elBtnEdit.classList.add('button','edit','right');
 		this.elBtnEdit.m_task = this;
-		this.elBtnEdit.onclick = function(e){e.currentTarget.m_task.edit();}
+		this.elBtnEdit.onclick = function(e){e.stopPropagation();e.currentTarget.m_task.edit();}
 		this.elShow.appendChild(this.elBtnEdit);
 	}
 
@@ -357,7 +359,7 @@ Task.prototype.edit = function()
 	this.elBtnCancel.classList.add('button','right');
 	this.elBtnCancel.textContent = 'Cancel';
 	this.elBtnCancel.m_task = this;
-	this.elBtnCancel.onclick = function(e){e.currentTarget.m_task.editCancel();}
+	this.elBtnCancel.onclick = function(e){e.stopPropagation();e.currentTarget.m_task.editCancel();}
 	this.elEdit.appendChild(this.elBtnCancel);
 
 
@@ -365,7 +367,7 @@ Task.prototype.edit = function()
 	this.elBtnSave.classList.add('button','right');
 	this.elBtnSave.textContent = 'Save';
 	this.elBtnSave.m_task = this;
-	this.elBtnSave.onclick = function(e){e.currentTarget.m_task.editProcess();}
+	this.elBtnSave.onclick = function(e){e.stopPropagation();e.currentTarget.m_task.editProcess();}
 	this.elEdit.appendChild(this.elBtnSave);
 
 
@@ -433,7 +435,8 @@ Task.prototype.edit = function()
 		this.elBtnDelete.textContent = 'Delete';
 		this.elBtnDelete.title = 'Double click to delete task.';
 		this.elBtnDelete.m_task = this;
-		this.elBtnDelete.ondblclick = function(e){e.currentTarget.m_task.editDelete();}
+		this.elBtnDelete.onlclick = function(e){e.stopPropagation();}
+		this.elBtnDelete.ondblclick = function(e){e.stopPropagation();e.currentTarget.m_task.editDelete();}
 		this.elEdit.appendChild(this.elBtnDelete);
 	}
 }
