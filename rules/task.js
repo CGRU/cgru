@@ -207,11 +207,14 @@ function Task(i_statusClass, i_task)
 		this.obj.progress = 0;
 
 
+	this.elParent = $('status_tasks');
+
+
 	this.elRoot = document.createElement('div');
 	this.elRoot.classList.add('task');
 	this.elRoot.m_task = this;
 	this.elRoot.onclick = function(e){e.currentTarget.m_task.select()};
-	$('status_tasks').appendChild(this.elRoot);
+	this.elParent.appendChild(this.elRoot);
 
 
 	this.elShow = document.createElement('div');
