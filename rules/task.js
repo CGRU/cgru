@@ -214,13 +214,13 @@ function Task(i_statusClass, i_task)
 
 	this.elRoot = document.createElement('div');
 	this.elRoot.classList.add('task');
-	this.elRoot.m_task = this;
-	this.elRoot.onclick = function(e){e.currentTarget.m_task.select()};
 	this.elParent.appendChild(this.elRoot);
 
 
 	this.elShow = document.createElement('div');
 	this.elShow.classList.add('show_div');
+	this.elShow.m_task = this;
+	this.elShow.onclick = function(e){e.currentTarget.m_task.select()};
 	this.elRoot.appendChild(this.elShow);
 
 
