@@ -1324,10 +1324,14 @@ Status.prototype.editSave = function(i_args) {
 	var some_progress_changed = false;
 	var progresses = {};
 
-	for (var i = 0; i < statuses.length; i++)
+	for (let i = 0; i < statuses.length; i++)
 	{
 		if (statuses[i].obj == null)
 			statuses[i].obj = {};
+
+		// Store original progress to compare later
+		// and find out that is was changed.
+		let _progress = statuses[i].obj.progress;
 
 		if (annotation !== null)
 			statuses[i].obj.annotation = annotation;
@@ -1336,12 +1340,7 @@ Status.prototype.editSave = function(i_args) {
 		if (finish !== null)
 			statuses[i].obj.finish = finish;
 		if (progress !== null)
-		{
-			progresses[statuses[i].path] = progress;
-			if (progress != statuses[i].obj.progress)
-				some_progress_changed = true;
 			statuses[i].obj.progress = progress;
-		}
 
 		if (artists)
 		{
@@ -1392,13 +1391,7 @@ Status.prototype.editSave = function(i_args) {
 							progress = p_max;
 
 						if (progress != null)
-						{
 							statuses[i].obj.progress = progress;
-
-							// This is needed to update upper progress:
-							progresses[statuses[i].path] = progress;
-							some_progress_changed = true;
-						}
 
 						// Flag can be exclusive, so we should delete other flags:
 						if (RULES.flags[id].excl)
@@ -1470,6 +1463,18 @@ Status.prototype.editSave = function(i_args) {
 			statuses[i].obj.tasks = tasks;
 			statuses[i].obj.duration = duration;
 			statuses[i].obj.price = price;
+		}
+
+		// If shot progress is 100% all tasks should be 100%
+		if ((statuses[i].obj.progress == 100) && (statuses[i].obj.tasks))
+			for (let t in statuses[i].obj.tasks)
+				statuses[i].obj.tasks[t].progress = 100;
+
+		// If progress was changed we should update upper progress:
+		if (_progress != statuses[i].obj.progress)
+		{
+			progresses[statuses[i].path] = statuses[i].obj.progress;
+			some_progress_changed = true;
 		}
 
 		if (this.elEdit_Color.m_color_changed)
