@@ -205,6 +205,8 @@ function Task(i_statusClass, i_task)
 		this.obj.flags = [];
 	if (null == this.obj.progress)
 		this.obj.progress = 0;
+	if (null == this.obj.deleted)
+		this.obj.deleted = false;
 
 
 	this.elParent = $('status_tasks');
@@ -438,7 +440,7 @@ Task.prototype.edit = function()
 		this.elBtnDelete.textContent = 'Delete';
 		this.elBtnDelete.title = 'Double click to delete task.';
 		this.elBtnDelete.m_task = this;
-		this.elBtnDelete.onlclick = function(e){e.stopPropagation();}
+		this.elBtnDelete.onclick = function(e){e.stopPropagation();}
 		this.elBtnDelete.ondblclick = function(e){e.stopPropagation();e.currentTarget.m_task.editDelete();}
 		this.elEdit.appendChild(this.elBtnDelete);
 	}
