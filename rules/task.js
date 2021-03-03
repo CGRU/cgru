@@ -219,8 +219,6 @@ function Task(i_statusClass, i_task)
 
 	this.elShow = document.createElement('div');
 	this.elShow.classList.add('show_div');
-	//this.elShow.m_task = this;
-	//this.elShow.onclick = function(e){e.currentTarget.m_task.select()};
 	this.elRoot.appendChild(this.elShow);
 
 
@@ -503,6 +501,9 @@ Task.prototype.editProcess = function()
 		if (null == this.statusClass.obj.tasks)
 			this.statusClass.obj.tasks = {};
 		this.statusClass.obj.tasks[this.obj.name] = this.obj;
+
+		// On a new task, total progress should be recalculated
+		progress_changed = true;
 
 		// Set creation user and time:
 		this.obj.cuser = g_auth_user.id;
