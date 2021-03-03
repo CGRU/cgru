@@ -219,15 +219,15 @@ function Task(i_statusClass, i_task)
 
 	this.elShow = document.createElement('div');
 	this.elShow.classList.add('show_div');
-	this.elShow.m_task = this;
-	this.elShow.onclick = function(e){e.currentTarget.m_task.select()};
+	//this.elShow.m_task = this;
+	//this.elShow.onclick = function(e){e.currentTarget.m_task.select()};
 	this.elRoot.appendChild(this.elShow);
 
 
 	this.elName = document.createElement('div');
 	this.elName.classList.add('name','notselectable');
-	//this.elName.m_task = this;
-	//this.elName.onclick = function(e){e.currentTarget.m_task.select()};
+	this.elName.m_task = this;
+	this.elName.onclick = function(e){e.currentTarget.m_task.select()};
 	this.elShow.appendChild(this.elName);
 
 

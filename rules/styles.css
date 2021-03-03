@@ -824,7 +824,7 @@ margin: 1px 4px;
 padding: 1px 4px;
 border: 1px solid rgba(98,98,98,.5);
 }
-#status_tasks .task .show_div:hover .name {
+#status_tasks .task .show_div .name:hover {
 border: 1px solid rgba( 100, 255, 255);
 box-shadow: 0 0 4px rgba(100,255,255,1), 0 0 4px rgba(100,255,255,1) inset;
 }
