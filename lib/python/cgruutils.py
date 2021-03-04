@@ -87,6 +87,18 @@ def timecodesFromFrameRange( i_ffirst, i_flast, i_fps = 24):
     return '%s - %s' % (tc_first,tc_last)
 
 
+def memStrToBytes(i_str):
+    units = {"b": 1, "kb": 2**10, "mb": 2**20, "gb": 2**30, "tb": 2**40}
+    match = re.match('(\d{1,}\.?\d*)\s*(\w*)', i_str.strip().lower())
+    if match is None: return None
+    try:
+        fnum = float(match.group(1))
+        mult = units[match.group(2)]
+    except:
+        return None
+    return int(round(fnum * mult))
+
+
 def copy_file(source_file, destination_file, delete_original=False, debug=False):
     """Missing DocString
 
