@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+
+import json
 import os
 import sys
 import traceback
@@ -42,6 +44,11 @@ class parser(object):
         self.files = []
         self.files_onthefly = []
         self.files_all = []
+
+        self.host_resources = None
+        self.res_mem_peak_mb = None
+        self.res_cpu_agv = None
+        self.res_cpu_cur = []
 
     def setTaskInfo(self, taskInfo):
         """Missing DocString
@@ -154,10 +161,10 @@ class parser(object):
         i_args['data'] = cgruutils.toStr(i_args['data'])
         if 'mode' in i_args:
             i_args['mode'] = cgruutils.toStr(i_args['mode'])
-        if 'resources' in i_args:
-            i_args['resources'] = cgruutils.toStr(i_args['resources'])
         if 'pid' in i_args:
             self.pid = i_args['pid']
+
+        self.processResources(i_args)
 
         if len(i_args['data']):
             self.doBaseCheck(i_args['data'])
@@ -190,6 +197,47 @@ class parser(object):
             self.percent = 0
         if self.percent > 100:
             self.percent = 100
+
+
+    def processResources(self, i_args):
+        if not 'resources' in i_args:
+            return
+
+        resources = None
+        try:
+            resources = json.loads(cgruutils.toStr(i_args['resources']))
+        except:
+            print('Bad input resources json:')
+            traceback.print_exc(file=sys.stdout)
+            resources = None
+
+        if 'host_resources' in resources:
+            self.host_resources = resources['host_resources']
+
+        if self.host_resources is None:
+            return
+
+        # Peak Memory
+        if 'mem_total_mb' and 'mem_free_mb' in self.host_resources:
+            mem_used_mb = self.host_resources['mem_total_mb'] - self.host_resources['mem_free_mb']
+            if self.res_mem_peak_mb is None or self.res_mem_peak_mb < mem_used_mb:
+                self.res_mem_peak_mb = mem_used_mb
+
+        # Average CPU
+        cpubusy = None
+        for cpu in ['cpu_user', 'cpu_nice', 'cpu_system', 'cpu_iowait', 'cpu_irq', 'cpu_softirq']:
+            if cpu in self.host_resources:
+                if cpubusy is None:
+                    cpubusy = self.host_resources[cpu]
+                else:
+                    cpubusy += self.host_resources[cpu]
+        if cpubusy is not None:
+            self.res_cpu_cur.append(cpubusy)
+            self.res_cpu_agv = 0
+            for cpu in self.res_cpu_cur:
+                self.res_cpu_agv += cpu
+            self.res_cpu_agv = int(round(self.res_cpu_agv / float(len(self.res_cpu_cur))))
+
 
     def toHTML(self, i_data):
         """ Convert data to HTML.
