@@ -388,7 +388,6 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 		m_idle_time = render->getIdleTime();
 		m_busy_time = render->getBusyTime();
 
-	    int cpubusy = m_hres.cpu_user + m_hres.cpu_nice + m_hres.cpu_system + m_hres.cpu_iowait + m_hres.cpu_irq + m_hres.cpu_softirq;
 	    int mem_used = m_hres.mem_total_mb - m_hres.mem_free_mb;
 	    int hdd_used = m_hres.hdd_total_gb - m_hres.hdd_free_gb;
 
