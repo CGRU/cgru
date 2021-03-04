@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import json
 import os
 import subprocess
 import sys
@@ -64,6 +65,17 @@ Parser_Activity = None
 Parser_Resources = None
 Parser_Report = None
 
+resources = ''' {"host_resources":{
+    "cpu_num":4, "cpu_mhz":2790, "cpu_loadavg":[4,6,5],
+    "cpu_user":9, "cpu_nice":0, "cpu_system":4, "cpu_idle":84, "cpu_iowait":0, "cpu_irq":0, "cpu_softirq":0,
+    "mem_total_mb":7853, "mem_free_mb":4885, "mem_cached_mb":2724, "mem_buffers_mb":475,
+    "swap_total_mb":7812, "swap_used_mb":103,
+    "hdd_total_gb":34, "hdd_free_gb":11, "hdd_rd_kbsec":0, "hdd_wr_kbsec":47, "hdd_busy":0,
+    "net_recv_kbsec":0, "net_send_kbsec":0,
+    "logged_in_users":["foo","bar"]
+}}'''
+resources = json.loads(resources)
+
 while True:
     stdout.flush()
     data = stdout.readline()
@@ -74,7 +86,13 @@ while True:
 
     printMuted(cgruutils.toStr(data))
 
-    parser.parse({'data':data})
+    args = dict()
+    args['mode'] = 'RUN'
+    args['pid'] = process.pid
+    args['data'] = data
+    args['resources'] = json.dumps(resources)
+
+    parser.parse(args)
 
     info = 'Parse:'
     info += ' %d%%: %d frame %d%%;' % (parser.percent, parser.frame, parser.percentframe)
