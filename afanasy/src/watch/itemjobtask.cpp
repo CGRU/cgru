@@ -133,6 +133,28 @@ void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 	if (false == taskprogress.hostname.empty()) rightString += afqt::stoq( taskprogress.hostname);
 	if (false == taskprogress.activity.empty()) rightString += QString(": ") + afqt::stoq( taskprogress.activity);
 
+	// Process resources
+	if (false == taskprogress.resources.empty())
+	{
+		QString resources;
+		QStringList pairs = afqt::stoq(taskprogress.resources).split(' ');
+		for (int i = 0; i < pairs.size(); i++)
+		{
+			QStringList res = pairs[i].split(':');
+			if (res.size() != 2)
+				continue;
+
+			if (res[0] == "mem_peak_mb")
+				resources += QString(" %1GB").arg(res[1].toFloat() / 1024, 0, 'g', 2);
+			else if(res[0] == "cpu_avg")
+				resources += QString(" %1%").arg(res[1]);
+			else if(res[0].endsWith("_mb"))
+				resources += QString(" %1:%2GB").arg(res[0].left(res[0].size()-3)).arg(res[1].toFloat() / 1024, 0, 'g', 2);
+		}
+		if (resources.size())
+			rightString += QString(":") + resources;
+	}
+
 	if (taskprogress.state & (AFJOB::STATE_DONE_MASK | AFJOB::STATE_SKIPPED_MASK)) percent = 100;
 	else
 	if (taskprogress.state & (AFJOB::STATE_READY_MASK | AFJOB::STATE_ERROR_MASK)) percent = 0;
