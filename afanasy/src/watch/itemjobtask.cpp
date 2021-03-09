@@ -205,8 +205,6 @@ void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 
 		if (taskprogress.state & AFJOB::STATE_SKIPPED_MASK)
 			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_taskskipped.c, Qt::SolidPattern));
-		else if (taskprogress.state & AFJOB::STATE_WARNING_MASK)
-			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_itemjobwarning.c, Qt::SolidPattern));
 		else if (taskprogress.state & AFJOB::STATE_DONE_MASK)
 			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_done.c, Qt::SolidPattern));
 		else if (taskprogress.state & AFJOB::STATE_ERROR_READY_MASK)
@@ -217,6 +215,8 @@ void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_taskwaitreconn.c, Qt::SolidPattern));
 		else if (taskprogress.state & AFJOB::STATE_TRYTHISTASKNEXT_MASK)
 			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_tasktrynext.c, Qt::SolidPattern));
+		else if (taskprogress.state & AFJOB::STATE_WARNING_MASK)
+			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_itemjobwarning.c, Qt::SolidPattern));
 
 		i_painter->drawRect(x, y, w - WidthInfo, Height-1);
 	}

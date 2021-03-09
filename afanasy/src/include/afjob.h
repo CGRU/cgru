@@ -111,7 +111,7 @@ namespace AFJOB
 
 	// Tasks progess some states for GUI in ASCII
 	// Order is priority, as only one, most important state displayed in a job block progress bar
-	const int ASCII_PROGRESS_COUNT = 12;
+	const int ASCII_PROGRESS_COUNT = 14;
 	const int64_t ASCII_PROGRESS_STATES[ASCII_PROGRESS_COUNT*2] = {
 		' ', 0,
 		'D', STATE_DONE_MASK,
@@ -123,7 +123,9 @@ namespace AFJOB
 		'R', STATE_RUNNING_MASK,
 		'N', STATE_RUNNING_MASK | STATE_WARNING_MASK,
 		'Y', STATE_ERROR_READY_MASK | STATE_READY_MASK,
+		'Y', STATE_ERROR_READY_MASK | STATE_READY_MASK | STATE_WARNING_MASK,
 		'E', STATE_ERROR_MASK,
+		'E', STATE_ERROR_MASK | STATE_WARNING_MASK,
 		'C', STATE_WAITRECONNECT_MASK};
 	const int64_t ASCII_PROGRESS_MASK =
 		STATE_DONE_MASK |
