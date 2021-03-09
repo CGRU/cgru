@@ -42,9 +42,9 @@ class CGRUProperties(bpy.types.PropertyGroup):
         name='Pack Textures',
         description='Pack all Textures into the Blend File',
         default=0)
-    splitRenderLayers_description : "Split Render layer in blocks. " + \
-        "Warning: this option disable post-processing passes " + \
-        "(compositing nor seqeuncer are execute)"
+#    splitRenderLayers_description : "Split Render layer in blocks. " + \
+#        "Warning: this option disable post-processing passes " + \
+#        "(compositing nor seqeuncer are execute)"
     splitRenderLayers : BoolProperty(
         name='Split Render Layers',
         description="Split Render layer in blocks. " + \
