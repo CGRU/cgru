@@ -206,26 +206,6 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 	        m_update_counter = 0;
 
 	        m_hres.copy( render->getHostRes());
-
-	        m_plotMem.setScale( m_hres.mem_total_mb);
-	        m_plotMem.setHotMin(( 90*m_hres.mem_total_mb)/100);
-	        m_plotMem.setHotMax((100*m_hres.mem_total_mb)/100);
-	        m_plotHDD.setScale( m_hres.hdd_total_gb);
-	        m_plotHDD.setHotMin(( 95*m_hres.hdd_total_gb)/100);
-	        m_plotHDD.setHotMax((100*m_hres.hdd_total_gb)/100);
-	        m_plotSwp.setScale( m_hres.swap_total_mb);
-	        if( m_hres.swap_total_mb )
-			{
-	            m_plotSwp.setHotMin(( 10*m_hres.swap_total_mb)/100);
-	            m_plotSwp.setHotMax((100*m_hres.swap_total_mb)/100);
-
-			}
-			else
-			{
-	            m_plotSwp.setHotMin( 100);
-	            m_plotSwp.setHotMax( 10000);
-	            m_plotSwp.setAutoScaleMaxBGC( 100000);
-			}
 		}
 
 		// It became offline:
@@ -395,11 +375,29 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 	    m_plotCpu.addValue( 0, m_hres.cpu_system + m_hres.cpu_iowait + m_hres.cpu_irq + m_hres.cpu_softirq);
 	    m_plotCpu.addValue( 1, m_hres.cpu_user + m_hres.cpu_nice);
 
-	    m_plotMem.addValue( 0, mem_used);
-	    m_plotMem.addValue( 1, m_hres.mem_cached_mb + m_hres.mem_buffers_mb);
+		m_plotMem.setScale(m_hres.mem_total_mb);
+		m_plotMem.addValue( 0, mem_used);
+		m_plotMem.addValue( 1, m_hres.mem_cached_mb + m_hres.mem_buffers_mb);
+		m_plotMem.setHotMin(( 90*m_hres.mem_total_mb)/100);
+		m_plotMem.setHotMax((100*m_hres.mem_total_mb)/100);
 
-	    m_plotSwp.addValue( 0, m_hres.swap_used_mb);
+		m_plotSwp.setScale(m_hres.swap_total_mb);
+		if (m_hres.swap_total_mb)
+		{
+			m_plotSwp.setHotMin(( 10*m_hres.swap_total_mb)/100);
+			m_plotSwp.setHotMax((100*m_hres.swap_total_mb)/100);
+		}
+		else
+		{
+			m_plotSwp.setHotMin(100);
+			m_plotSwp.setHotMax(10000);
+			m_plotSwp.setAutoScaleMaxBGC(100000);
+		}
+		m_plotSwp.addValue( 0, m_hres.swap_used_mb);
 
+		m_plotHDD.setScale(m_hres.hdd_total_gb);
+		m_plotHDD.setHotMin(( 95*m_hres.hdd_total_gb)/100);
+		m_plotHDD.setHotMax((100*m_hres.hdd_total_gb)/100);
 	    m_plotHDD.addValue( 0, hdd_used, (m_update_counter % 10) == 0);
 
 	    m_plotNet.addValue( 0, m_hres.net_recv_kbsec);
