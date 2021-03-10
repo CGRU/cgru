@@ -5,10 +5,12 @@
 #include "../libafqt/qenvironment.h"
 
 #include "ctrlsortfilter.h"
+#include "itemrender.h"
 #include "listrenders.h"
 #include "watch.h"
 
 #include <QtCore/QEvent>
+#include <QtCore/QTimer>
 #include <QtGui/QPainter>
 
 #define AFOUTPUT
@@ -21,10 +23,19 @@ const int ItemPool::HeightPool_Small = 18;
 const int ItemPool::HeightAnnotation = 14;
 
 ItemPool::ItemPool(ListRenders * i_list_renders, af::Pool * i_pool, const CtrlSortFilter * i_ctrl_sf):
+	QObject(i_list_renders),
 	ItemFarm(i_list_renders, i_pool, TPool, i_ctrl_sf),
 	m_root(false),
+
+	m_resources_update_sec(-1),
+	m_resources_update_period(-1),
+	m_heartbeat_sec(-1),
+
 	m_paused(false)
 {
+	m_resources_update_timer = new QTimer(this);
+	connect(m_resources_update_timer, SIGNAL(timeout()), this, SLOT(slot_RequestResources()));
+
 	updateValues(i_pool, 0);
 }
 
@@ -163,6 +174,10 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 
 	ItemNode::updateStrParameters(strRightTop);
 
+	m_resources_update_period = pool->m_resources_update_period;
+	m_heartbeat_sec           = pool->m_heartbeat_sec;
+	processResources();
+
 	m_idle_wolsleep_time = pool->m_idle_wolsleep_time;
 	m_idle_free_time     = pool->m_idle_free_time;
 	m_busy_nimby_time    = pool->m_busy_nimby_time;
@@ -200,6 +215,43 @@ void ItemPool::updateInfo(af::Pool * i_pool)
 	m_info_text += QString("Created: <b>%1</b>").arg(afqt::time2Qstr(i_pool->getTimeCreation()));
 
     ItemNode::updateInfo();
+}
+
+void ItemPool::processResources()
+{
+	int resources_update_period = get_resources_update_period();
+	int heartbeat_sec           = get_heartbeat_sec();
+
+	if (resources_update_period <= 0) resources_update_period = AFRENDER::RESOURCES_UPDATE_PERIOD;
+	if (heartbeat_sec           <= 0) heartbeat_sec           = AFRENDER::HEARTBEAT_SEC;
+
+	if (m_resources_update_sec == resources_update_period * heartbeat_sec)
+		return;
+
+	m_resources_update_sec = resources_update_period * heartbeat_sec;
+	m_resources_update_timer->start(1000 * m_resources_update_sec);
+
+	for (int i = 0; i < m_child_list.size(); i++)
+		if (m_child_list[i]->getType() == Item::TPool)
+			(static_cast<ItemPool*>(m_child_list[i]))->processResources();
+}
+
+void ItemPool::slot_RequestResources()
+{
+	af::MCGeneral renders_ids;
+	for (int i = 0; i < m_child_list.size(); i++)
+	{
+		if (m_child_list[i]->getType() != Item::TRender)
+			continue;
+
+		ItemRender * render = static_cast<ItemRender*>(m_child_list[i]);
+
+		if (render->isOnline())
+			renders_ids.addId(render->getId());
+	}
+
+	if (renders_ids.getCount())
+		Watch::sendMsg(new af::Msg(af::Msg::TRendersResourcesRequestIds, &renders_ids));
 }
 
 bool ItemPool::calcHeight()

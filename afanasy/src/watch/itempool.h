@@ -4,10 +4,13 @@
 
 #include "itemfarm.h"
 
+class QTimer;
+
 class ListRenders;
 
-class ItemPool : public ItemFarm
+class ItemPool : public QObject, public ItemFarm
 {
+	Q_OBJECT
 public:
 	ItemPool(ListRenders * i_list_renders, af::Pool * i_pool, const CtrlSortFilter * i_ctrl_sf);
 	~ItemPool();
@@ -18,6 +21,11 @@ public:
 	void v_setFilterType( int i_type );
 
 	bool calcHeight();
+
+	inline int get_resources_update_period() const {if (m_resources_update_period <= 0 && m_parent_pool)
+		return m_parent_pool->get_resources_update_period(); else return m_resources_update_period;}
+	inline int get_heartbeat_sec() const {if (m_heartbeat_sec <= 0 && m_parent_pool)
+		return m_parent_pool->get_heartbeat_sec(); else return m_heartbeat_sec;}
 
 	inline int get_idle_wolsleep_time() const
 		{if (m_idle_wolsleep_time == -1){if (m_parent_pool) return m_parent_pool->get_idle_wolsleep_time(); return -1;} return m_idle_wolsleep_time;}
@@ -31,6 +39,11 @@ protected:
 
 private:
 	void updateInfo(af::Pool * i_pool);
+
+	void processResources();
+
+private slots:
+	void slot_RequestResources();
 
 private:
 	static const int HeightPool;
@@ -47,6 +60,10 @@ private:
 	QString strRightTop;
 	QString strRightBottom;
 
+	int m_resources_update_sec;
+	int m_resources_update_period;
+	int m_heartbeat_sec;
+
 	int m_idle_wolsleep_time;
 	int m_idle_free_time;
 	int m_busy_nimby_time;
@@ -62,4 +79,6 @@ private:
 	int m_busy_hddio;
 	int m_idle_netmbs;
 	int m_busy_netmbs;
+
+	QTimer * m_resources_update_timer;
 };

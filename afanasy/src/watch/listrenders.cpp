@@ -190,11 +190,6 @@ ListRenders::ListRenders( QWidget* parent):
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(actDelete()));
 	}
 
-
-	timer = new QTimer( this);
-	connect(timer, SIGNAL(timeout()), this, SLOT( requestResources()));
-	timer->start(1000 * AFRENDER::HEARTBEAT_SEC * AFRENDER::RESOURCES_UPDATE_PERIOD);
-
 	m_parentWindow->setWindowTitle("Renders");
 
 	if (af::Environment::GOD())
@@ -331,29 +326,6 @@ void ListRenders::rendersSelectionChanged(const QItemSelection & selected, const
 			else
 				m_view->selectionModel()->select(indexes[i], QItemSelectionModel::Deselect);
 		}
-}
-
-void ListRenders::requestResources()
-{
-	af::MCGeneral ids;
-	for( int i = 0; i < m_model->count(); i++)
-	{
-		Item * item = m_model->item(i);
-		if (item == NULL)
-			continue;
-
-		if (item->getType() != Item::TRender)
-			continue;
-
-		ItemRender * render = (ItemRender*)item;
-		if (render->isOnline())
-			ids.addId(render->getId());
-	}
-
-	if( ids.getCount())
-	{
-		Watch::sendMsg( new af::Msg( af::Msg::TRendersResourcesRequestIds, &ids));
-	}
 }
 
 void ListRenders::contextMenuEvent( QContextMenuEvent *event)
@@ -731,8 +703,6 @@ ItemNode * ListRenders::v_createNewItemNode(af::Node * i_afnode, Item::EType i_t
 
 void ListRenders::v_connectionLost()
 {
-	m_pool_renders.clear();
-	m_pools.clear();
 	ListNodes::v_connectionLost();
 }
 

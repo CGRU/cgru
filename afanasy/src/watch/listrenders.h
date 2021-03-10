@@ -104,8 +104,6 @@ private slots:
 	void actWOLSleep();
 	void actWOLWake();
 
-	void requestResources();
-
 private:
 	void addPool(int i_parent_id, const QString & i_child);
 	void renderSetPool(const QString & i_name);
@@ -119,9 +117,6 @@ private:
 	void ticketEdit_DialogCount(const QString & i_name, bool i_host_ticket);
 
 private:
-	QMap<QString, ItemPool*> m_pools;
-	QMap<QString, QList<ItemRender*>> m_pool_renders;
-
 	static EDisplaySize ms_displaysize;
 
 	static int     ms_SortType1;
@@ -135,6 +130,4 @@ private:
 
 	// To store what to hide
 	static uint32_t ms_hide_flags;
-
-	QTimer * timer;
 };
