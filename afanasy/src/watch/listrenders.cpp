@@ -225,12 +225,12 @@ ListRenders::ListRenders( QWidget* parent):
 
 		addParam_separator();
 
-		addParam_Num(Item::TPool, "heartbeat_sec", "Heart Beat Sec",
+		addParam_Num(Item::TPool, "heartbeat_sec", "Heart Beat",
 				QString("Render heart beat seconds (default is %1).)").arg(AFRENDER::HEARTBEAT_SEC), -1, 1<<6);
-		addParam_Num(Item::TPool, "resources_update_period", "Res. update period",
+		addParam_Num(Item::TPool, "resources_update_period", "Resources Update",
 				QString("Render resources update period (default is %1).)").arg(AFRENDER::RESOURCES_UPDATE_PERIOD), -1, 1<<4);
 		addParam_Num(Item::TPool, "zombie_time", "Zombie Time",
-				QString("Render zombie time.").arg(AFRENDER::ZOMBIETIME), -1, 1<<10);
+				QString("Render zombie time seconds (default is %1).").arg(AFRENDER::ZOMBIETIME), -1, 1<<10);
 	}
 
 	ParamsPanelFarm * paramspanelfarm = new ParamsPanelFarm(this);
