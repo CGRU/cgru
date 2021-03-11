@@ -201,17 +201,21 @@ function scene_Show()
 		elShot.m_elStatus.appendChild( elSt.elAnnotation);
 		elSt.elAnnotation.classList.add('annotation');
 
-		elSt.elArtists = document.createElement('div');
-		elShot.m_elStatus.appendChild( elSt.elArtists);
-		elSt.elArtists.classList.add('artists');
-
 		elSt.elFlags = document.createElement('div');
 		elShot.m_elStatus.appendChild( elSt.elFlags);
 		elSt.elFlags.classList.add('flags');
 
+		elSt.elTasks = document.createElement('div');
+		elShot.m_elStatus.appendChild( elSt.elTasks);
+		elSt.elTasks.classList.add('tags');
+
 		elSt.elTags = document.createElement('div');
 		elShot.m_elStatus.appendChild( elSt.elTags);
 		elSt.elTags.classList.add('tags');
+
+		elSt.elArtists = document.createElement('div');
+		elShot.m_elStatus.appendChild( elSt.elArtists);
+		elSt.elArtists.classList.add('artists');
 
 		function st_CreateSceneShot( i_status)
 		{
@@ -225,7 +229,7 @@ function scene_Show()
 			for( var fl = 0; fl < folders[f].status.flags.length; fl++)
 				elShot.classList.add( folders[f].status.flags[fl]);
 
-		var st_obj = new Status( folders[f].status, {"path":path,"createGUI": st_CreateSceneShot});
+		var st_obj = new Status( folders[f].status, {"path":path,"createGUI": st_CreateSceneShot,'tasks_badges':true});
 		elShot.m_status = st_obj;
 		elEditBtn.m_status = st_obj;
 		elEditBtn.onclick = sc_EditStatus;
@@ -361,6 +365,10 @@ function scenes_Received( i_data, i_args)
 			elShot.m_elStatus.appendChild( elSt.elFlags);
 			elSt.elFlags.classList.add('flags');
 
+			elSt.elTasks = document.createElement('div');
+			elShot.m_elStatus.appendChild(elSt.elTasks);
+			elSt.elTasks.classList.add('tasks');
+
 			elSt.elTags = document.createElement('div');
 			elShot.m_elStatus.appendChild( elSt.elTags);
 			elSt.elTags.classList.add('tags');
@@ -385,7 +393,7 @@ function scenes_Received( i_data, i_args)
 				for( var f = 0; f < fobj.status.flags.length; f++)
 					elShot.classList.add( fobj.status.flags[f]);
 
-			let st_obj = new Status(fobj.status, {"path":elShot.m_path,"createGUI": st_CreateSceneShot,"display_short":true});
+			let st_obj = new Status(fobj.status, {"path":elShot.m_path,"createGUI": st_CreateSceneShot,"display_short":true,'tasks_badges':true});
 			elShot.m_status = st_obj;
 
 			elShot.ondblclick = sc_EditStatus;

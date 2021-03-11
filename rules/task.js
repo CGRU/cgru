@@ -705,6 +705,7 @@ function task_DrawBadges(i_status, i_el, i_args)
 
 	let update = i_args.update;
 	let short_names = ! i_args.full_names;
+	let only_my = i_args.only_my;
 
 	if ( ! update)
 		i_el.textContent = '';
@@ -725,6 +726,13 @@ function task_DrawBadges(i_status, i_el, i_args)
 
 		if (task.deleted)
 			continue;
+
+		if (only_my)
+		{
+			if (null == g_auth_user) continue;
+			if (null == task.artists) continue;
+			if (task.artists.indexOf(g_auth_user.id) == -1) continue;
+		}
 
 		let elTask = document.createElement('div');
 		elTask.classList.add('task_badge');

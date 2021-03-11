@@ -231,7 +231,10 @@ Status.prototype.show = function(i_status, i_update = false) {
 		}
 	}
 
-	task_ShowTasks(this);
+	if (this.args.tasks_badges)
+		task_DrawBadges(this.obj, this.elTasks, {'only_my':this.args.display_short});
+	else
+		task_ShowTasks(this);
 
 	var args = {};
 	args.statuses = [this.obj];
