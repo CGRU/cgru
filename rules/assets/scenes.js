@@ -666,6 +666,25 @@ function sc_FilterShots(i_args)
 		if (el.m_status && el.m_status.obj)
 			st_obj = el.m_status.obj;
 
+		// Join status with tasks
+		if (st_obj.tasks)
+		{
+			let keys = ['artists','tags','flags'];
+			for (let t in st_obj.tasks)
+			{
+				let task = st_obj.tasks[t];
+				for (let key of keys)
+					if (task[key])
+					{
+						if (null == st_obj[key])
+							st_obj[key] = [];
+						for (let val of task[key])
+							if (st_obj[key].indexOf(val) == -1)
+								st_obj[key].push(val);
+					}
+			}
+		}
+
 		if (anns)
 		{
 			if (st_obj.annotation)
