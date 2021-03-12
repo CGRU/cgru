@@ -1473,6 +1473,14 @@ Status.prototype.editSave = function(i_args) {
 			for (let t in statuses[i].obj.tasks)
 				statuses[i].obj.tasks[t].progress = 100;
 
+		// If shot has OMIT flags, all tasks should be omitted
+		if (statuses[i].obj.flags && (statuses[i].obj.flags.indexOf('omit') != -1) && (statuses[i].obj.tasks))
+			for (let t in statuses[i].obj.tasks)
+			{
+				statuses[i].obj.tasks[t].flags = ['omit'];
+				statuses[i].obj.tasks[t].progress = -1;
+			}
+
 		// If progress was changed we should update upper progress:
 		if (_progress != statuses[i].obj.progress)
 		{
