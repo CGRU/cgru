@@ -79,6 +79,9 @@ void RenderAf::initDefaultValues()
 	setWOLFalling( false);
 	setWOLSleeping( false);
 	setWOLWaking( false);
+
+	m_no_task_time        = 0;
+	m_no_task_event_count = 0;
 }
 
 RenderAf::~RenderAf()
@@ -201,6 +204,7 @@ void RenderAf::getPoolConfig()
 	m_re.m_heartbeat_sec           = m_parent->getHeartBeatSec();
 	m_re.m_resources_update_period = m_parent->getResourcesUpdatePeriod();
 	m_re.m_zombie_time             = m_parent->getZombieTime();
+	m_re.m_exit_no_task_time       = m_parent->getExitNoTaskTime();
 }
 
 af::Msg * RenderAf::writeRenderEventsMsg()
@@ -929,6 +933,25 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 		emitEvents(std::vector<std::string>(1, "RENDER_ZOMBIE"));
 		offline( jobs, af::TaskExec::UPRenderZombie, monitoring);
 		return;
+	}
+
+	int _no_task_event_time = m_parent->getNoTaskEventTime() * (2 << m_no_task_event_count);
+	if (isOnline() && (m_tasks.size() == 0) && m_no_task_time && (_no_task_event_time > 0))
+	{
+		if ((currentTime - m_no_task_time) > _no_task_event_time)
+		{
+			std::ostringstream str;
+			str << "RENDER_NO_TASK: " << m_parent->getNoTaskEventTime()
+				<< " x2^"  << m_no_task_event_count << " = " << _no_task_event_time << " seconds.";
+			appendLog(str.str());
+			emitEvents(std::vector<std::string>(1, "RENDER_NO_TASK"));
+			m_no_task_event_count++;
+		}
+	}
+	else
+	{
+		m_no_task_time = currentTime;
+		m_no_task_event_count = 0;
 	}
 
 	// Remove dummy tickets that were needed to store usage only

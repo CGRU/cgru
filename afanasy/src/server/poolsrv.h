@@ -98,6 +98,12 @@ public:
 	inline int32_t getZombieTime() const
 		{if (m_zombie_time <= 0 && m_parent) return m_parent->getZombieTime(); else return m_zombie_time;}
 
+	inline int32_t getExitNoTaskTime() const
+		{if (m_exit_no_task_time <= 0 && m_parent) return m_parent->getExitNoTaskTime(); else return m_exit_no_task_time;}
+
+	inline int32_t getNoTaskEventTime() const
+		{if (m_no_task_event_time <= 0 && m_parent) return m_parent->getNoTaskEventTime(); else return m_no_task_event_time;}
+
 
 	// Idle & Busy
 	inline int get_idle_wolsleep_time() const

@@ -117,10 +117,6 @@
 		"":"if( nice <   0 ) priority = ABOVE_NORMAL_PRIORITY_CLASS;",
 		"":"if( nice < -10 ) priority = HIGH_PRIORITY_CLASS;",
 
-	"af_render_exit_no_task_time":-1,
-		"":"Program will exit if there will be no tasks for this time(seconds),",
-		"":"Negative value disables this feature",
-
 	"af_task_reconnect_timeout":30,
 		"":"After server restart, running tasks will wait renders to reconnect.",
 

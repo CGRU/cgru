@@ -44,6 +44,7 @@ public:
 	int32_t m_heartbeat_sec;
 	int32_t m_resources_update_period;
 	int32_t m_zombie_time;
+	int32_t m_exit_no_task_time;
 
 	// This is job solving tasks.
 	std::vector<TaskExec*> m_tasks;

@@ -155,7 +155,6 @@ public:
 	static inline std::string & getCmdShell()          { return cmd_shell;}
  
 	static inline int getRenderNice()               { return render_nice;                 }
-	static inline int getRenderExitNoTaskTime()     { return render_exit_no_task_time;    }
 
 	static inline bool hasRULES() { return rules_url.size(); }
 	static inline std::vector<std::string> & getRenderWindowsMustDie() { return render_windowsmustdie; }
@@ -315,7 +314,6 @@ private:
 	static int task_reconnect_timeout;
 
 	static int render_nice;       ///< Render task process nice factor.
-	static int render_exit_no_task_time;
 	static std::vector<std::string> render_windowsmustdie;
 
 	static std::string cmd_shell;

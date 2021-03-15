@@ -199,6 +199,9 @@ private:
 
 	std::list<ErrorTaskData*> m_error_tasks;
 
+	int m_no_task_time;
+	int m_no_task_event_count;
+
 private:
 	static RenderContainer * ms_renders;
 

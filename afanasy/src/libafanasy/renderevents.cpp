@@ -15,7 +15,8 @@ RenderEvents::RenderEvents():
 	m_id(0),
 	m_heartbeat_sec(0),
 	m_resources_update_period(0),
-	m_zombie_time(0)
+	m_zombie_time(0),
+	m_exit_no_task_time(0)
 {
 }
 
@@ -85,6 +86,7 @@ void RenderEvents::v_readwrite( Msg * msg)
 	rw_int32_t(m_heartbeat_sec,           msg);
 	rw_int32_t(m_resources_update_period, msg);
 	rw_int32_t(m_zombie_time,             msg);
+	rw_int32_t(m_exit_no_task_time,       msg);
 
 	rw_texecs( m_tasks,       msg);
 	rw_tp_vec( m_closes,      msg);
@@ -104,6 +106,7 @@ void RenderEvents::clear()
 	m_heartbeat_sec           = 0;
 	m_resources_update_period = 0;
 	m_zombie_time             = 0;
+	m_exit_no_task_time       = 0;
 
 	m_tasks.clear();
 
@@ -125,6 +128,7 @@ bool RenderEvents::isEmpty() const
 	if(m_heartbeat_sec)           return false;
 	if(m_resources_update_period) return false;
 	if(m_zombie_time)             return false;
+	if(m_exit_no_task_time)       return false;
 
 	if( m_tasks.size()) return false;
 
@@ -154,6 +158,8 @@ void RenderEvents::v_generateInfoStream( std::ostringstream & stream, bool full)
 		stream << " RUP[" << m_resources_update_period << "]";
 	if (m_zombie_time)
 		stream << " ZT[" << m_zombie_time << "]";
+	if (m_exit_no_task_time)
+		stream << " ENT[" << m_exit_no_task_time << "]";
 
 	if( m_tasks.size())
 		stream << " Exec["  << m_tasks.size()  << "]";

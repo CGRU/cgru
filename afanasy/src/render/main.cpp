@@ -21,6 +21,7 @@ extern bool AFRunning;
 int HeartBeatSec          = AFRENDER::HEARTBEAT_SEC;
 int ResourcesUpdatePeriod = AFRENDER::RESOURCES_UPDATE_PERIOD;
 int ZombieTime            = AFRENDER::ZOMBIETIME;
+int ExitNoTaskTime        = -1;
 
 //######################### Signal handlers ############################################
 #ifdef WINNT
@@ -333,6 +334,12 @@ AF_LOG << i_re;
 		else
 			ZombieTime = AFRENDER::ZOMBIETIME;
 		AF_LOG << "Zombie time set to " << ZombieTime << " seconds";
+	}
+
+	if (i_re.m_exit_no_task_time)
+	{
+		ExitNoTaskTime = i_re.m_exit_no_task_time;
+		AF_LOG << "Exit with no task time set to " << ExitNoTaskTime << " seconds" << ((ExitNoTaskTime > 0) ? "." : " (disabled).");
 	}
 
 

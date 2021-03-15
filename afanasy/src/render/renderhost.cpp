@@ -19,6 +19,7 @@
 extern bool AFRunning;
 
 extern int ZombieTime;
+extern int ExitNoTaskTime;
 
 RenderHost::RenderHost():
 	af::Render( Client::GetEnvironment),
@@ -174,10 +175,9 @@ void RenderHost::refreshTasks()
 	{
 		m_has_tasks_time = time(NULL);
 	}
-	else if(( af::Environment::getRenderExitNoTaskTime() >= 0 ) &&
-		( time(NULL) - m_has_tasks_time >= af::Environment::getRenderExitNoTaskTime()))
+	else if ((ExitNoTaskTime > 0) && ((time(NULL) - m_has_tasks_time) >= ExitNoTaskTime))
 	{
-		AF_LOG << "No tasks for " << af::Environment::getRenderExitNoTaskTime() << " seconds.";
+		AF_LOG << "No tasks for " << ExitNoTaskTime << " seconds.";
 		AFRunning = false;
 	}
 

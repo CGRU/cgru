@@ -69,7 +69,6 @@ int     Environment::watch_render_idle_bar_max =       AFWATCH::RENDER_IDLE_BAR_
 bool    Environment::watch_work_user_visible =         AFWATCH::WORK_USER_VISIBLE;
 
 int     Environment::render_nice =                     AFRENDER::TASKPROCESSNICE;
-int     Environment::render_exit_no_task_time =        AFRENDER::EXIT_NO_TASK_TIME;
 
 
 std::string Environment::rules_url;
@@ -278,7 +277,6 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, render_iostat_device,              "af_render_iostat_device"              );
 	getVar( i_obj, render_resclasses,                 "af_render_resclasses"                 );
 	getVar( i_obj, render_nice,                       "af_render_nice"                       );
-	getVar( i_obj, render_exit_no_task_time,          "af_render_exit_no_task_time"          );
 	getVar( i_obj, render_windowsmustdie,             "af_render_windowsmustdie"             );
 
 	getVar( i_obj, rendercmds,                        "af_rendercmds"                        );
