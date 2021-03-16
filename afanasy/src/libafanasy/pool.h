@@ -70,6 +70,7 @@ public:
 	int32_t m_zombie_time;
 	int32_t m_exit_no_task_time;
 	int32_t m_no_task_event_time;
+	int32_t m_overload_event_time;
 
 	int32_t m_idle_wolsleep_time;
 	int32_t m_idle_free_time;

@@ -236,6 +236,8 @@ ListRenders::ListRenders( QWidget* parent):
 
 		addParam_Num(Item::TPool, "no_task_event_time", "No Task Event",
 				QString("Render with no task event seconds (default is -1 = disabled)."), -1, 1<<10);
+		addParam_Num(Item::TPool, "overload_event_time", "Overload Event",
+				QString("Render with resources overload repeat event emit seconds (default is -1 = disabled)."), -1, 1<<10);
 
 		addParam_separator();
 

@@ -63,6 +63,7 @@ void Pool::initDefaultValues()
 	m_zombie_time             = -1;
 	m_exit_no_task_time       = -1;
 	m_no_task_event_time      = -1;
+	m_overload_event_time     = -1;
 
 	m_sick_errors_count = -1;
 
@@ -129,6 +130,8 @@ void Pool::v_jsonWrite(std::ostringstream & o_str, int i_type) const // Thread-s
 		o_str << ",\n\"exit_no_task_time\":"       << m_exit_no_task_time;
 	if (m_no_task_event_time > 0)
 		o_str << ",\n\"no_task_event_time\":"      << m_no_task_event_time;
+	if (m_overload_event_time > 0)
+		o_str << ",\n\"overload_event_time\":"     << m_overload_event_time;
 
 	if (m_new_nimby)
 		o_str << ",\n\"new_nimby\": true";
@@ -175,6 +178,7 @@ bool Pool::jsonRead(const JSON &i_object, std::string * io_changes)
 	jr_int32 ("zombie_time",             m_zombie_time,             i_object, io_changes);
 	jr_int32 ("exit_no_task_time",       m_exit_no_task_time,       i_object, io_changes);
 	jr_int32 ("no_task_event_time",      m_no_task_event_time,      i_object, io_changes);
+	jr_int32 ("overload_event_time",     m_overload_event_time,     i_object, io_changes);
 
 	jr_bool  ("new_nimby",             m_new_nimby,             i_object, io_changes);
 	jr_bool  ("new_paused",            m_new_paused,            i_object, io_changes);
@@ -238,6 +242,7 @@ void Pool::v_readwrite(Msg * msg)
 	rw_int32_t(m_zombie_time,            msg);
 	rw_int32_t(m_exit_no_task_time,      msg);
 	rw_int32_t(m_no_task_event_time,     msg);
+	rw_int32_t(m_overload_event_time,    msg);
 
 	rw_bool   (m_new_nimby,              msg);
 	rw_bool   (m_new_paused,             msg);

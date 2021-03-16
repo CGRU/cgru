@@ -91,6 +91,7 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 	m_params["zombie_time"]             = pool->m_zombie_time;
 	m_params["exit_no_task_time"]       = pool->m_exit_no_task_time;
 	m_params["no_task_event_time"]      = pool->m_no_task_event_time;
+	m_params["overload_event_time"]     = pool->m_overload_event_time;
 
 	strLeftTop = m_name;
 	if (false == m_root)

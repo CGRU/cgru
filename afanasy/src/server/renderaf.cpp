@@ -82,6 +82,9 @@ void RenderAf::initDefaultValues()
 
 	m_no_task_time        = 0;
 	m_no_task_event_count = 0;
+
+	m_overload_time  = 0;
+	m_overload_seconds = 0;
 }
 
 RenderAf::~RenderAf()
@@ -935,16 +938,19 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 		return;
 	}
 
-	int _no_task_event_time = m_parent->getNoTaskEventTime() * (2 << m_no_task_event_count);
-	if (isOnline() && (m_tasks.size() == 0) && m_no_task_time && (_no_task_event_time > 0))
+	// Check no task event timeout
+	int _no_task_event_timeout = m_parent->getNoTaskEventTime() * (1 << m_no_task_event_count);
+	if (isOnline() && (m_tasks.size() == 0) && m_no_task_time && (_no_task_event_timeout > 0))
 	{
-		if ((currentTime - m_no_task_time) > _no_task_event_time)
+		if ((currentTime - m_no_task_time) > _no_task_event_timeout)
 		{
 			std::ostringstream str;
 			str << "RENDER_NO_TASK: " << m_parent->getNoTaskEventTime()
-				<< " x2^"  << m_no_task_event_count << " = " << _no_task_event_time << " seconds.";
+				<< " x2^"  << m_no_task_event_count << " = " << _no_task_event_timeout << " seconds.";
 			appendLog(str.str());
 			emitEvents(std::vector<std::string>(1, "RENDER_NO_TASK"));
+
+			// Increase event count to not to emit event each heartbeat
 			m_no_task_event_count++;
 		}
 	}
@@ -952,6 +958,37 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 	{
 		m_no_task_time = currentTime;
 		m_no_task_event_count = 0;
+	}
+
+	// Check overload event
+	if (isOnline() && (m_parent->getOverloadEventTime() > 0) && (
+				(m_hres.mem_free_mb == 0)
+			|| (m_hres.hdd_free_gb == 0)
+			|| ((m_hres.swap_total_mb - m_hres.swap_used_mb) == 0)
+			))
+	{
+		if ((currentTime - m_overload_time) > m_overload_seconds)
+		{
+			std::ostringstream str;
+			str << "RENDER_OVERLOAD: Free"
+				<< " MEM=" << m_hres.mem_free_mb
+				<< " HDD="  << m_hres.hdd_free_gb
+				<< " SWAP="  << m_hres.swap_total_mb - m_hres.swap_used_mb
+				<< " for " << m_overload_seconds << " seconds.";
+			appendLog(str.str());
+			emitEvents(std::vector<std::string>(1, "RENDER_OVERLOAD"));
+
+			// Increase overload seconds to not to emit event each heartbeat
+			if (m_overload_seconds)
+				m_overload_seconds <<= 1;
+			else
+				m_overload_seconds = m_parent->getOverloadEventTime();
+		}
+	}
+	else
+	{
+		m_overload_time  = currentTime;
+		m_overload_seconds = 0;
 	}
 
 	// Remove dummy tickets that were needed to store usage only

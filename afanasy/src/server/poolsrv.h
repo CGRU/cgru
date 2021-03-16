@@ -104,6 +104,9 @@ public:
 	inline int32_t getNoTaskEventTime() const
 		{if (m_no_task_event_time <= 0 && m_parent) return m_parent->getNoTaskEventTime(); else return m_no_task_event_time;}
 
+	inline int32_t getOverloadEventTime() const
+		{if (m_overload_event_time <= 0 && m_parent) return m_parent->getOverloadEventTime(); else return m_overload_event_time;}
+
 
 	// Idle & Busy
 	inline int get_idle_wolsleep_time() const
