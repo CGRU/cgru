@@ -135,11 +135,39 @@ If event is emitted by render, render and all parent pools will be written too.
 Event service Python class reads its command - JSON data and can generate any command to execute.
 So event task receives data by a command, do something with this data and can construct a real command to execute as a task process.
 
-- *JOB_DONE* - Some job done.
-- *JOB_ERROR* - Some job task produced an error.
-- *JOB_DELETED* - Job deleted.
-- *RENDER_ZOMBIE* - Render stopped to send updates to server for *af_render_zombietime* seconds.
-- *RENDER_SICK* - Render starts to produce errors only and got *SICK* state.
+JOB_DONE
+~~~~~~~~
+Some job became done.
+
+JOB_ERROR
+~~~~~~~~~
+Some job task produced an error.
+
+JOB_DELETED
+~~~~~~~~~~~
+Job has been deleted.
+
+RENDER_ZOMBIE
+~~~~~~~~~~~~~
+Render stopped to send updates to server for
+`zombie_time <../afanasy/pools.html#zombie-time>`_ seconds.
+
+RENDER_SICK
+~~~~~~~~~~~
+Render produced
+`sick_errors_count <../afanasy/pools.html#sick-errors-count>`_
+errors from different users in a row and got *SICK* state.
+
+RENDER_NO_TASK
+~~~~~~~~~~~~~~
+Render has no task for
+`no_task_event_time <../afanasy/pools.html#no-task-event-time>`_ seconds.
+
+RENDER_OVERLOAD
+~~~~~~~~~~~~~~~
+Render has no free memory or disk or swap.
+Next time event will be emitted after
+`overload_event_time <../afanasy/pools.html#overload-event-time>`_ seconds.
 
 There is already default Python service class:
 ``cgru/afanasy/python/services/events.py``

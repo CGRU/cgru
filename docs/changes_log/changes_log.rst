@@ -16,21 +16,34 @@ v3.2.0
 
 *Not released.*
 
-2021.03.01
+2021.03.17
 
 **New Afanasy network protocol version.**
 
-- Such config parameters as *af_render_heartbeat_sec*, *af_render_up_resources_period* and *af_render_zombietime*
-  moved to pool parameters. On change they will be dispatched to all pool renders.
-  This way you can tune farm "onnder_connecti-the-fly". Parameter *af_reon_lost_time* removed.
+- Such config parameters as
+  *af_render_heartbeat_sec*,
+  *af_render_up_resources_period*,
+  *af_render_zombietime* and
+  *af_render_exit_no_task_time*
+  moved to pool parameters:
+  `heartbeat_sec <../afanasy/pools.html#heartbeat-sec>`_,
+  `resources_update_period <../afanasy/pools.html#resources-update-period>`_,
+  `zombie_time <../afanasy/pools.html#zombie-time>`_,
+  `exit_no_task_time <../afanasy/pools.html#exit-no-task-time>`_.
+  On change they will be dispatched to all pool renders.
+  This way you can tune farm "on-the-fly". Parameter *af_render_connection_lost_time* removed.
   Now render just uses the same *zombie_time* parameter as server for connection lost.
-
-- :ref:`afanasy-render-parsers` **do** function takes arguments via dictionary.
+- Parsers `do <../afanasy/render.html#do>`_ function takes arguments via dictionary.
   I hope that is was the last time we needed to change all parsers classes on a function interface change.
 - Parser takes resources string and can return resources string.
-  Takes host resurces as JSON, that afrender gets for server and GUIs.
+  Takes host resources as JSON, that afrender gets for server and GUIs.
   Can return any custom resources, for example peak memory usage or (and) triangles count.
-  Server stores this string in statistics databaes and dispatches to GUIs.
+  Server stores this string in statistics database and dispatches to GUIs.
+- `RENDER_NO_TASK <../afanasy/server.html#render-no-task>`_ event
+  and pool `no_task_event_time <../afanasy/pools.html#no-task-event-time>`_ parameter.
+- `RENDER_OVERLOAD <../afanasy/server.html#render-overload>`_ event
+  and pool `overload_event_time <../afanasy/pools.html#overload-event-time>`_ parameter.
+
 
 v3.1.1
 ======

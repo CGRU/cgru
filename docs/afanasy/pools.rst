@@ -81,9 +81,47 @@ capacity_host
 -------------
 Pool hosts capacity.
 
+exit_no_task_time
+-----------------
+Render will exit having no task for this time.
+By default it is ``-1``, feature is disabled.
+When this parameter is changed on pool, all its renders will receive it.
+
+heartbeat_sec
+-------------
+Renders heart beat period in seconds.
+Each heart beat render receives events from server,
+launches new tasks and processes running tasks output,
+sends an update message to server and receives a new events as an answer.
+When this parameter is changed on pool, all its renders will receive it.
+
 max_tasks_host
 --------------
 Pool hosts maximum running tasks.
+
+new_nimby
+---------
+New render will be registered in *NIMBY* state.
+Useful when new host was created, Afanasy installed, but render software is not.
+Afanasy can be used to install render software.
+*Maintenance* job can ignore *NIMBY* and *PAUSED* render state.
+*NIMBY* state can turned off automatically.
+
+new_paused
+----------
+New render will be registered in *PAUSED* state for maintenance purposes.
+
+no_task_event_time
+------------------
+If render has no task for this time (seconds), server will emit this event ``RENDER_NO_TASK``.
+Next time event will be repeated after twice longer duration.
+By default it is ``-1``, feature is disabled.
+
+overload_event_time
+-------------------
+Event ``RENDER_OVERLOAD`` will be emitted if it has no free memory, disk or swap.
+Next time event will be repeated after twice longer duration (seconds).
+By default it is ``-1``, feature is disabled.
 
 power_host
 ----------
@@ -97,17 +135,11 @@ Pool hosts *properties*.
 This is just any custom string.
 Job can filter renders for matches this string.
 
-new_nimby
----------
-New render will be registered in *NIMBY* state.
-Useful when new host was created, Afanasy installed, but render software is not.
-Afanasy can be used to install render software.
-*Maintenance* job can ignore *NIMBY* and *PAUSED* render state.
-*NIMBY* state can turned off automatically.
-
-new_paused
-----------
-New render will be registered in *PAUSED* state for maintenance purposes.
+resources_update_period
+-----------------------
+Render updates resources periodically, this is number of heart beats to do it.
+AfWatch farm monitor will ask for renders resources according to this parameter.
+When this parameter is changed on pool, all its renders will receive it.
 
 sick_errors_count
 -----------------
@@ -139,6 +171,11 @@ Each render in the pool have such tickets.
 For example, to limit RAM, you can set ``MEM:64`` tickets to some pool with renders which have 64GB RAM.
 And each render in the pool can run only one task with ``MEM:64`` tickets,
 or 2 tasks with ``MEM:32`` tickets, or 1 with ``MEM:32`` and 3 with ``MEM:10`` at the same time.
+
+zombie_time
+-----------
+If server will not receive an update message from render for this time,
+render is considered as zombie (connection is lost) and goes to offline state.
 
 idle_wolsleep_time
 ------------------
