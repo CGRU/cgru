@@ -964,7 +964,7 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 	if (isOnline() && (m_parent->getOverloadEventTime() > 0) && (
 				(m_hres.mem_free_mb == 0)
 			|| (m_hres.hdd_free_gb == 0)
-			|| ((m_hres.swap_total_mb - m_hres.swap_used_mb) == 0)
+			|| (m_hres.swap_total_mb && (m_hres.swap_total_mb == m_hres.swap_used_mb))
 			))
 	{
 		if ((currentTime - m_overload_time) > m_overload_seconds)
