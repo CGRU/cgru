@@ -358,7 +358,7 @@ border-radius: 3px;
 padding: 4px;
 }
 
-#status.updating {border: 2px solid #FF0000; box-shadow: 0 0 4px #FF0000 inset, 0 0 4px #FF0000;}
+#status.updating {border: 2px solid #FFFF00; box-shadow: 0 0 4px #FFFF00 inset, 0 0 4px #FFFF00;}
 
 #content > .view {
 position: relative;
