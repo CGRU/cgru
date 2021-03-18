@@ -205,7 +205,7 @@ function n_Request(i_args)
 		return xhr.responseText;
 	}
 
-	u_el.cycle.classList.remove('timeout');
+	u_el.cycle.classList.remove('fading');
 	u_el.cycle.classList.add('active');
 
 	xhr.onreadystatechange = n_XHRHandler;
@@ -226,13 +226,12 @@ function n_XHRHandler()
 		n_ConnectionEstablished();
 
 		n_conn_count--;
-		//		if( u_el && u_el.cycle )
-		// setTimeout('u_el.cycle.classList.add("timeout");u_el.cycle.style.opacity = ".1";',1)
+
 		if (n_conn_count < 0)
 			n_conn_count = 0;
 		if (n_conn_count == 0)
 		{
-			u_el.cycle.classList.add('timeout');
+			u_el.cycle.classList.add('fading');
 			u_el.cycle.classList.remove('active');
 		}
 

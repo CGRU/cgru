@@ -153,11 +153,6 @@ opacity: 0.1;
 box-shadow: 0px 0px 5px #FA6;
 }
 #footer #cycle.active { opacity: 1.0; }
-#footer #cycle.timeout {
--o-transition: all 1s ease-out;
--moz-transition: all 1s ease-out;
--webkit-transition: all 1s ease-out;
-}
 #footer #log_ctrl {
 display: none;
 float: right;
@@ -363,6 +358,8 @@ border-radius: 3px;
 padding: 4px;
 }
 
+#status.updating {border: 2px solid #FF0000; box-shadow: 0 0 4px #FF0000 inset, 0 0 4px #FF0000;}
+
 #content > .view {
 position: relative;
 margin: 3px 0px;
@@ -391,6 +388,12 @@ min-height: 19px;
 
 .waiting { cursor: wait; }
 .waiting * { cursor: wait; }
+
+.fading {
+-o-transition: all 1s ease-out;
+-moz-transition: all 1s ease-out;
+-webkit-transition: all 1s ease-out;
+}
 
 .thumbnail { box-shadow: 0 0 2px rgba(255,255,255,.5); border-radius: 4px; border: 1px solid rgba(98,98,98,.5); }
 

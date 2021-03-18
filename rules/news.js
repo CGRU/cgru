@@ -344,10 +344,10 @@ function nw_MakeNews(i_news, i_args)
 function nw_FilterStatus(i_status)
 {
 	var st = {};
-	var keys = ['artists','flags','progress','tags','color','frames_num','annotation','tasks','changed'];
+	var skip_keys = ['body'];
 
-	for (let key of keys)
-		if (i_status[key])
+	for (let key in i_status)
+		if (skip_keys.indexOf(key) == -1)
 			st[key] = i_status[key];
 
 	return st;
@@ -696,8 +696,8 @@ function nw_NewsShow(i_update_folders)
 			g_FolderSetStatus(news.status, el);
 
 			// Update current location status:
-			if ((news.path == g_CurPath()) && st_Status)
-				st_Status.show(news.status);
+			if (news.path == g_CurPath())
+				st_Update(news.status);
 
 			// Remove walk cache:
 			if (n_walks[news.path])

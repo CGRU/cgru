@@ -41,6 +41,8 @@ function st_Finish()
 		st_Status.editCancel();
 
 	st_Status = null;
+	$('status').classList.remove('fading');
+	$('status').classList.remove('updating');
 }
 
 function st_OnClose()
@@ -110,6 +112,18 @@ function st_Show(i_status)
 	if (st_Status)
 	{
 		st_Status.show(i_status);
+	}
+	else
+	{
+		st_Status = new Status(i_status);
+	}
+}
+
+function st_Update(i_status)
+{
+	if (st_Status)
+	{
+		st_Status.update(i_status);
 	}
 	else
 	{
@@ -244,7 +258,40 @@ Status.prototype.show = function(i_status, i_update = false) {
 	args.elTasksDiv = this.elTasksDiv;
 
 	stcs_Show(args);
+
+	this.elParent.classList.remove('fading');
+	this.elParent.classList.remove('updating');
 };
+
+Status.prototype.update = function(i_status)
+{
+	this.show(i_status);
+
+	this.elParent.classList.remove('fading');
+	this.elParent.classList.add('updating');
+
+	setTimeout(st_UpdatingFinished, 1000);
+}
+
+function st_UpdatingFinished()
+{
+	if (st_Status == null) return;
+	st_Status.updatingFinished();
+}
+
+Status.prototype.updatingFinished = function()
+{
+	if (this.elParent.classList.contains('fading'))
+	{
+		this.elParent.classList.remove('fading');
+		return;
+	}
+
+	this.elParent.classList.add('fading');
+	this.elParent.classList.remove('updating');
+
+	setTimeout(st_UpdatingFinished, 1000);
+}
 
 function st_SetElProgress(i_status, i_elProgressBar, i_elProgressHide, i_elPercentage)
 {
@@ -1497,6 +1544,10 @@ Status.prototype.editSave = function(i_args) {
 
 		if (this.elEdit_Color.m_color_changed)
 			statuses[i].obj.color = this.elEdit_Color.m_color;
+
+		// Store modification user and time
+		statuses[i].obj.muser = g_auth_user.id;
+		statuses[i].obj.mtime = c_DT_CurSeconds();
 	}
 
 	// News & Bookmarks:
@@ -1522,9 +1573,6 @@ Status.prototype.editSave = function(i_args) {
 };
 
 Status.prototype.save = function() {
-	this.obj.muser = g_auth_user.id;
-	this.obj.mtime = c_DT_CurSeconds();
-
 	if (this.path == g_CurPath())
 		RULES.status = this.obj;
 
