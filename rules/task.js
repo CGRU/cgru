@@ -769,6 +769,10 @@ function task_DrawBadges(i_status, i_el, i_args)
 
 		let elTask = document.createElement('div');
 		elTask.classList.add('task_badge');
+		if (task.artists.indexOf(g_auth_user.id) != -1)
+			elTask.classList.add('my');
+		else
+			elTask.classList.add('notmy');
 		elTask.m_name = task.name;
 		i_el.appendChild(elTask);
 		i_el.m_elTasks[task.name] = this;

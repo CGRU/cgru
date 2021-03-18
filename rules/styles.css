@@ -196,7 +196,7 @@ width: 2px;
 #navig_panel .button {
 font-size: 12px;
 padding: 0px;
-margin: 3px;
+margin: 2px;
 float: left;
 width: 40px;
 text-align: center;
@@ -277,6 +277,7 @@ border-radius: 20px 0px 0px 8px;
 #navig.navig_show_duration   .folder .duration   { display: inline; }
 #navig.navig_show_price      .folder .price      { display: inline; }
 #navig.navig_show_percent    .folder .percent    { display: inline; }
+#navig.navig_show_tasks_only_my .folder .tasks .notmy { display: none; }
 
 /* ========================================== */
 /* ============== GLOBALS: ================== */
@@ -485,6 +486,7 @@ border-radius: 4px;
 .task_badge .artist {margin: 0px; padding-top: 2px;; padding-bottom: 2px;}
 .task_badge .progress {clear: both; width: 100%}
 .task_badge .progressbar {height: 6px;}
+.task_badge.activity_filtered {display:none;}
 
 
 /* ========================================================= */

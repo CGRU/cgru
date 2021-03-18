@@ -31,7 +31,7 @@ var g_navigating_path = null;
 var g_arguments = null;
 
 var g_navig_infos = {
-	all     : ['annotation', 'size', 'flags', 'artists', 'tags', 'tasks', 'duration', 'price', 'frames', 'percent'],
+	all     : ['annotation', 'size', 'flags', 'artists', 'tags', 'tasks','tasks_only_my', 'duration', 'price', 'frames', 'percent'],
 	default : ['annotation', 'flags', 'tags', 'artists', 'tasks', 'percent'],
 	current : []
 };

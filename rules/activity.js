@@ -215,8 +215,8 @@ function activity_Changed()
 function activity_TaskBadgeFilter(i_badge)
 {
 	if ((activity_Filter.length == 0) || (activity_Filter.indexOf(i_badge.m_name) != -1))
-		i_badge.style.display = 'block';
+		i_badge.classList.remove('activity_filtered');
 	else
-		i_badge.style.display = 'none';
+		i_badge.classList.add('activity_filtered');
 }
 

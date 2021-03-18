@@ -339,7 +339,7 @@ function st_SetElProgress(i_status, i_elProgressBar, i_elProgressHide, i_elPerce
 		}
 		if (i_elPercentage)
 		{
-			i_elPercentage.style.display = 'block';
+			//i_elPercentage.style.display = 'block';
 			i_elPercentage.textContent = i_status.progress + '%';
 			if (i_status.progress > 0)
 			{
