@@ -1471,15 +1471,22 @@ Status.prototype.editSave = function(i_args) {
 		// If shot progress is 100% all tasks should be 100%
 		if ((statuses[i].obj.progress == 100) && (statuses[i].obj.tasks))
 			for (let t in statuses[i].obj.tasks)
-				statuses[i].obj.tasks[t].progress = 100;
+				if (statuses[i].obj.tasks[t].progress != 100)
+				{
+					statuses[i].obj.tasks[t].progress = 100;
+					statuses[i].obj.tasks[t].changed = true;
+				}
 
 		// If shot has OMIT flags, all tasks should be omitted
 		if (statuses[i].obj.flags && (statuses[i].obj.flags.indexOf('omit') != -1) && (statuses[i].obj.tasks))
 			for (let t in statuses[i].obj.tasks)
-			{
-				statuses[i].obj.tasks[t].flags = ['omit'];
-				statuses[i].obj.tasks[t].progress = -1;
-			}
+				if ((statuses[i].obj.tasks[t].flags.indexOf('omit') == -1) ||
+					(statuses[i].obj.tasks[t].progress != -1))
+				{
+					statuses[i].obj.tasks[t].flags = ['omit'];
+					statuses[i].obj.tasks[t].progress = -1;
+					statuses[i].obj.tasks[t].changed = true;
+				}
 
 		// If progress was changed we should update upper progress:
 		if (_progress != statuses[i].obj.progress)
@@ -1490,15 +1497,23 @@ Status.prototype.editSave = function(i_args) {
 
 		if (this.elEdit_Color.m_color_changed)
 			statuses[i].obj.color = this.elEdit_Color.m_color;
+	}
 
+	// News & Bookmarks:
+	// At first we should emit news,
+	// as some temporary could be added for news.
+	// For example task.changed = true
+	nw_StatusesChanged(statuses);
+
+	// Saving will filter objects.
+	// Temporary parameters will be removed.
+	for (let i = 0; i < statuses.length; i++)
+	{
 		statuses[i].save();
 		statuses[i].show();
 		//^ Status showing causes values redraw,
 		// and destroys edit GUI if any.
 	}
-
-	// News & Bookmarks:
-	nw_StatusesChanged(statuses);
 
 	if (some_progress_changed)
 		st_UpdateProgresses(this.path, progresses);
@@ -1518,9 +1533,18 @@ Status.prototype.save = function() {
 
 function st_FilterStatusForSave(i_status)
 {
+	// Delete temporary items:
 	delete i_status.error;
+
 	if (i_status.body)
 		delete i_status.body.data;
+
+	// Task changed property needed for news.
+	// Artist that is assigned to task only,
+	// should receive news only if it task changed.
+	if (i_status.tasks)
+		for (let t in i_status.tasks)
+			delete i_status.tasks[t].changed;
 }
 
 function st_Save(i_status, i_path, i_func, i_args, i_navig_params_update)

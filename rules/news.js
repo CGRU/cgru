@@ -344,7 +344,7 @@ function nw_MakeNews(i_news, i_args)
 function nw_FilterStatus(i_status)
 {
 	var st = {};
-	var keys = ['artists','flags','progress','tags','color','frames_num','annotation','tasks'];
+	var keys = ['artists','flags','progress','tags','color','frames_num','annotation','tasks','changed'];
 
 	for (let key of keys)
 		if (i_status[key])

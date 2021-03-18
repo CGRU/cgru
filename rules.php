@@ -1498,17 +1498,7 @@ function isUserAssignedInStatus(&$i_user, &$i_status)
 	// Check user is assigned in status
 	if (array_key_exists('artists', $i_status))
 		if (in_array($i_user['id'], $i_status['artists']))
-		{
-			$no_need = false;
-			// There is no need of news/bookmark if shot is done or omitted
-			if (isset($i_status['progress']) && ($i_status['progress'] >= 100))
-				$no_need = true;
-			if (isset($i_status['flags']) && in_array('omit', $i_status['flags']))
-				$no_need = true;
-
-			if (false == $no_need)
 				return true;
-		}
 
 	// Check user is assigned is some task
 	if (array_key_exists('tasks', $i_status))
@@ -1521,13 +1511,8 @@ function isUserAssignedInStatus(&$i_user, &$i_status)
 			if (false == in_array($i_user['id'], $task['artists']))
 				continue;
 
-			// There is no need of news/bookmark if shot is done or omitted
-			if (isset($task['progress']) && ($task['progress'] >= 100))
-				continue;
-			if (isset($task['flags']) && in_array('omit', $task['flags']))
-				continue;
-
-			return true;
+			if (isset($task['changed']) && $task['changed'])
+				return true;
 		}
 
 	return false;

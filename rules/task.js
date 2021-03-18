@@ -668,6 +668,13 @@ Task.prototype.save = function(i_progress_changed)
 				obj[arr] = this.statusClass.obj[arr];
 		}
 
+	// News & Bookmarks:
+	// Setting change to true, we telling to news what task was changes in status.
+	// This way artists that are assigned to task only will
+	// receive news only when their task is changed.
+	this.obj.changed = true;
+	nw_StatusesChanged([this.statusClass]);
+
 	// Save constucted status object
 	st_Save(obj);
 
@@ -678,9 +685,6 @@ Task.prototype.save = function(i_progress_changed)
 
 	if (i_progress_changed)
 		st_UpdateProgresses(this.statusClass.path, progresses);
-
-	// News & Bookmarks:
-	nw_StatusesChanged([this.statusClass]);
 }
 
 Task.prototype.editDelete = function()
