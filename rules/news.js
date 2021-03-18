@@ -678,6 +678,10 @@ function nw_NewsShow(i_update_folders)
 			if (news.status == null) continue;
 			if (news.time == null) continue;
 
+			// Update status only when news title is status.
+			// There is no need to update status on body, comments change.
+			if (news.title != 'status') continue;
+
 			let el = g_elFolders[news.path];
 			if (el == null) continue;
 
@@ -685,8 +689,6 @@ function nw_NewsShow(i_update_folders)
 			if (fstat == null) continue;
 
 			// Update only if news time > folder status time
-			//console.log(JSON.stringify(fstat));
-			//console.log(fstat.mtime, news.time);
 			if (fstat.ctime && (fstat.ctime >= news.time)) continue;
 			if (fstat.mtime && (fstat.mtime >= news.time)) continue;
 
