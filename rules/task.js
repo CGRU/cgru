@@ -245,7 +245,7 @@ if ( ! _OLD_TASTKS_ )
 		this.elBtnEdit = document.createElement('button');
 		this.elBtnEdit.classList.add('button','edit','right');
 		this.elBtnEdit.m_task = this;
-		this.elBtnEdit.onclick = function(e){e.stopPropagation();e.currentTarget.m_task.edit();}
+		this.elBtnEdit.onclick = function(e){e.stopPropagation();e.currentTarget.m_task.updateOrEdit();}
 		this.elShow.appendChild(this.elBtnEdit);
 	}
 
@@ -347,6 +347,35 @@ Task.prototype.select = function()
 Task.prototype.deselect = function()
 {
 	this.elRoot.classList.remove('selected');
+}
+
+Task.prototype.updateOrEdit = function()
+{
+	n_GetFile({
+		"path": c_GetRuFilePath('status.json', this.path),
+		"func": task_StatusReceived,
+		"task_object": this,
+		"info": 'status.task',
+		"parse": true,
+		"local": true,
+		"cache_time":-1
+	});
+}
+
+function task_StatusReceived(i_data, i_args)
+{
+	if (null == i_data.status)
+		c_Error("Invalid status received:<br>" + JSON.stringify(i_data));
+	else
+		i_args.task_object.received(i_data.status);
+}
+
+Task.prototype.received = function(i_status)
+{
+	if (i_status.mtime > this.statusClass.obj.mtime)
+		this.statusClass.update(i_status);
+	else
+		this.edit();
 }
 
 Task.prototype.edit = function()

@@ -166,7 +166,7 @@ function Status(i_obj, i_args)
 		this.elEditBtn.m_status = this;
 		this.elEditBtn.onclick = function(e) {
 			e.stopPropagation();
-			e.currentTarget.m_status.edit();
+			e.currentTarget.m_status.updateOrEdit();
 		};
 	}
 
@@ -271,6 +271,8 @@ Status.prototype.update = function(i_status)
 	this.elParent.classList.add('updating');
 
 	setTimeout(st_UpdatingFinished, 1000);
+
+	c_Info('Status updated.');
 }
 
 function st_UpdatingFinished()
@@ -808,6 +810,36 @@ function st_SetElFinish(i_status, i_elFinish, i_full)
 	i_elFinish.style.color = 'rgb(' + Math.round(150 * alpha) + ',0,0)';
 	i_elFinish.textContent = text;
 }
+
+Status.prototype.updateOrEdit = function()
+{
+	n_GetFile({
+		"path": c_GetRuFilePath('status.json', this.path),
+		"func": st_StatusReceived,
+		"status_object": this,
+		"info": 'status',
+		"parse": true,
+		"local": true,
+		"cache_time":-1
+	});
+}
+
+function st_StatusReceived(i_data, i_args)
+{
+	if (null == i_data.status)
+		c_Error("Invalid status received:<br>" + JSON.stringify(i_data));
+	else
+		i_args.status_object.received(i_data.status);
+}
+
+Status.prototype.received = function(i_status)
+{
+	if (i_status.mtime > this.obj.mtime)
+		this.update(i_status);
+	else
+		this.edit();
+}
+
 Status.prototype.edit = function(i_args) {
 	// console.log( JSON.stringify( i_args));
 	// console.log(JSON.stringify(i_status));
