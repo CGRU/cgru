@@ -1,3 +1,5 @@
+.. _cgru-configuration:
+
 Configuration
 =============
 

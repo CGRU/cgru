@@ -64,7 +64,9 @@ To switch user mode you need to type password in active Watch window
 (you do not need to re-login to switch between modes).
 To reset super user mode you can type password again.
 
-You can configure passwords in a CGRU config JSON file by variables:
+You can configure passwords in a CGRU config JSON files
+(see :ref:`cgru-configuration` page).
+Passwords are defined by configuration variables:
 
 pswd_visor
 ----------
