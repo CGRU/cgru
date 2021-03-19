@@ -18,10 +18,6 @@ VERBOSE = 0
 af = None
 
 
-def getNodeName(node):
-    return node.name()
-
-
 def checkFrameRange(framefirst, framelast, frameinc, framespertask, string=''):
     if string != '':
         string = ' on "%s"' % string
@@ -86,7 +82,7 @@ def getInputNodes(afnode, parent):
             addnodes.extend(nuke.allNodes(RenderNodeClassName, nuke.root()))
             addnodes.extend(nuke.allNodes(AfanasyNodeClassName, nuke.root()))
             if len(addnodes) > 1:
-                addnodes.sort(None, getNodeName)
+                addnodes = sorted(addnodes, key = lambda node: node.name())
             for node in addnodes:
                 if rexpr.match(node.name()):
                     inputnodes.append(node)
@@ -932,8 +928,7 @@ def render(node=None):
     framespertask_max = None
     framesequential_min = None
     framesequential_max = None
-    selectednodes = nuke.selectedNodes()
-    selectednodes.sort(None, getNodeName)
+    selectednodes = sorted(nuke.selectedNodes(), key = lambda node: node.name())
     for node in selectednodes:
         if node.Class() == AfanasyNodeClassName \
                 or node.Class() == RenderNodeClassName \

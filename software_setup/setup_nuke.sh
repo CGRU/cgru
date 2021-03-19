@@ -42,14 +42,10 @@ do
       fi
    fi
 done
-if [ -z "$NUKE_LOCATION" ]; then
-	echo "Nuke was not found in $NUKE_INSTALL_DIR"
-	exit 1
-fi
-export NUKE_EXEC="${NUKE_LOCATION}/${NUKE_EXEC}"
-#echo "NUKE = '${NUKE_EXEC}'"
 
-LM_LICENSE_FILE="`dirname $NUKE_EXEC`/nuke.lic"
+export NUKE_EXEC="${NUKE_LOCATION}/${NUKE_EXEC}"
+
+LM_LICENSE_FILE="${NUKE_LOCATION}/nuke.lic"
 if [ -f $LM_LICENSE_FILE ]; then
    export LM_LICENSE_FILE 
    echo "LM_LICENCS_FILE='$LM_LICENSE_FILE'"
