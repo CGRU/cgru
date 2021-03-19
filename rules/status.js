@@ -887,7 +887,7 @@ Status.prototype.edit = function(i_args) {
 	elBtnSave.textContent = 'Save';
 	elBtnSave.m_status = this;
 	elBtnSave.m_args = i_args;
-	elBtnSave.onclick = function(e) { e.currentTarget.m_status.editSave(i_args); };
+	elBtnSave.onclick = function(e) { e.currentTarget.m_status.editProcess(i_args); };
 
 	var elDiv = document.createElement('div');
 	this.elEdit.appendChild(elDiv);
@@ -1133,7 +1133,7 @@ Status.prototype.editOnKeyDown = function(e, i_args) {
 	if (e.keyCode == 27)
 		this.show();  // ESC
 	if (e.keyCode == 13)
-		this.editSave(i_args);  // ENTER
+		this.editProcess(i_args);  // ENTER
 };
 function st_EditColorOnClick(i_clr, i_data)
 {
@@ -1303,7 +1303,7 @@ Status.prototype.editCancel = function() {
 	this.elEdit = null;
 };
 
-Status.prototype.editSave = function(i_args) {
+Status.prototype.editProcess = function(i_args) {
 	if (this.obj == null)
 		this.obj = {};
 
@@ -1424,6 +1424,8 @@ Status.prototype.editSave = function(i_args) {
 		if (progress !== null)
 			statuses[i].obj.progress = progress;
 
+		st_SetStatusFlags(statuses[i].obj, flags);
+
 		if (artists)
 		{
 			if (statuses[i].obj.artists == null)
@@ -1438,50 +1440,6 @@ Status.prototype.editSave = function(i_args) {
 			for (let id in artists)
 				if ((artists[id].selected) && (statuses[i].obj.artists.indexOf(id) == -1))
 					statuses[i].obj.artists.push(id);
-		}
-
-		if (flags)
-		{
-			if (statuses[i].obj.flags == null)
-				statuses[i].obj.flags = [];
-
-			for (let a = 0; a < statuses[i].obj.flags.length;)
-				if (flags[statuses[i].obj.flags[a]] == null)
-					statuses[i].obj.flags.splice(a, 1);
-				else
-					a++;
-
-			// Store existing flags to check was it ON before:
-			let _flags = [];
-			for (let a = 0; a < statuses[i].obj.flags.length; a++)
-				_flags.push(statuses[i].obj.flags[a]);
-
-			for (let id in flags)
-				if ((flags[id].selected) && (_flags.indexOf(id) == -1))
-				{
-					if (RULES.flags[id])
-					{
-						// Flag can limit minimum and maximum progress percentage:
-						let p_min = RULES.flags[id].p_min;
-						let p_max = RULES.flags[id].p_max;
-						let progress = statuses[i].obj.progress;
-
-						if (p_min && ((progress == null) || (progress < p_min)))
-							progress = p_min;
-
-						if (p_max && ((p_max < 0) || (progress > p_max)))
-							progress = p_max;
-
-						if (progress != null)
-							statuses[i].obj.progress = progress;
-
-						// Flag can be exclusive, so we should delete other flags:
-						if (RULES.flags[id].excl)
-							statuses[i].obj.flags = [];
-					}
-
-					statuses[i].obj.flags.push(id);
-				}
 		}
 
 		if (tags)
@@ -1525,21 +1483,6 @@ Status.prototype.editSave = function(i_args) {
 							statuses[i].obj.tags.push(tag);
 					}
 				}
-
-				/*/ Add artist to status:
-				if (tasks[t].artists && tasks[t].artists.length)
-				{
-					if (statuses[i].obj.artists == null)
-						statuses[i].obj.artists = [];
-
-					for (var j = 0; j < tasks[t].artists.length; j++)
-					{
-						var artist = tasks[t].artists[j];
-
-						if (statuses[i].obj.artists.indexOf(artist) == -1)
-							statuses[i].obj.artists.push(artist);
-					}
-				}*/
 			}
 
 			statuses[i].obj.tasks = tasks;
@@ -1729,6 +1672,57 @@ function st_SetTimeCode(i_tc)
 	}
 
 	st_Save(save_fields, null, null, null, navig_params_update);
+}
+
+function st_SetStatusFlags(o_status, i_flags)
+{
+	if (null == i_flags)
+		return;
+
+	if (null == o_status)
+		return;
+
+	if (o_status.flags == null)
+		o_status.flags = [];
+
+	for (let a = 0; a < o_status.flags.length;)
+		if (i_flags[o_status.flags[a]] == null)
+			o_status.flags.splice(a, 1);
+		else
+			a++;
+
+	// Store existing flags to check was it ON before:
+	let _flags = [];
+	for (let a = 0; a < o_status.flags.length; a++)
+		_flags.push(o_status.flags[a]);
+
+	for (let id in i_flags)
+		if ((i_flags[id].selected) && (_flags.indexOf(id) == -1))
+		{
+			if (RULES.flags[id])
+			{
+				// Flag can limit minimum and maximum progress percentage:
+				let p_min = RULES.flags[id].p_min;
+				let p_max = RULES.flags[id].p_max;
+				let progress = o_status.progress;
+
+				if (p_min && ((progress == null) || (progress < p_min)))
+					progress = p_min;
+
+				if (p_max && ((progress == null) || (p_max < 0) || (progress > p_max)))
+					progress = p_max;
+
+				if (progress != null)
+					o_status.progress = progress;
+
+				// Flag can be exclusive, so we should delete other flags:
+				if (RULES.flags[id].excl)
+					o_status.flags = [];
+			}
+
+			o_status.flags.push(id);
+		}
+console.log(JSON.stringify(o_status));
 }
 
 function st_UpdateProgresses(i_path, i_progresses)

@@ -495,17 +495,16 @@ Task.prototype.editCancel = function()
 
 Task.prototype.editProcess = function()
 {
-	// Initialize nulls
-	let progress = null;
-	let artists = null;
-	let flags = null;
+	let this_is_a_new_task = false;
 
-	// Set values to statuses
-	let progress_changed = false;
+	// Store previous progress to find out that it was changed
+	let progress_prevous = this.obj.progress;
 
 	if (this.obj.name == null)
 	{
 		// This is a new added task
+		this_is_a_new_task = true;
+
 		let selected_tags = this.editTags.getSelectedNames();
 		if (selected_tags)
 			this.obj.tags = selected_tags;
@@ -531,9 +530,6 @@ Task.prototype.editProcess = function()
 			this.statusClass.obj.tasks = {};
 		this.statusClass.obj.tasks[this.obj.name] = this.obj;
 
-		// On a new task, total progress should be recalculated
-		progress_changed = true;
-
 		// Set creation user and time:
 		this.obj.cuser = g_auth_user.id;
 		this.obj.ctime = c_DT_CurSeconds();
@@ -545,69 +541,38 @@ Task.prototype.editProcess = function()
 		this.obj.mtime = c_DT_CurSeconds();
 	}
 
-
-	// Get values
+	// Get progress
 	let progress_edit = this.elEditPercentContent.textContent;
 	if (progress_edit.length && (progress_edit != st_MultiValue))
 	{
 		progress_edit = c_Strip(progress_edit);
-		progress = parseInt(progress_edit);
+		let progress = parseInt(progress_edit);
 		if (isNaN(progress))
 		{
-			progress = null;
+			progress = 0;
 			c_Error('Invalid progress: ' + c_Strip(progress_edit));
 		}
 		if (progress < -1)
 			progress = -1;
 		if (progress > 100)
 			progress = 100;
-	}
 
-	artists = this.editAritsts.getSelectedNames();
-	flags   = this.editFlags.getSelectedNames();
-
-
-	// Set values:
-	// Flags min, max progress and exclusiveness:
-	if (null !== flags){
-		this.obj.flags = [];
-		let p_min = null;
-		let p_max = null;
-		for (let f of flags)
-		{
-			let rFlag = RULES.flags[f];
-			if (rFlag)
-			{
-				if (rFlag.excl)
-				{
-					this.obj.flags = [];
-					p_min = null;
-					p_max = null;
-				}
-				if (rFlag.p_min && ((null === p_min) || (p_min > rFlag.p_min)))
-					p_min = rFlag.p_min;
-				if (rFlag.p_max && ((null === p_max) || (p_max > rFlag.p_max)))
-					p_max = rFlag.p_max;
-			}
-			this.obj.flags.push(f);
-		}
-
-		if (p_min && (progress < p_min))
-			progress = p_min;
-		else if (p_max && (progress > p_max))
-			progress = p_max;
-	}
-	// Progress:
-	if ((null !== progress) && (this.obj.progress != progress))
-	{
 		this.obj.progress = progress;
-		progress_changed = true;
 	}
+
+	// Get flags.
+	// We should do it after progress, as flags can limit it.
+	st_SetStatusFlags(this.obj, this.editFlags.getSelectedObjects());
+
 	// Artists:
+	let artists = this.editAritsts.getSelectedNames();
 	if (null !== artists )
 		this.obj.artists = artists;
 
-	this.save(progress_changed);
+	// We should calculate status progress
+	// if task progress is changed
+	// or if it is a new task
+	this.save(this_is_a_new_task || (progress_prevous != this.obj.progress));
 }
 
 Task.prototype.save = function(i_progress_changed)
