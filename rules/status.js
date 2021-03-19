@@ -1722,7 +1722,6 @@ function st_SetStatusFlags(o_status, i_flags)
 
 			o_status.flags.push(id);
 		}
-console.log(JSON.stringify(o_status));
 }
 
 function st_UpdateProgresses(i_path, i_progresses)
