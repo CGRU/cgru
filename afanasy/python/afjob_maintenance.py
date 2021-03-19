@@ -34,6 +34,7 @@ Renders = []
 if Options.hostsmask:
     for render in afcmd.getRenderList(Options.hostsmask):
         Renders.append(render.name)
+    Renders.sort()
 else:
     if len(Args) < 2:
         Parser.error('You should specify renders to run on.')
