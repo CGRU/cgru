@@ -1490,14 +1490,21 @@ Status.prototype.editProcess = function(i_args) {
 			statuses[i].obj.price = price;
 		}
 
-		// If shot progress is 100% all tasks should be 100%
+		// If shot progress is 100% all tasks should be 100% done.
 		if ((statuses[i].obj.progress == 100) && (statuses[i].obj.tasks))
 			for (let t in statuses[i].obj.tasks)
+			{
 				if (statuses[i].obj.tasks[t].progress != 100)
 				{
 					statuses[i].obj.tasks[t].progress = 100;
 					statuses[i].obj.tasks[t].changed = true;
 				}
+				if (statuses[i].obj.tasks[t].flags.indexOf('done') == -1)
+				{
+					statuses[i].obj.tasks[t].flags = ['done'];
+					statuses[i].obj.tasks[t].changed = true;
+				}
+			}
 
 		// If shot has OMIT flags, all tasks should be omitted
 		if (statuses[i].obj.flags && (statuses[i].obj.flags.indexOf('omit') != -1) && (statuses[i].obj.tasks))
