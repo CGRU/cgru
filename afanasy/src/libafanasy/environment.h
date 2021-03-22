@@ -169,6 +169,10 @@ public:
 	static inline const std::string & getRenderIOStatDevice()  { return render_iostat_device;   }
 	static inline const std::vector<std::string> & getRenderResClasses() { return render_resclasses;}
 
+	static inline int getRenderOverflowMem()  {return render_overflow_mem; }
+	static inline int getRenderOverflowSwap() {return render_overflow_swap;}
+	static inline int getRenderOverflowHDD()  {return render_overflow_hdd; }
+
 	static inline int getAfNodeLogLinesMax() { return afnode_log_lines_max; }
 
 	static inline const std::string & getStoreFolder()        { return store_folder;         }
@@ -325,6 +329,10 @@ private:
 	static std::string render_iostat_device;
 	static std::vector<std::string> render_resclasses;
 	static std::string render_networkif;
+
+	static int render_overflow_mem;
+	static int render_overflow_swap;
+	static int render_overflow_hdd;
 
 	static int errors_avoid_host;
 	static int task_error_retries;

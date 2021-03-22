@@ -911,7 +911,7 @@ void RenderAf::removeTask(const af::TaskExec * i_taskexec, MonitorContainer * i_
 	m_parent->taskRelease(i_taskexec, exp_tickets, i_monitoring);
 }
 
-void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorContainer * monitoring)
+void RenderAf::v_refresh( time_t i_current_time,  AfContainer * pointer, MonitorContainer * monitoring)
 {
 	if( isLocked() ) return;
 
@@ -929,7 +929,7 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 	int zombie_time = m_parent->getZombieTime();
 	if (zombie_time <= 0)
 		zombie_time = AFRENDER::ZOMBIETIME;
-	if (isOnline() && (getTimeUpdate() < (currentTime - zombie_time)))
+	if (isOnline() && (getTimeUpdate() < (i_current_time - zombie_time)))
 	{
 		appendLog( std::string("ZOMBIETIME: ") + af::itos(zombie_time) + " seconds.");
 		AFCommon::QueueLog( std::string("Render: \"") + getName() + "\" - ZOMBIETIME");
@@ -942,7 +942,7 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 	int _no_task_event_timeout = m_parent->getNoTaskEventTime() * (1 << m_no_task_event_count);
 	if (isOnline() && (m_tasks.size() == 0) && m_no_task_time && (_no_task_event_timeout > 0))
 	{
-		if ((currentTime - m_no_task_time) > _no_task_event_timeout)
+		if ((i_current_time - m_no_task_time) > _no_task_event_timeout)
 		{
 			std::ostringstream str;
 			str << "RENDER_NO_TASK: " << m_parent->getNoTaskEventTime()
@@ -956,25 +956,23 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 	}
 	else
 	{
-		m_no_task_time = currentTime;
+		m_no_task_time = i_current_time;
 		m_no_task_event_count = 0;
 	}
 
-	// Check overload event
-	if (isOnline() && (m_parent->getOverloadEventTime() > 0) && (
-				(m_hres.mem_free_mb == 0)
-			|| (m_hres.hdd_free_gb == 0)
-			|| (m_hres.swap_total_mb && (m_hres.swap_total_mb == m_hres.swap_used_mb))
-			))
+	// Check resources overflow for overload event
+	if (checkOverload())
 	{
-		if ((currentTime - m_overload_time) > m_overload_seconds)
+		if ((i_current_time - m_overload_time) > m_overload_seconds)
 		{
 			std::ostringstream str;
-			str << "RENDER_OVERLOAD: Free"
-				<< " MEM=" << m_hres.mem_free_mb
-				<< " HDD="  << m_hres.hdd_free_gb
-				<< " SWAP="  << m_hres.swap_total_mb - m_hres.swap_used_mb
-				<< " for " << m_overload_seconds << " seconds.";
+			str << "RENDER_OVERLOAD: For "  << m_overload_seconds << " seconds:";
+			str << "\nMem: free = " << m_hres.mem_free_mb << "MB, total = " << m_hres.mem_total_mb << "MB"
+				<< ", overflow limit = " << af::Environment::getRenderOverflowMem() << "%";
+			str << "\nSwap: free = " << (m_hres.swap_total_mb - m_hres.swap_used_mb) << "MB, total = " << m_hres.swap_total_mb << "MB"
+				<< ", overflow limit = " << af::Environment::getRenderOverflowSwap() << "%";
+			str << "\nHDD: free = " << m_hres.hdd_free_gb << "GB, total = " << m_hres.hdd_total_gb << "GB"
+				<< ", overflow limit = " << af::Environment::getRenderOverflowHDD() << "%";
 			appendLog(str.str());
 			emitEvents(std::vector<std::string>(1, "RENDER_OVERLOAD"));
 
@@ -987,7 +985,7 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 	}
 	else
 	{
-		m_overload_time  = currentTime;
+		m_overload_time  = i_current_time;
 		m_overload_seconds = 0;
 	}
 
@@ -1010,15 +1008,15 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 	// Later auto nimby operations not needed if render is not online:
 	if( isOffline())
 	{
-		m_busy_time = currentTime;
-		m_idle_time = currentTime;
+		m_busy_time = i_current_time;
+		m_idle_time = i_current_time;
 		return;
 	}
 
 	// Update busy with no task time:
 	if(( isFree() == false ) || isBusy()) // already nimby or has task(s)
 	{
-		m_busy_time = currentTime;
+		m_busy_time = i_current_time;
 	}
 	else
 	{
@@ -1057,9 +1055,9 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 		// Render will be treated as 'not busy' if all params are 'not busy'
 		if (cpu & mem & swp & hio & hgb & net)
 		{
-			m_busy_time = currentTime;
+			m_busy_time = i_current_time;
 		}
-		else if ((m_parent->get_busy_nimby_time() > 0) && (currentTime - m_busy_time > m_parent->get_busy_nimby_time()))
+		else if ((m_parent->get_busy_nimby_time() > 0) && (i_current_time - m_busy_time > m_parent->get_busy_nimby_time()))
 		{
 		// Automatic Nimby ON:
 			std::string log("Automatic Nimby: ");
@@ -1075,7 +1073,7 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 	// Update idle time:
 	if( isBusy())
 	{
-		m_idle_time = currentTime;
+		m_idle_time = i_current_time;
 	}
 	else if((m_parent->get_idle_cpu()    <= 0) &&
 			(m_parent->get_idle_mem()    <= 0) &&
@@ -1085,7 +1083,7 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 			(m_parent->get_idle_netmbs() <= 0))
 	{
 		// If all params are 'off' there is no 'idle':
-		m_idle_time = currentTime;
+		m_idle_time = i_current_time;
 	}
 	else
 	{
@@ -1124,13 +1122,13 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 		// it will be treated as 'not idle' any param is 'not idle'
 		if( cpu | mem | swp | hio | hgb | net )
 		{
-			m_idle_time = currentTime;
+			m_idle_time = i_current_time;
 		}
 		else 
 		{
 			// Automatic WOL sleep:
 			if ((m_parent->get_idle_wolsleep_time() > 0) && isOnline() && (isWOLSleeping() == false) && (isWOLFalling() == false)
-				&& (currentTime - m_idle_time > m_parent->get_idle_wolsleep_time()))
+				&& (i_current_time - m_idle_time > m_parent->get_idle_wolsleep_time()))
 			{
 				std::string log("Automatic WOL Sleep: ");
 				log += "\n Idle since: " + af::time2str(m_idle_time);
@@ -1141,7 +1139,7 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 
 			// Automatic Nimby Free:
 			if ((m_parent->get_idle_free_time() > 0) && isOnline() && (isNimby() || isNIMBY())
-				&& (currentTime - m_idle_time > m_parent->get_idle_free_time()))
+				&& (i_current_time - m_idle_time > m_parent->get_idle_free_time()))
 			{
 				std::string log("Automatic Nimby Free: ");
 				log += "\n Idle since: " + af::time2str(m_idle_time);
@@ -1155,7 +1153,7 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 	}
 }
 
-void RenderAf::v_postSolve(time_t i_curtime, MonitorContainer * i_monitoring)
+void RenderAf::v_postSolve(time_t i_current_time, MonitorContainer * i_monitoring)
 {
 	bool changed = false;
 
@@ -1164,7 +1162,7 @@ void RenderAf::v_postSolve(time_t i_curtime, MonitorContainer * i_monitoring)
 	if (isBusy() && (m_tasks.size() == 0))
 	{
 		setBusy(false);
-		m_task_start_finish_time = i_curtime;
+		m_task_start_finish_time = i_current_time;
 		changed = true;
 	}
 
@@ -1221,6 +1219,36 @@ void RenderAf::closeLostTask( const af::MCTaskUp &taskup)
 	AFCommon::QueueLogError( stream.str());
 
 	render->m_re.addTaskClose( taskup);
+}
+
+bool RenderAf::checkOverload()
+{
+	// If render is offline, it can't be overloaded
+	if (isOffline())
+		return false;
+
+	// By default overload time is -1.
+	// It means that the feature is disabled.
+	// To enable feature, overload time should be > 0.
+	if (m_parent->getOverloadEventTime() <= 0)
+		return false;
+
+	// Check memory
+	if (m_hres.mem_total_mb)
+		if (((100 * m_hres.mem_free_mb) / m_hres.mem_total_mb) <= af::Environment::getRenderOverflowMem())
+			return true;
+
+	// Check swap
+	if (m_hres.swap_total_mb)
+		if (((100 * (m_hres.swap_total_mb - m_hres.swap_used_mb)) / m_hres.swap_total_mb) <= af::Environment::getRenderOverflowSwap())
+			return true;
+
+	// Check HDD
+	if (m_hres.hdd_total_gb)
+		if (((100 * m_hres.hdd_free_gb) / m_hres.hdd_total_gb) <= af::Environment::getRenderOverflowHDD())
+			return true;
+
+	return false;
 }
 
 void RenderAf::emitEvents(const std::vector<std::string> & i_events) const

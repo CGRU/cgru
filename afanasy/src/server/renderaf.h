@@ -103,10 +103,10 @@ public:
 	void taskFinished(const af::TaskExec * i_exec, int64_t i_state, MonitorContainer * i_monitoring);
 
 	/// Refresh parameters.
-	void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
+	void v_refresh(time_t i_current_time, AfContainer * pointer, MonitorContainer * monitoring);
 
 	// Perform post solving calculations:
-	void v_postSolve(time_t i_curtime, MonitorContainer * i_monitoring);
+	void v_postSolve(time_t i_current_time, MonitorContainer * i_monitoring);
 
 	af::Msg * writeTasksLog( bool i_binary);
 
@@ -184,6 +184,9 @@ private:
 	 * @param events: event types, e.g. RENDER_ZOMBIE or RENDER_SICK
 	 */
 	void emitEvents(const std::vector<std::string> & i_events) const;
+
+	// Check resources, on overflow emit RENDER_OVERLOAD event
+	bool checkOverload();
 
 private:
 	std::list<std::string> m_tasks_log;							///< Tasks Log.

@@ -121,6 +121,12 @@
 		"":"After server restart, running tasks will wait renders to reconnect.",
 
 	"af_render_cmd_wolwake":"wolwake",
+
+	"af_render_overflow_mem" :90,
+	"af_render_overflow_swap":-1,
+	"af_render_overflow_hdd" :-1,
+		"":"Percentage of a free memomry, swap and hdd, to consider thar render overflowed",
+
 	"":"",
 
 "":"Thumbnail:",

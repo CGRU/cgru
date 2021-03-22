@@ -85,6 +85,10 @@ std::string Environment::render_networkif =            AFRENDER::NETWORK_IF;
 std::string Environment::render_hddspace_path =        AFRENDER::HDDSPACE_PATH;
 std::string Environment::render_iostat_device =        AFRENDER::IOSTAT_DEVICE;
 
+int Environment::render_overflow_mem  = -1;
+int Environment::render_overflow_swap = -1;
+int Environment::render_overflow_hdd  = -1;
+
 std::string Environment::pswd_visor =                  AFUSER::PSWD_VISOR;
 std::string Environment::pswd_god =                    AFUSER::PSWD_GOD;
 int     Environment::errors_forgivetime =              AFUSER::ERRORS_FORGIVETIME;
@@ -278,6 +282,9 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, render_resclasses,                 "af_render_resclasses"                 );
 	getVar( i_obj, render_nice,                       "af_render_nice"                       );
 	getVar( i_obj, render_windowsmustdie,             "af_render_windowsmustdie"             );
+	getVar( i_obj, render_overflow_mem,               "af_render_overflow_mem"               );
+	getVar( i_obj, render_overflow_swap,              "af_render_overflow_swap"              );
+	getVar( i_obj, render_overflow_hdd,               "af_render_overflow_hdd"               );
 
 	getVar( i_obj, rendercmds,                        "af_rendercmds"                        );
 	getVar( i_obj, rendercmds_admin,                  "af_rendercmds_admin"                  );
