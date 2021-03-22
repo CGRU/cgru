@@ -767,10 +767,9 @@ void BlockInfo::generateMenu(QMenu * i_menu, QMenu * i_params_submenu) const
 		"restart_skipped",   "Restart Skipped",
 		"restart_done",      "Restart Done"};
 
-	QStringListIterator it(operations);
-	while (it.hasNext())
+	for (int i = 0; i < operations.size(); i+=2)
 	{
-		ActionString * action = new ActionString(it.next(), it.next(), m_listitems);
+		ActionString * action = new ActionString(operations[i], operations[i+1], m_listitems);
 		connect(action, SIGNAL(triggeredString(QString)), this, SLOT(slot_BlockOperation(QString)));
 		i_menu->addAction(action);
 	}
