@@ -87,6 +87,8 @@ ListWork::ListWork(QWidget * i_parent):
 		bp = addButtonPanel(Item::TJob, "SET BRANCH","job_change_branch","Change job branch.");
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_JobSetBranch()));
 	}
+	else
+		m_paramspanel->v_setEditable(false);
 }
 
 ListWork::~ListWork()
@@ -102,7 +104,7 @@ void ListWork::v_hideChanged()
 
 void ListWork::contextMenuEvent(QContextMenuEvent *event)
 {
-	if (false == af::Environment::GOD())
+	if (false == af::Environment::VISOR())
 		return;
 
 	Item * item = getCurrentItem();
@@ -125,6 +127,14 @@ void ListWork::contextMenuEvent(QContextMenuEvent *event)
 	menu.addAction(action);
 
 	menu.exec(event->globalPos());
+}
+
+void ListWork::v_doubleClicked(Item * i_item)
+{
+	if (false == af::Environment::VISOR())
+		return;
+
+	ListJobs::v_doubleClicked(i_item);
 }
 
 bool ListWork::v_caseMessage(af::Msg * msg)

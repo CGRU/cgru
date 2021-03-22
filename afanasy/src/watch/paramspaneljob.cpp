@@ -21,7 +21,8 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-ParamsPanelJob::ParamsPanelJob()
+ParamsPanelJob::ParamsPanelJob():
+	m_editable(true)
 {
 	// Construct folders widgets:
 	QFrame * folders_frame = new QFrame();
@@ -214,6 +215,7 @@ void ParamsPanelJob::constructBlocks(ItemJob * i_item)
 	for (int b = 0; b < i_item->getBlocksNum(); b++)
 	{
 		BlockCaptionWidget * bw = new BlockCaptionWidget(i_item->getBlockInfo(b));
+		bw->setEditable(m_editable);
 
 		// Open block, if job has only one
 		if (i_item->getBlocksNum() == 1)
@@ -231,6 +233,18 @@ void ParamsPanelJob::clearBlocks()
 	m_blocks_widgets.clear();
 }
 
+void ParamsPanelJob::v_setEditable(bool i_editable)
+{
+	if (m_editable == i_editable)
+		return;
+
+	m_editable = i_editable;
+
+	for (int b = 0; b < m_blocks_widgets.size(); b++)
+		m_blocks_widgets[b]->setEditable(i_editable);
+
+	ParamsPanel::v_setEditable(i_editable);
+}
 
 ///////////// Folders:
 
@@ -352,6 +366,7 @@ void BlockNameLabel::paintEvent(QPaintEvent *event)
 }
 
 BlockCaptionWidget::BlockCaptionWidget(const BlockInfo * i_info):
+	m_editable(true),
 	m_info(i_info),
 	m_info_widget(NULL)
 {
@@ -398,6 +413,7 @@ void BlockCaptionWidget::slot_OpenInfo()
 	m_btn_close->setHidden(false);
 
 	m_info_widget = new BlockInfoWidget(m_info);
+	m_info_widget->setEditable(m_editable);
 	m_layout->addWidget(m_info_widget);
 }
 
@@ -416,6 +432,14 @@ void BlockCaptionWidget::slot_CloseInfo()
 	m_info_widget = NULL;
 }
 
+void BlockCaptionWidget::setEditable(bool i_editable)
+{
+	m_editable = i_editable;
+
+	if (m_info_widget)
+		m_info_widget->setEditable(i_editable);
+}
+
 void BlockCaptionWidget::update()
 {
 	if (m_info_widget)
@@ -423,6 +447,7 @@ void BlockCaptionWidget::update()
 }
 
 BlockInfoWidget::BlockInfoWidget(const BlockInfo * i_info):
+	m_editable(true),
 	m_info(i_info),
 	m_params_show_all(false)
 {
@@ -433,10 +458,10 @@ BlockInfoWidget::BlockInfoWidget(const BlockInfo * i_info):
 	layout->addLayout(tcaplayout);
 	tcaplayout->addWidget(new QLabel("<b>Tickets</b>:"));
 
-	QPushButton * btn_ticket_add = new QPushButton("add");
-	btn_ticket_add->setFixedSize(36, 16);
-	connect(btn_ticket_add, SIGNAL(clicked()), m_info, SLOT(slot_BlockTicketAdd()));
-	tcaplayout->addWidget(btn_ticket_add);
+	m_btn_ticket_add = new QPushButton("add");
+	m_btn_ticket_add->setFixedSize(36, 16);
+	connect(m_btn_ticket_add, SIGNAL(clicked()), m_info, SLOT(slot_BlockTicketAdd()));
+	tcaplayout->addWidget(m_btn_ticket_add);
 
 	m_tickets_layout = new QVBoxLayout();
 	layout->addLayout(m_tickets_layout);
@@ -495,6 +520,24 @@ void BlockInfoWidget::slot_BlockParamsShowAll()
 	m_params_show_all = true;
 }
 
+void BlockInfoWidget::setEditable(bool i_editable)
+{
+	if (m_editable == i_editable)
+		return;
+
+	m_editable = i_editable;
+
+	m_btn_ticket_add->setHidden(false == i_editable);
+
+	QMap<QString, ParamTicket*>::iterator pIt = m_map_params_ticket.begin();
+	for (; pIt != m_map_params_ticket.end(); pIt++)
+		pIt.value()->setEditable(i_editable);
+
+	QList<ParamWidget*>::iterator wIt = m_params_widgets.begin();
+	for (; wIt != m_params_widgets.end(); wIt++)
+		(*wIt)->v_setEditable(i_editable);
+}
+
 void BlockInfoWidget::update()
 {
 	// Update or delete tickets:
@@ -522,6 +565,7 @@ void BlockInfoWidget::update()
 		if (pIt == m_map_params_ticket.end())
 		{
 			ParamTicket * pt = new ParamTicket(bIt.key(), bIt.value());
+			pt->setEditable(m_editable);
 			m_map_params_ticket[bIt.key()] = pt;
 			m_tickets_layout->addWidget(pt);
 			connect(pt, SIGNAL(sig_Edit(QString)), m_info, SLOT(slot_BlockTicketEdit(QString)));

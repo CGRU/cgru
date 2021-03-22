@@ -26,6 +26,8 @@ public:
 
 	void initPanel(const QList<Param*> & i_params, QSplitter * i_splitter, const QString & i_type);
 
+	virtual void v_setEditable(bool i_editable);
+
 	virtual void v_updatePanel(Item * i_item = NULL);
 
 	void addParamWidget(Param * i_param);
@@ -96,6 +98,8 @@ public:
 	ParamWidget(const Param * i_parm);
 	virtual ~ParamWidget();
 
+	virtual void v_setEditable(bool i_editable);
+
 	void update(const Item * i_item, int i_params_show);
 	void update(const QMap<QString, QVariant> & i_var_map, bool i_show_all);
 
@@ -111,10 +115,10 @@ protected:
 	QLabel * m_label_widget;
 	QLabel * m_value_widget;
 
+	QPushButton * m_btn_edit;
+
 private slots:
 	void slot_Edit();
-
-private:
 };
 
 class ParamSeparator: public QWidget
@@ -136,6 +140,8 @@ Q_OBJECT
 public:
 	ParamTicket(const QString & i_name, int i_count, int i_usage = -1, int i_hosts = -1, int i_max_hosts = -1);
 	~ParamTicket();
+
+	void setEditable(bool i_editable);
 
 	void update(int i_count, int i_usage = -1, int i_hosts = -1, int i_max_hosts = -1);
 

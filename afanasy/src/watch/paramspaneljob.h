@@ -27,6 +27,8 @@ public:
 	ParamsPanelJob();
 	virtual ~ParamsPanelJob();
 
+	virtual void v_setEditable(bool i_editable);
+
 	virtual void v_updatePanel(Item * i_item = NULL);
 
 private:
@@ -41,6 +43,8 @@ private slots:
 	void slot_Rules();
 
 private:
+	bool m_editable;
+
 	QVBoxLayout * m_folders_layout;
 	QPushButton * m_rules_btn;
 	QString       m_rules_path;
@@ -108,6 +112,8 @@ public:
 	BlockCaptionWidget(const BlockInfo * i_info);
 	~BlockCaptionWidget();
 
+	void setEditable(bool i_editable);
+
 	void update();
 
 public slots:
@@ -115,6 +121,7 @@ public slots:
 	void slot_CloseInfo();
 
 private:
+	bool m_editable;
 	const BlockInfo * m_info;
 	QVBoxLayout * m_layout;
 	QPushButton * m_btn_open;
@@ -129,6 +136,8 @@ public:
 	BlockInfoWidget(const BlockInfo * i_info);
 	~BlockInfoWidget();
 
+	void setEditable(bool i_editable);
+
 	void update();
 
 private slots:
@@ -138,7 +147,10 @@ private:
 	void addBlockParamWidget(Param * i_param);
 
 private:
+	bool m_editable;
 	const BlockInfo * m_info;
+
+	QPushButton * m_btn_ticket_add;
 
 	QVBoxLayout * m_tickets_layout;
 	QMap<QString, ParamTicket*> m_map_params_ticket;

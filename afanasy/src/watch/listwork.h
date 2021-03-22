@@ -30,6 +30,7 @@ public:
 
 protected:
 	void contextMenuEvent( QContextMenuEvent *event);
+	void v_doubleClicked(Item * i_item);
 
 private slots:
 	void slot_ACC_Enable();

@@ -240,6 +240,13 @@ void ParamsPanel::updateParams()
 		(*sIt)->update(m_cur_item, m_params_show);
 }
 
+void ParamsPanel::v_setEditable(bool i_editable)
+{
+	QList<ParamWidget*>::iterator pIt;
+	for (pIt = m_params_list.begin(); pIt != m_params_list.end(); pIt++)
+		(*pIt)->v_setEditable(i_editable);
+}
+
 void ParamsPanel::updateParamShowButton()
 {
 	switch(m_params_show)
@@ -292,12 +299,12 @@ ParamWidget::ParamWidget(const Param * i_param):
 	m_value_widget->setTextInteractionFlags(Qt::TextBrowserInteraction);
 	m_value_widget->setWordWrap(true);
 
-	QPushButton * btn = new QPushButton("[...]");
-	layout->addWidget(btn);
-	btn->setToolTip("Edit");
-	btn->setFixedSize(24, 16);
+	m_btn_edit = new QPushButton("[...]");
+	layout->addWidget(m_btn_edit);
+	m_btn_edit->setToolTip("Edit");
+	m_btn_edit->setFixedSize(24, 16);
 
-	connect(btn, SIGNAL(clicked()), this, SLOT(slot_Edit()));
+	connect(m_btn_edit, SIGNAL(clicked()), this, SLOT(slot_Edit()));
 
 	setHidden(true);
 }
@@ -347,6 +354,11 @@ void ParamWidget::update(const QMap<QString, QVariant> & i_var_map, bool i_show_
 		setHidden(false);
 	else
 		setHidden(is_default);
+}
+
+void ParamWidget::v_setEditable(bool i_editable)
+{
+	m_btn_edit->setHidden(false == i_editable);
 }
 
 void ParamWidget::paintEvent(QPaintEvent * event)
@@ -428,6 +440,11 @@ ParamTicket::ParamTicket(const QString & i_name, int i_count, int i_usage, int i
 
 ParamTicket::~ParamTicket()
 {
+}
+
+void ParamTicket::setEditable(bool i_editable)
+{
+	m_edit_btn->setHidden(false == i_editable);
 }
 
 void ParamTicket::update(int i_count, int i_usage, int i_hosts, int i_max_hosts)
