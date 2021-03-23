@@ -17,6 +17,8 @@ public:
 	inline int count() const { return items.size();}
 	QVariant data( const QModelIndex &index, int role) const;
 
+	virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
+
 	void addItem( Item * item, int row = -1);
 
 	void delItem( int row);

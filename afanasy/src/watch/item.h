@@ -37,6 +37,8 @@ public:
 
 	inline int getHeight() const { return m_height;}
 
+	virtual bool v_isSelectable() const;
+
 	void paint(QPainter * i_painter, const QStyleOptionViewItem & i_option) const;
 	virtual void v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const;
 

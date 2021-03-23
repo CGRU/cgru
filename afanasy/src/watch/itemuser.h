@@ -31,6 +31,8 @@ public:
 
 	bool calcHeight();
 
+	bool v_isSelectable() const override;
+
 protected:
 	virtual void v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const;
 

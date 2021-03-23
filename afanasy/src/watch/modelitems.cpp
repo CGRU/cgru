@@ -44,6 +44,20 @@ QVariant ModelItems::data( const QModelIndex &index, int role) const
    }
 }
 
+Qt::ItemFlags ModelItems::flags(const QModelIndex &index) const
+{
+	Qt::ItemFlags flags = Qt::NoItemFlags;
+
+	if (Item::isItemP(index.data()))
+		if (Item::toItemP(index.data())->v_isSelectable())
+		{
+			flags |= Qt::ItemIsEnabled;
+			flags |= Qt::ItemIsSelectable;
+		}
+
+	return flags;
+}
+
 void ModelItems::addItem( Item * item, int row)
 {
    if( row == -1) row = items.size();

@@ -74,6 +74,11 @@ bool Item::calcHeight()
     return true;
 }
 
+bool Item::v_isSelectable() const
+{
+	return true;
+}
+
 const QColor & Item::clrTextMain( const QStyleOptionViewItem &option) const
 {
 	if( m_locked ) return afqt::QEnvironment::clr_textbright.c;

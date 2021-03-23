@@ -115,10 +115,11 @@ ListUsers::ListUsers( QWidget* parent):
 
 	initListNodes();
 
-	if( false == af::Environment::VISOR()) setAllowSelection( false);
+	if (false == af::Environment::VISOR())
+		setAllowSelection(false);
 
-	connect( (ModelNodes*)m_model, SIGNAL( nodeAdded( ItemNode *, const QModelIndex &)),
-			                 this,   SLOT( userAdded( ItemNode *, const QModelIndex &)));
+	connect((ModelNodes*)m_model, SIGNAL(nodeAdded(ItemNode *, const QModelIndex &)),
+			                 this,  SLOT(userAdded(ItemNode *, const QModelIndex &)));
 }
 
 ListUsers::~ListUsers()

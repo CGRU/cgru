@@ -156,6 +156,18 @@ bool ItemRender::calcHeight()
 	return old_height == m_height;
 }
 
+bool ItemRender::v_isSelectable() const
+{
+	if (af::Environment::GOD())
+		return true;
+
+	if ((getName() == QString::fromUtf8(af::Environment::getComputerName().c_str())) ||
+		(getUserName() == QString::fromUtf8(af::Environment::getUserName().c_str())))
+		return true;
+
+	return false;
+}
+
 void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 {
 	af::Render * render = (af::Render*)i_afnode;

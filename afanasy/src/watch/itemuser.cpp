@@ -5,6 +5,7 @@
 #include "../libafqt/qenvironment.h"
 
 #include "ctrlsortfilter.h"
+#include "monitorhost.h"
 #include "watch.h"
 
 #include <QtCore/QEvent>
@@ -174,6 +175,17 @@ bool ItemUser::calcHeight()
 	m_height = HeightUser;
 	if( false == m_annotation.isEmpty()) m_height += HeightAnnotation;
 	return old_height == m_height;
+}
+
+bool ItemUser::v_isSelectable() const
+{
+	if (af::Environment::VISOR())
+		return true;
+
+	if (getId() == MonitorHost::getUid())
+		return true;
+
+	return false;
 }
 
 void ItemUser::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const

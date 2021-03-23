@@ -22,6 +22,8 @@ public:
 
 	bool calcHeight();
 
+	bool v_isSelectable() const override;
+
 	inline int get_resources_update_period() const {if (m_resources_update_period <= 0 && m_parent_pool)
 		return m_parent_pool->get_resources_update_period(); else return m_resources_update_period;}
 	inline int get_heartbeat_sec() const {if (m_heartbeat_sec <= 0 && m_parent_pool)

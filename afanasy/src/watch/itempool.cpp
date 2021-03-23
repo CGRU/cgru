@@ -281,6 +281,14 @@ bool ItemPool::calcHeight()
 	return old_height == m_height;
 }
 
+bool ItemPool::v_isSelectable() const
+{
+	if (af::Environment::GOD())
+		return true;
+
+	return false;
+}
+
 void ItemPool::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const
 {
 	QColor c("#737770");

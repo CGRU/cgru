@@ -249,12 +249,11 @@ ListRenders::ListRenders( QWidget* parent):
 	m_paramspanel = paramspanelfarm;
 	initListNodes();
 
+	if(false == af::Environment::GOD())
+		setAllowSelection(false);
+
 	connect( (ModelNodes*)m_model, SIGNAL(   nodeAdded( ItemNode *, const QModelIndex &)),
 	                         this,   SLOT( renderAdded( ItemNode *, const QModelIndex &)));
-
-	if (false == af::Environment::VISOR())
-		connect(m_view->selectionModel(), SIGNAL(       selectionChanged(const QItemSelection &, const QItemSelection &)),
-	                                this,   SLOT(rendersSelectionChanged(const QItemSelection &, const QItemSelection &)));
 
 	setSpacing();
 
@@ -315,31 +314,6 @@ void ListRenders::renderAdded( ItemNode * node, const QModelIndex & index)
 	}
 }
 
-void ListRenders::rendersSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected)
-{
-	QModelIndexList indexes = selected.indexes();
-	if (indexes.size() == 0)
-	{
-		return;
-	}
-
-	for (int i = 0; i < indexes.count(); i++)
-		if (Item::isItemP(indexes[i].data()))
-		{
-			Item * item = (Item::toItemP(indexes[i].data()));
-
-			if (item->getType() == Item::TRender)
-			{
-				ItemRender * render = (ItemRender*)item;
-				if ((render->getName() != QString::fromUtf8(af::Environment::getComputerName().c_str())) &&
-					(render->getUserName() != QString::fromUtf8(af::Environment::getUserName().c_str())))
-					m_view->selectionModel()->select(indexes[i], QItemSelectionModel::Deselect);
-			}
-			else
-				m_view->selectionModel()->select(indexes[i], QItemSelectionModel::Deselect);
-		}
-}
-
 void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 {
 	Item * item = getCurrentItem();
@@ -352,7 +326,10 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 	ItemRender * render = (ItemRender*)item;
 
 	bool me = false;
-	if( render->getName().contains( QString::fromUtf8( af::Environment::getComputerName().c_str())) || ( render->getUserName() == QString::fromUtf8( af::Environment::getUserName().c_str()))) me = true;
+	if (render->getName().contains(QString::fromUtf8( af::Environment::getComputerName().c_str())) ||
+		(render->getUserName() == QString::fromUtf8(af::Environment::getUserName().c_str())))
+		me = true;
+
 	int selectedItemsCount = getSelectedItemsCount();
 
 	QMenu menu(this);
