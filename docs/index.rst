@@ -3,7 +3,9 @@ Welcome to CGRU - AFANASY documentation!
 
 .. sidebar:: Read The Funny Manuals!
 
-	*Last edit* |today|
+	**Latest changes:** :ref:`changes-log-latest`
+
+	*Last edit*: |today|
 
 
 Contents:

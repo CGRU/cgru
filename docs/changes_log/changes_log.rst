@@ -11,12 +11,14 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
 - The third number versions are fully compatible.
   You can upgrade only one client or server for changes.
 
+.. _changes-log-latest:
+
 v3.2.0
 ======
 
 *Not released.*
 
-2021.03.17
+2021.03.23
 
 **New Afanasy network protocol version.**
 
@@ -44,6 +46,11 @@ v3.2.0
 - `RENDER_OVERLOAD <../afanasy/server.html#render-overload>`_ event
   and pool `overload_event_time <../afanasy/pools.html#overload-event-time>`_ parameter.
 
+- **Bugfixes**
+
+	- AfWatch Work monitor allows modifications only in admin mode.
+	- AfWatch Users and Farm monitors allow selection and current item change only in admin mode.
+	- AfWatch Job Block operatons fixed to work on MS Windows.
 
 v3.1.1
 ======
