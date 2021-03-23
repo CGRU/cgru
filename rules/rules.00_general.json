@@ -16,7 +16,9 @@
 },
 
 "bookmarks":{
-	"refresh":300
+	"refresh":300,
+	"obsolete_delete_days":10,
+	"inactive_delete_days":366
 },
 
 "-group_folders_levels":[3,4],

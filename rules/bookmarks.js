@@ -263,6 +263,8 @@ function bm_Show()
 
 	bm_HighlightCurrent();
 	bm_ThumbnailsShowHide();
+
+	bm_DeleteObsoleteForTime();
 }
 
 function bm_CreateBookmark(i_bm)
@@ -444,18 +446,63 @@ function bm_DeleteFinished(i_data)
 
 function bm_DeleteObsoleteOnClick()
 {
-	var paths = [];
-	for (var i = 0; i < bm_elements.length; i++)
-		if (bm_elements[i].classList.contains('obsolete'))
-			paths.push(bm_elements[i].m_bookmark.path);
-
-	if (paths.length == 0)
+	let bookmarks_deleted = bm_DeleteObsoleteForTime(true);
+	if (bookmarks_deleted == 0)
+		c_Info('No obsolete bookmarks found.');
+	else
+		c_Info('Bookmarks deleted: ' + bookmarks_deleted);
+}
+function bm_DeleteObsoleteForTime(i_delete_any_time)
+{
+	let paths = [];
+	let cur_seconds = c_DT_CurSeconds();
+	for (let i = 0; i < bm_elements.length; i++)
 	{
-		c_Info('No obsolete bookmarks founded.');
-		return;
+		let el = bm_elements[i];
+		let bm = el.m_bookmark;
+
+		if ( ! bm.mtime)
+		{
+			paths.push(bm.path);
+			c_Log('Deleting invalid bookmark: ' + bm.path + ' - no modification time.');
+			continue;
+		}
+
+		if (false == el.classList.contains('obsolete'))
+		{
+			// Delete bookmarks that are inactive for a long time
+			if ((cur_seconds - bm.mtime) > (RULES.bookmarks.inactive_delete_days * 24 * 60 * 60))
+			{
+				paths.push(bm.path);
+				c_Log('Deleting inactive bookmark: ' + bm.path + ' - '
+						+ c_DT_StrFromSec(bm.mtime) + ' - ' + RULES.bookmarks.inactive_delete_days + ' days.');
+			}
+
+			continue;
+		}
+
+		// Deleta all obsolete bookmarks
+		if (i_delete_any_time)
+		{
+			paths.push(bm.path);
+			c_Log('Deleting obsolete bookmark: ' + bm.path);
+			continue;
+		}
+
+		// Delete obsolete bookmarks if modified time later than configured
+		if ((cur_seconds - bm.mtime) > (RULES.bookmarks.obsolete_delete_days * 24 * 60 * 60))
+		{
+			paths.push(bm.path);
+			c_Log('Deleting obsolete bookmark: ' + bm.path + ' - '
+					+ c_DT_StrFromSec(bm.mtime) + ' - ' + RULES.bookmarks.obsolete_delete_days + ' days.');
+			continue;
+		}
 	}
 
-	bm_Delete(paths);
+	if (paths.length)
+		bm_Delete(paths);
+
+	return paths.length;
 }
 
 /* ---------------- [ thumbnail functions ] -------------------------------------------------------------- */
