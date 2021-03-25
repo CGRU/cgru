@@ -805,6 +805,21 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 	elItem.m_elMenu.style.display = 'none';
 	elItem.m_elMenu.classList.add('menu');
 
+	// Copy link to the item:
+	{
+		let el = document.createElement('div');
+		elBody.appendChild(el);
+		el.classList.add('anchor');
+		el.title = 'Click to copy link to the item.';
+		el.m_path = g_GetLocationArgs({"fv_Goto": elItem.m_path});
+		el.onclick = function(e) {
+			e.stopPropagation();
+			let text = e.currentTarget.m_path;
+			navigator.clipboard.writeText(text);
+			c_Info('Link copied: "' + text + '"')
+		};
+	}
+
 	// Button to add a comment with a link to this item:
 	{
 		var el = document.createElement('div');
