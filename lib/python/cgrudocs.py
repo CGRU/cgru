@@ -10,7 +10,7 @@ def show(i_path=None):
 
     if i_path is not None:
         i_path.rstrip('/')
-        url = '%s/%s' % (url, i_path)
+        url = '%s/en/latest/%s' % (url, i_path)
 
     cgruutils.webbrowse( url)
 
