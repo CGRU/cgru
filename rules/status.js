@@ -1517,6 +1517,18 @@ Status.prototype.editProcess = function(i_args) {
 					statuses[i].obj.tasks[t].changed = true;
 				}
 
+		// Shot "super" flags resets tasks flags
+		if (statuses[i].obj.flags && statuses[i].obj.flags.length)
+			for (let f of statuses[i].obj.flags)
+				if (f && RULES.flags[f] && statuses[i].obj.tasks && RULES.flags[f].mode && (RULES.flags[f].mode == "super"))
+					for (let t in statuses[i].obj.tasks)
+						if (statuses[i].obj.tasks[t].flags &&
+							statuses[i].obj.tasks[t].flags.length)
+						{
+							statuses[i].obj.tasks[t].flags = [];
+							statuses[i].obj.tasks[t].changed = true;
+						}
+
 		// If progress was changed we should update upper progress:
 		if (_progress != statuses[i].obj.progress)
 		{
@@ -1551,7 +1563,7 @@ Status.prototype.editProcess = function(i_args) {
 	if (some_progress_changed)
 		st_UpdateProgresses(this.path, progresses);
 
-	c_Info('Status(es) saved.');
+	c_Log('Status(es) saved.');
 };
 
 Status.prototype.save = function() {
@@ -1723,7 +1735,10 @@ function st_SetStatusFlags(o_status, i_flags)
 					o_status.progress = progress;
 
 				// Flag can be exclusive, so we should delete other flags:
-				if (RULES.flags[id].excl)
+				if (RULES.flags[id].mode && (
+							(RULES.flags[id].mode == 'stage') ||
+							(RULES.flags[id].mode == 'super')
+							))
 					o_status.flags = [];
 			}
 
