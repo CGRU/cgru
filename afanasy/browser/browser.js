@@ -103,7 +103,7 @@ function g_ConfigReceived(i_obj)
 		}
 
 		if (cgru_Config.docs_url)
-			$('docs_link').href = cgru_Config.docs_url + '/afanasy/gui#web';
+			$('docs_link').href = cgru_Config.docs_url + '/en/latest/afanasy/watch.html';
 		if (cgru_Config.forum_url)
 			$('forum_link').href = cgru_Config.forum_url + '/viewforum.php?f=17';
 

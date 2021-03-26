@@ -51,8 +51,8 @@
         "FAILED"
     ],
 
-	"docs_url":"http://cgru.info",
-	"forum_url":"http://forum.cgru.info",
+	"docs_url":"https://cgru.readthedocs.io",
+	"forum_url":"https://forum.cgru.info",
 
 	"":"Configure SMTP server to send emails from",
 	"email_smtp_server":"localhost",
