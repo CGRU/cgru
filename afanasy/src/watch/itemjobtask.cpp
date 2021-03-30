@@ -145,11 +145,11 @@ void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 				continue;
 
 			if (res[0] == "mem_peak_mb")
-				resources += QString(" %1GB").arg(res[1].toFloat() / 1024, 0, 'g', 2);
+				resources += QString(" %1GB").arg(res[1].toFloat() / 1024, 0, 'f', 2);
 			else if(res[0] == "cpu_avg")
 				resources += QString(" %1%").arg(res[1]);
 			else if(res[0].endsWith("_mb"))
-				resources += QString(" %1:%2GB").arg(res[0].left(res[0].size()-3)).arg(res[1].toFloat() / 1024, 0, 'g', 2);
+				resources += QString(" %1:%2GB").arg(res[0].left(res[0].size()-3)).arg(res[1].toFloat() / 1024, 0, 'f', 2);
 		}
 		if (resources.size())
 			rightString += QString(":") + resources;
