@@ -90,7 +90,8 @@ function shot_InitHTML( i_data)
 
 		for (let el of elements)
 		{
-if (g_CurPath().indexOf('/SWORD_III/') == 0)
+//if (g_CurPath().indexOf('/SWORD_III/') == 0)
+if ((g_CurPath().indexOf('/VAMPIRS/') != 0) && (g_CurPath().indexOf('/MAGIC_SUMMER/') != 0))
 			if (activity_Selected == null)
 				el.style.display = 'none';
 

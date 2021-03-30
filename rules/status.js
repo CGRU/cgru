@@ -826,15 +826,12 @@ Status.prototype.updateOrEdit = function()
 
 function st_StatusReceived(i_data, i_args)
 {
-	if (null == i_data.status)
-		c_Error("Invalid status received:<br>" + JSON.stringify(i_data));
-	else
-		i_args.status_object.received(i_data.status);
+	i_args.status_object.received(i_data.status);
 }
 
 Status.prototype.received = function(i_status)
 {
-	if (i_status.mtime > this.obj.mtime)
+	if (i_status && i_status.mtime && (i_status.mtime > this.obj.mtime))
 		this.update(i_status);
 	else
 		this.edit();
