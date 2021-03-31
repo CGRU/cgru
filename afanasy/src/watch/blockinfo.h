@@ -133,6 +133,8 @@ private:
 	void addParam_Str(const QString & i_name, const QString & i_label, const QString & i_tip);
 	void addParam_REx(const QString & i_name, const QString & i_label, const QString & i_tip);
 	void addParam_Hrs(const QString & i_name, const QString & i_label, const QString & i_tip);
+	void addParam_MiB(const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = 1<<30);
+	void addParam_GiB(const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = 1<<30);
 
 	void drawProgress(
 		QPainter * i_painter,

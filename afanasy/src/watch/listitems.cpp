@@ -548,6 +548,26 @@ void ListItems::addParam_Num(
 	addParam(new Param(Param::TNum, i_type, i_name, i_label, i_tip, i_min, i_max));
 }
 
+void ListItems::addParam_MiB(
+		Item::EType i_type,
+		const QString & i_name,
+		const QString & i_label,
+		const QString & i_tip,
+		int i_min, int i_max)
+{
+	addParam(new Param(Param::TMiB, i_type, i_name, i_label, i_tip, i_min, i_max));
+}
+
+void ListItems::addParam_GiB(
+		Item::EType i_type,
+		const QString & i_name,
+		const QString & i_label,
+		const QString & i_tip,
+		int i_min, int i_max)
+{
+	addParam(new Param(Param::TGiB, i_type, i_name, i_label, i_tip, i_min, i_max));
+}
+
 void ListItems::addParam_Str(
 		Item::EType i_type,
 		const QString & i_name,

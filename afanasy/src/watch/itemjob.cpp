@@ -147,8 +147,6 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 	hostsmask_exclude    = afqt::stoq(job->getHostsMaskExclude());
 	dependmask           = afqt::stoq(job->getDependMask());
 	dependmask_global    = afqt::stoq(job->getDependMaskGlobal());
-	need_os              = afqt::stoq(job->getNeedOS());
-	need_properties      = afqt::stoq(job->getNeedProperties());
 	cmd_pre              = afqt::stoq(job->getCmdPre());
 	cmd_post             = afqt::stoq(job->getCmdPost());
 	description          = afqt::stoq(job->getDescription());
@@ -219,8 +217,12 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 		if (false == dependmask.isEmpty()       ) m_str_props += QString(" Depends(%1)").arg(dependmask);
 		if (false == hostsmask.isEmpty()        ) m_str_props += QString(" HostsMask(%1)").arg(hostsmask);
 		if (false == hostsmask_exclude.isEmpty()) m_str_props += QString(" ExcludeHosts(%1)").arg(hostsmask_exclude);
+		if (false == need_os.isEmpty()          ) m_str_props += QString(" OS:%1").arg(need_os);
 		if (false == need_properties.isEmpty()  ) m_str_props += QString(" Properities(%1)").arg(need_properties);
-		if (maxrunningtasks != -1) m_str_props += QString(" MaxTasks:%1").arg(maxrunningtasks);
+		if (need_memory != -1) m_str_props += QString(" Mem>%1").arg(afqt::stoq(af::toKMG(int64_t(need_memory)*(1<<20), 1<<10)));
+		if (need_hdd    != -1) m_str_props += QString(" HDD>%1").arg(afqt::stoq(af::toKMG(int64_t(need_hdd   )*(1<<30), 1<<10)));
+		if( need_power  != -1) m_str_props += QString(" Power>%1").arg(need_power);
+		if (maxrunningtasks    != -1) m_str_props += QString(" MaxTasks:%1"  ).arg(maxrunningtasks);
 		if (maxruntasksperhost != -1) m_str_props += QString(" MaxPerHost:%1").arg(maxruntasksperhost);
 		if (ppapproval) m_str_props += " PPA";
 		if (maintenance) m_str_props += " MNT";
@@ -233,7 +235,11 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 		if (false == dependmask.isEmpty()       ) m_str_props += QString(" Dep(%1)").arg(dependmask);
 		if (false == hostsmask.isEmpty()        ) m_str_props += QString(" Host(%1)").arg(hostsmask);
 		if (false == hostsmask_exclude.isEmpty()) m_str_props += QString(" Exclude(%1)").arg(hostsmask_exclude);
+		if (false == need_os.isEmpty()          ) m_str_props += QString(" OS:%1").arg(need_os);
 		if (false == need_properties.isEmpty()  ) m_str_props += QString(" Props(%1)").arg(need_properties);
+		if (need_memory != -1) m_str_props += QString(" Mem>%1").arg(afqt::stoq(af::toKMG(int64_t(need_memory)*(1<<20), 1<<10)));
+		if (need_hdd    != -1) m_str_props += QString(" HDD>%1").arg(afqt::stoq(af::toKMG(int64_t(need_hdd   )*(1<<30), 1<<10)));
+		if( need_power  != -1) m_str_props += QString(" Pow>%1").arg(need_power);
 		if (maxrunningtasks != -1) m_str_props += QString(" Max:%1").arg(maxrunningtasks);
 		if (maxruntasksperhost != -1) m_str_props += QString(" PerHost:%1").arg(maxruntasksperhost);
 		if (ppapproval) m_str_props += " PPA";
@@ -247,7 +253,11 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 		if (false == dependmask.isEmpty()       ) m_str_props += QString(" d(%1)").arg(dependmask      );
 		if (false == hostsmask.isEmpty()        ) m_str_props += QString(" h(%1)").arg(hostsmask       );
 		if (false == hostsmask_exclude.isEmpty()) m_str_props += QString(" e(%1)").arg(hostsmask_exclude);
-		if (false == need_properties.isEmpty()  ) m_str_props += QString(" p(%1)").arg(need_properties );
+		if (false == need_os.isEmpty()          ) m_str_props += QString(" %1").arg(need_os);
+		if (false == need_properties.isEmpty()  ) m_str_props += QString(" p(%1)").arg(need_properties);
+		if (need_memory != -1) m_str_props += QString(" m>%1").arg(afqt::stoq(af::toKMG(int64_t(need_memory)*(1<<20), 1<<10)));
+		if (need_hdd    != -1) m_str_props += QString(" h>%1").arg(afqt::stoq(af::toKMG(int64_t(need_hdd   )*(1<<30), 1<<10)));
+		if( need_power  != -1) m_str_props += QString(" p>%1").arg(need_power);
 		if (maxrunningtasks != -1) m_str_props += QString(" m%1").arg(maxrunningtasks);
 		if (maxruntasksperhost != -1) m_str_props += QString(" mph%1").arg(maxruntasksperhost);
 		if (ppapproval) m_str_props += " ppa";

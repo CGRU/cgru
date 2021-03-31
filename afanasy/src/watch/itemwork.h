@@ -25,6 +25,12 @@ public:
 	int running_tasks_num;
 	int64_t running_capacity_total;
 
+	QString need_os;
+	QString need_properties;
+	int need_power;
+	int need_memory;
+	int need_hdd;
+
 protected:
 	int calcHeightWork() const;
 	void updateInfo(const af::Work * i_afwork);

@@ -217,8 +217,8 @@ ListJobs::ListJobs(QWidget * i_parent, bool i_listwork, const std::string & i_na
 	addParam_separator();
 	addParam_Num(Item::TJob, "need_power",      "Power Needed",       "Job need client that has at least this power", -1, 1<<30);
 	addParam_REx(Item::TJob, "need_os",         "OS Needed",          "Job will run only on this OS");
-	addParam_Num(Item::TJob, "need_memory",     "Memory Needed",      "Job need client to have at least this free memory (MB)", -1, 1<<30);
-	addParam_Num(Item::TJob, "need_hdd",        "HDD Needed",         "Job need client to have at least this free HDD space (GB)", -1, 1<<30);
+	addParam_MiB(Item::TJob, "need_memory",     "Memory Needed",      "Job need client to have at least this free memory (GB)", -1, 1<<30);
+	addParam_GiB(Item::TJob, "need_hdd",        "HDD Needed",         "Job need client to have at least this free HDD space (GB)", -1, 1<<30);
 	addParam_REx(Item::TJob, "need_properties", "Properties Needed",  "Job need client that has such properties");
 
 	m_paramspanel = new ParamsPanelJob();

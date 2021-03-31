@@ -13,10 +13,12 @@ public:
 		tsep = 0,
 		TNum = 1,
 		TStr = 2,
-		TMSI = 3,
+		TMSI = 3, // Map <String, Integer>
 		TREx = 4,
 		Time = 5,
-		THrs = 6
+		THrs = 6,
+		TGiB = 7,
+		TMiB = 8
 	};
 
 	Param(EType i_type, Item::EType i_itemtype, const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = -1);

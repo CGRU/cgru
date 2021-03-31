@@ -78,6 +78,8 @@ protected:
 	void addParam_REx(Item::EType i_type, const QString & i_name, const QString & i_label, const QString & i_tip);
 	void addParam_Tim(Item::EType i_type, const QString & i_name, const QString & i_label, const QString & i_tip);
 	void addParam_Hrs(Item::EType i_type, const QString & i_name, const QString & i_label, const QString & i_tip);
+	void addParam_MiB(Item::EType i_type, const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = -1);
+	void addParam_GiB(Item::EType i_type, const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = -1);
 
 	void initListItems();
 

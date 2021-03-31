@@ -40,10 +40,23 @@ const QString Param::varToQStr(const QVariant & i_var, bool * o_default) const
 		break;
 	}
 	case TNum:
+	case TMiB:
+	case TGiB:
 	{
 		int64_t value = i_var.toLongLong();
-		str = QString("%1").arg(value);
 		is_default = (value == -1);
+
+		if ((value > 0) && (type != TNum))
+		{
+			if (type == TMiB)
+				value *= (1<<20);
+			else
+				value *= (1<<30);
+			str = afqt::stoq(af::toKMG(value, 1<<10, " ") + "B");
+		}
+		else
+			str = QString("%1").arg(value);
+
 		break;
 	}
 	case TStr:
@@ -110,9 +123,11 @@ bool Param::getInputDialog(const QVariant & i_var, QString & o_str, QWidget * i_
 		break;
 	}
 	case TNum:
+	case TGiB:
 	{
 		int64_t current = i_var.toLongLong();
-		int64_t value = QInputDialog::getInt(i_parent, label, tip, current, m_min, m_max, 1, &ok);
+		QString _tip = tip + "\nEnter number of Gigabytes";
+		int64_t value = QInputDialog::getInt(i_parent, label, _tip, current, m_min, m_max, 1, &ok);
 		if (ok)
 			o_str = QString("%1").arg(value);
 		break;
@@ -225,6 +240,23 @@ bool Param::getInputDialog(const QVariant & i_var, QString & o_str, QWidget * i_
 				o_str = "0";
 			else
 				o_str = QString("%1").arg(int(value * (60.0 * 60.0)));
+		}
+		break;
+	}
+	case TMiB:
+	{
+		QString _tip = tip + "\nEnter number of Gigabytes";
+		double current = double(i_var.toLongLong()) / (1<<10);
+		double value = QInputDialog::getDouble(i_parent, label, _tip, current, -1, 1<<30, 2, &ok);
+
+		if (ok)
+		{
+			if (value == 0)
+				o_str = "0";
+			else if (value < 0)
+				o_str = "-1";
+			else
+				o_str = QString("%1").arg(int(value * (1<<10)));
 		}
 		break;
 	}

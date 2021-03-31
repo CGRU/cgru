@@ -44,8 +44,6 @@ public:
 	QString hostsmask_exclude;
 	QString dependmask;
 	QString dependmask_global;
-	QString need_os;
-	QString need_properties;
 	QString cmd_pre;
 	QString cmd_post;
 	QString description;

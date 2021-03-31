@@ -70,8 +70,8 @@ BlockInfo::BlockInfo(const af::BlockData * i_data, Item * i_item, ListItems * i_
 	addParam_separator();
 	addParam_REx("hosts_mask",                   "Hosts Mask",            "Host names pattern that block can run on");
 	addParam_REx("hosts_mask_exclude",           "Hosts Mask Exclude",    "Host names pattern that block will not run");
-	addParam_Num("need_memory",                  "Need Memory",           "Host free memory needed to run tasks");
-	addParam_Num("need_hdd",                     "Need HDD Space",        "Host free HDD space needed to run tasks");
+	addParam_MiB("need_memory",                  "Need Memory",           "Host free memory needed to run tasks (MB)");
+	addParam_GiB("need_hdd",                     "Need HDD Space",        "Host free HDD space needed to run tasks (GB)");
 	addParam_REx("need_properties",              "Need Properties",       "Host \"Properties\" needed to run tasks");
 	addParam_Num("need_power",                   "Need Power",            "Host \"Power\" needed to run tasks");
 	addParam_separator();
@@ -342,8 +342,8 @@ void BlockInfo::refresh()
 		if( false == hosts_mask.isEmpty()          ) str_right_top += QString(" HostsMask(%1)").arg( hosts_mask         );
 		if( false == hosts_mask_exclude.isEmpty()  ) str_right_top += QString(" ExcludeHosts(%1)").arg( hosts_mask_exclude );
 		if( false == need_properties.isEmpty()    ) str_right_top += QString(" Properties(%1)").arg( need_properties   );
-		if( need_memory > 0 ) str_right_top += QString(" Mem>%1").arg( need_memory);
-		if( need_hdd    > 0 ) str_right_top += QString(" HDD>%1").arg( need_hdd);
+		if (need_memory > 0) str_right_top += QString(" Mem>%1").arg(afqt::stoq(af::toKMG(int64_t(need_memory)*(1<<20), 1<<10)));
+		if (need_hdd    > 0) str_right_top += QString(" HDD>%1").arg(afqt::stoq(af::toKMG(int64_t(need_hdd   )*(1<<30), 1<<10)));
 		if( need_power  > 0 ) str_right_top += QString(" Power>%1").arg( need_power);
 		if( multihost )
 		{
@@ -396,8 +396,8 @@ void BlockInfo::refresh()
 		if( false == hosts_mask.isEmpty()          ) str_right_top += QString(" Hosts(%1)").arg( hosts_mask         );
 		if( false == hosts_mask_exclude.isEmpty()  ) str_right_top += QString(" Exclude(%1)").arg( hosts_mask_exclude );
 		if( false == need_properties.isEmpty()    ) str_right_top += QString(" Props(%1)").arg( need_properties   );
-		if( need_memory > 0 ) str_right_top += QString(" Mem>%1").arg( need_memory);
-		if( need_hdd    > 0 ) str_right_top += QString(" HDD>%1").arg( need_hdd);
+		if (need_memory > 0) str_right_top += QString(" Mem>%1").arg(afqt::stoq(af::toKMG(int64_t(need_memory)*(1<<20), 1<<10)));
+		if (need_hdd    > 0) str_right_top += QString(" HDD>%1").arg(afqt::stoq(af::toKMG(int64_t(need_hdd   )*(1<<30), 1<<10)));
 		if( need_power  > 0 ) str_right_top += QString(" Pow>%1").arg( need_power);
 		if( multihost )
 		{
@@ -450,8 +450,8 @@ void BlockInfo::refresh()
 		if( false == hosts_mask.isEmpty()          ) str_right_top += QString(" h(%1)").arg( hosts_mask         );
 		if( false == hosts_mask_exclude.isEmpty()  ) str_right_top += QString(" e(%1)").arg( hosts_mask_exclude );
 		if( false == need_properties.isEmpty()    ) str_right_top += QString(" p(%1)").arg( need_properties   );
-		if( need_memory > 0 ) str_right_top += QString(" m>%1").arg( need_memory);
-		if( need_hdd    > 0 ) str_right_top += QString(" h>%1").arg( need_hdd);
+		if (need_memory > 0) str_right_top += QString(" m>%1").arg(afqt::stoq(af::toKMG(int64_t(need_memory)*(1<<20), 1<<10)));
+		if (need_hdd    > 0) str_right_top += QString(" h>%1").arg(afqt::stoq(af::toKMG(int64_t(need_hdd   )*(1<<30), 1<<10)));
 		if( need_power  > 0 ) str_right_top += QString(" p>%1").arg( need_power);
 		if( multihost )
 		{
@@ -882,4 +882,10 @@ void BlockInfo::addParam_REx(const QString & i_name, const QString & i_label, co
 
 void BlockInfo::addParam_Hrs(const QString & i_name, const QString & i_label, const QString & i_tip) {
 	m_params.append(new Param(Param::THrs, Item::TAny, i_name, i_label, i_tip));}
+
+void BlockInfo::addParam_MiB(const QString & i_name, const QString & i_label, const QString & i_tip, int i_min, int i_max) {
+	m_params.append(new Param(Param::TMiB, Item::TAny, i_name, i_label, i_tip, i_min, i_max));}
+
+void BlockInfo::addParam_GiB(const QString & i_name, const QString & i_label, const QString & i_tip, int i_min, int i_max) {
+	m_params.append(new Param(Param::TGiB, Item::TAny, i_name, i_label, i_tip, i_min, i_max));}
 

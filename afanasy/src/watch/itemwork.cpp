@@ -44,6 +44,12 @@ void ItemWork::updateWorkValues(af::Work * i_afwork)
 
 	running_tasks_num          = i_afwork->getRunningTasksNum();
 	running_capacity_total     = i_afwork->getRunningCapacityTotal();
+
+	need_os         = afqt::stoq(i_afwork->getNeedOS());
+	need_properties = afqt::stoq(i_afwork->getNeedProperties());
+	need_power      = i_afwork->getNeedPower();
+	need_memory     = i_afwork->getNeedMemory();
+	need_hdd        = i_afwork->getNeedHDD();
 }
 
 int ItemWork::calcHeightWork() const
