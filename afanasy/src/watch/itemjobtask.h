@@ -67,8 +67,7 @@ private:
 	void thumbsCLear();
 
 private:
-	static const int TaskHeight;
-	static const int TaskThumbHeight;
+	static const int HeightThumb;
 
 private:
 	ListTasks * m_list;

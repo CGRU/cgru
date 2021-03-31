@@ -25,7 +25,7 @@ QPolygonF Item::ms_star_pointsDraw;
 const int Item::HeightAnnotation = 14;
 const int Item::HeightTickets = 24;
 
-const int Item::Height = 14;
+const int Item::Height = 16;
 const int Item::Width  = 100;
 
 Item::Item(const QString &i_name, int i_id, EType i_type):
@@ -71,6 +71,7 @@ QSize Item::sizeHint( const QStyleOptionViewItem &option) const
 
 bool Item::calcHeight()
 {
+	//AF_DEV << afqt::qtos(m_name) << ": " << m_height;
     return true;
 }
 
