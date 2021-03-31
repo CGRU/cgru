@@ -14,8 +14,6 @@ public:
 	ItemJobBlock(const af::BlockData * i_block, ListTasks * i_listtasks);
    ~ItemJobBlock();
 
-   virtual QSize sizeHint( const QStyleOptionViewItem &option) const;
-
    void update( const af::BlockData* block, int type);
 
    inline int getNumBlock() const { return numblock; }
@@ -98,8 +96,6 @@ private:
 	std::string m_tooltip_base;
 	std::string m_tooltip_properties;
 	std::string m_tooltip_progress;
-
-	int m_height;
 
 	BlockInfo * m_info;
 

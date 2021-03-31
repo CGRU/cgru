@@ -186,7 +186,7 @@ void Item::v_filesReceived( const af::MCTaskUp & i_taskup) {}
 
 void Item::printfState( const uint32_t state, int posx, int posy, QPainter * painter, const QStyleOptionViewItem &option) const
 {
-	static const int posx_d = 18;
+	static const int posx_d = 20;
 
 	painter->setFont( afqt::QEnvironment::f_min);
 

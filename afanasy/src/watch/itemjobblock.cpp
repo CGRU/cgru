@@ -43,11 +43,6 @@ ItemJobBlock::~ItemJobBlock()
 	delete m_info;
 }
 
-QSize ItemJobBlock::sizeHint( const QStyleOptionViewItem &option) const
-{
-	return QSize(Width, m_height);
-}
-
 void ItemJobBlock::update( const af::BlockData* block, int type)
 {
    switch( type)
@@ -139,7 +134,7 @@ void ItemJobBlock::v_paint(QPainter * i_painter, const QRect & i_rect, const QSt
 	i_painter->setPen(clrTextMain(i_option));
 	i_painter->drawText(x+5, y+16, m_info->getName());
 
-	printfState(state, x+w-125, y+8, i_painter, i_option);
+	printfState(state, x+w-136, y+8, i_painter, i_option);
 
 	i_painter->setFont(afqt::QEnvironment::f_info);
 	i_painter->setPen(clrTextInfo(i_option));

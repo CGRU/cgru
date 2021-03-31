@@ -24,6 +24,8 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
+const int ItemJobTask::TaskHeight = 14;
+const int ItemJobTask::TaskThumbHeight = 100;
 const int ItemJobTask::WidthInfo = 98;
 
 ItemJobTask::ItemJobTask( ListTasks * i_list, ItemJobBlock * i_block, int i_numtask, const af::BlockData * i_bdata):
@@ -45,6 +47,8 @@ ItemJobTask::ItemJobTask( ListTasks * i_list, ItemJobBlock * i_block, int i_numt
 	const af::TaskData * tdata = i_bdata->getTaskData(m_tasknum);
 	if (NULL == tdata)
 		return;
+
+	calcHeight();
 
 	m_files = tdata->getFiles();
 }
@@ -75,6 +79,7 @@ bool ItemJobTask::calcHeight()
 	if( m_thumbs_num )
 		m_height += ItemJobTask::TaskThumbHeight;
 
+	//AF_DEV << afqt::qtos(m_name) << ": " << m_height;
 	return old_height == m_height;
 }
 
@@ -111,6 +116,7 @@ void ItemJobTask::upProgress( const af::TaskProgress &tp){ taskprogress = tp;}
 
 void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const
 {
+	//AF_DEV << afqt::qtos(m_name) << ": " << m_height;
 	drawBack(i_painter, i_rect, i_option);
 
 	int x = i_rect.x(); int y = i_rect.y(); int w = i_rect.width();
@@ -269,7 +275,7 @@ void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 		}
 	}
 
-	printfState(taskprogress.state, x+w - WidthInfo+10, y+Height, i_painter, i_option);
+	printfState(taskprogress.state, x+w - WidthInfo+2, y+Height, i_painter, i_option);
 
 	if ((~taskprogress.state) & AFJOB::STATE_READY_MASK)
 	{

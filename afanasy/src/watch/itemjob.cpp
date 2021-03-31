@@ -506,7 +506,19 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 		properties_time += QString(" L%1-%2")
 			.arg(af::time2strHMS(lifetime, true).c_str()).arg(af::time2strHMS(lifetime - (currenttime - time_creation)).c_str());
 
-	printfState(state, x+35+(w>>3), y+25, i_painter, i_option);
+	// Draw state:
+	{
+		int _x = x + 32 + (w>>4);
+		int _y = y + 26;
+
+		i_painter->setOpacity(0.2);
+		i_painter->setPen(afqt::QEnvironment::qclr_black);
+		i_painter->setBrush(afqt::QEnvironment::clr_outline.c);
+		i_painter->drawRoundedRect(_x-4, _y+3, 204, -11, 2, 2);
+		i_painter->setOpacity(1.0);
+
+		printfState(state, _x, _y, i_painter, i_option);
+	}
 
 	QRect rect_done_time;
 	if (state & AFJOB::STATE_DONE_MASK)
