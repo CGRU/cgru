@@ -165,8 +165,18 @@ Render has no task for
 
 RENDER_OVERLOAD
 ~~~~~~~~~~~~~~~
-Render has no free memory or disk or swap.
-Next time event will be emitted after
+Render has low free memory or disk or swap.
+How much resources considered as low, you can configure by JSON config parameters:
+
+- ``af_render_overflow_mem`` - percentage of a free memory.
+- ``af_render_overflow_swap`` - percentage of a free swap.
+- ``af_render_overflow_hdd`` - percentage of a free disk space.
+
+By default this parameters are equal to ``-1`` and this means that the resource check is disabled.
+Practically good free percentage to emit event is ``1``,
+as an overloaded machine never reaches zero free memory or hdd.
+
+The next time event will be emitted after
 `overload_event_time <../afanasy/pools.html#overload-event-time>`_ seconds.
 
 There is already default Python service class:
