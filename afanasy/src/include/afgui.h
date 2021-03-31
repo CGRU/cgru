@@ -16,7 +16,7 @@ namespace AFGUI
 
 	const char FONT_FAMILY[] = "SansSerif";
 
-	const int THUMB_JOBS_NUM = 10;
+	const int THUMB_JOBS_NUM = 20;
 	const int THUMB_JOBS_HEIGHT = 50;
 
 	const int LEFT   = 0;

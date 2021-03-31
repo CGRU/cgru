@@ -399,7 +399,7 @@ bool ItemJob::calcHeight()
 	{
 		m_height += afqt::QEnvironment::thumb_jobs_height.n;
 		m_height += ItemJob::HeightThumbName;
-		m_height += 4;
+		m_height += 8;
 	}
 
 	return old_height == m_height;
@@ -588,30 +588,57 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 
 
 	// Thumbnails:
-	int tx = x + w;
-	static const int xb = 4;
-	i_painter->setPen(afqt::QEnvironment::qclr_black);
-	i_painter->setFont(afqt::QEnvironment::f_info);
-	for (int i = 0; i < m_thumbs.size(); i++)
+	if (m_thumbs.size())
 	{
-		tx -= xb;
-		if (tx < x + xb) break;
-		int tw = m_thumbs[i]->size().width();
-		tx -= tw;
-		int sx = 0;
-		if (tx < x + xb)
+		static const int tspacing = 8;
+		int thumbs_w = m_thumbs.size() * (m_thumbs[0]->size().width() + tspacing);
+		if (thumbs_w > w-10)
+			thumbs_w = w-10;
+		int tx = x + w;
+		int th = y + Height + m_block_height * m_blocks.size() + 4;
+		i_painter->setFont(afqt::QEnvironment::f_info);
+		// All thumbnails border
+		i_painter->setOpacity(0.3);
+		i_painter->setBrush(afqt::QEnvironment::qclr_black);
+		i_painter->setPen(Qt::NoPen);
+		i_painter->drawRoundedRect(tx-4, th-2, -thumbs_w,
+				HeightThumbName + m_thumbs[0]->size().height() + 4,
+				0, 0);
+		i_painter->setOpacity(0.7);
+		i_painter->setPen(afqt::QEnvironment::qclr_black);
+		i_painter->setBrush(Qt::NoBrush);
+		i_painter->drawRoundedRect(tx-4, th-2, -thumbs_w,
+				HeightThumbName + m_thumbs[0]->size().height() + 4,
+				0, 0);
+		i_painter->setBrush(afqt::QEnvironment::qclr_black);
+		// Thumbnail image and name
+		for (int i = 0; i < m_thumbs.size(); i++)
 		{
-			sx =  (x + xb) - tx;
-			tw -= (x + xb) - tx;
-			tx = x + xb;
+			tx -= tspacing;
+			if (tx < x + tspacing) break;
+			int tw = m_thumbs[i]->size().width();
+			tx -= tw;
+			int sx = 0;
+			if (tx < x + tspacing)
+			{
+				sx =  (x + tspacing) - tx;
+				tw -= (x + tspacing) - tx;
+				tx = x + tspacing;
+			}
+
+			// Draw thumbnail border
+			i_painter->setOpacity(0.5);
+			i_painter->setPen(afqt::QEnvironment::qclr_black);
+			i_painter->setBrush(afqt::QEnvironment::qclr_black);
+			i_painter->drawRoundedRect(tx-2, th, tw+4, HeightThumbName + m_thumbs[i]->size().height(), 2, 2);
+
+			i_painter->setPen(afqt::QEnvironment::qclr_white);
+			i_painter->drawText(tx, th - 1, tw, HeightThumbName, Qt::AlignRight | Qt::AlignVCenter, m_thumbs_paths[i]);
+
+			i_painter->setOpacity(1.0);
+			i_painter->drawImage(tx, th -1 + HeightThumbName, * m_thumbs[i], sx, 0, tw, m_thumbs[i]->size().height());
 		}
-		int th = y + Height + m_block_height * m_blocks.size();
-
-		i_painter->drawText(tx, th, tw, ItemJob::HeightThumbName, Qt::AlignRight | Qt::AlignVCenter, m_thumbs_paths[i]);
-
-		th += ItemJob::HeightThumbName;
-
-		i_painter->drawImage(tx, th, * m_thumbs[i], sx, 0, tw, m_thumbs[i]->size().height());
+		i_painter->setOpacity(1.0);
 	}
 
 
