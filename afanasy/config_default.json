@@ -132,7 +132,7 @@
 
 "":"Thumbnail:",
 	"af_thumbnail_extensions":["exr","dpx","jpg","jpeg","png","tif","tiff","tga"],
-	"af_thumbnail_cmd":"convert -identify \"%(image)s\" %(pre_args)s -thumbnail \"x100\" -alpha Deactivate -gravity center -extent x100 -colorspace sRGB \"%(thumbnail)s\"",
+	"af_thumbnail_cmd":"convert -identify \"%(image)s\" %(pre_args)s -alpha Deactivate -thumbnail x100 -gravity center -extent x100 -colorspace sRGB \"%(thumbnail)s\"",
 
 "":"User:",
 	"af_errors_avoid_host":3,
