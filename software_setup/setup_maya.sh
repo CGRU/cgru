@@ -54,6 +54,9 @@ export MAYA_SCRIPT_PATH="${MAYA_CGRU_LOCATION}/afanasy:${MAYA_SCRIPT_PATH}"
 
 # Disable the Customer Improvement Program
 export MAYA_DISABLE_CIP=1
+# https://discourse.techart.online/t/maya-reducing-maya-shutdown-time-by-disabling-autodesk-cip/4951
+# Disable the Customer Error Reporting
+export MAYA_DISABLE_CER=1
 
 export APP_DIR="${MAYA_LOCATION}"
 export APP_EXE="${MAYA_EXEC}"
