@@ -2,6 +2,8 @@
 
 #include "../include/afanasy.h"
 
+#include "../include/afgui.h"
+
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msgclasses/mctaskup.h"
 
@@ -80,6 +82,12 @@ Watch::~Watch()
 }
 
 void Watch::destroy() { ms_d = NULL; }
+
+bool Watch::isPadawan()  { return afqt::QEnvironment::level.n == AFGUI::PADAWAN; }
+bool Watch::notPadawan() { return afqt::QEnvironment::level.n != AFGUI::PADAWAN; }
+bool Watch::isJedi( )    { return afqt::QEnvironment::level.n == AFGUI::JEDI;    }
+bool Watch::isSith()     { return afqt::QEnvironment::level.n == AFGUI::SITH;    }
+bool Watch::notSith()    { return afqt::QEnvironment::level.n != AFGUI::SITH;    }
 
 void Watch::loadIcons(QMap<QString, QPixmap*> & o_map, const QString & i_path, int i_height)
 {

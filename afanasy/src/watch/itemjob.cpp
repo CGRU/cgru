@@ -591,7 +591,10 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 	if (m_thumbs.size())
 	{
 		static const int tspacing = 8;
-		int thumbs_w = m_thumbs.size() * (m_thumbs[0]->size().width() + tspacing);
+		int thumbs_w = 0;
+		// Calculate total thumnails width:
+		for (int i = 0; i < m_thumbs.size(); i++)
+			thumbs_w += m_thumbs[i]->size().width() + tspacing;
 		if (thumbs_w > w-10)
 			thumbs_w = w-10;
 		int tx = x + w;
