@@ -631,7 +631,10 @@ void ListJobs::jobsHeightRecalculate()
 {
 	for( int i = 0; i < m_model->count(); i++)
 	{
-		ItemJob * job = static_cast<ItemJob*>(m_model->item(i));
+		Item * item = m_model->item(i);
+		if (item->getType() != Item::TJob)
+			continue;
+		ItemJob * job = static_cast<ItemJob*>(item);
 		job->resizeThumbnails();
 	}
 
