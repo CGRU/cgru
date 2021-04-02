@@ -87,18 +87,24 @@ ListItems::ListItems(QWidget * i_parent, const std::string & i_type):
 	m_panel_left_layout->setSpacing(5);
 
 	m_splitter = new QSplitter();
+	m_splitter->setContentsMargins(0, 0, 0, 0);
 	hlayout->addWidget(m_splitter);
+
 	m_vlayout = new QVBoxLayout();
+	m_vlayout->setSpacing(0);
+	m_vlayout->setContentsMargins(0, 0, 0, 0);
+
+	m_toplayout = new QHBoxLayout();
+	m_vlayout->setSpacing(0);
+	m_toplayout->setContentsMargins(0, 0, 0, 0);
+	m_vlayout->addLayout(m_toplayout);
+
 	QWidget * widget = new QWidget();
 	m_splitter->addWidget(widget);
 	widget->setLayout(m_vlayout);
 
-	m_vlayout->setSpacing(0);
-	m_splitter->setContentsMargins(0, 0, 0, 0);
-	m_vlayout->setContentsMargins(0, 0, 0, 0);
 	m_infoline = new InfoLine(this);
 
-//	if( m_parentWindow != (QWidget*)(Watch::getDialog())) setFocusPolicy(Qt::StrongFocus);
 	setFocusPolicy(Qt::StrongFocus);
 }
 
@@ -121,7 +127,7 @@ void ListItems::initListItems()
 	// ListTasks does not.
 	// And it should be properly inserted.
 	if (m_ctrl_sf)
-		m_vlayout->addWidget(m_ctrl_sf);
+		m_toplayout->insertWidget(0, m_ctrl_sf);
 	m_vlayout->addWidget(m_view);
 	m_vlayout->addWidget(m_infoline);
 

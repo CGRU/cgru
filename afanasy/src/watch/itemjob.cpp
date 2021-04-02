@@ -87,6 +87,9 @@ ItemJob::~ItemJob()
 
 	for (int i = 0; i < m_thumbs.size(); i++)
 		delete m_thumbs[i];
+
+	for (int i = 0; i < m_thumbs_orig.size(); i++)
+		delete m_thumbs_orig[i];
 }
 
 void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
@@ -776,7 +779,7 @@ void ItemJob::getThumbnail() const
 	if (isHidden())
 		return;
 
-	if (afqt::QEnvironment::thumb_jobs_num.n < 1)
+	if (afqt::QEnvironment::thumb_jobs_height.n < 1)
 		return;
 
 	std::ostringstream str;
@@ -804,31 +807,42 @@ void ItemJob::v_filesReceived(const af::MCTaskUp & i_taskup)
 		if (m_thumbs_paths[0] == filename)
 			return;
 
-	if (m_thumbs.size() && (m_thumbs.size() >= afqt::QEnvironment::thumb_jobs_num.n))
+	if (m_thumbs.size() && (m_thumbs.size() >= 24))
 	{
+		delete m_thumbs_orig.takeLast();
 		delete m_thumbs.takeLast();
 		m_thumbs_paths.removeLast();
 	}
 
-	if (afqt::QEnvironment::thumb_jobs_num.n > 0)
+	if (afqt::QEnvironment::thumb_jobs_height.n > 0)
 	{
-		QImage * img = new QImage();
-		if (false == img->loadFromData((const unsigned char *) i_taskup.getFileData(0), i_taskup.getFileSize(0)))
+		QImage * img_orig = new QImage();
+		if (false == img_orig->loadFromData((const unsigned char *) i_taskup.getFileData(0), i_taskup.getFileSize(0)))
 			return;
 
-		if (img->size().height() != afqt::QEnvironment::thumb_jobs_height.n)
-		{
-			QImage img_scaled = img->scaledToHeight(afqt::QEnvironment::thumb_jobs_height.n, Qt::SmoothTransformation);
-			delete img;
-			img = new QImage(img_scaled);
-		}
+		QImage * img;
+		if (img_orig->size().height() != afqt::QEnvironment::thumb_jobs_height.n)
+			img = new QImage(img_orig->scaledToHeight(afqt::QEnvironment::thumb_jobs_height.n, Qt::SmoothTransformation));
+		else
+			img = new QImage(*img_orig);
 
+		m_thumbs_orig.prepend(img_orig);
 		m_thumbs.prepend(img);
 		m_thumbs_paths.prepend(filename);
 	}
 
 	if (false == calcHeight())
 		m_list_nodes->itemsHeightChanged();
+}
+
+void ItemJob::resizeThumbnails()
+{
+	for (int i = 0; i < m_thumbs.size(); i++)
+	{
+		QImage * img = m_thumbs_orig[i];
+		QImage * img_scaled = new QImage(img->scaledToHeight(afqt::QEnvironment::thumb_jobs_height.n, Qt::SmoothTransformation));
+		m_thumbs[i] = img_scaled;
+	}
 }
 
 const QString ItemJob::getRulesFolder()

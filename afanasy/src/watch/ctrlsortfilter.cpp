@@ -93,13 +93,13 @@ CtrlSortFilter::CtrlSortFilter( ListItems * i_parent,
 
 	QLineEdit * lineEdit = new QLineEdit( afqt::stoq(*m_filter), this);
 
-	m_layout = new QHBoxLayout( this);
-	m_layout->addWidget( m_sort_label);
-	m_layout->addWidget( m_sort_menu1);
-	m_layout->addWidget( m_sort_menu2);
-	m_layout->addWidget( m_filter_label);
-	m_layout->addWidget( m_filter_menu);
-	m_layout->addWidget( lineEdit);
+	QHBoxLayout * layout = new QHBoxLayout(this);
+	layout->addWidget(m_sort_label);
+	layout->addWidget(m_sort_menu1);
+	layout->addWidget(m_sort_menu2);
+	layout->addWidget(m_filter_label);
+	layout->addWidget(m_filter_menu);
+	layout->addWidget(lineEdit);
 
 	setAutoFillBackground( true);
 	setFrameShape(QFrame::StyledPanel);

@@ -91,8 +91,7 @@ ListJobs::ListJobs(QWidget * i_parent, bool i_listwork, const std::string & i_na
 	initSortFilterCtrl();
 
 	CtrlJobs * control = new CtrlJobs(m_ctrl_sf, this, m_listwork);
-	m_ctrl_sf->getLayout()->addWidget(control);
-
+	m_toplayout->addWidget(control);
 
 	// Add left panel buttons:
 	if (af::Environment::VISOR() || (false == m_listwork))
@@ -625,6 +624,20 @@ void ListJobs::v_resetSorting()
 {
 	if ((af::Environment::VISOR() == false) && (m_listwork == false))
 		getUserJobsOrder();
+}
+
+
+void ListJobs::jobsHeightRecalculate()
+{
+	for( int i = 0; i < m_model->count(); i++)
+	{
+		ItemJob * job = static_cast<ItemJob*>(m_model->item(i));
+		job->resizeThumbnails();
+	}
+
+	itemsHeightCalc();
+	revertModel();
+	repaintItems();
 }
 
 void ListJobs::getUserJobsOrder()

@@ -76,6 +76,8 @@ public:
 
 	void getThumbnail() const;
 
+	void resizeThumbnails();
+
 	void v_buttonClicked(ItemButton * i_b);
 
 	void setItemCollapsed(bool i_collapse);
@@ -118,6 +120,7 @@ private:
 
 	int m_num_runningtasks;
 
+	QList<QImage*> m_thumbs_orig;
 	QList<QImage*> m_thumbs;
 	QList<QString> m_thumbs_paths;
 

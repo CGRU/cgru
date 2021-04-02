@@ -139,7 +139,6 @@ public:
 	static QFont f_plotter;
 	static QFont f_min;
 
-	static AttrNumber thumb_jobs_num;
 	static AttrNumber thumb_jobs_height;
 
 	inline static const QString & getServerName() { return ms_servername; }

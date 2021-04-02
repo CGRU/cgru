@@ -47,8 +47,6 @@ public:
 
 	inline const af::RegExp & getFilterRE() const { return m_filter_re; }
 
-	inline QHBoxLayout * getLayout() { return m_layout;}
-
 	enum TYPE{
 		TNONE,
 		TPRIORITY,
@@ -105,8 +103,6 @@ private:
 	std::vector<int> m_filter_types;
 
 	ListItems * m_parernlist;
-
-	QHBoxLayout * m_layout;
 
 	QLabel * m_sort_label;
 	QLabel * m_filter_label;

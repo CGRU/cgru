@@ -6,6 +6,7 @@
 #include <QFrame>
 #include <QLabel>
 
+class Button;
 class ListJobs;
 
 class CtrlJobs : public QFrame
@@ -14,6 +15,9 @@ Q_OBJECT
 public:
 	CtrlJobs(QWidget * i_parent, ListJobs * i_listjobs, bool i_inworklist);
 	~CtrlJobs();
+
+private slots:
+	void slot_ThumsButtonClicked(Button*);
 
 private:
 	ListJobs * m_listjobs;

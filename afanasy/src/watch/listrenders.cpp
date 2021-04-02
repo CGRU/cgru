@@ -82,7 +82,7 @@ ListRenders::ListRenders( QWidget* parent):
 	initSortFilterCtrl();
 
 	CtrlRenders * control = new CtrlRenders( m_ctrl_sf, this);
-	m_ctrl_sf->getLayout()->addWidget( control);
+	m_toplayout->addWidget(control);
 
 	// Add left panel buttons:
 	ButtonPanel * bp; ButtonsMenu * bm;

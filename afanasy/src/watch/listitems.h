@@ -121,6 +121,8 @@ protected:
 
 	Item * m_current_item;
 
+	QHBoxLayout * m_toplayout;
+
 	CtrlSortFilter * m_ctrl_sf;
 
 	ParamsPanel * m_paramspanel;

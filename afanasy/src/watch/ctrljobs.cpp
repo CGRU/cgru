@@ -8,6 +8,13 @@
 
 #include "../libafqt/qenvironment.h"
 
+#include "button.h"
+
+#define AFOUTPUT
+#undef AFOUTPUT
+#include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
+
 CtrlJobs::CtrlJobs(QWidget * i_parent, ListJobs * i_listjobs, bool i_inworklist):
 	QFrame(i_parent),
 	m_listjobs(i_listjobs),
@@ -16,10 +23,17 @@ CtrlJobs::CtrlJobs(QWidget * i_parent, ListJobs * i_listjobs, bool i_inworklist)
 	setFrameShape(QFrame::StyledPanel);
 	setFrameShadow(QFrame::Raised);
 
-	setToolTip("Click RMB for options.");
-
 	QHBoxLayout * layout = new QHBoxLayout(this);
-	layout->setContentsMargins(4, 1, 4, 1);
+
+	layout->addWidget(new QLabel("Thumbs:", this));
+
+	QStringList sizes = {"S","M","L","XL"};
+	for (int i = 0; i < sizes.size(); i++)
+	{
+		Button * btn = new Button(sizes[i]);
+		layout->addWidget(btn);
+		connect(btn, SIGNAL(sig_Clicked(Button*)), this, SLOT(slot_ThumsButtonClicked(Button*)));
+	}
 
 	CtrlJobsViewOptions * viewOpts = new CtrlJobsViewOptions(this, m_listjobs, m_inworklist);
 	layout->addWidget(viewOpts);
@@ -29,11 +43,35 @@ CtrlJobs::~CtrlJobs()
 {
 }
 
+void CtrlJobs::slot_ThumsButtonClicked(Button * i_btn)
+{
+	int size = 10;
+	if (i_btn->getName() == "S")
+		size = 25;
+	else if (i_btn->getName() == "M")
+		size = 50;
+	else if (i_btn->getName() == "L")
+		size = 100;
+	else if (i_btn->getName() == "XL")
+		size = 200;
+
+	if (size == afqt::QEnvironment::thumb_jobs_height.n)
+		return;
+
+	afqt::QEnvironment::thumb_jobs_height.n = size;
+
+	m_listjobs->jobsHeightRecalculate();
+}
+
 CtrlJobsViewOptions::CtrlJobsViewOptions(QWidget * i_parent, ListJobs * i_listjobs, bool i_inworklist):
 	QLabel("View Options", i_parent),
 	m_listjobs(i_listjobs),
 	m_inworklist(i_inworklist)
 {
+	setFrameShape(QFrame::StyledPanel);
+	setFrameShadow(QFrame::Raised);
+
+	setToolTip("Click RMB for options.");
 }
 
 CtrlJobsViewOptions::~CtrlJobsViewOptions()

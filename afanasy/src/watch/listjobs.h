@@ -29,6 +29,8 @@ public:
 	// Not called on list dtor.
 	void v_itemToBeDeleted(Item * i_item);
 
+	void jobsHeightRecalculate();
+
 protected:
 	void contextMenuEvent(QContextMenuEvent *event);
 
