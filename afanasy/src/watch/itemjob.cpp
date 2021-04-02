@@ -601,7 +601,7 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 		if (thumbs_w > w-10)
 			thumbs_w = w-10;
 		int tx = x + w;
-		int th = y + Height + m_block_height * m_blocks.size() + 4;
+		int th = y + Height + m_block_height * m_blocks.size() + 3;
 		i_painter->setFont(afqt::QEnvironment::f_info);
 		// All thumbnails border
 		i_painter->setOpacity(0.3);
