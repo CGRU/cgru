@@ -36,6 +36,8 @@ ItemJob::ItemJob(ListNodes * i_list_nodes, bool i_inworklist, af::Job * i_job, c
 	m_tasks_error(-1),
 	m_tasks_percent(-1),
 
+	m_thumbs_visible(1),
+
 	state(0)
 {
 	for (int b = 0; b < i_job->getBlocksNum(); b++)
@@ -620,8 +622,12 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 		// Thumbnail image and name
 		for (int i = 0; i < m_thumbs.size(); i++)
 		{
+			m_thumbs_visible = i + 1;
+
 			tx -= tspacing;
-			if (tx < x + tspacing) break;
+			if (tx < x + tspacing)
+				break;
+
 			int tw = m_thumbs[i]->size().width();
 			tx -= tw;
 			int sx = 0;
@@ -807,7 +813,7 @@ void ItemJob::v_filesReceived(const af::MCTaskUp & i_taskup)
 		if (m_thumbs_paths[0] == filename)
 			return;
 
-	if (m_thumbs.size() && (m_thumbs.size() >= 24))
+	if (m_thumbs.size() && (m_thumbs.size() > m_thumbs_visible))
 	{
 		delete m_thumbs_orig.takeLast();
 		delete m_thumbs.takeLast();

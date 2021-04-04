@@ -126,6 +126,7 @@ private:
 	QList<QImage*> m_thumbs_orig;
 	QList<QImage*> m_thumbs;
 	QList<QString> m_thumbs_paths;
+	mutable int m_thumbs_visible;
 
 	int m_block_height;
 
