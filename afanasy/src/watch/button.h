@@ -13,12 +13,15 @@ public:
 		const QString & i_label,
 		const QString & i_name = QString(),
 		const QString & i_tooltip = QString(),
-		bool i_dblclick = false);
+		bool i_dblclick = false,
+		bool i_radio = false,
+		int  i_clicked_ms = 500);
 
 	~Button();
 
 	inline const QString & getName() const {return m_name;}
 
+	inline void setActive( bool i_active ) {if(i_active  == m_active ) return; m_active  = i_active;  repaint();}
 	inline void setEnabled(bool i_enabled) {if(i_enabled == m_enabled) return; m_enabled = i_enabled; repaint();}
 
 signals:
@@ -36,10 +39,12 @@ private:
 	void emitSignal();
 
 private slots:
-	void deactivate();
+	void slot_ClickedFinished();
 
 private:
 	bool m_enabled;
+	bool m_radio;
+	bool m_active;
 	QString m_label;
 	QString m_name;
 	QString m_tooltip;
@@ -47,4 +52,5 @@ private:
 
 	bool m_hovered;
 	bool m_clicked;
+	int  m_clicked_ms;
 };

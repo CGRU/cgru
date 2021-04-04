@@ -140,6 +140,7 @@ public:
 	static QFont f_min;
 
 	static AttrNumber thumb_jobs_height;
+	static AttrNumber thumb_work_height;
 
 	inline static const QString & getServerName() { return ms_servername; }
 	inline static const QString & getUserName()   { return ms_username;   }

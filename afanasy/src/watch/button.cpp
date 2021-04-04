@@ -17,14 +17,19 @@ Button::Button(
 		const QString & i_label,
 		const QString & i_name,
 		const QString & i_tooltip,
-		bool i_dblclick):
-	m_label   (i_label),
-	m_name    (i_name),
-	m_tooltip (i_tooltip),
-	m_dblclick(i_dblclick),
+		bool i_dblclick,
+		bool i_radio,
+		int  i_clicked_ms):
+	m_label     (i_label),
+	m_name      (i_name),
+	m_tooltip   (i_tooltip),
+	m_dblclick  (i_dblclick),
+	m_radio     (i_radio),
+	m_clicked_ms(i_clicked_ms),
 
-	m_hovered(false),
 	m_enabled(true),
+	m_active (false),
+	m_hovered(false),
 	m_clicked(false)
 {
 	if (m_name.isEmpty())
@@ -51,6 +56,8 @@ void Button::paintEvent(QPaintEvent * i_evt)
 		color.setAlphaF(.2);
 	else if (m_clicked)
 		color.setAlphaF(.8);
+	else if (m_active)
+		color.setAlphaF(.6);
 	else if (m_hovered)
 		color.setAlphaF(.4);
 	else
@@ -76,6 +83,9 @@ void Button::clicked(QMouseEvent * i_evt, bool i_dbl)
 	if (false == m_enabled)
 		return;
 
+	if (m_active)
+		return;
+
 	if (i_dbl != m_dblclick) return;
 
 	if (i_evt->button() == Qt::LeftButton)
@@ -85,14 +95,16 @@ void Button::clicked(QMouseEvent * i_evt, bool i_dbl)
 void Button::emitSignal()
 {
 	m_clicked = true;
+	if (m_radio)
+		m_active = true;
 	repaint();
 
 	emit sig_Clicked(this);
 
-	QTimer::singleShot(1000, this, SLOT(deactivate()));
+	QTimer::singleShot(m_clicked_ms, this, SLOT(slot_ClickedFinished()));
 }
 
-void Button::deactivate()
+void Button::slot_ClickedFinished()
 {
 	m_clicked = false;
 	repaint();

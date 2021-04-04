@@ -95,6 +95,9 @@ private:
 
 	int drawButtons(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option, const QColor * i_clrItem) const;
 
+	inline int getThumbsHeight() const
+		{return m_inworklist ? afqt::QEnvironment::thumb_work_height.n : afqt::QEnvironment::thumb_jobs_height.n;}
+
 private:
 	int64_t m_serial;
 

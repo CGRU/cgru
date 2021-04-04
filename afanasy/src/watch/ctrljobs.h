@@ -20,6 +20,10 @@ private slots:
 	void slot_ThumsButtonClicked(Button*);
 
 private:
+	QList<Button*> m_thumbs_btns;
+	static const QStringList ms_thumbs_names;
+	static const QList<int>  ms_thumbs_sizes;
+
 	ListJobs * m_listjobs;
 	const bool m_inworklist;
 };

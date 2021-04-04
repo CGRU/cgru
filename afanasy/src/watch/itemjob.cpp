@@ -400,7 +400,7 @@ bool ItemJob::calcHeight()
 
 	if (m_thumbs.size())
 	{
-		m_height += afqt::QEnvironment::thumb_jobs_height.n;
+		m_height += getThumbsHeight();
 		m_height += ItemJob::HeightThumbName;
 		m_height += 8;
 	}
@@ -779,7 +779,7 @@ void ItemJob::getThumbnail() const
 	if (isHidden())
 		return;
 
-	if (afqt::QEnvironment::thumb_jobs_height.n < 1)
+	if (getThumbsHeight() < 1)
 		return;
 
 	std::ostringstream str;
@@ -814,15 +814,15 @@ void ItemJob::v_filesReceived(const af::MCTaskUp & i_taskup)
 		m_thumbs_paths.removeLast();
 	}
 
-	if (afqt::QEnvironment::thumb_jobs_height.n > 0)
+	if (getThumbsHeight() > 0)
 	{
 		QImage * img_orig = new QImage();
 		if (false == img_orig->loadFromData((const unsigned char *) i_taskup.getFileData(0), i_taskup.getFileSize(0)))
 			return;
 
 		QImage * img;
-		if (img_orig->size().height() != afqt::QEnvironment::thumb_jobs_height.n)
-			img = new QImage(img_orig->scaledToHeight(afqt::QEnvironment::thumb_jobs_height.n, Qt::SmoothTransformation));
+		if (img_orig->size().height() != getThumbsHeight())
+			img = new QImage(img_orig->scaledToHeight(getThumbsHeight(), Qt::SmoothTransformation));
 		else
 			img = new QImage(*img_orig);
 
@@ -840,7 +840,7 @@ void ItemJob::resizeThumbnails()
 	for (int i = 0; i < m_thumbs.size(); i++)
 	{
 		QImage * img = m_thumbs_orig[i];
-		QImage * img_scaled = new QImage(img->scaledToHeight(afqt::QEnvironment::thumb_jobs_height.n, Qt::SmoothTransformation));
+		QImage * img_scaled = new QImage(img->scaledToHeight(getThumbsHeight(), Qt::SmoothTransformation));
 		m_thumbs[i] = img_scaled;
 	}
 }

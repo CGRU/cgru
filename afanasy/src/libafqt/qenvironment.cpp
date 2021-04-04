@@ -113,7 +113,8 @@ AttrColor QEnvironment::clr_textdone(        "clr_textdone",         "Done Text"
 AttrColor QEnvironment::clr_textmuted(       "clr_textmuted",        "Muted Text",              AFGUI::CLR_TEXTMUTED           );
 AttrColor QEnvironment::clr_textstars(       "clr_textstars",        "Stars Text",              AFGUI::CLR_TEXTSTARS           );
 
-AttrNumber QEnvironment::thumb_jobs_height( "thumb_jobs_height", "Job Item Height",   AFGUI::THUMB_JOBS_HEIGHT );
+AttrNumber QEnvironment::thumb_jobs_height("thumb_jobs_height", "Job Item Height",      AFGUI::THUMB_JOBS_HEIGHT);
+AttrNumber QEnvironment::thumb_work_height("thumb_work_height", "Work Job Item Height", AFGUI::THUMB_JOBS_HEIGHT);
 
 QColor QEnvironment::qclr_black(   0,   0,   0);
 QColor QEnvironment::qclr_white( 255, 255, 255);
@@ -157,6 +158,7 @@ QEnvironment::QEnvironment( const QString & i_name)
     ms_attrs_prefs.append( &showOfflineNoise   );
 
 	ms_attrs_prefs.append(&thumb_jobs_height);
+	ms_attrs_prefs.append(&thumb_work_height);
 
     ms_attrs_prefs.append( &ntf_job_added_alert );
     ms_attrs_prefs.append( &ntf_job_added_sound );

@@ -15,6 +15,9 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
+const QStringList CtrlJobs::ms_thumbs_names = {"S","M","L","XL"};
+const QList<int>  CtrlJobs::ms_thumbs_sizes = { 25, 50,100, 200};
+
 CtrlJobs::CtrlJobs(QWidget * i_parent, ListJobs * i_listjobs, bool i_inworklist):
 	QFrame(i_parent),
 	m_listjobs(i_listjobs),
@@ -27,12 +30,24 @@ CtrlJobs::CtrlJobs(QWidget * i_parent, ListJobs * i_listjobs, bool i_inworklist)
 
 	layout->addWidget(new QLabel("Thumbs:", this));
 
-	QStringList sizes = {"S","M","L","XL"};
-	for (int i = 0; i < sizes.size(); i++)
+	for (int i = 0; i < ms_thumbs_names.size(); i++)
 	{
-		Button * btn = new Button(sizes[i]);
+		Button * btn = new Button(ms_thumbs_names[i], QString(), QString(), false, true);
 		layout->addWidget(btn);
 		connect(btn, SIGNAL(sig_Clicked(Button*)), this, SLOT(slot_ThumsButtonClicked(Button*)));
+
+		if (m_inworklist)
+		{
+			if (ms_thumbs_sizes[i] == afqt::QEnvironment::thumb_work_height.n)
+				btn->setActive(true);
+		}
+		else
+		{
+			if (ms_thumbs_sizes[i] == afqt::QEnvironment::thumb_jobs_height.n)
+				btn->setActive(true);
+		}
+
+		m_thumbs_btns.append(btn);
 	}
 
 	CtrlJobsViewOptions * viewOpts = new CtrlJobsViewOptions(this, m_listjobs, m_inworklist);
@@ -45,20 +60,30 @@ CtrlJobs::~CtrlJobs()
 
 void CtrlJobs::slot_ThumsButtonClicked(Button * i_btn)
 {
-	int size = 10;
-	if (i_btn->getName() == "S")
-		size = 25;
-	else if (i_btn->getName() == "M")
-		size = 50;
-	else if (i_btn->getName() == "L")
-		size = 100;
-	else if (i_btn->getName() == "XL")
-		size = 200;
+	int size = 0;
+	for (int i = 0; i < ms_thumbs_names.size(); i++)
+		if (i_btn->getName() == ms_thumbs_names[i])
+			size = ms_thumbs_sizes[i];
 
-	if (size == afqt::QEnvironment::thumb_jobs_height.n)
-		return;
+	if (m_inworklist)
+	{
+		if (size == afqt::QEnvironment::thumb_work_height.n)
+			return;
+	}
+	else
+	{
+		if (size == afqt::QEnvironment::thumb_jobs_height.n)
+			return;
+	}
 
-	afqt::QEnvironment::thumb_jobs_height.n = size;
+	for (int i = 0; i < m_thumbs_btns.size(); i++)
+		if (m_thumbs_btns[i] != i_btn)
+			m_thumbs_btns[i]->setActive(false);
+
+	if (m_inworklist)
+		afqt::QEnvironment::thumb_work_height.n = size;
+	else
+		afqt::QEnvironment::thumb_jobs_height.n = size;
 
 	m_listjobs->jobsHeightRecalculate();
 }
