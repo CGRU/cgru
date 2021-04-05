@@ -27,7 +27,7 @@ public:
    ~RenderContainerIt();
 
 	inline RenderAf * render() { return (RenderAf*)(getNode()); }
-	inline RenderAf * getRender( int id) { return (RenderAf*)(get( id)); }
+	inline RenderAf * getRender(int i_id, const af::Msg * i_msg = NULL) {return static_cast<RenderAf*>(get(i_id, i_msg));}
 
 private:
 };

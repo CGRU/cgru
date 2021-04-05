@@ -90,7 +90,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	{
 	  AfContainerLock lock( i_args->monitors, AfContainerLock::READLOCK);
 		MonitorContainerIt it( i_args->monitors);
-		MonitorAf * node = it.getMonitor( i_msg->int32());
+		MonitorAf * node = it.getMonitor(i_msg->int32(), i_msg);
 
 		if( node )
 			o_msg_response = node->getEventsBin();
@@ -123,7 +123,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 			AfContainerLock rlock( i_args->renders, AfContainerLock::WRITELOCK);
 
 			RenderContainerIt rendersIt( i_args->renders);
-			RenderAf * render = rendersIt.getRender( rup->getId());
+			RenderAf * render = rendersIt.getRender(rup->getId(), i_msg);
 
 			if( NULL == render)
 			{

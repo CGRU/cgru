@@ -400,7 +400,7 @@ void AfContainer::freeZombies()
 	}
 }
 
-af::Msg *AfContainer::action(Action &i_action)
+af::Msg * AfContainer::action(Action & i_action, const af::Msg * i_msg)
 {
 	bool found = false;
 	if (i_action.ids.size())
@@ -410,7 +410,8 @@ af::Msg *AfContainer::action(Action &i_action)
 			if (i_action.ids[i] >= m_capacity)
 			{
 				std::string errlog = std::string("Action node ID above container capacity: ")
-									 + af::itos(i_action.ids[i]) + " >= " + af::itos(m_capacity);
+									 + af::itos(i_action.ids[i]) + " >= " + af::itos(m_capacity)
+									 + ": " + i_msg->v_generateInfoString();
 				AFCommon::QueueLogError(errlog);
 				continue;
 			}
@@ -418,7 +419,8 @@ af::Msg *AfContainer::action(Action &i_action)
 			AfNodeSrv *node = m_nodes_table[i_action.ids[i]];
 			if (NULL == node)
 			{
-				std::string errlog = std::string("Action node ID not found: ") + af::itos(i_action.ids[i]);
+				std::string errlog = std::string("Action node ID not found: ") + af::itos(i_action.ids[i])
+									 + ": " + i_msg->v_generateInfoString();
 				AFCommon::QueueLogError(errlog);
 				continue;
 			}
@@ -436,7 +438,8 @@ af::Msg *AfContainer::action(Action &i_action)
 		if (rx.empty())
 		{
 			std::string errlog =
-				"AfContainer::action: Name pattern '" + i_action.mask + ("' is invalid: ") + err_msg;
+				"AfContainer::action: Name pattern '" + i_action.mask + ("' is invalid: ") + err_msg
+								+ ": " + i_msg->v_generateInfoString();
 			AFCommon::QueueLogError(errlog);
 		}
 		else
@@ -452,7 +455,8 @@ af::Msg *AfContainer::action(Action &i_action)
 
 			if (false == found)
 			{
-				std::string errlog = m_name + ": No node matches '" + i_action.mask + "' found.";
+				std::string errlog = m_name + ": No node matches '" + i_action.mask + "' found: "
+									+ i_msg->v_generateInfoString();
 				AFCommon::QueueLogError(errlog);
 			}
 		}

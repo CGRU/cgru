@@ -41,7 +41,7 @@ public:
 	inline AfNodeSrv * getNode() { return m_node; }
 	
 	/// Get node with specitied id. \c NULL returned if there is no node with such id.
-	AfNodeSrv* get( int id);
+	AfNodeSrv * get(int id, const af::Msg * i_msg = NULL);
 
 private:
 	AfNodeSrv * m_node;        ///< Current node pointer.

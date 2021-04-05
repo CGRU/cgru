@@ -453,6 +453,7 @@ void Msg::v_generateInfoStream( std::ostringstream & stream, bool full) const
 	else
 		stream << "!UNKNOWN!(" << m_type << ")";
 	stream << "[" << writeSize() << "]";
+	stream << ": " << m_address;
 }
 
 void Msg::stdOutData( bool withHeader)

@@ -71,7 +71,7 @@ public:
    ~MonitorContainerIt();
 
 	inline MonitorAf * monitor() { return (MonitorAf*)(getNode()); }
-	inline MonitorAf * getMonitor( int id) { return (MonitorAf*)(get( id)); }
+	inline MonitorAf * getMonitor(int i_id, const af::Msg * i_msg = NULL) {return static_cast<MonitorAf*>(get(i_id, i_msg));}
 
 private:
 };

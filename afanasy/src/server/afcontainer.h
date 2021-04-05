@@ -57,7 +57,7 @@ public:
 	void postSolve(MonitorContainer * i_monitoring); 
 
 	/// Perform an aciton:
-	af::Msg *action(Action &i_action);
+	af::Msg * action(Action & i_action, const af::Msg * i_msg = NULL);
 
 	void ReadLock(void) { m_rw_lock.ReadLock(); }
 	void WriteLock(void) { m_rw_lock.WriteLock(); }

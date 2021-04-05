@@ -117,7 +117,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 						AfContainerLock jlock( i_args->jobs,    AfContainerLock::READLOCK);
 
 						JobContainerIt it( i_args->jobs);
-						JobAf * job = it.getJob( ids[0]);
+						JobAf * job = it.getJob(ids[0], i_msg);
 						if( job == NULL )
 							error = "Invalid job ID";
 						else
@@ -197,7 +197,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				if( ids.size() == 1 )
 				{
 					JobContainerIt it( i_args->jobs);
-					job = it.getJob( ids[0]);
+					job = it.getJob(ids[0], i_msg);
 					if( job == NULL )
 						o_msg_response = af::jsonMsgError( "Invalid ID");
 				}
@@ -254,7 +254,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				if( ids.size() == 1 )
 				{
 					RenderContainerIt it( i_args->renders);
-					render = it.getRender( ids[0]);
+					render = it.getRender(ids[0], i_msg);
 					if( render == NULL )
 						o_msg_response = af::jsonMsgError( "Invalid ID");
 				}
@@ -285,7 +285,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				if( ids.size() == 1 )
 				{
 					UserContainerIt it( i_args->users);
-					user = it.getUser( ids[0]);
+					user = it.getUser(ids[0], i_msg);
 					if( user == NULL )
 						o_msg_response = af::jsonMsgError( "Invalid ID");
 				}
@@ -309,7 +309,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				if (ids.size() == 1)
 				{
 					BranchesContainerIt it(i_args->branches);
-					branch = it.getBranch(ids[0]);
+					branch = it.getBranch(ids[0], i_msg);
 					if (branch == NULL)
 						o_msg_response = af::jsonMsgError("Invalid ID");
 				}
@@ -332,7 +332,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				if (ids.size() == 1)
 				{
 					PoolsContainerIt it(i_args->pools);
-					pool = it.getPool(ids[0]);
+					pool = it.getPool(ids[0], i_msg);
 					if (pool == NULL)
 						o_msg_response = af::jsonMsgError("Invalid ID");
 				}

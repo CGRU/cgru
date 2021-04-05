@@ -52,7 +52,7 @@ public:
 	~UserContainerIt();
 
 	inline UserAf * user() { return (UserAf*)(getNode()); }
-	inline UserAf * getUser( int id) { return (UserAf*)(get( id)); }
+	inline UserAf * getUser(int i_id, const af::Msg * i_msg = NULL) {return static_cast<UserAf*>(get(i_id, i_msg));}
 
 private:
 };

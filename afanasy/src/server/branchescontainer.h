@@ -56,7 +56,7 @@ public:
 	~BranchesContainerIt();
 
 	inline BranchSrv * branch() { return (BranchSrv*)(getNode()); }
-	inline BranchSrv * getBranch(int id) { return (BranchSrv*)(get(id)); }
+	inline BranchSrv * getBranch(int i_id, const af::Msg * i_msg = NULL) {return static_cast<BranchSrv*>(get(i_id, i_msg));}
 
 private:
 };

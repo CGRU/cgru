@@ -69,7 +69,7 @@ public:
 	~JobContainerIt();
 
 	inline JobAf * job() { return (JobAf*)(getNode()); }
-	inline JobAf * getJob( int id) { return (JobAf*)(get( id)); }
+	inline JobAf * getJob(int i_id, const af::Msg * i_msg = NULL) {return static_cast<JobAf*>(get(i_id, i_msg));}
 
 private:
 };

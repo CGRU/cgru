@@ -1,6 +1,8 @@
 #include "afcontainerit.h"
 #include "afcontainer.h"
 
+#include "../libafanasy/msg.h"
+
 #include "afcommon.h"
 
 #define AFOUTPUT
@@ -80,16 +82,18 @@ void AfContainerIt::next()
 	}
 }
 
-AfNodeSrv* AfContainerIt::get( int id)
+AfNodeSrv* AfContainerIt::get(int id, const af::Msg * i_msg)
 {
 	if( id < 1 )
 	{
-		AFCommon::QueueLogError("AfContainerIt::get(): invalid id = " + af::itos(id));
+		AFCommon::QueueLogError(m_container->m_name + ".get(): invalid id = " + af::itos(id) + ": " +
+				(i_msg ? i_msg->v_generateInfoString() : ""));
 		return NULL;
 	}
 	if( id >= m_container->m_capacity)
 	{
-		AFCommon::QueueLogError("AfContainerIt::get(): id=" + af::itos(id) + " >= size=" + af::itos(m_container->m_capacity));
+		AFCommon::QueueLogError(m_container->m_name + ".get(): id=" + af::itos(id) + " >= size=" + af::itos(m_container->m_capacity) + ": " +
+				(i_msg ? i_msg->v_generateInfoString() : ""));
 		return NULL;
 	}
 	
@@ -97,12 +101,14 @@ AfNodeSrv* AfContainerIt::get( int id)
 	
 	if( m_node == NULL )
 	{
-		AFCommon::QueueLogError("AfContainerIt::get(): node == NULL : id = " + af::itos(id));
+		AFCommon::QueueLogError(m_container->m_name + ".get(): node == NULL: id = " + af::itos(id) + ": " +
+				(i_msg ? i_msg->v_generateInfoString() : ""));
 		return NULL;
 	}
 	if( m_node->m_node->isZombie())
 	{
-		AFCommon::QueueLogError("AfContainerIt::get(): node is zombie ( id = %d ) \n" + af::itos(id));
+		AFCommon::QueueLogError(m_container->m_name + ".get(): node is zombie ( id = %d ) \n" + af::itos(id) + ": " +
+				(i_msg ? i_msg->v_generateInfoString() : ""));
 		return NULL;
 	}
 	

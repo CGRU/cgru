@@ -63,7 +63,7 @@ public:
 	~PoolsContainerIt();
 
 	inline PoolSrv * pool() { return (PoolSrv*)(getNode()); }
-	inline PoolSrv * getPool(int id) { return (PoolSrv*)(get(id)); }
+	inline PoolSrv * getPool(int i_id, const af::Msg * i_msg = NULL) { return static_cast<PoolSrv*>(get(i_id, i_msg));}
 
 private:
 };
