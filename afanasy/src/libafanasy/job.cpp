@@ -498,8 +498,6 @@ void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
    o_str << "[" << m_user_list_order << "]";
 	if( isHidden()) o_str << " (hidden)";
 
-	Work::generateInfoStream( o_str, full);
-
 	bool display_blocks = true;
 	if( m_blocks_num == 0)
 	{
