@@ -126,7 +126,9 @@ bool Param::getInputDialog(const QVariant & i_var, QString & o_str, QWidget * i_
 	case TGiB:
 	{
 		int64_t current = i_var.toLongLong();
-		QString _tip = tip + "\nEnter number of Gigabytes";
+		QString _tip = tip;
+		if (type == TGiB)
+			_tip += "\nEnter number of Gigabytes";
 		int64_t value = QInputDialog::getInt(i_parent, label, _tip, current, m_min, m_max, 1, &ok);
 		if (ok)
 			o_str = QString("%1").arg(value);
