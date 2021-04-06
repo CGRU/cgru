@@ -134,8 +134,8 @@ class Tray(QtWidgets.QSystemTrayIcon):
         action.triggered.connect( nimby.setNIMBY)
         self.menu['AFANASY'].addAction(action)
 
-        action = QtWidgets.QAction('Set Free && Unpause', self)
-        action.triggered.connect( nimby.setFreeUnpause)
+        action = QtWidgets.QAction('Set Free', self)
+        action.triggered.connect(nimby.setFree)
         self.menu['AFANASY'].addAction(action)
 
         action = QtWidgets.QAction('Eject Tasks', self)
