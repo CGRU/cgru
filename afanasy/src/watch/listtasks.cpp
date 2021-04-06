@@ -499,6 +499,7 @@ bool ListTasks::updateProgress( const af::JobProgress * progress/*bool blocksOnl
 	}
 
 	setWindowTitleProgress();
+	repaintItems();
 
 	return true;
 }
