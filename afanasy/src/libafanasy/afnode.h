@@ -81,8 +81,6 @@ public:
 		const JSON &i_object, std::string *io_changes = NULL, MonitorContainer *i_monitoring = NULL);
 	virtual void v_jsonWrite(std::ostringstream &o_str, int i_type) const;
 
-	Msg *jsonWrite(const std::string &i_type, const std::string &i_name) const;
-
 	inline const std::map<std::string, int32_t> & getRunnigServices() const {return m_running_services;}
 
 protected:

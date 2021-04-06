@@ -112,15 +112,6 @@ void Node::v_jsonWrite(std::ostringstream &o_str, int i_type) const
 		jw_intmap("running_services", m_running_services, o_str);
 }
 
-Msg *Node::jsonWrite(const std::string &i_type, const std::string &i_name) const
-{
-	std::ostringstream str;
-	str << "{\"" << i_name << "\":\n";
-	v_jsonWrite(str, 0);
-	str << "\n}";
-	return jsonMsg(str);
-}
-
 void Node::incrementService(const std::string & i_name)
 {
 	std::map<std::string, int32_t>::iterator it = m_running_services.begin();
