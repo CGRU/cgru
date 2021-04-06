@@ -1279,6 +1279,8 @@ void RenderAf::emitEvents(const std::vector<std::string> & i_events) const
 
 	str << "\n\"render\":";
 	v_jsonWrite(str, af::Msg::TRendersList);
+	str << ",\n";
+	m_hres.jsonWrite(str);
 
 	str << ",\n\"pools\":[";
 	const PoolSrv * pool = m_parent;

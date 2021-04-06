@@ -36,11 +36,11 @@ if Options.smtpserver == '':
 html = """
 <html>
 <body>
-<div style="color:#002000; padding:10px; margin:10px; border:2px solid #007000; border-radius:10px; background:#DDFFAA; box-shadow:0px 0px 10px #000000 inset;">
-<div style="color:#000000; padding:10px; margin:10px; border:2px solid #007000; border-radius:10px; background:#FFFFFF; box-shadow:0px 0px 10px #000000 inset;">
+<div style="color:#002000; padding:10px; margin:10px; border:2px solid #506020; border-radius:10px; background:#BBCC99; box-shadow:0px 0px 10px #000000 inset;">
+<div style="color:#000000; padding:10px; margin:10px; border:2px solid #506020; border-radius:10px; background:#FFFFFF; box-shadow:0px 0px 10px #000000 inset;">
 %s
 </div>
-<a href="cgru.info" style="padding:10px;margin:10px;" target="_blank">CGRU</a>
+<b><a href="cgru.info" style="padding:10px;margin:10px;" target="_blank">CGRU</a></b>
 </div>
 </body>
 </html>

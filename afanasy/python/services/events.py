@@ -96,10 +96,6 @@ class events(service.service):
                 continue
 
             if 'email' in methods and 'emails' in custom_obj and len(custom_obj['emails']):
-                print('EVENT: %s:%s %s:%s' %
-                      (event, task_info['job_name'], task_info['user_name'],
-                       custom_obj['emails'])
-                      )
                 email_events.append(event)
 
             # Essentially for debugging
@@ -113,11 +109,20 @@ class events(service.service):
             for addr in custom_obj['emails']:
                 cmd += ' -t "%s"' % addr
             cmd += ' -s "%s"' % (','.join(email_events))
-            cmd += ' "Events: <b>%s</b><br>"' % (','.join(email_events))
+            cmd += ' "<p>Events: <b>%s</b></p>"' % (','.join(email_events))
             if 'render' in objects:
-                cmd += ' "Render Name: <b>%s</b><br>"' % objects['render']['name']
-            cmd += ' "Job Name: <b>%s</b><br>"' % cgruutils.toStr(task_info['job_name'])
-            cmd += ' "User Name: <b>%s</b><br>"' % cgruutils.toStr(task_info['user_name'])
+                cmd += ' "<p>Render Name: <b>%s</b>' % objects['render']['name']
+                if 'host_resources' in objects:
+                    hres = objects['host_resources']
+                    cmd += '<ul>'
+                    cmd += '<li>CPU: %(cpu_mhz)dMHz x%(cpu_num)d / idle = %(cpu_idle)d%%</li>' % hres
+                    cmd += '<li>MEM: %dGB / free = %dGB</li>' % (hres['mem_total_mb']/1024, hres['mem_free_mb']/1024)
+                    cmd += '<li>SWP: %dGB / free = %dGB</li>' % (hres['swap_total_mb']/1024, (hres['swap_total_mb']-hres['swap_used_mb'])/1024)
+                    cmd += '<li>HDD: %(hdd_total_gb)dGB / free = %(hdd_free_gb)dGB / busy = %(hdd_busy)d%%</li>' % hres
+                    cmd += '</ul>'
+                cmd += '</p>"'
+            cmd += ' "<p>Job Name: <b>%s</b></p>"' % cgruutils.toStr(task_info['job_name'])
+            cmd += ' "<p>User Name: <b>%s</b></p>"' % cgruutils.toStr(task_info['user_name'])
             print(cmd)
             self.taskInfo['command'] = cmd
 
