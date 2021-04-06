@@ -70,10 +70,7 @@ class mantra(parser.parser):
             if match:
                 mem = cgruutils.memStrToBytes(match.group(1))
                 if mem:
-                    if mem > 2**30:
-                        mem = 'gb:{:.2f}'.format(float(mem) / (2**30))
-                    else:
-                        mem = 'mb:{:.2f}'.format(float(mem) / (2**20))
+                    mem = 'gb:{:.2f}'.format(float(mem) / (2**30))
                     self.mantra_mem = 'mantra_' + mem.strip('.0')
 
         # Resources and host peak memory
