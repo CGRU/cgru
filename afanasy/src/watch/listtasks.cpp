@@ -20,6 +20,7 @@
 #include "itemjobtask.h"
 #include "modelitems.h"
 #include "monitorhost.h"
+#include "paramspaneltask.h"
 #include "viewitems.h"
 #include "watch.h"
 #include "wndtask.h"
@@ -49,6 +50,8 @@ ListTasks::ListTasks( QWidget* parent, int JobId, const QString & JobName):
 	m_tasks( NULL),
 	constructed( false)
 {
+	m_paramspanel_task = new ParamsPanelTask();
+	m_paramspanel = m_paramspanel_task;
 	initListItems();
 
 	m_view->setSpacing( 1);
@@ -478,6 +481,8 @@ int ListTasks::getRow( int block, int task)
 
 bool ListTasks::updateProgress( const af::JobProgress * progress/*bool blocksOnly = false*/)
 {
+	m_paramspanel_task->updateJobProgress(progress);
+
 	if( m_blocks_num != progress->getBlocksNum())
 	{
 		AFERRAR("ListTasks::updateProgress: Blocks number mismatch (%d!=%d).", m_blocks_num, progress->getBlocksNum())

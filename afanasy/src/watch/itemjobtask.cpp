@@ -87,23 +87,32 @@ const QString ItemJobTask::v_getInfoText() const
 {
 	QString info;
 
-	info += QString("Times started: <b>%1</b> / <b>%2</b> with errors").arg(taskprogress.starts_count).arg(taskprogress.errors_count);
+	info += QString("Times started: <b>%1</b>").arg(taskprogress.starts_count);
+
+	if (taskprogress.errors_count)
+		info += QString("Errors count: <b>%1</b>").arg(taskprogress.errors_count);
 
 	if (false == taskprogress.hostname.empty())
-		info += QString("<br>Last started host: <b>%1</b>").arg(afqt::stoq(taskprogress.hostname));
+		info += QString("<br>Last started host:<br><b>%1</b>").arg(afqt::stoq(taskprogress.hostname));
 
 	if (taskprogress.activity.size())
 		info += QString("<br>Activity: <b>%1</b>").arg(afqt::stoq(taskprogress.activity));
 
-	if (taskprogress.resources.size())
-		info += QString("<br>Resources: <b>%1</b>").arg(afqt::stoq(taskprogress.resources));
-
 	if (taskprogress.time_start != 0)
 	{
-		info += QString("<br>Started at <b>%1</b>").arg(afqt::time2Qstr(taskprogress.time_start));
+		info += QString("<br>Started at:<br><b>%1</b>").arg(afqt::time2Qstr(taskprogress.time_start));
 		if (((taskprogress.state & AFJOB::STATE_RUNNING_MASK) == false) && taskprogress.time_done)
-			info += QString("<br>Finished at <b>%1</b>").arg(afqt::time2Qstr(taskprogress.time_done));
+			info += QString("<br>Finished at:<br><b>%1</b>").arg(afqt::time2Qstr(taskprogress.time_done));
 	}
+
+	if (taskprogress.resources.size())
+	{
+		info += "<br>Resources:";
+		QStringList pairs = afqt::stoq(taskprogress.resources).split(' ');
+		for (int i = 0; i < pairs.size(); i++)
+			info += QString("<br><b>%1</b>").arg(pairs[i]);
+	}
+
 	return info;
 }
 
@@ -154,6 +163,8 @@ void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 				resources += QString(" %1GB").arg(res[1].toFloat() / 1024, 0, 'f', 2);
 			else if(res[0] == "cpu_avg")
 				resources += QString(" %1%").arg(res[1]);
+			else if(res[0].endsWith("_mb"))
+				resources += QString(" %1:%2GB").arg(res[0].left(res[0].size()-3)).arg(res[1].toFloat() / 1024.0, 0, 'f', 2);
 			else if(res[0].endsWith("_gb"))
 				resources += QString(" %1:%2GB").arg(res[0].left(res[0].size()-3)).arg(res[1].toFloat(), 0, 'f', 2);
 		}

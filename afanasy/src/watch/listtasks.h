@@ -13,7 +13,7 @@ class QListWidgetItem;
 
 class ItemJobBlock;
 class ItemJobTask;
-
+class ParamsPanelTask;
 class WndTask;
 
 class ListTasks : public ListItems
@@ -79,6 +79,8 @@ private:
 	ItemJobTask *** m_tasks;
 
 	bool constructed;
+
+	ParamsPanelTask * m_paramspanel_task;
 
 	std::vector<WndTask*> m_wndtasks;
 
