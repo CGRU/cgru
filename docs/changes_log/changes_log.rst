@@ -18,7 +18,7 @@ v3.2.0
 
 *Not released.*
 
-2021.03.23
+2021.04.07
 
 **New Afanasy network protocol version.**
 
@@ -45,12 +45,14 @@ v3.2.0
   and pool `no_task_event_time <../afanasy/pools.html#no-task-event-time>`_ parameter.
 - `RENDER_OVERLOAD <../afanasy/server.html#render-overload>`_ event
   and pool `overload_event_time <../afanasy/pools.html#overload-event-time>`_ parameter.
+- AfWatch jobs thumbnails size buttons.
 
 - **Bugfixes**
 
 	- AfWatch Work monitor allows modifications only in admin mode.
 	- AfWatch Users and Farm monitors allow selection and current item change only in admin mode.
 	- AfWatch Job Block operatons fixed to work on MS Windows.
+	- AfWatch Job Tasks List window on open task progresses refreshing.
 
 v3.1.1
 ======
