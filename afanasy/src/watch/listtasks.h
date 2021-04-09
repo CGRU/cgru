@@ -87,11 +87,13 @@ private:
 private:
 	void construct( af::Job * job);
 
-	bool updateProgress( const af::JobProgress * progress);
+	bool updateProgress(const af::JobProgress * i_job_progress);
 	bool updateTasks(
 		const std::vector<int32_t> & i_blocks,
 		const std::vector<int32_t> & i_tasks,
 		const std::vector<af::TaskProgress> & i_tps);
+
+	void updateResources();
 
 	void openTask( ItemJobTask * i_itemTask);
 

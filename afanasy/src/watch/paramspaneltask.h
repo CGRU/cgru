@@ -15,10 +15,10 @@ public:
 	ParamsPanelTask();
 	virtual ~ParamsPanelTask();
 
-	void updateJobProgress(const af::JobProgress * i_job_progress);
+	void updateResources(const QMap<QString, QVector<float>> & i_resmap);
 
 private:
-	const QStringList processResource(const QString & i_name, int min, int avg, int max) const;
+	const QStringList processResource(const QString & i_name, float min, float avg, float max) const;
 
 private:
 	QLabel * m_resources_label;

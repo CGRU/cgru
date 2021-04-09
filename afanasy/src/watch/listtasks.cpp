@@ -479,34 +479,55 @@ int ListTasks::getRow( int block, int task)
 	return row;
 }
 
-bool ListTasks::updateProgress( const af::JobProgress * progress/*bool blocksOnly = false*/)
+bool ListTasks::updateProgress(const af::JobProgress * i_job_progress/*bool blocksOnly = false*/)
 {
-	m_paramspanel_task->updateJobProgress(progress);
-
-	if( m_blocks_num != progress->getBlocksNum())
+	if (m_blocks_num != i_job_progress->getBlocksNum())
 	{
-		AFERRAR("ListTasks::updateProgress: Blocks number mismatch (%d!=%d).", m_blocks_num, progress->getBlocksNum())
+		AFERRAR("ListTasks::updateProgress: Blocks number mismatch (%d!=%d).", m_blocks_num, i_job_progress->getBlocksNum())
 		return false;
 	}
 
-	for( int b = 0; b < m_blocks_num; b++)
+	for (int b = 0; b < m_blocks_num; b++)
 	{
-		if( m_tasks_num[b] != progress->getTasksNum(b))
+		if (m_tasks_num[b] != i_job_progress->getTasksNum(b))
 		{
-			AFERRAR("ListTasks::updateProgress: Tasks number mismatch in block #%d (%d!=%d)", b, m_tasks_num[b], progress->getTasksNum(b))
+			AFERRAR("ListTasks::updateProgress: Tasks number mismatch in block #%d (%d!=%d)", b, m_tasks_num[b], i_job_progress->getTasksNum(b))
 			return false;
 		}
 
-		for( int t = 0; t < m_tasks_num[b]; t++)
+		for (int t = 0; t < m_tasks_num[b]; t++)
 		{
-			m_tasks[b][t]->upProgress( *(progress->tp[b][t]) );
+			m_tasks[b][t]->upProgress(*(i_job_progress->tp[b][t]) );
 		}
 	}
 
 	setWindowTitleProgress();
 	repaintItems();
+	updateResources();
 
 	return true;
+}
+
+void ListTasks::updateResources()
+{
+	QMap<QString, QVector<float>> resmap;
+	for (int b = 0; b < m_blocks_num; b++)
+	{
+		for (int t = 0; t < m_tasks_num[b]; t++)
+		{
+			QStringList pair = afqt::stoq(m_tasks[b][t]->taskprogress.resources).split(' ');
+			for (int i = 0; i < pair.size(); i++)
+			{
+				QStringList res = pair[i].split(':');
+				if (res.size() != 2)
+					continue;
+
+				resmap[res[0]].append(res[1].toFloat());
+			}
+		}
+	}
+	if (resmap.size())
+		m_paramspanel_task->updateResources(resmap);
 }
 
 bool ListTasks::updateTasks(
@@ -552,6 +573,7 @@ bool ListTasks::updateTasks(
 	if( firstChangedRow != -1 ) m_model->emit_dataChanged( firstChangedRow, lastChangedRow);
 
 	setWindowTitleProgress();
+	updateResources();
 
 	return true;
 }

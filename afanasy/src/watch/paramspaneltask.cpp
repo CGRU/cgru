@@ -16,55 +16,37 @@ ParamsPanelTask::ParamsPanelTask()
 	m_resources_label = new QLabel();
 	m_resources_label->setHidden(true);
 	getPublicLayout()->insertWidget(0, m_resources_label);
-	m_resources_label->setFrameShape(QFrame::StyledPanel);
-	m_resources_label->setFrameShadow(QFrame::Plain);
+//	m_resources_label->setFrameShape(QFrame::StyledPanel);
+//	m_resources_label->setFrameShadow(QFrame::Plain);
 }
 
 ParamsPanelTask::~ParamsPanelTask()
 {
 }
 
-void ParamsPanelTask::updateJobProgress(const af::JobProgress * i_job_progress)
+void ParamsPanelTask::updateResources(const QMap<QString, QVector<float>> & i_resmap)
 {
-	QMap<QString, QVector<int>> map;
-
-	for (int b = 0; b < i_job_progress->getBlocksNum(); b++)
-	{
-		for (int t = 0; t < i_job_progress->getTasksNum(b); t++)
-		{
-			QStringList pair = afqt::stoq(i_job_progress->tp[b][t]->resources).split(' ');
-			for (int i = 0; i < pair.size(); i++)
-			{
-				QStringList res = pair[i].split(':');
-				if (res.size() != 2)
-					continue;
-
-				map[res[0]].append(res[1].toInt());
-			}
-		}
-	}
-
-	if (map.size() == 0)
+	if (i_resmap.size() == 0)
 		return;
 
 	QStringList names;
-	QVector<int> mins;
-	QVector<int> maxs;
-	QVector<int> avgs;
+	QVector<float> mins;
+	QVector<float> maxs;
+	QVector<float> avgs;
 
-	QMapIterator<QString, QVector<int>> it(map);
+	QMapIterator<QString, QVector<float>> it(i_resmap);
 	while (it.hasNext())
 	{
 		it.next();
 		if (it.value().size() == 0)
 			continue;
 
-		int min, max, avg;
+		float min, max, avg;
 		min = max = avg = it.value()[0];
 
 		for (int v = 1; v < it.value().size(); v++)
 		{
-			int val = it.value()[v];
+			float val = it.value()[v];
 			if (val < min) min = val;
 			if (val > max) max = val;
 			avg += val;
@@ -81,16 +63,16 @@ void ParamsPanelTask::updateJobProgress(const af::JobProgress * i_job_progress)
 
 	QString info = "Resources:";
 
-	info += "<table>";
+	info += "<table border=1 border-style=\"none\" cellpadding=4 width=100%>";
 	info += "<tr>";
-	info += "<td>name</td><td>min</td><td>avg</td><td>max</td>";
+	info += "<td align=center>name</td><td align=center>min</td><td align=center>avg</td align=center><td>max</td>";
 	info += "</tr>";
 	for (int i = 0; i < names.size(); i++)
 	{
 		info += "<tr>";
 		QStringList td(processResource(names[i], mins[i], avgs[i], maxs[i]));
 		for (int c = 0; c < td.size(); c++)
-			info += QString("<td>%1</td>").arg(td[c]);
+			info += QString("<td align=right><b>%1</b></td>").arg(td[c]);
 		info += "</tr>";
 	}
 	info += "</table>";
@@ -99,23 +81,31 @@ void ParamsPanelTask::updateJobProgress(const af::JobProgress * i_job_progress)
 	m_resources_label->setHidden(false);
 }
 
-const QStringList ParamsPanelTask::processResource(const QString & i_name, int min, int avg, int max) const
+const QStringList ParamsPanelTask::processResource(const QString & i_name, float min, float avg, float max) const
 {
-	QStringList out = {i_name, QString("%1").arg(min), QString("%1").arg(avg), QString("%1").arg(max)};
+	QStringList out;
+	out.append(i_name);
+	out.append(QString("%1").arg(min, 0, 'f', 2));
+	out.append(QString("%1").arg(avg, 0, 'f', 2));
+	out.append(QString("%1").arg(max, 0, 'f', 2));
 
 	if (i_name == "cpu_avg")
 	{
 		out[0] = "CPU(%)";
-		out[1] = QString("%1").arg(min);
-		out[2] = QString("%1").arg(avg);
-		out[3] = QString("%1").arg(max);
+		out[1] = QString("%1").arg(int(round(min)));
+		out[2] = QString("%1").arg(int(round(avg)));
+		out[3] = QString("%1").arg(int(round(max)));
 	}
 	else if (i_name == "mem_peak_mb")
 	{
 		out[0] = "MEM(GB)";
-		out[1] = QString("%1").arg(double(min) / 1024.0, 0, 'f', 2);
-		out[2] = QString("%1").arg(double(avg) / 1024.0, 0, 'f', 2);
-		out[3] = QString("%1").arg(double(max) / 1024.0, 0, 'f', 2);
+		out[1] = QString("%1").arg(min / 1024.0, 0, 'f', 2);
+		out[2] = QString("%1").arg(avg / 1024.0, 0, 'f', 2);
+		out[3] = QString("%1").arg(max / 1024.0, 0, 'f', 2);
+	}
+	else if(i_name.endsWith("_gb"))
+	{
+		out[0] = i_name.left(i_name.size()-3) + "(GB)";
 	}
 
 	return out;
