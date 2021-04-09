@@ -15,6 +15,7 @@ ParamsPanelTask::ParamsPanelTask()
 {
 	m_resources_label = new QLabel();
 	m_resources_label->setHidden(true);
+	m_resources_label->setTextInteractionFlags(Qt::TextBrowserInteraction);
 	getPublicLayout()->insertWidget(0, m_resources_label);
 //	m_resources_label->setFrameShape(QFrame::StyledPanel);
 //	m_resources_label->setFrameShadow(QFrame::Plain);
