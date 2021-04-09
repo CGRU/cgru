@@ -108,6 +108,30 @@ const QStringList ParamsPanelTask::processResource(const QString & i_name, float
 	{
 		out[0] = i_name.left(i_name.size()-3) + "(GB)";
 	}
+	else if (min >= (1000.0*1000.0*1000.0))
+	{
+		out[1] = QString("%1G").arg(min / (1000.0*1000.0*1000.0), 0, 'f', 2);
+		out[2] = QString("%1G").arg(avg / (1000.0*1000.0*1000.0), 0, 'f', 2);
+		out[3] = QString("%1G").arg(max / (1000.0*1000.0*1000.0), 0, 'f', 2);
+	}
+	else if (min >= (1000.0*1000.0))
+	{
+		out[1] = QString("%1M").arg(min / (1000.0*1000.0), 0, 'f', 2);
+		out[2] = QString("%1M").arg(avg / (1000.0*1000.0), 0, 'f', 2);
+		out[3] = QString("%1M").arg(max / (1000.0*1000.0), 0, 'f', 2);
+	}
+	else if (min >= 1000.0)
+	{
+		out[1] = QString("%1K").arg(min / 1000.0, 0, 'f', 2);
+		out[2] = QString("%1K").arg(avg / 1000.0, 0, 'f', 2);
+		out[3] = QString("%1K").arg(max / 1000.0, 0, 'f', 2);
+	}
+	else if (min >= 100.0)
+	{
+		out[1] = QString("%1").arg(int(round(min)));
+		out[2] = QString("%1").arg(int(round(avg)));
+		out[3] = QString("%1").arg(int(round(max)));
+	}
 
 	return out;
 }
