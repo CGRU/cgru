@@ -65,7 +65,7 @@ void ParamsPanelTask::updateResources(const QMap<QString, QVector<float>> & i_re
 
 	info += "<table border=1 border-style=\"none\" cellpadding=4 width=100%>";
 	info += "<tr>";
-	info += "<td align=center>name</td><td align=center>min</td><td align=center>avg</td align=center><td>max</td>";
+	info += "<td align=center>name</td><td align=center>min</td><td align=center>avg</td><td align=center>max</td>";
 	info += "</tr>";
 	for (int i = 0; i < names.size(); i++)
 	{
