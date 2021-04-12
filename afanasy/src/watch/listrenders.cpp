@@ -36,9 +36,9 @@
 
 ListRenders::EDisplaySize ListRenders::ms_displaysize = ListRenders::EVariableSize;
 
-int     ListRenders::ms_SortType1      = CtrlSortFilter::TPRIORITY;
+int     ListRenders::ms_SortType1      = CtrlSortFilter::TNAME;
 int     ListRenders::ms_SortType2      = CtrlSortFilter::TNAME;
-bool    ListRenders::ms_SortAscending1 = false;
+bool    ListRenders::ms_SortAscending1 = true;
 bool    ListRenders::ms_SortAscending2 = true;
 int     ListRenders::ms_FilterType     = CtrlSortFilter::TNAME;
 bool    ListRenders::ms_FilterInclude  = true;

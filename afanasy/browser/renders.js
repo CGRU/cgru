@@ -1004,7 +1004,7 @@ RenderNode.params_render = {
 	annotation      : {'type':'str', 'label':'Annotation'}
 };
 
-RenderNode.sort = ['priority', 'user_name', 'name'];
+RenderNode.sort = ['name', 'priority', 'user_name'];
 RenderNode.filter = ['user_name', 'name', 'host_name'];
 
 RenderNode.createParams = function() {
