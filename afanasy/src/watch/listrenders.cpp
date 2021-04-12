@@ -34,8 +34,6 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-ListRenders::EDisplaySize ListRenders::ms_displaysize = ListRenders::EVariableSize;
-
 int     ListRenders::ms_SortType1      = CtrlSortFilter::TNAME;
 int     ListRenders::ms_SortType2      = CtrlSortFilter::TNAME;
 bool    ListRenders::ms_SortAscending1 = true;
@@ -274,28 +272,21 @@ void ListRenders::v_hideChanged()
 
 void ListRenders::setSpacing()
 {
-	 switch( ms_displaysize )
+	 switch(afqt::QEnvironment::render_item_size.n)
 	 {
 	 case  ListRenders::ESmallSize:
-		  m_view->setSpacing( 1);
+		  m_view->setSpacing(1);
 		  break;
 	 case  ListRenders::ENormalSize:
-		  m_view->setSpacing( 2);
+		  m_view->setSpacing(2);
 		  break;
 	 default:
-		  m_view->setSpacing( 3);
+		  m_view->setSpacing(3);
 	 }
 }
 
-void ListRenders::actChangeSize( int i_size)
+void ListRenders::itemsSizeChanged()
 {
-	 ListRenders::EDisplaySize dsize = (ListRenders::EDisplaySize)i_size;
-
-	 if( dsize == ms_displaysize )
-		  return;
-
-	 ms_displaysize = dsize;
-
 	 setSpacing();
 	 itemsHeightCalc();
 	 revertModel();

@@ -261,7 +261,7 @@ bool ItemPool::calcHeight()
 {
 	int old_height = m_height;
 
-	if (ListRenders::getDisplaySize() == ListRenders::ESmallSize)
+	if (afqt::QEnvironment::render_item_size.n == ListRenders::ESmallSize)
 	{
 		m_height = HeightPool_Small;
 	}
@@ -306,7 +306,7 @@ void ItemPool::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleO
 	int w = i_rect.width() - 10;
 	int h = i_rect.height() - 4;
 	int height_pool = HeightPool-2;
-	if (ListRenders::getDisplaySize() == ListRenders::ESmallSize)
+	if (afqt::QEnvironment::render_item_size.n == ListRenders::ESmallSize)
 	{
 		y = i_rect.y();
 		h = i_rect.height();
@@ -320,14 +320,14 @@ void ItemPool::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleO
 
 	i_painter->setPen(clrTextInfo(i_option));
 	i_painter->setFont(afqt::QEnvironment::f_info);
-	if (ListRenders::getDisplaySize() != ListRenders::ESmallSize)
+	if (afqt::QEnvironment::render_item_size.n != ListRenders::ESmallSize)
 		i_painter->drawText(x, y, w, height_pool, Qt::AlignLeft  | Qt::AlignBottom, strLeftBottom);
 	i_painter->setPen(afqt::QEnvironment::qclr_black);
-	if (ListRenders::getDisplaySize() != ListRenders::ESmallSize)
+	if (afqt::QEnvironment::render_item_size.n != ListRenders::ESmallSize)
 		i_painter->drawText(x, y, w, height_pool, Qt::AlignRight | Qt::AlignBottom, strRightBottom);
 	i_painter->drawText(x, y, w, height_pool, Qt::AlignRight | Qt::AlignTop,    strRightTop);
 
-	if (ListRenders::getDisplaySize() != ListRenders::ESmallSize)
+	if (afqt::QEnvironment::render_item_size.n != ListRenders::ESmallSize)
 	{
 		y += HeightPool;
 

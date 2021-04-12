@@ -26,6 +26,8 @@ public:
 
 	virtual void v_hideChanged();
 
+	void itemsSizeChanged();
+
 public slots:
 	void slot_ServiceAdd();
 	void slot_ServiceDisable();
@@ -45,16 +47,13 @@ protected:
 public:
 	 enum EDisplaySize
 	 {
-		  EVariableSize,
-		  EBigSize,
-		  ENormalSize,
-		  ESmallSize
+		  EVariableSize = 0,
+		  ESmallSize    = 1,
+		  ENormalSize   = 2,
+		  EBigSize      = 3
 	 };
-	 static EDisplaySize getDisplaySize() { return ms_displaysize; }
 
 private slots:
-
-	void actChangeSize( int i_size);
 
 	void renderAdded( ItemNode * node, const QModelIndex & index);
 
@@ -116,8 +115,6 @@ private:
 	void ticketEdit_DialogCount(const QString & i_name, bool i_host_ticket);
 
 private:
-	static EDisplaySize ms_displaysize;
-
 	static int     ms_SortType1;
 	static int     ms_SortType2;
 	static bool    ms_SortAscending1;

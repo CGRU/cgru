@@ -141,6 +141,7 @@ public:
 
 	static AttrNumber thumb_jobs_height;
 	static AttrNumber thumb_work_height;
+	static AttrNumber render_item_size;
 
 	inline static const QString & getServerName() { return ms_servername; }
 	inline static const QString & getUserName()   { return ms_username;   }

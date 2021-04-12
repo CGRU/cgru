@@ -119,12 +119,12 @@ bool ItemRender::calcHeight()
 			m_plots_height = m_plots[i]->height+4;
 
 	m_plots_height += 2;
-	if (ListRenders::getDisplaySize() == ListRenders::ESmallSize)
+	if (afqt::QEnvironment::render_item_size.n == ListRenders::ESmallSize)
 	    m_plots_height += HeightSmall;
 	else
 	    m_plots_height += HeightBase;
 
-	switch (ListRenders::getDisplaySize())
+	switch (afqt::QEnvironment::render_item_size.n)
 	{
 	case  ListRenders::ESmallSize:
 	case  ListRenders::ENormalSize:
@@ -521,7 +521,7 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	int base_height = HeightBase;
 	int plot_y_offset = 4;
 	int plot_h = base_height - 5;
-	if (ListRenders::getDisplaySize() == ListRenders::ESmallSize)
+	if (afqt::QEnvironment::render_item_size.n == ListRenders::ESmallSize)
 	{
 	    base_height = HeightSmall;
 		plot_y_offset = 1;
@@ -611,7 +611,7 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 
 	QString ann_state = m_state;
 	// Join annotation+state+tasks on small displays:
-	if (ListRenders::getDisplaySize() == ListRenders::ESmallSize)
+	if (afqt::QEnvironment::render_item_size.n == ListRenders::ESmallSize)
 	{
 	    if (false == m_annotation.isEmpty())
 	        ann_state = m_annotation + ' ' + ann_state;
@@ -671,7 +671,7 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 		return;
 	}
 
-	switch (ListRenders::getDisplaySize())
+	switch (afqt::QEnvironment::render_item_size.n)
 	{
 	case ListRenders::ESmallSize:
 		i_painter->setPen(clrTextInfo(i_option));
@@ -700,7 +700,7 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	
 	// Print Bottom|Right
 	// busy/free time for big displays or annotation+users for normal
-	switch (ListRenders::getDisplaySize())
+	switch (afqt::QEnvironment::render_item_size.n)
 	{
 	case ListRenders::ESmallSize:
 		break;
@@ -717,7 +717,7 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 
 	// Print information under plotters:
 	y_cur += m_plots_height;
-	switch (ListRenders::getDisplaySize())
+	switch (afqt::QEnvironment::render_item_size.n)
 	{
 	case  ListRenders::ESmallSize:
 	case  ListRenders::ENormalSize:
@@ -819,7 +819,8 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 		int star_size_txt = 11;
 		int tasks_num_x = 25;
 		int tasks_num_y = 28;
-		if (ListRenders::getDisplaySize() == ListRenders::ESmallSize)
+
+		if (afqt::QEnvironment::render_item_size.n == ListRenders::ESmallSize)
 		{
 			stars_offset_y = 7;
 			stars_offset_x = 17;

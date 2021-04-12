@@ -18,6 +18,8 @@ namespace AFGUI
 
 	const int THUMB_JOBS_HEIGHT = 50;
 
+	const int RENDER_ITEM_SIZE = 0;
+
 	const int LEFT   = 0;
 	const int TOP    = 1;
 	const int RIGHT  = 2;
