@@ -349,7 +349,7 @@ function processUserIP($i_arg, &$o_user)
 	$rec = array();
 	$rec['ip'] = $ip;
 	$rec['time'] = time();
-	$rec['url'] = $i_arg['url'];
+	$rec['url'] = isset($i_arg['url']) ? $i_arg['url'] : '';
 
 	array_unshift($o_user['ips'], $rec);
 
