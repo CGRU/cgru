@@ -53,6 +53,7 @@ v3.2.0
 	- AfWatch Users and Farm monitors allow selection and current item change only in admin mode.
 	- AfWatch Job Block operatons fixed to work on MS Windows.
 	- AfWatch Job Tasks List window on open task progresses refreshing.
+	- AfWatch Jobs List hidden nodes mix on reopen / monitor type or change fixed.
 
 v3.1.1
 ======
