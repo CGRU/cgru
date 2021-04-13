@@ -357,6 +357,7 @@ void ListNodes::sortMatch( const std::vector<int32_t> & i_list)
 {
 	storeSelection();
 	((ModelNodes*)m_model)->sortMatch( i_list);
+	processHidden();
 	reStoreSelection();
 }
 
