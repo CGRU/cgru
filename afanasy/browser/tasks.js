@@ -353,7 +353,7 @@ TaskItem.prototype.thumbsReceived = function(i_obj) {
 	{
 		var elImg = this.monitor.document.createElement('img');
 		this.elThumbs.appendChild(elImg);
-		elImg.src = '@TMP@' + files[i].name;
+		elImg.src = '/@TMP@' + files[i].name;
 	}
 };
 

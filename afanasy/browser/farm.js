@@ -31,7 +31,7 @@ function farm_showServices(i_el, i_params, i_type)
 			{
 				let elIcon = document.createElement('img');
 				elSrv.appendChild(elIcon);
-				elIcon.src = 'icons/software/' + srv + '.png';
+				elIcon.src = '/icons/software/' + srv + '.png';
 			}
 
 			if (i_params.services_disabled && i_params.services_disabled.includes(srv))
@@ -279,7 +279,7 @@ function farm_showTickets(i_el, i_tickets, i_type, i_node)
 		{
 			let elIcon = document.createElement('img');
 			elTk.appendChild(elIcon);
-			elIcon.src = 'icons/tickets/' + tk + '.png';
+			elIcon.src = '/icons/tickets/' + tk + '.png';
 		}
 		else
 			label = tk;

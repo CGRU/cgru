@@ -397,7 +397,7 @@ JobNode.prototype.showThumb = function(i_path) {
 		var img = document.createElement('img');
 		thumb.appendChild(img);
 		img.ondragstart = function() { return false; };
-		img.src = '@TMP@' + i_path;
+		img.src = '/@TMP@' + i_path;
 		img.style.display = 'none';
 		img.m_height = this.monitor.view_opts.jobs_thumbs_height;
 		img.onload = function(e) {
@@ -441,7 +441,7 @@ function JobBlock(i_elParent, i_block)
 	this.service = this.params.service;
 	this.elIcon = document.createElement('img');
 	this.elRoot.appendChild(this.elIcon);
-	this.elIcon.src = 'icons/software/' + this.service + '.png';
+	this.elIcon.src = '/icons/software/' + this.service + '.png';
 	this.elIcon.style.position = 'absolute';
 	//	this.elIcon.classList.add('icon');
 
@@ -1353,7 +1353,7 @@ JobBlock.prototype.updateTickets = function() {
 		{
 			let elIcon = document.createElement('img');
 			elTk.appendChild(elIcon);
-			elIcon.src = ('icons/tickets/' + tk + '.png');
+			elIcon.src = ('/icons/tickets/' + tk + '.png');
 		}
 		else
 			label += tk;
