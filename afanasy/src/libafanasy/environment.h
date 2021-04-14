@@ -96,13 +96,16 @@ public:
 	static inline const std::string & getHomeAfanasy() { return home_afanasy;  }
 	static inline const std::string & getCGRULocation(){ return cgrulocation;  } ///< Get CGRU root directory.
 	static inline const std::string & getAfRoot()      { return afroot;        } ///< Get Afanasy root directory.
-	static inline const std::string & getHTTPServeDir(){ return http_serve_dir;}
 	static inline const std::string & getServerName()  { return servername;    } ///< Get Afanasy server name.
 	static inline const int isIPv6Disabled()           { return ipv6_disable;  }
 	static inline const std::string & getUserName()    { return username;      } ///< Get current user name.
 	static inline const std::string & getHostName()    { return hostname;      } ///< Get Render host name.
 	static inline const std::string & getComputerName(){ return computername;  } ///< Get local computer name.
 	static inline const std::vector<std::string> & getPlatform() { return platform;} ///< Get platform name.
+
+	static inline const std::string & getHTTPServeDir()     {return http_serve_dir;      }
+	static inline const std::string & getHTTPSiteIndex()    {return http_site_index;     }
+	static inline const std::string & getHTTPDirecoryIndex(){return http_directory_index;}
 
 	static inline const Address & getServerAddress() { return serveraddress; }
 
@@ -250,7 +253,10 @@ private:
 	static std::string afroot;          ///< Afanasy root directory.
 	static std::string home;            ///< User home directory.
 	static std::string home_afanasy;    ///< Afanasy home settings.
-	static std::string http_serve_dir;  ///< Afanasy HTTP server serve directory.
+
+	static std::string http_serve_dir;       ///< Afanasy HTTP server serve directory.
+	static std::string http_site_index;      ///< Afanasy HTTP server response on an empty GET request.
+	static std::string http_directory_index; ///< Afanasy HTTP server response on a directory GET request.
 
 	static std::string version_revision;///< Sources version, will be compiled in binaries
 	static std::string version_cgru;    ///< CGRU version, will be get from environment on applications startup

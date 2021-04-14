@@ -45,8 +45,6 @@ const char FILENAME_INVALID_CHARACTERS[] = "\"\\ /|!$&?()[]{}*^<>%`',:;";
 const size_t FILENAME_INVALID_CHARACTERS_LENGTH = strlen(FILENAME_INVALID_CHARACTERS);
 const char FILENAME_INVALID_CHARACTER_REPLACE = '_';
 const int LOG_LINES_MAX = 100; ///< Maximum number of lines in each node log.
-
-const char HTML_BROWSER[] = "/afanasy/browser/index.html";
 }
 
 /// Addresses:

@@ -129,12 +129,19 @@ std::string HttpGet::getFileNameFromInMsg(const af::Msg *i_msg)
 		}
 		else
 		{
+			// Add a directory index
+			if (file_name[file_name.size()-1] == '/')
+				file_name += af::Environment::getHTTPDirecoryIndex();
+			else if (file_name.find('.') == std::string::npos)
+				file_name = file_name + AFGENERAL::PATH_SEPARATOR + af::Environment::getHTTPDirecoryIndex();
+
+			// Convert relative file name to absolute from serving directory
 			file_name = af::Environment::getHTTPServeDir() + AFGENERAL::PATH_SEPARATOR + file_name;
 		}
 	}
 	else
 	{
-		file_name = af::Environment::getHTTPServeDir() + AFGENERAL::HTML_BROWSER;
+		file_name = af::Environment::getHTTPServeDir() + af::Environment::getHTTPSiteIndex();
 	}
 	return file_name;
 }

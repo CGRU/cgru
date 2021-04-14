@@ -9,8 +9,12 @@
 	"af_ipv6_disable":1,
 		"":"IPv6 is disabled by default, to enable it, set this parameter value to 0",
 
-		"":"Afanasy server HTTP serve folder, if empty CGRU root folder will be used",
+		"":"Afanasy server HTTP serve folder, if not set CGRU root folder will be used",
 	"-af_http_serve_dir":"/cgru",
+		"":"Afanasy server HTTP response on an empty GET request",
+	"af_http_site_index":"/afanasy/browser/index.html",
+		"":"Afanasy server HTTP response on a directory GET request",
+	"af_http_directory_index":"index.html",
 
 		"":"Trusted IP addresses masks. From these IPs no authentication needed.",
 	"af_ip_trust":["*.*","127.0.0.1","192.168.*","*:*","0:0:0:0:0:0:0:1","FC00:*","FD00:*"],

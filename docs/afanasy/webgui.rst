@@ -41,3 +41,25 @@ http://afanasy.cgru.info:51000
 - Server does not allow to change existing tasks commands.
 - All services (tasks) starts a simple python script that just sleeps for some time.
 
+
+HTTP Server Configuration
+-------------------------
+
+There is some Afanasy server settings stands for HTTP serving.
+This settings can help you to setup some custom web GUI.
+
+- ``af_http_serve_dir``
+	Afanasy server HTTP serve folder.
+	If not set or empty CGRU root folder will be used.
+
+- ``af_http_site_index``
+	Afanasy server HTTP response on an empty GET request.
+	Default: ``/afanasy/browser/index.html``
+
+
+- ``af_http_directory_index``
+	Afanasy server HTTP response on a directory GET request.
+	Default: ``index.html``
+
+You can even make server to serve several GUIs and let artists to choose one.
+

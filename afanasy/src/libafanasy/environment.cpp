@@ -160,7 +160,10 @@ std::string Environment::cgrulocation;
 std::string Environment::afroot;
 std::string Environment::home;
 std::string Environment::home_afanasy;
+
 std::string Environment::http_serve_dir;
+std::string Environment::http_site_index;
+std::string Environment::http_directory_index;
 
 Address Environment::serveraddress;
 
@@ -213,7 +216,10 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, digest_file,                       "af_digest_file"                       );
 	getVar( i_obj, digest_realm,                      "realm"                                );
 	getVar( i_obj, serverport,                        "af_serverport"                        );
-	getVar( i_obj, http_serve_dir,                    "af_http_serve_dir"                    );
+
+	getVar(i_obj, http_serve_dir,                     "af_http_serve_dir"                    );
+	getVar(i_obj, http_site_index,                    "af_http_site_index"                   );
+	getVar(i_obj, http_directory_index,               "af_http_directory_index"              );
 
 	getVar( i_obj, rules_url,                         "rules_url"                            );
 	getVar( i_obj, projects_root,                     "projects_root"                        );
