@@ -46,6 +46,8 @@ v3.2.0
 - `RENDER_OVERLOAD <../afanasy/server.html#render-overload>`_ event
   and pool `overload_event_time <../afanasy/pools.html#overload-event-time>`_ parameter.
 - AfWatch jobs thumbnails size buttons.
+- Server `HTTP configuration <../afanasy/webgui.html#http-server-configuration>`_ added.
+  Now it is more easy to make server to serve some custom or even several WebGUIs.
 
 - **Bugfixes**
 
