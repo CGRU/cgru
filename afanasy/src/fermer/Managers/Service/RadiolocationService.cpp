@@ -1276,12 +1276,12 @@ void RadiolocationService::bladesUpdate()
 
         int loadnet = hres.net_recv_kbsec;
 
-        af::Host host = render->getHost();
-        QString os = (false == host.m_os.empty()) ? QString::fromStdString(host.m_os) : QString("Undefined");
+		std::string _os = render->getOS();
+        QString os = (false == _os.empty()) ? QString::fromStdString(_os) : QString("Undefined");
         long long busy_time = render->getTimeLaunch();
         QString job_names;
         QList<int> job_hashes;
-        int total_slots = render->getCapacity();
+        int total_slots = render->getCapacityHost();
         int avalible_slots = RadiolocationStation::getAvalibleSlotsAndJobNames(render, total_slots, job_names, job_hashes);
 
         m_it_blades = m_blade_indeces.find(i);
@@ -1328,8 +1328,8 @@ void RadiolocationService::bladesUpdate()
                 ,state
                 ,total_slots
                 ,avalible_slots
-                ,host.m_max_tasks
-                ,host.m_capacity
+                ,-1/*host.m_max_tasks*/
+                ,-1/*host.m_capacity*/
                 ,render->getId()
                 ,job_names
                 ,username
@@ -1338,9 +1338,9 @@ void RadiolocationService::bladesUpdate()
 
         obj->m_resource_map["performance_slots"] = QString::number( total_slots);
         obj->m_resource_map["avalible_performance_slots"] = QString::number( avalible_slots );
-        obj->m_resource_map["properties"] = QString::fromStdString( host.m_properties );
-        obj->m_resource_map["resources"] = QString::fromStdString( host.m_resources );
-        obj->m_resource_map["data"] = QString::fromStdString(host.m_data );
+        obj->m_resource_map["properties"] = QString::fromStdString(render->getPropertiesHost());
+        //obj->m_resource_map["resources"] = QString::fromStdString( host.m_resources );
+        obj->m_resource_map["data"] = QString::fromStdString(render->getCustomData());
         obj->m_resource_map["cpu_num"] = QString::number( hres.cpu_num );
         obj->m_resource_map["cpu_mhz"] = QString::number( hres.cpu_mhz );
         obj->m_resource_map["mem_total_mb"] = QString::number( hres.mem_total_mb );
@@ -1355,7 +1355,7 @@ void RadiolocationService::bladesUpdate()
         obj->m_resource_map["hdd_busy"] = QString::number( hres.hdd_busy );
         obj->m_resource_map["net_recv_kbsec"] = QString::number( hres.net_recv_kbsec );
         obj->m_resource_map["net_send_kbsec"] = QString::number( hres.net_send_kbsec );
-        obj->m_resource_map["max_running_task"] = QString::number( render->getMaxTasks() );
+        obj->m_resource_map["max_running_task"] = QString::number(render->getMaxTasksHost());
     } // for
 }
 

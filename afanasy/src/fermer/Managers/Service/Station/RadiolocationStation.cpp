@@ -87,7 +87,7 @@ void RadiolocationStation::getComputerName(std::string& o_compname)
     o_compname.assign(comp_name);
 }
 
-bool RadiolocationStation::QStringFromMsg(QString& o_ret, Waves::Ptr i_answer)
+void RadiolocationStation::QStringFromMsg(QString& o_ret, Waves::Ptr i_answer)
 {
     switch (i_answer.get()->type())
     {
@@ -134,7 +134,7 @@ RadiolocationStation::~RadiolocationStation()
 
 
 RadiolocationStation::RadiolocationStation():
-      m_qafclient( this, af::Environment::getWatchConnectRetries())
+      m_qafclient( this, af::Environment::getWatchConnectionLostTime())
     , m_connected(false)
     , user_id(0)
 {

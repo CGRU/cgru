@@ -8,8 +8,10 @@
 #define slots
 
 #else
+#undef slots
 #include <boost/python.hpp>
 #include "Py/PythonStdIoRedirect.hpp"
+#define slots
 #endif
 
 

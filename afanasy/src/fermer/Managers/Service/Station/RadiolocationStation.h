@@ -48,7 +48,7 @@ public:
     AFERMER_TYPEDEF_SMART_PTRS(RadiolocationStation)
     AFERMER_DEFINE_CREATE_FUNC(RadiolocationStation)
 
-    static bool QStringFromMsg(QString&, Waves::Ptr);
+    static void QStringFromMsg(QString&, Waves::Ptr);
     static int getAvalibleSlotsAndJobNames(af::Render *, int, QString&, QList<int>&);
     static void getItemInfo( std::ostringstream&, const std::string &, const std::string &, int);
 
