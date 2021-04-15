@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "../libafanasy/name_af.h"
+#include "../libafanasy/environment.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -18,8 +19,9 @@ LogData::LogData( const std::string & str, int flags)
       text += "ERROR ";
    }
 
-   text += af::time2str();
-   text += ": ";
+	if (false == af::Environment::logNoDate())
+		text += af::time2str() + ": ";
+
    text += str;
 
    switch(flags)
