@@ -17,8 +17,8 @@ g_graph_intervals.week   = {"seconds":60 * 60 * 24 * 7,"intervals":[ 1 ],"offset
 
 g_args = {};
 g_args.action = 'jobs_table';
-g_args.time_min = 0;
 g_args.time_max = Math.round((new Date()).valueOf() / 1000);
+g_args.time_min = g_args.time_max - (60*60 * 24 * 48);
 g_args.folder = '/';
 
 g_folders = [];
@@ -37,8 +37,8 @@ function g_Start( i_data, i_args)
 	g_Log('Server: ' + JSON.stringify( i_data.server, null,' '));
 
 	// Get time min and max:
-	g_args.time_min = i_data.time.time_min;
-	g_args.time_max = i_data.time.time_max;
+	/*g_args.time_min = i_data.time.time_min;
+	g_args.time_max = i_data.time.time_max;*/
 
 
 	// Initialize folders:

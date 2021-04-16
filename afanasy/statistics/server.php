@@ -43,7 +43,7 @@ function init( $i_args, &$o_out)
 	$dbconn = db_connect();
 
 	# Time min and max:
-	$time = array();
+	/*$time = array();
 	$query="SELECT min(time_done) AS time_done FROM jobs WHERE time_done > 0;";
 	$result = pg_query($query) or die('Query failed: ' . pg_last_error());
 	$line = pg_fetch_array( $result, null, PGSQL_ASSOC);
@@ -51,7 +51,7 @@ function init( $i_args, &$o_out)
 	pg_free_result($result);
 	if( $time['time_min'] == '') $time['time_min'] = 0;
 	$time['time_max'] = time();
-	$o_out['time'] = $time;
+	$o_out['time'] = $time;*/
 
 	# Folders:
 	$query="SELECT min(folder) as folder FROM jobs GROUP BY folder ORDER BY folder;";
@@ -129,7 +129,8 @@ SELECT service,
 		}
 		pg_free_result($sub_result);
 		$line['fav_service'] = $sub_name;
-		$line['fav_service_percent'] = $sub_favourite/$sub_total;
+		if ($sub_total > 0)
+			$line['fav_service_percent'] = $sub_favourite/$sub_total;
 
 		# Get folder favorite user:
 		$sub_query="
@@ -156,7 +157,8 @@ SELECT username,
 		}
 		pg_free_result($sub_result);
 		$line['fav_user'] = $sub_name;
-		$line['fav_user_percent'] = $sub_favourite/$sub_total;
+		if ($sub_total > 0)
+			$line['fav_user_percent'] = $sub_favourite/$sub_total;
 
 		$o_out['table'][] = $line;
 	}
