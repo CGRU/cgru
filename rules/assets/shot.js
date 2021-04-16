@@ -279,11 +279,10 @@ function shot_MakeThumbnail( i_args)
 	u_ThumbnailMake( i_args);
 }
 
-function shot_ShowRefs()
+function shot_RefsShow()
 {
 	$('shot_refs_div').style.clear = 'both';
 	$('shot_refs_div').style.cssFloat = 'none';
-	$('shot_refs_btn').style.display = 'none';
 	$('shot_refs').style.display = 'block';
 	$('shot_refs').classList.add('waiting');
 
@@ -297,8 +296,19 @@ function shot_ShowRefs()
 
 	n_WalkDir( walk);
 }
+function shot_RefsClose()
+{
+	$('shot_refs_div').style.clear = 'none';
+	$('shot_refs_div').style.cssFloat = 'left';
+	$('shot_refs').style.display = 'none';
+	$('shot_refs_btn').style.display = 'block';
+	$('shot_refs_close_btn').style.display = 'none';
+}
 function shot_RefsReceived( i_data, i_args)
 {
+	$('shot_refs_btn').style.display = 'none';
+	$('shot_refs_close_btn').style.display = 'block';
+
 	var walk = i_args;
 	walk.walks = i_data;
 
