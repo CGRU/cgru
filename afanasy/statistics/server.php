@@ -236,7 +236,8 @@ SELECT $favorite,
 		}
 		pg_free_result($sub_result);
 		$line['fav_name'] = $sub_name;
-		$line['fav_percent'] = $sub_favourite/$sub_total;
+		if ($sub_total > 0)
+			$line['fav_percent'] = $sub_favourite/$sub_total;
 
 		$o_out['table'][] = $line;
 	}
@@ -304,7 +305,8 @@ SELECT service,
 		}
 		pg_free_result($sub_result);
 		$line['fav_service'] = $sub_name;
-		$line['fav_service_percent'] = $sub_favourite/$sub_total;
+		if ($sub_total > 0)
+			$line['fav_service_percent'] = $sub_favourite/$sub_total;
 
 		# Get folder favorite user:
 		$sub_query="
@@ -331,7 +333,8 @@ SELECT username,
 		}
 		pg_free_result($sub_result);
 		$line['fav_user'] = $sub_name;
-		$line['fav_user_percent'] = $sub_favourite/$sub_total;
+		if ($sub_total > 0)
+			$line['fav_user_percent'] = $sub_favourite/$sub_total;
 
 		$o_out['table'][] = $line;
 	}
@@ -399,7 +402,8 @@ SELECT $favorite,
 		}
 		pg_free_result($sub_result);
 		$line['fav_name'] = $sub_name;
-		$line['fav_percent'] = $sub_favourite/$sub_total;
+		if ($sub_total > 0)
+			$line['fav_percent'] = $sub_favourite/$sub_total;
 
 		$o_out['table'][] = $line;
 	}
