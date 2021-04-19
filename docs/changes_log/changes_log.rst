@@ -16,9 +16,7 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
 v3.2.0
 ======
 
-*Not released.*
-
-2021.04.14
+2021.04.18
 
 **New Afanasy network protocol version.**
 
