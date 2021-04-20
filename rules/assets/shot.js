@@ -281,14 +281,29 @@ function shot_MakeThumbnail( i_args)
 
 function shot_RefsShow()
 {
+	$('shot_refs_btn').style.display = 'none';
 	$('shot_refs_div').style.clear = 'both';
 	$('shot_refs_div').style.cssFloat = 'none';
+	$('shot_refs').textContent = '';
 	$('shot_refs').style.display = 'block';
 	$('shot_refs').classList.add('waiting');
 
-	var walk = {};
+	let cmds = [];
+	for (let i = 0; i < ASSET.references.path.length; i++)
+		cmds.push('rules/bin/walk.sh --maxdepth 0 --mediainfo "'
+				+ RULES.root + '/' + ASSET.path + '/' + ASSET.references.path[0] + '"');
+	n_Request({
+		"send": {"cmdexec": {"cmds": cmds}},
+		"func": shot_RefsWalkReceived,
+		"info": 'walk refs media'
+	});
+}
+
+function shot_RefsWalkReceived(i_data, i_args)
+{
+	let walk = {};
 	walk.paths = [];
-	for( var i = 0; i < ASSET.references.path.length; i++)
+	for (let i = 0; i < ASSET.references.path.length; i++)
 		walk.paths.push( ASSET.path + '/' + ASSET.references.path[i]);
 
 	walk.wfunc = shot_RefsReceived;
@@ -306,7 +321,6 @@ function shot_RefsClose()
 }
 function shot_RefsReceived( i_data, i_args)
 {
-	$('shot_refs_btn').style.display = 'none';
 	$('shot_refs_close_btn').style.display = 'block';
 
 	var walk = i_args;
@@ -327,7 +341,7 @@ function shot_RefsReceived( i_data, i_args)
 			((  files == null ) || (   files.length == 0 )))
 			 continue;
 		not_empty_paths.push( walk.paths[i]);
-		new FilesView({"el":el,"path":walk.paths[i],"walk":walk.walks[i],"limits":false,"count_images":true})
+		new FilesView({"el":el,"path":walk.paths[i],"walk":walk.walks[i],"limits":false,"can_count":true})
 		found = true;
 	}
 	if( false == found )
