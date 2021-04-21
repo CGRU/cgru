@@ -201,6 +201,12 @@ function s_SearchOnClick()
 			el.m_flag = '_AND_';
 			specialElements.push(el);
 		}
+		{// Search TSK flags:
+			let el = $('search_flags_tasks');
+			$('search_flags').m_elFlags.push(el);
+			el.m_flag = '_TSK_';
+			specialElements.push(el);
+		}
 
 		// Tags:
 		if ($('search_tags').m_elTags)

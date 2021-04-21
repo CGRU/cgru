@@ -672,12 +672,15 @@ function sc_FilterShots(i_args)
 		let el = sc_elShots[th];
 		let st_obj = {};
 		if (el.m_status && el.m_status.obj)
-			st_obj = el.m_status.obj;
+			st_obj = Object.assign({}, el.m_status.obj);
 
 		// Join status with tasks
 		if (st_obj.tasks)
 		{
-			let keys = ['artists','tags','flags'];
+			let keys = ['artists','tags'];
+			if (i_args.flags && i_args.flags.includes('_TSK_'))
+				keys.push('flags');
+
 			for (let t in st_obj.tasks)
 			{
 				let task = st_obj.tasks[t];
