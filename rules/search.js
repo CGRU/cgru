@@ -164,10 +164,11 @@ function s_SearchOnClick()
 		let specialElements = [];
 
 		// Flags:
-		// Remove old:
+		// Remove old, as a new location can has own flags.
 		if ($('search_flags').m_elFlags)
 			for (let i = 0; i < $('search_flags').m_elFlags.length; i++)
-				$('search_flags').removeChild($('search_flags').m_elFlags[i]);
+				if ($('search_flags').m_elFlags[i].m_flag.indexOf('_') != 0)
+					$('search_flags').removeChild($('search_flags').m_elFlags[i]);
 		$('search_flags').m_elFlags = [];
 
 		// Create new:
@@ -213,8 +214,10 @@ function s_SearchOnClick()
 
 		// Tags:
 		if ($('search_tags').m_elTags)
+		// Remove old, as a new location can has own tags.
 			for (let i = 0; i < $('search_tags').m_elTags.length; i++)
-				$('search_tags').removeChild($('search_tags').m_elTags[i]);
+				if ($('search_tags').m_elTags[i].m_tag.indexOf('_') != 0)
+					$('search_tags').removeChild($('search_tags').m_elTags[i]);
 		$('search_tags').m_elTags = [];
 		for (let tag in RULES.tags)
 		{
