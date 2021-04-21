@@ -672,7 +672,8 @@ function sc_FilterShots(i_args)
 		let el = sc_elShots[th];
 		let st_obj = {};
 		if (el.m_status && el.m_status.obj)
-			st_obj = Object.assign({}, el.m_status.obj);
+			st_obj = c_CloneObj(el.m_status.obj);
+			//st_obj = Object.assign({}, el.m_status.obj);
 
 		// Join status with tasks
 		if (st_obj.tasks)

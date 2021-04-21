@@ -9,7 +9,7 @@ ini_set('max_execution_time', 600);
 define('HT_ACCESS_FILE_NAME', '.htaccess');
 define('HT_GROUPS_FILE_NAME', '.htgroups');
 define('HT_DIGEST_FILE_NAME', '.htdigest');
-define('FILE_MAX_LENGTH', 1000000);
+define('FILE_MAX_LENGTH', 3000000);
 
 $GuestSites = array('rules.cgru.info', '127.0.0.1');
 $CONF = array();
