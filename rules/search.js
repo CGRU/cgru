@@ -18,6 +18,9 @@
 
 function s_SearchOnClick()
 {
+	$('search_artists_btn').style.display = 'block';
+	$('search_artists_div').style.display = 'none';
+
 	// First time search operations:
 	if ($('search').m_constcted != true)
 	{
@@ -259,6 +262,12 @@ function s_SearchOnClick()
 
 	if (ASSET && window[ASSET.filter])
 		s_Found(window[ASSET.filter]());
+}
+
+function s_ShowArtists()
+{
+	$('search_artists_btn').style.display = 'none';
+	$('search_artists_div').style.display = 'block';
 }
 
 function s_ShowHideRoles()

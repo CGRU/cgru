@@ -142,7 +142,7 @@ function u_InitAuth()
 {
 	st_InitAuth();
 	$('body_edit').style.display = 'block';
-	$('search_artists_div').style.display = 'block';
+	$('search_artists_grp').style.display = 'block';
 	$('auth_user').textContent = c_GetUserTitle() + ' [' + g_auth_user.id + ']';
 
 	if (c_CanExecuteSoft())
