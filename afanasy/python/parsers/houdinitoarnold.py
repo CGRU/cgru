@@ -1,29 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from parsers import parser
-
-import re
-# re.findall(r'(\|\s*)(\d*)(%\s*done)','12:34:56      32MB   |   45% done - 23 rays/pixel')
-# |     0% done - 37 rays/pixel
-re_percent = re.compile(r'(\s*)(\d*)(\s*% done)')
+from parsers import hbatch
+from parsers import arnold
 
 
-class houdinitoarnold(parser.parser):
-    """Houdini to Arnold
+class houdinitoarnold(hbatch.hbatch, arnold.arnold):
+    """Houdini batch + catch arnold node output
     """
 
     def __init__(self):
-        parser.parser.__init__(self)
-        self.firstframe = True
-        self.data_all = ''
+        hbatch.hbatch.__init__(self)
+        arnold.arnold.__init__(self)
 
     def do(self, i_args):
-        data = i_args['data']
-
-        if len(data) < 1:
-            return
-
-        match = re_percent.findall(data)
-        if len(match):
-            percentframe = float(match[-1][1])
-            self.percent = int(percentframe)
+        arnold.arnold.do(self, i_args)
+        hbatch.hbatch.do(self, i_args)
