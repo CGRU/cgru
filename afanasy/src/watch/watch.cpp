@@ -42,11 +42,11 @@ const int Watch::Icons_Size_Large = 48;
 const int Watch::Icons_Size_Small = 16;
 const int Watch::Icons_Size_Tiny  = 10;
 
-QLinkedList<Wnd*>      Watch::ms_windows;
-QLinkedList<Receiver*> Watch::ms_receivers;
-QLinkedList<int>       Watch::ms_listenjobids;
-QLinkedList<int>       Watch::ms_watchtasksjobids;
-QLinkedList<QWidget*>  Watch::ms_watchtaskswindows;
+QList<Wnd*>      Watch::ms_windows;
+QList<Receiver*> Watch::ms_receivers;
+QList<int>       Watch::ms_listenjobids;
+QList<int>       Watch::ms_watchtasksjobids;
+QList<QWidget*>  Watch::ms_watchtaskswindows;
 
 QMap<QString, QPixmap *> Watch::ms_services_icons_large;
 QMap<QString, QPixmap *> Watch::ms_services_icons_small;
@@ -237,7 +237,7 @@ void Watch::caseMessage( af::Msg * msg)
 {
    bool received = false;
 
-	QLinkedList<Receiver*>::iterator rIt;
+	QList<Receiver*>::iterator rIt;
 	for( rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
 	{
 		msg->resetWrittenSize();
@@ -305,7 +305,7 @@ void Watch::caseMessage( af::Msg * msg)
 
 void Watch::filesReceived( const af::MCTaskUp & i_taskup)
 {
-	for( QLinkedList<Receiver*>::iterator rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
+	for (QList<Receiver*>::iterator rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
 	{
 		if((*rIt)->v_filesReceived( i_taskup))
 			return;
@@ -335,8 +335,8 @@ void Watch::listenTask( int jobid, int block, int task, const QString & name)
 void Watch::watchJobTasksWindowAdd( int id, const QString & name)
 {
 AFINFA("Watch::watchTasks: trying to open job \"%s\"[%d] tasks window.", name.toUtf8().data(), id)
-   QLinkedList<int>::const_iterator iIt = ms_watchtasksjobids.begin();
-   QLinkedList<QWidget*>::iterator wIt = ms_watchtaskswindows.begin();
+	QList<int>::const_iterator iIt = ms_watchtasksjobids.begin();
+	QList<QWidget*>::iterator wIt = ms_watchtaskswindows.begin();
    while( iIt != ms_watchtasksjobids.end())
    {
       if( *iIt == id)
@@ -359,8 +359,8 @@ AFINFA("Watch::watchTasks: \"%s\" window opened.", name.toUtf8().data())
 
 void Watch::watchJobTasksWindowRem( int id)
 {
-   QLinkedList<int>::iterator iIt = ms_watchtasksjobids.begin();
-   QLinkedList<QWidget*>::iterator wIt = ms_watchtaskswindows.begin();
+	QList<int>::iterator iIt = ms_watchtasksjobids.begin();
+	QList<QWidget*>::iterator wIt = ms_watchtaskswindows.begin();
    while( iIt != ms_watchtasksjobids.end())
    {
       if( *iIt == id)
@@ -378,13 +378,13 @@ void Watch::watchJobTasksWindowRem( int id)
 
 void Watch::connectionLost()
 {
-   for( QLinkedList<Receiver*>::iterator rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
+	for (QList<Receiver*>::iterator rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
       (*rIt)->v_connectionLost();
 }
 
 void Watch::connectionEstablished()
 {
-   for( QLinkedList<Receiver*>::iterator rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
+	for (QList<Receiver*>::iterator rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
       (*rIt)->v_connectionEstablished();
 }
 
@@ -579,7 +579,7 @@ void Watch::repaint()
 
     if( ms_d) ms_d->repaint();
     for( int i = 0; i < WLAST; i++) if( opened[i]) opened[i]->repaintItems();
-    for( QLinkedList<Wnd*>::iterator wIt = ms_windows.begin(); wIt != ms_windows.end(); wIt++) (*wIt)->update();
+	for (QList<Wnd*>::iterator wIt = ms_windows.begin(); wIt != ms_windows.end(); wIt++) (*wIt)->update();
 //printf("Watch::repaint: finish\n");
 }
 

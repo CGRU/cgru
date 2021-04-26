@@ -8,7 +8,6 @@
 #include "labelversion.h"
 #include "watch.h"
 
-#include <QtCore/QLinkedList>
 #include <QtCore/QTimer>
 #include <QBoxLayout>
 #include <QLabel>

@@ -3,7 +3,7 @@
 #include "../libafqt/qenvironment.h"
 #include "../libafqt/name_afqt.h"
 
-#include <QtCore/QLinkedList>
+#include <QtCore/QList>
 #include <QtCore/QStringList>
 
 class QApplication;
@@ -138,12 +138,12 @@ private:
 	static Dialog * ms_d;
 	static QApplication * ms_app;
 
-	static QLinkedList<Wnd*> ms_windows;
-	static QLinkedList<Receiver*> ms_receivers;
+	static QList<Wnd*> ms_windows;
+	static QList<Receiver*> ms_receivers;
 
-	static QLinkedList<int> ms_listenjobids;
-	static QLinkedList<int> ms_watchtasksjobids;
-	static QLinkedList<QWidget*> ms_watchtaskswindows;
+	static QList<int> ms_listenjobids;
+	static QList<int> ms_watchtasksjobids;
+	static QList<QWidget*> ms_watchtaskswindows;
 
 	static QMap<QString, QPixmap *> ms_services_icons_large;
 	static QMap<QString, QPixmap *> ms_services_icons_small;
