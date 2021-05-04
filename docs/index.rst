@@ -3,6 +3,8 @@ Welcome to CGRU - AFANASY documentation!
 
 .. sidebar:: Read The Funny Manuals!
 
+	`Project Home Page <https://cgru.info>`_
+
 	**Latest changes:** :ref:`changes-log-latest`
 
 	*Last edit*: |today|

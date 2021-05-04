@@ -55,6 +55,9 @@ Linux
 - Ubuntu 20.04 LTS
 	https://sourceforge.net/projects/cgru/files/3.2.0/cgru.3.2.0.ubuntu20.04_amd64.tar.gz/download
 
+- Ubuntu 21.04
+	https://sourceforge.net/projects/cgru/files/3.2.0/cgru.3.2.0.ubuntu21.04_amd64.tar.gz/download
+
 *All binaries (packages) are 64 bit.*
 
 
