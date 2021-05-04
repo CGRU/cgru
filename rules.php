@@ -263,7 +263,7 @@ function jsf_initialize($i_arg, &$o_out)
 	if (array_key_exists('error', $o_out)) return;
 
 	$out = array();
-	getallusers($out);
+	getallusers($out, false);
 	if (array_key_exists('error', $out))
 	{
 		$o_out['error'] = $out['error'];
@@ -299,9 +299,8 @@ function processUser($i_arg, &$o_out)
 
 	if (USER_ID == null) return;
 
-	$filename = $dirname . '/' . USER_ID . '.json';
-	$user = null;
-	if (false == readObj($filename, $user))
+	$user = readUser(USER_ID, true);
+	if (null == $user)
 		$user = array();
 
 	if (array_key_exists('error', $user))
@@ -324,7 +323,7 @@ function processUser($i_arg, &$o_out)
                     array_splice($user[$arr], $i, 1);
                 else $i++;
 
-	if (false == writeUser($user))
+	if (false == writeUser($user, false))
 	{
 		$o_out['error'] = 'Can`t write current user';
 		return;
@@ -356,14 +355,45 @@ function processUserIP($i_arg, &$o_user)
 	$o_user['ips'] = array_slice($o_user['ips'], 0, 10);
 }
 
-function writeUser(&$i_user)
+function writeUser($i_user, $i_full)
 {
-	$filename = 'users/' . $i_user['id'] . '.json';
+	$uid = $i_user['id'];
+	$ufile_main = "users/$uid/$uid.json";
+	$ufile_news = "users/$uid/$uid-news.json";
+	$ufile_bookmarks = "users/$uid/$uid-bookmarks.json";
 
-	if (writeObj($filename, $i_user))
+	$news = null;
+	$bookmarks = null;
+
+	if (array_key_exists('news', $i_user) && count($i_user['news']))
+	{
+		$news = $i_user['news'];
+		unset($i_user['news']);
+	}
+
+	if (array_key_exists('bookmarks', $i_user) && count($i_user['bookmarks']))
+	{
+		$bookmarks = $i_user['bookmarks'];
+		unset($i_user['bookmarks']);
+	}
+
+	if (false == writeObj($ufile_main, $i_user))
+		return false;
+
+	if (false == $i_full)
 		return true;
 
-	return false;
+	if ($news && count($news))
+		writeObj($ufile_news, array('news' => $news));
+	else if (is_file($ufile_news))
+		unlink($ufile_news);
+
+	if ($bookmarks && count($bookmarks))
+		writeObj($ufile_bookmarks, array('bookmarks' => $bookmarks));
+	else if (is_file($ufile_bookmarks))
+		unlink($ufile_bookmarks);
+
+	return true;
 }
 
 function http_digest_parse()
@@ -1192,7 +1222,7 @@ function jsf_makenews($i_args, &$o_out)
 {
 	// Read all users:
 	$users = array();
-	getallusers($users);
+	getallusers($users, true);
 	if (array_key_exists('error', $users))
 	{
 		$o_out['error'] = $users['error'];
@@ -1232,7 +1262,7 @@ function jsf_makenews($i_args, &$o_out)
 
 	// Write changed users:
 	foreach ($users_changed as $id)
-		writeUser($users[$id]);
+		writeUser($users[$id], true);
 
 	$o_out['users'] = $users_changed;
 }
@@ -1579,7 +1609,7 @@ function jsf_htdigest($i_recv, &$o_out)
 
 		// Check "passwd" state:
 		$out = array();
-		getallusers($out);
+		getallusers($out, false);
 		if (array_key_exists('error', $out))
 		{
 			$o_out['error'] = $out['error'];
@@ -1639,36 +1669,33 @@ function jsf_disableuser($i_args, &$o_out)
 	if (false == isAdmin($o_out)) return;
 
 	$uid = $i_args['uid'];
-
-	$dHandle = opendir('users');
-	if ($dHandle === false)
+	$udir = "users/$uid";
+	$ufile = "$udir/$uid.json";
+	if (false === is_file($ufile))
 	{
-		$o_out['error'] = 'Can`t open users folder.';
+		$o_out['error'] = 'User file does not exist.';
 		return;
 	}
-	while (false !== ($entry = readdir($dHandle)))
+
+	// If user new object provided, we write it.
+	// This needed to just disable user and not to loose its settings.
+	if (array_key_exists('uobj', $i_args))
 	{
-		if (false === is_file("users/$entry")) continue;
-		if ($entry != "$uid.json") continue;
-
-		// If user new object provided, we write it.
-		// This needed to just disable user and not to loose its settings.
-		if (array_key_exists('uobj', $i_args))
-		{
-			if (writeUser($i_args['uobj']))
-				$o_out['status'] = 'success';
-			else
-				$out['error'] = 'Unable to write "' . $uid . '" user file';
-		}
+		if (writeUser($i_args['uobj'], true))
+			$o_out['status'] = 'success';
 		else
-		{
-			// Delete user file and loose all its data:
-			unlink("users/$entry");
-		}
-		break;
+			$out['error'] = 'Unable to write "' . $uid . '" user file';
 	}
-	closedir($dHandle);
+	else
+	{
+		// Delete user files and loose all its data:
+		$files = glob($udir . '/*');
+		foreach ($files as $file)
+			unlink($file);
+		rmdir($udir);
+	}
 
+	// Remove user from digest file
 	$data = fileRead(HT_DIGEST_FILE_NAME, true);
 	if (is_null($data))
 	{
@@ -1697,10 +1724,10 @@ function jsf_disableuser($i_args, &$o_out)
 function jsf_getallusers($i_args, &$o_out)
 {
 	if (false == isAdmin($o_out)) return;
-	getallusers($o_out);
+	getallusers($o_out, true);
 }
 
-function getallusers(&$o_out)
+function getallusers(&$o_out, $i_full)
 {
 	$dHandle = opendir('users');
 	if ($dHandle === false)
@@ -1713,14 +1740,60 @@ function getallusers(&$o_out)
 
 	while (false !== ($entry = readdir($dHandle)))
 	{
-		if (false === is_file("users/$entry")) continue;
-		if (strrpos($entry, '.json') !== (strlen($entry) - 5)) continue;
+		if (false === is_dir("users/$entry")) continue;
 
-		$user = null;
-		if (readObj("users/$entry", $user))
+		$user = readUser($entry, $i_full);
+		if (null != $user)
 			$o_out['users'][$user['id']] = $user;
 	}
 	closedir($dHandle);
+}
+
+function readUser($i_uid, $i_full)
+{
+	$ufile_main = "users/$i_uid/$i_uid.json";
+	$ufile_news = "users/$i_uid/$i_uid-news.json";
+	$ufile_bookmarks = "users/$i_uid/$i_uid-bookmarks.json";
+
+	if (false === is_file($ufile_main))
+		return null;
+
+	$user = null;
+	if (false == readObj($ufile_main, $user))
+		return null;
+
+	if (false == $i_full)
+		return $user;
+
+	if (is_file($ufile_news))
+	{
+		$news = null;
+		if (readObj($ufile_news, $news))
+		{
+			if (array_key_exists('news', $news) && count($news['news']))
+				$user['news'] = $news['news'];
+			else
+				unlink($ufile_news);
+		}
+		else
+			unlink($ufile_news);
+	}
+
+	if (is_file($ufile_bookmarks))
+	{
+		$bookmarks = null;
+		if (readObj($ufile_bookmarks, $bookmarks))
+		{
+			if (array_key_exists('bookmarks', $bookmarks) && count($bookmarks['bookmarks']))
+				$user['bookmarks'] = $bookmarks['bookmarks'];
+			else
+				unlink($ufile_bookmarks);
+		}
+		else
+			unlink($ufile_bookmarks);
+	}
+
+	return $user;
 }
 
 function jsf_getallgroups($i_args, &$o_out)

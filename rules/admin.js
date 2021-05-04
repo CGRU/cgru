@@ -44,6 +44,22 @@ var ad_prof_props = {
 	signature /***/: {}
 };
 
+function ad_GetUserFileName(i_uid, i_type)
+{
+	if (null == i_type)
+		i_type = '';
+	else
+		i_type = '-' + i_type;
+
+	if (null == i_uid)
+		i_uid = g_auth_user.id;
+
+	if (null == i_uid)
+		return null;
+
+	return 'users/' + i_uid + '/' + i_uid + i_type + '.json';
+}
+
 function ad_Init()
 {
 	if (g_auth_user == null)
@@ -1214,11 +1230,6 @@ function ad_ChangeEmail(i_email, i_user_id)
 	ad_SaveUser({"id": i_user_id, "email": i_email}, ad_WndRefresh);
 }
 
-function ad_UserBookmarksClean(i_user_id)
-{
-	ad_SaveUser({"id": i_user_id, "bookmarks": []}, ad_WndRefresh);
-}
-
 function ad_UserChannelsClean(i_user_id)
 {
 	ad_SaveUser({"id": i_user_id, "channels": []}, ad_WndRefresh);
@@ -1226,7 +1237,12 @@ function ad_UserChannelsClean(i_user_id)
 
 function ad_UserNewsClean(i_user_id)
 {
-	ad_SaveUser({"id": i_user_id, "news": []}, ad_WndRefresh);
+	ad_SaveUser({"id": i_user_id, "news": []}, ad_WndRefresh, 'news');
+}
+
+function ad_UserBookmarksClean(i_user_id)
+{
+	ad_SaveUser({"id": i_user_id, "bookmarks": []}, ad_WndRefresh, 'bookmarks');
 }
 
 function ad_UserNewsLimitDialog(i_user_id)
@@ -1274,7 +1290,7 @@ function ad_UserShowEntries(i_el, i_show_ips)
 	i_el.innerHTML = text;
 }
 
-function ad_SaveUser(i_user, i_func)
+function ad_SaveUser(i_user, i_func, i_type)
 {
 	if (i_user == null)
 		i_user = g_auth_user;
@@ -1282,7 +1298,7 @@ function ad_SaveUser(i_user, i_func)
 	var obj = {};
 	obj.add = true;
 	obj.object = i_user;
-	obj.file = 'users/' + i_user.id + '.json';
+	obj.file = ad_GetUserFileName(i_user.id, i_type);
 
 	n_Request({
 		"send": {"editobj": obj},
@@ -1306,14 +1322,12 @@ function ad_CreateUser(i_user_id)
 {
 	var user = {};
 	user.id = i_user_id;
-	user.channels = [];
-	user.news = [];
 	user.ctime = Math.round((new Date()).valueOf() / 1000);
 
 	var obj = {};
 	obj.add = true;
 	obj.object = user;
-	obj.file = 'users/' + i_user_id + '.json';
+	obj.file = ad_GetUserFileName(i_user_id);
 
 	n_Request({
 		"send": {"editobj": obj},
