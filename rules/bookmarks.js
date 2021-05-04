@@ -134,12 +134,12 @@ function bm_Received(i_user, i_args)
 	if (false == bm_initialized)
 		return;
 
-	// console.log('nw_NewsReceived()');
 	if (i_user == null)
 		return;
+
 	if (i_user.error)
 	{
-		c_Error(i_user.error);
+		c_Log(i_user.error);
 		return;
 	}
 

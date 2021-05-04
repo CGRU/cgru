@@ -556,9 +556,10 @@ function nw_NewsReceived(i_data)
 {
 	if (i_data == null)
 		return;
+
 	if (i_data.error)
 	{
-		c_Error(i_data.error);
+		c_Log(i_data.error);
 		return;
 	}
 
