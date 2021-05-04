@@ -54,6 +54,7 @@ case ${DISTRIBUTIVE} in
         export AF_ADD_LFLAGS="$AF_ADD_LFLAGS -lpthread -lrt"
         ;;
     Gentoo)
+	export AF_EXTRA_LIBS="pthread"
         ;;
     Ubuntu)
         export ADD_CMAKE_MODULE_PATH="$PWD"
