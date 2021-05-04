@@ -63,6 +63,11 @@ function bm_InitConfigured()
 	setInterval(bm_Load, RULES.bookmarks.refresh * 1000);
 }
 
+function bm_GetUserFileName()
+{
+	return ad_GetUserFileName(g_auth_user.id, 'bookmarks');
+}
+
 function bm_OnClick()
 {
 	if ($('sidepanel').classList.contains('opened'))
@@ -114,12 +119,13 @@ function bm_Load(i_args)
 	if (i_args.info == null)
 		i_args.info = 'load';
 
-	var filename = 'users/' + g_auth_user.id + '.json';
-	n_Request({
-		'send': {'getobjects': {'file': filename, 'objects': ['bookmarks']}},
+	n_GetFile({
+		'path': bm_GetUserFileName(),
 		'func': bm_Received,
-		'args': i_args,
-		'info': 'bookmarks ' + i_args.info
+		'info': 'news',
+		'cache_time': -1,
+		'parse': true,
+		'local': false
 	});
 }
 
@@ -428,7 +434,7 @@ function bm_Delete(i_paths)
 		obj.objects.push({"path": i_paths[i]});
 	obj.delarray = 'bookmarks';
 
-	obj.file = 'users/' + g_auth_user.id + '.json';
+	obj.file = bm_GetUserFileName();
 	n_Request({"send": {"editobj": obj}, "func": bm_DeleteFinished});
 }
 

@@ -71,6 +71,11 @@ function nw_InitConfigured()
 	setInterval(nw_NewsLoad, RULES.news.refresh * 1000);
 }
 
+function nw_GetUserFileName()
+{
+	return ad_GetUserFileName(g_auth_user.id, 'news');
+}
+
 /* ---------------- [ Toggle functions ] ----------------------------------------------------------------- */
 
 function nw_DisableNewsToggle(i_toggle)
@@ -233,7 +238,7 @@ function nw_Subscribe(i_path)
 	var obj = {};
 	obj.object = {'channels': new_channels};
 	obj.add = true;
-	obj.file = 'users/' + g_auth_user.id + '.json';
+	obj.file = ad_GetUserFileName();
 
 	n_Request({"send": {"editobj": obj}, "func": nw_SubscribeFinished, 'path': i_path});
 }
@@ -264,7 +269,7 @@ function nw_Unsubscribe(i_path)
 	obj.objects = [{"id": i_path}];
 	obj.delarray = 'channels';
 	obj.id = g_auth_user.id;
-	obj.file = 'users/' + g_auth_user.id + '.json';
+	obj.file = ad_GetUserFileName();
 
 	n_Request({"send": {"editobj": obj}, "func": nw_UnsubscribeFinished, 'path': i_path});
 }
@@ -537,11 +542,13 @@ function nw_NewsLoad(i_refresh)
 		return;
 	}
 
-	var filename = 'users/' + g_auth_user.id + '.json';
-	n_Request({
-		'send': {'getobjects': {'file': filename, 'objects': ['news']}},
+	n_GetFile({
+		'path': nw_GetUserFileName(),
 		'func': nw_NewsReceived,
-		'info': 'news'
+		'info': 'news',
+		'cache_time': -1,
+		'parse': true,
+		'local': false
 	});
 }
 
@@ -861,7 +868,7 @@ function nw_DeleteNews(i_ids)
 		obj.objects.push({"id": i_ids[i]});
 	obj.delarray = 'news';
 
-	obj.file = 'users/' + g_auth_user.id + '.json';
+	obj.file = nw_GetUserFileName();
 	n_Request({"send": {"editobj": obj}, "func": nw_DeleteNewsFinished});
 }
 
