@@ -246,7 +246,7 @@ Status.prototype.show = function(i_status, i_update = false) {
 	}
 
 	if (this.args.tasks_badges)
-		task_DrawBadges(this.obj, this.elTasks, {'only_my':this.args.display_short});
+		task_DrawBadges(this.obj, this.elTasks/*, {'only_my':this.args.display_short}*/);
 	else
 		task_ShowTasks(this);
 
