@@ -884,9 +884,9 @@ table.statistics .duration { text-align: center; border-left-width: 0; }
 	width: 60px;
 }
 .search_grp_ctrl .button {
-	font-size: 14px;
+	font-size: 12px;
 	width: 40px;
-	padding: 1px 2px;
+	height: 12px;
 }
 
 #search_artists_div .notartist { font-style: italic; border-style: dashed }

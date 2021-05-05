@@ -636,16 +636,54 @@ function scenes_GetSelectedShots()
 function sc_FilterShots(i_args)
 {
 	var o_res = {};
-	o_res.found = {};
-	o_res.found.artists = [];
-	o_res.found.flags = [];
-	o_res.found.tags = [];
+	o_res.artists = [];
+	o_res.flags = [];
+	o_res.tags = [];
 
 	if (sc_elShots == null)
 		return;
 
 	if (i_args == null)
 		i_args = {};
+
+
+	// Prepare speial flags and tags:
+	let flags_and = false;
+	let flags_tsk = false;
+	if (i_args.flags)
+	{
+		let index = i_args.flags.indexOf('_AND_');
+		if (index != -1)
+		{
+			flags_and = true;
+			i_args.flags.splice(index, 1);
+		}
+		index = i_args.flags.indexOf('_TSK_');
+		if (index != -1)
+		{
+			flags_tsk = true;
+			i_args.flags.splice(index, 1);
+		}
+	}
+
+	let tags_and  = false;
+	let tags_tsk  = false;
+	if (i_args.tags)
+	{
+		let index = i_args.tags.indexOf('_AND_');
+		if (index != -1)
+		{
+			tags_and = true;
+			i_args.tags.splice(index, 1);
+		}
+		index = i_args.tags.indexOf('_TSK_');
+		if (index != -1)
+		{
+			tags_tsk = true;
+			i_args.tags.splice(index, 1);
+		}
+	}
+
 
 	var anns = null;
 	if (i_args.ann )
@@ -678,9 +716,17 @@ function sc_FilterShots(i_args)
 		// Join status with tasks
 		if (st_obj.tasks)
 		{
-			let keys = ['artists','tags'];
-			if (i_args.flags && i_args.flags.includes('_TSK_'))
-				keys.push('flags');
+			let keys = ['artists'];
+			// Join flags or tags, never join and flags and tags.
+			// If task search enabled for both tags and flags,
+			// we should search tasks, not just join shot status with tasks status.
+			if (false == (flags_tsk && tags_tsk))
+			{
+				if (flags_tsk)
+					keys.push('flags');
+				if (tags_tsk)
+					keys.push('tags');
+			}
 
 			for (let t in st_obj.tasks)
 			{
@@ -743,12 +789,11 @@ function sc_FilterShots(i_args)
 				}
 		}
 
-		if (i_args.flags && found)
+		if (i_args.flags && i_args.flags.length && found)
 		{
 			found = false;
 			if (st_obj.flags && st_obj.flags.length)
 			{
-				let flags_and = i_args.flags.includes('_AND_');
 				for (let f of i_args.flags)
 				{
 					// skip special flags
@@ -772,12 +817,11 @@ function sc_FilterShots(i_args)
 				found = true;
 		}
 
-		if (i_args.tags && found)
+		if (i_args.tags && i_args.tags.length && found)
 		{
 			found = false;
 			if (st_obj.tags && st_obj.tags.length)
 			{
-				let tags_and = i_args.tags.includes('_AND_');
 				for (let t of i_args.tags)
 				{
 					// skip special tags
@@ -799,6 +843,43 @@ function sc_FilterShots(i_args)
 			}
 			else if (i_args.tags.indexOf('_null_') != -1)
 				found = true;
+		}
+
+		// Search tasks:
+		if (flags_tsk && tags_tsk)
+		{
+			if (st_obj.tasks)
+			{
+				for (let t in st_obj.tasks)
+				{
+					let task = st_obj.tasks[t];
+					found = true;
+
+					if (found && i_args.flags && i_args.flags.length)
+					{
+						found = false;
+						if (task.flags && task.flags.length)
+						{
+							for (let i = 0; i < i_args.flags.length; i++)
+								if (task.flags.includes(i_args.flags[i]))
+									{ found = true; break; }
+						}
+					}
+
+					if (found && i_args.tags && i_args.tags.length)
+					{
+						found = false;
+						if (task.tags && task.tags.length)
+						{
+							for (let i = 0; i < i_args.tags.length; i++)
+								if (task.tags.includes(i_args.tags[i]))
+									{ found = true; break; }
+						}
+					}
+				}
+			}
+			else
+				found = false;
 		}
 
 		if (i_args.artists && found)
@@ -840,18 +921,26 @@ function sc_FilterShots(i_args)
 			el.style.display = 'block';
 			el.m_filtered = false;
 
+			// We should return not filtered shots all artists,
+			// flags and tags for search field to mute it.
 			if (st_obj.artists)
-				for (let a = 0; a < st_obj.artists.length; a++)
-					o_res.found.artists.push(st_obj.artists[a]);
+				o_res.artists = o_res.artists.concat(st_obj.artists);
 
 			if (st_obj.flags)
-				for (let f = 0; f < st_obj.flags.length; f++)
-					o_res.found.flags.push(st_obj.flags[f]);
+				o_res.flags = o_res.flags.concat(st_obj.flags);
 
 			if (st_obj.tags)
-				for (let t = 0; t < st_obj.tags.length; t++)
-					o_res.found.tags.push(st_obj.tags[t]);
+				o_res.tags = o_res.tags.concat(st_obj.tags);
 
+			if (flags_tsk && tags_tsk && st_obj.tasks)
+				for (let t in st_obj.tasks)
+				{
+					let task = st_obj.tasks[t];
+					if (task.flags)
+						o_res.flags = o_res.flags.concat(task.flags);
+					if (task.tags)
+						o_res.tags = o_res.tags.concat(task.tags);
+				}
 		}
 		else
 		{

@@ -246,6 +246,12 @@ function s_SearchOnClick()
 			el.m_tag = '_AND_';
 			specialElements.push(el);
 		}
+		{// Search TSK tags:
+			let el = $('search_tags_tasks');
+			$('search_tags').m_elTags.push(el);
+			el.m_tag = '_TSK_';
+			specialElements.push(el);
+		}
 
 		for (let el of specialElements)
 		{
@@ -586,12 +592,12 @@ function s_ResultReceived(i_data)
 
 function s_Found(i_args)
 {
-	if (i_args.found == null)
+	if (i_args == null)
 		return;
 
-	var artists = i_args.found.artists;
-	var   flags = i_args.found.flags;
-	var    tags = i_args.found.tags;
+	var artists = i_args.artists;
+	var   flags = i_args.flags;
+	var    tags = i_args.tags;
 
 	var elArtists = $('search_artists').m_elArtists;
 	var elFlags   = $('search_flags').m_elFlags;

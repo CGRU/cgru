@@ -106,21 +106,21 @@ Refresh browser to sort by size" onclick="g_NavigShowInfo(this)">SIZE</div>
 			<div style="float:left;">Annotation:</div>
 			<div id="search_annotation" class="editing" contenteditable="true"></div>
 		</div>
-<div id="search_artists_grp" class="search_grp" style="display:none">
-		<div id="search_artists_btn" class="button" onclick="s_ShowArtists()">Search Artists</div>
-		<div id="search_artists_div" _class="_search_grp" style="display:none">
-			<div class="search_grp_ctrl">
-				<div>Artists:</div>
-				<div class="button" onclick="s_ShowDisabledArtists(this)" title="Show disabled artists.">Dis</div>
-				<div class="button" onclick="s_ShowNotArtists(this)" title="Show not only artists.">All</div>
-				<div class="button" id="search_artists_notassigned"
-					title="Search shots that not assigned to any artist.">
-					N/A
+		<div id="search_artists_grp" class="search_grp" style="display:none">
+			<div id="search_artists_btn" class="button" onclick="s_ShowArtists()">Search Artists</div>
+			<div id="search_artists_div" _class="_search_grp" style="display:none">
+				<div class="search_grp_ctrl">
+					<div>Artists:</div>
+					<div class="button" onclick="s_ShowDisabledArtists(this)" title="Show disabled artists.">Dis</div>
+					<div class="button" onclick="s_ShowNotArtists(this)" title="Show not only artists.">All</div>
+					<div class="button" id="search_artists_notassigned"
+						title="Search shots that not assigned to any artist.">
+						N/A
+					</div>
 				</div>
+				<div id="search_artists" class="artists"></div>
 			</div>
-			<div id="search_artists" class="artists"></div>
 		</div>
-</div>
 		<div class="search_grp">
 			<div class="search_grp_ctrl">
 				<div>Flags:</div>
@@ -149,6 +149,10 @@ Refresh browser to sort by size" onclick="g_NavigShowInfo(this)">SIZE</div>
 				<div class="button" id="search_tags_and"
 					title="Search tags with AND logic.">
 					AND
+				</div>
+				<div class="button" id="search_tags_tasks"
+					title="Search tags in tasks.">
+					TSK
 				</div>
 			</div>
 			<div id="search_tags" class="tags"></div>
