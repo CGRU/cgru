@@ -399,11 +399,9 @@ function bm_StatusesChanged(i_args)
 
 function bm_HighlightCurrent()
 {
-	var path = g_CurPath();
-
-	for (var i = 0; i < bm_elements.length; i++)
+	for (let i = 0; i < bm_elements.length; i++)
 	{
-		if (path == bm_elements[i].m_bookmark.path)
+		if (bm_elements[i].m_bookmark.path == g_CurPath())
 		{
 			bm_elements[i].classList.add('cur_path');
 			if (g_CurPathDummy() || (false == bm_ActualStatus(RULES.status)))

@@ -705,7 +705,10 @@ function nw_NewsShow(i_update_folders)
 
 			// Update current location status:
 			if (news.path == g_CurPath())
+			{
+				RULES.status = news.status;
 				st_Update(news.status);
+			}
 
 			// Remove walk cache:
 			if (n_walks[news.path])
