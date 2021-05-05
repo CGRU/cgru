@@ -952,8 +952,7 @@ function ad_WndAddUser(i_el, i_user, i_row)
 	if (i_user.bookmarks)
 		el.textContent = i_user.bookmarks.length;
 	el.m_user_id = i_user.id;
-	if (i_user.disabled !== true)
-		el.ondblclick = function(e) { ad_UserBookmarksClean(e.currentTarget.m_user_id); };
+	el.ondblclick = function(e) { ad_UserBookmarksClean(e.currentTarget.m_user_id); };
 
 	var el = document.createElement('td');
 	elTr.appendChild(el);
@@ -975,8 +974,7 @@ function ad_WndAddUser(i_el, i_user, i_row)
 	if (i_user.news)
 		el.textContent = i_user.news.length;
 	el.m_user_id = i_user.id;
-	if (i_user.disabled !== true)
-		el.ondblclick = function(e) { ad_UserNewsClean(e.currentTarget.m_user_id); };
+	el.ondblclick = function(e) { ad_UserNewsClean(e.currentTarget.m_user_id); };
 
 	var el = document.createElement('td');
 	elTr.appendChild(el);
