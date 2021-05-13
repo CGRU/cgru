@@ -1137,17 +1137,22 @@ function c_HttpToLinks(i_text)
 			link = text.substr(0, pos);
 			text = text.substr(pos);
 		}
-		let href = text.replace(a_re, '$1');
-		let name = href;
-		if (name.includes('fv_Goto'))
+		//text = text.replace(a_re, '<a target="_blank" class="link_auto" href="$1">$1</a>');
+		//console.log(text);
+		if (text.search(a_re) != -1)
 		{
-			name = name.split('fv_Goto');
-			name = name[name.length-1];
-			name = name.replace(/[:\"\{\}]|%22|%7D|/g,'');
+			let href = text.replace(a_re, '$1');
+			let name = href;
+			if (name.includes('fv_Goto'))
+			{
+				name = name.split('fv_Goto');
+				name = name[name.length-1];
+				name = name.replace(/[:\"\{\}]|%22|%7D|/g,'');
+			}
+			name = name.replace(g_CurPath(), '');
+			while ((name.indexOf('/') == 0) && name.length) name = name.substr(1);
+			text = '<a target="_blank" class="link_auto" href="' + href + '">' + name + '</a>';
 		}
-		name = name.replace(g_CurPath(), '');
-		while ((name.indexOf('/') == 0) && name.length) name = name.substr(1);
-		text = '<a target="_blank" class="link_auto" href="' + href + '">' + name + '</a>';
 		text = link + text;
 
 		if (out == null)
