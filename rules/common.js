@@ -1138,10 +1138,15 @@ function c_HttpToLinks(i_text)
 			text = text.substr(pos);
 		}
 		//text = text.replace(a_re, '<a target="_blank" class="link_auto" href="$1">$1</a>');
-		//console.log(text);
-		if (text.search(a_re) != -1)
+		let found_links = [];
+		let matches = text.matchAll(a_re);
+		for (const match of matches)
 		{
-			let href = text.replace(a_re, '$1');
+			let href = match[0];
+			if (found_links.includes(href))
+				continue;
+			found_links.push(href);
+			console.log(href);
 			let name = href;
 			if (name.includes('fv_Goto'))
 			{
@@ -1151,7 +1156,7 @@ function c_HttpToLinks(i_text)
 			}
 			name = name.replace(g_CurPath(), '');
 			while ((name.indexOf('/') == 0) && name.length) name = name.substr(1);
-			text = '<a target="_blank" class="link_auto" href="' + href + '">' + name + '</a>';
+			text = text.replaceAll(href, '<a target="_blank" class="link_auto" href="' + href + '">' + name + '</a>');
 		}
 		text = link + text;
 
