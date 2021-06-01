@@ -63,12 +63,6 @@ class BlockParameters:
 
         # Get parameters:
         self.single_task = bool(afnode.parm('single_task').eval())
-        if self.single_task:
-            self.frame_pertask = self.frame_last - self.frame_first + 1
-            self.frame_sequential = 1
-        else:
-            self.frame_pertask = int(afnode.parm('frame_pertask').eval())
-            self.frame_sequential = int(afnode.parm('frame_sequential').eval())
         self.local_render = bool(afnode.parm('local_render').eval())
         self.job_name = str(afnode.parm('job_name').eval())
         self.job_branch = ''
@@ -166,6 +160,13 @@ class BlockParameters:
         if self.frame_pertask < 1:
             hou.ui.displayMessage('Frames per task < 1 for "%s"' % opname)
             return
+
+        if self.single_task:
+            self.frame_pertask = self.frame_last - self.frame_first + 1
+            self.frame_sequential = 1
+        else:
+            self.frame_pertask = int(afnode.parm('frame_pertask').eval())
+            self.frame_sequential = int(afnode.parm('frame_sequential').eval())
 
         # Process output driver type to construct a command:
         if ropnode:
