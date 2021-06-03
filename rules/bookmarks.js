@@ -302,6 +302,10 @@ function bm_Show()
 				if (scene_highlighted)
 					label += ' (' + scene_highlighted + ')';
 				scene.elLabel.textContent = label;
+
+				scene.elLabel.title = scene.path
+						+ '\nBookmarks count: ' + scene.bms.length;
+						+ '\nClick to toggle collapse';
 			}
 
 			project_count += scene.bms.length;
@@ -312,6 +316,10 @@ function bm_Show()
 		if (project_highlighted)
 			label += ' (' + project_highlighted + ')';
 		project.elLabel.textContent = label;
+
+		project.elLabel.title = 'Project: ' + project.name
+				+ '\nBookmarks count: ' + project_count
+				+ '\nClick to toggle collapse';
 	}
 
 	bm_HighlightCurrent();
