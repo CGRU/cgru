@@ -304,7 +304,7 @@ function bm_Show()
 				scene.elLabel.textContent = label;
 
 				scene.elLabel.title = scene.path
-						+ '\nBookmarks count: ' + scene.bms.length;
+						+ '\nBookmarks count: ' + scene.bms.length
 						+ '\nClick to toggle collapse';
 			}
 
