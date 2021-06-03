@@ -27,11 +27,11 @@ function bm_Init()
 	if (localStorage.bookmarks_opened == null)
 		localStorage.bookmarks_opened = 'false';
 
-	if (localStorage.bookmarks_projects_opened == null)
-		localStorage.bookmarks_projects_opened = '';
+	if (localStorage.bookmarks_projects_closed == null)
+		localStorage.bookmarks_projects_closed = '';
 
-	if (localStorage.bookmarks_scenes_opened == null)
-		localStorage.bookmarks_scenes_opened = '';
+	if (localStorage.bookmarks_scenes_closed == null)
+		localStorage.bookmarks_scenes_closed = '';
 
 	if (localStorage.bookmarks_thumbnails_show == null)
 		localStorage.bookmarks_thumbnails_show = 'false';
@@ -216,7 +216,7 @@ function bm_Show()
 		if (names.length > 3)
 		{
 			scene_path = names[1] + '/' + names[2] + '/' + names[3];
-			scene_name = names[1];
+			scene_name = names[3];
 		}
 		if ((scene == null) || (scene.path != scene_path))
 		{
@@ -232,7 +232,7 @@ function bm_Show()
 	}
 
 	// Construct elements:
-	let opened_projects = localStorage.bookmarks_projects_opened.split('|');
+	let closed_projects = localStorage.bookmarks_projects_closed.split('|');
 	for (let p = 0; p < bm_projects.length; p++)
 	{
 		let project = bm_projects[p];
@@ -241,10 +241,10 @@ function bm_Show()
 		project.el = document.createElement('div');
 		$('bookmarks').appendChild(project.el);
 		project.el.classList.add('project');
-		if (opened_projects.indexOf(project.name) != -1)
-			project.el.classList.add('opened');
-		else
+		if (closed_projects.includes(project.name))
 			project.el.classList.add('closed');
+		else
+			project.el.classList.add('opened');
 
 		// Project label:
 		let el = document.createElement('div');
@@ -257,7 +257,7 @@ function bm_Show()
 		// Project scenes:
 		let project_count = 0;
 		let project_highlighted = 0;
-		let opened_scenes = localStorage.bookmarks_scenes_opened.split('|');
+		let closed_scenes = localStorage.bookmarks_scenes_closed.split('|');
 		for (let s = 0; s < project.scenes.length; s++)
 		{
 			let scene = project.scenes[s];
@@ -266,10 +266,10 @@ function bm_Show()
 			scene.el = document.createElement('div');
 			project.el.appendChild(scene.el);
 			scene.el.classList.add('scene');
-			if (opened_scenes.indexOf(scene.path) != -1)
-				scene.el.classList.add('opened');
-			else
+			if (closed_scenes.includes(scene.path))
 				scene.el.classList.add('closed');
+			else
+				scene.el.classList.add('opened');
 
 			// Scene label:
 			if (scene.name)
@@ -374,7 +374,7 @@ function bm_ProjectClicked(i_evt)
 	let list = '';
 	for (let p = 0; p < bm_projects.length; p++)
 	{
-		if (bm_projects[p].el.classList.contains('closed'))
+		if (false == bm_projects[p].el.classList.contains('closed'))
 			continue;
 
 		if (list.length)
@@ -383,7 +383,7 @@ function bm_ProjectClicked(i_evt)
 		list += bm_projects[p].name;
 	}
 
-	localStorage.bookmarks_projects_opened = list;
+	localStorage.bookmarks_projects_closed = list;
 }
 
 function bm_SceneClicked(i_evt)
@@ -402,7 +402,7 @@ function bm_SceneClicked(i_evt)
 			if (scene.path == null)
 				continue;
 
-			if (scene.el.classList.contains('closed'))
+			if (false == scene.el.classList.contains('closed'))
 				continue;
 
 			if (list.length)
@@ -412,7 +412,7 @@ function bm_SceneClicked(i_evt)
 		}
 	}
 
-	localStorage.bookmarks_scenes_opened = list;
+	localStorage.bookmarks_scenes_closed = list;
 }
 
 function bm_NavigatePost()
