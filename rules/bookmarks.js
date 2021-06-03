@@ -30,6 +30,9 @@ function bm_Init()
 	if (localStorage.bookmarks_projects_opened == null)
 		localStorage.bookmarks_projects_opened = '';
 
+	if (localStorage.bookmarks_scenes_opened == null)
+		localStorage.bookmarks_scenes_opened = '';
+
 	if (localStorage.bookmarks_thumbnails_show == null)
 		localStorage.bookmarks_thumbnails_show = 'false';
 
@@ -186,8 +189,9 @@ function bm_Show()
 
 	g_auth_user.bookmarks.sort(bm_Compare);
 
-	// Collect projects:
+	// Collect projects and scenes:
 	let project = null;
+	let scene = null;
 	for (let i = 0; i < g_auth_user.bookmarks.length; i++)
 	{
 		let bm = g_auth_user.bookmarks[i];
@@ -201,16 +205,34 @@ function bm_Show()
 		{
 			project = {};
 			project.name = names[1];
-			project.bms = [];
+			project.scenes = [];
+			scene = null;
 
 			bm_projects.push(project);
 		}
 
-		project.bms.push(bm);
+		let scene_path = null;
+		let scene_name = null;
+		if (names.length > 3)
+		{
+			scene_path = names[1] + '/' + names[2] + '/' + names[3];
+			scene_name = names[1];
+		}
+		if ((scene == null) || (scene.path != scene_path))
+		{
+			scene = {};
+			scene.name = scene_name;
+			scene.path = scene_path;
+			scene.bms = [];
+
+			project.scenes.push(scene);
+		}
+
+		scene.bms.push(bm);
 	}
 
 	// Construct elements:
-	let opened = localStorage.bookmarks_projects_opened.split('|');
+	let opened_projects = localStorage.bookmarks_projects_opened.split('|');
 	for (let p = 0; p < bm_projects.length; p++)
 	{
 		let project = bm_projects[p];
@@ -219,7 +241,7 @@ function bm_Show()
 		project.el = document.createElement('div');
 		$('bookmarks').appendChild(project.el);
 		project.el.classList.add('project');
-		if (opened.indexOf(project.name) != -1)
+		if (opened_projects.indexOf(project.name) != -1)
 			project.el.classList.add('opened');
 		else
 			project.el.classList.add('closed');
@@ -228,42 +250,67 @@ function bm_Show()
 		let el = document.createElement('div');
 		project.elLabel = el;
 		project.el.appendChild(el);
+		el.textContent = project.name;
 		el.classList.add('label');
 		el.onclick = bm_ProjectClicked;
-		el.m_project = project;
 
-		// Project bookmarks:
-		let highlighted = 0;
-		let folder_label = null;
-		for (let b = 0; b < project.bms.length; b++)
+		// Project scenes:
+		let project_count = 0;
+		let project_highlighted = 0;
+		let opened_scenes = localStorage.bookmarks_scenes_opened.split('|');
+		for (let s = 0; s < project.scenes.length; s++)
 		{
-			let bm = project.bms[b];
+			let scene = project.scenes[s];
 
-			// Folder label:
-			let label = bm.path.split('/');
-			if (label.length > 3)
-				label = label.slice(3,-1);
-			label = label.join(' / ');
-			if (label != folder_label)
+			// Scene element:
+			scene.el = document.createElement('div');
+			project.el.appendChild(scene.el);
+			scene.el.classList.add('scene');
+			if (opened_scenes.indexOf(scene.path) != -1)
+				scene.el.classList.add('opened');
+			else
+				scene.el.classList.add('closed');
+
+			// Scene label:
+			if (scene.name)
 			{
 				let el = document.createElement('div');
-				project.el.appendChild(el);
-				el.classList.add('bm_folder_label');
-				el.textContent = label;
-				folder_label = label;
+				scene.elLabel = el;
+				scene.el.appendChild(el);
+				el.textContent = scene.name;
+				el.classList.add('label');
+				el.onclick = bm_SceneClicked;
 			}
 
-			// Bookmark element:
-			let el = bm_CreateBookmark(bm);
-			bm_elements.push(el);
-			project.el.appendChild(el);
-			if (el.highlighted)
-				highlighted++;
+			// Scene bookmarks:
+			let scene_highlighted = 0;
+			for (let b = 0; b < scene.bms.length; b++)
+			{
+				let bm = scene.bms[b];
+
+				// Bookmark element:
+				let el = bm_CreateBookmark(bm);
+				bm_elements.push(el);
+				scene.el.appendChild(el);
+				if (el.highlighted)
+					scene_highlighted++;
+			}
+
+			if (scene.elLabel)
+			{
+				let label = scene.name + ' - ' + scene.bms.length;
+				if (scene_highlighted)
+					label += ' (' + scene_highlighted + ')';
+				scene.elLabel.textContent = label;
+			}
+
+			project_count += scene.bms.length;
+			project_highlighted += scene_highlighted;
 		}
 
-		let label = project.name + ' - ' + project.bms.length;
-		if (highlighted)
-			label += ' (' + highlighted + ')';
+		let label = project.name + ' - ' + project_count;
+		if (project_highlighted)
+			label += ' (' + project_highlighted + ')';
 		project.elLabel.textContent = label;
 	}
 
@@ -320,12 +367,12 @@ function bm_CreateBookmark(i_bm)
 
 function bm_ProjectClicked(i_evt)
 {
-	var el = i_evt.currentTarget.m_project.el;
+	let el = i_evt.currentTarget.parentElement;
 	el.classList.toggle('opened');
 	el.classList.toggle('closed');
 
-	var list = '';
-	for (var p = 0; p < bm_projects.length; p++)
+	let list = '';
+	for (let p = 0; p < bm_projects.length; p++)
 	{
 		if (bm_projects[p].el.classList.contains('closed'))
 			continue;
@@ -337,6 +384,35 @@ function bm_ProjectClicked(i_evt)
 	}
 
 	localStorage.bookmarks_projects_opened = list;
+}
+
+function bm_SceneClicked(i_evt)
+{
+	let el = i_evt.currentTarget.parentElement;
+	el.classList.toggle('opened');
+	el.classList.toggle('closed');
+
+	let list = '';
+	for (let p = 0; p < bm_projects.length; p++)
+	{
+		for (let s = 0; s < bm_projects[p].scenes.length; s++)
+		{
+			let scene =  bm_projects[p].scenes[s];
+
+			if (scene.path == null)
+				continue;
+
+			if (scene.el.classList.contains('closed'))
+				continue;
+
+			if (list.length)
+				list += '|';
+
+			list += scene.path;
+		}
+	}
+
+	localStorage.bookmarks_scenes_opened = list;
 }
 
 function bm_NavigatePost()

@@ -610,18 +610,19 @@ cursor: pointer;
 #bookmarks .project .label:hover {
 text-shadow: 0 0 2px rgba( 100, 255, 255, .5);
 }
-#bookmarks .project.closed .label {
+#bookmarks .project.closed .label, #bookmarks .project .scene.closed .label {
 font-style: italic;
 }
-#bookmarks .project .bm_folder_label {
+#bookmarks .project.closed .scene, #bookmarks .project .scene.closed .bookmark {
+display: none;
+}
+#bookmarks .project .scene .label {
+text-align: left;
 font-size: 14px;
 padding: 6px 4px 0px 4px;
 margin: 0px 4px 0px 4px;
 font-weight: bold;
 opacity: .7;
-}
-#bookmarks .project.closed .bm_folder_label {
-display: none;
 }
 #bookmarks .bookmark {
 position: relative;
