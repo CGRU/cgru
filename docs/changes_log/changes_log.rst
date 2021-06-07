@@ -11,6 +11,17 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
 - The third number versions are fully compatible.
   You can upgrade only one client or server for changes.
 
+v3.2.1
+======
+
+*Not released*
+
+2021.06.07
+
+- **Bugfixes**
+	- AfWatch jobs folders buttons refresh fix on a new job selection.
+
+
 .. _changes-log-latest:
 
 v3.2.0

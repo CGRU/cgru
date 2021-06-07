@@ -287,6 +287,7 @@ FolderWidget::~FolderWidget()
 
 void FolderWidget::setValue(const QString & i_value)
 {
+	m_value = i_value;
 	m_value_widget->setText(i_value);
 	m_value_widget->setToolTip(i_value);
 }
