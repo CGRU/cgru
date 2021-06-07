@@ -608,7 +608,17 @@ bool ListJobs::v_processEvents( const af::MonitorEvents & i_me)
 
 ItemNode * ListJobs::v_createNewItemNode(af::Node * i_afnode, Item::EType i_type, bool i_notify)
 {
-	return new ItemJob(this, false /*in work list*/, (af::Job*)i_afnode, m_ctrl_sf, i_notify);
+	af::Job * job = static_cast<af::Job*>(i_afnode);
+
+	if (false == af::Environment::VISOR())
+	{
+		// User should not see ther users jobs if watch is not in admin mode.
+		// But just switching from admin mode, prevous asked jobs can arrive.
+		if (job->getUserName() != af::Environment::getUserName())
+			return NULL;
+	}
+
+	return new ItemJob(this, false /*in work list*/, job, m_ctrl_sf, i_notify);
 }
 
 void ListJobs::v_itemToBeDeleted(Item * i_item)

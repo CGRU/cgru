@@ -19,8 +19,8 @@ v3.2.1
 2021.06.07
 
 - **Bugfixes**
-	- AfWatch jobs folders buttons refresh fix on a new job selection.
-
+	- AfWatch jobs list right panel folders buttons refresh fix on a new job selection.
+	- AfWatch jobs list fixed switching from admin mode, other users jobs can appear.
 
 .. _changes-log-latest:
 
