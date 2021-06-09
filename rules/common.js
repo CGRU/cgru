@@ -975,7 +975,7 @@ function c_PathPM_Rules2Server(i_path)
 	if (RULES.root_link)
 		return (RULES.root_link + i_path);
 	else
-		return ('/' + RULES.root + i_path);
+		return (RULES.root + i_path);
 }
 
 function c_PathPM_Rules2Client(i_path)
