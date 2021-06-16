@@ -1525,12 +1525,12 @@ function isUserAssignedInStatus(&$i_user, &$i_status)
 	if (is_null($i_status))
 		return false;
 
-	// Check user is assigned in status
+	// Check if user is assigned in status
 	if (array_key_exists('artists', $i_status))
 		if (in_array($i_user['id'], $i_status['artists']))
 				return true;
 
-	// Check user is assigned is some task
+	// Check if user is assigned in some task
 	if (array_key_exists('tasks', $i_status))
 		foreach ($i_status['tasks'] as $tname => $task)
 		{
@@ -1542,6 +1542,10 @@ function isUserAssignedInStatus(&$i_user, &$i_status)
 				continue;
 
 			if (isset($task['changed']) && $task['changed'])
+				return true;
+
+			// If status head changed, we should make news for all tasks artists, if task is not done
+			if ($i_status['changed'] && isset($task['progress']) && ($task['progress'] < 100))
 				return true;
 		}
 

@@ -1509,9 +1509,15 @@ Status.prototype.editProcess = function(i_args) {
 				if ((statuses[i].obj.tasks[t].flags.indexOf('omit') == -1) ||
 					(statuses[i].obj.tasks[t].progress != -1))
 				{
-					statuses[i].obj.tasks[t].flags = ['omit'];
-					statuses[i].obj.tasks[t].progress = -1;
-					statuses[i].obj.tasks[t].changed = true;
+					let task = statuses[i].obj.tasks[t];
+
+					// Skip done tasks
+					if (task.progress && (task.progress == 100))
+						continue;
+
+					task.flags = ['omit'];
+					task.progress = -1;
+					task.changed = true;
 				}
 
 		// Shot "super" flags resets tasks flags
@@ -1519,12 +1525,20 @@ Status.prototype.editProcess = function(i_args) {
 			for (let f of statuses[i].obj.flags)
 				if (f && RULES.flags[f] && statuses[i].obj.tasks && RULES.flags[f].mode && (RULES.flags[f].mode == "super"))
 					for (let t in statuses[i].obj.tasks)
-						if (statuses[i].obj.tasks[t].flags &&
-							statuses[i].obj.tasks[t].flags.length)
+					{
+						let task = statuses[i].obj.tasks[t];
+
+						// Skip done tasks
+						if (task.progress && (task.progress == 100))
+							continue;
+
+						if (task.flags &&
+							task.flags.length)
 						{
-							statuses[i].obj.tasks[t].flags = [];
-							statuses[i].obj.tasks[t].changed = true;
+							task.flags = [];
+							task.changed = true;
 						}
+					}
 
 		// If progress was changed we should update upper progress:
 		if (_progress != statuses[i].obj.progress)
@@ -1539,6 +1553,10 @@ Status.prototype.editProcess = function(i_args) {
 		// Store modification user and time
 		statuses[i].obj.muser = g_auth_user.id;
 		statuses[i].obj.mtime = c_DT_CurSeconds();
+
+		// This is needed for news&bookmarks
+		// Maybe just one task was changed, not the entire status
+		statuses[i].obj.changed = true;
 	}
 
 	// News & Bookmarks:
@@ -1574,6 +1592,7 @@ function st_FilterStatusForSave(i_status)
 {
 	// Delete temporary items:
 	delete i_status.error;
+	delete i_status.changed;
 
 	if (i_status.body)
 		delete i_status.body.data;
