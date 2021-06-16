@@ -348,7 +348,7 @@ function a_CopySend(i_wnd)
 	i_wnd.m_elWait = elWait;
 	elWait.classList.add('wait');
 
-	var cmd = 'rules/bin/copy.py';
+	var cmd = 'rules/bin/copy_template.py';
 	cmd += ' -t "' + c_PathPM_Client2Server(params.template) + '"';
 	cmd += ' -d "' + c_PathPM_Rules2Server(params.destination) + '"';
 	cmd += ' ' + params.name;
