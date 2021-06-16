@@ -86,7 +86,7 @@ movie_name = os.path.join(Options.outdir, movie_name)
 commands = []
 task_names = []
 cmd_prefix = os.path.join(os.path.dirname(sys.argv[0]), 'makeframe.py')
-cmd_prefix = 'python "%s"' % os.path.normpath(cmd_prefix)
+cmd_prefix = '"%s" "%s"' % (os.getenv('CGRU_PYTHONEXE', 'python'), os.path.normpath(cmd_prefix))
 cmd_prefix += ' --mkdir'
 cmd_prefix += ' -t "dailies"'
 cmd_prefix += ' -r %s' % Options.resolution
@@ -192,7 +192,7 @@ print('{"progress":"%d sequences found"},' % len(Shots))
 print('{"progress":"%d files found"},' % file_counter)
 
 cmd_encode = os.path.join(os.path.dirname(sys.argv[0]), 'makemovie.py')
-cmd_encode = 'python "%s"' % os.path.normpath(cmd_encode)
+cmd_encode = '"%s" "%s"' % (os.getenv('CGRU_PYTHONEXE', 'python'), os.path.normpath(cmd_encode))
 cmd_encode += ' -f %s' % Options.fps
 cmd_encode += ' -c %s' % Options.codec
 cmd_encode += ' "%s"' % os.path.join(OutDir, TmpFiles)

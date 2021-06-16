@@ -225,8 +225,8 @@ if Options.afanasy:
 
 	job.blocks.append(block)
 
-Put = os.environ['CGRU_LOCATION'] + '/utilities/put.py'
-Put = 'python "%s"' % os.path.normpath(Put)
+Put = os.path.join(os.environ['CGRU_LOCATION'], 'utilities', 'put.py')
+Put = '"%s" "%s"' % (os.getenv('CGRU_PYTHONEXE', 'python'), Put)
 
 for shot in Out:
 	if 'shot' in shot:

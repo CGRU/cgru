@@ -72,11 +72,7 @@ if Options.exclude != '':
 	REexclude = re.compile(Options.exclude)
 
 Command = os.path.join(os.path.dirname(sys.argv[0]), 'makemovie.py')
-if Options.afanasy == 0:
-	Command = '"%s" "%s"' % ( os.getenv('CGRU_PYTHONEXE', 'python'), Command)
-else:
-	Command = 'python "%s"' % Command
-
+Command = '"%s" "%s"' % ( os.getenv('CGRU_PYTHONEXE', 'python'), Command)
 
 def getPatterns(filenames):
 	patterns = []

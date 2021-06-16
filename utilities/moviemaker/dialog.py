@@ -1251,10 +1251,9 @@ class Dialog(QtWidgets.QWidget):
         )
         self.decodeOutputAbs.setText(outputSequence)
 
-        cmd = \
-            os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/movconvert.py'
+        cmd = os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/movconvert.py'
         cmd = os.path.normpath(cmd)
-        cmd = 'python "%s"' % cmd
+        cmd = '"%s" "%s"' % (os.getenv('CGRU_PYTHONEXE', 'python'), cmd)
         cmd = cmd + (' "%s" "%s"' % (inputMovie, outputSequence))
 
         self.cmdField.setText(cmd)
