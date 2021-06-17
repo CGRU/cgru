@@ -584,12 +584,12 @@ function p_Put()
 		return;
 	}
 
-	args.shots = [];
+	args.paths = [];
 	for (var i = 0; i < p_elCurFolder.m_elArray.length; i++)
 		if (p_elCurFolder.m_elArray[i].m_path)
-			args.shots.push(p_elCurFolder.m_elArray[i].m_path);
+			args.paths.push(p_elCurFolder.m_elArray[i].m_path);
 
-	if (args.shots.length < 1)
+	if (args.paths.length < 1)
 	{
 		c_Error('Current folder has less then one shot.');
 		return;
