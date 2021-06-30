@@ -1390,7 +1390,7 @@ function makenews($i_args, &$io_users, &$o_out)
 
 		// If user is assigned, it should receive news:
 		if (array_key_exists('status', $news) && is_array($news['status']))
-			if (isUserAssignedInStatus($user, $news['status']))
+			if (isUserAssignedInStatus($user, $news))
 				{
 					if (false == in_array($user['id'], $sub_users))
 						array_push($sub_users, $user['id']);
@@ -1489,7 +1489,7 @@ function makebookmarks($i_bm, &$io_users, &$o_out)
 		if ($bm_index == -1)
 		{
 			// Check whether the bookmark is needed:
-			if (false == isUserAssignedInStatus($user, $i_bm['status']))
+			if (false == isUserAssignedInStatus($user, $i_bm))
 				continue;
 
 			// Initialize parameters:
@@ -1518,21 +1518,23 @@ function makebookmarks($i_bm, &$io_users, &$o_out)
 	return $changed_users;
 }
 
-function isUserAssignedInStatus(&$i_user, &$i_status)
+function isUserAssignedInStatus(&$i_user, &$i_obj)
 {
-	if (false == isset($i_status))
+	if (false == isset($i_obj['status']))
 		return false;
-	if (is_null($i_status))
+
+	$status = $i_obj['status'];
+	if (is_null($status))
 		return false;
 
 	// Check if user is assigned in status
-	if (array_key_exists('artists', $i_status))
-		if (in_array($i_user['id'], $i_status['artists']))
+	if (array_key_exists('artists', $status))
+		if (in_array($i_user['id'], $status['artists']))
 				return true;
 
 	// Check if user is assigned in some task
-	if (array_key_exists('tasks', $i_status))
-		foreach ($i_status['tasks'] as $tname => $task)
+	if (array_key_exists('tasks', $status))
+		foreach ($status['tasks'] as $tname => $task)
 		{
 			if (array_key_exists('deleted', $task) && $task['deleted'])
 				continue;
@@ -1544,8 +1546,17 @@ function isUserAssignedInStatus(&$i_user, &$i_status)
 			if (isset($task['changed']) && $task['changed'])
 				return true;
 
-			// If status head changed, we should make news for all tasks artists, if task is not done
-			if ($i_status['changed'] && isset($task['progress']) && ($task['progress'] < 100))
+			// Below situations for not done tasks only
+			if ((false == isset($task['progress'])) || ($task['progress'] >= 100))
+				continue;
+
+			// If status head changed, all tasks users should receive news (if task is not done)
+			if ($status['changed'])
+				return true;
+
+			// If it is a news on change something, but not status (body, comments),
+			// All tasks users should receive news (if task is not done)
+			if (isset($i_obj['title']) && ($i_obj['title'] != 'status'))
 				return true;
 		}
 
