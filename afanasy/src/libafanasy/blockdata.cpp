@@ -1093,6 +1093,8 @@ TaskExec *BlockData::genTask(int num) const
 		taskExec->setTaskCommand(m_tasks_data[num]->getCommand());
 		taskExec->setTaskFiles(m_tasks_data[num]->getFiles());
 		taskExec->m_custom_data_task = m_tasks_data[num]->getCustomData();
+		if (m_tasks_data[num]->hasEnvironment())
+			taskExec->joinEnvironment(m_tasks_data[num]->getEnvironment());
 	}
 
 	return taskExec;

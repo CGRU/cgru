@@ -32,6 +32,9 @@ void TaskData::jsonRead( const JSON & i_object)
 	jr_string("name",        m_name,        i_object);
 	jr_string("command",     m_command,     i_object);
 	jr_stringvec("files",    m_files,       i_object);
+
+	jr_stringmap("environment", m_environment, i_object);
+
 	//jr_string("depend_mask", m_depend_mask, i_object);
 	//jr_string("custom_data", m_custom_data, i_object);
 }
