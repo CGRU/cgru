@@ -49,6 +49,13 @@ files[]
 
 Files for preview. Generated, if block is numeric.
 
+environment
+-----------
+``af.Task.setEnv(name, value)``
+
+Tasks process extra environment.
+It will be merged with a block extra environment.
+
 tst
 ---
 Time when task was started (last start).

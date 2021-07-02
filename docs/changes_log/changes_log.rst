@@ -16,7 +16,9 @@ v3.2.1
 
 *Not released*
 
-2021.06.07
+2021.07.02
+
+- Each not numeric task can have an own extra `environment <../afanasy/job_task.html#environment>`_.
 
 - **Bugfixes**
 	- AfWatch jobs list right panel folders buttons refresh fix on a new job selection.
