@@ -62,14 +62,19 @@ Watch::Watch( Dialog * pDialog, QApplication * pApplication)
    ms_d = pDialog;
 
 	// Load icons:
+	QString custom_icons_path = afqt::stoq(af::Environment::getIconsPath());
 	QString icons_path = afqt::stoq(af::Environment::getCGRULocation()) + "/icons";
-	// Load services icons:
-	loadIcons(ms_services_icons_tiny,  icons_path + "/software", Icons_Size_Tiny );
-	loadIcons(ms_services_icons_small, icons_path + "/software", Icons_Size_Small);
-	loadIcons(ms_services_icons_large, icons_path + "/software", Icons_Size_Large);
 
-	// Load tickets icons:
-	loadIcons(ms_tickets_icons, icons_path + "/tickets", Icons_Size_Small);
+	for (QString path : {custom_icons_path, icons_path})
+	{
+		// Load services icons:
+		loadIcons(ms_services_icons_tiny,  path + "/software", Icons_Size_Tiny );
+		loadIcons(ms_services_icons_small, path + "/software", Icons_Size_Small);
+		loadIcons(ms_services_icons_large, path + "/software", Icons_Size_Large);
+
+		// Load tickets icons:
+		loadIcons(ms_tickets_icons, path + "/tickets", Icons_Size_Small);
+	}
 }
 
 Watch::~Watch()

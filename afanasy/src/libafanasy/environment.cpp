@@ -161,6 +161,7 @@ std::string Environment::customconfig;
 std::string Environment::afroot;
 std::string Environment::home;
 std::string Environment::home_afanasy;
+std::string Environment::icons_path;
 
 std::string Environment::http_serve_dir;
 std::string Environment::http_site_index;
@@ -236,6 +237,7 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, previewcmds,                       "previewcmds"                          );
 	getVar( i_obj, annotations,                       "annotations"                          );
 	getVar( i_obj, cmd_shell,                         "cmd_shell"                            );
+	getVar( i_obj, icons_path,                        "icons_path"                           );
 
 	getVar( i_obj, afnode_log_lines_max,              "af_node_log_lines_max"                );
 	getVar( i_obj, priority,                          "af_priority"                          );

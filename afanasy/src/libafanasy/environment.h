@@ -94,6 +94,7 @@ public:
 
 	static inline const std::string & getHome()        { return home;          }
 	static inline const std::string & getHomeAfanasy() { return home_afanasy;  }
+	static inline const std::string & getIconsPath()   { return icons_path;    }
 	static inline const std::string & getCGRULocation(){ return cgrulocation;  } ///< Get CGRU root directory.
 	static inline const std::string & getAfRoot()      { return afroot;        } ///< Get Afanasy root directory.
 	static inline const std::string & getServerName()  { return servername;    } ///< Get Afanasy server name.
@@ -254,6 +255,7 @@ private:
 	static std::string afroot;          ///< Afanasy root directory.
 	static std::string home;            ///< User home directory.
 	static std::string home_afanasy;    ///< Afanasy home settings.
+	static std::string icons_path;      ///< Base path to custom icons.
 
 	static std::string http_serve_dir;       ///< Afanasy HTTP server serve directory.
 	static std::string http_site_index;      ///< Afanasy HTTP server response on an empty GET request.
