@@ -37,13 +37,23 @@ export HOUDINI_CGRU_PATH=$CGRU_LOCATION/plugins/houdini
 export PYTHONPATH=$HOUDINI_CGRU_PATH:$PYTHONPATH
 
 # Define OTL scan path:
-HOUDINI_CGRU_OTLSCAN_PATH=$HIH/otls:$HOUDINI_CGRU_PATH:$HH/otls
+HOUDINI_CGRU_OTLSCAN_PATH="${HOUDINI_CGRU_PATH}"
 
-# Create or add to exist OTL scan path:
+# Create or add to existing OTL scan path:
 if [ "$HOUDINI_OTLSCAN_PATH" != "" ]; then
-	export HOUDINI_OTLSCAN_PATH="${HOUDINI_CGRU_OTLSCAN_PATH}:${HOUDINI_OTLSCAN_PATH}"
+	export HOUDINI_OTLSCAN_PATH="${HOUDINI_CGRU_OTLSCAN_PATH}:${HOUDINI_OTLSCAN_PATH}:&"
 else
-	export HOUDINI_OTLSCAN_PATH=$HOUDINI_CGRU_OTLSCAN_PATH
+	export HOUDINI_OTLSCAN_PATH="${HOUDINI_CGRU_OTLSCAN_PATH}:&"
+fi
+
+# Define PDG templates search path:
+export HOUDINI_CGRU_PDG_PATH="${HOUDINI_CGRU_PATH}/pdg"
+
+# Create or add to existing PDG path:
+if [ "$HOUDINI_PDG_PATH" != "" ]; then
+	export HOUDINI_PDG_PATH="${HOUDINI_CGRU_PATH}:${HOUDINI_PDG_PATH}:&"
+else
+	export HOUDINI_PDG_PATH="${HOUDINI_CGRU_PDG_PATH}:&"
 fi
 
 export APP_DIR="$HOUDINI_LOCATION"
