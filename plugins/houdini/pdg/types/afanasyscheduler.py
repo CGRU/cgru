@@ -32,7 +32,7 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
     def templateName(cls):
         return 'afanasyscheduler'
 
-        
+
     @classmethod
     def templateBody(cls):
         return json.dumps({
@@ -43,6 +43,17 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
 
     def applicationBin(self, i_app, i_work_item):
         return i_app
+
+
+    def onStart(self):
+        logger.debug("onStart")
+        return True
+
+
+    def onStop(self):
+        logger.debug("onStop")
+        self.stopCallbackServer()
+        return True
 
 
     def onStartCook(self, static, cook_set):
@@ -60,7 +71,7 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
             self.startCallbackServer()
 
         # Create Job
-        job = af.Job('PDG Job')
+        job = af.Job(self['job_name'].evaluateString())
 
         # Job Parameters
         job.setBranch(self['job_branch'].evaluateString())
@@ -92,7 +103,7 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
             traceback.print_exc()
             sys.stderr.flush()
             raise RuntimeError('Error creating PDG job.')
-        
+
         return True
 
 
@@ -168,23 +179,12 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
 
 
     def onScheduleStatic(self, dependencies, dependents, ready_items):
-        logger.debug('onScheduleStatic:') 
+        logger.debug('onScheduleStatic:')
         print('Counts:')
         print('len(dependencies) = %d' % len(dependencies))
         print('len(dependents)   = %d' % len(dependents))
         print('len(ready)        = %d' % len(ready_items))
         return
-
-
-    def onStart(self):
-        logger.debug("onStart")
-        return True
-
-
-    def onStop(self):
-        logger.debug("onStop")
-        self.stopCallbackServer()
-        return True
 
 
     def onTick(self):
