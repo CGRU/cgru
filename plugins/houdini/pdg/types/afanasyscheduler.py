@@ -53,6 +53,9 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
     def onStop(self):
         logger.debug("onStop")
         self.stopCallbackServer()
+        if self.job_id is not None:
+            af.Cmd().deleteJobById(self.job_id)
+            self.job_id = None
         return True
 
 
@@ -95,7 +98,6 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
 
         job.blocks.append(block)
 
-        self.job_id = 0
         try:
             self.job_id = job.send()
             self.job_id = self.job_id[1]['id']
@@ -114,6 +116,10 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         """
         logger.debug("onStopCook")
         self.stopCallbackServer()
+        if self.job_id is not None:
+            af.Cmd().deleteJobById(self.job_id)
+            self.job_id = None
+
         return True
 
 
