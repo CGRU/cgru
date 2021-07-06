@@ -250,6 +250,7 @@ private:
 
 	static std::string executable_path;
 	static std::string cgrulocation;    ///< CGRU root directory.
+	static std::string customconfig;    ///< CGRU root directory.
 	static std::string afroot;          ///< Afanasy root directory.
 	static std::string home;            ///< User home directory.
 	static std::string home_afanasy;    ///< Afanasy home settings.

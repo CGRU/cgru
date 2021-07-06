@@ -157,6 +157,7 @@ std::string Environment::hostname;
 
 std::string Environment::executable_path;
 std::string Environment::cgrulocation;
+std::string Environment::customconfig;
 std::string Environment::afroot;
 std::string Environment::home;
 std::string Environment::home_afanasy;
@@ -705,8 +706,10 @@ void Environment::load()
 	m_config_data.clear();
 
 	m_config_data = "{\"cgru_config\":[";
+	customconfig = af::getenv("CGRU_CUSTOM_CONFIG");
 
 	loadFile( cgrulocation + "/config_default.json");
+	loadFile( customconfig);
 	loadFile( home_afanasy + "/config.json");
 
 	PRINT("Getting variables from environment:\n");
