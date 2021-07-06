@@ -1,7 +1,7 @@
 {"cgru_config":{
-		"":"This is a CGRU default config file",
-		"":"Describe your own configuration in 'config.json', it will be included last",
-		"":"To disable property you can just prefix it with '-'",
+	"":"This is a CGRU default config file",
+	"":"Describe your own configuration in 'config.json', it will be included last",
+	"":"To disable property you can just prefix it with '-'",
 
 	"include":["afanasy/config_default.json","config.json"],
 
@@ -29,7 +29,7 @@
 
 	"":"To open location/shot in RULES:",
 	"-rules_url":"http://localhost/cgru/#/",
-		"":"By default it is disabled",
+	"":"By default it is disabled",
 
 	"projects_root":["/mnt/prj/","/projects/","/cgru/rules_root/"],
 
@@ -41,15 +41,15 @@
 	"previewcmds":[
 		"Nuke|nuke -v \"@ARG@\"",
 		"Mplay|mplay \"@ARG@\"",
-        "Mplay *|mplay `dirname \"@ARG@\"`/*",
-        "DJV|djv_view \"@ARG@\"",
+		"Mplay *|mplay `dirname \"@ARG@\"`/*",
+		"DJV|djv_view \"@ARG@\"",
 		"IMDisplay|display \"@ARG@\"",
 		"XTerm Folder|cd `dirname @ARG@` && xterm"
-    ],
-    "annotations":[
-        "APPROVED",
-        "FAILED"
-    ],
+	],
+	"annotations":[
+		"APPROVED",
+		"FAILED"
+	],
 
 	"docs_url":"https://cgru.readthedocs.io",
 	"forum_url":"https://forum.cgru.info",
