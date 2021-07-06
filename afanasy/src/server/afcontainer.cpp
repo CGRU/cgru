@@ -474,7 +474,7 @@ af::Msg * AfContainer::action(Action & i_action, const af::Msg * i_msg)
 			{
 				if (i_action.answer_kind.empty())
 				{
-					return af::jsonMsgInfo("log", i_action.answer);
+					return af::jsonMsgObject(i_action.answer);
 				}
 				else
 				{

@@ -107,6 +107,6 @@ private:
 	int  getRenderCount(RenderAf * i_render) const;
 	void remRenderCount(RenderAf * i_render);
 
-	bool appendTasks(const JSON &tasks_json);
+	bool appendTasks(Action & i_action, const JSON & i_operation);
 };
 

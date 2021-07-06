@@ -341,6 +341,7 @@ namespace af
 	af::Msg * jsonMsg( const std::string & i_type, const std::string & i_name, char * i_data, int i_size);
 	af::Msg * jsonMsgInfo( const std::string & i_kind, const std::string & i_info);
 	af::Msg * jsonMsgError( const std::string & i_str);
+	af::Msg * jsonMsgObject(const std::string & i_str);
 	af::Msg * jsonMsgStatus( bool i_error, const std::string & i_type, const std::string & i_msg);
 
 	void jsonActionStart(  std::ostringstream & i_str, const std::string & i_type,

@@ -173,7 +173,7 @@ private:
 	bool checkTryTasksNext();
 	void resetTryTasksNext();
 
-	void appendBlocks( const JSON & i_blocks);
+	void appendBlocks(Action & i_action, const JSON & i_operation);
 
 	af::TaskExec *genTask( RenderAf *render, int block, int task, std::list<int> * blocksIds, MonitorContainer * monitoring);
 	

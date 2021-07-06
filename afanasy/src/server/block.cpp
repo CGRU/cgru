@@ -471,7 +471,7 @@ bool Block::action( Action & i_action)
 		}
 		else if (type == "append_tasks")
 		{
-			if (appendTasks(operation))
+			if (appendTasks(i_action, operation))
 			{
 				// Add a log line so that store() is called at the job level (a bit hacky)
 				i_action.log += "\nBlock['" + m_data->getName() + "']: Append tasks";
@@ -744,23 +744,33 @@ int Block::blackListWeight() const
    return weight;
 }
 
-bool Block::appendTasks(const JSON &operation)
+bool Block::appendTasks(Action & i_action, const JSON & i_operation)
 {
-	if (m_data->isNumeric())
+	if (m_job->getId() == AFJOB::SYSJOB_ID)
 	{
-		appendJobLog("Appending tasks to numeric block is not allowed");
+		i_action.answer_kind = "error";
+		i_action.answer = "Appending system job is not allowed.";
 		return false;
 	}
-	const JSON &tasks = operation["tasks"];
+
+	if (m_data->isNumeric())
+	{
+		i_action.answer_kind = "error";
+		i_action.answer = "Appending tasks to numeric block is not allowed.";
+		return false;
+	}
+
+	const JSON &tasks = i_operation["tasks"];
 	if (!tasks.IsArray())
 	{
-		appendJobLog("Operation \"append_tasks\" requires data in an array named \"tasks\"");
+		i_action.answer_kind = "error";
+		i_action.answer = "Operation requires tasks array.";
 		return false;
 	}
 
 	// Allocate new tasks
 	int old_tasks_num = m_data->getTasksNum();
-	m_data->jsonReadAndAppendTasks(operation);
+	m_data->jsonReadAndAppendTasks(i_operation);
 	m_jobprogress->appendTasks(m_data->getBlockNum(), m_data->getTasksNum() - old_tasks_num);
 	allocateTasks(old_tasks_num); // allocate only new tasks
 
@@ -769,5 +779,16 @@ bool Block::appendTasks(const JSON &operation)
 
 	// Set new tasks ready
 	m_job->checkStatesOnAppend();
+
+	// Return new tasks ids:
+	i_action.answer = "{\"task_ids\":[";
+	for (int i = old_tasks_num; i < m_data->getTasksNum(); i++)
+	{
+		if (i != old_tasks_num)
+			i_action.answer += ",";
+		i_action.answer += af::itos(i);
+	}
+	i_action.answer += "]}";
+
 	return true;
 }

@@ -91,6 +91,11 @@ af::Msg * af::jsonMsgError( const std::string & i_str)
 {
 	return af::jsonMsgInfo( "error", i_str);
 }
+af::Msg * af::jsonMsgObject(const std::string & i_str)
+{
+	std::string str = "{\"object\":" + i_str + "}";
+	return af::jsonMsg( str);
+}
 af::Msg * af::jsonMsgStatus( bool i_success, const std::string & i_type, const std::string & i_msg)
 {
 	std::string str = "{\"status\":";

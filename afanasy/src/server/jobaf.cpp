@@ -561,7 +561,8 @@ void JobAf::v_action( Action & i_action)
 		}
 		else if( type == "append_blocks")
 		{
-			appendBlocks(operation["blocks"]);
+			appendBlocks(i_action, operation);
+			return;
 		}
 		else
 		{
@@ -1651,24 +1652,55 @@ int JobAf::v_calcWeight() const
 	return weight;
 }
 
-void JobAf::appendBlocks( const JSON & i_blocks)
+void JobAf::appendBlocks(Action & i_action, const JSON & i_operation)
 {
+	if (m_id == AFJOB::SYSJOB_ID)
+	{
+		i_action.answer_kind = "error";
+		i_action.answer = "Appending system job is not allowed.";
+		return;
+	}
+
+	const JSON & blocks = i_operation["blocks"];
+	if (!blocks.IsArray())
+	{
+		i_action.answer_kind = "error";
+		i_action.answer = "Operation requires blocks array.";
+		return;
+	}
+	if (blocks.Size() == 0)
+	{
+		i_action.answer_kind = "error";
+		i_action.answer = "Operation blocks array has zero size.";
+		return;
+	}
+
 	int old_blocks_num = m_blocks_num;
 
-	jsonReadAndAppendBlocks( i_blocks);
+	if (false == jsonReadAndAppendBlocks(blocks))
+	{
+		i_action.answer_kind = "error";
+		i_action.answer = "Appending blocks failed, see server log for details.";
+	}
 
 	m_progress->reconstruct( this);
 
 	// construct new blocks only (reuse the old_blocks_num existing ones)
 	construct( old_blocks_num);
 
-	// initialize
+	// initialize and constuct new blocks ids in an answer
+	i_action.answer = "{\"block_ids\":[";
 	for( int b = old_blocks_num; b < m_blocks_num; b++)
 	{
 		m_blocks_data[b]->setJobId( m_id);
 		m_blocks[b]->storeTasks();
 		m_blocks[b]->setUser( m_user);
+
+		if (b != old_blocks_num)
+			i_action.answer += ",";
+		i_action.answer += af::itos(b);
 	}
+	i_action.answer += "]}";
 
 	checkDepends();
 	checkStatesOnAppend();
