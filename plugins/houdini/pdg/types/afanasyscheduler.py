@@ -135,8 +135,11 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         [virtual] Callback invoked by PDG when graph cook ends.
                   Can be called multiple times.
         """
-        logger.debug("onStopCook")
+        logger.debug("onStopCook: cancel = " + str(cancel))
         self.stopCallbackServer()
+
+        if cancel:
+            self._deleteJob()
 
         return True
 
