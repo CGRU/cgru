@@ -17,6 +17,10 @@ else
    export PYTHONPATH="${CGRU_PYTHON}"
 fi
 
+if [ "${CGRU_CUSTOM_PYTHONPATH}" != "" ]; then
+   export PYTHONPATH="${CGRU_CUSTOM_PYTHONPATH}:${PYTHONPATH}"
+fi
+
 # Get CGRU version:
 export CGRU_VERSION=`cat ${CGRU_LOCATION}/version.txt`
 echo "CGRU_VERSION $CGRU_VERSION : '$CGRU_LOCATION'"
