@@ -147,7 +147,7 @@ class Config:
                 os.path.join(self.Vars['HOME_CGRU'], 'config.json')
 
             customconfig = os.environ.get('CGRU_CUSTOM_CONFIG', None)
-            if os.path.isfile(customconfig):
+            if customconfig is not None and os.path.isfile(customconfig):
                 configfiles.append(customconfig)
 
             if sys.platform.find('win') == 0 or os.geteuid() != 0:
