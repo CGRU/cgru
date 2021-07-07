@@ -6,9 +6,7 @@ re_frame = re.compile(
     r'SCEN.*(progr: begin scene preprocessing for frame )([0-9]+)'
 )
 re_number = re.compile(r'[0-9]+')
-re_percent = re.compile(
-    r'Rendering image...:([ ]{,})([0-9]{1,2}.*)(%[ ]{,}).*'
-)
+re_percent = re.compile('Rendering image.*:  ()([0-9]{1,2}\.[0-9]{1,2})()')
 IMAGE = r'Successfully written image file '
 
 
