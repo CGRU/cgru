@@ -134,6 +134,13 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         """
         [virtual] Callback invoked by PDG when graph cook ends.
                   Can be called multiple times.
+
+          If cancel is True there will likely be jobs still running.
+          In that case the scheduler should cancel them and block until they are actually canceled.
+          This is also the time to tear down any resources that are set up in onStartCook.
+
+          - Strange, with a vary if cancel parameter this function is called in a two completely different cases.
+          - I think that it will be more clean to create 2 different functions onStopCook and onCancelCook.
         """
         logger.debug("onStopCook: cancel = " + str(cancel))
         self.stopCallbackServer()
