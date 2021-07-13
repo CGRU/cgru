@@ -270,6 +270,9 @@ This can be used to explain other ROP network what to do with Afanasy node.
 	That default script will execute *Submit* button on a specified Afanasy ROP.
 
 
+Afanasy TOP
+===========
+
 Examples
 ========
 

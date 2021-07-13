@@ -4,11 +4,13 @@ import os
 import sys
 import traceback
 
+import hou
 import pdg
 from pdg.scheduler import PyScheduler
 from pdg.job.callbackserver import CallbackServerMixin
 from pdg.utils import expand_vars
 
+import cgruconfig
 import af
 
 logging.basicConfig(level = logging.DEBUG)
@@ -312,9 +314,32 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         graph_file      Path to a .hip file containing the TOP Network, relative to $PDG_DIR.
         node_path       Op path to the TOP Network
         """
-        # not supported, yet
         logger.debug("submitAsJob({},{})".format(graph_file, node_path))
-        return ""
+
+        # Constuct a command for hython + topcook script
+        cmd = 'hython'
+        # Use PDG licence
+        cmd += ' --pdg'
+        # Specify script that cooks graph
+        cmd += ' "%s/pdgjob/topcook.py"' % os.getenv('HHP')
+        # Set verbosity level
+        cmd += ' --verbosity 2'
+        # Set hip file:
+        cmd += ' --hip "%s"' % hou.hipFile.path()
+        # Set top network to cook
+        cmd += ' --toppath "%s"' % node_path
+
+        # Constuct a job:
+        job = self._constructJob()
+        block = af.Block('PDG-GRAPH','hbatch')
+        task = af.Task(node_path)
+        task.setCommand(cmd)
+        task.setEnv('AF_USERNAME', cgruconfig.VARS['USERNAME'])
+        block.tasks.append(task)
+        job.blocks.append(block)
+        job.send()
+
+        return None
 
 
 # Register Afanasy Scheduler type

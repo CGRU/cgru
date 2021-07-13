@@ -18,6 +18,8 @@ v3.2.1
 
 2021.07.02
 
+- Houdini Afanasy `TOP Scheduler </software/houdini.html#afanasy-top>`_.
+
 - Each not numeric task can have an own extra `environment <../afanasy/job_task.html#environment>`_.
 
 - **Bugfixes**
