@@ -77,7 +77,7 @@ def makeTip():
 
         tip += '\n%s - %s' % (task['user_name'], task['service'])
         tip += '\n%s[%s][%s]' % (task['job_name'], task['block_name'], task['name'])
-        tip += '\n%s - %d%%' % (str_running, percent)
+        tip += '\nRUNNING: %s - %d%%' % (str_running, percent)
         t += 1
 
     return tip
