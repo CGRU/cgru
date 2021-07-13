@@ -255,7 +255,7 @@ class Tray(QtWidgets.QSystemTrayIcon):
         self.setContextMenu(self.menu['menu'])
 
         # Tray tooltip:
-        self.setToolTip('%s Keeper' % cgruconfig.VARS['company'].upper())
+        self.updateToolTip()
 
         # Tray icon:
         icon_filename = cgruconfig.VARS['tray_icon']
@@ -268,6 +268,12 @@ class Tray(QtWidgets.QSystemTrayIcon):
         # Show:
         self.activated.connect( self.activated_slot)
         self.show()
+
+    def updateToolTip(self, i_tip = None):
+        tip = '%s Keeper' % cgruconfig.VARS['company'].upper()
+        if i_tip:
+            tip += '\n' + i_tip
+        self.setToolTip(tip)
 
     def getIconPixmap( self): return self.icon_pixmap
 

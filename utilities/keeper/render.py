@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import json
+import time
 
 import af
 import cmd
@@ -55,6 +56,32 @@ def refresh():
             print(json.dumps(RenderFull, sort_keys=True, indent=4))
 
     cmd.Tray.showIcon( makeIcon())
+    cmd.Tray.updateToolTip(makeTip())
+
+def makeTip():
+    if Render is None: return None
+    if not 'tasks' in Render: return None
+    if len(Render['tasks']) == 0: return None
+
+    tip = ''
+    t = 0
+    for task in Render['tasks']:
+        sec_started = task['time_start']
+        percent = Render['tasks_percents'][t]
+        sec_running = int(time.time()) - sec_started
+        hrs_running = int(sec_running / 3600)
+        sec_running = int(sec_running - (hrs_running * 3600))
+        mns_running = int(sec_running / 60)
+        sec_running = int(sec_running - (mns_running * 60))
+        str_running = '%02d:%02d:%02d' % (hrs_running, mns_running, sec_running)
+
+        tip += '\n%s - %s' % (task['user_name'], task['service'])
+        tip += '\n%s[%s][%s]' % (task['job_name'], task['block_name'], task['name'])
+        tip += '\n%s - %d%%' % (str_running, percent)
+        t += 1
+
+    return tip
+
 
 def makeIcon():
 
