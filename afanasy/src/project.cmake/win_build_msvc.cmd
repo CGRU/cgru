@@ -1,5 +1,5 @@
 rem @echo off
-set CMAKE_GENERATOR=Visual Studio 15 2017 Win64
+set CMAKE_GENERATOR=Visual Studio 16 2019
 
 pushd ..\..\..
 call setup.cmd
@@ -10,7 +10,7 @@ setlocal EnableDelayedExpansion
 rem Cmake finds 'Qt' by searching for 'qmake' in 'PATH'
 set "cgru_qt=C:\Qt"
 For /F "Tokens=*" %%I in ('dir /b "%cgru_qt%\5.*"') Do set "cgru_qt=%cgru_qt%\%%I"
-set "cgru_qt=%cgru_qt%\msvc2017_64"
+set "cgru_qt=%cgru_qt%\msvc2019_64"
 if exist !cgru_qt! (
 	echo Adding "!cgru_qt!\bin" to PATH
 	SET "PATH=!cgru_qt!\bin;%PATH%"
@@ -24,7 +24,7 @@ if exist %CGRU_LOCATION%\python-devel set CGRU_PYTHONDIR=%CGRU_LOCATION%\python-
 if defined CGRU_PYTHONDIR (
    echo Building with CGRU Python: "!CGRU_PYTHONDIR!"
    SET "AF_PYTHON_INCLUDE_PATH=!CGRU_PYTHONDIR!\include"
-   SET "AF_PYTHON_LIBRARIES=!CGRU_PYTHONDIR!\libs\python36.lib"
+   SET "AF_PYTHON_LIBRARIES=!CGRU_PYTHONDIR!\libs\python39.lib"
 )
 
 rem Boost:
