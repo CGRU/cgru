@@ -1,6 +1,11 @@
+"""
+To reload scheduler type:
+import pdg; pdg.TypeRegistry.types().registeredType(pdg.registeredType.Scheduler, "afanasyscheduler").reload()
+"""
 import json
 import logging
 import os
+import socket
 import sys
 import traceback
 
@@ -15,7 +20,6 @@ import af
 
 logging.basicConfig(level = logging.DEBUG)
 logger = logging.getLogger(__name__)
-
 
 class AfanasyScheduler(CallbackServerMixin, PyScheduler):
     """
@@ -44,6 +48,7 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         self.job_id = None
         self.job_block_name_id = {}
         self.job_tasks_id_name = {}
+        self._local_addr = self._getLocalAddr()
 
 
     def _constructJob(self):
@@ -108,6 +113,29 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
             af.Cmd().deleteJobById(self.job_id)
         self._initData()
 
+
+    def _getLocalAddr(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            # doesn't even have to be reachable
+            s.connect(('10.255.255.255', 1))
+            addr = s.getsockname()[0]
+        except Exception:
+            addr = socket.gethostbyname(socket.gethostname())
+        finally:
+            s.close()
+        """ Solution from:
+        https://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib?page=1&tab=votes#tab-top
+        """
+        print(addr)
+        return addr
+
+    def workItemResultServerAddr(self):
+        # By default it uses local host name.
+        # On farm better to use direct IP address.
+        addr, port = self._workItemResultServerAddr.split(':')
+        addr = ':'.join([self._local_addr, port])
+        return addr
 
     def applicationBin(self, i_app, i_work_item):
         """
