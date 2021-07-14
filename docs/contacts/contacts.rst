@@ -22,3 +22,7 @@ Contacts
 
 .. image:: dr.strangelove.gif
 
+
+- Russian Telegram channel
+    https://t.me/cgruafanasy
+
