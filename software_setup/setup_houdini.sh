@@ -48,10 +48,9 @@ fi
 
 # Define PDG templates search path:
 export HOUDINI_CGRU_PDG_PATH="${HOUDINI_CGRU_PATH}/pdg"
-
 # Create or add to existing PDG path:
 if [ "$HOUDINI_PDG_PATH" != "" ]; then
-	export HOUDINI_PDG_PATH="${HOUDINI_CGRU_PATH}:${HOUDINI_PDG_PATH}:&"
+	export HOUDINI_PDG_PATH="${HOUDINI_CGRU_PDG_PATH}:${HOUDINI_PDG_PATH}:&"
 else
 	export HOUDINI_PDG_PATH="${HOUDINI_CGRU_PDG_PATH}:&"
 fi
