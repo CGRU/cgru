@@ -63,6 +63,13 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
 
     def _constructBlock(self, work_item):
         block = af.Block(work_item.node.name, 'hbatch_mantra')
+        block.setCapacity(self['capacity'].evaluateInt())
+        block.setNeedMemory(self['min_memory'].evaluateInt()*1024)
+        block.setTaskMinRunTime(self['minruntime'].evaluateInt())
+        block.setTaskMaxRunTime(int(self['maxruntime'].evaluateFloat()*3600.0))
+        # Check service and parser:
+        # PDG uses "ALF_PROGRESS" everywhere
+        block.setParser('mantra')
 
         return block
 
