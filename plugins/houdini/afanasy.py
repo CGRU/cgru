@@ -575,7 +575,7 @@ class BlockParameters:
             job.setCmdPost('deletefiles "%s"' % renderhip)
 
         if VERBOSE:
-            job.output(True)
+            job.output()
 
         job.send()
 
