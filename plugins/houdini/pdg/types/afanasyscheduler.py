@@ -127,7 +127,6 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         """ Solution from:
         https://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib?page=1&tab=votes#tab-top
         """
-        print(addr)
         return addr
 
     def workItemResultServerAddr(self):
@@ -365,11 +364,23 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         cmd += ' --toppath "%s"' % node_path
 
         # Constuct a job:
-        job = self._constructJob()
+        job = af.Job(self['gj_name'].evaluateString())
+        job.setBranch(self['job_branch'].evaluateString())
+        job.setPriority(self['gj_priority'].evaluateInt())
+        job.setDependMask(self['gj_depend_mask'].evaluateString())
+        job.setDependMaskGlobal(self['gj_depend_mask_global'].evaluateString())
+        job.setHostsMask(self['gj_hosts_mask'].evaluateString())
+        job.setHostsMaskExclude(self['gj_hosts_mask_exclude'].evaluateString())
+        if self['gj_start_paused'].evaluateInt():
+            job.setPaused()
+        # Block
         block = af.Block('PDG-GRAPH','hbatch')
+        block.setCapacity(self['gj_capacity'].evaluateInt())
+        # Task
         task = af.Task(node_path)
         task.setCommand(cmd)
         task.setEnv('AF_USERNAME', cgruconfig.VARS['USERNAME'])
+        # Append task and block and send job
         block.tasks.append(task)
         job.blocks.append(block)
         job.send()
