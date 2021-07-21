@@ -193,7 +193,7 @@ class Block:
         :param value:
         :return:
         """
-        self.data["frames_per_task"] = value
+        self.data["frames_per_task"] = int(value)
 
     def setSequential(self, value):
         """Missing DocString
@@ -201,7 +201,7 @@ class Block:
         :param value:
         :return:
         """
-        self.data["sequential"] = value
+        self.data["sequential"] = int(value)
 
     def setCapacity(self, capacity):
         """Missing DocString
@@ -220,8 +220,8 @@ class Block:
         :return:
         """
         if capacity_coeff_min >= 0 or capacity_coeff_max >= 0:
-            self.data["capacity_coeff_min"] = capacity_coeff_min
-            self.data["capacity_coeff_max"] = capacity_coeff_max
+            self.data["capacity_coeff_min"] = int(capacity_coeff_min)
+            self.data["capacity_coeff_max"] = int(capacity_coeff_max)
 
     def setWorkingDirectory(self, working_directory, TransferToServer=True):
         """Missing DocString
@@ -373,7 +373,8 @@ class Block:
         :param value:
         :return:
         """
-        self.data["need_hdd"] = value
+        if value > 0:
+            self.data["need_hdd"] = int(value)
 
     def setNeedMemory(self, value):
         """Missing DocString
@@ -381,7 +382,8 @@ class Block:
         :param value:
         :return:
         """
-        self.data["need_memory"] = value
+        if value > 0:
+            self.data["need_memory"] = int(value)
 
     def setNeedPower(self, value):
         """Missing DocString
@@ -389,7 +391,8 @@ class Block:
         :param value:
         :return:
         """
-        self.data["need_power"] = value
+        if value > 0:
+            self.data["need_power"] = int(value)
 
     def setDependSubTask(self):
         """Missing DocString
@@ -404,7 +407,7 @@ class Block:
         :return:
         """
         if value > 0:
-            self.data["task_max_run_time"] = value
+            self.data["task_max_run_time"] = int(value)
 
     def setTaskMinRunTime(self, value):
         """Missing DocString
@@ -413,7 +416,7 @@ class Block:
         :return:
         """
         if value > 0:
-            self.data["task_min_run_time"] = value
+            self.data["task_min_run_time"] = int(value)
 
     def setTaskProgressChangeTimeout(self, value):
         """If running task will not change its progress (percentage)
@@ -421,7 +424,7 @@ class Block:
         :param value: timeout in seconds
         """
         if value > 0:
-            self.data["task_progress_change_timeout"] = value
+            self.data["task_progress_change_timeout"] = int(value)
 
     def setMaxRunningTasks(self, value):
         """Missing DocString
@@ -430,7 +433,7 @@ class Block:
         :return:
         """
         if value >= 0:
-            self.data["max_running_tasks"] = value
+            self.data["max_running_tasks"] = int(value)
 
     def setMaxRunTasksPerHost(self, value):
         """Missing DocString
@@ -439,7 +442,7 @@ class Block:
         :return:
         """
         if value >= 0:
-            self.data["max_running_tasks_per_host"] = value
+            self.data["max_running_tasks_per_host"] = int(value)
 
     def setHostsMask(self, value):
         """Missing DocString
@@ -606,7 +609,7 @@ class Job:
             priority = 250
             print('Warning: priority clamped to maximum = %d' % priority)
 
-        self.data["priority"] = priority
+        self.data["priority"] = int(priority)
 
     def setCmdPre(self, command, TransferToServer=True):
         """Missing DocString
@@ -769,7 +772,7 @@ class Job:
         :return:
         """
         if value >= 0:
-            self.data["max_running_tasks"] = value
+            self.data["max_running_tasks"] = int(value)
 
     def setMaxRunTasksPerHost(self, value):
         """Missing DocString
@@ -778,7 +781,7 @@ class Job:
         :return:
         """
         if value >= 0:
-            self.data["max_running_tasks_per_host"] = value
+            self.data["max_running_tasks_per_host"] = int(value)
 
     def setHostsMask(self, value):
         """Missing DocString
