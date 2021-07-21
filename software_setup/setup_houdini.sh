@@ -30,30 +30,18 @@ pushd $HOUDINI_LOCATION >> /dev/null
 source houdini_setup_bash
 popd $pwd >> /dev/null
 
-# Setup CGRU houdini scripts location:
+# Setup CGRU houdini plugins location:
 export HOUDINI_CGRU_PATH=$CGRU_LOCATION/plugins/houdini
+
+# Create or add to HOUDINI_PATH to include CGRU houdini plugins:
+if [ "$HOUDINI_PATH" != "" ]; then
+	export HOUDINI_PATH="${HOUDINI_CGRU_PATH}:${HOUDINI_PATH}:&"
+else
+	export HOUDINI_PATH="${HOUDINI_CGRU_PATH}:&"
+fi
 
 # Set Python path to afanasy submission script:
 export PYTHONPATH=$HOUDINI_CGRU_PATH:$PYTHONPATH
-
-# Define OTL scan path:
-HOUDINI_CGRU_OTLSCAN_PATH="${HOUDINI_CGRU_PATH}"
-
-# Create or add to existing OTL scan path:
-if [ "$HOUDINI_OTLSCAN_PATH" != "" ]; then
-	export HOUDINI_OTLSCAN_PATH="${HOUDINI_CGRU_OTLSCAN_PATH}:${HOUDINI_OTLSCAN_PATH}:&"
-else
-	export HOUDINI_OTLSCAN_PATH="${HOUDINI_CGRU_OTLSCAN_PATH}:&"
-fi
-
-# Define PDG templates search path:
-export HOUDINI_CGRU_PDG_PATH="${HOUDINI_CGRU_PATH}/pdg"
-# Create or add to existing PDG path:
-if [ "$HOUDINI_PDG_PATH" != "" ]; then
-	export HOUDINI_PDG_PATH="${HOUDINI_CGRU_PDG_PATH}:${HOUDINI_PDG_PATH}:&"
-else
-	export HOUDINI_PDG_PATH="${HOUDINI_CGRU_PDG_PATH}:&"
-fi
 
 export APP_DIR="$HOUDINI_LOCATION"
 export APP_EXE="houdini"

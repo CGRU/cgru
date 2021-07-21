@@ -20,6 +20,8 @@ v3.2.1
 
 - Houdini Afanasy `TOP Scheduler </software/houdini.html#afanasy-top>`_.
 
+- Houdini setup changed. Now ``HOUDINI_PATH=cgru/plugins/houdini`` and *afanasy.otl* moved to *otls/afanasy.hda*.
+
 - Each not numeric task can have an own extra `environment <../afanasy/job_task.html#environment>`_.
 
 - **Bugfixes**

@@ -572,11 +572,11 @@ Houdini setup example (*bash*):
 	cd /opt/cgru
 	source ./setup.sh
 
-	# Setup CGRU houdini scripts location:
+	# Setup CGRU houdini plugins location:
 	export HOUDINI_CGRU_PATH="${CGRU_LOCATION}/plugins/houdini"
 
-	# Append OTL scan path with afanasy.otl location:
-	export HOUDINI_OTLSCAN_PATH="${HOUDINI_CGRU_PATH}:&"
+	# Append HOUDINI_PATH with CGRU plugins:
+	export HOUDINI_PATH="${HOUDINI_CGRU_PATH}:&"
 
 	# Append Python path with afanasy submission script:
 	export PYTHONPATH="${HOUDINI_CGRU_PATH}:${PYTHONPATH}"
