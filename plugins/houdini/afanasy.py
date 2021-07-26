@@ -575,7 +575,7 @@ class BlockParameters:
             job.setCmdPost('deletefiles "%s"' % renderhip)
 
         if VERBOSE:
-            job.output(True)
+            job.output()
 
         job.send()
 
@@ -653,7 +653,7 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
                 block_generate.soho_outputmode = 0
                 block_generate.ropnode.parm('soho_diskfile').set(
                     block_generate.ropnode.parm(
-                        'vm_picture').unexpandedString() + '.ifd'
+                        'vm_picture').eval() + '.ifd'
                 )
 
         if read_rop:

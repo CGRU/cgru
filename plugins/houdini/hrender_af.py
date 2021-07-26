@@ -288,32 +288,32 @@ if drivertypename == "alembic":
             method=hou.renderMethod.FrameByFrame,
             ignore_inputs=ignoreInputs
         )
+else:
+    time_prev = None
+    while frame <= end:
+        # Ouput frame and time:
+        time_cur = time.time()
+        time_str = ''
+        if time_prev is not None:
+            seconds = time_cur-time_prev
+            minutes = int(seconds / 60)
+            seconds = int(round(seconds - 60*minutes))
+            time_str = '; Last Frame: %d\'%02d' % (minutes, seconds)
+        time_prev = time_cur
+        report = ropnode.path() + ': ' + parsers.hbatch.keyframe + str(frame) + '; Started at: ' + time.strftime('%X') + time_str
+        if options.report:
+            report = 'REPORT: ' + report
+        print(report)
+        sys.stdout.flush()
 
-time_prev = None
-while frame <= end:
-    # Ouput frame and time:
-    time_cur = time.time()
-    time_str = ''
-    if time_prev is not None:
-        seconds = time_cur-time_prev
-        minutes = int(seconds / 60)
-        seconds = int(round(seconds - 60*minutes))
-        time_str = '; Last Frame: %d\'%02d' % (minutes, seconds)
-    time_prev = time_cur
-    report = ropnode.path() + ': ' + parsers.hbatch.keyframe + str(frame) + '; Started at: ' + time.strftime('%X') + time_str
-    if options.report:
-        report = 'REPORT: ' + report
-    print(report)
-    sys.stdout.flush()
+        # Launch render function:
+        render_range = (frame, frame, by)
+        ropnode.render(
+            frame_range=render_range,
+            output_file=render_output,
+            method=hou.renderMethod.FrameByFrame,
+            ignore_inputs=ignoreInputs
+        )
 
-    # Launch render function:
-    render_range = (frame, frame, by)
-    ropnode.render(
-        frame_range=render_range,
-        output_file=render_output,
-        method=hou.renderMethod.FrameByFrame,
-        ignore_inputs=ignoreInputs
-    )
-
-    # Increment frame:
-    frame += by
+        # Increment frame:
+        frame += by
