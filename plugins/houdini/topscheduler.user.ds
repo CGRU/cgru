@@ -1,0 +1,93 @@
+    parm {
+		name    "afanasy_capacity"
+		label   "Tasks Capacity"
+		type    integer
+		default { "-1" }
+		range   { -1 10000 }
+		parmtag { "pdg::scheduler" "" }
+		parmtag { spare_category "Afanasy" }
+		help	"Afanasy job tasks capacity."
+    }
+
+
+	parm {
+		name    "afanasy_hosts_mask"
+		label   "Hosts Mask"
+		type    string
+		default { "" }
+		parmtag { "pdg::scheduler" "" }
+		parmtag { spare_category "Afanasy" }
+		help    "The regular expression for hosts that the job should execute on."
+	}
+
+
+	parm {
+		name    "afanasy_hosts_mask_exclude"
+		label   "Exclude Hosts Mask"
+		type    string
+		default { "" }
+		parmtag { "pdg::scheduler" "" }
+		parmtag { spare_category "Afanasy" }
+		help    "The regular expression for hosts that the job should not be executed on."
+	}
+
+
+    parm {
+		name    "afanasy_max_running_tasks"
+		label   "Maximum Running Tasks"
+		type    integer
+		default { "-1" }
+		range   { -1 100 }
+		parmtag { "pdg::scheduler" "" }
+		parmtag { spare_category "Afanasy" }
+		help	"Maximum running tasks at the same time limit."
+    }
+
+
+    parm {
+		name    "afanasy_max_running_tasks_per_host"
+		label   "Maximum Running Tasks Per Host"
+		type    integer
+		default { "-1" }
+		range   { -1 10 }
+		parmtag { "pdg::scheduler" "" }
+		parmtag { spare_category "Afanasy" }
+		help	"Maximum running tasks at the same time on the same host limit."
+    }
+
+
+    parm {
+		name    "afanasy_need_memory"
+		label   "Memory Needed GB"
+		type    integer
+		default { "-1" }
+		range   { -1 256 }
+		parmtag { "pdg::scheduler" "" }
+		parmtag { spare_category "Afanasy" }
+		help	"Minimum free memory needed on host to be able to run a task in Giga bytes)."
+    }
+
+
+    parm {
+		name    "afanasy_task_min_run_time"
+		label   "Task Minmum Running Time (Sec)"
+		type    integer
+		default { "-1" }
+		range   { -1 60 }
+		parmtag { "pdg::scheduler" "" }
+		parmtag { spare_category "Afanasy" }
+		help	"Task minimum running time in seconds."
+    }
+
+
+    parm {
+		name    "afanasy_task_max_run_time"
+		label   "Task Maximum Running Time (Hours)"
+		type    float
+		default { "-1" }
+		range   { -1 60 }
+		parmtag { "pdg::scheduler" "" }
+		parmtag { spare_category "Afanasy" }
+		help	"Task maximum running time in hours."
+    }
+

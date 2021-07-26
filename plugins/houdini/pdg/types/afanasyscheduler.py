@@ -28,6 +28,7 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
     def __init__(self, scheduler, name):
         PyScheduler.__init__(self, scheduler, name)
         CallbackServerMixin.__init__(self, False)
+        self.parmprefix = 'afanasy'
         self._initData()
 
 
@@ -55,23 +56,25 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         job = af.Job(self['job_name'].evaluateString())
 
         job.setBranch(self['job_branch'].evaluateString())
-        job.setDependMask(self['depend_mask'].evaluateString())
-        job.setDependMaskGlobal(self['depend_mask_global'].evaluateString())
         job.setPriority(self['priority'].evaluateInt())
-        job.setMaxRunningTasks(self['max_runtasks'].evaluateInt())
-        job.setMaxRunTasksPerHost(self['maxperhost'].evaluateInt())
-        job.setHostsMask(self['hosts_mask'].evaluateString())
-        job.setHostsMaskExclude(self['hosts_mask_exclude'].evaluateString())
+        job.setMaxRunningTasks(self['afanasy_max_running_tasks'].evaluateInt())
+        job.setMaxRunTasksPerHost(self['afanasy_max_running_tasks_per_host'].evaluateInt())
+        job.setHostsMask(self['afanasy_hosts_mask'].evaluateString())
+        job.setHostsMaskExclude(self['afanasy_hosts_mask_exclude'].evaluateString())
 
         return job
 
 
     def _constructBlock(self, work_item):
         block = af.Block(work_item.node.name, 'hbatch_mantra')
-        block.setCapacity(self['capacity'].evaluateInt())
-        block.setNeedMemory(self['min_memory'].evaluateInt()*1024)
-        block.setTaskMinRunTime(self['minruntime'].evaluateInt())
-        block.setTaskMaxRunTime(int(self['maxruntime'].evaluateFloat()*3600.0))
+        block.setCapacity(self.evaluateIntOverride(work_item.node, self.parmprefix, 'capacity', work_item, -1))
+        block.setHostsMask(self.evaluateStringOverride(work_item.node, self.parmprefix, 'hosts_mask', work_item, ''))
+        block.setHostsMaskExclude(self.evaluateStringOverride(work_item.node, self.parmprefix, 'hosts_mask_exclude', work_item, ''))
+        block.setMaxRunningTasks(self.evaluateIntOverride(work_item.node, self.parmprefix, 'max_running_tasks', work_item, -1))
+        block.setMaxRunTasksPerHost(self.evaluateIntOverride(work_item.node, self.parmprefix, 'max_running_tasks_per_host', work_item, -1))
+        block.setNeedMemory(self.evaluateIntOverride(work_item.node, self.parmprefix, 'need_memory', work_item, -1)*1024)
+        block.setTaskMinRunTime(self.evaluateIntOverride(work_item.node, self.parmprefix, 'task_min_run_time', work_item, -1))
+        block.setTaskMaxRunTime(int(self.evaluateFloatOverride(work_item.node, self.parmprefix, 'task_max_run_time', work_item, -1)*3600.0))
         # Check service and parser:
         # PDG uses "ALF_PROGRESS" everywhere
         block.setParser('mantra')
