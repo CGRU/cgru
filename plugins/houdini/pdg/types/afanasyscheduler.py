@@ -377,8 +377,9 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         if self['gj_start_paused'].evaluateInt():
             job.setPaused()
         # Block
-        block = af.Block('PDG-GRAPH','hbatch')
+        block = af.Block('PDG-GRAPH', self['gj_service'].evaluateString())
         block.setCapacity(self['gj_capacity'].evaluateInt())
+        block.addTicket(self['gj_ticket'].evaluateString(), 1)
         # Task
         task = af.Task(node_path)
         task.setCommand(cmd)
