@@ -52,9 +52,42 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         self._local_addr = self._getLocalAddr()
 
 
+    def _getWorkItemServiceAndParser(self, work_item):
+        # Set the default service values
+        service = 'hbatch'
+        # PDG uses "ALF_PROGRESS" everywhere
+        parser = 'mantra'
+
+        topnode = work_item.node.topNode()
+        toptype = topnode.type().name()
+        if toptype == 'ropfetch':
+            # Try to detect ROP type
+            roppath = topnode.parm('roppath')
+            if roppath is not None:
+                ropnode = hou.node(roppath.eval())
+                if ropnode:
+                    roptype = ropnode.type().name()
+                    if roptype == 'ifd':
+                        service = 'hbatch_mantra'
+        elif toptype == 'ffmpegencodevideo':
+            service = 'ffmpeg'
+            parser = 'ffmpeg'
+
+        # Service can be specified directly:
+        value = self.evaluateStringOverride(work_item.node, self.parmprefix, 'service', work_item, '')
+        if value is not None and len(value):
+            service = value
+
+        # Parser can be specified directly:
+        value = self.evaluateStringOverride(work_item.node, self.parmprefix, 'parser', work_item, '')
+        if value is not None and len(value):
+            parser = value
+
+        return service, parser
+
+
     def _constructJob(self):
         job = af.Job(self['job_name'].evaluateString())
-
         job.setBranch(self['job_branch'].evaluateString())
         job.setPriority(self['priority'].evaluateInt())
         job.setMaxRunningTasks(self['afanasy_max_running_tasks'].evaluateInt())
@@ -66,7 +99,9 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
 
 
     def _constructBlock(self, work_item):
-        block = af.Block(work_item.node.name, 'hbatch_mantra')
+        service, parser = self._getWorkItemServiceAndParser(work_item)
+        block = af.Block(work_item.node.name, service)
+        block.setParser(parser)
         block.setCapacity(self.evaluateIntOverride(work_item.node, self.parmprefix, 'capacity', work_item, -1))
         block.setHostsMask(self.evaluateStringOverride(work_item.node, self.parmprefix, 'hosts_mask', work_item, ''))
         block.setHostsMaskExclude(self.evaluateStringOverride(work_item.node, self.parmprefix, 'hosts_mask_exclude', work_item, ''))
@@ -75,9 +110,6 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         block.setNeedMemory(self.evaluateIntOverride(work_item.node, self.parmprefix, 'need_memory', work_item, -1)*1024)
         block.setTaskMinRunTime(self.evaluateIntOverride(work_item.node, self.parmprefix, 'task_min_run_time', work_item, -1))
         block.setTaskMaxRunTime(int(self.evaluateFloatOverride(work_item.node, self.parmprefix, 'task_max_run_time', work_item, -1)*3600.0))
-        # Check service and parser:
-        # PDG uses "ALF_PROGRESS" everywhere
-        block.setParser('mantra')
 
         return block
 
@@ -86,7 +118,7 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         task = af.Task(work_item.name)
         task.setCommand(self.expandCommandTokens(work_item.command, work_item))
 
-        # Set Environment Task Variables
+        # Set environment variables
         task.setEnv('PDG_RESULT_SERVER', str(self.workItemResultServerAddr()))
         task.setEnv('PDG_ITEM_NAME', str(work_item.name))
         task.setEnv('PDG_DIR', str(self.workingDir(False)))

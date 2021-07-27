@@ -91,3 +91,25 @@
 		help	"Task maximum running time in hours."
     }
 
+
+	parm {
+		name    "afanasy_service"
+		label   "Service"
+		type    string
+		default { "" }
+		parmtag { "pdg::scheduler" "" }
+		parmtag { spare_category "Afanasy" }
+		help    "Tasks service."
+	}
+
+
+	parm {
+		name    "afanasy_parser"
+		label   "Parser"
+		type    string
+		default { "" }
+		parmtag { "pdg::scheduler" "" }
+		parmtag { spare_category "Afanasy" }
+		help    "Tasks output parser."
+	}
+
