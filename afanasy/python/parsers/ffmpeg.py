@@ -18,11 +18,12 @@ class ffmpeg(parser.parser):
 
     def __init__(self):
         parser.parser.__init__(self)
-        self.str_badresult    = ['Output file is empty']
-        self.str_error        = ['Invalid', 'Impossible to open', 'No such file or directory']
-        self.duration        = 0.1
-        self.frame            = 0
-        self.frames            = 0
+        self.str_badresult = ['output file is empty']
+        self.str_error     = ['impossible to open', 'no such file or directory']
+        self.str_warning   = ['invalid']
+        self.duration      = 0.1
+        self.frame         = 0
+        self.frames        = 0
 
     def parseTime(self, time):
         res = re_time.match(time)
