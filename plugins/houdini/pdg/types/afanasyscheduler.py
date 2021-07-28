@@ -3,7 +3,6 @@ To reload scheduler type:
 import pdg; pdg.TypeRegistry.types().registeredType(pdg.registeredType.Scheduler, "afanasyscheduler").reload()
 """
 import json
-import logging
 import os
 import socket
 import sys
@@ -18,8 +17,6 @@ from pdg.utils import expand_vars
 import cgruconfig
 import af
 
-logging.basicConfig(level = logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 class AfanasyScheduler(CallbackServerMixin, PyScheduler):
     """
@@ -50,6 +47,10 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         self.job_block_name_id = {}
         self.job_tasks_id_name = {}
         self._local_addr = self._getLocalAddr()
+
+
+    def _log(self, i_msg):
+        print(self.topNode().name() + ': ' + str(i_msg))
 
 
     def _getWorkItemServiceAndParser(self, work_item):
@@ -166,9 +167,11 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
 
     def workItemResultServerAddr(self):
         # By default it uses local host name.
+        addr = self._workItemResultServerAddr
         # On farm better to use direct IP address.
-        addr, port = self._workItemResultServerAddr.split(':')
-        addr = ':'.join([self._local_addr, port])
+        if self['use_ip_address'].evaluateInt():
+            addr, port = self._workItemResultServerAddr.split(':')
+            addr = ':'.join([self._local_addr, port])
         return addr
 
     def applicationBin(self, i_app, i_work_item):
@@ -186,7 +189,7 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         """
         [virtual] Called by PDG when scheduler is first created.
         """
-        logger.debug("onStart")
+        self._log('onStart')
         return True
 
 
@@ -194,7 +197,7 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         """
         [virtual] Called by PDG when scheduler is cleaned up.
         """
-        logger.debug("onStop")
+        self._log('onStop')
         self.stopCallbackServer()
         self._deleteJob()
         return True
@@ -206,7 +209,7 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
 
         [virtual] Cook start callback. Starts the job for the cook session.
         """
-        logger.debug("onStartCook")
+        self._log('onStartCook')
         self._deleteJob()
 
         pdg_workingdir = self["pdg_workingdir"].evaluateString()
@@ -230,7 +233,7 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
           - Strange, with a vary if cancel parameter this function is called in a two completely different cases.
           - I think that it will be more clean to create 2 different functions onStopCook and onCancelCook.
         """
-        logger.debug("onStopCook: cancel = " + str(cancel))
+        self._log('onStopCook: cancel = ' + str(cancel))
         self.stopCallbackServer()
 
         if cancel:
@@ -248,7 +251,7 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         if len(work_item.command) == 0:
             return pdg.scheduleResult.CookSucceeded
 
-        logger.debug('onSchedule input: {} {}'.format(work_item.node.name, work_item.name))
+        self._log('onSchedule input: {} - {}'.format(work_item.node.name, work_item.name))
 
         # Ensure directories exist and serialize the work item
         self.createJobDirsAndSerializeWorkItems(work_item)
@@ -276,8 +279,7 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
                 # Append a new block to the job
                 struct = af.Cmd().appendBlocks(self.job_id, [block])
                 if not 'block_ids' in struct['object']:
-                    print("Error appending block:")
-                    print(struct)
+                    self._log('Error appending block:\n' + str(struct))
                     return pdg.scheduleResult.Failed
 
                 block_id = struct['object']['block_ids'][0]
@@ -291,8 +293,7 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
             block_id = self.job_block_name_id[work_item.node.name]
             struct = af.Cmd().appendTasks(self.job_id, block_id, [task])
             if not 'task_ids' in struct['object']:
-                print("Error appending task:")
-                print(struct)
+                self._log('Error appending task:\n' + str(struct))
                 return pdg.scheduleResult.Failed
 
             task_id = struct['object']['task_ids'][0]
@@ -311,7 +312,7 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
 
          - Not Supported
         """
-        logger.debug('onScheduleStatic:')
+        self._log('onScheduleStatic:')
         print('Counts:')
         print('len(dependencies) = %d' % len(dependencies))
         print('len(dependents)   = %d' % len(dependents))
@@ -334,7 +335,7 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         # get job progress
         job_progress = af.Cmd().getJobProgress(self.job_id)
         if job_progress is None:
-            print('Error getting job progress.')
+            self._log('Error getting job progress.')
             return pdg.tickResult.SchedulerBusy
 
         job_progress = job_progress['progress']
@@ -351,8 +352,12 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
                     self.onWorkItemStartCook(work_item_name, -1)
 
                 elif state.find('ERR') != -1:
-                    self.onWorkItemFailed(work_item_name, -1)
-                    ids_to_del[block_id].append(task_id)
+                    if self['report_fail_on_error'].evaluateInt():
+                        self.onWorkItemFailed(work_item_name, -1)
+                        # If the graph is setup to block on failures, then
+                        # we continue to track the task
+                        if not self.isWaitForFailures:
+                            ids_to_del[block_id].append(task_id)
 
                 elif state.find('SKP') != -1:
                     self.onWorkItemCanceled(work_item_name, -1)
@@ -383,7 +388,7 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         graph_file      Path to a .hip file containing the TOP Network, relative to $PDG_DIR.
         node_path       Op path to the TOP Network
         """
-        logger.debug("submitAsJob({},{})".format(graph_file, node_path))
+        self._log("submitAsJob({},{})".format(graph_file, node_path))
 
         # Constuct a command for hython + topcook script
         cmd = 'hython'
