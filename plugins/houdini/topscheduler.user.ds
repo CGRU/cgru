@@ -113,3 +113,42 @@
 		help    "Tasks output parser."
 	}
 
+
+	parm {
+		name    "afanasy_tickets"
+		label   "Tickets"
+		type    string
+		default { "" }
+		parmtag { "pdg::scheduler" "" }
+		parmtag { spare_category "Afanasy" }
+		help    "Tasks block tickets. A comma separated list of key:count. Example: MEM:64,GPU:1"
+	}
+
+
+multiparm {
+	name    "afanasy_envmulti"
+	label    "Extra Environment"
+	parmtag { "pdg::nocopy" "" }
+	parmtag { "pdg::scheduler" "" }
+	parmtag { spare_category "Afanasy" }
+
+	parm {
+		name    "afanasy_envname#"
+		label   "Name"
+		type    string
+		joinnext
+		default { "" }
+		parmtag { "pdg::scheduler" "" }
+		parmtag { spare_category "Afanasy" }
+		help    "Name of the work item environment variable."
+	}
+	parm {
+		name    "afanasy_envvalue#"
+		label   "Value"
+		type    string
+		default { "" }
+		parmtag { "pdg::scheduler" "" }
+		parmtag { spare_category "Afanasy" }
+		help    "Value of the work item environment variable."
+	}
+}

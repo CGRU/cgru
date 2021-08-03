@@ -273,6 +273,18 @@ This can be used to explain other ROP network what to do with Afanasy node.
 Afanasy TOP
 ===========
 
+.. figure:: images/houdini_pdg_scheduler.png
+
+	Afanasy TOP Shecduler tab
+
+.. figure:: images/houdini_pdg_parameters.png
+
+	Afanasy TOP Tasks Parameters tab
+
+.. figure:: images/houdini_pdg_adjustment.png
+
+	Afanasy TOP Adjustment tab
+
 Examples
 ========
 

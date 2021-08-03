@@ -18,6 +18,28 @@ import cgruconfig
 import af
 
 
+def displayError(msg, exception=None):
+    """Pop up a message dialog to display the given error message.
+    If the ui is unavailable, then it writes the message to the console.
+    """
+    if hou.isUIAvailable():
+        details = (str(exception) if exception is not None else None)
+        hou.ui.displayMessage(msg, severity=hou.severityType.Error, details=details)
+    else:
+        if exception is not None:
+            msg += "\n" + str(exception)
+        raise hou.OperationFailed(msg)
+
+def displayMessage(msg):
+    """Pop up a message dialog to display the given message.
+    If the ui is unavailable, then it writes the message to the console.
+    """
+    if hou.isUIAvailable():
+        hou.ui.displayMessage(msg, severity=hou.severityType.Message)
+    else:
+        print(msg)
+
+
 class AfanasyScheduler(CallbackServerMixin, PyScheduler):
     """
     Scheduler implementation that interfaces with a Afanasy farm instance.
@@ -53,13 +75,34 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         print(self.topNode().name() + ': ' + str(i_msg))
 
 
-    def _getWorkItemServiceAndParser(self, work_item):
+    def _getTicketsDictFromString(self, i_str):
+        tickets = dict()
+
+        if i_str is None or len(i_str) == 0:
+            return tickets
+
+        for ticket in i_str.split(','):
+            ticket = ticket.strip().split(':')
+            if len(ticket) != 2:
+                displayMessage('Invalid ticket data: "%s".' % ticket)
+            tickets[ticket[0]] = int(ticket[1])
+
+        return tickets
+
+
+    def _getWorkItemServiceParserTickets(self, i_work_item):
         # Set the default service values
         service = 'hbatch'
         # PDG uses "ALF_PROGRESS" everywhere
         parser = 'mantra'
+        # By default there are no tickets at all
+        tickets = dict()
+        tickets_auto = self['afanasy_tickets_auto'].evaluateInt()
+        if tickets_auto:
+            # If auto tickets, almost all nodes launches hython
+            tickets['HYTHON'] = 1
 
-        topnode = work_item.node.topNode()
+        topnode = i_work_item.node.topNode()
         toptype = topnode.type().name()
         if toptype == 'ropfetch':
             # Try to detect ROP type
@@ -70,21 +113,28 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
                     roptype = ropnode.type().name()
                     if roptype == 'ifd':
                         service = 'hbatch_mantra'
+                        if tickets_auto:
+                            tickets['MANTRA'] = 1
         elif toptype == 'ffmpegencodevideo':
             service = 'ffmpeg'
             parser = 'ffmpeg'
+            tickets.pop('HYTHON', None)
 
         # Service can be specified directly:
-        value = self.evaluateStringOverride(work_item.node, self.parmprefix, 'service', work_item, '')
+        value = self.evaluateStringOverride(i_work_item.node, self.parmprefix, 'service', i_work_item, '')
         if value is not None and len(value):
             service = value
 
         # Parser can be specified directly:
-        value = self.evaluateStringOverride(work_item.node, self.parmprefix, 'parser', work_item, '')
+        value = self.evaluateStringOverride(i_work_item.node, self.parmprefix, 'parser', i_work_item, '')
         if value is not None and len(value):
             parser = value
 
-        return service, parser
+        # Add tickets that are specified directly:
+        value = self.evaluateStringOverride(i_work_item.node, self.parmprefix, 'tickets', i_work_item, '')
+        tickets.update(self._getTicketsDictFromString(value))
+
+        return service, parser, tickets
 
 
     def _constructJob(self):
@@ -100,9 +150,11 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
 
 
     def _constructBlock(self, work_item):
-        service, parser = self._getWorkItemServiceAndParser(work_item)
+        service, parser, tickets = self._getWorkItemServiceParserTickets(work_item)
         block = af.Block(work_item.node.name, service)
         block.setParser(parser)
+        for name in tickets:
+            block.addTicket(name, tickets[name])
         block.setCapacity(self.evaluateIntOverride(work_item.node, self.parmprefix, 'capacity', work_item, -1))
         block.setHostsMask(self.evaluateStringOverride(work_item.node, self.parmprefix, 'hosts_mask', work_item, ''))
         block.setHostsMaskExclude(self.evaluateStringOverride(work_item.node, self.parmprefix, 'hosts_mask_exclude', work_item, ''))
@@ -111,6 +163,9 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         block.setNeedMemory(self.evaluateIntOverride(work_item.node, self.parmprefix, 'need_memory', work_item, -1)*1024)
         block.setTaskMinRunTime(self.evaluateIntOverride(work_item.node, self.parmprefix, 'task_min_run_time', work_item, -1))
         block.setTaskMaxRunTime(int(self.evaluateFloatOverride(work_item.node, self.parmprefix, 'task_max_run_time', work_item, -1)*3600.0))
+        env_dict, removekeys = self.resolveEnvParams(self.parmprefix, work_item, False)
+        for name in env_dict:
+            block.setEnv(name, env_dict[name])
 
         return block
 
