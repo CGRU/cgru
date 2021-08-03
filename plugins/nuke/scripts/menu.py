@@ -7,7 +7,7 @@ import cgrules
 cgru_menu = nuke.menu('Nuke').addMenu('CGRU')
 
 if cgrules.hasRULES():
-	cgru_menu.addCommand('RULES', 'cgru.rulesOpenShot()', 'F12')
+	cgru_menu.addCommand('RULES', 'cgru.rulesOpenShot()')
 
 cgru_menu.addCommand('Afanasy Node', 'nuke.createNode("afanasy")', 'F10')
 cgru_menu.addCommand('Dailies Node', 'nuke.createNode("cgru_dailies")')
