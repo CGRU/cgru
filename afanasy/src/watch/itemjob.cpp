@@ -96,14 +96,30 @@ ItemJob::~ItemJob()
 
 void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 {
-	af::Job *job = (af::Job*)i_afnode;
+	af::Job *job = static_cast<af::Job*>(i_afnode);
 
-	if (m_blocks.size() != job->getBlocksNum())
+	if (m_serial != job->getSerial())
 	{
-		AFERROR("ItemJob::v_updateValues: Blocks number mismatch, deleting invalid item.")
+		AFERROR("ItemJob::v_updateValues: Job serial number mismatch, deleting item.")
 		resetId();
 		return;
 	}
+
+	if (m_blocks.size() > job->getBlocksNum())
+	{
+		AFERROR("ItemJob::v_updateValues: Constructed job blocks size is greater than arrived from server, deleting item.")
+		resetId();
+		return;
+	}
+
+	if (m_blocks.size() < job->getBlocksNum())
+		for (int b = m_blocks.size(); b < job->getBlocksNum(); b++)
+		{
+			const af::BlockData * blockdata = job->getBlock(b);
+			BlockInfo * blockinfo = new BlockInfo(blockdata, this, m_list_nodes);
+			QObject::connect(blockinfo, SIGNAL(sig_BlockAction(int, QString)), m_list_nodes, SLOT(slot_BlockAction(int, QString)));
+			m_blocks.append(blockinfo);
+		}
 
 	// Store previous state to check difference for notifications.
 	int64_t prev_state = state;

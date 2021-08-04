@@ -1704,4 +1704,6 @@ void JobAf::appendBlocks(Action & i_action, const JSON & i_operation)
 
 	checkDepends();
 	checkStatesOnAppend();
+
+	i_action.monitors->addJobEvent(af::Monitor::EVT_jobs_change, getId(), getUid());
 }
