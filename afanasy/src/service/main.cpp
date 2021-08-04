@@ -181,7 +181,7 @@ bool startCmd()
 		if (spos != std::string::npos) cgru.resize(spos);
 	}
 	// Add command
-	std::string cmd = cgru + "\\start\\AFANASY\\render.cmd";
+	std::string cmd = cgru + "\\start\\AFANASY\\99.render.cmd";
 	if (ServiceType == "server")
 		cmd = cgru + "\\start\\AFANASY\\_afserver.cmd";
 	OutLog(std::string("Starting command: ") + cmd);

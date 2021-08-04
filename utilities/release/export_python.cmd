@@ -2,7 +2,7 @@
 
 set dest=%1
 if exist %dest% rd /s /q %dest%
-call minimize_python.cmd
+rem call minimize_python.cmd
 cd ..\..
 set python=%CD%\python
 
