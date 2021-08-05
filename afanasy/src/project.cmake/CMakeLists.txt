@@ -1,3 +1,6 @@
+if(UNIX)
+	cmake_minimum_required(VERSION 2.8)
+endif()
 project(afanasy)
 
 set(CMAKE_BUILD_TYPE "Release")
