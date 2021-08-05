@@ -24,6 +24,8 @@ public:
 	ListTasks( QWidget* parent, int JobId, const QString & JobName);
 	~ListTasks();
 
+	void getJobFullData();
+
 	virtual bool v_caseMessage( af::Msg * msg);
 
 	virtual bool v_processEvents( const af::MonitorEvents & i_me);
@@ -72,11 +74,8 @@ private slots:
 private:
 	int m_job_id;
 	QString m_job_name;
-
-	int m_blocks_num;
-	ItemJobBlock ** m_blocks;
-	int * m_tasks_num;
-	ItemJobTask *** m_tasks;
+	QVector<ItemJobBlock*> m_blocks;
+	QVector<QVector<ItemJobTask*>> m_tasks;
 
 	bool constructed;
 
@@ -85,7 +84,7 @@ private:
 	std::vector<WndTask*> m_wndtasks;
 
 private:
-	void construct( af::Job * job);
+	void construct(af::Job * i_job);
 
 	bool updateProgress(const af::JobProgress * i_job_progress);
 	bool updateTasks(

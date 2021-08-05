@@ -41,14 +41,10 @@
 #include "../libafanasy/logger.h"
 
 ListTasks::ListTasks( QWidget* parent, int JobId, const QString & JobName):
-	ListItems( parent, "tasks"),
-	m_job_id( JobId),
-	m_job_name( JobName),
-	m_blocks_num(0),
-	m_blocks( NULL),
-	m_tasks_num( NULL),
-	m_tasks( NULL),
-	constructed( false)
+	ListItems(parent, "tasks"),
+	m_job_id(JobId),
+	m_job_name(JobName),
+	constructed(false)
 {
 	m_paramspanel_task = new ParamsPanelTask();
 	m_paramspanel = m_paramspanel_task;
@@ -58,44 +54,56 @@ ListTasks::ListTasks( QWidget* parent, int JobId, const QString & JobName):
 //   view->setUniformItemSizes( true);
 //   view->setBatchSize( 10000);
 
+	m_parentWindow->setWindowTitle( m_job_name);
+
+	getJobFullData();
+}
+
+void ListTasks::getJobFullData()
+{
 	std::ostringstream str;
 	str << "{\"get\":{\"type\":\"jobs\",\"mode\":\"full\",\"binary\":true";
 	str << ",\"ids\":[" << m_job_id << "]}}";
 
 	af::Msg * msg = af::jsonMsg( str);
-	Watch::sendMsg( msg);
-
-	m_parentWindow->setWindowTitle( m_job_name);
+	Watch::sendMsg(msg);
 }
 
-void ListTasks::construct( af::Job * job)
+void ListTasks::construct(af::Job * i_job)
 {
 	constructed = true;
 	m_view->viewport()->hide();
 
-	m_blocks_num = job->getBlocksNum();
-	if( m_blocks_num == 0 ) return;
-
-	m_tasks_num = new int[m_blocks_num];
-	m_blocks = new ItemJobBlock*[m_blocks_num];
-	m_tasks = new ItemJobTask**[m_blocks_num];
-	int row = 0;
-	for( int b = 0; b < m_blocks_num; b++)
+	if (i_job->getBlocksNum() == 0)
 	{
-		const af::BlockData* block = job->getBlock( b);
-		m_blocks[b] = new ItemJobBlock( block, this);
-		m_tasks_num[b] = block->getTasksNum();
-		m_blocks[b]->tasksHidded = ((m_blocks_num > 1) && (m_tasks_num[b] > 1));
-		m_model->addItem( m_blocks[b]);
+		displayError("Job with a zero blocks number received.");
+		return;
+	}
+
+	m_tasks.resize(i_job->getBlocksNum());
+	int row = 0;
+
+	for (int b = 0; b < i_job->getBlocksNum(); b++)
+	{
+		const af::BlockData * block = i_job->getBlock(b);
+		ItemJobBlock * item_block = new ItemJobBlock(block, this);
+		m_blocks.append(item_block);
+
+		int tasks_num = block->getTasksNum();
+		item_block->tasksHidded = ((i_job->getBlocksNum() > 1) && (tasks_num > 1));
+		m_model->addItem(item_block);
+
 		row++;
-		m_tasks[b] = new ItemJobTask*[m_tasks_num[b]];
-		for( int t = 0; t < m_tasks_num[b]; t++)
+
+		for (int t = 0; t < tasks_num; t++)
 		{
-			ItemJobTask *wtask =  new ItemJobTask( this, m_blocks[b], t, block);
-			m_model->addItem( wtask);
-			if( m_blocks[b]->tasksHidded) m_view->setRowHidden( row , true);
+			ItemJobTask * item_task = new ItemJobTask(this, item_block, t, block);
+			m_model->addItem(item_task);
+			if(item_block->tasksHidded)
+				m_view->setRowHidden(row , true);
+
 			row++;
-			m_tasks[b][t] = wtask;
+			m_tasks[b].append(item_task);
 		}
 	}
 
@@ -104,17 +112,12 @@ void ListTasks::construct( af::Job * job)
 
 ListTasks::~ListTasks()
 {
-	for( int i = 0; i < m_wndtasks.size(); i++)
+	for (int i = 0; i < m_wndtasks.size(); i++)
 		m_wndtasks[i]->parentClosed();
 	
-	MonitorHost::delJobId( m_job_id);
+	MonitorHost::delJobId(m_job_id);
 
-	for( int b = 0; b < m_blocks_num; b++) delete [] m_tasks[b];
-	delete [] m_tasks_num;
-	delete [] m_blocks;
-	delete [] m_tasks;
-
-	Watch::watchJobTasksWindowRem( m_job_id);
+	Watch::watchJobTasksWindowRem(m_job_id);
 }
 
 void ListTasks::v_connectionLost()
@@ -313,24 +316,25 @@ void ListTasks::generateMenu(QMenu &o_menu, Item * i_item)
 	}
 }
 
-bool ListTasks::v_caseMessage( af::Msg * msg)
+bool ListTasks::v_caseMessage(af::Msg * msg)
 {
 	switch( msg->type())
 	{
 	case af::Msg::TJob:
 	{
 		af::MCAfNodes mcnodes(msg);
-		af::Job * job = (af::Job*)(mcnodes.getNode(0));
-		if( job->getId() != m_job_id )
+		af::Job * job = static_cast<af::Job*>(mcnodes.getNode(0));
+
+		if(job->getId() != m_job_id)
 		{
 			// No job deletion needed.
 			// af::MCAfNodes delete all node in dtor.
 			return false;
 		}
 
-		if( constructed == false)
+		if (constructed == false)
 		{
-			construct( job);
+			construct(job);
 
 			std::ostringstream str;
 			str << "{\"get\":{\"type\":\"jobs\",\"mode\":\"progress\",\"binary\":true";
@@ -339,7 +343,7 @@ bool ListTasks::v_caseMessage( af::Msg * msg)
 			af::Msg * msg = af::jsonMsg( str);
 			Watch::sendMsg( msg);
 
-			MonitorHost::addJobId( m_job_id);
+			MonitorHost::addJobId(m_job_id);
 		}
 		else
 		{
@@ -350,15 +354,15 @@ bool ListTasks::v_caseMessage( af::Msg * msg)
 	}
 	case af::Msg::TJobProgress:
 	{
-		if( constructed == false ) break;
+		if (constructed == false)
+			break;
 
-		af::JobProgress * progress = new af::JobProgress( msg);
-		if( m_job_id == progress->getJobId())
+		af::JobProgress * progress = new af::JobProgress(msg);
+		if (m_job_id == progress->getJobId())
 		{
-			if( updateProgress( progress ) == false)
+			if (updateProgress(progress) == false)
 			{
-				printf("Tasks update error. Closing tasks window.\n");
-				displayWarning( "Tasks update error.");
+				displayError("Tasks update error. Closing tasks window.");
 				m_parentWindow->close();
 			}
 		}
@@ -369,26 +373,30 @@ bool ListTasks::v_caseMessage( af::Msg * msg)
 	case af::Msg::TBlocksProperties:
 	case af::Msg::TBlocksProgress:
 	{
-		af::MCAfNodes mcblocks( msg);
-		int count = int( mcblocks.getCount());
-		for( int b = 0; b < count; b++)
+		af::MCAfNodes mcblocks(msg);
+		int count = int(mcblocks.getCount());
+		for (int b = 0; b < count; b++)
 		{
-			af::BlockData * block = (af::BlockData*)mcblocks.getNode( b);
-			if( block->getJobId() != m_job_id) continue;
+			af::BlockData * block = static_cast<af::BlockData*>(mcblocks.getNode(b));
+			if (block->getJobId() != m_job_id)
+				continue;
 			int blocknum = block->getBlockNum();
-			if( blocknum >= m_blocks_num ) continue;
+			if (blocknum >= m_blocks.size())
+				continue;
 
-			m_blocks[blocknum]->update( block, msg->type());
+			m_blocks[blocknum]->update(block, msg->type());
 
-			if( msg->type() == af::Msg::TBlocks)
+			if (msg->type() == af::Msg::TBlocks)
 				m_model->emit_dataChanged();
 			else
 			{
-				int row = getRow( b);
-				if( row != -1 ) m_model->emit_dataChanged( getRow( blocknum));
+				int row = getRow(b);
+				if (row != -1)
+					m_model->emit_dataChanged(getRow( blocknum));
 			}
 		}
-		if( msg->type() == af::Msg::TBlocks) m_model->emit_dataChanged();
+		if (msg->type() == af::Msg::TBlocks)
+			m_model->emit_dataChanged();
 		break;
 	}
 	default:
@@ -457,45 +465,50 @@ bool ListTasks::v_processEvents( const af::MonitorEvents & i_me)
 	return founded;
 }
 
-int ListTasks::getRow( int block, int task)
+int ListTasks::getRow(int i_block, int i_task)
 {
 	int row = -1;
-	if( block < m_blocks_num )
+	if (i_block < m_blocks.size())
 	{
-		if((task != -1) && (task >= m_tasks_num[block]))
+		if((i_task != -1) && (i_task >= m_tasks[i_block].size()))
 		{
-			AFERRAR("ListTasks::getRow: task >= m_tasks_num[block] : (%d>=%d[%d])", task, m_tasks_num[block], block)
+			AF_ERR << "ListTasks::getRow: i_task >= m_tasks[i_block].size(): "
+				<< i_task << ">=" << m_tasks[i_block].size();
 		}
 		else
 		{
 			row = 1;
-			for( int b = 0; b < block; b++) row += 1 + m_tasks_num[b];
-			row += task;
+			for (int b = 0; b < i_block; b++)
+				row += 1 + m_tasks[b].size();
+			row += i_task;
 		}
 	}
 	else
-		AFERRAR("ListTasks::getRow: block >= m_blocks_num : (%d>=%d)", block, m_blocks_num)
-//printf("ListTasks::getRow: b[%d] t[%d] = %d\n", block, task, row);
+		AF_ERR << "ListTasks::getRow: i_block >= m_blocks.size(): "
+			<< i_block << ">=" << m_blocks.size();
+
 	return row;
 }
 
 bool ListTasks::updateProgress(const af::JobProgress * i_job_progress/*bool blocksOnly = false*/)
 {
-	if (m_blocks_num != i_job_progress->getBlocksNum())
+	if (m_blocks.size() != i_job_progress->getBlocksNum())
 	{
-		AFERRAR("ListTasks::updateProgress: Blocks number mismatch (%d!=%d).", m_blocks_num, i_job_progress->getBlocksNum())
+		AF_ERR << "ListTasks::updateProgress: Blocks number mismatch: "
+			<< m_blocks.size() << "!=" << i_job_progress->getBlocksNum();
 		return false;
 	}
 
-	for (int b = 0; b < m_blocks_num; b++)
+	for (int b = 0; b < m_blocks.size(); b++)
 	{
-		if (m_tasks_num[b] != i_job_progress->getTasksNum(b))
+		if (m_tasks[b].size() != i_job_progress->getTasksNum(b))
 		{
-			AFERRAR("ListTasks::updateProgress: Tasks number mismatch in block #%d (%d!=%d)", b, m_tasks_num[b], i_job_progress->getTasksNum(b))
+			AF_ERR << "ListTasks::updateProgress: Tasks number mismatch in block #"
+				<< b << ": " << m_tasks[b].size() << "!=" << i_job_progress->getTasksNum(b);
 			return false;
 		}
 
-		for (int t = 0; t < m_tasks_num[b]; t++)
+		for (int t = 0; t < m_tasks[b].size(); t++)
 		{
 			m_tasks[b][t]->upProgress(*(i_job_progress->tp[b][t]) );
 		}
@@ -511,9 +524,9 @@ bool ListTasks::updateProgress(const af::JobProgress * i_job_progress/*bool bloc
 void ListTasks::updateResources()
 {
 	QMap<QString, QVector<float>> resmap;
-	for (int b = 0; b < m_blocks_num; b++)
+	for (int b = 0; b < m_blocks.size(); b++)
 	{
-		for (int t = 0; t < m_tasks_num[b]; t++)
+		for (int t = 0; t < m_tasks[b].size(); t++)
 		{
 			QStringList pair = afqt::stoq(m_tasks[b][t]->taskprogress.resources).split(' ');
 			for (int i = 0; i < pair.size(); i++)
@@ -537,40 +550,46 @@ bool ListTasks::updateTasks(
 {
 	if(( i_tps.size() != i_blocks.size()) && ( i_tps.size() != i_tasks.size()))
 	{
-		AFERRAR("ListTasks::updateTasks: input sizes mismatch: %d, %d, %d", int(i_tasks.size()), int(i_blocks.size()), int(i_tps.size()))
+		AF_ERR << "ListTasks::updateTasks: input sizes mismatch: "
+			<< int(i_tasks.size()) << ", " << int(i_blocks.size()) << ", " << int(i_tps.size());
 		return false;
 	}
 
 	int firstChangedRow = -1;
 	int lastChangedRow = -1;
-	for( int i = 0; i < i_tps.size(); i++)
+	for (int i = 0; i < i_tps.size(); i++)
 	{
-		if( i_blocks[i] >= m_blocks_num)
+		if (i_blocks[i] >= m_blocks.size())
 		{
-			AFERRAR("ListTasks::updateTasks: block >= m_blocks_num (%d>=%d)", i_blocks[i], m_blocks_num)
+			AF_ERR << "ListTasks::updateTasks: block >= m_blocks.size(): "
+				<< i_blocks[i] << ">=" << m_blocks.size();
 			return false;
 		}
-		if( i_tasks[i] >= m_tasks_num[i_blocks[i]])
+		if (i_tasks[i] >= m_tasks[i_blocks[i]].size())
 		{
-			AFERRAR("ListTasks::updateTasks: task >= m_tasks_num[%d] (%d>=%d)", i_blocks[i], i_tasks[i], m_tasks_num[i_blocks[i]])
+			AF_ERR << "ListTasks::updateTasks: i_tasks[i] >= m_tasks[i_blocks[i]].size():"
+				<< i_tasks[i] << ">=" << m_tasks[i_blocks[i]].size();
 			return false;
 		}
-		m_tasks[i_blocks[i]][i_tasks[i]]->upProgress( i_tps[i]);
+		m_tasks[i_blocks[i]][i_tasks[i]]->upProgress(i_tps[i]);
 
-		int row = getRow( i_blocks[i], i_tasks[i]);
-		if( row != -1 )
+		int row = getRow(i_blocks[i], i_tasks[i]);
+		if (row != -1)
 		{
-			if((firstChangedRow == -1) || (firstChangedRow > row)) firstChangedRow = row;
-			if(  lastChangedRow < row) lastChangedRow = row;
+			if ((firstChangedRow == -1) || (firstChangedRow > row))
+				firstChangedRow = row;
+			if (lastChangedRow < row)
+				lastChangedRow = row;
 		}
 
 		/// Update opened tasks windows ( if any )
-		for( int w = 0; w < m_wndtasks.size(); w++)
-			if( m_wndtasks[w]->isSameTask( af::MCTaskPos( m_job_id, i_blocks[i], i_tasks[i])))
-					m_wndtasks[w]->updateProgress( i_tps[i]);
+		for (int w = 0; w < m_wndtasks.size(); w++)
+			if (m_wndtasks[w]->isSameTask(af::MCTaskPos(m_job_id, i_blocks[i], i_tasks[i])))
+					m_wndtasks[w]->updateProgress(i_tps[i]);
 	}
 
-	if( firstChangedRow != -1 ) m_model->emit_dataChanged( firstChangedRow, lastChangedRow);
+	if (firstChangedRow != -1)
+		m_model->emit_dataChanged(firstChangedRow, lastChangedRow);
 
 	setWindowTitleProgress();
 	updateResources();
@@ -582,13 +601,13 @@ void ListTasks::setWindowTitleProgress()
 {
 	int total_percent = 0;
 	int total_tasks = 0;
-	for( int b = 0; b < m_blocks_num; b++)
-		for( int t = 0; t < m_tasks_num[b]; t++)
+	for (int b = 0; b < m_blocks.size(); b++)
+		for (int t = 0; t < m_tasks[b].size(); t++)
 		{
-			if(( m_tasks[b][t]->taskprogress.state & AFJOB::STATE_DONE_MASK) ||
-				( m_tasks[b][t]->taskprogress.state & AFJOB::STATE_SKIPPED_MASK))
+			if ((m_tasks[b][t]->taskprogress.state & AFJOB::STATE_DONE_MASK) ||
+				(m_tasks[b][t]->taskprogress.state & AFJOB::STATE_SKIPPED_MASK))
 				total_percent += 100;
-			else if ( m_tasks[b][t]->taskprogress.state & AFJOB::STATE_RUNNING_MASK )
+			else if (m_tasks[b][t]->taskprogress.state & AFJOB::STATE_RUNNING_MASK)
 				total_percent += m_tasks[b][t]->taskprogress.percent;
 			total_tasks++;
 		}
@@ -638,11 +657,13 @@ void ListTasks::v_doubleClicked(Item * i_item)
 		int blockNum = block->getNumBlock();
 		bool hide = false == m_blocks[blockNum]->tasksHidded;
 		m_blocks[blockNum]->tasksHidded = hide;
-		int row_start = getRow( blockNum, 0);
-		int row_end   = getRow( blockNum, m_tasks_num[blockNum]-1);
-		for( int row = row_start; row <= row_end; row++) m_view->setRowHidden( row, hide);
+		int row_start = getRow(blockNum, 0);
+		int row_end   = getRow(blockNum, m_tasks[blockNum].size() - 1);
+		for (int row = row_start; row <= row_end; row++)
+			m_view->setRowHidden(row, hide);
 //   view->updateGeometries();
-		if( block->resetSortingParameters()) sortBlock( block->getNumBlock());
+		if (block->resetSortingParameters())
+			sortBlock(block->getNumBlock());
 	}
 }
 
@@ -891,27 +912,29 @@ void ListTasks::blockAction(const QString & i_json)
 	Watch::sendMsg( af::jsonMsg( str));
 }
 
-void ListTasks::sortBlock( int i_block_num)
+void ListTasks::sortBlock(int i_block_num)
 {
-	if( i_block_num >= m_blocks_num )
+	if (i_block_num >= m_blocks.size())
 	{
-		AFERRAR("ListTasks::sortBlock: i_block_num >= m_blocks_num (%d>=%d)", i_block_num, m_blocks_num)
+		AF_ERR << "ListTasks::sortBlock: i_block_num >= m_blocks.size(): "
+			<< i_block_num << ">=" << m_blocks.size();
 		return;
 	}
 
 	int sort_type = m_blocks[i_block_num]->getSortType();
 	bool sort_ascending = m_blocks[i_block_num]->isSortAsceding();
 
-	ItemJobTask ** array = new ItemJobTask*[m_tasks_num[i_block_num]];
-	for( int i = 0; i < m_tasks_num[i_block_num]; i++) array[i] = m_tasks[i_block_num][i];
+	ItemJobTask ** array = new ItemJobTask*[m_tasks[i_block_num].size()];
+	for (int i = 0; i < m_tasks[i_block_num].size(); i++)
+		array[i] = m_tasks[i_block_num][i];
 
-	if( sort_type)
-		for( int i = 0; i < m_tasks_num[i_block_num]; i++)
-			for( int j = m_tasks_num[i_block_num]-1; j > i; j--)
+	if (sort_type)
+		for (int i = 0; i < m_tasks[i_block_num].size(); i++)
+			for (int j = m_tasks[i_block_num].size() - 1; j > i; j--)
 			{
 				ItemJobTask * item_a = array[j-1];
 				ItemJobTask * item_b = array[j];
-				if( item_a->compare( sort_type, *item_b, sort_ascending ))
+				if (item_a->compare(sort_type, *item_b, sort_ascending))
 				{
 					array[j-1] = item_b;
 					array[j]   = item_a;
@@ -919,10 +942,11 @@ void ListTasks::sortBlock( int i_block_num)
 			}
 
 	int start = i_block_num+1;
-	for( int b = 0; b < i_block_num; b++) start += m_tasks_num[b];
+	for (int b = 0; b < i_block_num; b++)
+		start += m_tasks[b].size();
 
 	storeSelection();
-	m_model->setItems( start, (Item**)array, m_tasks_num[i_block_num]);
+	m_model->setItems(start, (Item**)array, m_tasks[i_block_num].size());
 	reStoreSelection();
 
 	delete [] array;
@@ -936,15 +960,17 @@ bool ListTasks::v_filesReceived( const af::MCTaskUp & i_taskup )
 	if(( i_taskup.getNumBlock() < 0 ) || ( i_taskup.getNumTask() < 0 ))
 		return false; // This files are for an entire job
 
-	if( i_taskup.getNumBlock() >= m_blocks_num )
+	if (i_taskup.getNumBlock() >= m_blocks.size())
 	{
-		AFERRAR("ListTasks::taskFilesReceived: i_taskup.getNumBlock() >= m_blocks_num ( %d >= %d )", i_taskup.getNumBlock(), m_blocks_num)
+		AF_ERR << "ListTasks::taskFilesReceived: i_taskup.getNumBlock() >= m_blocks.size():"
+			<< i_taskup.getNumBlock() << ">=" << m_blocks.size();
 		return true;
 	}
 
-	if( i_taskup.getNumTask() >= m_tasks_num[i_taskup.getNumBlock()] )
+	if (i_taskup.getNumTask() >= m_tasks[i_taskup.getNumBlock()].size())
 	{
-		AFERRAR("ListTasks::taskFilesReceived: i_taskup.getNumBlock() >= m_blocks_num ( %d >= %d )", i_taskup.getNumBlock(), m_blocks_num)
+		AF_ERR << "ListTasks::taskFilesReceived: i_taskup.getNumTask() >= m_tasks[i_taskup.getNumBlock()].size():"
+			<< i_taskup.getNumTask() << ">=" << m_tasks[i_taskup.getNumBlock()].size();
 		return true;
 	}
 
