@@ -47,7 +47,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 
 	af::Msg * o_msg_response = NULL;
 
-	JSON & getObj = document["get"];
+	const JSON & getObj = document["get"];
 	if( getObj.IsObject())
 	{
 		std::string type, mode;

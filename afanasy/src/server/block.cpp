@@ -780,6 +780,9 @@ bool Block::appendTasks(Action & i_action, const JSON & i_operation)
 	// Set new tasks ready
 	m_job->checkStatesOnAppend();
 
+	// Emit an event for monitors (afwatch ListTasks)
+	i_action.monitors->addBlock(af::Msg::TBlocks, m_data);
+
 	// Return new tasks ids:
 	i_action.answer = "{\"task_ids\":[";
 	for (int i = old_tasks_num; i < m_data->getTasksNum(); i++)

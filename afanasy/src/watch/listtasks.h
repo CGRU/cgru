@@ -85,6 +85,8 @@ private:
 
 private:
 	void construct(af::Job * i_job);
+	void appendBlock(af::BlockData * i_block);
+	void appendTasks(af::BlockData * i_block, ItemJobBlock * i_item_block);
 
 	bool updateProgress(const af::JobProgress * i_job_progress);
 	bool updateTasks(

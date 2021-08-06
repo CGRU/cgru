@@ -1418,8 +1418,9 @@ af::Msg * JobAf::writeBlocks( std::vector<int32_t> i_block_ids, std::vector<std:
 	{
 		af::MCAfNodes mcblocks;
 		for( int b = 0; b < i_block_ids.size(); b++)
-		mcblocks.addNode( m_blocks_data[i_block_ids[b]]);
-		return new af::Msg( af::BlockData::DataModeFromString( i_modes[0]), &mcblocks);
+			mcblocks.addNode(m_blocks_data[i_block_ids[b]]);
+
+		return new af::Msg(af::BlockData::DataModeFromString(i_modes[0]), &mcblocks);
 	}
 
 	std::ostringstream str;
@@ -1696,6 +1697,9 @@ void JobAf::appendBlocks(Action & i_action, const JSON & i_operation)
 		m_blocks[b]->storeTasks();
 		m_blocks[b]->setUser( m_user);
 
+		// Emit an event for monitors (afwatch ListTasks)
+		i_action.monitors->addBlock(af::Msg::TBlocks, m_blocks[b]->m_data);
+
 		if (b != old_blocks_num)
 			i_action.answer += ",";
 		i_action.answer += af::itos(b);
@@ -1705,5 +1709,6 @@ void JobAf::appendBlocks(Action & i_action, const JSON & i_operation)
 	checkDepends();
 	checkStatesOnAppend();
 
+	// Emit an event for monitors (afwatch ListJobs)
 	i_action.monitors->addJobEvent(af::Monitor::EVT_jobs_change, getId(), getUid());
 }

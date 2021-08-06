@@ -80,34 +80,59 @@ void ListTasks::construct(af::Job * i_job)
 		return;
 	}
 
-	m_tasks.resize(i_job->getBlocksNum());
-	int row = 0;
-
 	for (int b = 0; b < i_job->getBlocksNum(); b++)
+		appendBlock(i_job->getBlock(b));
+
+	// If the job has several blocks, we hide tasks if block more than one task
+	if (m_blocks.size() > 1)
 	{
-		const af::BlockData * block = i_job->getBlock(b);
-		ItemJobBlock * item_block = new ItemJobBlock(block, this);
-		m_blocks.append(item_block);
-
-		int tasks_num = block->getTasksNum();
-		item_block->tasksHidded = ((i_job->getBlocksNum() > 1) && (tasks_num > 1));
-		m_model->addItem(item_block);
-
-		row++;
-
-		for (int t = 0; t < tasks_num; t++)
+		int row = 0;
+		for (int b = 0; b < m_blocks.size(); b++)
 		{
-			ItemJobTask * item_task = new ItemJobTask(this, item_block, t, block);
-			m_model->addItem(item_task);
-			if(item_block->tasksHidded)
-				m_view->setRowHidden(row , true);
-
+			m_blocks[b]->tasksHidded = m_tasks[b].size() > 1;
 			row++;
-			m_tasks[b].append(item_task);
+
+			for (int t = 0; t < m_tasks[b].size(); t++)
+			{
+				if (m_blocks[b]->tasksHidded)
+					m_view->setRowHidden(row, true);
+				row++;
+			}
 		}
 	}
 
 	m_view->viewport()->show();
+}
+
+void ListTasks::appendBlock(af::BlockData * i_block)
+{
+	ItemJobBlock * item_block = new ItemJobBlock(i_block, this);
+	m_blocks.append(item_block);
+	m_model->addItem(item_block);
+
+	appendTasks(i_block, item_block);
+}
+
+void ListTasks::appendTasks(af::BlockData * i_block, ItemJobBlock * i_item_block)
+{
+	int start_task_num = 0;
+	if (m_tasks.size() <= i_block->getBlockNum())
+	{
+		// A block was just created and has no task items
+		m_tasks.resize(i_block->getBlockNum() + 1);
+	}
+	else
+	{
+		// We appending tasks to an existing block item
+		start_task_num = m_tasks[i_block->getBlockNum()].size();
+	}
+
+	for (int t = start_task_num; t < i_block->getTasksNum(); t++)
+	{
+		ItemJobTask * item_task = new ItemJobTask(this, i_item_block, t, i_block);
+		m_model->addItem(item_task);
+		m_tasks[i_block->getBlockNum()].append(item_task);
+	}
 }
 
 ListTasks::~ListTasks()
@@ -318,7 +343,7 @@ void ListTasks::generateMenu(QMenu &o_menu, Item * i_item)
 
 bool ListTasks::v_caseMessage(af::Msg * msg)
 {
-	switch( msg->type())
+	switch (msg->type())
 	{
 	case af::Msg::TJob:
 	{
@@ -379,12 +404,37 @@ bool ListTasks::v_caseMessage(af::Msg * msg)
 		{
 			af::BlockData * block = static_cast<af::BlockData*>(mcblocks.getNode(b));
 			if (block->getJobId() != m_job_id)
+			{
+				AF_ERR << "ListTasks::v_caseMessage: block->getJobId() != m_job_id: "
+					<< block->getJobId() << "!=" << m_job_id;
 				continue;
+			}
+
 			int blocknum = block->getBlockNum();
 			if (blocknum >= m_blocks.size())
-				continue;
+			{
+				if (msg->type() == af::Msg::TBlocks)
+				{
+					// A new block(s) was appended to the job
+					appendBlock(block);
+				}
+				else
+				{
+					AF_ERR << "ListTasks::v_caseMessage: blocknum >= m_blocks.size(): "
+						<< blocknum << ">=" << m_blocks.size();
+				}
+			}
+			else
+			{
+				m_blocks[blocknum]->update(block, msg->type());
 
-			m_blocks[blocknum]->update(block, msg->type());
+				if ((msg->type() == af::Msg::TBlocks) &&
+					(block->getTasksNum() > m_tasks[blocknum].size()))
+				{
+					// New tasks were appended to block
+					appendTasks(block, m_blocks[blocknum]);
+				}
+			}
 
 			if (msg->type() == af::Msg::TBlocks)
 				m_model->emit_dataChanged();
@@ -407,7 +457,7 @@ bool ListTasks::v_caseMessage(af::Msg * msg)
 
 bool ListTasks::v_processEvents( const af::MonitorEvents & i_me)
 {
-	bool founded = false;
+	bool found = false;
 
 	if( i_me.m_tp.size())
 	{
@@ -418,7 +468,7 @@ bool ListTasks::v_processEvents( const af::MonitorEvents & i_me)
 
 			updateTasks( i_me.m_tp[j].blocks, i_me.m_tp[j].tasks, i_me.m_tp[j].tp);
 
-			founded = true;
+			found = true;
 
 			break;
 		}
@@ -426,7 +476,6 @@ bool ListTasks::v_processEvents( const af::MonitorEvents & i_me)
 
 	if( i_me.m_bids.size())
 	{
-		std::vector<int32_t> job_ids;
 		std::vector<int32_t> block_ids;
 		std::vector<std::string> modes;
 
@@ -435,7 +484,6 @@ bool ListTasks::v_processEvents( const af::MonitorEvents & i_me)
 			if( i_me.m_bids[j].job_id != m_job_id )
 				continue;
 
-			job_ids.push_back( m_job_id);
 			block_ids.push_back( i_me.m_bids[j].block_num);
 
 			modes.push_back( af::BlockData::DataModeFromMsgType( i_me.m_bids[j].mode));
@@ -443,9 +491,9 @@ bool ListTasks::v_processEvents( const af::MonitorEvents & i_me)
 
 		if( block_ids.size())
 		{
-			Watch::get( "jobs", job_ids, modes, block_ids);
+			Watch::get("jobs", std::vector<int>(1, m_job_id), modes, block_ids);
 
-			founded = true;
+			found = true;
 		}
 	}
 
@@ -455,14 +503,14 @@ bool ListTasks::v_processEvents( const af::MonitorEvents & i_me)
 	{
 		if( i_me.m_events[af::Monitor::EVT_jobs_del][i] == m_job_id )
 		{
-			founded = true;
+			found = true;
 			displayWarning( "The job does not exist any more.");
 			m_parentWindow->close();
 			break;
 		}
 	}
 
-	return founded;
+	return found;
 }
 
 int ListTasks::getRow(int i_block, int i_task)
