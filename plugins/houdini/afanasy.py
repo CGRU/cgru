@@ -651,9 +651,13 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
                 # Set output mode to produce ifd files:
                 block_generate.ropnode.parm('soho_outputmode').set(1)
                 block_generate.soho_outputmode = 0
+
+                # We use unexpandedString() here to keep $F4 as expression.
+                # If we eval() the value,
+                # we will 'bake' the frame number when user submit the job.
                 block_generate.ropnode.parm('soho_diskfile').set(
                     block_generate.ropnode.parm(
-                        'vm_picture').eval() + '.ifd'
+                        'vm_picture').unexpandedString() + '.ifd'
                 )
 
         if read_rop:
