@@ -16,13 +16,15 @@ v3.2.1
 
 *Not released*
 
-2021.07.02
+2021.08.09
 
 - Houdini Afanasy `TOP Scheduler </software/houdini.html#afanasy-top>`_.
 
 - Houdini setup changed. Now ``HOUDINI_PATH=cgru/plugins/houdini`` and *afanasy.otl* moved to *otls/afanasy.hda*.
 
 - Each not numeric task can have an own extra `environment <../afanasy/job_task.html#environment>`_.
+
+- AfWatch now understands appending new blocks/tasks to an existing job.
 
 - AfWatch: Added Reset Windows Geometry item in Preferences menu.
 
