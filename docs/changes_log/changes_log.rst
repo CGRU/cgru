@@ -26,7 +26,9 @@ v3.2.1
 
 - AfWatch now understands appending new blocks/tasks to an existing job.
 
-- AfWatch: Added Reset Windows Geometry item in Preferences menu.
+- AfWatch can restart error tasks of a specified block.
+
+- AfWatch Preferences menu got Reset Windows Geometry item.
 
 - **Bugfixes**
 	- AfWatch jobs list right panel folders buttons refresh fix on a new job selection.

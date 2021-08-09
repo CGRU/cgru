@@ -431,35 +431,40 @@ bool Block::action( Action & i_action)
 	{
 		std::string type;
 		af::jr_string("type", type, operation);
-		if( type == "reset_error_hosts")
+		if (type == "reset_error_hosts")
 		{
 			v_errorHostsReset();
-			if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
+			if (blockchanged_type < af::Msg::TBlocksProperties)
+				blockchanged_type = af::Msg::TBlocksProperties;
 			job_changed = true;
 		}
-		else if( type == "skip")
+		else if (type == "skip")
 		{
 			skipRestartTasks(true, "Tasks skip by " + i_action.author, i_action, operation, AFJOB::STATE_SKIPPED_MASK | AFJOB::STATE_DONE_MASK);
 		}
-		else if(type == "done")
+		else if (type == "done")
 		{
-			skipRestartTasks(true, "Tasks done by " + i_action.author, i_action, operation, AFJOB::STATE_DONE_MASK);
+			skipRestartTasks(true, "Tasks set done by " + i_action.author, i_action, operation, AFJOB::STATE_DONE_MASK);
 		}
-		else if( type == "restart")
+		else if (type == "restart")
 		{
-			skipRestartTasks( false, "Tasks restart by " + i_action.author, i_action, operation, 0 /*any task*/);
+			skipRestartTasks(false, "Tasks restart by " + i_action.author, i_action, operation, 0 /*any task*/);
 		}
-		else if( type == "restart_running")
+		else if (type == "restart_running")
 		{
-			skipRestartTasks( false, "Tasks restart running by " + i_action.author, i_action, operation, AFJOB::STATE_RUNNING_MASK);
+			skipRestartTasks(false, "Restart running tasks by " + i_action.author, i_action, operation, AFJOB::STATE_RUNNING_MASK);
 		}
-		else if( type == "restart_skipped")
+		else if (type == "restart_skipped")
 		{
-			skipRestartTasks( false, "Tasks restart skipped by " + i_action.author, i_action, operation, AFJOB::STATE_SKIPPED_MASK);
+			skipRestartTasks(false, "Restart skipped tasks by " + i_action.author, i_action, operation, AFJOB::STATE_SKIPPED_MASK);
 		}
-		else if( type == "restart_done")
+		else if (type == "restart_done")
 		{
-			skipRestartTasks( false, "Tasks restart done by " + i_action.author, i_action, operation, AFJOB::STATE_DONE_MASK);
+			skipRestartTasks(false, "Restart done tasks by " + i_action.author, i_action, operation, AFJOB::STATE_DONE_MASK);
+		}
+		else if (type == "restart_errors")
+		{
+			skipRestartTasks(false, "Restart error tasks by " + i_action.author, i_action, operation, AFJOB::STATE_ERROR_MASK);
 		}
 		else if (type == "trynext")
 		{
@@ -479,7 +484,7 @@ bool Block::action( Action & i_action)
 			}
 			return false;
 		}
-		else if(type == "tickets")
+		else if (type == "tickets")
 		{
 			if (editTickets(i_action, operation))
 			{

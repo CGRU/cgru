@@ -763,6 +763,7 @@ void BlockInfo::generateMenu(QMenu * i_menu, QMenu * i_params_submenu) const
 		"reset_error_hosts", "Reset Error Hosts",
 		"skip",              "Skip Block Tasks",
 		"restart",           "Restart Block Tasks",
+		"restart_errors",    "Restart Errors",
 		"restart_running",   "Restart Running",
 		"restart_skipped",   "Restart Skipped",
 		"restart_done",      "Restart Done"};
