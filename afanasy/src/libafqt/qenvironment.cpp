@@ -539,6 +539,14 @@ void QEnvironment::setRect( const QString & i_name, const QRect & rect)
    }
 }
 
+void QEnvironment::resetAllRects()
+{
+   for (int i = 0; i < ms_attrs_wndrects.size(); i++)
+	   delete ms_attrs_wndrects[i];
+
+   ms_attrs_wndrects.clear();
+}
+
 void QEnvironment::solveServerAddress()
 {
    static std::string serveraddrnum_arg("-srvaddrnum");

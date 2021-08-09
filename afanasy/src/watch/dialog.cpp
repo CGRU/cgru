@@ -12,7 +12,7 @@
 
 #include "actionid.h"
 #include "buttonmonitor.h"
-#include "buttonout.h"
+#include "buttonsnapwnd.h"
 #include "listitems.h"
 #include "listjobs.h"
 #include "listusers.h"
@@ -75,17 +75,17 @@ Dialog::Dialog():
     m_hlayout_b->setSpacing( 0);
     m_vlayout_b->setSpacing( 3);
 
-    m_btn_out_left = new ButtonOut( ButtonOut::Left,  this);
-    m_btn_out_right = new ButtonOut( ButtonOut::Right, this);
+    m_btn_snap_left  = new ButtonSnapWnd(ButtonSnapWnd::Left,  this);
+    m_btn_snap_right = new ButtonSnapWnd(ButtonSnapWnd::Right, this);
 
-    m_hlayout_a->addWidget( m_btn_out_left);
+    m_hlayout_a->addWidget(m_btn_snap_left);
     m_hlayout_a->addLayout( m_vlayout_a);
-    m_hlayout_a->addWidget( m_btn_out_right);
+    m_hlayout_a->addWidget(m_btn_snap_right);
     m_vlayout_a->addLayout( m_hlayout_b);
     m_vlayout_a->addLayout( m_vlayout_b);
 
-    m_hlayout_a->setAlignment( m_btn_out_left, Qt::AlignVCenter);
-    m_hlayout_a->setAlignment( m_btn_out_right, Qt::AlignVCenter);
+    m_hlayout_a->setAlignment(m_btn_snap_left,  Qt::AlignVCenter);
+    m_hlayout_a->setAlignment(m_btn_snap_right, Qt::AlignVCenter);
 
     m_infoline = new InfoLine( this);
     m_infoline->setMaximumHeight( ButtonMonitor::ButtonsHeight);
@@ -287,6 +287,10 @@ void Dialog::showMenuPrefs()
     action->setChecked( afqt::QEnvironment::saveWndRectsOnExit.n != 0);
     connect( action, SIGNAL( triggered() ), this, SLOT( actSaveWndRectsOnExit() ));
     m_prefsMenu->addAction( action);
+
+	action = new QAction("Reset Windows Geometry", m_prefsMenu);
+	connect(action, SIGNAL(triggered()), this, SLOT(actResetWndRects()));
+	m_prefsMenu->addAction(action);
 
 	m_prefsMenu->addSeparator();
 
@@ -653,13 +657,14 @@ void Dialog::actNotifications()
     Watch::displayInfo("Opening 'Notifications' Window");
 }
 
-void Dialog::actSavePreferencesOnExit()   { afqt::QEnvironment::savePrefsOnExit.n    = 1 - afqt::QEnvironment::savePrefsOnExit.n;     }
-void Dialog::actSaveGUIOnExit()           { afqt::QEnvironment::saveGUIOnExit.n      = 1 - afqt::QEnvironment::saveGUIOnExit.n;       }
-void Dialog::actSaveHotkeysOnExit()       { afqt::QEnvironment::saveHotkeysOnExit.n  = 1 - afqt::QEnvironment::saveHotkeysOnExit.n;   }
-void Dialog::actSaveWndRectsOnExit()      { afqt::QEnvironment::saveWndRectsOnExit.n = 1 - afqt::QEnvironment::saveWndRectsOnExit.n;  }
-void Dialog::actShowOfflineNoise()        { afqt::QEnvironment::showOfflineNoise.n   = 1 - afqt::QEnvironment::showOfflineNoise.n;    }
-void Dialog::actShowDocs()  { Watch::showDocs();  }
-void Dialog::actShowForum() { Watch::showForum(); }
+void Dialog::actSavePreferencesOnExit(){afqt::QEnvironment::savePrefsOnExit.n    = 1 - afqt::QEnvironment::savePrefsOnExit.n;   }
+void Dialog::actSaveGUIOnExit()        {afqt::QEnvironment::saveGUIOnExit.n      = 1 - afqt::QEnvironment::saveGUIOnExit.n;     }
+void Dialog::actSaveHotkeysOnExit()    {afqt::QEnvironment::saveHotkeysOnExit.n  = 1 - afqt::QEnvironment::saveHotkeysOnExit.n; }
+void Dialog::actSaveWndRectsOnExit()   {afqt::QEnvironment::saveWndRectsOnExit.n = 1 - afqt::QEnvironment::saveWndRectsOnExit.n;}
+void Dialog::actResetWndRects()        {afqt::QEnvironment::resetAllRects();}
+void Dialog::actShowOfflineNoise()     {afqt::QEnvironment::showOfflineNoise.n   = 1 - afqt::QEnvironment::showOfflineNoise.n;  }
+void Dialog::actShowDocs() {Watch::showDocs();}
+void Dialog::actShowForum(){Watch::showForum();}
 
 void Dialog::actSavePreferences()
 {
@@ -737,8 +742,8 @@ void Dialog::reloadImages()
     else
         m_labelversion->setFixedHeight( m_img_bot.height());
 
-    m_btn_out_left->reloadImages();
-    m_btn_out_right->reloadImages();
+    m_btn_snap_left->reloadImages();
+    m_btn_snap_right->reloadImages();
 }
 
 void Dialog::paintEvent( QPaintEvent * event )

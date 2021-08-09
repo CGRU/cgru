@@ -24,6 +24,8 @@ v3.2.1
 
 - Each not numeric task can have an own extra `environment <../afanasy/job_task.html#environment>`_.
 
+- AfWatch: Added Reset Windows Geometry item in Preferences menu.
+
 - **Bugfixes**
 	- AfWatch jobs list right panel folders buttons refresh fix on a new job selection.
 	- AfWatch jobs list switching from admin mode, other users jobs appear fixed.

@@ -32,6 +32,7 @@ public:
 
 	static bool getRect( const QString & i_name, QRect & rect);
 	static void setRect( const QString & i_name, const QRect & rect);
+	static void resetAllRects();
 
 	static QMap<QString, AttrNumber> ms_attrs_panel;
 
