@@ -27,6 +27,7 @@ ItemJobBlock::ItemJobBlock(const af::BlockData * i_block, ListTasks * i_listtask
 	job_id(i_block->getJobId()),
 	numblock(i_block->getBlockNum()),
 	m_listtasks(i_listtasks),
+	tasksHidden(false),
 	m_wdir_ready(false),
 	m_files_ready(false)
 {
@@ -205,7 +206,7 @@ void ItemJobBlock::v_paint(QPainter * i_painter, const QRect & i_rect, const QSt
 
 bool ItemJobBlock::v_mousePressed(int i_x, int i_y, int i_w, int i_h, const Qt::MouseButtons & i_buttons)
 {
-   if (tasksHidded)
+   if (tasksHidden)
 	   return false;
 
 	if (i_y < m_height - HeightFooter)

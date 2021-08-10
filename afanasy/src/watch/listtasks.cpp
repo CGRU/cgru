@@ -89,12 +89,12 @@ void ListTasks::construct(af::Job * i_job)
 		int row = 0;
 		for (int b = 0; b < m_blocks.size(); b++)
 		{
-			m_blocks[b]->tasksHidded = m_tasks[b].size() > 1;
+			m_blocks[b]->tasksHidden = m_tasks[b].size() > 1;
 			row++;
 
 			for (int t = 0; t < m_tasks[b].size(); t++)
 			{
-				if (m_blocks[b]->tasksHidded)
+				if (m_blocks[b]->tasksHidden)
 					m_view->setRowHidden(row, true);
 				row++;
 			}
@@ -703,8 +703,8 @@ void ListTasks::v_doubleClicked(Item * i_item)
 	{
 		ItemJobBlock * block = static_cast<ItemJobBlock*>(i_item);
 		int blockNum = block->getNumBlock();
-		bool hide = false == m_blocks[blockNum]->tasksHidded;
-		m_blocks[blockNum]->tasksHidded = hide;
+		bool hide = false == m_blocks[blockNum]->tasksHidden;
+		m_blocks[blockNum]->tasksHidden = hide;
 		int row_start = getRow(blockNum, 0);
 		int row_end   = getRow(blockNum, m_tasks[blockNum].size() - 1);
 		for (int row = row_start; row <= row_end; row++)

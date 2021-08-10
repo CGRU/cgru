@@ -50,7 +50,7 @@ public:
 
    QString description;
 
-   bool tasksHidded;
+   bool tasksHidden;
 
 	inline const BlockInfo * getInfo() const {return m_info;}
 
