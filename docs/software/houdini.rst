@@ -734,7 +734,7 @@ Afanasy Houdini operator library and Python module are located in:
 
 ``cgru/plugins/houdini``
 
-You should add this folder ``HOUDINI_OTLSCAN_PATH`` and ``PYTHONPATH`` environment variables.
+You should add this folder ``HOUDINI_PATH`` and ``PYTHONPATH`` environment variables.
 
 Houdini setup example (*bash*):
 
