@@ -664,6 +664,20 @@ except *Job Priority* which will be set to an entire job.
 	If node fetches *ifd* ROP, service will be *hbatch_mantra*,
 	*ffmpegencodevideo* will be *ffmpeg*.
 
+- Tickets
+	asks block tickets. A comma separated list of key:count.
+	Example: ``MEM:64,GPU:1``.
+	See `tickets </afanasy/tickets.html>`_ documentation for details.
+
+- Auto
+	Automatically add common tickets.
+	Almost all tasks launch *hython*, so *HYTHON* ticket will be added.
+	If node fetches *ifd* ROP, *MANTRA* ticket will be added.
+
+- Environment
+	Adds custom key-value environment variables to tasks block.
+
+
 To override task parameter on TOP node add it via Edit Parameter Interface window:
 
 .. figure:: images/houdini_pdg_edit_parameter_interface.png
