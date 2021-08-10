@@ -18,7 +18,7 @@ v3.2.1
 
 2021.08.09
 
-- Houdini Afanasy `TOP Scheduler </software/houdini.html#afanasy-top>`_.
+- Houdini Afanasy `TOP Scheduler </software/houdini.html#afanasy-top-scheduler>`_.
 
 - Houdini setup changed. Now ``HOUDINI_PATH=cgru/plugins/houdini`` and *afanasy.otl* moved to *otls/afanasy.hda*.
 
@@ -74,7 +74,7 @@ v3.2.0
 
 	- AfWatch Work monitor allows modifications only in admin mode.
 	- AfWatch Users and Farm monitors allow selection and current item change only in admin mode.
-	- AfWatch Job Block operatons fixed to work on MS Windows.
+	- AfWatch Job Block operations fixed to work on MS Windows.
 	- AfWatch Job Tasks List window on open task progresses refreshing.
 	- AfWatch Jobs List hidden nodes mix on reopen / monitor type or change fixed.
 

@@ -80,17 +80,17 @@ Parameters
 		- **Native**: the same as this OTL was launched on.
 
 - Tickets
-	Use :ref:`afanasy-tickets`:
+	Use `tickets </afanasy/tickets.html>`_:
 		- *Auto*: Submission script will try to set tickets automatically, depending on the ROP to render.
 		- *Memory*: If not zero, this amount of *MEM* tickets will be set.
 		- *Aux*: Any other tickets string as ``TICKET:COUNT`` comma separated list.
 
-- Tickets
-	Use :ref:`afanasy-pools` that are specified as ``pool:priority`` comma separated list.
+- Pools
+	Use `pools </afanasy/pools.html>`_ that are specified as ``pool:priority`` comma separated list.
 
 - Enable Extended Parameters
 	To switch ON/OFF it fast.
-- Job :ref:`afanasy-branch`
+- Job `Branch </afanasy/branch.html>`_
 	``$HIP`` should be used in most cases.
 	No matter how deep you placed *hip* file in file-system.
 	It just help to find server an existing parent branch (department, project, scene).
@@ -270,26 +270,11 @@ This can be used to explain other ROP network what to do with Afanasy node.
 	That default script will execute *Submit* button on a specified Afanasy ROP.
 
 
-Afanasy TOP
-===========
-
-.. figure:: images/houdini_pdg_scheduler.png
-
-	Afanasy TOP Shecduler tab
-
-.. figure:: images/houdini_pdg_parameters.png
-
-	Afanasy TOP Tasks Parameters tab
-
-.. figure:: images/houdini_pdg_adjustment.png
-
-	Afanasy TOP Adjustment tab
-
-Examples
-========
+ROP Examples
+------------
 
 Simple
-------
+~~~~~~
 
 Just connect ``afanasy`` ROP to your render ROP. 
 
@@ -309,7 +294,7 @@ The job consists of single tasks block.
 Each task represents a frame or several number of frames, specified in *Frames Per Task* parameter.
 
 Command Render
---------------
+~~~~~~~~~~~~~~
 
 You can send any custom command to your farm.
 Usually you need separate IFD files generation and run ``mantra`` as a standalone process to render.
@@ -331,7 +316,7 @@ The first block produced by ``mantra_ifd`` node, with ``Disk File`` parameter tu
 Next block runs ``mantra`` with ``files`` parameter pointing to the generated files.
 
 Tile Render
------------
+~~~~~~~~~~~
 
 You can split single image to render on several hosts.
 Each host (task) will produce a *tile* - some part of an image.
@@ -364,7 +349,7 @@ Houdini native ``itilestitch`` tool is used to join tiles.
 
 
 Sub Task Dependence
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 This option is designed to start to render simulation without waiting the whole simulation is finished.
 
@@ -390,7 +375,7 @@ while the simulation block got only *HYTHON* ticket
 
 
 Complex
--------
+~~~~~~~
 
 You can construct a complex Afanasy ROP network to construct a complex job.
 
@@ -447,6 +432,7 @@ Step-By-Step
 #. Set *Output Driver* to */obj/distribute_pyro/save_slices*
    and in the *Distributed Simulation* tab set *Controls Node* to */obj/AutoDopNetwork/DISRIBUTE_pyro_CONTROLS*.
    You can copy this values from *HQueue Simulation* ROP that was automatically created.
+
 	.. figure:: images/houdini_distribpyro_afgeneral.png
          :scale: 22%
          :align: left
@@ -565,6 +551,180 @@ And the last block task to stop the tracker.
 	Distributed Job Tasks
 
 
+Afanasy TOP Scheduler
+=====================
+
+This node executes work items on farm using Afanasy render manager.
+It can schedule work items from TOP UI, and as standalone job.
+Using a standalone job you can close Houdini session and watch progress via Afanasy GUI.
+
+Here is the scheduler nodes parameters description.
+Almost anywhere in Afanasy ``-1`` means that the value is not set and defaults will be used.
+
+Scheduling Parameters
+---------------------
+
+.. figure:: images/houdini_pdg_scheduler.png
+
+	Afanasy TOP Shecduler tab
+
+- Job Name
+	The name of the job where work items tasks will be appended to.
+
+- Job Branch
+	The branch of the job. The same value will be used if you submit graph as job.
+
+- PDG Directory
+	Specifies the directory where the cook generates intermediate files.
+	The intermediate files are placed in a subdirectory named ``pdgtemp``.
+
+
+Submit Graph As Job
+-------------------
+
+- Submit Graph As Job
+	Cooks the entire TOP network as a standalone job.
+	Displays the status URI for the submitted job.
+	The submitting Houdini session is detached from the cooking of the TOP network.
+
+- Start Paused
+	Start graph cooking job paused.
+
+- Priority
+	Graph cooking job priority value.
+
+- Capacity
+	Cooking task capacity.
+
+- Hosts Mask
+	Hosts names regular expression, where graph job can run.
+
+- Exclude
+	Hosts names regular expression, where graph job can not run.
+
+- Depend Mask
+	Current user jobs names expression, that job will wait to start for.
+
+- Global
+	Any user jobs names expression, that job will wait to start for.
+
+- Service
+	Cooking job task block service name.
+
+- Ticket
+	Cooking job task block will need and take one ticket with this name.
+	See `tickets </afanasy/tickets.html>`_ documentation for details.
+
+
+Tasks Parameters
+----------------
+
+You can override this parameters on each TOP node,
+except *Job Priority* which will be set to an entire job.
+
+.. figure:: images/houdini_pdg_parameters.png
+
+	Afanasy TOP Tasks Parameters tab
+
+- Job Priority
+	Priority value of a job were working items tasks will be executed.
+
+- Capacity
+	Work items tasks block capacity.
+
+- Hosts Mask
+	Hosts names regular expression, where tasks can run.
+
+- Exclude
+	Hosts names regular expression, where tasks can not run.
+
+- Max Running Tasks
+	Running tasks count at the same time limit.
+
+- Per Host
+	Running tasks count at the same time on the same host limit.
+
+- Render Time Min (Sec)
+	Minimum task running time limit.
+	If task will finish for seconds below this value,
+	task finish will be considered as with an error.
+
+- Max (Hours)
+	Maximum task running time limit.
+	If task will run for hours above this value,
+	it will be forced to stop with an error.
+
+- Min RAM (GB)
+	Host should have this count of Gigabytes of a free RAM
+	to be able to run tasks.
+
+- Service
+	Tasks block service.
+	If empty it will try to detect automatically.
+	If node fetches *ifd* ROP, service will be *hbatch_mantra*,
+	*ffmpegencodevideo* will be *ffmpeg*.
+
+To override task parameter on TOP node add it via Edit Parameter Interface window:
+
+.. figure:: images/houdini_pdg_edit_parameter_interface.png
+
+	Edit Parameter Interface window
+
+
+Adjustment Parameters
+---------------------
+
+.. figure:: images/houdini_pdg_adjustment.png
+
+	Afanasy TOP Adjustment tab
+
+- Report Item Fail On Error
+	If task gets error state, scheduler will report PDG that work item failed.
+	You can turn it off and try to solve errors via Afanasy only.
+	Read output for an error cause, try to fix it, restart task.
+	And PDG will know nothing about it.
+
+- Block On Failed Work Items
+	When this option is enabled the scheduler will block the cook from completing
+	if there are any failed work items in that scheduler.
+	This makes it possible to manually retry those work items,
+	by preventing the PDG graph cook from ending before failed items can be retried.
+	A cook that is blocked on failed work items can still be canceled using the ESC key,
+	the cancel button in the TOP task bar, or the cancel API method.
+
+- Check Expected Outputs On Disk
+	When enabled, PDG will look on disk for any expected work items outputs
+	that were not explicitly reported when the work item cooked.
+	Expected outputs for a work item are checked immediately after the scheduler marks the work item as cooked.
+	Output files that were reported by the work item normally while cooking will not be checked.
+
+- Use IP Address
+	Use IP address instead of host name as work item result server address.
+	Some times render farm can't solve workstations by name.
+	Also it can save DNS load.
+
+	Work item task can send progress to PDG itself.
+	It is used by batch work item to notify that a specific frame (item in the batch) is done.
+	This way PDG can start to render images when just first frames of a simulation rendered,
+	and there is no need to wait the entire simulation finish.
+	So work item should know address and port to send progress to.
+
+- Tick Period
+	Sets the minimum time (in seconds) between calls to the *onTick* callback.
+	This callback is called periodically when the graph is cooking.
+	The callback is generally used to check the state of running work items.
+
+	Afanasy server heart beat is 1 second,
+	so there is no sense to set this parameter less than a second.
+
+- Max Items Per Tick
+	Sets the maximum number of ready item *onSchedule* callbacks between ticks.
+
+	For example by default the tick period is 1s and the max items per tick is 30.
+	This means that scheduler can send a maximum of 30 work items per second to farm.
+	Adjusting these values can be useful to control the load on the farm scheduler.
+
+
 Setup
 =====
 
@@ -594,5 +754,5 @@ Houdini setup example (*bash*):
 	export PYTHONPATH="${HOUDINI_CGRU_PATH}:${PYTHONPATH}"
 
 
-If you avoid sourcing ``cgru/setup.sh`` see :ref:`manual-environment-setup`.
+If you avoid sourcing ``cgru/setup.sh`` see `Manual Environment Setup </configuration/configuration.html#manual-environment-setup>`_.
 
