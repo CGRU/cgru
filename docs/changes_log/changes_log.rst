@@ -18,7 +18,7 @@ v3.2.1
 
 2021.08.11
 
-- Houdini Afanasy `TOP Scheduler </software/houdini.html#afanasy-top-scheduler>`_.
+- Houdini Afanasy `TOP Scheduler <../software/houdini.html#afanasy-top-scheduler>`_.
 
 - Houdini setup changed. Now ``HOUDINI_PATH=cgru/plugins/houdini`` and *afanasy.otl* moved to *otls/afanasy.hda*.
 
@@ -148,8 +148,8 @@ v2.3.1
 - Afanasy
 	- Linux packages moved on System D.
 	- Windows service.
-	- AfterFX `submission </software/afterfx.html#afterfx#tool-dialog>`__ improvements. More setting appeared.
-	- NVIDIA `nvidia-smi </afanasy/render.html#nvidia-smi>`__ Python custom resource class</a>.
+	- AfterFX `submission <../software/afterfx.html#afterfx#tool-dialog>`__ improvements. More setting appeared.
+	- NVIDIA `nvidia-smi <../afanasy/render.html#nvidia-smi>`__ Python custom resource class</a>.
 - RULES
 	- News, Bookmarks and Recent items display status.
 	- Incoming fresh News statuses update folders statuses.
@@ -183,8 +183,8 @@ v2.3.0
 	  This is much more flexible.
 	  For example, now in a Python service class we can check all numeric task files for existence and size.
 	  And decide to skip task execution if all files are fine.
-	- Task `progress change timeout </afanasy/job_block.html#task-progress-change-timeout>`__  job block parameter.
-	- Task `minimum run time </afanasy/job_block#task-min-run-time>`__ job block parameter.
+	- Task `progress change timeout <../afanasy/job_block.html#task-progress-change-timeout>`__  job block parameter.
+	- Task `minimum run time <../afanasy/job_block#task-min-run-time>`__ job block parameter.
 	- New user max_run_tasks_per_host and jobs_life_time default values are configurable.
 	- Some config parameters renamed:
 		- ``af_maxrunningtasks`` -> ``af_max_running_tasks``
