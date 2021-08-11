@@ -137,6 +137,15 @@ public:
 
 	void actionHealSick(Action & i_action);
 
+	void launchAndExit(const std::string & i_cmd, bool i_exit);
+
+	void ejectTasks(JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus, const std::string * i_keeptasks_username = NULL);
+
+	void exitClient(const std::string & i_type, JobContainer * i_jobs, MonitorContainer * i_monitoring);
+
+/// Set Render to Ofline. \c updateTaskState - whether to update it's state.
+	void offline(JobContainer * jobs, uint32_t updateTaskState, MonitorContainer * monitoring, bool toZombie = false);
+
 public:
 	/// Set container:
 	inline static void setRenderContainer( RenderContainer * i_container){ ms_renders = i_container;}
@@ -164,16 +173,6 @@ private:
 
 	void addErrorTask(const af::TaskExec * i_exec);
 	void clearErrorTasks();
-
-/// Stop tasks.
-	void ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus, const std::string * i_keeptasks_username = NULL);
-
-	void exitClient( const std::string & i_type, JobContainer * i_jobs, MonitorContainer * i_monitoring);	///< Exit Render client program.
-
-	void launchAndExit( const std::string & i_cmd, bool i_exit, JobContainer * i_jobs, MonitorContainer * i_monitoring);
-
-/// Set Render to Ofline. \c updateTaskState - whether to update it's state.
-	void offline( JobContainer * jobs, uint32_t updateTaskState, MonitorContainer * monitoring, bool toZombie = false );
 
 	void wolSleep( MonitorContainer * monitoring);
 

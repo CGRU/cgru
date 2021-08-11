@@ -146,6 +146,46 @@ void PoolSrv::v_action(Action & i_action)
 			if (false == actionTicket(i_action))
 				return;
 		}
+		else if (type == "launch_cmd")
+		{
+			std::string cmd;
+			if (false == af::jr_string("cmd", cmd, operation))
+			{
+				appendLog("Launch command request by " + i_action.author + "has no 'cmd'");
+				i_action.answer_kind = "error";
+				i_action.answer = "Launch command request has no command";
+				return;
+			}
+
+			bool exit = false;
+			af::jr_bool("exit", exit, operation);
+			std::string log = "Launch command";
+			if (exit)
+				log += " and exit";
+			log += " request by " + i_action.author + " on pool " + m_name + "\n" + cmd;
+
+			actionLaunchCmd(i_action, cmd, exit, log);
+
+			return;
+		}
+		else if (type == "eject_tasks")
+		{
+			std::string log = "Eject tasks request by " + i_action.author + " on pool " + m_name;
+			actionEjectTasks(i_action, log);
+			return;
+		}
+		else if (type == "exit")
+		{
+			std::string log = "Exit renders request by " + i_action.author + " on pool " + m_name;
+			actionExitRenders(i_action, log);
+			return;
+		}
+		else if (type == "delete_renders")
+		{
+			std::string log = "Delete renders by " + i_action.author + " on pool " + m_name;
+			actionDeleteRenders(i_action, log);
+			return;
+		}
 		else
 		{
 			appendLog("Unknown operation \"" + type + "\" by " + i_action.author);
@@ -376,6 +416,77 @@ void PoolSrv::actionHealSick(Action & i_action)
 		it->actionHealSick(i_action);
 
 	appendLog(std::string("Healed by ") + i_action.author);
+}
+
+void PoolSrv::actionLaunchCmd(Action & i_action, const std::string & i_cmd, bool i_exit, const std::string & i_log)
+{
+	appendLog(i_log);
+
+	for (auto & it : m_renders_list)
+	{
+		if (it->isOffline())
+			continue;
+
+		it->appendLog(i_log);
+		it->launchAndExit(i_cmd, i_exit);
+	}
+
+	for (auto & it : m_pools_list)
+		it->actionLaunchCmd(i_action, i_cmd, i_exit, i_log);
+}
+
+void PoolSrv::actionEjectTasks(Action & i_action, const std::string & i_log)
+{
+	appendLog(i_log);
+
+	for (auto & it : m_renders_list)
+	{
+		if (false == it->isBusy())
+			continue;
+
+		it->appendLog(i_log);
+		it->ejectTasks(i_action.jobs, i_action.monitors, af::TaskExec::UPEject);
+	}
+
+	for (auto & it : m_pools_list)
+		it->actionEjectTasks(i_action, i_log);
+}
+
+void PoolSrv::actionExitRenders(Action & i_action, const std::string & i_log)
+{
+	appendLog(i_log);
+
+	for (auto & it : m_renders_list)
+	{
+		if (it->isOffline())
+			continue;
+
+		it->appendLog(i_log);
+		it->exitClient("exit", i_action.jobs, i_action.monitors);
+	}
+
+	for (auto & it : m_pools_list)
+		it->actionExitRenders(i_action, i_log);
+}
+
+void PoolSrv::actionDeleteRenders(Action & i_action, const std::string & i_log)
+{
+	appendLog(i_log);
+
+	// We should operate a temporary list, as on deletion, primary list will change.
+	// And we can't perform a simple for cycle on a changing list.
+	std::list<RenderAf*> _renders_list(m_renders_list);
+	for (auto & it : _renders_list)
+	{
+		if (it->isOnline())
+			continue;
+
+		it->appendLog(i_log);
+		it->offline(NULL, 0, i_action.monitors, true);
+	}
+
+	for (auto & it : m_pools_list)
+		it->actionDeleteRenders(i_action, i_log);
 }
 
 bool PoolSrv::hasPoolTicket(const std::string & i_name, const int32_t & i_count, const bool i_ticket_running) const

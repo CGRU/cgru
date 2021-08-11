@@ -148,10 +148,14 @@ private:
 	bool hasPool(const PoolSrv * i_pool) const;
 	void removePool(PoolSrv * i_pool);
 
-	void actionAddPool (Action & i_action);
-	void actionDelete  (Action & i_action);
-	void actionService (Action & i_action);
+	void actionAddPool(Action & i_action);
+	void actionDelete(Action & i_action);
+	void actionService(Action & i_action);
 	void actionHealSick(Action & i_action);
+	void actionLaunchCmd(Action & i_action, const std::string & i_cmd, bool i_exit, const std::string & i_log);
+	void actionEjectTasks(Action & i_action, const std::string & i_log);
+	void actionExitRenders(Action & i_action, const std::string & i_log);
+	void actionDeleteRenders(Action & i_action, const std::string & i_log);
 
 	void dispatchFarmConfig();
 

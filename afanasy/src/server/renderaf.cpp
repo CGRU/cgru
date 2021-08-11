@@ -414,7 +414,7 @@ void RenderAf::v_action( Action & i_action)
 					appendLog("Launch command and exit request by " + i_action.author + "\n" + cmd);
 				else
 					appendLog("Launch command request by " + i_action.author + "\n" + cmd);
-				launchAndExit( cmd, exit, i_action.jobs, i_action.monitors);
+				launchAndExit(cmd, exit);
 			}
 			else
 			{
@@ -598,11 +598,12 @@ void RenderAf::exitClient( const std::string & i_type, JobContainer * i_jobs, Mo
 	m_re.m_instruction = i_type;
 }
 
-void RenderAf::launchAndExit( const std::string & i_cmd, bool i_exit, JobContainer * i_jobs, MonitorContainer * i_monitoring)
+void RenderAf::launchAndExit(const std::string & i_cmd, bool i_exit)
 {
-	if( false == isOnline() ) return;
+	if (false == isOnline())
+		return;
 
-	m_re.m_instruction = ( i_exit ? "launch_exit" : "launch");
+	m_re.m_instruction = (i_exit ? "launch_exit" : "launch");
 	m_re.m_command = i_cmd;
 }
 

@@ -38,7 +38,10 @@ public slots:
 	void slot_TicketHostEdit(const QString & i_name);
 
 protected:
-	void contextMenuEvent( QContextMenuEvent *event);
+	void contextMenuEvent(QContextMenuEvent * event);
+	void generateRenderMenu(QMenu * i_menu);
+	void generatePoolMenu(QMenu * i_menu);
+	void generateCommonMenuItems(QMenu * i_menu);
 
 	void v_doubleClicked(Item * i_item);
 
@@ -95,6 +98,7 @@ private slots:
 	void actHealSick();
 	void actExit();
 	void actDelete();
+	void actDeleteRenders();
 
 	void actCommand( int number);
 	void actReboot();

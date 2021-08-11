@@ -86,7 +86,7 @@ ListRenders::ListRenders( QWidget* parent):
 	ButtonPanel * bp; ButtonsMenu * bm;
 
 	bp = addButtonPanel(Item::TAny, "LOG","renders_log","Get render log.");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestLog()));
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRequestLog()));
 
 	if( af::Environment::GOD())
 	{
@@ -95,24 +95,24 @@ ListRenders::ListRenders( QWidget* parent):
 	}
 
 	bp = addButtonPanel(Item::TRender, "TASKS LOG","renders_tasks_log","Get tasks log.");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestTasksLog()));
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRequestTasksLog()));
 
 	bp = addButtonPanel(Item::TRender, "nimby","renders_nimby","Set nimby.","M");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actNimby()));
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actNimby()));
 
 	bp = addButtonPanel(Item::TRender, "NIMBY","renders_NIMBY","Set NIMBY.","N");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actNIMBY()));
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actNIMBY()));
 
 	bp = addButtonPanel(Item::TRender, "FREE","renders_free","Set free.","F");
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actFree()));
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actFree()));
 
 	bm = addButtonsMenu(Item::TRender, "Eject Tasks","Eject tasks from render.");
 
 	bp = addButtonPanel(Item::TAny, "ALL","renders_eject_all","Eject all tasks.","", true);
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actEjectTasks()));
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actEjectTasks()));
 
 	bp = addButtonPanel(Item::TAny, "NOT MY","renders_eject_notmy","Eject not my tasks.","", true);
-	connect( bp, SIGNAL( sigClicked()), this, SLOT( actEjectNotMyTasks()));
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actEjectNotMyTasks()));
 
 	resetButtonsMenu();
 
@@ -176,10 +176,10 @@ ListRenders::ListRenders( QWidget* parent):
 		resetButtonsMenu();
 
 		bp = addButtonPanel(Item::TAny, "PAUSE","farm_pause","Pause selected renders.","P");
-		connect( bp, SIGNAL( sigClicked()), this, SLOT(actSetPaused()));
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actSetPaused()));
 
 		bp = addButtonPanel(Item::TAny, "START","farm_unpause","Start (Unpause) selected renders.","S");
-		connect( bp, SIGNAL( sigClicked()), this, SLOT(actUnsetPaused()));
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(actUnsetPaused()));
 
         bp = addButtonPanel(Item::TPool, "CUSTOM DATA","node_custom_data","Edit node custom data.");
         connect(bp, SIGNAL(sigClicked()), this, SLOT(actCustomData()));
@@ -250,14 +250,14 @@ ListRenders::ListRenders( QWidget* parent):
 	if(false == af::Environment::GOD())
 		setAllowSelection(false);
 
-	connect( (ModelNodes*)m_model, SIGNAL(   nodeAdded( ItemNode *, const QModelIndex &)),
-	                         this,   SLOT( renderAdded( ItemNode *, const QModelIndex &)));
+	connect((ModelNodes*)m_model, SIGNAL(nodeAdded(ItemNode *, const QModelIndex &)),
+	                         this, SLOT(renderAdded(ItemNode *, const QModelIndex &)));
 
 	setSpacing();
 
 	QTimer * timer = new QTimer(this);
 	timer->start( 1900 * af::Environment::getWatchRefreshGuiSec());
-	connect( timer, SIGNAL( timeout()), this, SLOT( repaintItems()));
+	connect(timer, SIGNAL(timeout()), this, SLOT(repaintItems()));
 }
 
 ListRenders::~ListRenders()
@@ -305,16 +305,26 @@ void ListRenders::renderAdded( ItemNode * node, const QModelIndex & index)
 	}
 }
 
-void ListRenders::contextMenuEvent( QContextMenuEvent *event)
+void ListRenders::contextMenuEvent(QContextMenuEvent * event)
 {
 	Item * item = getCurrentItem();
 	if (item == NULL)
 		return;
 
-	if (item->getType() != Item::TRender)
-		return;
+	QMenu menu(this);
 
-	ItemRender * render = (ItemRender*)item;
+	if (item->getType() == Item::TRender)
+		generateRenderMenu(&menu);
+	else if (item->getType() == Item::TPool)
+		generatePoolMenu(&menu);
+
+	if (false == menu.isEmpty())
+		menu.exec(event->globalPos());
+}
+
+void ListRenders::generateRenderMenu(QMenu * i_menu)
+{
+	ItemRender * render = static_cast<ItemRender*>(getCurrentItem());
 
 	bool me = false;
 	if (render->getName().contains(QString::fromUtf8( af::Environment::getComputerName().c_str())) ||
@@ -323,29 +333,28 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 
 	int selectedItemsCount = getSelectedItemsCount();
 
-	QMenu menu(this);
-	QAction *action;
+	QAction * action;
 	QMenu * submenu;
 
 	if( selectedItemsCount <= 1 )
 	{
 		action = new QAction( render->getName(), this);
 		action->setEnabled( false);
-		menu.addAction( action);
-		menu.addSeparator();
+		i_menu->addAction(action);
+		i_menu->addSeparator();
 	}
 
 	action = new QAction( "Show Log", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actRequestLog() ));
-	menu.addAction( action);
+	connect(action, SIGNAL(triggered()), this, SLOT(actRequestLog()));
+	i_menu->addAction(action);
 
 	action = new QAction( "Tasks Log", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actRequestTasksLog() ));
-	menu.addAction( action);
+	connect(action, SIGNAL(triggered()), this, SLOT(actRequestTasksLog()));
+	i_menu->addAction(action);
 
 	action = new QAction( "Show Info", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actRequestInfo() ));
-	menu.addAction( action);
+	connect(action, SIGNAL(triggered()), this, SLOT(actRequestInfo()));
+	i_menu->addAction(action);
 	
 	std::list<const af::TaskExec*> l = render->getTasks();
 	submenu = new QMenu( l.size() > 1 ? "Running Tasks" : "Running Task", this);
@@ -367,129 +376,203 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 			title,
 			this);
 
-		connect( action, SIGNAL( triggeredId(int,int,int) ),
-				 this, SLOT( actRequestTaskInfo(int,int,int) ));
+		connect(action, SIGNAL(triggeredId(int,int,int)),
+				 this, SLOT(actRequestTaskInfo(int,int,int)));
 
-		submenu->addAction( action);
+		submenu->addAction(action);
 	}
 	
-	menu.addMenu( submenu);
+	i_menu->addMenu( submenu);
 
 	if( me || af::Environment::VISOR())
 	{
-		menu.addSeparator();
+		i_menu->addSeparator();
 
 		action = new QAction( "Set NIMBY", this);
 		if( selectedItemsCount == 1) action->setEnabled(false == render->isNIMBY());
-		connect( action, SIGNAL( triggered() ), this, SLOT( actNIMBY() ));
-		menu.addAction( action);
+		connect(action, SIGNAL(triggered()), this, SLOT(actNIMBY()));
+		i_menu->addAction(action);
+
 		action = new QAction( "Set nimby", this);
 		if( selectedItemsCount == 1) action->setEnabled(false == render->isNimby());
-		connect( action, SIGNAL( triggered() ), this, SLOT( actNimby() ));
-		menu.addAction( action);
+		connect(action, SIGNAL(triggered()), this, SLOT(actNimby()));
+		i_menu->addAction(action);
+
 		action = new QAction( "Set Free", this);
 		if( selectedItemsCount == 1) action->setEnabled(render->isNimby() || render->isNIMBY());
-		connect( action, SIGNAL( triggered() ), this, SLOT( actFree() ));
-		menu.addAction( action);
-		action = new QAction( "Set User", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actUser() ));
-		menu.addAction( action);
+		connect(action, SIGNAL(triggered()), this, SLOT(actFree()));
+		i_menu->addAction(action);
 
-		menu.addSeparator();
+		action = new QAction( "Set User", this);
+		connect(action, SIGNAL(triggered()), this, SLOT(actUser()));
+		i_menu->addAction(action);
+
+		i_menu->addSeparator();
 
 		submenu = new QMenu( "Eject", this);
 
 		action = new QAction( "All Tasks", this);
 		if( selectedItemsCount == 1) action->setEnabled( render->hasTasks());
-		connect( action, SIGNAL( triggered() ), this, SLOT( actEjectTasks() ));
-		submenu->addAction( action);
+		connect(action, SIGNAL(triggered()), this, SLOT(actEjectTasks()));
+		submenu->addAction(action);
 
 		action = new QAction( "Not My Tasks", this);
 		if( selectedItemsCount == 1) action->setEnabled( render->hasTasks());
-		connect( action, SIGNAL( triggered() ), this, SLOT( actEjectNotMyTasks() ));
-		submenu->addAction( action);
+		connect(action, SIGNAL(triggered()), this, SLOT(actEjectNotMyTasks()));
+		submenu->addAction(action);
 
-		menu.addMenu( submenu);
+		i_menu->addMenu( submenu);
 	}
 
 	QMenu * custom_submenu = NULL;
 	int custom_cmd_index = 0;
-	if(af::Environment::getRenderCmds().size() > 0)
+	if (af::Environment::getRenderCmds().size() > 0)
 	{
-		menu.addSeparator();
-		custom_submenu = new QMenu( "Custom", this);
-		for( std::vector<std::string>::const_iterator it = af::Environment::getRenderCmds().begin(); it != af::Environment::getRenderCmds().end(); it++, custom_cmd_index++)
+		i_menu->addSeparator();
+		custom_submenu = new QMenu("Custom", this);
+		for (std::vector<std::string>::const_iterator it = af::Environment::getRenderCmds().begin(); it != af::Environment::getRenderCmds().end(); it++, custom_cmd_index++)
 		{
 			ActionId * actionid = new ActionId( custom_cmd_index, QString("%1").arg( afqt::stoq(*it)), this);
-			connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actCommand( int ) ));
-			custom_submenu->addAction( actionid);
+			connect(actionid, SIGNAL(triggeredId(int)), this, SLOT(actCommand(int)));
+			custom_submenu->addAction(actionid);
 		}
-		menu.addMenu( custom_submenu);
+		i_menu->addMenu( custom_submenu);
 	}
-	if( af::Environment::GOD() && ( af::Environment::getRenderCmdsAdmin().size() > 0 ))
+	if (af::Environment::GOD() && (af::Environment::getRenderCmdsAdmin().size() > 0))
 	{
-		if( custom_submenu == NULL)
+		if (custom_submenu == NULL)
 		{
-			menu.addSeparator();
+			i_menu->addSeparator();
 			custom_submenu = new QMenu( "Custom", this);
 		}
-	  for (std::vector<std::string>::const_iterator it = af::Environment::getRenderCmdsAdmin().begin();
+
+		for (std::vector<std::string>::const_iterator it = af::Environment::getRenderCmdsAdmin().begin();
 			  it != af::Environment::getRenderCmdsAdmin().end();
 			  it++, custom_cmd_index++)
 		{
 			ActionId * actionid = new ActionId( custom_cmd_index, QString("%1").arg( afqt::stoq(*it)), this);
-			connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actCommand( int ) ));
-			custom_submenu->addAction( actionid);
+			connect(actionid, SIGNAL(triggeredId(int)), this, SLOT(actCommand(int)));
+			custom_submenu->addAction(actionid);
 		}
-		menu.addMenu( custom_submenu);
+		i_menu->addMenu( custom_submenu);
 	}
 
 	// Menu completed for user mode:
 
-	if( ! af::Environment::GOD())
+	if (false == af::Environment::GOD())
 	{
-		menu.exec( event->globalPos());
 		return;
 	}
 		
 	// Administare ( super user mode ):
 
-	menu.addSeparator();
+	i_menu->addSeparator();
 
 	submenu = new QMenu("Administrate", this);
-	menu.addMenu( submenu);
+	i_menu->addMenu( submenu);
 
 	action = new QAction( "Annotate", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actAnnotate() ));
-	submenu->addAction( action);
+	connect(action, SIGNAL(triggered()), this, SLOT(actAnnotate()));
+	submenu->addAction(action);
 	action = new QAction( "Set Priority", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actPriority() ));
-	submenu->addAction( action);
+	connect(action, SIGNAL(triggered()), this, SLOT(actPriority()));
+	submenu->addAction(action);
 
 	submenu->addSeparator();
 
 	action = new QAction("Set Paused", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actSetPaused() ));
-	submenu->addAction( action);
+	connect(action, SIGNAL(triggered()), this, SLOT(actSetPaused()));
+	submenu->addAction(action);
+
 	action = new QAction("Unset Paused", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actUnsetPaused() ));
-	submenu->addAction( action);
+	connect(action, SIGNAL(triggered()), this, SLOT(actUnsetPaused()));
+	submenu->addAction(action);
 
 	submenu->addSeparator();
 
 	action = new QAction( "Change Capacity", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actCapacity() ));
-	submenu->addAction( action);
+	connect(action, SIGNAL(triggered()), this, SLOT(actCapacity()));
+	submenu->addAction(action);
+
 	action = new QAction( "Change Max Tasks", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actMaxTasks() ));
-	submenu->addAction( action);
+	connect(action, SIGNAL(triggered()), this, SLOT(actMaxTasks()));
+	submenu->addAction(action);
 
 	submenu->addSeparator();
 
+	generateCommonMenuItems(submenu);
+
+	submenu->addSeparator();
+
+	action = new QAction("Exit Client", this);
+	if (selectedItemsCount == 1) action->setEnabled(render->isOnline());
+	connect(action, SIGNAL(triggered()), this, SLOT(actExit()));
+	submenu->addAction(action);
+
+	action = new QAction("Delete Client", this);
+	connect(action, SIGNAL(triggered()), this, SLOT(actDelete()));
+	if (selectedItemsCount == 1) action->setEnabled(false == render->isOnline());
+	submenu->addAction(action);
+
+	submenu->addSeparator();
+
+	action = new QAction("Wake-On-Lan Sleep", this);
+	if (selectedItemsCount == 1)
+		action->setEnabled(render->isOnline() && (false == render->isBusy()) && (false == render->isWOLFalling()));
+	connect(action, SIGNAL(triggered()), this, SLOT(actWOLSleep()));
+	submenu->addAction(action);
+
+	action = new QAction("Wake-On-Lan Wake", this);
+	if (selectedItemsCount == 1) action->setEnabled(render->isOffline());
+	connect(action, SIGNAL(triggered()), this, SLOT(actWOLWake()));
+	submenu->addAction(action);
+
+	submenu->addSeparator();
+
+	action = new QAction("Reboot Machine", this);
+	if( selectedItemsCount == 1) action->setEnabled(render->isOnline());
+	connect(action, SIGNAL(triggered()), this, SLOT(actReboot()));
+	submenu->addAction(action);
+
+	action = new QAction("Shutdown Machine", this);
+	if( selectedItemsCount == 1) action->setEnabled(render->isOnline());
+	connect(action, SIGNAL(triggered()), this, SLOT(actShutdown()));
+	submenu->addAction(action);
+}
+
+void ListRenders::generatePoolMenu(QMenu * i_menu)
+{
+	if (false == af::Environment::GOD())
+		return;
+
+	QAction * action;
+	QMenu * submenu = new QMenu("Administrate", this);
+	i_menu->addMenu(submenu);
+
+	generateCommonMenuItems(submenu);
+
+	submenu->addSeparator();
+
+	action = new QAction("Eject Tasks", this);
+	connect(action, SIGNAL(triggered()), this, SLOT(actEjectTasks()));
+	submenu->addAction(action);
+
+	action = new QAction("Exit Renders", this);
+	connect(action, SIGNAL(triggered()), this, SLOT(actExit()));
+	submenu->addAction(action);
+
+	action = new QAction("Delete Renders", this);
+	connect(action, SIGNAL(triggered()), this, SLOT(actDeleteRenders()));
+	submenu->addAction(action);
+}
+
+void ListRenders::generateCommonMenuItems(QMenu * i_menu)
+{
+	QAction * action;
+
 	action = new QAction("Launch Command ...", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actLaunchCmd() ));
-	if( selectedItemsCount == 1) action->setEnabled( render->isOnline());
-	submenu->addAction( action);
+	connect(action, SIGNAL(triggered()), this, SLOT(actLaunchCmd()));
+	i_menu->addAction(action);
 
 	if (af::Environment::getRenderLaunchCmds().size())
 	{
@@ -523,13 +606,12 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 			connect(action_string, SIGNAL(triggeredString(QString)), this, SLOT(actLaunchCmdString(QString)));
 			custom_submenu->addAction(action_string);
 		}
-		submenu->addMenu(custom_submenu);
+		i_menu->addMenu(custom_submenu);
 	}
 
 	action = new QAction("Launch And Exit ...", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actLaunchCmdExit() ));
-	if( selectedItemsCount == 1) action->setEnabled( render->isOnline());
-	submenu->addAction( action);
+	connect(action, SIGNAL(triggered()), this, SLOT(actLaunchCmdExit()));
+	i_menu->addAction(action);
 
 	if (af::Environment::getRenderLaunchCmdsExit().size())
 	{
@@ -546,44 +628,8 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 			connect(action_string, SIGNAL(triggeredString(QString)), this, SLOT(actLaunchCmdExitString(QString)));
 			custom_submenu->addAction(action_string);
 		}
-		submenu->addMenu(custom_submenu);
+		i_menu->addMenu(custom_submenu);
 	}
-
-	submenu->addSeparator();
-
-	action = new QAction("Exit Client", this);
-	if( selectedItemsCount == 1) action->setEnabled(render->isOnline());
-	connect( action, SIGNAL( triggered() ), this, SLOT( actExit() ));
-	submenu->addAction( action);
-	action = new QAction("Delete Client", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actDelete() ));
-	if( selectedItemsCount == 1) action->setEnabled(false == render->isOnline());
-	submenu->addAction( action);
-
-	submenu->addSeparator();
-
-	action = new QAction("Wake-On-Lan Sleep", this);
-	if( selectedItemsCount == 1)
-		action->setEnabled( render->isOnline() && ( false == render->isBusy()) && ( false == render->isWOLFalling()));
-	connect( action, SIGNAL( triggered() ), this, SLOT( actWOLSleep()));
-	submenu->addAction( action);
-	action = new QAction("Wake-On-Lan Wake", this);
-	if( selectedItemsCount == 1) action->setEnabled( render->isOffline());
-	connect( action, SIGNAL( triggered() ), this, SLOT( actWOLWake()));
-	submenu->addAction( action);
-
-	submenu->addSeparator();
-
-	action = new QAction("Reboot Machine", this);
-	if( selectedItemsCount == 1) action->setEnabled(render->isOnline());
-	connect( action, SIGNAL( triggered() ), this, SLOT( actReboot() ));
-	submenu->addAction( action);
-	action = new QAction("Shutdown Machine", this);
-	if( selectedItemsCount == 1) action->setEnabled(render->isOnline());
-	connect( action, SIGNAL( triggered() ), this, SLOT( actShutdown() ));
-	submenu->addAction( action);
-
-	menu.exec( event->globalPos());
 }
 
 void ListRenders::v_doubleClicked(Item * i_item)
@@ -857,15 +903,16 @@ void ListRenders::actUser()
 	setParameter(Item::TRender, "user_name", afqt::qtos(QString("\"%1\"").arg(text)));
 }
 
-void ListRenders::actEjectTasks()      { operation(Item::TRender, "eject_tasks"        ); }
+void ListRenders::actEjectTasks()      { operation(Item::TAny,    "eject_tasks"        ); }
 void ListRenders::actEjectNotMyTasks() { operation(Item::TRender, "eject_tasks_keep_my"); }
-void ListRenders::actExit()            { operation(Item::TRender, "exit"               ); }
+void ListRenders::actExit()            { operation(Item::TAny,    "exit"               ); }
 void ListRenders::actReboot()          { operation(Item::TRender, "reboot"             ); }
 void ListRenders::actShutdown()        { operation(Item::TRender, "shutdown"           ); }
 void ListRenders::actWOLSleep()        { operation(Item::TRender, "wol_sleep"          ); }
 void ListRenders::actWOLWake()         { operation(Item::TRender, "wol_wake"           ); }
 void ListRenders::actHealSick()        { operation(Item::TAny,    "heal_sick"          ); }
 void ListRenders::actDelete()          { operation(Item::TAny,    "delete"             ); }
+void ListRenders::actDeleteRenders()   { operation(Item::TPool,   "delete_renders"     ); }
 
 void ListRenders::actRequestLog()      { getItemInfo(Item::TAny,    "log"      ); }
 void ListRenders::actRequestTasksLog() { getItemInfo(Item::TRender, "tasks_log"); }
@@ -1077,14 +1124,17 @@ void ListRenders::actLaunchCmdExit() { launchCmdExit( true );}
 void ListRenders::launchCmdExit( bool i_exit)
 {
 	Item* item = getCurrentItem();
-	if( item == NULL ) return;
+	if (NULL == item)
+		return;
 
 	QString caption("Launch Command");
-	if( i_exit ) caption += "And Exit";
+	if (i_exit)
+		caption += "And Exit";
 
 	bool ok;
-	QString cmd = QInputDialog::getText( this, caption,"Enter Command", QLineEdit::Normal, QString(), &ok);
-	if( !ok) return;
+	QString cmd = QInputDialog::getText(this, caption,"Enter Command", QLineEdit::Normal, QString(), &ok);
+	if	(false == ok)
+		return;
 
 	launchCmdStringExit(cmd, i_exit);
 }
@@ -1093,9 +1143,11 @@ void ListRenders::actLaunchCmdExitString(QString i_cmd) { launchCmdStringExit(i_
 void ListRenders::launchCmdStringExit(const QString & i_cmd, bool i_exit)
 {
 	std::ostringstream str;
-	Item::EType type = Item::TRender;
+
+	Item::EType type = getCurrentItem()->getType();
 	std::vector<int> ids(getSelectedIds(type));
-	af::jsonActionOperationStart(str, "renders", "launch_cmd", "", ids);
+	af::jsonActionOperationStart(str, type == Item::TRender ? "renders" : "pools", "launch_cmd", "", ids);
+
 	str << ",\n\"cmd\":\"" << afqt::qtos(i_cmd) << "\"";
 	if (i_exit)
 		str << ",\n\"exit\":true";
