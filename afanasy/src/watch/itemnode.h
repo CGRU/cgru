@@ -100,6 +100,9 @@ protected:
 	QMap<QString, int> m_running_services;
 
 private:
+	void showHideChildsShowHideButtons();
+
+private:
 	int32_t m_hide_flags;
 
 	bool m_childs_hidden;

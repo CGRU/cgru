@@ -31,9 +31,9 @@ ItemNode::ItemNode(ListNodes * i_list_nodes, af::Node * node, EType i_type, cons
 void ItemNode::addChildsHideShowButton()
 {
 	m_btn_childs_hide = new ItemButton("hide_childs", 2, 2, 12, "▼", "Hide childs.");
-	m_btn_childs_hide->setHidden(m_childs_hidden);
+	m_btn_childs_hide->setHidden(true);
 	m_btn_childs_show   = new ItemButton("show_childs",   2, 2, 12, "▶", "Show childs.");
-	m_btn_childs_show->setHidden(false == m_childs_hidden);
+	m_btn_childs_show->setHidden(true);
 
 	addButton(m_btn_childs_hide);
 	addButton(m_btn_childs_show);
@@ -45,7 +45,10 @@ ItemNode::~ItemNode()
 		m_child_list[i]->m_parent_item = NULL;
 
 	if (m_parent_item)
+	{
 		m_parent_item->m_child_list.removeAll(this);
+		m_parent_item->showHideChildsShowHideButtons();
+	}
 }
 
 void ItemNode::updateValues(af::Node * i_afnode, int i_msgType)
@@ -138,6 +141,8 @@ void ItemNode::addChild(ItemNode * i_item)
 	m_child_list.append(i_item);
 
 	i_item->setParentItem(this);
+
+	showHideChildsShowHideButtons();
 }
 
 void ItemNode::setParentItem(ItemNode * i_parent_item)
@@ -304,6 +309,24 @@ void ItemNode::v_buttonClicked(ItemButton * i_b)
 
 		m_btn_childs_hide->setHidden(m_childs_hidden);
 		m_btn_childs_show->setHidden(false == m_childs_hidden);
+	}
+}
+
+void ItemNode::showHideChildsShowHideButtons()
+{
+	// May be show/hide childs buttons were not created
+	if (NULL == m_btn_childs_hide)
+		return;
+
+	if (m_child_list.size())
+	{
+		m_btn_childs_hide->setHidden(m_childs_hidden);
+		m_btn_childs_show->setHidden(false == m_childs_hidden);
+	}
+	else
+	{
+		m_btn_childs_hide->setHidden(true);
+		m_btn_childs_show->setHidden(true);
 	}
 }
 
