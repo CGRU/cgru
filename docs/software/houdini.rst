@@ -558,6 +558,29 @@ This node executes work items on farm using Afanasy render manager.
 It can schedule work items from TOP UI, and as standalone job.
 Using a standalone job you can close Houdini session and watch progress via Afanasy GUI.
 
+
+.. figure:: images/houdini_pdg_cooking1.png
+.. figure:: images/houdini_pdg_cooking2.png
+
+	Scheduling from Houdini TOP UI
+
+
+.. figure:: images/houdini_pdg_job1.png
+	:scale: 18%
+	:align: left
+
+
+.. figure:: images/houdini_pdg_job2.png
+	:scale: 18%
+	:align: left
+
+
+.. figure:: images/houdini_pdg_job3.png
+	:scale: 18%
+
+	Scheduling using a standalone job
+
+
 Here is the scheduler nodes parameters description.
 Almost anywhere in Afanasy ``-1`` means that the value is not set and defaults will be used.
 
