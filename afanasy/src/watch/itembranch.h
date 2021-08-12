@@ -37,6 +37,8 @@ private:
 	static const int HeightBranch;
 	static const int HeightBranch_Idle;
 
+	int m_buttons_width;
+
 	QString strName;
 	QString strCounts;
 	QString strParameters;

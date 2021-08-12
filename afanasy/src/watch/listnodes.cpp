@@ -292,14 +292,25 @@ void ListNodes::processHidden()
 {
 	for (int i = 0; i < m_model->count(); i++)
 	{
-		ItemNode * item = (ItemNode*)(m_model->item(i));
+		ItemNode * item = static_cast<ItemNode*>(m_model->item(i));
 
+		// Node can be filtered by name
 		bool hidden = item->filter();
 
 		if (false == hidden)
+		{
+			// Node can be hidden by View Options.
+			// For example user can hide offline jobs.
 			hidden = item->getHideFlags(m_hide_flags);
+		}
 
-		item->setHidded(hidden);
+		if (false == hidden)
+		{
+			// Parent node can hide childs
+			hidden = item->isHiddenByParents();
+		}
+
+		item->setHidden(hidden);
 
 		if (hidden != m_view->isRowHidden(i))
 			m_view->setRowHidden(i, hidden);

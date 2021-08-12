@@ -16,7 +16,7 @@ v3.2.1
 
 *Not released*
 
-2021.08.11
+2021.08.12
 
 - Houdini Afanasy `TOP Scheduler <../software/houdini.html#afanasy-top-scheduler>`_.
 
@@ -29,6 +29,8 @@ v3.2.1
 - AfWatch can restart error tasks of a specified block.
 
 - AfWatch Preferences menu got Reset Windows Geometry item.
+
+- AfWatch can hide branch jobs and pool renders.
 
 - Pools got some operations that will be applied to all renders in it: ejects tasks, launch command, exit renders and delete renders.
 

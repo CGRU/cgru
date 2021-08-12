@@ -36,6 +36,10 @@ ItemPool::ItemPool(ListRenders * i_list_renders, af::Pool * i_pool, const CtrlSo
 	m_resources_update_timer = new QTimer(this);
 	connect(m_resources_update_timer, SIGNAL(timeout()), this, SLOT(slot_RequestResources()));
 
+	// Add buttons:
+	addChildsHideShowButton();
+	m_buttons_width = 16;
+
 	updateValues(i_pool, 0);
 }
 
@@ -316,7 +320,7 @@ void ItemPool::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleO
 	QRect qr_LeftTop;
 	i_painter->setPen(clrTextMain(i_option));
 	i_painter->setFont(afqt::QEnvironment::f_name);
-	i_painter->drawText(x, y, w, h, Qt::AlignLeft | Qt::AlignTop, strLeftTop, &qr_LeftTop);
+	i_painter->drawText(x+m_buttons_width, y, w-m_buttons_width, h, Qt::AlignLeft | Qt::AlignTop, strLeftTop, &qr_LeftTop);
 
 	i_painter->setPen(clrTextInfo(i_option));
 	i_painter->setFont(afqt::QEnvironment::f_info);
@@ -325,7 +329,7 @@ void ItemPool::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleO
 	i_painter->setPen(afqt::QEnvironment::qclr_black);
 	if (afqt::QEnvironment::render_item_size.n != ListRenders::ESmallSize)
 		i_painter->drawText(x, y, w, height_pool, Qt::AlignRight | Qt::AlignBottom, strRightBottom);
-	i_painter->drawText(x, y, w, height_pool, Qt::AlignRight | Qt::AlignTop,    strRightTop);
+	i_painter->drawText(x+m_buttons_width, y, w-m_buttons_width, height_pool, Qt::AlignRight | Qt::AlignTop,    strRightTop);
 
 	if (afqt::QEnvironment::render_item_size.n != ListRenders::ESmallSize)
 	{

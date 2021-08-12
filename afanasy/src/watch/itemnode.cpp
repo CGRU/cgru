@@ -3,6 +3,7 @@
 #include "../libafqt/name_afqt.h"
 
 #include "ctrlsortfilter.h"
+#include "itembutton.h"
 #include "watch.h"
 
 #include <QtGui/QPainter>
@@ -19,9 +20,23 @@ ItemNode::ItemNode(ListNodes * i_list_nodes, af::Node * node, EType i_type, cons
 	m_sort_int1( 0),
 	m_sort_int2( 0),
 	m_hide_flags( 0),
+	m_childs_hidden(false),
+	m_btn_childs_hide(NULL),
+	m_btn_childs_show(NULL),
 	m_parent_item(NULL)
 {
 	m_locked = node->isLocked();
+}
+
+void ItemNode::addChildsHideShowButton()
+{
+	m_btn_childs_hide = new ItemButton("hide_childs", 2, 2, 12, "▼", "Hide childs.");
+	m_btn_childs_hide->setHidden(m_childs_hidden);
+	m_btn_childs_show   = new ItemButton("show_childs",   2, 2, 12, "▶", "Show childs.");
+	m_btn_childs_show->setHidden(false == m_childs_hidden);
+
+	addButton(m_btn_childs_hide);
+	addButton(m_btn_childs_show);
 }
 
 ItemNode::~ItemNode()
@@ -250,6 +265,46 @@ bool ItemNode::getHideFlags(int32_t i_hide_flags) const
 		result = !result;
 
 	return result;
+}
+
+bool ItemNode::isHiddenByParents() const
+{
+	if (NULL == m_parent_item)
+		return false;
+
+	if (m_parent_item->m_childs_hidden)
+		return true;
+
+	return m_parent_item->isHiddenByParents();
+}
+
+void ItemNode::setChildsHidden(bool i_hidden)
+{
+	if (i_hidden == m_childs_hidden)
+		return;
+
+	m_childs_hidden = i_hidden;
+
+	m_list_nodes->processHidden();
+}
+
+void ItemNode::v_buttonClicked(ItemButton * i_b)
+{
+	if ((m_btn_childs_hide && m_btn_childs_show) &&
+		((i_b == m_btn_childs_hide) || (i_b == m_btn_childs_show)))
+	{
+		if (i_b == m_btn_childs_hide)
+		{
+			setChildsHidden(true);
+		}
+		else if (i_b == m_btn_childs_show)
+		{
+			setChildsHidden(false);
+		}
+
+		m_btn_childs_hide->setHidden(m_childs_hidden);
+		m_btn_childs_show->setHidden(false == m_childs_hidden);
+	}
 }
 
 void ItemNode::drawRunningServices(QPainter * i_painter, int i_x, int i_y, int i_w, int i_h) const

@@ -23,6 +23,10 @@ ItemBranch::ItemBranch(ListWork * i_list_work, af::Branch * i_branch, const Ctrl
 	ItemWork(i_list_work, i_branch, TBranch, i_ctrl_sf),
 	m_empty(false)
 {
+	// Add buttons:
+	addChildsHideShowButton();
+	m_buttons_width = 16;
+
 	updateValues(i_branch, 0);
 }
 
@@ -187,14 +191,15 @@ void ItemBranch::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	else
 		i_painter->setFont(afqt::QEnvironment::f_info);
 	QRect rect_name;
-	i_painter->drawText(x, y, w, h, Qt::AlignLeft | Qt::AlignTop, strName, &rect_name);
+	i_painter->drawText(x+m_buttons_width, y, w-m_buttons_width, h, Qt::AlignLeft | Qt::AlignTop, strName, &rect_name);
 	rect_name.adjust(0,0,10,0);
 
 	i_painter->setPen(clrTextInfo(i_option));
 	i_painter->setFont(afqt::QEnvironment::f_info);
 	if (false == m_empty)
 	{
-		i_painter->drawText(x + rect_name.width(), y+1, w - rect_name.width(), height_branch, Qt::AlignLeft | Qt::AlignTop, strCounts);
+		i_painter->drawText(x+m_buttons_width + rect_name.width(), y+1, w-rect_name.width()-m_buttons_width, height_branch,
+				Qt::AlignLeft | Qt::AlignTop, strCounts);
 	}
 	i_painter->setPen(afqt::QEnvironment::qclr_black);
 	i_painter->drawText(x, y, w, height_branch, Qt::AlignRight | Qt::AlignTop, strParameters);

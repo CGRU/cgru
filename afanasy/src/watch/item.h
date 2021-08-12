@@ -100,7 +100,7 @@ public:
 
 	virtual bool calcHeight();
 
-	inline void setHidded(bool i_hidden) {m_hidden = i_hidden;}
+	inline void setHidden(bool i_hidden) {m_hidden = i_hidden;}
 	inline bool isHidden() const {return m_hidden;}
 
 	inline bool hasParam(const QString & i_name) const {return m_params.contains(i_name);}

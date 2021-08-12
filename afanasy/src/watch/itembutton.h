@@ -15,7 +15,7 @@ public:
 
 	void paint(QPainter * i_painter, const QRect & i_item_rect) const;
 
-	inline void setHidded(bool i_hidden) {m_hidden = i_hidden;}
+	inline void setHidden(bool i_hidden) {m_hidden = i_hidden;}
 
 	bool isClicked(int i_x, int i_y) const;
 

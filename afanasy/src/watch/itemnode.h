@@ -6,6 +6,7 @@
 #include "../libafanasy/afnode.h"
 
 class CtrlSortFilter;
+class ItemButton;
 class MainWidget;
 
 class ItemNode : public Item
@@ -22,6 +23,9 @@ public:
 
 	virtual void v_setSortType(   int i_type1, int i_type2 ) = 0;
 	virtual void v_setFilterType( int i_type ) = 0;
+	virtual void v_buttonClicked(ItemButton * i_b);
+
+	void addChildsHideShowButton();
 
 	inline void resetSorting()   { m_sort_int1 = 0; m_sort_int2 = 0; m_sort_str1.clear(); m_sort_str2.clear(); }
 	inline void resetFiltering() { m_filter_str.clear(); }
@@ -53,6 +57,10 @@ public:
 		{if(i_value) m_hide_flags |= ListNodes::e_HidePools;   else m_hide_flags &= ~ListNodes::e_HidePools;   }
 
 	bool getHideFlags(int32_t i_hide_flags) const;
+
+	inline bool isHidingChilds() const {return m_childs_hidden;}
+	bool isHiddenByParents() const;
+	void setChildsHidden(bool i_hidden);
 
 	inline const QString & getParentPath() const {return m_parent_path;}
 
@@ -93,6 +101,11 @@ protected:
 
 private:
 	int32_t m_hide_flags;
+
+	bool m_childs_hidden;
+
+	ItemButton * m_btn_childs_hide;
+	ItemButton * m_btn_childs_show;
 
 	QString m_parent_path;
 

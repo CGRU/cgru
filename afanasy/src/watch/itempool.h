@@ -82,5 +82,7 @@ private:
 	int m_idle_netmbs;
 	int m_busy_netmbs;
 
+	int m_buttons_width;
+
 	QTimer * m_resources_update_timer;
 };

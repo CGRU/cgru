@@ -42,6 +42,8 @@ public:
 
 	void hrParentChanged(ItemNode * i_item);
 
+	void processHidden();
+
 public slots:
 	void actHideShow( int i_type);
 
@@ -76,6 +78,8 @@ protected:
 	/// Needed for jobs, to get user jobs list from server
 	virtual void v_resetSorting();
 
+	// Nedded to store hide flags.
+	// Each descendant class should store flags in own variable.
 	virtual void v_hideChanged();
 
 protected:
@@ -98,7 +102,6 @@ private slots:
 	void filterSettingsChanged();
 
 private:
-	void processHidden();
 
 private:
 	bool m_subscribed;
