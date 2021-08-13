@@ -39,6 +39,8 @@ parser = eval(cmd)
 taskInfo = dict()
 taskInfo['frames_num'] = framesNum
 taskInfo['wdir'] = os.getcwd()
+taskInfo['environment'] = dict()
+taskInfo['environment']['PDG_DIR'] = os.getcwd()
 parser.setTaskInfo(taskInfo)
 
 arguments = []

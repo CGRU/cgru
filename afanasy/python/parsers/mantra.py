@@ -11,6 +11,8 @@ PERCENT_len = len(PERCENT)
 
 IMAGE_RE = re.compile(r'.*Generating Image: (.+) \(\d+x\d+\)')
 
+PDG_IMG_RE = re.compile(r'PDG_RESULT:.*;\s*(.*)\s*;.*;.*')
+
 ErrorsRE = [re.compile(r'Error loading geometry .* from stdin')]
 
 PeakMem_RE = re.compile('.*Peak Memory Usage: *(.*)')
@@ -51,6 +53,12 @@ class mantra(parser.parser):
             m = IMAGE_RE.match(line)
             if m:
                 self.appendFile(m.group(1))
+            m = PDG_IMG_RE.search(line)
+            if m:
+                img = m.group(1)
+                if cgruutils.isImageExt(img):
+                    self.appendFile(self.expandEnvVars(img))
+                
 
         percent_pos = data.find(PERCENT)
         if percent_pos > -1:
@@ -89,3 +97,14 @@ class mantra(parser.parser):
         res = res.strip()
         if len(res):
             self.resources = res
+
+
+    def expandEnvVars(self, i_str):
+
+        if not 'environment' in self.taskInfo:
+            return i_str
+
+        for name in self.taskInfo['environment']:
+            i_str = i_str.replace('__%s__' % name, cgruutils.toStr(self.taskInfo['environment'][name]))
+
+        return i_str

@@ -172,6 +172,10 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 		PyList_Append( pHostsList, PyBytes_FromString((*it).c_str()));
 
 
+	PyObject * pEenvDict = PyDict_New();
+	for (auto const& it : i_task_exec->getEnv())
+		PyDict_SetItemString(pEenvDict, it.first.c_str(), PyBytes_FromString(it.second.c_str()));
+
 	PyObject *pArgs;
 	pArgs = PyTuple_New( 2);
 
@@ -189,6 +193,7 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	PyDict_SetItemString( task_info, "file_size_max", PyLong_FromLong( i_task_exec->getFileSizeMax()));
 	PyDict_SetItemString( task_info, "hosts",         pHostsList);
 	PyDict_SetItemString( task_info, "parsed_files",  pParsedFilesList);
+	PyDict_SetItemString(task_info, "environment",    pEenvDict);
 
     PyDict_SetItemString( task_info, "frame_start",  PyLong_FromLong(i_task_exec->getFrameStart()));
     PyDict_SetItemString( task_info, "frame_finish", PyLong_FromLong(i_task_exec->getFrameFinish()));
