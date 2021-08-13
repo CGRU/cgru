@@ -67,9 +67,6 @@ private:
 	void thumbsCLear();
 
 private:
-	static const int HeightThumb;
-
-private:
 	ListTasks * m_list;
 
 	int m_job_id;
@@ -84,6 +81,6 @@ private:
 	std::vector<std::string> m_files;
 	bool m_files_ready;
 
-	int m_thumbs_num;
-	QImage ** m_thumbs_imgs;
+	QVector<QImage*> m_thumbs_imgs;
+	QVector<QString> m_thumbs_names;
 };

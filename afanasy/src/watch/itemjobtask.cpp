@@ -24,7 +24,6 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-const int ItemJobTask::HeightThumb = 100;
 const int ItemJobTask::WidthInfo = 98;
 
 ItemJobTask::ItemJobTask( ListTasks * i_list, ItemJobBlock * i_block, int i_numtask, const af::BlockData * i_bdata):
@@ -34,9 +33,7 @@ ItemJobTask::ItemJobTask( ListTasks * i_list, ItemJobBlock * i_block, int i_numt
 	m_blocknum( i_bdata->getBlockNum()),
 	m_tasknum( i_numtask),
 	m_block( i_block),
-	m_files_ready(false),
-	m_thumbs_num( 0),
-	m_thumbs_imgs( NULL)
+	m_files_ready(false)
 {
 	i_bdata->genNumbers(m_frame_first, m_frame_last, m_tasknum, &m_frames_num);
 
@@ -48,13 +45,13 @@ ItemJobTask::ItemJobTask( ListTasks * i_list, ItemJobBlock * i_block, int i_numt
 		return;
 
 	calcHeight();
-	m_height = 16;
 
 	m_files = tdata->getFiles();
 }
 
 ItemJobTask::~ItemJobTask()
 {
+	thumbsCLear();
 }
 
 void ItemJobTask::processFiles()
@@ -76,8 +73,14 @@ bool ItemJobTask::calcHeight()
 	int old_height = m_height;
 
 	m_height = Height;
-	if( m_thumbs_num )
-		m_height += HeightThumb;
+
+	int thumbs_max_height = 0;
+	for (int i = 0; i < m_thumbs_imgs.size(); i++)
+		if (m_thumbs_imgs[i]->height() > thumbs_max_height)
+			thumbs_max_height =m_thumbs_imgs[i]->height();
+
+	if (thumbs_max_height)
+		m_height += thumbs_max_height + 24;
 
 	//AF_DEV << afqt::qtos(m_name) << ": " << m_height;
 	return old_height == m_height;
@@ -128,7 +131,7 @@ void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 	//AF_DEV << afqt::qtos(m_name) << ": " << m_height;
 	drawBack(i_painter, i_rect, i_option);
 
-	int x = i_rect.x(); int y = i_rect.y(); int w = i_rect.width();
+	int x = i_rect.x(); int y = i_rect.y(); int w = i_rect.width(); int h = i_rect.height();
 
 	//
 	// Prepare strings:
@@ -301,9 +304,17 @@ void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 	if (taskprogress.state & AFJOB::STATE_RUNNING_MASK)
 		drawStar(7, x + w - 10, y + 7, i_painter);
 
-	if (m_thumbs_num)
-		for (int i = 0; i < m_thumbs_num; i++)	
-			i_painter->drawImage(x + 110*i, y + Height, * m_thumbs_imgs[i]);
+	// Draw thumbnails, if any
+	y += Height;
+	for (int i = 0; i < m_thumbs_imgs.size(); i++)
+	{
+		x += 10;
+
+		i_painter->drawText(x, y + 3, m_thumbs_imgs[i]->width(), 16, Qt::AlignRight |  Qt::AlignTop, m_thumbs_names[i]);
+		i_painter->drawImage(x, y + 20, * m_thumbs_imgs[i]);
+
+		x += m_thumbs_imgs[i]->width();
+	}
 }
 
 bool ItemJobTask::compare( int type, const ItemJobTask & other, bool ascending) const
@@ -334,7 +345,7 @@ bool ItemJobTask::compare( int type, const ItemJobTask & other, bool ascending) 
 
 bool ItemJobTask::v_mousePressed(int i_x, int i_y, int i_w, int i_h, const Qt::MouseButtons & i_buttons)
 {
-	if ((i_buttons == Qt::MidButton) || (QApplication::keyboardModifiers() == Qt::AltModifier))
+	if ((i_buttons == Qt::MidButton) || (QApplication::keyboardModifiers() != Qt::NoModifier))
 	{
 		showThumbnail();
 		return true;
@@ -345,7 +356,7 @@ bool ItemJobTask::v_mousePressed(int i_x, int i_y, int i_w, int i_h, const Qt::M
 
 void ItemJobTask::showThumbnail()
 {
-	if( m_thumbs_num )
+	if (m_thumbs_imgs.size())
 	{
 		thumbsCLear();
 		calcHeight();
@@ -362,26 +373,30 @@ void ItemJobTask::taskFilesReceived( const af::MCTaskUp & i_taskup )
 //i_taskup.v_stdOut();
 	thumbsCLear();
 
-	m_thumbs_num = i_taskup.getFilesNum();
-
-	if( m_thumbs_num == 0 )
+	if (i_taskup.getFilesNum() == 0)
 		return;
 
-	m_thumbs_imgs = new QImage*[m_thumbs_num];
-
-	for( int i = 0; i < m_thumbs_num; i++)
+	for (int i = 0; i < i_taskup.getFilesNum(); i++)
 	{
-		m_thumbs_imgs[i] = new QImage();
+		QImage * img = new QImage();
 
-		if( false == m_thumbs_imgs[i]->loadFromData( (const unsigned char *) i_taskup.getFileData(i), i_taskup.getFileSize(i)))
+		if (false == img->loadFromData((const unsigned char *) i_taskup.getFileData(i), i_taskup.getFileSize(i)))
 		{
-			AFERRAR("Can't constuct an image '%s'[%d]", i_taskup.getFileName(i).c_str(), i_taskup.getFileSize(i))
+			AF_ERR << "Can't constuct an image " << i_taskup.getFileName(i) << ", size = " << i_taskup.getFileSize(i);
 			Watch::displayError("Can't constuct an image.");
 			continue;
 		}
+
+		QString name = afqt::stoq(i_taskup.getFileName(i));
+		static const QRegExp rx(".*/");
+		name = name.replace(rx, "");
+		name = name.replace(".jpg","");
+
+		m_thumbs_imgs.append(img);
+		m_thumbs_names.append(name);
 	}
 
-	if( false == calcHeight())
+	if (false == calcHeight())
 		m_list->itemsHeightChanged();
 }
 
@@ -404,14 +419,13 @@ void ItemJobTask::getTaskInfo(const std::string &i_mode, int i_number)
 
 void ItemJobTask::thumbsCLear()
 {
-	if( m_thumbs_num == 0 )
+	if (m_thumbs_imgs.size() == 0)
 		return;
 
-	for( int i = 0; i < m_thumbs_num; i++)
+	for (int i = 0; i < m_thumbs_imgs.size(); i++)
 		delete m_thumbs_imgs[i];
 
-	m_thumbs_num = 0;
-
-	delete [] m_thumbs_imgs;
+	m_thumbs_imgs.clear();
+	m_thumbs_names.clear();
 }
 
