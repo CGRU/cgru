@@ -126,7 +126,7 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec, RenderHost * i_render):
 
 	// Process environment:
 	if( m_taskexec->hasEnv())
-		m_environ = af::processEnviron( m_taskexec->getEnv());
+		m_environ = af::processEnviron(m_service->getEnvironment());
 
 	launchCommand();
 

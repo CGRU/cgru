@@ -71,6 +71,29 @@ bool af::PyGetStringList( PyObject * i_obj, std::vector<std::string> & o_list, c
 	return true;
 }
 
+bool af::PyGetDict(PyObject * i_obj, std::map<std::string, std::string> & o_dict, const char * i_err_info)
+{
+	o_dict.clear();
+
+	if (PyDict_Check(i_obj) != true)
+	{
+		outError("af::PyGetDict: Object is not a dict.");
+		return false;
+	}
+
+	PyObject *pName, *pValue;
+	Py_ssize_t pPos = 0;
+
+	while (PyDict_Next(i_obj, &pPos, &pName, &pValue))
+	{
+		std::string name, value;
+		if (af::PyGetString(pName, name) && af::PyGetString(pValue, value))
+			o_dict[name] = value;
+	}
+
+	return true;
+}
+
 bool af::PyGetAttrBool( PyObject * i_obj, const char * i_name, bool & o_bool, const std::string & i_err_info)
 {
 	PyObject * pAttr = PyObject_GetAttrString( i_obj, i_name);

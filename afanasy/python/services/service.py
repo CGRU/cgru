@@ -77,6 +77,10 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
         if self.isSkippingExistingFiles() and len(self.taskInfo['files']):
             self.checkExistingFiles()
 
+        # Transfer paths in envitonment:
+        for name in self.taskInfo['envitonment']:
+            self.taskInfo['envitonment'][name] = self.pm.toClient(self.taskInfo['envitonment'][name])
+
         # When GUI receives task exec to show files,
         # server sends exec with parsed files.
         for i in range(0, len(self.taskInfo['parsed_files'])):
@@ -226,6 +230,13 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
             return files
         else:
             return []
+
+    def getEnvironment(self):
+        """Missing DocString
+
+        :return:
+        """
+        return self.taskInfo['envitonment']
 
     def getLog(self):
         """

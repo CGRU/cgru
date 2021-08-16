@@ -44,6 +44,7 @@ public:
 
 	inline const std::string & getWDir()    const { return m_wdir;    }
 	inline const std::string & getCommand() const { return m_command; }
+	const std::map<std::string, std::string> & getEnvironment() const {return m_environment;}
 	const std::vector<std::string> getFiles() const;
 	const std::vector<std::string> getParsedFiles() const;
 
@@ -74,6 +75,7 @@ private:
 
 	PyObject * m_PyObj_FuncGetWDir;
 	PyObject * m_PyObj_FuncGetCommand;
+	PyObject * m_PyObj_FuncGetEnvironment;
 	PyObject * m_PyObj_FuncGetFiles;
 	PyObject * m_PyObj_FuncGetParsedFiles;
 	PyObject * m_PyObj_FuncHasParser;
@@ -88,5 +90,6 @@ private:
 
 	std::string m_wdir;
 	std::string m_command;
+	std::map<std::string, std::string> m_environment;
 };
 }

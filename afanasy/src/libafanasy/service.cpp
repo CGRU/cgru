@@ -147,6 +147,7 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 {
 	m_PyObj_FuncGetWDir = NULL;
 	m_PyObj_FuncGetCommand = NULL;
+	m_PyObj_FuncGetEnvironment = NULL;
 	m_PyObj_FuncGetFiles = NULL;
 	m_PyObj_FuncGetParsedFiles = NULL;
 	m_PyObj_FuncParse = NULL;
@@ -241,6 +242,10 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	m_PyObj_FuncGetCommand = getFunction( AFPYNAMES::SERVICE_FUNC_GETCOMMAND);
 	if( m_PyObj_FuncGetCommand == NULL ) return;
 
+	m_PyObj_FuncGetEnvironment = getFunction(AFPYNAMES::SERVICE_FUNC_GETENVIRONMENT);
+	if (NULL == m_PyObj_FuncGetEnvironment)
+		return;
+
 	m_PyObj_FuncGetFiles = getFunction( AFPYNAMES::SERVICE_FUNC_GETFILES);
 	if( m_PyObj_FuncGetFiles == NULL ) return;
 
@@ -300,6 +305,22 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 		return;
 	}
 	Py_DECREF( pResult);
+
+	// Process environment:
+	pResult = PyObject_CallObject(m_PyObj_FuncGetEnvironment, NULL);
+	if (NULL == pResult)
+	{
+		if (PyErr_Occurred())
+			PyErr_Print();
+		return;
+	}
+	if (false == af::PyGetDict(pResult, m_environment))
+	{
+		AF_ERR << "Service: Returned object is not a dict.";
+		Py_DECREF(pResult);
+		return;
+	}
+	Py_DECREF(pResult);
 
 	m_initialized = true;
 }

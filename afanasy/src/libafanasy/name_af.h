@@ -299,6 +299,7 @@ namespace af
 	// Python:
 	bool PyGetString( PyObject * i_obj, std::string & o_str, const char * i_err_info = NULL);
 	bool PyGetStringList( PyObject * i_obj, std::vector<std::string> & o_list, const char * i_err_info = NULL);
+	bool PyGetDict(PyObject * i_obj, std::map<std::string, std::string> & o_dict, const char * i_err_info = NULL);
 
 	bool PyGetAttrBool( PyObject * i_obj, const char * i_name, bool        & o_bool, const std::string & i_err_info);
 	bool PyGetAttrInt(  PyObject * i_obj, const char * i_name, int         & o_int,  const std::string & i_err_info);

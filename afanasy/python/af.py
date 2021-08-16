@@ -93,7 +93,7 @@ class Task:
                 afile = Pathmap.toServer(afile)
             self.data["files"].append(afile)
 
-    def setEnv(self, i_name, i_value):
+    def setEnv(self, i_name, i_value, i_transfer_to_server=True):
         """Missing DocString
 
         :param i_name:
@@ -102,8 +102,10 @@ class Task:
         """
         if "environment" not in self.data:
             self.data["environment"] = dict()
-
-        self.data["environment"][i_name] = i_value
+        if i_transfer_to_server:
+            self.data["environment"][i_name] = Pathmap.toServer(i_value)
+        else:
+            self.data["environment"][i_name] = i_value
 
 
 class Block:
@@ -287,7 +289,7 @@ class Block:
                 afile = Pathmap.toServer(afile)
             self.data["files"].append(afile)
 
-    def setEnv(self, i_name, i_value):
+    def setEnv(self, i_name, i_value, i_transfer_to_server=True):
         """Missing DocString
 
         :param i_name:
@@ -296,8 +298,10 @@ class Block:
         """
         if "environment" not in self.data:
             self.data["environment"] = dict()
-
-        self.data["environment"][i_name] = i_value
+        if i_transfer_to_server:
+            self.data["environment"][i_name] = Pathmap.toServer(i_value)
+        else:
+            self.data["environment"][i_name] = i_value
 
     def addTicket(self, i_name, i_count):
         """Missing DocString
