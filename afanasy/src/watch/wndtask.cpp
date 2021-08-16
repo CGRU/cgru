@@ -450,7 +450,7 @@ void WndTask::showExec(af::MCTask & i_mctask)
 	af::Service service(exec);
 	QString wdir    = afqt::stoq(service.getWDir());
 	QString command = afqt::stoq(service.getCommand());
-	std::map<std::string,std::string> environment = exec->getEnv();
+	std::map<std::string,std::string> environment = service.getEnvironment();
 	std::vector<std::string> files = service.getFiles();
 	std::vector<std::string> parsed_files = service.getParsedFiles();
 
