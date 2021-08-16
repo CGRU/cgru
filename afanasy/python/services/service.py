@@ -77,9 +77,9 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
         if self.isSkippingExistingFiles() and len(self.taskInfo['files']):
             self.checkExistingFiles()
 
-        # Transfer paths in envitonment:
-        for name in self.taskInfo['envitonment']:
-            self.taskInfo['envitonment'][name] = self.pm.toClient(self.taskInfo['envitonment'][name])
+        # Transfer paths in environment:
+        for name in self.taskInfo['environment']:
+            self.taskInfo['environment'][name] = self.pm.toClient(self.taskInfo['environment'][name])
 
         # When GUI receives task exec to show files,
         # server sends exec with parsed files.
@@ -236,7 +236,7 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
 
         :return:
         """
-        return self.taskInfo['envitonment']
+        return self.taskInfo['environment']
 
     def getLog(self):
         """
