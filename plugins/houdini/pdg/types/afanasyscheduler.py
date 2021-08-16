@@ -184,6 +184,12 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         task.setEnv('PDG_INDEX4', "{:04d}".format(work_item.index))
         task.setEnv('PDG_SCRIPTDIR', str(self.scriptDir(False)))
 
+        # This adds paths mapping data to environment
+        self.resolvePathMapping(task.data['environment'])
+        # We need to set it after task.setEnv,
+        # as on task.setEnv CGRU paths mapping applied.
+        # And better not to apply CGRU paths mapping on PDG paths mapping data.
+
         return task
 
 

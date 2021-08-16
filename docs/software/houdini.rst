@@ -601,6 +601,16 @@ Scheduling Parameters
 	Specifies the directory where the cook generates intermediate files.
 	The intermediate files are placed in a subdirectory named ``pdgtemp``.
 
+- Path Mapping
+	- Global
+		If the PDG Path Map exists, then it is applied to file paths.
+	- None
+		Delocalizes paths using the PDG_DIR token.
+
+- Path Map Zone
+	When on, specifies a custom mapping zone to apply to all jobs executed by this scheduler. 
+	Otherwise, the local platform is ``LINUX``, ``MAC`` or ``WIN``.
+
 
 Submit Graph As Job
 -------------------
@@ -728,6 +738,11 @@ Adjustment Parameters
 	by preventing the PDG graph cook from ending before failed items can be retried.
 	A cook that is blocked on failed work items can still be canceled using the ESC key,
 	the cancel button in the TOP task bar, or the cancel API method.
+
+- Validate Outputs When Recooking
+	When enabled, PDG will check the output files of work items when the graph recooks,
+	to see if the files still exist on disk.
+	Work items that are missing output files will be dirtied and cook again.
 
 - Check Expected Outputs On Disk
 	When enabled, PDG will look on disk for any expected work items outputs
