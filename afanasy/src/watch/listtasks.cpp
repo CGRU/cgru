@@ -57,6 +57,8 @@ ListTasks::ListTasks( QWidget* parent, int JobId, const QString & JobName):
 	m_parentWindow->setWindowTitle( m_job_name);
 
 	getJobFullData();
+
+	displayInfo("Use Alt+LMB or MMB on a task to ask server for thumbnails.");
 }
 
 void ListTasks::getJobFullData()
