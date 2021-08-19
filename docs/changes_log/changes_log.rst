@@ -11,18 +11,20 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
 - The third number versions are fully compatible.
   You can upgrade only one client or server for changes.
 
+.. _changes-log-latest:
+
 v3.2.1
 ======
 
-*Not released*
-
-2021.08.12
+2021.08.19
 
 - Houdini Afanasy `TOP Scheduler <../software/houdini.html#afanasy-top-scheduler>`_.
 
 - Houdini setup changed. Now ``HOUDINI_PATH=cgru/plugins/houdini`` and *afanasy.otl* moved to *otls/afanasy.hda*.
 
 - Each not numeric task can have an own extra `environment <../afanasy/job_task.html#environment>`_.
+
+- Paths mapping is applied to Block and Task environment.
 
 - AfWatch now understands appending new blocks/tasks to an existing job.
 
@@ -34,11 +36,15 @@ v3.2.1
 
 - Pools got some operations that will be applied to all renders in it: ejects tasks, launch command, exit renders and delete renders.
 
+- MS Windows release moved on MSVC 2019, Python 3.9.6 and Qt 5.15.2.
+
+	.. warning::
+
+		MS Windows 7 is no longer supported, as Python 3.9 dropped it.
+
 - **Bugfixes**
 	- AfWatch jobs list right panel folders buttons refresh fix on a new job selection.
 	- AfWatch jobs list switching from admin mode, other users jobs appear fixed.
-
-.. _changes-log-latest:
 
 v3.2.0
 ======
