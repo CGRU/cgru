@@ -165,5 +165,5 @@ class AfanasyRenderJob(RenderJob):
 		if self.paused:
 			self.af_job.offline()
 
-		self.af_job.output(1)
+		self.af_job.output()
 		self.af_job.send()
