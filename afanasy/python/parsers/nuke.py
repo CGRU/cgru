@@ -6,6 +6,7 @@ import re
 key = 'Writing'
 key_len = len(key)
 
+Errors = ['Error:', 'Worker process failed', 'Segmentation fault', 'Node execution error:']
 ErrorsRE = [re.compile(r'Invalid .* license key.')]
 
 
@@ -15,15 +16,23 @@ class nuke(parser.parser):
 
     def __init__(self):
         parser.parser.__init__(self)
-        self.str_error = ['Worker process failed']
         self.filename = ''
 
-    def do(self, i_args):
-        data = i_args['data']
+    def do(self, data, mode):
+        """Missing DocString
 
+        :param data:
+        :param mode:
+        :return:
+        """
         data_len = len(data)
         if data_len < 1:
             return
+
+        for error in Errors:
+            if data.find(error) != -1:
+                self.error = True
+                break
 
         for errorRE in ErrorsRE:
             if errorRE.search(data) is not None:
