@@ -204,9 +204,14 @@ class BlockParameters:
                             vm_picture.evalAsStringAtFrame(self.frame_first),
                             vm_picture.evalAsStringAtFrame(self.frame_last)
                         )
+
+            # TODO karma hydra delegate.
+
             elif roptype == 'rib':
                 self.service = 'hbatch_prman'
                 self.tickets['PRMAN'] = 1
+
+            # TODO renderman hydra delegate.
 
             elif roptype == 'arnold':
                 if not ropnode.parm('soho_outputmode').eval():
@@ -221,7 +226,20 @@ class BlockParameters:
                             ar_picture.evalAsStringAtFrame(self.frame_last)
                         )
 
-            elif roptype == 'alembic':
+            # Solaris. Arnold.
+            elif roptype == 'usdrender_rop' and ropnode.parm('renderer').eval() == 'HdArnoldRendererPlugin':
+                self.service = 'houdinitoarnold'
+
+                ar_picture = ropnode.parm('outputimage')
+
+                if ar_picture is not None:
+                    self.preview = \
+                        afcommon.patternFromPaths(
+                            ar_picture.evalAsStringAtFrame(self.frame_first),
+                            ar_picture.evalAsStringAtFrame(self.frame_last)
+                        )
+
+            elif roptype in ['alembic', 'usd_rop']:
                 self.numeric = False
                 taskname = ropnode.name()
                 taskname += ' ' + str(self.frame_first)
@@ -240,6 +258,8 @@ class BlockParameters:
                             rs_picture.evalAsStringAtFrame(self.frame_first),
                             rs_picture.evalAsStringAtFrame(self.frame_last)
                         )
+
+            # TODO redshift hydra delegate.
 
             # For files menu in watcher
             elif roptype == 'geometry':
