@@ -717,7 +717,6 @@ function st_SetElStatus(i_el, i_status, i_show_all_tasks = false)
 		let elFlags = document.createElement('div');
 		elStatus.appendChild(elFlags);
 		elFlags.classList.add('flags');
-		i_el.highlighted = st_SetElFlags(i_status, elFlags);
 	}
 
 

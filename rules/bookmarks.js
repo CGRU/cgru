@@ -256,7 +256,6 @@ function bm_Show()
 
 		// Project scenes:
 		let project_count = 0;
-		let project_highlighted = 0;
 		let closed_scenes = localStorage.bookmarks_scenes_closed.split('|');
 		for (let s = 0; s < project.scenes.length; s++)
 		{
@@ -283,7 +282,6 @@ function bm_Show()
 			}
 
 			// Scene bookmarks:
-			let scene_highlighted = 0;
 			for (let b = 0; b < scene.bms.length; b++)
 			{
 				let bm = scene.bms[b];
@@ -292,15 +290,11 @@ function bm_Show()
 				let el = bm_CreateBookmark(bm);
 				bm_elements.push(el);
 				scene.el.appendChild(el);
-				if (el.highlighted)
-					scene_highlighted++;
 			}
 
 			if (scene.elLabel)
 			{
 				let label = scene.name + ' - ' + scene.bms.length;
-				if (scene_highlighted)
-					label += ' (' + scene_highlighted + ')';
 				scene.elLabel.textContent = label;
 
 				scene.elLabel.title = scene.path
@@ -309,12 +303,9 @@ function bm_Show()
 			}
 
 			project_count += scene.bms.length;
-			project_highlighted += scene_highlighted;
 		}
 
 		let label = project.name + ' - ' + project_count;
-		if (project_highlighted)
-			label += ' (' + project_highlighted + ')';
 		project.elLabel.textContent = label;
 
 		project.elLabel.title = 'Project: ' + project.name
@@ -335,7 +326,6 @@ function bm_CreateBookmark(i_bm)
 
 	let el = document.createElement('div');
 	el.classList.add('bookmark');
-	el.highlighted = false;
 
 	let elDel = document.createElement('div');
 	el.appendChild(elDel);
