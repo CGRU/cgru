@@ -282,7 +282,13 @@ if output is not None and len(output) > 0:
 
 frame = start
 
-if drivertypename == "alembic":
+multisampled_rops = ["alembic", "usd_rop"]
+fetched_rop = drivertypename
+
+if drivertypename == "fetch":
+    fetched_rop = hou.node(ropnode.parm("source").eval()).type().name()
+
+if drivertypename in multisampled_rops or fetched_rop in multisampled_rops:
     ropnode.render(
             output_file=render_output,
             method=hou.renderMethod.FrameByFrame,
