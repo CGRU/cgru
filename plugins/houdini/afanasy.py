@@ -293,6 +293,8 @@ class BlockParameters:
                 self.name = self.afnode.parm('cmd_name').eval()
                 if self.name is None or self.name == '':
                     self.name = self.cmd.split(' ')[0]
+                if self.prefix != '':
+                    self.name = '%s_%s' % (self.prefix, self.name)
 
                 # Service:
                 self.service = self.afnode.parm('cmd_service').eval()
