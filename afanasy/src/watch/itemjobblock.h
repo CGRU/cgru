@@ -62,6 +62,7 @@ public:
       SHost,
       SStarts,
       SErrors,
+      SPct,
       STime,
       SState
    };
@@ -75,6 +76,7 @@ public:
    static const int WHost = 60;
    static const int WStarts = 40;
    static const int WErrors = 40;
+   static const int WPct = 50;
    static const int WTime = 50;
 
 protected:
