@@ -49,7 +49,9 @@ function g_Init()
 	u_Init();
 	c_Init();
 	activity_Init();
-	n_Request({"send": {"start": {}}, "func": g_Init_Server, "info": 'start'});
+
+	n_LogResponses();
+	n_Request({"send": {"start": {}}, "func": g_Init_Server, "info": 'start', "force_log": true});
 
 	window.onbeforeunload = g_OnClose;
 }
@@ -72,7 +74,6 @@ function g_Init_Server(i_data)
 
 	var url = decodeURI(document.location.href);
 
-	n_log_responses = false;
 	n_Request({"send": {"initialize": {'url': url}}, "func": g_Init_Config, "info": 'init'});
 }
 
