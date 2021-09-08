@@ -66,6 +66,8 @@ function st_HilightedStoreWrite()
 {
 	for (let key of st_HilightedKeys)
 	{
+		if (st_Hilighted[key] == null)
+			continue;
 		let storageName = 'highlighted_' + key + 's';
 		let storageValue = st_Hilighted[key].join(',');
 		localStorage[storageName] = storageValue;
