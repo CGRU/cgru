@@ -48,9 +48,9 @@ function g_Init()
 	cgru_Init();
 	u_Init();
 	c_Init();
+	n_Init();
 	activity_Init();
 
-	n_LogResponses();
 	n_Request({"send": {"start": {}}, "func": g_Init_Server, "info": 'start', "force_log": true});
 
 	window.onbeforeunload = g_OnClose;

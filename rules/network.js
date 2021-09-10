@@ -28,6 +28,14 @@ var n_gets = {};
 
 var n_log_responses = null;
 
+function n_Init()
+{
+	if (document.location.hostname == '127.0.0.1')
+		n_server = '/server';
+
+	n_LogResponses();
+}
+
 function n_WalkDir(i_args)
 {
 	// i_args.cache_time = null;
