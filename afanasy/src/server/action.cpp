@@ -20,16 +20,19 @@
 
 #include "afcommon.h"
 
-Action::Action(const af::Msg *i_msg, ThreadArgs *i_args)
-	: without_answer(false),
-	  branches(i_args->branches),
-	  jobs(i_args->jobs),
-	  monitors(i_args->monitors),
-	  pools(i_args->pools),
-	  renders(i_args->renders),
-	  users(i_args->users),
-	  m_buffer(NULL),
-	  m_valid(false)
+const std::string Action::ms_answer_type_str[] = {"object","log","error","info"};
+
+Action::Action(const af::Msg *i_msg, ThreadArgs *i_args):
+	without_answer(false),
+	m_answer_type(ATLog),
+	branches(i_args->branches),
+	jobs(i_args->jobs),
+	monitors(i_args->monitors),
+	pools(i_args->pools),
+	renders(i_args->renders),
+	users(i_args->users),
+	m_buffer(NULL),
+	m_valid(false)
 {
 	std::string error;
 	m_buffer = af::jsonParseMsg(m_document, i_msg, &error);

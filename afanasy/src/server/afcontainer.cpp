@@ -466,22 +466,14 @@ af::Msg * AfContainer::action(Action & i_action, const af::Msg * i_msg)
 	{
 		if (i_action.without_answer)
 			return NULL;
-		else
-		{
-			if (i_action.answer.empty())
-				return af::jsonMsgInfo("log", "Action processed.");
-			else
-			{
-				if (i_action.answer_kind.empty())
-				{
-					return af::jsonMsgObject(i_action.answer);
-				}
-				else
-				{
-					return af::jsonMsgInfo(i_action.answer_kind, i_action.answer);
-				}
-			}
-		}
+
+		if (i_action.isAnswerEmpty())
+			return af::jsonMsgInfo("log", "Action processed.");
+
+		if (i_action.getAnswerType() == Action::ATObject)
+			return af::jsonMsgObject(i_action.getAnswer());
+
+		return af::jsonMsgInfo(i_action.answerTypeToStr(), i_action.getAnswer());
 	}
 	else
 	{

@@ -171,7 +171,7 @@ void BranchSrv::v_action(Action & i_action)
 	if (i_action.log.size())
 	{
 		store();
-		i_action.answer = "Branch(es) parameter(s) changed.";
+		i_action.answerLog("Branch(es) parameter(s) changed.");
 		i_action.monitors->addEvent(af::Monitor::EVT_branches_change, m_id);
 	}
 }
@@ -188,15 +188,13 @@ void BranchSrv::deleteBranch(Action & o_action, MonitorContainer * i_monitoring)
 {
 	if (isRoot())
 	{
-		o_action.answer_kind = "error";
-		o_action.answer = "Can`t delete ROOT branch.";
+		o_action.answerError("Can`t delete ROOT branch.");
 		return;
 	}
 
 	if (m_branches_num || m_jobs_num)
 	{
-		o_action.answer_kind = "error";
-		o_action.answer = "Branch['" + m_name + "'] has child branches/jobs.";
+		o_action.answerError("Branch['" + m_name + "'] has child branches/jobs.");
 		return;
 	}
 

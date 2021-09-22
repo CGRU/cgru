@@ -495,8 +495,7 @@ bool Block::action( Action & i_action)
 		else
 		{
 			appendJobLog("Unknown block operation \"" + type + "\" by " + i_action.author);
-			i_action.answer_kind = "error";
-			i_action.answer = "Unknown operation: \"" + type + "\"";
+			i_action.answerError("Unknown operation: " + type);
 			return false;
 		}
 
@@ -535,16 +534,14 @@ bool Block::editTickets(Action & i_action, const JSON & operation)
 	std::string name;
 	if (false == af::jr_string("name", name, operation))
 	{
-		i_action.answer_kind = "error";
-		i_action.answer = "Ticket \"name\" string is not specified.";
+		i_action.answerError("Ticket 'name' string is not specified.");
 		return false;
 	}
 
 	int32_t count;
 	if (false == af::jr_int32("count", count, operation))
 	{
-		i_action.answer_kind = "error";
-		i_action.answer = "Ticket \"count\" integer is not specified.";
+		i_action.answerError("Ticket 'count' integer is not specified.");
 		return false;
 	}
 
@@ -591,8 +588,7 @@ bool Block::tryTasksNext(Action & i_action, const JSON & i_operation)
 {
 	if (m_job->isMaintenanceFlag())
 	{
-		i_action.answer_kind = "error";
-		i_action.answer = "Maintenance job can't try tasks next.";
+		i_action.answerError("Maintenance job can't try tasks next.");
 		return false;
 	}
 
@@ -603,8 +599,7 @@ bool Block::tryTasksNext(Action & i_action, const JSON & i_operation)
 
 	if (tasks_vec.size() == 0)
 	{
-		i_action.answer_kind = "error";
-		i_action.answer = "\"task_ids\" array is not specified.";
+		i_action.answerError("'task_ids' array is not specified.");
 		return false;
 	}
 
@@ -615,8 +610,7 @@ bool Block::tryTasksNext(Action & i_action, const JSON & i_operation)
 		append = false;
 	else
 	{
-		i_action.answer_kind = "error";
-		i_action.answer = "Invalid \"mode\" = \"" + mode + "\".";
+		i_action.answerError("Invalid 'mode' = '" + mode + "'.");
 		return false;
 	}
 
@@ -627,9 +621,8 @@ bool Block::tryTasksNext(Action & i_action, const JSON & i_operation)
 
 		if ((t >= m_data->getTasksNum()) || ( t < 0 ))
 		{
-			i_action.answer_kind = "error";
-			i_action.answer = "Invalid operation task numer = " + af::itos(t);
-			appendJobLog(i_action.answer);
+			i_action.answerError("Invalid operation task numer = " + af::itos(t));
+			appendJobLog(i_action.getAnswer());
 			break;
 		}
 
@@ -642,13 +635,11 @@ bool Block::tryTasksNext(Action & i_action, const JSON & i_operation)
 
 	if (success)
 	{
-		i_action.answer_kind = "info";
-		i_action.answer = "Tasks to try next processed.";
+		i_action.answerInfo("Tasks to try next processed.");
 	}
 	else
 	{
-		i_action.answer_kind = "error";
-		i_action.answer = "Unable to find valid tasks.";
+		i_action.answerError("Unable to find valid tasks.");
 	}
 
 	return success;
@@ -753,23 +744,20 @@ bool Block::appendTasks(Action & i_action, const JSON & i_operation)
 {
 	if (m_job->getId() == AFJOB::SYSJOB_ID)
 	{
-		i_action.answer_kind = "error";
-		i_action.answer = "Appending system job is not allowed.";
+		i_action.answerError("Appending system job is not allowed.");
 		return false;
 	}
 
 	if (m_data->isNumeric())
 	{
-		i_action.answer_kind = "error";
-		i_action.answer = "Appending tasks to numeric block is not allowed.";
+		i_action.answerError("Appending tasks to numeric block is not allowed.");
 		return false;
 	}
 
 	const JSON &tasks = i_operation["tasks"];
 	if (!tasks.IsArray())
 	{
-		i_action.answer_kind = "error";
-		i_action.answer = "Operation requires tasks array.";
+		i_action.answerError("Operation requires tasks array.");
 		return false;
 	}
 
@@ -789,14 +777,15 @@ bool Block::appendTasks(Action & i_action, const JSON & i_operation)
 	i_action.monitors->addBlock(af::Msg::TBlocks, m_data);
 
 	// Return new tasks ids:
-	i_action.answer = "{\"task_ids\":[";
+	std::string answer = "{\"task_ids\":[";
 	for (int i = old_tasks_num; i < m_data->getTasksNum(); i++)
 	{
 		if (i != old_tasks_num)
-			i_action.answer += ",";
-		i_action.answer += af::itos(i);
+			answer += ",";
+		answer += af::itos(i);
 	}
-	i_action.answer += "]}";
+	answer += "]}";
+	i_action.answerObject(answer);
 
 	return true;
 }

@@ -152,8 +152,7 @@ void PoolSrv::v_action(Action & i_action)
 			if (false == af::jr_string("cmd", cmd, operation))
 			{
 				appendLog("Launch command request by " + i_action.author + "has no 'cmd'");
-				i_action.answer_kind = "error";
-				i_action.answer = "Launch command request has no command";
+				i_action.answerError("Launch command request has no command");
 				return;
 			}
 
@@ -189,8 +188,7 @@ void PoolSrv::v_action(Action & i_action)
 		else
 		{
 			appendLog("Unknown operation \"" + type + "\" by " + i_action.author);
-			i_action.answer_kind = "error";
-			i_action.answer = "Unknown operation: " + type;
+			i_action.answerError("Unknown operation: " + type);
 			return;
 		}
 
@@ -233,15 +231,13 @@ void PoolSrv::actionDelete(Action & i_action)
 {
 	if (NULL == m_parent)
 	{
-		i_action.answer_kind = "error";
-		i_action.answer = "Can`t delete ROOT pool.";
+		i_action.answerError("Can`t delete ROOT pool.");
 		return;
 	}
 
 	if (m_pools_num || m_renders_num)
 	{
-		i_action.answer_kind = "error";
-		i_action.answer = "Pool '" + m_name + "' has child pools/renders.";
+		i_action.answerError("Pool '" + m_name + "' has child pools/renders.");
 		return;
 	}
 
@@ -290,15 +286,13 @@ void PoolSrv::actionAddPool(Action & i_action)
 	std::string name;
 	if (false == af::jr_string("name", name, operation))
 	{
-		i_action.answer_kind = "error";
-		i_action.answer = "add_pool operation should have a new pools name string.";
+		i_action.answerError("add_pool operation should have a new pools name string.");
 		return;
 	}
 
 	if (name.size() < 1)
 	{
-		i_action.answer_kind = "error";
-		i_action.answer = "New pool name should not have a zero length.";
+		i_action.answerError("New pool name should not have a zero length.");
 		return;
 	}
 
@@ -309,8 +303,7 @@ void PoolSrv::actionAddPool(Action & i_action)
 
 	if (hasPool(name))
 	{
-		i_action.answer_kind = "error";
-		i_action.answer = std::string("Pool '") + getName() + "' already has a pool '" + name + "'";
+		i_action.answerError(std::string("Pool '") + getName() + "' already has a pool '" + name + "'");
 		return;
 	}
 
@@ -324,8 +317,7 @@ void PoolSrv::actionAddPool(Action & i_action)
 
 	i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_id);
 	i_action.monitors->addEvent(af::Monitor::EVT_pools_add, pool->getId());
-	i_action.answer_kind = "info";
-	i_action.answer = "Pool '" + pool->getName() + "' added to pool '" + getName() + "'";
+	i_action.answerInfo("Pool '" + pool->getName() + "' added to pool '" + getName() + "'");
 }
 
 bool PoolSrv::addPool(PoolSrv * i_pool)

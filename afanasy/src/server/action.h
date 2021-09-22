@@ -42,9 +42,28 @@ public:
 	// This is for Node changes log
 	std::string log;
 
-	// This is a network answer on the action
-	std::string answer;
-	std::string answer_kind;
+	enum AnswerType {
+		ATObject,
+		ATLog,
+		ATError,
+		ATInfo,
+		ATLast
+	};
+
+	inline void setAnwer(AnswerType i_type, const std::string & i_answer) {m_answer_type = i_type; m_answer = i_answer;}
+
+	inline void answerError( const std::string & i_msg) {setAnwer(ATError,  i_msg);}
+	inline void answerLog(   const std::string & i_msg) {setAnwer(ATLog,    i_msg);}
+	inline void answerInfo(  const std::string & i_msg) {setAnwer(ATInfo,   i_msg);}
+	inline void answerObject(const std::string & i_msg) {setAnwer(ATObject, i_msg);}
+
+	inline const std::string & answerTypeToStr() const {
+		return ms_answer_type_str[m_answer_type < ATLast ? m_answer_type : ATInfo];
+	}
+
+	inline const bool isAnswerEmpty() const {return m_answer.empty();}
+	inline const AnswerType getAnswerType() const {return m_answer_type;}
+	inline const std::string & getAnswer() const {return m_answer;}
 
 	// Just Web Browser asks to deregister, and on page close it can't wait for an answer
 	bool without_answer;
@@ -61,4 +80,8 @@ private:
 	bool m_valid;
 	rapidjson::Document m_document;
 	char *m_buffer;
+
+	std::string m_answer;
+	AnswerType m_answer_type;
+	static const std::string ms_answer_type_str[];
 };
