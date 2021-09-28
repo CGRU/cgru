@@ -1044,15 +1044,16 @@ function d_WmDiscard(i_wm)
 ########################################################################################################### */
 
 var d_cutparams = {
-	cut_name /*******/: {},
-	input /**********/: {},
-	fps /************/: {"label": 'FPS', 'width': '50%'},
-	af_pertask /*****/: {"label": 'Frames Per Task', 'width': '50%', 'lwidth': '140px'},
-	af_capacity /****/: {"label": 'Capacity', 'width': '25%'},
-	af_maxtasks /****/: {"label": 'Max Run Tasks', 'width': '25%', 'lwidth': '120px'},
-	af_perhost /*****/: {"label": 'Max Tasks Per Host', 'width': '25%', 'lwidth': '140px'},
-	af_maxruntime /**/: {"label": 'Max Run Time', 'width': '25%', 'lwidth': '120px'},
-	output /*********/: {}
+	cut_name      : {},
+	input         : {},
+	fps           : {"label": 'FPS', 'width': '25%'},
+	af_pertask    : {"label": 'Frames Per Task', 'width': '25%', 'lwidth': '140px'},
+	af_maxtasks   : {"label": 'Max Run Tasks', 'width': '25%', 'lwidth': '120px'},
+	af_perhost    : {"label": 'Per Host', 'width': '25%', 'lwidth': '120px'},
+	af_capacity   : {"label": 'Capacity', 'width': '25%'},
+	af_maxruntime : {"label": 'Max Run Time', 'width': '25%', 'lwidth': '140px'},
+	skipnosrc     : {"label": 'Skip No Src', 'width': '25%', 'lwidth': '120px', 'type':'bool', default: false},
+	output        : {}
 };
 
 function d_MakeCut(i_args)
@@ -1158,6 +1159,9 @@ function d_CutProcessGUI(i_wnd, i_test)
 	cmd += ' -c "' + params.codec + '"';
 	cmd += ' --colorspace "' + params.colorspace + '"';
 
+	if (params.skipnosrc)
+		cmd += ' --skipnosrc'
+
 	if (RULES.dailies.font)
 		cmd += ' --font "' + RULES.dailies.font + '"';
 
@@ -1207,6 +1211,9 @@ function d_CutFinished(i_data, i_args)
 			}
 			text += ' ' + msg + ': ' + cut[i][msg];
 		}
+
+		if (text.indexOf('warning') != -1)
+			el.style.color = '#FF2';
 
 		if (text.indexOf('error') != -1)
 			el.style.color = '#F42';
