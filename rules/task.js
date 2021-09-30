@@ -384,6 +384,7 @@ Task.prototype.edit = function()
 		return;
 
 	this.editing = true;
+	this.elRoot.classList.add('edit');
 	this.elShow.style.display = 'none';
 
 
@@ -489,6 +490,7 @@ Task.prototype.editCancel = function()
 	}
 
 	this.editing = false;
+	this.elRoot.classList.remove('edit');
 	this.elEdit.textContent = '';
 	this.elShow.style.display = 'block';
 }
