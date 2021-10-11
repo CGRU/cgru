@@ -234,7 +234,7 @@ bool JobContainer::registerJob(JobAf * i_job, std::string & o_err, BranchesConta
 		return false;
 	}
 
-
+	// If monotors is NULL, this is a server start, and this job is from store.
 	if (i_monitors)
 	{
 		AfContainerLock mLock( i_monitors, AfContainerLock::WRITELOCK);
@@ -243,6 +243,8 @@ bool JobContainer::registerJob(JobAf * i_job, std::string & o_err, BranchesConta
 		i_monitors->addJobEvent( af::Monitor::EVT_jobs_change, i_job->getId(), user->getId());
 		i_monitors->addEvent( af::Monitor::EVT_branches_change, branch->getId());
 		i_monitors->addEvent( af::Monitor::EVT_users_change, user->getId());
+
+		AFCommon::QueueLog("Job registered: " + i_job->v_generateInfoString());
 	}
 
 	// Unlocking nodes:
@@ -255,8 +257,6 @@ bool JobContainer::registerJob(JobAf * i_job, std::string & o_err, BranchesConta
 		user->unLock();
 		i_job->unLock();
 	}
-
-	AFCommon::QueueLog("Job registered: " + i_job->v_generateInfoString());
 
 	return true;
 }

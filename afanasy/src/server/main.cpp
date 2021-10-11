@@ -312,6 +312,8 @@ int main(int argc, char *argv[])
 			jobs.registerJob( job, err, &branches, &users, NULL);
 			if( err.size())
 				AF_ERR << err;
+			else
+				AF_LOG << "Job restored (" << (i+1) << " of " << folders.size() << "):" << job;
 		}
 		else
 		{
