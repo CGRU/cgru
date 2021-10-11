@@ -1403,8 +1403,9 @@ bool BlockData::updateProgress(JobProgress *progress)
 		{
 			new_tasks_done++;
 			task_percent = 100;
-			new_tasks_run_time +=
-				progress->tp[m_block_num][t]->time_done - progress->tp[m_block_num][t]->time_start;
+			if (false == (task_state & AFJOB::STATE_SKIPPED_MASK))
+				new_tasks_run_time +=
+					progress->tp[m_block_num][t]->time_done - progress->tp[m_block_num][t]->time_start;
 		}
 		if (task_state & AFJOB::STATE_RUNNING_MASK)
 		{
