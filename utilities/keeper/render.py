@@ -13,6 +13,7 @@ from Qt import QtCore, QtGui, QtWidgets
 
 Render = None
 RenderFull = None
+Refresh = None
 
 def showInfo(tray=None):
     render = RenderFull
@@ -42,21 +43,42 @@ def refresh():
     global RenderFull
 
     if Render is None:
+        # Get render by local host name
         renders = af.Cmd().renderGetLocal()
         if renders is not None and len(renders):
             Render = renders[0]
 
     if Render is not None:
+        # Get render by ID, as we already know it
         obj = af.Cmd().renderGetId(Render['id'],'full')
         if obj is not None and 'object' in obj and 'render' in obj['object']:
             RenderFull = obj['object']
             Render = RenderFull['render']
+            Refresh.setDefaultInterval()
         else:
-            print('ERROR: Unexpected object reveived:')
-            print(json.dumps(RenderFull, sort_keys=True, indent=4))
+            if obj is None:
+                print('ERROR: NULL object reveived.')
+            elif 'info' in obj:
+                obj = obj['info']
+                if obj['kind'] == 'error':
+                    print('ERROR: %s' % obj['text'])
+                else:
+                    print('%s: %s' % (obj['kind'], obj['text']))
+            else:
+                print('ERROR: Unexpected object reveived:')
+                print(json.dumps(RenderFull, sort_keys=True, indent=4))
+
+            # "Reset" render information, if failed to reveive it
+            # Most probably render was deleted,
+            # and there is no more render with such ID
+            Render = None
+            RenderFull = None
+            # Increase refresh interval by 10 times
+            Refresh.setIntervalKoeff(10)
 
     cmd.Tray.showIcon( makeIcon())
     cmd.Tray.updateToolTip(makeTip())
+
 
 def makeTip():
     if Render is None: return None
