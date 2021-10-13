@@ -310,7 +310,7 @@ void JobAf::checkStates()
 		{
 			uint32_t taskstate = m_progress->tp[b][t]->state;
 
-			if( taskstate == 0 )
+			if ((taskstate == 0) || (taskstate == AFJOB::STATE_WARNING_MASK))
 			{
 				taskstate = AFJOB::STATE_READY_MASK;
 			}
