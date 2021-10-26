@@ -184,9 +184,17 @@ function c_RulesMergeDir(o_rules, i_dir)
 		return;
 	if (i_dir.rules == null)
 		return;
-	for (var attr in i_dir.rules)
+
+	// We should sort rufiles alphabetically.
+	// So "rules.10.local" will override "rules.00.general".
+	let keys = [];
+	for (let key in i_dir.rules)
+		keys.push(key);
+	keys.sort();
+
+	for (let k = 0; k < keys.length; k++)
 	{
-		var obj = i_dir.rules[attr];
+		let obj = i_dir.rules[keys[k]];
 		if (obj == null)
 			c_Error('RULES file "' + attr + '" in "' + g_CurPath() + '/' + RULES.rufolder + '" is invalid.');
 		else

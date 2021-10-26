@@ -4,6 +4,7 @@ import time
 import traceback
 
 from rusrv import environ
+from rusrv import editobj
 
 def initApp(i_app_root):
     environ.CGRU_LOCATION = os.path.dirname(i_app_root)
@@ -257,18 +258,6 @@ def skipFile(i_filename):
     return False
 
 
-def mergeObjs(o_obj, i_obj):
-    if i_obj is None or o_obj is None:
-        return
-
-    for key in i_obj:
-        if key in o_obj and type(i_obj[key]) is dict and type(o_obj[key]) is dict:
-            mergeObjs(o_obj[key], i_obj[key])
-            continue
-
-        o_obj[key] = i_obj[key]
-
-
 def walkDir(i_recv, i_dir, o_out, i_depth):
     if i_depth > i_recv['depth']:
         return
@@ -393,7 +382,7 @@ def walkDir(i_recv, i_dir, o_out, i_depth):
         if rufolder and lookahead:
             for sfile in lookahead:
                 sfilepath = os.path.join(path, rufolder, sfile) + '.json'
-                mergeObjs(folderObj, readObj(sfilepath))
+                editobj.mergeObjs(folderObj, readObj(sfilepath))
 
         if i_depth < i_recv['depth']:
             walkDir(i_recv, path, folderObj, i_depth + 1)

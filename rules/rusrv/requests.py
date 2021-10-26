@@ -4,6 +4,7 @@ import os
 import subprocess
 
 from rusrv import environ
+from rusrv import editobj
 from rusrv import functions
 
 def req_start(i_args, out):
@@ -87,4 +88,56 @@ def req_cmdexec(i_args, o_out):
             out = obj
 
         o_out['cmdexec'].append(out)
+
+
+def req_editobj(i_edit, o_out):
+
+    if environ.USER_ID is None:
+        if os.path.isfile(i_edit['file']):
+            if not os.path.basename(i_edit['file']) in environ.GUESTCANEDIT:
+                o_out['error'] = 'Guests are not allowed to edit here.'
+                return
+        else:
+            if not os.path.basename(i_edit['file']) in environ.GUESTCANCREATE:
+                o_out['error'] = 'Guests are not allowed here.'
+                return
+
+    # Read object:
+    obj = functions.readObj(i_edit['file'])
+
+    # Edit object:
+    if 'add' in i_edit and i_edit['add'] is True:
+        if obj is None:
+            # This is a new object creation
+            obj = dict()
+            # Create folder if does not exist
+            if not os.path.isdir(os.path.dirname(i_edit['file'])):
+                os.makedirs(os.path.dirname(i_edit['file']), mode=0o777);
+        editobj.mergeObjs(obj, i_edit['object'])
+    else:
+        if obj is None:
+            # Object to edit does not exist
+            o_out['status'] = 'error';
+            o_out['error'] = 'Can`t edit null object: ' + i_edit['file']
+            return
+
+        if 'pusharray' in i_edit:
+            editobj.pushArray(obj, i_edit)
+        elif 'replace' in i_edit and i_edit['replace'] is True:
+            for newobj in i_edit['objects']:
+                editobj.replaceObject(obj, newobj)
+        elif 'delarray' in i_edit:
+            editobj.delArray(obj, i_edit)
+        else:
+            o_out['status'] = 'error'
+            o_out['error'] = 'Unknown edit object operation: ' + i_edit['file']
+            return
+
+    # Write object:
+    if functions.writeObj(i_edit['file'], obj):
+        o_out['status'] = 'success'
+        o_out['object'] = obj
+    else:
+        o_out['status'] = 'error'
+        o_out['error'] = 'Can`t write to ' + i_edit['file']
 
