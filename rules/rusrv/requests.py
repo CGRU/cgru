@@ -2,6 +2,7 @@ import hashlib
 import json
 import os
 import subprocess
+import sys
 
 from rusrv import environ
 from rusrv import editobj
@@ -10,6 +11,7 @@ from rusrv import functions
 def req_start(i_args, out):
     out['version'] = environ.CGRU_VERSION
     out['software'] = environ.SERVER_SOFTWARE
+    out['python'] = sys.version
     out['client_ip'] = environ.REMOTE_ADDR
     out['counter'] = environ.COUNTER
 
@@ -41,7 +43,7 @@ def req_initialize(i_args, out):
         if 'avatar' in obj and len(obj['avatar']):
             user['avatar'] = obj['avatar']
         elif 'email' in obj and len(obj['email']):
-            user['avatar'] = 'https://gravatar.com/avatar/' + hashlib.md5(obj['email'].strip().tolower().encode()).hexdigest()
+            user['avatar'] = 'https://gravatar.com/avatar/' + hashlib.md5(obj['email'].strip().lower().encode()).hexdigest()
 
         out['users'][obj['id']] = user;
 
