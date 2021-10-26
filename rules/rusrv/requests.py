@@ -1,8 +1,10 @@
+import base64
 import hashlib
 import json
 import os
 import subprocess
 import sys
+import traceback
 
 from rusrv import environ
 from rusrv import editobj
@@ -66,6 +68,33 @@ def req_getfile(i_file, out):
         return data
 
     out['error'] = 'Unable to load file: ' + i_file
+
+
+def req_save(i_save, o_out):
+    filename = i_save['file']
+    dirname = os.path.dirname(filename)
+
+    if environ.USER_ID is None:
+        if os.path.isfile(filename) or ps.path.basename(filename) != 'body.html':
+            o_out['error'] = 'Guests are not allowed to save files.'
+            return
+
+    o_out['save'] = filename
+
+    if not os.path.isdir(dirname):
+        try:
+            os.makedirs(dirname, mode=0o777)
+        except:
+            o_out['error'] = '%s' % traceback.format_exc()
+            return
+
+    data = i_save['data']
+    if 'type' in i_save:
+        if i_save['type'] == 'base64':
+            data = base65.b64decode(data)
+
+    if not functions.fileWrite(filename, data):
+        o_out['error'] = 'Unable to open save file: ' + filename
 
 
 def req_cmdexec(i_args, o_out):
