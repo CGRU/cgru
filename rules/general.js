@@ -1005,9 +1005,18 @@ function g_CompareFolders(a, b)
 		}
 	}
 
+	// Move COMMON folder to top:
+	let a_cmn = c_PathBase(a.name) == 'COMMON';
+	let b_cmn = c_PathBase(b.name) == 'COMMON';
+
+	if (a_cmn && (false == b_cmn))
+		return -1;
+	if (b_cmn && (false == a_cmn))
+		return 1;
+
 	// Move auxiliary folders to bottom:
-	var a_aux = c_AuxFolder(a);
-	var b_aux = c_AuxFolder(b);
+	let a_aux = c_AuxFolder(a);
+	let b_aux = c_AuxFolder(b);
 
 	if (a_aux && (false == b_aux))
 		return 1;
