@@ -24,6 +24,7 @@ class Refresh:
     def setInterval(self, i_sec):
         msec = i_sec * 1000
         if self.timer.interval() != msec:
+            print('Setting refresh interval to %d seconds.' % i_sec)
             self.timer.setInterval(msec)
 
 

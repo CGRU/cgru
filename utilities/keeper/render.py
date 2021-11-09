@@ -54,7 +54,8 @@ def refresh():
         if obj is not None and 'object' in obj and 'render' in obj['object']:
             RenderFull = obj['object']
             Render = RenderFull['render']
-            Refresh.setDefaultInterval()
+            if Refresh:
+                Refresh.setDefaultInterval()
         else:
             if obj is None:
                 print('ERROR: NULL object reveived.')
@@ -74,7 +75,8 @@ def refresh():
             Render = None
             RenderFull = None
             # Increase refresh interval by 10 times
-            Refresh.setIntervalKoeff(10)
+            if Refresh:
+                Refresh.setIntervalKoeff(10)
 
     cmd.Tray.showIcon( makeIcon())
     cmd.Tray.updateToolTip(makeTip())
