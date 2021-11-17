@@ -511,7 +511,7 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 
 	if (time_wait > currenttime)
 	{
-		QString wait = af::time2strHMS(time_wait - currenttime).c_str();
+		QString wait = afqt::stoq(af::time2strHMS(time_wait - currenttime));
 		if (Watch::isPadawan())
 			user_eta = m_str_user + " Waiting Time:" + wait;
 		else if (Watch::isJedi())
