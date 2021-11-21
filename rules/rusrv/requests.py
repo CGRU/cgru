@@ -9,6 +9,7 @@ import traceback
 from rusrv import environ
 from rusrv import editobj
 from rusrv import functions
+from rusrv import news
 
 def req_start(i_args, out):
     out['version'] = environ.CGRU_VERSION
@@ -50,7 +51,7 @@ def req_initialize(i_args, out):
         out['users'][obj['id']] = user;
 
         # TODO
-        #if (isAdmin($out)) $o_out['admin'] = true;
+        #if (isAdmin($out)) $o_out['admin'] = True
 
 
 def req_getfile(i_file, out):
@@ -171,4 +172,42 @@ def req_editobj(i_edit, o_out):
     else:
         o_out['status'] = 'error'
         o_out['error'] = 'Can`t write to ' + i_edit['file']
+
+
+def req_makenews(i_args, o_out):
+    # Read all users:
+    users = functions.readAllUsers(o_out, True)
+    if 'error' in o_out:
+        return
+
+    if len(users) == 0:
+        o_out['error'] = 'No users found.'
+        return
+
+    users_changed = []
+
+    for request in i_args['news_requests']:
+        ids = news.makenews(request, users, o_out)
+        if 'error' in o_out:
+            return
+
+        for id in ids:
+            if not id in users_changed:
+                users_changed.append(id)
+
+    if 'bookmarks' in i_args:
+        for bm in i_args['bookmarks']:
+            ids = news.makebookmarks(bm, users, o_out)
+            if 'error' in o_out:
+                return
+
+            for id in ids:
+                if not id in users_changed:
+                    users_changed.append(id)
+
+    # Write changed users:
+    for id in users_changed:
+        functions.writeUser(users[id], True)
+
+    o_out['users'] = users_changed
 

@@ -249,7 +249,7 @@ def writeUser(i_user, i_full):
     elif os.path.isfile(ufile_bookmarks):
         os.unlink(ufile_bookmarks)
 
-    return true
+    return True
 
 
 def skipFile(i_filename):
