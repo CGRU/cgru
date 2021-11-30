@@ -560,7 +560,9 @@ function nw_NewsReceived(i_data)
 	if (i_data.error)
 	{
 		c_Log(i_data.error);
-		return;
+		// If there is no news file, error will be returned.
+		// No file, is not an error in this case.
+		// This just means that there is no news.
 	}
 
 	var news = [];
