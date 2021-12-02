@@ -112,31 +112,31 @@ void Node::v_jsonWrite(std::ostringstream &o_str, int i_type) const
 		jw_intmap("running_services", m_running_services, o_str);
 }
 
-void Node::incrementService(const std::string & i_name)
+void Node::incrementService(const std::string & i_name, int count)
 {
 	std::map<std::string, int32_t>::iterator it = m_running_services.begin();
 	while (it != m_running_services.end())
 	{
 		if (it->first == i_name)
 		{
-			it->second++;
+			it->second += count;
 			return;
 		}
 
 		it++;
 	}
 
-	m_running_services[i_name] = 1;
+	m_running_services[i_name] = count;
 }
 
-void Node::decrementService(const std::string & i_name)
+void Node::decrementService(const std::string & i_name, int count)
 {
 	std::map<std::string, int32_t>::iterator it = m_running_services.begin();
 	while (it != m_running_services.end())
 	{
 		if (it->first == i_name)
 		{
-			it->second--;
+			it->second -= count;
 			if (it->second <= 0)
 				m_running_services.erase(it);
 			return;
