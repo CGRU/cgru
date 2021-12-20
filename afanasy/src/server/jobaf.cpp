@@ -284,9 +284,15 @@ bool JobAf::initialize()
 			}
 		}
 		// Process event
-		std::vector<std::string> events;
-		events.push_back("JOB_CREATED");
-		emitEvents(events);
+		if( m_id != AFJOB::SYSJOB_ID ) // skip system job
+		{
+			if (hasCustomData() || m_user->hasCustomData())
+			{
+				std::vector<std::string> events;
+				events.push_back("JOB_CREATED");
+				emitEvents(events);
+			}
+		}
 
 		appendLog("Initialized.");
 	}
