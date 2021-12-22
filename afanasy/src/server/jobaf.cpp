@@ -283,6 +283,17 @@ bool JobAf::initialize()
 				appendLog( std::string("Block[") + m_blocks_data[b]->getName() + "] pre command executed:\n" + m_blocks_data[b]->getCmdPre());
 			}
 		}
+		// Process event
+		if( m_id != AFJOB::SYSJOB_ID ) // skip system job
+		{
+			if (hasCustomData() || m_user->hasCustomData())
+			{
+				std::vector<std::string> events;
+				events.push_back("JOB_CREATED");
+				emitEvents(events);
+			}
+		}
+
 		appendLog("Initialized.");
 	}
 	else
