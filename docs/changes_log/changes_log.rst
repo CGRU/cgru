@@ -11,6 +11,26 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
 - The third number versions are fully compatible.
   You can upgrade only one client or server for changes.
 
+
+v3.2.2
+======
+
+2022.01.11
+
+*Not Released*
+
+- AfServer ``JOB_CREATED`` event added.
+
+- **Bugfixes**
+	- AfServer: Change running job owner or branch fixed.
+	- AfServer: On start set just WARNING tasks to READY.
+	- AfWatch: Skipped tasks does not affect job block average running timings.
+	- Kepper: Refresh when local render deleted now does not produce an error in server log.
+	- Houdini: Afanasy ROP: Custom command mode block naming fix.
+	- Houdini: USD ROP now can works like Alembic ROP. One render session for all frame range.
+	- Houdini: MS Windows launch scripts fixed to work with 19 version.
+
+
 .. _changes-log-latest:
 
 v3.2.1
