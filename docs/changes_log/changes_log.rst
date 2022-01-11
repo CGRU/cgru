@@ -23,7 +23,7 @@ v3.2.2
 
 - **Bugfixes**
 	- AfServer: Change running job owner or branch fixed.
-	- AfServer: On start set just WARNING tasks to READY.
+	- AfServer: On start set WARNING tasks to READY.
 	- AfWatch: Skipped tasks does not affect job block average running timings.
 	- Kepper: Refresh when local render deleted now does not produce an error in server log.
 	- Houdini: Afanasy ROP: Custom command mode block naming fix.
