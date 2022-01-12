@@ -228,19 +228,19 @@ ListRenders::ListRenders( QWidget* parent):
 		addParam_Num(Item::TPool, "resources_update_period", "Resources Update",
 				QString("Render resources update period (default is %1).)").arg(AFRENDER::RESOURCES_UPDATE_PERIOD), -1, 1<<4);
 		addParam_Num(Item::TPool, "zombie_time", "Zombie Time",
-				QString("Render zombie time seconds (default is %1).").arg(AFRENDER::ZOMBIETIME), -1, 1<<10);
+				QString("Render zombie time seconds (default is %1).").arg(AFRENDER::ZOMBIETIME), -1, 1<<15);
 
 		addParam_separator();
 
 		addParam_Num(Item::TPool, "no_task_event_time", "No Task Event",
-				QString("Render with no task event seconds (default is -1 = disabled)."), -1, 1<<10);
+				QString("Render with no task event seconds (default is -1 = disabled)."), -1, 1<<15);
 		addParam_Num(Item::TPool, "overload_event_time", "Overload Event",
-				QString("Render with resources overload repeat event emit seconds (default is -1 = disabled)."), -1, 1<<10);
+				QString("Render with resources overload repeat event emit seconds (default is -1 = disabled)."), -1, 1<<15);
 
 		addParam_separator();
 
 		addParam_Num(Item::TPool, "exit_no_task_time", "Exit No Task",
-				QString("Render exit with no task seconds (default is -1 = disabled)."), -1, 1<<10);
+				QString("Render exit with no task seconds (default is -1 = disabled)."), -1, 1<<15);
 	}
 
 	ParamsPanelFarm * paramspanelfarm = new ParamsPanelFarm(this);
