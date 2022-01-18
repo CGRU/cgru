@@ -205,6 +205,10 @@ void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 
 	if (taskprogress.state & AFJOB::STATE_RUNNING_MASK)
 	{
+		i_painter->setPen(Qt::NoPen);
+		i_painter->setBrush(QBrush(afqt::QEnvironment::clr_itemjob.c, Qt::SolidPattern));
+		i_painter->drawRect(x, y, w - WidthInfo, Height-1);
+
 		drawPercent (i_painter, x, y, w - WidthInfo, Height-1,
 			100, percent, 0, 0 , !(taskprogress.state & AFJOB::STATE_DONE_MASK));
 	}
