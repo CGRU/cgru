@@ -88,7 +88,8 @@ public:
 		int posx, int posy, int width, int height,
 		int whole,
 		int part_a, int part_b = 0, int part_c = 0,
-		bool drawBorder = true
+		bool drawBorder = true,
+		QColor * i_done_color = NULL
 	);
 
 	static void calcutaleStarPoints();
