@@ -15,11 +15,13 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
 v3.2.2
 ======
 
-2022.01.11
+2022.01.18
 
 *Not Released*
 
 - AfServer ``JOB_CREATED`` event added.
+- Afanasy config: Parameter of a string array type can be overridden by command arguments or environment by a string contains a comma separated items.
+
 
 - **Bugfixes**
 	- AfServer: Change running job owner or branch fixed.
