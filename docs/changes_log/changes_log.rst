@@ -21,6 +21,7 @@ v3.2.2
 
 - AfServer ``JOB_CREATED`` event added.
 - Afanasy config: Parameter of a string array type can be overridden by command arguments or environment by a string contains a comma separated items.
+- AfWatch: Task window uses monospace font for task output and log.
 
 
 - **Bugfixes**
