@@ -60,6 +60,8 @@ class BlockParameters:
         # Parameters to restore ROP changes:
         self.soho_foreground = None
         self.soho_outputmode = None
+        self.pre_submit_script = None
+        self.post_submit_script = None
 
         # Get parameters:
         self.single_task = bool(afnode.parm('single_task').eval())
@@ -995,6 +997,20 @@ def getJobParameters(afnode, subblock=False, frame_range=None, prefix=''):
 
         prevparams = newparams
 
+    if len(params):
+        # Get Pre/Post Submit Scrips:
+        parm = params[0]
+
+        if afnode.parm('pre_submit_script_enable').eval():
+            pre_submit_script = afnode.parm('pre_submit_script').eval()
+            if pre_submit_script is not None and len(pre_submit_script):
+                parm.pre_submit_script = pre_submit_script
+        if afnode.parm('post_submit_script_enable').eval():
+            post_submit_script = afnode.parm('post_submit_script').eval()
+            if post_submit_script is not None and len(post_submit_script):
+                parm.post_submit_script = post_submit_script
+
+
     # Last parameter needed to generate a job.
     if not subblock:
         params.append(
@@ -1011,9 +1027,23 @@ def render(afnode):
     params = getJobParameters(afnode)
 
     if params is not None and len(params) > 1:
-        params[-1].genJob(params[:-1])
+        job_params = params[-1]
+        params = params[:-1]
+
+        for parm in params:
+            if parm.pre_submit_script:
+                afnode = parm.afnode
+                print('Executimg pre submit script on "%s":\n%s' % (afnode.name(), parm.pre_submit_script))
+                eval(parm.pre_submit_script)
+
+        job_params.genJob(params)
+
         for parm in params:
             parm.doPost()
+            if parm.post_submit_script:
+                afnode = parm.afnode
+                print('Executimg post submit script on "%s":\n%s' % (afnode.name(), parm.post_submit_script))
+                eval(parm.post_submit_script)
     else:
         hou.ui.displayMessage(
             'No tasks found for:'
