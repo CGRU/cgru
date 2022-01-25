@@ -15,20 +15,21 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
 v3.2.2
 ======
 
-2022.01.18
+2022.01.25
 
 *Not Released*
 
 - AfServer ``JOB_CREATED`` event added.
 - Afanasy config: Parameter of a string array type can be overridden by command arguments or environment by a string contains a comma separated items.
-- AfWatch: Task window uses monospace font for task output and log.
+- AfWatch: Task window uses mono-space font for task output and log.
+- Houdini: Afanasy ROP: Pre and post submission scripts execution.
 
 
 - **Bugfixes**
 	- AfServer: Change running job owner or branch fixed.
 	- AfServer: On start set WARNING tasks to READY.
 	- AfWatch: Skipped tasks does not affect job block average running timings.
-	- Kepper: Refresh when local render deleted now does not produce an error in server log.
+	- Keeper: Refresh when local render deleted now does not produce an error in server log.
 	- Houdini: Afanasy ROP: Custom command mode block naming fix.
 	- Houdini: USD ROP now can works like Alembic ROP. One render session for all frame range.
 	- Houdini: MS Windows launch scripts fixed to work with 19 version.
