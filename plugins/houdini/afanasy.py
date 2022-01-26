@@ -705,8 +705,10 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
 
             if not join_render:
                 block_generate.service = 'hbatch'
+                block_generate.tickets = {'HYTHON':1}
             else:
                 block_generate.service = 'hbatch_mantra'
+                block_generate.tickets = {'HYTHON':1,'MANTRA':1}
                 block_generate.cmd = block_generate.cmd.replace(
                     'hrender_af', 'hrender_separate'
                 )
@@ -714,9 +716,10 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
         if not join_render:
             block_render = BlockParameters(afnode, ropnode, subblock, prefix,
                                            frame_range)
-            block_render.name = blockname + '-TileRender'
             block_render.cmd = 'mantra'
-            block_render.service = block_render.cmd
+            block_render.service = 'mantra'
+            block_render.tickets = {'MANTRA':1}
+
             if run_rop:
                 block_render.dependmask = block_generate.name
 
@@ -724,6 +727,7 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
                 block_render.delete_files.append(files)
 
             if tile_render:
+                block_render.name = blockname + '-TileRender'
                 block_render.numeric = False
                 block_render.cmd += ' -t count=%(tile_divx)dx%(tile_divy)d,index=@#@' % vars()
                 block_render.frame_pertask = -tiles_count
@@ -739,6 +743,7 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
                         block_render.tasks_names.append('frame %d tile %d' % (frame, tile))
                         block_render.tasks_cmds.append('%d %s' % (tile, arguments))
             else:
+                block_render.name = blockname + '-Render'
                 block_render.cmd += ' ' + afcommon.patternFromPaths(
                     afnode.parm('sep_render_arguments').evalAsStringAtFrame(block_generate.frame_first),
                     afnode.parm('sep_render_arguments').evalAsStringAtFrame(block_generate.frame_last)
