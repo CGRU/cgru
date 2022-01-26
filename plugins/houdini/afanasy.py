@@ -637,7 +637,6 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
         block_generate = \
             BlockParameters(afnode, ropnode, subblock, prefix, frame_range)
         blockname = block_generate.name
-        block_generate.name += '-GenIFD'
 
         if not block_generate.valid:
             block_generate.doPost()
@@ -669,8 +668,11 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
             join_render = False
 
         if join_render:
+            block_generate.name += '-Separate'
             tile_render = False
         else:
+            block_generate.name += '-GenIFD'
+
             if block_generate.ropnode.parm('soho_outputmode').eval() == 0:
                 # Set output mode to produce ifd files:
                 block_generate.ropnode.parm('soho_outputmode').set(1)
