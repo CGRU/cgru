@@ -634,14 +634,6 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
     if ropnode is not None and ropnode.type().name() == 'ifd' and afnode.parm('sep_enable').eval():
         # Case mantra separate render:
 
-        block_generate = \
-            BlockParameters(afnode, ropnode, subblock, prefix, frame_range)
-        blockname = block_generate.name
-
-        if not block_generate.valid:
-            block_generate.doPost()
-            return None
-
         run_rop = afnode.parm('sep_run_rop').eval()
         read_rop = afnode.parm('sep_read_rop_params').eval()
         join_render = afnode.parm('sep_join').eval()
@@ -652,6 +644,16 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
         tiles_stitch_service = afnode.parm('tiles_stitch_service').eval()
         tiles_stitch_capacity = afnode.parm('tiles_stitch_capacity').eval()
         del_rop_files = afnode.parm('sep_del_rop_files').eval()
+
+        if not run_rop:
+            join_render = False
+
+        block_generate = BlockParameters(afnode, ropnode, join_render == False, prefix, frame_range)
+        blockname = block_generate.name
+
+        if not block_generate.valid:
+            block_generate.doPost()
+            return None
 
         if read_rop or run_rop:
             if not block_generate.ropnode:
@@ -664,14 +666,31 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
                     '"%s" is not a ROP node' % block_generate.ropnode.path()
                 )
 
-        if not run_rop:
-            join_render = False
-
         if join_render:
             block_generate.name += '-Separate'
             tile_render = False
         else:
             block_generate.name += '-GenIFD'
+
+            # Get some generation specific parameters:
+            capacity      = int(afnode.parm('sep_gen_capacity').eval())
+            hosts_mask    = str(afnode.parm('sep_gen_hosts_mask').eval())
+            hosts_exclude = str(afnode.parm('sep_gen_hosts_mask_exclude').eval())
+            max_runtasks  = int(afnode.parm('sep_gen_max_runtasks').eval())
+            maxperhost    = int(afnode.parm('sep_gen_maxperhost').eval())
+            min_memory    = int(afnode.parm('sep_gen_min_memory').eval())
+            if capacity > 0:
+                block_generate.capacity = capacity
+            if hosts_mask != '':
+                block_generate.hosts_mask = hosts_mask
+            if hosts_exclude != '':
+                block_generate.hosts_mask_exclude = hosts_exclude
+            if max_runtasks > -1:
+                block_generate.max_runtasks = max_runtasks
+            if maxperhost > -1:
+                block_generate.maxperhost = maxperhost
+            if min_memory > -1:
+                block_generate.min_memory = min_memory
 
             if block_generate.ropnode.parm('soho_outputmode').eval() == 0:
                 # Set output mode to produce ifd files:
