@@ -38,7 +38,8 @@ case ${DISTRIBUTIVE} in
 		export DEPENDS_CGRU="python3-qt5 openexr imagemagick ffmpeg"
 		;;
 	*)
-		export DEPENDS_AFANASY="libpq qt5-qtbase-gui qt5-qtmultimedia"
+		export DEPENDS_AFANASY="libpq"
+		export DEPENDS_QTGUI="qt5-qtbase-gui qt5-qtmultimedia"
 		export DEPENDS_CGRU="python3-qt5"
 		;;
 esac
