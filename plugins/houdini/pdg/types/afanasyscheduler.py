@@ -67,12 +67,15 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
     def _initData(self):
         self.job_id = None
         self.job_block_name_id = {}
-        self.job_tasks_id_name = {}
+        self.job_tasks_id_workid = {}
         self._local_addr = self._getLocalAddr()
 
 
     def _log(self, i_msg):
-        print(self.topNode().name() + ': ' + str(i_msg))
+        txt = str(i_msg)
+        if self.topNode():
+            txt = '%s: %s' % (self.topNode().name(), txt)
+        print(txt)
 
 
     def _getTicketsDictFromString(self, i_str):
@@ -207,7 +210,10 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
 
     def _deleteJob(self):
         if self.job_id is not None:
-            af.Cmd().deleteJobById(self.job_id)
+            if self['keep_job_on_cancel_cook'].evaluateInt():
+                af.Cmd().stopJobById(self.job_id)
+            else:
+                af.Cmd().deleteJobById(self.job_id)
         self._initData()
 
 
@@ -346,8 +352,8 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
                 block_id = struct['object']['block_ids'][0]
 
             self.job_block_name_id[work_item.node.name] = block_id
-            self.job_tasks_id_name[block_id] = {}
-            self.job_tasks_id_name[block_id][0] = work_item.name
+            self.job_tasks_id_workid[block_id] = {}
+            self.job_tasks_id_workid[block_id][0] = work_item.id
 
         else:
             # Current TOP node block exists, we need just to append the task
@@ -358,7 +364,7 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
                 return pdg.scheduleResult.Failed
 
             task_id = struct['object']['task_ids'][0]
-            self.job_tasks_id_name[block_id][task_id] = work_item.name
+            self.job_tasks_id_workid[block_id][task_id] = work_item.id
 
         return pdg.scheduleResult.Succeeded
 
@@ -402,38 +408,38 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         job_progress = job_progress['progress']
         ids_to_del = {}
 
-        for block_id in self.job_tasks_id_name:
+        for block_id in self.job_tasks_id_workid:
             ids_to_del[block_id] = []
-            for task_id in self.job_tasks_id_name[block_id]:
-                work_item_name = self.job_tasks_id_name[block_id][task_id]
+            for task_id in self.job_tasks_id_workid[block_id]:
+                work_item_id = self.job_tasks_id_workid[block_id][task_id]
                 task_progress = job_progress[block_id][task_id]
                 state = task_progress['state']
 
                 if state.find('RUN') != -1:
-                    self.onWorkItemStartCook(work_item_name, -1)
+                    self.onWorkItemStartCook(work_item_id, -1)
 
                 elif state.find('ERR') != -1:
                     if self['report_fail_on_error'].evaluateInt():
-                        self.onWorkItemFailed(work_item_name, -1)
+                        self.onWorkItemFailed(work_item_id, -1)
                         # If the graph is setup to block on failures, then
                         # we continue to track the task
                         if not self.isWaitForFailures:
                             ids_to_del[block_id].append(task_id)
 
                 elif state.find('SKP') != -1:
-                    self.onWorkItemCanceled(work_item_name, -1)
+                    self.onWorkItemCanceled(work_item_id, -1)
                     ids_to_del[block_id].append(task_id)
 
                 elif state.find('DON') != -1:
                     time_started = task_progress['tst']
                     time_done = task_progress['tdn']
                     cook_time = float(time_started - time_done)
-                    self.onWorkItemSucceeded(work_item_name, -1, cook_time)
+                    self.onWorkItemSucceeded(work_item_id, -1, cook_time)
                     ids_to_del[block_id].append(task_id)
 
         for block_id in ids_to_del:
             for task_id in ids_to_del[block_id]:
-                del self.job_tasks_id_name[block_id][task_id]
+                del self.job_tasks_id_workid[block_id][task_id]
 
         return pdg.tickResult.SchedulerReady
 
