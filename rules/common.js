@@ -222,7 +222,9 @@ function c_RulesMergeObjs(o_rules, i_rules_new)
 					c_RulesMergeObjs(o_rules, i_rules_new[attr]);
 			continue;
 		}
-		if ((typeof(i_rules_new[attr]) == 'object') && (o_rules[attr] != null))
+		if ((typeof(i_rules_new[attr]) == 'object') &&
+				(false == Array.isArray(i_rules_new[attr])) &&
+				(o_rules[attr] != null))
 		{
 			c_RulesMergeObjs(o_rules[attr], i_rules_new[attr]);
 			continue;
