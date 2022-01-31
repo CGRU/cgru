@@ -50,6 +50,7 @@
 	"comp"    :{"title":"Comp",     "short":"Cp",  "tip":"Compositing"},
 	"concept" :{"title":"Concept",  "short":"Cc",  "tip":"Concept"},
 	"frlnc"   :{"title":"Freelance","short":"Fl",  "tip":"Freelance"},
+	"fur"     :{"title":"Fur",      "short":"Fur", "tip":"Fur, Hair"},
 	"fx"      :{"title":"FX",       "short":"FX",  "tip":"FX"},
 	"key"     :{"title":"Keying",   "short":"Key", "tip":"Keying"},
 	"layout"  :{"title":"Layout",   "short":"Lay", "tip":"Layout"},
