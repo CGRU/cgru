@@ -199,6 +199,9 @@ function bm_Show()
 		if (bm == null)
 			continue;
 
+		if (bm.path == null)
+			continue;
+
 		let names = bm.path.split('/');
 
 		if ((project == null) || (project.name != names[1]))
