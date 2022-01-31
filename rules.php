@@ -123,7 +123,7 @@ function jsonEncode(&$i_obj)
 
 function _flock_(&$i_handle, $i_type)
 {
-	flock( $i_handle, $i_type);
+//	flock( $i_handle, $i_type);
 }
 
 function fileRead($i_filename, $i_lock = true, $i_verbose = false)
