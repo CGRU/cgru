@@ -1,6 +1,7 @@
 COUNTER = 0
 
 USER_ID = None
+AUTH_TYPE = None
 
 HT_ACCESS_FILE_NAME = '.htaccess'
 HT_GROUPS_FILE_NAME = '.htgroups'

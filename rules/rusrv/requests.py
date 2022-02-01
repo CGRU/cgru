@@ -14,8 +14,10 @@ from rusrv import news
 def req_start(i_args, out):
     out['version'] = environ.CGRU_VERSION
     out['software'] = environ.SERVER_SOFTWARE
+    out['mod_wsgi_version'] = environ.MOD_WSGI_VERSION
     out['python'] = sys.version
     out['client_ip'] = environ.REMOTE_ADDR
+    out['auth_type'] = environ.AUTH_TYPE
     out['counter'] = environ.COUNTER
 
 def req_initialize(i_args, out):

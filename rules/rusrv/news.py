@@ -153,6 +153,7 @@ def makenews(i_args, io_users, o_out):
         while len(user['news']) > limit:
             del user['news'][-1]
 
+#TODO
 #        # Send emails:
 #        if (array_key_exists('email', $user) == false) continue;
 #        if (array_key_exists('email_news', $user) == false) continue;

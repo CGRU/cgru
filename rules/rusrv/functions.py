@@ -14,6 +14,9 @@ def initApp(i_app_root):
 def initEnv(i_environ):
     environ.COUNTER += 1
     environ.SERVER_SOFTWARE = i_environ['SERVER_SOFTWARE']
+    environ.MOD_WSGI_VERSION = i_environ['mod_wsgi.version']
+    if 'AUTH_TYPE' in i_environ:
+        environ.AUTH_TYPE = i_environ['AUTH_TYPE']
 
 
 def initSession(i_environ):
