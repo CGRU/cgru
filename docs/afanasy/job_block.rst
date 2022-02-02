@@ -264,6 +264,10 @@ task_progress_change_timeout
 If running task progress (percentage) will be the same for this time, task will be stopped with error.
 If this value equals or less that zero, no such limit exists.
 
+The default value can be set by ``af_task_progress_change_timeout`` config variable.
+It is a server side variable, you can ask server to reload config without restarting by ``afcmd cload`` command.
+See `Configuration <../configuration/configuration.html>`_ and `afcmd <../afanasy/afcmd.html>`_ sections.
+
 need_power
 ----------
 ``af.Block.setNeedPower(int)``
