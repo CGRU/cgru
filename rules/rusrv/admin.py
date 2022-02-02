@@ -1,4 +1,5 @@
 import os
+import shutil
 import traceback
 
 from rusrv import environ
@@ -240,4 +241,44 @@ def htaccessPath(i_path):
         if access is True: return True
 
     return True
+
+
+def disableUser(i_args, o_out):
+
+    uid = i_args['uid']
+    udir = os.path.join('users', uid)
+    ufile = os.path.join(udir, uid+'.json')
+    if not os.path.isfile(ufile):
+        o_out['error'] = 'User file does not exist.'
+        return
+
+    # If user new object provided, we write it.
+    # This needed to just disable user and not to loose its settings.
+    if 'uobj' in i_args:
+        if functions.writeUser(i_args['uobj'], True):
+            o_out['status'] = 'success'
+        else:
+            o_out['error'] = 'Unable to write "%s" user file' % uid
+    else:
+        # Delete user files and loose all its data:
+        shutil.rmtree(udir)
+
+    # Remove user from digest file
+    data = functions.fileRead(environ.HT_DIGEST_FILE_NAME, True)
+    if data is None:
+        o_out['error'] = 'Unable to read the file.'
+        return
+
+    old_lines = data.split('\n')
+    new_lines = []
+    for line in old_lines:
+        values = line.split(':')
+        if len(values) == 3:
+            if values[0] != uid:
+                new_lines.append(line)
+
+    data = '\n'.join(new_lines) + '\n'
+
+    if not functions.fileWrite(environ.HT_DIGEST_FILE_NAME, data):
+        o_out['error'] = 'Unable to write into the file.'
 

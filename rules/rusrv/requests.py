@@ -115,6 +115,21 @@ def req_permissionsclear(i_args, o_out):
         return
     return admin.permissionsClear(i_args, o_out)
 
+def req_getallgroups(i_args, o_out):
+    if not admin.isAdmin(o_out):
+        return
+    o_out['groups'] = environ.GROUPS
+
+def req_getallusers(i_args, o_out):
+    if not admin.isAdmin(o_out):
+        return
+    o_out['users'] = functions.readAllUsers(o_out, True)
+
+def req_disableuser(i_args, o_out):
+    if not admin.isAdmin(o_out):
+        return
+    return admin.disableUser(i_args, o_out)
+
 
 def req_cmdexec(i_args, o_out):
     if environ.USER_ID is None:
