@@ -130,6 +130,17 @@ def req_disableuser(i_args, o_out):
         return
     return admin.disableUser(i_args, o_out)
 
+def req_writegroups(i_args, o_out):
+    if not admin.isAdmin(o_out):
+        return
+    return admin.writeGroups(i_args, o_out)
+
+def req_htdigest(i_args, o_out):
+    if environ.USER_ID is None:
+        o_out['error'] = 'Guests can`t change any password'
+        return
+    return admin.htdigest(i_args, o_out)
+
 
 def req_cmdexec(i_args, o_out):
     if environ.USER_ID is None:

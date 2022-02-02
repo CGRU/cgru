@@ -282,3 +282,68 @@ def disableUser(i_args, o_out):
     if not functions.fileWrite(environ.HT_DIGEST_FILE_NAME, data):
         o_out['error'] = 'Unable to write into the file.'
 
+
+def writeGroups(i_groups, o_out):
+    environ.GROUPS = i_groups
+
+    lines = []
+    for group in i_groups:
+        lines.append(group + ':' + ' '.join(i_groups[group]))
+
+    data = '\n'.join(lines) + '\n'
+    if not functions.fileWrite(environ.HT_GROUPS_FILE_NAME, data):
+        o_out['error'] = 'Unable to write in groups file.'
+
+
+def htdigest(i_args, o_out):
+    user = i_args['user']
+
+    # Not admin can change only own password,
+    # and only if he has a special state "passwd".
+    # Admin can change any user password.
+    if not isAdmin(o_out):
+        if user != environ.USER_ID:
+            o_out['error'] = 'User can`t change other user password'
+            return
+
+        # Check "passwd" state:
+        out = dict()
+        functions.readAllUsers(out, False)
+        if 'error' in out:
+            o_out['error'] = out['error']
+            return
+
+        if not user in out['users']:
+            o_out['error'] = 'User "%s" not found.' % user
+            return
+
+        uobj = out['users'][user]
+        if (not 'states' in uobj) or (not 'passwd' in uobj['states']):
+            o_out['error'] = 'You are not allowed to change password.'
+            return
+
+    data = functions.fileRead(environ.HT_DIGEST_FILE_NAME, True)
+    if data is None:
+        data = ''
+
+    # Construct new lines w/o our user (if it exists):
+    o_out['status'] = 'User "%s" set.' % user
+    o_out['user'] = user
+    new_lines = []
+    for line in data.split('\n'):
+        values = line.split(':')
+        if len(values) == 3:
+            if values[0] == user:
+                # Just skip old line with our user:
+                o_out['status'] = 'User "%s" updated.' % user
+            else:
+                # Store line with other user:
+                new_lines.append(line)
+
+    # Add our user at the end:
+    new_lines.append(i_args['digest'])
+
+    data = '\n'.join(new_lines) + '\n'
+    if not functions.fileWrite(environ.HT_DIGEST_FILE_NAME, data):
+        o_out['error'] = 'Unable to write into the file.'
+
