@@ -368,7 +368,7 @@ function ad_PermissionsGrpAddOnClick()
 		"value": 'admins',
 		"name": 'permissions',
 		"title": 'Add Group',
-		"info": 'Enter Group ID'
+		"info": 'Enter Group ID, default groups are: ' + JSON.stringify(RULES.permissions.default_groups)
 	});
 }
 
@@ -379,7 +379,7 @@ function ad_PermissionsUsrAddOnClick()
 		"param": 'users',
 		"name": 'permissions',
 		"title": 'Add User',
-		"info": 'Enter User ID'
+		"info": 'Enter User ID, default groups are: ' + JSON.stringify(RULES.permissions.default_groups)
 	});
 }
 
@@ -400,9 +400,11 @@ function ad_PermissionsAdd(i_id, i_type)
 	// Set default minimal permissions:
 	if (RULES.permissions.default_groups)
 		if ((ad_permissions.groups.length == 0) && (ad_permissions.users.length == 0))
-			ad_permissions.groups = RULES.permissions.default_groups;
+			for (let grp of RULES.permissions.default_groups)
+				ad_permissions.groups.push(grp);
 
-	ad_permissions[i_type].push(i_id);
+	if (ad_permissions[i_type].indexOf(i_id) == -1)
+		ad_permissions[i_type].push(i_id);
 
 	n_Request({
 		"send": {"permissionsset": ad_permissions},

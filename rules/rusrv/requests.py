@@ -6,6 +6,7 @@ import subprocess
 import sys
 import traceback
 
+from rusrv import admin
 from rusrv import environ
 from rusrv import editobj
 from rusrv import functions
@@ -52,8 +53,8 @@ def req_initialize(i_args, out):
 
         out['users'][obj['id']] = user;
 
-        # TODO
-        #if (isAdmin($out)) $o_out['admin'] = True
+        if admin.isAdmin():
+            out['admin'] = True
 
 
 def req_getfile(i_file, out):
@@ -61,10 +62,9 @@ def req_getfile(i_file, out):
         out['error'] = 'No such file: ' + i_file
         return
 
-    # TODO
-    #if (false == htaccessPath($i_file))
-    #   $o_out['error'] = 'Permissions denied';
-    #   return;
+    if not admin.htaccessPath(i_file):
+        o_out['error'] = 'Permissions denied';
+        return
 
     data = functions.fileRead(i_file)
     if data:
@@ -98,6 +98,22 @@ def req_save(i_save, o_out):
 
     if not functions.fileWrite(filename, data):
         o_out['error'] = 'Unable to open save file: ' + filename
+
+
+def req_permissionsget(i_args, o_out):
+    if not admin.isAdmin(o_out):
+        return
+    return admin.permissionsGet(i_args, o_out)
+
+def req_permissionsset(i_args, o_out):
+    if not admin.isAdmin(o_out):
+        return
+    return admin.permissionsSet(i_args, o_out)
+
+def req_permissionsclear(i_args, o_out):
+    if not admin.isAdmin(o_out):
+        return
+    return admin.permissionsClear(i_args, o_out)
 
 
 def req_cmdexec(i_args, o_out):

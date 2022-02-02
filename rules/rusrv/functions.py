@@ -3,6 +3,7 @@ import os
 import time
 import traceback
 
+from rusrv import admin
 from rusrv import environ
 from rusrv import editobj
 
@@ -199,7 +200,7 @@ def processUser(i_arg, o_out):
 def processUserIP(i_args, o_user):
     ip = environ.REMOTE_ADDR
 
-    if not 'ips' in o_user['ips']:
+    if not 'ips' in o_user:
         o_user['ips'] = []
 
     # Remove other enties from this IP:
@@ -281,7 +282,7 @@ def walkDir(i_recv, i_dir, o_out, i_depth):
 
     access = False
     denied = True
-    if True:#TODO htaccessPath(i_dir):
+    if admin.htaccessPath(i_dir):
         access = True
         denied = False
     else:
@@ -358,10 +359,6 @@ def walkDir(i_recv, i_dir, o_out, i_depth):
                 if obj:
                     o_out['rules'][ruentry] = obj
 
-            # XXX is this sorting needed?
-            #o_out['rufiles'].sort()
-            #ksort($o_out['rules']);
-
             continue
 
         if os.path.isfile(os.path.join(path, '.hidden')):
@@ -371,8 +368,8 @@ def walkDir(i_recv, i_dir, o_out, i_depth):
         if denied:
             continue
 
-        #TODO
-        #if (false === htaccessFolder($path)) continue;
+        if admin.htaccessFolder(path) is False:
+            continue
 
         folderObj = dict()
 

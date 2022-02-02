@@ -1,0 +1,243 @@
+import os
+import traceback
+
+from rusrv import environ
+from rusrv import functions
+
+def isAdmin(o_out = None):
+    
+    if environ.USER_ID is None:
+        if o_out is not None:
+            o_out['error'] = 'Access denied.'
+        return False
+
+    if environ.GROUPS is None:
+        out = dict()
+        readGroups(out)
+        if 'error' in out:
+            if o_out is not None:
+                o_out['error'] = out['error']
+            return False
+
+        if environ.GROUPS is None:
+            if o_out is not None:
+                o_out['error'] = 'Error reading groups.'
+            return False
+
+    if not 'admins' in environ.GROUPS:
+        if o_out is not None:
+            o_out['error'] = 'No admins group found.'
+        return False
+
+    if environ.USER_ID in environ.GROUPS['admins']:
+        return True
+
+    if o_out is not None:
+        o_out['error'] = 'Access denied.'
+
+    return False
+
+def readGroups(o_out = None):
+
+    if environ.GROUPS is not None:
+        return True
+
+    if not os.path.isfile(environ.HT_GROUPS_FILE_NAME):
+        error = 'HT Groups file does not exist.'
+        if o_out:
+            o_out['error'] = error
+        else:
+            print(error)
+        return False
+
+    data = functions.fileRead(environ.HT_GROUPS_FILE_NAME)
+    if data is None:
+        error = 'Unable to read groups file.'
+        if o_out:
+            o_out['error'] = error
+        else:
+            print(error)
+        return False
+
+    groups = dict()
+
+    for line in data.split('\n'):
+        if len(line) < 3:
+            continue
+
+        fields = line.split(':')
+        if len(fields) == 0:
+            continue
+        if len(fields[0]) < 1:
+            continue
+
+        groups[fields[0]] = []
+        if len(fields) < 2:
+            continue
+
+        for user in fields[1].split(' '):
+            if len(user) < 1:
+                continue
+
+            groups[fields[0]].append(user)
+
+    environ.GROUPS = groups
+
+    return True
+
+
+def permissionsGet(i_args, o_out):
+
+    o_out['groups'] = []
+    o_out['users'] = []
+    o_out['merge'] = False
+
+    if not os.path.isdir(i_args['path']):
+        o_out['error'] = 'No such directory.'
+        return
+
+    htaccess = os.path.join(i_args['path'], environ.HT_ACCESS_FILE_NAME)
+    if not os.path.isfile(htaccess):
+        return
+
+    data = functions.fileRead(htaccess)
+    if data is None:
+        o_out['error'] = 'Can`t read the file.'
+        return
+
+    for line in data.split('\n'):
+
+        if len(line) <= 1:
+            continue
+
+        words = line.split(' ')
+
+        if len(words) < 2:
+            o_out['error'] = 'Invalid line: "%s"' % line
+            return
+
+        if words[0] == 'AuthMerging':
+            if words[1] == 'Or':
+                o_out['merge'] = True
+            continue
+
+        if words[0] != 'Require':
+            continue
+
+        del words[0]
+
+        if words[0] == 'group':
+            del words[0]
+            for group in words:
+                o_out['groups'].append(group)
+        elif words[0] == 'user':
+            del words[0]
+            for user in words:
+                o_out['users'].append(user)
+        elif words[0] == 'valid-user':
+            o_out['valid_user'] = True
+
+
+def permissionsSet(i_args, o_out):
+
+    # There should be at least one group 'admins'
+    if not 'groups' in i_args:
+        i_args['groups'] = []
+    if not 'admins' in i_args['groups']:
+        i_args['groups'].insert(0, 'admins')
+
+    lines = []
+    lines.append('AuthMerging Or')
+
+    if 'groups' in i_args and len(i_args['groups']):
+        lines.append('Require group ' + ' '.join(i_args['groups']))
+
+    if 'users' in i_args and len(i_args['users']):
+        lines.append('Require user ' + ' '.join(i_args['users']))
+
+    data = '\n'.join(lines) + '\n'
+
+    htaccess = os.path.join(i_args['path'], environ.HT_ACCESS_FILE_NAME)
+    if not functions.fileWrite(htaccess, data):
+        o_out['error'] = 'Unable to write into the file.'
+
+
+def permissionsClear(i_args, o_out):
+    htaccess = os.path.join(i_args['path'], environ.HT_ACCESS_FILE_NAME)
+    if not os.path.isfile(htaccess):
+        o_out['error'] = 'No permissions settings found.'
+        return
+
+    try:
+        os.remove(htaccess)
+    except:
+        o_out['error'] = 'Can`t remove the file.'
+        o_out['info'] = '%s' % traceback.format_exc()
+
+
+def htaccessFolder(i_folder):
+
+    if i_folder == '.':
+        return True
+
+    if not readGroups():
+        return False
+
+    args = dict()
+    args['path'] = i_folder
+    out = dict()
+    permissionsGet(args, out)
+
+    if 'error' in out:
+        print(out['error'])
+        return False
+    if 'valid_user' in out:
+        if environ.USER_ID is None:
+            return False
+        return True
+
+    if len(out['users']) == 0 and len(out['groups']) == 0:
+        return None
+
+    if environ.USER_ID is None:
+        return False
+
+    for grp in out['groups']:
+        if grp in environ.GROUPS:
+            if environ.USER_ID in environ.GROUPS[grp]:
+                return True
+
+    if environ.USER_ID in out['users']:
+        return True
+
+    if out['merge']:
+        return None
+
+    return False
+
+
+def htaccessPath(i_path):
+
+    if os.path.isfile(i_path):
+        i_path = os.path.dirname(i_path)
+
+    if not os.path.isdir(i_path):
+        print('htaccessPath: no such directory: ' + i_path)
+        return False
+
+    path = None
+    paths = []
+    for folder in i_path.split('/'):
+        if path is not None:
+            path = os.path.join(path, folder)
+        else:
+            path = folder
+        paths.append(path)
+
+    for path in reversed(paths):
+        access = htaccessFolder(path)
+        if access is False: return False
+        if access is True: return True
+
+    return True
+
