@@ -2251,7 +2251,9 @@ function upload($i_path, &$o_out)
 			$file_info['path'] = $path;
 		}
 
-		array_push($o_out['files'], $file_info);
+		//array_push($o_out['files'], $file_info);
+		$o_out['upload'] = $file_info;
+		break;
 	}
 }
 

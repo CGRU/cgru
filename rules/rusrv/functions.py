@@ -1,3 +1,4 @@
+import cgi
 import json
 import os
 import time
@@ -390,32 +391,38 @@ def walkDir(i_recv, i_dir, o_out, i_depth):
         o_out['folders'].append(folderObj)
 
 
-def upload(i_env, out):
+def upload(i_env, o_out):
     fieldStorage = cgi.FieldStorage(fp=i_env['wsgi.input'], environ=i_env, keep_blank_values=True)
     if 'upload_path' not in fieldStorage or 'upload_file' not in fieldStorage:
-        out['error'] = 'Upload form should contain upload_path and upload_file fields.'
+        o_out['error'] = 'Upload form should contain upload_path and upload_file fields.'
         return
 
     path = fieldStorage['upload_path'].value
-    name = fieldStorage['upload_file'].filename
+    dirname = os.path.dirname(path)
 
-    path = os.path.join(out['app_root'], path)
-    if not os.path.isdir(path):
+    # Create a download directory
+    if not os.path.isdir(dirname):
         try:
-            os.makedirs(path)
+            os.makedirs(dirname)
         except:
-            out['error'] = 'Unable to crearte upload directory: %s' % path
-            out['info'] = '%s' % traceback.format_exc()
+            o_out['error'] = 'Unable to crearte upload directory: %s' % dirname
+            o_out['info'] = '%s' % traceback.format_exc()
             return
-        out['info'] = 'Upload directory created: %s' % path
+        o_out['info'] = 'Upload directory created: %s' % dirname
 
-    filename = os.path.join(path, name)
+    # If file exists add a nubmer
+    basename, ext = os.path.splitext(os.path.basename(path))
+    i = 0
+    while os.path.isfile(path):
+        i += 1
+        path = os.path.join(dirname, '%s-%d' % (basename, i)) + ext
+
     file = None
     try:
-        file = open(filename, 'wb')
+        file = open(path, 'wb')
     except:
-        out['error'] = 'Unable to open file: %s' % filename
-        out['info'] = '%s' % traceback.format_exc()
+        o_out['error'] = 'Unable to open file: %s' % path
+        o_out['info'] = '%s' % traceback.format_exc()
         return
 
     while 1:
@@ -424,5 +431,6 @@ def upload(i_env, out):
             break
         file.write(data)
 
-    out['info'] = 'File uploaded: %s' % filename
+    o_out['upload'] = dict()
+    o_out['upload']['path'] = path
 

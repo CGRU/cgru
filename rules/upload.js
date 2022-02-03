@@ -317,7 +317,8 @@ function up_Received(i_args, i_el)
 		c_Error('Upload undefined error.');
 		return;
 	}
-	if ((i_args.files == null) || (i_args.files.length == 0))
+
+	if (i_args.upload == null)
 	{
 		if (i_args.error)
 			c_Error('Upload server: ' + i_args.error);
@@ -326,24 +327,18 @@ function up_Received(i_args, i_el)
 		return;
 	}
 
-	var news = [];
-	for (let f = 0; f < i_args.files.length; f++)
-	{
-		up_Done(i_el, i_args.files[f]);
+	up_Done(i_el, i_args.upload);
 
-		let path = i_args.files[f].path;
-		if (path == null)
-			continue;
+	let path = i_args.upload.path;
+	if (path == null)
+		return;
 
-		// File (path base) can be renamed during upload
-		path = c_PathDir(i_el.m_uppath) + '/' + c_PathBase(path);
-		let news_link = g_GetLocationArgs({"fv_Goto": path}, false, i_el.m_curpath);
-		news.push(nw_CreateNews({'title': i_el.m_uptitle, 'path': i_el.m_curpath, 'link': news_link}));
-	}
+	// File (path base) can be renamed during upload
+	path = c_PathDir(i_el.m_uppath) + '/' + c_PathBase(path);
+	let news_link = g_GetLocationArgs({"fv_Goto": path}, false, i_el.m_curpath);
+	news = nw_CreateNews({'title': i_el.m_uptitle, 'path': i_el.m_curpath, 'link': news_link});
 
-	if (news.length)
-		nw_SendNews(news);
-	// console.log( JSON.stringify( i_args));
+	nw_SendNews([news]);
 }
 
 function up_Done(i_el, i_file_info)

@@ -28,7 +28,7 @@ def application(environ, start_response):
     request = None
 
     if 'CONTENT_TYPE' in environ and environ['CONTENT_TYPE'].find('multipart/form-data') != -1:
-        upload(environ, out)
+        rusrv.functions.upload(environ, out)
     else:
         content_length = 0
         if 'CONTENT_LENGTH' in environ:
