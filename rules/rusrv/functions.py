@@ -312,7 +312,7 @@ def walkDir(i_recv, i_dir, o_out, i_depth):
                 file_info = dict()
                 if walk and 'files' in walk and entry in walk['files']:
                     file_info = walk['files'][entry]
-                file_info['name'] = entry
+                file_info['name'] = os.fsencode(entry).decode('utf-8', 'surrogateescape')
                 st = os.stat(path)
                 file_info['size'] = st.st_size
                 file_info['mtime'] = st.st_mtime
@@ -377,7 +377,7 @@ def walkDir(i_recv, i_dir, o_out, i_depth):
         if walk and 'folders' in walk and entry in walk['folders']:
             folderObj = walk['folders'][entry]
 
-        folderObj['name'] = entry
+        folderObj['name'] = os.fsencode(entry).decode('utf-8', 'surrogateescape')
         folderObj['mtime'] = os.path.getmtime(path)
 
         if rufolder and lookahead:
@@ -401,9 +401,9 @@ def upload(i_env, o_out):
     dirname = os.path.dirname(path)
 
     # Create a download directory
-    if not os.path.isdir(dirname):
+    if not os.path.isdir(os.fsdecode(dirname.encode())):
         try:
-            os.makedirs(dirname)
+            os.makedirs(os.fsdecode(dirname.encode()))
         except:
             o_out['error'] = 'Unable to crearte upload directory: %s' % dirname
             o_out['info'] = '%s' % traceback.format_exc()
@@ -413,13 +413,13 @@ def upload(i_env, o_out):
     # If file exists add a nubmer
     basename, ext = os.path.splitext(os.path.basename(path))
     i = 0
-    while os.path.isfile(path):
+    while os.path.isfile(os.fsdecode(path.encode())):
         i += 1
         path = os.path.join(dirname, '%s-%d' % (basename, i)) + ext
 
     file = None
     try:
-        file = open(path, 'wb')
+        file = open(os.fsdecode(path.encode()), 'wb')
     except:
         o_out['error'] = 'Unable to open file: %s' % path
         o_out['info'] = '%s' % traceback.format_exc()
