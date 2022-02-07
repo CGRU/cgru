@@ -146,6 +146,7 @@ class BlockParameters:
         self.tmpimage = 1
         self.pathsmap = 1
         self.imgfiles = []
+        self.moviemode = False
         self.tickets_use = 0
         self.tickets_data = None
 
@@ -250,6 +251,12 @@ class BlockParameters:
                         )
                         self.valid = False
                         return
+
+                    if cgruutils.isMovieExt(images1):
+                        self.imgfiles.append(images1)
+                        self.moviemode = True
+                        continue
+
                     octx.setFrame(octx_framelast)
                     images2 = fileknob.getEvaluatedValue(octx)
                     if images2 is None or images2 == '':
@@ -262,8 +269,8 @@ class BlockParameters:
                         )
                         self.valid = False
                         return
-                    part1, padding, part2 = \
-                        afcommon.splitPathsDifference(images1, images2)
+
+                    part1, padding, part2 = afcommon.splitPathsDifference(images1, images2)
 
                     if padding < 1:
                         nuke.message(
@@ -275,9 +282,8 @@ class BlockParameters:
                         )
                         self.valid = False
                         return
-                    self.imgfiles.append(
-                        '%s@%s@%s' % (part1, '#' * padding, part2)
-                    )
+
+                    self.imgfiles.append('%s@%s@%s' % (part1, '#' * padding, part2))
 
             # Check images folders:
             for imgfile in self.imgfiles:
@@ -311,6 +317,9 @@ class BlockParameters:
                 if hasattr(self, par):
                     setattr(self, par, fparams[par])
 
+        if self.moviemode:
+            self.framespertask = self.framelast - self.framefirst + 1
+
         self.name = self.writename
         if subblock:
             if self.prefix is not None:
@@ -343,6 +352,7 @@ class BlockParameters:
             block = af.Block(self.name, AfanasyServiceType)
             block.setNumeric(self.framefirst, self.framelast,
                              self.framespertask, self.frameinc)
+            print(self.imgfiles)
             block.setFiles(self.imgfiles)
             if self.skipexisting:
                 block.skipExistingFiles()

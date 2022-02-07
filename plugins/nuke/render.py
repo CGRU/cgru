@@ -9,6 +9,8 @@ import re
 
 import nuke
 
+import cgruutils
+
 from parsers import parser
 
 tmpdir = None
@@ -178,6 +180,7 @@ filenames = []
 views_str = None
 views = []
 views_num = 0
+MovieMode = False
 try:
 	views_str = writenode['views'].value()
 	print('Views = "%s"' % views_str)
@@ -195,6 +198,8 @@ try:
 			filename = fileknob.getEvaluatedValue(octx)
 			imagesdirs.append(os.path.dirname(filename))
 			filenames.append(filename)
+			if cgruutils.isMovieExt(filename):
+				MovieMode = True
 except Exception as e:
 	errorExit('Can`t process views on "%s" write node:\n%s' % (xnode, e), True)
 
@@ -240,7 +245,10 @@ print('Number of views = %d' % views_num)
 exitcode = 0
 frame = ffirst
 while frame <= flast:
-	print('Rendering frame %d:' % frame)
+	if MovieMode:
+		print('Rendering frame range [%d - %d] into the movie.' % (ffirst, flast))
+	else:
+		print('Rendering frame %d:' % frame)
 	sys.stdout.flush()
 
 	# Iterate views:
@@ -256,14 +264,17 @@ while frame <= flast:
 			sys.stdout.flush()
 
 		# Try to execute write node:
+		frame_last = frame
+		if MovieMode:
+			frame_last = flast
 		try:
 			if nuke.env['NukeVersionMajor'] < 6:
-				nuke.execute(writenode.name(), frame, frame)
+				nuke.execute(writenode.name(), frame, frame_last)
 			else:
 				if multiview_file:
-					nuke.execute(writenode, frame, frame, 1, views)
+					nuke.execute(writenode, frame, frame_last, 1, views)
 				else:
-					nuke.execute(writenode, frame, frame, 1, [view])
+					nuke.execute(writenode, frame, frame_last, 1, [view])
 		except Exception as e:
 			print('Node execution error:')
 			print(str(e))
@@ -339,6 +350,9 @@ while frame <= flast:
 		break
 
 	frame += fby
+
+	if MovieMode:
+		break
 
 # Remove temp directory:
 shutil.rmtree(tmpdir)
