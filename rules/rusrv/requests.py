@@ -218,6 +218,19 @@ def req_editobj(i_edit, o_out):
         o_out['error'] = 'Can`t write to ' + i_edit['file']
 
 
+def req_makefolder(i_args, o_out):
+    dirname = i_args['path']
+
+    try:
+        os.makedirs(os.fsdecode(dirname.encode()), 0o777)
+    except:
+        o_out['error'] = 'Unable to create directory ' + dirname
+        o_out['info'] = '%s' % traceback.format_exc()
+        return
+
+    o_out['makefolder'] = dirname
+
+
 def req_makenews(i_args, o_out):
     # Read all users:
     users = functions.readAllUsers(o_out, True)
