@@ -37,7 +37,8 @@ v3.2.2
 
 	- **Changed to work with Houdini 19 version, will not work with 18.5.**
 
- - Nuke: Submission and render scripts support rendering a movie.
+- Nuke: Submission and render scripts support rendering a movie.
+
 
 - **Bugfixes:**
 
