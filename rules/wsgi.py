@@ -14,7 +14,7 @@ sys.path.append(APP_ROOT)
 
 import rusrv
 
-rusrv.functions.initApp(APP_ROOT)
+rusrv.environ.initApp(APP_ROOT)
 
 os.chdir(rusrv.environ.CGRU_LOCATION)
 
@@ -22,8 +22,8 @@ def application(environ, start_response):
 
     out = dict()
 
-    rusrv.functions.initEnv(environ)
-    rusrv.functions.initSession(environ)
+    rusrv.environ.initEnv(environ)
+    rusrv.environ.initSession(environ)
 
     request = None
 

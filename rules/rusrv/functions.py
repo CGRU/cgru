@@ -9,31 +9,6 @@ from rusrv import admin
 from rusrv import environ
 from rusrv import editobj
 
-def initApp(i_app_root):
-    environ.CGRU_LOCATION = os.path.dirname(i_app_root)
-    environ.CGRU_VERSION = fileRead(os.path.join(environ.CGRU_LOCATION,'version.txt'))
-
-    os.environ['CGRU_LOCATION'] = environ.CGRU_LOCATION
-    os.environ['CGRU_VERSION'] = environ.CGRU_VERSION
-    os.environ['AF_ROOT'] = os.path.join(environ.CGRU_LOCATION, 'afanasy')
-
-    sys.path.append(os.path.join(environ.CGRU_LOCATION, 'lib', 'python'))
-    sys.path.append(os.path.join(environ.CGRU_LOCATION, 'afanasy', 'python'))
-
-
-def initEnv(i_environ):
-    environ.COUNTER += 1
-    environ.SERVER_SOFTWARE = i_environ['SERVER_SOFTWARE']
-    environ.MOD_WSGI_VERSION = i_environ['mod_wsgi.version']
-    if 'AUTH_TYPE' in i_environ:
-        environ.AUTH_TYPE = i_environ['AUTH_TYPE']
-
-
-def initSession(i_environ):
-    environ.REMOTE_ADDR = i_environ['REMOTE_ADDR']
-    if 'REMOTE_USER' in i_environ:
-        environ.USER_ID = i_environ['REMOTE_USER']
-
 
 def fileRead(i_file, i_lock = True, i_verbose = False):
     try:
