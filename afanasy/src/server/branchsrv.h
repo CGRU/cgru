@@ -110,8 +110,8 @@ private:
 	void remUserJob(JobAf * i_job, UserAf * i_user);
 	void addUserJob(JobAf * i_job, UserAf * i_user);
 
-	void addSolveCounts(const JobAf & i_job);
-	void remSolveCounts(const JobAf & i_job);
+	void addJobCounts(const JobAf & i_job);
+	void remJobCounts(const JobAf & i_job);
 
 private:
 	static BranchesContainer * ms_branches;

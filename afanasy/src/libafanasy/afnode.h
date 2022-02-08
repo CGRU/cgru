@@ -88,8 +88,8 @@ protected:
 
 	virtual void v_priorityChanged(MonitorContainer *i_monitoring);
 
-	void incrementService(const std::string & i_name);
-	void decrementService(const std::string & i_name);
+	void incrementService(const std::string & i_name, int count = 1);
+	void decrementService(const std::string & i_name, int count = 1);
 
 	inline void clearRunningServices() {m_running_services.clear();}
 
@@ -117,9 +117,9 @@ protected:
 	std::string m_custom_data;
 	std::string m_srv_info;       ///< Some info that server can show to user.
 
+	std::map<std::string, int32_t> m_running_services;
+
 private:
 	std::list<std::string> m_log; ///< Log.
-
-	std::map<std::string, int32_t> m_running_services;
 };
 }

@@ -7,7 +7,7 @@ import re
 import cgruutils
 
 
-re_percent = re.compile(r'(\s*)(\d*)(\s*% done)')
+re_percent = re.compile(r'(\s*)(\d*)(\s*%)')
 
 PeakMem_RE = re.compile('.*peak CPU memory used *(.*)')
 
@@ -24,6 +24,15 @@ class arnold(parser.parser):
         self.str_warning += [
             'WARNING | rendering with watermarks because of failed authorization:',
         ]
+        self.str_error = ['Error reading pixel data from image file',
+                          "ERROR | [ass] can't open",
+                          "ERROR | [ass] can't read in",
+                          "ERROR | [texturesys] unspecified OIIO error ",
+                          "can't create file",
+                          'ERROR   | signal caught: '
+                          'SIGABRT -- Abnormal process abort',
+                          '[rlm] error initializing license system',
+                          'ERROR | [alembic] invalid archive']
 
 
         self.arnold_mem = None        

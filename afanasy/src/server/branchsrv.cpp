@@ -171,7 +171,7 @@ void BranchSrv::v_action(Action & i_action)
 	if (i_action.log.size())
 	{
 		store();
-		i_action.answer = "Branch(es) parameter(s) changed.";
+		i_action.answerLog("Branch(es) parameter(s) changed.");
 		i_action.monitors->addEvent(af::Monitor::EVT_branches_change, m_id);
 	}
 }
@@ -188,15 +188,13 @@ void BranchSrv::deleteBranch(Action & o_action, MonitorContainer * i_monitoring)
 {
 	if (isRoot())
 	{
-		o_action.answer_kind = "error";
-		o_action.answer = "Can`t delete ROOT branch.";
+		o_action.answerError("Can`t delete ROOT branch.");
 		return;
 	}
 
 	if (m_branches_num || m_jobs_num)
 	{
-		o_action.answer_kind = "error";
-		o_action.answer = "Branch['" + m_name + "'] has child branches/jobs.";
+		o_action.answerError("Branch['" + m_name + "'] has child branches/jobs.");
 		return;
 	}
 
@@ -241,7 +239,7 @@ void BranchSrv::addJob(JobAf * i_job, UserAf * i_user)
 
 	// Add solve counts, this function will add it to all parents
 	// (running tasts number, capacity total, renders counts for max tasks per host)
-	addSolveCounts(*i_job);
+	addJobCounts(*i_job);
 
 	// Add job to user (create new branch user if not exists)
 	addUserJob(i_job, i_user);
@@ -272,7 +270,7 @@ void BranchSrv::removeJob(JobAf * i_job, UserAf * i_user)
 
 	// Remove solve counts, this function will remove it to all parents
 	// (running tasts number, capacity total, renders counts for max tasks per host)
-	remSolveCounts(*i_job);
+	remJobCounts(*i_job);
 
 	// Remove job from m_users
 	remUserJob(i_job, i_user);
@@ -325,7 +323,7 @@ void BranchSrv::changeJobUser(UserAf * i_old_user, JobAf * i_job, UserAf * i_new
 	addUserJob(i_job, i_new_user);
 }
 
-void BranchSrv::addSolveCounts(const JobAf & i_job)
+void BranchSrv::addJobCounts(const JobAf & i_job)
 {
 	// Add running counts (runnig tasks num and capacity total) to Af::Work
 	addRunningCounts(i_job);
@@ -335,10 +333,10 @@ void BranchSrv::addSolveCounts(const JobAf & i_job)
 
 	// Add solve counts to the parent (if any, branch can be the root)
 	if (m_parent)
-		m_parent->addSolveCounts(i_job);
+		m_parent->addJobCounts(i_job);
 }
 
-void BranchSrv::remSolveCounts(const JobAf & i_job)
+void BranchSrv::remJobCounts(const JobAf & i_job)
 {
 	// Remove running counts (runnig tasks num and capacity total) from Af::Work
 	remRunningCounts(i_job);
@@ -348,7 +346,7 @@ void BranchSrv::remSolveCounts(const JobAf & i_job)
 
 	// Remove solve counts to the parent (if any, branch can be the root)
 	if (m_parent)
-		m_parent->remSolveCounts(i_job);
+		m_parent->remJobCounts(i_job);
 }
 
 void BranchSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, MonitorContainer * i_monitoring)

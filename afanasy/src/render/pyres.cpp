@@ -59,7 +59,11 @@ void PyRes::update()
 	std::string err = std::string("PyRes::update['" + m_name + "']: ");
 
 
-	int value, valuemax, width, height, graphr, graphg, graphb, labelsize, labelr, labelg, labelb, bgcolorr, bgcolorg, bgcolorb = 0;
+	int value = 0, valuemax = 0;
+	int width = 0, height = 0;
+	int graphr = 0, graphg = 0, graphb = 0;
+	int labelsize = 0, labelr = 0, labelg = 0, labelb = 0;
+	int bgcolorr = 0, bgcolorg = 0, bgcolorb = 0;
 	std::string label, tooltip;
 
 	if (false == af::PyGetAttrInt(pClass,"value",     value,     err)) return;

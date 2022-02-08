@@ -13,17 +13,23 @@ URL:           http://cgru.info/
 Requires:      afanasy-common = @VERSION@
 
 %description
-Afanasy render init sctipts. Create user "render" if does not exists.
+Afanasy render SystemD sctipts. Create user "render" if does not exists.
 
 %prep
 
 %build
 
 %install
-mkdir -p $RPM_BUILD_ROOT
+cd ../..
+dirs="usr"
+for dir in $dirs; do
+   mkdir -p $RPM_BUILD_ROOT/$dir
+   mv $dir/* $RPM_BUILD_ROOT/$dir
+done
 
 %files
 %defattr(-,root,root)
+/usr/lib/systemd/system/afrender.service
 
 %clean
 
@@ -43,7 +49,7 @@ if ! id render; then
 		useradd render -m
 	fi
 fi
-systemctl enable /opt/cgru/afanasy/systemd/afrender.service || true
+systemctl enable afrender.service || true
 systemctl daemon-reload || true
 systemctl start afrender.service || true
 exit 0

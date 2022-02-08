@@ -326,9 +326,9 @@ void BlockInfo::refresh()
 	str_right_top.clear();
 	if( Watch::isPadawan())
 	{
-		if( p_tasksdone) str_right_top += QString(" Render Timings: Sum:%1 / Average:%2")
-			.arg( af::time2strHMS( p_taskssumruntime, true).c_str())
-			.arg( af::time2strHMS( p_taskssumruntime/p_tasksdone, true).c_str());
+		if ((p_tasksdone - p_tasksskipped) > 0) str_right_top += QString(" Render Timings: Sum:%1 / Average:%2")
+			.arg(af::time2strHMS(p_taskssumruntime, true).c_str())
+			.arg(af::time2strHMS(p_taskssumruntime/(p_tasksdone - p_tasksskipped), true).c_str());
 
 		if(( errors_avoid_host >= 0 ) || ( errors_task_same_host >= 0 ) || ( errors_retries >= 0 ))
 			str_right_top += Item::generateErrorsSolvingInfo( errors_avoid_host, errors_task_same_host, errors_retries);
@@ -380,9 +380,9 @@ void BlockInfo::refresh()
 	}
 	else if( Watch::isJedi())
 	{
-		if( p_tasksdone) str_right_top += QString(" Timings: Sum:%1/Avg:%2")
-			.arg( af::time2strHMS( p_taskssumruntime, true).c_str())
-			.arg( af::time2strHMS( p_taskssumruntime/p_tasksdone, true).c_str());
+		if ((p_tasksdone - p_tasksskipped) > 0) str_right_top += QString(" Timings: Sum:%1/Avg:%2")
+			.arg(af::time2strHMS(p_taskssumruntime, true).c_str())
+			.arg(af::time2strHMS(p_taskssumruntime/(p_tasksdone - p_tasksskipped), true).c_str());
 
 		if(( errors_avoid_host >= 0 ) || ( errors_task_same_host >= 0 ) || ( errors_retries >= 0 ))
 			str_right_top += Item::generateErrorsSolvingInfo( errors_avoid_host, errors_task_same_host, errors_retries);
@@ -434,9 +434,9 @@ void BlockInfo::refresh()
 	}
 	else
 	{
-		if( p_tasksdone) str_right_top += QString(" rt:s%1/a%2")
-			.arg( af::time2strHMS( p_taskssumruntime, true).c_str())
-			.arg( af::time2strHMS( p_taskssumruntime/p_tasksdone, true).c_str());
+		if ((p_tasksdone - p_tasksskipped) > 0) str_right_top += QString(" rt:s%1/a%2")
+			.arg(af::time2strHMS(p_taskssumruntime, true).c_str())
+			.arg(af::time2strHMS(p_taskssumruntime/(p_tasksdone - p_tasksskipped), true).c_str());
 
 		if(( errors_avoid_host >= 0 ) || ( errors_task_same_host >= 0 ) || ( errors_retries >= 0 ))
 			str_right_top += Item::generateErrorsSolvingInfo( errors_avoid_host, errors_task_same_host, errors_retries);

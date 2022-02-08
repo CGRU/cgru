@@ -10,7 +10,7 @@ if ! id render; then
 	fi
 fi
 
-systemctl enable /opt/cgru/afanasy/systemd/afrender.service || true
+systemctl enable afrender.service || true
 systemctl daemon-reload || true
 systemctl start afrender.service || true
 

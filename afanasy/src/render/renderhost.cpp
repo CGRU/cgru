@@ -243,7 +243,7 @@ af::Msg * RenderHost::updateServer()
 
 		m_tasks.clear();
 	}
-	else if( m_updateMsgType == af::Msg::TRenderUpdate )
+	else
 	{
 		#ifdef AFOUTPUT
 		AF_LOG << m_up;

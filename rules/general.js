@@ -48,8 +48,10 @@ function g_Init()
 	cgru_Init();
 	u_Init();
 	c_Init();
+	n_Init();
 	activity_Init();
-	n_Request({"send": {"start": {}}, "func": g_Init_Server, "info": 'start'});
+
+	n_Request({"send": {"start": {}}, "func": g_Init_Server, "info": 'start', "force_log": true});
 
 	window.onbeforeunload = g_OnClose;
 }
@@ -72,7 +74,6 @@ function g_Init_Server(i_data)
 
 	var url = decodeURI(document.location.href);
 
-	n_log_responses = false;
 	n_Request({"send": {"initialize": {'url': url}}, "func": g_Init_Config, "info": 'init'});
 }
 
@@ -1004,9 +1005,18 @@ function g_CompareFolders(a, b)
 		}
 	}
 
+	// Move COMMON folder to top:
+	let a_cmn = c_PathBase(a.name) == 'COMMON';
+	let b_cmn = c_PathBase(b.name) == 'COMMON';
+
+	if (a_cmn && (false == b_cmn))
+		return -1;
+	if (b_cmn && (false == a_cmn))
+		return 1;
+
 	// Move auxiliary folders to bottom:
-	var a_aux = c_AuxFolder(a);
-	var b_aux = c_AuxFolder(b);
+	let a_aux = c_AuxFolder(a);
+	let b_aux = c_AuxFolder(b);
 
 	if (a_aux && (false == b_aux))
 		return 1;

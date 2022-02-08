@@ -180,6 +180,14 @@ void ItemJobBlock::v_paint(QPainter * i_painter, const QRect & i_rect, const QSt
 	i_painter->drawText(x+3, y, ItemJobTask::WidthInfo, HeightFooter-1, Qt::AlignLeft | Qt::AlignVCenter, "Tasks:");
 
 	i_painter->setOpacity(sorting_fields_text_opacity);
+	if (m_sort_type == SPct)
+		i_painter->fillRect(linex-WPct+1, y, WPct-1, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
+	i_painter->drawText(linex - WPct, y, WPct, HeightFooter-1, Qt::AlignCenter, "pct");
+	linex -= WPct;
+	i_painter->setOpacity(sorting_fields_line_opacity);
+	i_painter->drawLine(linex, y, linex, y+HeightFooter-2);
+
+	i_painter->setOpacity(sorting_fields_text_opacity);
 	if (m_sort_type == SErrors)
 		i_painter->fillRect(linex-WErrors+1, y, WErrors-1, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
 	i_painter->drawText(linex - WErrors, y, WErrors, HeightFooter-1, Qt::AlignCenter, "errors");
@@ -216,7 +224,7 @@ bool ItemJobBlock::v_mousePressed(int i_x, int i_y, int i_w, int i_h, const Qt::
    bool processed = false;
    int sort_type_old = m_sort_type;
 
-   x -= WHost + WErrors + WStarts;
+   x -= WHost + WErrors + WPct + WStarts;
 	if (!processed && i_x < x)
    {
       if( resetSortingParameters() == 0) return true;
@@ -244,6 +252,13 @@ bool ItemJobBlock::v_mousePressed(int i_x, int i_y, int i_w, int i_h, const Qt::
       processed = true;
    }
 
+	x += WPct;
+	if (!processed && i_x < x)
+	{
+		m_sort_type = SPct;
+		processed = true;
+	}
+
    x += WTime;
 	if (!processed && i_x < x)
    {
@@ -265,6 +280,7 @@ case 0:        printf("Tasks %d \n",   m_sort_ascending); break;
 case SHost:    printf("Host %d \n",    m_sort_ascending); break;
 case SStarts:  printf("Start %d \n",   m_sort_ascending); break;
 case SErrors:  printf("Errors %d \n",  m_sort_ascending); break;
+case SPct:     printf("Pct %d \n",     m_sort_ascending); break;
 case STime:    printf("Time %d \n",    m_sort_ascending); break;
 case SState:   printf("State %d \n",   m_sort_ascending); break;
 }

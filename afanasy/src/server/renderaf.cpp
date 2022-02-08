@@ -440,8 +440,7 @@ void RenderAf::v_action( Action & i_action)
 		{
 			if(isOnline())
 			{
-				i_action.answer_kind = "error";
-				i_action.answer = "Can`t delete online render.";
+				i_action.answerError("Can`t delete online render.");
 				return;
 			}
 			appendLog( std::string("Deleted by ") + i_action.author);
@@ -489,8 +488,7 @@ void RenderAf::v_action( Action & i_action)
 		else
 		{
 			appendLog("Unknown operation \"" + type + "\" by " + i_action.author);
-			i_action.answer_kind = "error";
-			i_action.answer = "Unknown operation: " + type;
+			i_action.answerError("Unknown operation: " + type);
 			return;
 		}
 
@@ -506,23 +504,20 @@ void RenderAf::actionSetPool(const std::string & i_pool_name, Action & i_action)
 {
 	if (m_pool == i_pool_name)
 	{
-		i_action.answer_kind = "error";
-		i_action.answer = "Render '" + getName() + "' already in a poll '" + i_pool_name + "'.";
+		i_action.answerError("Render '" + getName() + "' already in a poll '" + i_pool_name + "'.");
 		return;
 	}
 
 	PoolSrv * pool = i_action.pools->getPool(i_pool_name);
 	if (NULL == pool)
 	{
-		i_action.answer_kind = "error";
-		i_action.answer = "Pool '" + i_pool_name + "' does not exist.";
+		i_action.answerError("Pool '" + i_pool_name + "' does not exist.");
 		return;
 	}
 
 	if (pool->hasRender(this))
 	{
-		i_action.answer_kind = "error";
-		i_action.answer = "Pool '" + pool->getName() + "' already has a render '" + getName() + "'.";
+		i_action.answerError("Pool '" + pool->getName() + "' already has a render '" + getName() + "'.");
 		return;
 	}
 

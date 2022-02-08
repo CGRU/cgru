@@ -384,6 +384,7 @@ Task.prototype.edit = function()
 		return;
 
 	this.editing = true;
+	this.elRoot.classList.add('edit');
 	this.elShow.style.display = 'none';
 
 
@@ -489,6 +490,7 @@ Task.prototype.editCancel = function()
 	}
 
 	this.editing = false;
+	this.elRoot.classList.remove('edit');
 	this.elEdit.textContent = '';
 	this.elShow.style.display = 'block';
 }
@@ -734,7 +736,7 @@ function task_DrawBadges(i_status, i_el, i_args)
 
 		let elTask = document.createElement('div');
 		elTask.classList.add('task_badge');
-		if (task.artists.indexOf(g_auth_user.id) != -1)
+		if (g_auth_user && (task.artists.indexOf(g_auth_user.id) != -1))
 			elTask.classList.add('my');
 		else
 			elTask.classList.add('notmy');

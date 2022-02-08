@@ -123,7 +123,7 @@ function jsonEncode(&$i_obj)
 
 function _flock_(&$i_handle, $i_type)
 {
-	flock( $i_handle, $i_type);
+//	flock( $i_handle, $i_type);
 }
 
 function fileRead($i_filename, $i_lock = true, $i_verbose = false)
@@ -2251,7 +2251,9 @@ function upload($i_path, &$o_out)
 			$file_info['path'] = $path;
 		}
 
-		array_push($o_out['files'], $file_info);
+		//array_push($o_out['files'], $file_info);
+		$o_out['upload'] = $file_info;
+		break;
 	}
 }
 

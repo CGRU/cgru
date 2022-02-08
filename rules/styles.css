@@ -811,6 +811,9 @@ border: 2px solid rgba(98,98,98,.5);
 border: 2px solid rgba(100,255,255,1);
 box-shadow: 0 0 4px rgba(100,255,255,1), 0 0 4px rgba(100,255,255,1) inset;
 }
+#status_tasks .task.edit {
+border: 2px solid rgba(255,255,0,1);
+}
 #status_tasks .task.deleted            {display: none;}
 #status_tasks .task .show_div          {clear: both;}
 #status_tasks .task .show_div .artists {float: left;}

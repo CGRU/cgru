@@ -283,6 +283,17 @@ bool JobAf::initialize()
 				appendLog( std::string("Block[") + m_blocks_data[b]->getName() + "] pre command executed:\n" + m_blocks_data[b]->getCmdPre());
 			}
 		}
+		// Process event
+		if( m_id != AFJOB::SYSJOB_ID ) // skip system job
+		{
+			if (hasCustomData() || m_user->hasCustomData())
+			{
+				std::vector<std::string> events;
+				events.push_back("JOB_CREATED");
+				emitEvents(events);
+			}
+		}
+
 		appendLog("Initialized.");
 	}
 	else
@@ -310,7 +321,7 @@ void JobAf::checkStates()
 		{
 			uint32_t taskstate = m_progress->tp[b][t]->state;
 
-			if( taskstate == 0 )
+			if ((taskstate == 0) || (taskstate == AFJOB::STATE_WARNING_MASK))
 			{
 				taskstate = AFJOB::STATE_READY_MASK;
 			}
@@ -567,7 +578,7 @@ void JobAf::v_action( Action & i_action)
 		else
 		{
 			appendLog("Unknown operation \"" + type + "\" by " + i_action.author);
-			i_action.answer = "Unknown operation '" + type + "\"";
+			i_action.answerError("Unknown operation: " + type);
 			return;
 		}
 		appendLog("Operation \"" + type + "\" by " + i_action.author);
@@ -591,7 +602,7 @@ void JobAf::v_action( Action & i_action)
 		UserAf * user = i_action.users->getUser( m_user_name);
 		if( user == NULL )
 		{
-			i_action.answer = "User does not exist: '" + m_user_name + "'";
+			i_action.answerError("User does not exist: " + m_user_name);
 			m_user_name = _user_name;
 			return;
 		}
@@ -618,7 +629,7 @@ void JobAf::v_action( Action & i_action)
 		BranchSrv * new_branch_srv = i_action.branches->getBranch(m_branch);
 		if (new_branch_srv == NULL)
 		{
-			i_action.answer = "New job branch not found: '" + m_branch + "'";
+			i_action.answerError("New job branch not found: " + m_branch);
 			m_branch = _branch;
 			return;
 		}
@@ -1657,22 +1668,19 @@ void JobAf::appendBlocks(Action & i_action, const JSON & i_operation)
 {
 	if (m_id == AFJOB::SYSJOB_ID)
 	{
-		i_action.answer_kind = "error";
-		i_action.answer = "Appending system job is not allowed.";
+		i_action.answerError("Appending system job is not allowed.");
 		return;
 	}
 
 	const JSON & blocks = i_operation["blocks"];
 	if (!blocks.IsArray())
 	{
-		i_action.answer_kind = "error";
-		i_action.answer = "Operation requires blocks array.";
+		i_action.answerError("Operation requires blocks array.");
 		return;
 	}
 	if (blocks.Size() == 0)
 	{
-		i_action.answer_kind = "error";
-		i_action.answer = "Operation blocks array has zero size.";
+		i_action.answerError("Operation blocks array has zero size.");
 		return;
 	}
 
@@ -1680,8 +1688,7 @@ void JobAf::appendBlocks(Action & i_action, const JSON & i_operation)
 
 	if (false == jsonReadAndAppendBlocks(blocks))
 	{
-		i_action.answer_kind = "error";
-		i_action.answer = "Appending blocks failed, see server log for details.";
+		i_action.answerError("Appending blocks failed, see server log for details.");
 	}
 
 	m_progress->reconstruct( this);
@@ -1690,7 +1697,7 @@ void JobAf::appendBlocks(Action & i_action, const JSON & i_operation)
 	construct( old_blocks_num);
 
 	// initialize and constuct new blocks ids in an answer
-	i_action.answer = "{\"block_ids\":[";
+	std::string answer = "{\"block_ids\":[";
 	for( int b = old_blocks_num; b < m_blocks_num; b++)
 	{
 		m_blocks_data[b]->setJobId( m_id);
@@ -1701,10 +1708,11 @@ void JobAf::appendBlocks(Action & i_action, const JSON & i_operation)
 		i_action.monitors->addBlock(af::Msg::TBlocks, m_blocks[b]->m_data);
 
 		if (b != old_blocks_num)
-			i_action.answer += ",";
-		i_action.answer += af::itos(b);
+			answer += ",";
+		answer += af::itos(b);
 	}
-	i_action.answer += "]}";
+	answer += "]}";
+	i_action.answerObject(answer);
 
 	checkDepends();
 	checkStatesOnAppend();

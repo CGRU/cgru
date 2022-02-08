@@ -280,7 +280,8 @@ void Item::drawPercent
 	int posx, int posy, int width, int height,
 	int whole,
 	int part_a, int part_b, int part_c,
-	bool drawBorder
+	bool drawBorder,
+	QColor * i_done_color
 )
 {
 	int x = posx;
@@ -292,7 +293,7 @@ void Item::drawPercent
 	if( part_a)
 	{
 		int w = width*part_a/whole;
-		painter->setBrush( QBrush( afqt::QEnvironment::clr_done.c, Qt::SolidPattern ));
+		painter->setBrush(QBrush(i_done_color ? *i_done_color : afqt::QEnvironment::clr_done.c, Qt::SolidPattern ));
 		painter->drawRect( x, y, w, h);
 		x += w;
 	}

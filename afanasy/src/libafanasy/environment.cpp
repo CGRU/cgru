@@ -412,6 +412,15 @@ void Environment::getVar( const JSON * i_obj, std::vector<std::string> & o_value
 		if( af::jr_stringvec( i_name, o_value, *i_obj))
 			found = true;
 	}
+	else
+	{
+		std::string env_val = getVarEnv(i_name);
+		if (env_val.size())
+		{
+			o_value = af::strSplit(env_val, ",");
+			found = true;
+		}
+	}
 
 	if( found && m_verbose_init )
 	{

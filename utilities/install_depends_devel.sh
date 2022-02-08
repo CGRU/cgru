@@ -49,8 +49,7 @@ function redhatArch(){
 function fedoraArch(){
 	packages="$packages vim"
 	packages="$packages gcc-c++"
-	packages="$packages postgresql-devel"
-	packages="$packages postgresql-server-devel"
+	packages="$packages libpq-devel"
 	packages="$packages qt5-qtmultimedia-devel"
 	packages="$packages rpm-build"
 	packages="$packages git"

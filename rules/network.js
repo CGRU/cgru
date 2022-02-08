@@ -26,7 +26,15 @@ var n_conn_count = 0;
 var n_walks = {};
 var n_gets = {};
 
-var n_log_responses = true;
+var n_log_responses = null;
+
+function n_Init()
+{
+	if (document.location.hostname == '127.0.0.1')
+		n_server = '/server';
+
+	n_LogResponses();
+}
 
 function n_WalkDir(i_args)
 {
@@ -238,7 +246,7 @@ function n_XHRHandler()
 		if (this.status == 200)
 		{
 			let log = '<b><i style="color:#048">recv ' + this.m_args.id + ' (' + n_conn_count + ')</i> ' + this.m_args.info + '</b> ';
-			if (n_log_responses)
+			if (n_log_responses || this.m_args.force_log)
 			{
 				log += ': ' + this.responseText.replace(/[<>]/g, '*');
 			}
@@ -270,15 +278,24 @@ function n_XHRHandler()
 
 function n_LogResponses()
 {
+	if (n_log_responses === null)
+	{
+		// This is the first time function call from a global init:
+		n_log_responses = (localStorage.net_log_responses != 'ON');
+		// We getting NOT 'ON' because later we toggle variable
+	}
+
 	if (n_log_responses)
 	{
 		n_log_responses = false;
 		$('log_responses').classList.remove('pushed');
+		localStorage.net_log_responses = 'OFF';
 	}
 	else
 	{
 		n_log_responses = true;
 		$('log_responses').classList.add('pushed');
+		localStorage.net_log_responses = 'ON';
 	}
 }
 

@@ -20,11 +20,28 @@ class Refresh:
         self.counter = 0
         self.refresh()
 
+
+    def setInterval(self, i_sec):
+        msec = i_sec * 1000
+        if self.timer.interval() != msec:
+            print('Setting refresh interval to %d seconds.' % i_sec)
+            self.timer.setInterval(msec)
+
+
+    def setDefaultInterval(self):
+        sec = int(cgruconfig.VARS['keeper_refresh'])
+        self.setInterval(sec)
+
+
+    def setIntervalKoeff(self, i_koeff):
+        sec = i_koeff * int(cgruconfig.VARS['keeper_refresh'])
+        self.setInterval(sec)
+
+
     def refresh(self):
-        if self.counter > 0:
-            keeper_refresh = 1000 * int(cgruconfig.VARS['keeper_refresh'])
-            if self.timer.interval() != keeper_refresh:
-                self.timer.setInterval(keeper_refresh)
+        if self.counter == 1:
+            self.setDefaultInterval()
+
         nimby.refresh()
         render.refresh()
         self.counter += 1

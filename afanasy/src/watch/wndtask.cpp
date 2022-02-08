@@ -573,7 +573,11 @@ void WndTask::showOutput(const af::MCTask & i_mctask)
 	if (service.isInitialized() && service.hasParser())
 	{
 		std::string html = service.toHTML(i_mctask.getOutput());
-		m_output_te->setHtml(afqt::stoq(html));
+		QString text = afqt::stoq(html);
+		text = text.replace("<br>\n","\n");
+		text = text.replace("<br>","\n");
+		text = QString("<pre>%1</pre>").arg(text);
+		m_output_te->setHtml(text);
 	}
 	else
 	{

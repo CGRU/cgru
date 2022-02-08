@@ -270,12 +270,19 @@ void Work::addRunningCounts(const af::Work & i_other)
 {
 	m_running_tasks_num += i_other.m_running_tasks_num;
 	m_running_capacity_total += i_other.m_running_capacity_total;
+
+	for (auto const & it : i_other.m_running_services)
+		incrementService(it.first, it.second);
 }
 
 void Work::remRunningCounts(const af::Work & i_other)
 {
 	m_running_tasks_num -= i_other.m_running_tasks_num;
 	m_running_capacity_total -= i_other.m_running_capacity_total;
+
+	for (auto const & it : i_other.m_running_services)
+		decrementService(it.first, it.second);
+
 	checkNegativeRunningCounts();
 }
 

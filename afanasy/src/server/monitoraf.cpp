@@ -90,7 +90,7 @@ void MonitorAf::v_action( Action & i_action)
 		if( optype == "exit")
 		{
 			m_e.m_instruction = "exit";
-			i_action.answer = "Instruction 'exit' set.";
+			i_action.answerLog("Instruction 'exit' set.");
 			return;
 		}
 		else if( optype == "deregister")
@@ -108,19 +108,20 @@ void MonitorAf::v_action( Action & i_action)
 			std::vector<int32_t> uids;
 
 			bool subscribe = false;
-			i_action.answer = "Unsubscribed from ";
+			std::string answer = "Unsubscribed from ";
 			if (opstatus == "subscribe")
 			{
 				subscribe = true;
-				i_action.answer = "Subscribed on ";
+				answer = "Subscribed on ";
 			}
-			i_action.answer += "'" + opclass + "'";
+			answer += "'" + opclass + "'";
+			i_action.answerLog(answer);
 
 			if( opclass == "perm")
 			{
 				int32_t new_uid = -1;
 				af::jr_int32("uid", new_uid, operation);
-				i_action.answer = "Permissions set.";
+				i_action.answerLog("Permissions set.");
 				if( new_uid >= 0 )
 					m_uid = new_uid;
 			}
@@ -188,8 +189,7 @@ void MonitorAf::v_action( Action & i_action)
 			else
 			{
 				appendLog("Unknown operation '" + optype + "' class '" + opclass + "' status '" + opstatus + "' by " + i_action.author);
-				i_action.answer_kind = "error";
-				i_action.answer = "Unknown operation '" + optype + "' class '" + opclass + "'.";
+				i_action.answerError("Unknown operation '" + optype + "' class '" + opclass + "'.");
 				return;
 			}
 			if( eids.size())
@@ -208,13 +208,12 @@ void MonitorAf::v_action( Action & i_action)
 			af::jr_string("text", text, operation);
 			text += "\n - " + i_action.author;
 			sendMessage( text);
-			i_action.answer = "Message sent.";
+			i_action.answerLog("Message sent.");
 		}
 		else
 		{
 			appendLog("Unknown operation '" + optype + "' by " + i_action.author);
-			i_action.answer_kind = "error";
-			i_action.answer = "Unknown operation '" + optype + "'.";
+			i_action.answerError("Unknown operation '" + optype + "'.");
 			return;
 		}
 		appendLog("Operation '" + optype + "' by " + i_action.author);

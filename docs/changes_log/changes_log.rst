@@ -11,18 +11,72 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
 - The third number versions are fully compatible.
   You can upgrade only one client or server for changes.
 
+
+v3.2.2
+======
+
+2022.01.25
+
+*Not Released*
+
+- AfServer ``JOB_CREATED`` event added.
+
+- Afanasy config: Parameter of a string array type can be overridden by command arguments or environment by a string contains a comma separated items.
+
+- AfWatch: Task window uses mono-space font for task output and log.
+
+- Houdini Afanasy ROP:
+
+	- Pre and post submission scripts execution.
+
+	- Separate Mantra rendering: Generate IFD block parameters.
+
+- Houdini Afanasy TOP:
+
+	- "Keep Job On Cancel Cook" option added. You can check tasks outputs, compare different jobs after cooking stop.
+
+	- **Changed to work with Houdini 19 version, will not work with 18.5.**
+
+- Nuke: Submission and render scripts support rendering a movie.
+
+
+- **Bugfixes:**
+
+	- AfServer: Change running job owner or branch fixed.
+
+	- AfServer: On start set WARNING tasks to READY.
+
+	- AfWatch: Skipped tasks does not affect job block average running timings.
+
+	- Keeper: Refresh when local render deleted now does not produce an error in server log.
+
+	- Houdini:
+
+		- USD ROP now can works like Alembic ROP. One render session for all frame range.
+
+		- MS Windows launch scripts fixed to work with 19 version.
+
+		- Afanasy ROP:
+
+			- Custom command mode block naming fix.
+
+			- Separate Mantra rendering Auto Tickets fixed.
+
+
+.. _changes-log-latest:
+
 v3.2.1
 ======
 
-*Not released*
-
-2021.08.12
+2021.08.19
 
 - Houdini Afanasy `TOP Scheduler <../software/houdini.html#afanasy-top-scheduler>`_.
 
 - Houdini setup changed. Now ``HOUDINI_PATH=cgru/plugins/houdini`` and *afanasy.otl* moved to *otls/afanasy.hda*.
 
 - Each not numeric task can have an own extra `environment <../afanasy/job_task.html#environment>`_.
+
+- Paths mapping is applied to Block and Task environment.
 
 - AfWatch now understands appending new blocks/tasks to an existing job.
 
@@ -34,11 +88,15 @@ v3.2.1
 
 - Pools got some operations that will be applied to all renders in it: ejects tasks, launch command, exit renders and delete renders.
 
+- MS Windows release moved on MSVC 2019, Python 3.9.6 and Qt 5.15.2.
+
+	.. warning::
+
+		MS Windows 7 is no longer supported, as Python 3.9 dropped it.
+
 - **Bugfixes**
 	- AfWatch jobs list right panel folders buttons refresh fix on a new job selection.
 	- AfWatch jobs list switching from admin mode, other users jobs appear fixed.
-
-.. _changes-log-latest:
 
 v3.2.0
 ======

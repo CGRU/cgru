@@ -38,6 +38,7 @@ from Qt import QtWidgets
 import cgruconfig
 import cmd
 from refresh import Refresh
+import render
 from tray import Tray
 from server import Server
 import serverhttps
@@ -56,5 +57,6 @@ cmd.Application = app
 serverhttps.serve(cgruconfig.VARS['keeper_port_https'])
 cmd.Tray = Tray(app)
 refresh = Refresh(app)
+render.Refresh = refresh
 server = Server()
 app.exec_()

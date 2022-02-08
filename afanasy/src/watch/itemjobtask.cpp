@@ -165,7 +165,7 @@ void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 			if (res[0] == "mem_peak_mb")
 				resources += QString(" %1GB").arg(res[1].toFloat() / 1024, 0, 'f', 2);
 			else if(res[0] == "cpu_avg")
-				resources += QString(" %1%").arg(res[1]);
+				resources += QString(" %1ac").arg(res[1]);
 			else if(res[0].endsWith("_mb"))
 				resources += QString(" %1:%2GB").arg(res[0].left(res[0].size()-3)).arg(res[1].toFloat() / 1024.0, 0, 'f', 2);
 			else if(res[0].endsWith("_gb"))
@@ -187,17 +187,12 @@ void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 		if (frame        <   0)        frame =   0;
 		if (percentframe <   0) percentframe =   0;
 		if (percentframe > 100) percentframe = 100;
-		if (m_block->numeric)
+		if (frames_num > 1)
 		{
-			if (frames_num > 1)
+			if (m_block->numeric)
 				leftString = QString("%1 - f%2/%3-%4%").arg(leftString).arg(frames_num).arg(frame).arg(percentframe);
-			leftString = QString("%1 - %2%").arg(leftString).arg(percent);
-		}
-		else
-		{
-			if (frames_num > 1)
+			else
 				leftString = QString("f%1/%2-%3% %4").arg(frames_num).arg(frame).arg(percentframe).arg(leftString);
-			leftString = QString("%1% - %2").arg(percent).arg(leftString);
 		}
 	}
 	else
@@ -210,8 +205,15 @@ void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 
 	if (taskprogress.state & AFJOB::STATE_RUNNING_MASK)
 	{
+		i_painter->setPen(Qt::NoPen);
+		i_painter->setBrush(QBrush(afqt::QEnvironment::clr_itemjob.c, Qt::SolidPattern));
+		i_painter->drawRect(x, y, w - WidthInfo, Height-1);
+
 		drawPercent (i_painter, x, y, w - WidthInfo, Height-1,
-			100, percent, 0, 0 , !(taskprogress.state & AFJOB::STATE_DONE_MASK));
+			100, percent, 0, 0,
+			!(taskprogress.state & AFJOB::STATE_DONE_MASK),
+			((taskprogress.state & AFJOB::STATE_WARNING_MASK) ? &afqt::QEnvironment::clr_itemjobwarning.c : NULL)
+			);
 	}
 	else if (taskprogress.state &
 		(AFJOB::STATE_ERROR_MASK
@@ -225,6 +227,8 @@ void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 
 		if (taskprogress.state & AFJOB::STATE_SKIPPED_MASK)
 			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_taskskipped.c, Qt::SolidPattern));
+		else if (taskprogress.state & AFJOB::STATE_WARNING_MASK)
+			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_itemjobwarning.c, Qt::SolidPattern));
 		else if (taskprogress.state & AFJOB::STATE_DONE_MASK)
 			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_done.c, Qt::SolidPattern));
 		else if (taskprogress.state & AFJOB::STATE_ERROR_READY_MASK)
@@ -235,8 +239,6 @@ void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_taskwaitreconn.c, Qt::SolidPattern));
 		else if (taskprogress.state & AFJOB::STATE_TRYTHISTASKNEXT_MASK)
 			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_tasktrynext.c, Qt::SolidPattern));
-		else if (taskprogress.state & AFJOB::STATE_WARNING_MASK)
-			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_itemjobwarning.c, Qt::SolidPattern));
 
 		i_painter->drawRect(x, y, w - WidthInfo, Height-1);
 	}
@@ -259,6 +261,11 @@ void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 	}
 
 	int text_x = w - WidthInfo;
+
+	if ((taskprogress.state & AFJOB::STATE_RUNNING_MASK && (taskprogress.percent > 0) && (taskprogress.percent < 100)))
+		i_painter->drawText(x+1, y+1, text_x-10, Height, Qt::AlignVCenter | Qt::AlignRight, QString("%1%").arg(taskprogress.percent));
+	text_x -= ItemJobBlock::WPct;
+
 	i_painter->drawText(x+1, y+1, text_x-10, Height, Qt::AlignVCenter | Qt::AlignRight, QString("e%1").arg( taskprogress.errors_count));
 	text_x -= ItemJobBlock::WErrors;
 
@@ -322,6 +329,9 @@ bool ItemJobTask::compare( int type, const ItemJobTask & other, bool ascending) 
 	bool result = false;
 	switch( type)
 	{
+	case ItemJobBlock::SPct:
+		if ((taskprogress.percent > other.taskprogress.percent) == ascending) result = true;
+		break;
 	case ItemJobBlock::SErrors:
 		if(( taskprogress.errors_count > other.taskprogress.errors_count ) == ascending) result = true;
 		break;

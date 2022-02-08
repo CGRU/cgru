@@ -38,6 +38,8 @@ private:
 	bool m_empty;
 	bool m_find_opened;
 
+	QFont m_font;
+
 	QTextEdit * m_text_edit;
 	QFrame    * m_find_wnd;
 	QLineEdit * m_find_le;
