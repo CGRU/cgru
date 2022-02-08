@@ -53,6 +53,8 @@ def application(environ, start_response):
                     walkdir = dict()
                     rusrv.functions.walkDir(request, path, walkdir, 0)
                     out['walkdir'].append(walkdir)
+            elif 'afanasy' in request:
+                rusrv.afanasy.sendJob(request, out)
             else:
                 found = False
                 for key in request:
