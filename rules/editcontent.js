@@ -319,24 +319,14 @@ function ec_ProcessImageUploadProgress(i_evt)
 
 function ec_ProcessImageUploadFinished(i_args)
 {
-	if (i_args.files == null)
+	if (i_args.upload == null)
 	{
 		c_Error('Uploaded no files.');
 		ec_process_image.el_status.innerHTML = 'Uploaded no files.';
 		return;
 	}
-	if (i_args.files.length == 0)
-	{
-		c_Error('Uploaded zero files.');
-		ec_process_image.el_status.innerHTML = 'Uploaded zero files.';
-		return;
-	}
-	if (i_args.files.length > 1)
-	{
-		c_Error('Uploaded several files at once. Processing only the first one.');
-	}
 
-	ec_ProcessImageFileUploaded(i_args.files[0]);
+	ec_ProcessImageFileUploaded(i_args.upload);
 }
 
 function ec_ProcessImageFileUploaded(i_file)
