@@ -15,7 +15,7 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
 v3.2.2
 ======
 
-2022.01.25
+2022.02.09
 
 *Not Released*
 
@@ -42,9 +42,13 @@ v3.2.2
 
 - **Bugfixes:**
 
-	- AfServer: Change running job owner or branch fixed.
+	- AfServer:
 
-	- AfServer: On start set WARNING tasks to READY.
+		- Change running job owner or branch fixed.
+
+		- On start set WARNING tasks to READY.
+
+		- Fixed task progress sending to GUIs mixing task and block numbers.
 
 	- AfWatch: Skipped tasks does not affect job block average running timings.
 
