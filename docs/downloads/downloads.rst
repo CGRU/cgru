@@ -26,7 +26,7 @@ Linux
 =====
 
 - AltLinux 10 (Simply Linux)
-	https://sourceforge.net/projects/cgru/files/3.2.2/cgru.3.2.2.alt9.0_x86_64.tar.gz/download
+	https://sourceforge.net/projects/cgru/files/3.2.2/cgru.3.2.2.alt10.0_x86_64.tar.gz/download
 
 - Debian 10
 	https://sourceforge.net/projects/cgru/files/3.2.2/cgru.3.2.2.debian10_amd64.tar.gz/download
