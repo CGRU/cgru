@@ -12,12 +12,13 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
   You can upgrade only one client or server for changes.
 
 
+.. _changes-log-latest:
+
+
 v3.2.2
 ======
 
 2022.02.09
-
-*Not Released*
 
 - AfServer ``JOB_CREATED`` event added.
 
@@ -70,8 +71,6 @@ v3.2.2
 
 			- Separate Mantra rendering Auto Tickets fixed.
 
-
-.. _changes-log-latest:
 
 v3.2.1
 ======
