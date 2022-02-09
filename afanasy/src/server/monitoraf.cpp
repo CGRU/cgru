@@ -303,7 +303,7 @@ void MonitorAf::addTaskProgress( int i_j, int i_b, int i_t, const af::TaskProgre
 
 		for( int t = 0; t < m_e.m_tp[j].tp.size(); t++)
 		{
-			if(( m_e.m_tp[j].blocks[t] == i_t ) && ( m_e.m_tp[j].tasks[t] == i_b ))
+			if(( m_e.m_tp[j].blocks[t] == i_b ) && ( m_e.m_tp[j].tasks[t] == i_t ))
 			{
 				m_e.m_tp[j].tp[t] = *i_tp;
 //printf("MonitorAf::addTaskProgress(): Task progress updated.\n");
