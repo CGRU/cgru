@@ -18,6 +18,7 @@
 #include <QtGui/QKeyEvent>
 #include <QBoxLayout>
 #include <QLabel>
+#include <QScrollBar>
 #include <QSplitter>
 
 #define AFOUTPUT
@@ -155,6 +156,8 @@ ListItems::~ListItems()
 }
 
 int ListItems::count() const { return m_model->count();}
+
+void ListItems::setScrollStep(int i_step) {m_view->verticalScrollBar()->setSingleStep(i_step);}
 
 bool ListItems::mousePressed(QMouseEvent * i_event)
 {

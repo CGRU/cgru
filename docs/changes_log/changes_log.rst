@@ -23,7 +23,11 @@ v3.2.2
 
 - Afanasy config: Parameter of a string array type can be overridden by command arguments or environment by a string contains a comma separated items.
 
-- AfWatch: Task window uses mono-space font for task output and log.
+- AfWatch
+
+	- Task window uses mono-space font for task output and log.
+
+	- Scroll step size preferences option. Later scroll size was only by item height.
 
 - Houdini Afanasy ROP:
 

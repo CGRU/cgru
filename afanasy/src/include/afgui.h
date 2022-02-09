@@ -8,6 +8,8 @@ namespace AFGUI
 	const int JEDI    = 1;
 	const int SITH    = 2;
 
+	const int SCROLL_SIZE = 32;
+
 	const int SAVEPREFSONEXIT = 1;
 	const int SAVEWNDRECTS = 1;
 	const int SAVEGUI = 0;

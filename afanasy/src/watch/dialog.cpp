@@ -47,6 +47,8 @@ int Dialog::ms_size_border_bot   = 25;
 int Dialog::ms_size_border_left  = 65;
 int Dialog::ms_size_border_right = 75;
 
+QVector<int> Dialog::ms_scroll_steps = {-1, 16, 32, 64};
+
 Dialog::Dialog():
     m_connected(false),
     m_monitorType( Watch::WNONE),
@@ -261,6 +263,28 @@ void Dialog::showMenuPrefs()
 {
 	m_prefsMenu->clear();
 	QAction * action;
+
+	QMenu * scroll_step_menu = new QMenu("Set Scroll Step");
+	m_prefsMenu->addMenu(scroll_step_menu);
+
+	for (int i = 0; i < ms_scroll_steps.size(); i++)
+	{
+		int step = ms_scroll_steps[i];
+		QString label = QString("%1 Pixels").arg(step);
+		if (i == 0)
+			label = "By Item Size.";
+
+		ActionId * action_id = new ActionId(step, label, scroll_step_menu);
+		action_id->setCheckable(true);
+		action_id->setChecked(afqt::QEnvironment::scroll_step.n == step);
+		connect(action_id, SIGNAL(triggeredId(int)), this, SLOT(actScrollStep(int)));
+		scroll_step_menu->addAction(action_id);
+
+		if (i == 0)
+			scroll_step_menu->addSeparator();
+	}
+
+	m_prefsMenu->addSeparator();
 
     action = new QAction( "Save Prefs on Exit", m_prefsMenu);
     action->setCheckable( true);
@@ -715,6 +739,14 @@ void Dialog::actGuiTheme( QString theme)
     }
     else
         Watch::displayError(QString("Failed to load '%1' theme").arg( theme));
+}
+
+void Dialog::actScrollStep(int i_step)
+{
+	afqt::QEnvironment::scroll_step.n = i_step;
+
+	if (m_listitems)
+		m_listitems->setScrollStep(i_step);
 }
 
 void Dialog::reloadImages()

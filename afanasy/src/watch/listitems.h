@@ -63,6 +63,8 @@ public:
 	// Not called on list dtor.
 	virtual void v_itemToBeDeleted(Item * i_item);
 
+	void setScrollStep(int i_step);
+
 public slots:
 	void repaintItems();
 	void deleteAllItems();

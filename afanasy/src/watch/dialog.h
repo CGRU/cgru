@@ -77,6 +77,7 @@ private slots:
     void actShowOfflineNoise();
 	void actGuiTheme( QString theme);
     void actGuiLevel( int i_level);
+	void actScrollStep(int i_step);
 	void actShowDocs();
 	void actShowForum();
 
@@ -142,4 +143,7 @@ private:
     static int ms_size_border_bot;
     static int ms_size_border_left;
     static int ms_size_border_right;
+
+	static QVector<int> ms_scroll_steps;
+
 };

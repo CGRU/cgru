@@ -23,6 +23,8 @@ AttrNumber QEnvironment::level("level", "UI Level", AFGUI::PADAWAN);
 
 Attr       QEnvironment::theme("theme", "Theme", AFGUI::THEME );
 
+AttrNumber QEnvironment::scroll_step("scroll_step", "Scroll Step", AFGUI::SCROLL_SIZE);
+
 Attr       QEnvironment::image_back(            "image_back",            "Items Background",        "");
 Attr       QEnvironment::image_border_top(      "image_border_top",      "Border Top",              "");
 Attr       QEnvironment::image_border_topleft(  "image_border_topleft",  "Border Top Left",         "");
@@ -152,6 +154,7 @@ QEnvironment::QEnvironment( const QString & i_name)
 
     ms_attrs_prefs.append( &level              );
     ms_attrs_prefs.append( &theme              );
+    ms_attrs_prefs.append(&scroll_step         );
     ms_attrs_prefs.append( &savePrefsOnExit    );
     ms_attrs_prefs.append( &saveWndRectsOnExit );
     ms_attrs_prefs.append( &saveGUIOnExit      );

@@ -45,6 +45,7 @@ ViewItems::ViewItems( ListItems * parent):
 
     setHorizontalScrollMode(ScrollPerPixel);
     setVerticalScrollMode(ScrollPerPixel);
+	verticalScrollBar()->setSingleStep(afqt::QEnvironment::scroll_step.n);
 
     setSelectionRectVisible( true);
     setSelectionMode( QAbstractItemView::ExtendedSelection);

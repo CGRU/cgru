@@ -40,6 +40,8 @@ public:
 
 	static Attr theme;
 
+	static AttrNumber scroll_step;
+
 	static Attr image_back;
 	static Attr image_border_top;
 	static Attr image_border_topleft;
