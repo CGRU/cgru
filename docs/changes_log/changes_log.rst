@@ -44,6 +44,7 @@ v3.2.2
 
 - Nuke: Submission and render scripts support rendering a movie.
 
+- Afanasy new services and parsers added: *shotgun, ftrack*.
 
 - **Bugfixes:**
 
