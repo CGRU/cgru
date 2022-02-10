@@ -844,8 +844,13 @@ function g_AppendFolder(i_elParent, i_fobject)
 		elBody = i_elParent;
 
 	// Insert element to parent body:
-	if (i_elParent.m_elFolders.length)
+	if (i_elParent.m_elFolders.length && i_elParent.m_elFolders[index])
+	{
+		// There can be a folders group:
+		// (this is most probably a dummy folder)
+		elBody = i_elParent.m_elFolders[index].parentNode;
 		elBody.insertBefore(elFolder, i_elParent.m_elFolders[index]);
+	}
 	else
 		elBody.appendChild(elFolder);
 
