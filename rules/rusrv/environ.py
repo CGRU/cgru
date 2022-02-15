@@ -62,12 +62,3 @@ def initEnv(i_environ):
     if SERVER_NAME in GUEST_SITES:
         AUTH_RULES = True
 
-
-def initSession(i_environ):
-    global REMOTE_ADDR
-    global USER_ID
-
-    REMOTE_ADDR = i_environ['REMOTE_ADDR']
-    if 'REMOTE_USER' in i_environ:
-        USER_ID = i_environ['REMOTE_USER']
-

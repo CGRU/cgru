@@ -1,12 +1,6 @@
 import json
 
-from rusrv import environ
-
 def sendJob(i_args, o_out):
-
-    if environ.USER_ID is None:
-        o_out['error'] = 'Guests are not allowed to send jobs.'
-        return
 
     obj = dict()
     obj['job'] = i_args['job']

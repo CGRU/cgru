@@ -2,10 +2,8 @@ import cgi
 import json
 import os
 import sys
-import time
 import traceback
 
-from rusrv import admin
 from rusrv import environ
 from rusrv import editobj
 
@@ -152,63 +150,6 @@ def readAllUsers(o_out, i_full):
     return users
 
 
-def processUser(i_arg, o_out):
-    if not os.path.isdir('users'):
-        os.mkdir('users')
-
-    if environ.USER_ID is None:
-        return
-
-    user = readUser(environ.USER_ID, True)
-    if user is None:
-        user = dict()
-
-    if 'error' in user:
-        o_out['error'] = user['error']
-
-    user['rtime'] = int(time.time())
-    if not 'id'       in user: user['id']       = environ.USER_ID
-    if not 'channels' in user: user['channels'] = []
-    if not 'news'     in user: user['news']     = []
-    if not 'ctime'    in user: user['ctime']    = user['rtime']
-
-    processUserIP(i_arg, user)
-
-    # Delete nulls from some arrays:
-    arrays = ['news', 'bookmarks', 'channels']
-    for arr in arrays:
-        if arr in user and user[arr] is not None:
-            user[arr] = list(filter(lambda a: a != None, user[arr]))
-
-    if not writeUser(user, False):
-        o_out['error'] = 'Can`t write current user'
-        return
-
-    o_out['user'] = user;
-
-
-def processUserIP(i_args, o_user):
-    ip = environ.REMOTE_ADDR
-
-    if not 'ips' in o_user:
-        o_user['ips'] = []
-
-    # Remove other enties from this IP:
-    o_user['ips'] = list(filter(lambda a: a['ip'] != ip, o_user['ips']))
-
-    entry = dict()
-    entry['ip'] = ip
-    entry['time'] = int(time.time())
-    if 'url' in i_args:
-        entry['url'] = i_args['url']
-
-    # Insest and entry in the beginning
-    o_user['ips'].insert(0, entry)
-
-    # Limit entries count 
-    o_user['ips'] = o_user['ips'][:10]
-
-
 def writeUser(i_user, i_full):
     uid = i_user['id']
     ufile_main = 'users/%s/%s.json' % (uid, uid)
@@ -252,7 +193,7 @@ def skipFile(i_filename):
     return False
 
 
-def walkDir(i_recv, i_dir, o_out, i_depth):
+def walkDir(admin, i_recv, i_dir, o_out, i_depth):
     if i_depth > i_recv['depth']:
         return
 
@@ -375,7 +316,7 @@ def walkDir(i_recv, i_dir, o_out, i_depth):
                 editobj.mergeObjs(folderObj, readObj(sfilepath))
 
         if i_depth < i_recv['depth']:
-            walkDir(i_recv, path, folderObj, i_depth + 1)
+            walkDir(admin, i_recv, path, folderObj, i_depth + 1)
 
         o_out['folders'].append(folderObj)
 

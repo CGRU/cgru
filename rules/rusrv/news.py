@@ -1,7 +1,6 @@
 import os
 import time
 
-from rusrv import environ
 from rusrv import functions
 
 def makenews(i_args, io_users, o_out):
@@ -171,7 +170,7 @@ def makenews(i_args, io_users, o_out):
     return changed_users
 
 
-def makebookmarks(i_bm, io_users, o_out):
+def makebookmarks(i_user_id, i_bm, io_users, o_out):
     changed_users = []
     for id in io_users:
         user = io_users[id]
@@ -182,6 +181,9 @@ def makebookmarks(i_bm, io_users, o_out):
         bm_index = -1
         for i in range(len(user['bookmarks'])):
             if user['bookmarks'][i] is None:
+                continue
+
+            if not 'path' in user['bookmarks'][i]:
                 continue
 
             if user['bookmarks'][i]['path'] == i_bm['path']:
@@ -195,7 +197,7 @@ def makebookmarks(i_bm, io_users, o_out):
                 continue
 
             # Initialize parameters:
-            i_bm['cuser'] = environ.USER_ID
+            i_bm['cuser'] = i_user_id
             i_bm['ctime'] = int(time.time())
         else:
             # Bookmark exists
@@ -207,7 +209,7 @@ def makebookmarks(i_bm, io_users, o_out):
             # no updating, just new will be created
             del user['bookmarks'][i]
 
-        i_bm['muser'] = environ.USER_ID
+        i_bm['muser'] = i_user_id
         i_bm['mtime'] = int(time.time())
 
         user['bookmarks'].append(i_bm)

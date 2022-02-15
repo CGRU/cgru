@@ -23,7 +23,12 @@ def application(environ, start_response):
     out = dict()
 
     rusrv.environ.initEnv(environ)
-    rusrv.environ.initSession(environ)
+
+    session = rusrv.session.Session(environ)
+
+    admin = rusrv.admin.Admin(session)
+
+    requests = rusrv.requests.Requests(session, admin)
 
     request = None
 
@@ -71,17 +76,20 @@ def application(environ, start_response):
                     for rem in ['../', '../', '..']:
                         path = path.replace(rem, '')
                     walkdir = dict()
-                    rusrv.functions.walkDir(request, path, walkdir, 0)
+                    rusrv.functions.walkDir(admin, request, path, walkdir, 0)
                     out['walkdir'].append(walkdir)
             elif 'afanasy' in request:
-                rusrv.afanasy.sendJob(request, out)
+                if session.USER_ID is None:
+                    o_out['error'] = 'Guests are not allowed to send jobs.'
+                else:
+                    rusrv.afanasy.sendJob(request, out)
             else:
                 found = False
                 for key in request:
                     func = 'req_%s' % key
-                    if hasattr(rusrv.requests, func):
+                    if hasattr(requests, func):
                         found = True
-                        rawout = getattr(rusrv.requests, func)(request[key], out)
+                        rawout = getattr(requests, func)(request[key], out)
                     else:
                         out['error'] = 'Request not recognized: ' + key
                         break
