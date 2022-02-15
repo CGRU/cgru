@@ -30,7 +30,7 @@ var n_log_responses = null;
 
 function n_Init()
 {
-	if (document.location.hostname == '127.0.0.1')
+	if (document.location.hostname != 'u5fx.ru')
 		n_server = '/server';
 
 	n_LogResponses();
