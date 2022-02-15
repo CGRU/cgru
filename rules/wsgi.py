@@ -53,12 +53,12 @@ def application(environ, start_response):
             # Authentication
             if rusrv.environ.AUTH_RULES:
                 if 'digest' in request:
-                    if rusrv.admin.http_digest_validate(request['digest'], out):
-                        rusrv.environ.USER_ID = request['digest']['username']
+                    if admin.http_digest_validate(request['digest'], out):
+                        session.USER_ID = request['digest']['username']
                     else:
                         out['auth_status'] = 'Wrong credentials.'
                         out['auth_error'] = True
-                        rusrv.environ.USER_ID = None
+                        session.USER_ID = None
                     out['nonce'] = rusrv.functions.randMD5()
                     del request['digest']
 
@@ -66,7 +66,7 @@ def application(environ, start_response):
                 if not 'digest' in request['login']:
                     out['error'] = 'No digest in login object.'
                 else:
-                    if rusrv.admin.http_digest_validate(request['login']['digest'], out):
+                    if admin.http_digest_validate(request['login']['digest'], out):
                         out['status'] = 'success'
                     else:
                         out['error'] = 'Invalid login.'
