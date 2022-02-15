@@ -3,6 +3,10 @@ GROUPS = None
 
 AUTH_TYPE = None
 
+GUEST_SITES = ['rules.cgru.info', '127.0.0.1']
+SERVER_NAME = None
+AUTH_RULES = False
+
 HT_ACCESS_FILE_NAME = '.htaccess'
 HT_GROUPS_FILE_NAME = '.htgroups'
 HT_DIGEST_FILE_NAME = '.htdigest'
@@ -46,12 +50,17 @@ def initEnv(i_environ):
     global SERVER_SOFTWARE
     global MOD_WSGI_VERSION
     global AUTH_TYPE
+    global SERVER_NAME
+    global AUTH_RULES
 
     COUNTER += 1
     SERVER_SOFTWARE = i_environ['SERVER_SOFTWARE']
     MOD_WSGI_VERSION = i_environ['mod_wsgi.version']
     if 'AUTH_TYPE' in i_environ:
         AUTH_TYPE = i_environ['AUTH_TYPE']
+    SERVER_NAME = i_environ['SERVER_NAME']
+    if SERVER_NAME in GUEST_SITES:
+        AUTH_RULES = True
 
 
 def initSession(i_environ):

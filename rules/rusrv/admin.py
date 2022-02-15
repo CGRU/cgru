@@ -347,3 +347,51 @@ def htdigest(i_args, o_out):
     if not functions.fileWrite(environ.HT_DIGEST_FILE_NAME, data):
         o_out['error'] = 'Unable to write into the file.'
 
+
+def  http_digest_validate(i_digest, o_out):
+
+    if not os.path.isfile(environ.HT_DIGEST_FILE_NAME):
+        o_out['error'] = 'HT digest file does not exist.'
+        return False
+
+    data = functions.fileRead(environ.HT_DIGEST_FILE_NAME, True)
+    if data is None:
+        o_out['error'] = 'Can`t read HT digest file.'
+        error_log(o_out['error'])
+        return False
+
+    data = data.split('\n')
+    found = False
+    for line in data:
+        if line.find(i_digest['username']) == 0:
+            data = line
+            found = True
+            break
+
+    if not found:
+        o_out['error'] = 'Wrong!'
+        return False
+
+    data = data.split(':')
+    if len(data) != 3:
+        o_out['error'] = 'Invalid HT digest entry.'
+        return False
+
+    print(i_digest)
+
+    for field in ['uri','nonce','nc','cnonce','qop']:
+        if not field in  i_digest:
+            o_out['error'] = 'Received diges does not contain "%s" field.' % field
+            return False
+
+    data = data[2]
+    hashlib = __import__('hashlib', globals(), locals(), [])
+    hget = hashlib.md5(('POST:' + i_digest['uri']).encode()).hexdigest()
+    data = data + ':' + i_digest['nonce'] + ':' + str(i_digest['nc']) + ':' + i_digest['cnonce'] + ':' + i_digest['qop'] + ':' + hget
+    valid_response = hashlib.md5(data.encode()).hexdigest()
+
+    if i_digest['response'] == valid_response:
+        return True
+
+    o_out['error'] = 'Wrong!'
+    return False

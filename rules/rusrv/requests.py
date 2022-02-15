@@ -20,6 +20,11 @@ def req_start(i_args, out):
     out['client_ip'] = environ.REMOTE_ADDR
     out['auth_type'] = environ.AUTH_TYPE
     out['counter'] = environ.COUNTER
+    if environ.AUTH_TYPE:
+        out['AUTH_TYPE'] = environ.AUTH_TYPE
+    if environ.AUTH_RULES:
+        out['AUTH_RULES'] = environ.AUTH_RULES
+        out['nonce'] = functions.randMD5()
 
 def req_initialize(i_args, out):
     configs = dict()

@@ -10,6 +10,12 @@ from rusrv import environ
 from rusrv import editobj
 
 
+def randMD5():
+    hashlib = __import__('hashlib', globals(), locals(), [])
+    random = __import__('random', globals(), locals(), [])
+    return hashlib.md5(str(random.random()).encode()).hexdigest()
+
+
 def fileRead(i_file, i_lock = True, i_verbose = False):
     try:
         f = open(i_file, mode='r', encoding='utf-8')
