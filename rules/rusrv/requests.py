@@ -6,11 +6,11 @@ import subprocess
 import sys
 import traceback
 
-#from rusrv import admin
 from rusrv import environ
 from rusrv import editobj
 from rusrv import functions
 from rusrv import news
+from rusrv import search
 
 class Requests:
 
@@ -281,3 +281,26 @@ class Requests:
 
         o_out['users'] = users_changed
 
+    def req_search(self, i_args, o_out):
+        if not 'path' in i_args:
+            o_out['error'] = 'Search path is not specified.'
+            return
+
+        path = i_args['path']
+        for rem in ['../', '../', '..']:
+            path = path.replace(rem, '')
+        if not os.path.isdir(path):
+            o_out['error'] = 'Search path does not exist: ' + path
+            return
+
+        if not self.admin.htaccessPath(path):
+            o_out['error'] = 'Access denied.'
+            return
+
+        if not 'depth' in i_args:
+            i_args['depth'] = 1
+
+        o_out['search'] = i_args
+        o_out['result'] = []
+
+        search.search(i_args, o_out, path, 0)
