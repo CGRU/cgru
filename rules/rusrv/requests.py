@@ -107,7 +107,7 @@ class Requests:
         data = i_save['data']
         if 'type' in i_save:
             if i_save['type'] == 'base64':
-                data = base65.b64decode(data)
+                data = base64.b64decode(data)
 
         if not functions.fileWrite(filename, data):
             o_out['error'] = 'Unable to open save file: ' + filename

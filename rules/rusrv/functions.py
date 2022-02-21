@@ -31,7 +31,10 @@ def fileRead(i_file, i_lock = True, i_verbose = False):
 def fileWrite(i_file, i_data, i_lock = True, i_verbose = False):
     tmp_name = ('%s-%s') % (i_file, os.getpid())
     try:
-        f = open(tmp_name, mode='w', encoding='utf-8')
+        if isinstance(i_data, str):
+            f = open(tmp_name, mode='w', encoding='utf-8')
+        else:
+            f = open(tmp_name, mode='wb')
     except:
         print('fileWrite: Unable open for writing: ' + tmp_name)
         print('%s' % traceback.format_exc())
