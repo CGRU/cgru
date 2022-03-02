@@ -126,21 +126,25 @@ def delArray(o_obj, i_edit):
             delArray(obj, i_edit)
 
 
-def replaceObject(o_obj, i_obj):
+def replaceObject(o_obj, i_obj, i_edit):
     if not isinstance(o_obj, dict):
         return
 
     for name in o_obj:
         if isinstance(o_obj[name], dict):
-            replaceObject(o_obj[name], i_obj)
+            replaceObject(o_obj[name], i_obj, i_edit)
             continue
         if isinstance(o_obj[name], list):
             for obj in o_obj[name]:
                 if isinstance(obj, dict):
-                    replaceObject(obj, i_obj)
+                    replaceObject(obj, i_obj, i_edit)
 
-    if 'id' in o_obj and o_obj['id'] == i_obj['id']:
+    id_name = 'id'
+    if 'id' in i_edit:
+        id_name = i_edit['id']
+
+    if id_name in o_obj and o_obj[id_name] == i_obj[id_name]:
         for key in i_obj:
-            if key != 'id':
+            if key != id_name:
                 o_obj[key] = i_obj[key]
 

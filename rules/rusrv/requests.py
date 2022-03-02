@@ -214,7 +214,7 @@ class Requests:
                 editobj.pushArray(obj, i_edit)
             elif 'replace' in i_edit and i_edit['replace'] is True:
                 for newobj in i_edit['objects']:
-                    editobj.replaceObject(obj, newobj)
+                    editobj.replaceObject(obj, newobj, i_edit)
             elif 'delarray' in i_edit:
                 editobj.delArray(obj, i_edit)
             else:

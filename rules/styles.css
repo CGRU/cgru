@@ -655,8 +655,21 @@ float: right;
 width: 14px;
 height: 14px;
 }
+#bookmarks .bookmark .button.favourite_toggle {
+float: left;
+width: 8px;
+height: 8px;
+_background-image: url(icons/delete.png);
+background-color: rgba(0,0,0,0.2);
+}
+#bookmarks .bookmark.favourite .button.favourite_toggle {
+background-color: rgba(255,255,100,0.7);
+}
 #bookmarks .bookmark.obsolete .button.delete {
 display: block;
+}
+#bookmarks .bookmark.favourite .button.delete {
+display: none;
 }
 
 

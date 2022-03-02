@@ -204,6 +204,8 @@ def makebookmarks(i_user_id, i_bm, io_users, o_out):
             # Copy creation parameters
             i_bm['cuser'] = user['bookmarks'][bm_index]['cuser']
             i_bm['ctime'] = user['bookmarks'][bm_index]['ctime']
+            if 'favourite' in user['bookmarks'][bm_index] and user['bookmarks'][bm_index]['favourite']:
+                i_bm['favourite'] = True
 
             # Delete existing bookmark,
             # no updating, just new will be created
