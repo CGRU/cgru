@@ -165,16 +165,24 @@ class Requests:
             for rem in ['../', '../', '..', '&', '|', '>', '<']:
                 cmd = cmd.replace(rem, '')
 
-            out = subprocess.check_output('./' + cmd, shell=True, encoding='utf-8')
-            obj = None
-
+            out = None
             try:
-                obj = json.loads(out)
-            except:
-                obj = None
+                out = subprocess.check_output('./' + cmd, shell=True, encoding='utf-8')
+            except subprocess.CalledProcessError as e:
+                out = dict()
+                out['error'] = e.output
+                out['info'] = '%s' % traceback.format_exc()
+                o_out['cmdexec'].append(out)
+                out = None
 
-            if obj is not None:
-                out = obj
+            if out is not None:
+                obj = None
+                try:
+                    obj = json.loads(out)
+                except:
+                    obj = None
+                if obj is not None:
+                    out = obj
 
             o_out['cmdexec'].append(out)
 
