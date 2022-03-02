@@ -340,7 +340,6 @@ function bm_CreateBookmark(i_bm)
 
 	let elFav = document.createElement('div');
 	el.appendChild(elFav);
-	elFav.classList.add('button');
 	elFav.classList.add('favourite_toggle');
 	elFav.m_bm = i_bm;
 	elFav.title = 'Double click to toggle favourite.';

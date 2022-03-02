@@ -655,15 +655,29 @@ float: right;
 width: 14px;
 height: 14px;
 }
-#bookmarks .bookmark .button.favourite_toggle {
+#bookmarks .bookmark .favourite_toggle {
+cursor: pointer;
 float: left;
 width: 8px;
 height: 8px;
-_background-image: url(icons/delete.png);
-background-color: rgba(0,0,0,0.2);
+margin: 2px;
+padding: 2px;
+background-size: 100%;
+background-repeat: no-repeat;
+background-position: center;
+background-image: url(icons/favourite.png);
+filter: grayscale(100%);
+opacity: 0.7;
 }
-#bookmarks .bookmark.favourite .button.favourite_toggle {
-background-color: rgba(255,255,100,0.7);
+#bookmarks .bookmark.favourite .favourite_toggle {
+opacity: 1.0;
+filter: none;
+}
+#bookmarks .bookmark .favourite_toggle:hover {
+opacity: 1.0;
+}
+#bookmarks .bookmark.favourite .favourite_toggle:hover {
+opacity: 0.7;
 }
 #bookmarks .bookmark.obsolete .button.delete {
 display: block;
