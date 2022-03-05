@@ -614,6 +614,20 @@ class Job:
             print('Warning: priority clamped to maximum = %d' % priority)
 
         self.data["priority"] = int(priority)
+        
+    def setPrioritybyId(self,jobId, priority, verbose=False):
+    """Missing DocString
+
+            :param jobId:
+            :param str params:
+            :param bool verbose:
+            :return:
+            """
+    self.action = 'action'
+    self.data['type'] = 'jobs'
+    self.data['ids'] = [jobId]
+    self.data['params'] = {'priority': priority}
+    return self._sendRequest(verbose)
 
     def setCmdPre(self, command, TransferToServer=True):
         """Missing DocString
