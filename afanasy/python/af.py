@@ -1295,7 +1295,7 @@ class Cmd:
                                   'tasks': tasks_data}
         return self._sendRequest(verbose)
     
-    def setJobPrioritybyId(self,jobId, priority, verbose=False):
+    def setJobPriorityById(self,jobId, priority, verbose=False):
         """Missing DocString
 
                 :param jobId:
