@@ -889,6 +889,10 @@ box-shadow: 0px 0px 3px #000, 0px 0px 5px rgba(255,255,255,.7) inset;
 background-color: rgba(255,255,255,0.2);
 opacity: 1.0;
 }
+.edit_tags_list .menu .artist.me {
+border: 1px solid rgba(98,250,98,.5);
+box-shadow: 0px 0px 3px #040, 0 0 8px #88FF88 inset;
+}
 .edit_tags_list .menu .item:hover {
 border: 1px solid #AFF;
 box-shadow: 0px 0px 6px #AFF, 0px 0px 6px #AFF inset;
