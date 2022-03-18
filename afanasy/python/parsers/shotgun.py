@@ -9,7 +9,7 @@ class Shotgun(parser.parser):
     def __init__(self):
         parser.parser.__init__(self)
         self.firstframe = True
-        self.str_error = ["FTRACK ERROR"]
+        self.str_error = ["SHOTGUN ERROR"]
 
     def do(self, i_args):
         data = i_args['data']
