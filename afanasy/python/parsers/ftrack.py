@@ -3,20 +3,17 @@
 from parsers import parser
 
 
-Errors = ['FTRACK ERROR']
+class Ftrack(parser.parser):
+    """Simple Ftrack  parser
+    """
+    def __init__(self):
+        parser.parser.__init__(self)
+        self.firstframe = True
+        self.str_error = ["FTRACK ERROR"]
 
+    def do(self, i_args):
+        data = i_args['data']
 
-class shotgun(parser.parser):
-	"""Simple shotgun  parser
-	"""
-	def __init__(self):
-		parser.parser.__init__(self)
-		self.firstframe = True
-
-	def do(self, data, mode):
-		for error in Errors:
-			if data.find(error) != -1:
-				self.error = True
-				#self.badresult = True
-				break
-
+        data_len = len(data)
+        if data_len < 1:
+            return
