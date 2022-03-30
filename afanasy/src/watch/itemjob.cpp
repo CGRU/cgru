@@ -204,9 +204,9 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 			service = afqt::stoq(block->getService());
 
 		m_tasks_total   += m_blocks[b]->tasksnum;
-		m_tasks_done    += m_blocks[b]->p_tasksdone;
-		m_tasks_running += m_blocks[b]->p_tasksrunning;
-		m_tasks_error   += m_blocks[b]->p_taskserror;
+		m_tasks_done    += m_blocks[b]->p_tasks_done;
+		m_tasks_running += m_blocks[b]->p_tasks_running;
+		m_tasks_error   += m_blocks[b]->p_tasks_error;
 		m_tasks_percent += m_blocks[b]->p_percentage;
 	}
 	m_tasks_percent /= m_blocks.size();
