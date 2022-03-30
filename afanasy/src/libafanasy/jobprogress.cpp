@@ -34,7 +34,7 @@ bool JobProgress::construct( Job * job)
 
    for( int b = 0; b < m_blocks_num; b++)
    {
-      const af::BlockData * block = job->getBlock( b);
+		const af::BlockData * block = job->getBlockData(b);
       tasksnum[b] = block->getTasksNum();
       if( tasksnum[b] < 1)
       {
@@ -69,7 +69,7 @@ bool JobProgress::reconstruct( Job * job)
 
    for( int b = old_blocks_num; b < m_blocks_num; b++)
    {
-      const af::BlockData * block = job->getBlock( b);
+		const af::BlockData * block = job->getBlockData(b);
       tasksnum[b] = block->getTasksNum();
       if( tasksnum[b] < 1)
       {

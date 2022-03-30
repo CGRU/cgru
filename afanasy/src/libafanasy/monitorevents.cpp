@@ -380,7 +380,12 @@ void MonitorEvents::v_generateInfoStream( std::ostringstream & o_str, bool i_ful
 	}
 
 	if( m_tp.size())
-		o_str << " TP[" << m_tp.size() << "]";
+	{
+		o_str << " TP[" << m_tp.size();
+		for (int j = 0; j < m_tp.size(); j++)
+			o_str << "[" << m_tp[j].tp.size() << "]";
+		o_str << "]";
+	}
 
 	if( m_bids.size())
 		o_str << " BID[" << m_bids.size() << "]";

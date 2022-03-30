@@ -57,6 +57,9 @@ JobAf::JobAf( JSON & i_object):
 
 	m_serial = AFCommon::getJobSerial();
 	// System job never constructed from incoming JSON object and always has zero serial
+
+	for (int b = 0; b < m_blocks_num; b++)
+		m_blocks[b]->constructDependTasks();
 }
 
 JobAf::JobAf( const std::string & i_store_dir, bool i_system):
@@ -81,6 +84,9 @@ JobAf::JobAf( const std::string & i_store_dir, bool i_system):
 		m_serial = AFCommon::getJobSerial();
 		store();
 	}
+
+	for (int b = 0; b < m_blocks_num; b++)
+		m_blocks[b]->constructDependTasks();
 }
 
 void JobAf::readStore()
@@ -1098,6 +1104,7 @@ bool JobAf::solveOnRender( RenderAf * i_render, MonitorContainer * i_monitoring)
 
 bool JobAf::solveTaskOnRender(RenderAf * i_render, int i_block_num, int i_task_num, MonitorContainer * i_monitoring, bool & o_continue)
 {
+/*
 		std::list<int> blocksIds;
 		af::TaskExec *task_exec = genTask(i_render, i_block_num, i_task_num, &blocksIds, i_monitoring);
 		
@@ -1108,7 +1115,9 @@ bool JobAf::solveTaskOnRender(RenderAf * i_render, int i_block_num, int i_task_n
 			o_continue = false;
 			return false;
 		}
-		
+*/
+		af::TaskExec * task_exec = genTask(i_render, i_block_num, i_task_num);
+
 		// Check if render is online
 		// It can be solved with offline render to check whether to WOL wake it
 		if( task_exec && i_render->isOffline())
@@ -1117,18 +1126,18 @@ bool JobAf::solveTaskOnRender(RenderAf * i_render, int i_block_num, int i_task_n
 			o_continue = true;
 			return true;
 		}
-		
+
 		// No task was generated:
 		if (NULL == task_exec)
 		{
 			o_continue = true;
 			return false;
 		}
-		
+
 		// Job successfully solved (produced a task)
 		task_exec->setJobName( m_name);
 		task_exec->setUserName( m_user_name);
-		
+
 		// Job was not able to start a task.
 		// This should not happen.
 		// This is some error situation (probably system job), see server log.
@@ -1140,7 +1149,7 @@ bool JobAf::solveTaskOnRender(RenderAf * i_render, int i_block_num, int i_task_n
 		}
 
 		m_blocks[task_exec->getBlockNum()]->m_data->setTimeStarted( time(NULL) );
-		
+
 		// If job was not started it became started
 		if( m_time_started == 0 )
 		{
@@ -1152,8 +1161,38 @@ bool JobAf::solveTaskOnRender(RenderAf * i_render, int i_block_num, int i_task_n
 		// Set RUNNING state if it was not:
 		if( false == ( m_state & AFJOB::STATE_RUNNING_MASK ))
 			m_state |= AFJOB::STATE_RUNNING_MASK;
-		
+
 		return true;
+}
+
+af::TaskExec * JobAf::genTask(RenderAf * i_render, int i_block, int i_task)
+{
+	if (false == (m_blocks_data[i_block]->getState() & AFJOB::STATE_READY_MASK))
+		return NULL;
+
+	if (i_task >= m_blocks_data[i_block]->getTasksNum())
+	{
+		AF_ERR << "block[" << i_block << "] '" << m_blocks_data[i_block]->getName()
+		       << "' : " << i_task << " >= number of tasks = " << m_blocks_data[i_block]->getTasksNum();
+		return NULL;
+	}
+
+	if (false == (m_progress->tp[i_block][i_task]->state & AFJOB::STATE_READY_MASK))
+		return NULL;
+
+	if (false == m_blocks[i_block]->canRunOn(i_render))
+		return NULL;
+
+	if (m_blocks[i_block]->m_tasks[i_task]->avoidHostsCheck(i_render->getName()))
+		return NULL;
+
+	af::TaskExec * task_exec = m_blocks_data[i_block]->genTask(i_task);
+
+	task_exec->m_custom_data_job = m_custom_data;
+	task_exec->m_custom_data_render = i_render->getCustomData();
+	task_exec->m_custom_data_user = m_user->getCustomData();
+
+	return task_exec;
 }
 
 void JobAf::v_updateTaskState( const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring)
@@ -1222,11 +1261,11 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 		if( m_blocks[b]->v_refresh( currentTime, renders, monitoring))
 			jobchanged = af::Monitor::EVT_jobs_change;
 
-	// Check block depends after all block refreshed,
+	// Check block depends after all blocks refresh finished,
 	// as states can be changed during refresh.
 	// ( some block can be DONE after refresh )
-	for( int b = 0; b < m_blocks_num; b++)
-		if( m_blocks[b]->checkDepends( monitoring))
+	for (int b = 0; b < m_blocks_num; b++)
+		if (m_blocks[b]->checkBlockDependStatus(monitoring))
 			jobchanged = af::Monitor::EVT_jobs_change;
 
 	// Set ready tasks to try next

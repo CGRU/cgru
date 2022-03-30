@@ -53,7 +53,7 @@ void DBJob::add( const af::Job * i_job, std::list<std::string> * o_queries)
 	for( int b = 0; b < i_job->getBlocksNum(); b++)
 	{
 		// Get block parameters:
-		af::BlockData * block = i_job->getBlock(b);
+		af::BlockData * block = i_job->getBlockData(b);
 		m_blockname = block->getName();
 		m_capacity = block->getCapacity();
 		m_service = block->getService();

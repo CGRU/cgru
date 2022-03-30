@@ -29,7 +29,11 @@ import services.service
 
 from optparse import OptionParser
 
-parser = OptionParser(usage="usage: %prog [Options]", version="%prog 1.0")
+parser = OptionParser(version="%prog 1.0", epilog="""
+Examples:\n
+Job with sub-task dependence:\n
+./job.py --labels 'render,simulation' --frames "1/30/1/1,1/30/30/1" --sub\n
+""")
 parser.add_option(      '--name',         dest='jobname',      type='string', default='', help='job name')
 parser.add_option('-u', '--user',         dest='user',         type='string', default='', help='job user name')
 parser.add_option('-l', '--labels',       dest='labels',       type='string', default='', help='blocks names (labels)')

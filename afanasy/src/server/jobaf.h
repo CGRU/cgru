@@ -15,6 +15,7 @@ class BranchSrv;
 class JobContainer;
 class RenderAf;
 class RenderContainer;
+class Task;
 class UserAf;
 
 /// Server side of Afanasy job.
@@ -117,6 +118,8 @@ public:
 
 	void tryTaskNext(bool i_append, int i_block_num, int i_task_num);
 
+	inline Block * getBlock(int i_num) {if ((i_num < 0) || (i_num >= m_blocks_num)) return NULL; return m_blocks[i_num];}
+
 public:
 	/// Set Jobs Container.
 	inline static void setJobContainer( JobContainer *Jobs){ ms_jobs = Jobs;}
@@ -175,7 +178,10 @@ private:
 
 	void appendBlocks(Action & i_action, const JSON & i_operation);
 
+	// An old recursive function:
 	af::TaskExec *genTask( RenderAf *render, int block, int task, std::list<int> * blocksIds, MonitorContainer * monitoring);
+
+	af::TaskExec * genTask(RenderAf * i_render, int i_block, int i_task);
 	
 	/**
 	 * @brief Emit events and submit them to the wall job
