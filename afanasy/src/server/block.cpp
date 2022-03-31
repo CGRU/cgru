@@ -381,13 +381,13 @@ bool Block::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCon
 	// ( if it will be updated here, it will always return that it changes )
 	if (m_job->getId() != AFJOB::SYSJOB_ID)
 	{
-		// Update block tasks progress and bars
-		if (m_data->updateProgress(m_jobprogress))
-			blockProgress_changed = true;
-
 		if (false == (m_data->getState() & AFJOB::STATE_DONE_MASK))
 			if (checkTasksDependStatus(monitoring))
 				blockProgress_changed = true;
+
+		// Update block tasks progress and bars
+		if (m_data->updateProgress(m_jobprogress))
+			blockProgress_changed = true;
 	}
 
 	if (old_block_state != m_data->getState())
