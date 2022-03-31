@@ -16,6 +16,7 @@
 This is testing job.
 
 '''
+import argparse
 import json
 import os
 import random
@@ -27,79 +28,77 @@ import afcommon
 
 import services.service
 
-from optparse import OptionParser
-
-parser = OptionParser(version="%prog 1.0", epilog="""
-Examples:\n
-Job with sub-task dependence:\n
-./job.py --labels 'render,simulation' --frames "1/30/1/1,1/30/30/1" --sub\n
+parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, epilog="""
+Examples:
+ * Job with sub-task dependence:
+./job.sh --sub --name 'Sub Task Dependence' --labels 'render,simulation' --frames '1/30/1/1,1/30/30/1'
 """)
-parser.add_option(      '--name',         dest='jobname',      type='string', default='', help='job name')
-parser.add_option('-u', '--user',         dest='user',         type='string', default='', help='job user name')
-parser.add_option('-l', '--labels',       dest='labels',       type='string', default='', help='blocks names (labels)')
-parser.add_option(      '--services',     dest='services',     type='string', default=None, help='blocks types (services)')
-parser.add_option('-t', '--time',         dest='timesec',      type='float',  default=2,  help='time per frame in seconds')
-parser.add_option('-r', '--randtime',     dest='randtime',     type='float',  default=2,  help='random time per frame in seconds')
-parser.add_option('-b', '--numblocks',    dest='numblocks',    type='int',    default=1,  help='number of blocks')
-parser.add_option('-n', '--numtasks',     dest='numtasks',     type='int',    default=10, help='number of tasks')
-parser.add_option(      '--frames',       dest='frames',       type='string', default='', help='frames "1/20/2/3,1/20/2/3"')
-parser.add_option('-i', '--increment',    dest='increment',    type='int',    default=1,  help='tasks "frame increment" parameter')
-parser.add_option('-p', '--pertask',      dest='pertask',      type='int',    default=1,  help='number of tasks per task')
-parser.add_option('-m', '--maxtime',      dest='maxtime',      type='int',    default=0,  help='tasks maximum run time in seconds')
-parser.add_option(      '--timeout',      dest='timeout',      type='int',    default=0,  help='tasks progress change timeout in seconds')
-parser.add_option(      '--pkp',          dest='pkp',          type='int',    default=1,  help='Parser key percentage')
-parser.add_option(      '--send',         dest='sendjob',      type='int',    default=1,  help='send job')
-parser.add_option('-w', '--waittime',     dest='waittime',     type='int',    default=0,  help='set job to wait to start time')
-parser.add_option(      '--os',           dest='os',           type='string', default=None, help='OS needed')
-parser.add_option('-c', '--capacity',     dest='capacity',     type='int',    default=0,  help='tasks capacity')
-parser.add_option(      '--capmin',       dest='capmin',       type='int',    default=-1, help='tasks variable capacity coeff min')
-parser.add_option(      '--capmax',       dest='capmax',       type='int',    default=-1, help='tasks variable capacity coeff max')
-parser.add_option('-f', '--filesout',     dest='filesout',     type='string', default=None, help='Tasks out file [render/img.%04d.jpg]')
-parser.add_option(      '--filemin',      dest='filemin',      type='int',    default=-1, help='tasks output file size min')
-parser.add_option(      '--filemax',      dest='filemax',      type='int',    default=-1, help='tasks output file size max')
-parser.add_option(      '--stdoutfile',   dest='stdoutfile',   type='string', default=None, help='Read tasks stdout from file')
-parser.add_option(      '--mhmin',        dest='mhmin',        type='int',    default=-1, help='multi host tasks min hosts')
-parser.add_option(      '--mhmax',        dest='mhmax',        type='int',    default=-1, help='multi host tasks max hosts')
-parser.add_option(      '--mhwaitmax',    dest='mhwaitmax',    type='int',    default=0,  help='multi host tasks max hosts wait time seconds')
-parser.add_option(      '--mhwaitsrv',    dest='mhwaitsrv',    type='int',    default=0,  help='multi host tasks service start wait time seconds')
-parser.add_option(      '--mhsame',       dest='mhsame',       type='int',    default=0,  help='multi host tasks same host slave and master')
-parser.add_option(      '--mhignorelost', dest='mhignorelost', type='int',    default=0,  help='multi host mosater will ignore slave lost')
-parser.add_option(      '--mhservice',    dest='mhservice',    type='str',    default='', help='multi host tasks service command')
-parser.add_option(      '--cmd',          dest='cmd',          type='string', default=None, help='Tasks command')
-parser.add_option(      '--cmdpre',       dest='cmdpre',       type='string', default='', help='job pre command')
-parser.add_option(      '--cmdpost',      dest='cmdpost',      type='string', default='', help='job post command')
-parser.add_option(      '--parser',       dest='parser',       type='string', default=None, help='parser type, default if not set')
-parser.add_option(      '--env',          dest='environment',  type='string', default='CG_VAR=somevalue', help='add an evironment, example: "CG_VAR=somevalue"')
-parser.add_option(      '--tickets',      dest='tickets',      type='string', default='GPU:1,NET:100', help='add tickets, example: "MEM:32,NET:100"')
-parser.add_option(      '--folder',       dest='folder',       type='string', default=None, help='add a folder')
-parser.add_option(      '--nofolder',     dest='nofolder',     action='store_true', default=False, help='do not set any folders')
-parser.add_option(      '--pools',        dest='pools',        type='string', default=None, help='Set job render pools [/local/blender:90,/local/natron:10].')
-parser.add_option(      '--branch',       dest='branch',       type='string', default=None, help='Set job branch.')
-parser.add_option(      '--try',          dest='trytasks',     type='string', default=None, help='Try tasks "0:3,0:5"')
-parser.add_option(      '--seq',          dest='sequential',   type='int',    default=None, help='Sequential running')
-parser.add_option(      '--ppa',          dest='ppapproval',   action='store_true', default=False, help='Preview pending approval')
-parser.add_option('-e', '--exitstatus',   dest='exitstatus',   type='int',    default=0,  help='good exit status')
-parser.add_option('-v', '--verbose',      dest='verbose',      type='int',    default=0,  help='tasks verbose level')
-parser.add_option('-x', '--xcopy',        dest='xcopy',        type='int',    default=1,  help='number of copies to send')
-parser.add_option(      '--sub',          dest='subdep',       action='store_true', default=False, help='sub task dependence')
-parser.add_option('-s', '--stringtype',   dest='stringtype',   action='store_true', default=False, help='generate not numeric blocks')
-parser.add_option('-o', '--output',       dest='output',       action='store_true', default=False, help='output job information')
-parser.add_option(      '--pause',        dest='pause',        action='store_true', default=False, help='start job paused')
+parser.add_argument(      '--name',         dest='jobname',      type=str,   default='', help='job name')
+parser.add_argument('-u', '--user',         dest='user',         type=str,   default='', help='job user name')
+parser.add_argument('-l', '--labels',       dest='labels',       type=str,   default='', help='blocks names (labels)')
+parser.add_argument(      '--services',     dest='services',     type=str,   default=None, help='blocks types (services)')
+parser.add_argument('-t', '--time',         dest='timesec',      type=float, default=2,  help='time per frame in seconds')
+parser.add_argument('-r', '--randtime',     dest='randtime',     type=float, default=2,  help='random time per frame in seconds')
+parser.add_argument('-b', '--numblocks',    dest='numblocks',    type=int,   default=1,  help='number of blocks')
+parser.add_argument('-n', '--numtasks',     dest='numtasks',     type=int,   default=10, help='number of tasks')
+parser.add_argument(      '--frames',       dest='frames',       type=str,   default='', help='frames "1/20/2/3,1/20/2/3"')
+parser.add_argument('-i', '--increment',    dest='increment',    type=int,   default=1,  help='tasks "frame increment" parameter')
+parser.add_argument('-p', '--pertask',      dest='pertask',      type=int,   default=1,  help='number of tasks per task')
+parser.add_argument('-m', '--maxtime',      dest='maxtime',      type=int,   default=0,  help='tasks maximum run time in seconds')
+parser.add_argument(      '--timeout',      dest='timeout',      type=int,   default=0,  help='tasks progress change timeout in seconds')
+parser.add_argument(      '--pkp',          dest='pkp',          type=int,   default=1,  help='Parser key percentage')
+parser.add_argument(      '--send',         dest='sendjob',      type=int,   default=1,  help='send job')
+parser.add_argument('-w', '--waittime',     dest='waittime',     type=int,   default=0,  help='set job to wait to start time')
+parser.add_argument(      '--os',           dest='os',           type=str,   default=None, help='OS needed')
+parser.add_argument('-c', '--capacity',     dest='capacity',     type=int,   default=0,  help='tasks capacity')
+parser.add_argument(      '--capmin',       dest='capmin',       type=int,   default=-1, help='tasks variable capacity coeff min')
+parser.add_argument(      '--capmax',       dest='capmax',       type=int,   default=-1, help='tasks variable capacity coeff max')
+parser.add_argument('-f', '--filesout',     dest='filesout',     type=str,   default=None, help='Tasks out file [render/img.%%04d.jpg]')
+parser.add_argument(      '--filemin',      dest='filemin',      type=int,   default=-1, help='tasks output file size min')
+parser.add_argument(      '--filemax',      dest='filemax',      type=int,   default=-1, help='tasks output file size max')
+parser.add_argument(      '--stdoutfile',   dest='stdoutfile',   type=str,   default=None, help='Read tasks stdout from file')
+parser.add_argument(      '--mhmin',        dest='mhmin',        type=int,   default=-1, help='multi host tasks min hosts')
+parser.add_argument(      '--mhmax',        dest='mhmax',        type=int,   default=-1, help='multi host tasks max hosts')
+parser.add_argument(      '--mhwaitmax',    dest='mhwaitmax',    type=int,   default=0,  help='multi host tasks max hosts wait time seconds')
+parser.add_argument(      '--mhwaitsrv',    dest='mhwaitsrv',    type=int,   default=0,  help='multi host tasks service start wait time seconds')
+parser.add_argument(      '--mhsame',       dest='mhsame',       type=int,   default=0,  help='multi host tasks same host slave and master')
+parser.add_argument(      '--mhignorelost', dest='mhignorelost', type=int,   default=0,  help='multi host mosater will ignore slave lost')
+parser.add_argument(      '--mhservice',    dest='mhservice',    type=str,   default='', help='multi host tasks service command')
+parser.add_argument(      '--cmd',          dest='cmd',          type=str,   default=None, help='Tasks command')
+parser.add_argument(      '--cmdpre',       dest='cmdpre',       type=str,   default='', help='job pre command')
+parser.add_argument(      '--cmdpost',      dest='cmdpost',      type=str,   default='', help='job post command')
+parser.add_argument(      '--parser',       dest='parser',       type=str,   default=None, help='parser type, default if not set')
+parser.add_argument(      '--env',          dest='environment',  type=str,   default='CG_VAR=somevalue', help='add an evironment, example: "CG_VAR=somevalue"')
+parser.add_argument(      '--tickets',      dest='tickets',      type=str,   default='GPU:1,NET:100', help='add tickets, example: "MEM:32,NET:100"')
+parser.add_argument(      '--folder',       dest='folder',       type=str,   default=None, help='add a folder')
+parser.add_argument(      '--pools',        dest='pools',        type=str,   default=None, help='Set job render pools [/local/blender:90,/local/natron:10].')
+parser.add_argument(      '--branch',       dest='branch',       type=str,   default=None, help='Set job branch.')
+parser.add_argument(      '--try',          dest='trytasks',     type=str,   default=None, help='Try tasks "0:3,0:5"')
+parser.add_argument(      '--seq',          dest='sequential',   type=int,   default=None, help='Sequential running')
+parser.add_argument('-e', '--exitstatus',   dest='exitstatus',   type=int,   default=0,  help='good exit status')
+parser.add_argument('-v', '--verbose',      dest='verbose',      type=int,   default=0,  help='tasks verbose level')
+parser.add_argument('-x', '--xcopy',        dest='xcopy',        type=int,   default=1,  help='number of copies to send')
+parser.add_argument(      '--ppa',          dest='ppapproval',   action='store_true', default=False, help='Preview pending approval')
+parser.add_argument(      '--nofolder',     dest='nofolder',     action='store_true', default=False, help='do not set any folders')
+parser.add_argument(      '--sub',          dest='subdep',       action='store_true', default=False, help='sub task dependence')
+parser.add_argument('-s', '--stringtype',   dest='stringtype',   action='store_true', default=False, help='generate not numeric blocks')
+parser.add_argument('-o', '--output',       dest='output',       action='store_true', default=False, help='output job information')
+parser.add_argument(      '--pause',        dest='pause',        action='store_true', default=False, help='start job paused')
 
-Options, args = parser.parse_args()
+Args = parser.parse_args()
 
-jobname     = Options.jobname
-timesec     = Options.timesec
-randtime    = Options.randtime
-pkp         = Options.pkp
-numblocks   = Options.numblocks
-numtasks    = Options.numtasks
-increment   = Options.increment
-verbose     = Options.verbose
-xcopy       = Options.xcopy
-frames      = Options.frames.split(',')
+jobname     = Args.jobname
+timesec     = Args.timesec
+randtime    = Args.randtime
+pkp         = Args.pkp
+numblocks   = Args.numblocks
+numtasks    = Args.numtasks
+increment   = Args.increment
+verbose     = Args.verbose
+xcopy       = Args.xcopy
+frames      = Args.frames.split(',')
 
-if Options.frames != '':
+if Args.frames != '':
     numblocks = len(frames)
 
 if xcopy < 1:
@@ -112,38 +111,38 @@ job = af.Job(jobname)
 job.setDescription('afanasy test - empty tasks')
 
 # Set job folder:
-if Options.folder is not None:
-    job.setFolder('folder', Options.folder)
-if not Options.nofolder:
+if Args.folder is not None:
+    job.setFolder('folder', Args.folder)
+if not Args.nofolder:
     job.setFolder('pwd', os.getcwd())
 
-if Options.pools is not None:
+if Args.pools is not None:
     pools = dict()
-    for pool in Options.pools.split(','):
+    for pool in Args.pools.split(','):
         pool = pool.split(':')
         pools[pool[0]] = int(pool[1])
     job.setPools( pools)
 
-if Options.branch is not None:
-    job.setBranch( Options.branch)
+if Args.branch is not None:
+    job.setBranch( Args.branch)
 else:
     job.setBranch( os.getcwd())
 
-if Options.trytasks:
-    for pair in Options.trytasks.split(','):
+if Args.trytasks:
+    for pair in Args.trytasks.split(','):
         bt = pair.split(':')
         if len(bt) == 2:
             job.tryTask(int(bt[0]), int(bt[1]))
 
 blocknames = []
-if Options.labels != '':
-    blocknames = Options.labels.split(',')
+if Args.labels != '':
+    blocknames = Args.labels.split(',')
 else:
     blocknames.append('block')
 
 blocktypes = []
-if Options.services is not None:
-    blocktypes = Options.services.split(',')
+if Args.services is not None:
+    blocktypes = Args.services.split(',')
 else:
     blocktypes.append('test')
 
@@ -170,50 +169,50 @@ for b in range(numblocks):
     block = af.Block(blockname, blocktype)
     job.blocks.append(block)
 
-    if Options.parser is not None:
-        block.setParser(Options.parser)
+    if Args.parser is not None:
+        block.setParser(Args.parser)
 
     if b > 0:
         job.blocks[b - 1].setTasksDependMask(blockname)
-        if Options.subdep:
+        if Args.subdep:
             job.blocks[b].setDependSubTask()
 
-    if Options.maxtime:
-        block.setTasksMaxRunTime(Options.maxtime)
+    if Args.maxtime:
+        block.setTasksMaxRunTime(Args.maxtime)
 
-    if Options.timesec:
-        block.setTaskProgressChangeTimeout(Options.timeout)
+    if Args.timesec:
+        block.setTaskProgressChangeTimeout(Args.timeout)
 
-    if Options.capacity != 0:
-        block.setCapacity(Options.capacity)
+    if Args.capacity != 0:
+        block.setCapacity(Args.capacity)
 
-    if Options.sequential != None:
-        block.setSequential( Options.sequential)
+    if Args.sequential != None:
+        block.setSequential( Args.sequential)
 
-    if Options.ppapproval:
+    if Args.ppapproval:
         job.setPPApproval()
 
-    if Options.environment:
-        for env in Options.environment.split(';'):
+    if Args.environment:
+        for env in Args.environment.split(';'):
             vals = env.split('=')
             if len(vals) == 2:
                 block.setEnv(vals[0], vals[1])
             else:
-                'Warning: Invalid environment: "%s"' % Options.environment
+                'Warning: Invalid environment: "%s"' % Args.environment
 
-    if Options.tickets:
-        for env in Options.tickets.split(','):
+    if Args.tickets:
+        for env in Args.tickets.split(','):
             vals = env.split(':')
             if len(vals) == 2:
                 block.addTicket(vals[0], int(vals[1]))
             else:
-                'Warning: Invalid tickets: "%s"' % Options.environment
+                'Warning: Invalid tickets: "%s"' % Args.environment
 
-    if Options.filemin != -1 or Options.filemax != -1:
-        block.setFileSizeCheck(Options.filemin, Options.filemax)
+    if Args.filemin != -1 or Args.filemax != -1:
+        block.setFileSizeCheck(Args.filemin, Args.filemax)
 
     negative_pertask = False
-    if Options.frames != '':
+    if Args.frames != '':
         fr = frames[b].split('/')
         if int(fr[2]) < 0:
             negative_pertask = True
@@ -221,46 +220,46 @@ for b in range(numblocks):
     cmd = 'task.py'
     cmd = "\"%s\"" % os.path.join(os.getcwd(), cmd)
     cmd = "%s %s" % (os.getenv('CGRU_PYTHONEXE','python3'), cmd)
-    cmd += ' --exitstatus %d ' % Options.exitstatus
+    cmd += ' --exitstatus %d ' % Args.exitstatus
 
-    if Options.capmin != -1 or Options.capmax != -1:
-        block.setVariableCapacity(Options.capmin, Options.capmax)
+    if Args.capmin != -1 or Args.capmax != -1:
+        block.setVariableCapacity(Args.capmin, Args.capmax)
         cmd += ' -c ' + services.service.str_capacity
 
-    if Options.mhmin != -1 or Options.mhmax != -1:
+    if Args.mhmin != -1 or Args.mhmax != -1:
         block.setMultiHost(
-            Options.mhmin, Options.mhmax, Options.mhwaitmax,
-            Options.mhsame, Options.mhservice, Options.mhwaitsrv
+            Args.mhmin, Args.mhmax, Args.mhwaitmax,
+            Args.mhsame, Args.mhservice, Args.mhwaitsrv
         )
-        if Options.mhignorelost:
+        if Args.mhignorelost:
             block.setSlaveLostIgnore()
         cmd += ' ' + services.service.str_hosts
 
-    if Options.filesout:
-        cmd += ' --filesout "%s"' % Options.filesout
+    if Args.filesout:
+        cmd += ' --filesout "%s"' % Args.filesout
         block.skipExistingFiles()
         block.checkRenderedFiles(100)
         files = []
-        for afile in Options.filesout.split(';'):
+        for afile in Args.filesout.split(';'):
             files.append(afcommon.patternFromStdC(afile))
         block.setFiles(files)
 
-    if Options.stdoutfile:
-        if not os.path.isfile(Options.stdoutfile):
+    if Args.stdoutfile:
+        if not os.path.isfile(Args.stdoutfile):
             print('ERROR: File "%s" does not exist.')
             sys.exit(1)
-        cmd += ' --stdoutfile "%s"' % Options.stdoutfile
+        cmd += ' --stdoutfile "%s"' % Args.stdoutfile
 
-    if not Options.stringtype and not negative_pertask:
+    if not Args.stringtype and not negative_pertask:
         cmd += ' -s @#@ -e @#@ -i %(increment)d' \
                ' -t %(timesec)g -r %(randtime)g --pkp %(pkp)d' \
                ' -v %(verbose)d @####@ @#####@ @#####@ @#####@' % vars()
 
-        if Options.frames != '':
+        if Args.frames != '':
             fr = frames[b].split('/')
             block.setNumeric(int(fr[0]), int(fr[1]), int(fr[2]), int(fr[3]))
         else:
-            block.setNumeric(1, numtasks, Options.pertask, increment)
+            block.setNumeric(1, numtasks, Args.pertask, increment)
 
     else:
         cmd += ' -v %(verbose)d' % vars()
@@ -268,7 +267,7 @@ for b in range(numblocks):
 
         block.setTasksName('task @#@')
 
-        if Options.frames != '':
+        if Args.frames != '':
             fr = frames[b].split('/')
             block.setFramesPerTask(int(fr[2]))
             numtasks = int(fr[1]) - int(fr[0]) + 1
@@ -278,40 +277,40 @@ for b in range(numblocks):
             task = af.Task('#' + str(t))
             task.setCommand('-s %(t)d -e %(t)d -t %(timesec_task)g' % vars())
 
-            if Options.filesout:
+            if Args.filesout:
                 task.setFiles(['%04d' % t])
 
             block.tasks.append(task)
 
-    if Options.cmd:
-        cmd = Options.cmd
+    if Args.cmd:
+        cmd = Args.cmd
 
     block.setCommand(cmd, False)
 
-if Options.cmdpre != '':
-    job.setCmdPre(Options.cmdpre)
-if Options.cmdpost != '':
-    job.setCmdPost(Options.cmdpost)
+if Args.cmdpre != '':
+    job.setCmdPre(Args.cmdpre)
+if Args.cmdpost != '':
+    job.setCmdPost(Args.cmdpost)
 
-if Options.waittime:
-    job.setWaitTime(int(time.time()) + Options.waittime)
+if Args.waittime:
+    job.setWaitTime(int(time.time()) + Args.waittime)
 
-if Options.user != '':
-    job.setUserName(Options.user)
+if Args.user != '':
+    job.setUserName(Args.user)
 
-if Options.pause:
+if Args.pause:
     job.offLine()
 
-if Options.output:
+if Args.output:
     job.output()
 
-if Options.os is None:
+if Args.os is None:
     job.setNeedOS('')
 else:
-    job.setNeedOS(Options.os)
+    job.setNeedOS(Args.os)
 
 exit_status = 0
-if Options.sendjob:
+if Args.sendjob:
     for x in range(xcopy):
         status, data = job.send(verbose)
         if not status:
