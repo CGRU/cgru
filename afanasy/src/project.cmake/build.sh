@@ -20,11 +20,11 @@ popd > /dev/null
 options=""
 sql="REQUIRED"
 gui="YES"
-fermer="YES"
+fermer="NO"
 for arg in "$@"; do
 	[ $arg == "--nosql" ] && sql="NO" && shift
 	[ $arg == "--nogui" ] && gui="NO" && shift
-	[ $arg == "--nofermer" ] && fermer="NO" && shift
+	[ $arg == "--fermer" ] && fermer="YES" && shift
 	[ $arg == "--debug" ] && debug="-g" && shift
 done
 
