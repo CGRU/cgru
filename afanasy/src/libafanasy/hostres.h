@@ -4,11 +4,11 @@
 
 namespace af
 {
-class HostResMeter : public Af
+class HostResCustom : public Af
 {
 public:
-	HostResMeter();
-	HostResMeter( Msg * msg);
+	HostResCustom();
+	HostResCustom(Msg * msg);
 
 	int32_t value;
 	int32_t valuemax;
@@ -42,6 +42,7 @@ public:
 
 	HostRes( Msg * msg);
 
+public:
 	uint8_t cpu_loadavg[3];
 
 	int32_t cpu_num;
@@ -76,6 +77,9 @@ public:
 	/// List of users currently logged in on a machine
 	std::vector<std::string> logged_in_users;
 
+	std::vector<HostResCustom*> custom;
+
+public:
 	/// Generate information.
 	void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
@@ -87,7 +91,5 @@ public:
 	void jsonWrite( std::ostringstream & o_str) const;
 
 	void v_readwrite( Msg * msg); ///< Read or write Host Resources in message.
-
-	std::vector<HostResMeter*> custom;
 };
 }

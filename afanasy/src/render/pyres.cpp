@@ -29,7 +29,7 @@ PyRes::PyRes(const std::string & i_className, af::HostRes * i_hostRes):
 	if (m_PyObj_FuncUpdate == NULL)
 		return;
 
-	m_hres->custom.push_back(new af::HostResMeter());
+	m_hres->custom.push_back(new af::HostResCustom());
 	m_initialized = true;
 }
 
