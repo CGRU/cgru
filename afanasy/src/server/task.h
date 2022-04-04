@@ -83,7 +83,15 @@ public:
 	inline bool isDone()    const { return m_progress->state & AFJOB::STATE_DONE_MASK;    }
 	inline bool isError()   const { return m_progress->state & AFJOB::STATE_ERROR_MASK;   }
 
+	inline long long getProgressFrame() const {return m_progress->frame;}
+
+	inline Block * getBlock() {return m_block;}
+
+public:
 	bool m_solved;
+
+	std::vector<Task*> m_depend_on;
+	std::vector<Task*> m_dependent;
 
 protected:
 	af::TaskProgress * m_progress;

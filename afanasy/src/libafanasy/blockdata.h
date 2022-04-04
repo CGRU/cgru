@@ -270,6 +270,7 @@ public:
 	inline int getProgressTasksSkipped() const { return p_tasks_skipped; }
 	inline int getProgressTasksWarning() const { return p_tasks_warning; }
 	inline int getProgressTasksWaitReconn() const { return p_tasks_waitrec; }
+	inline int getProgressTasksWaitDep() const { return p_tasks_waitdep; }
 	inline long long getProgressTasksSumRunTime() const { return p_tasks_run_time; }
 
 	inline void setState(uint32_t value) { m_state = value; }
@@ -348,7 +349,7 @@ protected:
 	std::string m_tasks_name; ///< Tasks name pattern;
 	std::string m_service;	///< Tasks service name.
 	std::string m_parser;	 ///< Tasks parser type.
-	int32_t m_parser_coeff;   ///< Parser koefficient.
+	int32_t m_parser_coeff;   ///< Parser coefficient.
 
 	std::string m_working_directory;				  ///< Block tasks working directory.
 	std::map<std::string, std::string> m_environment; ///< Block tasks extra environment.
@@ -429,6 +430,7 @@ private:
 	int32_t p_tasks_warning;  ///< Number of skipped with warnings.
 	int32_t p_tasks_skipped;  ///< Number of skipped tasks.
 	int32_t p_tasks_waitrec;  ///< Number of tasks waiting for reconnect.
+	int32_t p_tasks_waitdep;  ///< Number of tasks waiting for dependencies.
 	int64_t p_tasks_run_time; ///< Tasks run time summ.
 };
 }

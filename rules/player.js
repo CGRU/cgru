@@ -104,6 +104,7 @@ function p_Init()
 	cgru_Init();
 	u_Init();
 	c_Init();
+	n_Init();
 
 	for (var i = 0; i < p_elements.length; i++)
 		p_el[p_elements[i]] = document.getElementById(p_elements[i]);

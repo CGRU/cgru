@@ -16,7 +16,7 @@
 
 "use strict";
 
-var n_server = 'rules.php';
+var n_server = '/server';
 var n_connection_lost = false;
 
 var n_requests = [];
@@ -30,8 +30,10 @@ var n_log_responses = null;
 
 function n_Init()
 {
-	if (document.location.hostname == '127.0.0.1')
-		n_server = '/server';
+	if (document.location.hostname == 'u5fx.ru')
+		n_server = '/les/server';
+
+	//n_server = 'rules.php';
 
 	n_LogResponses();
 }

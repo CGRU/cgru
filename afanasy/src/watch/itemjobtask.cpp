@@ -218,6 +218,7 @@ void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 	else if (taskprogress.state &
 		(AFJOB::STATE_ERROR_MASK
 		| AFJOB::STATE_WAITRECONNECT_MASK
+		| AFJOB::STATE_WAITDEP_MASK
 		| AFJOB::STATE_SKIPPED_MASK
 		| AFJOB::STATE_DONE_MASK
 		| AFJOB::STATE_ERROR_READY_MASK
@@ -239,6 +240,8 @@ void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_taskwaitreconn.c, Qt::SolidPattern));
 		else if (taskprogress.state & AFJOB::STATE_TRYTHISTASKNEXT_MASK)
 			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_tasktrynext.c, Qt::SolidPattern));
+		else if (taskprogress.state & AFJOB::STATE_WAITDEP_MASK)
+			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_itemjobwdep.c, Qt::SolidPattern));
 
 		i_painter->drawRect(x, y, w - WidthInfo, Height-1);
 	}

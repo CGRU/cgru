@@ -55,7 +55,9 @@ public:
 	/// Refresh block. Retrun true if block progress changed, needed for jobs monitoring (watch jobs list).
 	virtual bool v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
 
-	bool checkDepends( MonitorContainer * i_monitoring);
+	bool checkBlockDependStatus(MonitorContainer * i_monitoring);
+	bool checkTasksDependStatus(MonitorContainer * i_monitoring);
+	void constructDependTasks();
 
 	/// Return \c true if some job block progess parameter needs to updated for monitoring
 	bool action( Action & i_action);
@@ -93,7 +95,10 @@ private:
 	/// Allocate, or reallocate when appending tasks, Task objects.
 	/// When reallocating, one must provide the number of alread allocated tasks
 	bool allocateTasks(int alreadyAllocated = 0);
+
 	void constructDependBlocks();
+
+	bool resetTasksDependStatus(MonitorContainer * i_monitoring);
 
 	const std::string getStoreTasksFileName() const;
 

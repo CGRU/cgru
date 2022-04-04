@@ -125,7 +125,7 @@ public:
 //	const std::string & getTasksOutputDir() const { return m_tasks_output_dir; }
 
 	/// Get block constant pointer.
-	inline BlockData* getBlock( int n) const { if(n<(m_blocks_num))return m_blocks_data[n];else return NULL;}
+	inline BlockData * getBlockData(int i_num) const {if(i_num < m_blocks_num) return m_blocks_data[i_num]; else return NULL;}
 	
 	virtual int v_calcWeight() const;                   ///< Calculate and return memory size.
 

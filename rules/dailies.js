@@ -95,6 +95,8 @@ function d_Make(i_path, i_outfolder)
 	params.input = i_path;
 	params.output = c_PathPM_Rules2Client(out_path);
 	params.activity = RULES.dailies.activity;
+	if (activity_Current)
+		params.activity = activity_Current;
 
 	d_params.general.artist = {"width": '50%'};
 	params.artist = c_GetUserTitle();
@@ -198,7 +200,8 @@ function d_DailiesWalkReceived(i_data, i_args)
 		gui_CreateTabs({"tabs": d_params_types, "elParent": wnd.elContent, "name": 'd_params_types'});
 
 	for (var type in d_params_types)
-		gui_Create(wnd.elTabs[type], d_params[type], [params, RULES.dailies]);
+		gui_Create(wnd.elTabs[type], d_params[type], [RULES.dailies, params]);
+		//gui_Create(wnd.elTabs[type], d_params[type], [params, RULES.dailies]);
 
 	gui_CreateChoices({
 		"wnd": wnd.elTabs.general,

@@ -54,7 +54,7 @@ int now = 0;
 
 ULONGLONG g_time_prev = 0;
 
-void GetResources(af::HostRes & hres, bool verbose)
+void GetResources_WINDOWS(af::HostRes & hres, bool verbose)
 {
 #ifdef AFOUTPUT
 printf("\nGetResources:\n");

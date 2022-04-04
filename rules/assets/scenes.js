@@ -731,6 +731,12 @@ function sc_FilterShots(i_args)
 			for (let t in st_obj.tasks)
 			{
 				let task = st_obj.tasks[t];
+				if (task.deleted)
+				{
+					found = false;
+					continue;
+				}
+
 				for (let key of keys)
 					if (task[key])
 					{
@@ -853,6 +859,11 @@ function sc_FilterShots(i_args)
 				for (let t in st_obj.tasks)
 				{
 					let task = st_obj.tasks[t];
+					if (task.deleted)
+					{
+						found = false;
+						continue;
+					}
 					found = true;
 
 					if (found && i_args.flags && i_args.flags.length)

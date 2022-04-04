@@ -8,10 +8,10 @@
 
 using namespace af;
 
-HostResMeter::HostResMeter(){}
-HostResMeter::HostResMeter( Msg * msg){ read( msg);}
+HostResCustom::HostResCustom(){}
+HostResCustom::HostResCustom(Msg * msg) {read(msg);}
 
-void HostResMeter::v_readwrite( Msg * msg)
+void HostResCustom::v_readwrite(Msg * msg)
 {
     rw_int32_t( value,      msg);
     rw_int32_t( valuemax,   msg);
@@ -31,7 +31,7 @@ void HostResMeter::v_readwrite( Msg * msg)
     rw_String(  tooltip,    msg);
 }
 
-void HostResMeter::jsonWrite( std::ostringstream & o_str) const
+void HostResCustom::jsonWrite(std::ostringstream & o_str) const
 {
 	o_str << "{";
 
@@ -49,7 +49,7 @@ void HostResMeter::jsonWrite( std::ostringstream & o_str) const
 	o_str << "\n}";
 }
 
-void HostResMeter::v_generateInfoStream( std::ostringstream & stream, bool full) const
+void HostResCustom::v_generateInfoStream(std::ostringstream & stream, bool full) const
 {
     stream << label   << ": ";
     stream << value   << " of " << valuemax;
@@ -143,7 +143,7 @@ void HostRes::copy( const HostRes & other)
             if( custom[i] ) delete custom[i];
         custom.clear();
         for( unsigned i = 0; i < other.custom.size(); i++)
-            custom.push_back( new HostResMeter());
+            custom.push_back(new HostResCustom());
     }
 
     for( unsigned i = 0; i < custom.size(); i++)
@@ -248,7 +248,7 @@ void HostRes::v_readwrite( Msg * msg)
 
     for( int i = 0; i < custom_count; i++)
         if( msg->isWriting()) custom[i]->write( msg);
-        else custom.push_back( new HostResMeter( msg));
+        else custom.push_back(new HostResCustom( msg));
 }
 
 void HostRes::v_generateInfoStream( std::ostringstream & stream, bool full) const

@@ -42,7 +42,7 @@ ItemJob::ItemJob(ListNodes * i_list_nodes, bool i_inworklist, af::Job * i_job, c
 {
 	for (int b = 0; b < i_job->getBlocksNum(); b++)
 	{
-		const af::BlockData * blockdata = i_job->getBlock(b);
+		const af::BlockData * blockdata = i_job->getBlockData(b);
 		BlockInfo * blockinfo = new BlockInfo(blockdata, this, m_list_nodes);
 		QObject::connect(blockinfo, SIGNAL(sig_BlockAction(int, QString)), m_list_nodes, SLOT(slot_BlockAction(int, QString)));
 		m_blocks.append(blockinfo);
@@ -112,7 +112,7 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 	if (m_blocks.size() < job->getBlocksNum())
 		for (int b = m_blocks.size(); b < job->getBlocksNum(); b++)
 		{
-			const af::BlockData * blockdata = job->getBlock(b);
+			const af::BlockData * blockdata = job->getBlockData(b);
 			BlockInfo * blockinfo = new BlockInfo(blockdata, this, m_list_nodes);
 			QObject::connect(blockinfo, SIGNAL(sig_BlockAction(int, QString)), m_list_nodes, SLOT(slot_BlockAction(int, QString)));
 			m_blocks.append(blockinfo);
@@ -194,7 +194,7 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 	m_tasks_percent = 0;
 	for (int b = 0; b < m_blocks.size(); b++)
 	{
-		const af::BlockData * block = job->getBlock(b);
+		const af::BlockData * block = job->getBlockData(b);
 		m_blocks[b]->update(block, i_msgType);
 
 		if (block->getProgressAvoidHostsNum() > 0)
@@ -204,9 +204,9 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 			service = afqt::stoq(block->getService());
 
 		m_tasks_total   += m_blocks[b]->tasksnum;
-		m_tasks_done    += m_blocks[b]->p_tasksdone;
-		m_tasks_running += m_blocks[b]->p_tasksrunning;
-		m_tasks_error   += m_blocks[b]->p_taskserror;
+		m_tasks_done    += m_blocks[b]->p_tasks_done;
+		m_tasks_running += m_blocks[b]->p_tasks_running;
+		m_tasks_error   += m_blocks[b]->p_tasks_error;
 		m_tasks_percent += m_blocks[b]->p_percentage;
 	}
 	m_tasks_percent /= m_blocks.size();

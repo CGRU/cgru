@@ -338,6 +338,13 @@ function bm_CreateBookmark(i_bm)
 	elDel.ondblclick = function(e) { bm_Delete([e.currentTarget.m_path]); };
 	elDel.title = 'Double click to delete.';
 
+	let elFav = document.createElement('div');
+	el.appendChild(elFav);
+	elFav.classList.add('favourite_toggle');
+	elFav.m_bm = i_bm;
+	elFav.title = 'Double click to toggle favourite.';
+	elFav.ondblclick = function(e) {bm_FavouriteToggle(e.currentTarget.m_bm);};
+
 	var elPath = document.createElement('a');
 	el.appendChild(elPath);
 	elPath.classList.add('name');
@@ -360,6 +367,9 @@ function bm_CreateBookmark(i_bm)
 
 	if (false == bm_ActualStatus(i_bm.status))
 		el.classList.add('obsolete');
+
+	if (i_bm.favourite)
+		el.classList.add('favourite');
 
 	el.m_bookmark = i_bm;
 
@@ -525,6 +535,30 @@ function bm_DeleteFinished(i_data)
 	bm_Load({"info": 'deleted'});
 }
 
+function bm_FavouriteToggle(i_bm)
+{
+	let favourite = (true != i_bm.favourite);
+	let obj = {};
+	obj.replace = true;
+	obj.objects = [];
+	obj.objects.push({"path": i_bm.path,"favourite":favourite});
+	obj.id = 'path';
+	obj.file = bm_GetUserFileName();
+	n_Request({"send": {"editobj": obj}, "func": bm_FavouriteToggle_Finished});
+}
+
+function bm_FavouriteToggle_Finished(i_data)
+{
+	if ((i_data == null) || (i_data.error))
+	{
+		c_Error(i_data.error);
+		return;
+	}
+
+	c_Info('Bookmark favourite toggled.');
+	bm_Load({"info": 'favourite'});
+}
+
 function bm_DeleteObsoleteOnClick()
 {
 	let bookmarks_deleted = bm_DeleteObsoleteForTime(true);
@@ -541,6 +575,9 @@ function bm_DeleteObsoleteForTime(i_delete_any_time)
 	{
 		let el = bm_elements[i];
 		let bm = el.m_bookmark;
+
+		if (bm.favourite)
+			continue;
 
 		if ( ! bm.mtime)
 		{

@@ -704,6 +704,7 @@ JobBlock.prototype.constructFull = function() {
 	this.elTasksDon = cm_ElCreateText(this.elFull, 'Done Tasks Counter');
 	this.elTasksRdy = cm_ElCreateText(this.elFull, 'Ready Tasks Counter');
 	this.elTasksSkp = cm_ElCreateText(this.elFull, 'Skipped Tasks Counter');
+	this.elTasksWDP = cm_ElCreateText(this.elFull, 'Waitind Depends Tasks Counter');
 	this.elTasksWrn = cm_ElCreateText(this.elFull, 'Warning Tasks Counter');
 	this.elTasksWrc = cm_ElCreateText(this.elFull, 'Waiting Reconnect Tasks Counter');
 	this.elTasksErr = cm_ElCreateText(this.elFull, 'Error Tasks Counter');
@@ -1151,6 +1152,11 @@ JobBlock.prototype.update = function(i_displayFull) {
 			else
 				this.elTasksSkp.textContent = '';
 
+			if (this.params.p_tasks_waitdep)
+				this.elTasksWDP.innerHTML = 'Wait Depends:<b>' + this.params.p_tasks_waitdep + '</b>';
+			else
+				this.elTasksWDP.textContent = '';
+
 			if (this.params.p_tasks_warning)
 				this.elTasksWrn.innerHTML = 'Warnings:<b>' + this.params.p_tasks_warning + '</b>';
 			else
@@ -1193,6 +1199,11 @@ JobBlock.prototype.update = function(i_displayFull) {
 			else
 				this.elTasksSkp.textContent = '';
 
+			if (this.params.p_tasks_waitdep)
+				this.elTasksWDP.innerHTML = 'WaitDep:<b>' + this.params.p_tasks_waitdep + '</b>';
+			else
+				this.elTasksWDP.textContent = '';
+
 			if (this.params.p_tasks_warning)
 				this.elTasksWrn.innerHTML = 'Wrn:<b>' + this.params.p_tasks_warning + '</b>';
 			else
@@ -1234,6 +1245,11 @@ JobBlock.prototype.update = function(i_displayFull) {
 				this.elTasksSkp.innerHTML = 's<b>' + this.params.p_tasks_skipped + '</b>';
 			else
 				this.elTasksSkp.textContent = '';
+
+			if (this.params.p_tasks_waitdep)
+				this.elTasksWDP.innerHTML = 'wdp:<b>' + this.params.p_tasks_waitdep + '</b>';
+			else
+				this.elTasksWDP.textContent = '';
 
 			if (this.params.p_tasks_warning)
 				this.elTasksWrn.innerHTML = 'w<b>' + this.params.p_tasks_warning + '</b>';

@@ -655,8 +655,35 @@ float: right;
 width: 14px;
 height: 14px;
 }
+#bookmarks .bookmark .favourite_toggle {
+cursor: pointer;
+float: left;
+width: 8px;
+height: 8px;
+margin: 2px;
+padding: 2px;
+background-size: 100%;
+background-repeat: no-repeat;
+background-position: center;
+background-image: url(icons/favourite.png);
+filter: grayscale(100%);
+opacity: 0.7;
+}
+#bookmarks .bookmark.favourite .favourite_toggle {
+opacity: 1.0;
+filter: none;
+}
+#bookmarks .bookmark .favourite_toggle:hover {
+opacity: 1.0;
+}
+#bookmarks .bookmark.favourite .favourite_toggle:hover {
+opacity: 0.7;
+}
 #bookmarks .bookmark.obsolete .button.delete {
 display: block;
+}
+#bookmarks .bookmark.favourite .button.delete {
+display: none;
 }
 
 
@@ -861,6 +888,10 @@ border-radius: 8px;
 box-shadow: 0px 0px 3px #000, 0px 0px 5px rgba(255,255,255,.7) inset;
 background-color: rgba(255,255,255,0.2);
 opacity: 1.0;
+}
+.edit_tags_list .menu .artist.me {
+border: 1px solid rgba(98,250,98,.5);
+box-shadow: 0px 0px 3px #040, 0 0 8px #88FF88 inset;
 }
 .edit_tags_list .menu .item:hover {
 border: 1px solid #AFF;

@@ -377,14 +377,21 @@ bool Block::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCon
 	  m_data->setProgressAvoidHostsNum( avoidhostsnum);
    }
 
-   // No need to update progress in sys job block, it will be updated in virtual function customly
-   // ( if it will be updated here, it will always return that it changes )
-   if( m_job->getId() != AFJOB::SYSJOB_ID )
-   // Update block tasks progress and bars
-	  if( m_data->updateProgress( m_jobprogress)) blockProgress_changed = true;
+	// No need to update progress in sys job block, it will be updated in virtual function customly
+	// ( if it will be updated here, it will always return that it changes )
+	if (m_job->getId() != AFJOB::SYSJOB_ID)
+	{
+		if (false == (m_data->getState() & AFJOB::STATE_DONE_MASK))
+			if (checkTasksDependStatus(monitoring))
+				blockProgress_changed = true;
 
+		// Update block tasks progress and bars
+		if (m_data->updateProgress(m_jobprogress))
+			blockProgress_changed = true;
+	}
 
-   if( old_block_state != m_data->getState()) blockProgress_changed = true;
+	if (old_block_state != m_data->getState())
+		blockProgress_changed = true;
 
    // update block monitoring and database if needed
    if( blockProgress_changed && monitoring )
@@ -393,7 +400,7 @@ bool Block::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCon
    return blockProgress_changed;
 }
 
-bool Block::checkDepends( MonitorContainer * i_monitoring)
+bool Block::checkBlockDependStatus(MonitorContainer * i_monitoring)
 {
 	bool was_depend = m_data->getState() & AFJOB::STATE_WAITDEP_MASK;
 	bool now_depend = false;
@@ -401,7 +408,7 @@ bool Block::checkDepends( MonitorContainer * i_monitoring)
 	if( m_dependBlocks.size())
 		for( std::list<int>::const_iterator bIt = m_dependBlocks.begin(); bIt != m_dependBlocks.end(); bIt++)
 		{
-			if( m_job->getBlock(*bIt)->getState() & AFJOB::STATE_DONE_MASK)
+			if (m_job->getBlockData(*bIt)->getState() & AFJOB::STATE_DONE_MASK)
 				continue;
 
 			now_depend = true;
@@ -419,6 +426,104 @@ bool Block::checkDepends( MonitorContainer * i_monitoring)
 	}
 
 	return false;
+}
+
+bool Block::resetTasksDependStatus(MonitorContainer * i_monitoring)
+{
+	bool some_task_state_changed = false;
+
+	for (int task = 0; task < m_data->getTasksNum(); task++)
+	{
+		int64_t state = m_jobprogress->tp[m_data->getBlockNum()][task]->state;
+
+		if (false == (state & AFJOB::STATE_WAITDEP_MASK))
+			continue;
+
+		state = state & (~AFJOB::STATE_WAITDEP_MASK);
+		state = state | AFJOB::STATE_READY_MASK;
+
+		m_tasks[task]->m_dependent.clear();
+		m_tasks[task]->m_depend_on.clear();
+
+		m_jobprogress->tp[m_data->getBlockNum()][task]->state = state;
+		m_tasks[task]->v_monitor(i_monitoring);
+		some_task_state_changed = true;
+	}
+
+	return some_task_state_changed;
+}
+
+bool Block::checkTasksDependStatus(MonitorContainer * i_monitoring)
+{
+	if (m_job->getBlocksNum() < 2)
+		return false;
+
+	if (m_dependTasksBlocks.size() == 0)
+		return false;
+
+	bool some_task_state_changed = false;
+
+	for (int task = 0; task < m_data->getTasksNum(); task++)
+	{
+		int64_t state = m_jobprogress->tp[m_data->getBlockNum()][task]->state;
+
+		if (state & AFJOB::STATE_WAITDEP_MASK)
+		{
+			state = state & (~AFJOB::STATE_WAITDEP_MASK);
+			state = state | AFJOB::STATE_READY_MASK;
+		}
+
+		if (false == (state & AFJOB::STATE_READY_MASK))
+			continue;
+
+		for (int t = 0; t < m_tasks[task]->m_depend_on.size(); t++)
+		{
+			Task * dep_on_task = m_tasks[task]->m_depend_on[t];
+
+			if (dep_on_task->isDone())
+				continue;
+
+			// Check subframe depend, is depend task is running:
+			if (dep_on_task->getBlock()->m_data->isDependSubTask() && dep_on_task->isRunning())
+			{
+				long long firstdependframe, lastdependframe;
+				m_data->genNumbers(firstdependframe, lastdependframe, task);
+				if (m_data->isNumeric() && dep_on_task->getBlock()->m_data->isNotNumeric())
+				{
+					firstdependframe -= m_data->getFrameFirst();
+					lastdependframe  -= m_data->getFrameFirst();
+				}
+				else if (m_data->isNotNumeric() && dep_on_task->getBlock()->m_data->isNumeric())
+				{
+					firstdependframe += dep_on_task->getBlock()->m_data->getFrameFirst();
+					lastdependframe  += dep_on_task->getBlock()->m_data->getFrameFirst();
+				}
+
+				if (dep_on_task->getBlock()->m_data->getFramePerTask() < 0)
+					lastdependframe++; // For several frames in task
+
+				long long f_start_dep, f_end_dep;
+				dep_on_task->getBlock()->m_data->genNumbers(f_start_dep, f_end_dep, dep_on_task->getNumber());
+				long long frame_run = f_start_dep + dep_on_task->getProgressFrame();
+				if (frame_run > lastdependframe)
+					continue;
+			}
+
+			state = state | AFJOB::STATE_WAITDEP_MASK;
+			state = state & (~AFJOB::STATE_READY_MASK);
+
+			break;
+		}
+
+		if (state != m_jobprogress->tp[m_data->getBlockNum()][task]->state)
+		{
+			m_jobprogress->tp[m_data->getBlockNum()][task]->state = state;
+			m_tasks[task]->v_monitor(i_monitoring);
+			some_task_state_changed = true;
+		}
+	}
+
+	return some_task_state_changed;
 }
 
 bool Block::action( Action & i_action)
@@ -517,6 +622,11 @@ bool Block::action( Action & i_action)
 			blockchanged_type = af::Msg::TBlocksProperties;
 			job_changed = true;
 			constructDependBlocks();
+
+			if (m_dependTasksBlocks.size() == 0)
+				resetTasksDependStatus(i_action.monitors);
+			else
+				constructDependTasks();
 		}
 	}
 
@@ -691,7 +801,7 @@ void Block::constructDependBlocks()
 			if( bd == m_data->getBlockNum() ) continue;
 
             // store block if name match mask
-			if( m_data->checkDependMask( m_job->getBlock(bd)->getName()))
+			if (m_data->checkDependMask(m_job->getBlockData(bd)->getName()))
             m_dependBlocks.push_back( bd);
         }
     }
@@ -704,10 +814,62 @@ void Block::constructDependBlocks()
 			if( bd == m_data->getBlockNum() ) continue;
 
             // store block if name match mask
-			if( m_data->checkTasksDependMask( m_job->getBlock(bd)->getName()))
+			if (m_data->checkTasksDependMask(m_job->getBlockData(bd)->getName()))
             m_dependTasksBlocks.push_back( bd);
         }
     }
+}
+
+void Block::constructDependTasks()
+{
+	if (m_job->getBlocksNum() < 2)
+		return;
+
+	if (m_dependTasksBlocks.size() == 0)
+		return;
+
+	for (int task = 0; task < m_data->getTasksNum(); task++)
+	{
+		m_tasks[task]->m_dependent.clear();
+		m_tasks[task]->m_depend_on.clear();
+
+		for (int & b : m_dependTasksBlocks)
+		{
+			long long firstdependframe, lastdependframe;
+			m_data->genNumbers(firstdependframe, lastdependframe, task);
+			if (m_data->isNumeric() && m_job->getBlockData(b)->isNotNumeric())
+			{
+				firstdependframe -= m_data->getFrameFirst();
+				lastdependframe  -= m_data->getFrameFirst();
+			}
+			else if (m_data->isNotNumeric() && m_job->getBlockData(b)->isNumeric())
+			{
+				firstdependframe += m_job->getBlockData(b)->getFrameFirst();
+				lastdependframe  += m_job->getBlockData(b)->getFrameFirst();
+			}
+
+			if (m_job->getBlockData(b)->getFramePerTask() < 0)
+				lastdependframe++; // For several frames in task
+
+			int firstdependtask, lastdependtask;
+			bool inValidRange;
+			firstdependtask = m_job->getBlockData(b)->calcTaskNumber(firstdependframe, inValidRange);
+			lastdependtask  = m_job->getBlockData(b)->calcTaskNumber( lastdependframe, inValidRange);
+			if (inValidRange)
+				if (m_job->getBlockData(b)->getFramePerTask() < 0)
+					lastdependtask--;
+
+			for (int t = firstdependtask; t <= lastdependtask; t++)
+			{
+				Task * depTask = m_job->getBlock(b)->m_tasks[t];
+				m_tasks[task]->m_depend_on.push_back(depTask);
+				depTask->m_dependent.push_back(m_tasks[task]);
+//				af::addUniqueToVect(m_tasks[task]->m_depend_on, t);
+//				af::addUniqueToVect(m_tasks[t]->m_dependent, task);
+//if (m_jobprogress->tp[b][t]->state & (AFJOB::STATE_DONE_MASK | AFJOB::STATE_SKIPPED_MASK))
+			}
+		}
+	}
 }
 
 bool Block::tasksDependsOn( int block)

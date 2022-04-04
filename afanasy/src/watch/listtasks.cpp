@@ -83,7 +83,7 @@ void ListTasks::construct(af::Job * i_job)
 	}
 
 	for (int b = 0; b < i_job->getBlocksNum(); b++)
-		appendBlock(i_job->getBlock(b));
+		appendBlock(i_job->getBlockData(b));
 
 	// If the job has several blocks, we hide tasks if block more than one task
 	if (m_blocks.size() > 1)
