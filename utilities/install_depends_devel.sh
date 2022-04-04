@@ -106,10 +106,7 @@ function mageiaArch(){
 	packages="$packages lib64python3-devel"
 	packages="$packages python3-pyside"
 	packages="$packages postgresql-devel"
-	packages="$packages lib64qt5base5-devel"
-	packages="$packages lib64qt5multimedia-devel"
-	packages="$packages qtmultimedia5"
-	packages="$packages lib64openexr-devel"
+	packages="$packages qt5-devel lib64qt5multimedia-devel"
 	packages="$packages rpm-build"
 	packages="$packages libzip libzip-devel"
 
@@ -167,7 +164,7 @@ case ${DISTRIBUTIVE} in
 	openSUSE)
 		suseArch
 		;;
-	Mageia)
+	Mageia|ROSA)
 		mageiaArch
 		;;
 	Fedora)

@@ -83,7 +83,7 @@ case ${DISTRIBUTIVE} in
     RedHat|Rocky)
         export AF_ADD_LFLAGS="$AF_ADD_LFLAGS -lpthread -ldl"
         ;;
-    Mageia)
+    Mageia|ROSA)
         export AF_EXTRA_LIBS="pthread"
         ;;
     Arch|Manjaro)

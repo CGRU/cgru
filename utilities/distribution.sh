@@ -2,8 +2,8 @@
 
 echo "Detecting UNIX distribution..."
 
-distskeys="Debian Ubuntu Rocky CentOS Red Fedora openSUSE Simply Gentoo Mint SUSE Mageia Arch Manjaro"
-knowndists="Debian Ubuntu ROcky CentOS RedHat Fedora openSUSE AltLinux MacOSX Gentoo Mint SUSE Mageia Arch Manjaro"
+distskeys="Debian Ubuntu Rocky CentOS Red Fedora openSUSE Simply Gentoo Mint SUSE Mageia Arch Manjaro ROSA"
+knowndists="Debian Ubuntu Rocky CentOS RedHat Fedora openSUSE AltLinux MacOSX Gentoo Mint SUSE Mageia Arch Manjaro ROSA"
 
 # MacOSX
 if [ `uname` == "Darwin" ]; then
