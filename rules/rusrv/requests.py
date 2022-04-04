@@ -167,13 +167,16 @@ class Requests:
 
             out = None
             try:
-                out = subprocess.check_output('./' + cmd, shell=True, encoding='utf-8')
+                out = subprocess.check_output('./' + cmd, shell=True, stderr=subprocess.STDOUT, encoding='utf-8')
             except subprocess.CalledProcessError as e:
-                out = dict()
-                out['error'] = e.output
-                out['info'] = '%s' % traceback.format_exc()
-                o_out['cmdexec'].append(out)
-                out = None
+                if not 'ignore_errors' in i_args or i_args['ignore_errors'] is False:
+                    obj = dict()
+                    obj['error'] = e.output
+                    if out is not None and len(out):
+                        obj['error'] = out
+                    obj['info'] = '%s' % traceback.format_exc()
+                    o_out['cmdexec'].append(obj)
+                    out = None
 
             if out is not None:
                 obj = None

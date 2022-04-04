@@ -190,31 +190,34 @@ def makebookmarks(i_user_id, i_bm, io_users, o_out):
                 bm_index = i
                 break
 
+        # Copy a dict, as we will edit it per user personally
+        bm = i_bm.copy()
+
         # Bookmark with the same path does not exist:
         if bm_index == -1:
             # Check whether the bookmark is needed:
-            if not isUserAssignedInStatus(user, i_bm):
+            if not isUserAssignedInStatus(user, bm):
                 continue
 
             # Initialize parameters:
-            i_bm['cuser'] = i_user_id
-            i_bm['ctime'] = int(time.time())
+            bm['cuser'] = i_user_id
+            bm['ctime'] = int(time.time())
         else:
             # Bookmark exists
             # Copy creation parameters
-            i_bm['cuser'] = user['bookmarks'][bm_index]['cuser']
-            i_bm['ctime'] = user['bookmarks'][bm_index]['ctime']
+            bm['cuser'] = user['bookmarks'][bm_index]['cuser']
+            bm['ctime'] = user['bookmarks'][bm_index]['ctime']
             if 'favourite' in user['bookmarks'][bm_index] and user['bookmarks'][bm_index]['favourite']:
-                i_bm['favourite'] = True
+                bm['favourite'] = True
 
             # Delete existing bookmark,
             # no updating, just new will be created
             del user['bookmarks'][i]
 
-        i_bm['muser'] = i_user_id
-        i_bm['mtime'] = int(time.time())
+        bm['muser'] = i_user_id
+        bm['mtime'] = int(time.time())
 
-        user['bookmarks'].append(i_bm)
+        user['bookmarks'].append(bm)
         changed_users.append(user['id'])
 
     return changed_users
