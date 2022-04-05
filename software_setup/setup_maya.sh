@@ -15,7 +15,7 @@ MAYA_LOCATION=""
 MAYA_EXEC=""
 for MAYA_FOLDER in $MAYA_FOLDERS ;
 do
-   if [ "`echo $MAYA_FOLDER | gawk '{print match( \$1, "maya")}'`" == "1" ]; then
+	if [ "`echo $MAYA_FOLDER | gawk '{print match( \$1, /maya[0-9]+.*/)}'`" == "1" ]; then
       MAYA_LOCATION="${MAYA_INSTALL_DIR}/${MAYA_FOLDER}"
       MAYA_VERSION="`echo $MAYA_FOLDER | gawk '{print substr( \$1, 5, 4)}'`"
    fi

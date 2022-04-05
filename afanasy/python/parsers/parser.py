@@ -28,6 +28,7 @@ class parser(object):
         self.report = ''
         self.result = None
         self.log = None
+        self.progress_changed = False
         self.numframes = 0
         self.taskInfo = {}
         self.pid = 0
@@ -168,12 +169,18 @@ class parser(object):
 
         if len(i_args['data']):
             self.doBaseCheck(i_args['data'])
+
         try:
             self.result = self.do(i_args)
         except:  # TODO: too broad exception clause
             print('Error parsing output:')
             # print(str(sys.exc_info()[1]))
             traceback.print_exc(file=sys.stdout)
+
+        self.progress_changed = self.hasProgressChanged(i_args)
+
+    def hasProgressChanged(self, i_args):
+        return len(i_args['data']) > 0
 
     def calculate(self):
         """Missing DocString
