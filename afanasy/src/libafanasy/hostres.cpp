@@ -135,6 +135,13 @@ void HostRes::copy( const HostRes & other)
     hdd_busy         = other.hdd_busy;
     net_recv_kbsec   = other.net_recv_kbsec;
     net_send_kbsec   = other.net_send_kbsec;
+
+	gpu_gpu_util     = other.gpu_gpu_util;
+	gpu_gpu_temp     = other.gpu_gpu_temp;
+	gpu_mem_total_mb = other.gpu_mem_total_mb;
+	gpu_mem_used_mb  = other.gpu_mem_used_mb;
+	gpu_string       = other.gpu_string;
+
     logged_in_users  = other.logged_in_users;
 
     if( custom.size() != other.custom.size())
@@ -178,6 +185,11 @@ void HostRes::jsonWrite( std::ostringstream & o_str) const
 	o_str << ",\n\"hdd_busy\":"       << int(hdd_busy);
 	o_str << ",\n\"net_recv_kbsec\":" << net_recv_kbsec;
 	o_str << ",\n\"net_send_kbsec\":" << net_send_kbsec;
+
+	o_str << ",\n\"gpu_gpu_util\":"     << int(gpu_gpu_util);
+	o_str << ",\n\"gpu_gpu_temp\":"     << int(gpu_gpu_temp);
+	o_str << ",\n\"gpu_mem_total_mb\":" << gpu_mem_total_mb;
+	o_str << ",\n\"gpu_mem_used_mb\":"  << gpu_mem_used_mb;
 
 	if( logged_in_users.size())
 	{
@@ -234,6 +246,13 @@ void HostRes::v_readwrite( Msg * msg)
     rw_int8_t ( hdd_busy,         msg);
     rw_int32_t( net_recv_kbsec,   msg);
     rw_int32_t( net_send_kbsec,   msg);
+
+	rw_int8_t (gpu_gpu_util,     msg);
+	rw_int8_t (gpu_gpu_temp,     msg);
+	rw_int32_t(gpu_mem_total_mb, msg);
+	rw_int32_t(gpu_mem_used_mb,  msg);
+	rw_String (gpu_string,       msg);
+
     rw_StringVect( logged_in_users, msg);
 
     uint8_t custom_count = uint8_t(custom.size());
@@ -276,7 +295,14 @@ void HostRes::v_generateInfoStream( std::ostringstream & stream, bool full) cons
         stream << "\n   Network: Received " << net_recv_kbsec << " Kb/sec, Send " << net_send_kbsec  << " Kb/sec",
         stream << "\n   IO: Read " << hdd_rd_kbsec << " Kb/sec, Write " << hdd_wr_kbsec << " Kb/sec, Busy = " << int(hdd_busy) << "%";
         stream << "\n   HDD: " << hdd_total_gb << " Gb / " << hdd_free_gb  << " Gb free";
-        
+
+		if (gpu_string.size())
+		{
+			stream << "\n   GPU = \"" << gpu_string << "\"";
+			stream << "\n       Utilization: " << int(gpu_gpu_util) << "%, Temperature: " << int(gpu_gpu_temp) << "C";
+			stream << "\n       Memory: " << gpu_mem_total_mb << " Mb / " << gpu_mem_used_mb << " Mb used";
+		}
+
         if( logged_in_users.size())
 		{
 			stream << ",\n   Logged in users = ";

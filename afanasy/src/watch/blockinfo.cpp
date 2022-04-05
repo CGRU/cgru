@@ -499,7 +499,7 @@ void BlockInfo::refresh()
 		if (p_tasks_done    ) str_left_bottom += QString(" Done:%1"            ).arg(p_tasks_done);
 		if (p_tasks_error   ) str_left_bottom += QString(" Errors:%1"          ).arg(p_tasks_error);
 		if (p_tasks_skipped ) str_left_bottom += QString(" Skipped:%1"         ).arg(p_tasks_skipped);
-//		if (p_tasks_waitdep ) str_left_bottom += QString(" WaitDepends:%1"     ).arg(p_tasks_waitdep); //NEW_VERSION
+		if (p_tasks_waitdep ) str_left_bottom += QString(" WaitDepends:%1"     ).arg(p_tasks_waitdep);
 		if (p_tasks_warning ) str_left_bottom += QString(" Warnings:%1"        ).arg(p_tasks_warning);
 		if (p_tasks_waitrec ) str_left_bottom += QString(" WaitingReconnect:%1").arg(p_tasks_waitrec);
 	}
@@ -510,7 +510,7 @@ void BlockInfo::refresh()
 		if (p_tasks_done    ) str_left_bottom += QString(" Done:%1").arg(p_tasks_done);
 		if (p_tasks_error   ) str_left_bottom += QString(" Err:%1" ).arg(p_tasks_error);
 		if (p_tasks_skipped ) str_left_bottom += QString(" Skp:%1" ).arg(p_tasks_skipped);
-//		if (p_tasks_waitdep ) str_left_bottom += QString(" WDP:%1" ).arg(p_tasks_waitdep); //NEW_VERSION
+		if (p_tasks_waitdep ) str_left_bottom += QString(" WDP:%1" ).arg(p_tasks_waitdep);
 		if (p_tasks_warning ) str_left_bottom += QString(" Wrn:%1" ).arg(p_tasks_warning);
 		if (p_tasks_waitrec ) str_left_bottom += QString(" WRC:%1" ).arg(p_tasks_waitrec);
 	}
@@ -521,7 +521,7 @@ void BlockInfo::refresh()
 		if (p_tasks_done    ) str_left_bottom += QString(" d%1"  ).arg(p_tasks_done);
 		if (p_tasks_error   ) str_left_bottom += QString(" e%1"  ).arg(p_tasks_error);
 		if (p_tasks_skipped ) str_left_bottom += QString(" s%1"  ).arg(p_tasks_skipped);
-//		if (p_tasks_waitdep ) str_left_bottom += QString(" wdp%1").arg(p_tasks_waitdep); //NEW_VERSION
+		if (p_tasks_waitdep ) str_left_bottom += QString(" wdp%1").arg(p_tasks_waitdep);
 		if (p_tasks_warning ) str_left_bottom += QString(" w%1"  ).arg(p_tasks_warning);
 		if (p_tasks_waitrec ) str_left_bottom += QString(" wrc%1").arg(p_tasks_waitrec);
 	}

@@ -212,6 +212,11 @@ public:
 	inline int getNeedPower() const { return m_need_power; }
 	inline int getNeedHDD() const { return m_need_hdd; }
 
+	inline int getNeedCPUFreq()      const {return m_need_cpu_freq_mgz;}
+	inline int getNeedCPUCores()     const {return m_need_cpu_cores;}
+	inline int getNeedCPUFreqCores() const {return m_need_cpu_freq_cores;}
+	inline int getNeedGPUMemMb()     const {return m_need_gpu_mem_mb;}
+
 	inline uint32_t getState() const { return m_state; }			   ///< Get state.
 	inline int getTasksNum() const { return m_tasks_num; }			   ///< Get tasks quantity.
 	inline int getBlockNum() const { return m_block_num; }			   ///< Get block number in job.
@@ -345,6 +350,11 @@ protected:
 	int32_t m_need_memory;
 	int32_t m_need_power;
 	int32_t m_need_hdd;
+
+	int32_t m_need_cpu_freq_mgz;
+	int32_t m_need_cpu_cores;
+	int32_t m_need_cpu_freq_cores;
+	int32_t m_need_gpu_mem_mb;
 
 	std::string m_tasks_name; ///< Tasks name pattern;
 	std::string m_service;	///< Tasks service name.

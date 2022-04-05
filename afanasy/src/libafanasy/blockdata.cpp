@@ -85,6 +85,10 @@ void BlockData::initDefaults()
 	m_need_memory /************/ = -1;
 	m_need_power /*************/ = -1;
 	m_need_hdd /***************/ = -1;
+	m_need_cpu_freq_mgz          = -1;
+	m_need_cpu_cores             = -1;
+	m_need_cpu_freq_cores        = -1;
+	m_need_gpu_mem_mb            = -1;
 	m_errors_retries /*********/ = -1;
 	m_errors_avoid_host /******/ = -1;
 	m_errors_task_same_host /**/ = -1;
@@ -168,6 +172,10 @@ void BlockData::jsonRead(const JSON &i_object, std::string *io_changes)
 	jr_int32("need_memory" /***********/, m_need_memory /************/, i_object, io_changes);
 	jr_int32("need_power" /************/, m_need_power /*************/, i_object, io_changes);
 	jr_int32("need_hdd" /**************/, m_need_hdd /***************/, i_object, io_changes);
+	jr_int32("need_cpu_freq",             m_need_cpu_freq_mgz,          i_object, io_changes);
+	jr_int32("need_cpu_cores",            m_need_cpu_cores,             i_object, io_changes);
+	jr_int32("need_cpu_freq_cores",       m_need_cpu_freq_cores,        i_object, io_changes);
+	jr_int32("need_gpu_mem_mb",           m_need_gpu_mem_mb,            i_object, io_changes);
 	jr_regexp("depend_mask" /**********/, m_depend_mask /************/, i_object, io_changes);
 	jr_regexp("tasks_depend_mask" /****/, m_tasks_depend_mask /******/, i_object, io_changes);
 	jr_regexp("hosts_mask" /***********/, m_hosts_mask /*************/, i_object, io_changes);
@@ -443,6 +451,12 @@ void BlockData::jsonWrite(std::ostringstream &o_str, int i_type) const
 			if (m_need_memory > 0) o_str << ",\n\"need_memory\":" << m_need_memory;
 			if (m_need_power > 0) o_str << ",\n\"need_power\":" << m_need_power;
 			if (m_need_hdd > 0) o_str << ",\n\"need_hdd\":" << m_need_hdd;
+
+			if (m_need_cpu_freq_mgz   > -1) o_str << ",\n\"need_cpu_freq_mgz\":"   << m_need_cpu_freq_mgz;
+			if (m_need_cpu_cores      > -1) o_str << ",\n\"need_cpu_cores\":"      << m_need_cpu_cores;
+			if (m_need_cpu_freq_cores > -1) o_str << ",\n\"need_cpu_freq_cores\":" << m_need_cpu_freq_cores;
+			if (m_need_gpu_mem_mb     > -1) o_str << ",\n\"need_gpu_mem_mb\":"     << m_need_gpu_mem_mb;
+
 			if (m_errors_retries != -1) o_str << ",\n\"errors_retries\":" << int(m_errors_retries);
 			if (m_errors_avoid_host != -1) o_str << ",\n\"errors_avoid_host\":" << int(m_errors_avoid_host);
 			if (m_errors_task_same_host != -1)
@@ -612,6 +626,12 @@ void BlockData::v_readwrite(Msg *msg)
 			rw_int32_t(m_need_memory, msg);
 			rw_int32_t(m_need_power, msg);
 			rw_int32_t(m_need_hdd, msg);
+
+			rw_int32_t(m_need_cpu_freq_mgz,   msg);
+			rw_int32_t(m_need_cpu_cores,      msg);
+			rw_int32_t(m_need_cpu_freq_cores, msg);
+			rw_int32_t(m_need_gpu_mem_mb,     msg);
+
 			rw_RegExp(m_depend_mask, msg);
 			rw_RegExp(m_tasks_depend_mask, msg);
 			rw_RegExp(m_hosts_mask, msg);
@@ -643,10 +663,7 @@ void BlockData::v_readwrite(Msg *msg)
 			rw_int32_t(p_tasks_skipped, msg);
 			rw_int32_t(p_tasks_warning, msg);
 			rw_int32_t(p_tasks_waitrec, msg);
-
-			// NEW_VERSION
-			//rw_int32_t(p_tasks_waitdep, msg);
-
+			rw_int32_t(p_tasks_waitdep, msg);
 			rw_int64_t(p_tasks_run_time, msg);
 
 			rw_int64_t(m_state, msg);
@@ -1273,6 +1290,11 @@ void BlockData::generateInfoStreamTyped(std::ostringstream &o_str, int type, boo
 			if (m_need_hdd > 0) o_str << "\n Need HDD = " << m_need_hdd;
 			if (m_need_properties.notEmpty())
 				o_str << "\n Need Properties = " << m_need_properties.getPattern();
+
+			if (m_need_cpu_freq_mgz   > -1) o_str << "\n Need CPU Freq MHz = "  << m_need_cpu_freq_mgz;
+			if (m_need_cpu_cores      > -1) o_str << "\n Need CPU Cores = "     << m_need_cpu_cores;
+			if (m_need_cpu_freq_cores > -1) o_str << "\n Need CPU MHz*Cores = " << m_need_cpu_freq_cores;
+			if (m_need_gpu_mem_mb     > -1) o_str << "\n Need GPU Mem Mb = "    << m_need_gpu_mem_mb;
 
 			if (m_depend_mask.notEmpty()) o_str << "\n Depend Mask = " << m_depend_mask.getPattern();
 			if (m_tasks_depend_mask.notEmpty())

@@ -56,7 +56,6 @@ public:
 	uint8_t cpu_irq;
 	uint8_t cpu_softirq;
 
-
 	int32_t mem_total_mb;
 	int32_t mem_free_mb;
 	int32_t mem_cached_mb;
@@ -73,7 +72,13 @@ public:
 
 	int32_t net_recv_kbsec;
 	int32_t net_send_kbsec;
-	
+
+	int8_t  gpu_gpu_util;
+	int8_t  gpu_gpu_temp;
+	int32_t gpu_mem_total_mb;
+	int32_t gpu_mem_used_mb;
+	std::string gpu_string;
+
 	/// List of users currently logged in on a machine
 	std::vector<std::string> logged_in_users;
 
