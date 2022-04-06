@@ -41,6 +41,7 @@ ParserHost::ParserHost( af::Service * i_service):
 	m_percent( 0),
 	m_frame( 0),
 	m_percentframe( 0),
+	m_progress_changed(false),
 	m_error( false),
 	m_warning( false),
 	m_badresult( false),
@@ -175,6 +176,7 @@ void ParserHost::parse(const std::string & i_mode, int i_pid, std::string & io_o
 			io_output, m_resources,
 			m_percent, m_frame, m_percentframe,
 			m_activity, m_report,
+			m_progress_changed,
 			_warning, _error, _badresult, _finishedsuccess);
 
 	if ( _error           ) m_error           = true;

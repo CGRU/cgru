@@ -23,6 +23,9 @@ public:
 			int i_percent       = -1,
 			int i_frame         = -1,
 			int i_percent_frame = -1,
+
+			bool i_progress_changed = false,
+
 			const std::string & i_log      = std::string(),
 			const std::string & i_activity = std::string(),
 			const std::string & i_resources= std::string(),
@@ -47,6 +50,7 @@ public:
 	inline int getPercent()                  const { return m_percent;       }
 	inline int getFrame()                    const { return m_frame;         }
 	inline int getPercentFrame()             const { return m_percent_frame; }
+	inline bool hasProgressChanged()         const { return m_progress_changed;}
 	inline const bool          hasActivity() const { return m_activity.size(); }
 	inline const std::string & getActivity() const { return m_activity;      }
 	inline const bool          hasResources()const { return m_resources.size();}
@@ -85,6 +89,8 @@ private:
 	int8_t  m_percent;
 	int32_t m_frame;
 	int8_t  m_percent_frame;
+
+	bool m_progress_changed;
 
 	std::string m_activity;
 	std::string m_resources;

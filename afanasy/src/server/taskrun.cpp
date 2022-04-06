@@ -58,7 +58,7 @@ TaskRun::TaskRun( Task * runningTask,
    m_progress->state = AFJOB::STATE_RUNNING_MASK;
    m_progress->starts_count++;
    m_progress->time_start = time( NULL);
-   m_progress->last_percent_change = time( NULL);
+   m_progress->last_progress_change = m_progress->time_start;
    m_progress->time_done = m_progress->time_start;
    m_tasknum = m_exec->getTaskNum();
    m_hostId = render->getId();
@@ -120,11 +120,9 @@ void TaskRun::update(const af::MCTaskUp& taskup, RenderContainer * renders, Moni
 		}
 	case af::TaskExec::UPPercent:
 	{
-		//printf("TaskRun::update: case af::TaskExec::UPPercent:\n");
-		int new_percent = taskup.getPercent();
-		if (new_percent != m_progress->percent)
-			m_progress->last_percent_change = m_progress->time_done;
-		m_progress->percent      = new_percent;
+		if (taskup.hasProgressChanged())
+			m_progress->last_progress_change = m_progress->time_done;
+		m_progress->percent      = taskup.getPercent();
 		m_progress->frame        = taskup.getFrame();
 		m_progress->percentframe = taskup.getPercentFrame();
 		m_task->v_monitor( monitoring );
@@ -285,7 +283,7 @@ bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
 
 	// Tasks progress change timeout:
 	int timeout = m_block->m_data->getTaskProgressChangeTimeout();
-	int no_progress_for = currentTime - m_progress->last_percent_change;
+	int no_progress_for = currentTime - m_progress->last_progress_change;
 	if ((timeout > 0 ) && (no_progress_for > timeout))
 	{
 		m_progress->state = m_progress->state | AFJOB::STATE_ERROR_MASK;

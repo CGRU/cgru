@@ -507,6 +507,8 @@ void TaskProcess::sendTaskSate()
 		frame,
 		percentframe,
 
+		m_parser->hasProgressChanged(),
+
 		log,
 		activity,
 		resources,

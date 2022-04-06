@@ -25,6 +25,8 @@ MCTaskUp::MCTaskUp
 	int i_frame,
 	int i_percent_frame,
 
+	bool i_progress_changed,
+
 	const std::string & i_log,
 	const std::string & i_activity,
 	const std::string & i_resources,
@@ -45,6 +47,8 @@ MCTaskUp::MCTaskUp
 	m_percent       (i_percent),
 	m_frame         (i_frame),
 	m_percent_frame (i_percent_frame),
+
+	m_progress_changed(i_progress_changed),
 
 	m_log           (i_log),
 	m_activity      (i_activity),
@@ -100,6 +104,8 @@ void MCTaskUp::v_readwrite( Msg * msg)
 	rw_int8_t ( m_percent,        msg);
 	rw_int32_t( m_frame,          msg);
 	rw_int8_t ( m_percent_frame,  msg);
+
+	rw_bool  (m_progress_changed, msg);
 
 	rw_String ( m_activity,       msg);
 	rw_String ( m_resources,      msg);

@@ -17,10 +17,11 @@ public:
 	inline int getPercent()           const { return m_percent;         }
 	inline int getFrame()             const { return m_frame;           }
 	inline int getPercentFrame()      const { return m_percentframe;    }
-	inline int hasWarning()           const { return m_warning;         }
-	inline int hasError()             const { return m_error;           }
-	inline int isBadResult()          const { return m_badresult;       }
-	inline int isFinishedSuccess()    const { return m_finishedsuccess; }
+	inline bool hasProgressChanged()  const { return m_progress_changed;}
+	inline bool hasWarning()          const { return m_warning;         }
+	inline bool hasError()            const { return m_error;           }
+	inline bool isBadResult()         const { return m_badresult;       }
+	inline bool isFinishedSuccess()   const { return m_finishedsuccess; }
 	inline std::string getActivity()  const { return m_activity;        }
 	inline std::string getResources() const { return m_resources;       }
 	inline std::string getReport()    const { return m_report;          }
@@ -32,6 +33,7 @@ private:
 	int  m_percent;
 	int  m_frame;
 	int  m_percentframe;
+	bool m_progress_changed;
 	bool m_error;
 	bool m_warning;
 	bool m_badresult;

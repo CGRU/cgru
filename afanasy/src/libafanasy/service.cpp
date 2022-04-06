@@ -357,6 +357,7 @@ void Service::parse(const std::string & i_mode, int i_pid,
 		std::string & io_data, std::string & io_resources,
 		int & o_percent, int & o_frame, int & o_percentframe,
 		std::string & o_activity, std::string & o_report,
+		bool & o_progress_changed,
 		bool & o_warning, bool & o_error, bool & o_badresult, bool & o_finishedsuccess) const
 {
 	PyObject * pArgs = PyTuple_New(1);
@@ -381,6 +382,7 @@ void Service::parse(const std::string & i_mode, int i_pid,
 			af::PyGetAttrInt(pClass,"frame",        o_frame,        err);
 			af::PyGetAttrInt(pClass,"percentframe", o_percentframe, err);
 
+			af::PyGetAttrBool(pClass,"progress_changed",o_progress_changed,err);
 			af::PyGetAttrBool(pClass,"warning",         o_warning,         err);
 			af::PyGetAttrBool(pClass,"error",           o_error,           err);
 			af::PyGetAttrBool(pClass,"badresult",       o_badresult,       err);

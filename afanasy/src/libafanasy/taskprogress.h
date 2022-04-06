@@ -27,7 +27,7 @@ public:
 	int32_t errors_count;  ///< Number of times task finished with errors .
 	int64_t time_start;    ///< start time.
 	int64_t time_done;     ///< Task finish time ( or last update time if still running ).
-	int64_t last_percent_change; ///< Time of the last time that `percent` has been changed
+	int64_t last_progress_change; ///< Time of the last time that `progress` has been changed
 
 	inline void setSolved() { state |= AFJOB::STATE_SOLVED_MASK; }
 	inline void setNotSolved() { state &= (~AFJOB::STATE_SOLVED_MASK); }
