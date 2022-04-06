@@ -6,7 +6,7 @@ echo "Depends for $DISTRIBUTIVE:"
 
 # Case distribution:
 case ${DISTRIBUTIVE} in
-	Ubuntu | Mint )
+	Ubuntu | Mint | Astra )
 		export DEPENDS_AFANASY="libpq5"
 		export DEPENDS_QTGUI="libqt5network5 libqt5widgets5 libqt5multimedia5"
 		export DEPENDS_CGRU="python3-pyqt5 openexr imagemagick"

@@ -158,7 +158,7 @@ case ${DISTRIBUTIVE} in
 	AltLinux)
 		altArch
 		;;
-	Debian|Ubuntu|Mint)
+	Debian|Ubuntu|Mint|Astra)
 		debianArch
 		;;
 	openSUSE)

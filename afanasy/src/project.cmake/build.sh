@@ -49,7 +49,7 @@ case ${DISTRIBUTIVE} in
     SUSE)
         export AF_ADD_LFLAGS="$AF_ADD_LFLAGS -lpthread -ldl"
         ;;
-    Debian)
+    Debian|Astra)
         export ADD_CMAKE_MODULE_PATH="$PWD"
         export AF_EXTRA_LIBS="pthread"
         ;;
