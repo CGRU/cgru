@@ -129,6 +129,8 @@ private:
 	int m_plotIO_wn_r, m_plotIO_wn_g, m_plotIO_wn_b;
 	int m_plotIO_rh_r, m_plotIO_rh_g, m_plotIO_rh_b;
 	int m_plotIO_wh_r, m_plotIO_wh_g, m_plotIO_wh_b;
+	Plotter m_plot_GPU_gpu;
+	Plotter m_plot_GPU_mem;
 
 	std::vector<Plotter*> m_plots;
 

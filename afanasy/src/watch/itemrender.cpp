@@ -34,6 +34,8 @@ ItemRender::ItemRender(ListRenders * i_list_renders, af::Render * i_render, cons
 	m_plotHDD( 1),
 	m_plotNet( 2, -1),
 	m_plotIO(  2, -1),
+	m_plot_GPU_gpu(1),
+	m_plot_GPU_mem(1),
 	m_update_counter(0)
 {
 	m_plotCpu.setLabel("C");
@@ -88,6 +90,16 @@ ItemRender::ItemRender(ListRenders * i_list_renders, af::Render * i_render, cons
 	m_plotIO.setLabel("D %1");
 	m_plotIO.setLabelValue( 1000);
 	m_plotIO.setAutoScaleMaxBGC( 100000);
+
+
+	m_plot_GPU_gpu.setLabel("GU");
+	m_plot_GPU_gpu.setColor(50, 200, 20, 0);
+
+	m_plot_GPU_mem.setLabel("GM %1");
+	m_plot_GPU_mem.setLabelValue(1000);
+	m_plot_GPU_mem.setColor(  50, 200, 20, 0);
+	m_plot_GPU_mem.setColorHot( 255, 0, 0);
+
 
 	updateValues(i_render, 0);
 }
@@ -429,6 +441,23 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 	    m_plotIO.addValue( 0, m_hres.hdd_rd_kbsec);
 	    m_plotIO.addValue( 1, m_hres.hdd_wr_kbsec);
 
+		m_plot_GPU_gpu.setLabel(QString("GU %1C").arg(m_hres.gpu_gpu_temp));
+		m_plot_GPU_gpu.addValue(0, m_hres.gpu_gpu_util);
+		int plot_GPU_red_min = 65;
+		int plot_GPU_red_max = 95;
+		int plot_GPU_red = (m_hres.gpu_gpu_temp - plot_GPU_red_min) * 100 / (plot_GPU_red_max - plot_GPU_red_min);
+		if (plot_GPU_red < 0) plot_GPU_red = 0;
+		if (plot_GPU_red > 100) plot_GPU_red = 100;
+		int plot_GPU_temp_r = 50 + (2*plot_GPU_red);
+		int plot_GPU_temp_g = 200 - (2*plot_GPU_red);
+		int plot_GPU_temp_b = 20;
+		m_plot_GPU_gpu.setColor(plot_GPU_temp_r, plot_GPU_temp_g, plot_GPU_temp_b, 0);
+
+		m_plot_GPU_mem.setScale(m_hres.gpu_mem_total_mb);
+		m_plot_GPU_mem.addValue(0, m_hres.gpu_mem_used_mb);
+		m_plot_GPU_mem.setHotMin(( 90*m_hres.mem_total_mb)/100);
+		m_plot_GPU_mem.setHotMax((100*m_hres.mem_total_mb)/100);
+
 		// Create custom plots:
 	    if( m_plots.size() != m_hres.custom.size())
 		{
@@ -459,6 +488,9 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 		if( m_hres.swap_total_mb )
 			m_info_text_hres += QString(" Swap: <b>%1</b> Gb").arg(m_hres.swap_total_mb>>10);
 		m_info_text_hres += QString("<br>HDD: <b>%1</b> Gb").arg(m_hres.hdd_total_gb);
+		if (m_hres.gpu_string.size())
+			m_info_text_hres += QString("<br>GPU: <b>%1</b> Mem: <b>%2</b> Gb")
+				.arg(afqt::stoq(m_hres.gpu_string)).arg(m_hres.gpu_mem_total_mb / 1000);
 
 		m_loggedin_users.clear();
 		if (m_hres.logged_in_users.size())
@@ -533,6 +565,14 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	int plot_y = y + plot_y_offset;
 	int plot_w = plot_dw - 4;
 	int plot_x = x + (w - allplots_w)/2 + (w>>5);
+	if(m_hres.gpu_string.size())
+	{
+		plot_dw = w / 12;
+		allplots_w = plot_dw * 8;
+		plot_y = y + plot_y_offset;
+		plot_w = plot_dw - 4;
+		plot_x = x + (w - allplots_w)/2 + (w>>6);
+	}
 
 	static const int left_x_offset = 25;
 	int left_text_x = x + left_x_offset;
@@ -801,6 +841,13 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	m_plotNet.paint(i_painter, plot_x, plot_y, plot_w, plot_h);
 	plot_x += plot_dw;
 	m_plotIO.paint( i_painter, plot_x, plot_y, plot_w, plot_h);
+	if(m_hres.gpu_string.size())
+	{
+		plot_x += plot_dw;
+		m_plot_GPU_gpu.paint(i_painter, plot_x, plot_y, plot_w, plot_h);
+		plot_x += plot_dw;
+		m_plot_GPU_mem.paint(i_painter, plot_x, plot_y, plot_w, plot_h);
+	}
 
 	plot_x = x + 4;
 	for (unsigned i = 0; i < m_plots.size(); i++)

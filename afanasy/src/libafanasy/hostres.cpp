@@ -190,6 +190,7 @@ void HostRes::jsonWrite( std::ostringstream & o_str) const
 	o_str << ",\n\"gpu_gpu_temp\":"     << int(gpu_gpu_temp);
 	o_str << ",\n\"gpu_mem_total_mb\":" << gpu_mem_total_mb;
 	o_str << ",\n\"gpu_mem_used_mb\":"  << gpu_mem_used_mb;
+	o_str << ",\n\"gpu_string\":\""     << gpu_string << "\"";
 
 	if( logged_in_users.size())
 	{
