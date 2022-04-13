@@ -389,6 +389,22 @@ class Block:
         if value > 0:
             self.data["need_memory"] = int(value)
 
+    def setNeedGPUMemGB(self, value):
+        if value > 0:
+            self.data["need_gpu_mem_mb"] = int(value*1024.0)
+
+    def setNeedCPUFreqGHz(self, value):
+        if value > 0:
+            self.data["need_cpu_freq_mgz"] = int(value*1000.0)
+
+    def setNeedCPUCores(self, value):
+        if value > 0:
+            self.data["need_cpu_cores"] = int(value)
+
+    def setNeedCPUFreqCores(self, value):
+        if value > 0:
+            self.data["need_cpu_freq_cores"] = int(value*1000.0)
+
     def setNeedPower(self, value):
         """Missing DocString
 
