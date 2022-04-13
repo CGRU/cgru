@@ -227,11 +227,27 @@ bool Block::canRunOn( RenderAf * render)
 		return false;
 
 	// Check needed memory:
-	if (m_data->getNeedMemory() >= render->getHostRes().mem_free_mb)
+	if (m_data->getNeedMemory() > render->getHostRes().mem_free_mb)
+		return false;
+
+	// Check needed GPU memory:
+	if (m_data->getNeedGPUMemMb() > (render->getHostRes().gpu_mem_total_mb - render->getHostRes().gpu_mem_used_mb))
+		return false;
+
+	// Check needed CPU frequency:
+	if (m_data->getNeedCPUFreqMHz() > render->getHostRes().cpu_mhz)
+		return false;
+
+	// Check needed CPU cores:
+	if (m_data->getNeedCPUCores() > render->getHostRes().cpu_num)
+		return false;
+
+	// Check needed CPU frequency * cores:
+	if (m_data->getNeedCPUFreqCores() > (render->getHostRes().cpu_num * render->getHostRes().cpu_mhz))
 		return false;
 
 	// Check needed hdd:
-	if (m_data->getNeedHDD() >= render->getHostRes().hdd_free_gb)
+	if (m_data->getNeedHDD() > render->getHostRes().hdd_free_gb)
 		return false;
 
 	// check hosts mask:

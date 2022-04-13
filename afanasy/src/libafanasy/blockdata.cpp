@@ -172,7 +172,7 @@ void BlockData::jsonRead(const JSON &i_object, std::string *io_changes)
 	jr_int32("need_memory" /***********/, m_need_memory /************/, i_object, io_changes);
 	jr_int32("need_power" /************/, m_need_power /*************/, i_object, io_changes);
 	jr_int32("need_hdd" /**************/, m_need_hdd /***************/, i_object, io_changes);
-	jr_int32("need_cpu_freq",             m_need_cpu_freq_mgz,          i_object, io_changes);
+	jr_int32("need_cpu_freq_mgz",         m_need_cpu_freq_mgz,          i_object, io_changes);
 	jr_int32("need_cpu_cores",            m_need_cpu_cores,             i_object, io_changes);
 	jr_int32("need_cpu_freq_cores",       m_need_cpu_freq_cores,        i_object, io_changes);
 	jr_int32("need_gpu_mem_mb",           m_need_gpu_mem_mb,            i_object, io_changes);

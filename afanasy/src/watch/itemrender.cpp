@@ -395,7 +395,7 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 	    int mem_used = m_hres.mem_total_mb - m_hres.mem_free_mb;
 	    int hdd_used = m_hres.hdd_total_gb - m_hres.hdd_free_gb;
 
-		m_plotCpu.setLabel(QString("C %1*%2").arg(m_hres.cpu_num).arg(double(m_hres.cpu_mhz) / 1024.0, 0, 'f', 1));
+		m_plotCpu.setLabel(QString("C %1*%2").arg(m_hres.cpu_num).arg(double(m_hres.cpu_mhz) / 1000.0, 0, 'f', 1));
 	    m_plotCpu.addValue( 0, m_hres.cpu_system + m_hres.cpu_iowait + m_hres.cpu_irq + m_hres.cpu_softirq);
 	    m_plotCpu.addValue( 1, m_hres.cpu_user + m_hres.cpu_nice);
 
