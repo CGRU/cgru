@@ -212,7 +212,7 @@ public:
 	inline int getNeedPower() const { return m_need_power; }
 	inline int getNeedHDD() const { return m_need_hdd; }
 
-	inline int getNeedCPUFreq()      const {return m_need_cpu_freq_mgz;}
+	inline int getNeedCPUFreqMHz()   const {return m_need_cpu_freq_mgz;}
 	inline int getNeedCPUCores()     const {return m_need_cpu_cores;}
 	inline int getNeedCPUFreqCores() const {return m_need_cpu_freq_cores;}
 	inline int getNeedGPUMemMb()     const {return m_need_gpu_mem_mb;}

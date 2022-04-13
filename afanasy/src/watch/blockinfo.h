@@ -94,6 +94,10 @@ public:
 	int     max_running_tasks;
 	int     max_running_tasks_per_host;
 	int     need_memory;
+	int     need_gpu_mem_mb;
+	int     need_cpu_freq_mgz;
+	int     need_cpu_cores;
+	int     need_cpu_freq_cores;
 	int     need_power;
 	int     need_hdd;
 	QString need_properties;
@@ -136,6 +140,7 @@ private:
 	void addParam_Hrs(const QString & i_name, const QString & i_label, const QString & i_tip);
 	void addParam_MiB(const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = 1<<30);
 	void addParam_GiB(const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = 1<<30);
+	void addParam_Meg(const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = 1<<30);
 
 	void drawProgress(
 		QPainter * i_painter,

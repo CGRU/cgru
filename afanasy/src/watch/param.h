@@ -18,7 +18,8 @@ public:
 		Time = 5,
 		THrs = 6,
 		TGiB = 7,
-		TMiB = 8
+		TMiB = 8,
+		TMeg = 9
 	};
 
 	Param(EType i_type, Item::EType i_itemtype, const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = -1);

@@ -59,6 +59,21 @@ const QString Param::varToQStr(const QVariant & i_var, bool * o_default) const
 
 		break;
 	}
+	case TMeg:
+	{
+		int64_t value = i_var.toLongLong();
+		is_default = (value == -1);
+
+		if (value > 0)
+		{
+			value *= 1000000;
+			str = afqt::stoq(af::toKMG(value, 1000, " "));
+		}
+		else
+			str = QString("%1").arg(value);
+
+		break;
+	}
 	case TStr:
 	case TREx:
 	{
@@ -259,6 +274,23 @@ bool Param::getInputDialog(const QVariant & i_var, QString & o_str, QWidget * i_
 				o_str = "-1";
 			else
 				o_str = QString("%1").arg(int(value * (1<<10)));
+		}
+		break;
+	}
+	case TMeg:
+	{
+		QString _tip = tip + "\nEnter a float Giga";
+		double current = double(i_var.toLongLong()) / 1000.0;
+		double value = QInputDialog::getDouble(i_parent, label, _tip, current, -1, 1<<30, 2, &ok);
+
+		if (ok)
+		{
+			if (value == 0)
+				o_str = "0";
+			else if (value < 0)
+				o_str = "-1";
+			else
+				o_str = QString("%1").arg(int(value * 1000));
 		}
 		break;
 	}

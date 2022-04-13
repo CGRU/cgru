@@ -71,7 +71,11 @@ BlockInfo::BlockInfo(const af::BlockData * i_data, Item * i_item, ListItems * i_
 	addParam_separator();
 	addParam_REx("hosts_mask",                   "Hosts Mask",            "Host names pattern that block can run on");
 	addParam_REx("hosts_mask_exclude",           "Hosts Mask Exclude",    "Host names pattern that block will not run");
-	addParam_MiB("need_memory",                  "Need Memory",           "Host free memory needed to run tasks (MB)");
+	addParam_MiB("need_memory",                  "Need Memory",           "Host free memory needed to run tasks (GB)");
+	addParam_MiB("need_gpu_mem_mb",              "Need GPU Memory",       "Host free GPU memory needed to run tasks (GB)");
+	addParam_Meg("need_cpu_freq_mgz",            "Need CPU Frequency",    "Host CPU freqency to run tasks (GHz)");
+	addParam_Num("need_cpu_cores",               "Need CPU Cores",        "Host CPU cores number to run tasks");
+	addParam_Meg("need_cpu_freq_cores",          "Need CPU Cores*Freq",   "Host CPU cores*freqency to run tasks (GHz)");
 	addParam_GiB("need_hdd",                     "Need HDD Space",        "Host free HDD space needed to run tasks (GB)");
 	addParam_REx("need_properties",              "Need Properties",       "Host \"Properties\" needed to run tasks");
 	addParam_Num("need_power",                   "Need Power",            "Host \"Power\" needed to run tasks");
@@ -138,6 +142,16 @@ bool BlockInfo::update( const af::BlockData* block, int type)
 		m_var_map["hosts_mask_exclude"]           = afqt::stoq(block->getHostsMaskExclude());
 		           need_memory                    = block->getNeedMemory();
 		m_var_map["need_memory"]                  = block->getNeedMemory();
+
+		           need_gpu_mem_mb                = block->getNeedGPUMemMb();
+		m_var_map["need_gpu_mem_mb"]              = block->getNeedGPUMemMb();
+		           need_cpu_freq_mgz              = block->getNeedCPUFreqMHz();
+		m_var_map["need_cpu_freq_mgz"]            = block->getNeedCPUFreqMHz();
+		           need_cpu_cores                 = block->getNeedCPUCores();
+		m_var_map["need_cpu_cores"]               = block->getNeedCPUCores();
+		           need_cpu_freq_cores            = block->getNeedCPUFreqCores();
+		m_var_map["need_cpu_freq_cores"]          = block->getNeedCPUFreqCores();
+
 		           need_hdd                       = block->getNeedHDD();
 		m_var_map["need_hdd"]                     = block->getNeedHDD();
 		           need_properties                = afqt::stoq(block->getNeedProperties());
@@ -345,6 +359,10 @@ void BlockInfo::refresh()
 		if( false == hosts_mask_exclude.isEmpty()  ) str_right_top += QString(" ExcludeHosts(%1)").arg( hosts_mask_exclude );
 		if( false == need_properties.isEmpty()    ) str_right_top += QString(" Properties(%1)").arg( need_properties   );
 		if (need_memory > 0) str_right_top += QString(" Mem>%1").arg(afqt::stoq(af::toKMG(int64_t(need_memory)*(1<<20), 1<<10)));
+		if (need_gpu_mem_mb > 0) str_right_top += QString(" GPUMem>%1").arg(afqt::stoq(af::toKMG(int64_t(need_gpu_mem_mb)*1000000, 1000)));
+		if (need_cpu_freq_mgz > 0) str_right_top += QString(" CPUGHz>%1").arg(afqt::stoq(af::toKMG(int64_t(need_cpu_freq_mgz)*1000000, 1000)));
+		if (need_cpu_cores > 0) str_right_top += QString(" CPUCores>%1").arg(need_cpu_cores);
+		if (need_cpu_freq_cores > 0) str_right_top += QString(" CPUCoresGHz>%1").arg(afqt::stoq(af::toKMG(int64_t(need_cpu_freq_cores)*1000000, 1000)));
 		if (need_hdd    > 0) str_right_top += QString(" HDD>%1").arg(afqt::stoq(af::toKMG(int64_t(need_hdd   )*(1<<30), 1<<10)));
 		if( need_power  > 0 ) str_right_top += QString(" Power>%1").arg( need_power);
 		if( multihost )
@@ -399,6 +417,10 @@ void BlockInfo::refresh()
 		if( false == hosts_mask_exclude.isEmpty()  ) str_right_top += QString(" Exclude(%1)").arg( hosts_mask_exclude );
 		if( false == need_properties.isEmpty()    ) str_right_top += QString(" Props(%1)").arg( need_properties   );
 		if (need_memory > 0) str_right_top += QString(" Mem>%1").arg(afqt::stoq(af::toKMG(int64_t(need_memory)*(1<<20), 1<<10)));
+		if (need_gpu_mem_mb > 0) str_right_top += QString(" GMem>%1").arg(afqt::stoq(af::toKMG(int64_t(need_gpu_mem_mb)*1000000, 1000)));
+		if (need_cpu_freq_mgz > 0) str_right_top += QString(" GHz>%1").arg(afqt::stoq(af::toKMG(int64_t(need_cpu_freq_mgz)*1000000, 1000)));
+		if (need_cpu_cores > 0) str_right_top += QString(" Cores>%1").arg(need_cpu_cores);
+		if (need_cpu_freq_cores > 0) str_right_top += QString(" CoresGHz>%1").arg(afqt::stoq(af::toKMG(int64_t(need_cpu_freq_cores)*1000000, 1000)));
 		if (need_hdd    > 0) str_right_top += QString(" HDD>%1").arg(afqt::stoq(af::toKMG(int64_t(need_hdd   )*(1<<30), 1<<10)));
 		if( need_power  > 0 ) str_right_top += QString(" Pow>%1").arg( need_power);
 		if( multihost )
@@ -453,6 +475,10 @@ void BlockInfo::refresh()
 		if( false == hosts_mask_exclude.isEmpty()  ) str_right_top += QString(" e(%1)").arg( hosts_mask_exclude );
 		if( false == need_properties.isEmpty()    ) str_right_top += QString(" p(%1)").arg( need_properties   );
 		if (need_memory > 0) str_right_top += QString(" m>%1").arg(afqt::stoq(af::toKMG(int64_t(need_memory)*(1<<20), 1<<10)));
+		if (need_gpu_mem_mb > 0) str_right_top += QString(" gm>%1").arg(afqt::stoq(af::toKMG(int64_t(need_gpu_mem_mb)*1000000, 1000)));
+		if (need_cpu_freq_mgz > 0) str_right_top += QString(" ghz>%1").arg(afqt::stoq(af::toKMG(int64_t(need_cpu_freq_mgz)*1000000, 1000)));
+		if (need_cpu_cores > 0) str_right_top += QString(" cr>%1").arg(need_cpu_cores);
+		if (need_cpu_freq_cores > 0) str_right_top += QString(" cr*ghz>%1").arg(afqt::stoq(af::toKMG(int64_t(need_cpu_freq_cores)*1000000, 1000)));
 		if (need_hdd    > 0) str_right_top += QString(" h>%1").arg(afqt::stoq(af::toKMG(int64_t(need_hdd   )*(1<<30), 1<<10)));
 		if( need_power  > 0 ) str_right_top += QString(" p>%1").arg( need_power);
 		if( multihost )
@@ -894,4 +920,7 @@ void BlockInfo::addParam_MiB(const QString & i_name, const QString & i_label, co
 
 void BlockInfo::addParam_GiB(const QString & i_name, const QString & i_label, const QString & i_tip, int i_min, int i_max) {
 	m_params.append(new Param(Param::TGiB, Item::TAny, i_name, i_label, i_tip, i_min, i_max));}
+
+void BlockInfo::addParam_Meg(const QString & i_name, const QString & i_label, const QString & i_tip, int i_min, int i_max) {
+	m_params.append(new Param(Param::TMeg, Item::TAny, i_name, i_label, i_tip, i_min, i_max));}
 
