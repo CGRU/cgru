@@ -16,7 +16,7 @@
 
 bool GetGPUInfo_NVIDIA(af::HostRes & o_hres, bool i_verbose)
 {
-	static const std::string cmd = "nvidia-smi --query-gpu=utilization.gpu,temperature.gpu,memory.total,memory.used,name --format=csv,noheader,nounits";
+	static const std::string cmd = "nvidia-smi --query-gpu=utilization.gpu,temperature.gpu,memory.total,memory.used,name --format=csv,noheader,nounits 2>&1";
 	static const int values_size = 5;
 
 	std::array<char, 128> buffer;
@@ -43,7 +43,8 @@ bool GetGPUInfo_NVIDIA(af::HostRes & o_hres, bool i_verbose)
 
 	if (values.size() < values_size)
 	{
-		AF_WARN << "Bad nvidia-smi output: \"" << output << "\"";
+		if (i_verbose)
+			AF_WARN << "Bad nvidia-smi output: \"" << output << "\"";
 		return false;
 	}
 
