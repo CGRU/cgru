@@ -52,8 +52,8 @@ bool GetGPUInfo_NVIDIA(af::HostRes & o_hres, bool i_verbose)
 
 	o_hres.gpu_gpu_util     = af::stoi(values[0]);
 	o_hres.gpu_gpu_temp     = af::stoi(values[1]);
-	o_hres.gpu_mem_used_mb  = af::stoi(values[2]);
-	o_hres.gpu_mem_total_mb = af::stoi(values[3]);
+	o_hres.gpu_mem_total_mb = af::stoi(values[2]);
+	o_hres.gpu_mem_used_mb  = af::stoi(values[3]);
 	o_hres.gpu_string   = af::strStrip(values[4]);
 
 	return true;
