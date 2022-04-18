@@ -11,6 +11,8 @@ if [ -z "$HOUDINI_LOCATION" ]; then
 			export HOUDINI_LOCATION="${HOUDINI_INSTALL_DIR}/${folder}"
 		fi
 	done
+else
+	echo "HOUDINI_LOCATION is already set: ${HOUDINI_LOCATION}"
 fi
 
 #Override houdini location based on locate_houdini.sh
