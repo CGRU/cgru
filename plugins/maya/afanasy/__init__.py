@@ -45,7 +45,16 @@ class MayaRenderCommandBuilder(object):
 
         :return str: The render command
         """
-        cmd_buffer = ['mayarender%s' % os.getenv('AF_CMDEXTENSION', '')]
+        if "REZ_USED_REQUEST" in os.environ:
+            # this is a rez configured environment
+            # use the same rez request to build the render command
+            logger.debug("Using REZ_USED_REQUEST to build the render command")
+            cmd_buffer = [
+                "rez-env {} -- mayarender".format(os.environ["REZ_USED_REQUEST"])
+            ]
+        else:
+            # use the default command
+            cmd_buffer = ["mayarender%s" % os.getenv("AF_CMDEXTENSION", "")]
 
         if self.render_engine == 'mentalRay':
             cmd_buffer.append('-r mr')
