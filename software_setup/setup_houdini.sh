@@ -5,11 +5,13 @@ source "$CGRU_LOCATION/software_setup/setup__all.sh"
 
 # Search directory where Houdini installed:
 HOUDINI_INSTALL_DIR="/opt"
-for folder in `ls "$HOUDINI_INSTALL_DIR"`; do
-	if [ "`echo $folder | awk '{print match( \$1, "hfs")}'`" == "1" ]; then
-		export HOUDINI_LOCATION="${HOUDINI_INSTALL_DIR}/${folder}"
-	fi
-done
+if [ -z "$HOUDINI_LOCATION" ]; then
+	for folder in `ls "$HOUDINI_INSTALL_DIR"`; do
+		if [ "`echo $folder | awk '{print match( \$1, "hfs")}'`" == "1" ]; then
+			export HOUDINI_LOCATION="${HOUDINI_INSTALL_DIR}/${folder}"
+		fi
+	done
+fi
 
 #Override houdini location based on locate_houdini.sh
 locate_houdini="$CGRU_LOCATION/software_setup/locate_houdini.sh"
