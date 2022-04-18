@@ -277,6 +277,14 @@ class BlockParameters:
             # Block command:
             self.cmd = 'hrender_af'
 
+            # If this is a "rez" configured environment supply the same environment to
+            # the render command
+            if "REZ_USED_REQUEST" in os.environ:
+                self.cmd = 'rez-env {} -- {}'.format(
+                    os.environ["REZ_USED_REQUEST"],
+                    self.cmd
+                )
+
             if self.single_task:
                 # On a single task we can see progress as job report
                 self.cmd += ' --report'
@@ -1059,7 +1067,7 @@ def render(afnode):
         for parm in params:
             if parm.pre_submit_script:
                 afnode = parm.afnode
-                print('Executimg pre submit script on "%s":\n%s' % (afnode.name(), parm.pre_submit_script))
+                print('Executing pre submit script on "%s":\n%s' % (afnode.name(), parm.pre_submit_script))
                 eval(parm.pre_submit_script)
 
         job_params.genJob(params)
@@ -1068,7 +1076,7 @@ def render(afnode):
             parm.doPost()
             if parm.post_submit_script:
                 afnode = parm.afnode
-                print('Executimg post submit script on "%s":\n%s' % (afnode.name(), parm.post_submit_script))
+                print('Executing post submit script on "%s":\n%s' % (afnode.name(), parm.post_submit_script))
                 eval(parm.post_submit_script)
     else:
         hou.ui.displayMessage(
