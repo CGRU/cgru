@@ -31,6 +31,8 @@ if [ -z "$FUSION_LOCATION" ]; then
   done
   export FUSION_LOCATION
   export FUSION_EXEC="${FUSION_LOCATION}/${FUSION_EXEC}"
+else
+  echo "FUSION_LOCATION is already set: ${FUSION_LOCATION}"
 fi
 
 #
