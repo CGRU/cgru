@@ -11,7 +11,10 @@ fi
 
 export BLENDER_CGRU_PATH="${CGRU_LOCATION}/plugins/blender"
 
-export BLENDER_USER_SCRIPTS="${BLENDER_CGRU_PATH}"
+# Do not override if BLENDER_USER_SCRIPTS is already defined
+if [ -z "$BLENDER_USER_SCRIPTS" ]; then
+  export BLENDER_USER_SCRIPTS="${BLENDER_CGRU_PATH}"
+fi
 
 export APP_DIR="${BLENDER_LOCATION}"
 export APP_EXE="${BLENDER_LOCATION}/blender"
