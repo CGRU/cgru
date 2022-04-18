@@ -22,6 +22,8 @@ if [ -z "$MAYA_LOCATION" ]; then
       MAYA_VERSION="`echo $MAYA_FOLDER | gawk '{print substr( \$1, 5, 4)}'`"
     fi
   done
+else
+  echo "MAYA_LOCATION is already set: ${MAYA_LOCATION}"
 fi
 
 export MAYA_EXEC="${MAYA_LOCATION}/bin/maya${MAYA_VERSION}"
