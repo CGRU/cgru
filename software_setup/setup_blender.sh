@@ -4,7 +4,10 @@
 source "$CGRU_LOCATION/software_setup/setup__all.sh"
 
 # Setup default Blender location:
-export BLENDER_LOCATION="/usr/bin"
+# Do not override if BLENDER_LOCATION is already set
+if [ -z "$BLENDER_LOCATION" ]; then
+  export BLENDER_LOCATION="/usr/bin"
+fi
 
 export BLENDER_CGRU_PATH="${CGRU_LOCATION}/plugins/blender"
 
