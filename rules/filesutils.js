@@ -369,7 +369,7 @@ function fu_ResultsFind(i_wnd)
 	for (var i = 0; i < paths.length; i++)
 		cmd += ' "' + c_PathPM_Client2Server(paths[i]) + '"';
 
-	n_Request({"send": {"cmdexec": {"cmds": [cmd]}}, "func": fu_ResultsReceived, "wnd": i_wnd});
+	n_Request({"send": {"cmdexec": {"cmds": [cmd], 'ignore_errors': true}}, "func": fu_ResultsReceived, "wnd": i_wnd});
 }
 
 function fu_ResultsReceived(i_data, i_args)

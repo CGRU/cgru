@@ -1113,19 +1113,21 @@ function d_MakeCut(i_args)
 	elLabel.innerHTML = '<a href="http://' + cgru_Config.af_servername + ':' + cgru_Config.af_serverport +
 		'" target="_blank">AFANASY</a>';
 
+	var elTest = document.createElement('div');
+	elAfDiv.appendChild(elTest);
+	elTest.textContent = 'Find Results';
+	elTest.classList.add('button');
+	elTest.m_wnd = wnd;
+	elTest.onclick = function(e) { d_CutProcessGUI(e.currentTarget.m_wnd, true); };
+
 	var elSend = document.createElement('div');
 	elAfDiv.appendChild(elSend);
 	elSend.textContent = 'Send Job';
 	elSend.classList.add('button');
+    elSend.style.display = 'none';
 	elSend.m_wnd = wnd;
+    wnd.m_elSend = elSend;
 	elSend.onclick = function(e) { d_CutProcessGUI(e.currentTarget.m_wnd, false); };
-
-	var elTest = document.createElement('div');
-	elAfDiv.appendChild(elTest);
-	elTest.textContent = 'Test Inputs';
-	elTest.classList.add('button');
-	elTest.m_wnd = wnd;
-	elTest.onclick = function(e) { d_CutProcessGUI(e.currentTarget.m_wnd, true); };
 
 	var elResults = document.createElement('div');
 	wnd.elContent.appendChild(elResults);
@@ -1180,8 +1182,7 @@ function d_CutProcessGUI(i_wnd, i_test)
 
 	for (var i = 0; i < shots.length; i++)
 		cmd += ' "' + c_PathPM_Rules2Server(shots[i]) + '"'
-
-			n_Request({"send": {"cmdexec": {"cmds": [cmd]}}, "func": d_CutFinished, "wnd": i_wnd});
+			n_Request({"send": {"cmdexec": {"cmds": [cmd], 'ignore_errors': true}}, "func": d_CutFinished, "wnd": i_wnd});
 }
 
 function d_CutFinished(i_data, i_args)
@@ -1195,8 +1196,11 @@ function d_CutFinished(i_data, i_args)
 	if ((i_data.cmdexec == null) || (!i_data.cmdexec.length) || (i_data.cmdexec[0].cut == null))
 	{
 		elResults.textContent = (JSON.stringify(i_data));
+        i_args.wnd.m_elSend.style.display = 'none';
 		return;
 	}
+
+    i_args.wnd.m_elSend.style.display = 'block';
 
 	var cut = i_data.cmdexec[0].cut;
 
@@ -1219,7 +1223,10 @@ function d_CutFinished(i_data, i_args)
 			el.style.color = '#FF2';
 
 		if (text.indexOf('error') != -1)
+        {
 			el.style.color = '#F42';
+            i_args.wnd.m_elSend.style.display = 'none';
+        }
 
 		el.textContent = text;
 	}

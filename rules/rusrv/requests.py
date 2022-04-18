@@ -169,7 +169,9 @@ class Requests:
             try:
                 out = subprocess.check_output('./' + cmd, shell=True, stderr=subprocess.STDOUT, encoding='utf-8')
             except subprocess.CalledProcessError as e:
-                if not 'ignore_errors' in i_args or i_args['ignore_errors'] is False:
+                if 'ignore_errors' in i_args and i_args['ignore_errors']:
+                   out = e.output
+                else:
                     obj = dict()
                     obj['error'] = e.output
                     if out is not None and len(out):

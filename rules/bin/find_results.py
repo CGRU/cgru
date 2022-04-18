@@ -107,7 +107,7 @@ for src in args:
 			result['respath'] = res
 
 	if result['src'] is None:
-		result['error'] = 'Not founded'
+		result['error'] = 'Not found'
 		if not Options.skiperrors:
 			errExit('Input not found for: %s' % src)
 
