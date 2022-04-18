@@ -29,6 +29,14 @@ CMD_TEMPLATE = "blender -b \"{blend_scene}\" -y -E {render_engine} " \
         "{python_options}" "{output_options} -s @#@ " \
         "-e @#@ -j {frame_inc} -a"
 
+# If this is a "rez" configured environment supply the same environment to the render
+# command
+if "REZ_USED_REQUEST" in os.environ:
+    CMD_TEMPLATE = "rez-env {} -- {}".format(
+        os.environ["REZ_USED_REQUEST"],
+        CMD_TEMPLATE
+    )
+
 
 class CGRU_Browse(bpy.types.Operator):
     bl_idname = "cgru.browse"
@@ -108,18 +116,17 @@ class CGRU_Submit(bpy.types.Operator):
 
         servicename = 'blender'
         renderlayer_names = []
-        #layers = bpy.context.scene.render.layers
+        # layers = bpy.context.scene.render.layers
         active_scene = bpy.context.active_object
 
         layers = utils.layers_get(active_scene)
 
-        #if hasattr(active_scene, "layers"):
+        # if hasattr(active_scene, "layers"):
         #    layers = active_scene.layers
-        #else:
+        # else:
         #    obj_colls = active_scene.users_collection # get all collections object is in
         #    collection_names = [coll.name for coll in obj_colls]
         #    layers = [str(i) in collection_names for i in range(20)] # ordered bool list
-
 
         if cgru_props.splitRenderLayers and len(layers) > 1:
             for layer in layers:
