@@ -344,6 +344,58 @@ void ItemJob::updateInfo(const af::Job * i_job)
 	ItemNode::updateInfo();
 }
 
+const QString ItemJob::v_getMultiSelecedText(const QList<Item*> & i_selected) const
+{
+	QString info;
+
+	if (i_selected.size() == 0)
+		return info;
+
+	int jobs_count = 0;
+	long long time_started_min = 0;
+	long long time_finished_max = 0;
+	long long time_run_sum = 0;
+	int time_run_count = 0;
+
+	QListIterator<Item*> it(i_selected);
+	while (it.hasNext())
+	{
+		Item * item = it.next();
+
+		if (item->getType() != Item::TJob)
+			continue;
+
+		ItemJob * item_job = static_cast<ItemJob*>(item);
+		jobs_count ++;
+
+		if (item_job->time_started && ((item_job->time_started < time_started_min) || (time_started_min == 0)))
+			time_started_min = item_job->time_started;
+
+		if ((item_job->state & AFJOB::STATE_DONE_MASK) && (item_job->time_done > time_finished_max))
+			time_finished_max = item_job->time_done;
+
+		if (item_job->state & AFJOB::STATE_DONE_MASK)
+		{
+			time_run_sum += item_job->time_done - item_job->time_started;
+			time_run_count ++;
+		}
+	}
+
+	info += QString("<br><u><i><b>%1 Jobs Selected</b></i></u>").arg(jobs_count);
+
+	if (time_started_min)
+		info += "<br>Started First: <b>" + afqt::time2Qstr(time_started_min) + "</b>";
+	if (time_finished_max)
+		info += "<br>Finished Last: <b>" + afqt::time2Qstr(time_finished_max) + "</b>";
+	if (time_run_count > 1)
+	{
+		info += "<br>Time Run Avg: <b>" + afqt::stoq(af::time2strHMS(time_run_sum / time_run_count)) + "</b>";
+		info += "<br>Time Run Sum: <b>" + afqt::stoq(af::time2strHMS(time_run_sum)) + "</b>";
+	}
+
+	return info;
+}
+
 void ItemJob::v_buttonClicked(ItemButton * i_b)
 {
 	if (i_b == m_btn_item_collapse)

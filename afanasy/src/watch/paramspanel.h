@@ -28,7 +28,7 @@ public:
 
 	virtual void v_setEditable(bool i_editable);
 
-	virtual void v_updatePanel(Item * i_item = NULL);
+	virtual void v_updatePanel(Item * i_item = NULL, const QList<Item*> * i_selected = NULL);
 
 	void addParamWidget(Param * i_param);
 

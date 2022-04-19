@@ -72,7 +72,7 @@ ParamsPanelJob::~ParamsPanelJob()
 {
 }
 
-void ParamsPanelJob::v_updatePanel(Item * i_item)
+void ParamsPanelJob::v_updatePanel(Item * i_item, const QList<Item*> * i_selected)
 {
 	if (i_item && (i_item->getType() == Item::TJob))
 	{
@@ -89,7 +89,7 @@ void ParamsPanelJob::v_updatePanel(Item * i_item)
 		clearBlocks();
 	}
 
-	ParamsPanel::v_updatePanel(i_item);
+	ParamsPanel::v_updatePanel(i_item, i_selected);
 }
 
 void ParamsPanelJob::constructFolders(ItemJob * i_item_job)

@@ -98,6 +98,8 @@ private:
 	inline int getThumbsHeight() const
 		{return m_inworklist ? afqt::QEnvironment::thumb_work_height.n : afqt::QEnvironment::thumb_jobs_height.n;}
 
+	virtual const QString v_getMultiSelecedText(const QList<Item*> & i_selected) const override;
+
 private:
 	int64_t m_serial;
 

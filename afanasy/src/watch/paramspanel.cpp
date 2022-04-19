@@ -192,7 +192,7 @@ ParamsPanel::~ParamsPanel()
 {
 }
 
-void ParamsPanel::v_updatePanel(Item * i_item)
+void ParamsPanel::v_updatePanel(Item * i_item, const QList<Item*> * i_selected)
 {
 	m_cur_item = i_item;
 
@@ -209,7 +209,14 @@ void ParamsPanel::v_updatePanel(Item * i_item)
 
 	m_name->setText(QString("<b>%1</b>").arg(m_cur_item->getName()));
 
-	m_info_text->setText(m_cur_item->v_getInfoText());
+	QString info = m_cur_item->v_getInfoText();
+
+	if (i_selected && (i_selected->size() > 1))
+	{
+		info += "<br>" + m_cur_item->v_getMultiSelecedText(*i_selected);
+	}
+
+	m_info_text->setText(info);
 	m_info_label->setHidden(true);
 }
 

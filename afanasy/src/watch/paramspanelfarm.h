@@ -18,7 +18,7 @@ public:
 	ParamsPanelFarm(ListRenders * i_list_renders);
 	~ParamsPanelFarm();
 
-	virtual void v_updatePanel(Item * i_item = NULL) override;
+	virtual void v_updatePanel(Item * i_item = NULL, const QList<Item*> * i_selected = NULL) override;
 
 private:
 	void updateServices(ItemFarm * i_item);

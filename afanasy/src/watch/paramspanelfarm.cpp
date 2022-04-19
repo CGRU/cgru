@@ -119,9 +119,9 @@ ParamsPanelFarm::~ParamsPanelFarm()
 	clearServices();
 }
 
-void ParamsPanelFarm::v_updatePanel(Item * i_item)
+void ParamsPanelFarm::v_updatePanel(Item * i_item, const QList<Item*> * i_selected)
 {
-	ParamsPanel::v_updatePanel(i_item);
+	ParamsPanel::v_updatePanel(i_item, i_selected);
 
 	ItemFarm * item_farm = (ItemFarm*)(i_item);
 

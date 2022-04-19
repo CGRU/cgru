@@ -53,6 +53,8 @@ public:
 	virtual const QString  v_getSelectString() const { return m_name;      }
 	virtual const QString  v_getInfoText()     const { return m_info_text; }
 
+	virtual const QString v_getMultiSelecedText(const QList<Item*> & i_selected) const {return QString();}
+
 	inline void lock()                const { setLock( true);  }
 	inline void unLock()              const { setLock( false); }
 	inline bool isLocked()            const { return m_locked;   }

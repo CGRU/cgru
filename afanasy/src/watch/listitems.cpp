@@ -138,8 +138,6 @@ void ListItems::initListItems()
 
 	connect(m_view, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(doubleClicked_slot(const QModelIndex &)));
 
-	connect(m_view->selectionModel(), SIGNAL(    currentChanged( const    QModelIndex &, const    QModelIndex &)),
-	                            this,   SLOT(currentItemChanged( const    QModelIndex &, const    QModelIndex &)));
 	connect(m_view->selectionModel(), SIGNAL(  selectionChanged( const QItemSelection &, const QItemSelection &)),
 	                            this,   SLOT(  selectionChanged( const QItemSelection &, const QItemSelection &)));
 }
@@ -288,58 +286,34 @@ void ListItems::doubleClicked_slot( const QModelIndex & index )
 		v_doubleClicked(Item::toItemP(index.data()));
 }
 
-void ListItems::currentItemChanged( const QModelIndex & current, const QModelIndex & previous )
-{
-	if (m_stored_selection.count())
-		return;
-
-	Item * item = NULL;
-
-	if (Item::isItemP(current.data()))
-		item = Item::toItemP(current.data());
-
-	if (item)
-	{
-		displayInfo(item->v_getSelectString());
-		updatePanels(item);
-	}
-
-	m_current_item = item;
-}
-
 void ListItems::selectionChanged(const QItemSelection & i_selected, const QItemSelection & i_deselected)
 {
 	if (m_stored_selection.count())
 		return;
 
-	if (m_view->selectionModel()->selectedIndexes().size() == 0)
+	const QList<Item*> selected = getSelectedItems();
+
+	if (selected.size() == 0)
 	{
 		// Everything was deselected:
 		m_current_item = NULL;
 		m_infoline->clear();
-		updatePanels();
-		return;
+	}
+	else
+	{
+		m_current_item = selected.last();
+		displayInfo(m_current_item->v_getSelectString());
 	}
 
-	if (NULL == m_current_item)
-	{
-		// This can be if the same one node was deselected, than selected again.
-		// In such case current item was not changed.
-		QModelIndexList indexes = i_selected.indexes();
-		if ((indexes.size()) && (Item::isItemP(indexes.last().data())))
-		{
-			m_current_item = Item::toItemP(indexes.last().data());
-			updatePanels(m_current_item);
-		}
-	}
+	updatePanels(selected);
 }
 
-void ListItems::updatePanels(Item * i_item)
+void ListItems::updatePanels(const QList<Item*> & i_selected)
 {
 	// Show hide panel button menus:
 	for (int i = 0; i < m_btn_menus.size(); i++)
 	{
-		if (i_item == NULL)
+		if (m_current_item == NULL)
 		{
 			m_btn_menus[i]->setHidden(false);
 			m_btn_menus[i]->setActive(false);
@@ -350,7 +324,7 @@ void ListItems::updatePanels(Item * i_item)
 
 		if (m_btn_menus[i]->getType() != Item::TAny)
 		{
-			if (m_btn_menus[i]->getType() != i_item->getType())
+			if (m_btn_menus[i]->getType() != m_current_item->getType())
 				m_btn_menus[i]->setHidden(true);
 			else
 				m_btn_menus[i]->setHidden(false);
@@ -360,7 +334,7 @@ void ListItems::updatePanels(Item * i_item)
 	// Show hide panel buttons:
 	for (int i = 0; i < m_btns.size(); i++)
 	{
-		if (i_item == NULL)
+		if (m_current_item == NULL)
 		{
 			m_btns[i]->setHidden(false);
 			m_btns[i]->setActive(false);
@@ -371,14 +345,14 @@ void ListItems::updatePanels(Item * i_item)
 
 		if (m_btns[i]->getType() != Item::TAny)
 		{
-			if (m_btns[i]->getType() != i_item->getType())
+			if (m_btns[i]->getType() != m_current_item->getType())
 				m_btns[i]->setHidden(true);
 			else
 				m_btns[i]->setHidden(false);
 		}
 	}
 
-	m_paramspanel->v_updatePanel(i_item);
+	m_paramspanel->v_updatePanel(m_current_item, &i_selected);
 }
 
 void ListItems::getItemInfo(Item::EType i_type, const std::string & i_mode)
