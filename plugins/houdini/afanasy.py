@@ -85,6 +85,10 @@ class BlockParameters:
         self.depend_mask = ''
         self.depend_mask_global = ''
         self.min_memory = -1
+        self.min_gpu_mem = -1
+        self.min_cpu_freq = -1
+        self.min_cpu_cores = -1
+        self.min_cpu_cores_freq = -1
         self.tickets_use = int(afnode.parm('tickets_use').eval())
         self.tickets_auto = int(afnode.parm('tickets_auto').eval())
         self.ticket_mem = int(afnode.parm('ticket_mem').eval())
@@ -106,6 +110,10 @@ class BlockParameters:
             self.minruntime = int(afnode.parm('minruntime').eval())
             self.progress_timeout = float(afnode.parm('progress_timeout').eval())
             self.min_memory = int(afnode.parm('min_memory').eval())
+            self.min_gpu_mem = float(afnode.parm('min_gpu_mem').eval())
+            self.min_cpu_freq = float(afnode.parm('min_cpu_freq').eval())
+            self.min_cpu_cores = int(afnode.parm('min_cpu_cores').eval())
+            self.min_cpu_cores_freq = float(afnode.parm('min_cpu_cores_freq').eval())
             self.capacity = int(afnode.parm('capacity').eval())
             self.capacity_min = int(
                 afnode.parm('capacity_coefficient1').eval())
@@ -465,6 +473,14 @@ class BlockParameters:
             block.setDependSubTask()
         if self.min_memory > -1:
             block.setNeedMemory(self.min_memory*1024)
+        if self.min_gpu_mem > 0:
+            block.setNeedGPUMemGB(self.min_gpu_mem)
+        if self.min_cpu_freq > 0:
+            block.setNeedCPUFreqGHz(self.min_cpu_freq)
+        if self.min_cpu_cores > 0:
+            block.setNeedCPUCores(self.min_cpu_cores)
+        if self.min_cpu_cores_freq > 0:
+            block.setNeedCPUFreqCores(self.min_cpu_cores_freq)
 
         # Process Tickets
         if self.tickets_use:
