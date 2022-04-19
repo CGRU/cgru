@@ -79,7 +79,8 @@ while True:
 	if data is None: break
 	if len(data) < 1: break
 
-	sys.stdout.write(cgruutils.toStr(data))
+	data = cgruutils.toStr(data)
+	sys.stdout.write(data)
 	sys.stdout.flush()
 
 	if Ext == 'zip':
@@ -125,7 +126,8 @@ while True:
 	if data is None: break
 	if len(data) < 1: break
 
-	sys.stdout.write(cgruutils.toStr(data))
+	data = cgruutils.toStr(data)
+	sys.stdout.write(data)
 
 	if data.find(Key) != -1 and FilesTotal:
 		if data not in Files:
