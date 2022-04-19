@@ -31,12 +31,14 @@ Gizmo {
    addUserKnob {  3 maxruntasks     l "Max Running Tasks"      }
    addUserKnob {  3 priority        l "Priority"               }
    addUserKnob {  1 hostsmask       l "Hosts Mask"             }
-   addUserKnob {  1 hostsmaskexcl   l "Exclude Hosts Mask"     }
+   addUserKnob {  1 hostsmaskexcl   l "Exclude" -STARTLINE     }
    addUserKnob {  1 dependmask      l "Depend Mask"            }
-   addUserKnob {  1 dependmaskglbl  l "Global Depend Mask"     }
+   addUserKnob {  1 dependmaskglbl  l "Global" -STARTLINE      }
    addUserKnob {  3 capacity        l "Capacity"               }
    addUserKnob {  3 maxperhost      l "Max Tasks Per Host"     }
-   addUserKnob {  3 maxruntime      l "Max Task Run Time"      }
+   addUserKnob {  3 maxruntime      l "Max Task Run Time (min)"}
+   addUserKnob {  3 need_memory     l "Need RAM (GB)"          }
+   addUserKnob {  7 need_gpu_mem    l "Need GPU RAM (GB)" R -1 32}
 
    addUserKnob { 20 "" MultiWrite }
    addUserKnob {  1 addnodes    l "Add Nodes"    }
@@ -84,6 +86,8 @@ Gizmo {
 	capacity       -1
 	maxperhost     -1
 	maxruntime     -1
+	need_memory    -1
+	need_gpu_mem   -1
 	hostsmask      ""
 	hostsmaskexcl  ""
 	dependmask     ""

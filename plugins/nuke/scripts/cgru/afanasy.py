@@ -140,6 +140,8 @@ class BlockParameters:
         self.capacity = -1
         self.maxperhost = -1
         self.maxruntime = -1
+        self.need_memory = -1
+        self.need_gpu_mem = -1
         self.hostsmask = None
         self.hostsmaskexclude = None
         self.fullrangedepend = 0
@@ -164,6 +166,8 @@ class BlockParameters:
             self.capacity = int(afnode.knob('capacity').value())
             self.maxperhost = int(afnode.knob('maxperhost').value())
             self.maxruntime = int(afnode.knob('maxruntime').value())
+            self.need_memory = int(afnode.knob('need_memory').value())
+            self.need_gpu_mem = float(afnode.knob('need_gpu_mem').value())
             self.tmpimage = int(afnode.knob('tmpimage').value())
             self.pathsmap = int(afnode.knob('pathsmap').value())
             self.hostsmask = afnode.knob('hostsmask').value()
@@ -361,7 +365,11 @@ class BlockParameters:
             if self.capacity != -1:
                 block.setCapacity(self.capacity)
             if self.maxruntime != -1:
-                block.setTasksMaxRunTime(self.maxruntime)
+                block.setTasksMaxRunTime(60 * self.maxruntime)
+            if self.need_memory > 0:
+                block.setNeedMemory(1024 * self.need_memory)
+            if self.need_gpu_mem > 0:
+                block.setNeedGPUMemGB(self.need_gpu_mem)
             if self.tickets_use and self.tickets_data is not None and len(self.tickets_data):
                 for ticket in self.tickets_data.split(','):
                     ticket = ticket.strip().split(':')
