@@ -842,7 +842,9 @@ Monitor.prototype.setSelected = function(i_item, on) {
 
 		this.cur_item = i_item;
 
-		this.updatePanels(null, {'hide_params': true});
+		// Function updatePanels was here at first.
+		// But for muiltiselection summary info, it should be called after selected_items changed.
+		//this.updatePanels(null, {'hide_params': true});
 
 		this.info(this.cur_item.params.name);
 
@@ -852,6 +854,10 @@ Monitor.prototype.setSelected = function(i_item, on) {
 		i_item.selected = true;
 		i_item.element.classList.add('selected');
 		this.selected_items.push(i_item);
+
+		// For muiltiselection summary info,
+		// updatePanels  should be called after selected_items changed.
+		this.updatePanels(null, {'hide_params': true});
 
 		if (this.type == 'jobs')
 			this.setWindowTitle();
@@ -1049,7 +1055,7 @@ Monitor.prototype.updatePanels = function(i_item, i_args) {
 		elParams[p].style.display = 'block';
 	}
 	if (i_item.updatePanels)
-		i_item.updatePanels();
+		i_item.updatePanels(this.selected_items);
 };
 
 Monitor.prototype.panelShowAllParameters = function() {

@@ -266,7 +266,7 @@ function cm_TimeStringFromSeconds(i_seconds, i_full)
 	if (i_seconds == 0)
 		return '0';
 
-	var seconds = i_seconds;
+	var seconds = Math.round(i_seconds);
 	var days = 0;
 	var hours = 0;
 	var minutes = Math.floor(seconds / 60);

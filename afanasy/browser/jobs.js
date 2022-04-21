@@ -1381,7 +1381,7 @@ JobBlock.prototype.updateTickets = function() {
 	}
 }
 
-JobNode.prototype.updatePanels = function() {
+JobNode.prototype.updatePanels = function(i_selected) {
 	var elPanelR = this.monitor.elPanelR;
 
 	// Blocks:
@@ -1419,6 +1419,8 @@ JobNode.prototype.updatePanels = function() {
 		info += '<p>Started: ' + cm_DateTimeStrFromSec(this.params.time_started) + '</p>';
 	if (this.params.time_done)
 		info += '<p>Finished: ' + cm_DateTimeStrFromSec(this.params.time_done) + '</p>';
+	if (i_selected && i_selected.length && (i_selected.length > 1))
+		info += '<p>' + JobNode.getMultiSelectionInfo(i_selected) + '</p>';
 	this.monitor.setPanelInfo(info);
 
 
@@ -1467,6 +1469,49 @@ JobNode.prototype.updatePanels = function() {
 		elFolders.m_elRules.style.display = 'block';
 		elFolders.m_elRules.href = cgru_RulesLink(rules_link);
 	}
+};
+
+JobNode.getMultiSelectionInfo = function(i_selected)
+{
+	let jobs_count = 0;
+	let time_started_min = 0;
+	let time_finished_max = 0;
+	let time_run_sum = 0;
+	let time_run_count = 0;
+
+	for (let job of i_selected)
+	{
+		if (job.node_type != 'jobs')
+			continue;
+
+		jobs_count ++;
+
+		if (job.params.time_started && ((job.params.time_started < time_started_min) || (time_started_min == 0)))
+			time_started_min = job.params.time_started;
+
+		if ((job.state.DON == true) && (job.params.time_done > time_finished_max))
+			time_finished_max = job.params.time_done;
+
+		if (job.state.DON == true)
+		{
+			time_run_sum += job.params.time_done - job.params.time_started;
+			time_run_count ++;
+		}
+	}
+
+	let info = '<b><i>' + jobs_count + ' Jobs Selected</i></b>';
+
+	if (time_started_min)
+		info += "<br>Started First: <b>" + cm_DateTimeStrFromSec(time_started_min) + "</b>";
+	if (time_finished_max)
+		info += "<br>Finished Last: <b>" + cm_DateTimeStrFromSec(time_finished_max) + "</b>";
+	if (time_run_count > 1)
+	{
+		info += "<br>Time Run Avg: <b>" + cm_TimeStringFromSeconds(time_run_sum / time_run_count) + "</b>";
+		info += "<br>Time Run Sum: <b>" + cm_TimeStringFromSeconds(time_run_sum) + "</b>";
+	}
+
+	return info;
 };
 
 JobNode.resetPanels = function(i_monitor) {
