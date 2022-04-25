@@ -2,4 +2,4 @@
 
 source $CGRU_LOCATION/software_setup/setup_blender.sh
 
-$APP_EXE "$@"
+$APP_EXE --python-use-system-env "$@"

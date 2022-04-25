@@ -8,18 +8,23 @@ export MAYA_CGRU_LOCATION="$CGRU_LOCATION/plugins/maya"
 export PYTHONPATH="${MAYA_CGRU_LOCATION}:${PYTHONPATH}"
 
 # Locate Maya:
-MAYA_INSTALL_DIR="/usr/autodesk"
-MAYA_FOLDERS=`ls "$MAYA_INSTALL_DIR"`
-MAYA_VERSION=""
-MAYA_LOCATION=""
 MAYA_EXEC=""
-for MAYA_FOLDER in $MAYA_FOLDERS ;
-do
-	if [ "`echo $MAYA_FOLDER | gawk '{print match( \$1, /maya[0-9]+.*/)}'`" == "1" ]; then
+
+if [ -z "$MAYA_LOCATION" ]; then
+  MAYA_INSTALL_DIR="/usr/autodesk"
+  MAYA_FOLDERS=`ls "$MAYA_INSTALL_DIR"`
+  MAYA_LOCATION=""
+  MAYA_VERSION=""
+  for MAYA_FOLDER in $MAYA_FOLDERS ;
+  do
+    if [ "`echo $MAYA_FOLDER | gawk '{print match( \$1, /maya[0-9]+.*/)}'`" == "1" ]; then
       MAYA_LOCATION="${MAYA_INSTALL_DIR}/${MAYA_FOLDER}"
       MAYA_VERSION="`echo $MAYA_FOLDER | gawk '{print substr( \$1, 5, 4)}'`"
-   fi
-done
+    fi
+  done
+else
+  echo "MAYA_LOCATION is already set: ${MAYA_LOCATION}"
+fi
 
 export MAYA_EXEC="${MAYA_LOCATION}/bin/maya${MAYA_VERSION}"
 echo "MAYA: ${MAYA_EXEC}"
