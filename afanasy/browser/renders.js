@@ -189,17 +189,34 @@ RenderNode.prototype.update = function(i_obj) {
 
 			this.plotterH.setTitle('HDD Space: ' + r.hdd_total_gb + ' Gb');
 			this.plotterH.setScale(r.hdd_total_gb, 95 * r.hdd_total_gb / 100, r.hdd_total_gb);
+
+			// GPU resources:
+			if (r.gpu_mem_total_mb)
+			{
+				this.plotter_GPU_GPU = new Plotter(this.elResources, 'GU', 'GPU');
+				this.plotter_GPU_GPU.addGraph();
+				this.plotter_GPU_GPU.setTitle(r.gpu_string + ':');
+				this.plotter_GPU_GPU.setColor([50, 200, 20]);
+				this.plotters.push(this.plotter_GPU_GPU);
+
+				this.plotter_GPU_Mem = new Plotter(this.elResources, 'GM ' + (r.gpu_mem_total_mb / 1000.0).toFixed(1), 'GPU Mem');
+				this.plotter_GPU_Mem.addGraph();
+				this.plotter_GPU_Mem.setTitle(r.gpu_string + ':\nMemory Total: ' + r.gpu_mem_total_mb + 'Mb');
+				this.plotter_GPU_Mem.setScale(r.gpu_mem_total_mb, 85 * r.gpu_mem_total_mb / 100, r.gpu_mem_total_mb);
+				this.plotter_GPU_Mem.setColor([50, 200, 20], [255, 0, 0]);
+				this.plotters.push(this.plotter_GPU_Mem);
+			}
 		}
 
-		var pl_w = Math.round(this.element.clientWidth / 11 - 4);
-		for (var i = 0; i < this.plotters.length; i++)
+		let pl_w = Math.round(0.6 * this.element.clientWidth / this.plotters.length);
+		for (let i = 0; i < this.plotters.length; i++)
 		{
 			this.plotters[i].setWidth(pl_w);
-			var dx = this.plotters[i].width + 8;
-			this.plotters[i].element.style.left = (-3 * dx + i * dx) + 'px';
+			let left = this.plotters[i].width + 8;
+			left = (i - 0.5 * this.plotters.length) * left - 20;
+			this.plotters[i].element.style.left = Math.round(left) + 'px';
 			this.plotters[i].element.style.top = '2px';
 		}
-
 
 		this.host_resources = r;
 
@@ -232,6 +249,26 @@ RenderNode.prototype.update = function(i_obj) {
 			'\nRead: ' + Math.round(r.hdd_rd_kbsec / 1024) + 'MBytes/s\nWrite: ' +
 			Math.round(r.hdd_wr_kbsec / 1024) + ' MBytes/s\nBusy: ' + r.hdd_busy + '%');
 		this.plotterD.addValues([r.hdd_rd_kbsec, r.hdd_wr_kbsec], r.hdd_busy / 100);
+
+		// GPU:
+		if (r.gpu_mem_total_mb && this.plotter_GPU_GPU)
+		{
+			let plot_GPU_red_min = 65;
+			let plot_GPU_red_max = 95;
+			let plot_GPU_red = (r.gpu_gpu_temp - plot_GPU_red_min) * 100 / (plot_GPU_red_max - plot_GPU_red_min);
+			if (plot_GPU_red < 0) plot_GPU_red = 0;
+			if (plot_GPU_red > 100) plot_GPU_red = 100;
+			let plot_GPU_temp_r = 50 + (2*plot_GPU_red);
+			let plot_GPU_temp_g = 200 - (2*plot_GPU_red);
+			let plot_GPU_temp_b = 20;
+			this.plotter_GPU_GPU.setColor([plot_GPU_temp_r, plot_GPU_temp_g, plot_GPU_temp_b]);
+			this.plotter_GPU_GPU.addValues([r.gpu_gpu_util]);
+			this.plotter_GPU_GPU.setLabel('GU ' + r.gpu_gpu_temp + 'C');
+			this.plotter_GPU_GPU.appendTitle('\nUtilization: ' + r.gpu_gpu_util + '%\nTemperature: ' + r.gpu_gpu_temp + 'C');
+
+			this.plotter_GPU_Mem.addValues([r.gpu_mem_used_mb]);
+			this.plotter_GPU_Mem.appendTitle('\nMemory used: ' + r.gpu_mem_used_mb + ' Mb');
+		}
 
 		this.params.tasks_percents = i_obj.tasks_percents;
 		this.updateTasksPercents();
@@ -941,11 +978,23 @@ RenderNode.prototype.updatePanels = function() {
 	if (r)
 	{
 		info += '<p>';
-		info += ' CPU: <b>' + r.cpu_mhz + '</b>x<b>' + r.cpu_num + '</b> MHz';
-		info += ' MEM: <b>' + Math.round(r.mem_total_mb / 1024) + '</b> Gb';
-		info += ' SWP: <b>' + Math.round(r.swap_total_mb / 1024) + '</b> Gb';
+		info += ' CPU: <b>' + (r.cpu_mhz / 1000.0).toFixed(1) + '</b>x<b>' + r.cpu_num + '</b> GHz';
+		info += ' MEM: <b>' + (r.mem_total_mb / 1024.0).toFixed(1) + '</b> Gb';
+		info += ' SWP: <b>' + (r.swap_total_mb / 1024.0).toFixed(1) + '</b> Gb';
 		info += ' HDD: <b>' + r.hdd_total_gb + '</b> Gb';
+		if (r.gpu_string)
+		{
+			info += '<br>GPU: <b>' + r.gpu_string + '</b> Mem: <b>' + (r.gpu_mem_total_mb / 1000.0).toFixed(1) + '</b>Gb'
+		}
 		info += '</p>';
+
+		if (r.logged_in_users && r.logged_in_users.length)
+		{
+			info += '<p>Logged in:<b>';
+			for (let usr of r.logged_in_users)
+				info += ' ' + usr;
+			info += '</b></p>';
+		}
 	}
 
 	info += '<div>Registered: ' + cm_DateTimeStrFromSec(this.params.time_register) + '</div>';
