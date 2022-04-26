@@ -17,7 +17,7 @@ Also it sends json data to server.
 Example
 -------
 
-.. code-block:: bash
+.. code-block:: python
 
     # Import afanasy python module (must be in PYTHONPATH)
     import af

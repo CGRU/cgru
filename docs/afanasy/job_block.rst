@@ -271,19 +271,48 @@ See `Configuration <../configuration/configuration.html>`_ and `afcmd <../afanas
 need_power
 ----------
 ``af.Block.setNeedPower(int)``
+
 Minimum render host power needed.
 It's custom host parameter can be set by pool.
 
 need_memory
 -----------
-``af.Block.setNeedMemory(megabytes)``
-Minimum render host free memory needed in mega-bytes.
+``af.Block.setNeedMemory(int)``
+
+Minimum render host free memory needed in megabytes.
+
+need_gpu_mem_mb
+---------------
+``af.Block.setNeedGPUMemGB(float)``
+
+Minimum render host GPU free memory needed in gigabytes.
+The function will convert it to integer megabytes.
+
+need_cpu_freq_mgz
+-----------------
+``af.Block.setNeedCPUFreqGHz(float)``
+
+Minimum render host CPU frequency in gigahertz.
+The function will convert it to integer megahertz.
+
+need_cpu_cores
+--------------
+``af.Block.setNeedCPUCores(int)``
+
+Minimum render host CPU cores number.
+
+need_cpu_freq_cores
+-------------------
+``af.Block.setNeedCPUFreqCores(float)``
+
+Minimum render host CPU frequency * cores in gigahertz.
+The function will convert it to integer megahertz.
 
 need_hdd
 --------
-``af.Block.setNeedHDD(gigabytes)``
+``af.Block.setNeedHDD(int)``
 
-Minimum render host free disk space needed in giga-bytes.
+Minimum render host free disk space needed in gigabytes.
 
 need_properties
 ---------------

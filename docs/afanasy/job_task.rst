@@ -7,7 +7,7 @@ In numeric blocks tasks are generated on demand, as numeric block enough has inf
 Most blocks are numeric, as tasks are differ only by few numbers in a command.
 
 There are some cases when tasks commands differ by some strings, and block can't be described by frame numbers.
-For example *ffmpeg* converts various sequences and movies in a sigle job block (Rules constucts such jobs for previews).
+For example *ffmpeg* converts various sequences and movies in a single job block (Rules constructs such jobs for previews).
 
 
 .. code-block:: python
@@ -104,6 +104,7 @@ Running              ``RUN`` Task is running.
 Done                 ``DON`` Task is done. 
 Error                ``ERR`` Task finished with error or failed to start. 
 Skipped              ``SKP`` Task skipped. 
+Waiting Dependencies ``WD``  Warning dependent tasks to be done.
 Warning              ``WRN`` Warning from parser. 
 Parser Error         ``PER`` Error from parser. 
 Parser Bad Result    ``PBR`` Bad result from parser. 
