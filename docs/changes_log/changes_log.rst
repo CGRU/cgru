@@ -12,6 +12,26 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
   You can upgrade only one client or server for changes.
 
 
+v3.3.0
+======
+
+*Not released*
+
+2022.04.26
+
+- AfRender can send to server GPU resources: utilization, temperature, memory total and used. For now, just NVIDIA is supported.
+- New job block parameters: need GPU memory, CPU frequency, cores and frequency*cores.
+- AfWatch and WebGUI shows some summary info, when several jobs are selected.
+- Now parser checks whether the task progress was changed.
+  Later server was, it had to compare previous and new percentage value.
+  And this behaviour was build-in.
+  Now you can override it by parser.
+  And by default, progress is changed if task produced any output.
+- New task flag Wait Dependencies appeared.
+  Now tasks that wait some other tasks will be marked with this flag.
+  Tasks with this flag are skipped during job solving.
+  So now task dependencies will not wait the last frame of unbroken sequence.
+
 .. _changes-log-latest:
 
 
