@@ -22,7 +22,7 @@ bool GetGPUInfo_NVIDIA(af::HostRes & o_hres, bool i_verbose)
 	std::array<char, 128> buffer;
 	std::string output;
 
-	std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
+	std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(cmd.c_str(), "r"), _pclose);
 	if (!pipe)
 	{
 		if (i_verbose)
