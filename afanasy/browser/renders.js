@@ -108,6 +108,9 @@ RenderNode.prototype.init = function() {
 	this.plotterD = new Plotter(this.elResources, 'D', 'Disk I/O');
 	this.plotters.push(this.plotterD);
 
+	this.plotter_GPU_GPU = null;
+	this.plotter_GPU_Mem = null;
+
 	this.plotterC.addGraph();
 	this.plotterC.setColor([200, 0, 0]);
 	this.plotterC.addGraph();
@@ -190,8 +193,8 @@ RenderNode.prototype.update = function(i_obj) {
 			this.plotterH.setTitle('HDD Space: ' + r.hdd_total_gb + ' Gb');
 			this.plotterH.setScale(r.hdd_total_gb, 95 * r.hdd_total_gb / 100, r.hdd_total_gb);
 
-			// GPU resources:
-			if (r.gpu_mem_total_mb)
+			// Create GPU resources ptotters (if was not created before)
+			if (r.gpu_mem_total_mb && (this.plotter_GPU_GPU == null))
 			{
 				this.plotter_GPU_GPU = new Plotter(this.elResources, 'GU', 'GPU');
 				this.plotter_GPU_GPU.addGraph();
@@ -250,7 +253,7 @@ RenderNode.prototype.update = function(i_obj) {
 			Math.round(r.hdd_wr_kbsec / 1024) + ' MBytes/s\nBusy: ' + r.hdd_busy + '%');
 		this.plotterD.addValues([r.hdd_rd_kbsec, r.hdd_wr_kbsec], r.hdd_busy / 100);
 
-		// GPU:
+		// GPU resources:
 		if (r.gpu_mem_total_mb && this.plotter_GPU_GPU)
 		{
 			let plot_GPU_red_min = 65;
