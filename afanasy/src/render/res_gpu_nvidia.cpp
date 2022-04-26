@@ -9,6 +9,11 @@
 
 #include "../libafanasy/name_af.h"
 
+#ifdef WINNT
+#define popen _popen
+#define pclose _pclose
+#endif
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -22,7 +27,7 @@ bool GetGPUInfo_NVIDIA(af::HostRes & o_hres, bool i_verbose)
 	std::array<char, 128> buffer;
 	std::string output;
 
-	std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(cmd.c_str(), "r"), _pclose);
+	std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
 	if (!pipe)
 	{
 		if (i_verbose)
