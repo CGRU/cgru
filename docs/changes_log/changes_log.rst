@@ -19,7 +19,8 @@ v3.3.0
 
 2022.04.26
 
-- AfRender can send to server GPU resources: utilization, temperature, memory total and used. For now, just NVIDIA is supported.
+- AfRender can send to server `GPU resources <../afanasy/render.html#gpu-string>`_:
+  utilization, temperature, memory total and used. For now, just NVIDIA is supported.
 
 - New job block need parameters:
   `GPU Memory <../afanasy/job_block.html#need-gpu-mem-mb>`_,
