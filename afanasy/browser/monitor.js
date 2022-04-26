@@ -1012,47 +1012,24 @@ Monitor.prototype.updatePanels = function(i_item, i_args) {
 		}
 	}
 
-	var els = this.elPanelR.getElementsByClassName('section');
-	for (var i = 0; i < els.length; i++)
+	let els = this.elPanelR.getElementsByClassName('section');
+	for (let i = 0; i < els.length; i++)
 		els[i].classList.add('active');
 
-	var elParams = this.elPanelR.m_elParams.m_elPMap;
-	for (var p in elParams)
+	let elParams = this.elPanelR.m_elParams.m_elPMap;
+	for (let p in elParams)
 	{
-		if (i_item.params[p] == null)
+		let value = cm_ValueToString(i_item.params[p], this.nodeConstructor.params[p].type);
+
+		if (value == '')
 		{
 			if (this.elPanelR.m_elParams.m_all_shown != true)
 				elParams[p].style.display = 'none';
-			elParams[p].m_elValue.textContent = '';
-			continue;
 		}
-
-		var value = i_item.params[p];
-		if (this.nodeConstructor.params[p].type == 'hrs')
-		{
-			value = cm_TimeStringFromSeconds(value, true);
-		}
-		else if (this.nodeConstructor.params[p].type == 'tim')
-		{
-			value = cm_DateTimeStrFromSec(value);
-		}
-		else if ((typeof value) == 'string')
-		{
-			// word-wrap long regular expressions:
-			value = value.replace(/\./g, '.&shy;');
-			value = value.replace(/\|/g, '|&shy;');
-			value = value.replace(/\)/g, ')&shy;');
-		}
-		else if (this.nodeConstructor.params[p].type == 'msi')
-		{
-			let msi = value;
-			value = '';
-			for (let s in msi)
-				value += ' <b>' + s + '</b>:' + msi[s];
-		}
+		else
+			elParams[p].style.display = 'block';
 
 		elParams[p].m_elValue.innerHTML = value;
-		elParams[p].style.display = 'block';
 	}
 	if (i_item.updatePanels)
 		i_item.updatePanels(this.selected_items);

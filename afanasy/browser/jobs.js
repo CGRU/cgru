@@ -461,6 +461,10 @@ function JobBlock(i_elParent, i_block)
 	this.elMinRunTime = cm_ElCreateFloatText(this.element, 'right', 'Task Minimum Run Time');
 	this.elProgressTimeout = cm_ElCreateFloatText(this.element, 'right', 'Task Progress Change Timeout');
 	this.elNeedMem = cm_ElCreateFloatText(this.element, 'right', 'Required Memory');
+	this.elNeed_GPU_Mem = cm_ElCreateFloatText(this.element, 'right', 'Required GPU Memory');
+	this.elNeed_CPU_Freq = cm_ElCreateFloatText(this.element, 'right', 'Required CPU Frequency');
+	this.elNeed_CPU_Cores = cm_ElCreateFloatText(this.element, 'right', 'Required CPU Cores');
+	this.elNeed_CPU_FreqCores = cm_ElCreateFloatText(this.element, 'right', 'Required CPU Frequency * Cores');
 	this.elNeedHDD = cm_ElCreateFloatText(this.element, 'right', 'Required HDD Space');
 	this.elNeedPower = cm_ElCreateFloatText(this.element, 'right', 'Needed Power');
 	this.elNeedProperties = cm_ElCreateFloatText(this.element, 'right', 'Needed Properties');
@@ -524,21 +528,21 @@ JobBlock.prototype.onContextMenu = function(i_e) {
 };
 
 JobBlock.prototype.updatePanels = function() {
-	var elBlocks = this.job.monitor.elPanelR.m_elBlocks;
+	let elBlocks = this.job.monitor.elPanelR.m_elBlocks;
 	elBlocks.m_cur_block = this;
 	elBlocks.classList.add('active');
 
 	elBlocks.m_elName.style.display = 'block';
 	elBlocks.m_elName.textContent = this.params.name;
 
-	for (var p in JobBlock.params)
+	for (let p in JobBlock.params)
 	{
 		if (this.params[p] == null)
 			continue;
 
-		var el = elBlocks.m_elParams[p];
+		let el = elBlocks.m_elParams[p];
 		el.style.display = 'block';
-		el.m_elValue.textContent = this.params[p];
+		el.m_elValue.textContent = cm_ValueToString(this.params[p], JobBlock.params[p].type);
 	}
 
 	this.job.monitor.setPanelInfo(this.params.name);
@@ -954,9 +958,29 @@ JobBlock.prototype.update = function(i_displayFull) {
 				this.elProgressTimeout.textContent = '';
 
 			if (this.params.need_memory)
-				this.elNeedMem.innerHTML = 'Memory><b>' + this.params.need_memory + '</b>';
+				this.elNeedMem.innerHTML = 'Memory><b>' + (this.params.need_memory/1024.0).toFixed(1) + 'Gb</b>';
 			else
 				this.elNeedMem.textContent = '';
+
+			if (this.params.need_gpu_mem_mb)
+				this.elNeed_GPU_Mem.innerHTML = 'GPU Memory><b>' + (this.params.need_gpu_mem_mb/1024.0).toFixed(1) + 'Gb</b>';
+			else
+				this.elNeed_GPU_Mem.textContent = '';
+
+			if (this.params.need_cpu_freq_mgz)
+				this.elNeed_CPU_Freq.innerHTML = 'CPU Frequency><b>' + (this.params.need_cpu_freq_mgz/1000.0).toFixed(1) + 'GHz</b>';
+			else
+				this.elNeed_CPU_Freq.textContent = '';
+
+			if (this.params.need_cpu_cores)
+				this.elNeed_CPU_Cores.innerHTML = 'CPU Cores><b>' + this.params.need_cpu_cores + '</b>';
+			else
+				this.elNeed_CPU_Cores.textContent = '';
+
+			if (this.params.need_cpu_freq_cores)
+				this.elNeed_CPU_FreqCores.innerHTML = 'CPU Frequency*Cores><b>' + (this.params.need_cpu_freq_cores/1000.0).toFixed(1) + 'GHz</b>';
+			else
+				this.elNeed_CPU_FreqCores.textContent = '';
 
 			if (this.params.need_hdd)
 				this.elNeedHDD.innerHTML = 'HDDSpace><b>' + this.params.need_hdd + '</b>';
@@ -1010,10 +1034,36 @@ JobBlock.prototype.update = function(i_displayFull) {
 			else
 				this.elMinRunTime.textContent = '';
 
+			if (this.params.task_progress_change_timeout != null)
+				this.elProgressTimeout.innerHTML =
+					'ProgessTimeout:<b>' + cm_TimeStringFromSeconds(this.params.task_progress_change_timeout) + '</b>';
+			else
+				this.elProgressTimeout.textContent = '';
+
 			if (this.params.need_memory)
-				this.elNeedMem.innerHTML = 'Mem><b>' + this.params.need_memory + '</b>';
+				this.elNeedMem.innerHTML = 'Mem><b>' + (this.params.need_memory/1024.0).toFixed(1) + 'Gb</b>';
 			else
 				this.elNeedMem.textContent = '';
+
+			if (this.params.need_gpu_mem_mb)
+				this.elNeed_GPU_Mem.innerHTML = 'GPU Mem><b>' + (this.params.need_gpu_mem_mb/1024.0).toFixed(1) + 'Gb</b>';
+			else
+				this.elNeed_GPU_Mem.textContent = '';
+
+			if (this.params.need_cpu_freq_mgz)
+				this.elNeed_CPU_Freq.innerHTML = 'CPU Freq><b>' + (this.params.need_cpu_freq_mgz/1000.0).toFixed(1) + 'GHz</b>';
+			else
+				this.elNeed_CPU_Freq.textContent = '';
+
+			if (this.params.need_cpu_cores)
+				this.elNeed_CPU_Cores.innerHTML = 'CPU Cores><b>' + this.params.need_cpu_cores + '</b>';
+			else
+				this.elNeed_CPU_Cores.textContent = '';
+
+			if (this.params.need_cpu_freq_cores)
+				this.elNeed_CPU_FreqCores.innerHTML = 'CPU Freq*Cores><b>' + (this.params.need_cpu_freq_cores/1000.0).toFixed(1) + 'GHz</b>';
+			else
+				this.elNeed_CPU_FreqCores.textContent = '';
 
 			if (this.params.need_hdd)
 				this.elNeedHDD.innerHTML = 'HDD><b>' + this.params.need_hdd + '</b>';
@@ -1066,10 +1116,36 @@ JobBlock.prototype.update = function(i_displayFull) {
 			else
 				this.elMinRunTime.textContent = '';
 
+			if (this.params.task_progress_change_timeout != null)
+				this.elProgressTimeout.innerHTML =
+					'tpt:<b>' + cm_TimeStringFromSeconds(this.params.task_progress_change_timeout) + '</b>';
+			else
+				this.elProgressTimeout.textContent = '';
+
 			if (this.params.need_memory)
-				this.elNeedMem.innerHTML = 'm><b>' + this.params.need_memory + '</b>';
+				this.elNeedMem.innerHTML = 'm><b>' + (this.params.need_memory/1024.0).toFixed(1) + '</b>';
 			else
 				this.elNeedMem.textContent = '';
+
+			if (this.params.need_gpu_mem_mb)
+				this.elNeed_GPU_Mem.innerHTML = 'gm><b>' + (this.params.need_gpu_mem_mb/1024.0).toFixed(1) + 'Gb</b>';
+			else
+				this.elNeed_GPU_Mem.textContent = '';
+
+			if (this.params.need_cpu_freq_mgz)
+				this.elNeed_CPU_Freq.innerHTML = 'cf><b>' + (this.params.need_cpu_freq_mgz/1000.0).toFixed(1) + 'GHz</b>';
+			else
+				this.elNeed_CPU_Freq.textContent = '';
+
+			if (this.params.need_cpu_cores)
+				this.elNeed_CPU_Cores.innerHTML = 'cr><b>' + this.params.need_cpu_cores + '</b>';
+			else
+				this.elNeed_CPU_Cores.textContent = '';
+
+			if (this.params.need_cpu_freq_cores)
+				this.elNeed_CPU_FreqCores.innerHTML = 'cfc><b>' + (this.params.need_cpu_freq_cores/1000.0).toFixed(1) + 'GHz</b>';
+			else
+				this.elNeed_CPU_FreqCores.textContent = '';
 
 			if (this.params.need_hdd)
 				this.elNeedHDD.innerHTML = 'h><b>' + this.params.need_hdd + '</b>';
@@ -1765,6 +1841,12 @@ JobBlock.params = {
 	hosts_mask_exclude /*****/: {"type": 'reg', "label": 'Exclude Hosts Mask'},
 	depend_mask /************/: {"type": 'reg', "label": 'Depend Mask'},
 	tasks_depend_mask /******/: {"type": 'reg', "label": 'Tasks Depend Mask'},
+	need_memory                 :{"type":'mib', "label": 'Needed Free Memory GB'},
+	need_gpu_mem_mb             :{"type":'mib', "label": 'Needed Free GPU Memory GB'},
+	need_cpu_freq_mgz           :{"type":'meg', "label": 'Needed GPU Frequency GHz'},
+	need_cpu_cores              :{"type":'num', "label": 'Needed GPU Cores'},
+	need_cpu_freq_cores         :{"type":'meg', "label": 'Needed GPU Freq*Cores GHz'},
+	need_hdd                    :{"type":'gib', "label": 'Needed Free HDD Space GB'},
 	need_properties /********/: {"type": 'reg', "label": 'Properties Needed'}
 };
 
