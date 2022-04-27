@@ -230,21 +230,26 @@ Network sending traffic in kilobytes per second.
 gpu_string
 ----------
 The official product name of the GPU.
+It will be empty, if GPU is not detected.
+You can check it length for zero to find out GPU exists.
 
 - NVIDIA cards are processed via `nvidia-smi <https://developer.nvidia.com/nvidia-system-management-interface>`_ command line utility.
   So ``nvidia-smi`` must be in ``PATH``.
 
-  - **Linux**: Any NVIDIA driver installation from some repository or official site adds this binary to ``PATH``, you should nothing to get it work.
-  - **Windows**: NVIDIA driver installation shoud add ``nvidia-smi.exe`` to ``C:\Program Files\NVIDIA Corporation\NVSMI`` folder.
+  - **Linux**: Any NVIDIA driver installation from some repository or official site adds this binary to ``PATH``, you should do nothing to get it work.
+  - **Windows**: NVIDIA driver installation should add ``nvidia-smi.exe`` to ``C:\Program Files\NVIDIA Corporation\NVSMI`` folder.
     The folder can differ on some custom installation.
     You should add that folder to ``PATH``. You can do this via system environment settings.
-    Better not to modify the system environment permanently, but to do it by demand via cmd scripting.
-    You can create a ``setup_gpu.cmd`` script in cgru root folder with a following content:
+    Better not to modify the system environment permanently, but to do it by demand via scripting.
+    You can create a ``setup_gpu.cmd`` script in CGRU root folder with a following content:
 
     .. code-block:: bat
 
         set "PATH=C:\Program Files\NVIDIA Corporation\NVSMI;%PATH%"
 
+  - **macOS**: Was not checked. Like on other platforms ``nvidia-smi`` should be in ``PATH``.
+
+*For now only NVIDIA cards are supported.*
 
 gpu_gpu_util
 ------------
@@ -256,7 +261,7 @@ GPU temperature of core GPU.
 
 gpu_mem_total_mb
 ----------------
-GPU total memory.
+GPU total memory. You can check for zero, to find out that GPU was detected.
 
 gpu_mem_used_mb
 ---------------
