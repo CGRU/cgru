@@ -139,13 +139,13 @@ def drawIconResources( i_painter):
     alpha = int(255 * (.3 + .7*factor))
 
     icon_size = i_painter.viewport().width()
-    x_offset = 0.1 * icon_size
+    x_offset = int(0.1 * icon_size)
     heigth = icon_size * mem
     mem_rect = QtCore.QRect(
-        x_offset,
-        icon_size - heigth,
-        icon_size - (2 * x_offset),
-        heigth
+        int(x_offset),
+        int(icon_size - heigth),
+        int(icon_size - (2 * x_offset)),
+        int(heigth)
     )
     mem_color = QtGui.QColor( color_red, color_green, 0, alpha)
     i_painter.setBrush( QtGui.QBrush( mem_color))
@@ -164,13 +164,13 @@ def drawIconState( i_painter):
     paused = state.find('PAU') != -1
 
     icon_size = i_painter.viewport().width()
-    text_font = QtGui.QFont('Arial', icon_size / 3)
+    text_font = QtGui.QFont('Arial', int(icon_size / 3))
     text_font.setBold(True)
     rect_back = QtCore.QRect(
-        icon_size * 3 / 10,
-        icon_size * 3 / 10,
-        icon_size * 2 / 5,
-        icon_size * 2 / 5
+        int(icon_size * 3 / 10),
+        int(icon_size * 3 / 10),
+        int(icon_size * 2 / 5),
+        int(icon_size * 2 / 5)
     )
     text_color = QtGui.QColor(0, 0, 0)
     back_color = QtGui.QColor(150, 150, 150)
@@ -209,10 +209,10 @@ def drawIconState( i_painter):
         back_color = QtGui.QColor(140, 140, 250)
 
     rect_render = QtCore.QRect(
-        icon_size / 4,
-        icon_size / 4,
-        icon_size / 2,
-        icon_size / 2
+        int(icon_size / 4),
+        int(icon_size / 4),
+        int(icon_size / 2),
+        int(icon_size / 2)
     )
     i_painter.fillRect(rect_back, back_color)
     i_painter.setFont(text_font)
