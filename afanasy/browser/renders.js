@@ -193,7 +193,7 @@ RenderNode.prototype.update = function(i_obj) {
 				this.plotterS.setAutoScale(1000, 100000);
 			}
 
-			this.plotterH.setLabel('H ' + (r.hdd_total_gb / 1024.0).toFixed(2));
+			this.plotterH.setLabel('H ' + r.hdd_total_gb);
 			this.plotterH.setTitle('HDD Space: ' + r.hdd_total_gb + ' Gb');
 			this.plotterH.setScale(r.hdd_total_gb, 95 * r.hdd_total_gb / 100, r.hdd_total_gb);
 
