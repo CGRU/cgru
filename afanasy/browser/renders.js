@@ -173,13 +173,16 @@ RenderNode.prototype.update = function(i_obj) {
 
 			this.elResources.style.display = 'block';
 
+			this.plotterC.setLabel('C ' + r.cpu_num + '*' + (r.cpu_mhz / 1000.0).toFixed(1));
 			this.plotterC.setTitle('CPU: ' + r.cpu_mhz + ' MHz x' + r.cpu_num);
 
+			this.plotterM.setLabel('M ' + Math.round(r.mem_total_mb / 1024.0));
 			this.plotterM.setTitle('Memory:\nTotal: ' + r.mem_total_mb + ' Mb');
 			this.plotterM.setScale(r.mem_total_mb, 85 * r.mem_total_mb / 100, r.mem_total_mb);
 
 			if (r.swap_total_mb > 0)
 			{
+				this.plotterS.setLabel('S ' + Math.round(r.swap_total_mb / 1024.0));
 				this.plotterS.setTitle('Swap: ' + r.swap_total_mb + ' Mb');
 				this.plotterS.setScale(r.swap_total_mb, r.swap_total_mb / 10, r.swap_total_mb);
 			}
@@ -190,6 +193,7 @@ RenderNode.prototype.update = function(i_obj) {
 				this.plotterS.setAutoScale(1000, 100000);
 			}
 
+			this.plotterH.setLabel('H ' + (r.hdd_total_gb / 1024.0).toFixed(2));
 			this.plotterH.setTitle('HDD Space: ' + r.hdd_total_gb + ' Gb');
 			this.plotterH.setScale(r.hdd_total_gb, 95 * r.hdd_total_gb / 100, r.hdd_total_gb);
 
