@@ -1294,7 +1294,7 @@ void BlockData::generateInfoStreamTyped(std::ostringstream &o_str, int type, boo
 			if (m_need_cpu_freq_mgz   > -1) o_str << "\n Need CPU Freq MHz = "  << m_need_cpu_freq_mgz;
 			if (m_need_cpu_cores      > -1) o_str << "\n Need CPU Cores = "     << m_need_cpu_cores;
 			if (m_need_cpu_freq_cores > -1) o_str << "\n Need CPU MHz*Cores = " << m_need_cpu_freq_cores;
-			if (m_need_gpu_mem_mb     > -1) o_str << "\n Need GPU Mem Mb = "    << m_need_gpu_mem_mb;
+			if (m_need_gpu_mem_mb     > -1) o_str << "\n Need GPU Mem MB = "    << m_need_gpu_mem_mb;
 
 			if (m_depend_mask.notEmpty()) o_str << "\n Depend Mask = " << m_depend_mask.getPattern();
 			if (m_tasks_depend_mask.notEmpty())

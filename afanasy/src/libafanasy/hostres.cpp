@@ -286,22 +286,22 @@ void HostRes::v_generateInfoStream( std::ostringstream & stream, bool full) cons
             << int( cpu_irq     ) << "% irq, "
             << int( cpu_softirq ) << "% sirq";
         stream << "\n      load average:   " << cpu_loadavg[0]/10.0 << "   " << cpu_loadavg[1]/10.0 << "   " << cpu_loadavg[2]/10.0;
-        stream << "\n   Memory: " << mem_total_mb << " Mb / " << mem_free_mb << " Mb free";
+        stream << "\n   Memory: " << mem_total_mb << " MB / " << mem_free_mb << " MB free";
         if( mem_cached_mb || mem_buffers_mb )
         {
-            stream << " (cache " << mem_cached_mb << " Mb";
-            stream << ", buffers " << mem_buffers_mb << " Mb)";
+            stream << " (cache " << mem_cached_mb << " MB";
+            stream << ", buffers " << mem_buffers_mb << " MB)";
         }
-        stream << "\n   Swap: " << swap_total_mb << " Mb / " << swap_used_mb << " Mb used";
+        stream << "\n   Swap: " << swap_total_mb << " MB / " << swap_used_mb << " MB used";
         stream << "\n   Network: Received " << net_recv_kbsec << " Kb/sec, Send " << net_send_kbsec  << " Kb/sec",
         stream << "\n   IO: Read " << hdd_rd_kbsec << " Kb/sec, Write " << hdd_wr_kbsec << " Kb/sec, Busy = " << int(hdd_busy) << "%";
-        stream << "\n   HDD: " << hdd_total_gb << " Gb / " << hdd_free_gb  << " Gb free";
+        stream << "\n   HDD: " << hdd_total_gb << " GB / " << hdd_free_gb  << " GB free";
 
 		if (gpu_string.size())
 		{
 			stream << "\n   GPU = \"" << gpu_string << "\"";
 			stream << "\n       Utilization: " << int(gpu_gpu_util) << "%, Temperature: " << int(gpu_gpu_temp) << "C";
-			stream << "\n       Memory: " << gpu_mem_total_mb << " Mb / " << gpu_mem_used_mb << " Mb used";
+			stream << "\n       Memory: " << gpu_mem_total_mb << " MB / " << gpu_mem_used_mb << " MB used";
 		}
 
         if( logged_in_users.size())

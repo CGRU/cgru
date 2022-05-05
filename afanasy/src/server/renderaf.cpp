@@ -1043,7 +1043,7 @@ void RenderAf::v_refresh( time_t i_current_time,  AfContainer * pointer, Monitor
 			(m_hres.hdd_busy < m_parent->get_busy_hddio()))
 			hio = 1;
 
-		// Net Mb/s:
+		// Net MB/s:
 		if ((m_parent->get_busy_netmbs() <= 0) ||
 			(m_hres.net_recv_kbsec + m_hres.net_send_kbsec < (1024 * m_parent->get_busy_netmbs())))
 			net = 1;
@@ -1110,7 +1110,7 @@ void RenderAf::v_refresh( time_t i_current_time,  AfContainer * pointer, Monitor
 			(m_hres.hdd_busy > m_parent->get_idle_hddio()))
 			hio = 1;
 
-		// Net Mb/s:
+		// Net MB/s:
 		if ((m_parent->get_idle_netmbs() > 0) &&
 			(m_hres.net_recv_kbsec + m_hres.net_send_kbsec > (1024 * m_parent->get_idle_netmbs())))
 			net = 1;
