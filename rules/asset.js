@@ -283,10 +283,10 @@ function a_ShowHeaders()
 function a_Copy(i_args)
 {
 	// console.log(JSON.stringify(i_args));
-	var wnd = new cgru_Window({"name": 'copy', "title": 'Copy Asset'});
+	let wnd = new cgru_Window({"name": 'copy', "title": 'Copy Asset'});
 	wnd.m_args = i_args;
 
-	var params = {};
+	let params = {};
 	params.template = c_PathPM_Server2Client(i_args.template);
 
 	params.name = i_args.name;
@@ -320,19 +320,19 @@ function a_Copy(i_args)
 
 	gui_Create(wnd.elContent, a_copy_params, [params]);
 
-	var elBtns = document.createElement('div');
+	let elBtns = document.createElement('div');
 	wnd.elContent.appendChild(elBtns);
 	elBtns.style.clear = 'both';
 	elBtns.classList.add('buttons');
 
-	var elCreate = document.createElement('div');
+	let elCreate = document.createElement('div');
 	elBtns.appendChild(elCreate);
 	elCreate.textContent = 'Create';
 	elCreate.classList.add('button');
 	elCreate.m_wnd = wnd;
-	elCreate.onclick = function(e) { a_CopySend(e.currentTarget.m_wnd); };
+	elCreate.onclick = function(e) {a_CopySend(e.currentTarget.m_wnd); };
 
-	var elResults = document.createElement('div');
+	let elResults = document.createElement('div');
 	wnd.elContent.appendChild(elResults);
 	wnd.m_elResults = elResults;
 	elResults.classList.add('output');
@@ -340,15 +340,15 @@ function a_Copy(i_args)
 
 function a_CopySend(i_wnd)
 {
-	var params = gui_GetParams(i_wnd.elContent, a_copy_params);
+	let params = gui_GetParams(i_wnd.elContent, a_copy_params);
 	// console.log(JSON.stringify(params));
 
-	var elWait = document.createElement('div');
+	let elWait = document.createElement('div');
 	i_wnd.elContent.appendChild(elWait);
 	i_wnd.m_elWait = elWait;
 	elWait.classList.add('wait');
 
-	var cmd = 'rules/bin/copy_template.py';
+	let cmd = 'rules/bin/copy_template.py';
 	cmd += ' -t "' + c_PathPM_Client2Server(params.template) + '"';
 	cmd += ' -d "' + c_PathPM_Rules2Server(params.destination) + '"';
 	cmd += ' ' + params.name;
@@ -365,23 +365,29 @@ function a_CopyReceived(i_data, i_args)
 {
 	// console.log(JSON.stringify(i_data));
 	i_args.wnd.elContent.removeChild(i_args.wnd.m_elWait);
-	var elResults = i_args.wnd.m_elResults;
+	let elResults = i_args.wnd.m_elResults;
 	elResults.textContent = '';
 
-	if ((i_data.cmdexec == null) || (!i_data.cmdexec.length) || (i_data.cmdexec[0].copy == null))
+	if ((i_data.cmdexec == null) || (!i_data.cmdexec.length))
 	{
 		elResults.textContent = (JSON.stringify(i_data));
 		return;
 	}
 
-	var copy = i_data.cmdexec[0].copy;
+	if (i_data.cmdexec[0].error)
+	{
+		elResults.innerHTML = '<b>ERROR:</b><br>' + i_data.cmdexec[0].error.replace(/\n/g,'<br>');
+		return;
+	}
+
+	let copy = i_data.cmdexec[0].copy;
 	if (copy.error)
 	{
 		elResults.textContent = 'Error: ' + copy.error;
 		return;
 	}
 
-	var copies = copy.copies;
+	let copies = copy.copies;
 	if (copies == null)
 	{
 		elResults.textContent = 'Error: Copies are null.';

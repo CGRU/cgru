@@ -73,16 +73,16 @@ function shot_InitHTML( i_data)
 		var el = document.createElement('div');
 		$('asset_top_left').appendChild(el);
 		el.classList.add('button');
-		el.textContent = 'NEW';
+		el.textContent = 'NEW SHOT';
 		el.title = 'Create new shot.';
-		el.onclick = shot_Copy;
+		el.onclick = shot_Create;
 	}
 	if( g_admin )
 	{
 		var el = document.createElement('div');
 		$('asset_top_left').appendChild(el);
 		el.classList.add('button');
-		el.textContent = 'RENAME';
+		el.textContent = 'RENAME SHOT';
 		el.title = 'Rename new shot.';
 		el.onclick = shot_Rename;
 	}
@@ -513,12 +513,12 @@ function shot_SourceWalkFind( i_walk, o_walk, i_path, i_parent_walk)
 	}
 }
 
-function shot_Copy()
+function shot_Create()
 {
-	var args = {};
+	let args = {};
 	args.template = RULES.assets.shot.template;
-	args.destination = c_PathDir( g_CurPath());
-	a_Copy( args);
+	args.destination = c_PathDir(g_CurPath());
+	a_Copy(args);
 }
 
 shot_rename_params = {};
