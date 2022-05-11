@@ -5,6 +5,7 @@ import json
 import os
 import shutil
 import sys
+import traceback
 
 from optparse import OptionParser
 
@@ -47,10 +48,15 @@ for name in Args:
 
     dest = os.path.join(Options.dest, name)
     copy['dest'] = dest
-    if not os.path.isdir(dest):
-        shutil.copytree(Options.template, dest)
-    else:
+    if os.path.isdir(dest):
         copy['exist'] = True
+    else:
+        try:
+            shutil.copytree(Options.template, dest)
+        except PermissionError:
+            copy['error'] = 'Permission denied: %s' % dest
+        except:
+            copy['error'] = '%s' % traceback.format_exc()
 
     Out['copies'].append(copy)
 

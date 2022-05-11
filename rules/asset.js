@@ -399,6 +399,20 @@ function a_CopyReceived(i_data, i_args)
 		return;
 	}
 
+	for (let item of copies)
+	{
+		if (item.error)
+		{
+			elResults.innerHTML = '<b>ERROR:</b><br>' + item.error.replace(/\n/g,'<br>');
+			return;
+		}
+		if (item.exist)
+		{
+			elResults.innerHTML = 'Asset already exists: ' + item.dest;
+			return;
+		}
+	}
+
 	i_args.wnd.destroy();
 	g_GO(i_args.wnd.m_go_path);
 }
