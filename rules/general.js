@@ -259,8 +259,9 @@ function g_NavigatePost()
 
 	if (g_nav_clicked == false)
 	{
-		g_elCurFolder.scrollIntoView();
+		g_elCurFolder.scrollIntoView({behavior:'auto',block:'center',inline:'center'});
 	}
+
 	g_nav_clicked = false;
 
 	nw_NavigatePost();

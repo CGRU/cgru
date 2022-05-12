@@ -18,6 +18,8 @@
 
 var bm_initialized = false;
 
+var bm_clicked = false;
+
 var bm_projects = [];
 var bm_elements = [];
 
@@ -350,6 +352,7 @@ function bm_CreateBookmark(i_bm)
 	elPath.classList.add('name');
 	elPath.textContent = name;
 	elPath.href = '#' + i_bm.path;
+	elPath.onclick = function(e){bm_clicked = true};
 
 	// Display status:
 	st_SetElStatus(el, i_bm.status, /*show all tasks = */ false);
@@ -432,6 +435,8 @@ function bm_NavigatePost()
 		return;
 
 	bm_HighlightCurrent();
+
+	bm_clicked = false;
 }
 
 function bm_ActualStatus(i_status)
@@ -491,6 +496,12 @@ function bm_HighlightCurrent()
 		if (bm_elements[i].m_bookmark.path == g_CurPath())
 		{
 			bm_elements[i].classList.add('cur_path');
+
+			if (bm_clicked == false)
+			{
+				bm_elements[i].scrollIntoView({behavior:'auto',block:'center',inline:'center'});
+			}
+
 			if (g_CurPathDummy() || (false == bm_ActualStatus(RULES.status)))
 			{
 				bm_elements[i].classList.add('obsolete');
