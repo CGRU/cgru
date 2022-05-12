@@ -516,8 +516,25 @@ function shot_SourceWalkFind( i_walk, o_walk, i_path, i_parent_walk)
 function shot_Create()
 {
 	let args = {};
+	args.title = 'Create New Shot';
 	args.template = RULES.assets.shot.template;
 	args.destination = c_PathDir(g_CurPath());
+
+	// Try to increment latest number in name by 10:
+	// Find all numbers
+	let numbers = ASSET.name.match(/\d+/g);
+	if ((numbers != null) && numbers.length)
+	{
+		let number = numbers[numbers.length-1];
+		let numplus = '' + (parseInt(number) + 10);
+		// Apply padding
+		while (numplus.length < number.length)
+			numplus = '0' + numplus;
+		// Lenght may be bigger on 'SHOT_990'
+		if (numplus.length == number.length)
+			args.name = ASSET.name.replace(number, numplus);
+	}
+
 	a_Copy(args);
 }
 

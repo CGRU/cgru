@@ -11,6 +11,27 @@ function prj_Init()
 function prj_InitHTML( i_data)
 {
 	$('asset').innerHTML = i_data;
+
+	// Show top buttons:
+	if (c_CanCreateProject())
+	{
+		let el = document.createElement('div');
+		$('asset_top_left').appendChild(el);
+		el.classList.add('button');
+		el.textContent = 'CREATE NEW PROJECT';
+		el.title = 'Create new scene.';
+		el.onclick = prj_Create_Project;
+	}
+}
+
+function prj_Create_Project()
+{
+	let args = {};
+	args.title = 'Create New Project';
+	args.template = RULES.assets.project.template;
+	args.destination = c_PathDir(g_CurPath());
+	args.name = 'PROJECT_NAME';
+	a_Copy(args);
 }
 
 prj_deploy_shots_params = {};

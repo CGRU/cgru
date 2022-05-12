@@ -95,6 +95,7 @@
 		"upload_dir":"_UPLOADS/@DATE@_@USER@",
 		"play_folders":false,
 		"scripts":["project.js"],
+		"template":"rules/assets/templates/project",
 		"show_files":true
 	},
 	"scenes":{
@@ -118,6 +119,7 @@
 			}
 		},
 		"filter":"sc_FilterShots",
+		"template":"rules/assets/templates/scene",
 		"scripts":["scenes.js"]
 	},
 	"shot":{
@@ -170,7 +172,7 @@
 				"render":"RESULT/RENDER"
 			}
 		},
-		"template":"rules/assets/shot",
+		"template":"rules/assets/templates/shot",
 
 		"shot_process":[
 			{

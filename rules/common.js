@@ -548,6 +548,13 @@ function c_CanCreateShot(i_user)
 	return false;
 }
 
+function c_CanCreateProject(i_user)
+{
+	if (g_admin)
+		return true;
+	return false;
+}
+
 function c_HasFileSystem()
 {
 	return localStorage.has_filesystem == 'ON';

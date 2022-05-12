@@ -39,6 +39,27 @@ function sc_InitHTML( i_data)
 {
 	$('asset').innerHTML = i_data;
 
+	// Show top buttons:
+	if (c_CanCreateShot())
+	{
+		let el = document.createElement('div');
+		$('asset_top_left').appendChild(el);
+		el.classList.add('button');
+		el.textContent = 'NEW SCENE';
+		el.title = 'Create new scene.';
+		el.onclick = sc_Create_Scene;
+
+		if (sc_scenes == false)
+		{
+			el = document.createElement('div');
+			$('asset_top_left').appendChild(el);
+			el.classList.add('button');
+			el.textContent = 'NEW SHOT';
+			el.title = 'Create new shot.';
+			el.onclick = sc_Create_Shot;
+		}
+	}
+
 	gui_Create( $('scenes_make_thumbnails'), sc_thumb_params);
 	gui_CreateChoices({"wnd":$('scenes_make_thumbnails'),"name":'colorspace',"value":RULES.thumbnail.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
 
@@ -60,6 +81,50 @@ function sc_InitHTML( i_data)
 			scene_Show();
 		}
 	}
+}
+
+function sc_Create_Shot()
+{
+	let args = {};
+	args.title = 'Create New Shot';
+	args.template = RULES.assets.shot.template;
+	args.destination = g_CurPath();
+	args.name = ASSET.name + '_SHOT_0010';
+	a_Copy(args);
+}
+
+function sc_Create_Scene()
+{
+	let args = {};
+	args.title = 'Create New Scene';
+	args.template = RULES.assets.scene.template;
+	args.destination = g_CurPath();
+
+	if (sc_scenes)
+	{
+		args.name = 'SCENE_01';
+	}
+	else
+	{
+		args.destination = c_PathDir(args.destination);
+
+		// Try to increment latest number in name:
+		// Find all numbers
+		let numbers = ASSET.name.match(/\d+/g);
+		if ((numbers != null) && numbers.length)
+		{
+			let number = numbers[numbers.length-1];
+			let numplus = '' + (parseInt(number) + 1);
+			// Apply padding
+			while (numplus.length < number.length)
+				numplus = '0' + numplus;
+			// Lenght may be bigger on 'SHOT_990'
+			if (numplus.length == number.length)
+				args.name = ASSET.name.replace(number, numplus);
+		}
+	}
+
+	a_Copy(args);
 }
 
 function sc_Show_Loaded()
