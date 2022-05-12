@@ -10,20 +10,20 @@ sc_thumb_params.skip_movies = {"width":'30%',"lwidth":'150px','type':"bool",'def
 
 sc_thumb_params_values = {};
 
-sc_scenes = false;
+sc_area = false;
 
-if( ASSETS.scene && ( ASSETS.scene.path == g_CurPath()))
+if (ASSETS.scene && (ASSETS.scene.path == g_CurPath()))
 {
 	a_SetLabel('Scene');
-	sc_scenes = false;
+	sc_area = false;
 
 	sc_Init();
 }
 
-if( ASSETS.scenes && ( ASSETS.scenes.path == g_CurPath()))
+if (ASSETS.area && (ASSETS.area.path == g_CurPath()))
 {
-	a_SetLabel('Scenes');
-	sc_scenes = true;
+	a_SetLabel('Area');
+	sc_area = true;
 
 	sc_Init();
 }
@@ -49,7 +49,7 @@ function sc_InitHTML( i_data)
 		el.title = 'Create new scene.';
 		el.onclick = sc_Create_Scene;
 
-		if (sc_scenes == false)
+		if (sc_area == false)
 		{
 			el = document.createElement('div');
 			$('asset_top_left').appendChild(el);
@@ -63,7 +63,7 @@ function sc_InitHTML( i_data)
 	gui_Create( $('scenes_make_thumbnails'), sc_thumb_params);
 	gui_CreateChoices({"wnd":$('scenes_make_thumbnails'),"name":'colorspace',"value":RULES.thumbnail.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
 
-	if( sc_scenes )
+	if (sc_area)
 	{
 		$('scenes_load_btn').textContent = 'Load All Shots';
 		$('scenes_load_btn').onclick = function()
@@ -74,7 +74,7 @@ function sc_InitHTML( i_data)
 	}
 	else
 	{
-		$('scenes_load_btn').textContent = 'Load Scene Shots';
+		$('scenes_load_btn').textContent = 'Show Scene Shots';
 		$('scenes_load_btn').onclick = function()
 		{
 			sc_Show_Loaded();
@@ -100,7 +100,7 @@ function sc_Create_Scene()
 	args.template = RULES.assets.scene.template;
 	args.destination = g_CurPath();
 
-	if (sc_scenes)
+	if (sc_area)
 	{
 		args.name = 'SCENE_01';
 	}
@@ -331,7 +331,7 @@ function sc_BodyReceived( i_data, i_args)
 
 function scenes_Show()
 {
-	n_WalkDir({"paths":[ASSET.path],"wfunc":scenes_Received,"info":'walk scenes',"depth":1,"rufiles":['rules','status'],"lookahead":['status'],"local":true});
+	n_WalkDir({"paths":[ASSET.path],"wfunc":scenes_Received,"info":'walk area',"depth":1,"rufiles":['rules','status'],"lookahead":['status'],"local":true});
 	$('asset').classList.add('waiting');
 	scenes_elWaiting = document.createElement('div');
 	scenes_elWaiting.innerHTML = '<h3 style="text-align:center">Loading all project shots...</h3>';
@@ -1131,7 +1131,7 @@ function sc_DisplayStatistics()
 
 	info += '<br>Frames count: ' + frames_count + ' = ' + c_DT_DurFromSec( frames_count / RULES.fps) + ' at ' + RULES.fps + ' FPS';
 
-	if( ASSET.type == 'scenes')
+	if (ASSET.type == 'area')
 	{
 		var scenes_count = 0;
 		for( var i = 0; i < sc_elScenes.length; i++)
