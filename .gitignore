@@ -45,8 +45,8 @@ Deploy
 *.swn
 *.swo
 *.swp
-tmp*
-temp*
+tmp
+temp
 *~
 
 # Archives
