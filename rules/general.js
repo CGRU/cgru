@@ -264,8 +264,10 @@ function g_NavigatePost()
 
 	g_nav_clicked = false;
 
-	nw_NavigatePost();
+	// Do bookmarks Post first.
+	// As we should scroll to current bookmark if clicked not news and not bookmark item
 	bm_NavigatePost();
+	nw_NavigatePost();
 	p_NavigatePost();
 
 	$('navigate_up').href = '#' + c_PathDir(g_CurPath());

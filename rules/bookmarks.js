@@ -497,7 +497,7 @@ function bm_HighlightCurrent()
 		{
 			bm_elements[i].classList.add('cur_path');
 
-			if (bm_clicked == false)
+			if ((bm_clicked == false) && (nw_clicked == false))
 			{
 				bm_elements[i].scrollIntoView({behavior:'auto',block:'center',inline:'center'});
 			}

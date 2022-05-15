@@ -22,6 +22,7 @@ var nw_recents = {};
 var nw_filter_project = null;
 var nw_disabled = false;
 var nw_ignore_own = false;
+var nw_clicked = false;
 
 function nw_Init()
 {
@@ -652,6 +653,7 @@ function nw_NewsShow(i_update_folders)
 		else
 			elLink.href = '#' + news.path;
 		elLink.textContent = news.path;
+		elLink.onclick = function(e){nw_clicked = true;};
 
 		// Display news status:
 		st_SetElStatus(el, news.status, c_IsUserSubsribedOnPath(news.path));
@@ -726,6 +728,8 @@ function nw_NavigatePost()
 {
 	nw_Process();
 	nw_HighlightCurrent();
+
+	nw_clicked = false;
 }
 
 function nw_HighlightCurrent()
