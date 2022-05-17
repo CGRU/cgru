@@ -231,7 +231,7 @@ bool ListNodes::updateItems(af::Msg * msg, Item::EType i_type)
 	// adding new items
 	bool newitemscreated = false;
 	// We need to add new items sorted by name for hierarchy:
-	qSort(newAfNodes.begin(), newAfNodes.end(), compareNodeName);
+	std::sort(newAfNodes.begin(), newAfNodes.end(), compareNodeName);
 	for (int i = 0; i < newAfNodes.size(); i++)
 	{
 		af::Node * node = newAfNodes[i];

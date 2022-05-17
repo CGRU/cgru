@@ -36,7 +36,7 @@ QVariant ModelItems::data( const QModelIndex &index, int role) const
    switch( role)
    {
    case Qt::DisplayRole:
-      return qVariantFromValue( items[index.row()]);
+      return QVariant::fromValue(items[index.row()]);
    case Qt::ToolTipRole:
 		return items[index.row()]->v_getToolTip();
    default:

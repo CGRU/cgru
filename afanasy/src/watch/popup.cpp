@@ -8,6 +8,7 @@
 #include <QDesktopWidget>
 #include <QLabel>
 #include <QLayout>
+#include <QScreen>
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -58,7 +59,8 @@ Popup::Popup( const QString & i_title, const QString & i_msg, uint32_t i_state):
 		Qt::RightToLeft,
 		Qt::AlignTop,
 		size(),
-		qApp->desktop()->availableGeometry())
+		qApp->screens()[0]->availableGeometry())
+		//qApp->desktop()->availableGeometry()) // <- Deprecated
 	);
 
 	ms_popup = this;

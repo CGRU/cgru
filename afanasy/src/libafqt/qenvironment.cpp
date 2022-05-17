@@ -725,13 +725,13 @@ void QEnvironment::clearCollapsedJobSerials()
 
 void QEnvironment::saveCollapsedJobsSerials(QByteArray & o_data)
 {
-	o_data.append(QString("    \"jobs_collapsed_new\":%1").arg(ms_jobs_collapse_new ? "true":"false"));
+	o_data.append(QString("    \"jobs_collapsed_new\":%1").arg(ms_jobs_collapse_new ? "true":"false").toUtf8());
 
 	o_data.append(",\n    \"jobs_serials_collapsed\":[");
 	for (int i = 0; i < ms_jobs_serials_collapsed.size(); i++)
 	{
 		if (i) o_data.append(",");
-		o_data.append(QString("\n        %1").arg(ms_jobs_serials_collapsed.at(i)));
+		o_data.append(QString("\n        %1").arg(ms_jobs_serials_collapsed.at(i)).toUtf8());
 	}
 	o_data.append("\n    ]");
 }

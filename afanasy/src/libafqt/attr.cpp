@@ -37,12 +37,13 @@ bool Attr::v_read( const JSON & i_obj)
 	return true;
 }
 
-void Attr::v_write( QByteArray & o_data)
+void Attr::v_write(QByteArray & o_data)
 {  
-	o_data.append( QString("    \"%1\"").arg( name));
-	for( int i = 0; i < 24 - name.size(); i++) o_data.append(' ');
+	o_data.append(QString("    \"%1\"").arg( name).toUtf8());
+	for (int i = 0; i < 24 - name.size(); i++)
+		o_data.append(' ');
 	o_data.append(": ");
-	o_data.append( v_writeData());
+	o_data.append(v_writeData().toUtf8());
 }
 
 /// Number ///

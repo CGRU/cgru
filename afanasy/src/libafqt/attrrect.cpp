@@ -53,6 +53,6 @@ AttrRect * AttrRect::readObj( const JSON & i_obj)
 
 void AttrRect::v_write( QByteArray & o_data)
 {
-	o_data.append( QString("{\"name\":\"%1\",\"coords\":[%2,%3,%4,%5]}")
-		.arg( getName()).arg( r.x()).arg( r.y()).arg( r.width()).arg( r.height()));
+	o_data.append(QString("{\"name\":\"%1\",\"coords\":[%2,%3,%4,%5]}")
+		.arg( getName()).arg( r.x()).arg( r.y()).arg( r.width()).arg( r.height()).toUtf8());
 }

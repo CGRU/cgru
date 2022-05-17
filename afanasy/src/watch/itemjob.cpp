@@ -614,18 +614,18 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 	QFontMetrics fm(afqt::QEnvironment::f_name);
 	QString id_str = QString("#%1").arg(getId());
 	i_painter->drawText(x+offset, y, w-10-offset-rect_top_right.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, id_str);
-	offset += fm.width(id_str) + 10;
+	offset += fm.boundingRect(id_str).width() + 10;
 	
 	if (project.size())
 	{
 		i_painter->setPen(afqt::QEnvironment::clr_textbright.c);
 		i_painter->setFont(afqt::QEnvironment::f_name);
 		i_painter->drawText(x+offset, y, w-10-offset-rect_top_right.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, project);
-		offset += fm.width(project);
+		offset += fm.boundingRect(project).width();
 		if (department.size())
 		{
 			i_painter->drawText(x+offset, y, w-10-offset-rect_top_right.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, "(" + department + ")");
-			offset += fm.width(department);
+			offset += fm.boundingRect(department).width();
 		}
 		offset += 25;
 	}

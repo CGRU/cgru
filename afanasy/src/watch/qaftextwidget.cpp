@@ -127,7 +127,7 @@ void QAfTextWidget::findNext() { findSearch( true); }
 void QAfTextWidget::findPrevious() { findSearch( false); }
 void QAfTextWidget::findSearch( bool i_next)
 {
-	QTextDocument::FindFlags flags = 0;
+	QTextDocument::FindFlags flags;
 	if( false == i_next )
 	{
 		flags |= QTextDocument::FindBackward;
