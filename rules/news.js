@@ -656,7 +656,7 @@ function nw_NewsShow(i_update_folders)
 		elLink.onclick = function(e){nw_clicked = true;};
 
 		// Display news status:
-		st_SetElStatus(el, news.status, c_IsUserSubsribedOnPath(news.path));
+		st_SetElStatus(el, news.status, c_IsUserSubsribedOnPath(news.path), /*show all tasks = */ false);
 
 		let prj = news.path.split('/')[1];
 		if (projects.indexOf(prj) == -1)

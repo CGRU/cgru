@@ -1343,6 +1343,11 @@ background-size: 100%;
 background-repeat: no-repeat;
 background-position: center;
 }
+.artpage_bm {
+float: left;
+padding: 4px;
+margin: 4px;
+}
 
 
 /* ================ LOADING: ==================== */

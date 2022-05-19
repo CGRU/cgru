@@ -210,8 +210,36 @@ function ArtPage(i_el, i_user)
 
 	for (let bm of this.user.bookmarks)
 	{
-		let el = document.createElement('div');
-		this.elBmrks.appendChild(el);
-		el.textContent = bm.path;
+		let apbm = new ArtPageBM(this.elBmrks, bm, this.user);
 	}
 }
+
+function ArtPageBM(i_el, i_bm, i_user)
+{
+	this.elParent = i_el;
+	this.bm = i_bm;
+	this.user = i_user;
+
+	if (null == this.bm.path)
+	{
+		this.bm.path = 'undefined';
+		this.bm.invalid = true;
+		console.log(JSON.stringify(this.bm));
+	}
+
+	this.name = this.bm.path.split('/');
+	this.name = this.name[this.name.length-1];
+
+	this.elRoot = document.createElement('div');
+	this.elParent.appendChild(this.elRoot);
+	this.elRoot.classList.add('artpage_bm');
+
+	this.elPath = document.createElement('a');
+	this.elRoot.appendChild(this.elPath);
+	this.elPath.classList.add('name');
+	this.elPath.textContent = this.name;
+	this.elPath.href = '#' + this.bm.path;
+
+	st_SetElStatus(this.elRoot, this.bm.status, /*show all tasks = */ false, this.user);
+}
+

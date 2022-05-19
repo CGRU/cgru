@@ -703,10 +703,13 @@ function st_SetElColorTextFromBack(i_clr, i_el)
 		i_el.style.color = '#FFF';
 }
 
-function st_SetElStatus(i_el, i_status, i_show_all_tasks = false)
+function st_SetElStatus(i_el, i_status, i_show_all_tasks, i_user = null)
 {
 	if (null == i_el)
 		return;
+
+	if (null == i_user)
+		i_user = g_auth_user;
 
 	let elStatus = document.createElement('div');
 	i_el.appendChild(elStatus);
@@ -739,7 +742,7 @@ function st_SetElStatus(i_el, i_status, i_show_all_tasks = false)
 			if (task.deleted)
 				continue;
 
-			if (task.artists && (task.artists.indexOf(g_auth_user.id) == -1))
+			if (task.artists && (task.artists.indexOf(i_user.id) == -1))
 				continue;
 
 			tasks[task.name] = task;
