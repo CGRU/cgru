@@ -9,6 +9,7 @@
 <script type="text/javascript" src="lib/js/md5.js"></script>
 <script type="text/javascript" src="rules/activity.js"></script>
 <script type="text/javascript" src="rules/admin.js"></script>
+<script type="text/javascript" src="rules/artbook.js"></script>
 <script type="text/javascript" src="rules/asset.js"></script>
 <script type="text/javascript" src="rules/bookmarks.js"></script>
 <script type="text/javascript" src="rules/comments.js"></script>
@@ -606,8 +607,10 @@ Link with hidden folder will not works.">
 			<div style="text-align:center; padding: 10px 0 0 0;">
 				<a id="afanasy_webgui" target="_blank" onclick="u_OpenCloseHeader()">
 					AFANASY</a></div>
-			<!--div style="text-align:center; padding: 10px 0 0 0;">
-				<a href="afanasy/webvisor/" target="_blank">Database Statistics</a></div-->
+			<div class="button" id="artbook_button"
+				_style="display:none; background: rgba(200,0,0,.2)"
+				title="All artists bookmarks."
+				onclick="ab_OpenWindow(true)">artbook</div>
 		</div>
 	</div>
 	<div id="headeropenbtn" class="headeropenbtn button" onclick="u_OpenCloseHeader()"
@@ -623,7 +626,7 @@ Link with hidden folder will not works.">
 			<a class="button" id="navigate_next" title="Navigate to the next folder (shot)"
 				style="background-image:url(rules/icons/next.png);"></a>
 		</div>
-		<div id="panel_logo"></div>
+		<div id="panel_logo" ondblclick="ab_OpenWindow()"></div>
 		<div id="profile_settings" title="Edit Profile Settings" onclick="ad_ProfileOpen()">
 			<img id="profile_settings_avatar"></img>
 			<div id="profile_settings_name">Guest</div>

@@ -1327,6 +1327,24 @@ background-position: center;
 .imgconvert > div .label { float: left; width: 100px; }
 .imgconvert > div .info { float: right; width: 150px; }
 
+
+.artbook {}
+.artpage {
+padding: 8px;
+}
+.artpage .info {
+float: left;
+width: 128px;
+}
+.artpage .avatar {
+width: 96px;
+height: 96px;
+background-size: 100%;
+background-repeat: no-repeat;
+background-position: center;
+}
+
+
 /* ================ LOADING: ==================== */
 #navig_loading, .loading {
 position: absolute;
