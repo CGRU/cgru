@@ -173,31 +173,15 @@ function bm_Compare(a, b)
 	return 0;
 }
 
-function bm_Show()
+function bm_CollectProjects(i_bookmarks)
 {
-	if (false == bm_initialized)
-		return;
+	i_bookmarks.sort(bm_Compare);
 
-	// console.log(JSON.stringify(g_auth_user.bookmarks));
-	$('bookmarks').innerHTML = '';
-	$('bookmarks_label').textContent = 'Bookmarks';
-	bm_projects = [];
-	bm_elements = [];
-
-	if ((g_auth_user.bookmarks == null) || (g_auth_user.bookmarks.length == 0))
-		return;
-
-	$('bookmarks_label').textContent = 'Bookmarks - ' + g_auth_user.bookmarks.length;
-
-	g_auth_user.bookmarks.sort(bm_Compare);
-
-	// Collect projects and scenes:
+	let collection = [];
 	let project = null;
 	let scene = null;
-	for (let i = 0; i < g_auth_user.bookmarks.length; i++)
+	for (let bm of i_bookmarks)
 	{
-		let bm = g_auth_user.bookmarks[i];
-
 		if (bm == null)
 			continue;
 
@@ -213,7 +197,7 @@ function bm_Show()
 			project.scenes = [];
 			scene = null;
 
-			bm_projects.push(project);
+			collection.push(project);
 		}
 
 		let scene_path = null;
@@ -235,6 +219,28 @@ function bm_Show()
 
 		scene.bms.push(bm);
 	}
+
+	return collection;
+}
+
+function bm_Show()
+{
+	if (false == bm_initialized)
+		return;
+
+	// console.log(JSON.stringify(g_auth_user.bookmarks));
+	$('bookmarks').innerHTML = '';
+	$('bookmarks_label').textContent = 'Bookmarks';
+	bm_projects = [];
+	bm_elements = [];
+
+	if ((g_auth_user.bookmarks == null) || (g_auth_user.bookmarks.length == 0))
+		return;
+
+	$('bookmarks_label').textContent = 'Bookmarks - ' + g_auth_user.bookmarks.length;
+
+	// Collect projects and scenes:
+	bm_projects = bm_CollectProjects(g_auth_user.bookmarks);
 
 	// Construct elements:
 	let closed_projects = localStorage.bookmarks_projects_closed.split('|');

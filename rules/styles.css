@@ -1347,6 +1347,9 @@ background-position: center;
 float: left;
 padding: 4px;
 margin: 4px;
+height: 56px;
+border: 2px solid rgba(98,98,98,.5);
+border-radius: 2px;
 }
 
 

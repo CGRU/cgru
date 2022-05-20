@@ -17,6 +17,9 @@
 "use strict";
 
 var ab_wnd = null;
+
+var ab_filter_artists = [];
+
 var ab_wnd_sort_prop = 'bookmarks';
 var ab_wnd_sort_dir = 1;
 
@@ -48,6 +51,12 @@ function ab_OpenWindow(i_close_header)
 	el.ondblclick = ab_WndRefresh;
 	el.style.cssFloat = 'right';
 
+	ab_wnd.editAritsts = new EditList({
+		"name"    : 'artists',
+		"label"   : 'Artists:',
+		"list"    : [],
+		"list_all": g_users,
+		"elParent": elBtnsDiv});
 
 	ab_wnd.elInfo = document.createElement('div');
 	ab_wnd.elContent.appendChild(ab_wnd.elInfo);
@@ -101,6 +110,12 @@ function ab_WndSortArtists(i_prop)
 	else
 		ab_wnd_sort_prop = i_prop;
 	ab_WndDrawArtists();
+}
+
+function ab_WndFilter()
+{
+	if (ab_filter_artists.length && (ab_filter_artists.indexOf(this.user.id) != -1))
+		this.elRoot.style.display = 'none';
 }
 
 function ab_WndDrawArtists()
@@ -173,8 +188,8 @@ function ArtPage(i_el, i_user)
 	this.elParent = i_el;
 
 	this.elRoot = document.createElement('div');
-	this.elRoot.classList.add('artpage');
 	this.elParent.appendChild(this.elRoot);
+	this.elRoot.classList.add('artpage');
 
 	// Info:
 	this.elInfo = document.createElement('div');
@@ -208,9 +223,48 @@ function ArtPage(i_el, i_user)
 	if (null == this.user.bookmarks)
 		return;
 
+	// Check validness:
 	for (let bm of this.user.bookmarks)
 	{
-		let apbm = new ArtPageBM(this.elBmrks, bm, this.user);
+		if (null == bm.path)
+		{
+			bm.path = 'undefined';
+			bm.invalid = true;
+			console.log(JSON.stringify(bm));
+		}
+	}
+
+	// Show bookmarks per project:
+	let projects = bm_CollectProjects(this.user.bookmarks)
+	for (let project of projects)
+	{
+		let prj = new ArtPagePrj(this.elBmrks, project, this.user)
+	}
+}
+
+function ArtPagePrj(i_el, i_project, i_user)
+{
+	this.elParent = i_el;
+	this.project = i_project;
+	this.user = i_user;
+
+	this.elRoot = document.createElement('div');
+	this.elParent.appendChild(this.elRoot);
+
+	this.elTitle = document.createElement('div');
+	this.elRoot.appendChild(this.elTitle);
+	this.elTitle.textContent = this.project.name;
+
+	this.elBmrks = document.createElement('div');
+	this.elRoot.appendChild(this.elBmrks);
+	this.elBmrks.classList.add('ap_bmrks_div');
+
+	for (let scene of this.project.scenes)
+	{
+		for (let bm of scene.bms)
+		{
+			let apbm = new ArtPageBM(this.elBmrks, bm, this.user);
+		}
 	}
 }
 
@@ -219,13 +273,6 @@ function ArtPageBM(i_el, i_bm, i_user)
 	this.elParent = i_el;
 	this.bm = i_bm;
 	this.user = i_user;
-
-	if (null == this.bm.path)
-	{
-		this.bm.path = 'undefined';
-		this.bm.invalid = true;
-		console.log(JSON.stringify(this.bm));
-	}
 
 	this.name = this.bm.path.split('/');
 	this.name = this.name[this.name.length-1];
