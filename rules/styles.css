@@ -1329,6 +1329,10 @@ background-position: center;
 
 
 .artbook {}
+.ab_projects_div {}
+.ab_projects_div > div {
+float: left;
+}
 .artpage {
 padding: 8px;
 }

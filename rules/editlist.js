@@ -23,6 +23,7 @@ function EditList(i_args)
 	this.list     = i_args.list;
 	this.list_all = i_args.list_all;
 	this.elParent = i_args.elParent;
+	this.onChange = i_args.onChange;
 
 	// List should be an objects not an array to store half_selected state,
 	// when several statuses selected.
@@ -130,6 +131,9 @@ EditList.prototype.appendItem = function(i_id, i_item)
 	el.appendChild(elBtnDel);
 
 	this.addInputProcess();
+
+	if (this.onChange)
+		this.onChange();
 }
 
 EditList.prototype.deleteItem = function(i_el)
@@ -137,6 +141,9 @@ EditList.prototype.deleteItem = function(i_el)
 	i_el.parentNode.removeChild(i_el);
 	this.list[i_el.m_id].selected = false;
 	this.addInputProcess();
+
+	if (this.onChange)
+		this.onChange();
 }
 
 EditList.prototype.addInputProcess = function()
@@ -310,6 +317,7 @@ EditList.prototype.showAllItems = function()
 		}
 
 		el.onclick = editlist_ToggleSelection;
+		el.m_editlist = this;
 
 		this.elAllItems.push(el);
 
@@ -392,6 +400,7 @@ EditList.prototype.editArtists = function()
 				}
 
 				el.onclick = editlist_ToggleSelection;
+				el.m_editlist = this;
 
 				this.elAllItems.push(el);
 			}
@@ -468,5 +477,8 @@ function editlist_ToggleSelection(e)
 		el.m_selected = true;
 		el.classList.add('selected');
 	}
+
+	if (el.m_editlist.onChange)
+		el.m_editlist.onChange();
 }
 
