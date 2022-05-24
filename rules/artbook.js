@@ -17,8 +17,11 @@
 "use strict";
 
 var ab_wnd = null;
+var ab_users = [];
+var ab_artists = [];
 
 var ab_filter_artists = [];
+var ab_filter_projects = [];
 
 var ab_art_pages = [];
 var ab_art_projects = [];
@@ -58,26 +61,25 @@ function ab_OpenWindow(i_close_header)
 	ab_wnd.elTopPanel.appendChild(ab_wnd.elProjectsDiv);
 	ab_wnd.elProjectsDiv.classList.add('ab_projects_div');
 
-	ab_wnd.editAritsts = new EditList({
-		"name"    : 'artists',
-		"label"   : 'Artists:',
-		"list"    : [],
-		"list_all": g_users,
-		"elParent": ab_wnd.elTopPanel,
-		"onChange": ab_ArtistsListChanged});
+	ab_wnd.elArtistsDiv = document.createElement('div');
+	ab_wnd.elTopPanel.appendChild(ab_wnd.elArtistsDiv);
+	ab_wnd.elArtistsDiv.classList.add('ab_artists_div');
 
 	ab_wnd.elInfo = document.createElement('div');
 	ab_wnd.elContent.appendChild(ab_wnd.elInfo);
 
-	ab_wnd.elArtists = document.createElement('div');
-	ab_wnd.elContent.appendChild(ab_wnd.elArtists);
-	ab_wnd.elArtists.classList.add('artbook_users');
+	ab_wnd.elPagesDiv = document.createElement('div');
+	ab_wnd.elContent.appendChild(ab_wnd.elPagesDiv);
+	ab_wnd.elPagesDiv.classList.add('artbook_pages');
 
 	ab_WndRefresh();
 }
 
 function ab_WndRefresh()
 {
+	ab_filter_artists = [];
+	ab_filter_projects = [];
+
 	n_Request({
 		"send": {'getallusers':true},
 		"func": ab_WndArtistsReceived
@@ -88,73 +90,105 @@ function ab_WndArtistsReceived(i_data)
 {
 	if (i_data == null)
 	{
-		ab_wnd.elContent.innerHTML = 'Error getting artists.';
+		ab_wnd.elContent.innerHTML = 'Error getting users.';
 		return;
 	}
 	if (i_data.error)
 	{
-		ab_wnd.elContent.innerHTML = 'Error getting artists:<br>' + i_data.error;
+		ab_wnd.elContent.innerHTML = 'Error getting users:<br>' + i_data.error;
 		return;
 	}
 	if (i_data.users == null)
 	{
-		ab_wnd.elContent.innerHTML = '"artists" are NULL.';
+		ab_wnd.elContent.innerHTML = '"users" are NULL.';
 		return;
 	}
 
-	g_users = i_data.users;
+	ab_users = i_data.users;
+	ab_wnd.elArtistsDiv.innerHTML = '';
+	ab_wnd.editAritsts = new EditList({
+		"name"    : 'artists',
+		"label"   : 'Artists:',
+		"list"    : [],
+		"list_all": ab_users,
+		"elParent": ab_wnd.elArtistsDiv,
+		"onChange": ab_ArtistsListChanged});
 
 	if (ab_wnd == null)
 		return;
 
-	ab_WndDrawArtists();
+	ab_ProcessArtists();
 }
 
-function ab_WndSortArtists(i_prop)
+function ab_ProcessArtists()
 {
-	// console.log('ab_WndSortArtists: ' + i_prop);
-	if (ab_wnd_sort_prop == i_prop)
-		ab_wnd_sort_dir = 1 - ab_wnd_sort_dir;
-	else
-		ab_wnd_sort_prop = i_prop;
-	ab_WndDrawArtists();
-}
-
-function ab_WndFilter()
-{
-	for (let ap of ab_art_pages)
+	ab_artists = [];
+	let prj_names = [];
+	for (let uid in ab_users)
 	{
-		if (ab_filter_artists.length && (ab_filter_artists.indexOf(ap.user.id) == -1))
-			ap.elRoot.style.display = 'none';
-		else
-			ap.elRoot.style.display = 'block';
-	}
-}
+		let user = ab_users[uid];
 
-function ab_ArtistsListChanged()
-{
-	ab_filter_artists = ab_wnd.editAritsts.getSelectedNames();
-	ab_WndFilter();
-}
-
-function ab_WndDrawArtists()
-{
-	ab_wnd.elArtists.innerHTML = '';
-	ab_wnd.elUsrRows = [];
-
-	let users = [];
-	for (let uid in g_users)
-	{
-		let user = g_users[uid];
+		// Skip disabled users
 		if (user.disabled)
 			continue;
+
+		// Skip not an atrists
 		if (c_IsNotAnArtist(user))
 			continue;
+		
+		// Skip no bookmarks
+		if ((null == user.bookmarks) || (user.bookmarks.length == 0))
+			continue;
 
-		users.push(user);
+		// Show only selected, or all if no selection
+		if (ab_filter_artists.length && (ab_filter_artists.indexOf(user.id) == -1))
+			continue;
+
+		// Check bookmarks validness:
+		for (let bm of user.bookmarks)
+		{
+			if (null == bm.path)
+			{
+				bm.path = 'undefined';
+				bm.invalid = true;
+				console.log(JSON.stringify(bm));
+			}
+		}
+
+		let artist =  user;
+		artist.projects = [];
+		let projects = bm_CollectProjects(artist.bookmarks);
+		for (let prj of projects)
+		{
+			if (prj_names.indexOf(prj.name) == -1)
+				prj_names.push(prj.name);
+
+			if (ab_filter_projects.length && (ab_filter_projects.indexOf(prj.name) == -1))
+				continue;
+
+			artist.projects.push(prj);
+		}
+
+		ab_artists.push(artist);
 	}
 
-	users.sort(function(a, b) {
+	prj_names.sort();
+	ab_wnd.elProjectsButtons = [];
+	ab_wnd.elProjectsDiv.innerHTML = '';
+	for (let pname of prj_names)
+	{
+		let el = document.createElement('div');
+		ab_wnd.elProjectsDiv.appendChild(el);
+		el.classList.add('button');
+		el.textContent = pname;
+		el.onclick = ab_ProjectClicked;
+		ab_wnd.elProjectsButtons.push(el);
+
+		if (ab_filter_projects.length && (ab_filter_projects.indexOf(pname) != -1))
+			el.classList.add('pushed');
+	}
+
+	ab_artists.sort(function(a, b) {
 		let val_a = a[ab_wnd_sort_prop];
 		let val_b = b[ab_wnd_sort_prop];
 
@@ -189,11 +223,39 @@ function ab_WndDrawArtists()
 		return 0;
 	});
 
+
+	ab_WndDrawArtists();
+}
+
+function ab_ArtistsListChanged()
+{
+	ab_filter_artists = ab_wnd.editAritsts.getSelectedNames();
+	ab_ProcessArtists();
+}
+
+function ab_ProjectClicked(i_e)
+{
+	let el = i_e.currentTarget;
+	el.classList.toggle('pushed');
+
+	ab_filter_projects = [];
+	for (el of ab_wnd.elProjectsButtons)
+		if (el.classList.contains('pushed'))
+			ab_filter_projects.push(el.textContent);
+
+	ab_ProcessArtists();
+}
+
+function ab_WndDrawArtists()
+{
+	ab_wnd.elPagesDiv.innerHTML = '';
+	ab_wnd.elUsrRows = [];
+
 	ab_art_pages = [];
 	ab_art_projects = [];
-	for (let i = 0; i < users.length; i++)
+	for (let i = 0; i < ab_artists.length; i++)
 	{
-		let ap = new ArtPage(ab_wnd.elArtists, users[i]);
+		let ap = new ArtPage(ab_wnd.elPagesDiv, ab_artists[i]);
 		ab_art_pages.push(ap);
 
 		if (i % 2)
@@ -201,29 +263,11 @@ function ab_WndDrawArtists()
 		else
 			ap.elRoot.style.backgroundColor = 'rgba(255,255,255,.1)';
 	}
-
-	let prj_names = [];
-	for (let prj of ab_art_projects)
-	{
-console.log(prj.project.name);
-		if (prj_names.indexOf(prj.project.name) == -1)
-			prj_names.push(prj.project.name);
-	}
-
-console.log(prj_names);
-	prj_names.sort();
-	for (let pname of prj_names)
-	{
-		let el = document.createElement('div');
-		ab_wnd.elProjectsDiv.appendChild(el);
-		el.classList.add('button');
-		el.textContent = pname;
-	}
 }
 
-function ArtPage(i_el, i_user)
+function ArtPage(i_el, i_artist)
 {
-	this.user = i_user;
+	this.artist = i_artist;
 
 	this.elParent = i_el;
 
@@ -239,55 +283,40 @@ function ArtPage(i_el, i_user)
 	this.elAvatar = document.createElement('div');
 	this.elInfo.appendChild(this.elAvatar);
 	this.elAvatar.classList.add('avatar');
-	let avatar = c_GetAvatar(this.user.id);
+	let avatar = c_GetAvatar(this.artist.id);
 	if (avatar)
 		this.elAvatar.style.backgroundImage = 'url(' + avatar + ')';
 
 	this.elTitle = document.createElement('div');
 	this.elInfo.appendChild(this.elTitle);
-	this.elTitle.textContent = c_GetUserTitle(this.user.id);
+	this.elTitle.textContent = c_GetUserTitle(this.artist.id);
 
 	this.elTag = document.createElement('div');
 	this.elInfo.appendChild(this.elTag);
-	this.elTag.textContent = i_user.tag;
+	this.elTag.textContent = i_artist.tag;
 
 	this.elRole = document.createElement('div');
 	this.elInfo.appendChild(this.elRole);
-	this.elRole.textContent = i_user.role;
+	this.elRole.textContent = i_artist.role;
 
 	// Bookmarks:
 	this.elBmrks = document.createElement('div');
 	this.elRoot.appendChild(this.elBmrks);
 	this.elBmrks.classList.add('ap_bmrks_div');
 
-	if (null == this.user.bookmarks)
-		return;
-
-	// Check validness:
-	for (let bm of this.user.bookmarks)
-	{
-		if (null == bm.path)
-		{
-			bm.path = 'undefined';
-			bm.invalid = true;
-			console.log(JSON.stringify(bm));
-		}
-	}
-
 	// Show bookmarks per project:
-	let projects = bm_CollectProjects(this.user.bookmarks)
-	for (let project of projects)
+	for (let project of this.artist.projects)
 	{
-		let prj = new ArtPagePrj(this.elBmrks, project, this.user);
+		let prj = new ArtPagePrj(this.elBmrks, project, this.artist);
 		ab_art_projects.push(prj);
 	}
 }
 
-function ArtPagePrj(i_el, i_project, i_user)
+function ArtPagePrj(i_el, i_project, i_artist)
 {
 	this.elParent = i_el;
 	this.project = i_project;
-	this.user = i_user;
+	this.artist = i_artist;
 
 	this.elRoot = document.createElement('div');
 	this.elParent.appendChild(this.elRoot);
@@ -304,16 +333,16 @@ function ArtPagePrj(i_el, i_project, i_user)
 	{
 		for (let bm of scene.bms)
 		{
-			let apbm = new ArtPageBM(this.elBmrks, bm, this.user);
+			let apbm = new ArtPageBM(this.elBmrks, bm, this.artist);
 		}
 	}
 }
 
-function ArtPageBM(i_el, i_bm, i_user)
+function ArtPageBM(i_el, i_bm, i_artist)
 {
 	this.elParent = i_el;
 	this.bm = i_bm;
-	this.user = i_user;
+	this.artist = i_artist;
 
 	this.name = this.bm.path.split('/');
 	this.name = this.name[this.name.length-1];
@@ -329,6 +358,6 @@ function ArtPageBM(i_el, i_bm, i_user)
 	this.elPath.href = '#' + this.bm.path;
 	this.elPath.target = '_blank';
 
-	st_SetElStatus(this.elRoot, this.bm.status, /*show all tasks = */ false, this.user);
+	st_SetElStatus(this.elRoot, this.bm.status, /*show all tasks = */ false, this.artist);
 }
 
