@@ -1332,11 +1332,15 @@ background-position: center;
 .ab_projects_div {}
 .ab_projects_div > div {
 float: left;
+padding: 2px 8px;
 }
 .artpage {
 padding: 8px;
 }
-.artpage .info {
+.artpage.disabled {
+opacity: 0.5;
+}
+.artpage .brief {
 float: left;
 width: 128px;
 }
@@ -1346,6 +1350,14 @@ height: 96px;
 background-size: 100%;
 background-repeat: no-repeat;
 background-position: center;
+}
+.artpage .brief .title {
+font-weight: bold;
+}
+.artpage.disabled .brief .title {
+text-decoration: line-through;
+font-style: italic;
+font-weight: normal;
 }
 .artpage_bm {
 float: left;
