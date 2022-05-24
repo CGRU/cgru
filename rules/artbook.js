@@ -237,7 +237,9 @@ function ab_ProcessArtists()
 	if (disabled_artists)
 		info += ' (' + disabled_artists + ' disabled)';
 	info += ', <b>' + prj_infos_arr.length + '</b> Projects';
-	info += ', <b>' + total_bookmarks + '</b> Total Bookmarks + (' + invalid_bookmarks + ' invalid)';
+	info += ', <b>' + total_bookmarks + '</b> Total Bookmarks';
+	if (invalid_bookmarks)
+		info += '(' + invalid_bookmarks + ' invalid)';
 	ab_wnd.elInfo.innerHTML = info;
 }
 
