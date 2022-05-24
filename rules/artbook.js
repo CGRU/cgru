@@ -126,6 +126,8 @@ function ab_ProcessArtists()
 	let prj_infos_obj = [];
 	let disabled_artists = 0;
 	let invalid_bookmarks = 0;
+	let total_artists = 0;
+	let total_projects = 0;
 	let total_bookmarks = 0;
 	for (let uid in ab_users)
 	{
@@ -153,8 +155,6 @@ function ab_ProcessArtists()
 				console.log(JSON.stringify(bm));
 				invalid_bookmarks += 1;
 			}
-
-			total_bookmarks += 1;
 		}
 
 		let artist =  user;
@@ -186,10 +186,15 @@ function ab_ProcessArtists()
 			artist.projects.push(prj);
 		}
 
-		if (artist.disabled)
-			disabled_artists += 1;
+		if (artist.bm_count)
+		{
+			ab_artists.push(artist);
+			total_artists += 1;
+			total_bookmarks += artist.bm_count;
 
-		ab_artists.push(artist);
+			if (artist.disabled)
+				disabled_artists += 1;
+		}
 	}
 	let prj_infos_arr = [];
 	for (let pname in prj_infos_obj)
@@ -209,8 +214,13 @@ function ab_ProcessArtists()
 		ab_wnd.elProjectsButtons.push(el);
 
 		if (ab_filter_projects.length && (ab_filter_projects.indexOf(prj.name) != -1))
+		{
 			el.classList.add('pushed');
+			total_projects += 1;
+		}
 	}
+	if (total_projects == 0)
+		total_projects = prj_infos_arr.length;
 
 	ab_artists.sort(function(a, b) {
 		let val_a = a[ab_wnd_sort_prop];
@@ -229,17 +239,16 @@ function ab_ProcessArtists()
 		return 0;
 	});
 
-
 	ab_WndDrawArtists();
 
 	let info = '';
-	info += '<b>' + ab_artists.length + '</b> Artists';
+	info += '<b>' + total_artists + '</b> Artists';
 	if (disabled_artists)
 		info += ' (' + disabled_artists + ' disabled)';
-	info += ', <b>' + prj_infos_arr.length + '</b> Projects';
+	info += ', <b>' + total_projects + '</b> Projects';
 	info += ', <b>' + total_bookmarks + '</b> Total Bookmarks';
 	if (invalid_bookmarks)
-		info += '(' + invalid_bookmarks + ' invalid)';
+		info += ' (' + invalid_bookmarks + ' invalid)';
 	ab_wnd.elInfo.innerHTML = info;
 }
 
@@ -271,10 +280,6 @@ function ab_WndDrawArtists()
 	ab_art_projects = [];
 	for (let i = 0; i < ab_artists.length; i++)
 	{
-		if (ab_artists[i].bm_count == 0)
-			if (ab_filter_projects.length)
-				continue;
-
 		let ap = new ArtPage(ab_wnd.elPagesDiv, ab_artists[i]);
 		ab_art_pages.push(ap);
 
