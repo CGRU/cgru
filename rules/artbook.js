@@ -125,6 +125,8 @@ function ab_ProcessArtists()
 	ab_artists = [];
 	let prj_infos_obj = [];
 	let disabled_artists = 0;
+	let invalid_bookmarks = 0;
+	let total_bookmarks = 0;
 	for (let uid in ab_users)
 	{
 		let user = ab_users[uid];
@@ -149,7 +151,10 @@ function ab_ProcessArtists()
 				bm.path = 'undefined';
 				bm.invalid = true;
 				console.log(JSON.stringify(bm));
+				invalid_bookmarks += 1;
 			}
+
+			total_bookmarks += 1;
 		}
 
 		let artist =  user;
@@ -228,10 +233,11 @@ function ab_ProcessArtists()
 	ab_WndDrawArtists();
 
 	let info = '';
-	info += ab_artists.length + ' Artists';
+	info += '<b>' + ab_artists.length + '</b> Artists';
 	if (disabled_artists)
 		info += ' (' + disabled_artists + ' disabled)';
-	info += ', ' + prj_infos_arr.length + ' Projects';
+	info += ', <b>' + prj_infos_arr.length + '</b> Projects';
+	info += ', <b>' + total_bookmarks + '</b> Total Bookmarks + (' + invalid_bookmarks + ' invalid)';
 	ab_wnd.elInfo.innerHTML = info;
 }
 
