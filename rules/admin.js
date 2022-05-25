@@ -33,17 +33,6 @@ var ad_states = {
 	editbody /***/: {"short": 'BD', "label": 'EditBody' /***/, "tooltip": 'Can edit body.'}
 };
 
-var ad_prof_props = {
-	id /**********/: {"disabled": true, "lwidth": '170px', "label": 'ID'},
-	role /********/: {"disabled": true, "lwidth": '170px'},
-	title /*******/: {"lwidth": '170px'},
-	avatar /******/: {},
-	news_limit /**/: {},
-	email /*******/: {"width": '70%'},
-	email_news /**/: {"width": '30%', 'type': "bool", 'default': false},
-	signature /***/: {}
-};
-
 function ad_GetUserFileName(i_uid, i_type)
 {
 	if (null == i_type)
@@ -1485,84 +1474,3 @@ function ad_SetPasswordFinished(i_data)
 		c_Error(i_data.error);
 }
 
-function ad_ProfileOpen()
-{
-	if (g_auth_user == null)
-	{
-		c_Error('No authenticated user found.');
-		return;
-	}
-
-	var wnd = new cgru_Window({"name": 'profile', "title": 'My Profile'});
-	wnd.elContent.classList.add('profile');
-
-	var avatar = c_GetAvatar();
-	if (avatar)
-	{
-		var el = document.createElement('img');
-		wnd.elContent.appendChild(el);
-		el.classList.add('avatar');
-		el.src = avatar;
-	}
-
-	gui_Create(wnd.elContent, ad_prof_props, [g_auth_user]);
-
-	var elBtns = document.createElement('div');
-	wnd.elContent.appendChild(elBtns);
-	elBtns.style.clear = 'both';
-
-	wnd.elContent.m_wnd = wnd;
-	wnd.elContent.onkeydown = function(e) {
-		if (e.keyCode == 13) // Enter
-			ad_ProfileSave(e.currentTarget.m_wnd);
-	}
-
-	var el = document.createElement('div');
-	elBtns.appendChild(el);
-	el.textContent = 'Save';
-	el.classList.add('button');
-	el.onclick = function(e) { ad_ProfileSave(e.currentTarget.m_wnd); };
-	el.m_wnd = wnd;
-
-	var el = document.createElement('div');
-	elBtns.appendChild(el);
-	el.textContent = 'Cancel';
-	el.classList.add('button');
-	el.onclick = function(e) { e.currentTarget.m_wnd.destroy(); };
-	el.m_wnd = wnd;
-
-	if (c_CanSetPassword())
-	{
-		var el = document.createElement('div');
-		elBtns.appendChild(el);
-		el.textContent = 'Set Password';
-		el.classList.add('button');
-		el.onclick = function(e) { ad_SetPasswordDialog(g_auth_user.id); };
-		el.m_wnd = wnd;
-	}
-}
-
-function ad_ProfileSave(i_wnd)
-{
-	var params = gui_GetParams(i_wnd.elContent, ad_prof_props);
-
-	if (params.news_limit.length == 0)
-		params.news_limit = '-1';
-
-	params.news_limit = parseInt(params.news_limit);
-	if (isNaN(params.news_limit))
-	{
-		c_Error('Invalid news limit number.');
-		return;
-	}
-
-	for (var p in params)
-	{
-		g_auth_user[p] = params[p];
-	}
-	g_users[g_auth_user.id] = g_auth_user;
-
-	ad_SaveUser();
-	ad_UpdateProfileSettings();
-	i_wnd.destroy();
-}
