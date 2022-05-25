@@ -35,13 +35,13 @@ function prof_Open()
 		return;
 	}
 
-	var wnd = new cgru_Window({"name": 'profile', "title": 'My Profile'});
+	let wnd = new cgru_Window({"name": 'profile', "title": 'My Profile'});
 	wnd.elContent.classList.add('profile');
 
-	var avatar = c_GetAvatar();
+	let avatar = c_GetAvatar();
 	if (avatar)
 	{
-		var el = document.createElement('img');
+		let el = document.createElement('img');
 		wnd.elContent.appendChild(el);
 		el.classList.add('avatar');
 		el.src = avatar;
@@ -49,7 +49,7 @@ function prof_Open()
 
 	gui_Create(wnd.elContent, prof_props, [g_auth_user]);
 
-	var elBtns = document.createElement('div');
+	let elBtns = document.createElement('div');
 	wnd.elContent.appendChild(elBtns);
 	elBtns.style.clear = 'both';
 
@@ -59,27 +59,27 @@ function prof_Open()
 			prof_Save(e.currentTarget.m_wnd);
 	}
 
-	var el = document.createElement('div');
+	let el = document.createElement('div');
 	elBtns.appendChild(el);
 	el.textContent = 'Save';
 	el.classList.add('button');
-	el.onclick = function(e) { prof_Save(e.currentTarget.m_wnd); };
+	el.onclick = function(e) {prof_Save(e.currentTarget.m_wnd);};
 	el.m_wnd = wnd;
 
-	var el = document.createElement('div');
+	el = document.createElement('div');
 	elBtns.appendChild(el);
 	el.textContent = 'Cancel';
 	el.classList.add('button');
-	el.onclick = function(e) { e.currentTarget.m_wnd.destroy(); };
+	el.onclick = function(e) {e.currentTarget.m_wnd.destroy();};
 	el.m_wnd = wnd;
 
 	if (c_CanSetPassword())
 	{
-		var el = document.createElement('div');
+		el = document.createElement('div');
 		elBtns.appendChild(el);
 		el.textContent = 'Set Password';
 		el.classList.add('button');
-		el.onclick = function(e) { ad_SetPasswordDialog(g_auth_user.id); };
+		el.onclick = function(e) {ad_SetPasswordDialog(g_auth_user.id);};
 		el.m_wnd = wnd;
 	}
 }
@@ -98,7 +98,7 @@ function prof_Save(i_wnd)
 		return;
 	}
 
-	for (var p in params)
+	for (let p in params)
 	{
 		g_auth_user[p] = params[p];
 	}
