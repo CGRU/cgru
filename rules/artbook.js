@@ -348,6 +348,9 @@ function ab_WndDrawArtists()
 	ab_art_projects = [];
 	for (let i = 0; i < ab_artists.length; i++)
 	{
+		if (ab_artists[i].disabled && (ab_artists[i].bm_count == 0))
+			continue;
+
 		let ap = new ArtPage(ab_wnd.elPagesDiv, ab_artists[i]);
 		ab_art_pages.push(ap);
 
