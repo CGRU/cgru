@@ -1340,6 +1340,9 @@ padding: 8px;
 .artpage.disabled {
 opacity: 0.5;
 }
+.artpage.empty {
+float:left;
+}
 .artpage .brief {
 float: left;
 width: 128px;
@@ -1359,6 +1362,9 @@ text-decoration: line-through;
 font-style: italic;
 font-weight: normal;
 }
+.artpage_prj .title {
+font-weight: bold;
+}
 .artpage_bm {
 float: left;
 padding: 4px;
@@ -1366,6 +1372,15 @@ margin: 4px;
 height: 56px;
 border: 2px solid rgba(98,98,98,.5);
 border-radius: 2px;
+}
+.artpage_bm.obsolete {
+font-style: italic;
+opacity: 0.5;
+}
+.ab_bot_panel {
+margin: 8px;
+border-top: 1px solid rgba(98,98,98,.5);
+padding: 8px;
 }
 
 

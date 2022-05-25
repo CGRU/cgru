@@ -445,10 +445,13 @@ function bm_NavigatePost()
 	bm_clicked = false;
 }
 
-function bm_ActualStatus(i_status)
+function bm_ActualStatus(i_status, i_user)
 {
 	if (i_status == null)
 		return false;
+
+	if (i_user == null)
+		i_user = g_auth_user;
 
 	if (i_status.tasks && (typeof i_status.tasks == 'object'))
 	{
@@ -458,7 +461,7 @@ function bm_ActualStatus(i_status)
 
 			if (task.deleted)
 				continue;
-			if (task.artists && (task.artists.indexOf(g_auth_user.id) == -1))
+			if (task.artists && (task.artists.indexOf(i_user.id) == -1))
 				continue;
 			if (task.progress && (task.progress >= 100))
 				continue;
@@ -472,7 +475,7 @@ function bm_ActualStatus(i_status)
 	if (i_status.artists == null)
 		return false;
 
-	if (i_status.artists.indexOf(g_auth_user.id) == -1)
+	if (i_status.artists.indexOf(i_user.id) == -1)
 		return false;
 
 	if (i_status.progress)

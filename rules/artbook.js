@@ -29,6 +29,8 @@ var ab_art_projects = [];
 var ab_wnd_sort_prop = 'bm_count';
 var ab_wnd_sort_dir = 1;
 
+var ab_flags_order = ['check','comment','ready','inprogress'];
+
 function ab_Init()
 {
 	if (g_auth_user == null)
@@ -49,6 +51,7 @@ function ab_OpenWindow(i_close_header)
 
 	ab_wnd.elTopPanel = document.createElement('div');
 	ab_wnd.elContent.appendChild(ab_wnd.elTopPanel);
+	ab_wnd.elTopPanel.classList.add('ab_top_panel');
 
 	let el = document.createElement('div');
 	ab_wnd.elTopPanel.appendChild(el);
@@ -71,6 +74,10 @@ function ab_OpenWindow(i_close_header)
 	ab_wnd.elPagesDiv = document.createElement('div');
 	ab_wnd.elContent.appendChild(ab_wnd.elPagesDiv);
 	ab_wnd.elPagesDiv.classList.add('artbook_pages');
+
+	ab_wnd.elBotPanel = document.createElement('div');
+	ab_wnd.elContent.appendChild(ab_wnd.elBotPanel);
+	ab_wnd.elBotPanel.classList.add('ab_bot_panel');
 
 	ab_WndRefresh();
 }
@@ -120,6 +127,51 @@ function ab_WndArtistsReceived(i_data)
 	ab_ProcessArtists();
 }
 
+function ab_CollectFlags(i_bm)
+{
+	let flags = [];
+
+	if (null == i_bm.status)
+		return flags;
+
+	if (i_bm.status.flags)
+		for (let flag of i_bm.status.flags)
+			if (flags.indexOf(flag) == -1)
+				flags.push(flag);
+
+	if (null == i_bm.status.tasks)
+		return flags;
+
+	for (let t in i_bm.status.tasks)
+	{
+		let task = i_bm.status.tasks[t];
+		if (task.flags)
+			for (let flag of task.flags)
+				if (flags.indexOf(flag) == -1)
+					flags.push(flag);
+	}
+
+	return flags;
+}
+
+function ab_CompareFlags(a,b)
+{
+	for (let flag of ab_flags_order)
+	{
+		if (a.indexOf(flag) > b.indexOf(flag))
+			return 1;
+		if (a.indexOf(flag) < b.indexOf(flag))
+			return -1;
+	}
+
+	return 0;
+}
+
+function ab_CompareBookmarks(a,b)
+{
+	return ab_CompareFlags(ab_CollectFlags(a), ab_CollectFlags(b));
+}
+
 function ab_ProcessArtists()
 {
 	ab_artists = [];
@@ -129,6 +181,7 @@ function ab_ProcessArtists()
 	let total_artists = 0;
 	let total_projects = 0;
 	let total_bookmarks = 0;
+	let obsolete_bookmarks = 0;
 	for (let uid in ab_users)
 	{
 		let user = ab_users[uid];
@@ -137,30 +190,39 @@ function ab_ProcessArtists()
 		if (c_IsNotAnArtist(user))
 			continue;
 		
-		// Skip no bookmarks
-		if ((null == user.bookmarks) || (user.bookmarks.length == 0))
-			continue;
-
 		// Show only selected, or all if no selection
 		if (ab_filter_artists.length && (ab_filter_artists.indexOf(user.id) == -1))
 			continue;
 
+		// Create an empty bookmarks array if it does not exist,
+		// to not to check each time, that bookmarks are not null.
+		if (null == user.bookmarks)
+			user.bookmarks = [];
+
+		let bookmarks = [];
 		// Check bookmarks validness:
 		for (let bm of user.bookmarks)
 		{
 			if (null == bm.path)
 			{
-				bm.path = 'undefined';
-				bm.invalid = true;
 				console.log(JSON.stringify(bm));
 				invalid_bookmarks += 1;
+				continue;
 			}
+
+			if (false == bm_ActualStatus(bm.status, user))
+			{
+				obsolete_bookmarks += 1;
+				continue;
+			}
+
+			bookmarks.push(bm);
 		}
 
 		let artist =  user;
 		artist.projects = [];
 		artist.bm_count = 0;
-		let projects = bm_CollectProjects(artist.bookmarks);
+		let projects = bm_CollectProjects(bookmarks);
 		for (let prj of projects)
 		{
 			let prj_info = {};
@@ -186,15 +248,16 @@ function ab_ProcessArtists()
 			artist.projects.push(prj);
 		}
 
-		if (artist.bm_count)
-		{
-			ab_artists.push(artist);
-			total_artists += 1;
-			total_bookmarks += artist.bm_count;
+		if (ab_filter_projects.length)
+			if (artist.bm_count == 0)
+				continue;
 
-			if (artist.disabled)
-				disabled_artists += 1;
-		}
+		ab_artists.push(artist);
+		total_artists += 1;
+		total_bookmarks += artist.bm_count;
+
+		if (artist.disabled)
+			disabled_artists += 1;
 	}
 	let prj_infos_arr = [];
 	for (let pname in prj_infos_obj)
@@ -208,7 +271,7 @@ function ab_ProcessArtists()
 		let el = document.createElement('div');
 		ab_wnd.elProjectsDiv.appendChild(el);
 		el.classList.add('button','project');
-		el.textContent = prj.name + ' (' + prj.count_art + 'A)';
+		el.innerHTML = prj.name + ' <small>(' + prj.count_art + 'A)</small>';
 		el.m_prj_name = prj.name;
 		el.onclick = ab_ProjectClicked;
 		ab_wnd.elProjectsButtons.push(el);
@@ -246,10 +309,15 @@ function ab_ProcessArtists()
 	if (disabled_artists)
 		info += ' (' + disabled_artists + ' disabled)';
 	info += ', <b>' + total_projects + '</b> Projects';
-	info += ', <b>' + total_bookmarks + '</b> Total Bookmarks';
-	if (invalid_bookmarks)
-		info += ' (' + invalid_bookmarks + ' invalid)';
+	info += ', <b>' + total_bookmarks + '</b> Bookmarks';
 	ab_wnd.elInfo.innerHTML = info;
+
+	info = 'Totals: '
+	if (obsolete_bookmarks)
+		info += '<b>' + obsolete_bookmarks + '</b> Obsolete Bookmarks';
+	if (invalid_bookmarks)
+		info += ', <b>' + invalid_bookmarks + '</b> Invalid Bookmarks';
+	ab_wnd.elBotPanel.innerHTML = info;
 }
 
 function ab_ArtistsListChanged()
@@ -322,6 +390,8 @@ function ArtPage(i_el, i_artist)
 	let info = this.artist.tag + ' ' + this.artist.role;
 	if (this.artist.bm_count)
 		info += '<br>Bookmarks: ' + this.artist.bm_count;
+	else
+		this.elRoot.classList.add('empty');
 
 	this.elInfo = document.createElement('div');
 	this.elBrief.appendChild(this.elInfo);
@@ -349,10 +419,12 @@ function ArtPagePrj(i_el, i_project, i_artist)
 
 	this.elRoot = document.createElement('div');
 	this.elParent.appendChild(this.elRoot);
+	this.elRoot.classList.add('artpage_prj')
 
 	this.elTitle = document.createElement('div');
 	this.elRoot.appendChild(this.elTitle);
 	this.elTitle.textContent = this.project.name;
+	this.elTitle.classList.add('title');
 
 	this.elBmrks = document.createElement('div');
 	this.elRoot.appendChild(this.elBmrks);
@@ -360,6 +432,7 @@ function ArtPagePrj(i_el, i_project, i_artist)
 
 	for (let scene of this.project.scenes)
 	{
+		scene.bms.sort(ab_CompareBookmarks);
 		for (let bm of scene.bms)
 		{
 			let apbm = new ArtPageBM(this.elBmrks, bm, this.artist);
@@ -379,6 +452,8 @@ function ArtPageBM(i_el, i_bm, i_artist)
 	this.elRoot = document.createElement('div');
 	this.elParent.appendChild(this.elRoot);
 	this.elRoot.classList.add('artpage_bm');
+	if (false == bm_ActualStatus(this.bm.status, this.artist))
+		this.elRoot.classList.add('obsolete');
 
 	this.elPath = document.createElement('a');
 	this.elRoot.appendChild(this.elPath);
