@@ -1342,6 +1342,7 @@ opacity: 0.5;
 }
 .artpage.empty {
 float:left;
+height: 176px;
 }
 .artpage .brief {
 float: left;
