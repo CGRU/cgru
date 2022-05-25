@@ -175,13 +175,16 @@ function ab_CompareBookmarks(a,b)
 function ab_ProcessArtists()
 {
 	ab_artists = [];
+
+	let total_obsolete_bookmarks = 0;
+	let total_invalid_bookmarks = 0;
+
+	let shown_artists = 0;
+	let shown_disabled_artists = 0;
+	let shown_projects = 0;
+	let shown_bookmarks = 0;
+
 	let prj_infos_obj = [];
-	let disabled_artists = 0;
-	let invalid_bookmarks = 0;
-	let total_artists = 0;
-	let total_projects = 0;
-	let total_bookmarks = 0;
-	let obsolete_bookmarks = 0;
 	for (let uid in ab_users)
 	{
 		let user = ab_users[uid];
@@ -206,13 +209,13 @@ function ab_ProcessArtists()
 			if (null == bm.path)
 			{
 				console.log(JSON.stringify(bm));
-				invalid_bookmarks += 1;
+				total_invalid_bookmarks += 1;
 				continue;
 			}
 
 			if (false == bm_ActualStatus(bm.status, user))
 			{
-				obsolete_bookmarks += 1;
+				total_obsolete_bookmarks += 1;
 				continue;
 			}
 
@@ -252,12 +255,16 @@ function ab_ProcessArtists()
 			if (artist.bm_count == 0)
 				continue;
 
-		ab_artists.push(artist);
-		total_artists += 1;
-		total_bookmarks += artist.bm_count;
-
 		if (artist.disabled)
-			disabled_artists += 1;
+		{
+			if (artist.bm_count == 0)
+				continue;
+			shown_disabled_artists += 1;
+		}
+
+		ab_artists.push(artist);
+		shown_artists += 1;
+		shown_bookmarks += artist.bm_count;
 	}
 	let prj_infos_arr = [];
 	for (let pname in prj_infos_obj)
@@ -279,11 +286,11 @@ function ab_ProcessArtists()
 		if (ab_filter_projects.length && (ab_filter_projects.indexOf(prj.name) != -1))
 		{
 			el.classList.add('pushed');
-			total_projects += 1;
+			shown_projects += 1;
 		}
 	}
-	if (total_projects == 0)
-		total_projects = prj_infos_arr.length;
+	if (shown_projects == 0)
+		shown_projects = prj_infos_arr.length;
 
 	ab_artists.sort(function(a, b) {
 		let val_a = a[ab_wnd_sort_prop];
@@ -305,19 +312,20 @@ function ab_ProcessArtists()
 	ab_WndDrawArtists();
 
 	let info = '';
-	info += '<b>' + total_artists + '</b> Artists';
-	if (disabled_artists)
-		info += ' (' + disabled_artists + ' disabled)';
-	info += ', <b>' + total_projects + '</b> Projects';
-	info += ', <b>' + total_bookmarks + '</b> Bookmarks';
+	info += '<b>' + shown_artists + '</b> Artists';
+	if (shown_disabled_artists)
+		info += ' (' + shown_disabled_artists + ' disabled)';
+	info += ', <b>' + shown_projects + '</b> Projects';
+	info += ', <b>' + shown_bookmarks + '</b> Bookmarks';
 	ab_wnd.elInfo.innerHTML = info;
 
-	info = 'Totals: '
-	if (obsolete_bookmarks)
-		info += '<b>' + obsolete_bookmarks + '</b> Obsolete Bookmarks';
-	if (invalid_bookmarks)
-		info += ', <b>' + invalid_bookmarks + '</b> Invalid Bookmarks';
-	ab_wnd.elBotPanel.innerHTML = info;
+	info = ''
+	if (total_obsolete_bookmarks)
+		info += '<b>' + total_obsolete_bookmarks + '</b> Obsolete Bookmarks';
+	if (total_invalid_bookmarks)
+		info += ', <b>' + total_invalid_bookmarks + '</b> Invalid Bookmarks';
+	if (info.length)
+		ab_wnd.elBotPanel.innerHTML = 'Totals: ' + info;
 }
 
 function ab_ArtistsListChanged()
@@ -348,9 +356,6 @@ function ab_WndDrawArtists()
 	ab_art_projects = [];
 	for (let i = 0; i < ab_artists.length; i++)
 	{
-		if (ab_artists[i].disabled && (ab_artists[i].bm_count == 0))
-			continue;
-
 		let ap = new ArtPage(ab_wnd.elPagesDiv, ab_artists[i]);
 		ab_art_pages.push(ap);
 
