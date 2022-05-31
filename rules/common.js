@@ -987,6 +987,15 @@ function c_PathDir(i_file)
 	return i_file.substr(0, i_file.lastIndexOf('/'));
 }
 
+function c_PathSplitExt(i_file)
+{
+	let split = [i_file,''];
+	let dot = i_file.lastIndexOf('.');
+	if (dot != -1)
+		split = [i_file.substr(0, dot), i_file.substr(dot+1)];
+	return split;
+}
+
 function c_PathPM_Rules2Server(i_path)
 {
 	if (RULES.root_link)

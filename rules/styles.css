@@ -1317,11 +1317,19 @@ background-position: center;
 /*
 .profile > div { border-radius: 4px; border: 1px solid #888; margin: 4px 0px; padding: 4px; }
 .profile > div > div { padding: 4px 8px; }
-.profile > div .label { float: left; width: 150px; }
 .profile > div .prop { min-height: 20px; box-shadow: 0 0 2px #000 inset, 0 0 0 2px rgba(255,255,255,.2); border-radius: 4px; }
 */
-.profile .button { width: 100px; float: right; margin: 12px 12px; padding: 2px 12px; }
-.profile .avatar { position: absolute; width: 88px; height: 88px; border: 1px solid #000; border-radius: 8px; box-shadow: 0 0 4px rgba(255,255,255,.8); }
+.profile > div .label {width: 250px;}
+.profile .buttons_div .button {width: 100px; float: right; margin: 12px 12px; padding: 2px 12px;}
+.profile .avatar_div {position: absolute; width: 172px; /*text-align: center; border: 1px solid #000;*/}
+.profile .avatar_div img {width: 128px; height: 128px; border: 1px solid #000; border-radius: 4px; box-shadow: 0 0 4px rgba(255,255,255,.8); display: block;}
+.profile .avatar_div label {display: block; width: 118px; /*border: 1px solid #F00;*/}
+.profile .avatar_div input {display: none;}
+.profile .avatar_div .pav_info {font-size: 14px; padding: 4px; /*border: 1px solid #FF0;*/}
+.profile .avatar_div .pav_upload {font-size: 14px; padding: 4px; border: 3px solid rgb(50,200,50);}
+.profile .avatar_div .pav_status {font-size: 14px; padding: 4px; font-style: italic;}
+.profile .avatar_div .pav_status.pav_status_success {color: #040; text-shadow: 0 0 1px #0F0;}
+.profile .avatar_div .pav_status.pav_status_error   {color: #800; text-shadow: 0 0 1px #F00;}
 
 .imgconvert > div > div { margin: 2px 8px; padding: 2px 8px;}
 .imgconvert > div .label { float: left; width: 100px; }
