@@ -49,6 +49,11 @@ class blender_cycles(blender.blender):
         lines = data.split('\n')
         need_calc = False
         for line in lines:
+            # deal with Cycles X syntax
+            status, perc = self.extractPercentage(line, '| Sample ', '\n')
+            if status:
+                self.percentframe = perc
+                need_calc = True
             # deal with new syntax
             status, perc = self.extractPercentage(line, '| Rendered ', 'Tiles')
             if status:
@@ -58,8 +63,7 @@ class blender_cycles(blender.blender):
             status, perc = self.extractPercentage(line, '| Path Tracing Tile ', ',')
             if status:
                 self.percentframe = perc
-                need_calc = True
-                        
+                need_calc = True                        
         if need_calc:
             self.calculate()
         blender.blender.do(self, i_args)
