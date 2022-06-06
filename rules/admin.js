@@ -1102,6 +1102,22 @@ function ad_WndUserGroupOnClick(i_user)
 
 function ad_WriteGroups()
 {
+	// Delete not existing users from groups:
+	for (let grp in g_groups)
+	{
+		for (let u = 0; u < g_groups[grp].length;)
+		{
+			if (false == g_users.hasOwnProperty(g_groups[grp][u]))
+			{
+				c_Log('User "' + g_groups[grp][u] + '" does not exist any more.');
+				g_groups[grp].splice(u, 1);
+				continue;
+			}
+
+			u = u + 1;
+		}
+	}
+
 	n_Request({
 		"send": {"writegroups": g_groups},
 		"func": ad_ChangesFinished,
