@@ -1367,9 +1367,13 @@ function ad_DisableUser(i_user_id)
 
 	var uobj = g_users[i_user_id];
 	uobj.disabled = true;
+
+	/* Lets keep news channels and bookmarks, as user can be re-eanbled.
+	 * Supervisor can decide to look at the disabled user bookmarks.
 	delete uobj.news;
 	delete uobj.channels;
 	delete uobj.bookmarks;
+	*/
 
 	n_Request({
 		"send": {"disableuser": {"uid": i_user_id, "uobj": uobj}},
