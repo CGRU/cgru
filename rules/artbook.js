@@ -127,7 +127,7 @@ function ab_WndArtistsReceived(i_data)
 	ab_ProcessArtists();
 }
 
-function ab_CollectFlags(i_bm)
+function ab_CollectFlags(i_bm, i_uid)
 {
 	let flags = [];
 
@@ -145,6 +145,12 @@ function ab_CollectFlags(i_bm)
 	for (let t in i_bm.status.tasks)
 	{
 		let task = i_bm.status.tasks[t];
+
+		if (task.artists == null)
+			continue;
+		if (task.artists.indexOf(i_uid) == -1)
+			continue;
+
 		if (task.flags)
 			for (let flag of task.flags)
 				if (flags.indexOf(flag) == -1)
@@ -156,21 +162,30 @@ function ab_CollectFlags(i_bm)
 
 function ab_CompareFlags(a,b)
 {
-	for (let flag of ab_flags_order)
-	{
-		if (a.indexOf(flag) > b.indexOf(flag))
-			return 1;
-		if (a.indexOf(flag) < b.indexOf(flag))
-			return -1;
-	}
+	let max_index_a = -1;
+	let max_index_b = -1;
+
+	for (let flag of a)
+		if (ab_flags_order.indexOf(flag) > max_index_a)
+			max_index_a = ab_flags_order.indexOf(flag);
+
+	for (let flag of b)
+		if (ab_flags_order.indexOf(flag) > max_index_b)
+			max_index_b = ab_flags_order.indexOf(flag);
+
+	if (max_index_a < max_index_b)
+		return 1;
+	if (max_index_a > max_index_b)
+		return -1;
 
 	return 0;
 }
 
-function ab_CompareBookmarks(a,b)
+function ab_CompareBookmarks(i_uid) {
+return function (a,b)
 {
-	return ab_CompareFlags(ab_CollectFlags(a), ab_CollectFlags(b));
-}
+	return ab_CompareFlags(ab_CollectFlags(a, i_uid), ab_CollectFlags(b, i_uid));
+}}
 
 function ab_ProcessArtists()
 {
@@ -189,7 +204,7 @@ function ab_ProcessArtists()
 	{
 		let user = ab_users[uid];
 
-		// Skip not an atrists
+		// Skip not an artists
 		if (c_IsNotAnArtist(user))
 			continue;
 		
@@ -438,13 +453,16 @@ function ArtPagePrj(i_el, i_project, i_artist)
 	this.elRoot.appendChild(this.elBmrks);
 	this.elBmrks.classList.add('ap_bmrks_div');
 
+	// Collect bookmarks of all project scenes:
+	let prj_bms = [];
 	for (let scene of this.project.scenes)
+		prj_bms = prj_bms.concat(scene.bms);
+
+	prj_bms.sort(ab_CompareBookmarks(this.artist.id));
+
+	for (let bm of prj_bms)
 	{
-		scene.bms.sort(ab_CompareBookmarks);
-		for (let bm of scene.bms)
-		{
-			let apbm = new ArtPageBM(this.elBmrks, bm, this.artist);
-		}
+		let apbm = new ArtPageBM(this.elBmrks, bm, this.artist);
 	}
 }
 
