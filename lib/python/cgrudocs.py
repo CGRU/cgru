@@ -15,7 +15,7 @@ def show(i_path=None):
     cgruutils.webbrowse( url)
 
 def showSoftware( i_soft):
-    return show('software/%s' % i_soft)
+    return show('software/%s.html' % i_soft)
 
 def showForum( i_forum = None):
 
