@@ -29,7 +29,7 @@ var ab_art_projects = [];
 var ab_wnd_sort_prop = 'bm_count';
 var ab_wnd_sort_dir = 1;
 
-var ab_flags_order = ['check','comment','ready','inprogress'];
+var ab_flags_order = ['precomp','check','comment','ready','inprogress','on_farm','sent'];
 
 function ab_Init()
 {
