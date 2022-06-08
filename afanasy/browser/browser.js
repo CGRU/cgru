@@ -18,6 +18,8 @@
 
 var g_cycle = 0;
 var g_last_msg_cycle = g_cycle;
+var g_register_timer_id = null;
+
 var g_id = 0;
 var g_uid = -1;
 var g_uid_orig = -1;
@@ -212,8 +214,27 @@ function g_Logout()
 	window.location.reload();
 }
 
-function g_RegisterSend()
+function g_RegisterSend(i_from_timer)
 {
+	// We should prevent to send register twice.
+	// Function call itself after timeout.
+	if (i_from_timer)
+	{
+		// Function called from timer.
+		g_register_timer_id = null;
+	}
+	else
+	{
+		if (g_register_timer_id)
+		{
+			// Function will be called after timeout.
+			//alert('Server too busy...');
+			g_Error('Ignoring a double registration...');
+			return;
+		}
+	}
+
+	// We have registered.
 	if (g_id != 0)
 		return;
 
@@ -226,7 +247,7 @@ function g_RegisterSend()
 	obj.monitor.engine = cgru_Browser;
 	nw_send(obj);
 
-	setTimeout('g_RegisterSend()', 5000);
+	g_register_timer_id = setTimeout(() => g_RegisterSend(true), 5000);
 }
 
 function g_ProcessMsg(i_obj)
@@ -319,7 +340,7 @@ function g_Refresh()
 		g_ConnectionLost();
 
 	g_cycle++;
-	setTimeout("g_Refresh()", 1000);
+	setTimeout(g_Refresh, 1000);
 
 	if (g_id == 0)
 		return;
