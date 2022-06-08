@@ -582,6 +582,7 @@ width: 32px;
 height: 32px;
 margin: 0 0 0 2px;
 }
+#news .news .status .flags {float: left;}
 
 
 /* ============= BOOKMARKS: =============== */
@@ -640,6 +641,7 @@ width: 100%;
 float: right;
 font-size: 10px;
 }
+#bookmarks .bookmark .status .flags {float: left;}
 #bookmarks .bookmark .bar {
 _position: absolute;
 bottom: 1px;
@@ -1382,6 +1384,7 @@ height: 56px;
 border: 2px solid rgba(98,98,98,.5);
 border-radius: 2px;
 }
+.artpage_bm .status .flags {float: left;}
 .artpage_bm.obsolete {
 font-style: italic;
 opacity: 0.5;

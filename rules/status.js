@@ -722,6 +722,7 @@ function st_SetElStatus(i_el, i_status, i_show_all_tasks, i_user = null)
 		let elFlags = document.createElement('div');
 		elStatus.appendChild(elFlags);
 		elFlags.classList.add('flags');
+		st_SetElFlags(i_status, elFlags);
 	}
 
 
@@ -773,12 +774,15 @@ function st_SetElStatus(i_el, i_status, i_show_all_tasks, i_user = null)
 	}
 
 	// Status color:
+	st_SetElColor(i_status, i_el, i_el, false);
+	/*
 	if (i_status && i_status.color)
 	{
 		let c = i_status.color;
 		i_el.style.backgroundColor = 'rgba('+c[0]+','+c[1]+','+c[2]+')';
 		st_SetElColorTextFromBack(c, i_el);
 	}
+	*/
 }
 
 function st_SetElFinish(i_status, i_elFinish, i_full)
