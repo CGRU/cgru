@@ -116,6 +116,7 @@ float: right;
 padding: 3px; margin: 3px;
 }
 #footer #log, #netlog {
+clear: both;
 border: 1px solid #575757;
 overflow: auto;
 word-wrap:break-word;
