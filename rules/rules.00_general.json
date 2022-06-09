@@ -62,7 +62,7 @@
 	"roto"    :{"title":"Roto",     "short":"Ro",  "tip":"Rotoscoping"},
 	"rnd"     :{"title":"R&D",      "short":"RnD", "tip":"Research and development"},
 	"textur"  :{"title":"Textur",   "short":"Tx",  "tip":"Texturing"},
-	"track"   :{"title":"Track",    "short":"Tr",  "tip":"Tracking"},
+	"track"   :{"title":"Track",    "short":"Tr",  "koeff":0.1, "tip":"Tracking"},
 
 	"other"   :{"title":"Other",    "short":"Ot",  "tip":"Something else",
 		"new_line":true}

@@ -637,8 +637,12 @@ Task.prototype.save = function(i_progress_changed)
 			if (task.deleted)
 				continue;
 
-			avg_progress += task.progress;
-			num_tasks += 1;
+			let koeff = 1;
+			if (RULES.tags[t].koeff)
+				koeff = RULES.tags[t].koeff;
+
+			avg_progress += koeff * task.progress;
+			num_tasks += koeff;
 		}
 		avg_progress = Math.floor(avg_progress / num_tasks);
 		progresses[this.statusClass.path] = avg_progress;
