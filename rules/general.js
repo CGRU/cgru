@@ -31,8 +31,8 @@ var g_navigating_path = null;
 var g_arguments = null;
 
 var g_navig_infos = {
-	all     : ['annotation', 'size', 'flags', 'artists', 'tags', 'tasks','tasks_only_my', 'duration', 'price', 'frames', 'percent'],
-	default : ['annotation', 'flags', 'tags', 'artists', 'tasks', 'percent'],
+	all     : ['annotation', 'size', 'flags', 'artists', 'tags', 'thumbs', 'tasks','tasks_only_my', 'duration', 'price', 'frames', 'percent'],
+	default : ['annotation', 'flags', 'tags', 'artists', 'thumbs', 'tasks', 'percent'],
 	current : []
 };
 
@@ -789,6 +789,15 @@ function g_AppendFolder(i_elParent, i_fobject)
 	elFlags.classList.add('flags');
 	elFlags.classList.add('info');
 
+	if (i_fobject.thumbnail)
+	{
+		let elThumb = document.createElement('div');
+		elFBody.appendChild(elThumb);
+		elFolder.m_elThumb = elThumb;
+		elThumb.classList.add('thumb');
+		elThumb.classList.add('info');
+	}
+
 	var elTasks = document.createElement('div');
 	elFBody.appendChild(elTasks);
 	elFolder.m_elTasks = elTasks;
@@ -807,7 +816,10 @@ function g_AppendFolder(i_elParent, i_fobject)
 		elFolder.m_path = '/' + folder;
 	else
 		elFolder.m_path = i_elParent.m_path + '/' + folder;
+
 	elName.href = '#' + elFolder.m_path;
+	if (i_fobject.thumbnail)
+		elFolder.m_elThumb.style.backgroundImage = 'url(' + c_GetRuFilePath(RULES.thumbnail.filename, elFolder.m_path) + ')';
 
 	elFolder.onclick = g_FolderOnClick;
 	elFolder.oncontextmenu = function(e) {

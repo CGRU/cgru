@@ -317,6 +317,9 @@ def walkDir(admin, i_recv, i_dir, o_out, i_depth):
             for sfile in lookahead:
                 sfilepath = os.path.join(path, rufolder, sfile) + '.json'
                 editobj.mergeObjs(folderObj, readObj(sfilepath))
+            thumbpath = os.path.join(path, rufolder, 'thumbnail.jpg')
+            if os.path.isfile(thumbpath):
+                folderObj['thumbnail'] = True
 
         if i_depth < i_recv['depth']:
             walkDir(admin, i_recv, path, folderObj, i_depth + 1)
