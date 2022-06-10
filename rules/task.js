@@ -638,7 +638,7 @@ Task.prototype.save = function(i_progress_changed)
 				continue;
 
 			let koeff = 1;
-			if (RULES.tags[t].koeff)
+			if (RULES.tags[t] && RULES.tags[t].koeff)
 				koeff = RULES.tags[t].koeff;
 
 			avg_progress += koeff * task.progress;
