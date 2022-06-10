@@ -377,7 +377,7 @@ function Monitor(i_args)
 		return;
 	}
 
-	nw_Subscribe(this.types[0]);
+	nw_Subscribe(this.types[0], true);
 	nw_GetNodes(this.types[0]);
 
 	g_refreshers.push(this);
@@ -578,7 +578,7 @@ Monitor.prototype.processMsg = function(obj) {
 		if (this.types.length == 2)
 		{
 			// Farm monitor has 2 node types:
-			nw_Subscribe(this.types[1]);
+			nw_Subscribe(this.types[1],true);
 			nw_GetNodes(this.types[1]);
 		}
 	}
