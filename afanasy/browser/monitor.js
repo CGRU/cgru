@@ -366,7 +366,9 @@ function Monitor(i_args)
 
 	// Add other node type to monitor:
 	if (this.type == 'renders')
-		this.types.push('pools');
+	{
+		this.types = ['pools','renders'];
+	}
 
 	if (this.type == 'tasks')
 	{
@@ -375,11 +377,8 @@ function Monitor(i_args)
 		return;
 	}
 
-	for (let type of this.types)
-	{
-		nw_Subscribe(type, true);
-		nw_GetNodes(type);
-	}
+	nw_Subscribe(this.types[0]);
+	nw_GetNodes(this.types[0]);
 
 	g_refreshers.push(this);
 }
@@ -569,10 +568,19 @@ Monitor.prototype.processMsg = function(obj) {
 			this.cur_item = updated_items[updated_items.length - 1];
 	}
 
-	if ((this.firstNodesReceived != true) && new_items.length && (g_VISOR() != true))
+	if ((this.firstNodesReceived != true) && new_items.length)
 	{
-		this.items[this.items.length - 1].element.scrollIntoView();
 		this.firstNodesReceived = true;
+
+		if (g_VISOR() != true)
+			this.items[this.items.length - 1].element.scrollIntoView();
+
+		if (this.types.length == 2)
+		{
+			// Farm monitor has 2 node types:
+			nw_Subscribe(this.types[1]);
+			nw_GetNodes(this.types[1]);
+		}
 	}
 
 	if (this.nodeConstructor.updatingFinished)
