@@ -17,10 +17,16 @@ v3.3.0
 
 *Not released*
 
-2022.04.26
+2022.06.10
 
 - AfRender can send to server `GPU resources <../afanasy/render.html#gpu-string>`_:
-  utilization, temperature, memory total and used. For now, just NVIDIA is supported.
+  utilization, temperature, memory total and used.
+
+  .. note::
+
+    This feature is sponsored by SMF Animation Studio, LLC
+
+  For now, just NVIDIA is supported.
 
 - New job block need parameters:
   `GPU Memory <../afanasy/job_block.html#need-gpu-mem-mb>`_,
