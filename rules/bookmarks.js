@@ -441,8 +441,6 @@ function bm_NavigatePost()
 		return;
 
 	bm_HighlightCurrent();
-
-	bm_clicked = false;
 }
 
 function bm_ActualStatus(i_status, i_user)
@@ -522,6 +520,8 @@ function bm_HighlightCurrent()
 			bm_elements[i].classList.remove('cur_path');
 		}
 	}
+
+	bm_clicked = false;
 }
 
 function bm_Delete(i_paths)
@@ -576,6 +576,7 @@ function bm_FavouriteToggle_Finished(i_data)
 	}
 
 	c_Info('Bookmark favourite toggled.');
+	bm_clicked = true;
 	bm_Load({"info": 'favourite'});
 }
 
