@@ -176,6 +176,9 @@ bool ListItems::mousePressed(QMouseEvent * i_event)
 		return true;
 	}
 
+	if (m_view->selectionMode() == QAbstractItemView::NoSelection)
+		displayWarning("Selection is allowed for administrators only.");
+
 	return false;
 }
 

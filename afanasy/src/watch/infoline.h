@@ -7,12 +7,14 @@
 class InfoLine : public QLineEdit
 {
 public:
-   InfoLine( QWidget *parent);
-   ~InfoLine();
+	InfoLine(QWidget *parent);
+	~InfoLine();
 
-   void displayInfo(    const QString &message );
-   void displayWarning( const QString &message );
-   void displayError(   const QString &message );
+	void clear();
+
+	void displayInfo(   const QString &i_message);
+	void displayWarning(const QString &i_message);
+	void displayError(  const QString &i_message);
 
 private:
 

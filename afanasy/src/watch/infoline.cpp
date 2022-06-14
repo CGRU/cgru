@@ -1,26 +1,35 @@
 #include "infoline.h"
 
-InfoLine::InfoLine( QWidget *parent):
-   QLineEdit( parent)
+InfoLine::InfoLine(QWidget * parent):
+	QLineEdit(parent)
 {
-   setReadOnly( true);
+	setReadOnly(true);
 }
 
 InfoLine::~InfoLine()
 {
 }
 
-void InfoLine::displayInfo( const QString &message)
+void InfoLine::clear()
 {
-   setText( message);
+	QLineEdit::clear();
+	setStyleSheet("");
 }
 
-void InfoLine::displayWarning( const QString &message)
+void InfoLine::displayInfo(const QString &i_message)
 {
-   setText( "WARNING: " + message);
+	setText(i_message);
+	setStyleSheet("");
 }
 
-void InfoLine::displayError( const QString &message)
+void InfoLine::displayWarning(const QString &i_message)
 {
-   setText( "ERROR: " + message);
+	setText("WARNING: " + i_message);
+	setStyleSheet("color: black; background-color: rgb(250,250,150)");
+}
+
+void InfoLine::displayError(const QString &i_message)
+{
+	setText("ERROR: " + i_message);
+	setStyleSheet("color: black; background-color: rgb(250,150,150)");
 }
