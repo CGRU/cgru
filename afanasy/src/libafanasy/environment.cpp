@@ -169,8 +169,8 @@ std::string Environment::http_directory_index;
 
 Address Environment::serveraddress;
 
-bool Environment::god_mode       = false;
-bool Environment::visor_mode     = false;
+bool Environment::m_god_mode     = false;
+bool Environment::m_visor_mode   = false;
 bool Environment::m_help_mode    = false;
 bool Environment::m_demo_mode    = false;
 bool Environment::m_valid        = false;
@@ -183,7 +183,7 @@ bool Environment::m_server          = false;
 std::vector<std::string> Environment::m_config_files;
 std::string Environment::m_config_data;
 
-Passwd * Environment::passwd = NULL;
+Passwd * Environment::m_passwd = NULL;
 
 std::vector<std::string> Environment::platform;
 std::vector<std::string> Environment::previewcmds;
@@ -707,7 +707,9 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 
 Environment::~Environment()
 {
-	if( passwd != NULL) delete passwd;
+	if (m_passwd != NULL)
+		delete m_passwd;
+
 	printUsage();
 }
 
@@ -830,7 +832,80 @@ bool Environment::reload()
 	return m_valid;
 }
 
-bool Environment::checkKey( const char key) { return passwd->checkKey( key, visor_mode, god_mode); }
+bool Environment::passwdCheckKey(const char i_key)
+{
+	bool visor_mode = false;
+	bool god_mode = false;
+
+	if (false == m_passwd->checkKey(i_key, visor_mode, god_mode))
+		return false;
+
+	if (visor_mode)
+	{
+		if (m_visor_mode)
+		{
+			m_visor_mode  = false;
+			printf("VISOR MODE OFF\n");
+			if (m_god_mode)
+				printf("GOD MODE OFF\n");
+			m_god_mode = false;
+		}
+		else
+		{
+			m_visor_mode  = true;
+			printf("VISOR MODE ON\n");
+			if (m_god_mode)
+				printf("GOD MODE OFF\n");
+			m_god_mode = false;
+		}
+		return true;
+	}
+
+	if (god_mode)
+	{
+		if (m_god_mode)
+		{
+			m_god_mode = false;
+			printf("GOD MODE OFF\n");
+			if (m_visor_mode)
+				printf("VISOR MODE OFF\n");
+			m_visor_mode = false;
+		}
+		else
+		{
+			m_god_mode  = true;
+			printf("GOD MODE ON\n");
+			if (!m_visor_mode)
+				printf("VISOR MODE ON\n");
+			m_visor_mode = true;
+		}
+		return true;
+	}
+
+	return false;
+}
+bool Environment::passwdCheckVisor(const std::string & i_passwd)
+{
+	if (m_passwd->checkPassVisor(i_passwd))
+	{
+		m_visor_mode = true;
+		m_god_mode = false;
+		return true;
+	}
+
+	return false;
+}
+bool Environment::passwdCheckGOD(const std::string & i_passwd)
+{
+	if (m_passwd->checkPassGOD(i_passwd))
+	{
+		m_visor_mode = true;
+		m_god_mode = true;
+		return true;
+	}
+
+	return false;
+}
 
 // Initialize environment after all variables are loaded (set to default values)
 bool Environment::initAfterLoad()
@@ -893,8 +968,9 @@ bool Environment::initAfterLoad()
 		 serveraddress = af::solveNetName( servername, serverport, AF_UNSPEC, m_verbose_init ? VerboseOn : VerboseOff);
 
 	// VISOR and GOD passwords:
-	if( passwd != NULL) delete passwd;
-	passwd = new Passwd( pswd_visor, pswd_god);
+	if (m_passwd != NULL)
+		delete m_passwd;
+	m_passwd = new Passwd(pswd_visor, pswd_god);
 
 	return true;
 }

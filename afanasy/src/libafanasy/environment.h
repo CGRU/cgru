@@ -71,10 +71,13 @@ public:
 	static const std::string & getConfigData() { return m_config_data;}
 
 	/// Check current key matching password sequence.
-	static bool checkKey( const char key);
+	static bool passwdCheckKey  (const char i_key);
+	static bool passwdCheckVisor(const std::string & i_passwd);
+	static bool passwdCheckGOD  (const std::string & i_passwd);
+	static inline void passwdSwitchToUser() {m_god_mode = false; m_visor_mode = false;}
 
-	static inline bool VISOR() { return visor_mode;  } ///< check user VISOR mode
-	static inline bool GOD()   { return god_mode;    } ///< check user GOD   mode
+	static inline bool VISOR(){return m_visor_mode;} ///< check user VISOR mode
+	static inline bool GOD()  {return m_god_mode;  } ///< check user GOD   mode
 
 	static inline bool getPermUserModHisPriority() { return perm_user_mod_his_priority; }
 	static inline bool getPermUserModJobPriority() { return perm_user_mod_job_priority; }
@@ -405,10 +408,11 @@ private:
 	static std::string rules_url;
 	static std::vector<std::string> projects_root;
 
-	static Passwd * passwd;
-	static bool visor_mode;     ///< user is VISOR
 	static std::string pswd_visor;  ///< VISOR password
-	static bool god_mode;       ///< user is GOD
 	static std::string pswd_god;    ///< GOD password
+
+	static Passwd * m_passwd;
+	static bool m_visor_mode;     ///< user is VISOR
+	static bool m_god_mode;       ///< user is GOD
 };
 }

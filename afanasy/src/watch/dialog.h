@@ -51,7 +51,7 @@ public:
 
     void reloadImages();
 
-    void keyPressEvent(    QKeyEvent         * event);
+	void keyPressEvent(QKeyEvent * event);
 
 signals:
     void stop();
@@ -60,6 +60,7 @@ private slots:
 	void showMenuLevel();
 	void showMenuTheme();
 	void showMenuPrefs();
+	void showMenuAdmin();
 	void showMenuHelp();
 
     void newMessage( af::Msg * msg);
@@ -80,6 +81,9 @@ private slots:
 	void actScrollStep(int i_step);
 	void actShowDocs();
 	void actShowForum();
+	void actSwitchToUser();
+	void actSwitchToVisor();
+	void actSwitchToGOD();
 
 protected:
     void contextMenuEvent( QContextMenuEvent * event);
@@ -95,11 +99,17 @@ private:
     void connectionEstablished();
     void setDefaultWindowTitle();
 
+	void switchToGOD();
+	void switchToVisor();
+	void switchToUser();
+	void reopenMonitor();
+
 private:
 	QMenu * m_contextMenu;
 	QMenu * m_levelMenu;
 	QMenu * m_themeMenu;
 	QMenu * m_prefsMenu;
+	QMenu * m_adminMenu;
 	QMenu * m_helpMenu;
 
     bool m_initialized;

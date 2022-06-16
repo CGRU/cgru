@@ -60,6 +60,9 @@ Passwd::~Passwd()
 
 bool Passwd::checkKey(const char i_key, bool & o_visor_mode, bool & o_god_mode)
 {
+	o_visor_mode = false;
+	o_god_mode = false;
+
 	for (int i = 1; i < ms_pswd_len; i++)
 		m_characters[i-1] = m_characters[i];
 	m_characters[ms_pswd_len-1] = i_key;
@@ -68,51 +71,31 @@ bool Passwd::checkKey(const char i_key, bool & o_visor_mode, bool & o_god_mode)
 
 	if (memcmp(m_visor, m_digest, ms_digest_len) == 0)
 	{
-		if (o_visor_mode)
-		{
-			o_visor_mode  = false;
-			printf("VISOR MODE OFF\n");
-			if (o_god_mode)
-				printf("GOD MODE OFF\n");
-			o_god_mode = false;
-		}
-		else
-		{
-			o_visor_mode  = true;
-			printf("VISOR MODE ON\n");
-			if (o_god_mode)
-				printf("GOD MODE OFF\n");
-			o_god_mode = false;
-		}
+		o_visor_mode = true;
 		return true;
 	}
-	else if (memcmp(m_god, m_digest, ms_digest_len) == 0)
+
+	if (memcmp(m_god, m_digest, ms_digest_len) == 0)
 	{
-		if (o_god_mode)
-		{
-			o_god_mode = false;
-			printf("GOD MODE OFF\n");
-			if (o_visor_mode)
-				printf("VISOR MODE OFF\n");
-			o_visor_mode = false;
-		}
-		else
-		{
-			o_god_mode  = true;
-			printf("GOD MODE ON\n");
-			if (!o_visor_mode)
-				printf("VISOR MODE ON\n");
-			o_visor_mode = true;
-		}
+		o_god_mode = true;
 		return true;
 	}
 
 	return false;
 }
 
-void Passwd::calculate(unsigned char * i_key, const char * i_passwd)
+bool Passwd::checkPassVisor(const std::string & i_pass)
 {
-	calculate(i_key, (unsigned char *)i_passwd, strlen(i_passwd));
+	calculate(m_digest, (const unsigned char *)(i_pass.c_str()), i_pass.length());
+
+	return memcmp(m_visor, m_digest, ms_digest_len) == 0;
+}
+
+bool Passwd::checkPassGOD(const std::string & i_pass)
+{
+	calculate(m_digest, (const unsigned char *)(i_pass.c_str()), i_pass.length());
+
+	return memcmp(m_god, m_digest, ms_digest_len) == 0;
 }
 
 void Passwd::PrintKey(unsigned char * i_key)
@@ -122,7 +105,7 @@ void Passwd::PrintKey(unsigned char * i_key)
 	printf("\n");
 }
 
-void Passwd::calculate(unsigned char * i_key, unsigned char * i_passwd, int i_len)
+void Passwd::calculate(unsigned char * i_key, const unsigned char * i_passwd, int i_len)
 {
 	MD5Init  (&m_context);
 	MD5Update(&m_context, i_passwd, i_len);

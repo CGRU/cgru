@@ -17,7 +17,8 @@ public:
 	/// Check current key matching password sequence.
 	bool checkKey(const char i_key, bool & o_visor_mode, bool & o_god_mode);
 
-	void calculate(unsigned char * i_key, const char * i_passwd);
+	bool checkPassVisor(const std::string & i_pass);
+	bool checkPassGOD  (const std::string & i_pass);
 
 	static void PrintKey(unsigned char * i_key);
 
@@ -33,7 +34,7 @@ private:
 
 private:
 	void init();
-	void calculate(unsigned char * i_key, unsigned char * i_passwd, int i_len);
+	void calculate(unsigned char * i_key, const unsigned char * i_passwd, int i_len);
 
 private:
 	MD5_CTX m_context;

@@ -33,6 +33,7 @@
 #include <QtGui/QContextMenuEvent>
 #include <QtGui/QPainter>
 #include <QBoxLayout>
+#include <QInputDialog>
 #include <QMenu>
 #include <QMenuBar>
 #include <QScrollArea>
@@ -97,6 +98,7 @@ Dialog::Dialog():
     m_vlayout_b->addWidget( m_labelversion);
 
 	m_topleft  = new QLabel("", this);
+	m_topleft->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	m_topright = new QWidget(this);
 
 	m_hlayout_b->addWidget(m_topleft);
@@ -222,6 +224,11 @@ void Dialog::createMenus()
     editMenu->addAction( action);
 	m_contextMenu->addAction( action);
 
+	m_adminMenu = new QMenu("&Administrate", this);
+	menuBar()->addMenu(m_adminMenu);
+	m_contextMenu->addMenu(m_adminMenu);
+	connect(m_adminMenu, SIGNAL(aboutToShow()), this, SLOT(showMenuAdmin()));
+
 	m_helpMenu = new QMenu("&Help", this);
 	menuBar()->addMenu( m_helpMenu);
 	m_contextMenu->addMenu( m_helpMenu);
@@ -323,6 +330,37 @@ void Dialog::showMenuPrefs()
     action->setChecked( afqt::QEnvironment::showOfflineNoise.n != 0);
     connect( action, SIGNAL( triggered() ), this, SLOT( actShowOfflineNoise() ));
     m_prefsMenu->addAction( action);
+}
+
+void Dialog::showMenuAdmin()
+{
+	m_adminMenu->clear();
+	QAction * action;
+
+	action = new QAction("USER Mode");
+	action->setCheckable(true);
+	action->setChecked(false == af::Environment::VISOR());
+	action->setEnabled(af::Environment::VISOR());
+	connect(action, SIGNAL(triggered() ), this, SLOT(actSwitchToUser()));
+	m_adminMenu->addAction(action);
+
+	m_adminMenu->addSeparator();
+
+	action = new QAction("VISOR Mode");
+	action->setCheckable(true);
+	action->setChecked(af::Environment::VISOR() && (false == af::Environment::GOD()));
+	action->setEnabled((false == af::Environment::VISOR()) || af::Environment::GOD());
+	connect(action, SIGNAL(triggered() ), this, SLOT(actSwitchToVisor()));
+	m_adminMenu->addAction(action);
+
+	m_adminMenu->addSeparator();
+
+	action = new QAction("GOD Mode");
+	action->setCheckable(true);
+	action->setChecked(af::Environment::GOD());
+	action->setEnabled(false == af::Environment::GOD());
+	connect(action, SIGNAL(triggered() ), this, SLOT(actSwitchToGOD()));
+	m_adminMenu->addAction(action);
 }
 
 void Dialog::showMenuHelp()
@@ -627,46 +665,109 @@ bool Dialog::openMonitor( int type, bool open)
    return true;
 }
 
-void Dialog::keyPressEvent( QKeyEvent * event)
+void Dialog::keyPressEvent(QKeyEvent * event)
 {
-   const QString key( event->text());
-   if( key.isNull() || key.isEmpty() ) return;
+	const QString key(event->text());
+	if (key.isNull() || key.isEmpty())
+		return;
 
-	if (af::Environment::checkKey(key.at(0).toLatin1()))
+	if (af::Environment::passwdCheckKey(key.at(0).toLatin1()))
 	{
 		if (af::Environment::GOD())
-		{
-			MonitorHost::setUid(0);
-
-			if (false == af::Environment::getWatchWorkUserVisible())
-				m_btnMonitor[Watch::WWork]->setHidden(false);
-			m_btnMonitor[Watch::WMonitors]->setHidden(false);
-
-			m_topleft->setText("GOD MODE");
-		}
+			switchToGOD();
 		else if (af::Environment::VISOR())
-		{
-			MonitorHost::setUid(0);
-
-			m_topleft->setText("VISOR MODE");
-		}
+			switchToVisor();
 		else
-		{
-			MonitorHost::setUid(-1);
+			switchToUser();
+	}
+}
+void Dialog::actSwitchToUser()
+{
+	af::Environment::passwdSwitchToUser();
+	switchToUser();
+}
+void Dialog::actSwitchToVisor()
+{
+	if (af::Environment::VISOR() && (false == af::Environment::GOD()))
+		return;
 
-			if (false == af::Environment::getWatchWorkUserVisible())
-				m_btnMonitor[Watch::WWork]->setHidden(true);
-			m_btnMonitor[Watch::WMonitors]->setHidden(true);
+	m_infoline->clear();
+	bool ok = false;
+	QString pass = QInputDialog::getText(this, "Enter Visor Password", QString(), QLineEdit::Password, QString(), &ok);
+	if (false == ok)
+		return;
 
-			m_topleft->setText("");
-		}
-      int opened_type = m_monitorType ;
-      closeList();
-//      ButtonMonitor::unset();
-      ButtonMonitor::refreshImages();
-      setDefaultWindowTitle();
-      if( opened_type != Watch::WNONE) openMonitor( opened_type, false);
-   }
+	if (false == af::Environment::passwdCheckVisor(afqt::qtos(pass)))
+	{
+		displayError("Invalid password.");
+		return;
+	}
+
+	m_infoline->clear();
+
+	switchToVisor();
+}
+void Dialog::actSwitchToGOD()
+{
+	if (af::Environment::GOD())
+		return;
+
+	m_infoline->clear();
+	bool ok = false;
+	QString pass = QInputDialog::getText(this, "Enter GOD Password", QString(), QLineEdit::Password, QString(), &ok);
+	if (false == ok)
+		return;
+
+	if (false == af::Environment::passwdCheckGOD(afqt::qtos(pass)))
+	{
+		displayError("Invalid password.");
+		return;
+	}
+
+	m_infoline->clear();
+
+	switchToGOD();
+}
+void Dialog::switchToGOD()
+{
+	MonitorHost::setUid(0);
+
+	if (false == af::Environment::getWatchWorkUserVisible())
+		m_btnMonitor[Watch::WWork]->setHidden(false);
+	m_btnMonitor[Watch::WMonitors]->setHidden(false);
+
+	m_topleft->setText("<b style=color:#0000DD>GOD MODE</b>");
+
+	reopenMonitor();
+}
+void Dialog::switchToVisor()
+{
+	MonitorHost::setUid(0);
+
+	m_topleft->setText("<b style=color:#008800>VISOR MODE</b>");
+
+	reopenMonitor();
+}
+void Dialog::switchToUser()
+{
+	MonitorHost::setUid(-1);
+
+	if (false == af::Environment::getWatchWorkUserVisible())
+		m_btnMonitor[Watch::WWork]->setHidden(true);
+	m_btnMonitor[Watch::WMonitors]->setHidden(true);
+
+	m_topleft->clear();
+
+	reopenMonitor();
+}
+void Dialog::reopenMonitor()
+{
+	int opened_type = m_monitorType ;
+	closeList();
+	ButtonMonitor::refreshImages();
+	setDefaultWindowTitle();
+	if (opened_type != Watch::WNONE)
+		openMonitor(opened_type, false);
 }
 
 void Dialog::actColors()
