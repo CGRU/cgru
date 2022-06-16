@@ -17,7 +17,7 @@ v3.3.0
 
 *Not released*
 
-2022.06.10
+2022.06.16
 
 - AfRender can send to server `GPU resources <../afanasy/render.html#gpu-string>`_:
   utilization, temperature, memory total and used.
@@ -35,6 +35,11 @@ v3.3.0
   `CPU Cores*Frequency <../afanasy/job_block.html#need-cpu-freq-cores>`_.
 
 - AfWatch and WebGUI shows some summary info, when several jobs are selected.
+
+- AfWatch got and "Administration" menu to switch to super user mode with password.
+
+- AfWatch warning and error messages and super user mode label highlighted to attract more attention.
+  When selection is not allowed, nodes list displays a warning message.
 
 - Now parser checks whether the task progress was changed.
   Later server had to compare previous and new percentage value.
