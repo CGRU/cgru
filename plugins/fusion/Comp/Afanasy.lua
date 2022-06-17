@@ -6,49 +6,49 @@
 
 -- ::again::
 
-	-- create dialog on unsaved composition
+    -- create dialog on unsaved composition
 function MessageBox(msg, title)
-	local d = {}
-	d[1] = {"Msg", Name = "Message", "Text", ReadOnly = true, Default = msg ,Lines = 2 ,Wrap = true}
-	comp:AskUser( title, d )
+    local d = {}
+    d[1] = {"Msg", Name = "Message", "Text", ReadOnly = true, Default = msg ,Lines = 2 ,Wrap = true}
+    comp:AskUser( title, d )
 end
 
-	-- get global parameters
+    -- get global parameters
 gcp = composition:GetAttrs()
 
-	-- check if the composition is saved and have been named
+    -- check if the composition is saved and have been named
 if gcp.COMPS_FileName == "" then
-	MessageBox( "You must save the comp before you can submit it.", "Submit to Afanasy" )
-	return
+    MessageBox( "You must save the comp before you can submit it.", "Submit to Afanasy" )
+    return
 end
 
-	-- autosave the comp if it was modified but not saved before submission
+    -- autosave the comp if it was modified but not saved before submission
 if gcp.COMPB_Modified then
     comp:Save(gcp.COMPS_FileName)
-end 
+end k
 
-	-- define global path to Afanasy
-	tenv = os.getenv("AF_ROOT")
+    -- define global path to Afanasy
+    tenv = os.getenv("AF_ROOT")
 if tenv == nil then
-	MessageBox( "Launch Fusion from CGRU Keeper.", "Submit to Afanasy" )
-	return
+    MessageBox( "Launch Fusion from CGRU Keeper.", "Submit to Afanasy" )
+    return
 else
-	afpy = "python" .." ".. tenv .. "/python/afjob.py"
+    afpy = "python" .." ".. tenv .. "/python/afjob.py"
 end
 
-	-- get full path to comp file
+    -- get full path to comp file
 fcn = gcp.COMPS_FileName
 
-	-- get first render frame
+    -- get first render frame
 frf = gcp.COMPN_RenderStartTime
 
-	-- get last render frame
+    -- get last render frame
 lrf = gcp.COMPN_RenderEndTime
 
-	-- show message at launch
+    -- show message at launch
 msg = " Comp is ready for submission"
 
-	-- GUI
+    -- GUI
 dialog = composition:AskUser(
   "Submit to Afanasy",
   {
@@ -60,33 +60,33 @@ dialog = composition:AskUser(
   }
 )
 
-	-- get rid from attention in console if dialog was denied by Cancel button
+    -- get rid from attention in console if dialog was denied by Cancel button
 if dialog == nil then
-	return
+    return
 end
 
-	-- get first render frame specified in GUI
+    -- get first render frame specified in GUI
 mfrf = dialog["Start Frame"]
 
-	-- get last render frame specified in GUI
+    -- get last render frame specified in GUI
 mlrf = dialog["Last Frame"]
 
-	-- get frames per task
+    -- get frames per task
 fpt = "-fpt" .." ".. dialog["Frames Per Task"]
 
-	-- get host mask
+    -- get host mask
 hosts_mask = "-hostsmask" .." ".. dialog["Hosts Mask"]
 
-	-- collect main command for cmd
+    -- collect main command for cmd
 rcom = afpy .." ".. fcn .." ".. mfrf .." ".. mlrf .." ".. fpt .. " ".. hosts_mask .. " -tempscene -deletescene"
 
 
-	-- print the main command in console
+    -- print the main command in console
 print("Command Line Command:  " .. rcom)
 
-	-- run cmd render
+    -- run cmd render
 executebg(rcom)
 
-	-- exit message
+    -- exit message
 MessageBox( "Successfully Submitted.", "Submit to Afanasy" )
 
