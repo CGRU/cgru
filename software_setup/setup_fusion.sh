@@ -28,6 +28,9 @@ if [ -z "$FUSION_LOCATION" ]; then
           FUSION_EXEC="Fusion"
         fi
      fi
+     # use the ``Fusion`` as the render executable by default
+     export FUSION_RENDERNODE_LOCATION="${FUSION_LOCATION}"
+     FUSION_RENDERNODE_EXEC="${FUSION_EXEC}"
      if [ "`echo $FUSION_FOLDER | awk '{print match( \$1, "FusionRenderNode[0-9]+")}'`" == "1" ]; then
         FUSION_RENDERNODE_LOCATION="${FUSION_INSTALL_DIR}/${FUSION_FOLDER}"
         if [ "`uname`" == "Darwin" ]; then
@@ -42,6 +45,11 @@ if [ -z "$FUSION_LOCATION" ]; then
   export FUSION_RENDERNODE_EXEC="${FUSION_RENDERNODE_LOCATION}/${FUSION_RENDERNODE_EXEC}"
 else
   echo "FUSION_LOCATION is already set: ${FUSION_LOCATION}"
+  # FUSION_LOCATION is already set by an external process (ex: Rez)
+  # The user also needs to setup the following environment variables for a complete setup
+  # $FUSION_EXEC
+  # $FUSION_RENDERNODE_LOCATION
+  # $FUSION_RENDERNODE_EXEC
 fi
 
 #
