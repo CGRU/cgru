@@ -27,10 +27,10 @@ class RenderCommandBuilder(object):
             # this is a rez configured environment
             # use the same rez request to build the render command
             logger.debug("Using REZ_USED_REQUEST to build the render command")
-            cmd_buffer = ["rez-env {} -- fusion".format(os.environ["REZ_USED_REQUEST"])]
+            cmd_buffer = ["rez-env {} -- fusion_render_node".format(os.environ["REZ_USED_REQUEST"])]
         else:
             # use the default command
-            cmd_buffer = ["fusion"]
+            cmd_buffer = ["fusion_render_node"]
 
         # Fusion [<filename.comp> | <filename.dfq>] [-config] [-manager] [-quiet]
         # [-clean] [-about] [-render [-frames <frameset>] [-start <frame>]
@@ -40,11 +40,14 @@ class RenderCommandBuilder(object):
         # [-execute <script string>]
 
         cmd_buffer.append(job_data["comp_file_full_path"])
-        cmd_buffer.append("-quiet")
         cmd_buffer.append("-render")
         cmd_buffer.append("-start @#@")
         cmd_buffer.append("-end @#@")
         cmd_buffer.append("-verbose")
+        cmd_buffer.append("-quiet")
+        cmd_buffer.append("-quietlicense")
+        cmd_buffer.append("-clean")
+        cmd_buffer.append("-quit")
 
         return " ".join(cmd_buffer)
 
