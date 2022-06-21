@@ -864,6 +864,7 @@ border: 2px solid rgba(255,255,0,1);
 #status_tasks .task .edit_div .tags    {float: left;}
 #status_tasks .task .edit_div .percent {float: right; width: 64px;}
 #status_tasks .task .edit_div .percent .label {float: right; padding: 2px; margin: 2px; margin-right: 8px;}
+#status_tasks .task .edit_div .annotation {margin: 4px; border-top: 1px solid rgba(98,98,98,.5);}
 #status_tasks .task .progress          {clear: both; border-radius: 4px;}
 #status_tasks .task .progressbar       {height: 6px; border-radius: 2px;}
 #status_tasks .task .info              {font-style: italic; font-size: 10px;}

@@ -166,6 +166,11 @@ function Task(i_statusClass, i_task)
 	this.elRoot.appendChild(this.elEdit);
 
 
+	this.elAnnotation = document.createElement('div');
+	this.elAnnotation.classList.add('annotation');
+	this.elShow.appendChild(this.elAnnotation);
+
+
 	this.elInfoLeft = document.createElement('div');
 	this.elInfoLeft.classList.add('info','left');
 	this.elRoot.appendChild(this.elInfoLeft);
@@ -197,6 +202,8 @@ Task.prototype.show = function()
 	st_SetElArtists(this.obj, this.elArtists,/*short = */false,/*clickable = */true);
 	st_SetElFlags(this.obj, this.elFlags,/*short = */false,/*clickable = */true);
 	st_SetElProgress(this.obj, this.elProgressBar, this.elProgress, this.elPercent);
+
+	this.elAnnotation.textContent = this.obj.annotation;
 
 	let info_left = '';
 	if (this.obj.cuser)
@@ -356,6 +363,23 @@ Task.prototype.edit = function()
 			"elParent": this.elEdit});
 
 
+	this.elEditAnnotationDiv = document.createElement('div');
+	this.elEditAnnotationDiv.classList.add('annotation');
+	this.elEdit.appendChild(this.elEditAnnotationDiv);
+
+	this.elEditAnnotationLabel = document.createElement('div');
+	this.elEditAnnotationLabel.classList.add('label');
+	this.elEditAnnotationLabel.contentEditable = true;
+	this.elEditAnnotationLabel.textContent = 'Annotation:';
+	this.elEditAnnotationDiv.appendChild(this.elEditAnnotationLabel);
+
+	this.elEditAnnotationContent = document.createElement('div');
+	this.elEditAnnotationContent.classList.add('content','editing');
+	this.elEditAnnotationContent.contentEditable = true;
+	this.elEditAnnotationContent.textContent = this.obj.annotation;
+	this.elEditAnnotationDiv.appendChild(this.elEditAnnotationContent);
+
+
 	// If there is no name, we just adding this task.
 	// So we should not delete it, we can cancel adding.
 	if (this.obj.name)
@@ -467,6 +491,15 @@ Task.prototype.editProcess = function()
 	let artists = this.editAritsts.getSelectedNames();
 	if (null !== artists )
 		this.obj.artists = artists;
+
+	// Annotation:
+	let annotation = this.elEditAnnotationContent.textContent;
+	if (annotation)
+	{
+		annotation = c_Strip(annotation);
+		if (annotation.length)
+			this.obj.annotation = annotation;
+	}
 
 	// We should calculate status progress
 	// if task progress is changed
