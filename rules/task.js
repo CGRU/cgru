@@ -499,7 +499,12 @@ Task.prototype.editProcess = function()
 		annotation = c_Strip(annotation);
 		if (annotation.length)
 			this.obj.annotation = annotation;
+		else
+			this.obj.annotation = '';
 	}
+	else if (this.obj.annotation)
+		this.obj.annotation = '';
+
 
 	// We should calculate status progress
 	// if task progress is changed
