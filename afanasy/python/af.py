@@ -703,6 +703,21 @@ class Job:
             block.fillTasks()
             self.data["blocks"].append(block.data)
 
+    def checkJob(self):
+        """Missing DocString
+
+        :return:
+        """
+        error = False
+        for block in self.blocks:
+            if block.data['flags'] == 0 and len(block.tasks) == 0:
+                error = True
+
+        if error is True:
+            return False
+        else:
+            return True
+
     def output(self):
         """Missing DocString
 
@@ -721,6 +736,9 @@ class Job:
             print('Error: Job has no blocks')
 
         self.fillBlocks()
+
+        if self.checkJob() is not True:
+            return False
 
         # Set folder if empty:
         if "folders" not in self.data:
