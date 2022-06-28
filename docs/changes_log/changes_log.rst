@@ -17,7 +17,7 @@ v3.3.0
 
 *Not released*
 
-2022.06.16
+2022.06.28
 
 - AfRender can send to server `GPU resources <../afanasy/render.html#gpu-string>`_:
   utilization, temperature, memory total and used.
@@ -53,6 +53,10 @@ v3.3.0
   Tasks with this flag are skipped during job solving.
   So now task dependencies will not wait the last frame of unbroken sequence.
 
+- **Bugfixes:**
+
+    - AfServer and job block with no task crash fixed.
+      The crash was very rare, another block with tasks should follow a block without tasks.
 
 .. _changes-log-latest:
 
