@@ -774,6 +774,12 @@ bool Block::tryTasksNext(Action & i_action, const JSON & i_operation)
 bool Block::allocateTasks(int alreadyAllocated)
 {
 	Task **old_tasks = m_tasks;
+
+	if (m_data->getTasksNum() <= 0)
+	{
+		AF_ERR << "Block '" + m_data->getName() + "' has a zero tasks number.";
+		return false;
+	}
 	m_tasks = new Task *[m_data->getTasksNum()];
 	if (m_tasks == NULL)
 	{
