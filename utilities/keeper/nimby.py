@@ -48,7 +48,6 @@ def refresh(reset=False):
     global free_set
 
     days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
-    print('nimby.refresh')
 
     if reset:
         nimby_set = False
@@ -84,12 +83,10 @@ def refresh(reset=False):
 
     # Check today:
     var = 'nimby_' + days[daytime.weekday()]
-    print(var)
     if var in cgruconfig.VARS:
         values = cgruconfig.VARS[var].split(' ')
         time_begin = values[0]
         time_end = values[1]
-        print(values, time_begin, time_end)
         if time_begin != time_end and 'Enable' in values:
             # Check free if it not tomorrow:
             if cur_time > time_end > time_begin:
