@@ -218,6 +218,9 @@ class parser(object):
             traceback.print_exc(file=sys.stdout)
             resources = None
 
+        if resources is None:
+            return
+
         if 'host_resources' in resources:
             self.host_resources = resources['host_resources']
 
