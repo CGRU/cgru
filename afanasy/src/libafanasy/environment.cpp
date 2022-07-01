@@ -724,7 +724,8 @@ void Environment::load()
 	customconfig = af::getenv("CGRU_CUSTOM_CONFIG");
 
 	loadFile( cgrulocation + "/config_default.json");
-	loadFile( customconfig);
+	if (customconfig.size())
+		loadFile(customconfig);
 	loadFile( home_afanasy + "/config.json");
 
 	PRINT("Getting variables from environment:\n");
@@ -753,7 +754,7 @@ void Environment::loadFile( const std::string & i_filename)
 	for(int i = 0; i < m_config_files.size(); i++)
 		if(m_config_files[i] == i_filename)
 		{
-			AF_ERR << "Config file already included: " << i_filename;
+			AF_ERR << "Config file already included: \"" << i_filename << "\"";
 			return;
 		}
 
@@ -762,7 +763,7 @@ void Environment::loadFile( const std::string & i_filename)
 
 	if(false == pathFileExists(i_filename))
 	{
-		AF_WARN << "Config file does not exist: " << i_filename;
+		AF_WARN << "Config file does not exist: \"" << i_filename << "\"";
 		return;
 	}
 
