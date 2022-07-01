@@ -81,6 +81,7 @@ std::string Environment::render_cmd_reboot =           AFRENDER::CMD_REBOOT;
 std::string Environment::render_cmd_shutdown =         AFRENDER::CMD_SHUTDOWN;
 std::string Environment::render_cmd_wolsleep =         AFRENDER::CMD_WOLSLEEP;
 std::string Environment::render_cmd_wolwake =          AFRENDER::CMD_WOLWAKE;
+std::string Environment::render_gpuinfo_nvidia_cmd =   AFRENDER::GPUINFO_NVIDIA_CMD;
 std::string Environment::render_networkif =            AFRENDER::NETWORK_IF;
 std::string Environment::render_hddspace_path =        AFRENDER::HDDSPACE_PATH;
 std::string Environment::render_iostat_device =        AFRENDER::IOSTAT_DEVICE;
@@ -286,6 +287,7 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, render_cmd_wolsleep,               "af_render_cmd_wolsleep"               );
 	getVar( i_obj, render_cmd_wolwake,                "af_render_cmd_wolwake"                );
 	getVar( i_obj, render_hddspace_path,              "af_render_hddspace_path"              );
+	getVar( i_obj, render_gpuinfo_nvidia_cmd,         "af_render_gpuinfo_nvidia_cmd"         );
 	getVar( i_obj, render_networkif,                  "af_render_networkif"                  );
 	getVar( i_obj, render_iostat_device,              "af_render_iostat_device"              );
 	getVar( i_obj, render_resclasses,                 "af_render_resclasses"                 );

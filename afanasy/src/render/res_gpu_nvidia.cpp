@@ -33,6 +33,8 @@
 #define pclose _pclose
 #endif
 
+#include "../libafanasy/environment.h"
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -40,13 +42,12 @@
 
 bool GetGPUInfo_NVIDIA(af::HostRes & o_hres, bool i_verbose)
 {
-	static const std::string cmd = "nvidia-smi --query-gpu=utilization.gpu,temperature.gpu,memory.total,memory.used,name --format=csv,noheader,nounits 2>&1";
 	static const int values_size = 5;
 
 	std::array<char, 128> buffer;
 	std::string output;
 
-	std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
+	std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(af::Environment::getRenderGPUInfoNvidiaCmd().c_str(), "r"), pclose);
 	if (!pipe)
 	{
 		if (i_verbose)
@@ -63,7 +64,7 @@ bool GetGPUInfo_NVIDIA(af::HostRes & o_hres, bool i_verbose)
 	if (i_verbose)
 		printf("GetGPUInfo_NVIDIA: \"%s\"\n", output.c_str());
 
-	const std::vector<std::string> values = af::strSplit(output, ",");
+	const std::vector<std::string> values = af::strSplit(af::strSplit(output, "\n")[0], ",");
 
 	if (values.size() < values_size)
 	{
