@@ -12,12 +12,12 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
   You can upgrade only one client or server for changes.
 
 
+.. _changes-log-latest:
+
 v3.3.0
 ======
 
-*Not released*
-
-2022.06.28
+2022.07.25
 
 - AfRender can send to server `GPU resources <../afanasy/render.html#gpu-string>`_:
   utilization, temperature, memory total and used.
@@ -57,8 +57,6 @@ v3.3.0
 
     - AfServer and job block with no task crash fixed.
       The crash was very rare, another block with tasks should follow a block without tasks.
-
-.. _changes-log-latest:
 
 
 v3.2.2

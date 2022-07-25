@@ -11,6 +11,9 @@ if [ -z "$BLENDER_LOCATION" ]; then
 	else
 		export BLENDER_LOCATION="/usr/bin"
 	fi
+	if [ -x "/snap/blender/current" ]; then
+		export BLENDER_LOCATION="/snap/bin"
+	fi
 fi
 
 export BLENDER_CGRU_PATH="${CGRU_LOCATION}/plugins/blender"
