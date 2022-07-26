@@ -31,6 +31,9 @@ Linux
 - CentOS 7 (RHEL)
     https://sourceforge.net/projects/cgru/files/3.3.0/cgru.3.3.0.CentOS-7_x86_64.tar.gz
 
+- Debian 10
+    https://sourceforge.net/projects/cgru/files/3.3.0/cgru.3.3.0.debian10_amd64.tar.gz
+
 - Debian 11
     https://sourceforge.net/projects/cgru/files/3.3.0/cgru.3.3.0.debian11_amd64.tar.gz
 
