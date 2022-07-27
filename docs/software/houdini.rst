@@ -806,5 +806,5 @@ Houdini setup example (*bash*):
 	export PYTHONPATH="${HOUDINI_CGRU_PATH}:${PYTHONPATH}"
 
 
-If you avoid sourcing ``cgru/setup.sh`` see `Manual Environment Setup </configuration/configuration.html#manual-environment-setup>`_.
+If you avoid sourcing ``cgru/setup.sh`` see `Manual Environment Setup <../configuration/configuration.html#manual-environment-setup>`_.
 
