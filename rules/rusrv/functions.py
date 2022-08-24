@@ -155,9 +155,18 @@ def readAllUsers(o_out, i_full):
 
 def writeUser(i_user, i_full):
     uid = i_user['id']
-    ufile_main = 'users/%s/%s.json' % (uid, uid)
-    ufile_news = 'users/%s/%s-news.json' % (uid, uid)
-    ufile_bookmarks = 'users/%s/%s-bookmarks.json' % (uid, uid)
+    udir = 'users/%s' % uid
+    ufile_main = '%s/%s.json' % (udir, uid)
+    ufile_news = '%s/%s-news.json' % (udir, uid)
+    ufile_bookmarks = '%s/%s-bookmarks.json' % (udir, uid)
+
+    if not os.path.isdir(udir):
+        try:
+            os.makedirs(udir)
+        except:
+            print('writeUser: Unable create user folder: ' + udir)
+            print('%s' % traceback.format_exc())
+            return False
 
     user = dict()
     news = None
