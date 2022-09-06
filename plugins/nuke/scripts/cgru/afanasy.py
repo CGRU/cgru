@@ -402,7 +402,7 @@ class BlockParameters:
                     if not self.pathsmap:
                         cmd += ' --nopathsmap'
 
-            cmd += ' -X %s -F@#@-@#@x%d -x \"%s\"' % \
+            cmd += ' -X %s -F @#@-@#@x%d -x \"%s\"' % \
                    (self.writename, self.frameinc, i_scene_path)
 
             block.setCommand(cmd)
