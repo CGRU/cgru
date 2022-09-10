@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import re
+import time
 
 Digits = '01234567890'
 
@@ -277,3 +278,16 @@ def patternFromFile(path):
         return path
 
     return path[:pos] + '@' + '#' * (pos_ext - pos) + '@' + path[pos_ext:]
+
+
+def timeWaitFromHM(i_hours, i_minutes):
+    hours = max(0,min(i_hours,23))
+    minutes = max(0,min(i_minutes,59))
+    now_sec = int(time.time())
+    now_day = int((now_sec - time.timezone) / (24*3600)) * (24*3600) + time.timezone
+    sec = now_sec % 60
+    wait_sec = now_day + (hours * 3600) + (minutes * 60) + sec
+    if wait_sec <= now_sec:
+        wait_sec += (24*3600)
+
+    return wait_sec
