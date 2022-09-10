@@ -289,6 +289,34 @@ class UI(object):
                         0
                     )
                 )
+            with pm.rowLayout(nc=5, adj=2, cl5=('right', 'left', 'left', 'left', 'left'), cw5=(labels_width, 20, 20, 6, 20)):
+                pm.text(l='<b>Wait Time</b>', al='right')
+                pm.checkBox(
+                    'cgru_afanasy__wt_enable',
+                    ann='Send job waiting for time.',
+                    l='',
+                    v=pm.optionVar.get(
+                        'cgru_afanasy__wt_enable_ov',
+                        0
+                    )
+                )
+                pm.intField(
+                    'cgru_afanasy__wt_hours',
+                    ann='Wait time hours',
+                    v=pm.optionVar.get(
+                        'cgru_afanasy__wt_hours_ov',
+                        22
+                    )
+                )
+                pm.text(l=':', al='right')
+                pm.intField(
+                    'cgru_afanasy__wt_minutes',
+                    ann='Wait time minutes',
+                    v=pm.optionVar.get(
+                        'cgru_afanasy__wt_minutes_ov',
+                        00
+                    )
+                )
 
             pm.radioButtonGrp(
                 'cgru_afanasy__separate_layers',
@@ -475,6 +503,11 @@ class UI(object):
         separate_layers = \
             pm.radioButtonGrp('cgru_afanasy__separate_layers', q=1, sl=1)
         pause = pm.checkBox('cgru_afanasy__paused', q=1, v=1)
+
+        wt_enable  = pm.checkBox('cgru_afanasy__wt_enable',   q=1, v=1)
+        wt_hours   = pm.intField('cgru_afanasy__wt_hours',    q=1, v=1)
+        wt_minutes = pm.intField('cgru_afanasy__wt_minutes',  q=1, v=1)
+
         life_time = pm.intField('cgru_afanasy__life_time', q=1, v=1)
         annotation = pm.textField('cgru_afanasy__annotation', q=1, text=True)
         errors_avoid_host = pm.intField('cgru_afanasy__errors_avoid_host', q=1, v=1)
@@ -516,6 +549,10 @@ class UI(object):
         pm.optionVar['cgru_afanasy__errors_task_same_host_ov'] = errors_task_same_host
         pm.optionVar['cgru_afanasy__errors_errors_forgive_time_ov'] = errors_forgive_time
         pm.optionVar['cgru_afanasy__paused_ov'] = pause
+
+        pm.optionVar['cgru_afanasy__wt_enable_ov'] = wt_enable
+        pm.optionVar['cgru_afanasy__wt_hours_ov' ] = wt_hours
+        pm.optionVar['cgru_afanasy__wt_hours_ov' ] = wt_hours
 
         pm.optionVar['cgru_afanasy__generate_previews_ov'] = generate_previews
 
@@ -708,6 +745,9 @@ class UI(object):
             job.setCmdPost('deletefiles -s "%s"' % os.path.abspath(filename))
             if pause:
                 job.offline()
+
+            if wt_enable:
+                job.setWaitTime(afcommon.timeWaitFromHM(wt_hours, wt_minutes))
 
             # add blocks
             if separate_layers in [1, 2]:
