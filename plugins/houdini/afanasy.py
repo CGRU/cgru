@@ -522,24 +522,7 @@ class BlockParameters:
         if self.afnode.parm('wait_time').eval():
             hours = int(self.afnode.parm('wait_time_hours').eval())
             minutes = int(self.afnode.parm('wait_time_minutes').eval())
-            hours = max(0,min(hours,23))
-            minutes = max(0,min(minutes,59))
-            now_sec = int(time.time())
-            now_day = int((now_sec - time.timezone) / (24*3600)) * (24*3600) + time.timezone
-            sec = now_sec % 60
-            wait_sec = now_day + (hours * 3600) + (minutes * 60) + sec
-            if wait_sec <= now_sec:
-                result = hou.ui.displayMessage(
-                    'Now is greater than %d:%d\nOffset by 1 day?' % (hours, minutes),
-                    buttons=('Offset', 'Abort'),
-                    default_choice=0, close_choice=1,
-                    title='Wait Time'
-                )
-                if result == 0:
-                    wait_sec += (24*3600)
-                else:
-                    return
-            job.setWaitTime(wait_sec)
+            job.setWaitTime(afcommon.timeWaitFromHM(hours, minutes))
 
         renderhip = hou.hipFile.name()
         if self.afnode.parm('render_temp_hip').eval():
