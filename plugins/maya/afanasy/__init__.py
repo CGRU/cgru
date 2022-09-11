@@ -289,7 +289,7 @@ class UI(object):
                         0
                     )
                 )
-            with pm.rowLayout(nc=5, adj=2, cl5=('right', 'left', 'left', 'left', 'left'), cw5=(labels_width, 20, 20, 6, 20)):
+            with pm.rowLayout(nc=6, adj=6, cl6=('right', 'left', 'left', 'left', 'left', 'left'), cw6=(labels_width, 20, 20, 6, 20, 10)):
                 pm.text(l='<b>Wait Time</b>', al='right')
                 pm.checkBox(
                     'cgru_afanasy__wt_enable',
@@ -314,9 +314,10 @@ class UI(object):
                     ann='Wait time minutes',
                     v=pm.optionVar.get(
                         'cgru_afanasy__wt_minutes_ov',
-                        00
+                        30
                     )
                 )
+                pm.separator(style='none')
 
             pm.radioButtonGrp(
                 'cgru_afanasy__separate_layers',
@@ -550,9 +551,9 @@ class UI(object):
         pm.optionVar['cgru_afanasy__errors_errors_forgive_time_ov'] = errors_forgive_time
         pm.optionVar['cgru_afanasy__paused_ov'] = pause
 
-        pm.optionVar['cgru_afanasy__wt_enable_ov'] = wt_enable
-        pm.optionVar['cgru_afanasy__wt_hours_ov' ] = wt_hours
-        pm.optionVar['cgru_afanasy__wt_hours_ov' ] = wt_hours
+        pm.optionVar['cgru_afanasy__wt_enable_ov' ] = wt_enable
+        pm.optionVar['cgru_afanasy__wt_hours_ov'  ] = wt_hours
+        pm.optionVar['cgru_afanasy__wt_minutes_ov'] = wt_minutes
 
         pm.optionVar['cgru_afanasy__generate_previews_ov'] = generate_previews
 
