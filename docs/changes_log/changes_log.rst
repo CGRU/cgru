@@ -12,6 +12,15 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
   You can upgrade only one client or server for changes.
 
 
+v3.3.1
+======
+
+2022.09.14 *(not released)*
+
+- Afanasy statistics database tables got new rows.
+  Job blocks got job serial. Tasks run got job serial, block and task ids.
+  See `database schema <../afanasy/server.html#database-schema>`_.
+
 .. _changes-log-latest:
 
 v3.3.0

@@ -26,10 +26,12 @@ private:
 	std::string m_service;
 	std::string m_username;
 
+	int32_t m_block_id;
 	int32_t m_capacity;
 	int32_t m_tasks_quantity;
 	int32_t m_tasks_done;
 
+	int64_t m_serial;
 	int64_t m_run_time_sum;
 	int64_t m_time_start;
 	int64_t m_time_done;

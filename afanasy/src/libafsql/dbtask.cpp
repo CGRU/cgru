@@ -12,6 +12,9 @@ const std::string DBTask::ms_TableName("tasks");
 
 DBTask::DBTask()
 {
+	dbAddAttr( new DBAttrInt64 ( DBAttr::_serial,       &m_time_done    ));
+	dbAddAttr( new DBAttrInt32 ( DBAttr::_id_block,     &m_block_id     ));
+	dbAddAttr( new DBAttrInt32 ( DBAttr::_id_task,      &m_task_id      ));
 	dbAddAttr( new DBAttrString( DBAttr::_annotation,   &m_annotation   ));
 	dbAddAttr( new DBAttrString( DBAttr::_blockname,    &m_blockname    ));
 	dbAddAttr( new DBAttrInt32 ( DBAttr::_capacity,     &m_capacity     ));
@@ -42,7 +45,11 @@ void DBTask::add(
 	const af::Render * i_render,
 	std::list<std::string> * o_queries)
 {
+	m_job_serial = i_job->getSerial();
+
 	// Get task exec parameters:
+	m_block_id  = i_exec->getBlockNum();
+	m_task_id   = i_exec->getTaskNum();
 	m_command   = i_exec->getCommandBlock() + i_exec->getCommandTask();
 	m_username  = i_exec->getUserName();
 	m_jobname   = i_exec->getJobName();

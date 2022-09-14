@@ -10,6 +10,8 @@ const std::string DBJob::ms_TableName("jobs");
 
 DBJob::DBJob()
 {
+	dbAddAttr( new DBAttrInt64 ( DBAttr::_serial,         &m_serial         ));
+	dbAddAttr( new DBAttrInt32 ( DBAttr::_id_block,       &m_block_id       ));
 	dbAddAttr( new DBAttrString( DBAttr::_annotation,     &m_annotation     ));
 	dbAddAttr( new DBAttrString( DBAttr::_blockname,      &m_blockname      ));
 	dbAddAttr( new DBAttrInt32 ( DBAttr::_capacity,       &m_capacity       ));
@@ -33,6 +35,7 @@ DBJob::~DBJob()
 void DBJob::add( const af::Job * i_job, std::list<std::string> * o_queries)
 {
 	// Get job parameters:
+	m_serial      = i_job->getSerial();
 	m_jobname     = i_job->getName();
 	m_description = i_job->getDescription();
 	m_folder      = i_job->getFolder();
@@ -54,6 +57,7 @@ void DBJob::add( const af::Job * i_job, std::list<std::string> * o_queries)
 	{
 		// Get block parameters:
 		af::BlockData * block = i_job->getBlockData(b);
+		m_block_id = block->getBlockNum();
 		m_blockname = block->getName();
 		m_capacity = block->getCapacity();
 		m_service = block->getService();

@@ -58,6 +58,7 @@ void DBAttr::init()
 	DBName[_id                    ] = "id";
 	DBName[_id_block              ] = "id_block";
 	DBName[_id_job                ] = "id_job";
+	DBName[_id_task               ] = "id_task";
 	DBName[_ipaddresses           ] = "ipaddresses";
 	DBName[_jobname               ] = "jobname";
 	DBName[_lifetime              ] = "lifetime";
@@ -81,6 +82,7 @@ void DBAttr::init()
 	DBName[_priority              ] = "priority";
 	DBName[_resources             ] = "resources";
 	DBName[_run_time_sum          ] = "run_time_sum";
+	DBName[_serial                ] = "serial";
 	DBName[_service               ] = "service";
 	DBName[_services_disabled     ] = "services_disabled";
 	DBName[_starts_count          ] = "starts_count";

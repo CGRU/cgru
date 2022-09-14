@@ -9,7 +9,7 @@ Launch Methods
     ``start\AFANASY\_afserver.cmd``
 
  -  UNIX script
-    
+
     ``start/AFANASY/_afserver.sh``
 
  -  Linux daemon when Linux packages are installed
@@ -90,7 +90,7 @@ Configuration
 
  -  ``"af_render_cmd_wolwake": "wolwake"``
 
-    Wake command constructed by a server and performed on a online client by the system job. 
+    Wake command constructed by a server and performed on a online client by the system job.
 
 
 Post Commands
@@ -210,8 +210,62 @@ And set it as System job events block service name in your configuration file:
 Statistics
 ----------
 
-Afanasy server can store tasks statistics in SQL database.
+Afanasy server can store jobs and tasks statistics in SQL database.
 It uses PostgreSQL engine.
+On job deletion and task finish (with any result) server insert some job and task data into database tables.
+
+
+Database Schema
+~~~~~~~~~~~~~~~
+
+.. code-block::
+
+    afanasy=# \d jobs;
+                               Table "public.jobs"
+         Column     |          Type          | Collation | Nullable | Default
+    ----------------+------------------------+-----------+----------+---------
+     annotation     | character varying(512) |           |          |
+     blockname      | character varying(512) |           |          |
+     capacity       | integer                |           |          | 0
+     description    | character varying(512) |           |          |
+     folder         | character varying(512) |           |          |
+     jobname        | character varying(512) |           |          |
+     hostname       | character varying(512) |           |          |
+     service        | character varying(512) |           |          |
+     tasks_done     | integer                |           |          | 0
+     tasks_quantity | integer                |           |          | 0
+     run_time_sum   | bigint                 |           |          | 0
+     time_done      | bigint                 |           |          | 0
+     time_started   | bigint                 |           |          | 0
+     username       | character varying(512) |           |          |
+     serial         | bigint                 |           |          | 0
+     id_block       | integer                |           |          | 0
+
+    afanasy=# \d tasks;
+                               Table "public.tasks"
+        Column     |          Type           | Collation | Nullable | Default
+    ---------------+-------------------------+-----------+----------+---------
+     annotation    | character varying(512)  |           |          |
+     blockname     | character varying(512)  |           |          |
+     capacity      | integer                 |           |          | 0
+     command       | character varying(4096) |           |          |
+     description   | character varying(512)  |           |          |
+     error         | integer                 |           |          | 0
+     errors_count  | integer                 |           |          | 0
+     folder        | character varying(512)  |           |          |
+     frame_pertask | bigint                  |           |          | 0
+     hostname      | character varying(512)  |           |          |
+     jobname       | character varying(512)  |           |          |
+     resources     | character varying(4096) |           |          |
+     service       | character varying(512)  |           |          |
+     starts_count  | integer                 |           |          | 0
+     time_done     | bigint                  |           |          | 0
+     time_started  | bigint                  |           |          | 0
+     username      | character varying(512)  |           |          |
+     serial        | bigint                  |           |          | 0
+     id_block      | integer                 |           |          | 0
+     id_task       | integer                 |           |          | 0
+
 
 Database Setup
 ~~~~~~~~~~~~~~
@@ -266,7 +320,7 @@ Any Linux distribution have this packages.
 In most Linux-es all this can be provided by packages:
 ``apache2 libapache2-mod-php php php-pgsql``
 
-The site is located in ``cgru/afanasy/statistics`` folder. 
+The site is located in ``cgru/afanasy/statistics`` folder.
 
 
 Web Page
