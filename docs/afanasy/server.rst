@@ -220,51 +220,51 @@ Database Schema
 
 .. code-block::
 
-    afanasy=# \d jobs;
-                               Table "public.jobs"
-         Column     |          Type          | Collation | Nullable | Default
-    ----------------+------------------------+-----------+----------+---------
-     annotation     | character varying(512) |           |          |
-     blockname      | character varying(512) |           |          |
-     capacity       | integer                |           |          | 0
-     description    | character varying(512) |           |          |
-     folder         | character varying(512) |           |          |
-     jobname        | character varying(512) |           |          |
-     hostname       | character varying(512) |           |          |
-     service        | character varying(512) |           |          |
-     tasks_done     | integer                |           |          | 0
-     tasks_quantity | integer                |           |          | 0
-     run_time_sum   | bigint                 |           |          | 0
-     time_done      | bigint                 |           |          | 0
-     time_started   | bigint                 |           |          | 0
-     username       | character varying(512) |           |          |
-     serial         | bigint                 |           |          | 0
-     id_block       | integer                |           |          | 0
-
-    afanasy=# \d tasks;
-                               Table "public.tasks"
-        Column     |          Type           | Collation | Nullable | Default
-    ---------------+-------------------------+-----------+----------+---------
-     annotation    | character varying(512)  |           |          |
-     blockname     | character varying(512)  |           |          |
-     capacity      | integer                 |           |          | 0
-     command       | character varying(4096) |           |          |
-     description   | character varying(512)  |           |          |
-     error         | integer                 |           |          | 0
-     errors_count  | integer                 |           |          | 0
-     folder        | character varying(512)  |           |          |
-     frame_pertask | bigint                  |           |          | 0
-     hostname      | character varying(512)  |           |          |
-     jobname       | character varying(512)  |           |          |
-     resources     | character varying(4096) |           |          |
-     service       | character varying(512)  |           |          |
-     starts_count  | integer                 |           |          | 0
-     time_done     | bigint                  |           |          | 0
-     time_started  | bigint                  |           |          | 0
-     username      | character varying(512)  |           |          |
-     serial        | bigint                  |           |          | 0
-     id_block      | integer                 |           |          | 0
-     id_task       | integer                 |           |          | 0
+        afanasy=# \d jobs;
+                                   Table "public.jobs"
+             Column     |          Type          | Collation | Nullable | Default
+        ----------------+------------------------+-----------+----------+---------
+         annotation     | character varying(512) |           |          |
+         blockname      | character varying(512) |           |          |
+         capacity       | integer                |           |          | 0
+         description    | character varying(512) |           |          |
+         folder         | character varying(512) |           |          |
+         jobname        | character varying(512) |           |          |
+         hostname       | character varying(512) |           |          |
+         service        | character varying(512) |           |          |
+         tasks_done     | integer                |           |          | 0
+         tasks_quantity | integer                |           |          | 0
+         run_time_sum   | bigint                 |           |          | 0
+         time_done      | bigint                 |           |          | 0
+         time_started   | bigint                 |           |          | 0
+         username       | character varying(512) |           |          |
+         serial         | bigint                 |           |          | 0
+         id_block       | integer                |           |          | 0
+        
+        afanasy=# \d tasks;
+                                   Table "public.tasks"
+            Column     |          Type           | Collation | Nullable | Default
+        ---------------+-------------------------+-----------+----------+---------
+         annotation    | character varying(512)  |           |          |
+         blockname     | character varying(512)  |           |          |
+         capacity      | integer                 |           |          | 0
+         command       | character varying(4096) |           |          |
+         description   | character varying(512)  |           |          |
+         error         | integer                 |           |          | 0
+         errors_count  | integer                 |           |          | 0
+         folder        | character varying(512)  |           |          |
+         frame_pertask | bigint                  |           |          | 0
+         hostname      | character varying(512)  |           |          |
+         jobname       | character varying(512)  |           |          |
+         resources     | character varying(4096) |           |          |
+         service       | character varying(512)  |           |          |
+         starts_count  | integer                 |           |          | 0
+         time_done     | bigint                  |           |          | 0
+         time_started  | bigint                  |           |          | 0
+         username      | character varying(512)  |           |          |
+         serial        | bigint                  |           |          | 0
+         id_block      | integer                 |           |          | 0
+         id_task       | integer                 |           |          | 0
 
 
 Database Setup
