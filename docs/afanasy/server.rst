@@ -218,7 +218,7 @@ On job deletion and task finish (with any result) server insert some job and tas
 Database Schema
 ~~~~~~~~~~~~~~~
 
-.. code-block::
+    .. code-block::
 
         afanasy=# \d jobs;
                                    Table "public.jobs"
