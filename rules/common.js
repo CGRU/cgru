@@ -245,6 +245,8 @@ function c_PadZero(i_num, i_len)
 
 function c_Info(i_msg, i_log)
 {
+	u_el.info.classList.remove('error');
+
 	if (i_log == null)
 		i_log = true;
 	u_el.info.innerHTML = i_msg;
@@ -255,6 +257,7 @@ function c_Info(i_msg, i_log)
 function c_Error(i_err)
 {
 	c_Info('<b style="font-size:15px;color:#700">Error:</b> ' + i_err);
+	u_el.info.classList.add('error');
 }
 
 function c_Log(i_msg)

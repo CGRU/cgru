@@ -7,6 +7,7 @@ openssl req -new -x509 -keyout serverhttps.pem -out serverhttps.pem -days 3656 -
 """
 # If file does not exist, it just skips serving.
 
+import json
 import os
 import ssl
 import subprocess
@@ -44,12 +45,20 @@ class Handler(BaseHandler):
         content_len = int(self.headers['content-length'])
         post_body = cgruutils.toStr( self.rfile.read(content_len))
 
-        cmd.execute( post_body)
-        #print('Executing:')
-        #print( post_body)
-        #subprocess.Popen( post_body, shell=True)
+        status, msg = cmd.execute(post_body)
+        if msg:
+            print(msg)
 
-        self.writeResponse( b'STATUS: OK')
+        response = dict()
+        response['status'] = status
+        if status:
+            response['info'] = msg
+        else:
+            response['error'] = msg
+
+        data = json.dumps(response, indent=4)
+
+        self.writeResponse(data.encode())
 
 
     def writeResponse( self, i_bytes):

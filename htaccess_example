@@ -11,8 +11,11 @@ AuthUserFile /cgru/.htdigest
 # Needed modules:
 # sudo a2enmod ssl auth_digest authz_groupfile
 
+# Remove /icons/ alias
+# sudo rm /etc/apache2/mods-enabled/alias.conf
+
 # Needed utils: htdigest, php multibyte string (utf-8 search)
-# sudo apt-get install apache2-utils php php-mbstring libapache2-mod-wsgi-py3
+# sudo apt-get install apache2-utils libapache2-mod-wsgi-py3
 # sudo apt-get install exiftool mediainfo
 # # Usage: htdigest [-c] passwordfile realm username
 # # The -c flag creates a new file.

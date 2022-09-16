@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import json
+import os
 import subprocess
 import sys
 
@@ -155,47 +156,66 @@ def execute( i_str):
     obj = None
 
     try:
-        obj = json.loads( i_str)
+        obj = json.loads(i_str)
     except:
-        return
+        return False, 'Bad JSON object received.'
 
     if not 'cmdexec' in obj:
-        print('"cmdexec" object missing.')
-        return
+        error = '"cmdexec" object missing.'
+        print(error)
+        return False, error
 
     cmdexec = obj['cmdexec']
+    cmd = None
 
     if 'cmds' in cmdexec:
         cmds = cmdexec['cmds']
 
         for cmd in cmds:
             print('Executing command:')
-            if cgruconfig.getVar('keeper_execute_in_terminal'):
-                if sys.platform.find('win') == 0:
-                    cmd = 'start cmd.exe /C "%s"' % cmd
-                else:
-                    cmd = cgruconfig.VARS['open_terminal_cmd'].replace('@CMD@', cmd)
             print(cmd)
             subprocess.Popen(cmd, shell=True)
 
-    if 'open' in cmdexec:
-        cmd = cgruconfig.VARS['open_folder_cmd'].replace('@PATH@',cmdexec['open'])
-        print('Opening folder:')
-        print(cmd)
-        subprocess.Popen( cmd, shell=True)
+        return True, None
 
-    if 'terminal' in cmdexec:
+    if 'cmd' in cmdexec:
+        cmd = cmdexec['cmd']
+        if cgruconfig.getVar('keeper_execute_in_terminal'):
+            if sys.platform.find('win') == 0:
+                cmd = 'start cmd.exe /C "%s"' % cmd
+            else:
+                cmd = cgruconfig.VARS['open_terminal_cmd'].replace('@CMD@', cmd)
+        print('Executing command:')
+
+    elif 'open' in cmdexec:
+        folder = cmdexec['open']
+        cmd = cgruconfig.VARS['open_folder_cmd'].replace('@PATH@', folder)
+        if not os.path.isdir(folder):
+            return False, ('Folder\n"%s"\ndoes not exist.' % folder)
+        print('Opening folder:')
+
+    elif 'terminal' in cmdexec:
         if sys.platform.find('win') == 0:
             cmd = ('start cmd.exe /K "cd %s"' % cmdexec['terminal'])
         else:
             cmd = ('cd %s; openterminal' % cmdexec['terminal'])
         print('Opening terminal:')
-        print(cmd)
-        subprocess.Popen(cmd, shell=True)
 
-    if 'eval' in cmdexec:
+    elif 'eval' in cmdexec:
         cmd = cmdexec['eval']
         print('Evaluating code:')
         print(cmd)
         eval(cmd)
+        return True, None
+
+    else:
+        return False, 'Invalid request object. Nothing to do.'
+
+    if cmd is None:
+        return False, 'Invalid request object. No command to execute.'
+
+    print(cmd)
+    subprocess.Popen(cmd, shell=True)
+
+    return True, None
 
