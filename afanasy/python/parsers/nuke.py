@@ -15,7 +15,7 @@ class nuke(parser.parser):
 
     def __init__(self):
         parser.parser.__init__(self)
-        self.str_error = ['Error:', 'Worker process failed', 'Segmentation fault', 'Node execution error:']
+        self.str_error = ['Worker process failed', 'Segmentation fault', 'Node execution error:']
         self.filename = ''
 
     def do(self, i_args):
