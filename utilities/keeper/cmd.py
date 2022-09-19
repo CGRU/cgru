@@ -215,7 +215,28 @@ def execute( i_str):
         return False, 'Invalid request object. No command to execute.'
 
     print(cmd)
-    subprocess.Popen(cmd, shell=True)
+    p = subprocess.Popen(cmd, shell=True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+    status = None
+    stderr = None
+    stdout = None
+    try:
+        status = p.wait(2)
+        stdout, stderr = p.communicate()
+    except:
+        pass
 
-    return True, None
+    output = ''
+    if stdout is not None:
+        output += stdout.decode('utf-8')
+    if stderr is not None:
+        if len(output):
+            output += '\n\n'
+        output += stderr.decode('utf-8')
+    if len(output) == 0:
+        output = None
+
+    if status is not None and status != 0:
+        return False, output
+
+    return True, output
 
