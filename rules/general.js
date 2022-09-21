@@ -50,6 +50,7 @@ function g_Init()
 	c_Init();
 	n_Init();
 	activity_Init();
+	cm_Init();
 
 	n_Request({"send": {"start": {}}, "func": g_Init_Server, "info": 'start', "force_log": true});
 

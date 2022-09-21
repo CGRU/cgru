@@ -23,6 +23,20 @@ var cm_durations = [
 ];
 var cm_array = [];
 
+var cm_elStat = null;
+
+var cm_tags = []
+
+function cm_Init()
+{
+	let array = c_Parse(localStorage.comments_tags);
+	if (null == array)
+		return;
+
+	for (let item of array)
+		cm_tags.push(item);
+}
+
 function View_comments_Open()
 {
 	cm_Load();
@@ -91,7 +105,74 @@ function cm_Received(i_data)
 	for (let i = 0; i < obj_array.length; i++)
 		cm_array.push(new Comment(obj_array[i]));
 
+	cm_DisplayStat();
+
 	g_POST('comments');
+}
+
+function cm_DisplayStat()
+{
+	if (cm_elStat)
+		cm_elStat.textContent = '';
+	else
+	{
+		if (cm_array.length == 0)
+			return;
+
+		cm_elStat = document.createElement('div');
+		$('comments').insertBefore(cm_elStat, $('comments').firstChild);
+		cm_elStat.classList.add('comments_stat');
+	}
+
+	let tags_counts = {};
+
+	for (let cm of cm_array)
+	{
+		let tags = cm.obj.tags;
+		if ((tags == null) || (tags.length == 0))
+			continue;
+
+		for (let tag of tags)
+		{
+			if (tags_counts[tag])
+				tags_counts[tag] += 1;
+			else
+				tags_counts[tag] = 1;
+		}
+	}
+
+	for (let tag in tags_counts)
+	{
+		let el = document.createElement('div');
+		el.classList.add('tag');
+		el.textContent = c_GetTagTitle(tag) + ':' + tags_counts[tag];
+		el.m_tag = tag;
+		el.onclick = cm_TagClicked;
+		if (cm_tags.indexOf(tag) != -1)
+			el.classList.add('selected');
+
+		cm_elStat.appendChild(el);
+	}
+}
+
+function cm_TagClicked(i_evt)
+{
+	let el = i_evt.currentTarget;
+	cm_TagSelect(el.m_tag);
+}
+function cm_TagSelect(i_tag)
+{
+	cm_tags = [];
+	for (let el of cm_elStat.childNodes)
+	{
+		if (el.m_tag == i_tag)
+			el.classList.toggle('selected');
+
+		if (el.classList.contains('selected'))
+			cm_tags.push(el.m_tag);
+	}
+
+	localStorage.comments_tags = JSON.stringify(cm_tags);
 }
 
 function cm_NewOnClick(i_text)
@@ -147,7 +228,12 @@ function Comment(i_obj)
 	if (ASSET && ASSET.comments_reversed)
 		$('comments').appendChild(this.el);
 	else
-		$('comments').insertBefore(this.el, $('comments').firstChild);
+	{
+		if (cm_array.length)
+			$('comments').insertBefore(this.el, cm_array[cm_array.length-1].el);
+		else
+			$('comments').appendChild(this.el);
+	}
 	this.el.classList.add('comment');
 	this.el.m_comment = this;
 
@@ -635,6 +721,8 @@ Comment.prototype.save = function() {
 
 	this.obj.key = key;
 	this.init();
+
+	cm_DisplayStat();
 
 	let file = c_GetRuFilePath(cm_file);
 	n_GetFileFlushCache(file);
