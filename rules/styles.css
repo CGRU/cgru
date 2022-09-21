@@ -1185,7 +1185,9 @@ margin: 0px 4px;
 .comment .report { display: none; }
 .comment.report .report { display: block; }
 .comment .panel { margin: 0px;}
-.comment .panel .type { width: 100px; text-align: center; display: block; }
+.comment .panel .type_tags {float: left; margin: 1px; padding: 1px;}
+.comment .panel .type_tags .type { width: 100px; text-align: center; display: block; clear: both;}
+.comment .panel .type_tags .tags { display: block; clear: both; font-weight: bold;}
 .comment .panel .avatar,.comment .panel .user,.comment .panel .duration,.comment .panel .date {
 float: left; margin: 1px 8px;
 }
@@ -1197,8 +1199,8 @@ float: left; margin: 1px 8px;
 .comment .panel > .button { font-size: 12px; float: right;}
 .comment .panel .edit_btns_div { float: right;}
 .comment .panel .edit_btns_div > .button { font-size: 12px; float: right;}
-.comment.edit .panel .duration { display: none; }
-.comment.edit .panel .tags { display: none; }
+.comment.edit .panel .duration { _display: none; }
+.comment.edit .panel .tags { _display: none; }
 .comment .edit .types { clear: both; border-top: 1px solid rgba(98,98,98,.5); }
 .comment .edit .tags { padding: 4px; clear: both; border-top: 1px solid rgba(98,98,98,.5); }
 .comment .edit .tags .label { float: left; padding: 2px; opacity: .7; }
