@@ -214,7 +214,18 @@ class Requests:
                 obj = dict()
                 # Create folder if does not exist
                 if not os.path.isdir(os.path.dirname(i_edit['file'])):
-                    os.makedirs(os.path.dirname(i_edit['file']), mode=0o777);
+                    try:
+                        os.makedirs(os.path.dirname(i_edit['file']), mode=0o777);
+                    except PermissionError:
+                        o_out['status'] = 'error';
+                        o_out['error'] = 'Permission denied: ' + os.path.dirname(os.path.dirname(i_edit['file']))
+                        o_out['info'] = '%s' % traceback.format_exc()
+                        return
+                    except:
+                        o_out['status'] = 'error';
+                        o_out['error'] = 'Can`t create folder: ' + os.path.dirname(i_edit['file'])
+                        o_out['info'] = '%s' % traceback.format_exc()
+                        return
             editobj.mergeObjs(obj, i_edit['object'])
         else:
             if obj is None:
