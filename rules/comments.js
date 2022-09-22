@@ -25,16 +25,16 @@ var cm_array = [];
 
 var cm_elStat = null;
 
-var cm_tags = []
+var cm_filter_tags = []
 
 function cm_Init()
 {
-	let array = c_Parse(localStorage.comments_tags);
+	let array = c_Parse(localStorage.comments_filter_tags);
 	if (null == array)
 		return;
 
 	for (let item of array)
-		cm_tags.push(item);
+		cm_filter_tags.push(item);
 }
 
 function View_comments_Open()
@@ -45,6 +45,12 @@ function View_comments_Open()
 function cm_Finish()
 {
 	cm_array = [];
+
+	if (cm_elStat)
+	{
+		cm_elStat.textContent = '';
+		cm_elStat = null;
+	}
 }
 
 function cm_Load()
@@ -106,6 +112,7 @@ function cm_Received(i_data)
 		cm_array.push(new Comment(obj_array[i]));
 
 	cm_DisplayStat();
+	cm_Filter();
 
 	g_POST('comments');
 }
@@ -148,8 +155,31 @@ function cm_DisplayStat()
 		el.textContent = c_GetTagTitle(tag) + ':' + tags_counts[tag];
 		el.m_tag = tag;
 		el.onclick = cm_TagClicked;
-		if (cm_tags.indexOf(tag) != -1)
+		el.title = 'This is comments tags count.'
+			+ '\n ' + tags_counts[tag] + ' comment(s) has \"' + c_GetTagTitle(tag) + '\" tag.'
+			+ '\n Click to filter comments by tag.'
+			+ '\n Hold CTRL or SHIFT to select several tags.';
+		if (cm_filter_tags.indexOf(tag) != -1)
 			el.classList.add('selected');
+
+		cm_elStat.appendChild(el);
+	}
+
+	// Display 'empty' tag filters.
+	// This can be if some filter was selected in one location,
+	// but there is no such comments in another location.
+	for (let tag of cm_filter_tags)
+	{
+		if (tags_counts[tag])
+			continue;
+
+		let el = document.createElement('div');
+		el.classList.add('tag');
+		el.textContent = c_GetTagTitle(tag) + ':0';
+		el.m_tag = tag;
+		el.onclick = cm_TagClicked;
+		el.classList.add('selected');
+		el.classList.add('empty');
 
 		cm_elStat.appendChild(el);
 	}
@@ -157,22 +187,29 @@ function cm_DisplayStat()
 
 function cm_TagClicked(i_evt)
 {
-	let el = i_evt.currentTarget;
-	cm_TagSelect(el.m_tag);
-}
-function cm_TagSelect(i_tag)
-{
-	cm_tags = [];
+	let tag = i_evt.currentTarget.m_tag;
+
+	cm_filter_tags = [];
 	for (let el of cm_elStat.childNodes)
 	{
-		if (el.m_tag == i_tag)
+		if (el.m_tag == tag)
 			el.classList.toggle('selected');
+		else if ((i_evt.shiftKey == false) && (i_evt.ctrlKey == false))
+			el.classList.remove('selected');
 
 		if (el.classList.contains('selected'))
-			cm_tags.push(el.m_tag);
+			cm_filter_tags.push(el.m_tag);
 	}
 
-	localStorage.comments_tags = JSON.stringify(cm_tags);
+	cm_Filter();
+
+	localStorage.comments_filter_tags = JSON.stringify(cm_filter_tags);
+}
+
+function cm_Filter()
+{
+	for (let cm of cm_array)
+		cm.filter();
 }
 
 function cm_NewOnClick(i_text)
@@ -530,6 +567,24 @@ Comment.prototype.setElType = function(i_type) {
 		st_SetElColor(null, this.el);
 	}
 };
+
+Comment.prototype.filter = function() {
+	this.el.style.display = 'block';
+
+	if (cm_filter_tags.length == 0)
+		return;
+
+	this.el.style.display = 'none';
+
+	if ((this.obj.tags == null) || (this.obj.tags.length == 0))
+		return;
+
+	for (let tag of cm_filter_tags)
+		if (this.obj.tags.indexOf(tag) == -1)
+			return;
+
+	this.el.style.display = 'block';
+}
 
 Comment.prototype.edit = function() {
 	if (this._new != true)
