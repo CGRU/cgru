@@ -10,16 +10,17 @@ class Param
 {
 public:
 	enum EType {
-		tsep = 0,
-		TNum = 1,
-		TStr = 2,
-		TMSI = 3, // Map <String, Integer>
-		TREx = 4,
-		Time = 5,
-		THrs = 6,
-		TGiB = 7,
-		TMiB = 8,
-		TMeg = 9
+		tsep =  0,
+		TNum =  1,
+		TStr =  2,
+		TMSI =  3, // Map <String, Integer>
+		TMSS =  4, // Map <String, String>
+		TREx =  5,
+		Time =  6,
+		THrs =  7,
+		TGiB =  8,
+		TMiB =  9,
+		TMeg = 10
 	};
 
 	Param(EType i_type, Item::EType i_itemtype, const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = -1);

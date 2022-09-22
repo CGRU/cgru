@@ -82,6 +82,8 @@ BlockInfo::BlockInfo(const af::BlockData * i_data, Item * i_item, ListItems * i_
 	addParam_separator();
 	addParam_REx("depend_mask",                  "Depend Mask",           "Blocks name mask to wait to finish totally");
 	addParam_REx("tasks_depend_mask",            "Tasks Depend Mask",     "Blocks name mask to wait to finish tasks");
+	addParam_separator();
+	addParam_MSS("environment",                  "Tasks Environment",     "Blocks tasks process extra environment variables");
 }
 
 BlockInfo::~BlockInfo()
@@ -163,6 +165,22 @@ bool BlockInfo::update( const af::BlockData* block, int type)
 		m_var_map["depend_mask"]                  = afqt::stoq(block->getDependMask());
 		           tasks_depend_mask              = afqt::stoq(block->getTasksDependMask());
 		m_var_map["tasks_depend_mask"]            = afqt::stoq(block->getTasksDependMask());
+
+		// Collect environment
+		{
+			environment.clear();
+			QMap<QString, QVariant> qv_environment;
+			for (auto const & it : block->getEnvironment())
+			{
+				if (environment.size()) environment += ",";
+				environment += QString("%1:%2").arg(afqt::stoq(it.first)).arg(afqt::stoq(it.second));
+
+				qv_environment[afqt::stoq(it.first)] = afqt::stoq(it.second);
+			}
+			if (environment.size())
+				environment = QString("{%1}").arg(environment);
+			m_var_map["environment"] = qv_environment;
+		}
 
 
 		skip_existing_files  = block->isSkippingExistingFiles();
@@ -908,6 +926,9 @@ void BlockInfo::addParam_Num(const QString & i_name, const QString & i_label, co
 
 void BlockInfo::addParam_Str(const QString & i_name, const QString & i_label, const QString & i_tip) {
 	m_params.append(new Param(Param::TStr, Item::TAny, i_name, i_label, i_tip));}
+
+void BlockInfo::addParam_MSS(const QString & i_name, const QString & i_label, const QString & i_tip) {
+	m_params.append(new Param(Param::TMSS, Item::TAny, i_name, i_label, i_tip));}
 
 void BlockInfo::addParam_REx(const QString & i_name, const QString & i_label, const QString & i_tip) {
 	m_params.append(new Param(Param::TREx, Item::TAny, i_name, i_label, i_tip));}
