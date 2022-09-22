@@ -62,6 +62,7 @@ class BlockParameters:
         self.soho_outputmode = None
         self.pre_submit_script = None
         self.post_submit_script = None
+        self.environment_dict = None
 
         # Get parameters:
         self.single_task = bool(afnode.parm('single_task').eval())
@@ -135,6 +136,8 @@ class BlockParameters:
 
         if self.local_render:
             self.hosts_mask = str(socket.gethostname())
+
+        self.environment_dict = afnode.parm('environment_dict').eval()
 
         # Process frame range:
         opname = afnode.path()
@@ -489,6 +492,9 @@ class BlockParameters:
             block.setNeedCPUCores(self.min_cpu_cores)
         if self.min_cpu_cores_freq > 0:
             block.setNeedCPUFreqCores(self.min_cpu_cores_freq)
+
+        for key in self.environment_dict:
+            block.setEnv(key, self.environment_dict[key])
 
         # Process Tickets
         if self.tickets_use:
