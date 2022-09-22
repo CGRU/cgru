@@ -15,11 +15,17 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
 v3.3.1
 ======
 
-2022.09.14 *(not released)*
+2022.09.22 *(not released)*
 
 - Afanasy statistics database tables got new rows.
   Job blocks got job serial. Tasks run got job serial, block and task ids.
   See `database schema <../afanasy/server.html#database-schema>`_.
+
+- Houdini Afanasy ROP can set extra
+  `environment <../software/houdini.html#environment>`_
+  variables that will be addded to task process.
+
+- Afwatch can edit job block environmet variables.
 
 .. _changes-log-latest:
 
