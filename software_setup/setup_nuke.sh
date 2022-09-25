@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Source general for all soft directives:
-source "$CGRU_LOCATION/software_setup/setup__all.sh"
-
 # Setup CGRU common scripts if location provided
 if [ ! -z "${CGRU_LOCATION}" ]; then
    export NUKE_CGRU_PATH="${CGRU_LOCATION}/plugins/nuke"
@@ -45,11 +42,24 @@ done
 
 export NUKE_EXEC="${NUKE_LOCATION}/${NUKE_EXEC}"
 
+# Check that Nuke is correctly found:
+if [ -z "$NUKE_LOCATION" ]; then
+	echo "Can't find Nuke in $NUKE_INSTALL_DIR"
+	exit 1
+fi
+if [ ! -x "$NUKE_EXEC" ]; then
+	echo "Can't find Nuke executable $NUKE_EXEC"
+	exit 1
+fi
+
 LM_LICENSE_FILE="${NUKE_LOCATION}/nuke.lic"
 if [ -f $LM_LICENSE_FILE ]; then
    export LM_LICENSE_FILE 
    echo "LM_LICENCS_FILE='$LM_LICENSE_FILE'"
 fi
+
+# Source general for all soft directives:
+source "$CGRU_LOCATION/software_setup/setup__all.sh"
 
 # Setup Dailies:
 moviemaker=$CGRU_LOCATION/utilities/moviemaker
