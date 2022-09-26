@@ -569,6 +569,12 @@ Comment.prototype.setElType = function(i_type) {
 };
 
 Comment.prototype.filter = function() {
+	if (this.obj.deleted)
+	{
+		this.el.style.display = 'none';
+		return;
+	}
+
 	this.el.style.display = 'block';
 
 	if (cm_filter_tags.length == 0)
