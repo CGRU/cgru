@@ -57,7 +57,7 @@ function cgru_CmdExecFilter(i_cmd)
 	let cmd = i_cmd;
 
 	cmd = activity_ChangeCmd(cmd);
-
+/*
 	// '@arg@' will be replaced with '--arg [arg value]'
 	// Value will be the first defined in action, ASSET, RULES
 	// For example: '@fps@' will be replaces with '--fps 24'
@@ -74,7 +74,7 @@ function cgru_CmdExecFilter(i_cmd)
 			else val = '';
 			cmd = cmd.replace(match, val);
 		}
-
+*/
 	return cmd;
 }
 

@@ -214,6 +214,8 @@ function u_Process()
 		$('open').style.display = 'none';
 		$('open').ondblclick = null;
 	}
+
+	u_ExecuteShow(false);
 }
 
 function u_Finish()
@@ -229,7 +231,6 @@ function u_Finish()
 	cm_Finish();
 
 	u_ViewsFuncsClose();
-	u_ExecuteShow(false);
 
 	$('body_avatar_c').style.display = 'none';
 	$('body_avatar_m').style.display = 'none';
@@ -1075,13 +1076,16 @@ function u_ExecuteShow(i_show)
 		return;
 
 	let favourites = [];
-	if (localStorage.execute_favourites);
+	if (localStorage.execute_favourites)
 		favourites = JSON.parse(localStorage.execute_favourites);
 
 	let actions = [];
 	let afavors = [];
 	for (let action of RULES.execute)
 	{
+		if (action.asset && (ASSETS[action.asset] == null))
+			continue;
+
 		if (favourites.indexOf(action.name) == -1)
 			actions.push(action);
 		else
@@ -1136,6 +1140,16 @@ function u_CreateActions(i_actions, i_el)
 		{
 			cmd = c_PathPM_Server2Client(action.cmd);
 			cmd = cmd.replace(/@PATH@/g, c_PathPM_Rules2Client(g_CurPath()));
+
+			cmd = cmd.replace(/@SHOT@/g, c_PathPM_Rules2Client(ASSETS.shot.path));
+
+			if (action.show_on_activity)
+			{
+				if (activity_Selected == null)
+					el.style.display = 'none';
+
+				el.classList.add('show_on_activity');
+			}
 		}
 
 		// Process open:

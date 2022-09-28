@@ -89,17 +89,7 @@ function shot_InitHTML( i_data)
 
 	// Create shot process buttons:
     if (c_CanExecuteSoft())
-	{
-		let elements = u_CreateActions(ASSET.shot_process, $('shot_process_div'));
-
-		for (let el of elements)
-		{
-			if (activity_Selected == null)
-				el.style.display = 'none';
-
-			el.classList.add('show_on_activity');
-		}
-	}
+		u_CreateActions(ASSET.shot_process, $('shot_process_div'));
 
 	shot_ResultsRead( true);
 }

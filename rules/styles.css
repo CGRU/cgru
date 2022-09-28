@@ -949,7 +949,7 @@ table.statistics .duration { text-align: center; border-left-width: 0; }
 #search_flags .flag { border-width: 4px; }
 
 #execute_div { display: none;}
-#execute_btn { font-size: 10px; float: left;}
+#execute_btn { font-size: 10px; float: left; margin: 4px; padding: 4px;}
 #execute_items > div, #execute_favor > div {
 float: left;
 margin: 4px;
