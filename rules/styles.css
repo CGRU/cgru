@@ -955,6 +955,7 @@ float: left;
 margin: 4px;
 font-size: 10px;
 }
+#execute_items .info { font-style:italic; padding: 4px;}
 
 #assets {
 background: rgba(200,255,200,.1);

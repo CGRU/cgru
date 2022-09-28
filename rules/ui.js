@@ -1107,6 +1107,11 @@ function u_ExecuteShow(i_show)
 	{
 		elBtn.classList.add('pushed');
 		u_CreateActions(actions, elItems);
+
+		let el = document.createElement('div');
+		el.classList.add('info');
+		el.textContent = 'Use CTRL or SHIFT click to add to favourites or remove from.'
+		elItems.appendChild(el);
 	}
 	else
 	{
@@ -1168,13 +1173,6 @@ function u_CreateActions(i_actions, i_el)
 		// Add action on CTRL or SHIFT click to add/remove favourites
 		el.m_action = action;
 		el.addEventListener('click', u_ExecClicked);
-		let title = el.title;
-		if (title && title.length)
-			title += '\n';
-		else
-			title = '';
-		title += 'Use CTRL or SHIFT click to add to favourites or remove from.'
-		el.title = title;
 
 		elements.push(el);
 	}

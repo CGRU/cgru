@@ -1527,7 +1527,7 @@ Status.prototype.editProcess = function(i_args) {
 					task.progress = -1;
 					task.changed = true;
 				}
-
+/*
 		// Shot "super" flags resets tasks flags
 		if (statuses[i].obj.flags && statuses[i].obj.flags.length)
 			for (let f of statuses[i].obj.flags)
@@ -1547,7 +1547,7 @@ Status.prototype.editProcess = function(i_args) {
 							task.changed = true;
 						}
 					}
-
+*/
 		// If progress was changed we should update upper progress:
 		if (_progress != statuses[i].obj.progress)
 		{
