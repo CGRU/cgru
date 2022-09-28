@@ -78,6 +78,7 @@
 
 "execute":[
 	{
+		"name":"terminal",
 		"label":"Terminal",
 		"icon":"icons/terminal.png",
 		"title":"Open terminal in this location.",

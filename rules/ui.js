@@ -1065,11 +1065,30 @@ function u_ExecuteSoft()
 
 function u_ExecuteShow(i_show)
 {
-	let elBody = $('execute_body');
-	elBody.textContent = '';
+	let elItems = $('execute_items');
+	let elFavor = $('execute_favor');
+
+	elItems.textContent = '';
+	elFavor.textContent = '';
 
 	if (false == c_CanExecuteSoft())
 		return;
+
+	let favourites = [];
+	if (localStorage.execute_favourites);
+		favourites = JSON.parse(localStorage.execute_favourites);
+
+	let actions = [];
+	let afavors = [];
+	for (let action of RULES.execute)
+	{
+		if (favourites.indexOf(action.name) == -1)
+			actions.push(action);
+		else
+			afavors.push(action);
+	}
+
+	u_CreateActions(afavors, elFavor);
 
 	let elBtn = $('execute_btn');
 	if (i_show == null)
@@ -1083,7 +1102,7 @@ function u_ExecuteShow(i_show)
 	if (i_show)
 	{
 		elBtn.classList.add('pushed');
-		u_CreateActions(RULES.execute, elBody);
+		u_CreateActions(actions, elItems);
 	}
 	else
 	{
@@ -1095,9 +1114,8 @@ function u_CreateActions(i_actions, i_el)
 {
 	let elements = [];
 
-	for (let n = 0; n < i_actions.length; n++)
+	for (let action of i_actions)
 	{
-		let action = i_actions[n];
 		let el = document.createElement('div');
 		i_el.appendChild(el);
 		el.textContent = action.label;
@@ -1133,8 +1151,42 @@ function u_CreateActions(i_actions, i_el)
 		// Make an executable button:
 		cgru_CmdExecProcess({'element':el,'cmd':cmd,'open':open,'terminal':terminal});
 
+		// Add action on CTRL or SHIFT click to add/remove favourites
+		el.m_action = action;
+		el.addEventListener('click', u_ExecClicked);
+		let title = el.title;
+		if (title && title.length)
+			title += '\n';
+		else
+			title = '';
+		title += 'Use CTRL or SHIFT click to add to favourites or remove from.'
+		el.title = title;
+
 		elements.push(el);
 	}
 
 	return elements;
+}
+
+function u_ExecClicked(i_evt)
+{
+	if ((i_evt.ctrlKey == false) && (i_evt.shiftKey == false))
+		return;
+
+	i_evt.stopPropagation();
+	let action = i_evt.currentTarget.m_action;
+
+	let favourites = [];
+	if (localStorage.execute_favourites)
+		favourites = JSON.parse(localStorage.execute_favourites);
+
+	let index = favourites.indexOf(action.name);
+	if (index == -1)
+		favourites.push(action.name);
+	else
+		favourites.splice(index, 1);
+
+	localStorage.execute_favourites = JSON.stringify(favourites);
+
+	u_ExecuteShow($('execute_btn').classList.contains('pushed'));
 }
