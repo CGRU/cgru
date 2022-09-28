@@ -1619,6 +1619,8 @@ function st_Save(i_status, i_path, i_func, i_args, i_navig_params_update)
 		i_status = RULES.status;
 	if (i_path == null)
 		i_path = g_CurPath();
+	if (i_func == null)
+		i_func = st_SaveFinished;
 
 	st_FilterStatusForSave(i_status);
 
@@ -1635,6 +1637,18 @@ function st_Save(i_status, i_path, i_func, i_args, i_navig_params_update)
 	obj.file = c_GetRuFilePath('status.json', i_path);
 	n_Request(
 		{"send": {"editobj": obj}, "func": i_func, "args": i_args, "wait": false, 'info': 'status save'});
+}
+
+function st_SaveFinished(i_data)
+{
+	if (i_data.info)
+		c_Info(i_data.info);
+
+	if(i_data.error)
+	{
+		c_Error(i_data.error);
+		return;
+	}
 }
 
 function st_SetFramesNumber(i_num)

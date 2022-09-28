@@ -285,9 +285,10 @@ class Requests:
             if 'error' in o_out:
                 return
 
-            for id in ids:
-                if not id in users_changed:
-                    users_changed.append(id)
+            if ids is not None:
+                for id in ids:
+                    if not id in users_changed:
+                        users_changed.append(id)
 
         if 'bookmarks' in i_args:
             for bm in i_args['bookmarks']:
@@ -295,9 +296,10 @@ class Requests:
                 if 'error' in o_out:
                     return
 
-                for id in ids:
-                    if not id in users_changed:
-                        users_changed.append(id)
+                if ids is not None:
+                    for id in ids:
+                        if not id in users_changed:
+                            users_changed.append(id)
 
         # Write changed users:
         for id in users_changed:

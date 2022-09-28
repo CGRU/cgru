@@ -63,7 +63,15 @@ def makenews(i_args, io_users, o_out):
 
         # Save recent:
         if not os.path.isdir(os.path.dirname(rfile)):
-            os.makedirs(os.path.dirname(rfile))
+            try:
+                os.makedirs(os.path.dirname(rfile))
+            except PermissionError:
+                o_out['error'] = 'Permission denied: "%s"' % os.path.dirname(rfile)
+                return
+            except:
+                o_out['error'] = 'Unable to create folder: "%s"' % os.path.dirname(rfile)
+                o_out['info'] = '%s' % traceback.format_exc()
+                return False
         functions.writeObj(rfile, rarray)
 
         # Exit cycle if path is root:
