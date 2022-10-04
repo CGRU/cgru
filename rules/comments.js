@@ -135,6 +135,9 @@ function cm_DisplayStat()
 
 	for (let cm of cm_array)
 	{
+		if (cm.obj.deleted)
+			continue;
+
 		let tags = cm.obj.tags;
 		if ((tags == null) || (tags.length == 0))
 			continue;
