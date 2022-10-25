@@ -7,10 +7,10 @@ import sys
 import traceback
 
 from rusrv import environ
-from rusrv import editobj
-from rusrv import functions
-from rusrv import news
-from rusrv import search
+from rulib import editobj
+from rulib import functions
+from rulib import news
+from rulib import search
 
 class Requests:
 

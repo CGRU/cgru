@@ -1,7 +1,7 @@
 import os
 import time
 
-from rusrv import functions
+from rulib import functions
 
 def makenews(i_args, io_users, o_out):
     news = i_args['news']

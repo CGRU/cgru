@@ -5,7 +5,7 @@ import sys
 import traceback
 
 from rusrv import environ
-from rusrv import editobj
+from rulib import editobj
 
 
 def randMD5():

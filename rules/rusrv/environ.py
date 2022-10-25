@@ -27,7 +27,7 @@ import os
 import sys
 
 
-from rusrv import functions
+from rulib import functions
 
 
 def initApp(i_app_root):
