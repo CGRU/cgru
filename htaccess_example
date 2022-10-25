@@ -20,4 +20,4 @@ AuthUserFile /cgru/.htdigest
 # # Usage: htdigest [-c] passwordfile realm username
 # # The -c flag creates a new file.
 # htdigest -c .htdigest CGRU admin
-
+# echo admins:admin > .htgroups
