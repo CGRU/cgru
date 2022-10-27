@@ -1,6 +1,3 @@
-USER_ID = None
-GROUPS = None
-
 AUTH_TYPE = None
 
 GUEST_SITES = ['rules.cgru.info', '127.0.0.1']
