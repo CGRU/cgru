@@ -1,7 +1,7 @@
 import os
 import time
 
-from rulib import functions
+import rulib
 
 def makenews(i_args, io_users, o_out):
     news = i_args['news']
@@ -34,7 +34,7 @@ def makenews(i_args, io_users, o_out):
 
         # Get existing recent:
         rfile = i_args['root'] + path + '/' + i_args['rufolder'] + '/' + i_args['recent_file']
-        rarray = functions.readObj(rfile)
+        rarray = rulib.functions.readObj(rfile)
         if rarray is None:
             rarray = []
         
@@ -72,7 +72,7 @@ def makenews(i_args, io_users, o_out):
                 o_out['error'] = 'Unable to create folder: "%s"' % os.path.dirname(rfile)
                 o_out['info'] = '%s' % traceback.format_exc()
                 return False
-        functions.writeObj(rfile, rarray)
+        rulib.functions.writeObj(rfile, rarray)
 
         # Exit cycle if path is root:
         if len(path) == 0:

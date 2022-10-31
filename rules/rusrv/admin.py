@@ -3,6 +3,8 @@ import shutil
 import time
 import traceback
 
+import rulib
+
 from rusrv import environ
 from rulib import functions
 
@@ -107,7 +109,7 @@ class Admin:
         if self.session.GROUPS is not None:
             return True
 
-        if not os.path.isfile(environ.HT_GROUPS_FILE_NAME):
+        if not os.path.isfile(rulib.HT_GROUPS_FILE_NAME):
             error = 'HT Groups file does not exist.'
             if o_out:
                 o_out['error'] = error
@@ -115,7 +117,7 @@ class Admin:
                 print(error)
             return False
 
-        data = functions.fileRead(environ.HT_GROUPS_FILE_NAME)
+        data = functions.fileRead(rulib.HT_GROUPS_FILE_NAME)
         if data is None:
             error = 'Unable to read groups file.'
             if o_out:
@@ -161,7 +163,7 @@ class Admin:
             o_out['error'] = 'No such directory.'
             return
 
-        htaccess = os.path.join(i_args['path'], environ.HT_ACCESS_FILE_NAME)
+        htaccess = os.path.join(i_args['path'], rulib.HT_ACCESS_FILE_NAME)
         if not os.path.isfile(htaccess):
             return
 
@@ -222,13 +224,13 @@ class Admin:
 
         data = '\n'.join(lines) + '\n'
 
-        htaccess = os.path.join(i_args['path'], environ.HT_ACCESS_FILE_NAME)
+        htaccess = os.path.join(i_args['path'], rulib.HT_ACCESS_FILE_NAME)
         if not functions.fileWrite(htaccess, data):
             o_out['error'] = 'Unable to write into the file.'
 
 
     def permissionsClear(self, i_args, o_out):
-        htaccess = os.path.join(i_args['path'], environ.HT_ACCESS_FILE_NAME)
+        htaccess = os.path.join(i_args['path'], rulib.HT_ACCESS_FILE_NAME)
         if not os.path.isfile(htaccess):
             o_out['error'] = 'No permissions settings found.'
             return
@@ -327,7 +329,7 @@ class Admin:
             shutil.rmtree(udir)
 
         # Remove user from digest file
-        data = functions.fileRead(environ.HT_DIGEST_FILE_NAME, True)
+        data = functions.fileRead(rulib.HT_DIGEST_FILE_NAME, True)
         if data is None:
             o_out['error'] = 'Unable to read the file.'
             return
@@ -342,7 +344,7 @@ class Admin:
 
         data = '\n'.join(new_lines) + '\n'
 
-        if not functions.fileWrite(environ.HT_DIGEST_FILE_NAME, data):
+        if not functions.fileWrite(rulib.HT_DIGEST_FILE_NAME, data):
             o_out['error'] = 'Unable to write into the file.'
 
 
@@ -354,7 +356,7 @@ class Admin:
             lines.append(group + ':' + ' '.join(i_groups[group]))
 
         data = '\n'.join(lines) + '\n'
-        if not functions.fileWrite(environ.HT_GROUPS_FILE_NAME, data):
+        if not functions.fileWrite(rulib.HT_GROUPS_FILE_NAME, data):
             o_out['error'] = 'Unable to write in groups file.'
 
 
@@ -385,7 +387,7 @@ class Admin:
                 o_out['error'] = 'You are not allowed to change password.'
                 return
 
-        data = functions.fileRead(environ.HT_DIGEST_FILE_NAME, True)
+        data = functions.fileRead(rulib.HT_DIGEST_FILE_NAME, True)
         if data is None:
             data = ''
 
@@ -407,17 +409,17 @@ class Admin:
         new_lines.append(i_args['digest'])
 
         data = '\n'.join(new_lines) + '\n'
-        if not functions.fileWrite(environ.HT_DIGEST_FILE_NAME, data):
+        if not functions.fileWrite(rulib.HT_DIGEST_FILE_NAME, data):
             o_out['error'] = 'Unable to write into the file.'
 
 
     def http_digest_validate(self, i_digest, o_out):
 
-        if not os.path.isfile(environ.HT_DIGEST_FILE_NAME):
+        if not os.path.isfile(rulib.HT_DIGEST_FILE_NAME):
             o_out['error'] = 'HT digest file does not exist.'
             return False
 
-        data = functions.fileRead(environ.HT_DIGEST_FILE_NAME, True)
+        data = functions.fileRead(rulib.HT_DIGEST_FILE_NAME, True)
         if data is None:
             o_out['error'] = 'Can`t read HT digest file.'
             error_log(o_out['error'])

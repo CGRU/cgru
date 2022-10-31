@@ -4,9 +4,7 @@ import os
 import sys
 import traceback
 
-from rusrv import environ
-from rulib import editobj
-
+import rulib
 
 def randMD5():
     hashlib = __import__('hashlib', globals(), locals(), [])
@@ -20,7 +18,7 @@ def fileRead(i_file, i_lock = True, i_verbose = False):
     except:
         return None
 
-    data = f.read(environ.FILE_MAX_LENGTH)
+    data = f.read(rulib.FILE_MAX_LENGTH)
     f.close()
 
     if i_verbose:
@@ -200,7 +198,7 @@ def writeUser(i_user, i_full):
 
 
 def skipFile(i_filename):
-    if i_filename in environ.SKIPFILES:
+    if i_filename in rulib.SKIPFILES:
         return True
     return False
 
@@ -325,7 +323,7 @@ def walkDir(admin, i_recv, i_dir, o_out, i_depth):
         if rufolder and lookahead:
             for sfile in lookahead:
                 sfilepath = os.path.join(path, rufolder, sfile) + '.json'
-                editobj.mergeObjs(folderObj, readObj(sfilepath))
+                rulib.editobj.mergeObjs(folderObj, readObj(sfilepath))
             thumbpath = os.path.join(path, rufolder, 'thumbnail.jpg')
             if os.path.isfile(thumbpath):
                 folderObj['thumbnail'] = True

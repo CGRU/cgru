@@ -63,7 +63,7 @@ def application(environ, start_response):
                     out['nonce'] = rulib.functions.randMD5()
                     del request['digest']
 
-            if 'login' in request and rulib.environ.AUTH_RULES and rulib.environ.AUTH_TYPE != 'AUTH_DIGEST':
+            if 'login' in request and rusrv.environ.AUTH_RULES and rusrv.environ.AUTH_TYPE != 'AUTH_DIGEST':
                 if not 'digest' in request['login']:
                     out['error'] = 'No digest in login object.'
                 else:
@@ -83,7 +83,7 @@ def application(environ, start_response):
                 if session.USER_ID is None:
                     o_out['error'] = 'Guests are not allowed to send jobs.'
                 else:
-                    rulib.afanasy.sendJob(request, out)
+                    rusrv.afanasy.sendJob(request, out)
             else:
                 found = False
                 for key in request:
