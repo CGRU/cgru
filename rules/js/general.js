@@ -113,7 +113,7 @@ function g_Init_Config(i_data)
 	bm_Init();
 	st_Init();
 
-	n_WalkDir({"paths": ['.'], "wfunc": g_Init_Rules, "info": 'walk config', "rufiles": ['rules']});
+	n_WalkDir({"paths": ['.'], "wfunc": g_Init_Rules, "info": 'walk config', "rufiles": ['rules'],'rufolder':'rules'});
 }
 
 function g_Init_Rules(i_data)

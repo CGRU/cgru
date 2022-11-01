@@ -540,7 +540,6 @@ function s_Search(i_args)
 		args.status[arg] = i_args[arg];
 	}
 	args.path = RULES.root + g_CurPath();
-	args.rufolder = RULES.rufolder;
 
 	n_Request({"send": {"search": args}, "func": s_ResultReceived});
 	$('search').classList.add('waiting');

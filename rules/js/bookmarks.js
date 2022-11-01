@@ -679,7 +679,7 @@ function bm_ThumbnailsShow()
 
 			var img = document.createElement('img');
 			el.m_elTh.appendChild(img);
-			img.src = RULES.root + el.m_bookmark.path + '/' + RULES.rufolder + '/thumbnail.jpg';
+			img.src = RULES.root + el.m_bookmark.path + '/' + RUFOLDER + '/thumbnail.jpg';
 			img.style.display = 'none';
 			img.onload = function(i_el) { i_el.currentTarget.style.display = 'block'; }
 		}

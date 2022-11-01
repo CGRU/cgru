@@ -1849,7 +1849,7 @@ function st_UpdateProgressesWalkReceived(i_walks, i_args)
 		{
 			var folder = i_walks[w].folders[f];
 
-			if (folder.name == RULES.rufolder)
+			if (folder.name == RUFOLDER)
 				continue;
 			if (c_AuxFolder(folder))
 				continue;

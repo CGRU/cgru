@@ -1016,7 +1016,7 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 				var ext = '.' + c_movieTypesHTML[i];
 				if (this.walk.rufiles.indexOf(i_obj.name + ext) != -1)
 					elItem.m_preview_file =
-						c_PathDir(elItem.m_path) + '/' + RULES.rufolder + '/' + i_obj.name + ext;
+						c_PathDir(elItem.m_path) + '/' + RUFOLDER + '/' + i_obj.name + ext;
 			}
 		}
 

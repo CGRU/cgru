@@ -269,43 +269,9 @@ class Requests:
 
 
     def req_makenews(self, i_args, o_out):
-        # Read all users:
-        users = functions.readAllUsers(o_out, True)
-        if 'error' in o_out:
-            return
+        news.makeNews(i_args, self.session.USER_ID, o_out)
+        return
 
-        if len(users) == 0:
-            o_out['error'] = 'No users found.'
-            return
-
-        users_changed = []
-
-        for request in i_args['news_requests']:
-            ids = news.makenews(request, users, o_out)
-            if 'error' in o_out:
-                return
-
-            if ids is not None:
-                for id in ids:
-                    if not id in users_changed:
-                        users_changed.append(id)
-
-        if 'bookmarks' in i_args:
-            for bm in i_args['bookmarks']:
-                ids = news.makebookmarks(self.session.USER_ID, bm, users, o_out)
-                if 'error' in o_out:
-                    return
-
-                if ids is not None:
-                    for id in ids:
-                        if not id in users_changed:
-                            users_changed.append(id)
-
-        # Write changed users:
-        for id in users_changed:
-            functions.writeUser(users[id], True)
-
-        o_out['users'] = users_changed
 
     def req_search(self, i_args, o_out):
         if not 'path' in i_args:

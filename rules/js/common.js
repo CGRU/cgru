@@ -20,7 +20,7 @@
 
 var SERVER = null;
 var RULES = {};
-RULES.rufolder = 'rules';
+var RUFOLDER = '.rules';
 var RULES_TOP = {};
 
 var c_movieTypes =
@@ -196,7 +196,7 @@ function c_RulesMergeDir(o_rules, i_dir)
 	{
 		let obj = i_dir.rules[keys[k]];
 		if (obj == null)
-			c_Error('RULES file "' + attr + '" in "' + g_CurPath() + '/' + RULES.rufolder + '" is invalid.');
+			c_Error('RULES file "' + attr + '" in "' + g_CurPath() + '/' + RUFOLDER + '" is invalid.');
 		else
 			c_RulesMergeObjs(o_rules, obj);
 	}
@@ -802,7 +802,7 @@ function c_GetRuFilePath(i_file, i_path)
 	if (path == null)
 		path = g_CurPath();
 
-	path += '/' + RULES.rufolder + '/' + i_file;
+	path += '/' + RUFOLDER + '/' + i_file;
 	path = RULES.root + path;
 
 	return path;
@@ -916,7 +916,7 @@ function c_GetThumbFileName(i_file)
 {
 	var name = c_PathBase(i_file);
 	var path = c_PathDir(i_file);
-	return path + '/' + RULES.rufolder + '/thumbnail.' + name + '.jpg';
+	return path + '/' + RUFOLDER + '/thumbnail.' + name + '.jpg';
 }
 
 function c_MakeThumbnail(i_file, i_func)

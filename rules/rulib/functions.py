@@ -211,7 +211,7 @@ def walkDir(admin, i_recv, i_dir, o_out, i_depth):
         o_out['error'] = 'No such folder.'
         return
 
-    rufolder = None
+    rufolder = rulib.RUFOLDER
     if 'rufolder' in i_recv:
         rufolder = i_recv['rufolder']
     rufiles = None

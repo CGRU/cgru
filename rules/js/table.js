@@ -383,7 +383,7 @@ function table_Gen_status(i_shot)
 function table_Gen_info(i_shot)
 {
 	var path = i_shot.path;
-	path = RULES.root + path + '/' + RULES.rufolder + '/' + u_body_filename;
+	path = RULES.root + path + '/' + RUFOLDER + '/' + u_body_filename;
 	n_GetFile(
 		{'path': path, 'func': table_BodyReceived, 'info': 'table_body', 'shot': i_shot, 'parse': false});
 }

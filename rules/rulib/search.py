@@ -27,7 +27,7 @@ def search(i_args, o_out, i_path, i_depth):
             continue
 
         found = False
-        rufolder = os.path.join(path, i_args['rufolder'])
+        rufolder = os.path.join(path, rulib.RUFOLDER)
         if os.path.isdir(rufolder):
             found = True
 

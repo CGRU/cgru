@@ -3,7 +3,46 @@ import time
 
 import rulib
 
-def makenews(i_args, io_users, o_out):
+def makeNews(i_args, i_uid, o_out):
+    # Read all users:
+    users = rulib.functions.readAllUsers(o_out, True)
+    if 'error' in o_out:
+        return
+
+    if len(users) == 0:
+        o_out['error'] = 'No users found.'
+        return
+
+    users_changed = []
+
+    for request in i_args['news_requests']:
+        ids = makeOneNews(request, users, o_out)
+        if 'error' in o_out:
+            return
+
+        if ids is not None:
+            for id in ids:
+                if not id in users_changed:
+                    users_changed.append(id)
+
+    if 'bookmarks' in i_args:
+        for bm in i_args['bookmarks']:
+            ids = makeBookmarks(i_uid, bm, users, o_out)
+            if 'error' in o_out:
+                return
+
+            if ids is not None:
+                for id in ids:
+                    if not id in users_changed:
+                        users_changed.append(id)
+
+    # Write changed users:
+    for id in users_changed:
+        rulib.functions.writeUser(users[id], True)
+
+    o_out['users'] = users_changed
+
+def makeOneNews(i_args, io_users, o_out):
     news = i_args['news']
 
     # Ensure that news has a path:
@@ -33,7 +72,7 @@ def makenews(i_args, io_users, o_out):
             break
 
         # Get existing recent:
-        rfile = i_args['root'] + path + '/' + i_args['rufolder'] + '/' + i_args['recent_file']
+        rfile = i_args['root'] + path + '/' + rulib.RUFOLDER + '/' + rulib.RECENT_FILENAME
         rarray = rulib.functions.readObj(rfile)
         if rarray is None:
             rarray = []
@@ -178,7 +217,7 @@ def makenews(i_args, io_users, o_out):
     return changed_users
 
 
-def makebookmarks(i_user_id, i_bm, io_users, o_out):
+def makeBookmarks(i_user_id, i_bm, io_users, o_out):
     changed_users = []
     for id in io_users:
         user = io_users[id]
