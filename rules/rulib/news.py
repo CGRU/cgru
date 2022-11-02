@@ -16,7 +16,7 @@ def makeNews(i_args, i_uid, o_out):
     users_changed = []
 
     for request in i_args['news_requests']:
-        ids = makeOneNews(request, users, o_out)
+        ids = makeNewsUno(request, users, i_uid, o_out)
         if 'error' in o_out:
             return
 
@@ -42,7 +42,7 @@ def makeNews(i_args, i_uid, o_out):
 
     o_out['users'] = users_changed
 
-def makeOneNews(i_args, io_users, o_out):
+def makeNewsUno(i_args, io_users, i_uid, o_out):
     news = i_args['news']
 
     # Ensure that news has a path:
@@ -72,7 +72,7 @@ def makeOneNews(i_args, io_users, o_out):
             break
 
         # Get existing recent:
-        rfile = i_args['root'] + path + '/' + rulib.RUFOLDER + '/' + rulib.RECENT_FILENAME
+        rfile = rulib.RULES['root'] + path + '/' + rulib.RUFOLDER + '/' + rulib.RECENT_FILENAME
         rarray = rulib.functions.readObj(rfile)
         if rarray is None:
             rarray = []
@@ -94,7 +94,7 @@ def makeOneNews(i_args, io_users, o_out):
                 if rarray[0]['path'] == news['path'] and rarray[0]['title'] == news['title'] and rarray[0]['user'] == news['user']:
                     del rarray[0]
 
-            while len(rarray) >= i_args['recent_max']:
+            while len(rarray) >= rulib.RULES['news']['recent']:
                 del rarray[-1]
 
         # Add new recent:
@@ -131,7 +131,7 @@ def makeOneNews(i_args, io_users, o_out):
 
     # User may be does not want to receive own news:
     ignore_own = False
-    if 'ignore_own' in i_args and i_args['ignore_own']:
+    if i_uid in io_users and 'ignore_own' in io_users[i_uid] and io_users[i_uid]['ignore_own']:
         ignore_own = True
 
     # Get subscribed users:
@@ -190,9 +190,7 @@ def makeOneNews(i_args, io_users, o_out):
         user['news'].insert(0, news)
 
         # Delete news above the limit:
-        limit = 99
-        if 'limit' in i_args and i_args['limit'] > 0:
-            limit = i_args['limit']
+        limit = rulib.RULES['news']['limit']
         if 'news_limit' in user and user['news_limit'] > 0:
             limit = user['news_limit']
 

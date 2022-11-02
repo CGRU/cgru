@@ -11,6 +11,30 @@ def randMD5():
     random = __import__('random', globals(), locals(), [])
     return hashlib.md5(str(random.random()).encode()).hexdigest()
 
+def getRuFiles(i_path = None, i_ruFolder = None):
+    if i_path is None: i_path = os.getcwd()
+    if i_ruFolder is None: i_ruFolder = rulib.RUFOLDER
+
+    ruFolder = os.path.join(i_path, i_ruFolder)
+
+    if not os.path.isdir(ruFolder):
+        return []
+    ruFiles = []
+    for afile in os.listdir(ruFolder):
+        if afile.find('rules') != 0:
+            continue
+        if afile.find('.json') == -1:
+            continue
+        ruFiles.append(os.path.join(ruFolder, afile))
+    ruFiles.sort()
+
+    return ruFiles
+
+def getRulesUno(i_path = None, i_ruFolder =  None):
+    rules = dict()
+    for afile in getRuFiles(i_path, i_ruFolder):
+        rulib.editobj.mergeObjs(rules, readObj(afile))
+    return rules
 
 def fileRead(i_file, i_lock = True, i_verbose = False):
     try:

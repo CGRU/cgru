@@ -34,13 +34,16 @@ def initApp(i_app_root):
 
 def initEnv(i_environ):
     global COUNTER
+    COUNTER += 1
+
+    if COUNTER > 1:
+        return
+
     global SERVER_SOFTWARE
     global MOD_WSGI_VERSION
     global AUTH_TYPE
     global SERVER_NAME
     global AUTH_RULES
-
-    COUNTER += 1
     SERVER_SOFTWARE = i_environ['SERVER_SOFTWARE']
     MOD_WSGI_VERSION = i_environ['mod_wsgi.version']
     if 'AUTH_TYPE' in i_environ:
@@ -48,4 +51,3 @@ def initEnv(i_environ):
     SERVER_NAME = i_environ['SERVER_NAME']
     if SERVER_NAME in GUEST_SITES:
         AUTH_RULES = True
-
