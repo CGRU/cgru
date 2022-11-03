@@ -112,13 +112,15 @@ function g_Init_Config(i_data)
 	nw_Init();
 	bm_Init();
 	st_Init();
-
+/*
 	n_WalkDir({"paths": ['.'], "wfunc": g_Init_Rules, "info": 'walk config', "rufiles": ['rules'],'rufolder':'rules'});
 }
 
 function g_Init_Rules(i_data)
 {
 	c_RulesMergeDir(RULES_TOP, i_data[0]);
+*/
+	c_RulesMergeObjs(RULES_TOP, config.rules_top);
 
 	if (RULES_TOP.cgru_config)
 		cgru_ConfigJoin(RULES_TOP.cgru_config);

@@ -13,7 +13,6 @@ RUFOLDER = '.rules'
 RECENT_FILENAME = 'recent.json'
 
 RULES_TOP = dict()
-RULES = dict()
 
 SKIPFILES = ['.', '..', HT_ACCESS_FILE_NAME, HT_GROUPS_FILE_NAME, HT_DIGEST_FILE_NAME]
 
@@ -23,4 +22,3 @@ GUESTCANEDIT = ['comments.json']
 if len(RULES_TOP) == 0:
     cgru_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
     RULES_TOP = functions.getRulesUno(cgru_root,'rules')
-    RULES = RULES_TOP

@@ -72,7 +72,7 @@ def makeNewsUno(i_args, io_users, i_uid, o_out):
             break
 
         # Get existing recent:
-        rfile = rulib.RULES['root'] + path + '/' + rulib.RUFOLDER + '/' + rulib.RECENT_FILENAME
+        rfile = rulib.RULES_TOP['root'] + path + '/' + rulib.RUFOLDER + '/' + rulib.RECENT_FILENAME
         rarray = rulib.functions.readObj(rfile)
         if rarray is None:
             rarray = []
@@ -94,7 +94,7 @@ def makeNewsUno(i_args, io_users, i_uid, o_out):
                 if rarray[0]['path'] == news['path'] and rarray[0]['title'] == news['title'] and rarray[0]['user'] == news['user']:
                     del rarray[0]
 
-            while len(rarray) >= rulib.RULES['news']['recent']:
+            while len(rarray) >= rulib.RULES_TOP['news']['recent']:
                 del rarray[-1]
 
         # Add new recent:
@@ -190,7 +190,7 @@ def makeNewsUno(i_args, io_users, i_uid, o_out):
         user['news'].insert(0, news)
 
         # Delete news above the limit:
-        limit = rulib.RULES['news']['limit']
+        limit = rulib.RULES_TOP['news']['limit']
         if 'news_limit' in user and user['news_limit'] > 0:
             limit = user['news_limit']
 
