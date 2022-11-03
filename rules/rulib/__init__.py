@@ -2,6 +2,8 @@ import os
 
 from . import editobj
 from . import functions
+from . import news
+from . import search
 
 FILE_MAX_LENGTH = 3000000
 
