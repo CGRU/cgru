@@ -1050,7 +1050,7 @@ Status.prototype.edit = function(i_args) {
 	this.elEdit_tasks = document.createElement('div');
 	this.elEdit.appendChild(this.elEdit_tasks);
 	this.elEdit_tasks.classList.add('edit_tasks');
-
+/*
 	if (c_CanEditTasks())
 	{
 		this.elTasksPanel = document.createElement('div');
@@ -1064,7 +1064,7 @@ Status.prototype.edit = function(i_args) {
 		el.m_status = this;
 		el.onclick = function(e) { e.currentTarget.m_status.editTasksShow(e, e.currentTarget.m_args); }
 	}
-
+*/
 
 	// Get values:
 	var annotation = this.obj.annotation;
@@ -1102,6 +1102,7 @@ Status.prototype.edit = function(i_args) {
 
 	this.elEdit_annotation.focus();
 };
+/*
 Status.prototype.editTasksShow = function(i_evt, i_args) {
 	// Show tasks only once:
 	if (this.elEdit_tasks.elTasks)
@@ -1134,6 +1135,7 @@ Status.prototype.editTasksShow = function(i_evt, i_args) {
 
 	this.editTasksShowTasks();
 };
+*/
 Status.prototype.editOnKeyDown = function(e, i_args) {
 	if (e.keyCode == 27)
 		this.show();  // ESC
@@ -1174,7 +1176,7 @@ Status.prototype.getMultiVale = function(i_key, i_statuses) {
 	}
 	return value;
 };
-
+/*
 Status.prototype.addTaskOnClick = function() {
 	if (this.obj.tasks == null)
 		this.obj.tasks = [];
@@ -1295,7 +1297,7 @@ Status.prototype.editTasksShowTasks = function(i_args) {
 		this.elEdit_tasks.elTasks.push(el);
 	}
 };
-
+*/
 Status.prototype.editCancel = function() {
 	if (this.elEdit == null)
 		return;
@@ -1370,7 +1372,7 @@ Status.prototype.editProcess = function(i_args) {
 	if (this.editTags)
 		tags = this.editTags.getSelectedObjects();
 
-
+/*
 	if (this.elEdit_tasks.elTasks)
 	{
 		tasks = [];
@@ -1396,7 +1398,7 @@ Status.prototype.editProcess = function(i_args) {
 			tasks.push(task);
 		}
 	}
-
+*/
 	// Collect statuses to change
 	// ( this and may be others selected )
 	var statuses = [this];
@@ -1462,7 +1464,7 @@ Status.prototype.editProcess = function(i_args) {
 				if ((tags[id].selected) && (statuses[i].obj.tags.indexOf(id) == -1))
 					statuses[i].obj.tags.push(id);
 		}
-
+/*
 		if (tasks)
 		{
 			var duration = 0;
@@ -1494,7 +1496,7 @@ Status.prototype.editProcess = function(i_args) {
 			statuses[i].obj.duration = duration;
 			statuses[i].obj.price = price;
 		}
-
+*/
 		// If shot progress is 100% all tasks should be 100% done.
 		if ((statuses[i].obj.progress == 100) && (statuses[i].obj.tasks))
 			for (let t in statuses[i].obj.tasks)
