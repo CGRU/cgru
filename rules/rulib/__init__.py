@@ -4,6 +4,7 @@ from . import editobj
 from . import functions
 from . import news
 from . import search
+from . import status
 
 FILE_MAX_LENGTH = 3000000
 

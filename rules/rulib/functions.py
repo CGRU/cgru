@@ -11,6 +11,11 @@ def randMD5():
     random = __import__('random', globals(), locals(), [])
     return hashlib.md5(str(random.random()).encode()).hexdigest()
 
+def getRuFilePath(i_file, i_path = None):
+    if i_path is None:
+        i_path = os.getcwd()
+    return os.path.join(i_path, rulib.RUFOLDER, i_file)
+
 def getRuFiles(i_path = None, i_ruFolder = None):
     if i_path is None: i_path = os.getcwd()
     if i_ruFolder is None: i_ruFolder = rulib.RUFOLDER
@@ -77,8 +82,11 @@ def fileWrite(i_file, i_data, i_lock = True, i_verbose = False):
 
 def readObj(i_file, o_out = None, i_lock = True):
     if not os.path.isfile(i_file):
+        error = 'No such file %s' % i_file
         if o_out:
-            o_out['error'] = 'No such file %s' % i_file
+            o_out['error'] = error
+        else:
+            print(error)
         return
 
     data = fileRead(i_file, i_lock)
@@ -87,8 +95,11 @@ def readObj(i_file, o_out = None, i_lock = True):
         obj = json.loads(data)
         return obj
 
+    error = 'Unable to read file %s' % i_file
     if o_out:
-        o_out['error'] = 'Unable to read file %s' % i_file
+        o_out['error'] = error
+    else:
+        print(error)
 
     return
 
