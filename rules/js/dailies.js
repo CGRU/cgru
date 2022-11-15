@@ -406,7 +406,7 @@ function d_MakeCmd(i_params)
 	{
 		cmd += ' --pcodec "' + RULES.dailies.preview.codec + '"';
 		cmd += ' --pargs "' + RULES.dailies.preview.args + '"';
-		cmd += ' --pdir "' + RULES.rufolder + '"';
+		cmd += ' --pdir "' + RUFOLDER + '"';
 	}
 
 	if ((params.aspect_in != null) && (params.aspect_in != ''))

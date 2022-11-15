@@ -1,18 +1,59 @@
 import cgi
 import json
 import os
+import getpass
 import sys
+import time
 import traceback
 
-from rusrv import environ
-from rusrv import editobj
-
+import rulib
 
 def randMD5():
     hashlib = __import__('hashlib', globals(), locals(), [])
     random = __import__('random', globals(), locals(), [])
     return hashlib.md5(str(random.random()).encode()).hexdigest()
 
+def getCurSeconds():
+    return round(time.time())
+
+def getCurUser():
+    return getpass.getuser()
+
+def outError(i_err, i_out = None):
+    if o_out:
+        o_out['error'] = i_err
+    else:
+        print(i_err)
+
+def getRuFilePath(i_file, i_path = None):
+    if i_path is None:
+        i_path = os.getcwd()
+    return os.path.join(i_path, rulib.RUFOLDER, i_file)
+
+def getRuFiles(i_path = None, i_ruFolder = None):
+    if i_path is None: i_path = os.getcwd()
+    if i_ruFolder is None: i_ruFolder = rulib.RUFOLDER
+
+    ruFolder = os.path.join(i_path, i_ruFolder)
+
+    if not os.path.isdir(ruFolder):
+        return []
+    ruFiles = []
+    for afile in os.listdir(ruFolder):
+        if afile.find('rules') != 0:
+            continue
+        if afile.find('.json') == -1:
+            continue
+        ruFiles.append(os.path.join(ruFolder, afile))
+    ruFiles.sort()
+
+    return ruFiles
+
+def getRulesUno(i_path = None, i_ruFolder =  None):
+    rules = dict()
+    for afile in getRuFiles(i_path, i_ruFolder):
+        rulib.editobj.mergeObjs(rules, readObj(afile))
+    return rules
 
 def fileRead(i_file, i_lock = True, i_verbose = False):
     try:
@@ -20,7 +61,7 @@ def fileRead(i_file, i_lock = True, i_verbose = False):
     except:
         return None
 
-    data = f.read(environ.FILE_MAX_LENGTH)
+    data = f.read(rulib.FILE_MAX_LENGTH)
     f.close()
 
     if i_verbose:
@@ -55,8 +96,11 @@ def fileWrite(i_file, i_data, i_lock = True, i_verbose = False):
 
 def readObj(i_file, o_out = None, i_lock = True):
     if not os.path.isfile(i_file):
+        error = 'No such file %s' % i_file
         if o_out:
-            o_out['error'] = 'No such file %s' % i_file
+            o_out['error'] = error
+        else:
+            print(error)
         return
 
     data = fileRead(i_file, i_lock)
@@ -65,8 +109,11 @@ def readObj(i_file, o_out = None, i_lock = True):
         obj = json.loads(data)
         return obj
 
+    error = 'Unable to read file %s' % i_file
     if o_out:
-        o_out['error'] = 'Unable to read file %s' % i_file
+        o_out['error'] = error
+    else:
+        print(error)
 
     return
 
@@ -155,9 +202,18 @@ def readAllUsers(o_out, i_full):
 
 def writeUser(i_user, i_full):
     uid = i_user['id']
-    ufile_main = 'users/%s/%s.json' % (uid, uid)
-    ufile_news = 'users/%s/%s-news.json' % (uid, uid)
-    ufile_bookmarks = 'users/%s/%s-bookmarks.json' % (uid, uid)
+    udir = 'users/%s' % uid
+    ufile_main = '%s/%s.json' % (udir, uid)
+    ufile_news = '%s/%s-news.json' % (udir, uid)
+    ufile_bookmarks = '%s/%s-bookmarks.json' % (udir, uid)
+
+    if not os.path.isdir(udir):
+        try:
+            os.makedirs(udir)
+        except:
+            print('writeUser: Unable create user folder: ' + udir)
+            print('%s' % traceback.format_exc())
+            return False
 
     user = dict()
     news = None
@@ -191,7 +247,7 @@ def writeUser(i_user, i_full):
 
 
 def skipFile(i_filename):
-    if i_filename in environ.SKIPFILES:
+    if i_filename in rulib.SKIPFILES:
         return True
     return False
 
@@ -204,7 +260,7 @@ def walkDir(admin, i_recv, i_dir, o_out, i_depth):
         o_out['error'] = 'No such folder.'
         return
 
-    rufolder = None
+    rufolder = rulib.RUFOLDER
     if 'rufolder' in i_recv:
         rufolder = i_recv['rufolder']
     rufiles = None
@@ -316,7 +372,7 @@ def walkDir(admin, i_recv, i_dir, o_out, i_depth):
         if rufolder and lookahead:
             for sfile in lookahead:
                 sfilepath = os.path.join(path, rufolder, sfile) + '.json'
-                editobj.mergeObjs(folderObj, readObj(sfilepath))
+                rulib.editobj.mergeObjs(folderObj, readObj(sfilepath))
             thumbpath = os.path.join(path, rufolder, 'thumbnail.jpg')
             if os.path.isfile(thumbpath):
                 folderObj['thumbnail'] = True

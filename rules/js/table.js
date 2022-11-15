@@ -17,16 +17,16 @@
 "use strict";
 
 var table_columns = {
-	name /******/: {'label': 'Name'},
-	frames_num   : {'label': 'Frames'},
-	picture /***/: {'label': 'Picture'},
-	status /****/: {'label': 'Status'},
-	info /******/: {'label': 'Info'},
-	comments /**/: {'label': 'Comments'},
-	tasks /*****/: {'label': 'Tasks'},
-	timecode /**/: {'label': 'TC'},
-	duration /**/: {'label': 'Dur'},
-	price /*****/: {'label': 'Price'}
+	name       : {'label': 'Name'},
+	frames_num : {'label': 'Frames'},
+	picture    : {'label': 'Picture'},
+	status     : {'label': 'Status'},
+	info       : {'label': 'Info'},
+	comments   : {'label': 'Comments'},
+	tasks      : {'label': 'Tasks'},
+	timecode   : {'label': 'TC'},
+	duration   : {'label': 'Dur'},
+	price      : {'label': 'Price'}
 };
 
 var table_args = null;
@@ -40,13 +40,14 @@ var table_function_num = null;
 var table_params = {
 	picture    : {'type': 'bool', 'default': true,  'width': '20%'},
 	status     : {'type': 'bool', 'default': true,  'width': '20%'},
+	tags       : {'type': 'bool', 'default': true,  'width': '20%'},
 	annotation : {'type': 'bool', 'default': false, 'width': '20%'},
 	comments   : {'type': 'bool', 'default': false, 'width': '20%'},
-	price      : {'type': 'bool', 'default': true,  'width': '20%'},
 	timecode   : {'type': 'bool', 'default': false, 'width': '20%'},
 	frames_num : {'type': 'bool', 'default': false, 'width': '20%'},
 	duration   : {'type': 'bool', 'default': true,  'width': '20%'},
-	tasks      : {'type': 'bool', 'default': false, 'width': '20%'}
+	tasks      : {'type': 'bool', 'default': false, 'width': '20%'},
+	price      : {'type': 'bool', 'default': true,  'width': '20%'}
 };
 
 function table_Export(i_args)
@@ -354,9 +355,9 @@ function table_PictureReceived(i_data, i_shot)
 
 function table_Gen_status(i_shot)
 {
-	var st = '';
+	let st = '';
 
-	if (table_args.params.tasks !== true)
+	if (table_args.params.tags)
 		if (i_shot.status.tags && i_shot.status.tags.length)
 			for (var i = 0; i < i_shot.status.tags.length; i++)
 			{
@@ -382,7 +383,7 @@ function table_Gen_status(i_shot)
 function table_Gen_info(i_shot)
 {
 	var path = i_shot.path;
-	path = RULES.root + path + '/' + RULES.rufolder + '/' + u_body_filename;
+	path = RULES.root + path + '/' + RUFOLDER + '/' + u_body_filename;
 	n_GetFile(
 		{'path': path, 'func': table_BodyReceived, 'info': 'table_body', 'shot': i_shot, 'parse': false});
 }
@@ -451,21 +452,29 @@ function table_CommentsReceived(i_data, i_args)
 
 function table_Gen_tasks(i_shot)
 {
-	var data = '';
+	let data = '';
 
-	var tasks = i_shot.status.tasks;
-	if (tasks && tasks.length)
-		for (var t = 0; t < tasks.length; t++)
+	let tasks = i_shot.status.tasks;
+	if (tasks)
+		for (let t in tasks)
 		{
-			var tags = '';
-			if (tasks[t].tags && tasks[t].tags.length)
-				for (var g = 0; g < tasks[t].tags.length; g++)
-					tags += ' ' + c_GetTagTitle(tasks[t].tags[g]);
+			let task = tasks[t];
+			let line = '';
+
+			if (task.tags && task.tags.length)
+				for (let g = 0; g < task.tags.length; g++)
+					line += ' ' + c_GetTagTitle(task.tags[g]);
+
+			line += ' - ';
+
+			if (task.artists && task.artists.length)
+				for (let a = 0; a < task.artists.length; a++)
+					line += ' ' + c_GetUserTitle(task.artists[a]);
 
 			if (data.length)
 				data += '<br>';
 
-			data += tags + ' - ' + tasks[t].duration;
+			data += line;
 		}
 
 	table_WriteTD({'data': data, 'status': i_shot.status});

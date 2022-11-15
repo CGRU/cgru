@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -z "${CGRU_PYTHONEXE}" ]; then
-   export CGRU_PYTHONEXE="python"
+   export CGRU_PYTHONEXE="python2"
    python="${CGRU_LOCATION}/python"
    if [ -d "${python}" ]; then
       echo "Using CGRU Python: ${python}"

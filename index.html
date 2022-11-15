@@ -7,31 +7,31 @@
 <link type="text/css" rel="stylesheet" href="rules/styles.css">
 <script type="text/javascript" src="lib/js/cgru.js"></script>
 <script type="text/javascript" src="lib/js/md5.js"></script>
-<script type="text/javascript" src="rules/activity.js"></script>
-<script type="text/javascript" src="rules/admin.js"></script>
-<script type="text/javascript" src="rules/artbook.js"></script>
-<script type="text/javascript" src="rules/asset.js"></script>
-<script type="text/javascript" src="rules/bookmarks.js"></script>
-<script type="text/javascript" src="rules/comments.js"></script>
-<script type="text/javascript" src="rules/common.js"></script>
-<script type="text/javascript" src="rules/dailies.js"></script>
-<script type="text/javascript" src="rules/editcontent.js"></script>
-<script type="text/javascript" src="rules/editlist.js"></script>
-<script type="text/javascript" src="rules/filesutils.js"></script>
-<script type="text/javascript" src="rules/filesview.js"></script>
-<script type="text/javascript" src="rules/general.js"></script>
-<script type="text/javascript" src="rules/gui.js"></script>
-<script type="text/javascript" src="rules/network.js"></script>
-<script type="text/javascript" src="rules/news.js"></script>
-<script type="text/javascript" src="rules/playlist.js"></script>
-<script type="text/javascript" src="rules/profile.js"></script>
-<script type="text/javascript" src="rules/search.js"></script>
-<script type="text/javascript" src="rules/statistics.js"></script>
-<script type="text/javascript" src="rules/status.js"></script>
-<script type="text/javascript" src="rules/table.js"></script>
-<script type="text/javascript" src="rules/task.js"></script>
-<script type="text/javascript" src="rules/ui.js"></script>
-<script type="text/javascript" src="rules/upload.js"></script>
+<script type="text/javascript" src="rules/js/activity.js"></script>
+<script type="text/javascript" src="rules/js/admin.js"></script>
+<script type="text/javascript" src="rules/js/artbook.js"></script>
+<script type="text/javascript" src="rules/js/asset.js"></script>
+<script type="text/javascript" src="rules/js/bookmarks.js"></script>
+<script type="text/javascript" src="rules/js/comments.js"></script>
+<script type="text/javascript" src="rules/js/common.js"></script>
+<script type="text/javascript" src="rules/js/dailies.js"></script>
+<script type="text/javascript" src="rules/js/editcontent.js"></script>
+<script type="text/javascript" src="rules/js/editlist.js"></script>
+<script type="text/javascript" src="rules/js/filesutils.js"></script>
+<script type="text/javascript" src="rules/js/filesview.js"></script>
+<script type="text/javascript" src="rules/js/general.js"></script>
+<script type="text/javascript" src="rules/js/gui.js"></script>
+<script type="text/javascript" src="rules/js/network.js"></script>
+<script type="text/javascript" src="rules/js/news.js"></script>
+<script type="text/javascript" src="rules/js/playlist.js"></script>
+<script type="text/javascript" src="rules/js/profile.js"></script>
+<script type="text/javascript" src="rules/js/search.js"></script>
+<script type="text/javascript" src="rules/js/statistics.js"></script>
+<script type="text/javascript" src="rules/js/status.js"></script>
+<script type="text/javascript" src="rules/js/table.js"></script>
+<script type="text/javascript" src="rules/js/task.js"></script>
+<script type="text/javascript" src="rules/js/ui.js"></script>
+<script type="text/javascript" src="rules/js/upload.js"></script>
 <script type="text/javascript">
 
 if( document.location.host.indexOf('rules.cgru.info') != -1 )
@@ -240,7 +240,8 @@ Supervisor can assign artist by creating a task."
 	</div>
 	<div id="execute_div" class="_view">
 		<div id="execute_btn" onclick="u_ExecuteShow()" class="button">EXECUTE</div>
-		<div id="execute_body"></div>
+		<div id="execute_favor"></div>
+		<div id="execute_items"></div>
 	</div>
 	<div id="asset_div" class="view">
 		<div class="button show" onclick="u_OpenCloseView('asset')"

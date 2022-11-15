@@ -136,6 +136,7 @@ const char CMD_REBOOT[] /****/ = "reboot";  ///< How to reboot a computer.
 const char CMD_SHUTDOWN[] /**/ = "shutdown";		///< How to shutdown a computer.
 const char CMD_WOLSLEEP[] /**/ = "wolsleep";		///< How to sleep computer.
 const char CMD_WOLWAKE[] /***/ = "wolwake";			///< How to wake computer.
+const char GPUINFO_NVIDIA_CMD[] = "nvidia-smi --id=0 --query-gpu=utilization.gpu,temperature.gpu,memory.total,memory.used,name --format=csv,noheader,nounits 2>&1";
 const char NETWORK_IF[] /**********/ = ".*";		///< Network interface(s) pattern to measure traffic on.
 const char HDDSPACE_PATH[] /*******/ = "/";			///< Path to query total and free space.
 const char IOSTAT_DEVICE[] /*******/ = "sda";		///< Device to monitor IO.

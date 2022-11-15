@@ -402,19 +402,16 @@ function nw_CreateNews(i_news)
 	if (nw_disabled)
 		return;
 
-	var news = i_news;
+	let news = i_news;
 
-	if (news.user_id == null)
+	if (g_auth_user)
 	{
-		if (g_auth_user)
-		{
-			news.user = g_auth_user.id;
-		}
-		else
-		{
-			c_Error('Can`t make news with no user.');
-			return;
-		}
+		news.user = g_auth_user.id;
+	}
+	else
+	{
+		c_Error('Can`t make news with no user.');
+		return;
 	}
 
 	if (news.path == null)
@@ -441,13 +438,6 @@ function nw_CreateNews(i_news)
 	request.email_from_title = c_EmailFromTitle();
 	request.email_subject = email_subject;
 	request.email_body = email_body;
-	request.root = RULES.root;
-	request.rufolder = RULES.rufolder;
-	request.limit = RULES.news.limit;
-	request.recent_max = RULES.news.recent;
-	request.recent_file = nw_recent_file;
-	if (nw_ignore_own)
-		request.ignore_own = true;
 
 	return request;
 }

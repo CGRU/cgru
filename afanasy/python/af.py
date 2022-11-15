@@ -703,6 +703,21 @@ class Job:
             block.fillTasks()
             self.data["blocks"].append(block.data)
 
+    def checkJob(self):
+        """Missing DocString
+
+        :return:
+        """
+        error = False
+        for block in self.blocks:
+            if block.data['flags'] == 0 and len(block.tasks) == 0:
+                error = True
+
+        if error is True:
+            return False
+        else:
+            return True
+
     def output(self):
         """Missing DocString
 
@@ -722,13 +737,16 @@ class Job:
 
         self.fillBlocks()
 
+        if self.checkJob() is not True:
+            return False
+
         # Set folder if empty:
         if "folders" not in self.data:
             self.data["folders"] = dict()
             # Try to set output folder from files:
             for block in self.blocks:
                 if "files" in block.data and len(block.data["files"]):
-                    self.data["folders"][block.data['name']] = os.path.dirname(block.data["files"][0])
+                    self.data["folders"][block.data['name']] = os.path.join(block.data['working_directory'], os.path.dirname(block.data["files"][0]))
 
         # Set branch if empty:
         if 'branch' not in self.data:

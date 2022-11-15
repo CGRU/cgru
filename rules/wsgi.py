@@ -13,6 +13,7 @@ APP_ROOT = os.path.dirname(APP_FILE)
 sys.path.append(APP_ROOT)
 
 import rusrv
+import rulib
 
 rusrv.environ.initApp(APP_ROOT)
 
@@ -33,7 +34,7 @@ def application(environ, start_response):
     request = None
 
     if 'CONTENT_TYPE' in environ and environ['CONTENT_TYPE'].find('multipart/form-data') != -1:
-        rusrv.functions.upload(environ, out)
+        rulib.functions.upload(environ, out)
     else:
         content_length = 0
         if 'CONTENT_LENGTH' in environ:
@@ -59,7 +60,7 @@ def application(environ, start_response):
                         out['auth_status'] = 'Wrong credentials.'
                         out['auth_error'] = True
                         session.USER_ID = None
-                    out['nonce'] = rusrv.functions.randMD5()
+                    out['nonce'] = rulib.functions.randMD5()
                     del request['digest']
 
             if 'login' in request and rusrv.environ.AUTH_RULES and rusrv.environ.AUTH_TYPE != 'AUTH_DIGEST':
@@ -76,7 +77,7 @@ def application(environ, start_response):
                     for rem in ['../', '../', '..']:
                         path = path.replace(rem, '')
                     walkdir = dict()
-                    rusrv.functions.walkDir(admin, request, path, walkdir, 0)
+                    rulib.functions.walkDir(admin, request, path, walkdir, 0)
                     out['walkdir'].append(walkdir)
             elif 'afanasy' in request:
                 if session.USER_ID is None:

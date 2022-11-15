@@ -7,10 +7,8 @@ import sys
 import traceback
 
 from rusrv import environ
-from rusrv import editobj
-from rusrv import functions
-from rusrv import news
-from rusrv import search
+
+import rulib
 
 class Requests:
 
@@ -31,19 +29,19 @@ class Requests:
             out['AUTH_TYPE'] = environ.AUTH_TYPE
         if environ.AUTH_RULES:
             out['AUTH_RULES'] = environ.AUTH_RULES
-            out['nonce'] = functions.randMD5()
+            out['nonce'] = rulib.functions.randMD5()
 
 
     def req_initialize(self, i_args, out):
         configs = dict()
-        functions.readConfig('config_default.json', configs)
+        rulib.functions.readConfig('config_default.json', configs)
         out['config'] = configs
 
         self.admin.processUser(i_args, out)
         if 'error' in out:
             return
 
-        users = functions.readAllUsers(out, False)
+        users = rulib.functions.readAllUsers(out, False)
         if 'error' in out:
             return
 
@@ -69,6 +67,8 @@ class Requests:
             if self.admin.isAdmin():
                 out['admin'] = True
 
+        out['rules_top'] = rulib.RULES_TOP
+
 
     def req_getfile(self, i_file, out):
         if not os.path.isfile(i_file):
@@ -79,7 +79,7 @@ class Requests:
             o_out['error'] = 'Permissions denied';
             return
 
-        data = functions.fileRead(i_file)
+        data = rulib.functions.fileRead(i_file)
         if data:
             return data
 
@@ -109,7 +109,7 @@ class Requests:
             if i_save['type'] == 'base64':
                 data = base64.b64decode(data)
 
-        if not functions.fileWrite(filename, data):
+        if not rulib.functions.fileWrite(filename, data):
             o_out['error'] = 'Unable to open save file: ' + filename
 
 
@@ -136,7 +136,7 @@ class Requests:
     def req_getallusers(self, i_args, o_out):
         if not self.admin.isAdmin(o_out):
             return
-        o_out['users'] = functions.readAllUsers(o_out, True)
+        o_out['users'] = rulib.functions.readAllUsers(o_out, True)
 
     def req_disableuser(self, i_args, o_out):
         if not self.admin.isAdmin(o_out):
@@ -205,7 +205,7 @@ class Requests:
                     return
 
         # Read object:
-        obj = functions.readObj(i_edit['file'])
+        obj = rulib.functions.readObj(i_edit['file'])
 
         # Edit object:
         if 'add' in i_edit and i_edit['add'] is True:
@@ -214,8 +214,19 @@ class Requests:
                 obj = dict()
                 # Create folder if does not exist
                 if not os.path.isdir(os.path.dirname(i_edit['file'])):
-                    os.makedirs(os.path.dirname(i_edit['file']), mode=0o777);
-            editobj.mergeObjs(obj, i_edit['object'])
+                    try:
+                        os.makedirs(os.path.dirname(i_edit['file']), mode=0o777);
+                    except PermissionError:
+                        o_out['status'] = 'error';
+                        o_out['error'] = 'Permission denied: ' + os.path.dirname(os.path.dirname(i_edit['file']))
+                        o_out['info'] = '%s' % traceback.format_exc()
+                        return
+                    except:
+                        o_out['status'] = 'error';
+                        o_out['error'] = 'Can`t create folder: ' + os.path.dirname(i_edit['file'])
+                        o_out['info'] = '%s' % traceback.format_exc()
+                        return
+            rulib.editobj.mergeObjs(obj, i_edit['object'])
         else:
             if obj is None:
                 # Object to edit does not exist
@@ -224,19 +235,19 @@ class Requests:
                 return
 
             if 'pusharray' in i_edit:
-                editobj.pushArray(obj, i_edit)
+                rulib.editobj.pushArray(obj, i_edit)
             elif 'replace' in i_edit and i_edit['replace'] is True:
                 for newobj in i_edit['objects']:
-                    editobj.replaceObject(obj, newobj, i_edit)
+                    rulib.editobj.replaceObject(obj, newobj, i_edit)
             elif 'delarray' in i_edit:
-                editobj.delArray(obj, i_edit)
+                rulib.editobj.delArray(obj, i_edit)
             else:
                 o_out['status'] = 'error'
                 o_out['error'] = 'Unknown edit object operation: ' + i_edit['file']
                 return
 
         # Write object:
-        if functions.writeObj(i_edit['file'], obj):
+        if rulib.functions.writeObj(i_edit['file'], obj):
             o_out['status'] = 'success'
             o_out['object'] = obj
         else:
@@ -258,41 +269,9 @@ class Requests:
 
 
     def req_makenews(self, i_args, o_out):
-        # Read all users:
-        users = functions.readAllUsers(o_out, True)
-        if 'error' in o_out:
-            return
+        rulib.news.makeNews(i_args, self.session.USER_ID, o_out)
+        return
 
-        if len(users) == 0:
-            o_out['error'] = 'No users found.'
-            return
-
-        users_changed = []
-
-        for request in i_args['news_requests']:
-            ids = news.makenews(request, users, o_out)
-            if 'error' in o_out:
-                return
-
-            for id in ids:
-                if not id in users_changed:
-                    users_changed.append(id)
-
-        if 'bookmarks' in i_args:
-            for bm in i_args['bookmarks']:
-                ids = news.makebookmarks(self.session.USER_ID, bm, users, o_out)
-                if 'error' in o_out:
-                    return
-
-                for id in ids:
-                    if not id in users_changed:
-                        users_changed.append(id)
-
-        # Write changed users:
-        for id in users_changed:
-            functions.writeUser(users[id], True)
-
-        o_out['users'] = users_changed
 
     def req_search(self, i_args, o_out):
         if not 'path' in i_args:
@@ -316,4 +295,4 @@ class Requests:
         o_out['search'] = i_args
         o_out['result'] = []
 
-        search.search(i_args, o_out, path, 0)
+        rulib.search.search(i_args, o_out, path, 0)

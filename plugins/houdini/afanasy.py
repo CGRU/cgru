@@ -62,6 +62,7 @@ class BlockParameters:
         self.soho_outputmode = None
         self.pre_submit_script = None
         self.post_submit_script = None
+        self.environment_dict = None
 
         # Get parameters:
         self.single_task = bool(afnode.parm('single_task').eval())
@@ -135,6 +136,8 @@ class BlockParameters:
 
         if self.local_render:
             self.hosts_mask = str(socket.gethostname())
+
+        self.environment_dict = afnode.parm('environment_dict').eval()
 
         # Process frame range:
         opname = afnode.path()
@@ -490,6 +493,9 @@ class BlockParameters:
         if self.min_cpu_cores_freq > 0:
             block.setNeedCPUFreqCores(self.min_cpu_cores_freq)
 
+        for key in self.environment_dict:
+            block.setEnv(key, self.environment_dict[key])
+
         # Process Tickets
         if self.tickets_use:
             if self.tickets_auto:
@@ -522,24 +528,7 @@ class BlockParameters:
         if self.afnode.parm('wait_time').eval():
             hours = int(self.afnode.parm('wait_time_hours').eval())
             minutes = int(self.afnode.parm('wait_time_minutes').eval())
-            hours = max(0,min(hours,23))
-            minutes = max(0,min(minutes,59))
-            now_sec = int(time.time())
-            now_day = int((now_sec - time.timezone) / (24*3600)) * (24*3600) + time.timezone
-            sec = now_sec % 60
-            wait_sec = now_day + (hours * 3600) + (minutes * 60) + sec
-            if wait_sec <= now_sec:
-                result = hou.ui.displayMessage(
-                    'Now is greater than %d:%d\nOffset by 1 day?' % (hours, minutes),
-                    buttons=('Offset', 'Abort'),
-                    default_choice=0, close_choice=1,
-                    title='Wait Time'
-                )
-                if result == 0:
-                    wait_sec += (24*3600)
-                else:
-                    return
-            job.setWaitTime(wait_sec)
+            job.setWaitTime(afcommon.timeWaitFromHM(hours, minutes))
 
         renderhip = hou.hipFile.name()
         if self.afnode.parm('render_temp_hip').eval():

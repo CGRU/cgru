@@ -20,7 +20,7 @@
 
 var SERVER = null;
 var RULES = {};
-RULES.rufolder = 'rules';
+var RUFOLDER = '.rules';
 var RULES_TOP = {};
 
 var c_movieTypes =
@@ -57,7 +57,7 @@ function cgru_CmdExecFilter(i_cmd)
 	let cmd = i_cmd;
 
 	cmd = activity_ChangeCmd(cmd);
-
+/*
 	// '@arg@' will be replaced with '--arg [arg value]'
 	// Value will be the first defined in action, ASSET, RULES
 	// For example: '@fps@' will be replaces with '--fps 24'
@@ -74,7 +74,7 @@ function cgru_CmdExecFilter(i_cmd)
 			else val = '';
 			cmd = cmd.replace(match, val);
 		}
-
+*/
 	return cmd;
 }
 
@@ -196,7 +196,7 @@ function c_RulesMergeDir(o_rules, i_dir)
 	{
 		let obj = i_dir.rules[keys[k]];
 		if (obj == null)
-			c_Error('RULES file "' + attr + '" in "' + g_CurPath() + '/' + RULES.rufolder + '" is invalid.');
+			c_Error('RULES file "' + attr + '" in "' + g_CurPath() + '/' + RUFOLDER + '" is invalid.');
 		else
 			c_RulesMergeObjs(o_rules, obj);
 	}
@@ -245,6 +245,8 @@ function c_PadZero(i_num, i_len)
 
 function c_Info(i_msg, i_log)
 {
+	u_el.info.classList.remove('error');
+
 	if (i_log == null)
 		i_log = true;
 	u_el.info.innerHTML = i_msg;
@@ -255,6 +257,7 @@ function c_Info(i_msg, i_log)
 function c_Error(i_err)
 {
 	c_Info('<b style="font-size:15px;color:#700">Error:</b> ' + i_err);
+	u_el.info.classList.add('error');
 }
 
 function c_Log(i_msg)
@@ -799,7 +802,7 @@ function c_GetRuFilePath(i_file, i_path)
 	if (path == null)
 		path = g_CurPath();
 
-	path += '/' + RULES.rufolder + '/' + i_file;
+	path += '/' + RUFOLDER + '/' + i_file;
 	path = RULES.root + path;
 
 	return path;
@@ -913,7 +916,7 @@ function c_GetThumbFileName(i_file)
 {
 	var name = c_PathBase(i_file);
 	var path = c_PathDir(i_file);
-	return path + '/' + RULES.rufolder + '/thumbnail.' + name + '.jpg';
+	return path + '/' + RUFOLDER + '/thumbnail.' + name + '.jpg';
 }
 
 function c_MakeThumbnail(i_file, i_func)

@@ -377,11 +377,11 @@ function ec_ProcessImageTumbnailed(i_data, i_args)
 
 function ec_ProcessImageInsertHTML(i_file)
 {
-	var info = i_file.name + ':';
+	let info = ec_process_image.file.name + ':';
 	info += ' ' + ec_process_image.width + 'x' + ec_process_image.height;
-	info += ' ' + c_Bytes2KMG(i_file.size);
+	info += ' ' + c_Bytes2KMG(ec_process_image.file.size);
 
-	var html = '';
+	let html = '';
 	html += '<div class="inserted_image_div">'
 	html += '<a target="_blank"';
 	html += ' href="' + i_file.path + '"';

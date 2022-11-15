@@ -93,6 +93,18 @@ const QString Param::varToQStr(const QVariant & i_var, bool * o_default) const
 		is_default = str.isEmpty();
 		break;
 	}
+	case TMSS:
+	{
+		QMapIterator<QString, QVariant> it(i_var.toMap());
+		while (it.hasNext())
+		{
+			it.next();
+			if (str.size()) str += ",";
+			str += QString("<b>%1</b>:%2").arg(it.key()).arg(it.value().toString());
+		}
+		is_default = str.isEmpty();
+		break;
+	}
 	case Time:
 	{
 		int64_t value = i_var.toLongLong();
@@ -186,6 +198,44 @@ bool Param::getInputDialog(const QVariant & i_var, QString & o_str, QWidget * i_
 
 			if (i) o_str += ",";
 			o_str += QString("\"%1\":%2").arg(pair[0]).arg(pair[1]);
+		}
+
+		if (false == ok)
+			break;
+
+		o_str = QString("{%1}").arg(o_str);
+
+		break;
+	}
+	case TMSS:
+	{
+		QString current;
+		QMapIterator<QString, QVariant> it(i_var.toMap());
+		while (it.hasNext())
+		{
+			it.next();
+			if (current.size()) current += ",";
+			current += QString("%1:%2").arg(it.key()).arg(it.value().toString());
+		}
+		QString _tip = tip + "\nExamples:\nNAME_A:TEXT_A\nNAME_A:TEXT_A,NAME_B:TEXT_B";
+		QString value = QInputDialog::getText(i_parent, label, _tip, QLineEdit::Normal, current, &ok);
+		if (false == ok)
+			break;
+
+		o_str.clear();
+		QStringList list = value.split(",", QString::SkipEmptyParts);
+		for (int i = 0; i < list.size(); i++)
+		{
+			QStringList pair = list[i].split(":", QString::SkipEmptyParts);
+			if (pair.size() != 2)
+			{
+				o_str = "Invalid environment string.";
+				ok = false;
+				break;
+			}
+
+			if (i) o_str += ",";
+			o_str += QString("\"%1\":\"%2\"").arg(pair[0]).arg(pair[1]);
 		}
 
 		if (false == ok)

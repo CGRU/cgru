@@ -2,7 +2,6 @@
 "root":"rules_root",
 "-root_link":"/data/prj",
 
-"rufolder":".rules",
 "company":"CGRU",
 "panel_logo_img":"rules/icons/rules.png",
 "-panel_logo_img":"rules_panel.png",
@@ -78,6 +77,7 @@
 
 "execute":[
 	{
+		"name":"terminal",
 		"label":"Terminal",
 		"icon":"icons/terminal.png",
 		"title":"Open terminal in this location.",
@@ -151,7 +151,7 @@
 			}
 		},
 		"scripts":["shot.js"],
-		"subfolders_status_hide":true,
+		"-subfolders_status_hide":true,
 		"subfolders_dailies_hide":false,
 		"post":"shot_Post",
 			"":"custom post function",

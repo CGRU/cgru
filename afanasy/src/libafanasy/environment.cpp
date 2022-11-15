@@ -81,6 +81,7 @@ std::string Environment::render_cmd_reboot =           AFRENDER::CMD_REBOOT;
 std::string Environment::render_cmd_shutdown =         AFRENDER::CMD_SHUTDOWN;
 std::string Environment::render_cmd_wolsleep =         AFRENDER::CMD_WOLSLEEP;
 std::string Environment::render_cmd_wolwake =          AFRENDER::CMD_WOLWAKE;
+std::string Environment::render_gpuinfo_nvidia_cmd =   AFRENDER::GPUINFO_NVIDIA_CMD;
 std::string Environment::render_networkif =            AFRENDER::NETWORK_IF;
 std::string Environment::render_hddspace_path =        AFRENDER::HDDSPACE_PATH;
 std::string Environment::render_iostat_device =        AFRENDER::IOSTAT_DEVICE;
@@ -286,6 +287,7 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, render_cmd_wolsleep,               "af_render_cmd_wolsleep"               );
 	getVar( i_obj, render_cmd_wolwake,                "af_render_cmd_wolwake"                );
 	getVar( i_obj, render_hddspace_path,              "af_render_hddspace_path"              );
+	getVar( i_obj, render_gpuinfo_nvidia_cmd,         "af_render_gpuinfo_nvidia_cmd"         );
 	getVar( i_obj, render_networkif,                  "af_render_networkif"                  );
 	getVar( i_obj, render_iostat_device,              "af_render_iostat_device"              );
 	getVar( i_obj, render_resclasses,                 "af_render_resclasses"                 );
@@ -722,7 +724,8 @@ void Environment::load()
 	customconfig = af::getenv("CGRU_CUSTOM_CONFIG");
 
 	loadFile( cgrulocation + "/config_default.json");
-	loadFile( customconfig);
+	if (customconfig.size())
+		loadFile(customconfig);
 	loadFile( home_afanasy + "/config.json");
 
 	PRINT("Getting variables from environment:\n");
@@ -751,7 +754,7 @@ void Environment::loadFile( const std::string & i_filename)
 	for(int i = 0; i < m_config_files.size(); i++)
 		if(m_config_files[i] == i_filename)
 		{
-			AF_ERR << "Config file already included: " << i_filename;
+			AF_ERR << "Config file already included: \"" << i_filename << "\"";
 			return;
 		}
 
@@ -760,7 +763,7 @@ void Environment::loadFile( const std::string & i_filename)
 
 	if(false == pathFileExists(i_filename))
 	{
-		AF_WARN << "Config file does not exist: " << i_filename;
+		AF_WARN << "Config file does not exist: \"" << i_filename << "\"";
 		return;
 	}
 

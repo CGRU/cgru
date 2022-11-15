@@ -402,7 +402,7 @@ class BlockParameters:
                     if not self.pathsmap:
                         cmd += ' --nopathsmap'
 
-            cmd += ' -X %s -F@#@-@#@x%d -x \"%s\"' % \
+            cmd += ' -X %s -F @#@-@#@x%d -x \"%s\"' % \
                    (self.writename, self.frameinc, i_scene_path)
 
             block.setCommand(cmd)
@@ -718,7 +718,7 @@ class JobParameters:
         f_output = None
         for block in blocks:
             if 'files' in block.data and len(block.data['files']):
-                f_output = block.data['files'][0]
+                f_output = os.path.abspath(block.data['files'][0])
                 break
         if f_output is not None:
             job.setFolder('output', os.path.dirname( f_output))

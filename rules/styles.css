@@ -130,6 +130,11 @@ height: 19px;
 box-shadow: 0px 0px 4px rgba(255,255,255,.5);
 font: 14px monospace;
 }
+#footer #info.error {
+background: rgba(255,100,100,0.2);
+border: 1px solid rgba(255,200,200,.9);
+box-shadow: 0px 0px 4px rgba(255,100,100,8), 0 0 8px rgba(255,100,100,.8) inset;
+}
 #footer #log {
 display: none;
 position: absolute;
@@ -864,6 +869,7 @@ border: 2px solid rgba(255,255,0,1);
 #status_tasks .task .edit_div .tags    {float: left;}
 #status_tasks .task .edit_div .percent {float: right; width: 64px;}
 #status_tasks .task .edit_div .percent .label {float: right; padding: 2px; margin: 2px; margin-right: 8px;}
+#status_tasks .task .edit_div .annotation {margin: 4px; border-top: 1px solid rgba(98,98,98,.5);}
 #status_tasks .task .progress          {clear: both; border-radius: 4px;}
 #status_tasks .task .progressbar       {height: 6px; border-radius: 2px;}
 #status_tasks .task .info              {font-style: italic; font-size: 10px;}
@@ -943,13 +949,13 @@ table.statistics .duration { text-align: center; border-left-width: 0; }
 #search_flags .flag { border-width: 4px; }
 
 #execute_div { display: none;}
-#execute_btn { font-size: 10px;}
-#execute_btn.pushed { float: left;}
-#execute_body > div {
+#execute_btn { font-size: 10px; float: left; margin: 4px; padding: 4px;}
+#execute_items > div, #execute_favor > div {
 float: left;
 margin: 4px;
 font-size: 10px;
 }
+#execute_items .info { font-style:italic; padding: 4px;}
 
 #assets {
 background: rgba(200,255,200,.1);
@@ -1158,6 +1164,10 @@ border-radius: 8px;
 
 /* ========================================================= */
 /* =================== COMMENTS ============================ */
+#comments .comments_stat .tag {border: 2px solid rgba(98,98,98,.5);}
+#comments .comments_stat .tag.selected {border: 2px solid rgb(100,250,250);}
+#comments .comments_stat .tag.empty {font-style:italic; opacity: .7;}
+#comments .comments_stat .tag.empty.selected {border: 2px dashed rgb(100,250,250);}
 .comment {
 /*box-shadow: 0 0 3px #000 inset, 0 0 3px #FFF;*/
 border-radius: 2px;
@@ -1179,7 +1189,9 @@ margin: 0px 4px;
 .comment .report { display: none; }
 .comment.report .report { display: block; }
 .comment .panel { margin: 0px;}
-.comment .panel .type { width: 100px; text-align: center; display: block; }
+.comment .panel .type_tags {float: left; margin: 1px; padding: 1px;}
+.comment .panel .type_tags .type { width: 100px; text-align: center; display: block; clear: both;}
+.comment .panel .type_tags .tags { display: block; clear: both; font-weight: bold;}
 .comment .panel .avatar,.comment .panel .user,.comment .panel .duration,.comment .panel .date {
 float: left; margin: 1px 8px;
 }
@@ -1191,8 +1203,8 @@ float: left; margin: 1px 8px;
 .comment .panel > .button { font-size: 12px; float: right;}
 .comment .panel .edit_btns_div { float: right;}
 .comment .panel .edit_btns_div > .button { font-size: 12px; float: right;}
-.comment.edit .panel .duration { display: none; }
-.comment.edit .panel .tags { display: none; }
+.comment.edit .panel .duration { _display: none; }
+.comment.edit .panel .tags { _display: none; }
 .comment .edit .types { clear: both; border-top: 1px solid rgba(98,98,98,.5); }
 .comment .edit .tags { padding: 4px; clear: both; border-top: 1px solid rgba(98,98,98,.5); }
 .comment .edit .tags .label { float: left; padding: 2px; opacity: .7; }

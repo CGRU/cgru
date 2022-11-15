@@ -1,9 +1,48 @@
 import os
 import time
 
-from rusrv import functions
+import rulib
 
-def makenews(i_args, io_users, o_out):
+def makeNews(i_args, i_uid, o_out):
+    # Read all users:
+    users = rulib.functions.readAllUsers(o_out, True)
+    if 'error' in o_out:
+        return
+
+    if len(users) == 0:
+        o_out['error'] = 'No users found.'
+        return
+
+    users_changed = []
+
+    for request in i_args['news_requests']:
+        ids = makeNewsUno(request, users, i_uid, o_out)
+        if 'error' in o_out:
+            return
+
+        if ids is not None:
+            for id in ids:
+                if not id in users_changed:
+                    users_changed.append(id)
+
+    if 'bookmarks' in i_args:
+        for bm in i_args['bookmarks']:
+            ids = makeBookmarks(i_uid, bm, users, o_out)
+            if 'error' in o_out:
+                return
+
+            if ids is not None:
+                for id in ids:
+                    if not id in users_changed:
+                        users_changed.append(id)
+
+    # Write changed users:
+    for id in users_changed:
+        rulib.functions.writeUser(users[id], True)
+
+    o_out['users'] = users_changed
+
+def makeNewsUno(i_args, io_users, i_uid, o_out):
     news = i_args['news']
 
     # Ensure that news has a path:
@@ -33,8 +72,8 @@ def makenews(i_args, io_users, o_out):
             break
 
         # Get existing recent:
-        rfile = i_args['root'] + path + '/' + i_args['rufolder'] + '/' + i_args['recent_file']
-        rarray = functions.readObj(rfile)
+        rfile = rulib.RULES_TOP['root'] + path + '/' + rulib.RUFOLDER + '/' + rulib.RECENT_FILENAME
+        rarray = rulib.functions.readObj(rfile)
         if rarray is None:
             rarray = []
         
@@ -55,7 +94,7 @@ def makenews(i_args, io_users, o_out):
                 if rarray[0]['path'] == news['path'] and rarray[0]['title'] == news['title'] and rarray[0]['user'] == news['user']:
                     del rarray[0]
 
-            while len(rarray) >= i_args['recent_max']:
+            while len(rarray) >= rulib.RULES_TOP['news']['recent']:
                 del rarray[-1]
 
         # Add new recent:
@@ -63,8 +102,16 @@ def makenews(i_args, io_users, o_out):
 
         # Save recent:
         if not os.path.isdir(os.path.dirname(rfile)):
-            os.makedirs(os.path.dirname(rfile))
-        functions.writeObj(rfile, rarray)
+            try:
+                os.makedirs(os.path.dirname(rfile))
+            except PermissionError:
+                o_out['error'] = 'Permission denied: "%s"' % os.path.dirname(rfile)
+                return
+            except:
+                o_out['error'] = 'Unable to create folder: "%s"' % os.path.dirname(rfile)
+                o_out['info'] = '%s' % traceback.format_exc()
+                return False
+        rulib.functions.writeObj(rfile, rarray)
 
         # Exit cycle if path is root:
         if len(path) == 0:
@@ -84,7 +131,7 @@ def makenews(i_args, io_users, o_out):
 
     # User may be does not want to receive own news:
     ignore_own = False
-    if 'ignore_own' in i_args and i_args['ignore_own']:
+    if i_uid in io_users and 'ignore_own' in io_users[i_uid] and io_users[i_uid]['ignore_own']:
         ignore_own = True
 
     # Get subscribed users:
@@ -143,9 +190,7 @@ def makenews(i_args, io_users, o_out):
         user['news'].insert(0, news)
 
         # Delete news above the limit:
-        limit = 99
-        if 'limit' in i_args and i_args['limit'] > 0:
-            limit = i_args['limit']
+        limit = rulib.RULES_TOP['news']['limit']
         if 'news_limit' in user and user['news_limit'] > 0:
             limit = user['news_limit']
 
@@ -170,7 +215,7 @@ def makenews(i_args, io_users, o_out):
     return changed_users
 
 
-def makebookmarks(i_user_id, i_bm, io_users, o_out):
+def makeBookmarks(i_user_id, i_bm, io_users, o_out):
     changed_users = []
     for id in io_users:
         user = io_users[id]

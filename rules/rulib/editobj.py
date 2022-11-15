@@ -3,6 +3,9 @@ def mergeObjs(o_obj, i_obj):
         return
 
     for key in i_obj:
+        if len(key) == 0: continue
+        if key[0] in ' -_#!': continue
+
         if key in o_obj and type(i_obj[key]) is dict and type(o_obj[key]) is dict:
             mergeObjs(o_obj[key], i_obj[key])
             continue

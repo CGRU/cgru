@@ -23,7 +23,19 @@ var cm_durations = [
 ];
 var cm_array = [];
 
-var cm_process_image = null;
+var cm_elStat = null;
+
+var cm_filter_tags = []
+
+function cm_Init()
+{
+	let array = c_Parse(localStorage.comments_filter_tags);
+	if (null == array)
+		return;
+
+	for (let item of array)
+		cm_filter_tags.push(item);
+}
 
 function View_comments_Open()
 {
@@ -33,6 +45,12 @@ function View_comments_Open()
 function cm_Finish()
 {
 	cm_array = [];
+
+	if (cm_elStat)
+	{
+		cm_elStat.textContent = '';
+		cm_elStat = null;
+	}
 }
 
 function cm_Load()
@@ -40,7 +58,7 @@ function cm_Load()
 	$('comments').textContent = '';
 	if (ASSET && ASSET.comments_reversed)
 	{
-		var el = $('comments_btn_add');
+		let el = $('comments_btn_add');
 		$('comments_show').removeChild(el);
 		$('comments_show').appendChild(el);
 	}
@@ -74,8 +92,8 @@ function cm_Received(i_data)
 		return;
 	}
 
-	var obj_array = [];
-	for (var key in i_data.comments)
+	let obj_array = [];
+	for (let key in i_data.comments)
 	{
 		i_data.comments[key].key = key;
 		obj_array.push(i_data.comments[key]);
@@ -89,16 +107,117 @@ function cm_Received(i_data)
 		return 0;
 	});
 
-	var i = 0;
-	for (var i = 0; i < obj_array.length; i++)
+	let i = 0;
+	for (let i = 0; i < obj_array.length; i++)
 		cm_array.push(new Comment(obj_array[i]));
+
+	cm_DisplayStat();
+	cm_Filter();
 
 	g_POST('comments');
 }
 
+function cm_DisplayStat()
+{
+	if (cm_elStat)
+		cm_elStat.textContent = '';
+	else
+	{
+		if (cm_array.length == 0)
+			return;
+
+		cm_elStat = document.createElement('div');
+		$('comments').insertBefore(cm_elStat, $('comments').firstChild);
+		cm_elStat.classList.add('comments_stat');
+	}
+
+	let tags_counts = {};
+
+	for (let cm of cm_array)
+	{
+		if (cm.obj.deleted)
+			continue;
+
+		let tags = cm.obj.tags;
+		if ((tags == null) || (tags.length == 0))
+			continue;
+
+		for (let tag of tags)
+		{
+			if (tags_counts[tag])
+				tags_counts[tag] += 1;
+			else
+				tags_counts[tag] = 1;
+		}
+	}
+
+	for (let tag in tags_counts)
+	{
+		let el = document.createElement('div');
+		el.classList.add('tag');
+		el.textContent = c_GetTagTitle(tag) + ':' + tags_counts[tag];
+		el.m_tag = tag;
+		el.onclick = cm_TagClicked;
+		el.title = 'This is comments tags count.'
+			+ '\n ' + tags_counts[tag] + ' comment(s) has \"' + c_GetTagTitle(tag) + '\" tag.'
+			+ '\n Click to filter comments by tag.'
+			+ '\n Hold CTRL or SHIFT to select several tags.';
+		if (cm_filter_tags.indexOf(tag) != -1)
+			el.classList.add('selected');
+
+		cm_elStat.appendChild(el);
+	}
+
+	// Display 'empty' tag filters.
+	// This can be if some filter was selected in one location,
+	// but there is no such comments in another location.
+	for (let tag of cm_filter_tags)
+	{
+		if (tags_counts[tag])
+			continue;
+
+		let el = document.createElement('div');
+		el.classList.add('tag');
+		el.textContent = c_GetTagTitle(tag) + ':0';
+		el.m_tag = tag;
+		el.onclick = cm_TagClicked;
+		el.classList.add('selected');
+		el.classList.add('empty');
+
+		cm_elStat.appendChild(el);
+	}
+}
+
+function cm_TagClicked(i_evt)
+{
+	let tag = i_evt.currentTarget.m_tag;
+
+	cm_filter_tags = [];
+	for (let el of cm_elStat.childNodes)
+	{
+		if (el.m_tag == tag)
+			el.classList.toggle('selected');
+		else if ((i_evt.shiftKey == false) && (i_evt.ctrlKey == false))
+			el.classList.remove('selected');
+
+		if (el.classList.contains('selected'))
+			cm_filter_tags.push(el.m_tag);
+	}
+
+	cm_Filter();
+
+	localStorage.comments_filter_tags = JSON.stringify(cm_filter_tags);
+}
+
+function cm_Filter()
+{
+	for (let cm of cm_array)
+		cm.filter();
+}
+
 function cm_NewOnClick(i_text)
 {
-	var comment = new Comment();
+	let comment = new Comment();
 	if (i_text)
 		comment.elText.innerHTML = i_text;
 	comment.edit();
@@ -123,9 +242,9 @@ function cm_Goto(i_key)
 	if (localStorage['view_comments'] !== 'true')
 		u_OpenCloseView('comments', true, true);
 
-	var cm = null;
+	let cm = null;
 
-	for (var i = 0; i < cm_array.length; i++)
+	for (let i = 0; i < cm_array.length; i++)
 		if (cm_array[i].obj.key == i_key)
 			cm = cm_array[i];
 		else
@@ -149,7 +268,12 @@ function Comment(i_obj)
 	if (ASSET && ASSET.comments_reversed)
 		$('comments').appendChild(this.el);
 	else
-		$('comments').insertBefore(this.el, $('comments').firstChild);
+	{
+		if (cm_array.length)
+			$('comments').insertBefore(this.el, cm_array[cm_array.length-1].el);
+		else
+			$('comments').appendChild(this.el);
+	}
 	this.el.classList.add('comment');
 	this.el.m_comment = this;
 
@@ -201,11 +325,18 @@ function Comment(i_obj)
 	this.elDel.ondblclick = function(e) { e.currentTarget.m_comment.destroy(); };
 	this.elDel.m_comment = this;
 
+	let elTypeTagsDiv = document.createElement('div');
+	this.elPanel.appendChild(elTypeTagsDiv);
+	elTypeTagsDiv.classList.add('type_tags');
+
 	this.elType = document.createElement('a');
-	this.elPanel.appendChild(this.elType);
-	this.elType.classList.add('tag');
+	elTypeTagsDiv.appendChild(this.elType);
+//	this.elType.classList.add('tag');
 	this.elType.classList.add('type');
-	this.elType.style.cssFloat = 'left';
+
+	this.elTags = document.createElement('div');
+	this.elTags.classList.add('tags');
+	elTypeTagsDiv.appendChild(this.elTags);
 
 	this.elAvatar = document.createElement('img');
 	this.elAvatar.classList.add('avatar');
@@ -217,16 +348,11 @@ function Comment(i_obj)
 
 	this.elReport = document.createElement('div');
 	this.elPanel.appendChild(this.elReport);
-	//	this.elReport.style.display = 'none';
 	this.elReport.classList.add('report');
 
 	this.elDuration = document.createElement('div');
 	this.elDuration.classList.add('duration');
 	this.elReport.appendChild(this.elDuration);
-
-	this.elTags = document.createElement('div');
-	this.elTags.classList.add('tags');
-	this.elReport.appendChild(this.elTags);
 
 	this.elDate = document.createElement('div');
 	this.elDate.classList.add('date');
@@ -288,16 +414,18 @@ Comment.prototype.init = function() {
 		if (g_auth_user)
 		{
 			this.obj.user_name = g_auth_user.id;
+			/*
 			if (g_auth_user.tag && g_auth_user.tag.length)
 			{
 				this.obj.tags = [g_auth_user.tag];
 			}
+			*/
 		}
 	}
 
-	var user = null;
-	var avatar = null;
-	var signature = null;
+	let user = null;
+	let avatar = null;
+	let signature = null;
 
 	// Get user object:
 	if (this.obj.user_name && g_users[this.obj.user_name])
@@ -347,18 +475,12 @@ Comment.prototype.init = function() {
 
 	if (this.obj.tags && this.obj.tags.length)
 	{
-		for (var i = 0; i < this.obj.tags.length; i++)
+		for (let i = 0; i < this.obj.tags.length; i++)
 		{
-			var tag = this.obj.tags[i];
-
-			var el = document.createElement('div');
+			let el = document.createElement('div');
 			this.elTags.appendChild(el);
 			el.classList.add('tag');
-
-			if (RULES.tags[tag] && RULES.tags[tag].title)
-				el.textContent = RULES.tags[tag].title;
-			else
-				el.textContent = tag;
+			el.textContent = c_GetTagTitle(this.obj.tags[i]);
 		}
 	}
 
@@ -366,7 +488,7 @@ Comment.prototype.init = function() {
 	if (this.obj.duration && this.obj.duration > 0)
 		this.elDuration.textContent = this.obj.duration;
 
-	var info = '';
+	let info = '';
 
 	// Email is shown for admins only:
 	if (g_admin && this.obj && this.obj.guest && this.obj.guest.email)
@@ -374,7 +496,7 @@ Comment.prototype.init = function() {
 
 	if (this.obj.mtime)
 	{
-		var date = c_DT_StrFromMSec(this.obj.mtime);
+		let date = c_DT_StrFromMSec(this.obj.mtime);
 		if (info.length)
 			info += '<br>';
 		info += 'Modified: ' + c_GetUserTitle(this.obj.muser_name) + ' ' + date;
@@ -423,7 +545,7 @@ Comment.prototype.init = function() {
 };
 
 Comment.prototype.setElType = function(i_type) {
-	for (var type in RULES.comments)
+	for (let type in RULES.comments)
 		this.el.classList.remove(type);
 
 	if (i_type)
@@ -448,6 +570,30 @@ Comment.prototype.setElType = function(i_type) {
 		st_SetElColor(null, this.el);
 	}
 };
+
+Comment.prototype.filter = function() {
+	if (this.obj.deleted)
+	{
+		this.el.style.display = 'none';
+		return;
+	}
+
+	this.el.style.display = 'block';
+
+	if (cm_filter_tags.length == 0)
+		return;
+
+	this.el.style.display = 'none';
+
+	if ((this.obj.tags == null) || (this.obj.tags.length == 0))
+		return;
+
+	for (let tag of cm_filter_tags)
+		if (this.obj.tags.indexOf(tag) == -1)
+			return;
+
+	this.el.style.display = 'block';
+}
 
 Comment.prototype.edit = function() {
 	if (this._new != true)
@@ -478,9 +624,9 @@ Comment.prototype.edit = function() {
 	this.elForEdit.appendChild(this.elEditTypesDiv);
 	this.elEditTypesDiv.classList.add('types');
 	//	this.elEditTypesDiv.style.clear = 'both';
-	for (var type in RULES.comments)
+	for (let type in RULES.comments)
 	{
-		var el = document.createElement('div');
+		let el = document.createElement('div');
 		this.elEditTypesDiv.appendChild(el);
 		el.classList.add('tag');
 		el.textContent = RULES.comments[type].title;
@@ -490,24 +636,20 @@ Comment.prototype.edit = function() {
 		st_SetElColor({"color": RULES.comments[type].color}, el);
 	}
 
-	this.elReportEdit = document.createElement('div');
-	this.elForEdit.appendChild(this.elReportEdit);
-	this.elReportEdit.classList.add('report');
-
 	this.elEditTags = document.createElement('div');
-	this.elReportEdit.appendChild(this.elEditTags);
+	this.elForEdit.appendChild(this.elEditTags);
 	this.elEditTags.classList.add('list');
 	this.elEditTags.classList.add('tags');
 
-	var el = document.createElement('div');
+	let el = document.createElement('div');
 	this.elEditTags.appendChild(el);
 	el.textContent = 'Tags:';
 	el.classList.add('label');
 
 	this.elEditTags.m_elTags = [];
-	for (var tag in RULES.tags)
+	for (let tag in RULES.tags)
 	{
-		var el = document.createElement('div');
+		let el = document.createElement('div');
 		this.elEditTags.appendChild(el);
 		el.classList.add('tag');
 		el.m_tag = tag;
@@ -525,11 +667,15 @@ Comment.prototype.edit = function() {
 		this.elEditTags.m_elTags.push(el);
 	}
 
-	var elDurationDiv = document.createElement('div');
+	this.elReportEdit = document.createElement('div');
+	this.elForEdit.appendChild(this.elReportEdit);
+	this.elReportEdit.classList.add('report');
+
+	let elDurationDiv = document.createElement('div');
 	this.elReportEdit.appendChild(elDurationDiv);
 	elDurationDiv.classList.add('edit_duration');
 
-	var elDurationLabel = document.createElement('div');
+	let elDurationLabel = document.createElement('div');
 	elDurationDiv.appendChild(elDurationLabel);
 	elDurationLabel.textContent = 'Duration:';
 
@@ -540,9 +686,9 @@ Comment.prototype.edit = function() {
 	if (this.obj.duration)
 		this.elEditDuration.textContent = this.obj.duration;
 
-	for (var i = 0; i < cm_durations.length; i++)
+	for (let i = 0; i < cm_durations.length; i++)
 	{
-		var el = document.createElement('div');
+		let el = document.createElement('div');
 		elDurationDiv.appendChild(el);
 		el.classList.add('sample');
 		el.textContent = cm_durations[i];
@@ -611,21 +757,16 @@ Comment.prototype.save = function() {
 	if (this.obj.deleted != true)
 		this.processUploads();
 
-	if (this.obj.type == 'report')
+	this.obj.tags = [];
+	for (let i = 0; i < this.elEditTags.m_elTags.length; i++)
 	{
-		this.obj.tags = [];
-		for (var i = 0; i < this.elEditTags.m_elTags.length; i++)
-		{
-			var el = this.elEditTags.m_elTags[i];
-			if (el.classList.contains('selected'))
-				this.obj.tags.push(el.m_tag);
-		}
+		let el = this.elEditTags.m_elTags[i];
+		if (el.classList.contains('selected'))
+			this.obj.tags.push(el.m_tag);
 	}
-	else
-		delete this.obj.tags;
 
 	this.obj.duration = -1;
-	var duration = parseFloat(this.elEditDuration.textContent);
+	let duration = parseFloat(this.elEditDuration.textContent);
 	if (false == isNaN(duration))
 		this.obj.duration = duration;
 
@@ -640,17 +781,19 @@ Comment.prototype.save = function() {
 		this.obj.muser_name = g_auth_user.id;
 	}
 
-	var key = this.obj.ctime + '_' + this.obj.user_name;
+	let key = this.obj.ctime + '_' + this.obj.user_name;
 
 	this.obj.key = key;
 	this.init();
 
-	var file = c_GetRuFilePath(cm_file);
+	cm_DisplayStat();
+
+	let file = c_GetRuFilePath(cm_file);
 	n_GetFileFlushCache(file);
 
-	var comments = {};
+	let comments = {};
 	comments[key] = this.obj;
-	var edit = {};
+	let edit = {};
 	edit.object = {"comments": comments};
 	edit.add = true;
 	edit.file = file;
@@ -662,11 +805,11 @@ Comment.prototype.saveFinished = function(i_data, i_args) {
 	if (c_NullOrErrorMsg(i_data))
 		return;
 
-	var news_user = i_args.this.obj.user_name;
+	let news_user = i_args.this.obj.user_name;
 	if (i_args.this.obj.muser_name)
 		news_user = i_args.this.obj.muser_name;
 
-	var news_title = 'comment';
+	let news_title = 'comment';
 	if (i_args.this.obj.type == 'report')
 		news_title = 'report';
 
@@ -683,28 +826,28 @@ Comment.prototype.saveFinished = function(i_data, i_args) {
 };
 
 Comment.prototype.sendEmails = function() {
-	var emails = [];
+	let emails = [];
 	if (RULES.status && RULES.status.body && RULES.status.body.guest && RULES.status.body.guest.email)
 		emails.push(RULES.status.body.guest.email);
-	for (var i = 0; i < cm_array.length; i++)
+	for (let i = 0; i < cm_array.length; i++)
 	{
-		var cm = cm_array[i].obj;
+		let cm = cm_array[i].obj;
 		if (cm.guest && cm.guest.email && cm.guest.email.length && (emails.indexOf(cm.guest.email) == -1))
 			emails.push(cm.guest.email);
 	}
 
-	for (var i = 0; i < emails.length; i++)
+	for (let i = 0; i < emails.length; i++)
 	{
-		var email = c_EmailDecode(emails[i]);
+		let email = c_EmailDecode(emails[i]);
 		if (false == c_EmailValidate(email))
 			continue;
-		var subject = 'RULES Comment: ' + g_CurPath();
-		var href = this.getLink(true);
-		var body = '<a href="' + href + '" target="_blank">' + href + '</a>';
+		let subject = 'RULES Comment: ' + g_CurPath();
+		let href = this.getLink(true);
+		let body = '<a href="' + href + '" target="_blank">' + href + '</a>';
 		body += '<br><br>';
 		body += this.obj.text;
 		body += '<br><br>';
-		var user = c_GetUserTitle(this.obj.user_name, this.obj.guest);
+		let user = c_GetUserTitle(this.obj.user_name, this.obj.guest);
 		body += user;
 		if (user != this.obj.user_name)
 			body += ' [' + this.obj.user_name + ']';
@@ -714,7 +857,7 @@ Comment.prototype.sendEmails = function() {
 };
 
 Comment.prototype.updateStatus = function() {
-	var reports = [];
+	let reports = [];
 
 	if (RULES.status == null)
 		RULES.status = {};
@@ -725,13 +868,13 @@ Comment.prototype.updateStatus = function() {
 	if (RULES.status.artists == null)
 		RULES.status.artists = [];
 
-	var reps_tags = [];
-	var reps_arts = [];
+	let reps_tags = [];
+	let reps_arts = [];
 
 	// Collect reports for status:
-	for (var i = 0; i < cm_array.length; i++)
+	for (let i = 0; i < cm_array.length; i++)
 	{
-		var obj = cm_array[i].obj;
+		let obj = cm_array[i].obj;
 
 		if (obj.deleted)
 			continue;
@@ -740,7 +883,7 @@ Comment.prototype.updateStatus = function() {
 		if (obj.duration == null)
 			continue;
 
-		var rep = {};
+		let rep = {};
 		rep.duration = obj.duration;
 		if (rep.duration < 0)
 			rep.duration = 0;
@@ -772,7 +915,7 @@ Comment.prototype.updateStatus = function() {
 };
 
 Comment.prototype.processUploads = function() {
-	var upfiles = [];
+	let upfiles = [];
 	for (let i = 0; i < up_elFiles.length; i++)
 	{
 		let el = up_elFiles[i];
@@ -801,9 +944,9 @@ Comment.prototype.processUploads = function() {
 		return 0;
 	});
 
-	var uploads = [];
-	var u = -1;
-	for (var f = 0; f < upfiles.length; f++)
+	let uploads = [];
+	let u = -1;
+	for (let f = 0; f < upfiles.length; f++)
 	{
 		if ((u == -1) || (upfiles[f].path != uploads[u].path))
 		{
@@ -819,21 +962,21 @@ Comment.prototype.processUploads = function() {
 };
 
 Comment.prototype.showFile = function(i_el, i_path, i_file) {
-	var el = document.createElement('div');
+	let el = document.createElement('div');
 	i_el.appendChild(el);
 	el.classList.add('file');
 /*
-	var elThumb = document.createElement('img');
+	let elThumb = document.createElement('img');
 	el.appendChild(elThumb);
 	elThumb.classList.add('thumbnail');
 	elThumb.src = RULES.root + c_GetThumbFileName(i_path + '/' + i_file.name);
 */
-	var elSize = document.createElement('div');
+	let elSize = document.createElement('div');
 	el.appendChild(elSize);
 	elSize.classList.add('size');
 	elSize.textContent = c_Bytes2KMG(i_file.size);
 
-	var elLink = document.createElement('a');
+	let elLink = document.createElement('a');
 	el.appendChild(elLink);
 	elLink.classList.add('link');
 	elLink.textContent = i_file.name;

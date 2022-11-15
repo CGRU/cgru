@@ -1,24 +1,11 @@
-USER_ID = None
-GROUPS = None
-
 AUTH_TYPE = None
 
 GUEST_SITES = ['rules.cgru.info', '127.0.0.1']
 SERVER_NAME = None
 AUTH_RULES = False
 
-HT_ACCESS_FILE_NAME = '.htaccess'
-HT_GROUPS_FILE_NAME = '.htgroups'
-HT_DIGEST_FILE_NAME = '.htdigest'
-
-FILE_MAX_LENGTH     =  3000000
-
 CGRU_LOCATION = None
 CGRU_VERSION = None
-
-SKIPFILES      = ['.', '..', HT_ACCESS_FILE_NAME, HT_GROUPS_FILE_NAME, HT_DIGEST_FILE_NAME]
-GUESTCANCREATE = ['status.json', 'comments.json']
-GUESTCANEDIT   = ['comments.json']
 
 COUNTER = 0
 
@@ -27,7 +14,7 @@ import os
 import sys
 
 
-from rusrv import functions
+from rulib import functions
 
 
 def initApp(i_app_root):
@@ -47,13 +34,16 @@ def initApp(i_app_root):
 
 def initEnv(i_environ):
     global COUNTER
+    COUNTER += 1
+
+    if COUNTER > 1:
+        return
+
     global SERVER_SOFTWARE
     global MOD_WSGI_VERSION
     global AUTH_TYPE
     global SERVER_NAME
     global AUTH_RULES
-
-    COUNTER += 1
     SERVER_SOFTWARE = i_environ['SERVER_SOFTWARE']
     MOD_WSGI_VERSION = i_environ['mod_wsgi.version']
     if 'AUTH_TYPE' in i_environ:
@@ -61,4 +51,3 @@ def initEnv(i_environ):
     SERVER_NAME = i_environ['SERVER_NAME']
     if SERVER_NAME in GUEST_SITES:
         AUTH_RULES = True
-

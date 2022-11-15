@@ -18,8 +18,6 @@
 
 var task_CurrentTasks = [];
 
-var _OLD_TASTKS_ = false;
-
 function tasks_Init()
 {
 	if (c_IsNotAnArtist())
@@ -29,9 +27,6 @@ function tasks_Init()
 // Called on location leave (change)
 function tasks_Finish()
 {
-_OLD_TASTKS_ = false;
-$('status_tasks_buttons').style.display = 'block';
-
 	for (let task of task_CurrentTasks)
 		task.destroy();
 
@@ -54,105 +49,8 @@ function task_ShowTasks(i_statusClass)
 		return;
 	}
 
-	// OLD TASKS
-	if (Array.isArray(i_statusClass.obj.tasks))
-	{
-		_OLD_TASTKS_ = true;
-		$('status_tasks_buttons').style.display = 'none';
-		let new_tasks = {};
-		for (let task of i_statusClass.obj.tasks)
-		{
-			let tags = task.tags;
-			if ((null == tags) || (tags.length == 0))
-			{
-				$('status_tasks').innerHTML = '<b style="color:darkred;font-size:32px;">TASK(s) HAS NO TAG(s)!!!</b>';
-				return;
-			}
-			let task_name = tags.join('_');
-			task.name = task_name;
-			new_tasks[task_name] = task;
-		}
-		for (let task in new_tasks)
-			new Task(i_statusClass, new_tasks[task]);
-
-		let el = document.createElement('div');
-		el.classList.add('button');
-		el.textContent = 'CONVERT OLD TASKS';
-		el.onclick = task_CONVERT_OLD_TASKS;
-		$('status_tasks').appendChild(el);
-	}
-	else
 	for (let task in i_statusClass.obj.tasks)
 		new Task(i_statusClass, i_statusClass.obj.tasks[task]);
-}
-
-var tasks_flags_map = {'roto':['masks'],'sim':['fx']};
-function task_CONVERT_OLD_TASKS(i_evt)
-{
-	let statusClass = task_CurrentTasks[0].statusClass;
-	statusClass.obj.tasks = {};
-	for (let task of task_CurrentTasks)
-	{
-		statusClass.obj.tasks[task.obj.name] = task.obj;
-
-		// Steal tags and aritsts from status:
-		if (statusClass.obj.artists && statusClass.obj.artists.length)
-			for (let artist of task.obj.artists)
-			{
-				let index = statusClass.obj.artists.indexOf(artist);
-				if (index != -1)
-					statusClass.obj.artists.splice(index, 1);
-			}
-		if (statusClass.obj.tags && statusClass.obj.tags.length)
-			for (let tag of task.obj.tags)
-			{
-				let index = statusClass.obj.tags.indexOf(tag);
-				if (index != -1)
-					statusClass.obj.tags.splice(index, 1);
-			}
-
-		// Grab flags:
-		if (statusClass.obj.flags && statusClass.obj.flags.length)
-		{
-			let f = 0;
-			while (f < statusClass.obj.flags.length)
-			{
-				let names = statusClass.obj.flags[f].split('_');
-				if (names.length != 2) {f++;continue;}
-
-				let tag = names[0];
-				let flag = names[1];
-				let name = task.obj.name;
-				if (name != tag)
-					if ((null == tasks_flags_map[name]) || (tasks_flags_map[name].indexOf(tag) == -1))
-						{f++;continue;}
-
-				if ( ! RULES.flags[flag]) {f++;continue;}
-
-				task.obj.flags.push(flag);
-				if (RULES.flags[flag].p_min)
-					task.obj.progress = RULES.flags[flag].p_min;
-
-				statusClass.obj.flags.splice(f, 1);
-			}
-		}
-	}
-
-	statusClass.show();
-
-	let elBtn = document.createElement('div');
-	elBtn.classList.add('button');
-	elBtn.textContent = 'SAVE NEW STATUS';
-	elBtn.onclick = task_CONVERT_OLD_TASKS_save;
-	$('status_tasks').appendChild(elBtn);
-}
-
-function task_CONVERT_OLD_TASKS_save(i_evt)
-{
-	let statusClass = task_CurrentTasks[0].statusClass;
-
-	statusClass.save();
-	statusClass.show();
 }
 
 function task_AddTask()
@@ -239,7 +137,6 @@ function Task(i_statusClass, i_task)
 	this.elShow.appendChild(this.elFlags);
 
 
-if ( ! _OLD_TASTKS_ )
 	if (c_CanEditTasks())
 	{
 		this.elBtnEdit = document.createElement('button');
@@ -267,6 +164,11 @@ if ( ! _OLD_TASTKS_ )
 	this.elEdit = document.createElement('div');
 	this.elEdit.classList.add('edit_div');
 	this.elRoot.appendChild(this.elEdit);
+
+
+	this.elAnnotation = document.createElement('div');
+	this.elAnnotation.classList.add('annotation');
+	this.elShow.appendChild(this.elAnnotation);
 
 
 	this.elInfoLeft = document.createElement('div');
@@ -300,6 +202,8 @@ Task.prototype.show = function()
 	st_SetElArtists(this.obj, this.elArtists,/*short = */false,/*clickable = */true);
 	st_SetElFlags(this.obj, this.elFlags,/*short = */false,/*clickable = */true);
 	st_SetElProgress(this.obj, this.elProgressBar, this.elProgress, this.elPercent);
+
+	this.elAnnotation.textContent = this.obj.annotation;
 
 	let info_left = '';
 	if (this.obj.cuser)
@@ -459,6 +363,23 @@ Task.prototype.edit = function()
 			"elParent": this.elEdit});
 
 
+	this.elEditAnnotationDiv = document.createElement('div');
+	this.elEditAnnotationDiv.classList.add('annotation');
+	this.elEdit.appendChild(this.elEditAnnotationDiv);
+
+	this.elEditAnnotationLabel = document.createElement('div');
+	this.elEditAnnotationLabel.classList.add('label');
+	this.elEditAnnotationLabel.contentEditable = true;
+	this.elEditAnnotationLabel.textContent = 'Annotation:';
+	this.elEditAnnotationDiv.appendChild(this.elEditAnnotationLabel);
+
+	this.elEditAnnotationContent = document.createElement('div');
+	this.elEditAnnotationContent.classList.add('content','editing');
+	this.elEditAnnotationContent.contentEditable = true;
+	this.elEditAnnotationContent.textContent = this.obj.annotation;
+	this.elEditAnnotationDiv.appendChild(this.elEditAnnotationContent);
+
+
 	// If there is no name, we just adding this task.
 	// So we should not delete it, we can cancel adding.
 	if (this.obj.name)
@@ -571,6 +492,20 @@ Task.prototype.editProcess = function()
 	if (null !== artists )
 		this.obj.artists = artists;
 
+	// Annotation:
+	let annotation = this.elEditAnnotationContent.textContent;
+	if (annotation)
+	{
+		annotation = c_Strip(annotation);
+		if (annotation.length)
+			this.obj.annotation = annotation;
+		else
+			this.obj.annotation = '';
+	}
+	else if (this.obj.annotation)
+		this.obj.annotation = '';
+
+
 	// We should calculate status progress
 	// if task progress is changed
 	// or if it is a new task
@@ -591,38 +526,6 @@ Task.prototype.save = function(i_progress_changed)
 	obj.mtime = c_DT_CurSeconds();
 	this.statusClass.obj.muser = obj.muser;
 	this.statusClass.obj.mtime = obj.mtime;
-
-
-	// Grab ready and done flags (OLD style TRACKDONE, ANIMREADY)
-	if (this.statusClass.obj.flags && this.statusClass.obj.flags.length)
-	{
-		let found = false;
-		let f = 0;
-		while (f < this.statusClass.obj.flags.length)
-		{
-			let keys = this.statusClass.obj.flags[f].split('_');
-
-			if (keys[0] == 'compoz') keys[0] = 'comp';
-			if (keys[0] == 'masks')  keys[0] = 'roto';
-
-			if ((keys.length == 2) && (this.obj.name == keys[0]) && (RULES.flags[keys[1]]))
-			{
-				if (this.obj.flags.indexOf(keys[1]) == -1)
-					this.obj.flags.push(keys[1]);
-				this.statusClass.obj.flags.splice(f, 1);
-				if (RULES.flags[keys[1]].p_min)
-				{
-					this.obj.progress = RULES.flags[keys[1]].p_min;
-					i_progress_changed = true;
-				}
-				found = true;
-				continue;
-			}
-			f++;
-		}
-
-		obj.flags = this.statusClass.obj.flags;
-	}
 
 
 	// Progress

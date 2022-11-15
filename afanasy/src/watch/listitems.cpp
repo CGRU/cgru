@@ -572,6 +572,15 @@ void ListItems::addParam_MSI(
 	addParam(new Param(Param::TMSI, i_type, i_name, i_label, i_tip));
 }
 
+void ListItems::addParam_MSS(
+		Item::EType i_type,
+		const QString & i_name,
+		const QString & i_label,
+		const QString & i_tip)
+{
+	addParam(new Param(Param::TMSS, i_type, i_name, i_label, i_tip));
+}
+
 void ListItems::addParam_REx(
 		Item::EType i_type,
 		const QString & i_name,

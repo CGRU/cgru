@@ -141,6 +141,18 @@ Parameters
 	- Skip Existing
 		Render can check files for existence before run task command.
 
+Environment
+-----------
+
+.. figure:: images/houdini_afrop_environment.png
+
+	Afanasy ROP Environment tab
+
+- Environment
+	It is key-value dictionary.
+	Key used as an environment variable name.
+	This environment variables will be *added* to task process environment.
+
 
 Distribute Simulation
 ---------------------
@@ -806,5 +818,5 @@ Houdini setup example (*bash*):
 	export PYTHONPATH="${HOUDINI_CGRU_PATH}:${PYTHONPATH}"
 
 
-If you avoid sourcing ``cgru/setup.sh`` see `Manual Environment Setup </configuration/configuration.html#manual-environment-setup>`_.
+If you avoid sourcing ``cgru/setup.sh`` see `Manual Environment Setup <../configuration/configuration.html#manual-environment-setup>`_.
 

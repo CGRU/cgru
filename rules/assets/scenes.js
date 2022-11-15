@@ -935,23 +935,44 @@ function sc_FilterShots(i_args)
 					{
 						found = false;
 						if (task.flags && task.flags.length)
-						{
 							for (let i = 0; i < i_args.flags.length; i++)
 								if (task.flags.includes(i_args.flags[i]))
-									{ found = true; break; }
-						}
+								{
+									found = true;
+									if (false == flags_and)
+										break;
+								}
+								else
+								{
+									found = false;
+									if (flags_and)
+										break;
+								}
 					}
 
 					if (found && i_args.tags && i_args.tags.length)
 					{
 						found = false;
 						if (task.tags && task.tags.length)
-						{
 							for (let i = 0; i < i_args.tags.length; i++)
 								if (task.tags.includes(i_args.tags[i]))
-									{ found = true; break; }
-						}
+								{
+									found = true;
+									if (false == tags_and)
+										break;
+								}
+								else
+								{
+									found = false;
+									if (tags_and)
+										break;
+								}
 					}
+
+					// We found one task matching flags and tags.
+					// One matching task it is enough to show entire shot.
+					if (found)
+						break;
 				}
 			}
 			else

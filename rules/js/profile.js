@@ -144,13 +144,15 @@ function prof_Save()
 		return;
 	}
 
+	let save_obj = {'id':g_auth_user.id};
 	for (let p in params)
 	{
 		g_auth_user[p] = params[p];
+		save_obj[p] = params[p];
 	}
 	g_users[g_auth_user.id] = g_auth_user;
 
-	ad_SaveUser();
+	ad_SaveUser(save_obj);
 	ad_UpdateProfileSettings();
 	prof_wnd.destroy();
 }

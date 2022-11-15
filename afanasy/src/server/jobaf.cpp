@@ -51,7 +51,10 @@ JobAf::JobAf( JSON & i_object):
 	
 	if( false == jsonRead( i_object))
 		return;
-	
+
+	if (false == isValid())
+		return;
+
 	m_progress = new af::JobProgress( this);
 	construct();
 
@@ -182,11 +185,8 @@ bool JobAf::isValidConstructed() const
 {
 	std::string err;
 
-	if( isValid( &err))
-	{
-		if( NULL == m_blocks )
-			err += "Job '" + m_name + "' is not constructed.";
-	}
+	if ((NULL == m_blocks) || (NULL == m_progress))
+		err += "Is not constructed.";
 
 	if( err.size())
 	{

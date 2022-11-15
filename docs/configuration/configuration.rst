@@ -128,6 +128,6 @@ Set ``CGRU_[PARAM_NAME]`` environment variable. For example to setup console to 
 Python API will take environment overrides too.
 
 Config Path Override
-----------------
+--------------------
 
 You can override the path to a custom config file using the ``CGRU_CUSTOM_CONFIG`` environment variable. This will be loaded last, but before ``~/.cgru/config.json``

@@ -234,6 +234,11 @@ void TaskExec::listenOutput( bool i_subscribe)
 		m_flags = m_flags & (~FListen);
 }
 
+void TaskExec::joinEnvironment(const std::map<std::string, std::string> & i_env)
+{
+	for (auto const& it : i_env) m_environment[it.first] = it.second;
+}
+
 void TaskExec::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
 	stream << "[" << m_service << "(" << m_parser << "):" << getCapResult() << "] " << m_user_name << ": ";
@@ -294,4 +299,3 @@ int TaskExec::calcWeight() const
 	weight += weigh(m_custom_data_task);
 	return weight;
 }
-

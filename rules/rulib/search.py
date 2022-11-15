@@ -2,7 +2,7 @@ import os
 import time
 import traceback
 
-from rusrv import functions
+import rulib
 
 def search(i_args, o_out, i_path, i_depth):
 
@@ -27,7 +27,7 @@ def search(i_args, o_out, i_path, i_depth):
             continue
 
         found = False
-        rufolder = os.path.join(path, i_args['rufolder'])
+        rufolder = os.path.join(path, rulib.RUFOLDER)
         if os.path.isdir(rufolder):
             found = True
 
@@ -35,7 +35,7 @@ def search(i_args, o_out, i_path, i_depth):
             found = False
             rufile = os.path.join(rufolder, 'status.json')
             if os.path.isfile(rufile):
-                obj = functions.readObj(rufile)
+                obj = rulib.functions.readObj(rufile)
                 if obj and searchStatus(i_args['status'], obj):
                         found = True
 
@@ -43,7 +43,7 @@ def search(i_args, o_out, i_path, i_depth):
             found = False
             rufile = os.path.join(rufolder, 'body.html')
             if os.path.isfile(rufile):
-                data = functions.fileRead(rufile)
+                data = rulib.functions.fileRead(rufile)
                 if data and data.find(i_args['body']) != -1:
                     found = True
 
@@ -51,7 +51,7 @@ def search(i_args, o_out, i_path, i_depth):
             found = False
             rufile = os.path.join(rufolder, 'comments.json')
             if os.path.isfile(rufile):
-                obj = functions.readObj(rufile)
+                obj = rulib.functions.readObj(rufile)
                 if obj and searchComment(i_args['comment'], obj):
                     found = True
 

@@ -45,8 +45,6 @@ function n_WalkDir(i_args)
 		i_args.info = 'walk';
 	if (i_args.depth == null)
 		i_args.depth = 0;
-	if (i_args.rufolder == null)
-		i_args.rufolder = RULES.rufolder;
 
 	var paths = [];
 	var cur_seconds = c_DT_CurSeconds();
@@ -70,7 +68,8 @@ function n_WalkDir(i_args)
 	var request = {};
 	request.walkdir = paths;
 	request.depth = i_args.depth;
-	request.rufolder = i_args.rufolder;
+    if (i_args.rufolder)
+	    request.rufolder = i_args.rufolder;
 	request.showhidden = (localStorage.show_hidden == 'ON');
 	if (i_args.rufiles)
 		request.rufiles = i_args.rufiles;

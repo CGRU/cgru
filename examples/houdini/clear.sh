@@ -3,7 +3,9 @@
 echo "Clearing Houdini examples in '$PWD'"
 
 rm -fv *.hip*.hip
-[ -d backup ] && rm -rvf backup
 
 rm -fv *.mov
-[ -d render ] && rm -rfv render
+
+# Remove all folders:
+
+find -mindepth 1 -maxdepth 1 -type d -prune -exec rm -rvf {} \;
