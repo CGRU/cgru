@@ -1,7 +1,9 @@
 import cgi
 import json
 import os
+import getpass
 import sys
+import time
 import traceback
 
 import rulib
@@ -10,6 +12,18 @@ def randMD5():
     hashlib = __import__('hashlib', globals(), locals(), [])
     random = __import__('random', globals(), locals(), [])
     return hashlib.md5(str(random.random()).encode()).hexdigest()
+
+def getCurSeconds():
+    return round(time.time())
+
+def getCurUser():
+    return getpass.getuser()
+
+def outError(i_err, i_out = None):
+    if o_out:
+        o_out['error'] = i_err
+    else:
+        print(i_err)
 
 def getRuFilePath(i_file, i_path = None):
     if i_path is None:
