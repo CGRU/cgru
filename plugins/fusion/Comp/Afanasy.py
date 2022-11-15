@@ -23,11 +23,11 @@ class RenderCommandBuilder(object):
     @classmethod
     def build(cls, job_data):
         """Build and return render command."""
-        if "REZ_USED_REQUEST" in os.environ:
+        if "REZ_USED_RESOLVE" in os.environ:
             # this is a rez configured environment
             # use the same rez request to build the render command
-            logger.debug("Using REZ_USED_REQUEST to build the render command")
-            cmd_buffer = ["rez-env {} -- fusion_render_node".format(os.environ["REZ_USED_REQUEST"])]
+            logger.debug("Using REZ_USED_RESOLVE to build the render command")
+            cmd_buffer = ["rez-env {} -- fusion_render_node".format(os.environ["REZ_USED_RESOLVE"])]
         else:
             # use the default command
             cmd_buffer = ["fusion_render_node"]

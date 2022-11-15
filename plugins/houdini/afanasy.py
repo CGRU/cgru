@@ -287,9 +287,9 @@ class BlockParameters:
 
             # If this is a "rez" configured environment supply the same environment to
             # the render command
-            if "REZ_USED_REQUEST" in os.environ:
+            if "REZ_USED_RESOLVE" in os.environ:
                 self.cmd = 'rez-env {} -- {}'.format(
-                    os.environ["REZ_USED_REQUEST"],
+                    os.environ["REZ_USED_RESOLVE"],
                     self.cmd
                 )
 
