@@ -3,23 +3,41 @@ import os
 
 import rulib
 
+def getStatusFilePath(i_path = None):
+    return rulib.functions.getRuFilePath('status.json', i_path)
+
+def getStatusData(i_path = None, o_out = None):
+    data = rulib.functions.readObj(getStatusFilePath(i_path), o_out)
+    if data is None:
+        return None
+    if 'status' in data:
+        return data['status']
+    error = 'Status data not found'
+    if o_out is not None: o_out['error'] = error
+    else: print(error)
+    return  None
+
+def saveStatusData(i_path, i_data):
+    rulib.functions.writeObj(getStatusFilePath(i_path), {'status':i_data})
+
 class Status:
 
     def __init__(self, i_uid = None, i_path = None):
 
-        self.path = rulib.functions.getRuFilePath('status.json', i_path)
+        self.path = i_path
+        if self.path is None:
+            self.path = os.getcwd()
+
         self.muser = i_uid
         if self.muser is None:
             self.muser = rulib.functions.getCurUser()
         self.mtime = rulib.functions.getCurSeconds()
 
-        data = rulib.functions.readObj(self.path)
-        if data is None:
+        self.data = getStatusData(self.path)
+        if self.data is None:
             self.data = dict()
-        if not 'status' in data:
-            self.data = dict()
-        else:
-            self.data = data['status']
+
+        self.progress_changed = False
 
     def __repr__(self):
         return json.dumps(self.data)
@@ -101,17 +119,32 @@ class Status:
         if deleted is not None:
             task['deleted'] = deleted
 
-        progress_changed = True
         if progress is not None and type(progress) is int:
             if progress < -1: progress = -1
             elif progress > 100: progress = 100
-            if task['progress'] == progress:
-                progress_changed = False
+        elif 'progress' in task:
+            progress = task['progress']
+        else:
+            progress = 0
+
+        # Task flags can detemine task progress (eg done=100%)
+        for flag in flags:
+            if not flag in rulib.RULES_TOP['flags']:
+                continue
+            p_min = None
+            p_max = None
+            if 'p_min' in rulib.RULES_TOP['flags'][flag]:
+                p_min = rulib.RULES_TOP['flags'][flag]['p_min']
+            if 'p_max' in rulib.RULES_TOP['flags'][flag]:
+                p_max = rulib.RULES_TOP['flags'][flag]['p_max']
+            if p_min is not None and progress < p_min: progress = p_min
+            if p_max is not None and progress > p_max: progress = p_max
+
+        # Set task progress if it changes:
+        if not 'progress' in task or task['progress'] != progress:
             task['progress'] = progress
 
-        # Calculate status progress
-        progresses = dict()
-        if progress_changed:
+            # Calculate status progress - tasks progress average
             avg_progress = 0.0
             num_tasks = 0
 
@@ -127,9 +160,14 @@ class Status:
                 avg_progress += koeff * task['progress']
                 num_tasks += koeff
 
-            avg_progress = int(avg_progress / num_tasks)
-            progresses[self.path] = avg_progress
-            self.data['progress'] = avg_progress
+            # Set status progress if it changes:
+            avg_progress = round(avg_progress / num_tasks)
+            if 'progress' not in self.data or self.data['progress'] != avg_progress:
+                self.data['progress'] = avg_progress
+                self.progress_changed = True
+            else:
+                self.progress_changed = False
+
 
         # Remove status tags, artists and flags if the task has the same
         for arr in ['tags','artists','flags']:
@@ -145,4 +183,63 @@ class Status:
         self.data['mtime'] = self.mtime
         self.data['muser'] = self.muser
 
-        rulib.functions.writeObj(self.path, {"status":self.data})
+        saveStatusData(self.path, self.data)
+
+        if self.progress_changed:
+            progresses = dict()
+            progresses[self.path] = self.data['progress']
+            updateUpperProgresses(os.path.dirname(self.path), progresses)
+
+
+def updateUpperProgresses(i_path, i_progresses):
+    path = ''
+    folders = []
+    for folder in i_path.split('/'):
+        if len(folder) == 0: continue
+        path += '/' + folder
+        folders.append(path)
+
+    folders.reverse()
+    for folder in folders:
+        try:
+            listdir = os.listdir(folder)
+        except:
+            return
+
+        progress_sum = 0
+        progress_count = 0
+        for entry in listdir:
+            if entry == rulib.RUFOLDER:
+                continue
+
+            progress = 0
+            path = os.path.join(folder, entry)
+            if path in i_progresses:
+                progress = i_progresses[path]
+            else:
+                sdata = getStatusData(path)
+                if sdata and 'progress' in sdata:
+                    progress = sdata['progress']
+
+            #print(entry, progress)
+
+            if progress < 0:
+                continue
+
+            progress_sum += progress
+            progress_count += 1
+
+        if progress_count == 0:
+            return
+
+        progress_avg = int(progress_sum / progress_count)
+        i_progresses[folder] = progress_avg
+
+        #print("%s %d%%" % (folder, progress_avg))
+
+        sdata = getStatusData(folder)
+        if sdata is None:
+            sdata = {'progress':progress_avg}
+        else:
+            sdata['progress'] = progress_avg
+        saveStatusData(folder, sdata)

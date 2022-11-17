@@ -1,10 +1,5 @@
 import os
 
-from . import editobj
-from . import functions
-from . import news
-from . import search
-from . import status
 
 FILE_MAX_LENGTH = 3000000
 
@@ -21,6 +16,14 @@ SKIPFILES = ['.', '..', HT_ACCESS_FILE_NAME, HT_GROUPS_FILE_NAME, HT_DIGEST_FILE
 
 GUESTCANCREATE = ['status.json', 'comments.json']
 GUESTCANEDIT = ['comments.json']
+
+
+from . import editobj
+from . import functions
+from . import news
+from . import search
+from . import status
+
 
 if len(RULES_TOP) == 0:
     cgru_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))

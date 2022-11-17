@@ -20,7 +20,7 @@ def getCurUser():
     return getpass.getuser()
 
 def outError(i_err, i_out = None):
-    if o_out:
+    if o_out is not None:
         o_out['error'] = i_err
     else:
         print(i_err)
@@ -97,10 +97,8 @@ def fileWrite(i_file, i_data, i_lock = True, i_verbose = False):
 def readObj(i_file, o_out = None, i_lock = True):
     if not os.path.isfile(i_file):
         error = 'No such file %s' % i_file
-        if o_out:
+        if o_out is not None:
             o_out['error'] = error
-        else:
-            print(error)
         return
 
     data = fileRead(i_file, i_lock)
@@ -110,10 +108,8 @@ def readObj(i_file, o_out = None, i_lock = True):
         return obj
 
     error = 'Unable to read file %s' % i_file
-    if o_out:
+    if o_out is not None:
         o_out['error'] = error
-    else:
-        print(error)
 
     return
 
