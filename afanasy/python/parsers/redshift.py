@@ -22,6 +22,7 @@ re_triangles = re.compile(r'(.*)(Total triangles:)(\s*)(\d*)')
 re_frame_start = re.compile(r'.*Rendering.*frame [0-9]+\.\.\.')
 re_frame_skip = re.compile(r'.*Skipping frame.*')
 re_frame_done = re.compile(r'.*Frame.*done.*')
+re_image = re.compile(r"Saving:\s(.+)")
 
 
 class redshift(parser.parser):
@@ -94,6 +95,11 @@ class redshift(parser.parser):
 
         if self.percentframe < percent:
             self.percentframe = int(percent)
+
+        match = re_image.search(data)
+        if match:
+            file_path = match.group(1)
+            self.appendFile(file_path.strip(), True)
 
         match = re_frame_done.findall(data)
         if match:
