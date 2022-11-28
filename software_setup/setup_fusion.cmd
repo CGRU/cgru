@@ -15,8 +15,13 @@ if not exist %FUSION_CGRU_PREFS% (
 )
 rem {Global={Paths={Map={["Scripts:"]="C:\\cgru\\plugins\\fusion\\;Fusion:Scripts",},},},}
 
-SET "APP_DIR=C:\Program Files\Blackmagic Design\Fusion"
-SET "APP_EXE=%APP_DIR%\Fusion.exe"
+IF NOT DEFINED FUSION_LOCATION (
+    For /F "Tokens=*" %%I in ('dir /b "C:\Program Files\Blackmagic Design\Fusion *"') Do set "FUSION_LOCATION=C:\Program Files\Blackmagic Design\%%I"
+) ELSE (
+    echo "FUSION_LOCATION already set: %FUSION_LOCATION%"
+)
+
+SET "APP_EXE=%FUSION_LOCATION%\Fusion.exe"
 
 rem Locate:
 set "locate_file=%CGRU_LOCATION%\software_setup\locate_fusion.cmd"
