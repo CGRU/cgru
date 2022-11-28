@@ -1,7 +1,15 @@
 rem Source general for all soft directives:
 call %CGRU_LOCATION%\software_setup\setup__all.cmd
 
-For /F "Tokens=*" %%I in ('dir /b "C:\Program Files\Side Effects Software\Houdini 1*"') Do set "HOUDINI_LOCATION=C:\Program Files\Side Effects Software\%%I"
+IF NOT DEFINED HOUDINI_LOCATION (
+    For /F "Tokens=*" %%I in ('dir /b "C:\Program Files\Side Effects Software\Houdini 1*"') Do set "HOUDINI_LOCATION=C:\Program Files\Side Effects Software\%%I"
+) ELSE (
+    echo "HOUDINI_LOCATION already set: %HOUDINI_LOCATION%"
+)
+
+rem Define location:
+set "locate_file=%CGRU_LOCATION%\software_setup\locate_houdini.cmd"
+if exist %locate_file% call %locate_file%
 
 set APP_DIR=%HOUDINI_LOCATION%
 set APP_EXE=%HOUDINI_LOCATION%\bin\houdini.exe
