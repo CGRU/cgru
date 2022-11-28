@@ -356,6 +356,15 @@ class BlockParameters:
                         cmd_files.evalAsStringAtFrame(self.frame_last)
                     ))
 
+                # Create preview
+                if self.afnode.parm('cmd_preview').eval():
+                    cmd_preview = self.afnode.parm('cmd_preview')
+                    self.preview = \
+                        afcommon.patternFromPaths(
+                            cmd_preview.evalAsStringAtFrame(self.frame_first),
+                            cmd_preview.evalAsStringAtFrame(self.frame_last)
+                        )
+                        
             elif not for_job_only:
                 hou.ui.displayMessage('Can\'t process "%s"' % afnode.path())
                 return
