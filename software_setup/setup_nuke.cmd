@@ -17,8 +17,13 @@ rem SET NUKE_AF_RENDERTHREADS=2
 rem Nuke render launcher:
 SET NUKE_AF_RENDER=nuke
 
-For /F "Tokens=*" %%I in ('dir /b "C:\Program Files\Nuke*"') Do set "NUKE_LOCATION=C:\Program Files\%%I"
-rem echo %NUKE_LOCATION%
+
+IF NOT DEFINED NUKE_LOCATION (
+   For /F "Tokens=*" %%I in ('dir /b "C:\Program Files\Nuke*"') Do set "NUKE_LOCATION=C:\Program Files\%%I"
+) ELSE (
+   echo "NUKE_LOCATION already set: %NUKE_LOCATION%"
+)
+
 For /F "Tokens=*" %%I in ('dir /b "%NUKE_LOCATION%\Nuke*.*.exe"') Do set "NUKE_EXEC=%NUKE_LOCATION%\%%I"
 rem echo %NUKE_EXEC%
 
