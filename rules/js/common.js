@@ -22,6 +22,7 @@ var SERVER = null;
 var RULES = {};
 var RUFOLDER = '.rules';
 var RULES_TOP = {};
+var ROOT = null;
 
 var c_movieTypes =
 	['mpg', 'mpeg', 'mov', 'avi', 'mp4', 'm4v', 'webm', 'ogg', 'ogv', 'mxf', 'flv', 'mkv', 'cine'];
@@ -1001,8 +1002,8 @@ function c_PathSplitExt(i_file)
 
 function c_PathPM_Rules2Server(i_path)
 {
-	if (RULES.root_link)
-		return (RULES.root_link + i_path);
+	if (ROOT)
+		return (ROOT + i_path);
 	else
 		return (RULES.root + i_path);
 }

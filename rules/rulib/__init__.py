@@ -1,5 +1,9 @@
 import os
+import sys
+import traceback
 
+CGRU_LOCATION = None
+CGRU_VERSION = None
 
 FILE_MAX_LENGTH = 3000000
 
@@ -11,6 +15,8 @@ RUFOLDER = '.rules'
 RECENT_FILENAME = 'recent.json'
 
 RULES_TOP = dict()
+
+ROOT = None
 
 SKIPFILES = ['.', '..', HT_ACCESS_FILE_NAME, HT_GROUPS_FILE_NAME, HT_DIGEST_FILE_NAME]
 
@@ -26,5 +32,20 @@ from . import status
 
 
 if len(RULES_TOP) == 0:
-    cgru_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-    RULES_TOP = functions.getRulesUno(cgru_root,'rules')
+    CGRU_LOCATION = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+    CGRU_VERSION = functions.fileRead(os.path.join(CGRU_LOCATION,'version.txt'))
+
+    os.environ['CGRU_LOCATION'] = CGRU_LOCATION
+    os.environ['CGRU_VERSION'] = CGRU_VERSION
+    os.environ['AF_ROOT'] = os.path.join(CGRU_LOCATION, 'afanasy')
+
+    sys.path.append(os.path.join(CGRU_LOCATION, 'lib', 'python'))
+    sys.path.append(os.path.join(CGRU_LOCATION, 'afanasy', 'python'))
+
+    RULES_TOP = functions.getRulesUno(CGRU_LOCATION,'rules')
+
+    try:
+        ROOT = os.readlink(os.path.join(CGRU_LOCATION, RULES_TOP['root']))
+    except:
+        print('%s' % traceback.format_exc())
+        ROOT = RULES_TOP['root']

@@ -18,7 +18,7 @@ class Requests:
 
 
     def req_start(self, i_args, out):
-        out['version'] = environ.CGRU_VERSION
+        out['version'] = rulib.CGRU_VERSION
         out['software'] = environ.SERVER_SOFTWARE
         out['mod_wsgi_version'] = environ.MOD_WSGI_VERSION
         out['python'] = sys.version
@@ -68,6 +68,7 @@ class Requests:
                 out['admin'] = True
 
         out['rules_top'] = rulib.RULES_TOP
+        out['root'] = rulib.ROOT
 
 
     def req_getfile(self, i_file, out):

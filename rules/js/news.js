@@ -488,16 +488,19 @@ function nw_MakeNewsFinished(i_data, i_args)
 		nw_RecentLoad({"file_check": false});
 	}
 
-	if (i_data.users.length == 0)
+	if ((i_data.users_subscribed == null) || (i_data.users_subscribed.length == 0))
 	{
 		c_Log('No subscribed users found.');
 		return;
 	}
 
-	var info = 'Subscribed users:';
-	for (var i = 0; i < i_data.users.length; i++)
-		info += ' ' + i_data.users[i];
-	c_Log(info);
+	let info = 'Subscribed users: ';
+	for (let i = 0; i < i_data.users_subscribed.length; i++)
+	{
+		if (i) info += ', ';
+		info += c_GetUserTitle(i_data.users_subscribed[i]);
+	}
+	c_Info(info);
 
 	if (i_args.args && i_args.args.func)
 		i_args.args.func(i_args.args);

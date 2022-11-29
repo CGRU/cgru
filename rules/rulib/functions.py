@@ -1,7 +1,7 @@
 import cgi
 import json
-import os
 import getpass
+import os
 import sys
 import time
 import traceback
@@ -29,6 +29,16 @@ def getRuFilePath(i_file, i_path = None):
     if i_path is None:
         i_path = os.getcwd()
     return os.path.join(i_path, rulib.RUFOLDER, i_file)
+
+
+def getRootPath(i_path = None):
+    path = i_path
+    if path is None:
+        path = os.getcwd()
+    if path.find(rulib.ROOT) == 0:
+        path = path[len(rulib.ROOT):]
+    return path
+
 
 def getRuFiles(i_path = None, i_ruFolder = None):
     if i_path is None: i_path = os.getcwd()
@@ -139,9 +149,9 @@ def readConfig(i_file, o_out):
 
 
 def readUser(i_uid, i_full):
-    ufile_main = 'users/%s/%s.json' % (i_uid, i_uid)
-    ufile_news = 'users/%s/%s-news.json' % (i_uid, i_uid)
-    ufile_bookmarks = 'users/%s/%s-bookmarks.json' % (i_uid, i_uid)
+    ufile_main = '%s/users/%s/%s.json' % (rulib.CGRU_LOCATION, i_uid, i_uid)
+    ufile_news = '%s/users/%s/%s-news.json' % (rulib.CGRU_LOCATION, i_uid, i_uid)
+    ufile_bookmarks = '%s/users/%s/%s-bookmarks.json' % (rulib.CGRU_LOCATION, i_uid, i_uid)
 
     if not os.path.isfile(ufile_main):
         return None
@@ -177,8 +187,9 @@ def readUser(i_uid, i_full):
 
 
 def readAllUsers(o_out, i_full):
+    users_dir = os.path.join(rulib.CGRU_LOCATION, 'users')
     try:
-        listdir = os.listdir('users')
+        listdir = os.listdir(users_dir)
     except:
         o_out['error'] = 'Can`t open users folder.'
         o_out['info'] = '%s' % traceback.format_exc()
@@ -186,7 +197,7 @@ def readAllUsers(o_out, i_full):
 
     users = dict()
     for entry in listdir:
-        if not os.path.isdir(os.path.join('users', entry)):
+        if not os.path.isdir(os.path.join(users_dir, entry)):
             continue;
 
         user = readUser(entry, i_full);
@@ -198,7 +209,7 @@ def readAllUsers(o_out, i_full):
 
 def writeUser(i_user, i_full):
     uid = i_user['id']
-    udir = 'users/%s' % uid
+    udir = '%s/users/%s' % (rulib.CGRU_LOCATION, uid)
     ufile_main = '%s/%s.json' % (udir, uid)
     ufile_news = '%s/%s-news.json' % (udir, uid)
     ufile_bookmarks = '%s/%s-bookmarks.json' % (udir, uid)

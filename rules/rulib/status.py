@@ -149,15 +149,15 @@ class Status:
             num_tasks = 0
 
             for t in self.data['tasks']:
-                task = self.data['tasks'][t]
-                if 'deleted' in task and task['deleted']:
+                _task = self.data['tasks'][t]
+                if 'deleted' in _task and _task['deleted']:
                     continue
 
                 koeff = 1.0
                 if t in rulib.RULES_TOP['tags'] and 'koeff' in rulib.RULES_TOP['tags'][t]:
                     koeff = rulib.RULES_TOP['tags'][t]['koeff']
 
-                avg_progress += koeff * task['progress']
+                avg_progress += koeff * _task['progress']
                 num_tasks += koeff
 
             # Set status progress if it changes:
@@ -176,12 +176,29 @@ class Status:
                     if item in self.data[arr]:
                         self.data[arr].remove(item)
 
+        # Set task changed.
+        # It needed for news to know what was changed in status.
+        task['changed'] = True
+
         return task
 
 
-    def save(self):
+    def filterDataForSave(self):
+        if 'changed' in self.data:
+            del self.data['changed']
+        if 'tasks' in self.data:
+            for t in self.data['tasks']:
+                if 'changed' in self.data['tasks'][t]:
+                    del self.data['tasks'][t]['changed']
+
+
+    def save(self, o_out=dict()):
         self.data['mtime'] = self.mtime
         self.data['muser'] = self.muser
+
+        rulib.news.statusChanged(self, o_out)
+
+        self.filterDataForSave()
 
         saveStatusData(self.path, self.data)
 

@@ -16,6 +16,8 @@ def makeNews(i_args, i_uid, o_out):
     users_changed = []
 
     for request in i_args['news_requests']:
+        if 'news' in request:
+            request = request['news']
         ids = makeNewsUno(request, users, i_uid, o_out)
         if 'error' in o_out:
             return
@@ -40,10 +42,10 @@ def makeNews(i_args, i_uid, o_out):
     for id in users_changed:
         rulib.functions.writeUser(users[id], True)
 
-    o_out['users'] = users_changed
+    o_out['users_changed'] = users_changed
 
 def makeNewsUno(i_args, io_users, i_uid, o_out):
-    news = i_args['news']
+    news = i_args
 
     # Ensure that news has a path:
     if not 'path' in news:
@@ -212,6 +214,8 @@ def makeNewsUno(i_args, io_users, i_uid, o_out):
 #        $out = array();
 #        jsf_sendmail($mail, $out);
 
+    o_out['users_subscribed'] = sub_users
+
     return changed_users
 
 
@@ -311,3 +315,33 @@ def isUserAssignedInStatus(i_user, i_obj):
 
     return False
 
+
+# Remove not needed status fields:
+def filterStatus(i_sdata):
+    sdata = dict()
+    skip_keys = ['body']
+    for key in i_sdata:
+        if not key in skip_keys:
+            sdata[key] = i_sdata[key]
+    return sdata
+
+
+def statusChanged(i_status, o_out=dict()):
+    news = createNews(title='status', path=i_status.path, uid=i_status.muser, status=i_status.data)
+    makeNews({'news_requests':[news]}, i_status.muser, o_out)
+
+
+def createNews(title='news',uid=None,path=None,status=None):
+    if uid is None: uid = rulib.functions.getCurUser()
+    if path is None: path = os.getcwd()
+    if status is None: rulib.status.getStatusData()
+
+    news = dict()
+    news['title'] = title
+    news['path'] = rulib.functions.getRootPath(path)
+    news['user'] = uid
+    news['status'] = filterStatus(status)
+    news['time'] = rulib.functions.getCurSeconds()
+    news['id'] = news['user'] + '_' + str(news['time']) + '_' + news['path']
+
+    return news

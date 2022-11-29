@@ -15,9 +15,7 @@ sys.path.append(APP_ROOT)
 import rusrv
 import rulib
 
-rusrv.environ.initApp(APP_ROOT)
-
-os.chdir(rusrv.environ.CGRU_LOCATION)
+os.chdir(rulib.CGRU_LOCATION)
 
 def application(environ, start_response):
 
