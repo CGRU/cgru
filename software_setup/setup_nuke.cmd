@@ -17,19 +17,25 @@ rem SET NUKE_AF_RENDERTHREADS=2
 rem Nuke render launcher:
 SET NUKE_AF_RENDER=nuke
 
-For /F "Tokens=*" %%I in ('dir /b "C:\Program Files\Nuke*"') Do set "NUKE_DIR=C:\Program Files\%%I"
-rem echo %NUKE_DIR%
-For /F "Tokens=*" %%I in ('dir /b "%NUKE_DIR%\Nuke*.*.exe"') Do set "NUKE_EXEC=%NUKE_DIR%\%%I"
+
+IF NOT DEFINED NUKE_LOCATION (
+   For /F "Tokens=*" %%I in ('dir /b "C:\Program Files\Nuke*"') Do set "NUKE_LOCATION=C:\Program Files\%%I"
+) ELSE (
+   echo "NUKE_LOCATION already set: %NUKE_LOCATION%"
+)
+
+For /F "Tokens=*" %%I in ('dir /b "%NUKE_LOCATION%\Nuke*.*.exe"') Do set "NUKE_EXEC=%NUKE_LOCATION%\%%I"
 rem echo %NUKE_EXEC%
 
-SET APP_DIR=%NUKE_DIR%
+SET NUKE_DIR=%NUKE_LOCATION%
+SET APP_DIR=%NUKE_LOCATION%
 SET APP_EXE=%NUKE_EXEC%
 
 rem Locate:
 set locate_file=%CGRU_LOCATION%\software_setup\locate_nuke.cmd
 if exist %locate_file% call %locate_file%
 
-SET NUKE_DIR=%APP_DIR%
+SET NUKE_LOCATION=%APP_DIR%
 
-SET LM_LICENSE_FILE=%NUKE_DIR%\nuke.lic
-SET LM_LICENSE_FILE=%NUKE_DIR%\foundry.lic
+SET LM_LICENSE_FILE=%NUKE_LOCATION%\nuke.lic
+SET LM_LICENSE_FILE=%NUKE_LOCATION%\foundry.lic

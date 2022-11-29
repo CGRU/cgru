@@ -1,7 +1,11 @@
 rem Source general for all soft directives:
 call "%CGRU_LOCATION%\software_setup\setup__all.cmd"
 
-set "BLENDER_LOCATION=C:\Program Files\Blender Foundation\Blender"
+IF NOT DEFINED BLENDER_LOCATION (
+    For /F "Tokens=*" %%I in ('dir /b "C:\Program Files\Blender Foundation\Blender *"') Do set "BLENDER_LOCATION=C:\Program Files\Blender Foundation\%%I"
+) ELSE (
+    echo "BLENDER_LOCATION already set: %BLENDER_LOCATION%"
+)
 
 set "BLENDER_CGRU_PATH=%CGRU_LOCATION%\plugins\blender"
 
