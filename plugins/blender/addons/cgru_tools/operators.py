@@ -31,9 +31,9 @@ CMD_TEMPLATE = "blender -b \"{blend_scene}\" -y -E {render_engine} " \
 
 # If this is a "rez" configured environment supply the same environment to the render
 # command
-if "REZ_USED_REQUEST" in os.environ:
+if "REZ_USED_RESOLVE" in os.environ:
     CMD_TEMPLATE = "rez-env {} -- {}".format(
-        os.environ["REZ_USED_REQUEST"],
+        os.environ["REZ_USED_RESOLVE"],
         CMD_TEMPLATE
     )
 
