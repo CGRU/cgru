@@ -270,7 +270,7 @@ class Requests:
 
 
     def req_makenews(self, i_args, o_out):
-        rulib.news.makeNews(i_args, self.session.USER_ID, o_out)
+        rulib.news.makeNewsAndBookmarks(i_args, self.session.USER_ID, o_out)
         return
 
 

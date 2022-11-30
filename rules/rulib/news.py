@@ -3,7 +3,7 @@ import time
 
 import rulib
 
-def makeNews(i_args, i_uid, o_out):
+def makeNewsAndBookmarks(i_args, i_uid, o_out):
     # Read all users:
     users = rulib.functions.readAllUsers(o_out, True)
     if 'error' in o_out:
@@ -15,10 +15,17 @@ def makeNews(i_args, i_uid, o_out):
 
     users_changed = []
 
-    for request in i_args['news_requests']:
-        if 'news' in request:
-            request = request['news']
-        ids = makeNewsUno(request, users, i_uid, o_out)
+    bookmarks = []
+    # TODO
+    i_news = []
+    if 'news' in i_args:
+        i_news = i_args['news']
+    elif 'news_requests' in i_args:
+        i_news = i_args['news_requests']
+    for news in i_news:
+        if 'news' in news:
+            news = news['news']
+        ids = makeNewsUno(news, users, i_uid, o_out)
         if 'error' in o_out:
             return
 
@@ -27,16 +34,19 @@ def makeNews(i_args, i_uid, o_out):
                 if not id in users_changed:
                     users_changed.append(id)
 
-    if 'bookmarks' in i_args:
-        for bm in i_args['bookmarks']:
-            ids = makeBookmarks(i_uid, bm, users, o_out)
-            if 'error' in o_out:
-                return
+        bookmarks.append({'status':news['status'],'path':news['path']})
 
-            if ids is not None:
-                for id in ids:
-                    if not id in users_changed:
-                        users_changed.append(id)
+    if 'bookmarks' in i_args:
+        bookmarks = i_args['bookmarks']
+    for bm in bookmarks:
+        ids = makeBookmarks(i_uid, bm, users, o_out)
+        if 'error' in o_out:
+            return
+
+        if ids is not None:
+            for id in ids:
+                if not id in users_changed:
+                    users_changed.append(id)
 
     # Write changed users:
     for id in users_changed:
@@ -107,12 +117,11 @@ def makeNewsUno(i_args, io_users, i_uid, o_out):
             try:
                 os.makedirs(os.path.dirname(rfile))
             except PermissionError:
-                o_out['error'] = 'Permission denied: "%s"' % os.path.dirname(rfile)
-                return
+                o_out['info'] = 'Permission denied: "%s"' % os.path.dirname(rfile)
+                continue
             except:
-                o_out['error'] = 'Unable to create folder: "%s"' % os.path.dirname(rfile)
-                o_out['info'] = '%s' % traceback.format_exc()
-                return False
+                o_out['info'] = 'Unable to create folder: "%s"' % traceback.format_exc()
+                continue
         rulib.functions.writeObj(rfile, rarray)
 
         # Exit cycle if path is root:
@@ -328,7 +337,7 @@ def filterStatus(i_sdata):
 
 def statusChanged(i_status, o_out=dict()):
     news = createNews(title='status', path=i_status.path, uid=i_status.muser, status=i_status.data)
-    makeNews({'news_requests':[news]}, i_status.muser, o_out)
+    makeNewsAndBookmarks({'news':[news]}, i_status.muser, o_out)
 
 
 def createNews(title='news',uid=None,path=None,status=None):
