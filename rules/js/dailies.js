@@ -1052,10 +1052,11 @@ var d_cutparams = {
 	fps           : {"label": 'FPS', 'width': '25%'},
 	af_pertask    : {"label": 'Frames Per Task', 'width': '25%', 'lwidth': '140px'},
 	af_maxtasks   : {"label": 'Max Run Tasks', 'width': '25%', 'lwidth': '120px'},
-	af_perhost    : {"label": 'Per Host', 'width': '25%', 'lwidth': '120px'},
+	af_perhost    : {"label": 'Per Host', 'width': '25%', 'lwidth': '140px'},
 	af_capacity   : {"label": 'Capacity', 'width': '25%'},
 	af_maxruntime : {"label": 'Max Run Time', 'width': '25%', 'lwidth': '140px'},
 	skipnosrc     : {"label": 'Skip No Src', 'width': '25%', 'lwidth': '120px', 'type':'bool', default: false},
+	flipversion   : {"label": 'Flip Version', 'width': '25%', 'lwidth': '140px', 'type':'bool', default: false},
 	output        : {}
 };
 
@@ -1166,6 +1167,9 @@ function d_CutProcessGUI(i_wnd, i_test)
 
 	if (params.skipnosrc)
 		cmd += ' --skipnosrc'
+
+	if (params.flipversion)
+		cmd += ' --flipversion'
 
 	if (RULES.dailies.font)
 		cmd += ' --font "' + RULES.dailies.font + '"';

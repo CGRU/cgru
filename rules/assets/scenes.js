@@ -1300,6 +1300,28 @@ function scenes_Convert()
 	d_Convert( args);
 }
 
+function scenes_MakeCut()
+{
+	let args = {};
+	args.shots = [];
+	let elShots = scenes_GetSelectedShots();
+	if (elShots.length < 1)
+		elShots = sc_elShots;
+	for (let i = 0; i < elShots.length; i++)
+		args.shots.push(elShots[i].m_path);
+
+	if (args.shots.length < 2)
+	{
+		c_Error('There should be at least two shots to make cut.');
+		return;
+	}
+
+	args.cut_name = ASSET.name;
+	args.output = ASSET.path + '/' + RULES.cut.output;
+
+	d_MakeCut(args);
+}
+
 function scenes_ExportTable()
 {
 	var args = {};

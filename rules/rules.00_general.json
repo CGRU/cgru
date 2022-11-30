@@ -359,7 +359,7 @@
 
 "cut":{
 	"input":"RESULT/ANIM,RESULT/PNG,RESULT/JPG,RESULT/TIF,RESULT/DPX",
-	"output":"COMMON/_cut",
+	"output":"COMMON/RESULT/JPG",
 	"af_capacity":500,
 	"af_maxtasks":10,
 	"af_perhost":-1,

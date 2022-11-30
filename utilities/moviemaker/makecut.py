@@ -23,6 +23,7 @@ Parser = OptionParser(
 Parser.add_option('-i', '--inputs',     dest='inputs',      type  ='string', default='RESULT/JPG',help='Inputs')
 Parser.add_option('-n', '--cutname',    dest='cutname',     type  ='string', default='',          help='Cut name')
 Parser.add_option('-s', '--skipnosrc',  dest='skipnosrc',   action='store_true', default=False,   help='Skip sources not found')
+Parser.add_option('--flipversion',      dest='flipversion', action='store_true', default=False,   help='Find the lowest versions')
 Parser.add_option('-f', '--fps',        dest='fps',         type  ='string', default='24',        help='FPS')
 Parser.add_option('-r', '--resolution', dest='resolution',  type  ='string', default='1280x720',  help='Resolution: 1280x720')
 Parser.add_option('-c', '--codec',      dest='codec',       type  ='string', default='h264_good', help='Codec')
@@ -121,8 +122,12 @@ for shot in Shots:
                 continue
             ver = item.replace(name, '').strip('_. ')
             if version is not None:
-                if version >= ver:
-                    continue
+                if Options.flipversion:
+                    if version <= ver:
+                        continue
+                else:
+                    if version >= ver:
+                        continue
             version = ver
             folder = os.path.join(inp, item)
 
