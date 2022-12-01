@@ -1,5 +1,6 @@
 import json
 import os
+import traceback
 
 import rulib
 
@@ -17,8 +18,24 @@ def getStatusData(i_path = None, o_out = None):
     else: print(error)
     return  None
 
-def saveStatusData(i_path, i_data):
-    rulib.functions.writeObj(getStatusFilePath(i_path), {'status':i_data})
+def saveStatusData(i_path, i_data, o_out=None):
+    path = getStatusFilePath(i_path)
+    rufolder = os.path.dirname(path)
+    if not os.path.isdir(rufolder):
+        try:
+            os.makedirs(rufolder)
+        except PermissionError:
+            err = 'Permissions denied: ' + rufolder
+            if o_out is not None: o_out['error'] = err
+            else: print(err)
+            return
+        except:
+            err = 'Unable to create folder: ' + rufolder
+            err += '\n%s' % traceback.format_exc()
+            if o_out is not None: o_out['error'] = err
+            else: print(err)
+            return
+    rulib.functions.writeObj(path, {'status':i_data}, o_out)
 
 class Status:
 
@@ -93,7 +110,8 @@ class Status:
                     if out is None: print(error)
                     else: out['error'] = error
                     return None
-                name = '_'.join(tags.sort())
+                tags.sort()
+                name = '_'.join(tags)
             task['name'] = name
             task['tags'] = tags
             task['artists'] = []
@@ -171,7 +189,7 @@ class Status:
 
         # Remove status tags, artists and flags if the task has the same
         for arr in ['tags','artists','flags']:
-            if self.data[arr] and len(self.data[arr]):
+            if arr in self.data and len(self.data[arr]):
                 for item in task[arr]:
                     if item in self.data[arr]:
                         self.data[arr].remove(item)
@@ -183,7 +201,7 @@ class Status:
         return task
 
 
-    def filterDataForSave(self):
+    def prepareDataForSave(self):
         if 'changed' in self.data:
             del self.data['changed']
         if 'tasks' in self.data:
@@ -198,9 +216,9 @@ class Status:
 
         rulib.news.statusChanged(self, o_out)
 
-        self.filterDataForSave()
+        self.prepareDataForSave()
 
-        saveStatusData(self.path, self.data)
+        saveStatusData(self.path, self.data, o_out)
 
         if self.progress_changed:
             progresses = dict()

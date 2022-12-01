@@ -79,16 +79,23 @@ def fileRead(i_file, i_lock = True, i_verbose = False):
 
     return data
 
-def fileWrite(i_file, i_data, i_lock = True, i_verbose = False):
+def fileWrite(i_file, i_data, o_out=None):
     tmp_name = ('%s-%s') % (i_file, os.getpid())
     try:
         if isinstance(i_data, str):
             f = open(tmp_name, mode='w', encoding='utf-8')
         else:
             f = open(tmp_name, mode='wb')
+    except PermissionError:
+        err = 'Permissions denied: ' + tmp_name
+        if o_out is not None: o_out['error'] = err
+        else: print(err)
+        return False
     except:
-        print('fileWrite: Unable open for writing: ' + tmp_name)
-        print('%s' % traceback.format_exc())
+        err = 'fileWrite: Unable open for writing: ' + tmp_name
+        err += '\n%s' % traceback.format_exc()
+        if o_out is not None: o_out['error'] = err
+        else: print(err)
         return False
 
     #if ($i_lock) _flock_($fHandle, LOCK_EX)
@@ -97,9 +104,6 @@ def fileWrite(i_file, i_data, i_lock = True, i_verbose = False):
     f.close()
 
     os.rename(tmp_name, i_file)
-
-    if i_verbose:
-        print('fileWrite: Written %d bytes to: %s' % (len(i_data), i_file))
 
     return True
 
@@ -124,8 +128,8 @@ def readObj(i_file, o_out = None, i_lock = True):
     return
 
 
-def writeObj(i_file, i_obj, i_lock = True, i_verbose = False):
-    if fileWrite(i_file, json.dumps(i_obj, indent='\t', sort_keys=True), i_lock, i_verbose):
+def writeObj(i_file, i_obj, o_out=None):
+    if fileWrite(i_file, json.dumps(i_obj, indent='\t', sort_keys=True), o_out):
         return True
 
     return False
