@@ -25,12 +25,12 @@ def saveStatusData(i_path, i_data, o_out=None):
         try:
             os.makedirs(rufolder)
         except PermissionError:
-            err = 'Permissions denied: ' + rufolder
+            err = 'Permissions denied to make folder for status: ' + rufolder
             if o_out is not None: o_out['error'] = err
             else: print(err)
             return
         except:
-            err = 'Unable to create folder: ' + rufolder
+            err = 'Unable to create folder for status: ' + rufolder
             err += '\n%s' % traceback.format_exc()
             if o_out is not None: o_out['error'] = err
             else: print(err)
@@ -41,9 +41,7 @@ class Status:
 
     def __init__(self, i_uid = None, i_path = None):
 
-        self.path = i_path
-        if self.path is None:
-            self.path = os.getcwd()
+        self.path = rulib.functions.getRootPath(i_path)
 
         self.muser = i_uid
         if self.muser is None:
@@ -146,17 +144,18 @@ class Status:
             progress = 0
 
         # Task flags can detemine task progress (eg done=100%)
-        for flag in flags:
-            if not flag in rulib.RULES_TOP['flags']:
-                continue
-            p_min = None
-            p_max = None
-            if 'p_min' in rulib.RULES_TOP['flags'][flag]:
-                p_min = rulib.RULES_TOP['flags'][flag]['p_min']
-            if 'p_max' in rulib.RULES_TOP['flags'][flag]:
-                p_max = rulib.RULES_TOP['flags'][flag]['p_max']
-            if p_min is not None and progress < p_min: progress = p_min
-            if p_max is not None and progress > p_max: progress = p_max
+        if flags is not None and len(flags):
+            for flag in flags:
+                if not flag in rulib.RULES_TOP['flags']:
+                    continue
+                p_min = None
+                p_max = None
+                if 'p_min' in rulib.RULES_TOP['flags'][flag]:
+                    p_min = rulib.RULES_TOP['flags'][flag]['p_min']
+                if 'p_max' in rulib.RULES_TOP['flags'][flag]:
+                    p_max = rulib.RULES_TOP['flags'][flag]['p_max']
+                if p_min is not None and progress < p_min: progress = p_min
+                if p_max is not None and progress > p_max: progress = p_max
 
         # Set task progress if it changes:
         if not 'progress' in task or task['progress'] != progress:

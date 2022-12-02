@@ -48,4 +48,4 @@ if len(RULES_TOP) == 0:
         ROOT = os.readlink(os.path.join(CGRU_LOCATION, RULES_TOP['root']))
     except:
         print('%s' % traceback.format_exc())
-        ROOT = RULES_TOP['root']
+        ROOT = os.path.join(CGRU_LOCATION, RULES_TOP['root'])

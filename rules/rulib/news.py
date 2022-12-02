@@ -84,11 +84,11 @@ def makeNewsUno(i_args, io_users, i_uid, o_out):
             break
 
         # Get existing recent:
-        rfile = rulib.RULES_TOP['root'] + path + '/' + rulib.RUFOLDER + '/' + rulib.RECENT_FILENAME
+        rfile = rulib.functions.getRuFilePath(rulib.RECENT_FILENAME, path)
         rarray = rulib.functions.readObj(rfile)
         if rarray is None:
             rarray = []
-        
+
         count = len(rarray)
         if len(rarray):
             if i:
@@ -117,10 +117,10 @@ def makeNewsUno(i_args, io_users, i_uid, o_out):
             try:
                 os.makedirs(os.path.dirname(rfile))
             except PermissionError:
-                o_out['info'] = 'Permission denied: "%s"' % os.path.dirname(rfile)
+                o_out['info'] = 'Permission denied to make folder for recent: "%s"' % os.path.dirname(rfile)
                 continue
             except:
-                o_out['info'] = 'Unable to create folder: "%s"' % traceback.format_exc()
+                o_out['info'] = 'Unable to create folder for recent: "%s"' % traceback.format_exc()
                 continue
         rulib.functions.writeObj(rfile, rarray)
 
@@ -347,7 +347,7 @@ def createNews(title='news',uid=None,path=None,status=None):
 
     news = dict()
     news['title'] = title
-    news['path'] = rulib.functions.getRootPath(path)
+    news['path'] = path
     news['user'] = uid
     news['status'] = filterStatus(status)
     news['time'] = rulib.functions.getCurSeconds()

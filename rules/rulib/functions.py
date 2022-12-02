@@ -19,25 +19,38 @@ def getCurSeconds():
 def getCurUser():
     return getpass.getuser()
 
-def outError(i_err, i_out = None):
+def outError(i_err, o_out = None):
     if o_out is not None:
         o_out['error'] = i_err
     else:
         print(i_err)
 
 def getRuFilePath(i_file, i_path = None):
-    if i_path is None:
-        i_path = os.getcwd()
-    return os.path.join(i_path, rulib.RUFOLDER, i_file)
+    path = i_path
+    if path is None:
+        path = os.getcwd()
+    path = os.path.join(path, rulib.RUFOLDER, i_file)
+    path = getAbsPath(path)
+    return path
 
 
 def getRootPath(i_path = None):
     path = i_path
     if path is None:
         path = os.getcwd()
+    else:
+        path = os.path.abspath(path)
     if path.find(rulib.ROOT) == 0:
         path = path[len(rulib.ROOT):]
     return path
+
+
+def getAbsPath(i_path):
+    if len(i_path) == 0:
+        return rulib.ROOT
+    if i_path[0] == '/':
+        return rulib.ROOT + i_path
+    return rulib.ROOT + '/' + i_path
 
 
 def getRuFiles(i_path = None, i_ruFolder = None):
@@ -87,12 +100,12 @@ def fileWrite(i_file, i_data, o_out=None):
         else:
             f = open(tmp_name, mode='wb')
     except PermissionError:
-        err = 'Permissions denied: ' + tmp_name
+        err = 'Permissions denied to write file: ' + tmp_name
         if o_out is not None: o_out['error'] = err
         else: print(err)
         return False
     except:
-        err = 'fileWrite: Unable open for writing: ' + tmp_name
+        err = 'Unable open for writing: ' + tmp_name
         err += '\n%s' % traceback.format_exc()
         if o_out is not None: o_out['error'] = err
         else: print(err)
