@@ -76,7 +76,7 @@ pswd_visor
 
 	Default value is *1832116180fdc61b64fd978401e462e9*
 
-	It is ``IDKFA``
+	It is ``idkfa``
 
 pswd_god
 --------
@@ -86,7 +86,7 @@ pswd_god
 
 	Default value is *73bcaaa458bff0d27989ed331b68b64d*
 
-	It is ``IDDQD``
+	It is ``iddqd``
 
 
 .. image:: images/doom2.jpg
