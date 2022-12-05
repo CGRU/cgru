@@ -3,14 +3,14 @@ import time
 
 import rulib
 
-def makeNewsAndBookmarks(i_args, i_uid, o_out):
+def makeNewsAndBookmarks(i_args, i_uid, out):
     # Read all users:
-    users = rulib.functions.readAllUsers(o_out, True)
-    if 'error' in o_out:
+    users = rulib.functions.readAllUsers(out, True)
+    if 'error' in out:
         return
 
     if len(users) == 0:
-        o_out['error'] = 'No users found.'
+        out['error'] = 'No users found.'
         return
 
     users_changed = []
@@ -25,8 +25,8 @@ def makeNewsAndBookmarks(i_args, i_uid, o_out):
     for news in i_news:
         if 'news' in news:
             news = news['news']
-        ids = makeNewsUno(news, users, i_uid, o_out)
-        if 'error' in o_out:
+        ids = makeNewsUno(news, users, i_uid, out)
+        if 'error' in out:
             return
 
         if ids is not None:
@@ -39,8 +39,8 @@ def makeNewsAndBookmarks(i_args, i_uid, o_out):
     if 'bookmarks' in i_args:
         bookmarks = i_args['bookmarks']
     for bm in bookmarks:
-        ids = makeBookmarks(i_uid, bm, users, o_out)
-        if 'error' in o_out:
+        ids = makeBookmarks(i_uid, bm, users, out)
+        if 'error' in out:
             return
 
         if ids is not None:
@@ -52,21 +52,21 @@ def makeNewsAndBookmarks(i_args, i_uid, o_out):
     for id in users_changed:
         rulib.functions.writeUser(users[id], True)
 
-    o_out['users_changed'] = users_changed
+    out['users_changed'] = users_changed
 
-def makeNewsUno(i_args, io_users, i_uid, o_out):
+def makeNewsUno(i_args, io_users, i_uid, out):
     news = i_args
 
     # Ensure that news has a path:
     if not 'path' in news:
-        o_out['error'] = 'News can`t be without a path.'
+        out['error'] = 'News can`t be without a path.'
         return False
 
     path = news['path']
 
     # Path should not be an empty string:
     if len(path) == 0:
-        o_out['error'] = 'Path is an empty string.'
+        out['error'] = 'Path is an empty string.'
         return False
 
     # Ensure that the first path character is '/':
@@ -117,10 +117,10 @@ def makeNewsUno(i_args, io_users, i_uid, o_out):
             try:
                 os.makedirs(os.path.dirname(rfile))
             except PermissionError:
-                o_out['info'] = 'Permission denied to make folder for recent: "%s"' % os.path.dirname(rfile)
+                out['info'] = 'Permission denied to make folder for recent: "%s"' % os.path.dirname(rfile)
                 continue
             except:
-                o_out['info'] = 'Unable to create folder for recent: "%s"' % traceback.format_exc()
+                out['info'] = 'Unable to create folder for recent: "%s"' % traceback.format_exc()
                 continue
         rulib.functions.writeObj(rfile, rarray)
 
@@ -223,12 +223,12 @@ def makeNewsUno(i_args, io_users, i_uid, o_out):
 #        $out = array();
 #        jsf_sendmail($mail, $out);
 
-    o_out['users_subscribed'] = sub_users
+    out['users_subscribed'] = sub_users
 
     return changed_users
 
 
-def makeBookmarks(i_user_id, i_bm, io_users, o_out):
+def makeBookmarks(i_user_id, i_bm, io_users, out):
     changed_users = []
     for id in io_users:
         user = io_users[id]
@@ -335,9 +335,9 @@ def filterStatus(i_sdata):
     return sdata
 
 
-def statusChanged(i_status, o_out=dict()):
+def statusChanged(i_status, out=dict()):
     news = createNews(title='status', path=i_status.path, uid=i_status.muser, status=i_status.data)
-    makeNewsAndBookmarks({'news':[news]}, i_status.muser, o_out)
+    makeNewsAndBookmarks({'news':[news]}, i_status.muser, out)
 
 
 def createNews(title='news',uid=None,path=None,status=None):

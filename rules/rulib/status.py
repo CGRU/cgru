@@ -7,18 +7,18 @@ import rulib
 def getStatusFilePath(i_path = None):
     return rulib.functions.getRuFilePath('status.json', i_path)
 
-def getStatusData(i_path = None, o_out = None):
-    data = rulib.functions.readObj(getStatusFilePath(i_path), o_out)
+def getStatusData(i_path = None, out = None):
+    data = rulib.functions.readObj(getStatusFilePath(i_path), out)
     if data is None:
         return None
     if 'status' in data:
         return data['status']
     error = 'Status data not found'
-    if o_out is not None: o_out['error'] = error
+    if out is not None: out['error'] = error
     else: print(error)
     return  None
 
-def saveStatusData(i_path, i_data, o_out=None):
+def saveStatusData(i_path, i_data, out=None):
     path = getStatusFilePath(i_path)
     rufolder = os.path.dirname(path)
     if not os.path.isdir(rufolder):
@@ -26,16 +26,16 @@ def saveStatusData(i_path, i_data, o_out=None):
             os.makedirs(rufolder)
         except PermissionError:
             err = 'Permissions denied to make folder for status: ' + rufolder
-            if o_out is not None: o_out['error'] = err
+            if out is not None: out['error'] = err
             else: print(err)
             return
         except:
             err = 'Unable to create folder for status: ' + rufolder
             err += '\n%s' % traceback.format_exc()
-            if o_out is not None: o_out['error'] = err
+            if out is not None: out['error'] = err
             else: print(err)
             return
-    rulib.functions.writeObj(path, {'status':i_data}, o_out)
+    rulib.functions.writeObj(path, {'status':i_data}, out)
 
 class Status:
 
@@ -209,15 +209,15 @@ class Status:
                     del self.data['tasks'][t]['changed']
 
 
-    def save(self, o_out=dict()):
+    def save(self, out=dict(), news=True):
         self.data['mtime'] = self.mtime
         self.data['muser'] = self.muser
 
-        rulib.news.statusChanged(self, o_out)
+        rulib.news.statusChanged(self, out)
 
         self.prepareDataForSave()
 
-        saveStatusData(self.path, self.data, o_out)
+        saveStatusData(self.path, self.data, out)
 
         if self.progress_changed:
             progresses = dict()

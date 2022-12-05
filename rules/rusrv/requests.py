@@ -77,7 +77,7 @@ class Requests:
             return
 
         if not self.admin.htaccessPath(i_file):
-            o_out['error'] = 'Permissions denied';
+            out['error'] = 'Permissions denied';
             return
 
         data = rulib.functions.fileRead(i_file)
