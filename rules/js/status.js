@@ -121,8 +121,10 @@ function st_Show(i_status)
 	}
 }
 
-function st_Update(i_status)
+function st_UpdateCurrent(i_status)
 {
+	RULES.status = i_status;
+
 	if (st_Status)
 	{
 		st_Status.update(i_status);
@@ -131,6 +133,12 @@ function st_Update(i_status)
 	{
 		st_Status = new Status(i_status);
 	}
+}
+
+function st_ReloadFile()
+{
+	if (st_Status)
+		st_Status.reloadFile();
 }
 
 function Status(i_obj, i_args)
@@ -168,7 +176,7 @@ function Status(i_obj, i_args)
 		this.elEditBtn.m_status = this;
 		this.elEditBtn.onclick = function(e) {
 			e.stopPropagation();
-			e.currentTarget.m_status.updateOrEdit();
+			e.currentTarget.m_status.reloadFile(/*edit=*/true);
 		};
 	}
 
@@ -819,12 +827,13 @@ function st_SetElFinish(i_status, i_elFinish, i_full)
 	i_elFinish.textContent = text;
 }
 
-Status.prototype.updateOrEdit = function()
+Status.prototype.reloadFile = function(i_edit = false)
 {
 	n_GetFile({
 		"path": c_GetRuFilePath('status.json', this.path),
 		"func": st_StatusReceived,
 		"status_object": this,
+		"edit": i_edit,
 		"info": 'status',
 		"parse": true,
 		"local": true,
@@ -834,10 +843,13 @@ Status.prototype.updateOrEdit = function()
 
 function st_StatusReceived(i_data, i_args)
 {
-	i_args.status_object.received(i_data.status);
+	if (i_args.edit)
+		i_args.status_object.updateOrEdit(i_data.status);
+	else
+		i_args.status_object.update(i_data.status);
 }
 
-Status.prototype.received = function(i_status)
+Status.prototype.updateOrEdit = function(i_status)
 {
 	if (i_status && i_status.mtime && (i_status.mtime > this.obj.mtime))
 		this.update(i_status);

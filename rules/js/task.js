@@ -142,7 +142,7 @@ function Task(i_statusClass, i_task)
 		this.elBtnEdit = document.createElement('button');
 		this.elBtnEdit.classList.add('button','edit','right');
 		this.elBtnEdit.m_task = this;
-		this.elBtnEdit.onclick = function(e){e.stopPropagation();e.currentTarget.m_task.updateOrEdit();}
+		this.elBtnEdit.onclick = function(e){e.stopPropagation();e.currentTarget.m_task.reloadBeforeEdit();}
 		this.elShow.appendChild(this.elBtnEdit);
 	}
 
@@ -253,10 +253,10 @@ Task.prototype.deselect = function()
 	this.elRoot.classList.remove('selected');
 }
 
-Task.prototype.updateOrEdit = function()
+Task.prototype.reloadBeforeEdit = function()
 {
 	n_GetFile({
-		"path": c_GetRuFilePath('status.json', this.path),
+		"path": c_GetRuFilePath('status.json', this.statusClass.path),
 		"func": task_StatusReceived,
 		"task_object": this,
 		"info": 'status.task',
@@ -271,10 +271,10 @@ function task_StatusReceived(i_data, i_args)
 	if (null == i_data.status)
 		c_Error("Invalid status received:<br>" + JSON.stringify(i_data));
 	else
-		i_args.task_object.received(i_data.status);
+		i_args.task_object.updateOrEdit(i_data.status);
 }
 
-Task.prototype.received = function(i_status)
+Task.prototype.updateOrEdit = function(i_status)
 {
 	if (i_status.mtime > this.statusClass.obj.mtime)
 		this.statusClass.update(i_status);
@@ -509,7 +509,54 @@ Task.prototype.editProcess = function()
 	// We should calculate status progress
 	// if task progress is changed
 	// or if it is a new task
-	this.save(this_is_a_new_task || (progress_prevous != this.obj.progress));
+	this.save(this_is_a_new_task || (progress_prevous != this.obj.progress));return;
+
+	let obj = {};
+	obj.path = this.statusClass.path;
+	let fields = ['name','atrists','flags','tags','progress','annotation'];
+	for (let f of fields)
+		obj[f] = this.obj[f];
+	if (nw_disabled)
+		obj.nonews = true;
+
+	n_Request({'send':{'settask':obj},'func':task_saved,'info':'status.setTask','wait':false});
+}
+
+function task_saved(i_data, i_args)
+{
+	if (i_data.error)
+	{
+		c_Error(i_data.error);
+		return;
+	}
+
+	// Update current status:
+	RULES.status = i_data.status;
+	st_Show(i_data.status);
+
+	// Get news if subscribed:
+	if (i_data.users_subscribed && (i_data.users_subscribed.indexOf(g_auth_user.id) != -1))
+	{
+		nw_NewsLoad();
+		nw_RecentLoad({"file_check": false});
+	}
+
+	// Get bookmarks:
+	if (i_data.users_changed && (i_data.users_changed.indexOf(g_auth_user.id) != -1))
+	{
+		bm_Load({'info': 'statuses'});
+	}
+
+	if (i_data.users_subscribed && i_data.users_subscribed.length)
+	{
+		let info = 'Subscribed users: ';
+		for (let i = 0; i < i_data.users_subscribed.length; i++)
+		{
+			if (i) info += ', ';
+			info += c_GetUserTitle(i_data.users_subscribed[i]);
+		}
+		c_Info(info);
+	}
 }
 
 Task.prototype.save = function(i_progress_changed)

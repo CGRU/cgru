@@ -274,6 +274,43 @@ class Requests:
         return
 
 
+    def req_settask(self, i_args, out):
+
+        if self.session.USER_ID is None:
+            o_out['error'] = 'Guests are not allowed to edit tasks.'
+            return
+
+        if not 'path' in i_args:
+            out['error'] = 'Path is not specified.'
+            return
+
+        s = rulib.status.Status(uid=self.session.USER_ID, path=i_args['path'])
+
+        name       = None
+        tags       = None
+        artists    = None
+        flags      = None
+        progress   = None
+        annotation = None
+        deleted    = None
+
+        if 'name'       in i_args: name       = i_args['name']
+        if 'tags'       in i_args: tags       = i_args['tags']
+        if 'artists'    in i_args: artists    = i_args['artists']
+        if 'flags'      in i_args: flags      = i_args['flags']
+        if 'progress'   in i_args: progress   = i_args['progress']
+        if 'annotation' in i_args: annotation = i_args['annotation']
+        if 'deleted'    in i_args: deleted    = i_args['deleted']
+
+        s.setTask(name=name, tags=tags, artists=artists, flags=flags, progress=progress, annotation=annotation, deleted=deleted, out=out)
+
+        nonews = False
+        if nonews in i_args and i_args['nonews']: nonews = True
+        s.save(out=out, nonews=nonews)
+
+        return
+
+
     def req_search(self, i_args, o_out):
         if not 'path' in i_args:
             o_out['error'] = 'Search path is not specified.'

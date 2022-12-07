@@ -570,6 +570,21 @@ function nw_NewsReceived(i_data)
 			g_auth_user.news.push(news[i]);
 
 	nw_NewsShow();
+
+	// Update current location status:
+	for (let i = 0; i < g_auth_user.news.length; i++)
+	{
+		let news = g_auth_user.news[i];
+
+		if (news.path != g_CurPath()) continue;
+		if (news.status == null) break;
+
+		if (RULES.status && RULES.status.mtime && (RULES.status.mtime >= news.status.mtime))
+			break;
+
+		st_UpdateCurrent(news.status);
+		break;
+	}
 }
 
 function nw_NewsShow(i_update_folders)
@@ -700,13 +715,6 @@ function nw_NewsShow(i_update_folders)
 
 			// Update folder status:
 			g_FolderSetStatus(news.status, el);
-
-			// Update current location status:
-			if (news.path == g_CurPath())
-			{
-				RULES.status = news.status;
-				st_Update(news.status);
-			}
 
 			// Remove walk cache:
 			if (n_walks[news.path])

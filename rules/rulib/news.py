@@ -3,7 +3,7 @@ import time
 
 import rulib
 
-def makeNewsAndBookmarks(i_args, i_uid, out):
+def makeNewsAndBookmarks(i_args, i_uid, out=dict(), nonews=False):
     # Read all users:
     users = rulib.functions.readAllUsers(out, True)
     if 'error' in out:
@@ -25,6 +25,12 @@ def makeNewsAndBookmarks(i_args, i_uid, out):
     for news in i_news:
         if 'news' in news:
             news = news['news']
+
+        bookmarks.append({'status':news['status'],'path':news['path']})
+
+        if nonews:
+            continue
+
         ids = makeNewsUno(news, users, i_uid, out)
         if 'error' in out:
             return
@@ -33,8 +39,6 @@ def makeNewsAndBookmarks(i_args, i_uid, out):
             for id in ids:
                 if not id in users_changed:
                     users_changed.append(id)
-
-        bookmarks.append({'status':news['status'],'path':news['path']})
 
     if 'bookmarks' in i_args:
         bookmarks = i_args['bookmarks']
@@ -335,9 +339,9 @@ def filterStatus(i_sdata):
     return sdata
 
 
-def statusChanged(i_status, out=dict()):
+def statusChanged(i_status, out=dict(), nonews=False):
     news = createNews(title='status', path=i_status.path, uid=i_status.muser, status=i_status.data)
-    makeNewsAndBookmarks({'news':[news]}, i_status.muser, out)
+    makeNewsAndBookmarks({'news':[news]}, i_status.muser, out=out, nonews=nonews)
 
 
 def createNews(title='news',uid=None,path=None,status=None):

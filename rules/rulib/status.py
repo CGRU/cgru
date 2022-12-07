@@ -39,11 +39,11 @@ def saveStatusData(i_path, i_data, out=None):
 
 class Status:
 
-    def __init__(self, i_uid = None, i_path = None):
+    def __init__(self, uid=None, path=None):
 
-        self.path = rulib.functions.getRootPath(i_path)
+        self.path = rulib.functions.getRootPath(path)
 
-        self.muser = i_uid
+        self.muser = uid
         if self.muser is None:
             self.muser = rulib.functions.getCurUser()
         self.mtime = rulib.functions.getCurSeconds()
@@ -209,16 +209,19 @@ class Status:
                     del self.data['tasks'][t]['changed']
 
 
-    def save(self, out=dict(), news=True):
+    def save(self, out=dict(), nonews=False):
         self.data['mtime'] = self.mtime
         self.data['muser'] = self.muser
 
-        rulib.news.statusChanged(self, out)
+        rulib.news.statusChanged(self, out, nonews)
 
         self.prepareDataForSave()
 
         saveStatusData(self.path, self.data, out)
 
+        out['status'] = self.data
+
+        print(self.progress_changed)
         if self.progress_changed:
             progresses = dict()
             progresses[self.path] = self.data['progress']
@@ -226,6 +229,7 @@ class Status:
 
 
 def updateUpperProgresses(i_path, i_progresses):
+    print(i_path)
     path = ''
     folders = []
     for folder in i_path.split('/'):
@@ -235,8 +239,9 @@ def updateUpperProgresses(i_path, i_progresses):
 
     folders.reverse()
     for folder in folders:
+        print(folder)
         try:
-            listdir = os.listdir(folder)
+            listdir = os.listdir(rulib.functions.getAbsPath(folder))
         except:
             return
 
@@ -255,7 +260,7 @@ def updateUpperProgresses(i_path, i_progresses):
                 if sdata and 'progress' in sdata:
                     progress = sdata['progress']
 
-            #print(entry, progress)
+            print(entry, progress)
 
             if progress < 0:
                 continue
@@ -269,7 +274,7 @@ def updateUpperProgresses(i_path, i_progresses):
         progress_avg = int(progress_sum / progress_count)
         i_progresses[folder] = progress_avg
 
-        #print("%s %d%%" % (folder, progress_avg))
+        print("%s %d%%" % (folder, progress_avg))
 
         sdata = getStatusData(folder)
         if sdata is None:
