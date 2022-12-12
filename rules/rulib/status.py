@@ -221,15 +221,14 @@ class Status:
 
         out['status'] = self.data
 
-        print(self.progress_changed)
         if self.progress_changed:
             progresses = dict()
             progresses[self.path] = self.data['progress']
-            updateUpperProgresses(os.path.dirname(self.path), progresses)
+            updateUpperProgresses(os.path.dirname(self.path), progresses, out)
 
 
-def updateUpperProgresses(i_path, i_progresses):
-    print(i_path)
+def updateUpperProgresses(i_path, i_progresses, out):
+    #print(i_path)
     path = ''
     folders = []
     for folder in i_path.split('/'):
@@ -237,9 +236,11 @@ def updateUpperProgresses(i_path, i_progresses):
         path += '/' + folder
         folders.append(path)
 
+    out['progresses'] = dict()
+
     folders.reverse()
     for folder in folders:
-        print(folder)
+        #print(folder)
         try:
             listdir = os.listdir(rulib.functions.getAbsPath(folder))
         except:
@@ -260,7 +261,7 @@ def updateUpperProgresses(i_path, i_progresses):
                 if sdata and 'progress' in sdata:
                     progress = sdata['progress']
 
-            print(entry, progress)
+            #print(entry, progress)
 
             if progress < 0:
                 continue
@@ -274,7 +275,7 @@ def updateUpperProgresses(i_path, i_progresses):
         progress_avg = int(progress_sum / progress_count)
         i_progresses[folder] = progress_avg
 
-        print("%s %d%%" % (folder, progress_avg))
+        #print("%s %d%%" % (folder, progress_avg))
 
         sdata = getStatusData(folder)
         if sdata is None:
@@ -282,3 +283,5 @@ def updateUpperProgresses(i_path, i_progresses):
         else:
             sdata['progress'] = progress_avg
         saveStatusData(folder, sdata)
+
+        out['progresses'][folder] = progress_avg

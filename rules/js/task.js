@@ -509,7 +509,7 @@ Task.prototype.editProcess = function()
 	// We should calculate status progress
 	// if task progress is changed
 	// or if it is a new task
-	this.save(this_is_a_new_task || (progress_prevous != this.obj.progress));return;
+	//this.save(this_is_a_new_task || (progress_prevous != this.obj.progress));return;
 
 	let obj = {};
 	obj.path = this.statusClass.path;
@@ -519,44 +519,7 @@ Task.prototype.editProcess = function()
 	if (nw_disabled)
 		obj.nonews = true;
 
-	n_Request({'send':{'settask':obj},'func':task_saved,'info':'status.setTask','wait':false});
-}
-
-function task_saved(i_data, i_args)
-{
-	if (i_data.error)
-	{
-		c_Error(i_data.error);
-		return;
-	}
-
-	// Update current status:
-	RULES.status = i_data.status;
-	st_Show(i_data.status);
-
-	// Get news if subscribed:
-	if (i_data.users_subscribed && (i_data.users_subscribed.indexOf(g_auth_user.id) != -1))
-	{
-		nw_NewsLoad();
-		nw_RecentLoad({"file_check": false});
-	}
-
-	// Get bookmarks:
-	if (i_data.users_changed && (i_data.users_changed.indexOf(g_auth_user.id) != -1))
-	{
-		bm_Load({'info': 'statuses'});
-	}
-
-	if (i_data.users_subscribed && i_data.users_subscribed.length)
-	{
-		let info = 'Subscribed users: ';
-		for (let i = 0; i < i_data.users_subscribed.length; i++)
-		{
-			if (i) info += ', ';
-			info += c_GetUserTitle(i_data.users_subscribed[i]);
-		}
-		c_Info(info);
-	}
+	n_Request({'send':{'settask':obj},'func':st_StatusesSaved,'info':'status.setTask','wait':false});
 }
 
 Task.prototype.save = function(i_progress_changed)

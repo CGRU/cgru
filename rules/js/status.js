@@ -1665,6 +1665,56 @@ function st_SaveFinished(i_data)
 	}
 }
 
+function st_StatusesSaved(i_data)
+{
+	if (i_data.error)
+	{
+		c_Error(i_data.error);
+		return;
+	}
+
+	// Update current status:
+	if (i_data.status)
+	{
+		RULES.status = i_data.status;
+		st_Show(i_data.status);
+	}
+
+	// Get news if subscribed:
+	if (i_data.users_subscribed && (i_data.users_subscribed.indexOf(g_auth_user.id) != -1))
+	{
+		nw_NewsLoad();
+		nw_RecentLoad({"file_check": false});
+	}
+
+	// Get bookmarks:
+	if (i_data.users_changed && (i_data.users_changed.indexOf(g_auth_user.id) != -1))
+	{
+		bm_Load({'info': 'statuses'});
+	}
+
+	if (i_data.users_subscribed && i_data.users_subscribed.length)
+	{
+		let info = 'Subscribed users: ';
+		for (let i = 0; i < i_data.users_subscribed.length; i++)
+		{
+			if (i) info += ', ';
+			info += c_GetUserTitle(i_data.users_subscribed[i]);
+		}
+		c_Info(info);
+	}
+
+	// Update navigation folders progresses:
+	let progresses = i_data.progresses;
+	if (progresses)
+	{
+		for (let path in progresses)
+		{
+			g_FolderSetStatusPath({'progress':progresses[path]}, path, {'progress':true});
+		}
+	}
+}
+
 function st_SetFramesNumber(i_num)
 {
 	if (RULES.status == null)
