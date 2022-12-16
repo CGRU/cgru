@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 
-import cgruconfig
-
+import os
 import smtplib
 import socket
-
-from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-
+from email.mime.text import MIMEText
 from optparse import OptionParser
 
+import cgruconfig
+
 Parser = OptionParser(
-	usage="%prog [options] message\ntype \"%prog -h\" for help",
-	version="%prog 1.0"
+    usage="%prog [options] message\ntype \"%prog -h\" for help",
+    version="%prog 1.0"
 )
 
 Parser.add_option('-f', '--from',       dest='sender',       type='string',                  default='',      help='Sender email address.')
@@ -25,13 +24,13 @@ Parser.add_option('-D', '--DEBUG',      dest='debug',      action='store_true', 
 Options, Args = Parser.parse_args()
 
 if Options.debug:
-	Options.verbose = True
+    Options.verbose = True
 
 if Options.sender == '':
-	Options.sender = cgruconfig.VARS['USERNAME'] + '@' + socket.gethostname()
+    Options.sender = cgruconfig.VARS['USERNAME'] + '@' + socket.gethostname()
 
 if Options.smtpserver == '':
-	Options.smtpserver = cgruconfig.VARS['email_smtp_server']
+    Options.smtpserver = cgruconfig.VARS['email_smtp_server']
 
 html = """
 <html>
@@ -56,13 +55,16 @@ msg['From'] = Options.sender
 msg['To'] = ', '.join(Options.to)
 
 if Options.verbose:
-	print('SMTP Host: %s' % Options.smtpserver)
-	print(msg)
+    print('SMTP Host: %s' % Options.smtpserver)
+    print(msg)
 
 if not Options.debug:
-	smtp = smtplib.SMTP(Options.smtpserver)
-	smtp.sendmail(Options.sender, Options.to, msg.as_string())
-	smtp.quit()
+    smtp = smtplib.SMTP(Options.smtpserver)
+    username = os.getenv("CGRU_EMAILSEND_USER")
+    password = os.getenv("CGRU_EMAILSEND_PASSWORD")
+    if username and password:
+        smtp.login(username, password)
+    smtp.sendmail(Options.sender, Options.to, msg.as_string())
+    smtp.quit()
 else:
-	print('DEBUG MODE. Skipping execution.')
-
+    print('DEBUG MODE. Skipping execution.')
