@@ -513,7 +513,7 @@ Task.prototype.editProcess = function()
 
 	let obj = {};
 	obj.path = this.statusClass.path;
-	let fields = ['name','atrists','flags','tags','progress','annotation'];
+	let fields = ['name','artists','flags','tags','progress','annotation'];
 	for (let f of fields)
 		obj[f] = this.obj[f];
 	if (nw_disabled)
