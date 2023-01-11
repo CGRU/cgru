@@ -488,9 +488,12 @@ Task.prototype.editProcess = function()
 	st_SetStatusFlags(this.obj, this.editFlags.getSelectedObjects());
 
 	// Artists:
-	let artists = this.editAritsts.getSelectedNames();
-	if (null !== artists )
-		this.obj.artists = artists;
+	if (c_CanAssignArtists())
+	{
+		let artists = this.editAritsts.getSelectedNames();
+		if (null !== artists)
+			this.obj.artists = artists;
+	}
 
 	// Annotation:
 	let annotation = this.elEditAnnotationContent.textContent;
@@ -509,7 +512,7 @@ Task.prototype.editProcess = function()
 	// We should calculate status progress
 	// if task progress is changed
 	// or if it is a new task
-	//this.save(this_is_a_new_task || (progress_prevous != this.obj.progress));return;
+	this.save(this_is_a_new_task || (progress_prevous != this.obj.progress));return;
 
 	let obj = {};
 	obj.path = this.statusClass.path;
