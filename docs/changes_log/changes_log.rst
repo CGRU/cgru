@@ -15,7 +15,11 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
 v3.3.1
 ======
 
-2022.09.22 *(not released)*
+2023.01.11 *(not released)*
+
+- Afanasy can be configured not to cut domain names from user and host names.
+  New parameters ``af_render_cut_domain_name`` and ``af_user_cut_domain_name`` added to control this.
+  The default behaviour is the same as before, domain names will be cut.
 
 - Afanasy statistics database tables got new rows.
   Job blocks got job serial. Tasks run got job serial, block and task ids.
@@ -23,9 +27,11 @@ v3.3.1
 
 - Houdini Afanasy ROP can set extra
   `environment <../software/houdini.html#environment>`_
-  variables that will be addded to task process.
+  variables that will be added to task process.
 
-- Afwatch can edit job block environmet variables.
+- Afwatch can edit job block environment variables.
+
+- Rules Python API started.
 
 .. _changes-log-latest:
 

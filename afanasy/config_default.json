@@ -134,6 +134,8 @@
 		"":"Percentage of a free memomry, swap and hdd, to consider thar render overflowed",
 		"":"-1 disables checking.",
 
+	"af_render_cut_domain_name":true,
+
 	"":"",
 
 "":"Thumbnail:",
@@ -147,6 +149,7 @@
 	"af_errors_forgivetime":18000,
 	"af_max_run_tasks_per_host":-1,
 	"af_jobs_life_time":0,
+	"af_user_cut_domain_name":true,
 
 "":"Monitor: (server side - any gui)",
 	"af_monitor_zombietime":16,

@@ -85,7 +85,7 @@ std::string Environment::render_gpuinfo_nvidia_cmd =   AFRENDER::GPUINFO_NVIDIA_
 std::string Environment::render_networkif =            AFRENDER::NETWORK_IF;
 std::string Environment::render_hddspace_path =        AFRENDER::HDDSPACE_PATH;
 std::string Environment::render_iostat_device =        AFRENDER::IOSTAT_DEVICE;
-
+bool Environment::render_cut_domain_name =             AFRENDER::CUT_DOMAIN_NAME;
 int Environment::render_overflow_mem  = -1;
 int Environment::render_overflow_swap = -1;
 int Environment::render_overflow_hdd  = -1;
@@ -96,6 +96,7 @@ int     Environment::errors_forgivetime =              AFUSER::ERRORS_FORGIVETIM
 int     Environment::errors_avoid_host =               AFUSER::ERRORS_AVOID_HOST;
 int     Environment::task_error_retries =              AFUSER::TASK_ERROR_RETRIES;
 int     Environment::task_errors_same_host =           AFUSER::TASK_ERRORS_SAME_HOST;
+bool Environment::user_cut_domain_name =               AFUSER::CUT_DOMAIN_NAME;
 
 int         Environment::sysjob_tasklife =            AFJOB::SYSJOB_TASKLIFE;
 int         Environment::sysjob_tasksmax =            AFJOB::SYSJOB_TASKSMAX;
@@ -152,6 +153,7 @@ std::string Environment::store_folder_pools;
 std::string Environment::timeformat =                 AFGENERAL::TIME_FORMAT;
 std::string Environment::servername =                 AFADDR::SERVER_NAME;
 int Environment::ipv6_disable = 0;
+std::string Environment::loginname;
 std::string Environment::username;
 std::string Environment::computername;
 std::string Environment::hostname;
@@ -296,11 +298,12 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, render_overflow_mem,               "af_render_overflow_mem"               );
 	getVar( i_obj, render_overflow_swap,              "af_render_overflow_swap"              );
 	getVar( i_obj, render_overflow_hdd,               "af_render_overflow_hdd"               );
-
 	getVar( i_obj, rendercmds,                        "af_rendercmds"                        );
 	getVar( i_obj, rendercmds_admin,                  "af_rendercmds_admin"                  );
 	getVar( i_obj, render_launch_cmds,                "af_render_launch_cmds"                );
 	getVar( i_obj, render_launch_cmds_exit,           "af_render_launch_cmds_exit"           );
+	getVar( i_obj, render_cut_domain_name,            "af_render_cut_domain_name"            );
+
 	getVar( i_obj, watch_get_events_sec,              "af_watch_get_events_sec"              );
 	getVar( i_obj, watch_refresh_gui_sec,             "af_watch_refresh_gui_sec"             );
 	getVar( i_obj, watch_connection_lost_time,        "af_watch_connection_lost_time"        );
@@ -313,6 +316,7 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, errors_avoid_host,                 "af_errors_avoid_host"                 );
 	getVar( i_obj, task_error_retries,                "af_task_error_retries"                );
 	getVar( i_obj, task_errors_same_host,             "af_task_errors_same_host"             );
+	getVar( i_obj, user_cut_domain_name,              "af_user_cut_domain_name"              );
 
 	getVar( i_obj, sysjob_tasklife,                   "af_sysjob_tasklife"                   );
 	getVar( i_obj, sysjob_tasksmax,                   "af_sysjob_tasksmax"                   );
@@ -547,43 +551,34 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 		AFERRAR("Can't make home directory '%s'", home_afanasy.c_str())
 	}
 //
-//############ user name:
-	getArgument("-username", username);
-	if( username.empty()) username = af::getenv("AF_USERNAME");
-	if( username.empty()) username = af::getenv("USER");
-	if( username.empty()) username = af::getenv("USERNAME");
-	if( username.empty())
-	{
+//############ Logged in user name:
 #ifdef WINNT
+	loginname = af::getenv("USERNAME");
+	if (loginname.empty())
+	{
 		 char acUserName[256];
 		 DWORD nUserName = sizeof(acUserName);
-		 if( GetUserName(acUserName, &nUserName)) username = acUserName;
+		 if (GetUserName(acUserName, &nUserName))
+			 loginname = acUserName;
+	}
 #else
-		 uid_t uid = geteuid ();
-		 struct passwd * pw = getpwuid (uid);
-		 if( pw ) username = pw->pw_name;
-#endif
-	}
-	if( username.empty()) username = "unknown";
-
-	// Convert to lowercase:
-	std::transform(username.begin(), username.end(), username.begin(), ::tolower);
-
-	// cut DOMAIN
+	loginname = af::getenv("USER");
+	if (loginname.empty())
 	{
-		size_t dpos = username.rfind('/');
-		if (dpos == std::string::npos)
-			dpos = username.rfind('\\');
-		if (dpos != std::string::npos)
-			username = username.substr( dpos + 1);
+		 uid_t uid = geteuid();
+		 struct passwd * pw = getpwuid(uid);
+		 if (pw)
+			 loginname = pw->pw_name;
 	}
-
-	PRINT("Afanasy user name = '%s'\n", username.c_str());
+#endif
+	if (loginname.empty())
+	{
+		loginname = "unknown";
+	}
+	PRINT("Logged in name = '%s'\n", loginname.c_str());
 
 //
-//############ Local host name:
-	getArgument("-hostname", hostname);
-	if( hostname.empty()) hostname = af::getenv("AF_HOSTNAME");
+//############ Local computer name:
 #ifdef WINNT
 	computername = af::getenv("COMPUTERNAME");
 	WSADATA wsaData;
@@ -612,23 +607,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 		}
 		computername = buffer;
 	}
-
-	if(hostname.empty())
-		hostname = computername;
-
-	// To lower case:
-	std::transform(hostname.begin(), hostname.end(), hostname.begin(), ::tolower);
-	std::transform(computername.begin(), computername.end(), computername.begin(), ::tolower);
-
-	// Cut DOMAIN:
-	{
-		size_t dpos = hostname.find('.');
-		if (dpos != std::string::npos)
-			hostname = hostname.substr(0, dpos);
-	}
-
 	PRINT("Local computer name = '%s'\n", computername.c_str());
-	PRINT("Afanasy host name = '%s'\n", hostname.c_str());
 
 //
 //############ Platform: #############################
@@ -913,6 +892,56 @@ bool Environment::passwdCheckGOD(const std::string & i_passwd)
 // Initialize environment after all variables are loaded (set to default values)
 bool Environment::initAfterLoad()
 {
+	// Afanasy host name:
+	hostname.clear();
+	getArgument("-hostname", hostname);
+	if(hostname.empty())
+	{
+		hostname = af::getenv("AF_HOSTNAME");
+	}
+	if(hostname.empty())
+	{
+		hostname = computername;
+
+		// To lower case:
+		std::transform(hostname.begin(), hostname.end(), hostname.begin(), ::tolower);
+
+		// Cut DOMAIN from host name:
+		if (render_cut_domain_name)
+		{
+			size_t dpos = hostname.find('.');
+			if (dpos != std::string::npos)
+				hostname = hostname.substr(0, dpos);
+		}
+	}
+	PRINT("Afanasy host name = '%s'\n", hostname.c_str());
+
+	// Afanasy user name:
+	username.clear();
+	getArgument("-username", username);
+	if (username.empty())
+	{
+		username = af::getenv("AF_USERNAME");
+	}
+	if (username.empty())
+	{
+		username = loginname;
+
+		// Convert to lowercase:
+		std::transform(username.begin(), username.end(), username.begin(), ::tolower);
+
+		// Cut DOMAIN from username:
+		if (user_cut_domain_name)
+		{
+			size_t dpos = username.rfind('/');
+			if (dpos == std::string::npos)
+				dpos = username.rfind('\\');
+			if (dpos != std::string::npos)
+				username = username.substr(dpos + 1);
+		}
+	}
+	PRINT("Afanasy user name = '%s'\n", username.c_str());
+
 	// Store folders:
 	store_folder_branches= store_folder + AFGENERAL::PATH_SEPARATOR + AFBRANCH::STORE_FOLDER;
 	store_folder_jobs    = store_folder + AFGENERAL::PATH_SEPARATOR +    AFJOB::STORE_FOLDER;
