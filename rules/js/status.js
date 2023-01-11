@@ -31,6 +31,11 @@ function st_Init()
 function st_InitAuth()
 {
 	$('status_edit_btn').style.display = 'block';
+	if (c_CanEditShot())
+	{
+		$('status_tasks_btn_add').style.display = 'block';
+		$('status_tasks_btn_add_artist').style.display = 'block';
+	}
 }
 
 function st_Finish()
