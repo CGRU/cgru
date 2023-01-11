@@ -178,6 +178,8 @@ function Status(i_obj, i_args)
 			e.stopPropagation();
 			e.currentTarget.m_status.reloadFile(/*edit=*/true);
 		};
+		if (false == c_CanEditShot())
+			this.elEditBtn.style.display = 'none';
 	}
 
 	this.path = i_args.path;

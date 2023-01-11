@@ -552,6 +552,18 @@ function c_CanCreateShot(i_user)
 	return false;
 }
 
+function c_CanEditShot(i_user)
+{
+	if (i_user == null)
+		i_user = g_auth_user;
+	if (i_user == null)
+		return false;
+
+	if ((['admin', 'coord', 'user']).indexOf(i_user.role) != -1)
+		return true;
+	return false;
+}
+
 function c_CanCreateProject(i_user)
 {
 	if (g_admin)
