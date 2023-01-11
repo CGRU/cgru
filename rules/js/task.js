@@ -137,7 +137,7 @@ function Task(i_statusClass, i_task)
 	this.elShow.appendChild(this.elFlags);
 
 
-	if (c_CanEditTasks())
+	if (c_CanEditTask(this.obj))
 	{
 		this.elBtnEdit = document.createElement('button');
 		this.elBtnEdit.classList.add('button','edit','right');

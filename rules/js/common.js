@@ -507,6 +507,7 @@ function c_CanAssignArtists(i_user)
 
 function c_CanEditTasks(i_user)
 {
+// Not used now. Was used in OLD tasks.
 	return c_IsUserStateSet(i_user, 'edittasks');
 }
 
@@ -561,6 +562,24 @@ function c_CanEditShot(i_user)
 
 	if ((['admin', 'coord', 'user']).indexOf(i_user.role) != -1)
 		return true;
+	return false;
+}
+
+function c_CanEditTask(i_task, i_user)
+{
+	if (i_user == null)
+		i_user = g_auth_user;
+	if (i_user == null)
+		return false;
+
+	if ((['admin', 'coord', 'user']).indexOf(i_user.role) != -1)
+		return true;
+
+	if ((i_task == null) || (i_task.artists == null))
+		return false;
+	if (i_task.artists.indexOf(i_user.id) != -1)
+		return true;
+
 	return false;
 }
 
