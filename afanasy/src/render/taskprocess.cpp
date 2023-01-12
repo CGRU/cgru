@@ -85,6 +85,7 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec, RenderHost * i_render):
 	m_stop_time( 0),
 	m_pid(0),
 	m_commands_launched(0),
+	m_command_launch_time(0),
 	m_doing_post( false),
 	m_closed( false),
 	m_zombie( false),
@@ -158,6 +159,7 @@ void TaskProcess::launchCommand()
 	closeHandles();
 
 	m_commands_launched++;
+	m_command_launch_time = time(NULL);
 
 	#ifdef WINNT
 	DWORD priority = NORMAL_PRIORITY_CLASS;
@@ -542,7 +544,8 @@ void TaskProcess::sendTaskSate()
 void TaskProcess::processFinished( int i_exitCode)
 {
 	AF_LOG << "Finished PID=" << m_pid << ": Exit Code=" << i_exitCode
-		<< " Status=" << WEXITSTATUS( i_exitCode) << (m_stop_time ? " (stopped)":"");
+		<< " Status=" << WEXITSTATUS( i_exitCode) << (m_stop_time ? " (stopped)":"")
+		<< " Time=" << af::time2strHMS(time(NULL) - m_command_launch_time, true);
 
 	// Zero m_pid means that task is not running any more
 	m_pid = 0;
