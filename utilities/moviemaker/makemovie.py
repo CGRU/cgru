@@ -44,7 +44,7 @@ Parser.add_option('-a', '--avcmd',      dest='avcmd',       type  ='string',    
 Parser.add_option('-c', '--codec',      dest='codec',       type  ='string',     default='h264_mid',  help='Encode command file')
 Parser.add_option('-f', '--fps',        dest='fps',         type  ='string',     default='25',        help='Frames per second')
 Parser.add_option('-t', '--template',   dest='template',    type  ='string',     default='',          help='Specify frame template to use')
-Parser.add_option('-s', '--slate',      dest='slate',       type  ='string',     default='',          help='Specify slate frame template')
+Parser.add_option('-s', '--slate',      dest='slate',       type  ='string',     default=None,        help='Specify slate frame template')
 Parser.add_option('-n', '--container',  dest='container',   type  ='string',     default=None,        help='Container')
 Parser.add_option('--fs',               dest='framestart',  type  ='int',        default=-1,          help='First frame to use, -1 use the first found')
 Parser.add_option('--fe',               dest='frameend',    type  ='int',        default=-1,          help='Last frame to use, -1 use the last found')
@@ -83,11 +83,11 @@ Parser.add_option('--artist',           dest='artist',         type  ='string', 
 Parser.add_option('--activity',         dest='activity',       type  ='string',     default='',          help='Draw activity')
 Parser.add_option('--comments',         dest='comments',       type  ='string',     default='',          help='Draw comments')
 Parser.add_option('--font',             dest='font',           type  ='string',     default='',          help='Specify font)')
-Parser.add_option('--lgspath',          dest='lgspath',        type  ='string',     default='',          help='Slate logotype path')
-Parser.add_option('--lgssize',          dest='lgssize',        type  ='int',        default=25,   	      help='Slate logotype size, percent of image')
+Parser.add_option('--lgspath',          dest='lgspath',        type  ='string',     default=None,        help='Slate logotype path')
+Parser.add_option('--lgssize',          dest='lgssize',        type  ='int',        default=25,   	 help='Slate logotype size, percent of image')
 Parser.add_option('--lgsgrav',          dest='lgsgrav',        type  ='string',     default='southeast', help='Slate logotype positioning gravity')
 Parser.add_option('--lgfpath',          dest='lgfpath',        type  ='string',     default='',          help='Flrame logotype path')
-Parser.add_option('--lgfsize',          dest='lgfsize',        type  ='int',        default=10,   	      help='Flrame logotype size, percent of image')
+Parser.add_option('--lgfsize',          dest='lgfsize',        type  ='int',        default=10,   	 help='Flrame logotype size, percent of image')
 Parser.add_option('--lgfgrav',          dest='lgfgrav',        type  ='string',     default='north',     help='Flrame logotype positioning gravity')
 Parser.add_option('--cacher_aspect',    dest='cacher_aspect',  type  ='float',      default=1.85,        help='Cacher aspect')
 Parser.add_option('--cacher_opacity',   dest='cacher_opacity', type  ='int',        default=0,           help='Cacher opacity')
@@ -102,7 +102,7 @@ Parser.add_option('--pargs',            dest='pargs',          type  = 'string',
 Parser.add_option('--pdir',             dest='pdir',           type  = 'string',    default='',          help='Preview output folder')
 Parser.add_option('--createoutdir',     dest='createoutdir',   action='store_true', default=False,       help='Create output folder if it not exists')
 Parser.add_option('--stereodub',        dest='stereodub',      action='store_true', default=False,       help='Force stereo mode, if only one sequence provided')
-Parser.add_option('--scale',            dest='scale',          type  = 'int',       default=0,          help='Movie encoding scale')
+Parser.add_option('--scale',            dest='scale',          type  = 'int',       default=0,           help='Movie encoding scale')
 
 Options, args = Parser.parse_args()
 
@@ -244,7 +244,7 @@ if Verbose:
 localtime = time.localtime()
 if Options.faketime:
 	localtime = time.localtime(1.0 * Options.faketime)
-datetimestring = time.strftime('%y-%m-%d', localtime)
+datetimestring = time.strftime('%Y.%m.%d', localtime)
 datetimesuffix = ''
 
 if Datesuffix:
@@ -551,7 +551,7 @@ logograv = [Options.lgsgrav, Options.lgfgrav]
 tmplogo = [tmplgs, tmplgf]
 logoname = ['slate', 'frame']
 for i in range(2):
-	if logopath[i] != '':
+	if logopath[i] is not None:
 		if need_convert:
 			if not os.path.isfile(logopath[i]):
 				logopath[i] = os.path.join(LOGOSDIR, logopath[i])
@@ -579,9 +579,9 @@ img_convert = []
 name_convert = []
 
 # Generate header:
-if need_convert and Options.slate != '':
+if need_convert and Options.slate is not None:
 	cmd = cmd_makeframe + cmd_args
-	if Options.lgspath != '':
+	if Options.lgspath is not None:
 		cmd += ' --logopath "%s"' % tmplogo[0]
 	cmd += ' --drawcolorbars' + cmd_args
 	cmd += ' -t "%s"' % Options.slate
