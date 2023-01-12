@@ -138,6 +138,10 @@ def walkdir(i_path, i_upwalk = False, i_curdepth = 0):
 
     for entry in entries:
 
+        #entry = entry.encode('utf8','replace').decode('utf8','replace')
+        #entry = entry.encode('utf8','replace').decode('utf8')
+        #entry = entry.encode('utf8','backslashreplace').decode('utf8','replace')
+        entry = entry.encode('utf8','surrogateescape').decode('utf8','replace')
         path = os.path.join(i_path, entry)
 
         st = None
