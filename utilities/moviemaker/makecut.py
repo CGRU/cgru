@@ -11,7 +11,7 @@ import af
 
 from optparse import OptionParser
 
-Extensions = ['jpg', 'png', 'dpx']
+Extensions = ['jpg','jpeg','png','dpx','exr','tif','tiff']
 TmpFiles = 'img.%07d.jpg'
 
 Parser = OptionParser(
