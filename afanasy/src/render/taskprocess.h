@@ -86,6 +86,9 @@ private:
 
 	bool m_doing_post;
 	std::vector<std::string> m_post_cmds;
+	int m_post_limit_sec;
+
+	std::string m_append_to_server_task_log;
 
 	std::string m_listened;
 

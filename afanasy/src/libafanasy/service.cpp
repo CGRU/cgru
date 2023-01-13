@@ -273,6 +273,10 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	m_PyObj_FuncDoPost = getFunction( AFPYNAMES::SERVICE_FUNC_DOPOST);
 	if( m_PyObj_FuncDoPost == NULL ) return;
 
+	m_PyObj_FuncDoPostLimitSec = getFunction(AFPYNAMES::SERVICE_FUNC_DOPOSTLIMITSEC);
+	if (m_PyObj_FuncDoPostLimitSec == NULL)
+		return;
+
 	PyObject * pResult;
 
 	// Process working directory:
@@ -507,11 +511,11 @@ const std::vector<std::string> Service::doPost()
 
 	std::vector<std::string> cmds;
 
-	PyObject * pResult = PyObject_CallObject( m_PyObj_FuncDoPost, NULL);
+	PyObject * pResult = PyObject_CallObject(m_PyObj_FuncDoPost, NULL);
 	if( pResult )
 	{
 		if( false == af::PyGetStringList( pResult, cmds))
-			AFERRAR("Service:goPost: '%s': returned object is not a string.", m_name.c_str())
+			AFERRAR("Service:doPost: '%s': returned object is not a string.", m_name.c_str())
 
 		Py_DECREF( pResult);
 	}
@@ -519,6 +523,28 @@ const std::vector<std::string> Service::doPost()
 		PyErr_Print();
 
 	return cmds;
+}
+
+int Service::doPostLimitSec()
+{
+	AFINFA("Service::doPostLimitSec()")
+
+	int limit_sec = 0;
+
+	PyObject * pResult = PyObject_CallObject(m_PyObj_FuncDoPostLimitSec, NULL);
+	if (pResult)
+	{
+		if( ! PyLong_Check(pResult))
+			AFERRAR("Service:doPostLimitSec: '%s': returned object is not an integer.", m_name.c_str())
+
+		limit_sec = PyLong_AsLong(pResult);
+
+		Py_DECREF(pResult);
+	}
+	else if (PyErr_Occurred())
+		PyErr_Print();
+
+	return limit_sec;
 }
 
 const std::vector<std::string> Service::getFiles() const

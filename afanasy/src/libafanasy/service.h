@@ -66,6 +66,7 @@ public:
 
 	// Return an empty string on sucess or an error message on error
 	const std::vector<std::string> doPost();
+	int doPostLimitSec();
 
 private:
 	void initialize( const TaskExec * taskExec, const std::string & i_store_dir);
@@ -86,6 +87,7 @@ private:
 	PyObject * m_PyObj_FuncCheckExitStatus;
 	PyObject * m_PyObj_FuncCheckRenderedFiles;
 	PyObject * m_PyObj_FuncDoPost;
+	PyObject * m_PyObj_FuncDoPostLimitSec;
 
 	bool m_initialized;
 

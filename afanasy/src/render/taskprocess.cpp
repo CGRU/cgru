@@ -87,6 +87,7 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec, RenderHost * i_render):
 	m_commands_launched(0),
 	m_command_launch_time(0),
 	m_doing_post( false),
+	m_post_limit_sec(0),
 	m_closed( false),
 	m_zombie( false),
 	m_cycle(0),
@@ -315,6 +316,23 @@ void TaskProcess::refresh()
 		}
 	}
 
+	// Check doing post and running time limit exists
+	if (m_doing_post && (m_post_limit_sec > 0))
+	{
+		// Check that running time limit is not reached
+		if ((time(NULL) - m_command_launch_time) > m_post_limit_sec)
+		{
+			// Check that process is running and was not asked to stop before
+			if (m_pid && (m_stop_time == 0))
+			{
+				m_append_to_server_task_log = std::string("Task doing post time > ") + af::itos(m_post_limit_sec) + " seconds.";
+				AF_WARN << m_append_to_server_task_log;
+				m_stop_time = time(NULL);
+				killProcess();
+			}
+		}
+	}
+
 	// Task is finished
 	if( m_pid == 0 )
 	{
@@ -467,13 +485,18 @@ void TaskProcess::sendTaskSate()
 
 	char * stdout_data = NULL;
 	int    stdout_size = 0;
-	std::string log;
 
-	if(( m_update_status != af::TaskExec::UPPercent ) &&
-		( m_update_status != af::TaskExec::UPWarning ))
+	if ((m_update_status != af::TaskExec::UPPercent) &&
+		(m_update_status != af::TaskExec::UPWarning))
 	{
 		stdout_data = m_parser->getData( &stdout_size);
-		log = m_service->getLog();
+		std::string log = m_service->getLog();
+		if (log.size())
+		{
+			if (m_append_to_server_task_log.size())
+				m_append_to_server_task_log += '\n';
+			m_append_to_server_task_log += log;
+		}
 	}
 
 	int percent          = m_parser->getPercent();
@@ -523,7 +546,7 @@ void TaskProcess::sendTaskSate()
 
 		m_parser->hasProgressChanged(),
 
-		log,
+		m_append_to_server_task_log,
 		activity,
 		resources,
 		report,
@@ -537,6 +560,8 @@ void TaskProcess::sendTaskSate()
 	taskup->setParsedFiles( m_service->getParsedFiles());
 
 	m_listened.clear();
+
+	m_append_to_server_task_log.clear();
 
 	m_render->addTaskUp( taskup);
 }
@@ -576,21 +601,23 @@ void TaskProcess::processFinished( int i_exitCode)
 		success = m_service->checkExitStatus( WEXITSTATUS( i_exitCode));
 #endif
 
-	if(( success != true ) || ( m_stop_time != 0 ))
+	if (( success != true ) || ( m_stop_time != 0 ))
 	{
 		if( m_doing_post )
 			m_update_status = af::TaskExec::UPFinishedFailedPost;
 		else
+		{
 			m_update_status = af::TaskExec::UPFinishedError;
 #ifdef WINNT
-		if( m_stop_time != 0 )
+			if (m_stop_time != 0)
 #else
-		if(( m_stop_time != 0 ) || WIFSIGNALED( i_exitCode))
+			if ((m_stop_time != 0) || WIFSIGNALED(i_exitCode))
 #endif
-		{
-			if(( m_update_status != af::TaskExec::UPFinishedParserError   ) &&
-			   ( m_update_status != af::TaskExec::UPFinishedParserSuccess ))
-			     m_update_status  = af::TaskExec::UPFinishedKilled;
+			{
+				if ((m_update_status != af::TaskExec::UPFinishedParserError  ) &&
+					(m_update_status != af::TaskExec::UPFinishedParserSuccess))
+					m_update_status  = af::TaskExec::UPFinishedKilled;
+			}
 		}
 	}
 	else if(m_parser->hasError())
@@ -613,6 +640,7 @@ void TaskProcess::processFinished( int i_exitCode)
 		if( false == m_doing_post )
 		{
 			m_post_cmds = m_service->doPost();
+			m_post_limit_sec = m_service->doPostLimitSec();
 			m_doing_post = true;
 		}
 
@@ -660,7 +688,9 @@ void TaskProcess::killProcess()
 
 	AF_DEBUG << this;
 
-	AF_WARN << "KILLING NOT TERMINATED TASK.";
+	if (false == m_doing_post)
+		AF_WARN << "KILLING NOT TERMINATED TASK.";
+
 #ifdef UNIX
 	killpg( getpgid( m_pid), SIGKILL);
 #else

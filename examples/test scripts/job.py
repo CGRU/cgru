@@ -54,6 +54,8 @@ parser.add_argument('-c', '--capacity',     dest='capacity',     type=int,   def
 parser.add_argument(      '--capmin',       dest='capmin',       type=int,   default=-1, help='tasks variable capacity coeff min')
 parser.add_argument(      '--capmax',       dest='capmax',       type=int,   default=-1, help='tasks variable capacity coeff max')
 parser.add_argument('-f', '--filesout',     dest='filesout',     type=str,   default=None, help='Tasks out file [render/img.%%04d.jpg]')
+parser.add_argument(      '--skipexist',    dest='skipexist',    action='store_true', default=False, help='Skip existing files.')
+parser.add_argument(      '--imgres',       dest='imgres',       type=str,   default=None, help='Images resolution [640x480]')
 parser.add_argument(      '--filemin',      dest='filemin',      type=int,   default=-1, help='tasks output file size min')
 parser.add_argument(      '--filemax',      dest='filemax',      type=int,   default=-1, help='tasks output file size max')
 parser.add_argument(      '--stdoutfile',   dest='stdoutfile',   type=str,   default=None, help='Read tasks stdout from file')
@@ -237,12 +239,15 @@ for b in range(numblocks):
 
     if Args.filesout:
         cmd += ' --filesout "%s"' % Args.filesout
-        block.skipExistingFiles()
         block.checkRenderedFiles(100)
+        if Args.skipexist:
+            block.skipExistingFiles()
         files = []
         for afile in Args.filesout.split(';'):
             files.append(afcommon.patternFromStdC(afile))
         block.setFiles(files)
+        if Args.imgres:
+            cmd += ' --imgres "%s"' % Args.imgres
 
     if Args.stdoutfile:
         if not os.path.isfile(Args.stdoutfile):

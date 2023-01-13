@@ -38,6 +38,7 @@ Parser.add_option('-t', '--time',      dest='timesec',   type='float',  default=
 Parser.add_option('-r', '--randtime',  dest='randtime',  type='float',  default=0,    help='Random time per frame in seconds')
 Parser.add_option('-f', '--filesout',  dest='filesout',  type='string', default=None, help='File(s) to write (";" separated)')
 Parser.add_option(      '--stdoutfile',dest='stdoutfile',type='string', default=None, help='File to read stdout from')
+Parser.add_option(      '--imgres',    dest='imgres',    type='string', default='1920x1080',help='Image resolution to write')
 Parser.add_option('-v', '--verbose',   dest='verbose',   type='int',    default=0,    help='Verbose')
 Parser.add_option('-p', '--pkp',       dest='pkp',       type='int',    default=1,    help='Parser key percentage')
 Parser.add_option('-H', '--hosts',     dest='hosts',     type='string', default=None, help='Hosts list for mutihost tasks')
@@ -123,9 +124,9 @@ while frame <= frame_end:
             while afile.find('%') != -1:
                 afile = afile % frame
 
-            cmd = 'convert -verbose -size 640x480 xc:Black -gravity West -fill White -pointsize 100 -annotate +0+0 "%s" "%s"'
-            cmd = cmd % ( "Frame: %d" % frame, afile)
-            os.system( cmd)
+            cmd = 'convert -verbose -size "%s" xc:Black -gravity Center -fill White -pointsize 300 -annotate +0+0 "%s" "%s"'
+            cmd = cmd % (Options.imgres, ("Frame: %04d" % frame), afile)
+            os.system(cmd)
 
             print('@IMAGE@' + afile)
 

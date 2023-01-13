@@ -162,7 +162,6 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
             if len(afile) == 0: continue
             afile = os.path.join(self.taskInfo['wdir'], afile)
             if not os.path.isfile(afile):
-                log += 'File does not exist: "%s"\n' % afile
                 allFilesExist = False
                 continue
 
@@ -183,7 +182,7 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
             log += 'File exists: "%s"\n' % afile
 
         if allFilesExist:
-            log += 'Task file(s) exits. Skipping command execution.\n'
+            log += 'Task file(s) exists. Skipping command execution.\n'
             self.taskInfo['command'] = ''
 
         if len(log):
@@ -350,6 +349,9 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
         # post_cmds.extend(['ls -la > ' + self.taskInfo['store_dir'] + '/afile'])
 
         return post_cmds
+
+    def doPostLimitSec(self):
+        return cgruconfig.VARS['af_task_post_limit_sec']
 
     def generateThumbnail(self, i_onthefly):
         """Missing DocString
