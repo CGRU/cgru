@@ -39,6 +39,8 @@ private:
 
 	static std::vector<int32_t> ms_ids;
 
+	static std::map<std::string, int> ms_subsribes_counts;
+
 private:
 	static void setJobId( int i_jid, bool i_add);
 };

@@ -8,12 +8,15 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 MonitorHost * MonitorHost::m_ = NULL;
 
 int MonitorHost::ms_uid = -1;
 
 std::vector<int32_t> MonitorHost::ms_ids;
+
+std::map<std::string, int> MonitorHost::ms_subsribes_counts;
 
 MonitorHost::MonitorHost()
 {
@@ -59,6 +62,32 @@ void MonitorHost::connectionEstablished( int i_id, int i_uid)
 
 void MonitorHost::subscribe( const std::string & i_class, bool i_subscribe)
 {
+	std::map<std::string, int>::iterator it = ms_subsribes_counts.find(i_class);
+	if (it == ms_subsribes_counts.end())
+		ms_subsribes_counts[i_class] = 0;
+
+	if (i_subscribe)
+	{
+		ms_subsribes_counts[i_class]++;
+
+		if (ms_subsribes_counts[i_class] > 1)
+			return;
+	}
+	else
+	{
+		ms_subsribes_counts[i_class]--;
+
+		if (ms_subsribes_counts[i_class] < 0)
+		{
+			ms_subsribes_counts[i_class] = 0;
+			AF_ERR << "Was not subscibed on '" << i_class << "'";
+			return;
+		}
+
+		if (ms_subsribes_counts[i_class] > 0)
+			return;
+	}
+
 	std::vector<int> ids;
 	ids.push_back( m_->getId());
 
