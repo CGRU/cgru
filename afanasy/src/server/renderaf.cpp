@@ -474,11 +474,13 @@ void RenderAf::v_action( Action & i_action)
 		{
 			std::string pool_name;
 			af::jr_string("name", pool_name, operation);
-			actionSetPool(pool_name, i_action);
+			if (false == actionSetPool(pool_name, i_action))
+				return;
 		}
 		else if (type == "reassign_pool")
 		{
-			actionReassignPool(i_action);
+			if (false == actionReassignPool(i_action))
+				return;
 		}
 		else if (type == "tickets")
 		{
@@ -500,25 +502,31 @@ void RenderAf::v_action( Action & i_action)
 
 }
 
-void RenderAf::actionSetPool(const std::string & i_pool_name, Action & i_action)
+bool RenderAf::actionSetPool(const std::string & i_pool_name, Action & i_action)
 {
+	if (isBusy())
+	{
+		i_action.answerError("Can't change pool. Render '" + getName() + "' is busy.");
+		return false;
+	}
+
 	if (m_pool == i_pool_name)
 	{
 		i_action.answerError("Render '" + getName() + "' already in a poll '" + i_pool_name + "'.");
-		return;
+		return false;
 	}
 
 	PoolSrv * pool = i_action.pools->getPool(i_pool_name);
 	if (NULL == pool)
 	{
 		i_action.answerError("Pool '" + i_pool_name + "' does not exist.");
-		return;
+		return false;
 	}
 
 	if (pool->hasRender(this))
 	{
 		i_action.answerError("Pool '" + pool->getName() + "' already has a render '" + getName() + "'.");
-		return;
+		return false;
 	}
 
 	if (m_parent)
@@ -532,10 +540,18 @@ void RenderAf::actionSetPool(const std::string & i_pool_name, Action & i_action)
 	m_parent = pool;
 
 	i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_parent->getId());
+
+	return true;
 }
 
-void RenderAf::actionReassignPool(Action & i_action)
+bool RenderAf::actionReassignPool(Action & i_action)
 {
+	if (isBusy())
+	{
+		i_action.answerError("Can't change pool. Render '" + getName() + "' is busy.");
+		return false;
+	}
+
 	if (m_parent)
 	{
 		m_parent->removeRender(this);
@@ -545,6 +561,8 @@ void RenderAf::actionReassignPool(Action & i_action)
 	i_action.pools->assignRender(this);
 
 	i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_parent->getId());
+
+	return true;
 }
 
 void RenderAf::ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus, const std::string * i_keeptasks_username )

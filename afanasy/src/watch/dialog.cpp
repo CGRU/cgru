@@ -498,17 +498,6 @@ void Dialog::newMessage( af::Msg *msg)
 		Watch::filesReceived( taskup);
         break;
 	}
-	case af::Msg::TJSON:
-	case af::Msg::TJSONBIN:
-	case af::Msg::THTTP:
-	case af::Msg::THTTPGET:
-	{
-		static int unused;
-		unused = ::write( 1, " >>> ", 5);
-		msg->stdOutData( false);
-		unused = ::write( 1, "\n", 1);
-		break;
-	}
     default:
         Watch::caseMessage( msg);
     }

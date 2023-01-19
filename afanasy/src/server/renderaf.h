@@ -158,8 +158,8 @@ private:
 
 	void findPool(PoolsContainer * i_pools);
 
-	void actionSetPool(const std::string & i_pool_name, Action & i_action);
-	void actionReassignPool(Action & i_action);
+	bool actionSetPool(const std::string & i_pool_name, Action & i_action);
+	bool actionReassignPool(Action & i_action);
 
 	// Write this message back to the new launched render
 	af::Msg * writeRenderEventsMsg();

@@ -73,7 +73,7 @@ public:
 	static void addReceiver(    Receiver * receiver );
 	static void removeReceiver( Receiver * receiver );
 
-	static void caseMessage( af::Msg * msg);
+	static void caseMessage(af::Msg * i_msg);
 
 	static void filesReceived( const af::MCTaskUp & i_taskup);
 

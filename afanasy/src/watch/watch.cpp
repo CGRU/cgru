@@ -238,24 +238,28 @@ void Watch::addReceiver( Receiver * receiver)
 void Watch::removeWindow(   Wnd      * wnd      ) {   ms_windows.removeAll( wnd);      }
 void Watch::removeReceiver( Receiver * receiver ) { ms_receivers.removeAll( receiver); }
 
-void Watch::caseMessage( af::Msg * msg)
+void Watch::caseMessage( af::Msg * i_msg)
 {
    bool received = false;
 
 	QList<Receiver*>::iterator rIt;
-	for( rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
+	for (rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
 	{
-		msg->resetWrittenSize();
-		if( (*rIt)->v_caseMessage( msg) && (false == received)) received = true;
+		i_msg->resetWrittenSize();
+		if ((*rIt)->v_caseMessage(i_msg) && (false == received))
+			received = true;
 	}
 
-	if( msg->type() == af::Msg::TMonitorEvents )
+	i_msg->resetWrittenSize();
+
+	switch (i_msg->type())
 	{
-		msg->resetWrittenSize();
-		af::MonitorEvents me( msg);
+	case af::Msg::TMonitorEvents:
+	{
+		af::MonitorEvents me(i_msg);
 		me.v_stdOut();
 
-		// General instructions for an application:
+		// General instructions for the application:
 		if( me.m_instruction.size())
 		{
 			if( me.m_instruction == "exit")
@@ -269,7 +273,7 @@ void Watch::caseMessage( af::Msg * msg)
 		// Let all receivers to process events:
 		for( rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
 		{
-			msg->resetWrittenSize();
+			i_msg->resetWrittenSize();
 			if( (*rIt)->v_processEvents( me) && (false == received)) received = true;
 		}
 
@@ -294,18 +298,57 @@ void Watch::caseMessage( af::Msg * msg)
 
 			received = true;
 		}
+
+		break;
 	}
-	else if( msg->type() == af::Msg::TTask )
+	case af::Msg::TTask:
 	{
-		af::MCTask mctask( msg);
+		af::MCTask mctask(i_msg);
 		received = WndTask::showTask( mctask);
+		break;
+	}
+	case af::Msg::TJSON:
+	case af::Msg::TJSONBIN:
+	{
+		rapidjson::Document document;
+		std::string error;
+		char * data = af::jsonParseMsg(document, i_msg, &error);
+		if (data == NULL)
+			AF_ERR << error;
+		else
+		{
+			const JSON & infObj = document["info"];
+			if (infObj.IsObject())
+			{
+				std::string text, kind;
+				af::jr_string("text", text, infObj);
+				af::jr_string("kind", kind, infObj);
+				if (kind == "error")
+					displayError(afqt::stoq(text));
+				else if (kind == "warning")
+					displayWarning(afqt::stoq(text));
+				else
+					displayInfo(afqt::stoq(text));
+			}
+		}
+	}
+	case af::Msg::THTTP:
+	case af::Msg::THTTPGET:
+	{
+		static int unused;
+		unused = ::write( 1, " >>> ", 5);
+		i_msg->stdOutData( false);
+		unused = ::write( 1, "\n", 1);
+		received = true;
+		break;
+	}
 	}
 
-   if( false == received)
-   {
+	if (false == received)
+	{
 		printf("Unknown message received: ");
-		msg->v_stdOut();
-   }
+		i_msg->v_stdOut();
+	}
 }
 
 void Watch::filesReceived( const af::MCTaskUp & i_taskup)

@@ -15,7 +15,12 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
 v3.3.1
 ======
 
-2023.01.11 *(not released)*
+2023.01.19 *(not released)*
+
+- Afanasy service can be configured to limit task post command running time.
+  Task post commands are used to generate thumbnails.
+  By default ``af_task_post_limit_sec`` config variable stands for it, and it is 16 seconds.
+  Later (on limit exceeded) task post command will be killed.
 
 - Afanasy can be configured not to cut domain names from user and host names.
   New parameters ``af_render_cut_domain_name`` and ``af_user_cut_domain_name`` added to control this.
@@ -30,6 +35,8 @@ v3.3.1
   variables that will be added to task process.
 
 - Afwatch can edit job block environment variables.
+
+- Afanasy server will not allow to change a pool of a busy render.
 
 - Rules Python API started.
 
