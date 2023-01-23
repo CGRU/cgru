@@ -258,7 +258,7 @@ class BlockParameters:
                 taskname += ' ' + str(self.frame_first)
                 taskname += '-' + str(self.frame_last)
                 self.tasks_names.append(taskname)
-                self.tasks_cmds.append(self.frame_first)
+                self.tasks_cmds.append('%d' % self.frame_first)
                 
             elif roptype == 'Redshift_ROP':
                 self.service = 'hbatch_redshift'
