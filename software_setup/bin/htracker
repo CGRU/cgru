@@ -2,7 +2,7 @@
 
 source "${CGRU_LOCATION}/software_setup/setup_houdini.sh"
 
-export PYTHONPATH="${HFS}/houdini/python2.7libs:${PYTHONPATH}"
+export PYTHONPATH="${HFS}/houdini/python3.9libs:${PYTHONPATH}"
 
-"${HFS}/python/bin/python2.7" "${HOUDINI_CGRU_PATH}/htracker.py" "$@"
+"${HFS}/python/bin/python" "${HOUDINI_CGRU_PATH}/htracker.py" "$@"
 
