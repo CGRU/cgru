@@ -98,7 +98,7 @@
 		"show_files":true
 	},
 	"area":{
-		"seek":["[project]/SCENE.*","[project]/EPISODE.*","[project]/SHOT.*","[project]/ASSETS.*","[project]/ANIM.*","[project]/RND.*","[project]/FREELANCE.*"],
+		"seek":["[project]/SCENE.*","[project]/EPISODE.*","[project]/SHOT.*","[project]/ASSETS.*","[project]/CONCEPT.*","[project]/ANIM.*","[project]/RND.*","[project]/FREELANCE.*"],
 		"uploads":{
 			"upload":{
 				"masks":[".*"],
