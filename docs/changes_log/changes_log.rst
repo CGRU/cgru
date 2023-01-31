@@ -34,9 +34,11 @@ v3.3.1
   `environment <../software/houdini.html#environment>`_
   variables that will be added to task process.
 
-- Afwatch can edit job block environment variables.
+- AfWatch can edit job block environment variables.
 
 - Afanasy server will not allow to change a pool of a busy render.
+
+- Afanasy server branches action added ``delete_done_jobs``. You can delete all done jobs from branch from AfWatch.
 
 - Rules Python API started.
 

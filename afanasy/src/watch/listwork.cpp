@@ -86,6 +86,9 @@ ListWork::ListWork(QWidget * i_parent):
 
 		bp = addButtonPanel(Item::TJob, "SET BRANCH","job_change_branch","Change job branch.");
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_JobSetBranch()));
+
+		bp = addButtonPanel(Item::TBranch, "DEL DONE JOBS","branch_del_done_jobs","Delete done jobs from branch.","", true);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_DelDoneJobs()));
 	}
 	else
 		m_paramspanel->v_setEditable(false);
@@ -317,6 +320,7 @@ void ListWork::slot_SolvePiority() {setParameter(Item::TBranch, "solve_method", 
 void ListWork::slot_SolveOrder()   {setParameter(Item::TBranch, "solve_method", "\"solve_order\""   );}
 void ListWork::slot_SolveTasks()   {setParameter(Item::TBranch, "solve_need", "\"solve_tasks\""   );}
 void ListWork::slot_SolveCapacity(){setParameter(Item::TBranch, "solve_need", "\"solve_capacity\"");}
+void ListWork::slot_DelDoneJobs()  {   operation(Item::TBranch, "delete_done_jobs");}
 
 void ListWork::slot_JobSetBranch()
 {

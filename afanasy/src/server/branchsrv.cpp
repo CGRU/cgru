@@ -162,6 +162,18 @@ void BranchSrv::v_action(Action & i_action)
 			deleteBranch(i_action, i_action.monitors);
 			return;
 		}
+		else if (type == "delete_done_jobs")
+		{
+			deleteDoneJobs(i_action, i_action.monitors);
+		}
+		else
+		{
+			i_action.answerError("Unknown operation '" + type + "'");
+			appendLog("Unknown operation \"" + type + "\" by " + i_action.author);
+			return;
+		}
+
+		appendLog("Operation \"" + type + "\" by " + i_action.author);
 	}
 
 	const JSON & params = (*i_action.data)["params"];
@@ -203,6 +215,25 @@ void BranchSrv::deleteBranch(Action & o_action, MonitorContainer * i_monitoring)
 
 	if (i_monitoring)
 		i_monitoring->addEvent(af::Monitor::EVT_branches_del, m_id);
+}
+
+void BranchSrv::deleteDoneJobs(Action & o_action, MonitorContainer * i_monitoring)
+{
+	std::list<JobAf*> jobs;
+	AfListIt jIt(&m_jobs_list);
+	for (AfNodeSrv * node = jIt.node(); node != NULL; jIt.next(), node = jIt.node())
+	{
+		JobAf * job = static_cast<JobAf*>(node);
+		if (job->isDone())
+			jobs.push_back(job);
+	}
+
+	o_action.answerLog("Deleting " + af::itos(jobs.size()) + " jobs.");
+
+	for (auto & job : jobs)
+		job->deleteNode(NULL, i_monitoring);
+
+	return;
 }
 
 void BranchSrv::addBranch(BranchSrv * i_branch)
