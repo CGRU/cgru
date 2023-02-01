@@ -40,6 +40,8 @@ v3.3.1
 
 - Afanasy server branches action added ``delete_done_jobs``. You can delete all done jobs from branch from AfWatch.
 
+- Server annoying error log removed on a running job deletion.
+
 - Rules Python API started.
 
 .. _changes-log-latest:
