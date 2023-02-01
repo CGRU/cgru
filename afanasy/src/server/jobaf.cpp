@@ -1228,11 +1228,16 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 	
 	if (m_deletion)
 	{
-		for (int b = 0; b < m_blocks_num; b++)
-			m_blocks[b]->v_refresh(currentTime, renders, monitoring);
+// Since running_tasks_num is calculated and stored in Af::Work, refresh no needed on deletion
+//		for (int b = 0; b < m_blocks_num; b++)
+//			m_blocks[b]->v_refresh(currentTime, renders, monitoring);
 
 		if (getRunningTasksNum() == 0)
+		{
 			deleteNode(NULL, monitoring);
+			// No later refresh needed, as running tasks number is stoted and calculated in af::Work
+			return;
+		}
 	}
 
 	// No more calculations needed for a locked job:

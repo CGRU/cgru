@@ -97,6 +97,14 @@ bool AfNodeSrv::createStoreDir() const
 void AfNodeSrv::store() const
 {
 	AFINFA("AfNodeSrv::store: %s; from store: %d:", getStoreDir().c_str(), isFromStore())
+
+	if (m_node->isZombie())
+	{
+		AF_WARN << "Trying to store a zomie node \"" << m_node->getName() << "\"";
+		// There is no need to store a node that will be deleted from store soon.
+		return;
+	}
+
 	if( m_node->getId() == 0 )
 	{
 		AFERRAR("AfNodeSrv::store(): '%s': zero ID.", m_node->getName().c_str())
