@@ -57,11 +57,11 @@ function prj_ShotsDeploy()
 	params.template = c_PathPM_Server2Client( RULES.assets.shot.template);
 
 //console.log( JSON.stringify( g_elCurFolder.m_dir));
-	params.destination = RULES.assets.scenes.seek[0];
-	for( var s = 0; s < RULES.assets.scenes.seek.length; s++)
+	params.destination = RULES.assets.area.seek[0];
+	for( var s = 0; s < RULES.assets.area.seek.length; s++)
 		for( var f = 0; f < g_elCurFolder.m_dir.folders.length; f++)
-			if( RULES.assets.scenes.seek[s].indexOf( g_elCurFolder.m_dir.folders[f]) != -1 )
-				params.destination = RULES.assets.scenes.seek[s];
+			if( RULES.assets.area.seek[s].indexOf( g_elCurFolder.m_dir.folders[f]) != -1 )
+				params.destination = RULES.assets.area.seek[s];
 	params.destination = params.destination.replace('[project]', ASSETS.project.path) + '/deploy';
 	params.destination = c_PathPM_Rules2Client( params.destination);
 
