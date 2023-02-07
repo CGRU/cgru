@@ -27,6 +27,9 @@ private slots:
 
 	void actRequestLog();
 
+	void actSetPaused();
+	void actUnsetPaused();
+
 	void actSolveJobsByOrder();
 	void actSolveJobsByPriority();
 	void actSolveJobsByCapacity();

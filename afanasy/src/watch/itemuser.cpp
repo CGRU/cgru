@@ -19,7 +19,8 @@
 const int ItemUser::HeightUser = 34;
 
 ItemUser::ItemUser(ListNodes * i_list_nodes, af::User * i_user, const CtrlSortFilter * i_ctrl_sf):
-	ItemWork(i_list_nodes, i_user, TUser, i_ctrl_sf)
+	ItemWork(i_list_nodes, i_user, TUser, i_ctrl_sf),
+	m_paused(false)
 {
 	updateValues(i_user, 0);
 }
@@ -51,6 +52,8 @@ void ItemUser::v_updateValues(af::Node * i_afnode, int i_msgType)
 	jobs_lifetime              = user->getJobsLifeTime();
 	time_register              = user->getTimeRegister();
 	time_activity              = user->getTimeActivity();
+
+	m_paused = user->isPaused();
 
 	if (running_tasks_num)
 		setRunning();
@@ -144,6 +147,8 @@ void ItemUser::v_updateValues(af::Node * i_afnode, int i_msgType)
 
 	if( isLocked()) strLeftTop = "(LOCK) " + strLeftTop;
 
+	if (m_paused) strRightTop += " PAUSED";
+
 	m_tooltip = user->v_generateInfoString( true).c_str();
 
 	updateInfo(user);
@@ -190,7 +195,16 @@ bool ItemUser::v_isSelectable() const
 
 void ItemUser::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const
 {
-	drawBack(i_painter, i_rect, i_option);
+	QColor c("#737770");
+	QColor cb("#838780");
+	QColor cp("#555555");
+//	const QColor * itemColor = &(afqt::QEnvironment::clr_itemrender.c);
+//	if (m_running_services.size()) itemColor = &(afqt::QEnvironment::clr_itemrenderbusy.c);
+	const QColor  * itemColor = &c;
+	if (m_paused) itemColor = &cp;
+	else if (isRunning()) itemColor = &cb;
+
+	drawBack(i_painter, i_rect, i_option, itemColor);
 	int x = i_rect.x() + 5;
 	int y = i_rect.y() + 2;
 	int w = i_rect.width() - 10;

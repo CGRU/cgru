@@ -60,6 +60,12 @@ ListUsers::ListUsers( QWidget* parent):
 	bp = addButtonPanel(Item::TUser, "LOG","users_log","Get user log.");
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actRequestLog()));
 
+	bp = addButtonPanel(Item::TUser, "PAUSE","user_pause","Pause selected users.","P");
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actSetPaused()));
+
+	bp = addButtonPanel(Item::TUser, "START","user_unpause","Start (Unpause) selected users.","S");
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actUnsetPaused()));
+
 	bm = addButtonsMenu(Item::TUser, "Solve","Choose jobs solving method.");
 	bm->openMenu();
 
@@ -203,6 +209,8 @@ void ListUsers::calcTitle()
 }
 
 void ListUsers::actDelete() { operation(Item::TUser, "delete"); }
+void ListUsers::actSetPaused()   {setParameter(Item::TUser, "paused", "true" );}
+void ListUsers::actUnsetPaused() {setParameter(Item::TUser, "paused", "false");}
 void ListUsers::actSolveJobsByOrder()    {setParameter(Item::TUser, "solve_method", "\"solve_order\""   ); }
 void ListUsers::actSolveJobsByPriority() {setParameter(Item::TUser, "solve_method", "\"solve_priority\""); }
 void ListUsers::actSolveJobsByCapacity() {setParameter(Item::TUser, "solve_need",   "\"solve_capacity\""); }

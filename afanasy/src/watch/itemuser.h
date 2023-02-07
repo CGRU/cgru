@@ -14,6 +14,8 @@ public:
 
 	void v_updateValues(af::Node * i_afnode, int i_msgType);
 
+	bool m_paused;
+
 	int errors_avoidhost;
 	int errors_tasksamehost;
 	int errors_retries;

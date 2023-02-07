@@ -80,6 +80,8 @@ void User::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 
 	Work::jsonWrite( o_str, i_type);
 
+	if (isPaused()) o_str << ",\n\"paused\":true";
+
 	o_str << ",\n\"time_register\":" << m_time_register;
 	o_str << ",\n\"time_activity\":" << m_time_activity;
 	o_str << ",\n\"errors_retries\":" << int(m_errors_retries);
@@ -108,6 +110,10 @@ bool User::jsonRead( const JSON &i_object, std::string * io_changes)
 		AFERROR("User::jsonRead: Not a JSON object.")
 		return false;
 	}
+
+	bool _paused;
+	if (jr_bool("paused", _paused, i_object, io_changes))
+		setPaused(_paused);
 
 	jr_uint8 ("errors_retries",        m_errors_retries,        i_object, io_changes);
 	jr_uint8 ("errors_avoid_host",     m_errors_avoid_host,     i_object, io_changes);

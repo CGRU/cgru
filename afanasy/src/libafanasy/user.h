@@ -68,6 +68,14 @@ public:
 
 	bool jsonRead( const JSON & i_object, std::string * io_changes = NULL);
 
+	enum State
+	{
+		SPaused = 1ULL << 0
+	};
+
+	inline bool isPaused() const {return m_state & SPaused;}
+	inline void setPaused(bool set) {m_state = set ? m_state | SPaused : m_state & (~SPaused);}
+
 protected:
 	std::string m_host_name;          ///< User host name.
 

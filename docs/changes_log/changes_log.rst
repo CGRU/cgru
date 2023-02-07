@@ -42,6 +42,8 @@ v3.3.1
 
 - Afanasy jobs branch can be paused.
 
+- Afanasy user can be paused.
+
 - Server annoying error log removed on a running job deletion.
 
 - Rules Python API started.
