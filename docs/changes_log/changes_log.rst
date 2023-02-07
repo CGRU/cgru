@@ -15,7 +15,7 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
 v3.3.1
 ======
 
-2023.01.19 *(not released)*
+2023.02.07 *(not released)*
 
 - Afanasy service can be configured to limit task post command running time.
   Task post commands are used to generate thumbnails.
@@ -39,6 +39,8 @@ v3.3.1
 - Afanasy server will not allow to change a pool of a busy render.
 
 - Afanasy server branches action added ``delete_done_jobs``. You can delete all done jobs from branch from AfWatch.
+
+- Afanasy jobs branch can be paused.
 
 - Server annoying error log removed on a running job deletion.
 

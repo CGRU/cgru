@@ -49,7 +49,8 @@ public:
 	enum FlagsBranch
 	{
 		CreateChilds = 1 << 0,
-		SolveJobs    = 1 << 1
+		SolveJobs    = 1 << 1,
+		Paused       = 1 << 2
 	};
 
 	inline bool isCreateChilds() const { return m_flags_branch & CreateChilds; }
@@ -57,6 +58,9 @@ public:
 
 	inline bool isSolveJobs() const { return m_flags_branch & SolveJobs; }
 	inline void setSolveJobs(bool i_on) { m_flags_branch = i_on ? m_flags_branch | SolveJobs : m_flags_branch & (~SolveJobs); }
+
+	inline bool isPaused() const { return m_flags_branch & Paused; }
+	inline void setPaused(bool i_on) { m_flags_branch = i_on ? m_flags_branch | Paused : m_flags_branch & (~Paused); }
 
 	inline int32_t getBranchesNum()   const { return m_branches_num;   }
 	inline int32_t getBranchesTotal() const { return m_branches_total; }

@@ -21,6 +21,7 @@ const int ItemBranch::HeightBranch_Idle = 20;
 
 ItemBranch::ItemBranch(ListWork * i_list_work, af::Branch * i_branch, const CtrlSortFilter * i_ctrl_sf):
 	ItemWork(i_list_work, i_branch, TBranch, i_ctrl_sf),
+	m_paused(false),
 	m_empty(false)
 {
 	// Add buttons:
@@ -44,6 +45,8 @@ void ItemBranch::v_updateValues(af::Node * i_afnode, int i_msgType)
 
 	jobs_num                   = branch->getJobsNum();
 	jobs_total                 = branch->getJobsTotal();
+
+	m_paused = branch->isPaused();
 
 	m_empty = (0 == jobs_total);
 
@@ -136,6 +139,8 @@ void ItemBranch::v_updateValues(af::Node * i_afnode, int i_msgType)
 
 	if (isLocked()) strName = "(LOCKED) " + strName;
 
+	if (m_paused) strParameters += " PAUSED";
+
 	m_tooltip = branch->v_generateInfoString(true).c_str();
 
 	updateInfo(branch);
@@ -178,7 +183,16 @@ bool ItemBranch::calcHeight()
 
 void ItemBranch::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const
 {
-	drawBack(i_painter, i_rect, i_option);
+	QColor c("#737770");
+	QColor cb("#838780");
+	QColor cp("#555555");
+//	const QColor * itemColor = &(afqt::QEnvironment::clr_itemrender.c);
+//	if (m_running_services.size()) itemColor = &(afqt::QEnvironment::clr_itemrenderbusy.c);
+	const QColor  * itemColor = &c;
+	if (m_paused) itemColor = &cp;
+	else if (isRunning()) itemColor = &cb;
+
+	drawBack(i_painter, i_rect, i_option, itemColor);
 	int x = i_rect.x() + 5;
 	int y = i_rect.y() + 2;
 	int w = i_rect.width() - 10;

@@ -166,6 +166,18 @@ void BranchSrv::v_action(Action & i_action)
 		{
 			deleteDoneJobs(i_action, i_action.monitors);
 		}
+		else if (type == "pause")
+		{
+			if (isPaused())
+				return;
+			setPaused(true);
+		}
+		else if (type == "start")
+		{
+			if (false == isPaused())
+				return;
+			setPaused(false);
+		}
 		else
 		{
 			i_action.answerError("Unknown operation '" + type + "'");
@@ -174,6 +186,9 @@ void BranchSrv::v_action(Action & i_action)
 		}
 
 		appendLog("Operation \"" + type + "\" by " + i_action.author);
+		i_action.monitors->addEvent(af::Monitor::EVT_branches_change, m_id);
+		store();
+		return;
 	}
 
 	const JSON & params = (*i_action.data)["params"];
@@ -461,6 +476,9 @@ bool BranchSrv::v_canRun()
 		// Nothing to run
 		return false;
 	}
+
+	if (isPaused())
+		return false;
 
 	return true;
 }

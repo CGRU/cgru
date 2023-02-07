@@ -43,5 +43,6 @@ private:
 	QString strCounts;
 	QString strParameters;
 
+	bool m_paused;
 	bool m_empty;
 };

@@ -94,6 +94,7 @@ void Branch::v_jsonWrite(std::ostringstream &o_str, int i_type) const
 
 	if (isCreateChilds()) o_str << ",\n\"create_childs\":true";
 	if (isSolveJobs()) o_str << ",\n\"solve_jobs\":true";
+	if (isPaused()) o_str << ",\n\"paused\":true";
 
 	o_str << ",\n\"time_creation\":" << m_time_creation;
 	if (m_time_empty)
@@ -170,6 +171,10 @@ bool Branch::jsonRead(const JSON &i_object, std::string *io_changes)
 	bool _solveJobs;
 	if (jr_bool("solve_jobs", _solveJobs, i_object, io_changes))
 		setSolveJobs(_solveJobs);
+
+	bool _paused;
+	if (jr_bool("paused", _paused, i_object, io_changes))
+		setPaused(_paused);
 
 	//
 	// Paramers below are not editable and are read only on creation.
