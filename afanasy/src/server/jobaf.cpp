@@ -1283,6 +1283,24 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 				m_progress->tp[b][t]->state |= AFJOB::STATE_TRYTHISTASKNEXT_MASK;
 		}
 
+	// Some statistics calculations:
+	int32_t _tasks_error = 0;
+	int32_t _tasks_ready = 0;
+	for (int b = 0; b < m_blocks_num; b++)
+	{
+		_tasks_error += m_blocks[b]->m_data->getProgressTasksError();
+
+		if (m_blocks[b]->m_data->getState() && AFJOB::STATE_READY_MASK)
+			_tasks_ready += m_blocks[b]->m_data->getProgressTasksReady();
+	}
+	// Compare changes
+	if ((_tasks_ready != m_tasks_ready) ||
+		(_tasks_error != m_tasks_error))
+		jobchanged = af::Monitor::EVT_jobs_change;
+	// Store new calculations
+	m_tasks_ready    = _tasks_ready;
+	m_tasks_error    = _tasks_error;
+
 	//
 	// job state calculation
 	m_state = m_state |   AFJOB::STATE_DONE_MASK;

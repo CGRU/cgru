@@ -141,9 +141,6 @@ protected:
 private:
 	bool m_deletion; ///< Whether the job is deleting.
 
-	std::list<RenderAf*> renders_ptrs;
-	std::list<int> renders_counts;
-
 	BranchSrv * m_branch_srv;
 
 	std::string m_store_dir_tasks; ///< Tasks store directory.

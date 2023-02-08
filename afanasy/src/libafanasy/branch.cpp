@@ -53,10 +53,16 @@ void Branch::initDefaultValues()
 	setSolvePriority();
 	setSolveTasksNum();
 
-	m_branches_num = 0;
 	m_branches_total = 0;
-	m_jobs_num = 0;
-	m_jobs_total = 0;
+
+	m_jobs_total     = 0;
+	m_jobs_running   = 0;
+	m_jobs_done      = 0;
+	m_jobs_error     = 0;
+	m_jobs_ready     = 0;
+
+	m_tasks_ready    = 0;
+	m_tasks_error    = 0;
 
 	m_time_creation = 0;
 	m_time_empty = 0;
@@ -78,10 +84,17 @@ void Branch::v_readwrite(Msg *msg)
 
 	rw_String(m_parent_path, msg);
 
-	rw_int32_t(m_branches_num, msg);
+	rw_int32_t(m_tasks_ready,    msg);
 	rw_int32_t(m_branches_total, msg);
-	rw_int32_t(m_jobs_num,       msg);
+	rw_int32_t(m_jobs_running,   msg);
 	rw_int32_t(m_jobs_total,     msg);
+	/*
+	NEW_VERSION
+	rw_int32_t(m_jobs_done,      msg);
+	rw_int32_t(m_jobs_error,     msg);
+	rw_int32_t(m_jobs_ready,     msg);
+	rw_int32_t(m_tasks_error,    msg);
+	*/
 }
 
 void Branch::v_jsonWrite(std::ostringstream &o_str, int i_type) const
@@ -102,14 +115,14 @@ void Branch::v_jsonWrite(std::ostringstream &o_str, int i_type) const
 
 	o_str << ",\n\"parent\":\"" << m_parent_path << "\"";
 
-	if (m_branches_num > 0)
-		o_str << ",\n\"branches_num\":" << m_branches_num;
-	if (m_branches_total > 0)
-		o_str << ",\n\"branches_total\":" << m_branches_total;
-	if (m_jobs_num > 0)
-		o_str << ",\n\"jobs_num\":" << m_jobs_num;
-	if (m_jobs_total > 0)
-		o_str << ",\n\"jobs_total\":" << m_jobs_total;
+	if (m_branches_total > 0) o_str << ",\n\"branches_total\":" << m_branches_total;
+	if (m_jobs_total     > 0) o_str << ",\n\"jobs_total\":"     << m_jobs_total;
+	if (m_jobs_running   > 0) o_str << ",\n\"jobs_running\":"   << m_jobs_running;
+	if (m_jobs_done      > 0) o_str << ",\n\"jobs_done\":"      << m_jobs_done;
+	if (m_jobs_ready     > 0) o_str << ",\n\"jobs_ready\":"     << m_jobs_ready;
+	if (m_jobs_error     > 0) o_str << ",\n\"jobs_error\":"     << m_jobs_error;
+	if (m_tasks_ready    > 0) o_str << ",\n\"tasks_ready\":"    << m_tasks_ready;
+	if (m_tasks_error    > 0) o_str << ",\n\"tasks_error\":"    << m_tasks_error;
 
 	o_str << ",\n\"active_jobs\":[";
 	for (std::list<Job *>::const_iterator it = m_active_jobs_list.begin(); it != m_active_jobs_list.end(); it++)

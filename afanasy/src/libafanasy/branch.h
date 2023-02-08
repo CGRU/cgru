@@ -62,11 +62,14 @@ public:
 	inline bool isPaused() const { return m_flags_branch & Paused; }
 	inline void setPaused(bool i_on) { m_flags_branch = i_on ? m_flags_branch | Paused : m_flags_branch & (~Paused); }
 
-	inline int32_t getBranchesNum()   const { return m_branches_num;   }
-	inline int32_t getBranchesTotal() const { return m_branches_total; }
-
-	inline int32_t getJobsNum()   const { return m_jobs_num;   }
-	inline int32_t getJobsTotal() const { return m_jobs_total; }
+	inline int32_t getBranchesTotal() const {return m_branches_total;}
+	inline int32_t getJobsTotal()     const {return m_jobs_total;    }
+	inline int32_t getJobsRunning()   const {return m_jobs_running;  }
+	inline int32_t getJobsDone()      const {return m_jobs_done;     }
+	inline int32_t getJobsError()     const {return m_jobs_error;    }
+	inline int32_t getJobsReady()     const {return m_jobs_ready;    }
+	inline int32_t getTasksReady()    const {return m_tasks_ready;   }
+	inline int32_t getTasksError()    const {return m_tasks_error;   }
 
 	inline int64_t getTimeCreated() const { return m_time_creation; }
 	inline int64_t getTimeEmpty()   const { return m_time_empty;    }
@@ -76,10 +79,16 @@ protected:
 
 	int8_t m_flags_branch;
 
-	int32_t m_branches_num;
 	int32_t m_branches_total;
-	int32_t m_jobs_num;
+
 	int32_t m_jobs_total;
+	int32_t m_jobs_running;
+	int32_t m_jobs_done;
+	int32_t m_jobs_error;
+	int32_t m_jobs_ready;
+
+	int32_t m_tasks_ready;
+	int32_t m_tasks_error;
 
 	std::list<af::Job *> m_active_jobs_list;
 

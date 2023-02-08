@@ -14,8 +14,14 @@ public:
 
 	void v_updateValues(af::Node * i_afnode, int i_msgType);
 
-	int jobs_num;
+	int branches_total;
 	int jobs_total;
+	int jobs_running;
+	int jobs_done;
+	int jobs_error;
+	int jobs_ready;
+	int tasks_ready;
+	int tasks_error;
 
 	int64_t time_creation;
 	int64_t time_empty;

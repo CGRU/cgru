@@ -228,6 +228,9 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 	if( m_time_life != -1 )
 		o_str << ",\n\"time_life\":"                  << m_time_life;
 
+	if (m_tasks_ready) o_str << ",\n\"tasks_ready\":" << m_tasks_ready;
+	if (m_tasks_error) o_str << ",\n\"tasks_error\":" << m_tasks_error;
+
 	if (m_try_this_tasks_num.size() ) af::jw_int32vec("try_this_tasks_num",  m_try_this_tasks_num,  o_str);
 	if (m_try_this_blocks_num.size()) af::jw_int32vec("try_this_blocks_num", m_try_this_blocks_num, o_str);
 
@@ -265,6 +268,8 @@ void Job::initDefaultValues()
 	m_time_done = 0;
 	m_user_list_order = -1; // On update, if old index == -1 storing is skipped (new job registration)
 	m_time_life = -1;
+	m_tasks_error = 0;
+	m_tasks_ready = 0;
 
 	m_branch = "/";
 
@@ -337,7 +342,10 @@ void Job::v_readwrite( Msg * msg)
 	rw_int64_t(m_time_started,  msg);
 	rw_int64_t(m_time_done,     msg);
 	rw_int32_t(m_time_life,     msg);
-
+	/* NEW_VERSION
+	rw_int32_t(m_tasks_ready,   msg);
+	rw_int32_t(m_tasks_error,   msg);
+	*/
 	rw_String(m_user_name,    msg);
 	rw_String(m_host_name,    msg);
 	rw_String(m_command_pre,  msg);

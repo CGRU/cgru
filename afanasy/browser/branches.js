@@ -147,53 +147,69 @@ BranchNode.prototype.update = function(i_obj) {
 
 	if (cm_IsPadawan())
 	{
-		var jobs = '';
-		if (this.params.jobs_total)
-		{
-			jobs += 'Jobs Total:';
-			jobs += ' <b>' + this.params.jobs_total + '</b>';
-		}
-		else
-		if (this.params.running_jobs_num)
-			jobs += ' / <b>' + this.params.running_jobs_num + '</b> Running';
-		this.elJobsCounts.innerHTML = jobs;
-
-		var counts = '';
+		let counts = '';
 		if (this.params.branches_total)
-			counts = 'Branches Total: <b>' + this.params.branches_total + '</b>';
+			counts = 'Branches Total:<b>' + this.params.branches_total + '</b>';
 		this.elBranchedCounts.innerHTML = counts;
-	}
-	else if (cm_IsJedi())
-	{
-		var jobs = 'Jobs:';
-		if (this.params.jobs_total)
-			jobs += ' <b>' + this.params.jobs_total + '</b>';
-		else
-			jobs += ' <b>0</b>';
-		if (this.params.running_jobs_num)
-			jobs += ' / <b>' + this.params.running_jobs_num + '</b> Run';
-		this.elJobsCounts.innerHTML = jobs;
 
-		var counts = '';
-		if (this.params.branches_total)
-			counts = 'Branches: <b>' + this.params.branches_total + '</b>';
-		this.elBranchedCounts.innerHTML = counts;
-	}
-	else
-	{
-		var jobs = 'j:';
+		let jobs = 'Jobs:';
 		if (this.params.jobs_total)
 			jobs += '<b>' + this.params.jobs_total + '</b>';
 		else
 			jobs += '<b>0</b>';
-		if (this.params.running_jobs_num)
-			jobs += ' / <b>' + this.params.running_jobs_num + '</b>r';
-		this.elJobsCounts.innerHTML = jobs;
 
-		var counts = '';
+		if (this.params.jobs_running) jobs += ' Running:<b>'     + this.params.jobs_running + '</b>';
+		if (this.params.jobs_done   ) jobs += ' Done:<b>'        + this.params.jobs_done    + '</b>';
+		if (this.params.jobs_ready  ) jobs += ' Ready:<b>'       + this.params.jobs_ready   + '</b>';
+		if (this.params.jobs_error  ) jobs += ' Error:<b>'       + this.params.jobs_error   + '</b>';
+		if (this.params.tasks_ready ) jobs += ' Tasks Ready:<b>' + this.params.tasks_ready  + '</b>';
+		if (this.params.tasks_error ) jobs += ' Tasks Error:<b>' + this.params.tasks_error  + '</b>';
+
+		this.elJobsCounts.innerHTML = jobs;
+	}
+	else if (cm_IsJedi())
+	{
+		let counts = '';
+		if (this.params.branches_total)
+			counts = 'Branches:<b>' + this.params.branches_total + '</b>';
+		this.elBranchedCounts.innerHTML = counts;
+
+		let jobs = 'Jobs:';
+		if (this.params.jobs_total)
+			jobs += '<b>' + this.params.jobs_total + '</b>';
+		else
+			jobs += '<b>0</b>';
+
+		if (this.params.jobs_running) jobs += ' Run:<b>'  + this.params.jobs_running + '</b>';
+		if (this.params.jobs_done   ) jobs += ' Done:<b>' + this.params.jobs_done    + '</b>';
+		if (this.params.jobs_ready  ) jobs += ' Rdy:<b>'  + this.params.jobs_ready   + '</b>';
+		if (this.params.jobs_error  ) jobs += ' Err:<b>'  + this.params.jobs_error   + '</b>';
+		if (this.params.tasks_ready ) jobs += ' TRdy:<b>' + this.params.tasks_ready  + '</b>';
+		if (this.params.tasks_error ) jobs += ' TErr:<b>' + this.params.tasks_error  + '</b>';
+
+		this.elJobsCounts.innerHTML = jobs;
+	}
+	else
+	{
+		let counts = '';
 		if (this.params.branches_total)
 			counts = 'b:<b>' + this.params.branches_total + '</b>';
 		this.elBranchedCounts.innerHTML = counts;
+
+		let jobs = 'j:';
+		if (this.params.jobs_total)
+			jobs += '<b>' + this.params.jobs_total + '</b>';
+		else
+			jobs += '<b>0</b>';
+
+		if (this.params.jobs_running) jobs +=  ' R:<b>' + this.params.jobs_running + '</b>';
+		if (this.params.jobs_done   ) jobs +=  ' d:<b>' + this.params.jobs_done    + '</b>';
+		if (this.params.jobs_ready  ) jobs +=  ' r:<b>' + this.params.jobs_ready   + '</b>';
+		if (this.params.jobs_error  ) jobs +=  ' E:<b>' + this.params.jobs_error   + '</b>';
+		if (this.params.tasks_ready ) jobs += ' tr:<b>' + this.params.tasks_ready  + '</b>';
+		if (this.params.tasks_error ) jobs += ' te:<b>' + this.params.tasks_error  + '</b>';
+
+		this.elJobsCounts.innerHTML = jobs;
 	}
 
 

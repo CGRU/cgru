@@ -137,6 +137,9 @@ public:
 	inline bool hasTasksToTryNext() const {return m_try_this_tasks_num.size();}
 	const std::string tryNextTasksToStr(int i_limit = 10) const;
 
+	inline int getTasksReady() const {return m_tasks_ready;}
+	inline int getTasksError() const {return m_tasks_error;}
+
 protected:
 	/// Read blocks data and append it to block list
 	/// (called by jsonRead and also when appending new blocks)
@@ -203,6 +206,10 @@ protected:
 	// "Try this task next"
 	std::vector<int32_t> m_try_this_tasks_num;
 	std::vector<int32_t> m_try_this_blocks_num;
+
+	// Just for some statistics:
+	int32_t m_tasks_ready;
+	int32_t m_tasks_error;
 
 private:
 	void initDefaultValues();
