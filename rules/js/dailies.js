@@ -139,6 +139,7 @@ function d_Make(i_path, i_outfolder)
 	params.filename = filename;
 
 	var wnd = new cgru_Window({"name": 'dailies', "title": 'Make Dailies'});
+	wnd.elContent.classList.add('dailies');
 
 	var cmd = 'rules/bin/walk.sh -m "' + RULES.root + i_path + '"';
 	n_Request({
@@ -188,6 +189,12 @@ function d_DailiesWalkReceived(i_data, i_args)
 		// Get comments (came from image EXIF metadata):
 		if (exif.comments)
 			params.comments += ' ' + exif.comments.trim();
+	}
+	else
+	{
+		wnd.elContent.innerHTML = 'ERROR: No valid sequence found.';
+		wnd.elContent.classList.add('error');
+		return;
 	}
 
 	params.comments = params.comments.trim();

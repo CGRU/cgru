@@ -509,10 +509,14 @@ Task.prototype.editProcess = function()
 		this.obj.annotation = '';
 
 
+	if (document.location.hostname != 'localhost')
+	{
 	// We should calculate status progress
 	// if task progress is changed
 	// or if it is a new task
-	this.save(this_is_a_new_task || (progress_prevous != this.obj.progress));return;
+		this.save(this_is_a_new_task || (progress_prevous != this.obj.progress));
+		return;
+	}
 
 	let obj = {};
 	obj.path = this.statusClass.path;
