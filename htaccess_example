@@ -14,7 +14,7 @@ AuthUserFile /cgru/.htdigest
 # Remove /icons/ alias
 # sudo rm /etc/apache2/mods-enabled/alias.conf
 
-# Needed utils: htdigest, php multibyte string (utf-8 search)
+# Needed utils:
 # sudo apt-get install apache2-utils libapache2-mod-wsgi-py3
 # sudo apt-get install exiftool mediainfo
 # # Usage: htdigest [-c] passwordfile realm username
