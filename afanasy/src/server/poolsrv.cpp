@@ -644,13 +644,13 @@ void PoolSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, Monitor
 	{
 		_renders_total++;
 
-		if ( (*it)->isBusy()   ) _renders_busy   ++;
-		if ( (*it)->isReady()  ) _renders_ready  ++;
-		if ( (*it)->isOnline() ) _renders_online ++;
-		if ( (*it)->isOffline()) _renders_offline++;
-		if (!(*it)->isFree()   ) _renders_nimby  ++;
-		if ( (*it)->isSick()   ) _renders_paused ++;
-		if ( (*it)->isPaused() ) _renders_sick   ++;
+		if ((*it)->isBusy()   ) _renders_busy   ++;
+		if ((*it)->isReady()  ) _renders_ready  ++;
+		if ((*it)->isOnline() ) _renders_online ++;
+		if ((*it)->isOffline()) _renders_offline++;
+		if ((*it)->isPaused() ) _renders_paused ++;
+		if ((*it)->isSick()   ) _renders_sick   ++;
+		if ((*it)->isNIMBY() || (*it)->isNimby()) _renders_nimby  ++;
 	}
 
 	// Compare changes
