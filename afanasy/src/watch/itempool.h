@@ -69,18 +69,6 @@ private:
 	int m_idle_wolsleep_time;
 	int m_idle_free_time;
 	int m_busy_nimby_time;
-	int m_idle_cpu;
-	int m_busy_cpu;
-	int m_idle_mem;
-	int m_busy_mem;
-	int m_idle_swp;
-	int m_busy_swp;
-	int m_idle_hddgb;
-	int m_busy_hddgb;
-	int m_idle_hddio;
-	int m_busy_hddio;
-	int m_idle_netmbs;
-	int m_busy_netmbs;
 
 	int m_buttons_width;
 

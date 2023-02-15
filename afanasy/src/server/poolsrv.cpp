@@ -235,7 +235,7 @@ void PoolSrv::actionDelete(Action & i_action)
 		return;
 	}
 
-	if (m_pools_num || m_renders_num)
+	if (m_pools_total || m_renders_total)
 	{
 		i_action.answerError("Pool '" + m_name + "' has child pools/renders.");
 		return;
@@ -340,8 +340,6 @@ bool PoolSrv::addPool(PoolSrv * i_pool)
 
 	m_pools_list.push_back(i_pool);
 
-	m_pools_num++;
-
 	return true;
 }
 
@@ -350,8 +348,6 @@ void PoolSrv::removePool(PoolSrv * i_pool)
 	appendLog(std::string("Removing a pool: ") + i_pool->getName());
 
 	m_pools_list.remove(i_pool);
-
-	m_pools_num--;
 }
 
 void PoolSrv::addRender(RenderAf * i_render)
@@ -365,8 +361,6 @@ void PoolSrv::addRender(RenderAf * i_render)
 	appendLog(std::string("Adding a render: ") + i_render->getName());
 
 	m_renders_list.push_back(i_render);
-
-	m_renders_num++;
 }
 
 void PoolSrv::removeRender(RenderAf * i_render)
@@ -374,8 +368,6 @@ void PoolSrv::removeRender(RenderAf * i_render)
 	appendLog(std::string("Removing a render: ") + i_render->getName());
 
 	m_renders_list.remove(i_render);
-
-	m_renders_num--;
 }
 
 bool PoolSrv::assignRender(RenderAf * i_render)
@@ -621,39 +613,68 @@ void PoolSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, Monitor
 	bool tostore = false;
 
 	// Init counters:
-	int32_t _pools_num = 0;
-	int32_t _pools_total = 0;
-	int32_t _renders_num = 0;
-	int32_t _renders_total = 0;
+	int32_t _pools_total     = 0;
+	int32_t _renders_total   = 0;
+	int32_t _renders_busy    = 0;
+	int32_t _renders_ready   = 0;
+	int32_t _renders_online  = 0;
+	int32_t _renders_offline = 0;
+	int32_t _renders_nimby   = 0;
+	int32_t _renders_paused  = 0;
+	int32_t _renders_sick    = 0;
 
 	// Iterate pools
 	for (std::list<PoolSrv*>::const_iterator it = m_pools_list.begin(); it != m_pools_list.end(); it++)
 	{
-		_pools_num     ++;
-		_pools_total   ++;
-		_pools_total   += (*it)->m_pools_total;
-		_renders_total += (*it)->m_renders_total;
+		_pools_total++;
+
+		_pools_total     += (*it)->m_pools_total;
+		_renders_total   += (*it)->m_renders_total;
+		_renders_busy    += (*it)->m_renders_busy;
+		_renders_ready   += (*it)->m_renders_ready;
+		_renders_online  += (*it)->m_renders_online;
+		_renders_offline += (*it)->m_renders_offline;
+		_renders_nimby   += (*it)->m_renders_nimby;
+		_renders_paused  += (*it)->m_renders_paused;
+		_renders_sick    += (*it)->m_renders_sick;
 	}
 
 	// Iterate renders
 	for (std::list<RenderAf*>::const_iterator it = m_renders_list.begin(); it != m_renders_list.end(); it++)
 	{
-		_renders_num++;
 		_renders_total++;
+
+		if ( (*it)->isBusy()   ) _renders_busy   ++;
+		if ( (*it)->isReady()  ) _renders_ready  ++;
+		if ( (*it)->isOnline() ) _renders_online ++;
+		if ( (*it)->isOffline()) _renders_offline++;
+		if (!(*it)->isFree()   ) _renders_nimby  ++;
+		if ( (*it)->isSick()   ) _renders_paused ++;
+		if ( (*it)->isPaused() ) _renders_sick   ++;
 	}
 
 	// Compare changes
-	if ((_pools_num     != m_pools_num    ) ||
-		(_pools_total   != m_pools_total  ) ||
-		(_renders_num   != m_renders_num  ) ||
-		(_renders_total != m_renders_total))
+	if ((_pools_total     != m_pools_total    ) ||
+		(_renders_total   != m_renders_total  ) ||
+		(_renders_busy    != m_renders_busy   ) ||
+		(_renders_ready   != m_renders_ready  ) ||
+		(_renders_online  != m_renders_online ) ||
+		(_renders_offline != m_renders_offline) ||
+		(_renders_nimby   != m_renders_nimby  ) ||
+		(_renders_paused  != m_renders_paused ) ||
+		(_renders_sick    != m_renders_sick   ))
 		changed = true;
 
 	// Store new calculations
-	m_pools_num     = _pools_num;
-	m_pools_total   = _pools_total;
-	m_renders_num   = _renders_num;
-	m_renders_total = _renders_total;
+	m_pools_total     = _pools_total;
+	m_renders_total   = _renders_total;
+	m_renders_busy    = _renders_busy;
+	m_renders_ready   = _renders_ready;
+	m_renders_online  = _renders_online;
+	m_renders_offline = _renders_offline;
+	m_renders_nimby   = _renders_nimby;
+	m_renders_paused  = _renders_paused;
+	m_renders_sick    = _renders_sick;
 
 	// Emit events on changes
 	if (changed && i_monitoring)
