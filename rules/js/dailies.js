@@ -168,6 +168,7 @@ function d_DailiesWalkReceived(i_data, i_args)
 
 	//console.log(JSON.stringify(data));
 	// Get files sequence pattern and comments:
+	let found = false;
 	if (data && data.walk && data.walk.exif)
 	{
 		var exif = data.walk.exif;
@@ -184,15 +185,27 @@ function d_DailiesWalkReceived(i_data, i_args)
 				pattern += '#';
 			pattern += file.substr(pos - 1 + match.length);
 			params.input = c_PathPM_Rules2Client(params.input + '/' + pattern);
+			found = true;
 		}
 
 		// Get comments (came from image EXIF metadata):
 		if (exif.comments)
 			params.comments += ' ' + exif.comments.trim();
 	}
-	else
+
+	if (false == found)
 	{
-		wnd.elContent.innerHTML = 'ERROR: No valid sequence found.';
+		if (data && data.walk)
+		{
+			let msg = 'ERROR: No valid sequence found.<br>';
+			msg += '<br>' + c_PathPM_Rules2Client(params.input) + '<br>';
+			msg += '<br><a href="#' + params.input + '" target="blank">#' + params.input + '</a><br>';
+			wnd.elContent.innerHTML = msg;
+		}
+		else
+		{
+			wnd.elContent.innerHTML = 'ERROR: Invalid data received:<br><br>' + JSON.stringify(i_data);
+		}
 		wnd.elContent.classList.add('error');
 		return;
 	}
