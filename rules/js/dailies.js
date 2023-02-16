@@ -163,21 +163,22 @@ function d_DailiesWalkReceived(i_data, i_args)
 		data = i_data.cmdexec[0].walk;
 
 	// Process comments:
-	params.comments = '';
+	let comments = '';
 	// Comments from annotation
 	if (RULES.dailies.comment_annotation && RULES.status && RULES.status.annotation && RULES.status.annotation.length)
-		params.comments = RULES.status.annotation.trim();
+		comments = RULES.status.annotation.trim();
 	// Comments from body
 	if (RULES.dailies.comment_body)
 	{
-		let text = $('body_body').innerText.replace('\n','; ');
+		let text = $('body_body').innerText.replaceAll('\n','; ').trim();
 		if (text && text.length)
 		{
-			if (params.comments.length)
-				params.comments += '; ';
-			params.comments += text;
+			if (comments.length)
+				comments += '; ';
+			comments += text;
 		}
 	}
+	params.comments = comments.replaceAll('"',"'");
 
 	//console.log(JSON.stringify(data));
 	// Get files sequence pattern and comments:
