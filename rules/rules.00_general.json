@@ -279,7 +279,11 @@
 	"logo_frame_path":"logo.png",
 	"logo_frame_size":10,
 	"logo_frame_grav":"North",
+
 	"activity":"comp",
+
+	"comment_annotation":true,
+	"comment_body":false,
 
 	"-imgcmd":"convert",
 		"":"Specify image convert and draw command, default is 'convert'",
