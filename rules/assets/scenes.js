@@ -1266,19 +1266,21 @@ function scenes_makeThumbnail( i_data, i_args)
 
 function scenes_Put()
 {
-	var args = {};
+	let args = {};
 	args.paths = [];
-	var paths = scenes_GetSelectedShots();
-	for( var i = 0; i < paths.length; i++)
-		args.paths.push( paths[i].m_path);
+	let elShots = scenes_GetSelectedShots();
+	if (elShots.length < 1)
+		elShots = sc_elShots;
+	for (let i = 0; i < elShots.length; i++)
+		args.paths.push(elShots[i].m_path);
 
-	if( args.paths.length < 1 )
+	if (args.paths.length < 1 )
 	{
 		c_Error('Select at least one shot.');
 		return;
 	}
 
-	fu_PutMultiDialog( args);
+	fu_PutMultiDialog(args);
 }
 
 function scenes_Convert()
