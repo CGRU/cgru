@@ -16,10 +16,11 @@ Parser = OptionParser(
 )
 
 Parser.add_option('-r', '--respaths',     dest='respaths',     type  ='string',     default='RESULT/JPG,RESULT/TIF,RESULT/DPX')
+Parser.add_option('-f', '--filesext',     dest='filesext',     type  ='string',     default='mov', help='Include files with extensions')
 Parser.add_option('-d', '--dest',         dest='dest',         type  ='string',     default=None,  help='Destination')
 Parser.add_option('-p', '--padding',      dest='padding',      type  ='int',        default=3,     help='Version padding')
 Parser.add_option('-s', '--skipcheck',    dest='skipcheck',    action='store_true', default=False, help='Skip destination check')
-Parser.add_option('-e', '--skiperrors',   dest='skiperrors',   action='store_true', default=False, help='Skip error folders')
+Parser.add_option('-e', '--skiperrors',   dest='skiperrors',   action='store_true', default=True,  help='Skip error folders')
 Parser.add_option('-V', '--verbose',      dest='verbose',      action='store_true', default=False, help='Verbose mode')
 
 (Options, args) = Parser.parse_args()
@@ -84,10 +85,16 @@ for src in args:
                 continue
 
             path = os.path.join(respath, item)
-            #if not os.path.isdir(path):
-            #    continue
+            if os.path.isfile(path):
+                n, ext = os.path.splitext(item)
+                ext = ext.strip('.')
+                if not ext in Options.filesext.split(','):
+                    continue
 
-            ver = simiralName(item).replace(simiralName(name), '').strip('!_-. ')
+            ver = item
+            if os.path.isfile(path):
+                ver, ext = os.path.splitext(item)
+            ver = simiralName(ver).replace(simiralName(name), '').strip('!_-. ')
 
             ver_digits = re.findall(r'\d+', ver)
             if len(ver_digits):
@@ -100,20 +107,19 @@ for src in args:
                 ver = 'v' + ver
 
             if version is not None:
-                if version >= ver:
+                if version > ver:
                     continue
 
             version = ver
-            version = version.split('_')[0]
             if os.path.isfile(path):
-                version, ext = os.path.splitext(version)
                 result['file'] = item
 
             result['src'] = os.path.join(respath, item)
             result['respath'] = res
 
     if result['src'] is None:
-        result['error'] = 'Not found'
+        if not 'error' in result:
+            result['error'] = 'Not found'
         if not Options.skiperrors:
             errExit('Input not found for: %s' % src)
 
