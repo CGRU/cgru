@@ -159,6 +159,8 @@ public:
 
 	static inline int getWOLWakeInterval() { return wolwake_interval; }
 
+	static inline std::string & getOpenFolderCmd() {return open_folder_cmd;}
+
 	static inline std::string & getCmdShell()          { return cmd_shell;}
  
 	static inline int getRenderNice()               { return render_nice;                 }
@@ -333,6 +335,8 @@ private:
 
 	static int render_nice;       ///< Render task process nice factor.
 	static std::vector<std::string> render_windowsmustdie;
+
+	static std::string open_folder_cmd;
 
 	static std::string cmd_shell;
 	static std::string render_cmd_reboot;
