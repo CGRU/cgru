@@ -106,7 +106,7 @@ int af::processHeader( af::Msg * io_msg, int i_bytes)
 				}
 
 				// Look for a special header:
-				if( strncmp("AFANASY: ", buffer+offset, 9) == 0)
+				if( strncasecmp("AFANASY: ", buffer+offset, 9) == 0)
 				{
 					//printf("\nAFANASY FOUND:\n");
 					offset += 9;
@@ -137,7 +137,7 @@ int af::processHeader( af::Msg * io_msg, int i_bytes)
 	}
 
 	// Simple header for JSON (used for example in python api and afcmd)
-	if( strncmp("AFANASY", buffer, 7) == 0 )
+	if( strncasecmp("AFANASY", buffer, 7) == 0 )
 	{
 		//writedata( 1, buffer+offset, i_bytes);printf("\n");
 		offset += 7;

@@ -590,12 +590,10 @@ void Watch::browseFolder( const QString & i_folder, const QString & i_wdir)
     }
 
 	Watch::displayInfo( QString("Opening '%1'").arg( dir.path().toUtf8().data()));
-#ifdef WINNT
-	QString cmd = "explorer";
-#else
-	QString cmd = "openfolder";
-#endif
-	cmd += " \"" + i_folder + "\"";
+
+	QString cmd = afqt::stoq(af::Environment::getOpenFolderCmd());
+	cmd = cmd.replace("@PATH@", i_folder);
+
 	Watch::startProcess( cmd, i_wdir);
 }
 

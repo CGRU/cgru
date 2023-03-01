@@ -36,6 +36,8 @@ v3.3.1
 
 - AfWatch can edit job block environment variables.
 
+- AfWatch now uses ``open_folder_cmd`` config variable to open folders.
+
 - Afanasy server will not allow to change a pool of a busy render.
 
 - Afanasy server branches action added ``delete_done_jobs``. You can delete all done jobs from branch from AfWatch.
