@@ -1124,3 +1124,26 @@ def computeWedge(ropnode, roptype):
         if not numWedgeJobs:
             raise hou.OperationFailed("The specified wedge node does not compute anything.")
     return numWedgeJobs
+
+
+def getHoudiniEnvironment(i_afnode):
+    environment_dict = i_afnode.parm('environment_dict').eval()
+    environment_dict['HOUDINI_LOCATION'] = os.getenv('HFS')
+
+    keys = ['HOUDINI_VERSION','HOUDINI_MAJOR_RELEASE','HOUDINI_MINOR_RELEASE','HOUDINI_BUILD_VERSION']
+    for key in keys:
+        value = os.getenv(key)
+        if value is not None:
+            environment_dict[key] = value
+
+    i_afnode.parm('environment_dict').set(environment_dict)
+
+def removeHoudiniEnvironment(i_afnode):
+    prev_dict = i_afnode.parm('environment_dict').eval()
+    new_dict = dict()
+
+    for key in prev_dict:
+        if key.find('HOUDINI_') == -1:
+            new_dict[key] = prev_dict[key]
+
+    i_afnode.parm('environment_dict').set(new_dict)

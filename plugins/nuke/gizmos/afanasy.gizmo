@@ -69,6 +69,7 @@ Gizmo {
 
 	addUserKnob { 20 "" Environment t }
 	addUserKnob { 43 env_data l "" t "Add extra environment variables to task process.\nENV_NAME1=value1\nENV_NAME2=value2" }
+	addUserKnob { 22 env_nuke_get l "Get Nuke Environment" +STARTLINE T "cgru.setNukeEnvironment(nuke.toNode(\"this\"))" }
 
 
    name afanasy
