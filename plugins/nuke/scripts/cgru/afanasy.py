@@ -151,6 +151,7 @@ class BlockParameters:
         self.moviemode = False
         self.tickets_use = 0
         self.tickets_data = None
+        self.env_data = None
 
         # Just to add to the final job name some info, for example timecode
         self.jobname_suffix = ''
@@ -174,6 +175,8 @@ class BlockParameters:
             self.hostsmaskexclude = afnode.knob('hostsmaskexcl').value()
             self.tickets_use = int(afnode.knob('tickets_use').value())
             self.tickets_data = afnode.knob('tickets_data').value()
+            self.env_data = afnode.knob('env_data').value()
+
 
             if int(afnode.knob('timecode_use').value()):
                 timecode = afnode.knob('timecode').value()
@@ -377,6 +380,14 @@ class BlockParameters:
                         nuke.message('Invalid ticket data: "%s".' % ticket)
                         continue
                     block.addTicket(ticket[0], int(ticket[1]))
+
+            if self.env_data and len(self.env_data):
+                for env_pair in self.env_data.split('\n'):
+                    env_pair = env_pair.split('=', 1)
+                    if len(env_pair) != 2:
+                        nuke.message('Invalid environment data: "%s".' % str(env_pair))
+                        continue
+                    block.setEnv(env_pair[0].strip(), env_pair[1].strip())
 
             cmd = os.getenv('NUKE_AF_RENDER', 'nuke')
             if self.tmpimage or self.pathsmap:

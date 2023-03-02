@@ -68,7 +68,7 @@ Gizmo {
    addUserKnob {  6 pathsmap l "Apply paths map to scene" }
 
 	addUserKnob { 20 "" Environment t }
-	addUserKnob { 43 environment l "" t "Add extra environment variables to task process.\nENV_NAME1=value1\nENV_NAME2=value2" }
+	addUserKnob { 43 env_data l "" t "Add extra environment variables to task process.\nENV_NAME1=value1\nENV_NAME2=value2" }
 
 
    name afanasy
