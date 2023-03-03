@@ -15,7 +15,7 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
 v3.3.1
 ======
 
-2023.02.07 *(not released)*
+2023.03.02 *(not released)*
 
 - Afanasy service can be configured to limit task post command running time.
   Task post commands are used to generate thumbnails.
@@ -30,9 +30,15 @@ v3.3.1
   Job blocks got job serial. Tasks run got job serial, block and task ids.
   See `database schema <../afanasy/server.html#database-schema>`_.
 
+- Nuke Afanasy Gizmo can set extra
+  `environment <../software/nuke.html#environment>`_
+  variables that will be added to task process.
+  You use it to store Nuke location and version.
+
 - Houdini Afanasy ROP can set extra
   `environment <../software/houdini.html#environment>`_
   variables that will be added to task process.
+  You use it to store Houdini location and version.
 
 - AfWatch can edit job block environment variables.
 

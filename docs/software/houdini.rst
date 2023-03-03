@@ -152,6 +152,13 @@ Environment
 	It is key-value dictionary.
 	Key used as an environment variable name.
 	This environment variables will be *added* to task process environment.
+- Get Houdini Environment
+    Get and store in variables Houdini location and version.
+    It can be used in setup scripts to launch the same version, initialize proper plug-ins.
+- Remove Houdini Environment
+    Remove Houdini related variables (starting with *"HOUDINI_"*).
+- Clear Environment
+    Remove all variables.
 
 
 Distribute Simulation
