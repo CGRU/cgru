@@ -306,7 +306,8 @@ bool Job::isValid( std::string * o_err) const
 	if( err->size())
 	{
 		valid = false;
-		AF_ERR << "Invalid job '" << m_name << "'[" << m_id << "]:\n" << err->c_str();
+		if (o_err == NULL)
+			AF_ERR << "Invalid job '" << m_name << "'[" << m_id << "]:\n" << err->c_str();
 	}
 
 	if( o_err == NULL )

@@ -183,18 +183,28 @@ void JobAf::construct(int alreadyConstructed)
 
 bool JobAf::isValidConstructed() const
 {
+	bool valid = true;
 	std::string err;
 
 	if ((NULL == m_blocks) || (NULL == m_progress))
+	{
 		err += "Is not constructed.";
+		valid = false;
+	}
 
-	if( err.size())
+	if (valid)
+	{
+		valid = isValid(&err);
+	}
+
+	if (false == valid)
 	{
 		err = std::string("Invalid job '") + m_name + "': " + err;
 		if( isFromStore())
 			AF_ERR << err;
 		else
 			AFCommon::QueueLogError( err);
+
 		return false;
 	}
 
