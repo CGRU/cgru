@@ -22,8 +22,8 @@ public:
 
 	virtual ~Pool();
 
-	inline const bool  isRoot() const { return m_name == "/"; }
-	inline const bool notRoot() const { return m_name != "/"; }
+	inline bool  isRoot() const { return m_name == "/"; }
+	inline bool notRoot() const { return m_name != "/"; }
 
 	void v_generateInfoStream(std::ostringstream & stream, bool full = false) const;
 

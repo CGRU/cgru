@@ -111,7 +111,7 @@ void Work::jsonRead(const JSON &i_object, std::string *io_changes)
 {
 	jr_int32("max_tasks_per_second", m_max_tasks_per_second, i_object, io_changes);
 	if (m_max_tasks_per_second  > AFBRANCH::TASKSPERSECOND_MAX)
-		m_max_tasks_per_second == AFBRANCH::TASKSPERSECOND_MAX;
+		m_max_tasks_per_second = AFBRANCH::TASKSPERSECOND_MAX;
 
 	jr_int32("max_running_tasks", m_max_running_tasks, i_object, io_changes);
 	jr_int32("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object, io_changes);

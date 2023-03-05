@@ -569,8 +569,10 @@ void Watch::browseImages( const QString & i_image, const QString & i_wdir)
 
     QString folder = i_image.left( i_image.lastIndexOf('/'));
     folder = folder.left( i_image.lastIndexOf('\\'));
-    if( folder == i_image )
+    if (folder == i_image)
+	{
         folder = i_wdir;
+	}
 
 	Watch::browseFolder( folder, i_wdir);
 }

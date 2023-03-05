@@ -43,10 +43,10 @@ public:
 	inline void setSolveCapacity() { m_solving_flags |= SolveCapacity; }
 	inline void setSolveTasksNum() { m_solving_flags &=~SolveCapacity; }
 
-	inline bool isSolvePriority() const { return m_solving_flags & SolvePriority; }
-	inline bool isSolveOrder()    const { return m_solving_flags & SolvePriority == false; }
-	inline bool isSolveCapacity() const { return m_solving_flags & SolveCapacity; }
-	inline bool isSolveTasksNum() const { return m_solving_flags & SolveCapacity == false; }
+	inline bool isSolvePriority() const {return  m_solving_flags & SolvePriority;}
+	inline bool isSolveOrder()    const {return (m_solving_flags & SolvePriority) == false;}
+	inline bool isSolveCapacity() const {return  m_solving_flags & SolveCapacity;}
+	inline bool isSolveTasksNum() const {return (m_solving_flags & SolveCapacity) == false;}
 
 
 	void generateInfoStream(std::ostringstream &o_str, bool full = false) const; /// Generate information.

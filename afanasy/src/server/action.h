@@ -61,8 +61,8 @@ public:
 		return ms_answer_type_str[m_answer_type < ATLast ? m_answer_type : ATInfo];
 	}
 
-	inline const bool isAnswerEmpty() const {return m_answer.empty();}
-	inline const AnswerType getAnswerType() const {return m_answer_type;}
+	inline bool isAnswerEmpty() const {return m_answer.empty();}
+	inline AnswerType getAnswerType() const {return m_answer_type;}
 	inline const std::string & getAnswer() const {return m_answer;}
 
 	// Just Web Browser asks to deregister, and on page close it can't wait for an answer

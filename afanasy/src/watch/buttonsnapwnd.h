@@ -14,7 +14,7 @@ public:
 
 	enum{NoSnap, Left, Right, LAST};
 
-	inline static const int getType() {return ms_CurrentType;}
+	inline static int getType() {return ms_CurrentType;}
 
 	void setSelected();
 	void setUnSelected();

@@ -22,8 +22,8 @@ public:
 
 	~RegExp();
 
-	inline const bool empty() const { return pattern.empty(); }
-	inline const bool notEmpty() const { return false == pattern.empty(); }
+	inline bool empty() const { return pattern.empty(); }
+	inline bool notEmpty() const { return false == pattern.empty(); }
 	inline const std::string & getPattern() const { return pattern;}
 
 	static bool Validate( const std::string & str, std::string * errOutput = NULL);
