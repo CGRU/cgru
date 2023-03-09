@@ -207,6 +207,7 @@ function c_RulesMergeDir(o_rules, i_dir)
                 c_Log(obj.ruerror.info);
             if (obj.ruerror.error)
                 c_Error(obj.ruerror.error);
+			c_ConstantError(obj.ruerror.error);
             continue;
         }
 
@@ -308,6 +309,13 @@ function c_LogClear()
 	c_lastLogCount = 1;
 
 	u_el.log.innerHTML = '';
+}
+
+function c_ConstantError(i_msg)
+{
+	let el = $('constant_error');
+	el.style.display = 'block';
+	el.innerHTML = i_msg;
 }
 
 function c_AuxFolder(i_folder)

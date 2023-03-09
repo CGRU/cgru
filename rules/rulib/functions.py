@@ -142,7 +142,7 @@ def readObj(i_file, o_out = None, i_lock = True):
     except:
         obj = None
         if o_out is not None:
-            o_out['error'] = 'Can`t read json object.'
+            o_out['error'] = 'Can`t read json object from "%s".' % i_file
             o_out['info'] = '%s' % traceback.format_exc()
 
     return obj

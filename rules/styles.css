@@ -791,6 +791,19 @@ padding: 10px;
 overflow-y: scroll;
 }
 
+#constant_error {
+display: none;
+margin: 8px;
+padding: 8px;
+border: 4px solid #700;
+border-radius: 8px;
+background-color: #F88;
+text-align: center;
+font-size: 22px;
+font-weight: bold;
+color: #400;
+}
+
 #annotations { float: left; padding: 6px; }
 #annotations > div { float: left; margin: 0px 4px; }
 #annotations > div * { margin: 0px 2px; }
