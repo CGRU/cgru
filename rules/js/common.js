@@ -197,9 +197,20 @@ function c_RulesMergeDir(o_rules, i_dir)
 	{
 		let obj = i_dir.rules[keys[k]];
 		if (obj == null)
-			c_Error('RULES file "' + attr + '" in "' + g_CurPath() + '/' + RUFOLDER + '" is invalid.');
-		else
-			c_RulesMergeObjs(o_rules, obj);
+        {
+			c_Error('RULES file "' + keys[k] + '" in "' + g_CurPath() + '/' + RUFOLDER + '" is invalid.');
+            continue;
+        }
+        if (obj.ruerror)
+        {
+            if (obj.ruerror.info)
+                c_Log(obj.ruerror.info);
+            if (obj.ruerror.error)
+                c_Error(obj.ruerror.error);
+            continue;
+        }
+
+		c_RulesMergeObjs(o_rules, obj);
 	}
 }
 

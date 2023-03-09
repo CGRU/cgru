@@ -389,13 +389,13 @@ Remember any delete operation buttons in RULES requires double-click.
 					<div class="button" id="news_settings_btn"
 						title="Click to open/close subscribed locations"
 						style="background-image:url(rules/icons/news_channels.png);"
-						onclick="c_ElDisplayToggle(document.getElementById('chanset'));
+						onclick="c_ElDisplayToggle(document.getElementById('news_settings'));
 						this.classList.toggle('pushed')"></div>
 					<div class="button" title="Change news sorting order"
 						style="background-image:url(rules/icons/sort_order_toggle.png);"
 						onclick="nw_SortOrderToggle()"></div>
 				</div>
-				<div id="chanset" style="display:none">
+				<div id="news_settings" style="display:none">
 					<div id="subscribe_path"
 						title="Subscribed parent location"></div>
 					<div id="subscribe_btn" class="button" onclick="nw_Subscribe()"
@@ -411,6 +411,12 @@ Remember any delete operation buttons in RULES requires double-click.
 						style="background-image:url(rules/icons/megaphone.png); float: right;"
 						title="Create some custom news"></div>
 					<div id="channels"></div>
+                    <!--div id="news_filter_div">
+                        <div>Include Tags:</div>
+                        <div>Exclude Tags:</div>
+                        <div>Include Flags:</div>
+                        <div>Exclude Flags:</div>
+                    </div-->
 				</div>
 			</div>
 			<div class="news_filter" style="font-size: 12px" title="News filter">

@@ -130,15 +130,22 @@ def readObj(i_file, o_out = None, i_lock = True):
 
     data = fileRead(i_file, i_lock)
     obj = None
-    if data:
+
+    if data is None:
+        error = 'Unable to read file %s' % i_file
+        if o_out is not None:
+            o_out['error'] = error
+        return
+
+    try:
         obj = json.loads(data)
-        return obj
+    except:
+        obj = None
+        if o_out is not None:
+            o_out['error'] = 'Can`t read json object.'
+            o_out['info'] = '%s' % traceback.format_exc()
 
-    error = 'Unable to read file %s' % i_file
-    if o_out is not None:
-        o_out['error'] = error
-
-    return
+    return obj
 
 
 def writeObj(i_file, i_obj, o_out=None):
@@ -369,9 +376,18 @@ def walkDir(admin, i_recv, i_dir, o_out, i_depth):
                     continue
 
                 # Read object from rufile
-                obj = readObj(os.path.join(path, ruentry), None, False)
-                if obj:
+                out = dict()
+                obj = readObj(os.path.join(path, ruentry), out, False)
+                if obj is not None:
                     o_out['rules'][ruentry] = obj
+                else:
+                    err = dict()
+                    if 'error' in out:
+                        err['ruerror'] = out
+                    else:
+                        err['ruerror'] = dict()
+                        err['ruerror']['error'] = 'Unable to read json object'
+                    o_out['rules'][ruentry] = err
 
             continue
 
