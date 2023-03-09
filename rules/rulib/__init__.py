@@ -44,8 +44,9 @@ if len(RULES_TOP) == 0:
 
     RULES_TOP = functions.getRulesUno(CGRU_LOCATION,'rules')
 
-    try:
-        ROOT = os.readlink(os.path.join(CGRU_LOCATION, RULES_TOP['root']))
-    except:
-        print('%s' % traceback.format_exc())
-        ROOT = os.path.join(CGRU_LOCATION, RULES_TOP['root'])
+    if 'root' in RULES_TOP:
+        try:
+            ROOT = os.readlink(os.path.join(CGRU_LOCATION, RULES_TOP['root']))
+        except:
+            print('%s' % traceback.format_exc())
+            ROOT = os.path.join(CGRU_LOCATION, RULES_TOP['root'])

@@ -75,7 +75,18 @@ def getRuFiles(i_path = None, i_ruFolder = None):
 def getRulesUno(i_path = None, i_ruFolder =  None):
     rules = dict()
     for afile in getRuFiles(i_path, i_ruFolder):
-        rulib.editobj.mergeObjs(rules, readObj(afile))
+        out = dict()
+        obj = readObj(afile, out)
+        if obj is None:
+            errobj = dict()
+            errobj['error'] = 'Invalid rules file: "%s"' % afile
+            if 'error' in out:
+                errobj['error'] = out['error']
+            if 'info' in out:
+                errobj['info'] = out['info']
+            rules['ruerror'] = errobj
+            break
+        rulib.editobj.mergeObjs(rules, obj)
     return rules
 
 def fileRead(i_file, i_lock = True, i_verbose = False):

@@ -114,6 +114,13 @@ function g_Init_Config(i_data)
 	st_Init();
 
 	c_RulesMergeObjs(RULES_TOP, config.rules_top);
+    if (RULES_TOP.ruerror)
+    {
+        if (RULES_TOP.ruerror.info)
+            c_Log(RULES_TOP.ruerror.info);
+        c_Error(RULES_TOP.ruerror.error);
+        c_ConstantError(RULES_TOP.ruerror.error);
+    }
 
 	if (RULES_TOP.cgru_config)
 		cgru_ConfigJoin(RULES_TOP.cgru_config);
