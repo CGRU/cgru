@@ -12,10 +12,12 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
   You can upgrade only one client or server for changes.
 
 
+.. _changes-log-latest:
+
 v3.3.1
 ======
 
-2023.03.02 *(not released)*
+2023.03.12
 
 - Afanasy service can be configured to limit task post command running time.
   Task post commands are used to generate thumbnails.
@@ -56,7 +58,6 @@ v3.3.1
 
 - Rules Python API started.
 
-.. _changes-log-latest:
 
 v3.3.0
 ======
