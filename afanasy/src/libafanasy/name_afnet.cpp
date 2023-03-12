@@ -9,6 +9,9 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #define closesocket close
+#else
+#define strncasecmp _strnicmp
+#define strcasecmp _stricmp
 #endif
 
 #include "../include/afanasy.h"
