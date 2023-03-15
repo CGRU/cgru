@@ -175,9 +175,10 @@ def makeNewsUno(i_args, io_users, i_uid, out):
         if 'channels' in user:
             for channel in user['channels']:
                 if news['path'].find(channel['id']) == 0:
-                    if not user['id'] in sub_users:
-                        sub_users.append(user['id'])
-                    break
+                    if filterPassed(user, news):
+                        if not user['id'] in sub_users:
+                            sub_users.append(user['id'])
+                        break
 
 
     # Add news and write files:
@@ -325,6 +326,72 @@ def isUserAssignedInStatus(i_user, i_obj):
             # All tasks users should receive news (if task is not done)
             if 'title' in i_obj and i_obj['title'] != 'status':
                 return True
+
+    return False
+
+
+def filterPassed(i_user, i_obj):
+
+    if not 'news_filter' in i_user:
+        return True
+
+    if not 'status' in i_obj:
+        return True
+
+    status = i_obj['status']
+    if not isinstance(status, dict):
+        return True
+
+    # Find out wat was changed:
+    changed = None
+    if 'changed' in status and status['changed']:
+        changed = status
+    else:
+        if 'tasks' in status:
+            for tname in status['tasks']:
+                task = status['tasks'][tname]
+
+                if 'deleted' in task and task['deleted']:
+                    continue
+
+                if 'changed' in task and task['changed']:
+                    changed = task
+
+    if changed is None:
+        return True
+
+    news_filter = i_user['news_filter']
+    #print(news_filter)
+    #print(changed)
+
+    if not checkIntersection(news_filter, 'tags_include', True, changed, 'tags', False):
+        return False
+    if not checkIntersection(news_filter, 'flags_include', True, changed, 'flags', False):
+        return False
+    if checkIntersection(news_filter, 'tags_exclude', False, changed, 'tags', False):
+        return False
+    if checkIntersection(news_filter, 'flags_exclude', False, changed, 'flags', False):
+        return False
+
+    return True
+
+
+def checkIntersection(obj_a, key_a, no_a, obj_b, key_b, no_b):
+    if not key_a in obj_a:
+        return no_a
+    list_a = obj_a[key_a]
+    if len(list_a) == 0:
+        return no_a
+
+    if not key_b in obj_b:
+        return no_b
+    list_b = obj_b[key_b]
+    if len(list_b) == 0:
+        return no_b
+
+    for i in list_a:
+        if i in list_b:
+            return True
 
     return False
 
