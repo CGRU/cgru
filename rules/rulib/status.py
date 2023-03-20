@@ -266,7 +266,10 @@ def updateUpperProgresses(i_path, i_progresses, out):
             if progress < 0:
                 continue
 
-            progress_sum += progress
+            #progress_sum += progress
+            if progress >= 100:
+                progress_sum += 100;
+
             progress_count += 1
 
         if progress_count == 0:

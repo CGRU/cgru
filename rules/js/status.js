@@ -1928,7 +1928,9 @@ function st_UpdateProgressesWalkReceived(i_walks, i_args)
 			var path = paths[w] + '/' + folder.name;
 			if ((progresses[path] != null) && (progresses[path] != -1))
 			{
-				progress += progresses[path];
+				//progress += progresses[path];
+				if (progresses[path] >= 100)
+					progress += 100;
 			}
 			else
 			{
@@ -1946,8 +1948,12 @@ function st_UpdateProgressesWalkReceived(i_walks, i_args)
 				}
 				else if (folder.status.progress < 0)
 					continue;
+				else if (folder.status.progress >= 100)
+					progress += 100;
+				/*
 				else
 					progress += folder.status.progress;
+				*/
 			}
 			progress_count++;
 		}
