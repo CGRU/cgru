@@ -490,16 +490,6 @@ void ListRenders::generateRenderMenu(QMenu * i_menu)
 
 	submenu->addSeparator();
 
-	action = new QAction( "Change Capacity", this);
-	connect(action, SIGNAL(triggered()), this, SLOT(actCapacity()));
-	submenu->addAction(action);
-
-	action = new QAction( "Change Max Tasks", this);
-	connect(action, SIGNAL(triggered()), this, SLOT(actMaxTasks()));
-	submenu->addAction(action);
-
-	submenu->addSeparator();
-
 	generateCommonMenuItems(submenu);
 
 	submenu->addSeparator();
@@ -863,29 +853,6 @@ void ListRenders::actNewRenderReady()
 	setParameter(Item::TPool, "new_paused", "false");
 }
 
-void ListRenders::actCapacity()
-{
-	ItemRender* item = (ItemRender*)getCurrentItem();
-	if( item == NULL ) return;
-	int current = item->getCapacity();
-
-	bool ok;
-	int capacity = QInputDialog::getInt(this, "Change Capacity", "Enter New Capacity", current, -1, 1000000, 1, &ok);
-	if( !ok) return;
-	setParameter(Item::TRender, "capacity", af::itos(capacity));
-}
-void ListRenders::actMaxTasks()
-{
-	ItemRender* item = (ItemRender*)getCurrentItem();
-	if( item == NULL ) return;
-	int current = item->getMaxTasks();
-
-	bool ok;
-	int max_tasks = QInputDialog::getInt(this, "Change Maximum Tasksy", "Enter New Limit", current, -1, 1000000, 1, &ok);
-	if( !ok) return;
-	setParameter(Item::TRender, "max_tasks", af::itos(max_tasks));
-}
-
 void ListRenders::actNIMBY()       {setParameter(Item::TRender, "NIMBY",  "true" );}
 void ListRenders::actNimby()       {setParameter(Item::TRender, "nimby",  "true" );}
 void ListRenders::actFree()        {setParameter(Item::TRender, "nimby",  "false");}
@@ -900,7 +867,7 @@ void ListRenders::actUser()
 	QString text = QInputDialog::getText(this, "Set User", "Enter User Name", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	setParameter(Item::TRender, "user_name", afqt::qtos(QString("\"%1\"").arg(text)));
+	setParameterQStr(Item::TRender, "user_name", text);
 }
 
 void ListRenders::actEjectTasks()      { operation(Item::TAny,    "eject_tasks"        ); }

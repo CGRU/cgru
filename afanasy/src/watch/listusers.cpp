@@ -211,10 +211,10 @@ void ListUsers::calcTitle()
 void ListUsers::actDelete() { operation(Item::TUser, "delete"); }
 void ListUsers::actSetPaused()   {setParameter(Item::TUser, "paused", "true" );}
 void ListUsers::actUnsetPaused() {setParameter(Item::TUser, "paused", "false");}
-void ListUsers::actSolveJobsByOrder()    {setParameter(Item::TUser, "solve_method", "\"solve_order\""   ); }
-void ListUsers::actSolveJobsByPriority() {setParameter(Item::TUser, "solve_method", "\"solve_priority\""); }
-void ListUsers::actSolveJobsByCapacity() {setParameter(Item::TUser, "solve_need",   "\"solve_capacity\""); }
-void ListUsers::actSolveJobsByTasksNum() {setParameter(Item::TUser, "solve_need",   "\"solve_tasksnum\""); }
+void ListUsers::actSolveJobsByOrder()    {setParameterStr(Item::TUser, "solve_method", "solve_order"   ); }
+void ListUsers::actSolveJobsByPriority() {setParameterStr(Item::TUser, "solve_method", "solve_priority"); }
+void ListUsers::actSolveJobsByCapacity() {setParameterStr(Item::TUser, "solve_need",   "solve_capacity"); }
+void ListUsers::actSolveJobsByTasksNum() {setParameterStr(Item::TUser, "solve_need",   "solve_tasksnum"); }
 
 void ListUsers::actRequestLog() { getItemInfo(Item::TAny, "log"); }
 

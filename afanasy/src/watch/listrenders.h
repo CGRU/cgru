@@ -60,9 +60,6 @@ private slots:
 
 	void renderAdded( ItemNode * node, const QModelIndex & index);
 
-	void actCapacity();
-	void actMaxTasks();
-
 	void actAddPool();
 
 	void actRenderSetPool();

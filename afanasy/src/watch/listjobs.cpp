@@ -788,7 +788,7 @@ void ListJobs::actSetUser()
 	QString text = QInputDialog::getText(this, "Change Owner", "Enter New User Name", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	setParameter(Item::TJob, "user_name", afqt::qtos(QString("\"%1\"").arg(text)));
+	setParameterQStr(Item::TJob, "user_name", text);
 }
 
 void ListJobs::actChangeBranch()
@@ -799,7 +799,7 @@ void ListJobs::actChangeBranch()
 	bool ok;
 	QString branch = QInputDialog::getText(this, "Change Branch", "Branch", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
-	setParameter(Item::TJob, "branch", afqt::qtos(QString("\"%1\"").arg(branch)));
+	setParameterQStr(Item::TJob, "branch", branch);
 }
 
 void ListJobs::actPostCommand()
@@ -812,7 +812,7 @@ void ListJobs::actPostCommand()
 	QString cmd = QInputDialog::getText(this, "Change Post Command", "Enter Command", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	setParameter(Item::TJob, "command_post", afqt::qtos( cmd));
+	setParameterQStrEscape(Item::TJob, "command_post", cmd);
 }
 
 void ListJobs::v_doubleClicked(Item * i_item)

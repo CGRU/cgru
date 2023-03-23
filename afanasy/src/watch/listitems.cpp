@@ -386,7 +386,7 @@ void ListItems::getItemInfo(Item::EType i_type, const std::string & i_mode)
 	Watch::sendMsg( af::jsonMsg( str));
 }
 
-void ListItems::setParameter(Item::EType i_type, const std::string & i_name, const std::string & i_value)
+void ListItems::setParameter(Item::EType i_type, const std::string & i_name, const std::string & i_value, bool i_quote)
 {
 	std::vector<int> ids = getSelectedIds(i_type);
 	if (ids.size() == 0)
@@ -401,7 +401,10 @@ void ListItems::setParameter(Item::EType i_type, const std::string & i_name, con
 
 	af::jsonActionParamsStart(str, itemTypeToAf(i_type), "", ids);
 
-	str << "\n\"" << i_name << "\":" << i_value;
+	if (i_quote)
+		str << "\n\"" << i_name << "\":\"" << i_value << "\"";
+	else
+		str << "\n\"" << i_name << "\":" << i_value;
 
 	af::jsonActionParamsFinish( str);
 

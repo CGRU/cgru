@@ -316,10 +316,10 @@ void ListWork::slot_ACC_Enable()   {setParameter(Item::TBranch, "create_childs",
 void ListWork::slot_ACC_Disable()  {setParameter(Item::TBranch, "create_childs", "false");}
 void ListWork::slot_SolveJobs()    {setParameter(Item::TBranch, "solve_jobs", "true" );}
 void ListWork::slot_SolveUsers()   {setParameter(Item::TBranch, "solve_jobs", "false");}
-void ListWork::slot_SolvePiority() {setParameter(Item::TBranch, "solve_method", "\"solve_priority\"");}
-void ListWork::slot_SolveOrder()   {setParameter(Item::TBranch, "solve_method", "\"solve_order\""   );}
-void ListWork::slot_SolveTasks()   {setParameter(Item::TBranch, "solve_need", "\"solve_tasks\""   );}
-void ListWork::slot_SolveCapacity(){setParameter(Item::TBranch, "solve_need", "\"solve_capacity\"");}
+void ListWork::slot_SolvePiority() {setParameterStr(Item::TBranch, "solve_method", "solve_priority");}
+void ListWork::slot_SolveOrder()   {setParameterStr(Item::TBranch, "solve_method", "solve_order"   );}
+void ListWork::slot_SolveTasks()   {setParameterStr(Item::TBranch, "solve_need",   "solve_tasks"   );}
+void ListWork::slot_SolveCapacity(){setParameterStr(Item::TBranch, "solve_need",   "solve_capacity");}
 void ListWork::slot_DelDoneJobs()  {   operation(Item::TBranch, "delete_done_jobs");}
 
 void ListWork::slot_JobSetBranch()
@@ -342,7 +342,7 @@ void ListWork::slot_JobSetBranch()
 
 	branch = QString("\"%1\"").arg(branch);
 
-	setParameter(Item::TJob, "branch", afqt::qtos(branch));
+	setParameterQStr(Item::TJob, "branch", branch);
 
 	displayInfo(QString("Setting branch to %1").arg(branch));
 }
