@@ -50,3 +50,30 @@ if len(RULES_TOP) == 0:
         except:
             print('%s' % traceback.format_exc())
             ROOT = os.path.join(CGRU_LOCATION, RULES_TOP['root'])
+
+
+def setTask(path=None, uid=None, name=None, tags=None, artists=None, flags=None, progress=None, annotation=None, deleted=None, nonews=False, out=None):
+    if out is None:
+        out = dict()
+
+    st = status.Status(uid, path)
+
+    st.setTask(tags=tags, artists=artists, flags=flags, progress=progress, annotation=annotation, deleted=deleted, out=out)
+
+    if 'error' in out:
+        return out
+
+    # News & Bookmarks:
+    # At first we should emit news,
+    # as some temporary could be added for news.
+    # For example task.changed = true
+    news.statusChanged(st, out, nonews)
+
+    st.save(out)
+
+    if st.progress_changed:
+        progresses = dict()
+        progresses[st.path] = st.data['progress']
+        status.updateUpperProgresses(os.path.dirname(st.path), progresses, out)
+
+    return out

@@ -90,6 +90,26 @@ class Status:
         return None
 
 
+    def set(self, tags=None, artists=None, flags=None, progress=None, annotation=None, out=None):
+
+        if tags is not None and type(tags) is list:
+            self.data['tags'] = tags
+        if artists is not None and type(artists) is list:
+            self.data['artists'] = artists
+        if flags is not None and type(flags) is list:
+            self.data['flags'] = flags
+        if annotation is not None and type(annotation) is str:
+            self.data['annotation'] = annotation
+        if progress is not None and type(progress) is int:
+            if progress < -1: progress = -1
+            elif progress > 100: progress = 100
+            self.data['progress'] = progress
+
+        self.data['changed'] = True
+
+        return self.data
+
+
     def setTask(self, name=None, tags=None, artists=None, flags=None, progress=None, annotation=None, deleted=None, out=None):
 
         task = self.findTask(name, tags)
@@ -209,22 +229,12 @@ class Status:
                     del self.data['tasks'][t]['changed']
 
 
-    def save(self, out=dict(), nonews=False):
-        self.data['mtime'] = self.mtime
-        self.data['muser'] = self.muser
-
-        rulib.news.statusChanged(self, out, nonews)
-
+    def save(self, out=dict()):
         self.prepareDataForSave()
 
         saveStatusData(self.path, self.data, out)
 
         out['status'] = self.data
-
-        if self.progress_changed:
-            progresses = dict()
-            progresses[self.path] = self.data['progress']
-            updateUpperProgresses(os.path.dirname(self.path), progresses, out)
 
 
 def updateUpperProgresses(i_path, i_progresses, out):

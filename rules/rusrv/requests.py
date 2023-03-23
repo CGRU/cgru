@@ -284,8 +284,6 @@ class Requests:
             out['error'] = 'Path is not specified.'
             return
 
-        s = rulib.status.Status(uid=self.session.USER_ID, path=i_args['path'])
-
         name       = None
         tags       = None
         artists    = None
@@ -293,6 +291,7 @@ class Requests:
         progress   = None
         annotation = None
         deleted    = None
+        nonews     = False
 
         if 'name'       in i_args: name       = i_args['name']
         if 'tags'       in i_args: tags       = i_args['tags']
@@ -301,12 +300,9 @@ class Requests:
         if 'progress'   in i_args: progress   = i_args['progress']
         if 'annotation' in i_args: annotation = i_args['annotation']
         if 'deleted'    in i_args: deleted    = i_args['deleted']
+        if 'nonews'     in i_args and i_args['nonews']: nonews = True
 
-        s.setTask(name=name, tags=tags, artists=artists, flags=flags, progress=progress, annotation=annotation, deleted=deleted, out=out)
-
-        nonews = False
-        if nonews in i_args and i_args['nonews']: nonews = True
-        s.save(out=out, nonews=nonews)
+        rulib.setTask(uid=self.session.USER_ID, path=i_args['path'], name=name, tags=tags, artists=artists, flags=flags, progress=progress, annotation=annotation, deleted=deleted, nonews=nonews, out=out)
 
         return
 
