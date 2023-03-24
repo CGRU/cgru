@@ -658,7 +658,7 @@ opacity: .7;
 position: relative;
 border-top: 1px solid rgba(98,98,98,.5);
 font-size: 12px;
-padding: 4px 0;
+padding: 4px 10px 0 0;
 }
 #bookmarks .bookmark a {
 padding: 0 12px;
