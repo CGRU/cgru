@@ -55,6 +55,14 @@ environment
 
 Tasks process extra environment.
 It will be merged with a block extra environment.
+Each task will automatically get the following environment variables:
+
+.. code-block:: shell
+
+   AF_JOB_ID = tasks job id
+   AF_BLOCK_ID = tasks block id
+   AF_TASK_ID = tasks task id
+
 
 tst
 ---
