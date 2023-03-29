@@ -122,6 +122,14 @@ environment
 ``af.Block.setEnv(name, value)``
 
 Tasks process extra environment.
+Each task in a block will automatically get the following environment variables:
+
+.. code-block:: shell
+
+   AF_JOB_ID = tasks job id
+   AF_BLOCK_ID = tasks block id
+   AF_TASK_ID = tasks task id
+
 
 command_post
 ------------
