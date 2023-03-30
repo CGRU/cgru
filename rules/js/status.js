@@ -1925,7 +1925,8 @@ function st_UpdateProgressesWalkReceived(i_walks, i_args)
 			if (c_AuxFolder(folder))
 				continue;
 
-			var path = paths[w] + '/' + folder.name;
+			let path = paths[w] + '/' + folder.name;
+			/*
 			if ((progresses[path] != null) && (progresses[path] != -1))
 			{
 				//progress += progresses[path];
@@ -1944,17 +1945,56 @@ function st_UpdateProgressesWalkReceived(i_walks, i_args)
 						continue;
 
 					// Save only progress:
-					st_Save({"progress": 0}, path, /*func=*/null, /*args=*/null, navig_params_update);
+					st_Save({"progress": 0}, path, null, null, navig_params_update);
 				}
 				else if (folder.status.progress < 0)
 					continue;
 				else if (folder.status.progress >= 100)
 					progress += 100;
-				/*
-				else
-					progress += folder.status.progress;
-				*/
 			}
+			*/
+			let cur_progress = 0;
+
+			if ((progresses[path] != null) && (progresses[path] != -1))
+			{
+				cur_progress = progresses[path];
+			}
+			else
+			{
+				if ((folder.status == null) || (folder.status.progress == null))
+				{
+					// Here we set and save 0% progress on a neighbour folders,
+					// if status or progress is not set at all:
+
+					// Siblings are only at last walk ( earlier are parents )
+					if (w != (i_walks.length - 1))
+						continue;
+
+					// Save only progress:
+					st_Save({"progress": 0}, path, null, null, navig_params_update);
+				}
+				else
+					cur_progress = folder.status.progress;
+			}
+
+			// Skip aux folders:
+			if (cur_progress < 0)
+				continue;
+
+			if (cur_progress > 100)
+				cur_progress = 100;
+
+			if (folder.status)
+			{
+				if (folder.status.tasks)
+				{
+					if (cur_progress < 100)
+						cur_progress = 0;
+				}
+			}
+
+			progress += cur_progress;
+
 			progress_count++;
 		}
 

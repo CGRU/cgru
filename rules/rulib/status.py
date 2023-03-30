@@ -263,23 +263,30 @@ def updateUpperProgresses(i_path, i_progresses, out):
                 continue
 
             progress = 0
+            sdata = None
             path = os.path.join(folder, entry)
+            sdata = getStatusData(path)
             if path in i_progresses:
                 progress = i_progresses[path]
             else:
-                sdata = getStatusData(path)
                 if sdata and 'progress' in sdata:
                     progress = sdata['progress']
 
-            #print(entry, progress)
-
+            # Skip aux folders:
             if progress < 0:
                 continue
 
-            #progress_sum += progress
+            # Clamp progress to 100%
             if progress >= 100:
-                progress_sum += 100;
+                progress = 100
 
+            # If status has tasks assuming that it is a shot.
+            # We want to count only 100% done shots.
+            if sdata and 'tasks' in sdata:
+                if progress < 100:
+                    progress = 0;
+
+            progress_sum += progress
             progress_count += 1
 
         if progress_count == 0:
