@@ -326,6 +326,10 @@ function bm_Show()
 						task = bm.status.tasks[task];
 						if (task.deleted)
 							continue;
+						if (task.artists == null)
+							continue;
+						if (task.artists.indexOf(g_auth_user.id) == -1)
+							continue;
 						if (task.flags)
 						{
 							for (let flag of task.flags)
