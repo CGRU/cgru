@@ -357,6 +357,7 @@ function bm_Show()
 		{
 			let el = document.createElement('div');
 			el.textContent = c_GetFlagShort(flag) + ': ' + prj_flags[flag];
+			el.title = c_GetFlagTitle(flag);
 			el.classList.add('tag','flag');
 			let clr = null;
 			if (RULES.flags[flag] && RULES.flags[flag].clr)
