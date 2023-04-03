@@ -324,6 +324,8 @@ function bm_Show()
 					for (let task in bm.status.tasks)
 					{
 						task = bm.status.tasks[task];
+						if (task.deleted)
+							continue;
 						if (task.flags)
 						{
 							for (let flag of task.flags)
@@ -354,7 +356,7 @@ function bm_Show()
 		for (let flag in prj_flags)
 		{
 			let el = document.createElement('div');
-			el.textContent = c_GetFlagShort(flag) + ':' + prj_flags[flag];
+			el.textContent = c_GetFlagShort(flag) + ': ' + prj_flags[flag];
 			el.classList.add('tag','flag');
 			let clr = null;
 			if (RULES.flags[flag] && RULES.flags[flag].clr)
