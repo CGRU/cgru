@@ -265,6 +265,12 @@ function bm_Show()
 		el.classList.add('label');
 		el.onclick = bm_ProjectClicked;
 
+		// Project statistics
+		let prj_flags = {};
+		project.elStat = document.createElement('div');
+		project.el.appendChild(project.elStat);
+		project.elStat.classList.add('statistics')
+
 		// Project scenes:
 		let project_count = 0;
 		let closed_scenes = localStorage.bookmarks_scenes_closed.split('|');
@@ -301,6 +307,35 @@ function bm_Show()
 				let el = bm_CreateBookmark(bm);
 				bm_elements.push(el);
 				scene.el.appendChild(el);
+
+				if (bm.status.flags)
+				{
+					for (let flag of bm.status.flags)
+					{
+						if (flag in prj_flags)
+							prj_flags[flag] += 1;
+						else
+							prj_flags[flag] = 1;
+					}
+				}
+
+				if (bm.status.tasks)
+				{
+					for (let task in bm.status.tasks)
+					{
+						task = bm.status.tasks[task];
+						if (task.flags)
+						{
+							for (let flag of task.flags)
+							{
+								if (flag in prj_flags)
+									prj_flags[flag] += 1;
+								else
+									prj_flags[flag] = 1;
+							}
+						}
+					}
+				}
 			}
 
 			if (scene.elLabel)
@@ -314,6 +349,20 @@ function bm_Show()
 			}
 
 			project_count += scene.bms.length;
+		}
+
+		for (let flag in prj_flags)
+		{
+			let el = document.createElement('div');
+			el.textContent = c_GetFlagShort(flag) + ':' + prj_flags[flag];
+			el.classList.add('tag','flag');
+			let clr = null;
+			if (RULES.flags[flag] && RULES.flags[flag].clr)
+				clr = RULES.flags[flag].clr;
+			if (clr)
+				st_SetElColor({"color": clr}, el);
+
+			project.elStat.appendChild(el);
 		}
 
 		let label = project.name + ' - ' + project_count;

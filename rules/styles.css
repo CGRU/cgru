@@ -637,6 +637,7 @@ padding: 0px 4px 0px 4px;
 margin: 0px 4px 0px 4px;
 cursor: pointer;
 }
+#bookmarks .project .statistics {font-size: 10px;}
 #bookmarks .project .label:hover {
 text-shadow: 0 0 2px rgba( 100, 255, 255, .5);
 }
