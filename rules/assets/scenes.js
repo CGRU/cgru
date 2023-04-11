@@ -296,6 +296,7 @@ function scene_Show()
 
 		var st_obj = new Status( folders[f].status, {"path":path,"createGUI": st_CreateSceneShot,'tasks_badges':true});
 		elShot.m_status = st_obj;
+        st_Statuses[path] = st_obj;
 		elEditBtn.m_status = st_obj;
 		elEditBtn.onclick = sc_EditStatus;
 
@@ -460,6 +461,7 @@ function scenes_Received( i_data, i_args)
 
 			let st_obj = new Status(fobj.status, {"path":elShot.m_path,"createGUI": st_CreateSceneShot,"display_short":true,'tasks_badges':true});
 			elShot.m_status = st_obj;
+            st_Statuses[elShot.m_path] = st_obj;
 
 			elShot.ondblclick = sc_EditStatus;
 			elShot.onclick = sc_ShotClicked;

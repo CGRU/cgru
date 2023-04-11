@@ -90,24 +90,104 @@ class Status:
         return None
 
 
-    def set(self, tags=None, artists=None, flags=None, progress=None, annotation=None, out=None):
+    def set(self, tags=None, tags_keep=None, artists=None, artists_keep=None, flags=None, flags_keep=None, progress=None, annotation=None, out=None):
+        # Store original progress to compare later
+        # and find out that is was changed.
+        _progress = self.data.get('progress')
 
-        if tags is not None and type(tags) is list:
-            self.data['tags'] = tags
-        if artists is not None and type(artists) is list:
-            self.data['artists'] = artists
-        if flags is not None and type(flags) is list:
-            self.data['flags'] = flags
         if annotation is not None and type(annotation) is str:
             self.data['annotation'] = annotation
+
         if progress is not None and type(progress) is int:
             if progress < -1: progress = -1
             elif progress > 100: progress = 100
             self.data['progress'] = progress
 
+        self.setItems('flags',   items_keep=flags_keep,   items_add=flags)
+        self.setItems('tags',    items_keep=tags_keep,    items_add=tags)
+        self.setItems('artists', items_keep=artists_keep, items_add=artists)
+
+        # If shot progress is 100% all tasks should be 100% done.
+        if self.data.get('progress') == 100 and 'tasks' in self.data:
+            for t in self.data['tasks']:
+                task = self.data['tasks'][t]
+                if task.get('progress') != 100:
+                    task['progress'] = 100;
+                    task['changed'] = True
+                if 'flags' in task and 'done' not in task['flags']:
+                    task['flags'] = ['done']
+                    task['changed'] = True
+
+        # If shot has OMIT flags, all tasks should be omitted
+        if 'flags' in self.data and 'omit' in self.data['flags'] and 'tasks' in self.data:
+            for t in self.data['tasks']:
+                task = self.data['tasks'][t]
+                if ('flags' not in task) or ('omit' not in task['flags']) or (task.get('progress') != -1):
+                    # Skip done tasks
+                    if task.get('progress') == 100:
+                        continue
+                    task['flags'] = ['omit']
+                    task['progress'] = -1
+                    task['changed'] = True
+
+        # If progress was changed we should update upper progress:
+        if _progress != self.data.get('progress'):
+            self.progress_changed = True
+
         self.data['changed'] = True
 
         return self.data
+
+
+    def setItems(self, item_name, items_keep=None, items_add=None):
+        if items_keep is None and items_add is None:
+            return
+        if items_keep is None:
+            items_keep = []
+        if items_add is None:
+            items_add = []
+        if not type(items_keep) is list:
+            return
+        if not type(items_add) is list:
+            return
+
+        if not item_name in self.data:
+            self.data[item_name] = []
+
+        # Remove items:
+        _items = []
+        for i in self.data[item_name]:
+            if i in items_keep or i in items_add:
+                _items.append(i)
+        self.data[item_name] = _items
+
+        # Add items:
+        for i in items_add:
+            # Skip items that are already set
+            if i in self.data[item_name]:
+                continue
+
+            if item_name == 'flags' and i in rulib.RULES_TOP[item_name]:
+                # Flag can limit minimum and maximum progress percentage:
+                p_min = rulib.RULES_TOP[item_name][i].get('p_min')
+                p_max = rulib.RULES_TOP[item_name][i].get('p_max')
+                progress = self.data.get('progress')
+
+                if (p_min is not None) and ((progress is None) or (progress < p_min)):
+                    progress = p_min;
+
+                if (p_max is not None) and ((progress is None) or (p_max < 0) or (progress > p_max)):
+                    progress = p_max;
+
+                if progress is not None:
+                    self.data['progress'] = progress
+
+                # Flag can be exclusive, so we should delete other items:
+                mode = rulib.RULES_TOP[item_name][i].get('mode')
+                if mode == 'stage' or mode == 'super':
+                    self.data[item_name] = []
+
+            self.data[item_name].append(i)
 
 
     def setTask(self, name=None, tags=None, artists=None, flags=None, progress=None, annotation=None, deleted=None, out=None):

@@ -406,9 +406,12 @@ def filterStatus(i_sdata):
     return sdata
 
 
-def statusChanged(i_status, out=dict(), nonews=False):
-    news = createNews(title='status', path=i_status.path, uid=i_status.muser, status=i_status.data)
-    makeNewsAndBookmarks({'news':[news]}, i_status.muser, out=out, nonews=nonews)
+def statusesChanged(i_statuses, out=dict(), nonews=False):
+    news = []
+    for status in i_statuses:
+        news.append(createNews(title='status', path=status.path, uid=status.muser, status=status.data))
+    if len(news):
+        makeNewsAndBookmarks({'news':news}, i_statuses[0].muser, out=out, nonews=nonews)
 
 
 def createNews(title='news',uid=None,path=None,status=None):

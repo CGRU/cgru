@@ -17,6 +17,9 @@
 "use strict";
 
 var st_Status = null;
+
+var st_Statuses = [];
+
 var st_MultiValue = '[...]';
 
 var st_Hilighted = {};
@@ -48,6 +51,8 @@ function st_Finish()
 	st_Status = null;
 	$('status').classList.remove('fading');
 	$('status').classList.remove('updating');
+
+	st_Statuses = [];
 }
 
 function st_OnClose()
@@ -1333,18 +1338,18 @@ Status.prototype.editProcess = function(i_args) {
 	if (this.obj == null)
 		this.obj = {};
 
-	var finish = null;
-	var annotation = null;
-	var adinfo = null;
-	var progress = null;
-	var artists = null;
-	var flags = null;
-	var tags = null;
-	var tasks = null;
+	let finish = null;
+	let annotation = null;
+	let adinfo = null;
+	let progress = null;
+	let artists = null;
+	let flags = null;
+	let tags = null;
+	let tasks = null;
 
 	// Get values from GUI:
 
-	var finish_edit = this.elEdit_finish.textContent;
+	let finish_edit = this.elEdit_finish.textContent;
 	if (finish_edit.length && (finish_edit != st_MultiValue))
 	{
 		finish_edit = c_DT_SecFromStr(finish_edit);
@@ -1354,7 +1359,7 @@ Status.prototype.editProcess = function(i_args) {
 			c_Error('Invalid date format: ' + this.elEdit_finish.textContent);
 	}
 
-	var progress_edit = this.elEdit_progress.textContent;
+	let progress_edit = this.elEdit_progress.textContent;
 	if (progress_edit.length && (progress_edit != st_MultiValue))
 	{
 		progress_edit = c_Strip(progress_edit);
@@ -1420,12 +1425,53 @@ Status.prototype.editProcess = function(i_args) {
 */
 	// Collect statuses to change
 	// ( this and may be others selected )
-	var statuses = [this];
+	let statuses = [this];
 	if (i_args && i_args.statuses && i_args.statuses.length)
 	{
 		statuses = i_args.statuses;
 		if (statuses.indexOf(this) == -1)
 			statuses.push(this);
+	}
+
+	if (document.location.hostname == 'localhost')
+	{
+	let obj = {};
+
+	obj.paths = [];
+	for (let st of statuses)
+		obj.paths.push(st.path);
+
+	if (annotation !== null)
+		obj.annotation = annotation;
+	if (adinfo !== null)
+		obj.adinfo = adinfo;
+	if (finish !== null)
+		obj.finish = finish;
+	if (progress !== null)
+		obj.progress = progress;
+
+	if (this.editAtrists)
+	{
+		obj.artists = this.editAtrists.getSelectedNames();
+		obj.artists_keep = this.editAtrists.getHalfSelectedNames();
+	}
+	if (this.editFlags)
+	{
+		obj.flags = this.editFlags.getSelectedNames();
+		obj.flags_keep = this.editFlags.getHalfSelectedNames();
+	}
+	if (this.editTags)
+	{
+		obj.tags = this.editTags.getSelectedNames();
+		obj.tags_keep = this.editTags.getHalfSelectedNames();
+	}
+
+	if (nw_disabled)
+		obj.nonews = true;
+
+	n_Request({'send':{'setstatuses':obj},'func':st_StatusesSaved,'info':'status.setStatuses','wait':false});
+	//console.log(JSON.stringify(obj));
+	return
 	}
 
 	// Set values to statuses
@@ -1674,17 +1720,29 @@ function st_SaveFinished(i_data)
 
 function st_StatusesSaved(i_data)
 {
+	// Update statuses:
+	if (i_data.statuses)
+	{
+		for (let sdata of i_data.statuses)
+		{
+			if (sdata.path == g_CurPath())
+			{
+				RULES.status = i_data.status;
+				st_Show(i_data.status);
+				continue;
+			}
+
+			if (st_Statuses[sdata.path])
+			{
+				st_Statuses[sdata.path].show(sdata.status);
+			}
+		}
+	}
+
 	if (i_data.error)
 	{
 		c_Error(i_data.error);
 		return;
-	}
-
-	// Update current status:
-	if (i_data.status)
-	{
-		RULES.status = i_data.status;
-		st_Show(i_data.status);
 	}
 
 	// Get news if subscribed:
