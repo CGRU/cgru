@@ -274,7 +274,7 @@ class Requests:
         return
 
 
-    def req_setstatuses(self, i_args, out):
+    def req_setstatus(self, i_args, out):
 
         if self.session.USER_ID is None:
             o_out['error'] = 'Guests are not allowed to edit statuses.'

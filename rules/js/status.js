@@ -1469,7 +1469,7 @@ Status.prototype.editProcess = function(i_args) {
 	if (nw_disabled)
 		obj.nonews = true;
 
-	n_Request({'send':{'setstatuses':obj},'func':st_StatusesSaved,'info':'status.setStatuses','wait':false});
+	n_Request({'send':{'setstatus':obj},'func':st_StatusesSaved,'info':'status.setStatuses','wait':false});
 	//console.log(JSON.stringify(obj));
 	return
 	}
@@ -1727,8 +1727,8 @@ function st_StatusesSaved(i_data)
 		{
 			if (sdata.path == g_CurPath())
 			{
-				RULES.status = i_data.status;
-				st_Show(i_data.status);
+				RULES.status = sdata.status;
+				st_Show(sdata.status);
 				continue;
 			}
 

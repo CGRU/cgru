@@ -41,16 +41,17 @@ class Status:
 
     def __init__(self, uid=None, path=None):
 
-        self.path = rulib.functions.getRootPath(path)
+        if uid is None:
+            uid = rulib.functions.getCurUser()
 
-        self.muser = uid
-        if self.muser is None:
-            self.muser = rulib.functions.getCurUser()
-        self.mtime = rulib.functions.getCurSeconds()
+        self.path = rulib.functions.getRootPath(path)
 
         self.data = getStatusData(self.path)
         if self.data is None:
             self.data = dict()
+
+        self.data['muser'] = uid
+        self.data['mtime'] = rulib.functions.getCurSeconds()
 
         self.progress_changed = False
 
@@ -215,16 +216,16 @@ class Status:
             task['artists'] = []
             task['flags'] = []
             task['progress'] = 0
-            task['cuser'] = self.muser
-            task['ctime'] = self.mtime
+            task['cuser'] = self.data['muser']
+            task['ctime'] = self.data['mtime']
 
             if not 'tasks' in self.data:
                 self.data['tasks'] = dict()
             self.data['tasks'][name] = task
 
         else:
-            task['muser'] = self.muser
-            task['mtime'] = self.mtime
+            task['muser'] = self.data['muser']
+            task['mtime'] = self.data['mtime']
 
         if artists is not None and type(artists) is list:
             task['artists'] = artists

@@ -578,12 +578,11 @@ function nw_NewsReceived(i_data)
 	for (let i = 0; i < g_auth_user.news.length; i++)
 	{
 		let news = g_auth_user.news[i];
-
 		if (news.path != g_CurPath()) continue;
-		if (news.status == null) break;
+		if (news.status == null) continue;
 
 		if (RULES.status && RULES.status.mtime && (RULES.status.mtime >= news.status.mtime))
-			break;
+			continue;
 
 		st_UpdateCurrent(news.status);
 		break;
