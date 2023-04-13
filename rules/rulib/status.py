@@ -278,13 +278,14 @@ class Status:
                 avg_progress += koeff * _task['progress']
                 num_tasks += koeff
 
-            # Set status progress if it changes:
-            avg_progress = round(avg_progress / num_tasks)
-            if 'progress' not in self.data or self.data['progress'] != avg_progress:
-                self.data['progress'] = avg_progress
-                self.progress_changed = True
-            else:
-                self.progress_changed = False
+            if num_tasks > 0:
+                avg_progress = round(avg_progress / num_tasks)
+                # Set status progress if it changes:
+                if 'progress' not in self.data or self.data['progress'] != avg_progress:
+                    self.data['progress'] = avg_progress
+                    self.progress_changed = True
+                else:
+                    self.progress_changed = False
 
 
         # Remove status tags, artists and flags if the task has the same
