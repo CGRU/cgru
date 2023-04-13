@@ -233,8 +233,10 @@ class Status:
             task['flags'] = flags
         if annotation is not None and type(annotation) is str:
             task['annotation'] = annotation
-        if deleted is not None:
-            task['deleted'] = deleted
+        if deleted:
+            task['deleted'] = True
+        elif 'deleted' in task:
+            del task['deleted']
 
         if progress is not None and type(progress) is int:
             if progress < -1: progress = -1
