@@ -119,7 +119,7 @@ for shot in Shots:
             continue
 
         for item in os.listdir(inp):
-            if item[0] in '._':
+            if item[0] in '._-':
                 continue
             if not os.path.isdir(os.path.join(inp, item)):
                 continue
