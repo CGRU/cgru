@@ -1466,6 +1466,13 @@ Status.prototype.editProcess = function(i_args) {
 		obj.tags_keep = this.editTags.getHalfSelectedNames();
 	}
 
+	if (this.elEdit_Color.m_color_changed)
+	{
+		obj.color = this.elEdit_Color.m_color;
+		if (obj.color == null)
+			obj.color = [];
+	}
+
 	if (nw_disabled)
 		obj.nonews = true;
 

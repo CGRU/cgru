@@ -91,13 +91,20 @@ class Status:
         return None
 
 
-    def set(self, tags=None, tags_keep=None, artists=None, artists_keep=None, flags=None, flags_keep=None, progress=None, annotation=None, out=None):
+    def set(self, tags=None, tags_keep=None, artists=None, artists_keep=None, flags=None, flags_keep=None, progress=None, annotation=None, color=None, out=None):
         # Store original progress to compare later
         # and find out that is was changed.
         _progress = self.data.get('progress')
 
         if annotation is not None and type(annotation) is str:
             self.data['annotation'] = annotation
+
+        if color is not None and type(color) is list:
+            if len(color) == 3:
+                self.data['color'] = color
+            else:
+                if 'color' in self.data:
+                    del self.data['color']
 
         if progress is not None and type(progress) is int:
             if progress < -1: progress = -1
