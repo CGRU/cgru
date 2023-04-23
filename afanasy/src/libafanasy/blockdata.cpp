@@ -407,7 +407,7 @@ void BlockData::jsonWrite(std::ostringstream &o_str, int i_type) const
 			if (m_command_post.size()) o_str << ",\n\"cmd_post\":\"" << af::strEscape(m_command_post) << "\"";
 			if (m_multihost_service.size())
 				o_str << ",\n\"multihost_service\":\"" << m_multihost_service << "\"";
-			if (m_custom_data.size()) o_str << ",\n\"custom_data\":\"" << m_custom_data << "\"";
+			if (m_custom_data.size()) o_str << ",\n\"custom_data\":\"" << af::strEscape(m_custom_data) << "\"";
 			if (m_environment.size()) af::jw_stringmap("environment", m_environment, o_str);
 			// o_str << ",\n\"parser_coeff\":\:"        << m_parser_coeff              << "\"";
 			o_str << ',';
