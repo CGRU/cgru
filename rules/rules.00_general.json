@@ -34,6 +34,7 @@
 	"sent"        :{"title":"SENT",        "clr":[222,222,191], "short":"SNT", "p_min":80, "p_max":90, "mode":"super", "tip":"Was sent"},
 	"omit"        :{"title":"OMIT",        "clr":[ 99, 99, 99], "short":"Om",              "p_max":-1, "mode":"stage", "tip":"Omit"},
 	"hqres"       :{"title":"HQRES",       "clr":[100,250,100], "short":"HQR", "p_min":98, "p_max":98, "mode":"stage", "tip":"Render high quality results"},
+	"cbb"         :{"title":"CBB",         "clr":[140,145,121], "short":"CBB", "p_min":100,            "mode":"stage", "tip":"Could be better"},
 	"done"        :{"title":"DONE",        "clr":[121,155,121], "short":"DON", "p_min":100,            "mode":"stage", "tip":"Done"},
 	"closed"      :{"title":"CLOSED",      "clr":[ 11, 55, 11], "short":"CLS", "p_min":100,            "mode":"stage", "tip":"Closed"},
 	"aux"         :{"title":"AUX",         "clr":[127,127,127], "short":"AUX",             "p_max":-1, "mode":"stage", "tip":"Auxiliary",
@@ -61,6 +62,8 @@
 	"rnd"     :{"title":"R&D",      "short":"RnD", "tip":"Research and development"},
 	"textur"  :{"title":"Textur",   "short":"Tx",  "tip":"Texturing"},
 	"track"   :{"title":"Track",    "short":"Tr",  "koeff":0.1, "tip":"Tracking"},
+	"cbb"     :{"title":"CBB",      "short":"CBB", "tip":"Could be better"},
+
 
 	"other"   :{"title":"Other",    "short":"Ot",  "tip":"Something else",
 		"new_line":true}
