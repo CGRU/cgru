@@ -29,7 +29,7 @@ LabelVersion::LabelVersion(QWidget *parent):
 	m_tooltip += QString("\nCGRU_LOCATION=%1"    ).arg(af::Environment::getCGRULocation().c_str());
 	m_tooltip += QString("\nAF_ROOT=%1"          ).arg(af::Environment::getAfRoot().c_str());
 	m_tooltip += QString("\nHome: %1"            ).arg(af::Environment::getHomeAfanasy().c_str());
-	m_tooltip += QString("\nServer: %1"          ).arg(af::Environment::getServerName().c_str());;
+	m_tooltip += QString("\nServer: %1:%2"       ).arg(af::Environment::getServerName().c_str()).arg(af::Environment::getServerPort());
 
 	QList<QByteArray> qList(QImageReader::supportedImageFormats());
 	m_tooltip += "\nSupported image formats:\n";
