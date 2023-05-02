@@ -54,7 +54,7 @@ ListTasks::ListTasks( QWidget* parent, int JobId, const QString & JobName):
 //   view->setUniformItemSizes( true);
 //   view->setBatchSize( 10000);
 
-	m_parentWindow->setWindowTitle( m_job_name);
+	this->setWindowTitleWithPrefix( m_job_name);
 
 	getJobFullData();
 
@@ -662,7 +662,7 @@ void ListTasks::setWindowTitleProgress()
 			total_tasks++;
 		}
 
-	m_parentWindow->setWindowTitle( QString("%1% %2").arg(total_percent/total_tasks).arg(m_job_name));
+	this->setWindowTitleWithPrefix( QString("%1% %2").arg(total_percent/total_tasks).arg(m_job_name));
 }
 
 void ListTasks::actTaskOpen()
