@@ -653,3 +653,7 @@ void ListItems::changeParam(const Param * i_param)
 	setParameter(i_param->itemtype, afqt::qtos(i_param->name), afqt::qtos(str));
 }
 
+void ListItems::setWindowTitleWithPrefix(QString windowTitle)
+{
+    m_parentWindow->setWindowTitle(QString("(%1) %2").arg(af::Environment::getServerName().c_str(), windowTitle));
+}

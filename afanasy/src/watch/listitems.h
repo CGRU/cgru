@@ -128,6 +128,8 @@ protected:
 		bool i_dblclick = false,
 		bool i_always_active = false);
 
+	void setWindowTitleWithPrefix(QString windowTitle);
+
 protected:
 
 	Item * m_current_item;

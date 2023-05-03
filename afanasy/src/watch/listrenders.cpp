@@ -188,7 +188,7 @@ ListRenders::ListRenders( QWidget* parent):
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(actDelete()));
 	}
 
-	m_parentWindow->setWindowTitle("Renders");
+	this->setWindowTitleWithPrefix("Renders");
 
 	if (af::Environment::GOD())
 	{
@@ -751,7 +751,7 @@ void ListRenders::calcTitle()
 		}
 	}
 
-	m_parentWindow->setWindowTitle(
+	this->setWindowTitleWithPrefix(
 			QString("Farm: %1 On, %2 Busy, %3 Off, %4 Nimby, %5 Total, %6 Pools")
 			.arg(ronline).arg(rbusy).arg(roffline).arg(rnimby).arg(rtotal).arg(ptotal));
 }

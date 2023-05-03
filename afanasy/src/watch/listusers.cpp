@@ -117,7 +117,7 @@ ListUsers::ListUsers( QWidget* parent):
 	addParam_Hrs(Item::TUser, "jobs_life_time",            "Jobs Life Time",         "After this time job will be deleted");
 
 
-	m_parentWindow->setWindowTitle("Users");
+	this->setWindowTitleWithPrefix("Users");
 
 	initListNodes();
 
@@ -205,7 +205,7 @@ void ListUsers::calcTitle()
 		ItemUser * itemuser = static_cast<ItemUser*>(m_model->item(i));
 		if (itemuser->running_tasks_num > 0) running++;
 	}
-	m_parentWindow->setWindowTitle(QString("Users: %1, Running %2").arg(total).arg(running));
+	this->setWindowTitleWithPrefix(QString("Users: %1, Running %2").arg(total).arg(running));
 }
 
 void ListUsers::actDelete() { operation(Item::TUser, "delete"); }

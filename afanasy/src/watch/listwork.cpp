@@ -45,7 +45,7 @@ ListWork::ListWork(QWidget * i_parent):
 
 	m_hide_flags = ms_hide_flags;
 
-	m_parentWindow->setWindowTitle("Work");
+	this->setWindowTitleWithPrefix("Work");
 
 	// Add left panel buttons:
 	ButtonPanel * bp;
@@ -309,7 +309,7 @@ void ListWork::calcTitle()
 	else
 		jobs = QString("Jobs: %1 Done").arg(jtotal);
 
-	m_parentWindow->setWindowTitle(jobs + "; " + branches);
+	this->setWindowTitleWithPrefix(jobs + "; " + branches);
 }
 
 void ListWork::slot_ACC_Enable()   {setParameter(Item::TBranch, "create_childs", "true" );}
