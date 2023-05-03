@@ -128,7 +128,7 @@ protected:
 		bool i_dblclick = false,
 		bool i_always_active = false);
 
-	void setWindowTitleWithPrefix(QString windowTitle);
+	void setWindowTitleWithPrefix(const QString & i_windowTitle);
 
 protected:
 

@@ -325,6 +325,20 @@ void Dialog::showMenuPrefs()
 
 	m_prefsMenu->addSeparator();
 
+    action = new QAction("Show Server Name", m_prefsMenu);
+    action->setCheckable(true);
+    action->setChecked(afqt::QEnvironment::showServerName.n != 0);
+    connect(action, SIGNAL(triggered()), this, SLOT(actShowServerName()));
+    m_prefsMenu->addAction(action);
+
+    action = new QAction("Show Server Port", m_prefsMenu);
+    action->setCheckable(true);
+    action->setChecked(afqt::QEnvironment::showServerPort.n != 0);
+    connect(action, SIGNAL(triggered()), this, SLOT(actShowServerPort()));
+    m_prefsMenu->addAction(action);
+
+	m_prefsMenu->addSeparator();
+
     action = new QAction( "Show Offline Noise", m_prefsMenu);
     action->setCheckable( true);
     action->setChecked( afqt::QEnvironment::showOfflineNoise.n != 0);
@@ -776,6 +790,8 @@ void Dialog::actSaveGUIOnExit()        {afqt::QEnvironment::saveGUIOnExit.n     
 void Dialog::actSaveHotkeysOnExit()    {afqt::QEnvironment::saveHotkeysOnExit.n  = 1 - afqt::QEnvironment::saveHotkeysOnExit.n; }
 void Dialog::actSaveWndRectsOnExit()   {afqt::QEnvironment::saveWndRectsOnExit.n = 1 - afqt::QEnvironment::saveWndRectsOnExit.n;}
 void Dialog::actResetWndRects()        {afqt::QEnvironment::resetAllRects();}
+void Dialog::actShowServerName()       {afqt::QEnvironment::showServerName.n     = 1 - afqt::QEnvironment::showServerName.n;    }
+void Dialog::actShowServerPort()       {afqt::QEnvironment::showServerPort.n     = 1 - afqt::QEnvironment::showServerPort.n;    }
 void Dialog::actShowOfflineNoise()     {afqt::QEnvironment::showOfflineNoise.n   = 1 - afqt::QEnvironment::showOfflineNoise.n;  }
 void Dialog::actShowDocs() {Watch::showDocs();}
 void Dialog::actShowForum(){Watch::showForum();}

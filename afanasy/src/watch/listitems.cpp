@@ -653,7 +653,22 @@ void ListItems::changeParam(const Param * i_param)
 	setParameter(i_param->itemtype, afqt::qtos(i_param->name), afqt::qtos(str));
 }
 
-void ListItems::setWindowTitleWithPrefix(QString windowTitle)
+void ListItems::setWindowTitleWithPrefix(const QString & i_windowTitle)
 {
-    m_parentWindow->setWindowTitle(QString("(%1) %2").arg(af::Environment::getServerName().c_str(), windowTitle));
+	if (afqt::QEnvironment::showServerName.n || afqt::QEnvironment::showServerPort.n)
+	{
+		QString prefix;
+
+		if (afqt::QEnvironment::showServerName.n)
+			prefix += afqt::stoq(af::Environment::getServerName());
+
+		if (afqt::QEnvironment::showServerPort.n)
+			prefix += QString(":%1").arg(af::Environment::getServerPort());
+
+		m_parentWindow->setWindowTitle(QString("(%1) %2").arg(prefix, i_windowTitle));
+	}
+	else
+	{
+		m_parentWindow->setWindowTitle(i_windowTitle);
+	}
 }
