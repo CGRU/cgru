@@ -272,33 +272,42 @@ Status.prototype.show = function(i_status, i_update = false) {
 		}
 	}
 
-	if (this.tasks)
+	if (this.multi)
 	{
-		for (let t in this.tasks)
-			this.tasks[t].destroy();
-	}
+		// Global status will be cleaned in tasks_Finish() function.
+		if (this.tasks)
+			for (let t in this.tasks)
+				this.tasks[t].destroy();
 
-	if (this.elTasks)
-		this.elTasks.textContent = '';
+		if (this.elTasks)
+			this.elTasks.textContent = '';
+	}
 
 	if (this.args.tasks_badges)
 	{
 		let elBages = task_DrawBadges(this.obj, this.elTasksBadges/*, {'only_my':this.args.display_short}*/);
-		for (let el of elBages)
+		if (this.multi)
 		{
-			el.m_status = this;
-			el.onclick = function(e){
-				e.stopPropagation();
-				e.currentTarget.m_status.elTasksBadges.style.display = 'none';
-				e.currentTarget.m_status.args.tasks_badges = false;
-				let tasks = task_ShowTasks(e.currentTarget.m_status);
-				for (let task of tasks)
-					task.elBtnEdit.onclick = sc_EditTask;
-			};
+			for (let el of elBages)
+			{
+				el.m_status = this;
+				el.onclick = function(e){
+					e.stopPropagation();
+					e.currentTarget.m_status.elTasksBadges.style.display = 'none';
+					e.currentTarget.m_status.args.tasks_badges = false;
+					let tasks = task_ShowTasks(e.currentTarget.m_status);
+					for (let task of tasks)
+						task.elBtnEdit.onclick = sc_EditTask;
+				};
+			}
 		}
 	}
 	else
-		task_ShowTasks(this);
+	{
+		let tasks = task_ShowTasks(this);
+		if (this.multi)
+			tasks[0].elBtnEdit.onclick = sc_EditTask;
+	}
 
 	let args = {};
 	args.statuses = [this.obj];

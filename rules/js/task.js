@@ -79,18 +79,18 @@ function task_AddArtistTask()
 
 function Task(i_statusClass, i_task)
 {
-	this.multi = false;
-	if (i_statusClass.multi)
-		this.multi = true;
-
-	if (false == this.multi)
-		task_CurrentTasks.push(this);
-
 	this.statusClass = i_statusClass;
 	if (this.statusClass == null)
 		this.statusClass = st_Status;
 	if (this.statusClass == null)
 		this.statusClass = {};
+
+	this.multi = false;
+	if (this.statusClass.multi)
+		this.multi = true;
+
+	if (false == this.multi)
+		task_CurrentTasks.push(this);
 
 	this.obj = i_task;
 	if (this.obj == null)
@@ -401,7 +401,7 @@ Task.prototype.edit = function(i_args)
 		this.elBtnDelete.title = 'Double click to delete task.';
 		this.elBtnDelete.m_task = this;
 		this.elBtnDelete.onclick = function(e){e.stopPropagation();}
-		this.elBtnDelete.ondblclick = function(e){e.stopPropagation();e.currentTarget.m_task.editDelete();}
+		this.elBtnDelete.ondblclick = function(e){e.stopPropagation();e.currentTarget.m_task.editDelete(i_args);}
 		this.elEdit.appendChild(this.elBtnDelete);
 	}
 }
@@ -625,7 +625,7 @@ Task.prototype.save = function(i_progress_changed)
 		st_UpdateProgresses(this.statusClass.path, progresses);
 }
 
-Task.prototype.editDelete = function()
+Task.prototype.editDelete = function(i_args)
 {
 	let index = task_CurrentTasks.indexOf(this);
 	if (index != -1)
@@ -637,7 +637,22 @@ Task.prototype.editDelete = function()
 
 	this.obj.deleted = true;
 
+	if (document.location.hostname != 'localhost')
+	{
 	this.save(this.obj.progress);
+	return;
+	}
+
+	let obj = {'name':this.obj.name,'deleted':true};
+	if (i_args.paths && i_args.paths.length)
+		obj.paths = i_args.paths;
+	else
+		obj.paths = [this.statusClass.path];
+
+	if (nw_disabled)
+		obj.nonews = true;
+
+	n_Request({'send':{'settask':obj},'func':st_StatusesSaved,'info':'status.setTask','wait':false});
 }
 
 function task_DrawBadges(i_status, i_el, i_args)
