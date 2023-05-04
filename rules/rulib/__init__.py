@@ -52,9 +52,11 @@ if len(RULES_TOP) == 0:
             ROOT = os.path.join(CGRU_LOCATION, RULES_TOP['root'])
 
 
-def setStatus(paths=[None], uid=None, name=None, tags=None, tags_keep=None, artists=None, artists_keep=None, flags=None, flags_keep=None, progress=None, annotation=None, color=None, nonews=False, out=None):
+def setStatus(paths=None, uid=None, name=None, tags=None, tags_keep=None, artists=None, artists_keep=None, flags=None, flags_keep=None, progress=None, annotation=None, color=None, nonews=False, out=None):
     if out is None:
         out = dict()
+    if paths is None or paths == []:
+        paths = [None]
 
     statuses = []
     some_progress_changed = False
@@ -88,16 +90,23 @@ def setStatus(paths=[None], uid=None, name=None, tags=None, tags_keep=None, arti
     return out
 
 
-def setTask(path=None, uid=None, name=None, tags=None, artists=None, flags=None, progress=None, annotation=None, deleted=None, nonews=False, out=None):
+def setTask(paths=None, uid=None, name=None, tags=None, artists=None, flags=None, progress=None, annotation=None, deleted=None, nonews=False, out=None):
     if out is None:
         out = dict()
+    if paths is None or paths == []:
+        paths = [None]
 
-    st = status.Status(uid, path)
+    statuses = []
+    some_progress_changed = False
 
-    st.setTask(tags=tags, artists=artists, flags=flags, progress=progress, annotation=annotation, deleted=deleted, out=out)
-
-    if 'error' in out:
-        return out
+    for path in paths:
+        st = status.Status(uid, path)
+        st.setTask(tags=tags, artists=artists, flags=flags, progress=progress, annotation=annotation, deleted=deleted, out=out)
+        if 'error' in out:
+            break
+        if st.progress_changed:
+            some_progress_changed = True
+        statuses.append(st)
 
     # News & Bookmarks:
     # At first we should emit news,
@@ -107,8 +116,9 @@ def setTask(path=None, uid=None, name=None, tags=None, artists=None, flags=None,
 
     out['statuses'] = []
     _out = dict()
-    st.save(_out)
-    out['statuses'].append({"path":st.path,"status":st.data})
+    for st in statuses:
+        st.save(_out)
+        out['statuses'].append({"path":st.path,"status":st.data})
 
     if st.progress_changed:
         progresses = dict()

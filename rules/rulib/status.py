@@ -360,7 +360,7 @@ def updateUpperProgresses(i_path, i_progresses, out):
             if path in i_progresses:
                 progress = i_progresses[path]
             else:
-                if sdata and 'progress' in sdata:
+                if sdata and 'progress' in sdata and type(sdata['progress']) is int:
                     progress = sdata['progress']
 
             # Skip aux folders:

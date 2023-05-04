@@ -319,7 +319,7 @@ class Requests:
             o_out['error'] = 'Guests are not allowed to edit tasks.'
             return
 
-        if not 'path' in i_args:
+        if not 'paths' in i_args:
             out['error'] = 'Path is not specified.'
             return
 
@@ -341,7 +341,7 @@ class Requests:
         if 'deleted'    in i_args: deleted    = i_args['deleted']
         if 'nonews'     in i_args and i_args['nonews']: nonews = True
 
-        rulib.setTask(uid=self.session.USER_ID, path=i_args['path'], name=name, tags=tags, artists=artists, flags=flags, progress=progress, annotation=annotation, deleted=deleted, nonews=nonews, out=out)
+        rulib.setTask(uid=self.session.USER_ID, paths=i_args['paths'], name=name, tags=tags, artists=artists, flags=flags, progress=progress, annotation=annotation, deleted=deleted, nonews=nonews, out=out)
 
         return
 

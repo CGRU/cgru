@@ -41,16 +41,20 @@ function task_ShowTasks(i_statusClass)
 	tasks_Finish();
 
 	if ((null == i_statusClass) || (null == i_statusClass.obj) || (null == i_statusClass.obj.tasks))
-		return;
+		return [];
 
 	if (Array.isArray(i_statusClass.obj.tasks) && (i_statusClass.obj.tasks.length == 0))
 	{
+		// OLD tasks way:
 		delete i_statusClass.obj.tasks;
-		return;
+		return [];
 	}
 
+	let tasks = [];
 	for (let task in i_statusClass.obj.tasks)
-		new Task(i_statusClass, i_statusClass.obj.tasks[task]);
+		tasks.push(new Task(i_statusClass, i_statusClass.obj.tasks[task]));
+
+	return tasks;
 }
 
 function task_AddTask()
@@ -75,7 +79,12 @@ function task_AddArtistTask()
 
 function Task(i_statusClass, i_task)
 {
-	task_CurrentTasks.push(this);
+	this.multi = false;
+	if (i_statusClass.multi)
+		this.multi = true;
+
+	if (false == this.multi)
+		task_CurrentTasks.push(this);
 
 	this.statusClass = i_statusClass;
 	if (this.statusClass == null)
@@ -108,6 +117,7 @@ function Task(i_statusClass, i_task)
 
 
 	this.elParent = $('status_tasks');
+	this.elParent = this.statusClass.elTasks;
 
 
 	this.elRoot = document.createElement('div');
@@ -123,7 +133,8 @@ function Task(i_statusClass, i_task)
 	this.elName = document.createElement('div');
 	this.elName.classList.add('name','notselectable');
 	this.elName.m_task = this;
-	this.elName.onclick = function(e){e.currentTarget.m_task.select()};
+	if (false == this.multi)
+		this.elName.onclick = function(e){e.currentTarget.m_task.select()};
 	this.elShow.appendChild(this.elName);
 
 
@@ -193,7 +204,7 @@ function Task(i_statusClass, i_task)
 
 Task.prototype.show = function()
 {
-	if (activity_Current == this.obj.name)
+	if ((activity_Current == this.obj.name) && (false == this.multi))
 		this.select();
 
 	//st_SetElTags(this.obj, this.elName);
@@ -282,7 +293,7 @@ Task.prototype.updateOrEdit = function(i_status)
 		this.edit();
 }
 
-Task.prototype.edit = function()
+Task.prototype.edit = function(i_args)
 {
 	if (this.editing)
 		return;
@@ -304,7 +315,7 @@ Task.prototype.edit = function()
 	this.elBtnSave.classList.add('button','right');
 	this.elBtnSave.textContent = 'Save';
 	this.elBtnSave.m_task = this;
-	this.elBtnSave.onclick = function(e){e.stopPropagation();e.currentTarget.m_task.editProcess();}
+	this.elBtnSave.onclick = function(e){e.stopPropagation();e.currentTarget.m_task.editProcess(i_args);}
 	this.elEdit.appendChild(this.elBtnSave);
 
 
@@ -416,8 +427,11 @@ Task.prototype.editCancel = function()
 	this.elShow.style.display = 'block';
 }
 
-Task.prototype.editProcess = function()
+Task.prototype.editProcess = function(i_args)
 {
+	if (i_args == null)
+		i_args = {};
+
 	let this_is_a_new_task = false;
 
 	// Store previous progress to find out that it was changed
@@ -519,7 +533,11 @@ Task.prototype.editProcess = function()
 	}
 
 	let obj = {};
-	obj.path = this.statusClass.path;
+	if (i_args.paths && i_args.paths.length)
+		obj.paths = i_args.paths;
+	else
+		obj.paths = [this.statusClass.path];
+
 	let fields = ['name','artists','flags','tags','progress','annotation'];
 	for (let f of fields)
 		obj[f] = this.obj[f];
@@ -642,6 +660,8 @@ function task_DrawBadges(i_status, i_el, i_args)
 	if (null == i_el.m_elTasks)
 		i_el.m_elTasks = {};
 
+	let elBages = [];
+
 	for (let t in i_status.tasks)
 	{
 		let task = i_status.tasks[t];
@@ -696,7 +716,11 @@ function task_DrawBadges(i_status, i_el, i_args)
 		st_SetElProgress(task, elProgressBar, elProgress);
 
 		activity_TaskBadgeFilter(elTask);
+
+		elBages.push(elTask);
 	}
+
+	return elBages;
 }
 
 function task_StatusTagClicked(i_name)

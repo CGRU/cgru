@@ -156,6 +156,10 @@ function Status(i_obj, i_args)
 	if (i_args == null)
 		i_args = {};
 
+	this.multi = false;
+	if (i_args.multi)
+		this.multi = true;
+
 	if (i_args.createGUI)
 		i_args.createGUI(this);
 	else
@@ -175,6 +179,9 @@ function Status(i_obj, i_args)
 		this.elFramesNum = $('status_framesnum');
 		this.elFinish = $('status_finish');
 		this.elModified = $('status_modified');
+
+		this.elTasks = $('status_tasks');
+
 		this.elReportsDiv = $('status_reports_div');
 		this.elReports = $('status_reports');
 	}
@@ -265,12 +272,35 @@ Status.prototype.show = function(i_status, i_update = false) {
 		}
 	}
 
+	if (this.tasks)
+	{
+		for (let t in this.tasks)
+			this.tasks[t].destroy();
+	}
+
+	if (this.elTasks)
+		this.elTasks.textContent = '';
+
 	if (this.args.tasks_badges)
-		task_DrawBadges(this.obj, this.elTasks/*, {'only_my':this.args.display_short}*/);
+	{
+		let elBages = task_DrawBadges(this.obj, this.elTasksBadges/*, {'only_my':this.args.display_short}*/);
+		for (let el of elBages)
+		{
+			el.m_status = this;
+			el.onclick = function(e){
+				e.stopPropagation();
+				e.currentTarget.m_status.elTasksBadges.style.display = 'none';
+				e.currentTarget.m_status.args.tasks_badges = false;
+				let tasks = task_ShowTasks(e.currentTarget.m_status);
+				for (let task of tasks)
+					task.elBtnEdit.onclick = sc_EditTask;
+			};
+		}
+	}
 	else
 		task_ShowTasks(this);
 
-	var args = {};
+	let args = {};
 	args.statuses = [this.obj];
 	args.elReports = this.elReports;
 	args.elReportsDiv = this.elReportsDiv;
