@@ -516,6 +516,20 @@ function sc_EditTask(e)
 	return false;
 }
 
+function sc_AddTask(i_status)
+{
+	let shots = scenes_GetSelectedShots();
+	let paths = [i_status.path];
+	for (let shot of shots)
+	{
+		let path = shot.m_status.path;
+		if (false == paths.includes(path))
+			paths.push(path);
+	}
+
+	new Task(i_status, /* task = */null/* as it is a new task*/,{"paths":paths});
+}
+
 function sc_EditBody( i_e)
 {
 	i_e.stopPropagation();

@@ -207,7 +207,8 @@ function Status(i_obj, i_args)
 	this.show();
 }
 
-Status.prototype.show = function(i_status, i_update = false) {
+Status.prototype.show = function(i_status, i_update = false)
+{
 	if (i_status)
 	{
 		if (i_update && this.obj)
@@ -272,9 +273,10 @@ Status.prototype.show = function(i_status, i_update = false) {
 		}
 	}
 
+	// Global status will be cleaned in tasks_Finish() function.
+	// So here we should clean multi statuses (scene shots view).
 	if (this.multi)
 	{
-		// Global status will be cleaned in tasks_Finish() function.
 		if (this.tasks)
 			for (let t in this.tasks)
 				this.tasks[t].destroy();
@@ -286,7 +288,7 @@ Status.prototype.show = function(i_status, i_update = false) {
 	if (this.args.tasks_badges)
 	{
 		let elBages = task_DrawBadges(this.obj, this.elTasksBadges/*, {'only_my':this.args.display_short}*/);
-		if (this.multi)
+		if (this.multi && g_admin)
 		{
 			for (let el of elBages)
 			{
@@ -295,18 +297,14 @@ Status.prototype.show = function(i_status, i_update = false) {
 					e.stopPropagation();
 					e.currentTarget.m_status.elTasksBadges.style.display = 'none';
 					e.currentTarget.m_status.args.tasks_badges = false;
-					let tasks = task_ShowTasks(e.currentTarget.m_status);
-					for (let task of tasks)
-						task.elBtnEdit.onclick = sc_EditTask;
+					e.currentTarget.m_status.showTasks();
 				};
 			}
 		}
 	}
 	else
 	{
-		let tasks = task_ShowTasks(this);
-		if (this.multi)
-			tasks[0].elBtnEdit.onclick = sc_EditTask;
+		this.showTasks();
 	}
 
 	let args = {};
@@ -320,6 +318,35 @@ Status.prototype.show = function(i_status, i_update = false) {
 	this.elParent.classList.remove('fading');
 	this.elParent.classList.remove('updating');
 };
+
+Status.prototype.showTasks = function()
+{
+	tasks_Finish();
+
+	if (this.obj && this.obj.tasks)
+	{
+		for (let t in this.obj.tasks)
+		{
+			let task = new Task(this, this.obj.tasks[t]);
+			if (this.multi)
+				task.elBtnEdit.onclick = sc_EditTask;
+		}
+	}
+
+	if (this.multi && g_admin)
+	{
+		let el = document.createElement('div');
+		this.elTasks.appendChild(el);
+		el.classList.add('button');
+		el.textContent = 'Add Task';
+		el.m_status = this;
+		el.onclick = function(e){
+			e.stopPropagation();
+			sc_AddTask(e.currentTarget.m_status);
+			return false;
+		};
+	}
+}
 
 Status.prototype.update = function(i_status)
 {

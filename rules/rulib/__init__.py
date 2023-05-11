@@ -101,7 +101,7 @@ def setTask(paths=None, uid=None, name=None, tags=None, artists=None, flags=None
 
     for path in paths:
         st = status.Status(uid, path)
-        st.setTask(tags=tags, artists=artists, flags=flags, progress=progress, annotation=annotation, deleted=deleted, out=out)
+        st.setTask(name=name, tags=tags, artists=artists, flags=flags, progress=progress, annotation=annotation, deleted=deleted, out=out)
         if 'error' in out:
             break
         if st.progress_changed:

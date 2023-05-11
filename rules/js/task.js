@@ -36,27 +36,6 @@ function tasks_Finish()
 	$('status_tasks').textContent = '';
 }
 
-function task_ShowTasks(i_statusClass)
-{
-	tasks_Finish();
-
-	if ((null == i_statusClass) || (null == i_statusClass.obj) || (null == i_statusClass.obj.tasks))
-		return [];
-
-	if (Array.isArray(i_statusClass.obj.tasks) && (i_statusClass.obj.tasks.length == 0))
-	{
-		// OLD tasks way:
-		delete i_statusClass.obj.tasks;
-		return [];
-	}
-
-	let tasks = [];
-	for (let task in i_statusClass.obj.tasks)
-		tasks.push(new Task(i_statusClass, i_statusClass.obj.tasks[task]));
-
-	return tasks;
-}
-
 function task_AddTask()
 {
 	new Task();
@@ -77,7 +56,7 @@ function task_AddArtistTask()
 	new Task(null, task);
 }
 
-function Task(i_statusClass, i_task)
+function Task(i_statusClass, i_task, i_args)
 {
 	this.statusClass = i_statusClass;
 	if (this.statusClass == null)
@@ -116,7 +95,6 @@ function Task(i_statusClass, i_task)
 		this.obj.deleted = false;
 
 
-	this.elParent = $('status_tasks');
 	this.elParent = this.statusClass.elTasks;
 
 
@@ -194,7 +172,7 @@ function Task(i_statusClass, i_task)
 
 	// We should start to edit new added task
 	if (this.obj.name == null)
-		this.edit();
+		this.edit(i_args);
 	else
 		this.show();
 
@@ -625,7 +603,7 @@ Task.prototype.save = function(i_progress_changed)
 		st_UpdateProgresses(this.statusClass.path, progresses);
 }
 
-Task.prototype.editDelete = function(i_args)
+Task.prototype.editDelete = function(i_args = {})
 {
 	let index = task_CurrentTasks.indexOf(this);
 	if (index != -1)
