@@ -247,15 +247,19 @@ function scene_Show()
 		elShot.m_elStatus.appendChild(elSt.elShow);
 		elSt.elShow.classList.add('status_show');
 
+		elSt.elShowCompact = document.createElement('div');
+		elSt.elShowCompact.classList.add('status_show_compact');
+		elSt.elShow.appendChild(elSt.elShowCompact);
+
 		elSt.elProgress = document.createElement('div');
-		elSt.elShow.appendChild(elSt.elProgress);
+		elSt.elShowCompact.appendChild(elSt.elProgress);
 		elSt.elProgress.classList.add('progress');
 		elSt.elProgressBar = document.createElement('div');
 		elSt.elProgress.appendChild( elSt.elProgressBar);
 		elSt.elProgressBar.classList.add('progressbar');
 
-		var elEditBtn = document.createElement('div');
-		elSt.elShow.appendChild( elEditBtn);
+		let elEditBtn = document.createElement('div');
+		elSt.elShowCompact.appendChild( elEditBtn);
 		elEditBtn.classList.add('button');
 		elEditBtn.classList.add('edit');
 		elEditBtn.title = 'Edit status.\nSelect several shots to edit.';
@@ -263,32 +267,33 @@ function scene_Show()
 			elEditBtn.style.display = 'none';
 
 		elSt.elPercentage = document.createElement('div');
-		elSt.elShow.appendChild(elSt.elPercentage);
+		elSt.elShowCompact.appendChild(elSt.elPercentage);
 		elSt.elPercentage.classList.add('percent');
 
 		elSt.elAnnotation = document.createElement('div');
-		elSt.elShow.appendChild(elSt.elAnnotation);
+		elSt.elShowCompact.appendChild(elSt.elAnnotation);
 		elSt.elAnnotation.classList.add('annotation');
 
 		elSt.elFlags = document.createElement('div');
-		elSt.elShow.appendChild(elSt.elFlags);
+		elSt.elShowCompact.appendChild(elSt.elFlags);
 		elSt.elFlags.classList.add('flags');
 
 		elSt.elTasksBadges = document.createElement('div');
-		elSt.elShow.appendChild(elSt.elTasksBadges);
+		elSt.elShowCompact.appendChild(elSt.elTasksBadges);
 		elSt.elTasksBadges.classList.add('tasks_badges');
 
 		elSt.elTags = document.createElement('div');
-		elSt.elShow.appendChild( elSt.elTags);
+		elSt.elShowCompact.appendChild( elSt.elTags);
 		elSt.elTags.classList.add('tags');
 
 		elSt.elArtists = document.createElement('div');
-		elSt.elShow.appendChild(elSt.elArtists);
+		elSt.elShowCompact.appendChild(elSt.elArtists);
 		elSt.elArtists.classList.add('artists');
 
 		elSt.elTasks = document.createElement('div');
 		elSt.elShow.appendChild(elSt.elTasks);
 		elSt.elTasks.classList.add('tasks');
+		elSt.elTasks.onclick = function(e){e.stopPropagation();return false;}
 
 		function sc_CreateSceneShot(i_status)
 		{
@@ -413,7 +418,7 @@ function scenes_Received( i_data, i_args)
 
 			elSt.elShow = document.createElement('div');
 			elShot.appendChild( elSt.elShow);
-			elSt.elShow.classList.add('status','status_show');
+			elSt.elShow.classList.add('status','status_show','status_show_compact');
 
 			elSt.elAnnotation = document.createElement('div');
 			elSt.elShow.appendChild( elSt.elAnnotation);
