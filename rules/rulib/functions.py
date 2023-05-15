@@ -195,7 +195,12 @@ def readUser(i_uid, i_full):
     if user is None:
         return None
 
+    # Not full request does not contain news and bookmarks
     if not i_full:
+        return user
+
+    # Auxiliary user state means no news and bookmarks
+    if 'states' in user and 'aux' in user['states']:
         return user
 
     if os.path.isfile(ufile_news):
