@@ -288,7 +288,7 @@ Status.prototype.show = function(i_status, i_update = false)
 	if (this.args.tasks_badges)
 	{
 		let elBages = task_DrawBadges(this.obj, this.elTasksBadges/*, {'only_my':this.args.display_short}*/);
-		if (this.multi && g_admin)
+		if (elBages && this.multi && g_admin)
 		{
 			for (let el of elBages)
 			{
@@ -1299,7 +1299,7 @@ Status.prototype.editProcess = function(i_args) {
 			statuses.push(this);
 	}
 
-	if (document.location.hostname == 'localhost')
+	if (1)//document.location.hostname == 'localhost')
 	{
 	let obj = {};
 
@@ -1566,17 +1566,32 @@ function st_StatusesSaved(i_data)
 	{
 		for (let sdata of i_data.statuses)
 		{
+			// Update current status:
 			if (sdata.path == g_CurPath())
 			{
 				RULES.status = sdata.status;
 				st_Show(sdata.status);
-				continue;
 			}
 
+			// Update other statuses (scene shots view):
 			if (st_Statuses[sdata.path])
 			{
 				st_Statuses[sdata.path].show(sdata.status);
 			}
+
+			// Update navigation folders
+			let el = g_elFolders[sdata.path];
+			if (el == null) continue;
+
+			let fstat = el.m_fobject.status;
+			if (fstat == null) continue;
+
+			// Update only if status time > folder status time
+			if (fstat.ctime && (fstat.ctime >= sdata.status.time)) continue;
+			if (fstat.mtime && (fstat.mtime >= sdata.status.time)) continue;
+
+			// Update folder status:
+			g_FolderSetStatus(sdata.status, el);
 		}
 	}
 
