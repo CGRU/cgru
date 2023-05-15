@@ -1584,11 +1584,12 @@ function st_StatusesSaved(i_data)
 			if (el == null) continue;
 
 			let fstat = el.m_fobject.status;
-			if (fstat == null) continue;
-
-			// Update only if status time > folder status time
-			if (fstat.ctime && (fstat.ctime >= sdata.status.time)) continue;
-			if (fstat.mtime && (fstat.mtime >= sdata.status.time)) continue;
+			if (fstat)
+			{
+				// Update only if status time > folder status time
+				if (fstat.ctime && (fstat.ctime >= sdata.status.time)) continue;
+				if (fstat.mtime && (fstat.mtime >= sdata.status.time)) continue;
+			}
 
 			// Update folder status:
 			g_FolderSetStatus(sdata.status, el);
