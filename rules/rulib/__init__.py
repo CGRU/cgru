@@ -112,7 +112,7 @@ def setTask(paths=None, uid=None, name=None, tags=None, artists=None, flags=None
     # At first we should emit news,
     # as some temporary could be added for news.
     # For example task.changed = true
-    news.statusesChanged([st], out, nonews)
+    news.statusesChanged(statuses, out, nonews)
 
     out['statuses'] = []
     _out = dict()
