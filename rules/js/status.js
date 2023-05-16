@@ -288,17 +288,24 @@ Status.prototype.show = function(i_status, i_update = false)
 	if (this.args.tasks_badges)
 	{
 		let elBages = task_DrawBadges(this.obj, this.elTasksBadges/*, {'only_my':this.args.display_short}*/);
-		if (elBages && this.multi && g_admin)
+		if (this.multi && g_admin)
 		{
-			for (let el of elBages)
+			if (elBages && elBages.length)
 			{
-				el.m_status = this;
-				el.onclick = function(e){
-					e.stopPropagation();
-					e.currentTarget.m_status.elTasksBadges.style.display = 'none';
-					e.currentTarget.m_status.args.tasks_badges = false;
-					e.currentTarget.m_status.showTasks();
-				};
+				for (let el of elBages)
+				{
+					el.m_status = this;
+					el.onclick = function(e){
+						e.stopPropagation();
+						e.currentTarget.m_status.elTasksBadges.style.display = 'none';
+						e.currentTarget.m_status.args.tasks_badges = false;
+						e.currentTarget.m_status.showTasks();
+					};
+				}
+			}
+			else
+			{
+				this.createAddTaskButton();
 			}
 		}
 	}
@@ -334,18 +341,24 @@ Status.prototype.showTasks = function()
 	}
 
 	if (this.multi && g_admin)
-	{
-		let el = document.createElement('div');
+		this.createAddTaskButton();
+}
+Status.prototype.createAddTaskButton = function()
+{
+	let el = document.createElement('div');
+	el.classList.add('button');
+	el.textContent = 'Add Task';
+	el.m_status = this;
+	el.onclick = function(e){
+		e.stopPropagation();
+		sc_AddTask(e.currentTarget.m_status);
+		return false;
+	};
+
+	if (this.args.tasks_badges)
+		this.elTasksBadges.appendChild(el);
+	else
 		this.elTasks.appendChild(el);
-		el.classList.add('button');
-		el.textContent = 'Add Task';
-		el.m_status = this;
-		el.onclick = function(e){
-			e.stopPropagation();
-			sc_AddTask(e.currentTarget.m_status);
-			return false;
-		};
-	}
 }
 
 Status.prototype.update = function(i_status)
