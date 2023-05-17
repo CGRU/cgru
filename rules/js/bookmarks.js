@@ -334,6 +334,10 @@ function bm_Show()
 						{
 							for (let flag of task.flags)
 							{
+								// Skip task if the flag was already added at status:
+								if (bm.status.flags && bm.status.flags.includes(flag))
+									continue;
+
 								if (flag in prj_flags)
 									prj_flags[flag] += 1;
 								else
