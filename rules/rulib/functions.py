@@ -52,6 +52,20 @@ def getAbsPath(i_path):
         return rulib.ROOT + i_path
     return rulib.ROOT + '/' + i_path
 
+def isAuxFolder(i_path, i_status = None):
+    if i_status is not None:
+        if 'flags' in i_status and 'aux' in i_status['flags']:
+            return True
+
+        if 'progress' in i_status and i_status['progress'] < 0:
+            return True
+
+    name = os.path.basename(i_path).lower()
+    for aux in rulib.RULES_TOP['aux_folders']:
+        if name.find(aux) == 0:
+            return True
+
+    return False
 
 def getRuFiles(i_path = None, i_ruFolder = None):
     if i_path is None: i_path = os.getcwd()

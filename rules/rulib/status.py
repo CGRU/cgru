@@ -357,15 +357,16 @@ def updateUpperProgresses(i_path, i_progresses, out):
             sdata = None
             path = os.path.join(folder, entry)
             sdata = getStatusData(path)
+
+            # Skip aux folders:
+            if rulib.functions.isAuxFolder(path, sdata):
+                continue
+
             if path in i_progresses:
                 progress = i_progresses[path]
             else:
                 if sdata and 'progress' in sdata and type(sdata['progress']) is int:
                     progress = sdata['progress']
-
-            # Skip aux folders:
-            if progress < 0:
-                continue
 
             # Clamp progress to 100%
             if progress >= 100:
