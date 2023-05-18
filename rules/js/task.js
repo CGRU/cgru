@@ -501,7 +501,7 @@ Task.prototype.editProcess = function(i_args)
 		this.obj.annotation = '';
 
 
-	if (document.location.hostname != 'localhost')
+	if (0)//document.location.hostname != 'localhost')
 	{
 	// We should calculate status progress
 	// if task progress is changed
@@ -615,7 +615,7 @@ Task.prototype.editDelete = function(i_args = {})
 
 	this.obj.deleted = true;
 
-	if (document.location.hostname != 'localhost')
+	if (0)//document.location.hostname != 'localhost')
 	{
 	this.save(this.obj.progress);
 	return;
