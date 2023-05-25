@@ -680,7 +680,10 @@ height: 4px;
 background-color: rgba(0,200,0,.5);
 opacity: 0.5;
 }
-#bookmarks .bookmark.cur_path { background: rgba( 100, 255, 255, .2); }
+#bookmarks .bookmark.cur_path {
+/*background: rgba( 100, 255, 255, .2);*/
+box-shadow: 0 0 4px rgba(100,255,255,1), 0 0 16px rgba(100,255,255,1) inset;
+}
 #bookmarks .bookmark .button.delete {
 display: none;
 float: right;
