@@ -1,12 +1,18 @@
+# RULES handles Apache Digest authentication.
 AuthType Digest
+
+# Better to use "YOUR_COMPANY_NAME" here:
 AuthName "CGRU"
-AuthDigestDomain /cgru/ http://cgru.info
 
+# Replace your site address:
+AuthDigestDomain /data/cgru/ https://rules.cgru.info
+
+# This files will be used to store digest passwords and groups
 AuthDigestProvider file
-AuthGroupFile /cgru/.htgroups
-AuthUserFile /cgru/.htdigest
+AuthGroupFile /data/cgru/.htgroups
+AuthUserFile /data/cgru/.htdigest
 
-# Require valid-user
+Require valid-user
 
 # Needed modules:
 # sudo a2enmod ssl auth_digest authz_groupfile
