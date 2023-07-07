@@ -140,6 +140,7 @@ EditList.prototype.deleteItem = function(i_el)
 {
 	i_el.parentNode.removeChild(i_el);
 	this.list[i_el.m_id].selected = false;
+	this.list[i_el.m_id].half_selected = false;
 	this.addInputProcess();
 
 	if (this.onChange)
@@ -307,6 +308,7 @@ EditList.prototype.showAllItems = function()
 			if (this.list[item].half_selected)
 			{
 				el.m_half_selected = true;
+                el.m_half_selected_initially = true;
 				el.classList.add('half_selected');
 			}
 			else if(this.list[item].selected)
@@ -390,6 +392,7 @@ EditList.prototype.editArtists = function()
 					if (this.list[artist.id].half_selected)
 					{
 						el.m_half_selected = true;
+						el.m_half_selected_initially = true;
 						el.classList.add('half_selected');
 					}
 					else if (this.list[artist.id].selected)
@@ -454,28 +457,56 @@ EditList.prototype.getSelectedNames = function ()
 	return names;
 }
 
+EditList.prototype.getHalfSelectedNames = function ()
+{
+	let names = [];
+
+	if (this.elAllItems)
+	{
+		for (let i = 0; i < this.elAllItems.length; i++)
+			if (this.elAllItems[i].m_half_selected)
+				names.push(this.elAllItems[i].m_item);
+	}
+	else
+	{
+		for (let id in this.list)
+			if (this.list[id].half_selected)
+				names.push(id);
+	}
+
+	return names;
+}
+
 function editlist_ToggleSelection(e)
 {
 	let el = e.currentTarget;
 	if (el.m_selected)
 	{
-		el.m_selected = false;
 		el.classList.remove('selected');
-	}
-	else if (el.classList.contains('half_selected'))
-	{
-		el.m_selected = true;
-		el.classList.add('selected');
 		el.classList.remove('half_selected');
+		el.m_selected = false;
+        el.m_half_selected = false;
 	}
 	else if (el.m_half_selected)
 	{
+		el.classList.add('selected');
+		el.classList.remove('half_selected');
+		el.m_selected = true;
+        el.m_half_selected = false;
+	}
+	else if (el.m_half_selected_initially)
+	{
+		el.classList.remove('selected');
 		el.classList.add('half_selected');
+		el.m_selected = false;
+        el.m_half_selected = true;
 	}
 	else
 	{
-		el.m_selected = true;
 		el.classList.add('selected');
+		el.classList.remove('half_selected');
+		el.m_selected = true;
+        el.m_half_selected = false;
 	}
 
 	if (el.m_editlist.onChange)

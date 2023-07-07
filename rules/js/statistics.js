@@ -28,12 +28,14 @@ function stcs_Show(i_args)
 	var i_main_artists = i_args.main_artists;
 	var i_draw_bars = i_args.draw_bars;
 
-	if (i_elTasks == null)
+	if (i_elTasks == null && (i_args.noTasks != true))
 		return;
 	if (i_elReports == null)
 		return;
 
-	i_elTasks.textContent = '';
+    if (i_elTasks)
+        i_elTasks.textContent = '';
+
 	var tasks_types = {};
 	var tasks_artists = {};
 
@@ -57,10 +59,10 @@ function stcs_Show(i_args)
 		}
 
 		// Tasks collection:
-		if (i_statuses[s].tasks)
-			for (var t = 0; t < i_statuses[s].tasks.length; t++)
+		if (i_statuses[s].tasks && (i_args.noTasks != true))
+			for (let t in i_statuses[s].tasks)
 			{
-				var task = i_statuses[s].tasks[t];
+				let task = i_statuses[s].tasks[t];
 
 				// If task has no own progress,
 				// we set task progress from status progress:
@@ -222,7 +224,7 @@ function stcs_Show(i_args)
 		if (tasks_a.length && i_main_artists)
 			stcs_ShowTable({"el": i_elTasks, "data": tasks_a, "draw_bars": i_draw_bars, "main": "artists"});
 	}
-	else
+	else if (i_elTasksDiv)
 		i_elTasksDiv.style.display = 'none';
 
 

@@ -75,6 +75,8 @@ private slots:
     void actSaveWndRectsOnExit();
     void actResetWndRects();
     void actSavePreferences();
+    void actShowServerName();
+    void actShowServerPort();
     void actShowOfflineNoise();
 	void actGuiTheme( QString theme);
     void actGuiLevel( int i_level);

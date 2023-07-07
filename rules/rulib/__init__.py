@@ -44,8 +44,85 @@ if len(RULES_TOP) == 0:
 
     RULES_TOP = functions.getRulesUno(CGRU_LOCATION,'rules')
 
-    try:
-        ROOT = os.readlink(os.path.join(CGRU_LOCATION, RULES_TOP['root']))
-    except:
-        print('%s' % traceback.format_exc())
-        ROOT = os.path.join(CGRU_LOCATION, RULES_TOP['root'])
+    if 'root' in RULES_TOP:
+        try:
+            ROOT = os.readlink(os.path.join(CGRU_LOCATION, RULES_TOP['root']))
+        except:
+            print('%s' % traceback.format_exc())
+            ROOT = os.path.join(CGRU_LOCATION, RULES_TOP['root'])
+
+
+def setStatus(paths=None, uid=None, name=None, tags=None, tags_keep=None, artists=None, artists_keep=None, flags=None, flags_keep=None, progress=None, annotation=None, color=None, nonews=False, out=None):
+    if out is None:
+        out = dict()
+    if paths is None or paths == []:
+        paths = [None]
+
+    statuses = []
+    some_progress_changed = False
+
+    for path in paths:
+        st = status.Status(uid, path)
+        st.set(tags=tags, tags_keep=tags_keep, artists=artists, artists_keep=artists_keep, flags=flags, flags_keep=flags_keep, progress=progress, annotation=annotation, color=color, out=out)
+        if 'error' in out:
+            break
+        if st.progress_changed:
+            some_progress_changed = True
+        statuses.append(st)
+
+    # News & Bookmarks:
+    # At first we should emit news,
+    # as some temporary could be added for news.
+    # For example task.changed = true
+    news.statusesChanged(statuses, out, nonews)
+
+    out['statuses'] = []
+    _out = dict()
+    for st in statuses:
+        st.save(_out)
+        out['statuses'].append({"path":st.path,"status":st.data})
+
+    if some_progress_changed:
+        progresses = dict()
+        progresses[st.path] = st.data['progress']
+        status.updateUpperProgresses(os.path.dirname(st.path), progresses, out)
+
+    return out
+
+
+def setTask(paths=None, uid=None, name=None, tags=None, artists=None, flags=None, progress=None, annotation=None, deleted=None, nonews=False, out=None):
+    if out is None:
+        out = dict()
+    if paths is None or paths == []:
+        paths = [None]
+
+    statuses = []
+    some_progress_changed = False
+
+    for path in paths:
+        st = status.Status(uid, path)
+        st.setTask(name=name, tags=tags, artists=artists, flags=flags, progress=progress, annotation=annotation, deleted=deleted, out=out)
+        if 'error' in out:
+            break
+        if st.progress_changed:
+            some_progress_changed = True
+        statuses.append(st)
+
+    # News & Bookmarks:
+    # At first we should emit news,
+    # as some temporary could be added for news.
+    # For example task.changed = true
+    news.statusesChanged(statuses, out, nonews)
+
+    out['statuses'] = []
+    _out = dict()
+    for st in statuses:
+        st.save(_out)
+        out['statuses'].append({"path":st.path,"status":st.data})
+
+    if st.progress_changed:
+        progresses = dict()
+        progresses[st.path] = st.data['progress']
+        status.updateUpperProgresses(os.path.dirname(st.path), progresses, out)
+
+    return out

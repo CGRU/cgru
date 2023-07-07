@@ -548,15 +548,27 @@ display: none;
 #sidepanel_news.news_disabled   { background-color: rgba(200,  0,0,.3); }
 #news_ctrl { margin: 2px; padding: 2px; }
 #news_ctrl_btns .button { font-size: 14px; width: 20px; height: 20px; float: left; margin: 1px 4px; padding: 0; }
-#chanset .button { float: left; width: 16px; height: 16px; }
+#news_channels .button { float: left; width: 16px; height: 16px; }
 #sidepanel_news.news_disabled   #news_disable    { background-color: #FF0000; }
 #sidepanel_news.news_ignore_own #news_ignore_own { background-color: #FF9900; }
 #channels { clear: both; }
 #channels .channel .button.delete { float: right; height: 14px; width: 14px; }
 #channels .channel { border-top: 1px solid rgba(98,98,98,.5); border-radius: 2px; margin: 0px; }
 #channels .channel.current { background-color: rgba(100,255,100,.3); }
-.news_filter { margin: 2px; padding: 0px 3px; border-top: 1px solid rgba(98,98,98,.5); }
-.news_filter .button { float: left; margin: 1px 1px; padding: 1px 2px; }
+
+#news_filter_div > div {border-top: 1px solid rgba(98,98,98,.5); padding-top: 4px; font-size: 10px;}
+#news_filter_div > div .news_filter_label {float: left;}
+#news_filter_div > div .list {}
+#news_filter_div > div .show .button.edit {width: 10px; height: 10px; float: right;}
+#news_filter_div > div .edit .button.save {font-size: 10px; width: 32px; padding: 2px; float: right;}
+#news_filter_div > div .edit_tags_list {font-size: 10px;}
+#news_filter_div > div .edit_tags_list .button {font-size: 10px; float: left;}
+#news_filter_div > div .edit_tags_list .button.delete {font-size: 10px; width: 8px; height: 8px;}
+#news_filter_div > div .edit_tags_list .editing {font-size: 10px; width: 24px; height: 10px;}
+
+.news_display_filter { margin: 2px; padding: 0px 3px; border-top: 1px solid rgba(98,98,98,.5); }
+.news_display_filter .button { float: left; margin: 1px 1px; padding: 1px 2px; }
+
 #news { }
 #news .news {
 position: relative;
@@ -625,6 +637,7 @@ padding: 0px 4px 0px 4px;
 margin: 0px 4px 0px 4px;
 cursor: pointer;
 }
+#bookmarks .project .statistics {font-size: 10px;}
 #bookmarks .project .label:hover {
 text-shadow: 0 0 2px rgba( 100, 255, 255, .5);
 }
@@ -646,7 +659,7 @@ opacity: .7;
 position: relative;
 border-top: 1px solid rgba(98,98,98,.5);
 font-size: 12px;
-padding: 4px 0;
+padding: 4px 10px 0 0;
 }
 #bookmarks .bookmark a {
 padding: 0 12px;
@@ -667,7 +680,10 @@ height: 4px;
 background-color: rgba(0,200,0,.5);
 opacity: 0.5;
 }
-#bookmarks .bookmark.cur_path { background: rgba( 100, 255, 255, .2); }
+#bookmarks .bookmark.cur_path {
+/*background: rgba( 100, 255, 255, .2);*/
+box-shadow: 0 0 4px rgba(100,255,255,1), 0 0 16px rgba(100,255,255,1) inset;
+}
 #bookmarks .bookmark .button.delete {
 display: none;
 float: right;
@@ -791,6 +807,19 @@ padding: 10px;
 overflow-y: scroll;
 }
 
+#constant_error {
+display: none;
+margin: 8px;
+padding: 8px;
+border: 4px solid #700;
+border-radius: 8px;
+background-color: #F88;
+text-align: center;
+font-size: 22px;
+font-weight: bold;
+color: #400;
+}
+
 #annotations { float: left; padding: 6px; }
 #annotations > div { float: left; margin: 0px 4px; }
 #annotations > div * { margin: 0px 2px; }
@@ -846,41 +875,41 @@ border-radius: 8px;
 #status_tasks_buttons {float: right; margin: 1px 12px; padding: 1px 12px;}
 #status_tasks_buttons .button {float: right; margin: 1px 12px; padding: 1px 12px;}
 #status_tasks_label   {float: left; margin: 6px 12px; padding: 1px 12px;}
-#status_tasks         {clear: both; margin: 4px;}
-#status_tasks .task {
+.status .tasks         {clear: both; margin: 4px;}
+.status .tasks .task {
 margin: 8px 4px;
 padding: 8px 4px 0px 4px;
 border-radius: 4px;
 border: 2px solid rgba(98,98,98,.5);
 }
-#status_tasks .task.selected {
+.status .tasks .task.selected {
 border: 2px solid rgba(100,255,255,1);
 box-shadow: 0 0 4px rgba(100,255,255,1), 0 0 4px rgba(100,255,255,1) inset;
 }
-#status_tasks .task.edit {
+.status .tasks .task.edit {
 border: 2px solid rgba(255,255,0,1);
 }
-#status_tasks .task.deleted            {display: none;}
-#status_tasks .task .show_div          {clear: both;}
-#status_tasks .task .show_div .artists {float: left;}
-#status_tasks .task .show_div .flags   {float: left;}
-#status_tasks .task .show_div .percent {float: right;}
-#status_tasks .task .edit_div          {clear: both;}
-#status_tasks .task .edit_div .tags    {float: left;}
-#status_tasks .task .edit_div .percent {float: right; width: 64px;}
-#status_tasks .task .edit_div .percent .label {float: right; padding: 2px; margin: 2px; margin-right: 8px;}
-#status_tasks .task .edit_div .annotation {margin: 4px; border-top: 1px solid rgba(98,98,98,.5);}
-#status_tasks .task .progress          {clear: both; border-radius: 4px;}
-#status_tasks .task .progressbar       {height: 6px; border-radius: 2px;}
-#status_tasks .task .info              {font-style: italic; font-size: 10px;}
-#status_tasks .task .show_div .name {
+.status .tasks .task.deleted            {display: none;}
+.status .tasks .task .show_div          {clear: both;}
+.status .tasks .task .show_div .artists {float: left;}
+.status .tasks .task .show_div .flags   {float: left;}
+.status .tasks .task .show_div .percent {float: right;}
+.status .tasks .task .edit_div          {clear: both;}
+.status .tasks .task .edit_div .tags    {float: left;}
+.status .tasks .task .edit_div .percent {float: right; width: 64px;}
+.status .tasks .task .edit_div .percent .label {float: right; padding: 2px; margin: 2px; margin-right: 8px;}
+.status .tasks .task .edit_div .annotation {margin: 4px; border-top: 1px solid rgba(98,98,98,.5);}
+.status .tasks .task .progress          {clear: both; border-radius: 4px;}
+.status .tasks .task .progressbar       {height: 6px; border-radius: 2px;}
+.status .tasks .task .info              {font-style: italic; font-size: 10px;}
+.status .tasks .task .show_div .name {
 float: left;
 cursor: pointer;
 margin: 1px 4px;
 padding: 1px 4px;
 border: 1px solid rgba(98,98,98,.5);
 }
-#status_tasks .task .show_div .name:hover {
+.status .tasks .task .show_div .name:hover {
 border: 1px solid rgba( 100, 255, 255);
 box-shadow: 0 0 4px rgba(100,255,255,1), 0 0 4px rgba(100,255,255,1) inset;
 }
@@ -1321,6 +1350,8 @@ border-radius: 6px;
 .gui .output table { width: 100%; }
 
 /* ==================== WINDOWS: ======================================== */
+.dailies.error { color: #A00; text-align: center; font-size: 20px; font-weight: bold; }
+
 .administrate { color: #000000; font-size: 14px; }
 .administrate .button { float: left; }
 .admin_groups { float: left; }

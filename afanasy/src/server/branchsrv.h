@@ -86,6 +86,7 @@ public:
 
 private:
 	void deleteBranch(Action & o_action, MonitorContainer * i_monitoring);
+	void deleteDoneJobs(Action & o_action, MonitorContainer * i_monitoring);
 
 private:
 	BranchSrv * m_parent;

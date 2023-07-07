@@ -17,6 +17,9 @@
 "use strict";
 
 var st_Status = null;
+
+var st_Statuses = [];
+
 var st_MultiValue = '[...]';
 
 var st_Hilighted = {};
@@ -48,6 +51,8 @@ function st_Finish()
 	st_Status = null;
 	$('status').classList.remove('fading');
 	$('status').classList.remove('updating');
+
+	st_Statuses = [];
 }
 
 function st_OnClose()
@@ -151,6 +156,10 @@ function Status(i_obj, i_args)
 	if (i_args == null)
 		i_args = {};
 
+	this.multi = false;
+	if (i_args.multi)
+		this.multi = true;
+
 	if (i_args.createGUI)
 		i_args.createGUI(this);
 	else
@@ -170,10 +179,11 @@ function Status(i_obj, i_args)
 		this.elFramesNum = $('status_framesnum');
 		this.elFinish = $('status_finish');
 		this.elModified = $('status_modified');
+
+		this.elTasks = $('status_tasks');
+
 		this.elReportsDiv = $('status_reports_div');
 		this.elReports = $('status_reports');
-		this.elTasksDiv = $('status_tasks_div_old');
-		this.elTasks = $('status_tasks_old');
 	}
 
 	if (this.elEditBtn)
@@ -197,7 +207,8 @@ function Status(i_obj, i_args)
 	this.show();
 }
 
-Status.prototype.show = function(i_status, i_update = false) {
+Status.prototype.show = function(i_status, i_update = false)
+{
 	if (i_status)
 	{
 		if (i_update && this.obj)
@@ -262,23 +273,93 @@ Status.prototype.show = function(i_status, i_update = false) {
 		}
 	}
 
-	if (this.args.tasks_badges)
-		task_DrawBadges(this.obj, this.elTasks/*, {'only_my':this.args.display_short}*/);
-	else
-		task_ShowTasks(this);
+	// Global status will be cleaned in tasks_Finish() function.
+	// So here we should clean multi statuses (scene shots view).
+	if (this.multi)
+	{
+		if (this.tasks)
+			for (let t in this.tasks)
+				this.tasks[t].destroy();
 
-	var args = {};
+		if (this.elTasks)
+			this.elTasks.textContent = '';
+	}
+
+	if (this.args.tasks_badges)
+	{
+		let elBages = task_DrawBadges(this.obj, this.elTasksBadges/*, {'only_my':this.args.display_short}*/);
+		if (this.multi && g_admin)
+		{
+			if (elBages && elBages.length)
+			{
+				for (let el of elBages)
+				{
+					el.m_status = this;
+					el.onclick = function(e){
+						e.stopPropagation();
+						e.currentTarget.m_status.elTasksBadges.style.display = 'none';
+						e.currentTarget.m_status.args.tasks_badges = false;
+						e.currentTarget.m_status.showTasks();
+					};
+				}
+			}
+			else
+			{
+				this.createAddTaskButton();
+			}
+		}
+	}
+	else
+	{
+		this.showTasks();
+	}
+
+	let args = {};
 	args.statuses = [this.obj];
 	args.elReports = this.elReports;
 	args.elReportsDiv = this.elReportsDiv;
-	args.elTasks = this.elTasks;
-	args.elTasksDiv = this.elTasksDiv;
+	args.noTasks = true;
 
 	stcs_Show(args);
 
 	this.elParent.classList.remove('fading');
 	this.elParent.classList.remove('updating');
 };
+
+Status.prototype.showTasks = function()
+{
+	tasks_Finish();
+
+	if (this.obj && this.obj.tasks)
+	{
+		for (let t in this.obj.tasks)
+		{
+			let task = new Task(this, this.obj.tasks[t]);
+			if (this.multi)
+				task.elBtnEdit.onclick = sc_EditTask;
+		}
+	}
+
+	if (this.multi && g_admin)
+		this.createAddTaskButton();
+}
+Status.prototype.createAddTaskButton = function()
+{
+	let el = document.createElement('div');
+	el.classList.add('button');
+	el.textContent = 'Add Task';
+	el.m_status = this;
+	el.onclick = function(e){
+		e.stopPropagation();
+		sc_AddTask(e.currentTarget.m_status);
+		return false;
+	};
+
+	if (this.args.tasks_badges)
+		this.elTasksBadges.appendChild(el);
+	else
+		this.elTasks.appendChild(el);
+}
 
 Status.prototype.update = function(i_status)
 {
@@ -1069,21 +1150,6 @@ Status.prototype.edit = function(i_args) {
 	this.elEdit_tasks = document.createElement('div');
 	this.elEdit.appendChild(this.elEdit_tasks);
 	this.elEdit_tasks.classList.add('edit_tasks');
-/*
-	if (c_CanEditTasks())
-	{
-		this.elTasksPanel = document.createElement('div');
-		this.elEdit_tasks.appendChild(this.elTasksPanel);
-
-		var el = document.createElement('div');
-		this.elTasksPanel.appendChild(el);
-		el.classList.add('button');
-		el.textContent = 'Tasks';
-		el.m_args = i_args;
-		el.m_status = this;
-		el.onclick = function(e) { e.currentTarget.m_status.editTasksShow(e, e.currentTarget.m_args); }
-	}
-*/
 
 	// Get values:
 	var annotation = this.obj.annotation;
@@ -1121,40 +1187,6 @@ Status.prototype.edit = function(i_args) {
 
 	this.elEdit_annotation.focus();
 };
-/*
-Status.prototype.editTasksShow = function(i_evt, i_args) {
-	// Show tasks only once:
-	if (this.elEdit_tasks.elTasks)
-		return;
-
-	// And remember it creating an array for task elements:
-	this.elEdit_tasks.elTasks = [];
-
-	var elTasksBtn = i_evt.currentTarget;
-	elTasksBtn.classList.remove('button');
-
-	var el = document.createElement('div');
-	this.elTasksPanel.insertBefore(el, elTasksBtn);
-	el.textContent = 'Add Task';
-	el.classList.add('button');
-	el.classList.add('task_add');
-	el.m_status = this;
-	el.onclick = function(e) { e.currentTarget.m_status.addTaskOnClick() };
-
-	// If this is scene shots multiselection:
-	if (i_args && i_args.statuses && i_args.statuses.length)
-	{
-		var el = document.createElement('div');
-		this.elTasksPanel.appendChild(el);
-		el.textContent =
-			'WARNING! This is scene shots multiselection, all previous tasks information will be dropped!';
-		el.classList.add('tasks_multiedit_message');
-		return;
-	}
-
-	this.editTasksShowTasks();
-};
-*/
 Status.prototype.editOnKeyDown = function(e, i_args) {
 	if (e.keyCode == 27)
 		this.show();  // ESC
@@ -1195,128 +1227,7 @@ Status.prototype.getMultiVale = function(i_key, i_statuses) {
 	}
 	return value;
 };
-/*
-Status.prototype.addTaskOnClick = function() {
-	if (this.obj.tasks == null)
-		this.obj.tasks = [];
 
-	var task = {};
-	task.duration = 1;
-	task.price = 0;
-	task.tags = [];
-	task.artists = [];
-
-	this.editTasksShowTasks({"new": task});
-};
-
-Status.prototype.editTasksShowTasks = function(i_args) {
-	var tasks = this.obj.tasks;
-	if (i_args && i_args.new)
-		tasks = [i_args.new];
-
-	if (tasks == null)
-		return;
-
-	for (var t = 0; t < tasks.length; t++)
-	{
-		var el = document.createElement('div');
-		this.elEdit_tasks.appendChild(el);
-		el.classList.add('task');
-
-		var elDel = document.createElement('div');
-		el.appendChild(elDel);
-		elDel.classList.add('button');
-		elDel.classList.add('delete');
-		// elDel.textContent = 'Delete';
-		elDel.title = 'Delete Task\n(by double click)';
-		elDel.m_status = this;
-		elDel.m_elTask = el;
-		elDel.ondblclick = function(e) {
-			var st = e.currentTarget.m_status;
-			var el = e.currentTarget.m_elTask;
-			st.elEdit_tasks.elTasks.splice(st.elEdit_tasks.elTasks.indexOf(el), 1);
-			st.elEdit_tasks.removeChild(el);
-		};
-
-		var elDurDiv = document.createElement('div');
-		el.appendChild(elDurDiv);
-		elDurDiv.classList.add('dur_div');
-
-		var elDurLabel = document.createElement('div');
-		elDurDiv.appendChild(elDurLabel);
-		elDurLabel.textContent = 'Duration: ';
-		elDurLabel.classList.add('dur_label');
-
-		var elDur = document.createElement('div');
-		elDurDiv.appendChild(elDur);
-		elDur.textContent = tasks[t].duration;
-		elDur.contentEditable = true;
-		elDur.classList.add('editing');
-		elDur.classList.add('duration');
-
-		var elPrcDiv = document.createElement('div');
-		el.appendChild(elPrcDiv);
-		elPrcDiv.classList.add('prc_div');
-		elPrcDiv.classList.add('dur_div');
-
-		var elPrcLabel = document.createElement('div');
-		elPrcDiv.appendChild(elPrcLabel);
-		elPrcLabel.textContent = 'Price: ';
-		elPrcLabel.classList.add('prc_label');
-		elPrcLabel.classList.add('dur_label');
-
-		var elPrice = document.createElement('div');
-		elPrcDiv.appendChild(elPrice);
-		elPrice.textContent = tasks[t].price;
-		elPrice.contentEditable = true;
-		elPrice.classList.add('editing');
-		elPrice.classList.add('price');
-		elPrice.classList.add('duration');
-
-		var tags = {};
-		if (tasks[t].tags)
-			for (var g = 0; g < tasks[t].tags.length; g++)
-			{
-				var id = tasks[t].tags[g];
-				tags[id] = {"title": c_GetTagTitle(id), "tooltip": c_GetTagTip(id)};
-			}
-		var elTags = document.createElement('div');
-		elTags.classList.add('tags');
-		el.appendChild(elTags);
-		elTags.m_editTags = new EditList(
-			{"name": 'tags', "label": 'Tags:', "list": tags, "list_all": RULES.tags, "elParent": elTags});
-
-		if (c_CanAssignArtists())
-		{
-			var artists = {};
-			if (tasks[t].artists)
-			{
-				for (var g = 0; g < tasks[t].artists.length; g++)
-				{
-					var id = tasks[t].artists[g];
-					artists[id] = {"title": c_GetUserTitle(id)};
-				}
-			}
-			var elArtists = document.createElement('div');
-			el.appendChild(elArtists);
-			elArtists.m_editArtists = new EditList({
-				"name": 'artists',
-				"label": 'Artists:',
-				"list": artists,
-				"list_all": g_users,
-				"elParent": elArtists
-			});
-		}
-
-		el.m_task = tasks[t];
-		el.m_elDur = elDur;
-		el.m_elPrice = elPrice;
-		el.m_elTags = elTags;
-		el.m_elArtists = elArtists;
-		this.elEdit_tasks.elTasks.push(el);
-	}
-};
-*/
 Status.prototype.editCancel = function() {
 	if (this.elEdit == null)
 		return;
@@ -1333,18 +1244,18 @@ Status.prototype.editProcess = function(i_args) {
 	if (this.obj == null)
 		this.obj = {};
 
-	var finish = null;
-	var annotation = null;
-	var adinfo = null;
-	var progress = null;
-	var artists = null;
-	var flags = null;
-	var tags = null;
-	var tasks = null;
+	let finish = null;
+	let annotation = null;
+	let adinfo = null;
+	let progress = null;
+	let artists = null;
+	let flags = null;
+	let tags = null;
+	let tasks = null;
 
 	// Get values from GUI:
 
-	var finish_edit = this.elEdit_finish.textContent;
+	let finish_edit = this.elEdit_finish.textContent;
 	if (finish_edit.length && (finish_edit != st_MultiValue))
 	{
 		finish_edit = c_DT_SecFromStr(finish_edit);
@@ -1354,7 +1265,7 @@ Status.prototype.editProcess = function(i_args) {
 			c_Error('Invalid date format: ' + this.elEdit_finish.textContent);
 	}
 
-	var progress_edit = this.elEdit_progress.textContent;
+	let progress_edit = this.elEdit_progress.textContent;
 	if (progress_edit.length && (progress_edit != st_MultiValue))
 	{
 		progress_edit = c_Strip(progress_edit);
@@ -1391,41 +1302,62 @@ Status.prototype.editProcess = function(i_args) {
 	if (this.editTags)
 		tags = this.editTags.getSelectedObjects();
 
-/*
-	if (this.elEdit_tasks.elTasks)
-	{
-		tasks = [];
-
-		for (let t = 0; t < this.elEdit_tasks.elTasks.length; t++)
-		{
-			let elTask = this.elEdit_tasks.elTasks[t];
-			let task = {};
-
-			let duration = parseFloat(c_Strip(elTask.m_elDur.textContent));
-			if (!isNaN(duration))
-				task.duration = duration;
-
-			let price = parseFloat(c_Strip(elTask.m_elPrice.textContent));
-			if (!isNaN(price))
-				task.price = price;
-
-			task.tags = elTask.m_elTags.m_editTags.getSelectedNames();
-
-			if (elTask.m_elArtists)
-				task.artists = elTask.m_elArtists.m_editArtists.getSelectedNames();
-
-			tasks.push(task);
-		}
-	}
-*/
 	// Collect statuses to change
 	// ( this and may be others selected )
-	var statuses = [this];
+	let statuses = [this];
 	if (i_args && i_args.statuses && i_args.statuses.length)
 	{
 		statuses = i_args.statuses;
 		if (statuses.indexOf(this) == -1)
 			statuses.push(this);
+	}
+
+	if (1)//document.location.hostname == 'localhost')
+	{
+	let obj = {};
+
+	obj.paths = [];
+	for (let st of statuses)
+		obj.paths.push(st.path);
+
+	if (annotation !== null)
+		obj.annotation = annotation;
+	if (adinfo !== null)
+		obj.adinfo = adinfo;
+	if (finish !== null)
+		obj.finish = finish;
+	if (progress !== null)
+		obj.progress = progress;
+
+	if (this.editAtrists)
+	{
+		obj.artists = this.editAtrists.getSelectedNames();
+		obj.artists_keep = this.editAtrists.getHalfSelectedNames();
+	}
+	if (this.editFlags)
+	{
+		obj.flags = this.editFlags.getSelectedNames();
+		obj.flags_keep = this.editFlags.getHalfSelectedNames();
+	}
+	if (this.editTags)
+	{
+		obj.tags = this.editTags.getSelectedNames();
+		obj.tags_keep = this.editTags.getHalfSelectedNames();
+	}
+
+	if (this.elEdit_Color.m_color_changed)
+	{
+		obj.color = this.elEdit_Color.m_color;
+		if (obj.color == null)
+			obj.color = [];
+	}
+
+	if (nw_disabled)
+		obj.nonews = true;
+
+	n_Request({'send':{'setstatus':obj},'func':st_StatusesSaved,'info':'status.setStatuses','wait':false});
+	//console.log(JSON.stringify(obj));
+	return
 	}
 
 	// Set values to statuses
@@ -1483,39 +1415,7 @@ Status.prototype.editProcess = function(i_args) {
 				if ((tags[id].selected) && (statuses[i].obj.tags.indexOf(id) == -1))
 					statuses[i].obj.tags.push(id);
 		}
-/*
-		if (tasks)
-		{
-			var duration = 0;
-			var price = 0;
-			for (var t = 0; t < tasks.length; t++)
-			{
-				if (tasks[t].duration)
-					duration += tasks[t].duration;
-				if (tasks[t].price)
-					price += tasks[t].price;
 
-				// Add tag to status:
-				if (tasks[t].tags && tasks[t].tags.length)
-				{
-					if (statuses[i].obj.tags == null)
-						statuses[i].obj.tags = [];
-
-					for (var j = 0; j < tasks[t].tags.length; j++)
-					{
-						var tag = tasks[t].tags[j];
-
-						if (statuses[i].obj.tags.indexOf(tag) == -1)
-							statuses[i].obj.tags.push(tag);
-					}
-				}
-			}
-
-			statuses[i].obj.tasks = tasks;
-			statuses[i].obj.duration = duration;
-			statuses[i].obj.price = price;
-		}
-*/
 		// If shot progress is 100% all tasks should be 100% done.
 		if ((statuses[i].obj.progress == 100) && (statuses[i].obj.tasks))
 			for (let t in statuses[i].obj.tasks)
@@ -1674,17 +1574,45 @@ function st_SaveFinished(i_data)
 
 function st_StatusesSaved(i_data)
 {
+	// Update statuses:
+	if (i_data.statuses)
+	{
+		for (let sdata of i_data.statuses)
+		{
+			// Update current status:
+			if (sdata.path == g_CurPath())
+			{
+				RULES.status = sdata.status;
+				st_Show(sdata.status);
+			}
+
+			// Update other statuses (scene shots view):
+			if (st_Statuses[sdata.path])
+			{
+				st_Statuses[sdata.path].show(sdata.status);
+			}
+
+			// Update navigation folders
+			let el = g_elFolders[sdata.path];
+			if (el == null) continue;
+
+			let fstat = el.m_fobject.status;
+			if (fstat)
+			{
+				// Update only if status time > folder status time
+				if (fstat.ctime && (fstat.ctime >= sdata.status.time)) continue;
+				if (fstat.mtime && (fstat.mtime >= sdata.status.time)) continue;
+			}
+
+			// Update folder status:
+			g_FolderSetStatus(sdata.status, el);
+		}
+	}
+
 	if (i_data.error)
 	{
 		c_Error(i_data.error);
 		return;
-	}
-
-	// Update current status:
-	if (i_data.status)
-	{
-		RULES.status = i_data.status;
-		st_Show(i_data.status);
 	}
 
 	// Get news if subscribed:
@@ -1925,10 +1853,13 @@ function st_UpdateProgressesWalkReceived(i_walks, i_args)
 			if (c_AuxFolder(folder))
 				continue;
 
-			var path = paths[w] + '/' + folder.name;
+			let path = paths[w] + '/' + folder.name;
+
+			let cur_progress = 0;
+
 			if ((progresses[path] != null) && (progresses[path] != -1))
 			{
-				progress += progresses[path];
+				cur_progress = progresses[path];
 			}
 			else
 			{
@@ -1942,13 +1873,30 @@ function st_UpdateProgressesWalkReceived(i_walks, i_args)
 						continue;
 
 					// Save only progress:
-					st_Save({"progress": 0}, path, /*func=*/null, /*args=*/null, navig_params_update);
+					st_Save({"progress": 0}, path, null, null, navig_params_update);
 				}
-				else if (folder.status.progress < 0)
-					continue;
 				else
-					progress += folder.status.progress;
+					cur_progress = folder.status.progress;
 			}
+
+			// Skip aux folders:
+			if (cur_progress < 0)
+				continue;
+
+			if (cur_progress > 100)
+				cur_progress = 100;
+
+			if (folder.status)
+			{
+				if (folder.status.tasks)
+				{
+					if (cur_progress < 100)
+						cur_progress = 0;
+				}
+			}
+
+			progress += cur_progress;
+
 			progress_count++;
 		}
 

@@ -101,10 +101,10 @@ ListJobs::ListJobs(QWidget * i_parent, bool i_listwork, const std::string & i_na
 	bp = addButtonPanel(Item::TAny, "LOG","jobs_log","Show job log.");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestLog()));
 
-	bp = addButtonPanel(Item::TJob, "PAUSE","jobs_pause","Pause selected jobs.","P");
+	bp = addButtonPanel(Item::TAny, "PAUSE","jobs_pause","Pause selected jobs or branches.","P");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actPause()));
 
-	bp = addButtonPanel(Item::TJob, "START","jobs_start","Start selected jobs.","S");
+	bp = addButtonPanel(Item::TAny, "START","jobs_start","Start selected jobs or branches.","S");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actStart()));
 
 	bp = addButtonPanel(Item::TJob, "STOP","jobs_stop","Stop selected jobs tasks and pause jobs.","", true);
@@ -227,7 +227,7 @@ ListJobs::ListJobs(QWidget * i_parent, bool i_listwork, const std::string & i_na
 	timer->start( 1000 * af::Environment::getWatchRefreshGuiSec());
 	connect( timer, SIGNAL( timeout()), this, SLOT( repaintItems()));
 
-	m_parentWindow->setWindowTitle("Jobs:");
+	this->setWindowTitleWithPrefix("Jobs:");
 }
 
 ListJobs::~ListJobs()
@@ -671,7 +671,7 @@ void ListJobs::calcTotals()
 
 	if (numjobs == 0)
 	{
-		m_parentWindow->setWindowTitle("Jobs: (none)");
+		this->setWindowTitleWithPrefix("Jobs: (none)");
 		return;
 	}
 
@@ -702,10 +702,10 @@ void ListJobs::calcTotals()
 		title += QString(" Run:%1 %2%").arg(running).arg(percent / blocksrun);
 		if (done)
 			title += QString(" Done:%1").arg(done);
-		m_parentWindow->setWindowTitle(title);
+		this->setWindowTitleWithPrefix(title);
 	}
 	else
-		m_parentWindow->setWindowTitle(QString("Jobs: %1 Done").arg(numjobs));
+		this->setWindowTitleWithPrefix(QString("Jobs: %1 Done").arg(numjobs));
 }
 
 void ListJobs::actMoveUp()     { moveJobs("move_jobs_up"    ); }
@@ -732,7 +732,7 @@ void ListJobs::moveJobs( const std::string & i_operation)
 	displayInfo( afqt::stoq( i_operation));
 }
 
-void ListJobs::actStart()           { operation(Item::TJob, "start"            );}
+void ListJobs::actStart()           { operation(Item::TAny, "start"            );}
 void ListJobs::actStop()            { operation(Item::TJob, "stop"             );}
 void ListJobs::actRestart()         { operation(Item::TJob, "restart"          );}
 void ListJobs::actRestartErrors()   { operation(Item::TJob, "restart_errors"   );}
@@ -741,7 +741,7 @@ void ListJobs::actRestartRunning()  { operation(Item::TJob, "restart_running"  )
 void ListJobs::actRestartSkipped()  { operation(Item::TJob, "restart_skipped"  );}
 void ListJobs::actRestartDone()     { operation(Item::TJob, "restart_done"     );}
 void ListJobs::actResetErrorHosts() { operation(Item::TJob, "reset_error_hosts");}
-void ListJobs::actPause()           { operation(Item::TJob, "pause"            );}
+void ListJobs::actPause()           { operation(Item::TAny, "pause"            );}
 void ListJobs::actRestartPause()    { operation(Item::TJob, "restart_pause"    );}
 void ListJobs::actDelete()          { operation(Item::TAny, "delete"           );}
 void ListJobs::actResetTryingNextTasks(){operation(Item::TJob, "reset_trying_next_tasks");}
@@ -788,7 +788,7 @@ void ListJobs::actSetUser()
 	QString text = QInputDialog::getText(this, "Change Owner", "Enter New User Name", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	setParameter(Item::TJob, "user_name", afqt::qtos(QString("\"%1\"").arg(text)));
+	setParameterQStr(Item::TJob, "user_name", text);
 }
 
 void ListJobs::actChangeBranch()
@@ -799,7 +799,7 @@ void ListJobs::actChangeBranch()
 	bool ok;
 	QString branch = QInputDialog::getText(this, "Change Branch", "Branch", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
-	setParameter(Item::TJob, "branch", afqt::qtos(QString("\"%1\"").arg(branch)));
+	setParameterQStr(Item::TJob, "branch", branch);
 }
 
 void ListJobs::actPostCommand()
@@ -812,7 +812,7 @@ void ListJobs::actPostCommand()
 	QString cmd = QInputDialog::getText(this, "Change Post Command", "Enter Command", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	setParameter(Item::TJob, "command_post", afqt::qtos( cmd));
+	setParameterQStrEscape(Item::TJob, "command_post", cmd);
 }
 
 void ListJobs::v_doubleClicked(Item * i_item)

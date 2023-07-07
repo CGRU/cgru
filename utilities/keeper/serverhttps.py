@@ -12,9 +12,11 @@ import os
 import ssl
 import subprocess
 import sys
+import time
 import threading
 
 import cmd
+from sendkeeper import sendkeeper
 
 import cgruutils
 
@@ -82,12 +84,27 @@ def serve( i_port):
         print('Certificate file "%s" not found, skipping HTTPS serving.' % certificate)
         return
 
-    httpd = BaseServer(('localhost', i_port), Handler)
+    httpd = None
+    for i in range(10):
+        try:
+            httpd = BaseServer(('localhost', i_port), Handler)
+        except:
+            httpd = None
+
+        if httpd is None:
+            sendkeeper({'eval':'quit()'})
+            time.sleep(1)
+            continue
+        else:
+            break
+
+    if httpd is None:
+        return None
+
     httpd.socket = ssl.wrap_socket (httpd.socket, certfile=certificate, server_side=True)
     thread = threading.Thread(target = httpd.serve_forever)
     thread.daemon = True
     thread.start()
-
     isRunning = True
 
     return thread

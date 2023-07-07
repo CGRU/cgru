@@ -178,53 +178,69 @@ PoolNode.prototype.update = function(i_obj) {
 
 	if (cm_IsPadawan())
 	{
-		var renders = '';
-		if (this.params.renders_total)
-		{
-			renders += 'Renders Total:';
-			renders += ' <b>' + this.params.renders_total + '</b>';
-		}
-		else
-		if (this.params.running_renders_num)
-			renders += ' / <b>' + this.params.running_renders_num + '</b> Running';
-		this.elRendersCounts.innerHTML = renders;
-
-		var counts = '';
+		let counts = '';
 		if (this.params.pools_total)
-			counts = 'Pools Total: <b>' + this.params.pools_total + '</b>';
+			counts = 'Pools Total:<b>' + this.params.pools_total + '</b>';
 		this.elPoolsCounts.innerHTML = counts;
+
+		let renders = '';
+		if (this.params.renders_total)   renders += 'Renders Total:<b>' + this.params.renders_total   + '</b>';
+		if (this.params.renders_busy)    renders += ' Busy:<b>'         + this.params.renders_busy    + '</b>';
+		if (this.params.renders_ready)   renders += ' Ready:<b>'        + this.params.renders_ready   + '</b>';
+		if (this.params.renders_online)  renders += ' Online:<b>'       + this.params.renders_online  + '</b>';
+		if (this.params.renders_offline) renders += ' Offline:<b>'      + this.params.renders_offline + '</b>';
+		if (this.params.renders_nimby)   renders += ' Nimby:<b>'        + this.params.renders_nimby   + '</b>';
+		if (this.params.renders_paused)  renders += ' Paused:<b>'       + this.params.renders_paused  + '</b>';
+		if (this.params.renders_sick)    renders += ' Sick:<b>'         + this.params.renders_sick    + '</b>';
+
+		if (this.params.run_tasks   ) renders += ' Running Tasks:<b>' + this.params.run_tasks    + '</b>';
+		if (this.params.run_capacity) renders += ' Capacity:<b>'      + this.params.run_capacity + '</b>';
+
+		this.elRendersCounts.innerHTML = renders;
 	}
 	else if (cm_IsJedi())
 	{
-		var renders = 'Renders:';
-		if (this.params.renders_total)
-			renders += ' <b>' + this.params.renders_total + '</b>';
-		else
-			renders += ' <b>0</b>';
-		if (this.params.running_renders_num)
-			renders += ' / <b>' + this.params.running_renders_num + '</b> Run';
-		this.elRendersCounts.innerHTML = renders;
-
-		var counts = '';
+		let counts = '';
 		if (this.params.pools_total)
-			counts = 'Pools: <b>' + this.params.pools_total + '</b>';
+			counts = 'Pools:<b>' + this.params.pools_total + '</b>';
 		this.elPoolsCounts.innerHTML = counts;
+
+		let renders = '';
+		if (this.params.renders_total)   renders += 'Renders:<b>' + this.params.renders_total   + '</b>';
+		if (this.params.renders_busy)    renders += ' Busy:<b>'   + this.params.renders_busy    + '</b>';
+		if (this.params.renders_ready)   renders += ' RDY:<b>'    + this.params.renders_ready   + '</b>';
+		if (this.params.renders_online)  renders += ' ON:<b>'     + this.params.renders_online  + '</b>';
+		if (this.params.renders_offline) renders += ' OFF:<b>'    + this.params.renders_offline + '</b>';
+		if (this.params.renders_nimby)   renders += ' Nby:<b>'    + this.params.renders_nimby   + '</b>';
+		if (this.params.renders_paused)  renders += ' Pau:<b>'    + this.params.renders_paused  + '</b>';
+		if (this.params.renders_sick)    renders += ' Sick:<b>'   + this.params.renders_sick    + '</b>';
+
+		if (this.params.run_tasks   ) renders += ' Tasks:<b>'    + this.params.run_tasks    + '</b>';
+		if (this.params.run_capacity) renders += ' Capacity:<b>' + this.params.run_capacity + '</b>';
+
+		this.elRendersCounts.innerHTML = renders;
 	}
 	else
 	{
-		var renders = 'r:';
-		if (this.params.renders_total)
-			renders += '<b>' + this.params.renders_total + '</b>';
-		else
-			renders += '<b>0</b>';
-		if (this.params.running_renders_num)
-			renders += ' / <b>' + this.params.running_renders_num + '</b>r';
-		this.elRendersCounts.innerHTML = renders;
-
-		var counts = '';
+		let counts = '';
 		if (this.params.pools_total)
-			counts = 'p:<b>' + this.params.pools_total + '</b>';
+			counts = 'Pools:<b>' + this.params.pools_total + '</b>';
 		this.elPoolsCounts.innerHTML = counts;
+
+		let renders = '';
+		if (this.params.renders_total)   renders += 'Renders:<b>' + this.params.renders_total   + '</b>';
+		if (this.params.renders_busy)    renders += ' B:<b>'      + this.params.renders_busy    + '</b>';
+		if (this.params.renders_ready)   renders += ' RDY:<b>'    + this.params.renders_ready   + '</b>';
+		if (this.params.renders_online)  renders += ' ON:<b>'     + this.params.renders_online  + '</b>';
+		if (this.params.renders_offline) renders += ' OFF:<b>'    + this.params.renders_offline + '</b>';
+		if (this.params.renders_nimby)   renders += ' N:<b>'      + this.params.renders_nimby   + '</b>';
+		if (this.params.renders_paused)  renders += ' P:<b>'      + this.params.renders_paused  + '</b>';
+		if (this.params.renders_sick)    renders += ' S:<b>'      + this.params.renders_sick    + '</b>';
+
+		if (this.params.run_tasks   ) renders += ' T:<b>' + this.params.run_tasks    + '</b>';
+		if (this.params.run_capacity) renders += ' C:<b>' + this.params.run_capacity + '</b>';
+
+		this.elRendersCounts.innerHTML = renders;
 	}
 
 	// Host properites

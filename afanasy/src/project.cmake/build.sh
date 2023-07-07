@@ -17,15 +17,16 @@ source ./getrevision.sh $src
 popd > /dev/null
 
 # Process options:
-options=""
 sql="REQUIRED"
 gui="YES"
 fermer="NO"
+warn="NO"
 for arg in "$@"; do
 	[ $arg == "--nosql" ] && sql="NO" && shift
 	[ $arg == "--nogui" ] && gui="NO" && shift
 	[ $arg == "--fermer" ] && fermer="YES" && shift
-	[ $arg == "--debug" ] && debug="-g" && shift
+	[ $arg == "--debug" ] && debug=" -g" && shift
+	[ $arg == "--warn" ] && warn="YES" && shift
 done
 
 # Configure SQL:
@@ -36,8 +37,13 @@ export AF_GUI=$gui
 export AF_FERMER=$fermer
 export AF_QT_VER="5"
 
-# Configure building:
-export AF_ADD_CFLAGS="$debug"
+# Configure building
+if [ "${warn}" == "YES" ]; then
+	export AF_ADD_CFLAGS="-Waddress -Wbool-compare -Wbool-operation -Wcatch-value -Wformat -Wformat-overflow -Wformat-truncation -Wint-in-bool-context -Winit-self -Wlogical-not-parentheses -Wmaybe-uninitialized -Wmemset-elt-size -Wmemset-transposed-args -Wmisleading-indentation -Wmissing-attributes -Wnarrowing -Wpessimizing-move -Wrestrict -Wreturn-type -Wsequence-point -Wsizeof-pointer-div -Wsizeof-pointer-memaccess -Wstrict-aliasing -Wstrict-overflow=1 -Wswitch -Wtautological-compare -Wtrigraphs -Wuninitialized -Wunknown-pragmas -Wunused-function -Wvolatile-register-var -Wcast-function-type -Wempty-body -Wmissing-field-initializers -Wredundant-move -Wtype-limits -Wuninitialized -Wdangling-else -Wenum-compare -Winline"
+	export AF_ADD_CFLAGS="${AF_ADD_CFLAGS} -Wignored-qualifiers"
+	#export AF_ADD_CFLAGS="${AF_ADD_CFLAGS} -Wconversion"
+fi
+export AF_ADD_CFLAGS="${AF_ADD_CFLAGS}${debug}"
 export AF_ADD_LFLAGS="-lutil"
 export AF_EXTRA_LIBS=""
 

@@ -154,7 +154,7 @@ function p_AddLink(i_id_before, i_abc)
 	}
 	else if (
 		(ASSETS.scene && ASSETS.scene.path == g_CurPath()) ||
-		(ASSETS.scenes && ASSETS.scenes.path == g_CurPath()))
+		(ASSETS.area && ASSETS.area.path == g_CurPath()))
 	{
 		var elShots = scenes_GetSelectedShots();
 		for (var i = 0; i < elShots.length; i++)

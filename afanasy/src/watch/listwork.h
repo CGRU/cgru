@@ -41,6 +41,7 @@ private slots:
 	void slot_SolveOrder();
 	void slot_SolveTasks();
 	void slot_SolveCapacity();
+	void slot_DelDoneJobs();
 
 	void slot_JobSetBranch();
 

@@ -71,6 +71,8 @@ public:
 	static AttrNumber saveGUIOnExit;
 	static AttrNumber saveHotkeysOnExit;
 	static AttrNumber showOfflineNoise;
+	static AttrNumber showServerName;
+	static AttrNumber showServerPort;
 
 	static AttrColor clr_Window;
 	static AttrColor clr_WindowText;

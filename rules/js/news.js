@@ -53,13 +53,16 @@ function nw_Init()
 		nw_ignore_own = true;
 
 	nw_Finish();
-	nw_UpdateChannels();
 	nw_DisableNewsToggle(false);
 	nw_IgnoreOwnToggle(false);
+	nw_FiltersConstruct();
 }
 
 function nw_InitConfigured()
 {
+	nw_UpdateChannels();
+	nw_FiltersUpdate();
+
 	if (localStorage.news_opened == 'true')
 		nw_NewsOpen(false);
 	else
@@ -575,12 +578,11 @@ function nw_NewsReceived(i_data)
 	for (let i = 0; i < g_auth_user.news.length; i++)
 	{
 		let news = g_auth_user.news[i];
-
 		if (news.path != g_CurPath()) continue;
-		if (news.status == null) break;
+		if (news.status == null) continue;
 
 		if (RULES.status && RULES.status.mtime && (RULES.status.mtime >= news.status.mtime))
-			break;
+			continue;
 
 		st_UpdateCurrent(news.status);
 		break;
@@ -851,6 +853,139 @@ function nw_DeleteNewsUser(i_news)
 			ids.push(elNews[i].m_news.id);
 
 	nw_DeleteNews(ids);
+}
+
+
+/* ---------------- [ Filters functions ] ----------------------------------------------------------------- */
+var nw_filters = [];
+nw_filters.tags_include  = {"label": 'Tags IN'};
+nw_filters.tags_exclude  = {"label": 'Tags EX'};
+nw_filters.flags_include = {"label":'Flags IN'};
+nw_filters.flags_exclude = {"label":'Flags EX'};
+function nw_FiltersConstruct()
+{
+	for (let filter in nw_filters)
+		new NewsFilterClass(filter);
+}
+function nw_FiltersUpdate()
+{
+	for (let filter in nw_filters)
+		nw_filters[filter].fClass.update();
+}
+
+function NewsFilterClass(i_name)
+{
+	this.name = i_name;
+	this.label = nw_filters[this.name].label;
+	this.type = i_name.split('_')[0];
+
+	this.elParent = $('news_filter_div');
+	this.elRoot = document.createElement('div');
+	this.elParent.appendChild(this.elRoot);
+
+	this.elShow = document.createElement('div');
+	this.elRoot.appendChild(this.elShow);
+	this.elShow.classList.add('show');
+
+	this.elLabel = document.createElement('div');
+	this.elShow.appendChild(this.elLabel);
+	this.elLabel.classList.add('news_filter_label');
+	this.elLabel.textContent = this.label + ':';
+
+	this.elBtnEdit = document.createElement('div');
+	this.elShow.appendChild(this.elBtnEdit);
+	this.elBtnEdit.classList.add('button','edit');
+	this.elBtnEdit.m_class = this;
+	this.elBtnEdit.onclick = function(e){e.currentTarget.m_class.edit()};
+
+	this.elList = document.createElement('div');
+	this.elShow.appendChild(this.elList);
+	this.elList.classList.add('list');
+
+	nw_filters[this.name].fClass = this;
+}
+
+NewsFilterClass.prototype.update = function()
+{
+	this.items = [];
+
+	if (g_auth_user && g_auth_user.news_filter && g_auth_user.news_filter[this.name])
+	{
+		this.items = g_auth_user.news_filter[this.name];
+		if (this.type == 'tags')
+			st_SetElTags({"tags":this.items}, this.elList,/*short = */false,/*clickable = */false);
+		else
+			st_SetElFlags({"flags":this.items}, this.elList,/*short = */false,/*clickable = */false);
+	}
+
+	this.elShow.style.display = 'block';
+}
+
+NewsFilterClass.prototype.edit = function()
+{
+	this.elShow.style.display = 'none';
+
+	this.elEdit = document.createElement('div');
+	this.elRoot.appendChild(this.elEdit);
+	this.elEdit.classList.add('edit');
+
+	this.elBtnCancel = document.createElement('div');
+	this.elEdit.appendChild(this.elBtnCancel);
+	this.elBtnCancel.classList.add('button','save');
+	this.elBtnCancel.textContent = 'Cancel';
+	this.elBtnCancel.m_class = this;
+	this.elBtnCancel.onclick = function(e){e.currentTarget.m_class.cancel()};
+
+	this.elBtnSave = document.createElement('div');
+	this.elEdit.appendChild(this.elBtnSave);
+	this.elBtnSave.classList.add('button','save');
+	this.elBtnSave.textContent = 'Save';
+	this.elBtnSave.m_class = this;
+	this.elBtnSave.onclick = function(e){e.currentTarget.m_class.save()};
+
+	this.editList = new EditList({
+			"name"    : this.type,
+			"label"   : this.label,
+			"list"    : this.items,
+			"list_all": RULES[this.type],
+			"elParent": this.elEdit});
+}
+
+NewsFilterClass.prototype.cancel = function()
+{
+	this.elEdit.textContent = '';
+	this.elRoot.removeChild(this.elEdit);
+	this.elShow.style.display = 'block';
+}
+
+NewsFilterClass.prototype.save = function()
+{
+	let items = this.editList.getSelectedNames();
+
+	let obj = {};
+	obj.object = {};
+	obj.object.news_filter = {};
+	obj.object.news_filter[this.name] = items;
+	obj.add = true;
+	obj.file = ad_GetUserFileName();
+
+	n_Request({"send": {"editobj": obj}, "func": nw_FilterEditFinished});
+
+	this.elEdit.textContent = '';
+	this.elRoot.removeChild(this.elEdit);
+}
+
+function nw_FilterEditFinished(i_data, i_args)
+{
+	if ((i_data == null) || (i_data.error))
+	{
+		c_Error(i_data.error);
+		return;
+	}
+
+	g_auth_user.news_filter = i_data.object.news_filter;
+
+	nw_FiltersUpdate();
 }
 
 /* ---------------- [ Delete functions ] ----------------------------------------------------------------- */

@@ -45,7 +45,7 @@ ListWork::ListWork(QWidget * i_parent):
 
 	m_hide_flags = ms_hide_flags;
 
-	m_parentWindow->setWindowTitle("Work");
+	this->setWindowTitleWithPrefix("Work");
 
 	// Add left panel buttons:
 	ButtonPanel * bp;
@@ -86,6 +86,9 @@ ListWork::ListWork(QWidget * i_parent):
 
 		bp = addButtonPanel(Item::TJob, "SET BRANCH","job_change_branch","Change job branch.");
 		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_JobSetBranch()));
+
+		bp = addButtonPanel(Item::TBranch, "DEL DONE JOBS","branch_del_done_jobs","Delete done jobs from branch.","", true);
+		connect(bp, SIGNAL(sigClicked()), this, SLOT(slot_DelDoneJobs()));
 	}
 	else
 		m_paramspanel->v_setEditable(false);
@@ -306,17 +309,18 @@ void ListWork::calcTitle()
 	else
 		jobs = QString("Jobs: %1 Done").arg(jtotal);
 
-	m_parentWindow->setWindowTitle(jobs + "; " + branches);
+	this->setWindowTitleWithPrefix(jobs + "; " + branches);
 }
 
 void ListWork::slot_ACC_Enable()   {setParameter(Item::TBranch, "create_childs", "true" );}
 void ListWork::slot_ACC_Disable()  {setParameter(Item::TBranch, "create_childs", "false");}
 void ListWork::slot_SolveJobs()    {setParameter(Item::TBranch, "solve_jobs", "true" );}
 void ListWork::slot_SolveUsers()   {setParameter(Item::TBranch, "solve_jobs", "false");}
-void ListWork::slot_SolvePiority() {setParameter(Item::TBranch, "solve_method", "\"solve_priority\"");}
-void ListWork::slot_SolveOrder()   {setParameter(Item::TBranch, "solve_method", "\"solve_order\""   );}
-void ListWork::slot_SolveTasks()   {setParameter(Item::TBranch, "solve_need", "\"solve_tasks\""   );}
-void ListWork::slot_SolveCapacity(){setParameter(Item::TBranch, "solve_need", "\"solve_capacity\"");}
+void ListWork::slot_SolvePiority() {setParameterStr(Item::TBranch, "solve_method", "solve_priority");}
+void ListWork::slot_SolveOrder()   {setParameterStr(Item::TBranch, "solve_method", "solve_order"   );}
+void ListWork::slot_SolveTasks()   {setParameterStr(Item::TBranch, "solve_need",   "solve_tasks"   );}
+void ListWork::slot_SolveCapacity(){setParameterStr(Item::TBranch, "solve_need",   "solve_capacity");}
+void ListWork::slot_DelDoneJobs()  {   operation(Item::TBranch, "delete_done_jobs");}
 
 void ListWork::slot_JobSetBranch()
 {
@@ -338,7 +342,7 @@ void ListWork::slot_JobSetBranch()
 
 	branch = QString("\"%1\"").arg(branch);
 
-	setParameter(Item::TJob, "branch", afqt::qtos(branch));
+	setParameterQStr(Item::TJob, "branch", branch);
 
 	displayInfo(QString("Setting branch to %1").arg(branch));
 }

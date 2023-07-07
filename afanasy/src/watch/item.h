@@ -67,7 +67,7 @@ public:
 	// ListNodes deletes such items on update.
 	inline void resetId() { m_id = 0; }
 
-	inline const EType getType() const { return m_type;}
+	inline EType getType() const { return m_type;}
 
 	const QColor & clrTextMain(      const QStyleOptionViewItem &option)           const;
 	const QColor & clrTextInfo(      const QStyleOptionViewItem &option)           const;
@@ -77,9 +77,9 @@ public:
 
 	static const QColor & clrTextInfo(bool running, bool selected, bool locked = false);
 
-	inline void      setRunning() const { m_running = true;  } ///< Set item m_running ( to change text colors only).
-	inline void   setNotRunning() const { m_running = false; } ///< Set item not m_running ( to change text colors only).
-	inline const bool isRunning() const { return m_running;  } ///< Return whether node is "m_running".
+	inline void    setRunning() const { m_running = true;  } ///< Set item m_running ( to change text colors only).
+	inline void setNotRunning() const { m_running = false; } ///< Set item not m_running ( to change text colors only).
+	inline bool     isRunning() const { return m_running;  } ///< Return whether node is "m_running".
 
 	static const QString generateErrorsSolvingInfo( int i_block, int i_task, int i_retries);
 

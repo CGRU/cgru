@@ -51,7 +51,7 @@ const char *BlockData::DataModeFromMsgType(int i_type)
 	AFERRAR("BlockData::DataModeFromMsgTyp: Invalid block write mode: %d", i_type);
 	return "invalid";
 }
-const int32_t BlockData::DataModeFromString(const std::string &i_mode)
+int32_t BlockData::DataModeFromString(const std::string &i_mode)
 {
 	if (i_mode == DataMode_Progress) return af::Msg::TBlocksProgress;
 	if (i_mode == DataMode_Properties) return af::Msg::TBlocksProperties;
@@ -407,7 +407,7 @@ void BlockData::jsonWrite(std::ostringstream &o_str, int i_type) const
 			if (m_command_post.size()) o_str << ",\n\"cmd_post\":\"" << af::strEscape(m_command_post) << "\"";
 			if (m_multihost_service.size())
 				o_str << ",\n\"multihost_service\":\"" << m_multihost_service << "\"";
-			if (m_custom_data.size()) o_str << ",\n\"custom_data\":\"" << m_custom_data << "\"";
+			if (m_custom_data.size()) o_str << ",\n\"custom_data\":\"" << af::strEscape(m_custom_data) << "\"";
 			if (m_environment.size()) af::jw_stringmap("environment", m_environment, o_str);
 			// o_str << ",\n\"parser_coeff\":\:"        << m_parser_coeff              << "\"";
 			o_str << ',';

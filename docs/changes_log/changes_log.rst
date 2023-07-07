@@ -12,10 +12,12 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
   You can upgrade only one client or server for changes.
 
 
+.. _changes-log-latest:
+
 v3.3.1
 ======
 
-2023.01.19 *(not released)*
+2023.03.12
 
 - Afanasy service can be configured to limit task post command running time.
   Task post commands are used to generate thumbnails.
@@ -30,17 +32,32 @@ v3.3.1
   Job blocks got job serial. Tasks run got job serial, block and task ids.
   See `database schema <../afanasy/server.html#database-schema>`_.
 
+- Nuke Afanasy Gizmo can set extra
+  `environment <../software/nuke.html#environment>`_
+  variables that will be added to task process.
+  You use it to store Nuke location and version.
+
 - Houdini Afanasy ROP can set extra
   `environment <../software/houdini.html#environment>`_
   variables that will be added to task process.
+  You use it to store Houdini location and version.
 
-- Afwatch can edit job block environment variables.
+- AfWatch can edit job block environment variables.
+
+- AfWatch now uses ``open_folder_cmd`` config variable to open folders.
 
 - Afanasy server will not allow to change a pool of a busy render.
 
+- Afanasy server branches action added ``delete_done_jobs``. You can delete all done jobs from branch from AfWatch.
+
+- Afanasy jobs branch can be paused.
+
+- Afanasy user can be paused.
+
+- Server annoying error log removed on a running job deletion.
+
 - Rules Python API started.
 
-.. _changes-log-latest:
 
 v3.3.0
 ======

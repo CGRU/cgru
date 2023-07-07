@@ -12,5 +12,5 @@ KillMode=process
 TimeoutStopSec=3
 
 [Install]
-WantedBy=remote-fs.target
+WantedBy=multi-user.target
 

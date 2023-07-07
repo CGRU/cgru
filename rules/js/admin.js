@@ -26,6 +26,7 @@ var ad_wnd_sort_dir = 0;
 
 var ad_states = {
 	notart /*****/: {"short": 'NA', "label": 'NotArt' /*****/, "tooltip": 'Not an artist.'},
+	aux           : {"short": 'AX', "label": 'Auxiliary'     , "tooltip": 'Auxiliary user, no news, no bookmarks.'},
 	passwd /*****/: {"short": 'PS', "label": 'Passwd' /*****/, "tooltip": 'Can change password.'},
 	playlist /***/: {"short": 'PL', "label": 'Playlist' /***/, "tooltip": 'Can edit playlist.'},
 	assignart /**/: {"short": 'AA', "label": 'AssignArt' /**/, "tooltip": 'Can assign artists.'},
@@ -957,8 +958,7 @@ function ad_WndAddUser(i_el, i_user, i_row)
 		el.title = channels;
 	}
 	el.m_user_id = i_user.id;
-	if (i_user.disabled !== true)
-		el.ondblclick = function(e) { ad_UserChannelsClean(e.currentTarget.m_user_id); };
+	el.ondblclick = function(e) { ad_UserChannelsClean(e.currentTarget.m_user_id); };
 
 	var el = document.createElement('td');
 	elTr.appendChild(el);

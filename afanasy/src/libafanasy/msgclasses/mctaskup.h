@@ -51,9 +51,9 @@ public:
 	inline int getFrame()                    const { return m_frame;         }
 	inline int getPercentFrame()             const { return m_percent_frame; }
 	inline bool hasProgressChanged()         const { return m_progress_changed;}
-	inline const bool          hasActivity() const { return m_activity.size(); }
+	inline bool                hasActivity() const { return m_activity.size(); }
 	inline const std::string & getActivity() const { return m_activity;      }
-	inline const bool          hasResources()const { return m_resources.size();}
+	inline bool                hasResources()const { return m_resources.size();}
 	inline const std::string & getResources()const { return m_resources;     }
 	inline const std::string & getReport()   const { return m_report;        }
 	inline const std::string & getLog()      const { return m_log;           }

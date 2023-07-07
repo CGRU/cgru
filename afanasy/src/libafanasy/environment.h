@@ -101,7 +101,7 @@ public:
 	static inline const std::string & getCGRULocation(){ return cgrulocation;  } ///< Get CGRU root directory.
 	static inline const std::string & getAfRoot()      { return afroot;        } ///< Get Afanasy root directory.
 	static inline const std::string & getServerName()  { return servername;    } ///< Get Afanasy server name.
-	static inline const int isIPv6Disabled()           { return ipv6_disable;  }
+	static inline int isIPv6Disabled() {return ipv6_disable;}
 	static inline const std::string & getUserName()    { return username;      } ///< Get current user name.
 	static inline const std::string & getHostName()    { return hostname;      } ///< Get Render host name.
 	static inline const std::string & getComputerName(){ return computername;  } ///< Get local computer name.
@@ -158,6 +158,8 @@ public:
 	static inline const std::string & getSysEventsService()  { return sysjob_events_service;     }
 
 	static inline int getWOLWakeInterval() { return wolwake_interval; }
+
+	static inline std::string & getOpenFolderCmd() {return open_folder_cmd;}
 
 	static inline std::string & getCmdShell()          { return cmd_shell;}
  
@@ -333,6 +335,8 @@ private:
 
 	static int render_nice;       ///< Render task process nice factor.
 	static std::vector<std::string> render_windowsmustdie;
+
+	static std::string open_folder_cmd;
 
 	static std::string cmd_shell;
 	static std::string render_cmd_reboot;

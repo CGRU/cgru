@@ -151,6 +151,7 @@ class BlockParameters:
         self.moviemode = False
         self.tickets_use = 0
         self.tickets_data = None
+        self.env_data = None
 
         # Just to add to the final job name some info, for example timecode
         self.jobname_suffix = ''
@@ -174,6 +175,8 @@ class BlockParameters:
             self.hostsmaskexclude = afnode.knob('hostsmaskexcl').value()
             self.tickets_use = int(afnode.knob('tickets_use').value())
             self.tickets_data = afnode.knob('tickets_data').value()
+            self.env_data = afnode.knob('env_data').value()
+
 
             if int(afnode.knob('timecode_use').value()):
                 timecode = afnode.knob('timecode').value()
@@ -377,6 +380,10 @@ class BlockParameters:
                         nuke.message('Invalid ticket data: "%s".' % ticket)
                         continue
                     block.addTicket(ticket[0], int(ticket[1]))
+
+            env_dict = envDataToDict(self.env_data)
+            for key in env_dict:
+                block.setEnv(key, env_dict[key])
 
             cmd = os.getenv('NUKE_AF_RENDER', 'nuke')
             if self.tmpimage or self.pathsmap:
@@ -1145,4 +1152,36 @@ def setTimeCodeFromFrames( i_afnode):
     ffirst = int(i_afnode.knob('framefirst').value())
     flast = int(i_afnode.knob('framelast').value())
     i_afnode.knob('timecode').setValue( cgruutils.timecodesFromFrameRange( ffirst, flast))
+
+def envDataToDict(i_env_data):
+    env_dict = dict()
+    if i_env_data and len(i_env_data):
+        for env_pair in i_env_data.split('\n'):
+            env_pair = env_pair.strip()
+            if len(env_pair) == 0:
+                continue
+            env_pair = env_pair.split('=', 1)
+            if len(env_pair) != 2:
+                nuke.message('Invalid environment data: "%s".' % str(env_pair))
+                continue
+            env_dict[env_pair[0].strip()] = env_pair[1].strip()
+    return env_dict
+
+def setNukeEnvironment(i_afnode):
+    env_dict = envDataToDict(i_afnode['env_data'].value())
+
+    keys=dict()
+    keys['ExecutablePath'] = 'NUKE_EXEC'
+    keys['NukeVersionMajor'] = 'NUKE_VERSION_MAJOR'
+    keys['NukeVersionMinor'] = 'NUKE_VERSION_MINOR'
+    keys['NukeVersionRelease'] = 'NUKE_VERSION_RELEASE'
+    keys['NukeVersionString'] = 'NUKE_VERSION_STRING'
+
+    for key in keys:
+        env_dict[keys[key]] = nuke.env[key]
+
+    env_data = ''
+    for key in env_dict:
+        env_data += "%s=%s\n" % (key, env_dict[key])
+    i_afnode['env_data'].setValue(env_data)
 

@@ -24,13 +24,15 @@
 #scenes_div .shot .name_body .body { height: 64px; font-size: 14px; margin-top: 4px;/* border: 1px solid #F00;*/ }
 
 #scenes_div .shot .status { clear:both; /*border: 1px solid #000;*/ }
-#scenes_div .shot .status .percent { float: left; margin-right: 5px; }
-#scenes_div .shot .status .annotation { float: left; margin-right: 5px; }
-#scenes_div .shot .status .artists { float: left; margin-right: 5px; }
-#scenes_div .shot .status .tags { float: left; margin-right: 5px; }
-#scenes_div .shot .status .flags { float: left; margin-right: 5px; }
-#scenes_div .shot .status .progressbar { clear: both; height: 8px; }
-#scenes_div .shot .status .button.edit { float: right; font-size: 10px; }
+#scenes_div .shot .status_show_compact { clear:both; /*border: 1px solid #000;*/ }
+#scenes_div .shot .status_show_compact .percent { float: left; margin-right: 5px; }
+#scenes_div .shot .status_show_compact .annotation { float: left; margin-right: 5px; }
+#scenes_div .shot .status_show_compact .artists { float: left; margin-right: 5px; }
+#scenes_div .shot .status_show_compact .tags { float: left; margin-right: 5px; }
+#scenes_div .shot .status_show_compact .flags { float: left; margin-right: 5px; }
+#scenes_div .shot .status_show_compact .progressbar { clear: both; height: 8px; }
+#scenes_div .shot .status_show_compact .button.edit { float: right; font-size: 10px; }
+#scenes_div .shot .status_show_compact .tasks_badges > .button { float:left; font-size:12px; padding: 0px 8px; border-radius: 6px; }
 
 #scenes_div .scene { padding: 4px; }
 #scenes_div .scene a { color: inherit; /*display:block;*/ }
@@ -50,7 +52,7 @@ left: 0; right: 0;
 height: auto;
 border: 2px solid #FF0;
 }
-#scenes_div .scene .shot .status {
+#scenes_div .scene .shot .status_show_compact {
 position:absolute;
 top:0;left:0;bottom:0;right:0;
 padding: 0px 4px;
@@ -61,16 +63,16 @@ color: #FFF;
 width: 190px;
 height: 64px;
 }
-#scenes_div .scene .shot .status .name { float:left;}
-#scenes_div .scene .shot .status .percent { float:right;}
-#scenes_div .scene .shot .status .annotation { float:right;}
-#scenes_div .scene .shot .status .progress { clear:both;}
-#scenes_div .scene .shot .status .progressbar { height: 6px; margin-top: 0px;}
-#scenes_div .scene .shot .status .flags { clear:both; float:left; opacity: .8;}
-#scenes_div .scene .shot .status .tasks { clear:both; float:left; opacity: .8;}
-#scenes_div .scene .shot .status .flags .flag { font-size: 10px; text-shadow: none; padding: 0px 4px; border: 1px; border-radius: 1px;}
-#scenes_div .scene .shot .status .artists, .scene .shot .status .tags { clear:none; float:left; font-size: 10px;}
-#scenes_div .scene .shot .status .finish { position: absolute; top: 10px; }
+#scenes_div .scene .shot .status_show_compact .name { float:left;}
+#scenes_div .scene .shot .status_show_compact .percent { float:right;}
+#scenes_div .scene .shot .status_show_compact .annotation { float:right;}
+#scenes_div .scene .shot .status_show_compact .progress { clear:both;}
+#scenes_div .scene .shot .status_show_compact .progressbar { height: 6px; margin-top: 0px;}
+#scenes_div .scene .shot .status_show_compact .flags { clear:both; float:left; opacity: .8;}
+#scenes_div .scene .shot .status_show_compact .tasks_badges { clear:both; float:left; opacity: .8;}
+#scenes_div .scene .shot .status_show_compact .flags .flag { font-size: 10px; text-shadow: none; padding: 0px 4px; border: 1px; border-radius: 1px;}
+#scenes_div .scene .shot .status_show_compact .artists, .scene .shot .status_show_compact .tags { clear:none; float:left; font-size: 10px;}
+#scenes_div .scene .shot .status_show_compact .finish { position: absolute; top: 10px; }
 #scenes_div .scene .shot img {
 position: absolute;
 width: 182px;

@@ -33,7 +33,7 @@ public:
 	static const char * TNAMES[];
 
 	inline bool isEmpty() const { return m_type == TNULL; }
-	inline const int32_t getType() const { return m_type; }
+	inline int32_t getType() const { return m_type; }
 
 
 	inline bool hasOutput() const { return ( m_type == TOutput ) && ( m_data.size() > 0 ); }
@@ -44,10 +44,10 @@ public:
 	//
 	inline bool isSameTask( const MCTask & i_other ) const { return m_pos.isSameTask( i_other.m_pos);}
 	inline bool isSameTask( const MCTaskPos & i_pos) const { return m_pos.isSameTask(         i_pos);}
-	inline const int32_t getJobId()    const { return m_pos.getJobId();   }
-	inline const int32_t getBlockNum() const { return m_pos.getBlockNum();}
-	inline const int32_t getTaskNum()  const { return m_pos.getTaskNum(); }
-	inline const int32_t getNumber()   const { return m_pos.getNumber();  }
+	inline int32_t getJobId()    const { return m_pos.getJobId();   }
+	inline int32_t getBlockNum() const { return m_pos.getBlockNum();}
+	inline int32_t getTaskNum()  const { return m_pos.getTaskNum(); }
+	inline int32_t getNumber()   const { return m_pos.getNumber();  }
 	inline const MCTaskPos & getPos()  const { return m_pos; }
 
 

@@ -75,6 +75,8 @@ std::string Environment::rules_url;
 std::vector<std::string> Environment::projects_root;
 std::vector<std::string> Environment::render_windowsmustdie;
 
+std::string Environment::open_folder_cmd =             AFGENERAL::OPEN_FOLDER_CMD;
+
 std::string Environment::cmd_shell =                   AFRENDER::CMD_SHELL;
  
 std::string Environment::render_cmd_reboot =           AFRENDER::CMD_REBOOT;
@@ -239,6 +241,7 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, timeformat,                        "timeformat"                           );
 	getVar( i_obj, previewcmds,                       "previewcmds"                          );
 	getVar( i_obj, annotations,                       "annotations"                          );
+	getVar( i_obj, open_folder_cmd,                   "open_folder_cmd"                      );
 	getVar( i_obj, cmd_shell,                         "cmd_shell"                            );
 	getVar( i_obj, icons_path,                        "icons_path"                           );
 

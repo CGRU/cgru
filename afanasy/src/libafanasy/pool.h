@@ -22,8 +22,8 @@ public:
 
 	virtual ~Pool();
 
-	inline const bool  isRoot() const { return m_name == "/"; }
-	inline const bool notRoot() const { return m_name != "/"; }
+	inline bool  isRoot() const { return m_name == "/"; }
+	inline bool notRoot() const { return m_name != "/"; }
 
 	void v_generateInfoStream(std::ostringstream & stream, bool full = false) const;
 
@@ -48,13 +48,20 @@ public:
 	inline bool isNewRenderNimby()  const { return m_new_nimby;  }
 	inline bool isNewRenderPaused() const { return m_new_paused; }
 
-	inline int32_t getPoolsNum()     const { return m_pools_num;     }
-	inline int32_t getPoolsTotal()   const { return m_pools_total;   }
-	inline int32_t getRendersNum()   const { return m_renders_num;   }
-	inline int32_t getRendersTotal() const { return m_renders_total; }
+	inline int32_t getPoolsTotal()     const {return m_pools_total;    }
+	inline int32_t getRendersTotal()   const {return m_renders_total;  }
+	inline int32_t getRendersBusy()    const {return m_renders_busy;   }
+	inline int32_t getRendersReady()   const {return m_renders_ready;  }
+	inline int32_t getRendersOnline()  const {return m_renders_online; }
+	inline int32_t getRendersOffline() const {return m_renders_offline;}
+	inline int32_t getRendersNimby()   const {return m_renders_nimby;  }
+	inline int32_t getRendersPaused()  const {return m_renders_paused; }
+	inline int32_t getRendersSick()    const {return m_renders_sick;   }
 
 	inline int getRunTasks()    const { return m_run_tasks;   }
 	inline int getRunCapacity() const { return m_run_capacity;}
+
+	inline int64_t getTaskStartFinishTime() const { return m_task_start_finish_time;}
 
 	inline int getSickErrorsCount() const {return m_sick_errors_count;}
 
@@ -103,10 +110,15 @@ protected:
 
 	int32_t m_sick_errors_count;
 
-	int32_t m_pools_num;
 	int32_t m_pools_total;
-	int32_t m_renders_num;
 	int32_t m_renders_total;
+	int32_t m_renders_busy;
+	int32_t m_renders_ready;
+	int32_t m_renders_online;
+	int32_t m_renders_offline;
+	int32_t m_renders_nimby;
+	int32_t m_renders_paused;
+	int32_t m_renders_sick;
 
 	int32_t m_run_tasks;
 	int32_t m_run_capacity;

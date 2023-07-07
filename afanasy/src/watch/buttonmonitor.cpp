@@ -129,9 +129,12 @@ void ButtonMonitor::createImage()
          if( ri > 128 ) r += ri - 128; else r = r * ri / 128;
          if( gi > 128 ) g += gi - 128; else g = g * gi / 128;
          if( bi > 128 ) b += bi - 128; else b = b * bi / 128;
-         if( r < 0 ) r = 0; if( r > 0xff ) r = 0xff;
-         if( g < 0 ) g = 0; if( g > 0xff ) g = 0xff;
-         if( b < 0 ) b = 0; if( b > 0xff ) b = 0xff;
+			if (r < 0   ) r = 0;
+			if (r > 0xff) r = 0xff;
+			if (g < 0   ) g = 0;
+			if (g > 0xff) g = 0xff;
+			if (b < 0   ) b = 0;
+			if (b > 0xff) b = 0xff;
          rgba.c[3] = 0xff;
          rgba.c[2] = r;
          rgba.c[1] = g;

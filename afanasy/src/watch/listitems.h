@@ -92,7 +92,17 @@ protected:
 
 	void getItemInfo(Item::EType i_type, const std::string & i_mode);
 
-	void setParameter(Item::EType i_type, const std::string & i_name, const std::string & i_value);
+	inline void setParameterQStrEscape(Item::EType i_type, const std::string & i_name, const QString & i_value)
+		{setParameter(i_type, i_name, af::strEscape(afqt::qtos(i_value)), true);}
+	inline void setParameterQStr(Item::EType i_type, const std::string & i_name, const QString & i_value)
+		{setParameter(i_type, i_name, afqt::qtos(i_value), true);}
+	inline void setParameterStrEscape(Item::EType i_type, const std::string & i_name, const std::string & i_value)
+		{setParameter(i_type, i_name, af::strEscape(i_value), true);}
+	inline void setParameterStr(Item::EType i_type, const std::string & i_name, const std::string & i_value)
+		{setParameter(i_type, i_name, i_value, true);}
+	inline void setParameterInt(Item::EType i_type, const std::string & i_name, int64_t i_value)
+		{setParameter(i_type, i_name, af::itos(i_value), false);}
+	void setParameter(Item::EType i_type, const std::string & i_name, const std::string & i_value, bool i_quote = false);
 
 	void operation(Item::EType i_type, const std::string & i_operation);
 
@@ -117,6 +127,8 @@ protected:
 		const QString & i_hotkey = "",
 		bool i_dblclick = false,
 		bool i_always_active = false);
+
+	void setWindowTitleWithPrefix(const QString & i_windowTitle);
 
 protected:
 

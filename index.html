@@ -84,6 +84,7 @@ Refresh browser to sort by size" onclick="g_NavigShowInfo(this)">SIZE</div>
 </div>
 
 <div id="content">
+    <div id="constant_error"></div>
 	<div id="panel">
 		<div id="annotations"></div>
 		<div id="search_panel" style="float:right">
@@ -195,7 +196,7 @@ Refresh browser to sort by size" onclick="g_NavigShowInfo(this)">SIZE</div>
 		</div>
 	</div>
 	<div style="text-align:center; clear: both;"><img id="thumbnail" class="thumbnail" style="margin-top:4px"></div>
-	<div id="status">
+	<div id="status" class="status">
 		<div id="status_show">
 			<div class="infotooltip" style="float: left;" title="Info:
 This is current location (folder,shot,project) status.
@@ -224,16 +225,12 @@ Supervisor can assign artist by creating a task."
 					<div id="status_tasks_btn_add_artist" class="button" onclick="task_AddArtistTask()" style="display:none">Add Artist Task</div>
 				</div>
 				<div id="status_tasks_label">Tasks:</div>
-				<div id="status_tasks"></div>
+				<div id="status_tasks" class="tasks"></div>
 			</div>
 			<div style="clear:both;">
-				<div id="status_reports_div">
+				<div id="status_reports_div" style="display: none;">
 					Reports:
 					<div id="status_reports" style="margin: 4px;"></div>
-				</div>
-				<div id="status_tasks_div_old">
-					Tasks:
-					<div id="status_tasks_old" style="margin: 4px;"></div>
 				</div>
 			</div>
 		</div>
@@ -389,31 +386,34 @@ Remember any delete operation buttons in RULES requires double-click.
 					<div class="button" id="news_settings_btn"
 						title="Click to open/close subscribed locations"
 						style="background-image:url(rules/icons/news_channels.png);"
-						onclick="c_ElDisplayToggle(document.getElementById('chanset'));
+						onclick="c_ElDisplayToggle(document.getElementById('news_settings'));
 						this.classList.toggle('pushed')"></div>
 					<div class="button" title="Change news sorting order"
 						style="background-image:url(rules/icons/sort_order_toggle.png);"
 						onclick="nw_SortOrderToggle()"></div>
 				</div>
-				<div id="chanset" style="display:none">
-					<div id="subscribe_path"
-						title="Subscribed parent location"></div>
-					<div id="subscribe_btn" class="button" onclick="nw_Subscribe()"
-						style="background-image:url(rules/icons/bell.png); display: none;"
-						title="Receive this location changes"></div>
-					<div id="news_disable" class="button" onclick="nw_DisableNewsToggle( true)"
-						style="background-image:url(rules/icons/power_button.png); float: right;"
-						title="If news disabled, your changes does not produce any news"></div>
-					<div id="news_ignore_own" class="button" onclick="nw_IgnoreOwnToggle( true)"
-						style="background-image:url(rules/icons/listen_own.png); float: right;"
-						title="If you ignoring own news, you do not receive changes performed by yourself"></div>
-					<div id="news_make" class="button" onclick="nw_MakeNewsDialog()"
-						style="background-image:url(rules/icons/megaphone.png); float: right;"
-						title="Create some custom news"></div>
-					<div id="channels"></div>
+				<div id="news_settings" style="display:none">
+					<div id="news_channels">
+						<div id="subscribe_path"
+							title="Subscribed parent location"></div>
+						<div id="subscribe_btn" class="button" onclick="nw_Subscribe()"
+							style="background-image:url(rules/icons/bell.png); display: none;"
+							title="Receive this location changes"></div>
+						<div id="news_disable" class="button" onclick="nw_DisableNewsToggle( true)"
+							style="background-image:url(rules/icons/power_button.png); float: right;"
+							title="If news disabled, your changes does not produce any news"></div>
+						<div id="news_ignore_own" class="button" onclick="nw_IgnoreOwnToggle( true)"
+							style="background-image:url(rules/icons/listen_own.png); float: right;"
+							title="If you ignoring own news, you do not receive changes performed by yourself"></div>
+						<div id="news_make" class="button" onclick="nw_MakeNewsDialog()"
+							style="background-image:url(rules/icons/megaphone.png); float: right;"
+							title="Create some custom news"></div>
+						<div id="channels"></div>
+					</div>
+					<div id="news_filter_div"></div>
 				</div>
 			</div>
-			<div class="news_filter" style="font-size: 12px" title="News filter">
+			<div class="news_display_filter" style="font-size: 12px" title="News filter">
 				<div class="button nw_fb" title="Show All" id="news_filter_show_all" onclick="nw_FilterBtn(this,'_all_')">All</div>
 				<div class="button nw_fb" title="I Am Assigned" onclick="nw_FilterBtn(this,'_ia_')"   >IA</div>
 				<div class="button nw_fb" title="By me"         onclick="nw_FilterBtn(this,'_me_')"   >My</div>
@@ -424,7 +424,7 @@ Remember any delete operation buttons in RULES requires double-click.
 				<div class="button nw_fb" title="Comment"       onclick="nw_FilterBtn(this,'comment')">C</div>
 				<div class="button nw_fb" title="Upload"        onclick="nw_FilterBtn(this,'upload')" >U</div>
 			</div>
-			<div class="news_filter" id="news_projects" style="font: 10px monospace;" title="News Projects"></div>
+			<div class="news_display_filter" id="news_projects" style="font: 10px monospace;" title="News Projects"></div>
 			<div id="news"></div>
 		</div>
 	</div>

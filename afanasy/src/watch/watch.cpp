@@ -569,8 +569,10 @@ void Watch::browseImages( const QString & i_image, const QString & i_wdir)
 
     QString folder = i_image.left( i_image.lastIndexOf('/'));
     folder = folder.left( i_image.lastIndexOf('\\'));
-    if( folder == i_image )
+    if (folder == i_image)
+	{
         folder = i_wdir;
+	}
 
 	Watch::browseFolder( folder, i_wdir);
 }
@@ -590,12 +592,10 @@ void Watch::browseFolder( const QString & i_folder, const QString & i_wdir)
     }
 
 	Watch::displayInfo( QString("Opening '%1'").arg( dir.path().toUtf8().data()));
-#ifdef WINNT
-	QString cmd = "explorer";
-#else
-	QString cmd = "openfolder";
-#endif
-	cmd += " \"" + i_folder + "\"";
+
+	QString cmd = afqt::stoq(af::Environment::getOpenFolderCmd());
+	cmd = cmd.replace("@PATH@", i_folder);
+
 	Watch::startProcess( cmd, i_wdir);
 }
 

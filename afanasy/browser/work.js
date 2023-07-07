@@ -43,7 +43,7 @@ function work_generateParamsString(i_params, i_type)
 		if (i_params.hosts_mask)
 			str += " HostsMask:<b>" + i_params.hosts_mask + "</b>";
 		if (i_params.hosts_mask_exclude)
-			str += " ExcludeHosts:<b>" + i_params.hosts_mask + "</b>";
+			str += " ExcludeHosts:<b>" + i_params.hosts_mask_exclude + "</b>";
 		if (i_type != 'job')
 		{
 			str += " Solving:";
@@ -69,7 +69,7 @@ function work_generateParamsString(i_params, i_type)
 		if (i_params.hosts_mask)
 			str += " Hosts:<b>" + i_params.hosts_mask + "</b>";
 		if (i_params.hosts_mask_exclude)
-			str += " Exclude:<b>" + i_params.hosts_mask + "</b>";
+			str += " Exclude:<b>" + i_params.hosts_mask_exclude + "</b>";
 		if (i_type != 'job')
 		{
 			str += " Slv:";
@@ -94,7 +94,7 @@ function work_generateParamsString(i_params, i_type)
 		if (i_params.hosts_mask)
 			str += " h:<b>" + i_params.hosts_mask + "</b>";
 		if (i_params.hosts_mask_exclude)
-			str += " e:<b>" + i_params.hosts_mask + "</b>";
+			str += " e:<b>" + i_params.hosts_mask_exclude + "</b>";
 		if (i_type != 'job')
 		{
 			str += " s:";

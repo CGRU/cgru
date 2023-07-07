@@ -41,16 +41,17 @@ class Status:
 
     def __init__(self, uid=None, path=None):
 
-        self.path = rulib.functions.getRootPath(path)
+        if uid is None:
+            uid = rulib.functions.getCurUser()
 
-        self.muser = uid
-        if self.muser is None:
-            self.muser = rulib.functions.getCurUser()
-        self.mtime = rulib.functions.getCurSeconds()
+        self.path = rulib.functions.getRootPath(path)
 
         self.data = getStatusData(self.path)
         if self.data is None:
             self.data = dict()
+
+        self.data['muser'] = uid
+        self.data['mtime'] = rulib.functions.getCurSeconds()
 
         self.progress_changed = False
 
@@ -90,6 +91,113 @@ class Status:
         return None
 
 
+    def set(self, tags=None, tags_keep=None, artists=None, artists_keep=None, flags=None, flags_keep=None, progress=None, annotation=None, color=None, out=None):
+        # Store original progress to compare later
+        # and find out that is was changed.
+        _progress = self.data.get('progress')
+
+        if annotation is not None and type(annotation) is str:
+            self.data['annotation'] = annotation
+
+        if color is not None and type(color) is list:
+            if len(color) == 3:
+                self.data['color'] = color
+            else:
+                if 'color' in self.data:
+                    del self.data['color']
+
+        if progress is not None and type(progress) is int:
+            if progress < -1: progress = -1
+            elif progress > 100: progress = 100
+            self.data['progress'] = progress
+
+        self.setItems('flags',   items_keep=flags_keep,   items_add=flags)
+        self.setItems('tags',    items_keep=tags_keep,    items_add=tags)
+        self.setItems('artists', items_keep=artists_keep, items_add=artists)
+
+        # If shot progress is 100% all tasks should be 100% done.
+        if self.data.get('progress') == 100 and 'tasks' in self.data:
+            for t in self.data['tasks']:
+                task = self.data['tasks'][t]
+                if task.get('progress') != 100:
+                    task['progress'] = 100;
+                    task['changed'] = True
+                if 'flags' in task and 'done' not in task['flags']:
+                    task['flags'] = ['done']
+                    task['changed'] = True
+
+        # If shot has OMIT flags, all tasks should be omitted
+        if 'flags' in self.data and 'omit' in self.data['flags'] and 'tasks' in self.data:
+            for t in self.data['tasks']:
+                task = self.data['tasks'][t]
+                if ('flags' not in task) or ('omit' not in task['flags']) or (task.get('progress') != -1):
+                    # Skip done tasks
+                    if task.get('progress') == 100:
+                        continue
+                    task['flags'] = ['omit']
+                    task['progress'] = -1
+                    task['changed'] = True
+
+        # If progress was changed we should update upper progress:
+        if _progress != self.data.get('progress'):
+            self.progress_changed = True
+
+        self.data['changed'] = True
+
+        return self.data
+
+
+    def setItems(self, item_name, items_keep=None, items_add=None):
+        if items_keep is None and items_add is None:
+            return
+        if items_keep is None:
+            items_keep = []
+        if items_add is None:
+            items_add = []
+        if not type(items_keep) is list:
+            return
+        if not type(items_add) is list:
+            return
+
+        if not item_name in self.data:
+            self.data[item_name] = []
+
+        # Remove items:
+        _items = []
+        for i in self.data[item_name]:
+            if i in items_keep or i in items_add:
+                _items.append(i)
+        self.data[item_name] = _items
+
+        # Add items:
+        for i in items_add:
+            # Skip items that are already set
+            if i in self.data[item_name]:
+                continue
+
+            if item_name == 'flags' and i in rulib.RULES_TOP[item_name]:
+                # Flag can limit minimum and maximum progress percentage:
+                p_min = rulib.RULES_TOP[item_name][i].get('p_min')
+                p_max = rulib.RULES_TOP[item_name][i].get('p_max')
+                progress = self.data.get('progress')
+
+                if (p_min is not None) and ((progress is None) or (progress < p_min)):
+                    progress = p_min;
+
+                if (p_max is not None) and ((progress is None) or (p_max < 0) or (progress > p_max)):
+                    progress = p_max;
+
+                if progress is not None:
+                    self.data['progress'] = progress
+
+                # Flag can be exclusive, so we should delete other items:
+                mode = rulib.RULES_TOP[item_name][i].get('mode')
+                if mode == 'stage' or mode == 'super':
+                    self.data[item_name] = []
+
+            self.data[item_name].append(i)
+
+
     def setTask(self, name=None, tags=None, artists=None, flags=None, progress=None, annotation=None, deleted=None, out=None):
 
         task = self.findTask(name, tags)
@@ -115,16 +223,16 @@ class Status:
             task['artists'] = []
             task['flags'] = []
             task['progress'] = 0
-            task['cuser'] = self.muser
-            task['ctime'] = self.mtime
+            task['cuser'] = self.data['muser']
+            task['ctime'] = self.data['mtime']
 
             if not 'tasks' in self.data:
                 self.data['tasks'] = dict()
             self.data['tasks'][name] = task
 
         else:
-            task['muser'] = self.muser
-            task['mtime'] = self.mtime
+            task['muser'] = self.data['muser']
+            task['mtime'] = self.data['mtime']
 
         if artists is not None and type(artists) is list:
             task['artists'] = artists
@@ -132,8 +240,10 @@ class Status:
             task['flags'] = flags
         if annotation is not None and type(annotation) is str:
             task['annotation'] = annotation
-        if deleted is not None:
-            task['deleted'] = deleted
+        if deleted:
+            task['deleted'] = True
+        elif 'deleted' in task:
+            del task['deleted']
 
         if progress is not None and type(progress) is int:
             if progress < -1: progress = -1
@@ -177,13 +287,14 @@ class Status:
                 avg_progress += koeff * _task['progress']
                 num_tasks += koeff
 
-            # Set status progress if it changes:
-            avg_progress = round(avg_progress / num_tasks)
-            if 'progress' not in self.data or self.data['progress'] != avg_progress:
-                self.data['progress'] = avg_progress
-                self.progress_changed = True
-            else:
-                self.progress_changed = False
+            if num_tasks > 0:
+                avg_progress = round(avg_progress / num_tasks)
+                # Set status progress if it changes:
+                if 'progress' not in self.data or self.data['progress'] != avg_progress:
+                    self.data['progress'] = avg_progress
+                    self.progress_changed = True
+                else:
+                    self.progress_changed = False
 
 
         # Remove status tags, artists and flags if the task has the same
@@ -209,22 +320,12 @@ class Status:
                     del self.data['tasks'][t]['changed']
 
 
-    def save(self, out=dict(), nonews=False):
-        self.data['mtime'] = self.mtime
-        self.data['muser'] = self.muser
-
-        rulib.news.statusChanged(self, out, nonews)
-
+    def save(self, out=dict()):
         self.prepareDataForSave()
 
         saveStatusData(self.path, self.data, out)
 
         out['status'] = self.data
-
-        if self.progress_changed:
-            progresses = dict()
-            progresses[self.path] = self.data['progress']
-            updateUpperProgresses(os.path.dirname(self.path), progresses, out)
 
 
 def updateUpperProgresses(i_path, i_progresses, out):
@@ -253,18 +354,29 @@ def updateUpperProgresses(i_path, i_progresses, out):
                 continue
 
             progress = 0
+            sdata = None
             path = os.path.join(folder, entry)
+            sdata = getStatusData(path)
+
+            # Skip aux folders:
+            if rulib.functions.isAuxFolder(path, sdata):
+                continue
+
             if path in i_progresses:
                 progress = i_progresses[path]
             else:
-                sdata = getStatusData(path)
-                if sdata and 'progress' in sdata:
+                if sdata and 'progress' in sdata and type(sdata['progress']) is int:
                     progress = sdata['progress']
 
-            #print(entry, progress)
+            # Clamp progress to 100%
+            if progress >= 100:
+                progress = 100
 
-            if progress < 0:
-                continue
+            # If status has tasks assuming that it is a shot.
+            # We want to count only 100% done shots.
+            if sdata and 'tasks' in sdata:
+                if progress < 100:
+                    progress = 0;
 
             progress_sum += progress
             progress_count += 1

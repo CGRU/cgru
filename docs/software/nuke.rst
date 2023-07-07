@@ -159,6 +159,21 @@ Advanced
 	Using CGRU Path Map you can work and render on different platforms.
 
 
+Environment
+-----------
+
+.. figure:: images/nuke_afanasy_environment.png
+
+	Afanasy Gizmo Environment Tab
+
+- Environment variables.
+	This environment variables will be *added* to task process environment.
+
+- Get Nuke Environment
+    Get and store in variables Nuke location and version.
+    It can be used in setup scripts to launch the same version, initialize proper plug-ins.
+
+
 Complex Job (Precomps)
 ======================
 

@@ -274,17 +274,54 @@ class Requests:
         return
 
 
+    def req_setstatus(self, i_args, out):
+
+        if self.session.USER_ID is None:
+            o_out['error'] = 'Guests are not allowed to edit statuses.'
+            return
+
+        if not 'paths' in i_args:
+            out['error'] = 'Paths are not specified.'
+            return
+
+        name         = None
+        tags         = None
+        tags_keep    = None
+        artists      = None
+        artists_keep = None
+        flags        = None
+        flags_keep   = None
+        progress     = None
+        annotation   = None
+        color        = None
+        nonews       = False
+
+        if 'name'         in i_args: name         = i_args['name']
+        if 'tags'         in i_args: tags         = i_args['tags']
+        if 'tags_keep'    in i_args: tags_keep    = i_args['tags_keep']
+        if 'artists'      in i_args: artists      = i_args['artists']
+        if 'artists_keep' in i_args: artists_keep = i_args['artists_keep']
+        if 'flags'        in i_args: flags        = i_args['flags']
+        if 'flags_keep'   in i_args: flags_keep   = i_args['flags_keep']
+        if 'progress'     in i_args: progress     = i_args['progress']
+        if 'annotation'   in i_args: annotation   = i_args['annotation']
+        if 'color'        in i_args: color        = i_args['color']
+        if 'nonews'       in i_args and i_args['nonews']: nonews = True
+
+        rulib.setStatus(uid=self.session.USER_ID, paths=i_args['paths'], name=name, tags=tags, tags_keep=tags_keep, artists=artists, artists_keep=artists_keep, flags=flags, flags_keep=flags_keep, progress=progress, annotation=annotation, color=color, nonews=nonews, out=out)
+
+        return
+
+
     def req_settask(self, i_args, out):
 
         if self.session.USER_ID is None:
             o_out['error'] = 'Guests are not allowed to edit tasks.'
             return
 
-        if not 'path' in i_args:
+        if not 'paths' in i_args:
             out['error'] = 'Path is not specified.'
             return
-
-        s = rulib.status.Status(uid=self.session.USER_ID, path=i_args['path'])
 
         name       = None
         tags       = None
@@ -293,6 +330,7 @@ class Requests:
         progress   = None
         annotation = None
         deleted    = None
+        nonews     = False
 
         if 'name'       in i_args: name       = i_args['name']
         if 'tags'       in i_args: tags       = i_args['tags']
@@ -301,12 +339,9 @@ class Requests:
         if 'progress'   in i_args: progress   = i_args['progress']
         if 'annotation' in i_args: annotation = i_args['annotation']
         if 'deleted'    in i_args: deleted    = i_args['deleted']
+        if 'nonews'     in i_args and i_args['nonews']: nonews = True
 
-        s.setTask(name=name, tags=tags, artists=artists, flags=flags, progress=progress, annotation=annotation, deleted=deleted, out=out)
-
-        nonews = False
-        if nonews in i_args and i_args['nonews']: nonews = True
-        s.save(out=out, nonews=nonews)
+        rulib.setTask(uid=self.session.USER_ID, paths=i_args['paths'], name=name, tags=tags, artists=artists, flags=flags, progress=progress, annotation=annotation, deleted=deleted, nonews=nonews, out=out)
 
         return
 

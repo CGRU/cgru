@@ -134,10 +134,14 @@ void RenderHost::setRegistered( int i_id)
 void RenderHost::serverUpdateFailed()
 {
     if (m_connected == false)
+	{
 		return;
+	}
 
     if (false == AFRunning)
+	{
         return;
+	}
 
 	AF_LOG << "Failed to connect to server."
 			<< " Last success connect time: " << af::time2str(m_server_update_time);

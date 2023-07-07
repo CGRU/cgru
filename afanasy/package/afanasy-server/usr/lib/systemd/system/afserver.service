@@ -13,5 +13,5 @@ TimeoutStopSec=30
 LimitNOFILE=16384
 
 [Install]
-WantedBy=remote-fs.target
+WantedBy=multi-user.target
 

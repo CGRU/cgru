@@ -24,7 +24,7 @@ if exist %CGRU_LOCATION%\python-devel set CGRU_PYTHONDIR=%CGRU_LOCATION%\python-
 if defined CGRU_PYTHONDIR (
    echo Building with CGRU Python: "!CGRU_PYTHONDIR!"
    SET "AF_PYTHON_INCLUDE_PATH=!CGRU_PYTHONDIR!\include"
-   SET "AF_PYTHON_LIBRARIES=!CGRU_PYTHONDIR!\libs\python39.lib"
+   SET "AF_PYTHON_LIBRARIES=!CGRU_PYTHONDIR!\libs\python310.lib"
 )
 
 rem Boost:

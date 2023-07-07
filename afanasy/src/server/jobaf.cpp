@@ -183,18 +183,28 @@ void JobAf::construct(int alreadyConstructed)
 
 bool JobAf::isValidConstructed() const
 {
+	bool valid = true;
 	std::string err;
 
 	if ((NULL == m_blocks) || (NULL == m_progress))
+	{
 		err += "Is not constructed.";
+		valid = false;
+	}
 
-	if( err.size())
+	if (valid)
+	{
+		valid = isValid(&err);
+	}
+
+	if (false == valid)
 	{
 		err = std::string("Invalid job '") + m_name + "': " + err;
 		if( isFromStore())
 			AF_ERR << err;
 		else
 			AFCommon::QueueLogError( err);
+
 		return false;
 	}
 
@@ -1228,11 +1238,16 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 	
 	if (m_deletion)
 	{
-		for (int b = 0; b < m_blocks_num; b++)
-			m_blocks[b]->v_refresh(currentTime, renders, monitoring);
+// Since running_tasks_num is calculated and stored in Af::Work, refresh no needed on deletion
+//		for (int b = 0; b < m_blocks_num; b++)
+//			m_blocks[b]->v_refresh(currentTime, renders, monitoring);
 
 		if (getRunningTasksNum() == 0)
+		{
 			deleteNode(NULL, monitoring);
+			// No later refresh needed, as running tasks number is stoted and calculated in af::Work
+			return;
+		}
 	}
 
 	// No more calculations needed for a locked job:
@@ -1277,6 +1292,24 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 			if (m_progress->tp[b][t]->state & AFJOB::STATE_READY_MASK)
 				m_progress->tp[b][t]->state |= AFJOB::STATE_TRYTHISTASKNEXT_MASK;
 		}
+
+	// Some statistics calculations:
+	int32_t _tasks_error = 0;
+	int32_t _tasks_ready = 0;
+	for (int b = 0; b < m_blocks_num; b++)
+	{
+		_tasks_error += m_blocks[b]->m_data->getProgressTasksError();
+
+		if (m_blocks[b]->m_data->getState() && AFJOB::STATE_READY_MASK)
+			_tasks_ready += m_blocks[b]->m_data->getProgressTasksReady();
+	}
+	// Compare changes
+	if ((_tasks_ready != m_tasks_ready) ||
+		(_tasks_error != m_tasks_error))
+		jobchanged = af::Monitor::EVT_jobs_change;
+	// Store new calculations
+	m_tasks_ready    = _tasks_ready;
+	m_tasks_error    = _tasks_error;
 
 	//
 	// job state calculation

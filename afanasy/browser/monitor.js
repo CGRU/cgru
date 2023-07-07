@@ -783,7 +783,13 @@ Monitor.prototype.createItem = function(i_item, i_obj, i_appendChild) {
 		if (e.button == 0)
 			return e.currentTarget.monitor.onMouseOver(e, e.currentTarget);
 	};
-	i_item.element.ondblclick = function(e) { return e.currentTarget.item.onDoubleClick(e); };
+
+	if (i_item.onDoubleClick)
+	{
+		i_item.element.ondblclick = function(e){
+			return e.currentTarget.item.onDoubleClick(e);};
+	}
+
 	i_item.element.oncontextmenu = function(e) {
 		return e.currentTarget.monitor.onContextMenu(e, e.currentTarget);
 	};

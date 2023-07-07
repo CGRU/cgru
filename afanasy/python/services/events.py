@@ -102,14 +102,21 @@ class events(service.service):
             if 'notify-send' in methods:
                 self.taskInfo['command'] = "notify-send Afanasy 'Job " + task_info['job_name'].replace("'", "'\\''") + ": " + event + "'"
 
+            # execute any command and give job ID of the source job
+            for m in methods:
+                if m not in ["email", "notify-send"]:
+                    self.taskInfo["command"] = "%s -jobid %s" % (m, objects['job']['id'])
+
+
         if len(email_events):
             cmd = cgruconfig.VARS['email_send_cmd']
             cmd += ' -V'  # Verbose mode
             cmd += ' -f "noreply@%s"' % cgruconfig.VARS['email_sender_address_host']
             for addr in custom_obj['emails']:
                 cmd += ' -t "%s"' % addr
-            cmd += ' -s "%s"' % (','.join(email_events))
-            cmd += ' "<p>Events: <b>%s</b></p>"' % (','.join(email_events))
+            _fmt_events = ', '.join(email_events).replace("_", " ").title()
+            cmd += ' -s "%s - %s"' % (_fmt_events, cgruutils.toStr(task_info['job_name'])) # e.g.: Job Error - MY_JOB_v01
+            cmd += ' "<p>Events: <b>%s</b></p>"' % (_fmt_events)
             if 'render' in objects:
                 cmd += ' "<p>Render Name: <b>%s</b>' % objects['render']['name']
                 if 'host_resources' in objects:

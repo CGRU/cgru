@@ -302,6 +302,9 @@ bool UserAf::v_canRun()
 		return false;
 	}
 
+	if (isPaused())
+		return false;
+
 	// Returning that node is able run
 	return true;
 }

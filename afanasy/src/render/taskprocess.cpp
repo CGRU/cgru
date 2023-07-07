@@ -139,8 +139,12 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec, RenderHost * i_render):
 		m_wdir = af::Environment::getStoreFolder();
 
 	// Process environment:
-	if( m_taskexec->hasEnv())
-		m_environ = af::processEnviron(m_service->getEnvironment());
+	auto service_env = m_service->getEnvironment();
+	service_env["AF_JOB_ID"] = std::to_string(m_taskexec->getJobId());
+	service_env["AF_BLOCK_ID"] = std::to_string(m_taskexec->getBlockNum());
+	service_env["AF_TASK_ID"] = std::to_string(m_taskexec->getTaskNum());
+
+	m_environ = af::processEnviron(service_env);
 
 	launchCommand();
 

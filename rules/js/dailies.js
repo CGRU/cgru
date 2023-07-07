@@ -139,6 +139,7 @@ function d_Make(i_path, i_outfolder)
 	params.filename = filename;
 
 	var wnd = new cgru_Window({"name": 'dailies', "title": 'Make Dailies'});
+	wnd.elContent.classList.add('dailies');
 
 	var cmd = 'rules/bin/walk.sh -m "' + RULES.root + i_path + '"';
 	n_Request({
@@ -161,12 +162,27 @@ function d_DailiesWalkReceived(i_data, i_args)
 	if (i_data.cmdexec && i_data.cmdexec[0].walk)
 		data = i_data.cmdexec[0].walk;
 
-	params.comments = '';
-	if (RULES.status && RULES.status.annotation && RULES.status.annotation.length)
-		params.comments = RULES.status.annotation.trim();
+	// Process comments:
+	let comments = '';
+	// Comments from annotation
+	if (RULES.dailies.comment_annotation && RULES.status && RULES.status.annotation && RULES.status.annotation.length)
+		comments = RULES.status.annotation.trim();
+	// Comments from body
+	if (RULES.dailies.comment_body)
+	{
+		let text = $('body_body').innerText.replaceAll('\n','; ').trim();
+		if (text && text.length)
+		{
+			if (comments.length)
+				comments += '; ';
+			comments += text;
+		}
+	}
+	params.comments = comments.replaceAll('"',"'");
 
 	//console.log(JSON.stringify(data));
 	// Get files sequence pattern and comments:
+	let found = false;
 	if (data && data.walk && data.walk.exif)
 	{
 		var exif = data.walk.exif;
@@ -183,11 +199,29 @@ function d_DailiesWalkReceived(i_data, i_args)
 				pattern += '#';
 			pattern += file.substr(pos - 1 + match.length);
 			params.input = c_PathPM_Rules2Client(params.input + '/' + pattern);
+			found = true;
 		}
 
 		// Get comments (came from image EXIF metadata):
 		if (exif.comments)
 			params.comments += ' ' + exif.comments.trim();
+	}
+
+	if (false == found)
+	{
+		if (data && data.walk)
+		{
+			let msg = 'ERROR: No valid sequence found.<br>';
+			msg += '<br>' + c_PathPM_Rules2Client(params.input) + '<br>';
+			msg += '<br><a href="#' + params.input + '" target="blank">#' + params.input + '</a><br>';
+			wnd.elContent.innerHTML = msg;
+		}
+		else
+		{
+			wnd.elContent.innerHTML = 'ERROR: Invalid data received:<br><br>' + JSON.stringify(i_data);
+		}
+		wnd.elContent.classList.add('error');
+		return;
 	}
 
 	params.comments = params.comments.trim();

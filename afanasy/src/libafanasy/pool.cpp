@@ -50,10 +50,15 @@ void Pool::initDefaultValues()
 
 	m_time_creation = 0;
 
-	m_pools_num = 0;
-	m_pools_total = 0;
-	m_renders_num = 0;
-	m_renders_total = 0;
+	m_pools_total     = 0;
+	m_renders_total   = 0;
+	m_renders_busy    = 0;
+	m_renders_ready   = 0;
+	m_renders_online  = 0;
+	m_renders_offline = 0;
+	m_renders_nimby   = 0;
+	m_renders_paused  = 0;
+	m_renders_sick    = 0;
 
 	m_new_nimby = false;
 	m_new_paused = false;
@@ -104,10 +109,16 @@ void Pool::v_jsonWrite(std::ostringstream & o_str, int i_type) const // Thread-s
 
 	o_str << ",\n\"parent\":\""       << m_parent_path << "\"";
 	o_str << ",\n\"time_creation\":"  << m_time_creation;
-	o_str << ",\n\"pools_num\":"      << m_pools_num;
-	o_str << ",\n\"pools_total\":"    << m_pools_total;
-	o_str << ",\n\"renders_num\":"    << m_renders_num;
-	o_str << ",\n\"renders_total\":"  << m_renders_total;
+
+	o_str << ",\n\"pools_total\":"     << m_pools_total;
+	o_str << ",\n\"renders_total\":"   << m_renders_total;
+	o_str << ",\n\"renders_busy\":"    << m_renders_busy;
+	o_str << ",\n\"renders_ready\":"   << m_renders_ready;
+	o_str << ",\n\"renders_online\":"  << m_renders_online;
+	o_str << ",\n\"renders_offline\":" << m_renders_offline;
+	o_str << ",\n\"renders_nimby\":"   << m_renders_nimby;
+	o_str << ",\n\"renders_paused\":"  << m_renders_paused;
+	o_str << ",\n\"renders_sick\":"    << m_renders_sick;
 
 	o_str << ",\n\"st\":" << m_state;
 	o_str << ",\n";
@@ -248,11 +259,27 @@ void Pool::v_readwrite(Msg * msg)
 	rw_bool   (m_new_paused,             msg);
 
 	rw_int32_t(m_sick_errors_count,      msg);
-
+/*
 	rw_int32_t(m_pools_num,              msg);
 	rw_int32_t(m_pools_total,            msg);
 	rw_int32_t(m_renders_num,            msg);
 	rw_int32_t(m_renders_total,          msg);
+*/
+	rw_int32_t(m_renders_busy,           msg);
+	rw_int32_t(m_renders_ready,          msg);
+	rw_int32_t(m_renders_offline,        msg);
+	rw_int32_t(m_renders_total,          msg);
+/*	NEW_VERSION
+	rw_int32_t(m_pools_total,            msg);
+	rw_int32_t(m_renders_total,          msg);
+	rw_int32_t(m_renders_busy,           msg);
+	rw_int32_t(m_renders_ready,          msg);
+	rw_int32_t(m_renders_online,         msg);
+	rw_int32_t(m_renders_offline,        msg);
+	rw_int32_t(m_renders_nimby,          msg);
+	rw_int32_t(m_renders_paused,         msg);
+	rw_int32_t(m_renders_sick,           msg);
+*/
 
 	rw_int32_t(m_run_tasks,              msg);
 	rw_int32_t(m_run_capacity,           msg);

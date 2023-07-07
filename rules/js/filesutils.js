@@ -264,9 +264,10 @@ function fu_ChecksumDo(i_wnd)
 
 /* ---------------- [ Multi Put structs and functions ] -------------------------------------------------- */
 var fu_putmulti_params = {
-	input /*********/: {"label": 'Result Paths'},
+	input /*********/: {"label": 'Result Paths', "width":'70%'},
+	filesext         : {"label": 'Files Extensions', "default":'mov', "width":'30%', "lwidth":'150px'},
 	skipexisting /**/: {"label": 'Skip Existing', 'type': "bool", 'default': true, "width": '33%'},
-	skiperrors /****/: {"label": 'Skip Errors', 'type': "bool", 'default': false, "width": '33%'},
+	skiperrors /****/: {"label": 'Skip Errors', 'type': "bool", 'default': true, "width": '33%'},
 	skipcheck /*****/: {"label": 'Skip Check', 'type': "bool", 'default': false, "width": '33%'},
 	dest /**********/: {"label": 'Destination'},
 	af_capacity /***/: {'label': 'Capacity', 'width': '20%', 'type': 'int'},
@@ -276,9 +277,10 @@ var fu_putmulti_params = {
 	af_paused /*****/: {'label': 'Paused', 'width': '15%', 'lwidth': '50px', 'type': 'bool'}
 };
 var fu_findres_params = {
+	filesext: {},
 	input: {},
 	dest: {},
-	skiperrors: {'type': "bool", 'default': false},
+	skiperrors: {'type': "bool", 'default': true},
 	skipcheck: {'type': "bool", 'default': false}
 };
 
@@ -360,6 +362,8 @@ function fu_ResultsFind(i_wnd)
 
 	var cmd = 'rules/bin/find_results.py';
 	cmd += ' -r "' + params.input + '"';
+	if (params.filesext.length)
+		cmd += ' --filesext "' + params.filesext + '"';
 	cmd += ' -d "' + c_PathPM_Client2Server(params.dest) + '"';
 	if (params.skipcheck)
 		cmd += ' --skipcheck';
@@ -414,7 +418,7 @@ function fu_ResultsReceived(i_data, i_args)
 	{
 		var el = document.createElement('div');
 		elResults.appendChild(el);
-		el.textContent = 'No results founded.';
+		el.textContent = 'No results found.';
 		el.style.color = '#F42';
 		return;
 	}
@@ -422,7 +426,7 @@ function fu_ResultsReceived(i_data, i_args)
 	var elTable = document.createElement('table');
 	elResults.appendChild(elTable);
 
-	var founded = false;
+	var found = false;
 	for (var i = 0; i < result.results.length; i++)
 	{
 		var res = result.results[i];
@@ -441,7 +445,13 @@ function fu_ResultsReceived(i_data, i_args)
 
 		var el = document.createElement('td');
 		elTr.appendChild(el);
-		el.textContent = res.name;
+		if (res.file)
+		{
+			el.textContent = res.file;
+			elTr.style.color = '#4DD';
+		}
+		else
+			el.textContent = res.name;
 
 		var el = document.createElement('td');
 		elTr.appendChild(el);
@@ -465,10 +475,10 @@ function fu_ResultsReceived(i_data, i_args)
 			elTr.style.color = '#F42';
 		}
 		else
-			founded = true;
+			found = true;
 	}
 
-	if (founded)
+	if (found)
 	{
 		i_args.wnd.m_result = result;
 		for (var i = 0; i < i_args.wnd.m_res_btns_show.length; i++)

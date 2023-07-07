@@ -21,6 +21,7 @@ const int ItemBranch::HeightBranch_Idle = 20;
 
 ItemBranch::ItemBranch(ListWork * i_list_work, af::Branch * i_branch, const CtrlSortFilter * i_ctrl_sf):
 	ItemWork(i_list_work, i_branch, TBranch, i_ctrl_sf),
+	m_paused(false),
 	m_empty(false)
 {
 	// Add buttons:
@@ -42,8 +43,16 @@ void ItemBranch::v_updateValues(af::Node * i_afnode, int i_msgType)
 
 	updateWorkValues(branch);
 
-	jobs_num                   = branch->getJobsNum();
-	jobs_total                 = branch->getJobsTotal();
+	branches_total = branch->getBranchesTotal();
+	jobs_total     = branch->getJobsTotal();
+	jobs_running   = branch->getJobsRunning();
+	jobs_done      = branch->getJobsDone();
+	jobs_error     = branch->getJobsError();
+	jobs_ready     = branch->getJobsReady();
+	tasks_ready    = branch->getTasksReady();
+	tasks_error    = branch->getTasksError();
+
+	m_paused = branch->isPaused();
 
 	m_empty = (0 == jobs_total);
 
@@ -70,7 +79,15 @@ void ItemBranch::v_updateValues(af::Node * i_afnode, int i_msgType)
 	if (Watch::isPadawan())
 	{
 		// Counts:
-		strCounts += QString(" Jobs:%1").arg(jobs_total);
+		if (branches_total) strCounts += QString(" Branches:%1").arg(branches_total);
+		if (jobs_total    ) strCounts += QString(    " Jobs:%1").arg(jobs_total);
+		if (jobs_running  ) strCounts += QString( " Running:%1").arg(jobs_running);
+		if (jobs_ready    ) strCounts += QString(   " Ready:%1").arg(jobs_ready);
+		if (jobs_done     ) strCounts += QString(    " Done:%1").arg(jobs_done);
+		if (jobs_error    ) strCounts += QString(   " Error:%1").arg(jobs_error);
+		if (tasks_ready   ) strCounts += QString(  " TReady:%1").arg(tasks_ready);
+		if (tasks_error   ) strCounts += QString(  " TError:%1").arg(tasks_error);
+
 		if (running_tasks_num)
 		{
 			strCounts += QString(" Tasks:%1").arg(running_tasks_num);
@@ -91,7 +108,15 @@ void ItemBranch::v_updateValues(af::Node * i_afnode, int i_msgType)
 	else if (Watch::isJedi())
 	{
 		// Counts:
-		strCounts += QString(" Jobs:%1").arg(jobs_total);
+		if (branches_total) strCounts += QString(" Branches:%1").arg(branches_total);
+		if (jobs_total    ) strCounts += QString(    " Jobs:%1").arg(jobs_total);
+		if (jobs_running  ) strCounts += QString(     " Run:%1").arg(jobs_running);
+		if (jobs_ready    ) strCounts += QString(     " Rdy:%1").arg(jobs_ready);
+		if (jobs_done     ) strCounts += QString(    " Done:%1").arg(jobs_done);
+		if (jobs_error    ) strCounts += QString(     " Err:%1").arg(jobs_error);
+		if (tasks_ready   ) strCounts += QString(    " TRdy:%1").arg(tasks_ready);
+		if (tasks_error   ) strCounts += QString(    " TErr:%1").arg(tasks_error);
+
 		if (running_tasks_num)
 		{
 			strCounts += QString(" Tasks:%1").arg(running_tasks_num);
@@ -111,7 +136,15 @@ void ItemBranch::v_updateValues(af::Node * i_afnode, int i_msgType)
 	else
 	{
 		// Counts:
-		strCounts += QString(" j:%1").arg(jobs_total);
+		if (branches_total) strCounts += QString(" b:%1").arg(branches_total);
+		if (jobs_total    ) strCounts += QString(" j:%1").arg(jobs_total);
+		if (jobs_running  ) strCounts += QString(" R:%1").arg(jobs_running);
+		if (jobs_ready    ) strCounts += QString(" r:%1").arg(jobs_ready);
+		if (jobs_done     ) strCounts += QString(" d:%1").arg(jobs_done);
+		if (jobs_error    ) strCounts += QString(" E:%1").arg(jobs_error);
+		if (tasks_ready   ) strCounts += QString(" T:%1").arg(tasks_ready);
+		if (tasks_error   ) strCounts += QString(" e:%1").arg(tasks_error);
+
 		if (running_tasks_num)
 		{
 			strCounts += QString(" t:%1").arg(running_tasks_num);
@@ -136,6 +169,8 @@ void ItemBranch::v_updateValues(af::Node * i_afnode, int i_msgType)
 
 	if (isLocked()) strName = "(LOCKED) " + strName;
 
+	if (m_paused) strParameters += " PAUSED";
+
 	m_tooltip = branch->v_generateInfoString(true).c_str();
 
 	updateInfo(branch);
@@ -147,7 +182,7 @@ void ItemBranch::updateInfo(af::Branch * i_branch)
 {
 	m_info_text.clear();
 
-	m_info_text = QString("Jobs: <b>%1</b>").arg(jobs_num);
+	m_info_text = QString("Jobs: <b>%1</b>").arg(jobs_total);
 	m_info_text += "<br>";
 
 	m_info_text += QString("<br>Created: <b>%1</b>").arg(afqt::time2Qstr(i_branch->getTimeCreated()));
@@ -178,7 +213,16 @@ bool ItemBranch::calcHeight()
 
 void ItemBranch::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const
 {
-	drawBack(i_painter, i_rect, i_option);
+	QColor c("#737770");
+	QColor cb("#838780");
+	QColor cp("#555555");
+//	const QColor * itemColor = &(afqt::QEnvironment::clr_itemrender.c);
+//	if (m_running_services.size()) itemColor = &(afqt::QEnvironment::clr_itemrenderbusy.c);
+	const QColor  * itemColor = &c;
+	if (m_paused) itemColor = &cp;
+	else if (isRunning()) itemColor = &cb;
+
+	drawBack(i_painter, i_rect, i_option, itemColor);
 	int x = i_rect.x() + 5;
 	int y = i_rect.y() + 2;
 	int w = i_rect.width() - 10;
@@ -232,7 +276,7 @@ void ItemBranch::v_setSortType(int i_type1, int i_type2)
 			m_sort_str1 = m_name;
 			break;
 		case CtrlSortFilter::TNUMJOBS:
-			m_sort_int1 = jobs_num;
+			m_sort_int1 = jobs_total;
 			break;
 		case CtrlSortFilter::TNUMRUNNINGTASKS:
 			m_sort_int1 = running_tasks_num;
@@ -259,7 +303,7 @@ void ItemBranch::v_setSortType(int i_type1, int i_type2)
 			m_sort_str2 = m_name;
 			break;
 		case CtrlSortFilter::TNUMJOBS:
-			m_sort_int2 = jobs_num;
+			m_sort_int2 = jobs_total;
 			break;
 		case CtrlSortFilter::TNUMRUNNINGTASKS:
 			m_sort_int2 = running_tasks_num;

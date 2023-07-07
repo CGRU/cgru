@@ -25,22 +25,28 @@ else
     NUKE_INSTALL_DIR="/usr/local"
 fi
 
-NUKE_FOLDERS=`ls "$NUKE_INSTALL_DIR"`
-NUKE_LOCATION=""
-NUKE_EXEC=""
-for NUKE_FOLDER in $NUKE_FOLDERS ;
-do
-   if [ "`echo $NUKE_FOLDER | awk '{print match( \$1, "Nuke")}'`" == "1" ]; then
-      NUKE_LOCATION="${NUKE_INSTALL_DIR}/${NUKE_FOLDER}"
-      if [ "`uname`" == "Darwin" ]; then
-        NUKE_EXEC="${NUKE_FOLDER}.app/${NUKE_FOLDER}"
-      else
-        NUKE_EXEC="`echo $NUKE_FOLDER | awk '{print substr( \$1, 1, -1+match( \$1, "v.*"))}'`"
-      fi
-   fi
-done
-
-export NUKE_EXEC="${NUKE_LOCATION}/${NUKE_EXEC}"
+# Get the latest Nuke location if not set
+if [ -z "$NUKE_LOCATION" ]; then
+	if [ -z "$NUKE_EXEC" ]; then
+		for NUKE_FOLDER in `ls "$NUKE_INSTALL_DIR"`; do
+			if [ "`echo $NUKE_FOLDER | awk '{print match( \$1, "Nuke")}'`" == "1" ]; then
+				NUKE_LOCATION="${NUKE_INSTALL_DIR}/${NUKE_FOLDER}"
+			fi
+		done
+	else
+		NUKE_LOCATION=`dirname "$NUKE_EXEC"`
+	fi
+fi
+# Pocess Nuke executable if not set
+if [ -z "$NUKE_EXEC" ]; then
+	NUKE_FOLDER=`basename "$NUKE_LOCATION"`
+	if [ "`uname`" == "Darwin" ]; then
+		NUKE_EXEC="${NUKE_FOLDER}.app/${NUKE_FOLDER}"
+	else
+		NUKE_EXEC="`echo $NUKE_FOLDER | awk '{print substr( \$1, 1, -1+match( \$1, "v.*"))}'`"
+	fi
+	NUKE_EXEC="${NUKE_LOCATION}/${NUKE_EXEC}"
+fi
 
 # Check that Nuke is correctly found:
 if [ -z "$NUKE_LOCATION" ]; then

@@ -36,23 +36,6 @@ function tasks_Finish()
 	$('status_tasks').textContent = '';
 }
 
-function task_ShowTasks(i_statusClass)
-{
-	tasks_Finish();
-
-	if ((null == i_statusClass) || (null == i_statusClass.obj) || (null == i_statusClass.obj.tasks))
-		return;
-
-	if (Array.isArray(i_statusClass.obj.tasks) && (i_statusClass.obj.tasks.length == 0))
-	{
-		delete i_statusClass.obj.tasks;
-		return;
-	}
-
-	for (let task in i_statusClass.obj.tasks)
-		new Task(i_statusClass, i_statusClass.obj.tasks[task]);
-}
-
 function task_AddTask()
 {
 	new Task();
@@ -73,15 +56,20 @@ function task_AddArtistTask()
 	new Task(null, task);
 }
 
-function Task(i_statusClass, i_task)
+function Task(i_statusClass, i_task, i_args)
 {
-	task_CurrentTasks.push(this);
-
 	this.statusClass = i_statusClass;
 	if (this.statusClass == null)
 		this.statusClass = st_Status;
 	if (this.statusClass == null)
 		this.statusClass = {};
+
+	this.multi = false;
+	if (this.statusClass.multi)
+		this.multi = true;
+
+	if (false == this.multi)
+		task_CurrentTasks.push(this);
 
 	this.obj = i_task;
 	if (this.obj == null)
@@ -107,7 +95,7 @@ function Task(i_statusClass, i_task)
 		this.obj.deleted = false;
 
 
-	this.elParent = $('status_tasks');
+	this.elParent = this.statusClass.elTasks;
 
 
 	this.elRoot = document.createElement('div');
@@ -123,7 +111,8 @@ function Task(i_statusClass, i_task)
 	this.elName = document.createElement('div');
 	this.elName.classList.add('name','notselectable');
 	this.elName.m_task = this;
-	this.elName.onclick = function(e){e.currentTarget.m_task.select()};
+	if (false == this.multi)
+		this.elName.onclick = function(e){e.currentTarget.m_task.select()};
 	this.elShow.appendChild(this.elName);
 
 
@@ -183,7 +172,7 @@ function Task(i_statusClass, i_task)
 
 	// We should start to edit new added task
 	if (this.obj.name == null)
-		this.edit();
+		this.edit(i_args);
 	else
 		this.show();
 
@@ -193,7 +182,7 @@ function Task(i_statusClass, i_task)
 
 Task.prototype.show = function()
 {
-	if (activity_Current == this.obj.name)
+	if ((activity_Current == this.obj.name) && (false == this.multi))
 		this.select();
 
 	//st_SetElTags(this.obj, this.elName);
@@ -282,7 +271,7 @@ Task.prototype.updateOrEdit = function(i_status)
 		this.edit();
 }
 
-Task.prototype.edit = function()
+Task.prototype.edit = function(i_args)
 {
 	if (this.editing)
 		return;
@@ -304,7 +293,7 @@ Task.prototype.edit = function()
 	this.elBtnSave.classList.add('button','right');
 	this.elBtnSave.textContent = 'Save';
 	this.elBtnSave.m_task = this;
-	this.elBtnSave.onclick = function(e){e.stopPropagation();e.currentTarget.m_task.editProcess();}
+	this.elBtnSave.onclick = function(e){e.stopPropagation();e.currentTarget.m_task.editProcess(i_args);}
 	this.elEdit.appendChild(this.elBtnSave);
 
 
@@ -390,7 +379,7 @@ Task.prototype.edit = function()
 		this.elBtnDelete.title = 'Double click to delete task.';
 		this.elBtnDelete.m_task = this;
 		this.elBtnDelete.onclick = function(e){e.stopPropagation();}
-		this.elBtnDelete.ondblclick = function(e){e.stopPropagation();e.currentTarget.m_task.editDelete();}
+		this.elBtnDelete.ondblclick = function(e){e.stopPropagation();e.currentTarget.m_task.editDelete(i_args);}
 		this.elEdit.appendChild(this.elBtnDelete);
 	}
 }
@@ -416,8 +405,11 @@ Task.prototype.editCancel = function()
 	this.elShow.style.display = 'block';
 }
 
-Task.prototype.editProcess = function()
+Task.prototype.editProcess = function(i_args)
 {
+	if (i_args == null)
+		i_args = {};
+
 	let this_is_a_new_task = false;
 
 	// Store previous progress to find out that it was changed
@@ -509,13 +501,21 @@ Task.prototype.editProcess = function()
 		this.obj.annotation = '';
 
 
+	if (0)//document.location.hostname != 'localhost')
+	{
 	// We should calculate status progress
 	// if task progress is changed
 	// or if it is a new task
-	this.save(this_is_a_new_task || (progress_prevous != this.obj.progress));return;
+		this.save(this_is_a_new_task || (progress_prevous != this.obj.progress));
+		return;
+	}
 
 	let obj = {};
-	obj.path = this.statusClass.path;
+	if (i_args.paths && i_args.paths.length)
+		obj.paths = i_args.paths;
+	else
+		obj.paths = [this.statusClass.path];
+
 	let fields = ['name','artists','flags','tags','progress','annotation'];
 	for (let f of fields)
 		obj[f] = this.obj[f];
@@ -603,7 +603,7 @@ Task.prototype.save = function(i_progress_changed)
 		st_UpdateProgresses(this.statusClass.path, progresses);
 }
 
-Task.prototype.editDelete = function()
+Task.prototype.editDelete = function(i_args = {})
 {
 	let index = task_CurrentTasks.indexOf(this);
 	if (index != -1)
@@ -615,7 +615,22 @@ Task.prototype.editDelete = function()
 
 	this.obj.deleted = true;
 
+	if (0)//document.location.hostname != 'localhost')
+	{
 	this.save(this.obj.progress);
+	return;
+	}
+
+	let obj = {'name':this.obj.name,'deleted':true};
+	if (i_args.paths && i_args.paths.length)
+		obj.paths = i_args.paths;
+	else
+		obj.paths = [this.statusClass.path];
+
+	if (nw_disabled)
+		obj.nonews = true;
+
+	n_Request({'send':{'settask':obj},'func':st_StatusesSaved,'info':'status.setTask','wait':false});
 }
 
 function task_DrawBadges(i_status, i_el, i_args)
@@ -637,6 +652,8 @@ function task_DrawBadges(i_status, i_el, i_args)
 
 	if (null == i_el.m_elTasks)
 		i_el.m_elTasks = {};
+
+	let elBages = [];
 
 	for (let t in i_status.tasks)
 	{
@@ -692,7 +709,11 @@ function task_DrawBadges(i_status, i_el, i_args)
 		st_SetElProgress(task, elProgressBar, elProgress);
 
 		activity_TaskBadgeFilter(elTask);
+
+		elBages.push(elTask);
 	}
+
+	return elBages;
 }
 
 function task_StatusTagClicked(i_name)

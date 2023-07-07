@@ -162,6 +162,33 @@ void BranchSrv::v_action(Action & i_action)
 			deleteBranch(i_action, i_action.monitors);
 			return;
 		}
+		else if (type == "delete_done_jobs")
+		{
+			deleteDoneJobs(i_action, i_action.monitors);
+		}
+		else if (type == "pause")
+		{
+			if (isPaused())
+				return;
+			setPaused(true);
+		}
+		else if (type == "start")
+		{
+			if (false == isPaused())
+				return;
+			setPaused(false);
+		}
+		else
+		{
+			i_action.answerError("Unknown operation '" + type + "'");
+			appendLog("Unknown operation \"" + type + "\" by " + i_action.author);
+			return;
+		}
+
+		appendLog("Operation \"" + type + "\" by " + i_action.author);
+		i_action.monitors->addEvent(af::Monitor::EVT_branches_change, m_id);
+		store();
+		return;
 	}
 
 	const JSON & params = (*i_action.data)["params"];
@@ -192,7 +219,7 @@ void BranchSrv::deleteBranch(Action & o_action, MonitorContainer * i_monitoring)
 		return;
 	}
 
-	if (m_branches_num || m_jobs_num)
+	if (m_branches_total || m_jobs_total)
 	{
 		o_action.answerError("Branch['" + m_name + "'] has child branches/jobs.");
 		return;
@@ -205,13 +232,30 @@ void BranchSrv::deleteBranch(Action & o_action, MonitorContainer * i_monitoring)
 		i_monitoring->addEvent(af::Monitor::EVT_branches_del, m_id);
 }
 
+void BranchSrv::deleteDoneJobs(Action & o_action, MonitorContainer * i_monitoring)
+{
+	std::list<JobAf*> jobs;
+	AfListIt jIt(&m_jobs_list);
+	for (AfNodeSrv * node = jIt.node(); node != NULL; jIt.next(), node = jIt.node())
+	{
+		JobAf * job = static_cast<JobAf*>(node);
+		if (job->isDone())
+			jobs.push_back(job);
+	}
+
+	o_action.answerLog("Deleting " + af::itos(jobs.size()) + " jobs.");
+
+	for (auto & job : jobs)
+		job->deleteNode(NULL, i_monitoring);
+
+	return;
+}
+
 void BranchSrv::addBranch(BranchSrv * i_branch)
 {
 	appendLog(std::string("Adding a branch: ") + i_branch->getName());
 
 	m_branches_list.add(i_branch);
-
-	m_branches_num++;
 }
 
 void BranchSrv::removeBranch(BranchSrv * i_branch)
@@ -219,8 +263,6 @@ void BranchSrv::removeBranch(BranchSrv * i_branch)
 	appendLog(std::string("Removing a branch: ") + i_branch->getName());
 
 	m_branches_list.remove(i_branch);
-
-	m_branches_num--;
 }
 
 void BranchSrv::addJob(JobAf * i_job, UserAf * i_user)
@@ -243,8 +285,6 @@ void BranchSrv::addJob(JobAf * i_job, UserAf * i_user)
 
 	// Add job to user (create new branch user if not exists)
 	addUserJob(i_job, i_user);
-
-	m_jobs_num++;
 }
 
 void BranchSrv::addUserJob(JobAf * i_job, UserAf * i_user)
@@ -274,8 +314,6 @@ void BranchSrv::removeJob(JobAf * i_job, UserAf * i_user)
 
 	// Remove job from m_users
 	remUserJob(i_job, i_user);
-
-	m_jobs_num--;
 }
 
 void BranchSrv::remUserJob(JobAf * i_job, UserAf * i_user)
@@ -355,10 +393,15 @@ void BranchSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, Monit
 	bool tostore = false;
 
 	// Init counters:
-	int32_t _branches_num = 0;
 	int32_t _branches_total = 0;
-	int32_t _jobs_num = 0;
-	int32_t _jobs_total = 0;
+	int32_t _jobs_total     = 0;
+	int32_t _jobs_running   = 0;
+	int32_t _jobs_done      = 0;
+	int32_t _jobs_error     = 0;
+	int32_t _jobs_ready     = 0;
+	int32_t _tasks_ready    = 0;
+	int32_t _tasks_error    = 0;
+
 	// Store values:
 	int64_t _time_empty = m_time_empty;
 
@@ -366,20 +409,36 @@ void BranchSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, Monit
 	AfListIt bIt(&m_branches_list);
 	for (AfNodeSrv * node = bIt.node(); node != NULL; bIt.next(), node = bIt.node())
 	{
-		BranchSrv * branch = (BranchSrv*)node;
+		BranchSrv * branch = static_cast<BranchSrv*>(node);
 
-		_branches_num++;
 		_branches_total++;
 		_branches_total += branch->m_branches_total;
-		_jobs_total += branch->m_jobs_total;
+
+		_jobs_total     += branch->m_jobs_total;
+		_jobs_running   += branch->m_jobs_running;
+		_jobs_done      += branch->m_jobs_done;
+		_jobs_ready     += branch->m_jobs_ready;
+		_jobs_error     += branch->m_jobs_error;
+
+		_tasks_ready    += branch->m_tasks_ready;
+		_tasks_error    += branch->m_tasks_error;
 	}
 
 	// Iterate jobs
 	AfListIt jIt(&m_jobs_list);
 	for (AfNodeSrv * node = jIt.node(); node != NULL; jIt.next(), node = jIt.node())
 	{
-		_jobs_num++;
+		JobAf * job = static_cast<JobAf*>(node);
+
 		_jobs_total++;
+
+		if (job->isRunning()) _jobs_running++;
+		if (job->isDone())    _jobs_done++;
+		if (job->isReady())   _jobs_ready++;
+		if (job->isError())   _jobs_error++;
+
+		_tasks_ready += job->getTasksReady();
+		_tasks_error += job->getTasksError();
 	}
 
 	// Store empty time (total jobs == 0)
@@ -397,10 +456,17 @@ void BranchSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, Monit
 	}
 
 	// Compare changes
-	if ((_branches_num   != m_branches_num  ) ||
-		(_branches_total != m_branches_total) ||
-		(_jobs_num       != m_jobs_num      ) ||
+	if ((_branches_total != m_branches_total) ||
+
 		(_jobs_total     != m_jobs_total    ) ||
+		(_jobs_running   != m_jobs_running  ) ||
+		(_jobs_done      != m_jobs_done     ) ||
+		(_jobs_ready     != m_jobs_ready    ) ||
+		(_jobs_error     != m_jobs_error    ) ||
+
+		(_tasks_ready    != m_tasks_ready   ) ||
+		(_tasks_error    != m_tasks_error   ) ||
+
 		(_time_empty     != m_time_empty    ))
 		changed = true;
 
@@ -408,10 +474,17 @@ void BranchSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, Monit
 		tostore = true;
 
 	// Store new calculations
-	m_branches_num   = _branches_num;
 	m_branches_total = _branches_total;
-	m_jobs_num       = _jobs_num;
+
 	m_jobs_total     = _jobs_total;
+	m_jobs_running   = _jobs_running;
+	m_jobs_done      = _jobs_done;
+	m_jobs_ready     = _jobs_ready;
+	m_jobs_error     = _jobs_error;
+
+	m_tasks_ready    = _tasks_ready;
+	m_tasks_error    = _tasks_error;
+
 	m_time_empty     = _time_empty;
 
 	// Emit events on changes
@@ -431,6 +504,9 @@ bool BranchSrv::v_canRun()
 		return false;
 	}
 
+	if (isPaused())
+		return false;
+
 	return true;
 }
 
@@ -443,7 +519,7 @@ RenderAf * BranchSrv::v_solve(std::list<RenderAf*> & i_renders_list, MonitorCont
 {
 	std::list<AfNodeSolve*> solve_list;
 
-	if (m_branches_num)
+	if (m_branches_list.getCount())
 	{
 		// Iterate child branches
 		AfListIt it(&m_branches_list);
@@ -458,7 +534,7 @@ RenderAf * BranchSrv::v_solve(std::list<RenderAf*> & i_renders_list, MonitorCont
 		}
 	}
 
-	if (isSolveJobs() && m_jobs_num)
+	if (isSolveJobs() && m_jobs_list.getCount())
 	{
 		// Iterate child jobs
 		AfListIt it(&m_jobs_list);

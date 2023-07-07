@@ -154,7 +154,7 @@ const std::string af::vectToStr( const std::vector<int32_t> & i_vec)
 	return o_str;
 }
 
-const long long af::stoi( const std::string & str, bool * ok)
+long long af::stoi( const std::string & str, bool * ok)
 {
 	if( str.empty())
 	{

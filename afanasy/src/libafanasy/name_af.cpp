@@ -79,8 +79,10 @@ int af::launchProgram( const std::string & i_commandline, const std::string & i_
                        FILE ** o_in, FILE ** o_out, FILE ** o_err)
 {
     const char * wdir = NULL;
-    if( i_wdir.size() > 0 )
+    if (i_wdir.size() > 0)
+	{
         wdir = i_wdir.c_str();
+	}
 
 	std::vector<std::string> shellWithArgs = af::strSplit( af::Environment::getCmdShell());
 	if( shellWithArgs.size() == 0 )

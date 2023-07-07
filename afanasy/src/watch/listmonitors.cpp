@@ -61,7 +61,7 @@ ListMonitors::ListMonitors( QWidget* parent):
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actExit()));
 
 
-	m_parentWindow->setWindowTitle("Monitors");
+	this->setWindowTitleWithPrefix("Monitors");
 
 	initListNodes();
 }
@@ -154,7 +154,7 @@ void ListMonitors::calcTitle()
 		ItemMonitor * itemmonitor = static_cast<ItemMonitor*>(m_model->item(i));
 		if (itemmonitor->isSuperUser()) super++;
 	}
-	m_parentWindow->setWindowTitle(QString("Monitors: %1, Super users %2").arg(total).arg(super));
+	this->setWindowTitleWithPrefix(QString("Monitors: %1, Super users %2").arg(total).arg(super));
 }
 
 void ListMonitors::actSendMessage()

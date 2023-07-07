@@ -53,6 +53,8 @@ AttrNumber QEnvironment::savePrefsOnExit(    "saveprefsonexit",      "Save On Ex
 AttrNumber QEnvironment::saveWndRectsOnExit( "savewndrectonexit",    "Save Windows Geometry",   AFGUI::SAVEWNDRECTS            );
 AttrNumber QEnvironment::saveGUIOnExit(      "saveguionexit",        "Save Gui Settings",       AFGUI::SAVEGUI                 );
 AttrNumber QEnvironment::saveHotkeysOnExit(  "savehotkeysonexit",    "Save Hotkeys",            AFGUI::SAVEHOTKEYS             );
+AttrNumber QEnvironment::showServerName(     "showservername",       "Show Server Name",        0                              );
+AttrNumber QEnvironment::showServerPort(     "showserverport",       "Show Server Port",        0                              );
 AttrNumber QEnvironment::showOfflineNoise(   "showofflinenoise",     "Show Offline Noise",      AFGUI::SHOWOFFLINENOISE        );
 
 Attr       QEnvironment::font_family(        "font_family",          "Font Family",             AFGUI::FONT_FAMILY             );
@@ -159,6 +161,8 @@ QEnvironment::QEnvironment( const QString & i_name)
     ms_attrs_prefs.append( &saveWndRectsOnExit );
     ms_attrs_prefs.append( &saveGUIOnExit      );
     ms_attrs_prefs.append( &saveHotkeysOnExit  );
+    ms_attrs_prefs.append(&showServerName      );
+    ms_attrs_prefs.append(&showServerPort      );
     ms_attrs_prefs.append( &showOfflineNoise   );
 
 	ms_attrs_prefs.append(&thumb_jobs_height);

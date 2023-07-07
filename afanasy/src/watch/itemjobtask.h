@@ -37,7 +37,7 @@ public:
 	inline const std::vector<std::string> & getFiles() {
 		processFiles();return m_files;}
 
-	inline const long long getFramesNum() const { return m_frames_num; }
+	inline long long getFramesNum() const { return m_frames_num; }
 
 	af::TaskProgress taskprogress;
 
