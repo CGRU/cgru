@@ -308,7 +308,7 @@ function bm_Show()
 				bm_elements.push(el);
 				scene.el.appendChild(el);
 
-				if (bm.status.flags)
+				if (bm.status && bm.status.flags)
 				{
 					for (let flag of bm.status.flags)
 					{
@@ -319,7 +319,7 @@ function bm_Show()
 					}
 				}
 
-				if (bm.status.tasks)
+				if (bm.status && bm.status.tasks)
 				{
 					for (let task in bm.status.tasks)
 					{
