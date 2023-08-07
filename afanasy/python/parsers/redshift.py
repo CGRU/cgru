@@ -22,6 +22,7 @@ re_triangles = re.compile(r'(.*)(Total triangles:)(\s*)(\d*)')
 re_frame_start = re.compile(r'.*Rendering.*frame [0-9]+\.\.\.')
 re_frame_skip = re.compile(r'.*Skipping frame.*')
 re_frame_done = re.compile(r'.*Frame.*done.*')
+re_rendering_done = re.compile(r'.*Rendering done.*')
 
 
 class redshift(parser.parser):
@@ -72,8 +73,7 @@ class redshift(parser.parser):
                 self.block_count = max(self.block_count, found_block_count)
 
                 # calculate percentage
-                percent = \
-                    int(100.0 * self.block / float(self.block_count))
+                percent = int(100.0 * self.block / float(self.block_count))
 
             triangles = None
             search = re_triangles.search(line)
@@ -90,7 +90,7 @@ class redshift(parser.parser):
                     self.triangles = triangles
 
         if self.triangles:
-            self.resources = 'triangles:%d' % self.triangles
+            self.resources = 'triangles:{}'.format(self.triangles)
 
         if self.percentframe < percent:
             self.percentframe = int(percent)
@@ -105,5 +105,13 @@ class redshift(parser.parser):
             if match:
                 self.percentframe = 0
                 self.frame += len(match)
+
+        match = re_rendering_done.findall(data)
+        if match:
+            if self.numframes > 1:
+                self.percentframe = 0
+                self.frame = self.numframes
+            else:
+                self.percentframe = 100
 
         self.calculate()
