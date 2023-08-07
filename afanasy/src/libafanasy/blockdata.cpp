@@ -1398,13 +1398,10 @@ void BlockData::remSolveCounts(TaskExec *i_exec, Render * i_render)
 		m_srv_info = i_render->getName();
 }
 
-// Functions to update tasks progress and block progress bar:
-// (for monitoring purpoces only, no meaning for server)
+// Functions to update tasks progress and block progress:
 bool BlockData::updateProgress(JobProgress *progress)
 {
 	bool changed = false;
-
-	updateBars(progress);
 
 	// Just store depend state, all other flags will be calculated
 	m_state = m_state & AFJOB::STATE_WAITDEP_MASK;
@@ -1510,6 +1507,7 @@ bool BlockData::updateProgress(JobProgress *progress)
 	return changed;
 }
 
+// (for monitoring purpoces only, no meaning for server)
 void BlockData::updateBars(JobProgress *progress)
 {
 	// Set to zeros:

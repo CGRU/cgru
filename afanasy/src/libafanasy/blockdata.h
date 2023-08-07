@@ -265,6 +265,11 @@ public:
 	void remSolveCounts(TaskExec * i_exec, Render * i_render);
 
 	bool updateProgress(JobProgress *progress);
+
+	// Functions to update tasks progress and progress bar:
+	// (for information purpose only, no meaning for server)
+	void updateBars(JobProgress *progress);
+
 	inline const char *getProgressBar() const { return p_progressbar; }
 	inline int getProgressPercentage() const { return p_percentage; }
 	inline int getProgressErrorHostsNum() const { return p_error_hosts; }
@@ -421,9 +426,6 @@ private:
 	void setVariableCapacity(int i_capacity_coeff_min, int i_capacity_coeff_max);
 	bool setMultiHost(int i_min, int i_max, int i_waitmax, const std::string &i_service, int i_waitsrv);
 
-	// Functions to update tasks progress and progress bar:
-	// (for information purpose only, no meaning for server)
-	void updateBars(JobProgress *progress);
 	/// Set one exact \c pos bit in \c array to \c value .
 	static void setProgressBit(uint8_t *array, int pos, bool value);
 	/// Set progress bits in \c array with \c size at \c pos to \c value .
