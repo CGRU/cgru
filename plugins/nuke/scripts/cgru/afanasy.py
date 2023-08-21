@@ -717,7 +717,10 @@ class JobParameters:
             job.setAnyOS()
         else:
             job.setNativeOS()
-        job.setCmdPost('deletefiles "%s"' % self.scene_path)
+
+        # If we render temporary scene, post command should delete it:
+        if self.tmpscene:
+            job.setCmdPost('deletefiles "%s"' % self.scene_path)
 
         job.blocks = blocks
 
