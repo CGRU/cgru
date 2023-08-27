@@ -24,6 +24,3 @@ set LIGHTWAVE_LOCATION=%APP_DIR%
 set LIGHTWAVE_CGRU_PATH=%CGRU_LOCATION%\plugins\lightwave
 
 @REM set PYTHONPATH=%LIGHTWAVE_CGRU_PATH%;%PYTHONPATH%
-
-@REM CGRU Sets PYTHONHOME, but Lightwave start fails if it is set
-set PYTHONHOME=
