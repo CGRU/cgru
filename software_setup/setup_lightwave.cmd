@@ -18,9 +18,4 @@ rem Define location:
 set locate_file=%CGRU_LOCATION%\software_setup\locate_lightwave.cmd
 if exist %locate_file% call %locate_file%
 
-set LIGHTWAVE_LOCATION=%APP_DIR%
-
-@REM TODO Roll lightwave_afanasy plugin into this dir?
-set LIGHTWAVE_CGRU_PATH=%CGRU_LOCATION%\plugins\lightwave
-
-@REM set PYTHONPATH=%LIGHTWAVE_CGRU_PATH%;%PYTHONPATH%
+set PYTHONSTARTUP=%CGRU_LOCATION%\plugins\lightwave\startup.py
