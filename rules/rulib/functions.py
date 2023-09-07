@@ -16,6 +16,9 @@ def randMD5():
 def getCurSeconds():
     return round(time.time())
 
+def getCurMSeconds():
+    return round(time.time() * 1000)
+
 def getCurUser():
     return getpass.getuser()
 

@@ -24,6 +24,7 @@ GUESTCANCREATE = ['status.json', 'comments.json']
 GUESTCANEDIT = ['comments.json']
 
 
+from . import comments
 from . import editobj
 from . import functions
 from . import news
@@ -126,3 +127,25 @@ def setTask(paths=None, uid=None, name=None, tags=None, artists=None, flags=None
         status.updateUpperProgresses(os.path.dirname(st.path), progresses, out)
 
     return out
+
+def setComment(paths=None, uid=None, ctype=None, text=None, tags=None, duration=None, nonews=None, out=None):
+    if out is None:
+        out = dict()
+    if paths is None or paths == []:
+        paths = [None]
+ 
+    out['comments'] = []
+    for path in paths:
+        cms = comments.Comments(uid, path)
+        cms.add(ctype=ctype, text=text, tags=tags, duration=duration, out=out)
+        _out = dict()
+        cms.save(_out)
+
+        if 'error' in _out:
+            out['error'] = _out['error']
+            return out
+
+        out['comments'].append({"path":cms.path,"comments":cms.data})
+
+        return out
+
