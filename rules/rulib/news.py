@@ -414,10 +414,28 @@ def statusesChanged(i_statuses, out=dict(), nonews=False):
         makeNewsAndBookmarks({'news':news}, i_statuses[0].data['muser'], out=out, nonews=nonews)
 
 
+def commentsChanged(i_path_cdata, out=dict(), nonews=False):
+    news = []
+    uid = None
+    title = 'comment'
+    for path in i_path_cdata:
+        cdata = i_path_cdata[path]
+        sdata = rulib.status.getStatusData(path)
+        print(path)
+        print(sdata)
+        if 'type' in cdata and cdata['type'] == 'report':
+            title = 'report'
+        if 'user_name' in cdata:
+            uid = cdata['user_name']
+        news.append(createNews(title=title, path=path, uid=uid, status=sdata))
+    if len(news):
+        makeNewsAndBookmarks({'news':news}, uid, out=out, nonews=nonews)
+
+
 def createNews(title='news',uid=None,path=None,status=None):
     if uid is None: uid = rulib.functions.getCurUser()
     if path is None: path = os.getcwd()
-    if status is None: rulib.status.getStatusData()
+    if status is None: rulib.status.getStatusData(path)
 
     news = dict()
     news['title'] = title
