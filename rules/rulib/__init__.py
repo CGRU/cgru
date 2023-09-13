@@ -128,7 +128,7 @@ def setTask(paths=None, uid=None, name=None, tags=None, artists=None, flags=None
 
     return out
 
-def setComment(paths=None, uid=None, ctype=None, text=None, tags=None, duration=None, nonews=None, out=None):
+def setComment(paths=None, uid=None, ctype=None, text=None, tags=None, duration=None, deleted=False, nonews=None, out=None, key=None):
     if out is None:
         out = dict()
     if paths is None or paths == []:
@@ -138,7 +138,7 @@ def setComment(paths=None, uid=None, ctype=None, text=None, tags=None, duration=
     path_cdata = dict()
     for path in paths:
         cms = comments.Comments(uid, path)
-        cdata = cms.add(ctype=ctype, text=text, tags=tags, duration=duration, out=out)
+        cdata = cms.add(ctype=ctype, text=text, tags=tags, duration=duration, deleted=deleted, out=out, key=key)
         path_cdata[path] = cdata
         _out = dict()
         cms.save(_out)

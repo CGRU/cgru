@@ -57,15 +57,22 @@ class Comments:
     def __str__(self):
         return json.dumps({"comments":self.data})
 
-    def add(self, ctype=None, text=None, tags=None, duration=None, out=None):
-
-        ctime = rulib.functions.getCurMSeconds()
-        key = "%d_%s" % (ctime, self.uid)
+    def add(self, ctype=None, text=None, tags=None, duration=None, deleted=False, out=None, key=None):
 
         cdata = dict()
-        cdata['user_name'] = self.uid
-        cdata['ctime'] = ctime
-        cdata['key'] = key
+        ctime = rulib.functions.getCurMSeconds()
+        if key is None:
+            key = "%d_%s" % (ctime, self.uid)
+            cdata['cuser'] = self.uid
+            cdata['ctime'] = ctime
+            cdata['key'] = key
+        else:
+            if not key in self.data:
+                out['error'] = 'No comments with key=%s' % key
+                return None
+            cdata = self.data[key]
+            cdata['muser'] = self.uid
+            cdata['mtime'] = ctime
 
         if ctype is not None:
             cdata['type'] = ctype
@@ -75,6 +82,8 @@ class Comments:
             cdata['tags'] = tags
         if duration is not None:
             cdata['duration'] = duration
+        if deleted:
+            cdata['deleted'] = True
 
         self.data[key] = cdata
 
