@@ -263,6 +263,14 @@ function cm_Goto(i_key)
 
 function Comment(i_obj)
 {
+    // Translate OLD user vars:
+    if (i_obj)
+    {
+        if (i_obj.user_name)  {i_obj.cuser = i_obj.user_name;  delete i_obj.user_name;}
+        if (i_obj.muser_name) {i_obj.muser = i_obj.muser_name; delete i_obj.muser_name;}
+    }
+
+
 	// window.console.log( JSON.stringify( i_obj));
 	this.el = document.createElement('div');
 	if (ASSET && ASSET.comments_reversed)
@@ -413,7 +421,7 @@ Comment.prototype.init = function() {
 		this._new = true;
 		if (g_auth_user)
 		{
-			this.obj.user_name = g_auth_user.id;
+			this.obj.cuser = g_auth_user.id;
 			/*
 			if (g_auth_user.tag && g_auth_user.tag.length)
 			{
@@ -428,37 +436,37 @@ Comment.prototype.init = function() {
 	let signature = null;
 
 	// Get user object:
-	if (this.obj.user_name && g_users[this.obj.user_name])
-		user = g_users[this.obj.user_name];
+	if (this.obj.cuser && g_users[this.obj.cuser])
+		user = g_users[this.obj.cuser];
 	else if (this.obj.guest)
 		user = this.obj.guest;
 	if (user == null)
 		user = {};
 
-	if (this.obj.user_name)
-		this.elUser.textContent = c_GetUserTitle(this.obj.user_name, this.obj.guest);
+	if (this.obj.cuser)
+		this.elUser.textContent = c_GetUserTitle(this.obj.cuser, this.obj.guest);
 
 	// Signature:
 	if (user.signature)
 		this.elSignature.textContent = user.signature;
 
-	// console.log( g_auth_user.id + ' ' + this.obj.user_name );
+	// console.log( g_auth_user.id + ' ' + this.obj.cuser );
 	if (g_auth_user)
 	{
 		// Edit button only for admins or a comment owner:
-		if (g_admin || (this.obj && (this.obj.user_name == g_auth_user.id)))
+		if (g_admin || (this.obj && (this.obj.cuser == g_auth_user.id)))
 			this.elEdit.style.display = 'block';
 		else
 			this.elEdit.style.display = 'none';
 
 		// If this is a new comment or and own old:
-		if ((this.obj == null) || (this.obj.user_name == g_auth_user.id))
+		if ((this.obj == null) || (this.obj.cuser == g_auth_user.id))
 			this.el.classList.add('own');
 	}
 	else
 		this.elEdit.style.display = 'none';
 
-	avatar = c_GetAvatar(this.obj.user_name, this.obj.guest);
+	avatar = c_GetAvatar(this.obj.cuser, this.obj.guest);
 	if (avatar != null)
 	{
 		this.elAvatar.src = avatar;
@@ -499,7 +507,7 @@ Comment.prototype.init = function() {
 		let date = c_DT_StrFromMSec(this.obj.mtime);
 		if (info.length)
 			info += '<br>';
-		info += 'Modified: ' + c_GetUserTitle(this.obj.muser_name) + ' ' + date;
+		info += 'Modified: ' + c_GetUserTitle(this.obj.muser) + ' ' + date;
 	}
 
 	this.elInfo.innerHTML = info;
@@ -748,7 +756,7 @@ Comment.prototype.save = function() {
 	if (g_auth_user == null)
 	{
 		this.obj.guest = u_GuestAttrsGet(this.elForEdit);
-		this.obj.user_name = this.obj.guest.id;
+		this.obj.cuser = this.obj.guest.id;
 	}
 
 	this.obj.text = c_LinksProcess(this.elText.innerHTML);
@@ -778,10 +786,10 @@ Comment.prototype.save = function() {
 	else
 	{
 		this.obj.mtime = (new Date()).getTime();
-		this.obj.muser_name = g_auth_user.id;
+		this.obj.muser = g_auth_user.id;
 	}
 
-	let key = this.obj.ctime + '_' + this.obj.user_name;
+	let key = this.obj.ctime + '_' + this.obj.cuser;
 
 	this.obj.key = key;
 	this.init();
@@ -805,9 +813,9 @@ Comment.prototype.saveFinished = function(i_data, i_args) {
 	if (c_NullOrErrorMsg(i_data))
 		return;
 
-	let news_user = i_args.this.obj.user_name;
-	if (i_args.this.obj.muser_name)
-		news_user = i_args.this.obj.muser_name;
+	let news_user = i_args.this.obj.cuser;
+	if (i_args.this.obj.muser)
+		news_user = i_args.this.obj.muser;
 
 	let news_title = 'comment';
 	if (i_args.this.obj.type == 'report')
@@ -847,10 +855,10 @@ Comment.prototype.sendEmails = function() {
 		body += '<br><br>';
 		body += this.obj.text;
 		body += '<br><br>';
-		let user = c_GetUserTitle(this.obj.user_name, this.obj.guest);
+		let user = c_GetUserTitle(this.obj.cuser, this.obj.guest);
 		body += user;
-		if (user != this.obj.user_name)
-			body += ' [' + this.obj.user_name + ']';
+		if (user != this.obj.cuser)
+			body += ' [' + this.obj.cuser + ']';
 
 		n_SendMail(email, subject, body);
 	}
@@ -888,7 +896,7 @@ Comment.prototype.updateStatus = function() {
 		if (rep.duration < 0)
 			rep.duration = 0;
 		rep.tags = obj.tags;
-		rep.artist = obj.user_name;
+		rep.artist = obj.cuser;
 		rep.time = obj.time;
 
 		reports.push(rep);
@@ -904,9 +912,9 @@ Comment.prototype.updateStatus = function() {
 					RULES.status.tags.push(tag);
 
 		// Add artist:
-		if (this.obj.user_name && this.obj.user_name.length)
-			if (RULES.status.artists.indexOf(this.obj.user_name) == -1)
-				RULES.status.artists.push(this.obj.user_name);
+		if (this.obj.cuser && this.obj.cuser.length)
+			if (RULES.status.artists.indexOf(this.obj.cuser) == -1)
+				RULES.status.artists.push(this.obj.cuser);
 	}
 */
 	RULES.status.reports = reports;
