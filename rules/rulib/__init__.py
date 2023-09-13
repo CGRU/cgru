@@ -135,9 +135,11 @@ def setComment(paths=None, uid=None, ctype=None, text=None, tags=None, duration=
         paths = [None]
  
     out['comments'] = []
+    path_cdata = dict()
     for path in paths:
         cms = comments.Comments(uid, path)
-        cms.add(ctype=ctype, text=text, tags=tags, duration=duration, out=out)
+        cdata = cms.add(ctype=ctype, text=text, tags=tags, duration=duration, out=out)
+        path_cdata[path] = cdata
         _out = dict()
         cms.save(_out)
 
@@ -147,5 +149,7 @@ def setComment(paths=None, uid=None, ctype=None, text=None, tags=None, duration=
 
         out['comments'].append({"path":cms.path,"comments":cms.data})
 
-        return out
+    news.commentsChanged(path_cdata, out, nonews)
+
+    return out
 
