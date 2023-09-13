@@ -374,9 +374,9 @@ def updateUpperProgresses(i_path, i_progresses, out):
 
             # If status has tasks assuming that it is a shot.
             # We want to count only 100% done shots.
-            if sdata and 'tasks' in sdata:
-                if progress < 100:
-                    progress = 0;
+            # if sdata and 'tasks' in sdata:
+            #    if progress < 100:
+            #        progress = 0;
 
             progress_sum += progress
             progress_count += 1
