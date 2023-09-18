@@ -57,7 +57,7 @@ class Comments:
     def __str__(self):
         return json.dumps({"comments":self.data})
 
-    def add(self, ctype=None, text=None, tags=None, duration=None, deleted=False, out=None, key=None):
+    def add(self, ctype=None, text=None, tags=None, duration=None, color=None, deleted=False, uploads=None, out=None, key=None):
 
         cdata = dict()
         ctime = rulib.functions.getCurMSeconds()
@@ -82,6 +82,14 @@ class Comments:
             cdata['tags'] = tags
         if duration is not None:
             cdata['duration'] = duration
+        if color is not None and type(color) is list:
+            if len(color) == 3:
+                cdata['color'] = color
+            else:
+                if 'color' in cdata:
+                    del cdata['color']
+        if uploads:
+            cdata['uploads'] = uploads
         if deleted:
             cdata['deleted'] = True
 

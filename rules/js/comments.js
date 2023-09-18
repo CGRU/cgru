@@ -225,7 +225,7 @@ function cm_NewOnClick(i_text)
 
 function cm_ColorOnclick(i_clr, i_data)
 {
-	i_data.setColor(i_clr);
+	i_data.comment.setColor(i_clr);
 }
 
 function cm_Goto(i_key)
@@ -263,12 +263,12 @@ function cm_Goto(i_key)
 
 function Comment(i_obj)
 {
-    // Translate OLD user vars:
-    if (i_obj)
-    {
-        if (i_obj.user_name)  {i_obj.cuser = i_obj.user_name;  delete i_obj.user_name;}
-        if (i_obj.muser_name) {i_obj.muser = i_obj.muser_name; delete i_obj.muser_name;}
-    }
+	// Translate OLD user vars:
+	if (i_obj)
+	{
+		if (i_obj.user_name)  {i_obj.cuser = i_obj.user_name;  delete i_obj.user_name;}
+		if (i_obj.muser_name) {i_obj.muser = i_obj.muser_name; delete i_obj.muser_name;}
+	}
 
 
 	// window.console.log( JSON.stringify( i_obj));
@@ -706,7 +706,10 @@ Comment.prototype.edit = function() {
 
 	this.elColor = document.createElement('div');
 	this.elForEdit.appendChild(this.elColor);
-	u_DrawColorBars({"el": this.elColor, "onclick": cm_ColorOnclick, "data": this});
+	u_DrawColorBars({"el": this.elColor, "onclick": cm_ColorOnclick, "data":{"comment":this}});
+	// Store that some (or empty) color was chosen.
+	// If empty color was clicked, we should reset color by sending an empty array ("color"=[]).
+	this.color_changed = false;
 
 	if (g_auth_user == null)
 		u_GuestAttrsDraw(this.elForEdit);
@@ -719,6 +722,7 @@ Comment.prototype.edit = function() {
 
 Comment.prototype.setColor = function(i_clr) {
 	this.color = i_clr;
+	this.color_changed = true;
 	this.setElType(this.type);
 	st_SetElColor({"color": this.color}, this.el, null, false);
 };
@@ -753,6 +757,7 @@ Comment.prototype.destroy = function() {
 };
 
 Comment.prototype.save = function() {
+/*
 	if (g_auth_user == null)
 	{
 		this.obj.guest = u_GuestAttrsGet(this.elForEdit);
@@ -807,12 +812,101 @@ Comment.prototype.save = function() {
 	edit.file = file;
 
 	n_Request({"send": {"editobj": edit}, "func": this.saveFinished, "this": this});
+*/
+	let obj = {};
+	obj.paths = [g_CurPath()];
+
+	if (g_auth_user == null)
+	{
+		obj.guest = u_GuestAttrsGet(this.elForEdit);
+		//this.obj.cuser = this.obj.guest.id;
+	}
+
+	obj.text = c_LinksProcess(this.elText.innerHTML);
+	obj.ctype = this.type;
+	if (this.color_changed) // Some (or empty) color was clicked during edit
+	{
+		if (this.color)
+			obj.color = this.color;
+		else
+			obj.color = []; // An empty array resets color
+	}
+	if (this.obj.deleted)
+		obj.deleted = true;
+	else
+	{
+		this.processUploads();
+		obj.uploads = this.obj.uploads;
+	}
+
+	let tags = [];
+	for (let i = 0; i < this.elEditTags.m_elTags.length; i++)
+	{
+		let el = this.elEditTags.m_elTags[i];
+		if (el.classList.contains('selected'))
+			tags.push(el.m_tag);
+	}
+	if (tags.length)
+		obj.tags = tags;
+
+	let duration = parseFloat(this.elEditDuration.textContent);
+	if (false == isNaN(duration))
+		obj.duration = duration;
+
+	if (this.obj.key)
+		obj.key = this.obj.key;
+
+	if (nw_disabled)
+		obj.nonews = true;
+
+	//console.log(JSON.stringify(obj));
+	n_Request({'send':{'setcomment':obj},'func':cm_SaveFinished, "comment": this,'info':'setComment','wait':false});
 };
 
-Comment.prototype.saveFinished = function(i_data, i_args) {
+function cm_SaveFinished(i_data, i_args)
+{
+	//console.log(JSON.stringify(i_data));
+
 	if (c_NullOrErrorMsg(i_data))
 		return;
 
+	let comment = i_args.comment;
+	comment.saveFinished(i_data);
+
+	// Get news if subscribed:
+	if (i_data.users_subscribed && (i_data.users_subscribed.indexOf(g_auth_user.id) != -1))
+	{
+		nw_NewsLoad();
+	}
+}
+
+Comment.prototype.saveFinished = function(i_data)
+{
+	if (i_data.comments == null)
+	{
+		c_Error('No comments created.');
+		return;
+	}
+
+    let obj = i_data.comments[g_CurPath()];
+	if (obj == null)
+	{
+		c_Error('No new comment created.');
+		return;
+	}
+
+	this.obj = obj;
+
+	if (this._new)
+	{
+		this._new = false;
+		cm_array.push(this);
+	}
+
+	this.init();
+
+	cm_DisplayStat();
+/*
 	let news_user = i_args.this.obj.cuser;
 	if (i_args.this.obj.muser)
 		news_user = i_args.this.obj.muser;
@@ -827,10 +921,10 @@ Comment.prototype.saveFinished = function(i_data, i_args) {
 		"user": news_user,
 		"guest": i_args.this.obj.guest
 	});
+*/
+	this.updateStatus();
 
-	i_args.this.updateStatus();
-
-	i_args.this.sendEmails();
+	this.sendEmails();
 };
 
 Comment.prototype.sendEmails = function() {

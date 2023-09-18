@@ -128,17 +128,24 @@ def setTask(paths=None, uid=None, name=None, tags=None, artists=None, flags=None
 
     return out
 
-def setComment(paths=None, uid=None, ctype=None, text=None, tags=None, duration=None, deleted=False, nonews=None, out=None, key=None):
+def setComment(paths=None, uid=None, ctype=None, text=None, tags=None, duration=None, color=None, uploads=None, deleted=False, nonews=None, out=None, key=None):
     if out is None:
         out = dict()
     if paths is None or paths == []:
         paths = [None]
  
-    out['comments'] = []
     path_cdata = dict()
     for path in paths:
         cms = comments.Comments(uid, path)
-        cdata = cms.add(ctype=ctype, text=text, tags=tags, duration=duration, deleted=deleted, out=out, key=key)
+
+        _out = dict()
+        cdata = cms.add(ctype=ctype, text=text, tags=tags, duration=duration, color=color, uploads=uploads, deleted=deleted, out=_out, key=key)
+        if 'error' in _out:
+            out['error'] = _out['error']
+            return out
+        if cdata is None:
+            return
+
         path_cdata[path] = cdata
         _out = dict()
         cms.save(_out)
@@ -147,9 +154,9 @@ def setComment(paths=None, uid=None, ctype=None, text=None, tags=None, duration=
             out['error'] = _out['error']
             return out
 
-        out['comments'].append({"path":cms.path,"comments":cms.data})
+    news.commentsChanged(path_cdata, uid=uid, out=out, nonews=nonews)
 
-    news.commentsChanged(path_cdata, out, nonews)
+    out['comments'] = path_cdata
 
     return out
 

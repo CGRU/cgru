@@ -346,6 +346,37 @@ class Requests:
         return
 
 
+    def req_setcomment(self, i_args, out):
+
+        if not 'paths' in i_args:
+            out['error'] = 'Path is not specified.'
+            return
+
+        key        = None
+        text       = None
+        ctype      = None
+        tags       = None
+        duration   = None
+        color      = None
+        uploads    = None
+        deleted    = None
+        nonews     = False
+
+        if 'key'        in i_args: key        = i_args['key']
+        if 'text'       in i_args: text       = i_args['text']
+        if 'ctype'      in i_args: ctype      = i_args['ctype']
+        if 'tags'       in i_args: tags       = i_args['tags']
+        if 'duration'   in i_args: duration   = i_args['duration']
+        if 'color'      in i_args: color      = i_args['color']
+        if 'uploads'    in i_args: uploads    = i_args['uploads']
+        if 'deleted'    in i_args: deleted    = i_args['deleted']
+        if 'nonews'     in i_args and i_args['nonews']: nonews = True
+
+        rulib.setComment(uid=self.session.USER_ID, paths=i_args['paths'], text=text, ctype=ctype, tags=tags, duration=duration, color=color, uploads=uploads, deleted=deleted, nonews=nonews, out=out, key=key)
+
+        return
+
+
     def req_search(self, i_args, o_out):
         if not 'path' in i_args:
             o_out['error'] = 'Search path is not specified.'
