@@ -376,10 +376,12 @@ function u_ApplyStyles()
 	{
 		u_background = localStorage.background;
 		document.body.style.background = localStorage.background;
+/* It can be just inherited, no need to set it to children (background: inherit;)
 		var backs =
 			['header', 'footer', 'navig_div', 'sidepanel_div', 'content', 'navig_handle', 'sidepanel_handle'];
 		for (var i = 0; i < backs.length; i++)
 			$(backs[i]).style.background = localStorage.background;
+*/
 	}
 
 	if (localStorage.text_color && localStorage.text_color.length)
@@ -453,6 +455,21 @@ function u_SidePanelOpen()
 function u_RulesShow()
 {
 	cgru_ShowObject(RULES, 'RULES ' + g_CurPath());
+}
+
+function u_NavigSettingsOnClick()
+{
+	let el = $('navig_settings');
+	if (el.m_opened)
+	{
+		el.m_opened = false;
+		el.style.display = 'none';
+	}
+	else
+	{
+		el.m_opened = true;
+		el.style.display = 'block';
+	}
 }
 
 // function u_DrawColorBars( i_el, i_onclick, height)
