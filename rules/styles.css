@@ -200,7 +200,7 @@ position: absolute; width: 300px; left: 0;
 }
 #navig {
 position: absolute;
-oaverflow-y: scroll;
+overflow-y: scroll;
 background: inherit;
 left: 0; right: 6px; top: 20px; bottom: 0; /*padding-right: 6px;*/
 }
