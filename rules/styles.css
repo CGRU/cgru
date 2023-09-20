@@ -216,7 +216,7 @@ height: 20px;
 left:0;right:0;top:0;
 box-shadow:0 0 4px #000, 0 0 4px rgba(255,255,255,.4) inset;
 }
-#navig_panel .button, #navig_settings .button {
+#navig_div .navig_buttons .button {
 font-size: 12px;
 padding: 0px;
 margin: 2px;
@@ -224,7 +224,7 @@ float: left;
 width: 40px;
 text-align: center;
 }
-#navig_panel .button.small, #navig_settings .button.small { width: 20px; }
+#navig_div .navig_buttons .button.small { width: 20px; }
 #navig_settings {
 background: inherit;
 position: absolute;
@@ -234,6 +234,7 @@ top: 20px;
 box-shadow:0 0 4px #000, 0 0 4px rgba(255,255,255,.4) inset;
 /*border: 2px solid #F00;*/
 }
+#navig_settings .flag {font-size: 12px;}
 #navig .folder {
 clear: both;
 position: relative;

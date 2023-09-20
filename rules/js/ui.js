@@ -459,17 +459,45 @@ function u_RulesShow()
 
 function u_NavigSettingsOnClick()
 {
-	let el = $('navig_settings');
-	if (el.m_opened)
+	let elSettings = $('navig_settings');
+	if (elSettings.m_opened)
 	{
-		el.m_opened = false;
-		el.style.display = 'none';
+		elSettings.m_opened = false;
+		elSettings.style.display = 'none';
+		return;
 	}
-	else
+
+	elSettings.m_opened = true;
+	elSettings.style.display = 'block';
+
+	let flags_coll = [];
+	for (let path in g_elFolders)
 	{
-		el.m_opened = true;
-		el.style.display = 'block';
+		let fobject = g_elFolders[path].m_fobject;
+		if (fobject == null) continue;
+
+		let stat = fobject.status;
+		if (stat == null) continue;
+
+		let flags = stat.flags;
+		if (flags == null) continue;
+
+		for (let flag of flags)
+			if (flags_coll.indexOf(flag) == -1)
+				flags_coll.push(flag);
 	}
+
+	let elFlagsColl = $('navig_settings_collected_flags');
+
+	let elFlags = st_SetElFlags({"flags":flags_coll}, elFlagsColl, true);
+
+	for (let elFlag of elFlags)
+		elFlag.onclick = u_NavigSettingsFlagColl_OnClick;
+}
+function u_NavigSettingsFlagColl_OnClick(i_evt)
+{
+	let elFlag = i_evt.currentTarget;
+console.log(elFlag.m_name);
 }
 
 // function u_DrawColorBars( i_el, i_onclick, height)

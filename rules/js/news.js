@@ -857,7 +857,7 @@ function nw_DeleteNewsUser(i_news)
 
 
 /* ---------------- [ Filters functions ] ----------------------------------------------------------------- */
-var nw_filters = [];
+var nw_filters = {};
 nw_filters.tags_include  = {"label": 'Tags IN'};
 nw_filters.tags_exclude  = {"label": 'Tags EX'};
 nw_filters.flags_include = {"label":'Flags IN'};
