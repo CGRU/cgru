@@ -45,6 +45,9 @@ var u_resizing_name = null;
 var u_resizing_koeff = null;
 var u_resizing_x = null;
 
+var u_navig_filter_flags_exclude = [];
+var u_navig_filter_flags_include = [];
+
 function View_body_Open()
 {
 	u_BodyLoad();
@@ -117,6 +120,11 @@ function u_Init()
 	if (localStorage.execute_soft == null)
 		localStorage.execute_soft = 'OFF';
 	$('execute_soft').textContent = localStorage.execute_soft;
+	
+	if (localStorage.navig_filter_flags_include)
+		u_navig_filter_flags_include = localStorage.navig_filter_flags_include.split(',');
+	if (localStorage.navig_filter_flags_exclude)
+		u_navig_filter_flags_exclude = localStorage.navig_filter_flags_exclude.split(',');
 
 	u_CalcGUI();
 
@@ -457,6 +465,7 @@ function u_RulesShow()
 	cgru_ShowObject(RULES, 'RULES ' + g_CurPath());
 }
 
+
 function u_NavigSettingsOnClick()
 {
 	let elSettings = $('navig_settings');
@@ -469,6 +478,24 @@ function u_NavigSettingsOnClick()
 
 	elSettings.m_opened = true;
 	elSettings.style.display = 'block';
+
+	u_NavigFiltersRefresh();
+}
+function u_NavigFiltersRefresh()
+{
+	localStorage.navig_filter_flags_exclude = u_navig_filter_flags_exclude.join(',');
+	localStorage.navig_filter_flags_include = u_navig_filter_flags_include.join(',');
+
+	let elFlagsEx = st_SetElFlags({"flags":u_navig_filter_flags_exclude}, $('navig_filter_flags_exclude'), true);
+	for (let el of elFlagsEx)
+	{
+		el.title = "Double click to remove.";
+		el.ondblclick = function(e)
+		{
+			u_navig_filter_flags_exclude = u_navig_filter_flags_exclude.filter(i => i !== e.currentTarget.m_name);
+			u_NavigFiltersRefresh();
+		}
+	}
 
 	let flags_coll = [];
 	for (let path in g_elFolders)
@@ -483,24 +510,40 @@ function u_NavigSettingsOnClick()
 		if (flags == null) continue;
 
 		for (let flag of flags)
-			if (flags_coll.indexOf(flag) == -1)
-				flags_coll.push(flag);
+		{
+			if (flags_coll.indexOf(flag) != -1) continue;
+			if (u_navig_filter_flags_include.indexOf(flag) != -1) continue;
+			if (u_navig_filter_flags_exclude.indexOf(flag) != -1) continue;
+			flags_coll.push(flag);
+		}
 	}
 
-	let elFlagsColl = $('navig_settings_collected_flags');
+	let elFlagsColl = $('navig_filter_flags_collected');
 
 	let elFlags = st_SetElFlags({"flags":flags_coll}, elFlagsColl, true);
 
 	for (let elFlag of elFlags)
-		elFlag.onclick = u_NavigSettingsFlagColl_OnClick;
+		elFlag.onclick = function(e){c_ElToggleSelected(e.currentTarget)};
 }
-function u_NavigSettingsFlagColl_OnClick(i_evt)
+function u_NavigFilterExcludeOnClick()
 {
-	let elFlag = i_evt.currentTarget;
-console.log(elFlag.m_name);
+	let elFlagsColl = $('navig_filter_flags_collected');
+	if (elFlagsColl.m_elFlags == null)
+		return;
+
+	let flags = [];
+	for (let el of elFlagsColl.m_elFlags)
+		if (el.m_selected && (flags.indexOf(el.m_name) == -1))
+			flags.push(el.m_name);
+
+	for (let flag of flags)
+		if (u_navig_filter_flags_exclude.indexOf(flag) == -1)
+			u_navig_filter_flags_exclude.push(flag);
+
+	u_NavigFiltersRefresh();
 }
 
-// function u_DrawColorBars( i_el, i_onclick, height)
+
 function u_DrawColorBars(i_args)
 {
 	var height = i_args.height;

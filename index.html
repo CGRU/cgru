@@ -84,8 +84,18 @@ Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
 			<div class="button small" id="navig_show_duration"   title="Show duration" onclick="g_NavigShowInfo(this)">D</div>
 			<div class="button small" id="navig_show_price"      title="Show price" onclick="g_NavigShowInfo(this)">P</div>
 		</div>
-		<div>
-			<div id="navig_settings_collected_flags"></div>
+		<div id="navig_filters">
+			<!--
+			<div class="navig_filter">
+				<div class="button" onclick="u_NavigSettingsIncludeOnClick()">IN</div>
+				<div id="navig_filter_flags_include"></div>
+			</div>
+			-->
+			<div class="navig_filter">
+				<div class="button" onclick="u_NavigFilterExcludeOnClick()">EX</div>
+				<div id="navig_filter_flags_exclude"></div>
+			</div>
+			<div id="navig_filter_flags_collected"></div>
 		</div>
 	</div>
 	<div id="navig_handle" class="gui_size_handle" onmousedown="u_ResizeGUIStart('navig_width',1)"></div>
