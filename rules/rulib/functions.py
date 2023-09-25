@@ -60,7 +60,7 @@ def isAuxFolder(i_path, i_status = None):
         if 'flags' in i_status and 'aux' in i_status['flags']:
             return True
 
-        if 'progress' in i_status and i_status['progress'] < 0:
+        if 'progress' in i_status and type(i_status['progress']) is int and i_status['progress'] < 0:
             return True
 
     name = os.path.basename(i_path).lower()
