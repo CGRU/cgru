@@ -224,6 +224,8 @@ function u_Process()
 	}
 
 	u_ExecuteShow(false);
+
+	u_NavigFiltersRefresh();
 }
 
 function u_Finish()
@@ -483,6 +485,9 @@ function u_NavigSettingsOnClick()
 }
 function u_NavigFiltersRefresh()
 {
+//	if ($('navig_settings').m_opened != true)
+//		return;
+
 	localStorage.navig_filter_flags_exclude = u_navig_filter_flags_exclude.join(',');
 	localStorage.navig_filter_flags_include = u_navig_filter_flags_include.join(',');
 
@@ -496,26 +501,58 @@ function u_NavigFiltersRefresh()
 			u_NavigFiltersRefresh();
 		}
 	}
+	let elFlagsIn = st_SetElFlags({"flags":u_navig_filter_flags_include}, $('navig_filter_flags_include'), true);
+	for (let el of elFlagsIn)
+	{
+		el.title = "Double click to remove.";
+		el.ondblclick = function(e)
+		{
+			u_navig_filter_flags_include = u_navig_filter_flags_include.filter(i => i !== e.currentTarget.m_name);
+			u_NavigFiltersRefresh();
+		}
+	}
+
+	let elParent = g_elCurFolder.m_elParent;
+	if (elParent == null)
+		return;
+	let elFolders = elParent.m_elFolders;
+	if (elFolders == null)
+		return;
 
 	let flags_coll = [];
-	for (let path in g_elFolders)
+	for (let elFolder of elFolders)
 	{
-		let fobject = g_elFolders[path].m_fobject;
+		let fobject = elFolder.m_fobject;
 		if (fobject == null) continue;
 
-		let stat = fobject.status;
-		if (stat == null) continue;
+		let flags = [];
+		if (fobject.status && fobject.status.flags)
+			flags = fobject.status.flags;
 
-		let flags = stat.flags;
-		if (flags == null) continue;
-
+//		let toHide = false;
+		let toHide = (u_navig_filter_flags_include.length > 0);
 		for (let flag of flags)
 		{
-			if (flags_coll.indexOf(flag) != -1) continue;
-			if (u_navig_filter_flags_include.indexOf(flag) != -1) continue;
-			if (u_navig_filter_flags_exclude.indexOf(flag) != -1) continue;
-			flags_coll.push(flag);
+			if (u_navig_filter_flags_exclude.indexOf(flag) != -1)
+			{
+				toHide = true;
+				continue;
+			}
+
+			if (u_navig_filter_flags_include.indexOf(flag) != -1)
+			{
+				toHide = false;
+				continue;
+			}
+
+			if (flags_coll.indexOf(flag) == -1)
+				flags_coll.push(flag);
 		}
+
+		if (toHide && ASSET && (ASSET.type == 'shot'))
+			elFolder.style.display = 'none';
+		else
+			elFolder.style.display = 'block';
 	}
 
 	let elFlagsColl = $('navig_filter_flags_collected');
@@ -525,7 +562,9 @@ function u_NavigFiltersRefresh()
 	for (let elFlag of elFlags)
 		elFlag.onclick = function(e){c_ElToggleSelected(e.currentTarget)};
 }
-function u_NavigFilterExcludeOnClick()
+function u_NavigFilterIncludeOnClick() {u_NavigFilterInExOnClick('include');}
+function u_NavigFilterExcludeOnClick() {u_NavigFilterInExOnClick('exclude');}
+function u_NavigFilterInExOnClick(i_inex)
 {
 	let elFlagsColl = $('navig_filter_flags_collected');
 	if (elFlagsColl.m_elFlags == null)
@@ -537,8 +576,8 @@ function u_NavigFilterExcludeOnClick()
 			flags.push(el.m_name);
 
 	for (let flag of flags)
-		if (u_navig_filter_flags_exclude.indexOf(flag) == -1)
-			u_navig_filter_flags_exclude.push(flag);
+		if (window['u_navig_filter_flags_'+i_inex].indexOf(flag) == -1)
+			window['u_navig_filter_flags_'+i_inex].push(flag);
 
 	u_NavigFiltersRefresh();
 }
