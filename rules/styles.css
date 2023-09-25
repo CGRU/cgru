@@ -695,6 +695,7 @@ padding: 4px 10px 0 0;
 #bookmarks .bookmark a {
 padding: 0 12px;
 }
+#bookmarks .bookmark .thumb_div {float: left;}
 #bookmarks .bookmark img {
 width: 100%;
 }
@@ -703,6 +704,7 @@ float: right;
 font-size: 10px;
 }
 #bookmarks .bookmark .status .flags {float: left;}
+#bookmarks .bookmark .status .tasks {clear: none;}
 #bookmarks .bookmark .bar {
 _position: absolute;
 bottom: 1px;
