@@ -17,5 +17,3 @@ set APP_EXE=%LIGHTWAVE_LOCATION%\bin\layout.exe
 rem Define location:
 set locate_file=%CGRU_LOCATION%\software_setup\locate_lightwave.cmd
 if exist %locate_file% call %locate_file%
-
-set PYTHONSTARTUP=%CGRU_LOCATION%\plugins\lightwave\startup.py

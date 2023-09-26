@@ -7,6 +7,7 @@ from subprocess import PIPE, Popen
 from textwrap import dedent, wrap
 
 import lwsdk
+import lwsdk.pris
 
 __lwver__ = "11"
 
@@ -95,17 +96,15 @@ class AfanasySubmitter(lwsdk.IGeneric):
             self.log.debug(
                 "Could not find {}. Generating file".format(self.config_path)
             )
-            lwsdk.LWMessageFuncs().info(
+            lwsdk.pris.info(
                 "Afanasy Submitter",
                 "Creating default config file {}".format(self.config_path),
             )
             config_parser.add_section("defaults")
+            config_parser.set("defaults", "frames_per_task", "10")
             config_parser.set("defaults", "priority", "99")
             config_parser.set(
                 "defaults", "config_dir", lwsdk.LWDirInfoFunc(lwsdk.LWFTYPE_SETTING)
-            )
-            config_parser.set(
-                "defaults", "content_dir", lwsdk.LWDirInfoFunc(lwsdk.LWFTYPE_CONTENT)
             )
             config_parser.set(
                 "defaults",
@@ -130,13 +129,13 @@ class AfanasySubmitter(lwsdk.IGeneric):
         self.frame_end_ctl.set_int(self.frame_end)
         self.frame_step_ctl = panel.int_ctl("frame_step")
         self.frame_step_ctl.set_int(self.frame_step)
+        self.frames_per_task_ctl = panel.int_ctl("frames_per_task")
+        self.frames_per_task_ctl.set_int(int(config_parser.get("defaults", "frames_per_task")))
 
         self.priority_ctl = panel.slider_ctl("Priority", self._ctl_width, 1, 200)
         self.priority_ctl.set_int(int(config_parser.get("defaults", "priority")))
         self.config_dir_ctl = panel.dir_ctl("Config Dir", self._ctl_width)
         self.config_dir_ctl.set_str(config_parser.get("defaults", "config_dir"))
-        self.content_dir_ctl = panel.str_ctl("Content Dir", self._ctl_width)
-        self.content_dir_ctl.set_str(config_parser.get("defaults", "content_dir"))
         self.lwsn_path_ctl = panel.file_ctl("lwsn_path", self._ctl_width)
         self.lwsn_path_ctl.set_str(config_parser.get("defaults", "lwsn_path"))
         self.host_mask_ctl = panel.str_ctl("host_mask", self._ctl_width)
@@ -154,11 +153,12 @@ class AfanasySubmitter(lwsdk.IGeneric):
         self.log.debug("Opening panel")
 
         if panel.open(lwsdk.PANF_BLOCKING | lwsdk.PANF_CANCEL):
-            # Create lwsn wrapper to unset PYTHONHOME
+            # Use an lwsn wrapper to unset PYTHONHOME
             args = [
                 "rez-env",
-                "cgru",
+                "cgru_pythonlib",
                 "cgru_settings",
+                "python",
                 "--",
                 "python",
                 self.af_job_py_path,
@@ -168,12 +168,12 @@ class AfanasySubmitter(lwsdk.IGeneric):
                 "-by",
                 str(self.frame_step_ctl.get_int()),
                 "-fpt",
-                str(self.frame_step_ctl.get_int()),
+                str(self.frames_per_task_ctl.get_int()),
                 "-extrargs",
                 '{lwsn_path} -3 -c"{config_dir}" -d"{content_dir}" "{scene_path}"'.format(
                     lwsn_path=self.lwsn_path_ctl.get_str(),
                     config_dir=self.config_dir_ctl.get_str(),
-                    content_dir=self.content_dir_ctl.get_str(),
+                    content_dir=lwsdk.LWDirInfoFunc(lwsdk.LWFTYPE_CONTENT),
                     scene_path=scene.filename,
                 ),
                 "-pwd",
@@ -207,7 +207,7 @@ class AfanasySubmitter(lwsdk.IGeneric):
                         proc.returncode, stderr
                     )
                 )
-                lwsdk.LWMessageFuncs().error(
+                lwsdk.pris.error(
                     "Submission failed",
                     "Process returned exit code: {}\n{}".format(
                         proc.returncode, stderr
@@ -216,6 +216,7 @@ class AfanasySubmitter(lwsdk.IGeneric):
             else:
                 self.log.info("Submission succeeded")
                 self.log.debug("Output:\n{}".format(stdout))
+                lwsdk.pris.info("Submission succeeded", stdout)
         else:
             self.log.info("Submission cancelled")
 
@@ -224,13 +225,12 @@ class AfanasySubmitter(lwsdk.IGeneric):
 
     def save_settings(self, ctl, config_parser):
         self.log.debug("Saving config file {}".format(self.config_path))
-        lwsdk.LWMessageFuncs().info(
+        lwsdk.pris.info(
             "Afanasy Submitter", "Saving config file {}".format(self.config_path)
         )
 
         config_parser.set("defaults", "priority", self.priority_ctl.get_int())
         config_parser.set("defaults", "config_dir", self.config_dir_ctl.get_str())
-        config_parser.set("defaults", "content_dir", self.content_dir_ctl.get_str())
         config_parser.set("defaults", "lwsn_path", self.lwsn_path_ctl.get_str())
         config_parser.set("defaults", "host_mask", self.host_mask_ctl.get_str())
         config_parser.set("defaults", "timeout", self.timeout_ctl.get_int())
