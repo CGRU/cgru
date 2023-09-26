@@ -318,6 +318,8 @@ function nw_NewsClose()
 	$('sidepanel_news').classList.remove('opened');
 	$('news').innerHTML = '';
 	localStorage.news_opened = false;
+	nw_elArray = [];
+	nw_elSelectedLast = null;
 }
 
 function nw_NewsOpen(i_refresh)
