@@ -608,7 +608,7 @@ padding-bottom: 2px;
 }
 #news .news.assigned          { box-shadow: 0 0 18px #33FF33 inset; }
 #news .news.cur_path          { box-shadow: 0 0 18px #77FFFF inset; }
-#news .news.selected          { box-shadow: 0 0 18px #FF7700 inset; }
+#news .news.news_selected     { box-shadow: 0 0 18px #FF7700 inset; }
 #news .news.assigned.cur_path { box-shadow: 0 0 18px #00FFAA inset; }
 #news .news_label { font-size: 12px; margin: 4px 0 0 0; }
 #news .news .status {float: right; font-size: 10px;}

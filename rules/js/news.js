@@ -754,7 +754,7 @@ function nw_NewsShow(i_update_folders)
 			if (id == selectedLastId)
 				nw_elSelectedLast = el;
 			if (selectedIds.indexOf(id) != -1)
-				c_ElToggleSelected(el);
+				c_ElToggleSelected(el, 'news_selected');
 		}
 	}
 }
@@ -786,12 +786,12 @@ function nw_ToggleSelected(i_el)
 		i += dir;
 		while (i != index_cur)
 		{
-			c_ElToggleSelected(nw_elArray[i]);
+			c_ElToggleSelected(nw_elArray[i], 'news_selected');
 			i += dir;
 		}
 	}
 
-	c_ElToggleSelected(i_el);
+	c_ElToggleSelected(i_el, 'news_selected');
 
 	nw_elSelectedLast = i_el;
 }

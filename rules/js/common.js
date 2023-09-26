@@ -787,29 +787,31 @@ function c_CompareFiles(a, b)
 	return 0;
 }
 
-function c_ElToggleSelected(i_e)
+function c_ElToggleSelected(i_e, i_toggleClassList = 'selected')
 {
 	var el = i_e;
 	if (i_e.currentTarget)
 		el = i_e.currentTarget;
-	c_ElSetSelected(el, el.m_selected != true);
+	c_ElSetSelected(el, el.m_selected != true, i_toggleClassList);
 	return el.m_selected;
 }
 
-function c_ElSetSelected(i_e, i_selected)
+function c_ElSetSelected(i_e, i_selected, i_toggleClassList = 'selected')
 {
 	var el = i_e;
 	if (i_e.currentTarget)
 		el = i_e.currentTarget;
 	if (i_selected)
 	{
-		el.classList.add('selected');
 		el.m_selected = true;
+		if (i_toggleClassList)
+			el.classList.add(i_toggleClassList);
 	}
 	else
 	{
-		el.classList.remove('selected');
 		el.m_selected = false;
+		if (i_toggleClassList)
+			el.classList.remove(i_toggleClassList);
 	}
 }
 
