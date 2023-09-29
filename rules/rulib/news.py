@@ -398,6 +398,8 @@ def checkIntersection(obj_a, key_a, no_a, obj_b, key_b, no_b):
 
 # Remove not needed status fields:
 def filterStatus(i_sdata):
+    if i_sdata is None:
+        return None
     sdata = dict()
     skip_keys = ['body']
     for key in i_sdata:
