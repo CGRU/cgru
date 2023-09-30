@@ -7,6 +7,10 @@ body, #header, #footer, #navig_div, #sidepanel_div, #content, .gui_size_handle {
 background-color: #A0A0A0;
 }
 
+#header, #footer, #navig_div, #sidepanel_div, #content, .gui_size_handle {
+background: inherit;
+}
+
 #header, #footer {
 -o-transition: all .3s ease-in-out;
 -moz-transition: all .3s ease-in-out;
@@ -191,14 +195,28 @@ top: 38px; bottom: 38px;
 -webkit-user-select: none;
 }
 /* =========== NAVIGATION: ============ */
-#navig_div { position: absolute; width: 300px; left: 0; }
+#navig_div {
+position: absolute; width: 300px; left: 0;
+}
+#navig {
+position: absolute;
+overflow-y: scroll;
+background: inherit;
+left: 0; right: 6px; top: 20px; bottom: 0; /*padding-right: 6px;*/
+}
 #navig_handle {
 position: absolute;
 right: 0; top: 0; bottom: 0;
 width: 2px;
 }
-#navig_panel { position: absolute; height: 20px; left:0;right:0;top:0; box-shadow:0 0 4px #000, 0 0 4px rgba(255,255,255,.4) inset;}
-#navig_panel .button {
+#navig_panel{
+background: inherit;
+position: absolute;
+height: 20px;
+left:0;right:0;top:0;
+box-shadow:0 0 4px #000, 0 0 4px rgba(255,255,255,.4) inset;
+}
+#navig_div .navig_buttons .button {
 font-size: 12px;
 padding: 0px;
 margin: 2px;
@@ -206,8 +224,21 @@ float: left;
 width: 40px;
 text-align: center;
 }
-#navig_panel .button.small { width: 20px; }
-#navig { position: absolute; overflow-y: scroll; left: 0; right: 6px; top: 20px; bottom: 0; /*padding-right: 6px;*/ }
+#navig_div .navig_buttons .button.small { width: 20px; }
+#navig_settings {
+background: inherit;
+position: absolute;
+left: 0; right: 0;
+top: 20px;
+/*height: 100px;*/
+box-shadow:0 0 4px #000, 0 0 4px rgba(255,255,255,.4) inset;
+/*border: 2px solid #F00;*/
+}
+#navig_filters {font-size: 12px;}
+#navig_filters div {float: left;}
+.navig_filter {border-radius: 4px; border: 2px solid rgba(98,98,98,.5);}
+#navig_settings .flag {}
+#navig_settings .flag.selected {box-shadow: 0 0 6px #8FF, 0 0 6px #8FF inset;}
 #navig .folder {
 clear: both;
 position: relative;
@@ -575,9 +606,10 @@ position: relative;
 border-top: 1px solid rgba(98,98,98,.5);
 padding-bottom: 2px;
 }
-#news .news.assigned          { background: rgba(   0, 255,   0, .2); }
-#news .news.cur_path          { background: rgba( 100, 255, 255, .2); }
-#news .news.assigned.cur_path { background: rgba(   0, 255, 150, .2); }
+#news .news.assigned          { box-shadow: 0 0 18px #33FF33 inset; }
+#news .news.cur_path          { box-shadow: 0 0 18px #77FFFF inset; }
+#news .news.news_selected     { box-shadow: 0 0 18px #FF7700 inset; }
+#news .news.assigned.cur_path { box-shadow: 0 0 18px #00FFAA inset; }
 #news .news_label { font-size: 12px; margin: 4px 0 0 0; }
 #news .news .status {float: right; font-size: 10px;}
 #news .news .status .flag {_float: none;}
@@ -664,6 +696,7 @@ padding: 4px 10px 0 0;
 #bookmarks .bookmark a {
 padding: 0 12px;
 }
+#bookmarks .bookmark .thumb_div {float: left;}
 #bookmarks .bookmark img {
 width: 100%;
 }
@@ -672,6 +705,7 @@ float: right;
 font-size: 10px;
 }
 #bookmarks .bookmark .status .flags {float: left;}
+#bookmarks .bookmark .status .tasks {clear: none;}
 #bookmarks .bookmark .bar {
 _position: absolute;
 bottom: 1px;

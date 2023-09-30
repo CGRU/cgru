@@ -208,6 +208,7 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	PyDict_SetItemString( task_info, "block_id",          PyLong_FromLong( i_task_exec->getBlockNum()));
 	PyDict_SetItemString( task_info, "block_name",        PyBytes_FromString( i_task_exec->getBlockName().c_str()));
 	PyDict_SetItemString( task_info, "block_flags",       PyLong_FromLong( i_task_exec->getBlockFlags()));
+	PyDict_SetItemString( task_info, "block_capacity",    PyLong_FromLong( i_task_exec->getCapacity()));
 	PyDict_SetItemString( task_info, "block_custom_data", PyBytes_FromString( i_task_exec->m_custom_data_block.c_str()));
 
 	PyDict_SetItemString( task_info, "job_id",          PyLong_FromLong( i_task_exec->getJobId()));

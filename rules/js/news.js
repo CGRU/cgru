@@ -24,6 +24,9 @@ var nw_disabled = false;
 var nw_ignore_own = false;
 var nw_clicked = false;
 
+var nw_elArray = [];
+var nw_elSelectedLast = null;
+
 function nw_Init()
 {
 	// Recent:
@@ -315,6 +318,8 @@ function nw_NewsClose()
 	$('sidepanel_news').classList.remove('opened');
 	$('news').innerHTML = '';
 	localStorage.news_opened = false;
+	nw_elArray = [];
+	nw_elSelectedLast = null;
 }
 
 function nw_NewsOpen(i_refresh)
@@ -591,9 +596,23 @@ function nw_NewsReceived(i_data)
 
 function nw_NewsShow(i_update_folders)
 {
-	$('news').innerHTML = '';
-	$('news').m_elArray = [];
+	// Store items selection
+	let selectedLastId = null;
+	let selectedIds = [];
+	if (nw_elSelectedLast)
+	{
+		selectedLastId = nw_elSelectedLast.m_news.id;
+		for (let el of nw_elArray)
+			if (el.m_selected)
+				selectedIds.push(el.m_news.id);
+	}
 
+	// Clear pevious news
+	$('news').innerHTML = '';
+	nw_elArray = [];
+	nw_elSelectedLast = null;
+
+	// Sort new by creation time
 	g_auth_user.news.sort(function(a, b) {
 		var attr = 'time';
 		if (a[attr] > b[attr])
@@ -602,22 +621,23 @@ function nw_NewsShow(i_update_folders)
 			return 1;
 		return 0;
 	});
-
+	// Reverse news sorting order depending on settings
 	if (localStorage.news_sort_order == 'ASC')
 		g_auth_user.news.reverse();
 
+	// Create news items
 	let projects = [];
-
 	for (let i = 0; i < g_auth_user.news.length; i++)
 	{
 		let news = g_auth_user.news[i];
 
 		let el = document.createElement('div');
 		$('news').appendChild(el);
-		$('news').m_elArray.push(el);
+		nw_elArray.push(el);
 		el.classList.add('news');
 		el.m_news = news;
 		el.title = c_DT_StrFromSec(news.time);
+		el.onclick = function(e) { if (e.shiftKey) nw_ToggleSelected(e.currentTarget);};
 
 		// Highlight news if artists is assigned,
 		// but only if artists has no subscribed channels
@@ -644,8 +664,8 @@ function nw_NewsShow(i_update_folders)
 		el.appendChild(elBtn);
 		elBtn.classList.add('button');
 		elBtn.classList.add('delete');
-		elBtn.m_id = news.id;
-		elBtn.ondblclick = function(e) { nw_DeleteNews([e.currentTarget.m_id]); };
+		elBtn.m_el = el;
+		elBtn.ondblclick = function(e) {nw_DeleteNewsOnDblclick(e.currentTarget.m_el);};
 		elBtn.title = 'Double click to remove link';
 
 		let elLabel = document.createElement('div');
@@ -683,7 +703,7 @@ function nw_NewsShow(i_update_folders)
 		el.classList.add('button');
 		el.classList.add('nw_fb');
 		el.textContent = projects[i];
-		el.onclick = function(e) { nw_FilterBtn(e.currentTarget, e.currentTarget.textContent, true); };
+		el.onclick = function(e) {nw_FilterBtn(e.currentTarget, e.currentTarget.textContent, true);};
 
 		el.m_filter = projects[i];
 		el.m_project = true;
@@ -726,6 +746,56 @@ function nw_NewsShow(i_update_folders)
 
 	nw_HighlightCurrent();
 	nw_Filter();
+
+	// Restore items selection
+	if (selectedLastId || selectedIds.length)
+	{
+		for (let el of nw_elArray)
+		{
+			let id = el.m_news.id;
+			if (id == selectedLastId)
+				nw_elSelectedLast = el;
+			if (selectedIds.indexOf(id) != -1)
+				c_ElToggleSelected(el, 'news_selected');
+		}
+	}
+}
+
+function nw_DeleteNewsOnDblclick(i_el)
+{
+	let ids = [];
+
+	for (let el of nw_elArray)
+		if (el.m_selected)
+			ids.push(el.m_news.id);
+
+	if (ids.indexOf(i_el.m_news.id) == -1)
+		ids.push(i_el.m_news.id);
+
+	nw_DeleteNews(ids);
+}
+
+function nw_ToggleSelected(i_el)
+{
+	if (nw_elSelectedLast && (i_el != nw_elSelectedLast))
+	{
+		let index_last = nw_elArray.indexOf(nw_elSelectedLast);
+		let index_cur  = nw_elArray.indexOf(i_el);
+		let dir = 1;
+		let i = index_last
+		if (i > index_cur)
+			dir = -1;
+		i += dir;
+		while (i != index_cur)
+		{
+			c_ElToggleSelected(nw_elArray[i], 'news_selected');
+			i += dir;
+		}
+	}
+
+	c_ElToggleSelected(i_el, 'news_selected');
+
+	nw_elSelectedLast = i_el;
 }
 
 function nw_NavigatePost()
@@ -739,15 +809,14 @@ function nw_NavigatePost()
 function nw_HighlightCurrent()
 {
 	var path = g_CurPath();
-	var elNews = $('news').m_elArray;
-	if (elNews == null)
+	if (nw_elArray == null)
 		return;
 
-	for (var i = 0; i < elNews.length; i++)
-		if (path == elNews[i].m_news.path)
-			elNews[i].classList.add('cur_path');
+	for (var i = 0; i < nw_elArray.length; i++)
+		if (path == nw_elArray[i].m_news.path)
+			nw_elArray[i].classList.add('cur_path');
 		else
-			elNews[i].classList.remove('cur_path');
+			nw_elArray[i].classList.remove('cur_path');
 
 	nw_HighlightChannels();
 }
@@ -803,19 +872,18 @@ function nw_Filter()
 	var assigned = (filter == '_ia_');
 	var by_me = (filter == '_me_');
 
-	var elNews = $('news').m_elArray;
 	var hidden_count = 0;
-	for (var i = 0; i < elNews.length; i++)
+	for (var i = 0; i < nw_elArray.length; i++)
 	{
-		if ((filter === null) || (project && (elNews[i].m_news.path.indexOf(filter) == 1)) ||
-			(elNews[i].m_news.title == filter) || (by_me && (g_auth_user.id == elNews[i].m_news.user)) ||
-			(assigned && (elNews[i].classList.contains('assigned'))))
+		if ((filter === null) || (project && (nw_elArray[i].m_news.path.indexOf(filter) == 1)) ||
+			(nw_elArray[i].m_news.title == filter) || (by_me && (g_auth_user.id == nw_elArray[i].m_news.user)) ||
+			(assigned && (nw_elArray[i].classList.contains('assigned'))))
 		{
-			elNews[i].style.display = 'block';
+			nw_elArray[i].style.display = 'block';
 		}
 		else
 		{
-			elNews[i].style.display = 'none';
+			nw_elArray[i].style.display = 'none';
 			hidden_count++;
 		}
 	}
@@ -828,15 +896,14 @@ function nw_Filter()
 
 function nw_DeleteFiltered(i_visible)
 {
-	var elNews = $('news').m_elArray;
 	var display = 'none';
 	if (i_visible)
 		display = 'block';
 
 	var ids = [];
-	for (var i = 0; i < elNews.length; i++)
-		if (elNews[i].style.display == display)
-			ids.push(elNews[i].m_news.id);
+	for (var i = 0; i < nw_elArray.length; i++)
+		if (nw_elArray[i].style.display == display)
+			ids.push(nw_elArray[i].m_news.id);
 
 	if (i_visible)
 		nw_FilterBtn($('news_filter_show_all'), '_all_');
@@ -846,18 +913,17 @@ function nw_DeleteFiltered(i_visible)
 
 function nw_DeleteNewsUser(i_news)
 {
-	var elNews = $('news').m_elArray;
 	var ids = [];
-	for (var i = 0; i < elNews.length; i++)
-		if (elNews[i].m_news.user == i_news.user)
-			ids.push(elNews[i].m_news.id);
+	for (var i = 0; i < nw_elArray.length; i++)
+		if (nw_elArray[i].m_news.user == i_news.user)
+			ids.push(nw_elArray[i].m_news.id);
 
 	nw_DeleteNews(ids);
 }
 
 
 /* ---------------- [ Filters functions ] ----------------------------------------------------------------- */
-var nw_filters = [];
+var nw_filters = {};
 nw_filters.tags_include  = {"label": 'Tags IN'};
 nw_filters.tags_exclude  = {"label": 'Tags EX'};
 nw_filters.flags_include = {"label":'Flags IN'};
@@ -996,10 +1062,9 @@ function nw_DeleteNews(i_ids)
 	if (i_ids == null)
 	{
 		i_ids = [];
-		var elNews = $('news').m_elArray;
 		// Make an array with all ids:
-		for (var i = 0; i < elNews.length; i++)
-			i_ids.push(elNews[i].m_news.id);
+		for (var i = 0; i < nw_elArray.length; i++)
+			i_ids.push(nw_elArray[i].m_news.id);
 	}
 
 	if (i_ids.length == 0)

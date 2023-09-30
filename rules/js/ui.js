@@ -45,6 +45,9 @@ var u_resizing_name = null;
 var u_resizing_koeff = null;
 var u_resizing_x = null;
 
+var u_navig_filter_flags_exclude = [];
+var u_navig_filter_flags_include = [];
+
 function View_body_Open()
 {
 	u_BodyLoad();
@@ -117,6 +120,11 @@ function u_Init()
 	if (localStorage.execute_soft == null)
 		localStorage.execute_soft = 'OFF';
 	$('execute_soft').textContent = localStorage.execute_soft;
+	
+	if (localStorage.navig_filter_flags_include)
+		u_navig_filter_flags_include = localStorage.navig_filter_flags_include.split(',');
+	if (localStorage.navig_filter_flags_exclude)
+		u_navig_filter_flags_exclude = localStorage.navig_filter_flags_exclude.split(',');
 
 	u_CalcGUI();
 
@@ -216,6 +224,8 @@ function u_Process()
 	}
 
 	u_ExecuteShow(false);
+
+	u_NavigFiltersRefresh();
 }
 
 function u_Finish()
@@ -376,10 +386,12 @@ function u_ApplyStyles()
 	{
 		u_background = localStorage.background;
 		document.body.style.background = localStorage.background;
+/* It can be just inherited, no need to set it to children (background: inherit;)
 		var backs =
 			['header', 'footer', 'navig_div', 'sidepanel_div', 'content', 'navig_handle', 'sidepanel_handle'];
 		for (var i = 0; i < backs.length; i++)
 			$(backs[i]).style.background = localStorage.background;
+*/
 	}
 
 	if (localStorage.text_color && localStorage.text_color.length)
@@ -455,7 +467,122 @@ function u_RulesShow()
 	cgru_ShowObject(RULES, 'RULES ' + g_CurPath());
 }
 
-// function u_DrawColorBars( i_el, i_onclick, height)
+
+function u_NavigSettingsOnClick()
+{
+	let elSettings = $('navig_settings');
+	if (elSettings.m_opened)
+	{
+		elSettings.m_opened = false;
+		elSettings.style.display = 'none';
+		return;
+	}
+
+	elSettings.m_opened = true;
+	elSettings.style.display = 'block';
+
+	u_NavigFiltersRefresh();
+}
+function u_NavigFiltersRefresh()
+{
+//	if ($('navig_settings').m_opened != true)
+//		return;
+
+	localStorage.navig_filter_flags_exclude = u_navig_filter_flags_exclude.join(',');
+	localStorage.navig_filter_flags_include = u_navig_filter_flags_include.join(',');
+
+	let elFlagsEx = st_SetElFlags({"flags":u_navig_filter_flags_exclude}, $('navig_filter_flags_exclude'), true);
+	for (let el of elFlagsEx)
+	{
+		el.title = "Double click to remove.";
+		el.ondblclick = function(e)
+		{
+			u_navig_filter_flags_exclude = u_navig_filter_flags_exclude.filter(i => i !== e.currentTarget.m_name);
+			u_NavigFiltersRefresh();
+		}
+	}
+	let elFlagsIn = st_SetElFlags({"flags":u_navig_filter_flags_include}, $('navig_filter_flags_include'), true);
+	for (let el of elFlagsIn)
+	{
+		el.title = "Double click to remove.";
+		el.ondblclick = function(e)
+		{
+			u_navig_filter_flags_include = u_navig_filter_flags_include.filter(i => i !== e.currentTarget.m_name);
+			u_NavigFiltersRefresh();
+		}
+	}
+
+	let elParent = g_elCurFolder.m_elParent;
+	if (elParent == null)
+		return;
+	let elFolders = elParent.m_elFolders;
+	if (elFolders == null)
+		return;
+
+	let flags_coll = [];
+	for (let elFolder of elFolders)
+	{
+		let fobject = elFolder.m_fobject;
+		if (fobject == null) continue;
+
+		let flags = [];
+		if (fobject.status && fobject.status.flags)
+			flags = fobject.status.flags;
+
+//		let toHide = false;
+		let toHide = (u_navig_filter_flags_include.length > 0);
+		for (let flag of flags)
+		{
+			if (u_navig_filter_flags_exclude.indexOf(flag) != -1)
+			{
+				toHide = true;
+				continue;
+			}
+
+			if (u_navig_filter_flags_include.indexOf(flag) != -1)
+			{
+				toHide = false;
+				continue;
+			}
+
+			if (flags_coll.indexOf(flag) == -1)
+				flags_coll.push(flag);
+		}
+
+		if (toHide && ASSET && (ASSET.type == 'shot'))
+			elFolder.style.display = 'none';
+		else
+			elFolder.style.display = 'block';
+	}
+
+	let elFlagsColl = $('navig_filter_flags_collected');
+
+	let elFlags = st_SetElFlags({"flags":flags_coll}, elFlagsColl, true);
+
+	for (let elFlag of elFlags)
+		elFlag.onclick = function(e){c_ElToggleSelected(e.currentTarget)};
+}
+function u_NavigFilterIncludeOnClick() {u_NavigFilterInExOnClick('include');}
+function u_NavigFilterExcludeOnClick() {u_NavigFilterInExOnClick('exclude');}
+function u_NavigFilterInExOnClick(i_inex)
+{
+	let elFlagsColl = $('navig_filter_flags_collected');
+	if (elFlagsColl.m_elFlags == null)
+		return;
+
+	let flags = [];
+	for (let el of elFlagsColl.m_elFlags)
+		if (el.m_selected && (flags.indexOf(el.m_name) == -1))
+			flags.push(el.m_name);
+
+	for (let flag of flags)
+		if (window['u_navig_filter_flags_'+i_inex].indexOf(flag) == -1)
+			window['u_navig_filter_flags_'+i_inex].push(flag);
+
+	u_NavigFiltersRefresh();
+}
+
+
 function u_DrawColorBars(i_args)
 {
 	var height = i_args.height;

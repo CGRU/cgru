@@ -225,7 +225,7 @@ function cm_NewOnClick(i_text)
 
 function cm_ColorOnclick(i_clr, i_data)
 {
-	i_data.setColor(i_clr);
+	i_data.comment.setColor(i_clr);
 }
 
 function cm_Goto(i_key)
@@ -263,6 +263,14 @@ function cm_Goto(i_key)
 
 function Comment(i_obj)
 {
+	// Translate OLD user vars:
+	if (i_obj)
+	{
+		if (i_obj.user_name)  {i_obj.cuser = i_obj.user_name;  delete i_obj.user_name;}
+		if (i_obj.muser_name) {i_obj.muser = i_obj.muser_name; delete i_obj.muser_name;}
+	}
+
+
 	// window.console.log( JSON.stringify( i_obj));
 	this.el = document.createElement('div');
 	if (ASSET && ASSET.comments_reversed)
@@ -413,7 +421,7 @@ Comment.prototype.init = function() {
 		this._new = true;
 		if (g_auth_user)
 		{
-			this.obj.user_name = g_auth_user.id;
+			this.obj.cuser = g_auth_user.id;
 			/*
 			if (g_auth_user.tag && g_auth_user.tag.length)
 			{
@@ -428,37 +436,37 @@ Comment.prototype.init = function() {
 	let signature = null;
 
 	// Get user object:
-	if (this.obj.user_name && g_users[this.obj.user_name])
-		user = g_users[this.obj.user_name];
+	if (this.obj.cuser && g_users[this.obj.cuser])
+		user = g_users[this.obj.cuser];
 	else if (this.obj.guest)
 		user = this.obj.guest;
 	if (user == null)
 		user = {};
 
-	if (this.obj.user_name)
-		this.elUser.textContent = c_GetUserTitle(this.obj.user_name, this.obj.guest);
+	if (this.obj.cuser)
+		this.elUser.textContent = c_GetUserTitle(this.obj.cuser, this.obj.guest);
 
 	// Signature:
 	if (user.signature)
 		this.elSignature.textContent = user.signature;
 
-	// console.log( g_auth_user.id + ' ' + this.obj.user_name );
+	// console.log( g_auth_user.id + ' ' + this.obj.cuser );
 	if (g_auth_user)
 	{
 		// Edit button only for admins or a comment owner:
-		if (g_admin || (this.obj && (this.obj.user_name == g_auth_user.id)))
+		if (g_admin || (this.obj && (this.obj.cuser == g_auth_user.id)))
 			this.elEdit.style.display = 'block';
 		else
 			this.elEdit.style.display = 'none';
 
 		// If this is a new comment or and own old:
-		if ((this.obj == null) || (this.obj.user_name == g_auth_user.id))
+		if ((this.obj == null) || (this.obj.cuser == g_auth_user.id))
 			this.el.classList.add('own');
 	}
 	else
 		this.elEdit.style.display = 'none';
 
-	avatar = c_GetAvatar(this.obj.user_name, this.obj.guest);
+	avatar = c_GetAvatar(this.obj.cuser, this.obj.guest);
 	if (avatar != null)
 	{
 		this.elAvatar.src = avatar;
@@ -499,7 +507,7 @@ Comment.prototype.init = function() {
 		let date = c_DT_StrFromMSec(this.obj.mtime);
 		if (info.length)
 			info += '<br>';
-		info += 'Modified: ' + c_GetUserTitle(this.obj.muser_name) + ' ' + date;
+		info += 'Modified: ' + c_GetUserTitle(this.obj.muser) + ' ' + date;
 	}
 
 	this.elInfo.innerHTML = info;
@@ -698,7 +706,10 @@ Comment.prototype.edit = function() {
 
 	this.elColor = document.createElement('div');
 	this.elForEdit.appendChild(this.elColor);
-	u_DrawColorBars({"el": this.elColor, "onclick": cm_ColorOnclick, "data": this});
+	u_DrawColorBars({"el": this.elColor, "onclick": cm_ColorOnclick, "data":{"comment":this}});
+	// Store that some (or empty) color was chosen.
+	// If empty color was clicked, we should reset color by sending an empty array ("color"=[]).
+	this.color_changed = false;
 
 	if (g_auth_user == null)
 		u_GuestAttrsDraw(this.elForEdit);
@@ -711,6 +722,7 @@ Comment.prototype.edit = function() {
 
 Comment.prototype.setColor = function(i_clr) {
 	this.color = i_clr;
+	this.color_changed = true;
 	this.setElType(this.type);
 	st_SetElColor({"color": this.color}, this.el, null, false);
 };
@@ -745,10 +757,11 @@ Comment.prototype.destroy = function() {
 };
 
 Comment.prototype.save = function() {
+/*
 	if (g_auth_user == null)
 	{
 		this.obj.guest = u_GuestAttrsGet(this.elForEdit);
-		this.obj.user_name = this.obj.guest.id;
+		this.obj.cuser = this.obj.guest.id;
 	}
 
 	this.obj.text = c_LinksProcess(this.elText.innerHTML);
@@ -778,10 +791,10 @@ Comment.prototype.save = function() {
 	else
 	{
 		this.obj.mtime = (new Date()).getTime();
-		this.obj.muser_name = g_auth_user.id;
+		this.obj.muser = g_auth_user.id;
 	}
 
-	let key = this.obj.ctime + '_' + this.obj.user_name;
+	let key = this.obj.ctime + '_' + this.obj.cuser;
 
 	this.obj.key = key;
 	this.init();
@@ -799,15 +812,104 @@ Comment.prototype.save = function() {
 	edit.file = file;
 
 	n_Request({"send": {"editobj": edit}, "func": this.saveFinished, "this": this});
+*/
+	let obj = {};
+	obj.paths = [g_CurPath()];
+
+	if (g_auth_user == null)
+	{
+		obj.guest = u_GuestAttrsGet(this.elForEdit);
+		//this.obj.cuser = this.obj.guest.id;
+	}
+
+	obj.text = c_LinksProcess(this.elText.innerHTML);
+	obj.ctype = this.type;
+	if (this.color_changed) // Some (or empty) color was clicked during edit
+	{
+		if (this.color)
+			obj.color = this.color;
+		else
+			obj.color = []; // An empty array resets color
+	}
+	if (this.obj.deleted)
+		obj.deleted = true;
+	else
+	{
+		this.processUploads();
+		obj.uploads = this.obj.uploads;
+	}
+
+	let tags = [];
+	for (let i = 0; i < this.elEditTags.m_elTags.length; i++)
+	{
+		let el = this.elEditTags.m_elTags[i];
+		if (el.classList.contains('selected'))
+			tags.push(el.m_tag);
+	}
+	if (tags.length)
+		obj.tags = tags;
+
+	let duration = parseFloat(this.elEditDuration.textContent);
+	if (false == isNaN(duration))
+		obj.duration = duration;
+
+	if (this.obj.key)
+		obj.key = this.obj.key;
+
+	if (nw_disabled)
+		obj.nonews = true;
+
+	//console.log(JSON.stringify(obj));
+	n_Request({'send':{'setcomment':obj},'func':cm_SaveFinished, "comment": this,'info':'setComment','wait':false});
 };
 
-Comment.prototype.saveFinished = function(i_data, i_args) {
+function cm_SaveFinished(i_data, i_args)
+{
+	//console.log(JSON.stringify(i_data));
+
 	if (c_NullOrErrorMsg(i_data))
 		return;
 
-	let news_user = i_args.this.obj.user_name;
-	if (i_args.this.obj.muser_name)
-		news_user = i_args.this.obj.muser_name;
+	let comment = i_args.comment;
+	comment.saveFinished(i_data);
+
+	// Get news if subscribed:
+	if (i_data.users_subscribed && (i_data.users_subscribed.indexOf(g_auth_user.id) != -1))
+	{
+		nw_NewsLoad();
+	}
+}
+
+Comment.prototype.saveFinished = function(i_data)
+{
+	if (i_data.comments == null)
+	{
+		c_Error('No comments created.');
+		return;
+	}
+
+    let obj = i_data.comments[g_CurPath()];
+	if (obj == null)
+	{
+		c_Error('No new comment created.');
+		return;
+	}
+
+	this.obj = obj;
+
+	if (this._new)
+	{
+		this._new = false;
+		cm_array.push(this);
+	}
+
+	this.init();
+
+	cm_DisplayStat();
+/*
+	let news_user = i_args.this.obj.cuser;
+	if (i_args.this.obj.muser)
+		news_user = i_args.this.obj.muser;
 
 	let news_title = 'comment';
 	if (i_args.this.obj.type == 'report')
@@ -819,10 +921,10 @@ Comment.prototype.saveFinished = function(i_data, i_args) {
 		"user": news_user,
 		"guest": i_args.this.obj.guest
 	});
+*/
+	this.updateStatus();
 
-	i_args.this.updateStatus();
-
-	i_args.this.sendEmails();
+	this.sendEmails();
 };
 
 Comment.prototype.sendEmails = function() {
@@ -847,10 +949,10 @@ Comment.prototype.sendEmails = function() {
 		body += '<br><br>';
 		body += this.obj.text;
 		body += '<br><br>';
-		let user = c_GetUserTitle(this.obj.user_name, this.obj.guest);
+		let user = c_GetUserTitle(this.obj.cuser, this.obj.guest);
 		body += user;
-		if (user != this.obj.user_name)
-			body += ' [' + this.obj.user_name + ']';
+		if (user != this.obj.cuser)
+			body += ' [' + this.obj.cuser + ']';
 
 		n_SendMail(email, subject, body);
 	}
@@ -888,7 +990,7 @@ Comment.prototype.updateStatus = function() {
 		if (rep.duration < 0)
 			rep.duration = 0;
 		rep.tags = obj.tags;
-		rep.artist = obj.user_name;
+		rep.artist = obj.cuser;
 		rep.time = obj.time;
 
 		reports.push(rep);
@@ -904,9 +1006,9 @@ Comment.prototype.updateStatus = function() {
 					RULES.status.tags.push(tag);
 
 		// Add artist:
-		if (this.obj.user_name && this.obj.user_name.length)
-			if (RULES.status.artists.indexOf(this.obj.user_name) == -1)
-				RULES.status.artists.push(this.obj.user_name);
+		if (this.obj.cuser && this.obj.cuser.length)
+			if (RULES.status.artists.indexOf(this.obj.cuser) == -1)
+				RULES.status.artists.push(this.obj.cuser);
 	}
 */
 	RULES.status.reports = reports;
