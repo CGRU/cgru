@@ -1,13 +1,16 @@
 from ConfigParser import ConfigParser
+import json
 import logging
 import os
-import sys
+import time
 from logging.handlers import TimedRotatingFileHandler
-from subprocess import PIPE, Popen
 from textwrap import dedent, wrap
 
+import af
+import afcommon
 import lwsdk
 import lwsdk.pris
+import lwsdk.pris.layout.cs
 
 __lwver__ = "11"
 
@@ -44,6 +47,84 @@ class AfanasySubmitter(lwsdk.IGeneric):
         self.log.debug("Logger initalized")
 
         self._ctl_width = 75
+
+    def create_job(self, scene):
+        """
+        Build the command to be executed
+
+        returns:
+            A tuple containing the success and data returned from the server
+
+        """
+
+        self.log.info("Creating afanasy job")
+
+        filename = os.path.normpath(scene.filename)
+        filename_dir, filename_tail = os.path.split(filename)
+        filename_stem, filename_ext = os.path.splitext(filename_tail)
+        temp_filename = os.path.join(
+            filename_dir,
+            "{}_{}{}".format(
+                filename_stem, str(time.time()).replace(".", "_"), filename_ext
+            ),
+        )
+
+        lwsdk.pris.layout.cs.savescene()
+        if lwsdk.pris.layout.cs.savescenecopy(temp_filename) == 0:
+            self.log.critical("Could not save scene copy to {}".format(temp_filename))
+            lwsdk.pris.error("Could not save scene copy to {}".format(temp_filename))
+
+        cmd = [
+            "lwsn_af.cmd",
+            "-3",
+            '-c"{}"'.format(self.config_dir_ctl.get_str()),
+            '-d"{}"'.format(lwsdk.LWDirInfoFunc(lwsdk.LWFTYPE_CONTENT)),
+            '"{}"'.format(temp_filename),
+            "@#@",
+            "@#@",
+            str(self.frame_step_ctl.get_int()),
+        ]
+
+        # If this is a "rez" configured environment supply the same environment to
+        # the render command
+        if "REZ_USED_RESOLVE" in os.environ:
+            cmd = ["rez-env", os.environ["REZ_USED_RESOLVE"], "--"] + cmd
+
+        self.log.debug("Using command: {}".format(" ".join(cmd)))
+
+        job = af.Job(self.job_name_ctl.get_str())
+        job.setBranch(self.branch_ctl.get_str())
+        # job.setFolder("input", )
+        # job.setNativeOS()
+
+        block = af.Block("lightwave", "lightwave")
+        block.setCommand(" ".join(cmd))
+        block.setNumeric(
+            self.frame_start_ctl.get_int(),
+            self.frame_end_ctl.get_int(),
+            self.frames_per_task_ctl.get_int(),
+        )
+        block.setWorkingDirectory(os.path.split(scene.filename)[0])
+        block.setTaskMaxRunTime(str(self.timeout_ctl.get_int()))
+
+        if self.images_ctl.get_str():
+            images = self.images_ctl.get_str().replace("%", "%%")
+            block.setFiles(
+                afcommon.patternFromDigits(afcommon.patternFromStdC(images)).split(";")
+            )
+            job.setFolder("output", os.path.pardir(images))
+
+        if self.host_mask_ctl.get_str():
+            block.setHostsMask(self.host_mask_ctl.get_str())
+
+        job.setPriority(str(self.priority_ctl.get_int()))
+        job.setPostDeleteFiles(str(temp_filename))
+        job.blocks.append(block)
+
+        self.log.debug(str(job))
+        self.log.info("Submitting")
+
+        return job.send(verbose=True)
 
     def help_popup(self, ctl, data):
         self.log.debug("Creating help popup panel")
@@ -106,11 +187,7 @@ class AfanasySubmitter(lwsdk.IGeneric):
             config_parser.set(
                 "defaults", "config_dir", lwsdk.LWDirInfoFunc(lwsdk.LWFTYPE_SETTING)
             )
-            config_parser.set(
-                "defaults",
-                "lwsn_path",
-                "{}\\lwsn.exe".format(os.path.split(sys.executable)[0]),
-            )
+            config_parser.set("defaults", "branch", "")
             config_parser.set("defaults", "host_mask", "")
             config_parser.set("defaults", "timeout", "999")
             config_parser.set("defaults", "images", "")
@@ -130,17 +207,19 @@ class AfanasySubmitter(lwsdk.IGeneric):
         self.frame_step_ctl = panel.int_ctl("frame_step")
         self.frame_step_ctl.set_int(self.frame_step)
         self.frames_per_task_ctl = panel.int_ctl("frames_per_task")
-        self.frames_per_task_ctl.set_int(int(config_parser.get("defaults", "frames_per_task")))
+        self.frames_per_task_ctl.set_int(
+            int(config_parser.get("defaults", "frames_per_task"))
+        )
 
         self.priority_ctl = panel.slider_ctl("Priority", self._ctl_width, 1, 200)
         self.priority_ctl.set_int(int(config_parser.get("defaults", "priority")))
+        self.branch_ctl = panel.str_ctl("Branch", self._ctl_width)
+        self.branch_ctl.set_str(config_parser.get("defaults", "branch"))
         self.config_dir_ctl = panel.dir_ctl("Config Dir", self._ctl_width)
         self.config_dir_ctl.set_str(config_parser.get("defaults", "config_dir"))
-        self.lwsn_path_ctl = panel.file_ctl("lwsn_path", self._ctl_width)
-        self.lwsn_path_ctl.set_str(config_parser.get("defaults", "lwsn_path"))
-        self.host_mask_ctl = panel.str_ctl("host_mask", self._ctl_width)
+        self.host_mask_ctl = panel.str_ctl("Hosts Mask", self._ctl_width)
         self.host_mask_ctl.set_str(config_parser.get("defaults", "host_mask"))
-        self.timeout_ctl = panel.int_ctl("timeout")
+        self.timeout_ctl = panel.int_ctl("Timeout")
         self.timeout_ctl.set_int(int(config_parser.get("defaults", "timeout")))
         self.images_ctl = panel.file_ctl("Preview Images", self._ctl_width)
         self.images_ctl.set_str(config_parser.get("defaults", "images"))
@@ -153,70 +232,15 @@ class AfanasySubmitter(lwsdk.IGeneric):
         self.log.debug("Opening panel")
 
         if panel.open(lwsdk.PANF_BLOCKING | lwsdk.PANF_CANCEL):
-            # Use an lwsn wrapper to unset PYTHONHOME
-            args = [
-                "rez-env",
-                "cgru_pythonlib",
-                "cgru_settings",
-                "python",
-                "--",
-                "python",
-                self.af_job_py_path,
-                scene.filename,
-                str(self.frame_start_ctl.get_int()),
-                str(self.frame_end_ctl.get_int()),
-                "-by",
-                str(self.frame_step_ctl.get_int()),
-                "-fpt",
-                str(self.frames_per_task_ctl.get_int()),
-                "-extrargs",
-                '{lwsn_path} -3 -c"{config_dir}" -d"{content_dir}" "{scene_path}"'.format(
-                    lwsn_path=self.lwsn_path_ctl.get_str(),
-                    config_dir=self.config_dir_ctl.get_str(),
-                    content_dir=lwsdk.LWDirInfoFunc(lwsdk.LWFTYPE_CONTENT),
-                    scene_path=scene.filename,
-                ),
-                "-pwd",
-                os.path.split(scene.filename)[0],
-                "-name",
-                self.job_name_ctl.get_str(),
-                "-execmaxruntime",
-                str(self.timeout_ctl.get_int()),
-                "-priority",
-                str(self.priority_ctl.get_int()),
-                "-type",
-                "lightwave",
-                "-exec",
-                os.path.join(os.path.dirname(__file__), "lwsn.bat"),
-            ]
+            success, data = self.create_job(scene)
 
-            if self.images_ctl.get_str():
-                args.extend(["-images", self.images_ctl.get_str().replace("%", "%%")])
-
-            if self.host_mask_ctl.get_str():
-                args.extend(["-hostsmask", self.host_mask_ctl.get_str()])
-
-            self.log.debug(args)
-            self.log.debug("Launching: {}".format(" ".join(args)))
-
-            proc = Popen(args=args, universal_newlines=True, stdout=PIPE, stderr=PIPE)
-            stdout, stderr = proc.communicate()
-            if proc.returncode != 0:
-                self.log.error(
-                    "Submission failed. Process returned exit code: {}\n{}".format(
-                        proc.returncode, stderr
-                    )
-                )
-                lwsdk.pris.error(
-                    "Submission failed",
-                    "Process returned exit code: {}\n{}".format(
-                        proc.returncode, stderr
-                    ),
-                )
+            if not success != 0:
+                self.log.error("Submission failed")
+                lwsdk.pris.error("Submission failed")
             else:
                 self.log.info("Submission succeeded")
-                self.log.debug("Output:\n{}".format(stdout))
-                lwsdk.pris.info("Submission succeeded", stdout)
+                self.log.debug("Output:\n{}".format(json.dumps(data)))
+                lwsdk.pris.info("Submission succeeded", json.dumps(data))
         else:
             self.log.info("Submission cancelled")
 
@@ -231,7 +255,6 @@ class AfanasySubmitter(lwsdk.IGeneric):
 
         config_parser.set("defaults", "priority", self.priority_ctl.get_int())
         config_parser.set("defaults", "config_dir", self.config_dir_ctl.get_str())
-        config_parser.set("defaults", "lwsn_path", self.lwsn_path_ctl.get_str())
         config_parser.set("defaults", "host_mask", self.host_mask_ctl.get_str())
         config_parser.set("defaults", "timeout", self.timeout_ctl.get_int())
         config_parser.set("defaults", "images", self.images_ctl.get_str())
