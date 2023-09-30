@@ -175,8 +175,16 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
 
     def _constructTask(self, work_item):
         task = af.Task(work_item.name)
-        task.setCommand(self.expandCommandTokens(work_item.command, work_item))
+        cmd = self.expandCommandTokens(work_item.command, work_item)
 
+        if "REZ_USED_RESOLVE" in os.environ:
+                cmd = 'rez-env {} --no-local -- {}'.format(
+                    os.environ["REZ_USED_RESOLVE"],
+                    cmd
+                )
+
+        task.setCommand(cmd)
+        
         # Set environment variables
         task.setEnv('PDG_RESULT_SERVER', str(self.workItemResultServerAddr()))
         task.setEnv('PDG_ITEM_NAME', str(work_item.name))
@@ -469,6 +477,12 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         cmd += ' --hip "%s"' % hou.hipFile.path()
         # Set top network to cook
         cmd += ' --toppath "%s"' % node_path
+
+        if "REZ_USED_RESOLVE" in os.environ:
+            cmd = 'rez-env {} -- {}'.format(
+                    os.environ["REZ_USED_RESOLVE"],
+                    cmd
+                )
 
         # Constuct a job:
         job = af.Job(self['gj_name'].evaluateString())
