@@ -49,4 +49,4 @@ cmake -G "%CMAKE_GENERATOR%" .
 
 cmake .
 
-
+pause

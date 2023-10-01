@@ -69,7 +69,6 @@ class AfanasySubmitter(lwsdk.IGeneric):
             ),
         )
 
-        lwsdk.pris.layout.cs.savescene()
         if lwsdk.pris.layout.cs.savescenecopy(temp_filename) == 0:
             self.log.critical("Could not save scene copy to {}".format(temp_filename))
             lwsdk.pris.error("Could not save scene copy to {}".format(temp_filename))
