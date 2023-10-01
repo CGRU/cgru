@@ -98,6 +98,7 @@ class AfanasySubmitter(lwsdk.IGeneric):
         # job.setNativeOS()
 
         block = af.Block("lightwave", "lightwave")
+        block.setParser("lightwave")
         block.setCommand(" ".join(cmd))
         block.setNumeric(
             self.frame_start_ctl.get_int(),

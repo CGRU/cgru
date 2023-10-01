@@ -3,10 +3,6 @@
 import sys
 import os
 
-import debugpy
-debugpy.listen(5678)
-debugpy.wait_for_client()
-
 if sys.platform.find('win') == 0 and sys.executable.find('pythonw') != -1:
 	try:
 		sys.stdout = open('c:\\temp\\cgru_keeper_log.txt', 'w')
