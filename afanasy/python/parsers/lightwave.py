@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from parsers import parser
-
 import re
+
+from parsers import parser
 
 # Example output
 # Scene loaded.
@@ -34,7 +34,7 @@ import re
 # Render time: 11.0 seconds
 # Writing RGB image to T:\TEST_LIGHTWAVE_OUTPUT\Final_Render_002.jpg
 
-re_percent = re.compile(r"Render Complete (\d?)%")
+re_percent = re.compile(r"Render Complete (\d{1,3})%")
 re_frame_start = re.compile(r"Beginning frame: (\d+)")
 re_frame_done = re.compile(r"Finished frame: (\d+)")
 
