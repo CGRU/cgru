@@ -828,6 +828,23 @@ if __name__ == '__main__':
             cmd += ' -format "%s"' % take
         cmd += ' -log_width 0'
 
+    # Lightwave
+    elif ext == 'lws':
+        scenetype = 'lightwave'
+        blocktype = 'lightwave'
+        # extraargs should be -c"{config_dir}" -d"{content_dir}"
+        cmd = ["lwsn_af",
+            "-3",
+            extrargs,
+            scene,
+            "@#@",
+            "@#@",
+            str(by),
+        ]
+        # Remove anything that is None or ""
+        cmd = list(filter(lambda x: x not in [None, ""], cmd))
+        cmd = " ".join(cmd)
+
     # simple generic:
     else:
         scenetype = 'generic'

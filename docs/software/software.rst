@@ -11,6 +11,7 @@ Software Integration
     clarisse.rst
     fusion.rst
     houdini.rst
+    lightwave.rst
     maya.rst
     natron.rst
     nuke.rst

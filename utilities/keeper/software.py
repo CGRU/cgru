@@ -11,7 +11,7 @@ from Qt import QtCore, QtGui, QtWidgets, QtCompat
 Names = ['Blender','Clarisse','Houdini','Maya','Natron','Nuke','NukeX']
 
 if 'windows' in cgruconfig.VARS['platform']:
-    Names.extend(['3DSMax','Fusion','Softimage'])
+    Names.extend(['3DSMax','Fusion','Softimage', "Lightwave"])
 if 'windows' in cgruconfig.VARS['platform'] \
     or 'macosx' in cgruconfig.VARS['platform']:
     Names.extend(['C4D','AfterFX'])
@@ -71,6 +71,10 @@ def startSoftimage():
 
 def startAfterFX():
     startDetached('afterfx')
+
+
+def startLightwave():
+    startDetached('lightwave')
 
 
 def getIcon(soft):
@@ -140,6 +144,10 @@ def exampleSoftimage():
 
 def exampleAfterFX():
     exampleSoftware('After FX', 'start_afterfx')
+
+
+def exampleLightwave():
+    exampleSoftware('After FX', 'start_lightwave')
 
 
 def locateSoftware(soft):
@@ -219,3 +227,7 @@ def locateSoftimage():
 
 def locateAfterFX():
     locateSoftware('AfterFX')
+
+
+def locateLightwave():
+    locateSoftware('Lightwave')

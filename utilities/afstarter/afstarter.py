@@ -74,6 +74,7 @@ def fileTypeList():
     fileType_list.append((['max'],      'max',          '3dsmax'))
     fileType_list.append((['aep'],      'afterfx',      'After Effects'))
     fileType_list.append((['render'],   'clarisse',     'Isotropix Clarisse'))
+    fileType_list.append((['lws'],      'lightwave',    'LightWave'))
     return fileType_list
 
 
