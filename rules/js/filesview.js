@@ -630,16 +630,38 @@ FilesView.prototype.showAttrs = function(i_el, i_obj) {
 		}
 	}
 
-	var video = i_el.m_obj.video;
+	let video = i_el.m_obj.video;
 	if (video)
 	{
+		if (video.frame_count)
+		{
+			if (i_el.m_el_num_files == null)
+			{
+				i_el.m_el_num_files = document.createElement('div');
+				i_el.m_elBody.appendChild(i_el.m_el_num_files);
+				i_el.m_el_num_files.classList.add('filesnum');
+				i_el.m_el_num_files.classList.add('attr');
+			}
+
+			i_el.m_el_num_files.textContent = 'F:' + video.frame_count;
+			i_el.m_el_num_files.title = 'Frames quantity: ' + video.frame_count + '\nDouble click to update status frames number.';
+			i_el.m_el_num_files.m_num_files = video.frame_count;
+			i_el.m_el_num_files.onclick = function(e) { e.stopPropagation(); };
+			i_el.m_el_num_files.ondblclick = function(e) {
+				e.stopPropagation();
+				st_SetFramesNumber(e.currentTarget.m_num_files);
+				fv_refreshAttrs();
+			};
+		}
+
 		if (i_el.m_el_mediainfo == null)
 		{
 			i_el.m_el_mediainfo = document.createElement('div');
 			i_el.m_elBody.appendChild(i_el.m_el_mediainfo);
 			i_el.m_el_mediainfo.classList.add('mediainfo');
 		}
-		var info = '';
+
+		let info = '';
 		if (video.width && video.height)
 			info += ' ' + video.width + 'x' + video.height;
 		if (video.frame_count && video.fps)
@@ -654,12 +676,10 @@ FilesView.prototype.showAttrs = function(i_el, i_obj) {
 			info += '/' + video.chromasubsampling;
 		if (video.chromasubsampling)
 			info += '/' + video.bitdepth;
-		if (video.frame_count)
-			info += ' ' + video.frame_count + 'f';
 		i_el.m_el_mediainfo.textContent = info;
 	}
 
-	var exif = i_el.m_obj.exif;
+	let exif = i_el.m_obj.exif;
 	if (exif)
 	{
 		if (i_el.m_el_mediainfo == null)
@@ -668,7 +688,7 @@ FilesView.prototype.showAttrs = function(i_el, i_obj) {
 			i_el.m_elBody.appendChild(i_el.m_el_mediainfo);
 			i_el.m_el_mediainfo.classList.add('mediainfo');
 		}
-		var info = '';
+		let info = '';
 		if (exif.width && exif.height) info += ' ' + exif.width + 'x' + exif.height;
 		//if (exif.bitdepth) info += ' ' + exif.bitdepth;
 		//if (exif.colortype) info += ' ' + exif.colortype;

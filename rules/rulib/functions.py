@@ -8,6 +8,10 @@ import traceback
 
 import rulib
 
+import cgruutils
+
+import mediainfo
+
 def randMD5():
     hashlib = __import__('hashlib', globals(), locals(), [])
     random = __import__('random', globals(), locals(), [])
@@ -316,7 +320,7 @@ def skipFile(i_filename):
     return False
 
 
-def walkDir(admin, i_recv, i_dir, o_out, i_depth):
+def walkDir(i_admin, i_recv, i_dir, o_out, i_depth):
     if i_depth > i_recv['depth']:
         return
 
@@ -336,7 +340,7 @@ def walkDir(admin, i_recv, i_dir, o_out, i_depth):
 
     access = False
     denied = True
-    if admin.htaccessPath(i_dir):
+    if i_admin is None or i_admin.htaccessPath(i_dir):
         access = True
         denied = False
     else:
@@ -366,10 +370,19 @@ def walkDir(admin, i_recv, i_dir, o_out, i_depth):
                 if walk and 'files' in walk and entry in walk['files']:
                     file_info = walk['files'][entry]
                 file_info['name'] = os.fsencode(entry).decode('utf-8', 'surrogateescape')
+
                 st = os.stat(path)
                 file_info['size'] = st.st_size
                 file_info['mtime'] = st.st_mtime
                 file_info['space'] = st.st_blocks * 512
+
+                if 'mediainfo' in i_recv and i_recv['mediainfo']:
+                    if cgruutils.isMovieExt(entry):
+                        obj = mediainfo.processMovie(path)
+                        if obj and 'mediainfo' in obj:
+                            for k in obj['mediainfo']:
+                                file_info[k] = obj['mediainfo'][k]
+
                 o_out['files'].append(file_info)
             continue
 
@@ -431,7 +444,7 @@ def walkDir(admin, i_recv, i_dir, o_out, i_depth):
         if denied:
             continue
 
-        if admin.htaccessFolder(path) is False:
+        if i_admin is not None and i_admin.htaccessFolder(path) is False:
             continue
 
         folderObj = dict()
@@ -451,7 +464,7 @@ def walkDir(admin, i_recv, i_dir, o_out, i_depth):
                 folderObj['thumbnail'] = True
 
         if i_depth < i_recv['depth']:
-            walkDir(admin, i_recv, path, folderObj, i_depth + 1)
+            walkDir(i_admin, i_recv, path, folderObj, i_depth + 1)
 
         o_out['folders'].append(folderObj)
 

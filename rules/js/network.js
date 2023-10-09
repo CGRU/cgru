@@ -75,6 +75,8 @@ function n_WalkDir(i_args)
 		request.rufiles = i_args.rufiles;
 	if (i_args.lookahead)
 		request.lookahead = i_args.lookahead;
+	if (i_args.mediainfo)
+		request.mediainfo = true;
 
 	if (i_args.wfunc)
 	{

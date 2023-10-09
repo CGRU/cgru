@@ -280,24 +280,12 @@ function shot_RefsShow()
 	$('shot_refs').style.display = 'block';
 	$('shot_refs').classList.add('waiting');
 
-	let cmds = [];
-	for (let i = 0; i < ASSET.references.path.length; i++)
-		cmds.push('rules/bin/walk.sh --maxdepth 0 --mediainfo "'
-				+ RULES.root + '/' + ASSET.path + '/' + ASSET.references.path[0] + '"');
-	n_Request({
-		"send": {"cmdexec": {"cmds": cmds}},
-		"func": shot_RefsWalkReceived,
-		"info": 'walk refs media'
-	});
-}
-
-function shot_RefsWalkReceived(i_data, i_args)
-{
 	let walk = {};
 	walk.paths = [];
 	for (let i = 0; i < ASSET.references.path.length; i++)
 		walk.paths.push( ASSET.path + '/' + ASSET.references.path[i]);
 
+	walk.mediainfo = true;
 	walk.wfunc = shot_RefsReceived;
 	walk.info = 'walk refs';
 
