@@ -226,6 +226,27 @@ function u_Process()
 	u_ExecuteShow(false);
 
 	u_NavigFiltersRefresh();
+
+	if (c_RuFileExists('location.json'))
+	{
+		n_GetFile({
+			"path": c_GetRuFilePath('location.json'),
+			"func": u_LocationInfoReceived,
+			"info": 'location.json',
+			"local": true
+		});
+	}
+}
+
+function u_LocationInfoReceived(i_data, i_args)
+{
+	let info = '';
+	if (i_data.cuser)
+		info += ' by ' + c_GetUserTitle(i_data.cuser);
+	if (i_data.ctime)
+		info += ' at ' + c_DT_StrFromSec(i_data.ctime);
+	if (info.length)
+		$('location_info').innerHTML = 'Created ' + info;
 }
 
 function u_Finish()
@@ -241,6 +262,8 @@ function u_Finish()
 	cm_Finish();
 
 	u_ViewsFuncsClose();
+
+	$('location_info').textContent = '';
 
 	$('body_avatar_c').style.display = 'none';
 	$('body_avatar_m').style.display = 'none';

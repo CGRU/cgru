@@ -269,6 +269,22 @@ class Requests:
         o_out['makefolder'] = dirname
 
 
+    def req_copytemplate(self, i_args, o_out):
+        if self.session.USER_ID is None:
+            o_out['error'] = 'Guests are not allowed create new assets.'
+            return
+
+        template    = None
+        destination = None
+        names       = None
+
+        if 'template'    in i_args: template    = i_args['template']
+        if 'destination' in i_args: destination = i_args['destination']
+        if 'names'       in i_args: names       = i_args['names']
+
+        rulib.functions.copyTemplate(self.session.USER_ID, template, destination, names, o_out)
+
+
     def req_makenews(self, i_args, o_out):
         rulib.news.makeNewsAndBookmarks(i_args, self.session.USER_ID, o_out)
         return

@@ -1225,6 +1225,17 @@ border-radius: 8px;
 
 #body_body { clear: both; }
 
+#location_info {
+font-size: 8px;
+font-style: italic;
+opacity: .7;
+text-align: right;
+-o-transition: all .3s ease-in-out;
+-moz-transition: all .3s ease-in-out;
+-webkit-transition: all .3s ease-in-out;
+}
+#location_info:hover {font-size: 14px; opacity: 1.0;}
+
 /* ========================================================= */
 /* =================== COMMENTS ============================ */
 #comments .comments_stat .tag {border: 2px solid rgba(98,98,98,.5);}

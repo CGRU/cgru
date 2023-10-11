@@ -328,16 +328,15 @@ function a_CopySend(i_wnd)
 	let elWait = document.createElement('div');
 	i_wnd.elContent.appendChild(elWait);
 	i_wnd.m_elWait = elWait;
+	i_wnd.m_go_path = params.destination + '/' + params.name.split(' ')[0];
 	elWait.classList.add('wait');
 
-	let cmd = 'rules/bin/copy_template.py';
-	cmd += ' -t "' + c_PathPM_Client2Server(params.template) + '"';
-	cmd += ' -d "' + c_PathPM_Rules2Server(params.destination) + '"';
-	cmd += ' ' + params.name;
+	let request = {};
+	request.template = c_PathPM_Client2Server(params.template);
+	request.destination = c_PathPM_Rules2Server(params.destination);
+	request.names = [params.name];
 
-	i_wnd.m_go_path = params.destination + '/' + params.name.split(' ')[0];
-
-	n_Request({"send": {"cmdexec": {"cmds": [cmd]}}, "func": a_CopyReceived, "wnd": i_wnd});
+	n_Request({"send": {"copytemplate": request}, "func": a_CopyReceived, "wnd": i_wnd});
 
 	// Clear walk cache, as we need to navigate there later:
 	n_walks[params.destination] = null;
@@ -350,34 +349,10 @@ function a_CopyReceived(i_data, i_args)
 	let elResults = i_args.wnd.m_elResults;
 	elResults.textContent = '';
 
-	if ((i_data.cmdexec == null) || (!i_data.cmdexec.length))
+	let copies = i_data.copies;
+	if ((copies == null) || (!copies.length))
 	{
 		elResults.textContent = (JSON.stringify(i_data));
-		return;
-	}
-
-	if (i_data.cmdexec[0].error)
-	{
-		elResults.innerHTML = '<b>ERROR:</b><br>' + i_data.cmdexec[0].error.replace(/\n/g,'<br>');
-		return;
-	}
-
-	let copy = i_data.cmdexec[0].copy;
-	if (copy.error)
-	{
-		elResults.textContent = 'Error: ' + copy.error;
-		return;
-	}
-
-	let copies = copy.copies;
-	if (copies == null)
-	{
-		elResults.textContent = 'Error: Copies are null.';
-		return;
-	}
-	if (copies.length == 0)
-	{
-		elResults.textContent = 'Error: Copies are empty.';
 		return;
 	}
 

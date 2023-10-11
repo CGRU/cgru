@@ -2,6 +2,7 @@ import cgi
 import json
 import getpass
 import os
+import shutil
 import sys
 import time
 import traceback
@@ -319,6 +320,58 @@ def skipFile(i_filename):
         return True
     return False
 
+
+def copyTemplate(i_uid, i_template, i_destination, i_names, o_out):
+    if not os.path.isdir(i_template):
+        o_out['error'] = 'Template folder does not exist.'
+        return False
+    if not os.path.isdir(i_destination):
+        o_out['error'] = 'Destination folder does not exist.'
+        return False
+    if not type(i_names) is list:
+        o_out['error'] = 'New names parameter should be list.'
+        return False
+    if len(i_names) == 0:
+        o_out['error'] = 'New names parameter is an empty list.'
+        return False
+    if i_uid is None:
+        i_uid = getCurUser()
+
+    obj = dict()
+    obj['cuser'] = i_uid
+    obj['ctime'] = getCurSeconds()
+
+    o_out['copies'] = []
+    for name in i_names:
+        copy = dict()
+
+        dest = os.path.normpath(os.path.join(i_destination, name))
+        copy['dest'] = dest
+        if os.path.isdir(dest):
+            copy['exist'] = True
+        else:
+            try:
+               shutil.copytree(i_template, dest)
+            except PermissionError:
+                copy['error'] = 'Permission denied: %s' % dest
+                continue
+            except:
+                copy['error'] = '%s' % traceback.format_exc()
+                continue
+
+            try:
+                cfile = os.path.join(dest, rulib.RUFOLDER, 'location.json')
+                cfileDir = os.path.dirname(cfile)
+                if not os.path.isdir(cfileDir):
+                    os.mkdir(cfileDir)
+                writeObj(cfile, obj)
+            except:
+                copy['error'] = 'Unable to write rules file.'
+                copy['info'] = '%s' % traceback.format_exc()
+
+        o_out['copies'].append(copy)
+
+    return True
 
 def walkDir(i_admin, i_recv, i_dir, o_out, i_depth):
     if i_depth > i_recv['depth']:
