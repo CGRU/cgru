@@ -11,6 +11,7 @@ sc_thumb_params.skip_movies = {"width":'30%',"lwidth":'150px','type':"bool",'def
 sc_thumb_params_values = {};
 
 sc_area = false;
+sc_show_aux = false;
 
 if (ASSETS.scene && (ASSETS.scene.path == g_CurPath()))
 {
@@ -60,6 +61,17 @@ function sc_InitHTML( i_data)
 		}
 	}
 
+	let elBtnShowAux = document.createElement('div');
+	elBtnShowAux.textContent = 'Show Aux';
+	elBtnShowAux.classList.add('button');
+	$('asset_top_left').appendChild(elBtnShowAux);
+	elBtnShowAux.onclick = function(e){
+		let el = e.currentTarget;
+		c_ElToggleSelected(el);
+		sc_show_aux = el.m_selected;
+	}
+
+
 	gui_Create( $('scenes_make_thumbnails'), sc_thumb_params);
 	gui_CreateChoices({"wnd":$('scenes_make_thumbnails'),"name":'colorspace',"value":RULES.thumbnail.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
 
@@ -82,7 +94,19 @@ function sc_InitHTML( i_data)
 		}
 	}
 }
-
+function sc_AuxFolder(i_fobj)
+{
+	if (c_AuxFolder(i_fobj))
+	{
+		if (sc_show_aux)
+		{
+			if (i_fobj && i_fobj.status && i_fobj.status.flags && (i_fobj.status.flags.indexOf('aux') != -1))
+				return false;
+		}
+		return true;
+	}
+	return false;
+}
 function sc_Create_Shot()
 {
 	let args = {};
@@ -145,7 +169,10 @@ function scene_Show()
 	var folders = g_elCurFolder.m_dir.folders;
 	for( var f = 0; f < folders.length; f++ )
 	{
-		if( c_AuxFolder( folders[f])) continue;
+		if (sc_AuxFolder(folders[f]))
+		{
+			continue;
+		}
 
 		var path = g_elCurFolder.m_path + '/' + folders[f].name;
 
@@ -365,7 +392,8 @@ function scenes_Received( i_data, i_args)
 	for( var sc = 0; sc < walk.folders.length; sc++)
 	{
 		var fobj = walk.folders[sc];
-		if( c_AuxFolder( fobj)) continue;
+		if (sc_AuxFolder(fobj))
+			continue;
 
 		var elScene = document.createElement('div');
 		sc_elScenes.push( elScene);
@@ -395,7 +423,8 @@ function scenes_Received( i_data, i_args)
 		for( var s = 0; s < walk.folders[sc].folders.length; s++)
 		{
 			var fobj = walk.folders[sc].folders[s];
-			if( c_AuxFolder( fobj)) continue;
+			if (sc_AuxFolder(fobj))
+				continue;
 
 			var elShot = document.createElement('div');
 			sc_elShots.push( elShot);
