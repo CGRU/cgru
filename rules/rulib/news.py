@@ -334,7 +334,7 @@ def isUserAssignedInStatus(i_user, i_obj):
                             found = True
                             break
                     if not found:
-                        return continue
+                        continue
                 return True
 
     return False
