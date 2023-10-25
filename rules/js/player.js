@@ -131,17 +131,16 @@ function p_InitializeReceived(i_data)
 {
 	if (i_data == null)
 		return;
-	for (var file in i_data.i_data)
-		cgru_ConfigJoin(i_data.i_data[file].cgru_i_data);
+
+	for (let file in i_data.config)
+		cgru_ConfigJoin(i_data.config[file].cgru_config);
+
 	g_users = i_data.users;
 	if (i_data.user)
 		g_auth_user = i_data.user;
 
-	n_WalkDir({"paths": ['.'], "wfunc": p_ConfigReceived, "info": 'walk init', "rufiles": ['rules']});
-}
-function p_ConfigReceived(i_data)
-{
-	c_RulesMergeDir(RULES, i_data[0]);
+	c_RulesMergeObjs(RULES_TOP, i_data.rules_top);
+	RULES = RULES_TOP;
 
 	if (RULES.cgru_config)
 		cgru_ConfigJoin(RULES.cgru_config);
