@@ -83,7 +83,7 @@ def processExif(i_file):
     params['Artist'] = 'artist'
     params['Comment'] = 'comments'
 
-    cmd_args = ['exiftool','-S','-fast2']
+    cmd_args = ['exiftool','-S','-fast2','-ignoreMinorErrors','-quiet','-quiet']
     for key in params:
         cmd_args.append('-'+key)
     cmd_args.append(i_file)
