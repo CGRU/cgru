@@ -165,7 +165,10 @@ bool RadiolocationService::get(QList<TaskObject> &o_tasks, int i_index)
    
     af::JobProgress progress(answer5.get());
 
-    const af::BlockData * block = itemjob->getBlock(block_id);
+	/*
+ 	class af::Job doesn't have or inherit getBlock method. How you could compile this?
+ 	*/
+    const af::BlockData * block = itemjob->getBlock(block_id); 
     if (block == NULL)
     {
         std::cerr << "RadiolocationService::get(QList<TaskObject>): block is NULL : " << block_id << std::endl;
