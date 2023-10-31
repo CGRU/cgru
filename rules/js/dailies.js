@@ -1117,7 +1117,8 @@ function d_WmDiscard(i_wm)
 ########################################################################################################### */
 
 var d_cutparams = {
-	cut_name      : {},
+	cut_name      : {'width': '30%'},
+	audio         : {'width': '70%'},
 	input         : {},
 	fps           : {"label": 'FPS', 'width': '25%'},
 	af_pertask    : {"label": 'Frames Per Task', 'width': '25%', 'lwidth': '140px'},
@@ -1139,6 +1140,7 @@ function d_MakeCut(i_args)
 
 	var params = {};
 	params.cut_name = i_args.cut_name;
+	params.audio = c_PathPM_Rules2Client(g_CurPath()) + '/REF/' + params.cut_name + '.flac';
 	params.output = c_PathPM_Rules2Client(i_args.output);
 	params.input = RULES.assets.shot.result.path.join(',');
 	params.fps = RULES.fps;
@@ -1228,12 +1230,13 @@ function d_CutProcessGUI(i_wnd, i_test)
 
 	var cmd = 'rules/bin/makecut.sh';
 
-	cmd += ' -i "' + params.input + '"';
-	cmd += ' -n "' + params.cut_name + '"';
-	cmd += ' -u "' + g_auth_user.id + '"';
-	cmd += ' -f "' + params.fps + '"';
-	cmd += ' -r "' + params.format + '"';
-	cmd += ' -c "' + params.codec + '"';
+	cmd += ' --inputs "'     + params.input      + '"';
+	cmd += ' --audio "'      + params.audio      + '"';
+	cmd += ' --cutname "'    + params.cut_name   + '"';
+	cmd += ' --afuser "'     + g_auth_user.id    + '"';
+	cmd += ' --fps "'        + params.fps        + '"';
+	cmd += ' --resolution "' + params.format     + '"';
+	cmd += ' --codec "'      + params.codec      + '"';
 	cmd += ' --colorspace "' + params.colorspace + '"';
 
 	if (params.getcomments)

@@ -23,6 +23,7 @@ Parser = OptionParser(
 )
 
 Parser.add_option('-i', '--inputs',     dest='inputs',      type  ='string', default='RESULT/JPG',help='Inputs')
+Parser.add_option('-a', '--audio',      dest='audio',       type  ='string', default=None,        help='Audio file')
 Parser.add_option('-n', '--cutname',    dest='cutname',     type  ='string', default='',          help='Cut name')
 Parser.add_option('-s', '--skipnosrc',  dest='skipnosrc',   action='store_true', default=False,   help='Skip sources not found')
 Parser.add_option('--flipversion',      dest='flipversion', action='store_true', default=False,   help='Find the lowest versions')
@@ -224,8 +225,10 @@ print('{"progress":"%d files found"},' % file_counter)
 
 cmd_encode = os.path.join(os.path.dirname(sys.argv[0]), 'makemovie.py')
 cmd_encode = '"%s" "%s"' % (os.getenv('CGRU_PYTHONEXE', 'python'), os.path.normpath(cmd_encode))
-cmd_encode += ' -f %s' % Options.fps
-cmd_encode += ' -c %s' % Options.codec
+cmd_encode += ' --fps %s' % Options.fps
+cmd_encode += ' --codec %s' % Options.codec
+if Options.audio is not None and os.path.isfile(Options.audio):
+    cmd_encode += ' --audio "%s"' % Options.audio
 cmd_encode += ' "%s"' % os.path.join(OutDir, TmpFiles)
 cmd_encode += ' "%s"' % movie_name
 
