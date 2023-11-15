@@ -288,7 +288,7 @@ Status.prototype.show = function(i_status, i_update = false)
 	if (this.args.tasks_badges)
 	{
 		let elBages = task_DrawBadges(this.obj, this.elTasksBadges/*, {'only_my':this.args.display_short}*/);
-		if (this.multi && g_admin)
+		if (this.multi)
 		{
 			if (elBages && elBages.length)
 			{
@@ -340,7 +340,7 @@ Status.prototype.showTasks = function()
 		}
 	}
 
-	if (this.multi && g_admin)
+	if (this.multi)
 		this.createAddTaskButton();
 }
 Status.prototype.createAddTaskButton = function()
