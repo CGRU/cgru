@@ -674,7 +674,7 @@ void ButtonMenu::launchCmd(int i_index)
 
 	if (i_index >= m_cmds.size())
 	{
-		AFERRAR("ButtonMenu::launchCmd: index is out of range: %d >= %d", i_index, m_cmds.size())
+		AF_ERR << "ButtonMenu::launchCmd: index is out of range: " << i_index << " >= m_cmds.size()";
 		return;
 	}
 	

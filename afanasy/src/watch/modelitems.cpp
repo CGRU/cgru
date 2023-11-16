@@ -5,6 +5,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 ModelItems::ModelItems(ListItems * i_list_items):
 	QAbstractListModel(i_list_items),
@@ -63,7 +64,7 @@ void ModelItems::addItem( Item * item, int row)
    if( row == -1) row = items.size();
    else if( row > items.size())
    {
-      AFERRAR("ModelItems::addItem: row > items.size() (%d > %d)\n", row, items.size());
+		AF_ERR << "ModelItems::addItem: row > items.size() (" << row << " > " << items.size() << ")";
       row = items.size();
    }
 //printf("ModelItems::addItem: %s[%d]\n", item->getName().toUtf8().data(), row);
@@ -76,7 +77,7 @@ void ModelItems::delItem( int row)
 {
    if( row >= items.size())
    {
-      AFERRAR("ModelItems::delItem: row >= items.size() (%d >= %d)\n", row, items.size());
+		AF_ERR << "ModelItems::addItem: row >= items.size() (" << row << " >= " << items.size() << ")";
       return;
    }
    beginRemoveRows( QModelIndex(), row, row);
@@ -124,7 +125,7 @@ void ModelItems::setItems( int start, Item ** item, int count)
    }
    if( start + count > items.size())
    {
-      AFERRAR("ModelItems::setItems: start + count > items.size() (%d+%d>=%d)\n", start, count, items.size());
+		AF_ERR << "ModelItems::setItems: start + count > items.size() (" << start << "+" << count << ">=" << items.size() << ")";
       return;
    }
    for( int i = 0; i < count; i++) items[start+i] = item[i];

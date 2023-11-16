@@ -7,6 +7,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 ModelNodes::ModelNodes(ListNodes * i_list_nodes):
 	ModelItems(i_list_nodes)
@@ -22,7 +23,7 @@ int ModelNodes::addNode( ItemNode * node, int row)
 	if( row == -1) row = items.size();
 	else if( row > items.size())
 	{
-		AFERRAR("ModelNodes::addNode: row > items.size() (%d > %d)\n", row, items.size());
+		AF_ERR << "ModelNodes::addNode: row > items.size() (" << row << " > " << items.size() << ")";
 		row = items.size();
 	}
 	addItem( node, row);
