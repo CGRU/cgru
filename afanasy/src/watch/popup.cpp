@@ -5,7 +5,7 @@
 #include "dialog.h"
 
 #include <QApplication>
-#include <QDesktopWidget>
+//#include <QDesktopWidget>
 #include <QLabel>
 #include <QLayout>
 #include <QScreen>
@@ -50,7 +50,8 @@ Popup::Popup( const QString & i_title, const QString & i_msg, uint32_t i_state):
 	if( i_state & AFJOB::STATE_ERROR_MASK )
 		clr = afqt::QEnvironment::clr_itemjoberror.c;
 	QPalette pal = palette();
-	pal.setColor( QPalette::Background, clr);
+	//pal.setColor( QPalette::Background, clr);
+	pal.setColor(QPalette::Window, clr);
 	label->setPalette( pal);
 
 	show();

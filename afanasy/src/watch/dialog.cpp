@@ -63,16 +63,19 @@ Dialog::Dialog():
 
 	QWidget * cw = new QWidget( this);
 	setCentralWidget( cw);
+	cw->setContentsMargins(0,0,0,0);
+	this->setContentsMargins(0,0,0,0);
 
     m_hlayout_a = new QHBoxLayout( cw);
     m_vlayout_a = new QVBoxLayout();
     m_hlayout_b = new QHBoxLayout();
     m_vlayout_b = new QVBoxLayout();
 
-    m_hlayout_a->setMargin ( 0);
-    m_vlayout_a->setMargin ( 0);
-    m_hlayout_b->setMargin ( 0);
-    m_vlayout_b->setMargin ( 0);
+	m_hlayout_a->setContentsMargins(0,0,0,0);
+	m_vlayout_a->setContentsMargins(0,0,0,0);
+	m_hlayout_b->setContentsMargins(0,0,0,0);
+	m_vlayout_b->setContentsMargins(0,0,0,0);
+
     m_hlayout_a->setSpacing( 0);
     m_vlayout_a->setSpacing( 0);
     m_hlayout_b->setSpacing( 0);

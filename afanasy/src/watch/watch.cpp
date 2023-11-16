@@ -27,7 +27,12 @@
 #include <QtCore/QProcess>
 #include <QtGui/QPixmap>
 #include <QApplication>
+
+#if QT_VERSION < 0x060000
 #include <QSound>
+#else
+#include <QSoundEffect>
+#endif
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -486,8 +491,8 @@ void Watch::startProcess( const QString & i_cmd, const QString & i_wdir, const s
 void Watch::ntf_JobAdded( const ItemJob * i_job)
 {
 	displayInfo("Job added.");
-	if( false == afqt::QEnvironment::ntf_job_added_sound.str.isEmpty())
-		QSound::play( afqt::QEnvironment::ntf_job_added_sound.str );
+
+	Watch::playSound( afqt::QEnvironment::ntf_job_added_sound.str );
 
 	if( afqt::QEnvironment::ntf_job_added_alert.n )
 		Watch::notify("Job Added", i_job->getName(), i_job->state);
@@ -497,8 +502,7 @@ void Watch::ntf_JobDone( const ItemJob * i_job)
 {
 	displayInfo("Job Done.");
 
-	if( false == afqt::QEnvironment::ntf_job_done_sound.str.isEmpty())
-		QSound::play( afqt::QEnvironment::ntf_job_done_sound.str );
+	Watch::playSound( afqt::QEnvironment::ntf_job_done_sound.str );
 
 	if( afqt::QEnvironment::ntf_job_added_alert.n )
 		Watch::notify("Job Done", i_job->getName(), i_job->state);
@@ -507,8 +511,8 @@ void Watch::ntf_JobDone( const ItemJob * i_job)
 void Watch::ntf_JobError( const ItemJob * i_job)
 {
 	displayWarning("Job Error.");
-	if( false == afqt::QEnvironment::ntf_job_error_sound.str.isEmpty())
-		QSound::play( afqt::QEnvironment::ntf_job_error_sound.str );
+
+	Watch::playSound( afqt::QEnvironment::ntf_job_error_sound.str );
 
 	if( afqt::QEnvironment::ntf_job_added_alert.n )
 		Watch::notify("Job Error", i_job->getName(), i_job->state);
@@ -634,6 +638,19 @@ void Watch::repaint()
 void Watch::notify( const QString & i_title, const QString & i_msg, uint32_t i_state)
 {
 	new Popup( i_title, i_msg, i_state);
+}
+void Watch::playSound(const QString & i_file)
+{
+	if (i_file.isEmpty())
+		return;
+
+#if QT_VERSION < 0x060000
+	QSound::play( afqt::QEnvironment::ntf_job_added_sound.str );
+#else
+	QSoundEffect effect;
+	effect.setSource(QUrl::fromLocalFile(i_file));
+	effect.play();
+#endif
 }
 
 void Watch::showDocs() { Watch::startProcess("documentation \"afanasy/watch.html\""); }

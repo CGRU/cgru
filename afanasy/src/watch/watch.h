@@ -129,6 +129,7 @@ public:
 	void static openTerminal(const QString & i_wdir = QString());
 
 	void static notify( const QString & i_title, const QString & i_msg = QString(), uint32_t i_state = 0);
+	void static playSound(const QString & i_file);
 
 private:
 	void loadIcons(QMap<QString, QPixmap*> & o_map, const QString & i_path, int i_height);

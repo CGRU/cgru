@@ -19,6 +19,10 @@
 #include <QtCore/QEvent>
 #include <QtGui/QPainter>
 
+#if QT_VERSION < 0x060000
+#define QRegularExpression QRegExp
+#endif
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -358,7 +362,8 @@ bool ItemJobTask::compare( int type, const ItemJobTask & other, bool ascending) 
 
 bool ItemJobTask::v_mousePressed(int i_x, int i_y, int i_w, int i_h, const Qt::MouseButtons & i_buttons)
 {
-	if ((i_buttons == Qt::MidButton) || (QApplication::keyboardModifiers() == Qt::AltModifier))
+//	if ((i_buttons == Qt::MidButton) || (QApplication::keyboardModifiers() == Qt::AltModifier))
+	if ((i_buttons == Qt::MiddleButton) || (QApplication::keyboardModifiers() == Qt::AltModifier))
 	{
 		showThumbnail();
 		return true;
@@ -401,7 +406,7 @@ void ItemJobTask::taskFilesReceived( const af::MCTaskUp & i_taskup )
 		}
 
 		QString name = afqt::stoq(i_taskup.getFileName(i));
-		static const QRegExp rx(".*/");
+		static const QRegularExpression rx(".*/");
 		name = name.replace(rx, "");
 		name = name.replace(".jpg","");
 

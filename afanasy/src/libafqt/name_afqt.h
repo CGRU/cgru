@@ -2,6 +2,8 @@
 
 #include "../libafanasy/name_af.h"
 
+#include <Python.h>
+
 #include <QtNetwork/QTcpSocket>
 
 namespace afqt

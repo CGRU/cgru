@@ -25,7 +25,7 @@ QAfSocket::QAfSocket( QObject * i_parent, af::Msg * i_msg_req, bool i_updater):
 	m_qsocket = new QTcpSocket( this);
 	m_msg_ans = new af::Msg();
 
-	connect( m_qsocket, SIGNAL( error( QAbstractSocket::SocketError)), this, SLOT( slot_error( QAbstractSocket::SocketError)));
+	connect(m_qsocket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this, SLOT(slot_error(QAbstractSocket::SocketError)));
 	connect( m_qsocket, SIGNAL( connected()), this, SLOT( slot_connected()));
 	connect( m_qsocket, SIGNAL( bytesWritten( qint64)), this, SLOT( slot_bytesWritten( qint64)));
 	connect( m_qsocket, SIGNAL( readyRead()), this, SLOT( slot_readyRead()));

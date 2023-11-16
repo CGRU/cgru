@@ -1,13 +1,9 @@
 file(GLOB_RECURSE src RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/*.cpp")
 file(GLOB_RECURSE inc RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/*.h")
 
-if( "$ENV{AF_QT_VER}" STREQUAL "5" )
-	find_package(Qt5Widgets REQUIRED)
-	find_package(Qt5Multimedia REQUIRED)
-
-else()
-	find_package(Qt4 COMPONENTS QtGui REQUIRED)
-	include(${QT_USE_FILE})
+find_package(Qt6 COMPONENTS Widgets Multimedia)
+if (NOT Qt6_FOUND)
+	find_package(Qt5 REQUIRED COMPONENTS Widgets Multimedia)
 endif()
 
 set(CMAKE_AUTOMOC ON)
@@ -35,4 +31,4 @@ if(APPLE)
 	   ${SECURITY_FRAMEWORK})
 endif(APPLE)
 
-target_link_libraries(afwatch afqt ${Qt5Multimedia_LIBRARIES} ${Qt5Widgets_LIBRARIES} $ENV{AF_EXTRA_LIBS} )
+target_link_libraries(afwatch afqt Qt::Multimedia Qt::Widgets $ENV{AF_EXTRA_LIBS} )

@@ -12,6 +12,10 @@
 #include <QtCore/QEvent>
 #include <QtGui/QPainter>
 
+#if QT_VERSION < 0x060000
+#define QRegularExpression QRegExp
+#endif
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -870,7 +874,7 @@ void ItemJob::v_filesReceived(const af::MCTaskUp & i_taskup)
 		return;
 
 	QString filename = afqt::stoq(i_taskup.getFileName(0));
-	static const QRegExp rx(".*/");
+	static const QRegularExpression rx(".*/");
 	filename = filename.replace(rx, "");
 	filename = filename.replace(".jpg","");
 

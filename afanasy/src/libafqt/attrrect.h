@@ -1,8 +1,9 @@
 #pragma once
 
+#include "name_afqt.h"
+
 #include <QtCore/QRect>
 
-#include "name_afqt.h"
 #include "attr.h"
 
 class QByteArray;
