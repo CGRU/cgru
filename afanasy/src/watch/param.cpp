@@ -7,6 +7,12 @@
 
 #include "../libafqt/qenvironment.h"
 
+#if QT_VERSION < 0x051500
+#define Qt_QString QString
+#else
+#define Qt_QString Qt
+#endif
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -185,12 +191,10 @@ bool Param::getInputDialog(const QVariant & i_var, QString & o_str, QWidget * i_
 			break;
 
 		o_str.clear();
-		//QStringList list = value.split(",", QString::SkipEmptyParts);
-		QStringList list = value.split(",", Qt::SkipEmptyParts);
+		QStringList list = value.split(",", Qt_QString::SkipEmptyParts);
 		for (int i = 0; i < list.size(); i++)
 		{
-			//QStringList pair = list[i].split(":", QString::SkipEmptyParts);
-			QStringList pair = list[i].split(":", Qt::SkipEmptyParts);
+			QStringList pair = list[i].split(":", Qt_QString::SkipEmptyParts);
 			if (pair.size() != 2)
 			{
 				o_str = "Invalid pools string.";
@@ -225,12 +229,10 @@ bool Param::getInputDialog(const QVariant & i_var, QString & o_str, QWidget * i_
 			break;
 
 		o_str.clear();
-		//QStringList list = value.split(",", QString::SkipEmptyParts);
-		QStringList list = value.split(",", Qt::SkipEmptyParts);
+		QStringList list = value.split(",", Qt_QString::SkipEmptyParts);
 		for (int i = 0; i < list.size(); i++)
 		{
-			//QStringList pair = list[i].split(":", QString::SkipEmptyParts);
-			QStringList pair = list[i].split(":", Qt::SkipEmptyParts);
+			QStringList pair = list[i].split(":", Qt_QString::SkipEmptyParts);
 			if (pair.size() != 2)
 			{
 				o_str = "Invalid environment string.";
