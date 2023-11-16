@@ -593,7 +593,7 @@ void QEnvironment::solveServerAddress()
          int number = atoi(serveraddrnum_str.c_str());
          if( number >= adresses.size())
          {
-            AFERRAR("Server address number >= server addresses size (%d>=%d), using the last.", number, adresses.size())
+				AF_ERR << "Server address number >= server addresses size (" << number << ">=" << adresses.size() << "), using the last.";
             number = adresses.size() - 1;
          }
          serveraddrnum = number;
