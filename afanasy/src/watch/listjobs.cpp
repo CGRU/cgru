@@ -22,6 +22,7 @@
 #include <QBoxLayout>
 #include <QInputDialog>
 #include <QMenu>
+#include <QMessageBox>
 #include <QSplitter>
 
 #define AFOUTPUT
@@ -758,7 +759,13 @@ void ListJobs::actDeleteDone()
 
 	if( ids.size() == 0 )
 	{
-		displayWarning("No done jobs founded.");
+		displayWarning("No done jobs found.");
+		return;
+	}
+
+	if (QMessageBox::question(this, "Delete Done Jobs", QString("Delete %1 done jobs?").arg(ids.size()),
+				QMessageBox::No | QMessageBox::Yes, QMessageBox::No) == QMessageBox::No)
+	{
 		return;
 	}
 
