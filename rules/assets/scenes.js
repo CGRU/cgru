@@ -72,6 +72,17 @@ function sc_InitHTML( i_data)
 	}
 
 
+	let elBtnShowOmit = document.createElement('div');
+	elBtnShowOmit.textContent = 'Show Omit';
+	elBtnShowOmit.classList.add('button');
+	$('asset_top_left').appendChild(elBtnShowOmit);
+	elBtnShowOmit.onclick = function(e){
+		let el = e.currentTarget;
+		c_ElToggleSelected(el);
+		sc_show_omit = el.m_selected;
+	}
+
+
 	gui_Create( $('scenes_make_thumbnails'), sc_thumb_params);
 	gui_CreateChoices({"wnd":$('scenes_make_thumbnails'),"name":'colorspace',"value":RULES.thumbnail.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
 
@@ -101,6 +112,11 @@ function sc_AuxFolder(i_fobj)
 		if (sc_show_aux)
 		{
 			if (i_fobj && i_fobj.status && i_fobj.status.flags && (i_fobj.status.flags.indexOf('aux') != -1))
+				return false;
+		}
+		if (sc_show_omit)
+		{
+			if (i_fobj && i_fobj.status && i_fobj.status.flags && (i_fobj.status.flags.indexOf('omit') != -1))
 				return false;
 		}
 		return true;
