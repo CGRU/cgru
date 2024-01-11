@@ -12,6 +12,7 @@ sc_thumb_params_values = {};
 
 sc_area = false;
 sc_show_aux = false;
+sc_show_omit = false;
 
 if (ASSETS.scene && (ASSETS.scene.path == g_CurPath()))
 {
