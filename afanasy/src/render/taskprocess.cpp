@@ -274,9 +274,14 @@ TaskProcess::~TaskProcess()
 		delete [] m_environ;
 	}
 
-	delete m_taskexec;
-	delete m_service;
-	delete m_parser;
+	if (m_taskexec)
+		delete m_taskexec;
+
+	if (m_service)
+		delete m_service;
+
+	if (m_parser)
+		delete m_parser;
 
 	af::removeDir( m_store_dir);
 }

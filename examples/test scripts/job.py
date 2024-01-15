@@ -215,7 +215,8 @@ for b in range(numblocks):
                 'Warning: Invalid tickets: "%s"' % Args.environment
 
     if Args.filemin != -1 or Args.filemax != -1:
-        block.setFileSizeCheck(Args.filemin, Args.filemax)
+        block.skipExistingFiles(Args.filemin, Args.filemax)
+        block.checkRenderedFiles(Args.filemin, Args.filemax)
 
     negative_pertask = False
     if Args.frames != '':
@@ -243,9 +244,12 @@ for b in range(numblocks):
 
     if Args.filesout:
         cmd += ' --filesout "%s"' % Args.filesout
-        block.checkRenderedFiles(100)
+        filemin = 100
+        if Args.filemin > 0:
+            filemin = Args.filemin
+        block.checkRenderedFiles(filemin, Args.filemax)
         if Args.skipexist:
-            block.skipExistingFiles()
+            block.skipExistingFiles(filemin, Args.filemax)
         files = []
         for afile in Args.filesout.split(';'):
             files.append(afcommon.patternFromStdC(afile))

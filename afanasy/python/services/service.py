@@ -443,7 +443,7 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
                     return False
 
                 if file_size_max > 0 and size > file_size_max:
-                    self.log = 'File size greater than maximum (%d < %d):\n%s' % (size, file_size_max, afile)
+                    self.log = 'File size greater than maximum (%d > %d):\n%s' % (size, file_size_max, afile)
                     return False
 
         return True

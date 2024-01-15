@@ -512,9 +512,9 @@ void WndTask::showExec(af::MCTask & i_mctask)
 	{
 		c.insertText("\n");
 		c.insertText("File Size Check: ", fItalic);
-		c.insertText(QString::number(exec->getFileSizeMin()), fBold);
+		c.insertText(afqt::stoq(af::toKMG(exec->getFileSizeMin())), fBold);
 		c.insertText(" - ", fItalic);
-		c.insertText(QString::number(exec->getFileSizeMax()), fBold);
+		c.insertText(afqt::stoq(af::toKMG(exec->getFileSizeMax())), fBold);
 	}
 
 	if (parsed_files.size())
