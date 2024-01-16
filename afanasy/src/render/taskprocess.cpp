@@ -104,6 +104,14 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec, RenderHost * i_render):
 	af::pathMakePath( m_store_dir);
 
 	m_service = new af::Service( m_taskexec, m_store_dir);
+	if (false == m_service->isInitialized())
+	{
+		af::TaskExec::UPFailedToStart;
+		AF_ERR << "Failed to initialize service: " << m_taskexec->getServiceType();
+		sendTaskSate();
+		return;
+	}
+
 	m_parser = new ParserHost( m_service);
 
 	m_cmd = m_service->getCommand();
