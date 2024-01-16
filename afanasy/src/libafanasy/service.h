@@ -42,6 +42,7 @@ public:
 
 	inline bool isInitialized() const { return m_initialized;}
 
+	bool skipTask() const;
 	inline const std::string & getWDir()    const { return m_wdir;    }
 	inline const std::string & getCommand() const { return m_command; }
 	const std::map<std::string, std::string> & getEnvironment() const {return m_environment;}
@@ -75,6 +76,7 @@ private:
 	std::string m_name;
 	std::string m_parser_type;
 
+	PyObject * m_PyObj_FuncSkipTask;
 	PyObject * m_PyObj_FuncGetWDir;
 	PyObject * m_PyObj_FuncGetCommand;
 	PyObject * m_PyObj_FuncGetEnvironment;

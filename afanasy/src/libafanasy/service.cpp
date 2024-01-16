@@ -145,6 +145,7 @@ Service::Service(
 
 void Service::initialize( const TaskExec * i_task_exec, const std::string & i_store_dir)
 {
+	m_PyObj_FuncSkipTask = NULL;
 	m_PyObj_FuncGetWDir = NULL;
 	m_PyObj_FuncGetCommand = NULL;
 	m_PyObj_FuncGetEnvironment = NULL;
@@ -237,6 +238,10 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 				return;
 
 	//Get functions:
+	m_PyObj_FuncSkipTask = getFunction(AFPYNAMES::SERVICE_FUNC_SKIPTASK);
+	if (m_PyObj_FuncSkipTask == NULL)
+		return;
+
 	m_PyObj_FuncGetWDir= getFunction( AFPYNAMES::SERVICE_FUNC_GETWDIR);
 	if( m_PyObj_FuncGetWDir == NULL ) return;
 
@@ -332,6 +337,29 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 
 Service::~Service()
 {
+}
+
+bool Service::skipTask() const
+{
+	PyObject * pResult = PyObject_CallObject(m_PyObj_FuncSkipTask, NULL);
+	if (pResult == NULL)
+	{
+		if (PyErr_Occurred())
+			PyErr_Print();
+		return false;
+	}
+
+	if (true != PyBool_Check(pResult))
+	{
+		AF_ERR << "Return object type is not a boolean.";
+		return false;
+	}
+
+	bool result = PyObject_IsTrue(pResult);
+
+	Py_DECREF(pResult);
+
+	return result;
 }
 
 bool Service::hasParser() const

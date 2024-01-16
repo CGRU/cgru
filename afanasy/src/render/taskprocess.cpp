@@ -80,6 +80,7 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec, RenderHost * i_render):
 	m_taskexec( i_taskExec),
 	m_environ( NULL),
 	m_render( i_render),
+	m_service(NULL),
 	m_parser( NULL),
 	m_update_status( af::TaskExec::UPPercent),
 	m_stop_time( 0),
@@ -103,23 +104,31 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec, RenderHost * i_render):
 		af::removeDir( m_store_dir);
 	af::pathMakePath( m_store_dir);
 
-	m_service = new af::Service( m_taskexec, m_store_dir);
+	m_service = new af::Service(m_taskexec, m_store_dir);
+	m_parser = new ParserHost(m_service);
+
 	if (false == m_service->isInitialized())
 	{
-		af::TaskExec::UPFailedToStart;
-		AF_ERR << "Failed to initialize service: " << m_taskexec->getServiceType();
-		sendTaskSate();
+		m_update_status = af::TaskExec::UPFailedToStart;
+		m_append_to_server_task_log = "Failed to initialize service: " + m_taskexec->getServiceType();
+		AF_ERR << m_append_to_server_task_log;
 		return;
 	}
 
-	m_parser = new ParserHost( m_service);
+	if (m_service->skipTask())
+	{
+		m_update_status = af::TaskExec::UPSkip;
+		AF_LOG << "Skipping task by service.";
+		return;
+	}
 
 	m_cmd = m_service->getCommand();
 	AF_DEBUG << m_cmd.c_str();
-	if( m_cmd.size() == 0 )
+	if (m_cmd.size() == 0)
 	{
-		m_update_status = af::TaskExec::UPSkip;
-		sendTaskSate();
+		m_update_status = af::TaskExec::UPFailedToStart;
+		m_append_to_server_task_log = "Zero command size.";
+		AF_ERR << m_append_to_server_task_log;
 		return;
 	}
 
@@ -159,7 +168,6 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec, RenderHost * i_render):
 	if( m_pid == 0 )
 	{
 		m_update_status = af::TaskExec::UPFailedToStart;
-		sendTaskSate();
 		return;
 	}
 }
