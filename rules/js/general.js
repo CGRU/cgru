@@ -30,6 +30,8 @@ var g_nav_clicked = false;
 var g_navigating_path = null;
 var g_arguments = null;
 
+var g_sort_aux_bottom = false;
+
 var g_navig_infos = {
 	all     : ['annotation', 'size', 'flags', 'artists', 'tags', 'thumbs', 'tasks','tasks_only_my', 'duration', 'price', 'frames', 'percent'],
 	default : ['annotation', 'flags', 'tags', 'artists', 'thumbs', 'tasks', 'percent'],
@@ -146,6 +148,11 @@ function g_Init_Config(i_data)
 	document.body.onkeydown = g_OnKeyDown;
 
 	g_NavigShowInfo();
+
+	if (localStorage.sort_aux_bottom == null)
+		localStorage.sort_aux_bottom = 'ON';
+	$('sort_aux_bottom').textContent = localStorage.sort_aux_bottom;
+	g_sort_aux_bottom = (localStorage.sort_aux_bottom == 'ON')
 
 	g_PathChanged();
 
@@ -1012,6 +1019,15 @@ function g_FolderSetStatus(i_status, i_elFolder, i_up_params)
 	}
 }
 
+function g_SortAuxBottom()
+{
+	if (localStorage.sort_aux_bottom == 'OFF')
+		localStorage.sort_aux_bottom = 'ON';
+	else
+		localStorage.sort_aux_bottom = 'OFF';
+	$('sort_aux_bottom').textContent = localStorage.sort_aux_bottom;
+	g_sort_aux_bottom = (localStorage.sort_aux_bottom == 'ON')
+}
 function g_CompareFolders(a, b)
 {
 	// Compare folders sizes if size is shown in the navigation:
@@ -1040,13 +1056,16 @@ function g_CompareFolders(a, b)
 		return 1;
 
 	// Move auxiliary folders to bottom:
-	let a_aux = c_AuxFolder(a);
-	let b_aux = c_AuxFolder(b);
+	if (g_sort_aux_bottom)
+	{
+		let a_aux = c_AuxFolder(a);
+		let b_aux = c_AuxFolder(b);
 
-	if (a_aux && (false == b_aux))
-		return 1;
-	if (b_aux && (false == a_aux))
-		return -1;
+		if (a_aux && (false == b_aux))
+			return 1;
+		if (b_aux && (false == a_aux))
+			return -1;
+	}
 
 	// Compare folders names:
 	if (a.name < b.name)
