@@ -294,23 +294,12 @@ function u_ShowHiddenToggle()
 	$('show_hidden').textContent = localStorage.show_hidden;
 }
 
-function u_CalcGUI(i_toggle_scrollbars)
+function u_CalcGUI()
 {
-	var barW = u_el.navig.offsetWidth - u_el.navig.clientWidth;
-	var sideW = parseInt(localStorage.sidepanel_width);
-	var sideClosedW = parseInt(localStorage.sidepanel_closed_width);
-	var navigW = parseInt(localStorage.navig_width);
-
-	if (localStorage.hide_scrollbars == null)
-		localStorage.hide_scrollbars = 'OFF';
-	if (i_toggle_scrollbars === true)
-	{
-		if (localStorage.hide_scrollbars == 'ON')
-			localStorage.hide_scrollbars = 'OFF';
-		else
-			localStorage.hide_scrollbars = 'ON';
-	}
-	$('hide_scrollbars').textContent = localStorage.hide_scrollbars;
+	let barW = u_el.navig.offsetWidth - u_el.navig.clientWidth;
+	let sideW = parseInt(localStorage.sidepanel_width);
+	let sideClosedW = parseInt(localStorage.sidepanel_closed_width);
+	let navigW = parseInt(localStorage.navig_width);
 
 	if (localStorage.sidepanel_opened == 'true')
 	{
@@ -323,46 +312,22 @@ function u_CalcGUI(i_toggle_scrollbars)
 		$('sidepanel').style.left = '0px';
 	}
 
-	if (localStorage.hide_scrollbars == 'ON')
+	$('navig_div').style.width = navigW + 'px';
+	$('navig').style.marginRight = '0px';
+
+	$('content').style.left = navigW + 'px';
+
+	if (localStorage.sidepanel_opened == 'true')
 	{
-		$('navig_div').style.width = (navigW - barW) + 'px';
-		$('navig').style.marginRight = (-barW) + 'px';
-
-		$('content').style.left = (navigW - barW) + 'px';
-
-
-		if (localStorage.sidepanel_opened == 'true')
-		{
-			$('content').style.right = (sideW - (2 * barW)) + 'px';
-			$('sidepanel_div').style.width = (sideW - barW) + 'px';
-			$('sidepanel').style.marginRight = (-barW) + 'px';
-		}
-		else
-		{
-			$('content').style.right = sideClosedW - barW + 'px';
-			$('sidepanel_div').style.width = sideClosedW + 'px';
-			$('sidepanel').style.marginRight = '-10px';
-		}
+		$('content').style.right = sideW + 'px';
+		$('sidepanel_div').style.width = sideW + 'px';
+		$('sidepanel').style.marginRight = '0px';
 	}
 	else
 	{
-		$('navig_div').style.width = navigW + 'px';
-		$('navig').style.marginRight = '0px';
-
-		$('content').style.left = navigW + 'px';
-
-		if (localStorage.sidepanel_opened == 'true')
-		{
-			$('content').style.right = sideW + 'px';
-			$('sidepanel_div').style.width = sideW + 'px';
-			$('sidepanel').style.marginRight = '0px';
-		}
-		else
-		{
-			$('content').style.right = sideClosedW + 'px';
-			$('sidepanel_div').style.width = sideClosedW + 'px';
-			$('sidepanel').style.marginRight = '-10px';
-		}
+		$('content').style.right = sideClosedW + 'px';
+		$('sidepanel_div').style.width = sideClosedW + 'px';
+		$('sidepanel').style.marginRight = '-10px';
 	}
 }
 
