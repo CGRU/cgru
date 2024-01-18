@@ -1055,12 +1055,24 @@ padding: 0px 8px;
 }
 
 .filesview { /*border: 1px solid rgba(98,98,98,.5); border-radius: 2px;*/ }
+.filesview.closed { magrin: 0px; padding: 0px; }
+.filesview.closed .panel { display: none; }
+.filesview.closed .view { display: none; }
+.filesview.closed .closed { display: block; }
+.filesview .closed { display: none; }
+.filesview .closed div { float: left; margin: 2px 8px; }
+.filesview .closed .open { height: 14px; }
+.filesview .closed a { font-size: 12px; }
+.filesview .closed .info { font-size: 12px; float: right; margin: 2px 8px; }
+.filesview .closed .button { font-size: 12px; float: right; margin: 2px 8px; padding: 0; height: 14px; width: 50px; }
 .filesview .panel { /*border: 1px solid rgba(98,98,98,.5);*/ }
 .filesview .panel .button { width: 18px; height: 18px; }
 .filesview .panel .counts { clear:both; font: 14px monospace; }
 .filesview .panel .counts .frames_count { float: right; border: 1px solid rgba(98,98,98,.5); font-size: 12px; padding: 0px 4px; cursor: pointer; }
 .filesview .panel div, .filesview .panel a { float: left; margin: 0px 8px; }
-.filesview .panel .limit { font-size: 12px; float: left; margin: 4px 8px; padding: 0; height: 14px; width: 50px; }
+.filesview .panel .limits { float: none; }
+.filesview .panel .limits .button { font-size: 12px; float: left; margin: 4px 8px; padding: 0; height: 14px; width: 50px; }
+.filesview .panel .limits .button.close { float: right; }
 .filesview .panel .title { clear: both; font-weight: bold;}
 .filesview .panel .path { margin: 0px 8px; }
 .filesview .panel .thumbsdiv { float: right; /*border: 1px solid #000;*/ }
