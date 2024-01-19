@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import json
+import subprocess
+import sys
+import traceback
+
+def outError(i_msg):
+    print('Error getting CPU temperature: ' + i_msg)
+
+def getCPUTemperatureLinux():
+    try:
+        text = subprocess.check_output(['sensors','-j'], timeout=1)
+    except:
+        print(traceback.format_exc())
+        return 0
+    try:
+        obj = json.loads(text)
+    except:
+        print(traceback.format_exc())
+        return 0
+    if type(obj) is not dict:
+        outError('Root is not an object.')
+        return 0
+    temperatures = []
+    for dev in obj:
+        dev = obj[dev]
+        if type(dev) is not dict:
+            continue
+        for part in dev:
+            part = dev[part]
+            if type(part) is not dict:
+                continue
+            for parm in part:
+                if parm.find('temp') == -1:
+                    continue
+                if parm.find('input') == -1:
+                    continue
+                t = part[parm]
+                if type(t) is not float:
+                    continue
+                temperatures.append(int(t))
+    if len(temperatures) == 0:
+        print('No valid sensors found.')
+        return 0
+    temperatures.sort()
+    return temperatures[-1]
+
+def getCPUTemperatureWindows():
+    return 40
+
+def getCPUTemperature():
+    if sys.platform.find('linux') == 0:
+        return getCPUTemperatureLinux()
+    if sys.platform.find('win') == 0:
+        return getCPUTemperatureWindows()
+    return 0
+
+if __name__ == '__main__':
+
+    print(getCPUTemperature())
+
