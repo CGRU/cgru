@@ -18,7 +18,8 @@ Intel(R) Xeon(R) CPU           E5530  @ 2.40GHz
 '''
 
 RegExps = [
-    re.compile(r'.*Intel.*Core.* (i\d+\S\d+\S+) .*', re.IGNORECASE)
+    [re.compile(r'AMD.* (\w*\d+\w*) .*', re.I),r'A-\1'],
+    [re.compile(r'.*Intel.*Core.* (i\d+\S\d+\S+) .*', re.I),r'\1']
 ]
 
 HwInfo = None
@@ -30,7 +31,7 @@ def subInfo(i_info):
     if len(i_info) == 0:
         return i_info
     for regexp in RegExps:
-        i_info = re.sub(regexp, r'\1', i_info)
+        i_info = re.sub(regexp[0], regexp[1], i_info)
     return i_info
 
 
