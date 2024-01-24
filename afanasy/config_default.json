@@ -91,6 +91,9 @@
 "":"Render:",
 	"af_render_gpuinfo_nvidia_cmd":"nvidia-smi --id=0 --query-gpu=utilization.gpu,temperature.gpu,memory.total,memory.used,name --format=csv,noheader,nounits 2>&1",
 
+	"af_render_get_cpu_temperature_mod":"getCPUTemperature",
+	"af_render_get_hw_info_mod":"getHWInfo",
+
 	"-af_render_networkif":"eth0",
 		"":"Network interface to measure traffic",
 		"":"If not specified all used except loopback",

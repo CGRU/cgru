@@ -21,5 +21,7 @@ namespace AFPYNAMES
 
 	const char RES_CLASSESDIR[]  = "resources";      ///< Resources directory relative to PYTHONPATH
 	const char RES_FUNC_UPDATE[] = "do";
+	const char RES_MOD_GET_CPU_TEMPERATURE[] = "getCPUTemperature";
+	const char RES_MOD_GET_HW_INFO[] = "getHWInfo";
 }
 

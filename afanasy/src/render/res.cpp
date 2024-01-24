@@ -12,6 +12,9 @@
 
 #include "res.h"
 
+#include "../include/afpynames.h"
+
+#include "../libafanasy/environment.h"
 #include "../libafanasy/pymodule.h"
 
 #define AFOUTPUT
@@ -77,12 +80,12 @@ void GetResources(af::HostRes & o_hres, bool i_verbose)
 void InitResources()
 {
 	PyMod_GetCPUTemperature = new af::PyModule();
-	if (PyMod_GetCPUTemperature->init("resources","getCPUTemperature"))
-		PyFunc_GetCPUTemperature = PyMod_GetCPUTemperature->getFunction("getCPUTemperature");
+	if (PyMod_GetCPUTemperature->init(AFPYNAMES::RES_CLASSESDIR,af::Environment::getRenderCPUTemperatureMod()))
+		PyFunc_GetCPUTemperature = PyMod_GetCPUTemperature->getFunction(af::Environment::getRenderCPUTemperatureMod());
 
 	PyMod_GetHWInfo = new af::PyModule();
-	if (PyMod_GetHWInfo->init("resources","getHWInfo"))
-		PyFunc_GetHWInfo = PyMod_GetHWInfo->getFunction("getHWInfo");
+	if (PyMod_GetHWInfo->init(AFPYNAMES::RES_CLASSESDIR, af::Environment::getRenderHWInfoMod()))
+		PyFunc_GetHWInfo = PyMod_GetHWInfo->getFunction(af::Environment::getRenderHWInfoMod());
 }
 
 void FreeResources()

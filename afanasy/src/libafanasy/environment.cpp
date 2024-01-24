@@ -25,6 +25,7 @@
 
 #include "../include/afanasy.h"
 #include "../include/afjob.h"
+#include "../include/afpynames.h"
 
 #include "common/passwd.h"
 
@@ -88,6 +89,8 @@ std::string Environment::render_networkif =            AFRENDER::NETWORK_IF;
 std::string Environment::render_hddspace_path =        AFRENDER::HDDSPACE_PATH;
 std::string Environment::render_iostat_device =        AFRENDER::IOSTAT_DEVICE;
 bool Environment::render_cut_domain_name =             AFRENDER::CUT_DOMAIN_NAME;
+std::string Environment::render_get_cpu_temperature_mod = AFPYNAMES::RES_MOD_GET_CPU_TEMPERATURE;
+std::string Environment::render_get_hw_info_mod         = AFPYNAMES::RES_MOD_GET_HW_INFO;
 int Environment::render_overflow_mem  = -1;
 int Environment::render_overflow_swap = -1;
 int Environment::render_overflow_hdd  = -1;
@@ -293,6 +296,8 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, render_cmd_wolwake,                "af_render_cmd_wolwake"                );
 	getVar( i_obj, render_hddspace_path,              "af_render_hddspace_path"              );
 	getVar( i_obj, render_gpuinfo_nvidia_cmd,         "af_render_gpuinfo_nvidia_cmd"         );
+	getVar( i_obj, render_get_cpu_temperature_mod,    "af_render_get_cpu_temperature_mod"    );
+	getVar( i_obj, render_get_hw_info_mod,            "af_render_get_hw_info_mod"            );
 	getVar( i_obj, render_networkif,                  "af_render_networkif"                  );
 	getVar( i_obj, render_iostat_device,              "af_render_iostat_device"              );
 	getVar( i_obj, render_resclasses,                 "af_render_resclasses"                 );

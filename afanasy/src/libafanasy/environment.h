@@ -173,11 +173,13 @@ public:
 	static inline const std::string & getRenderCmdShutdown()   { return render_cmd_shutdown;    }
 	static inline const std::string & getRenderCmdWolSleep()   { return render_cmd_wolsleep;    }
 	static inline const std::string & getRenderCmdWolWake()    { return render_cmd_wolwake;     }
-	static inline const std::string & getRenderGPUInfoNvidiaCmd(){return render_gpuinfo_nvidia_cmd;}
 	static inline const std::string & getRenderNetworkIF()     { return render_networkif;       }
 	static inline const std::string & getRenderHDDSpacePath()  { return render_hddspace_path;   }
 	static inline const std::string & getRenderIOStatDevice()  { return render_iostat_device;   }
-	static inline const std::vector<std::string> & getRenderResClasses() { return render_resclasses;}
+	static inline const std::vector<std::string> & getRenderResClasses() { return render_resclasses;     }
+	static inline const std::string & getRenderGPUInfoNvidiaCmd() {return render_gpuinfo_nvidia_cmd;     }
+	static inline const std::string & getRenderCPUTemperatureMod(){return render_get_cpu_temperature_mod;}
+	static inline const std::string & getRenderHWInfoMod()        {return render_get_hw_info_mod;        }
 
 	static inline int getRenderOverflowMem()  {return render_overflow_mem; }
 	static inline int getRenderOverflowSwap() {return render_overflow_swap;}
@@ -347,6 +349,8 @@ private:
 	static std::string render_iostat_device;
 	static std::vector<std::string> render_resclasses;
 	static std::string render_gpuinfo_nvidia_cmd;
+	static std::string render_get_cpu_temperature_mod;
+	static std::string render_get_hw_info_mod;
 	static std::string render_networkif;
 
 	static bool render_cut_domain_name;
