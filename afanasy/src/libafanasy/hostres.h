@@ -47,6 +47,7 @@ public:
 
 	int32_t cpu_num;
 	int32_t cpu_mhz;
+	int32_t cpu_temp;
 
 	uint8_t cpu_user;
 	uint8_t cpu_nice;
@@ -81,6 +82,8 @@ public:
 
 	/// List of users currently logged in on a machine
 	std::vector<std::string> logged_in_users;
+
+	std::string hw_info;
 
 	std::vector<HostResCustom*> custom;
 

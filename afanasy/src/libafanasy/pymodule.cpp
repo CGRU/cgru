@@ -43,6 +43,7 @@ bool PyModule::init(const std::string & i_dir, const std::string & i_name)
 
 PyModule::~PyModule()
 {
+AF_LOG << "~PyModule::" << m_modulename;
 	// Decrement functions references
 	for (std::list<PyObject*>::iterator it = m_PyObj_FuncList.begin(); it != m_PyObj_FuncList.end(); it++)
 		Py_XDECREF(*it);

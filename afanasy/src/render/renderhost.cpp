@@ -78,6 +78,8 @@ RenderHost::RenderHost():
 
 RenderHost::~RenderHost()
 {
+	FreeResources();
+
     // Delete custom python resources:
     for( int i = 0; i < m_pyres.size(); i++)
         if( m_pyres[i])

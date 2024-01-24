@@ -12,8 +12,37 @@
 
 #include "res.h"
 
+#include "../libafanasy/pymodule.h"
+
+#define AFOUTPUT
+#undef AFOUTPUT
+#include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
+
+af::PyModule * PyMod_GetCPUTemperature = NULL;
+PyObject * PyFunc_GetCPUTemperature = NULL;
+
+// Haders:
+void InitResources();
+
+void GetResources_LINUX(af::HostRes & hres, bool verbose = false);
+void GetResources_MACOSX(af::HostRes & hres, bool verbose = false);
+void GetResources_WINDOWS(af::HostRes & hres, bool verbose = false);
+
+bool GetGPUInfo_NVIDIA(af::HostRes & o_hres, bool i_verbose = false);
+
+int getCPUTemperature();
+
+const std::string getHWInfo();
+
+// Definitions:
 void GetResources(af::HostRes & o_hres, bool i_verbose)
 {
+	static int counter = 0;
+
+	if (counter == 0)
+		InitResources();
+
 #ifdef LINUX
 	GetResources_LINUX(o_hres, i_verbose);
 #endif
@@ -34,4 +63,53 @@ void GetResources(af::HostRes & o_hres, bool i_verbose)
 		o_hres.gpu_mem_total_mb = 0;
 		o_hres.gpu_string.clear();
 	}
+
+	o_hres.cpu_temp = getCPUTemperature();
+
+	o_hres.hw_info = getHWInfo();
+
+	counter++;
+}
+
+void InitResources()
+{
+	PyMod_GetCPUTemperature = new af::PyModule();
+
+	if (PyMod_GetCPUTemperature->init("resources","getCPUTemperature"))
+		PyFunc_GetCPUTemperature = PyMod_GetCPUTemperature->getFunction("getCPUTemperature");
+}
+
+void FreeResources()
+{
+	delete PyMod_GetCPUTemperature;
+}
+
+int getCPUTemperature()
+{
+	PyObject * pResult = PyObject_CallObject(PyFunc_GetCPUTemperature, NULL);
+	if (pResult == NULL)
+	{
+		if (PyErr_Occurred())
+			PyErr_Print();
+		return 0;
+	}
+
+	if (true != PyLong_Check(pResult))
+	{
+		AF_ERR << "Return object type is not an integer.";
+		return false;
+	}
+
+	int result = PyLong_AsLong(pResult);
+
+	Py_DECREF(pResult);
+
+	return result;
+}
+
+const std::string getHWInfo()
+{
+	std::string hw_info;
+
+	return hw_info;
 }

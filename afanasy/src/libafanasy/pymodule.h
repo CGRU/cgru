@@ -13,7 +13,7 @@ public:
 	/// Deincrement all objects references ( and functions too )
 	~PyModule();
 
-protected:
+//protected:
 	/// Import and reload module, find and instance class with provided arguments (arguments will be destoyed if not NULL)
 	bool init(const std::string & i_dir, const std::string & i_name);
 
