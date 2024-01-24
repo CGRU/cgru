@@ -18,8 +18,9 @@ Intel(R) Xeon(R) CPU           E5530  @ 2.40GHz
 '''
 
 RegExps = [
-    [re.compile(r'AMD.* (\w*\d+\w*) .*', re.I),r'A-\1'],
-    [re.compile(r'.*Intel.*Core.* (i\d+\S\d+\S+) .*', re.I),r'\1']
+    [re.compile(r'.*Intel.*Xeon.* (\w+\d+-?\d+\s?v?\d?) .*', re.I),r'X:\1'],
+    [re.compile(r'AMD.* (\w*\d+\w*) .*', re.I),r'A:\1'],
+    [re.compile(r'.*Intel.*Core.* (i\d+-?\d+\S+) .*', re.I),r'I:\1']
 ]
 
 HwInfo = None
