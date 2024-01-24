@@ -315,9 +315,6 @@ void HostRes::v_generateInfoStream( std::ostringstream & stream, bool full) cons
 			stream << "\n       Memory: " << gpu_mem_total_mb << " MB / " << gpu_mem_used_mb << " MB used";
 		}
 
-		if (hw_info.size())
-			stream << "\nHwInfo: " << hw_info;
-
         if( logged_in_users.size())
 		{
 			stream << ",\n   Logged in users = ";
