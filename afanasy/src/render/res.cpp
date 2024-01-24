@@ -22,6 +22,9 @@
 af::PyModule * PyMod_GetCPUTemperature = NULL;
 PyObject * PyFunc_GetCPUTemperature = NULL;
 
+af::PyModule * PyMod_GetHWInfo = NULL;
+PyObject * PyFunc_GetHWInfo = NULL;
+
 // Haders:
 void InitResources();
 
@@ -74,18 +77,25 @@ void GetResources(af::HostRes & o_hres, bool i_verbose)
 void InitResources()
 {
 	PyMod_GetCPUTemperature = new af::PyModule();
-
 	if (PyMod_GetCPUTemperature->init("resources","getCPUTemperature"))
 		PyFunc_GetCPUTemperature = PyMod_GetCPUTemperature->getFunction("getCPUTemperature");
+
+	PyMod_GetHWInfo = new af::PyModule();
+	if (PyMod_GetHWInfo->init("resources","getHWInfo"))
+		PyFunc_GetHWInfo = PyMod_GetHWInfo->getFunction("getHWInfo");
 }
 
 void FreeResources()
 {
 	delete PyMod_GetCPUTemperature;
+	delete PyMod_GetHWInfo;
 }
 
 int getCPUTemperature()
 {
+	if (PyFunc_GetCPUTemperature == NULL)
+		return 0;
+
 	PyObject * pResult = PyObject_CallObject(PyFunc_GetCPUTemperature, NULL);
 	if (pResult == NULL)
 	{
@@ -97,7 +107,7 @@ int getCPUTemperature()
 	if (true != PyLong_Check(pResult))
 	{
 		AF_ERR << "Return object type is not an integer.";
-		return false;
+		return 0;
 	}
 
 	int result = PyLong_AsLong(pResult);
@@ -110,6 +120,26 @@ int getCPUTemperature()
 const std::string getHWInfo()
 {
 	std::string hw_info;
+
+	if (PyFunc_GetHWInfo == NULL)
+		return hw_info;
+
+	PyObject * pResult = PyObject_CallObject(PyFunc_GetHWInfo, NULL);
+	if (pResult == NULL)
+	{
+		if (PyErr_Occurred())
+			PyErr_Print();
+		return hw_info;
+	}
+
+	if (false == af::PyGetString(pResult, hw_info))
+	{
+		AF_ERR << "Return object type is not a string.";
+		Py_DECREF(pResult);
+		return hw_info;
+	}
+
+	Py_DECREF(pResult);
 
 	return hw_info;
 }

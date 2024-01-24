@@ -284,10 +284,10 @@ void HostRes::v_readwrite( Msg * msg)
 
 void HostRes::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
-    stream << "\nResources: ";
+    stream << "\nResources: " << hw_info;
     if( full)
     {
-        stream << "\n   CPU = " << cpu_mhz << " MHz x" << cpu_num << ", Temperature: " << cpu_temp << "C";
+        stream << "\n   CPU = " << cpu_mhz << "MHz x" << cpu_num << ", Temperature: " << cpu_temp << "C";
         stream << "\n      "
             << int( cpu_user    ) << "% usr, "
             << int( cpu_nice    ) << "% nice, "
