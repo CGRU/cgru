@@ -178,6 +178,10 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	for (auto const& it : i_task_exec->getEnv())
 		PyDict_SetItemString(pEenvDict, it.first.c_str(), PyBytes_FromString(it.second.c_str()));
 
+	PyObject * pTicketsDict = PyDict_New();
+	for (auto const& it : i_task_exec->m_tickets)
+		PyDict_SetItemString(pTicketsDict, it.first.c_str(), PyLong_FromLong(it.second));
+
 	PyObject *pArgs;
 	pArgs = PyTuple_New( 2);
 
@@ -196,6 +200,7 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	PyDict_SetItemString( task_info, "hosts",         pHostsList);
 	PyDict_SetItemString( task_info, "parsed_files",  pParsedFilesList);
 	PyDict_SetItemString(task_info, "environment",    pEenvDict);
+	PyDict_SetItemString(task_info, "tickets",        pTicketsDict);
 
     PyDict_SetItemString( task_info, "frame_start",  PyLong_FromLong(i_task_exec->getFrameStart()));
     PyDict_SetItemString( task_info, "frame_finish", PyLong_FromLong(i_task_exec->getFrameFinish()));
