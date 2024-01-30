@@ -11,10 +11,11 @@ def outError(i_msg):
 
 def getCPUTemperatureLinux():
     try:
-        text = subprocess.check_output(['sensors','-j'], timeout=1)
+        proc = subprocess.run(['sensors','-j'], timeout=1, check=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     except:
         print(traceback.format_exc())
         return 0
+    text = proc.stdout
     try:
         obj = json.loads(text)
     except:
