@@ -3,6 +3,7 @@
 
 import re
 import os
+import subprocess
 import sys
 import traceback
 
@@ -28,15 +29,7 @@ HwInfo = None
 def outError(i_msg):
     print('Error getting hardware info: ' + i_msg)
 
-def subInfo(i_info):
-    if len(i_info) == 0:
-        return i_info
-    for regexp in RegExps:
-        i_info = re.sub(regexp[0], regexp[1], i_info)
-    return i_info
-
-
-def getHWInfoLinux():
+def getCPUInfo_Linux():
     info = ''
     try:
         cpuinfo = open('/proc/cpuinfo')
@@ -47,9 +40,40 @@ def getHWInfoLinux():
         if line.find('model name') == 0:
             info = line.split(':')[1].strip()
             break
-    return subInfo(info)
+    if len(info) == 0:
+        return info
+    for regexp in RegExps:
+        info = re.sub(regexp[0], regexp[1], info)
+    return info.strip()
 
-def getHWInfoWindows():
+
+def getHostNameCtl_Linux():
+    pref, suff = '', ''
+    try:
+        proc = subprocess.run(['hostnamectl'], timeout=1, check=True, encoding='utf-8', stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    except:
+        print(traceback.format_exc())
+        return preff, suff
+    for line in proc.stdout.split('\n'):
+        words = line.split(':',1)
+        if len(words) != 2:
+            continue
+        if words[0].lower().find('chassis') != -1:
+            pref = words[1].strip().upper()[0] + ' '
+        if words[0].lower().find('hardware') != -1:
+            suff += ' ' + words[1].strip()
+        if words[0].lower().find('virtual') != -1:
+            suff += ' ' + words[1].strip()
+    return pref, suff
+
+
+def getHWInfo_Linux():
+    cpu = getCPUInfo_Linux()
+    pref, suff = getHostNameCtl_Linux()
+    #print('"%s" "%s" "%s"' % (pref, cpu, suff))
+    return '%s%s%s' % (pref, cpu, suff)
+
+def getHWInfo_Windows():
     return ''
 
 def getHWInfo():
@@ -57,9 +81,9 @@ def getHWInfo():
 
     if HwInfo is None:
         if sys.platform.find('linux') == 0:
-            HwInfo = getHWInfoLinux()
+            HwInfo = getHWInfo_Linux()
         elif sys.platform.find('win') == 0:
-            HwInfo = getHWInfoWindows()
+            HwInfo = getHWInfo_Windows()
         else:
             HwInfo = ''
 
