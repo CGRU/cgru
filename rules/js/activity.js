@@ -201,8 +201,7 @@ function activity_Changed()
 	for (let elBadge of document.getElementsByClassName('task_badge'))
 		activity_TaskBadgeFilter(elBadge);
 
-	for (let el of document.getElementsByClassName('activity_filter'))
-		activity_ApplyFilter(el);
+	activity_ApplyFilter();
 
 
 	for (let el of document.getElementsByClassName('show_on_activity'))
@@ -223,7 +222,12 @@ function activity_TaskBadgeFilter(i_badge)
 		i_badge.classList.add('activity_filtered');
 }
 
-function activity_ApplyFilter(i_el)
+function activity_ApplyFilter()
+{
+	for (let el of document.getElementsByClassName('activity_filter'))
+		activity_ApplyFilterElement(el);
+}
+function activity_ApplyFilterElement(i_el)
 {
 	i_el.classList.remove('activity_filtered');
 

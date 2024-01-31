@@ -386,6 +386,7 @@ function bm_Show()
 
 	bm_HighlightCurrent();
 	bm_ThumbnailsShowHide();
+	activity_ApplyFilter();
 
 	bm_DeleteObsoleteForTime();
 }
