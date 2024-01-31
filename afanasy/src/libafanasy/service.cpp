@@ -179,7 +179,7 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 		PyDict_SetItemString(pEenvDict, it.first.c_str(), PyBytes_FromString(it.second.c_str()));
 
 	PyObject * pTicketsDict = PyDict_New();
-	for (auto const& it : i_task_exec->m_tickets)
+	for (auto const& it : i_task_exec->getTickets())
 		PyDict_SetItemString(pTicketsDict, it.first.c_str(), PyLong_FromLong(it.second));
 
 	PyObject *pArgs;

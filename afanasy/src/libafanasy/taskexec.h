@@ -189,7 +189,8 @@ public:
 	/// Read or write task in message buffer.
 	void v_readwrite( Msg * msg);
 
-	std::map<std::string, int32_t> m_tickets;
+	inline const std::map<std::string, int32_t> & getTickets() const {return m_tickets;}
+	inline void setTickets(const std::map<std::string, int32_t> & i_tickets) {m_tickets = i_tickets;}
 
 	std::string m_custom_data_task;
 	std::string m_custom_data_block;
@@ -209,6 +210,8 @@ private:
 	std::string m_service;            ///< Task service type.
 	std::string m_parser;             ///< Task parser type.
 	int32_t     m_parser_coeff;       ///< Parser koefficient.
+
+	std::map<std::string, int32_t> m_tickets; // Task tickets (from job block)
 
 	std::map<std::string, std::string> m_environment; ///< Extra environment.
 

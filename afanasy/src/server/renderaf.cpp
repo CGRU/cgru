@@ -846,7 +846,7 @@ void RenderAf::addTask(af::TaskExec * i_taskexec, MonitorContainer * i_monitorin
 
 	// Add task tickets
 	std::list<std::string> new_tickets;
-	for (auto & tIt : i_taskexec->m_tickets)
+	for (auto & tIt : i_taskexec->getTickets())
 	{
 		std::map<std::string, af::Farm::Tiks>::iterator hIt = m_tickets_host.find(tIt.first);
 		if (hIt != m_tickets_host.end())
@@ -899,7 +899,7 @@ void RenderAf::removeTask(const af::TaskExec * i_taskexec, MonitorContainer * i_
 
 	// Remove task tickets
 	std::list<std::string> exp_tickets;
-	for (auto & tIt : i_taskexec->m_tickets)
+	for (auto & tIt : i_taskexec->getTickets())
 	{
 		std::map<std::string, af::Farm::Tiks>::iterator hIt = m_tickets_host.find(tIt.first);
 		if (hIt != m_tickets_host.end())

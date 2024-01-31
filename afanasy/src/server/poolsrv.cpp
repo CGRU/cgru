@@ -519,7 +519,7 @@ bool PoolSrv::hasPoolTicket(const std::string & i_name, const int32_t & i_count,
 void PoolSrv::taskAcuire(const af::TaskExec * i_taskexec, const std::list<std::string> & i_new_tickets, MonitorContainer * i_monitoring)
 {
 	// Increment tickets:
-	for (auto const& eIt : i_taskexec->m_tickets)
+	for (auto const& eIt : i_taskexec->getTickets())
 	{
 		std::map<std::string, af::Farm::Tiks>::iterator it = m_tickets_pool.find(eIt.first);
 		if (it != m_tickets_pool.end())
@@ -554,7 +554,7 @@ void PoolSrv::taskAcuire(const af::TaskExec * i_taskexec, const std::list<std::s
 void PoolSrv::taskRelease(const af::TaskExec * i_taskexec, const std::list<std::string> & i_exp_tickets, MonitorContainer * i_monitoring)
 {
 	// Decrement tickets
-	for (auto const& eIt : i_taskexec->m_tickets)
+	for (auto const& eIt : i_taskexec->getTickets())
 	{
 		std::map<std::string, af::Farm::Tiks>::iterator it = m_tickets_pool.find(eIt.first);
 		if (it != m_tickets_pool.end())
