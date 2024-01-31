@@ -100,6 +100,7 @@ box-shadow: 0 0 6px rgb(100,255,255), 0 0 4px rgba(255,255,255,.5) inset;
 border: 2px solid rgb(255,255,120);
 box-shadow: 0 0 8px rgb(255,255,120), 0 0 4px rgba(255,255,255,.5) inset;
 }
+.activity_filtered {display:none;}
 
 #profile_settings {
 display: none;
@@ -534,7 +535,6 @@ border-radius: 4px;
 .task_badge .artist {margin: 0px; padding-top: 2px;; padding-bottom: 2px;}
 .task_badge .progress {clear: both; width: 100%}
 .task_badge .progressbar {height: 6px;}
-.task_badge.activity_filtered {display:none;}
 
 
 /* ========================================================= */

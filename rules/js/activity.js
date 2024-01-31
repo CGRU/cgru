@@ -201,6 +201,9 @@ function activity_Changed()
 	for (let elBadge of document.getElementsByClassName('task_badge'))
 		activity_TaskBadgeFilter(elBadge);
 
+	for (let el of document.getElementsByClassName('activity_filter'))
+		activity_ApplyFilter(el);
+
 
 	for (let el of document.getElementsByClassName('show_on_activity'))
 		if (activity_Selected)
@@ -220,3 +223,17 @@ function activity_TaskBadgeFilter(i_badge)
 		i_badge.classList.add('activity_filtered');
 }
 
+function activity_ApplyFilter(i_el)
+{
+	i_el.classList.remove('activity_filtered');
+
+	if (activity_Filter.length == 0)
+		return;
+
+	if (i_el.m_tags)
+		for (let tag of i_el.m_tags)
+			if (activity_Filter.indexOf(tag) != -1)
+				return;
+
+	i_el.classList.add('activity_filtered');
+}

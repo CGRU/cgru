@@ -422,7 +422,16 @@ function bm_CreateBookmark(i_bm)
 
 	el.m_elThumb_div = document.createElement('div');
 	el.appendChild(el.m_elThumb_div);
-	el.m_elThumb_div.classList.add('thumb_div');
+	el.m_elThumb_div.classList.add('thumb_div','activity_filter');
+	el.m_elThumb_div.m_tags = [];
+	if (i_bm.status && i_bm.status.tasks)
+		for (let t in i_bm.status.tasks)
+		{
+			let task = i_bm.status.tasks[t];
+			if (task.artists && (task.artists.indexOf(g_auth_user.id) != -1))
+				if (task.tags) for (let tag of task.tags)
+					el.m_elThumb_div.m_tags.push(tag);
+		}
 
 	// Display status:
 	st_SetElStatus(el, i_bm.status, /*show all tasks = */ false);
