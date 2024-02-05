@@ -157,8 +157,6 @@ const char CMDS_IPADDRESS[] = "@IP@";
 
 const char CMDS_ARGUMENT[] /****/ = "@ARG@"; ///< Commands argument.
 const char CMDS_ASKCOMMAND[] /**/ = "@ASK@"; ///< Ask a command, dialog will be raised.
-
-const int RENDER_IDLE_BAR_MAX = 3600; ///< Seconds - idle bar "width"
 }
 
 /// Monitor options:
@@ -166,6 +164,9 @@ namespace AFMONITOR
 {
 const int MAXCOUNT = 100000; ///< Maximum allowed online Monitors.
 const int ZOMBIETIME = 40;   ///< Seconds to wait for update to consider to kill Monitor.
+const int RENDER_IDLE_BAR_MAX = 3600; ///< Seconds - idle bar "width"
+const int RENDER_CPU_HOT_MIN =  80;
+const int RENDER_CPU_HOT_MAX = 100;
 }
 
 /// Network options:

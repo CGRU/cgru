@@ -594,8 +594,21 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	else if (m_nimby ) itemColor = &(afqt::QEnvironment::clr_itemrendernimby.c);
 	else if (m_busy  ) itemColor = &(afqt::QEnvironment::clr_itemrenderbusy.c);
 
+	// Hot CPU temperature makes background color red:
+	int tmin = af::Environment::getMonitorRenderCPUHotMin();
+	int tmax = af::Environment::getMonitorRenderCPUHotMax();
+	int clr[3] = {itemColor->red(), itemColor->green(), itemColor->blue()};
+	int c_hot[3] = {255, 0, 0};
+	float factor = float(m_hres.cpu_temp - tmin) / float(tmax - tmin);
+	if (factor < 0.0) factor = 0.0;
+	if (factor > 1.0) factor = 1.0;
+	factor = factor * factor;
+	for (int i = 0; i < 3; i++)
+		clr[i] = int((1.0 - factor) * clr[i] + factor * c_hot[i]);
+	QColor color = QColor(clr[0], clr[1], clr[2]);
+
 	// Draw standart backgroud
-	drawBack(i_painter, i_rect, i_option, itemColor, m_dirty ? &(afqt::QEnvironment::clr_error.c) : NULL);
+	drawBack(i_painter, i_rect, i_option, &color, m_dirty ? &(afqt::QEnvironment::clr_error.c) : NULL);
 
 	QString offlineState_time = m_offlineState;
 	if (m_wol_operation_time > 0)
@@ -612,7 +625,7 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 		long long curtime = time(0);
 		int bar_secs = curtime - m_idle_time;
 		int busy_secs = curtime - m_busy_time;
-		int max = af::Environment::getWatchRenderIdleBarMax();
+		int max = af::Environment::getMonitorRenderIdleBarMax();
 		i_painter->setBrush(QBrush(afqt::QEnvironment::clr_itemrenderoff.c, Qt::SolidPattern));
 
 		if ((m_parent_pool->get_idle_free_time() > 0) && (isNimby() || isNIMBY()) && (false == isBusy()))

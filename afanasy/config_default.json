@@ -160,13 +160,14 @@
 "":"Monitor: (server side - any gui)",
 	"af_monitor_zombietime":16,
     "af_monitor_render_idle_bar_max":3600,
+    "af_monitor_render_cpu_hot_min":80,
+    "af_monitor_render_cpu_hot_max":100,
 
 "":"Watch: (qt gui - client side)",
 	"af_watch_get_events_sec":1,
 	"af_watch_refresh_gui_sec":5,
 	"af_watch_connection_lost_time":20,
 		"":"If watch can`t update server for this time, it considers that server connection lost and tries to register again.",
-	"af_watch_render_idle_bar_max":3600,
 	"af_watch_work_user_visible":true,
 
 "":"Database:",
