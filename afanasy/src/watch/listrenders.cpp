@@ -70,12 +70,14 @@ ListRenders::ListRenders( QWidget* parent):
 	m_ctrl_sf->addSortType(   CtrlSortFilter::TTASKUSER);
 	m_ctrl_sf->addSortType(   CtrlSortFilter::TUSERNAME);
 	m_ctrl_sf->addSortType(   CtrlSortFilter::TENGINE);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::THWINFO);
 	m_ctrl_sf->addSortType(   CtrlSortFilter::TADDRESS);
 	m_ctrl_sf->addFilterType( CtrlSortFilter::TNONE);
 	m_ctrl_sf->addFilterType( CtrlSortFilter::TNAME);
 	m_ctrl_sf->addFilterType( CtrlSortFilter::TUSERNAME);
 	m_ctrl_sf->addFilterType( CtrlSortFilter::TTASKUSER);
 	m_ctrl_sf->addFilterType( CtrlSortFilter::TENGINE);
+	m_ctrl_sf->addFilterType( CtrlSortFilter::THWINFO);
 	m_ctrl_sf->addFilterType( CtrlSortFilter::TADDRESS);
 	initSortFilterCtrl();
 

@@ -6,6 +6,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "logger.h"
 
 using namespace af;
 
@@ -15,8 +16,6 @@ TaskExec::TaskExec(
 		const std::string & i_parser_type,
 
 		int i_capacity,
-		int i_file_size_min,
-		int i_file_size_max,
 
 		const std::string & i_command_block,
 		const std::vector<std::string> & i_files_block,
@@ -32,9 +31,7 @@ TaskExec::TaskExec(
 		int i_job_id,
 		int i_block_number,
 		long long i_block_flags,
-		int i_task_number,
-
-		int i_parser_coeff
+		int i_task_number
 	):
 
 	m_name(    i_name),
@@ -42,8 +39,6 @@ TaskExec::TaskExec(
 	m_parser(  i_parser_type),
 
 	m_capacity(      i_capacity),
-	m_file_size_min( i_file_size_min),
-	m_file_size_max( i_file_size_max),
 
 	m_command_block( i_command_block),
 	m_files_block(   i_files_block),
@@ -59,9 +54,9 @@ TaskExec::TaskExec(
 	m_job_id(      i_job_id),
 	m_block_num(   i_block_number),
 	m_block_flags( i_block_flags),
-	m_task_num(    i_task_number),
+	m_task_num(    i_task_number)
 
-	m_parser_coeff( i_parser_coeff)
+	//m_parser_coeff( i_parser_coeff)
 
 {
 	m_time_start = time(NULL);
@@ -125,27 +120,10 @@ void TaskExec::jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\"frames_inc\":"   << m_frames_inc;
 		o_str << ",\"frames_num\":"   << m_frames_num;
 
-		if( m_parser_coeff > 1 )
-			o_str << ",\"parser_coeff\":"  << m_parser_coeff;
-		if( m_file_size_min > 0 )
-			o_str << ",\"file_size_min\":" << m_file_size_min;
-		if( m_file_size_max > 0 )
-			o_str << ",\"file_size_max\":" << m_file_size_max;
-
 		if( m_parser.size())
 			o_str << ",\"parser\":\"" << m_parser << "\"";
 		if( m_working_directory.size())
 			o_str << ",\"working_directory\":\"" << af::strEscape( m_working_directory ) << "\"";
-		if( m_custom_data_task.size())
-			o_str << ",\"custom_data_task\":\"" << af::strEscape( m_custom_data_task ) << "\"";
-		if( m_custom_data_block.size())
-			o_str << ",\"custom_data_block\":\"" << af::strEscape( m_custom_data_block ) << "\"";
-		if( m_custom_data_job.size())
-			o_str << ",\"custom_data_job\":\"" << af::strEscape( m_custom_data_job ) << "\"";
-		if( m_custom_data_user.size())
-			o_str << ",\"custom_data_user\":\"" << af::strEscape( m_custom_data_user ) << "\"";
-		if( m_custom_data_render.size())
-			o_str << ",\"custom_data_render\":\"" << af::strEscape( m_custom_data_render ) << "\"";
 		if( m_environment.size())
 			af::jw_stringmap("environment", m_environment, o_str );
 
@@ -162,6 +140,7 @@ void TaskExec::jsonWrite( std::ostringstream & o_str, int i_type) const
 
 void TaskExec::v_readwrite( Msg * msg)
 {
+AF_LOG << "TaskExec::v_readwrite:"; msg->v_stdOut();
 	switch( msg->type())
 	{
 	case Msg::TRenderEvents:
@@ -169,16 +148,10 @@ void TaskExec::v_readwrite( Msg * msg)
 	case Msg::TTask:
 		rw_int64_t ( m_flags,             msg);
 		rw_int64_t ( m_block_flags,       msg);
-		rw_int64_t ( m_job_flags,         msg);
-		rw_int64_t ( m_user_flags,        msg);
-		rw_int64_t ( m_render_flags,      msg);
 		rw_int64_t ( m_frames_num,        msg);
 		rw_int64_t ( m_frames_inc,        msg);
 		rw_int64_t ( m_frame_start,       msg);
 		rw_int64_t ( m_frame_finish,      msg);
-		rw_int32_t ( m_parser_coeff,      msg);
-		rw_int64_t ( m_file_size_min,     msg);
-		rw_int64_t ( m_file_size_max,     msg);
 		rw_String  ( m_command_block,     msg);
 		rw_String  ( m_command_task,      msg);
 		rw_String  ( m_working_directory, msg);
@@ -188,14 +161,10 @@ void TaskExec::v_readwrite( Msg * msg)
 		rw_StringVect( m_files_block,     msg);
 		rw_StringVect( m_files_task,      msg);
 		rw_StringVect( m_parsed_files,    msg);
-
-		rw_String( m_custom_data_task,    msg);
-		rw_String( m_custom_data_block,   msg);
-		rw_String( m_custom_data_job,     msg);
-		rw_String( m_custom_data_user,    msg);
-		rw_String( m_custom_data_render,  msg);
-
 		rw_StringList( m_multihost_names, msg);
+
+		rw_LongMap(  m_data_integers, msg);
+		rw_StringMap(m_data_strings,  msg);
 
 	case Msg::TRendersList:
 		rw_String  ( m_service,           msg);
@@ -217,8 +186,8 @@ void TaskExec::v_readwrite( Msg * msg)
 	break;
 
 	default:
-		AFERROR("TaskExec::readwrite: Invalid message type:\n");
-		msg->v_stdOut( false);
+		AF_ERR << "TaskExec::readwrite: Invalid message type:";
+		msg->v_stdOut(false);
 		return;
 	}
 }
@@ -295,7 +264,7 @@ int TaskExec::calcWeight() const
 	weight += weigh(m_files_task);
 	weight += weigh(m_service);
 	weight += weigh(m_parser);
-	weight += weigh(m_custom_data_block);
-	weight += weigh(m_custom_data_task);
+//	weight += weigh(m_custom_data_block);
+//	weight += weigh(m_custom_data_task);
 	return weight;
 }

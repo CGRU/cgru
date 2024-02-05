@@ -508,13 +508,25 @@ void WndTask::showExec(af::MCTask & i_mctask)
 		for(int i = 0; i < parsed_files.size(); i++)
 			c.insertText("\n" + afqt::stoq(parsed_files[i]), fBold);
 	}*/
-	if (exec->hasFileSizeCheck())
+	if (exec->hasCheckRenderedFiles())
+		c.insertText("\nRendered Files Check.", fItalic);
+	if (exec->isSkippingExistingFiles())
+		c.insertText("\nSkipping Existing Files.", fItalic);
+
+	c.insertText("\nData:", fItalic);
+	for (auto const& it : exec->getDataIntegers())
 	{
-		c.insertText("\n");
-		c.insertText("File Size Check: ", fItalic);
-		c.insertText(afqt::stoq(af::toKMG(exec->getFileSizeMin())), fBold);
-		c.insertText(" - ", fItalic);
-		c.insertText(afqt::stoq(af::toKMG(exec->getFileSizeMax())), fBold);
+		QString name = afqt::stoq(it.first);
+		QString value = QString("%1").arg(it.second);
+		if (name.contains("size"))
+			value = QString("%1").arg(afqt::stoq(af::toKMG(it.second)));
+		c.insertText(QString("\n%1 = ").arg(name), fCommon);
+		c.insertText(QString("%1").arg(value), fBold);
+	}
+	for (auto const& it : exec->getDataStrings())
+	{
+		c.insertText(QString("\n%1 = ").arg(afqt::stoq(it.first)), fCommon);
+		c.insertText(afqt::stoq(it.second), fBold);
 	}
 
 	if (parsed_files.size())

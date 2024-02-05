@@ -720,132 +720,6 @@ void JobAf::checkDepends()
 	if( depend_local || depend_global ) m_state = m_state | AFJOB::STATE_WAITDEP_MASK;
 }
 
-af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<int> * blocksIds, MonitorContainer * monitoring)
-{
-	// Job can set offline itself on some error in this recursive function
-	if( m_state & AFJOB::STATE_OFFLINE_MASK )
-		return NULL;
-
-	if( m_blocks[block]->m_tasks[task]->m_solved )
-		return NULL;
-	m_blocks[block]->m_tasks[task]->m_solved = true;
-
-	//
-	// Recursive dependence check, only if needed
-	if( blocksIds )
-	{
-		std::list<int>::const_iterator bIt = blocksIds->begin();
-		std::list<int>::const_iterator end = blocksIds->end();
-		while( bIt != end)
-		{
-			if( block == *bIt)
-			{
-				appendLog( std::string("Block[") + m_blocks_data[block]->getName() + "] appears second time while job generating a task.\nJob has a recursive blocks tasks dependence.");
-				m_state = m_state | AFJOB::STATE_OFFLINE_MASK;
-				if( monitoring ) monitoring->addJobEvent( af::Monitor::EVT_jobs_change, getId(), getUid());
-				return NULL;
-			}
-			bIt++;
-		}
-		blocksIds->push_back( block);
-	}
-	//
-	
-	if( false == ( m_blocks_data[block]->getState() & AFJOB::STATE_READY_MASK ) ) return NULL;
-	if( task >= m_blocks_data[block]->getTasksNum() )
-	{
-		AF_ERR << "block[" << block << "] '" << m_blocks_data[block]->getName()
-		       << "' : " << task << " >= number of tasks = " << m_blocks_data[block]->getTasksNum();
-		return NULL;
-	}
-	if( false == ( m_progress->tp[block][task]->state & AFJOB::STATE_READY_MASK) ) return NULL;
-	
-	if( false == m_blocks[block]->canRunOn( render)) return NULL;
-	
-	if( m_blocks[block]->m_tasks[task]->avoidHostsCheck( render->getName())) return NULL;
-	
-	//
-	// Check block tasks dependence: Get tasks depend mask, if any exists:
-	if( m_blocks_data[block]->hasTasksDependMask() )
-	{
-		bool dependsnotdone = false;
-		std::list<int> blocksIdsBranch;
-		if( blocksIds)
-		{
-			blocksIdsBranch = *blocksIds;
-			blocksIds = &blocksIdsBranch;
-		}
-		
-		for( int b = 0; b < m_blocks_num; b++)
-		{
-			if( b == block ) continue;
-			
-			//         if( blocksdata[block]->checkTasksDependMask( blocksdata[b]->getName()) == false ) continue;
-			if( m_blocks[block]->tasksDependsOn( b) == false )
-				continue;
-			
-			long long firstdependframe, lastdependframe;
-			int firstdependtask, lastdependtask;
-			m_blocks_data[block]->genNumbers( firstdependframe, lastdependframe, task);
-			if( m_blocks_data[block]->isNumeric() && m_blocks_data[b]->isNotNumeric())
-			{
-				firstdependframe -= m_blocks_data[block]->getFrameFirst();
-				lastdependframe  -= m_blocks_data[block]->getFrameFirst();
-			}
-			else if( m_blocks_data[block]->isNotNumeric() && m_blocks_data[b]->isNumeric())
-			{
-				firstdependframe += m_blocks_data[b]->getFrameFirst();
-				lastdependframe  += m_blocks_data[b]->getFrameFirst();
-			}
-			if( m_blocks_data[b]->getFramePerTask() < 0 ) lastdependframe++; // For several frames in task
-			
-			bool inValidRange;
-			firstdependtask = m_blocks_data[b]->calcTaskNumber( firstdependframe, inValidRange);
-			lastdependtask  = m_blocks_data[b]->calcTaskNumber(  lastdependframe, inValidRange);
-			if( inValidRange )
-				if( m_blocks_data[b]->getFramePerTask() < 0 )
-					lastdependtask--;
-			
-			for( int t = firstdependtask; t <= lastdependtask; t++)
-			{
-				// Task is done, so depend is satisfied:
-				if( m_progress->tp[b][t]->state & AFJOB::STATE_DONE_MASK )
-					continue;
-				
-				// Check subframe depend, is depend task is running:
-				if( m_blocks_data[b]->isDependSubTask() && ( m_progress->tp[b][t]->state & AFJOB::STATE_RUNNING_MASK ))
-				{
-					long long f_start_dep, f_end_dep;
-					m_blocks_data[b]->genNumbers( f_start_dep, f_end_dep, t);
-					long long frame_run = f_start_dep + m_progress->tp[b][t]->frame;
-					if( frame_run > lastdependframe )
-						continue;
-				}
-				
-				// Run recurtsion:
-				af::TaskExec * task_ptr = genTask( render, b, t, (t == firstdependtask ? blocksIds : NULL), monitoring);
-				if( m_state & AFJOB::STATE_OFFLINE_MASK )
-				{
-					if( task_ptr ) delete task_ptr;
-					return NULL;
-				}
-				
-				if( task_ptr ) return task_ptr;
-				if( dependsnotdone == false ) dependsnotdone = true;
-			}
-		}
-		if( dependsnotdone ) return NULL;
-	}
-	
-	af::TaskExec * task_exec = m_blocks_data[block]->genTask( task);
-	
-	task_exec->m_custom_data_job = m_custom_data;
-	task_exec->m_custom_data_render = render->getCustomData();
-	task_exec->m_custom_data_user = m_user->getCustomData();
-	
-	return task_exec;
-}
-
 bool JobAf::v_canRun()
 {
 	if( isLocked() )
@@ -1065,11 +939,8 @@ bool JobAf::solveOnRender( RenderAf * i_render, MonitorContainer * i_monitoring)
 			if (false == (m_progress->tp[b][t]->state & AFJOB::STATE_TRYTHISTASKNEXT_MASK))
 				m_progress->tp[b][t]->state |= AFJOB::STATE_TRYTHISTASKNEXT_MASK;
 
-			bool toContinue;
-			if (solveTaskOnRender(i_render, b, t, i_monitoring, toContinue))
+			if (solveTaskOnRender(i_render, b, t, i_monitoring))
 				return true;
-			if (false == toContinue)
-				return false;
 		}
 	}
 
@@ -1102,77 +973,65 @@ bool JobAf::solveOnRender( RenderAf * i_render, MonitorContainer * i_monitoring)
 			continue;
 		}
 
-		bool toContinue;
-		if (solveTaskOnRender(i_render, b, task_num, i_monitoring, toContinue))
+		if (solveTaskOnRender(i_render, b, task_num, i_monitoring))
 			return true;
-		if (false == toContinue)
-			return false;
 	}
 
 	return false;
 }
 
-bool JobAf::solveTaskOnRender(RenderAf * i_render, int i_block_num, int i_task_num, MonitorContainer * i_monitoring, bool & o_continue)
+bool JobAf::solveTaskOnRender(RenderAf * i_render, int i_block_num, int i_task_num, MonitorContainer * i_monitoring)
 {
-/*
-		std::list<int> blocksIds;
-		af::TaskExec *task_exec = genTask(i_render, i_block_num, i_task_num, &blocksIds, i_monitoring);
-		
-		// Job may became paused, if recursion during task generation detected:
-		if( m_state & AFJOB::STATE_OFFLINE_MASK )
-		{
-			if( task_exec ) delete task_exec;
-			o_continue = false;
-			return false;
-		}
-*/
-		af::TaskExec * task_exec = genTask(i_render, i_block_num, i_task_num);
+	af::TaskExec * task_exec = genTask(i_render, i_block_num, i_task_num);
 
-		// Check if render is online
-		// It can be solved with offline render to check whether to WOL wake it
-		if( task_exec && i_render->isOffline())
-		{
-			delete task_exec;
-			o_continue = true;
-			return true;
-		}
+	// No task was generated:
+	if (NULL == task_exec)
+	{
+		return false;
+	}
 
-		// No task was generated:
-		if (NULL == task_exec)
-		{
-			o_continue = true;
-			return false;
-		}
-
-		// Job successfully solved (produced a task)
-		task_exec->setJobName( m_name);
-		task_exec->setUserName( m_user_name);
-
-		// Job was not able to start a task.
-		// This should not happen.
-		// This is some error situation (probably system job), see server log.
-		if( false == m_blocks[task_exec->getBlockNum()]->v_startTask( task_exec, i_render, i_monitoring))
-		{
-			delete task_exec;
-			o_continue = true;
-			return false;
-		}
-
-		m_blocks[task_exec->getBlockNum()]->m_data->setTimeStarted( time(NULL) );
-
-		// If job was not started it became started
-		if( m_time_started == 0 )
-		{
-			m_time_started = time(NULL);
-			appendLog("Started.");
-			store();
-		}
-
-		// Set RUNNING state if it was not:
-		if( false == ( m_state & AFJOB::STATE_RUNNING_MASK ))
-			m_state |= AFJOB::STATE_RUNNING_MASK;
-
+	// Check if render is online
+	// It can be solved with offline render to check whether to WOL wake it
+	if (i_render->isOffline())
+	{
+		delete task_exec;
 		return true;
+	}
+
+	// Fill some TaskExec fields:
+	task_exec->setJobName(m_name);
+	task_exec->setUserName(m_user_name);
+	if (hasCustomData())
+		task_exec->setDataString("job_custom_data", m_custom_data);
+	if (i_render->hasCustomData())
+		task_exec->setDataString("render_custom_data", i_render->getCustomData());
+	if (m_user->hasCustomData())
+		task_exec->setDataString("user_custom_data", m_user->getCustomData());
+
+	// Job was not able to start a task.
+	// This should not happen.
+	// This is some error situation (probably system job), see server log.
+	if( false == m_blocks[task_exec->getBlockNum()]->v_startTask( task_exec, i_render, i_monitoring))
+	{
+		delete task_exec;
+		return false;
+	}
+
+	m_blocks[task_exec->getBlockNum()]->m_data->setTimeStarted( time(NULL) );
+
+	// If job was not started it became started
+	if( m_time_started == 0 )
+	{
+		m_time_started = time(NULL);
+		appendLog("Started.");
+		store();
+	}
+
+	// Set RUNNING state if it was not:
+	if( false == ( m_state & AFJOB::STATE_RUNNING_MASK ))
+		m_state |= AFJOB::STATE_RUNNING_MASK;
+
+	return true;
 }
 
 af::TaskExec * JobAf::genTask(RenderAf * i_render, int i_block, int i_task)
@@ -1196,13 +1055,7 @@ af::TaskExec * JobAf::genTask(RenderAf * i_render, int i_block, int i_task)
 	if (m_blocks[i_block]->m_tasks[i_task]->avoidHostsCheck(i_render->getName()))
 		return NULL;
 
-	af::TaskExec * task_exec = m_blocks_data[i_block]->genTask(i_task);
-
-	task_exec->m_custom_data_job = m_custom_data;
-	task_exec->m_custom_data_render = i_render->getCustomData();
-	task_exec->m_custom_data_user = m_user->getCustomData();
-
-	return task_exec;
+	return m_blocks_data[i_block]->genTask(i_task);
 }
 
 void JobAf::v_updateTaskState( const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring)

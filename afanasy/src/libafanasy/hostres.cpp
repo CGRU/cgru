@@ -230,8 +230,7 @@ void HostRes::v_readwrite( Msg * msg)
 {
     rw_int32_t( cpu_num,      msg);
     rw_int32_t( cpu_mhz,      msg);
-	// NEW_VERSION
-    //rw_int32_t( cpu_temp,      msg);
+	rw_int32_t( cpu_temp,      msg);
     rw_uint8_t( cpu_loadavg[0],     msg);
     rw_uint8_t( cpu_loadavg[1],     msg);
     rw_uint8_t( cpu_loadavg[2],     msg);
@@ -262,10 +261,9 @@ void HostRes::v_readwrite( Msg * msg)
 	rw_int32_t(gpu_mem_used_mb,  msg);
 	rw_String (gpu_string,       msg);
 
-	// NEW_VERSION
-	//rw_String (hw_info, msg);
-
     rw_StringVect( logged_in_users, msg);
+
+	rw_String (hw_info, msg);
 
     uint8_t custom_count = uint8_t(custom.size());
 

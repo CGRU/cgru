@@ -391,11 +391,15 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 	    m_hres.copy( render->getHostRes());
 		m_idle_time = render->getIdleTime();
 		m_busy_time = render->getBusyTime();
+		m_hw_info = afqt::stoq(m_hres.hw_info);
 
 	    int mem_used = m_hres.mem_total_mb - m_hres.mem_free_mb;
 	    int hdd_used = m_hres.hdd_total_gb - m_hres.hdd_free_gb;
 
-		m_plotCpu.setLabel(QString("C %1*%2").arg(m_hres.cpu_num).arg(double(m_hres.cpu_mhz) / 1000.0, 0, 'f', 1));
+		QString cpu_label = QString("C %1*%2").arg(m_hres.cpu_num).arg(double(m_hres.cpu_mhz) / 1000.0, 0, 'f', 1);
+		if (m_hres.cpu_temp > 0)
+			cpu_label = QString("%1 %2C").arg(cpu_label).arg(m_hres.cpu_temp);
+		m_plotCpu.setLabel(cpu_label);
 	    m_plotCpu.addValue( 0, m_hres.cpu_system + m_hres.cpu_iowait + m_hres.cpu_irq + m_hres.cpu_softirq);
 	    m_plotCpu.addValue( 1, m_hres.cpu_user + m_hres.cpu_nice);
 
@@ -483,7 +487,8 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 	    m_update_counter++;
 
 		m_info_text_hres.clear();
-		m_info_text_hres += QString("CPU: <b>%1</b> x<b>%2</b> MHz").arg(m_hres.cpu_mhz).arg(m_hres.cpu_num);
+		m_info_text_hres += QString("<br>%1").arg(m_hw_info);
+		m_info_text_hres += QString("<br>CPU: <b>%1</b>x<b>%2</b> MHz <b>%3</b>C").arg(m_hres.cpu_mhz).arg(m_hres.cpu_num).arg(m_hres.cpu_temp);
 		m_info_text_hres += QString("<br>MEM: <b>%1</b> GB").arg(m_hres.mem_total_mb>>10);
 		if( m_hres.swap_total_mb )
 			m_info_text_hres += QString(" Swap: <b>%1</b> GB").arg(m_hres.swap_total_mb>>10);
@@ -685,7 +690,7 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 		i_painter->drawText(x+5, y_cur, w-10, HeightOffline,
 				Qt::AlignVCenter | Qt::AlignHCenter, offlineState_time, &rect_center);
 		i_painter->drawText(x+5, y_cur, (w>>1)-10-(rect_center.width()>>1), HeightOffline,
-				Qt::AlignVCenter | Qt::AlignLeft, m_name + ' ' + m_engine);
+				Qt::AlignVCenter | Qt::AlignLeft, m_name + ' ' + m_engine + ' ' + m_hw_info);
 
 		y_cur += HeightOffline;
 
@@ -717,7 +722,7 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 		i_painter->setPen(clrTextInfo(i_option));
 		i_painter->setFont(afqt::QEnvironment::f_info);
 	    i_painter->drawText(left_text_x, y_cur, left_text_w, h, Qt::AlignTop | Qt::AlignLeft,
-				m_name + ' ' + m_capacity_usage + ' ' + m_loggedin_users + ' ' + m_engine);
+				m_name + ' ' + m_capacity_usage + ' ' + m_loggedin_users + ' ' + m_engine + ' ' + m_hw_info);
 
 		i_painter->setPen(clrTextInfo(i_option));
 		i_painter->setFont(afqt::QEnvironment::f_info);
@@ -727,7 +732,7 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	default:
 		i_painter->setPen(clrTextMain(i_option));
 		i_painter->setFont(afqt::QEnvironment::f_name);
-	    i_painter->drawText(left_text_x, y_cur, left_text_w, h, Qt::AlignTop | Qt::AlignLeft, m_name + ' ' + m_engine);
+	    i_painter->drawText(left_text_x, y_cur, left_text_w, h, Qt::AlignTop | Qt::AlignLeft, m_name + ' ' + m_engine + ' ' + m_hw_info);
 
 		i_painter->setPen(afqt::QEnvironment::qclr_black );
 		i_painter->setFont(afqt::QEnvironment::f_info);
@@ -1004,6 +1009,9 @@ void ItemRender::v_setSortType( int i_type1, int i_type2 )
 		case CtrlSortFilter::TENGINE:
 	        m_sort_str1 = m_engine;
 			break;
+		case CtrlSortFilter::THWINFO:
+	        m_sort_str1 = m_hw_info;
+			break;
 		case CtrlSortFilter::TADDRESS:
 	        m_sort_str1 = m_address_str;
 			break;
@@ -1042,6 +1050,9 @@ void ItemRender::v_setSortType( int i_type1, int i_type2 )
 		case CtrlSortFilter::TENGINE:
 	        m_sort_str2 = m_engine;
 			break;
+		case CtrlSortFilter::THWINFO:
+	        m_sort_str2 = m_hw_info;
+			break;
 		case CtrlSortFilter::TADDRESS:
 	        m_sort_str2 = m_address_str;
 			break;
@@ -1069,6 +1080,9 @@ void ItemRender::v_setFilterType( int i_type )
 			break;
 		case CtrlSortFilter::TENGINE:
 	        m_filter_str = afqt::qtos( m_engine);
+			break;
+		case CtrlSortFilter::THWINFO:
+	        m_filter_str = afqt::qtos(m_hw_info);
 			break;
 		case CtrlSortFilter::TADDRESS:
 	        m_filter_str = afqt::qtos( m_address_str);

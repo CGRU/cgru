@@ -88,6 +88,9 @@ namespace AFJOB
 	const int64_t STATE_TRYTHISTASKNEXT_MASK       = 1ULL<<19;
 	const   char  STATE_TRYTHISTASKNEXT_NAME[]     = "Trying this task next";
 	const   char  STATE_TRYTHISTASKNEXT_NAME_S[]   = "TRY";
+	const int64_t STATE_SUSPENDED_MASK             = 1ULL<<20;
+	const   char  STATE_SUSPENDED_NAME[]           = "Suspended";
+	const   char  STATE_SUSPENDED_NAME_S[]         = "SUS";
 
 	const int64_t STATE_SOLVED_MASK                = 1ULL<<62;
 

@@ -655,7 +655,7 @@ void TaskProcess::processFinished( int i_exitCode)
 		m_update_status = af::TaskExec::UPFinishedParserBadResult;
 		AF_LOG << "Bad result from parser.";
 	}
-	else if( m_taskexec->hasFileSizeCheck() &&
+	else if( m_taskexec->hasCheckRenderedFiles() &&
 		( false == m_service->checkRenderedFiles()))
 	{
 		m_update_status = af::TaskExec::UPBadRenderedFiles;
