@@ -4,7 +4,7 @@ from parsers import hbatch
 from parsers import karma
 
 
-class hbatch_mantra(hbatch.hbatch, karma.karma):
+class hbatch_karma(hbatch.hbatch, karma.karma):
     """Houdini batch + catch karma node output
     """
 
