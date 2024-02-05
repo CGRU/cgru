@@ -23,8 +23,6 @@ public:
 			const std::string & i_parser_type,
 
 			int i_capacity,
-			int i_file_size_min,
-			int i_file_size_max,
 
 			const std::string & i_command_block,
 
@@ -41,9 +39,7 @@ public:
 			int i_job_id,
 			int i_block_number,
 			long long i_block_flags,
-			int i_task_number,
-
-			int i_parser_coeff = 1
+			int i_task_number
 );
 
 	TaskExec( Msg * msg); ///< Read task from message.
@@ -54,7 +50,6 @@ public:
 	inline const std::string & getName()        const { return m_name;       }///< Get task name.
 	inline const std::string & getServiceType() const { return m_service;}///< Get task parser type.
 	inline const std::string & getParserType()  const { return m_parser; }///< Get task parser type.
-	inline int getParserCoeff()            const { return m_parser_coeff;}///< Get parser koeff.
 
 	inline int  getCapacity()      const { return m_capacity;   }///< Get task capacity.
 	inline int  getCapCoeff()      const { return m_capacity_coeff;   }///< Get task capacity koeff.
@@ -74,14 +69,9 @@ public:
 	// Get job data:
 	inline const std::string & getJobName() const { return m_job_name; }
 	inline int getJobId() const { return m_job_id; }
-	inline int64_t getJobFlags() const { return m_job_flags; }
 
 	// Get user data:
 	inline const std::string & getUserName() const { return m_user_name;  }
-	inline int64_t getUserFlags() const { return m_user_flags; }
-
-	// Get render data:
-	inline int64_t getRenderFlags() const { return m_render_flags; }
 
 	inline const std::string & getCommandBlock() const { return m_command_block; }
 	inline const std::string & getCommandTask() const { return m_command_task; }
@@ -97,10 +87,9 @@ public:
 	inline const std::vector<std::string> & getParsedFiles() const { return m_parsed_files; }
 
 	inline bool hasEnv() const {return m_environment.size();} ///< Whether extra environment.
-	inline bool hasFileSizeCheck() const { return m_block_flags & af::BlockData::FCheckRenderedFiles ;}
+	inline bool hasCheckRenderedFiles() const { return m_block_flags & af::BlockData::FCheckRenderedFiles ;}
 
-	inline long long getFileSizeMin()   const { return m_file_size_min;}
-	inline long long getFileSizeMax()   const { return m_file_size_max;}
+	inline bool isSkippingExistingFiles() const { return m_block_flags & af::BlockData::FSkipExistingFiles;}
 
 	inline long long getFrameStart()  const { return m_frame_start;  } ///< Get first frame.
 	inline long long getFrameFinish() const { return m_frame_finish; } ///< Get last frame.
@@ -192,11 +181,13 @@ public:
 	inline const std::map<std::string, int32_t> & getTickets() const {return m_tickets;}
 	inline void setTickets(const std::map<std::string, int32_t> & i_tickets) {m_tickets = i_tickets;}
 
-	std::string m_custom_data_task;
-	std::string m_custom_data_block;
-	std::string m_custom_data_job;
-	std::string m_custom_data_user;
-	std::string m_custom_data_render;
+	inline void setDataInteger(const char * i_key, const int64_t i_value) {m_data_integers[i_key] = i_value;}
+	inline const std::map<std::string, int64_t> getDataIntegers() const {return m_data_integers;}
+	inline void setDataString(const char * i_key, const std::string & i_value) {m_data_strings[i_key] = i_value;}
+	inline const std::map<std::string, std::string> getDataStrings() const {return m_data_strings;}
+
+	inline const int64_t getDataInteger(const char * i_key) const
+		{auto const & pair = m_data_integers.find(i_key); if (pair != m_data_integers.end()) return pair->second; else return -1;}
 
 private:
 	std::string m_name;               ///< Task name.
@@ -209,7 +200,6 @@ private:
 	std::string m_command_task;       ///< Task command.
 	std::string m_service;            ///< Task service type.
 	std::string m_parser;             ///< Task parser type.
-	int32_t     m_parser_coeff;       ///< Parser koefficient.
 
 	std::map<std::string, int32_t> m_tickets; // Task tickets (from job block)
 
@@ -221,8 +211,6 @@ private:
 
 	int32_t m_capacity;
 	int32_t m_capacity_coeff;
-	int64_t m_file_size_min;
-	int64_t m_file_size_max;
 	std::list<std::string> m_multihost_names;
 
 	int32_t m_job_id;         ///< Job id number.
@@ -232,9 +220,6 @@ private:
 
 	int64_t m_flags;         ///< Flags.
 	int64_t m_block_flags;   ///< Block flags.
-	int64_t m_job_flags;     ///< Job flags.
-	int64_t m_user_flags;    ///< User flags.
-	int64_t m_render_flags;  ///< Render flags.
 
 	int64_t m_frame_start;   ///< First frame.
 	int64_t m_frame_finish;  ///< Last frame.
@@ -242,6 +227,9 @@ private:
 	int64_t m_frames_num;    ///< Number of frames.
 
 	int64_t m_time_start;
+
+	std::map<std::string, int64_t>     m_data_integers;
+	std::map<std::string, std::string> m_data_strings;
 
 private:
 	void initDefaults();

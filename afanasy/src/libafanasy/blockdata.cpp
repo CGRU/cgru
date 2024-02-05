@@ -1096,7 +1096,7 @@ TaskExec *BlockData::genTask(int num) const
 		new TaskExec(
 			genTaskName(num, &start, &end), m_service, m_parser,
 
-			m_capacity, m_file_size_min, m_file_size_max,
+			m_capacity,
 
 			m_command,
 
@@ -1108,14 +1108,22 @@ TaskExec *BlockData::genTask(int num) const
 
 			m_job_id, m_block_num, m_flags, num);
 
-	taskExec->m_custom_data_block = m_custom_data;
+	taskExec->setBlockName(m_name);
 	taskExec->setTickets(m_tickets);
+	if (m_parser_coeff != 1)
+		taskExec->setDataInteger("parser_koeff", m_parser_coeff);
+	if (m_file_size_min != -1)
+		taskExec->setDataInteger("file_size_min", m_file_size_min);
+	if (m_file_size_max != -1)
+		taskExec->setDataInteger("file_size_max", m_file_size_max);
+	if (m_custom_data.size())
+		taskExec->setDataString("block_custom_data", m_custom_data);
 
 	if (isNotNumeric())
 	{
 		taskExec->setTaskCommand(m_tasks_data[num]->getCommand());
 		taskExec->setTaskFiles(m_tasks_data[num]->getFiles());
-		taskExec->m_custom_data_task = m_tasks_data[num]->getCustomData();
+		taskExec->setDataString("task_custom_data", m_tasks_data[num]->getCustomData());
 		if (m_tasks_data[num]->hasEnvironment())
 			taskExec->joinEnvironment(m_tasks_data[num]->getEnvironment());
 	}

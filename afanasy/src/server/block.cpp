@@ -169,9 +169,6 @@ void Block::v_errorHostsReset()
 
 bool Block::v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
 {
-   // Store block name in task executable:
-   taskexec->setBlockName( m_data->getName());
-
    // Set variable capacity to maximum value:
    if( m_data->canVarCapacity() && (taskexec->getCapacity() > 0))
    {

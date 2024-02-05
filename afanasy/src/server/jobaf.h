@@ -159,7 +159,7 @@ private:
 
 	bool solveOnRender( RenderAf * i_render, MonitorContainer * i_monitoring);
 
-	bool solveTaskOnRender(RenderAf * i_render, int i_block_num, int i_task_num, MonitorContainer * i_monitoring, bool & o_continue);
+	bool solveTaskOnRender(RenderAf * i_render, int i_block_num, int i_task_num, MonitorContainer * i_monitoring);
 
 	virtual void v_priorityChanged( MonitorContainer * i_monitoring);
 
@@ -174,9 +174,6 @@ private:
 	void resetTryTasksNext();
 
 	void appendBlocks(Action & i_action, const JSON & i_operation);
-
-	// An old recursive function:
-	af::TaskExec *genTask( RenderAf *render, int block, int task, std::list<int> * blocksIds, MonitorContainer * monitoring);
 
 	af::TaskExec * genTask(RenderAf * i_render, int i_block, int i_task);
 	

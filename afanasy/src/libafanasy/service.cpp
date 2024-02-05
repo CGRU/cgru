@@ -38,7 +38,7 @@ Service::Service(
 {
 	TaskExec * i_task_exec = new TaskExec(
 			"name",m_name, m_parser_type,
-			1, -1, -1,
+			1,
             i_command_task,
 			std::vector<std::string>(),
 			1, 1, 1, 1,
@@ -59,7 +59,7 @@ Service::Service(
 {
 	TaskExec * i_task_exec = new TaskExec(
 			"name", m_name, m_parser_type,
-			1, -1, -1,
+			1,
 			"",
             std::vector<std::string>(),
 			1, 1, 1, 1,
@@ -80,7 +80,7 @@ Service::Service(
 {
 	TaskExec * i_task_exec = new TaskExec(
 			"name", m_name, m_parser_type,
-			1, -1, -1,
+			1,
 			"",
             std::vector<std::string>(),
 			1, 1, 1, 1,
@@ -106,7 +106,7 @@ Service::Service(
 
 	TaskExec * task_exec = new TaskExec(
 			"name", m_name, m_parser_type,
-			1, -1, -1,
+			1,
             "",
 			i_files_block,
 			i_frame_start, i_frame_end, i_frame_inc, 1,
@@ -131,7 +131,7 @@ Service::Service(
 {
 	TaskExec * i_task_exec = new TaskExec(
 			"name", m_name, m_parser_type,
-			1, -1, -1,
+			1,
 			i_command_block,
             std::vector<std::string>(),
 			i_frame_start, i_frame_end, 1, 1,
@@ -192,11 +192,10 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	PyDict_SetItemString( task_info, "parser",        PyBytes_FromString( m_parser_type.c_str()));
 	PyDict_SetItemString(task_info, "command_block",  PyBytes_FromString(i_task_exec->getCommandBlock().c_str()));
 	PyDict_SetItemString(task_info, "command_task",   PyBytes_FromString(i_task_exec->getCommandTask().c_str()));
-	PyDict_SetItemString( task_info, "capacity",      PyLong_FromLong( i_task_exec->getCapCoeff()));
+	PyDict_SetItemString(task_info, "capacity",       PyLong_FromLong(i_task_exec->getCapacity()));
+	PyDict_SetItemString(task_info, "capacity_coeff", PyLong_FromLong(i_task_exec->getCapCoeff()));
 	PyDict_SetItemString(task_info, "files_block",    pFilesBlockList);
 	PyDict_SetItemString(task_info, "files_task",     pFilesTaskList);
-	PyDict_SetItemString( task_info, "file_size_min", PyLong_FromLong( i_task_exec->getFileSizeMin()));
-	PyDict_SetItemString( task_info, "file_size_max", PyLong_FromLong( i_task_exec->getFileSizeMax()));
 	PyDict_SetItemString( task_info, "hosts",         pHostsList);
 	PyDict_SetItemString( task_info, "parsed_files",  pParsedFilesList);
 	PyDict_SetItemString(task_info, "environment",    pEenvDict);
@@ -209,27 +208,22 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 
 	PyDict_SetItemString( task_info, "task_id",          PyLong_FromLong( i_task_exec->getTaskNum()));
 	PyDict_SetItemString( task_info, "task_name",        PyBytes_FromString( i_task_exec->getName().c_str()));
-	PyDict_SetItemString( task_info, "task_custom_data", PyBytes_FromString( i_task_exec->m_custom_data_task.c_str()));
 
 	PyDict_SetItemString( task_info, "block_id",          PyLong_FromLong( i_task_exec->getBlockNum()));
 	PyDict_SetItemString( task_info, "block_name",        PyBytes_FromString( i_task_exec->getBlockName().c_str()));
 	PyDict_SetItemString( task_info, "block_flags",       PyLong_FromLong( i_task_exec->getBlockFlags()));
-	PyDict_SetItemString( task_info, "block_capacity",    PyLong_FromLong( i_task_exec->getCapacity()));
-	PyDict_SetItemString( task_info, "block_custom_data", PyBytes_FromString( i_task_exec->m_custom_data_block.c_str()));
 
 	PyDict_SetItemString( task_info, "job_id",          PyLong_FromLong( i_task_exec->getJobId()));
 	PyDict_SetItemString( task_info, "job_name",        PyBytes_FromString( i_task_exec->getJobName().c_str()));
-	PyDict_SetItemString( task_info, "job_flags",       PyLong_FromLong( i_task_exec->getJobFlags()));
-	PyDict_SetItemString( task_info, "job_custom_data", PyBytes_FromString( i_task_exec->m_custom_data_job.c_str()));
 
 	PyDict_SetItemString( task_info, "user_name",        PyBytes_FromString( i_task_exec->getUserName().c_str()));
-	PyDict_SetItemString( task_info, "user_flags",       PyLong_FromLong( i_task_exec->getUserFlags()));
-	PyDict_SetItemString( task_info, "user_custom_data", PyBytes_FromString( i_task_exec->m_custom_data_user.c_str()));
-
-	PyDict_SetItemString( task_info, "render_flags",       PyLong_FromLong( i_task_exec->getRenderFlags()));
-	PyDict_SetItemString( task_info, "render_custom_data", PyBytes_FromString( i_task_exec->m_custom_data_render.c_str()));
 
 	PyDict_SetItemString( task_info, "store_dir", PyBytes_FromString( i_store_dir.c_str()));
+
+	for (auto const& it : i_task_exec->getDataIntegers())
+		PyDict_SetItemString(task_info, it.first.c_str(), PyLong_FromLong(it.second));
+	for (auto const& it : i_task_exec->getDataStrings())
+		PyDict_SetItemString(task_info, it.first.c_str(), PyBytes_FromString(it.second.c_str()));
 
 	PyTuple_SetItem( pArgs, 0, task_info);
 	PyTuple_SetItem( pArgs, 1, PyBool_FromLong( af::Environment::isVerboseMode()));

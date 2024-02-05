@@ -12,7 +12,7 @@ const std::string DBTask::ms_TableName("tasks");
 
 DBTask::DBTask()
 {
-	dbAddAttr( new DBAttrInt64 ( DBAttr::_serial,       &m_time_done    ));
+	dbAddAttr( new DBAttrInt64 ( DBAttr::_serial,       &m_job_serial   ));
 	dbAddAttr( new DBAttrInt32 ( DBAttr::_id_block,     &m_block_id     ));
 	dbAddAttr( new DBAttrInt32 ( DBAttr::_id_task,      &m_task_id      ));
 	dbAddAttr( new DBAttrString( DBAttr::_annotation,   &m_annotation   ));
@@ -51,8 +51,6 @@ void DBTask::add(
 	m_block_id  = i_exec->getBlockNum();
 	m_task_id   = i_exec->getTaskNum();
 	m_command   = i_exec->getCommandBlock() + i_exec->getCommandTask();
-	m_username  = i_exec->getUserName();
-	m_jobname   = i_exec->getJobName();
 	m_blockname = i_exec->getBlockName();
 	m_service   = i_exec->getServiceType();
 	m_capacity  = i_exec->getCapacity();
@@ -67,6 +65,8 @@ void DBTask::add(
 
 	m_hostname = i_render->getName();
 
+	m_jobname     = i_job->getName();
+	m_username    = i_job->getUserName();
 	m_description = i_job->getDescription();
 	m_folder      = i_job->getFolder();
 	m_annotation  = i_job->getAnnotation();

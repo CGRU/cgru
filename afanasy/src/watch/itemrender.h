@@ -79,6 +79,7 @@ private:
 
 	QString m_os;
 	QString m_engine;
+	QString m_hw_info;
 	QString m_username;
 	QString m_loggedin_users;
 	QString m_tasksusers; ///< For sorting and filtering only
