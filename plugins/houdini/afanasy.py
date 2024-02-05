@@ -219,6 +219,9 @@ class BlockParameters:
                         )
 
             # TODO karma hydra delegate.
+            elif roptype == 'usdrender_rop' and ropnode.parm('renderer').eval() == 'BRAY_HdKarma':
+                self.service = 'hbatch_karma'
+                self.tickets['KARMA'] = 1
 
             elif roptype == 'rib':
                 self.service = 'hbatch_prman'
