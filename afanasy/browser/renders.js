@@ -235,9 +235,13 @@ RenderNode.prototype.update = function(i_obj) {
 		this.host_resources = r;
 
 		if (r.hw_info && r.hw_info.length)
+		{
 			this.elHWInfo.textContent = r.hw_info;
+			if (r.hw_info[0] == 'V')
+				this.m_virtual = true;
+		}
 
-		if (r.cpu_temp && (r.cpu_temp > 0))
+		if (r.cpu_temp && (r.cpu_temp > 0) && (true != this.m_virtual))
 		{
 			this.elTempBox.style.display = 'block';
 			this.elTempBar.style.width = r.cpu_temp + '%';
