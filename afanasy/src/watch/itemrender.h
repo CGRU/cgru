@@ -48,6 +48,9 @@ public:
 
 	bool v_isSelectable() const override;
 
+	inline bool isVirtual() const {return (m_hres.hw_info.size() && (m_hres.hw_info.at(0) == 'V'));}
+	inline bool notVirtual() const {return (false == isVirtual());}
+
 protected:
 	virtual void v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const;
 

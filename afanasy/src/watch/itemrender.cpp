@@ -397,7 +397,7 @@ void ItemRender::v_updateValues(af::Node * i_afnode, int i_msgType)
 	    int hdd_used = m_hres.hdd_total_gb - m_hres.hdd_free_gb;
 
 		QString cpu_label = QString("C %1*%2").arg(m_hres.cpu_num).arg(double(m_hres.cpu_mhz) / 1000.0, 0, 'f', 1);
-		if (m_hres.cpu_temp > 0)
+		if ((m_hres.cpu_temp > 0) && notVirtual())
 			cpu_label = QString("%1 %2C").arg(cpu_label).arg(m_hres.cpu_temp);
 		m_plotCpu.setLabel(cpu_label);
 	    m_plotCpu.addValue( 0, m_hres.cpu_system + m_hres.cpu_iowait + m_hres.cpu_irq + m_hres.cpu_softirq);
@@ -594,17 +594,20 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	else if (m_nimby ) itemColor = &(afqt::QEnvironment::clr_itemrendernimby.c);
 	else if (m_busy  ) itemColor = &(afqt::QEnvironment::clr_itemrenderbusy.c);
 
-	// Hot CPU temperature makes background color red:
-	int tmin = af::Environment::getMonitorRenderCPUHotMin();
-	int tmax = af::Environment::getMonitorRenderCPUHotMax();
 	int clr[3] = {itemColor->red(), itemColor->green(), itemColor->blue()};
-	int c_hot[3] = {255, 0, 0};
-	float factor = float(m_hres.cpu_temp - tmin) / float(tmax - tmin);
-	if (factor < 0.0) factor = 0.0;
-	if (factor > 1.0) factor = 1.0;
-	factor = factor * factor;
-	for (int i = 0; i < 3; i++)
-		clr[i] = int((1.0 - factor) * clr[i] + factor * c_hot[i]);
+	if ((m_hres.cpu_temp > 0) && notVirtual())
+	{
+		// Hot CPU temperature makes background color red:
+		int tmin = af::Environment::getMonitorRenderCPUHotMin();
+		int tmax = af::Environment::getMonitorRenderCPUHotMax();
+		int c_hot[3] = {255, 0, 0};
+		float factor = float(m_hres.cpu_temp - tmin) / float(tmax - tmin);
+		if (factor < 0.0) factor = 0.0;
+		if (factor > 1.0) factor = 1.0;
+		factor = factor * factor;
+		for (int i = 0; i < 3; i++)
+			clr[i] = int((1.0 - factor) * clr[i] + factor * c_hot[i]);
+	}
 	QColor color = QColor(clr[0], clr[1], clr[2]);
 
 	// Draw standart backgroud
