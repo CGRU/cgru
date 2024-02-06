@@ -778,13 +778,16 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 		return;
 	}
 
+	QRect rect;
 	switch (afqt::QEnvironment::render_item_size.n)
 	{
 	case ListRenders::ESmallSize:
 		i_painter->setPen(clrTextInfo(i_option));
 		i_painter->setFont(afqt::QEnvironment::f_info);
-	    i_painter->drawText(left_text_x, y_cur, left_text_w, h, Qt::AlignTop | Qt::AlignLeft,
-				m_name + ' ' + m_capacity_usage + ' ' + m_loggedin_users + ' ' + m_engine + ' ' + m_hw_info);
+		i_painter->drawText(left_text_x, y_cur, left_text_w, h, Qt::AlignTop | Qt::AlignLeft, m_name, &rect);
+		i_painter->setFont(afqt::QEnvironment::f_thin);
+		i_painter->drawText(left_text_x + rect.width()+5, y_cur-1, left_text_w, h, Qt::AlignTop | Qt::AlignLeft,
+				m_capacity_usage + ' ' + m_loggedin_users + ' ' + m_engine + ' ' + m_hw_info);
 
 		i_painter->setPen(clrTextInfo(i_option));
 		i_painter->setFont(afqt::QEnvironment::f_info);
@@ -794,7 +797,10 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	default:
 		i_painter->setPen(clrTextMain(i_option));
 		i_painter->setFont(afqt::QEnvironment::f_name);
-	    i_painter->drawText(left_text_x, y_cur, left_text_w, h, Qt::AlignTop | Qt::AlignLeft, m_name + ' ' + m_engine + ' ' + m_hw_info);
+		i_painter->drawText(left_text_x, y_cur, left_text_w, h, Qt::AlignTop | Qt::AlignLeft, m_name, &rect);
+
+		i_painter->setFont(afqt::QEnvironment::f_thin);
+		i_painter->drawText(left_text_x + rect.width()+5, y_cur, left_text_w, h, Qt::AlignTop | Qt::AlignLeft, m_hw_info + ' ' + m_engine);
 
 		i_painter->setPen(afqt::QEnvironment::qclr_black );
 		i_painter->setFont(afqt::QEnvironment::f_info);
@@ -802,7 +808,7 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 
 		i_painter->setPen(clrTextInfo(i_option));
 		i_painter->setFont(afqt::QEnvironment::f_info);
-	    i_painter->drawText(left_text_x,  y_cur, left_text_w,  base_height+2, Qt::AlignBottom | Qt::AlignLeft,  m_capacity_usage + ' ' + m_loggedin_users);
+		i_painter->drawText(left_text_x,  y_cur, left_text_w,  base_height+2, Qt::AlignBottom | Qt::AlignLeft,  m_capacity_usage + ' ' + m_loggedin_users);
 	}
 	
 	// Print Bottom|Right

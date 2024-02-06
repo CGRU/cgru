@@ -130,6 +130,7 @@ QString QEnvironment::ms_themes_folder;
 
 QFont QEnvironment::f_name;
 QFont QEnvironment::f_info;
+QFont QEnvironment::f_thin;
 QFont QEnvironment::f_muted;
 QFont QEnvironment::f_plotter;
 QFont QEnvironment::f_min;
@@ -373,6 +374,9 @@ void QEnvironment::initFonts()
 
 	f_info.setBold(         true               );
 	f_info.setPointSize(    font_sizeinfo.n    );
+
+	f_thin.setBold(         false              );
+	f_thin.setPointSize(    font_sizeinfo.n    );
 
 	f_muted.setItalic(      true               );
 	f_muted.setPointSize(   font_sizeinfo.n    );
