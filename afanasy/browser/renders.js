@@ -39,6 +39,13 @@ RenderNode.prototype.init = function() {
 
 	cm_CreateStart(this);
 
+	this.elTempBox = document.createElement('div');
+	this.elTempBox.classList.add('temp_box');
+	this.element.appendChild(this.elTempBox);
+	this.elTempBar = document.createElement('div');
+	this.elTempBar.classList.add('temp_bar');
+	this.elTempBox.appendChild(this.elTempBar);
+
 	this.elIdleBox = document.createElement('div');
 	this.elIdleBox.classList.add('idle_box');
 	this.element.appendChild(this.elIdleBox);
@@ -50,7 +57,8 @@ RenderNode.prototype.init = function() {
 	this.elName.classList.add('name');
 	this.elName.classList.add('prestar');
 
-	this.elVersion = cm_ElCreateText(this.element, 'Client Version');
+	this.elEngine = cm_ElCreateText(this.element, 'Client Version');
+	this.elHWInfo = cm_ElCreateText(this.element, 'Hardware Info');
 
 	if (cm_IsSith())
 	{
@@ -173,7 +181,6 @@ RenderNode.prototype.update = function(i_obj) {
 
 			this.elResources.style.display = 'block';
 
-			this.plotterC.setLabel('C ' + r.cpu_num + '*' + (r.cpu_mhz / 1000.0).toFixed(1));
 			this.plotterC.setTitle('CPU: ' + r.cpu_mhz + ' MHz x' + r.cpu_num);
 
 			this.plotterM.setLabel('M ' + Math.round(r.mem_total_mb / 1024.0));
@@ -226,6 +233,40 @@ RenderNode.prototype.update = function(i_obj) {
 		}
 
 		this.host_resources = r;
+
+		if (r.hw_info && r.hw_info.length)
+			this.elHWInfo.textContent = r.hw_info;
+
+		if (r.cpu_temp && (r.cpu_temp > 0))
+		{
+			this.elTempBox.style.display = 'block';
+			this.elTempBar.style.width = r.cpu_temp + '%';
+			const clr_cold = [ 50, 50,100];
+			const clr_warm = [100,120,100];
+			const clr_hot  = [255,  5,  5];
+			let hmin = cgru_Config.af_monitor_render_cpu_hot_min;
+			let hmax = cgru_Config.af_monitor_render_cpu_hot_max;
+			let clr = [0,0,0];
+			let factor = r.cpu_temp / hmin;
+			if (r.cpu_temp > hmin)
+			{
+				factor = (r.cpu_temp - hmin) / (hmax - hmin);
+				if (factor > 1.0) factor = 1.0;
+				for (let i = 0; i < 3; i++)
+					clr[i] = (1.0 - factor) * clr_warm[i] + factor * clr_hot[i];
+			}
+			else
+			{
+				for (let i = 0; i < 3; i++)
+					clr[i] = (1.0 - factor) * clr_cold[i] + factor * clr_warm[i];
+			}
+			this.elTempBar.style.backgroundColor = 'rgb('+clr[0]+','+clr[1]+','+clr[2]+')';
+
+			this.plotterC.setLabel('C ' + r.cpu_num + '*' + (r.cpu_mhz / 1000.0).toFixed(1) + ' ' + r.cpu_temp + 'C');
+		}
+		else
+			this.plotterC.setLabel('C ' + r.cpu_num + '*' + (r.cpu_mhz / 1000.0).toFixed(1));
+
 
 		var usr = r.cpu_user + r.cpu_nice;
 		var sys = r.cpu_system + r.cpu_iowait + r.cpu_irq + r.cpu_softirq;
@@ -343,10 +384,10 @@ RenderNode.prototype.update = function(i_obj) {
 
 	this.elName.innerHTML = '<b>' + this.params.name + '</b>';
 
-	if (this.params.version != null)
-		this.elVersion.textContent = 'v' + this.params.version;
+	if (this.params.engine != null)
+		this.elEngine.textContent = 'v' + this.params.engine;
 	else
-		this.elVersion.textContent = '';
+		this.elEngine.textContent = '';
 
 	if (cm_IsPadawan())
 	{
@@ -985,8 +1026,10 @@ RenderNode.prototype.updatePanels = function() {
 	if (r)
 	{
 		info += '<p>';
-		info += ' CPU: <b>' + (r.cpu_mhz / 1000.0).toFixed(1) + '</b>x<b>' + r.cpu_num + '</b> GHz';
-		info += ' MEM: <b>' + (r.mem_total_mb / 1024.0).toFixed(1) + '</b> Gb';
+		info += ' ' + r.hw_info;
+		info += '<br> CPU: <b>' + r.cpu_num + '</b>x<b>' + (r.cpu_mhz / 1000.0).toFixed(1) + '</b> GHz';
+		info += ' T=<b>' + r.cpu_temp + '</b>C';
+		info += '<br> MEM: <b>' + (r.mem_total_mb / 1024.0).toFixed(1) + '</b> Gb';
 		info += ' SWP: <b>' + (r.swap_total_mb / 1024.0).toFixed(1) + '</b> Gb';
 		info += ' HDD: <b>' + r.hdd_total_gb + '</b> Gb';
 		if (r.gpu_string)

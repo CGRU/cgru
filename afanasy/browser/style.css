@@ -529,6 +529,22 @@ font-size: 14px;
 /*font-weight: bold;*/
 }
 
+.render .temp_box {
+display: none;
+position: absolute;
+height: 3px;
+left: 50px;
+top: 16px;
+width: 10%;
+border-radius: 2px;
+box-shadow: 0px 0px 2px #000 inset;
+}
+.render .temp_box .temp_bar {
+background: #000;
+position: absolute;
+left: 0; top: 0; bottom: 0;
+border-radius: 2px;
+}
 .render .idle_box {
 display: none;
 position: absolute;
