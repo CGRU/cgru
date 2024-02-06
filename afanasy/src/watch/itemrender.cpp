@@ -604,7 +604,7 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 		float factor = float(m_hres.cpu_temp - tmin) / float(tmax - tmin);
 		if (factor < 0.0) factor = 0.0;
 		if (factor > 1.0) factor = 1.0;
-		factor = factor * factor;
+		factor = 0.3 * (factor * factor);
 		for (int i = 0; i < 3; i++)
 			clr[i] = int((1.0 - factor) * clr[i] + factor * c_hot[i]);
 	}
@@ -616,6 +616,52 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 	QString offlineState_time = m_offlineState;
 	if (m_wol_operation_time > 0)
 	    offlineState_time = m_offlineState + " " + afqt::stoq(af::time2strHMS(time(NULL) - m_wol_operation_time ));
+
+	// Draw CPU Temperature bar:
+	if (m_online && (m_hres.cpu_temp > 0) && notVirtual())
+	{
+		int width = w/7;
+		static const int height = 3;
+		int posx = x + 24;
+		int posy = y + 13;
+
+		int barw = m_hres.cpu_temp * width / 100;
+		if (barw > width) barw = width;
+		static const int clr_cold[3] = {  70,  70, 110};
+		static const int clr_warm[3] = { 180, 140,  90};
+		static const int clr_hot [3] = { 255,   0,   0};
+		int clr[3] = {0,0,0};
+		int tcold = 50;
+		int twarm = af::Environment::getMonitorRenderCPUHotMin();
+		int thot  = af::Environment::getMonitorRenderCPUHotMax();
+		if (m_hres.cpu_temp > twarm)
+		{
+			float factor = float(m_hres.cpu_temp - twarm) / float(thot - twarm);
+			if (factor > 1.0) factor = 1.0;
+			for (int i = 0; i < 3; i++)
+				clr[i] = (1.0 - factor) * clr_warm[i] + factor * clr_hot[i];
+		}
+		else if (m_hres.cpu_temp > tcold)
+		{
+			float factor = float(m_hres.cpu_temp - tcold) / float(twarm - tcold);
+			if (factor > 1.0) factor = 1.0;
+			for (int i = 0; i < 3; i++)
+				clr[i] = (1.0 - factor) * clr_cold[i] + factor * clr_warm[i];
+		}
+		else
+		{
+			for (int i = 0; i < 3; i++)
+				clr[i] = clr_cold[i];
+		}
+
+		i_painter->setBrush(QBrush(QColor(clr[0], clr[1], clr[2]), Qt::SolidPattern));
+		i_painter->setPen(Qt::NoPen);
+		i_painter->drawRect(posx, posy, barw, height);
+
+		i_painter->setPen(afqt::QEnvironment::clr_outline.c);
+		i_painter->setBrush(Qt::NoBrush);
+		i_painter->drawRect(posx, posy, width, height);
+	}
 
 	// Draw busy/idle bar:
 	if (m_online && m_parent_pool)
