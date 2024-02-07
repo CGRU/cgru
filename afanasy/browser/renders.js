@@ -57,8 +57,8 @@ RenderNode.prototype.init = function() {
 	this.elName.classList.add('name');
 	this.elName.classList.add('prestar');
 
-	this.elEngine = cm_ElCreateText(this.element, 'Client Version');
 	this.elHWInfo = cm_ElCreateText(this.element, 'Hardware Info');
+	this.elEngine = cm_ElCreateText(this.element, 'Client Version');
 
 	if (cm_IsSith())
 	{
