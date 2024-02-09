@@ -282,17 +282,34 @@ if output is not None and len(output) > 0:
 
 frame = start
 
-multisampled_rops = ["alembic", "usd_rop"]
+multisampled_rops = ["alembic"]
 fetched_rop = drivertypename
+
+# Add USDs Rops to multisamples if need
+if drivertypename in ["usd_rop", "usd"]:
+    try:
+        mode = ropnode.evalParm('fileperframe')
+        trange = ropnode.evalParm('trange')
+        if mode == 0 and trange != 0:
+            multisampled_rops.append(drivertypename)
+    except:
+        pass
 
 if drivertypename == "fetch":
     fetched_rop = hou.node(ropnode.parm("source").eval()).type().name()
+
+# Trying on Alfred Style Progress
+try:
+    ropnode.parm("alfprogress").set(1)
+except:
+    pass
 
 if drivertypename in multisampled_rops or fetched_rop in multisampled_rops:
     ropnode.render(
             output_file=render_output,
             method=hou.renderMethod.FrameByFrame,
-            ignore_inputs=ignoreInputs
+            ignore_inputs=ignoreInputs,
+            output_progress=True
         )
 else:
     time_prev = None
@@ -318,7 +335,8 @@ else:
             frame_range=render_range,
             output_file=render_output,
             method=hou.renderMethod.FrameByFrame,
-            ignore_inputs=ignoreInputs
+            ignore_inputs=ignoreInputs,
+            output_progress=True
         )
 
         # Increment frame:
