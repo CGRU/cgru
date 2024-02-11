@@ -46,14 +46,13 @@ def getCPUInfo_Linux():
         info = re.sub(regexp[0], regexp[1], info)
     return info.strip()
 
-
 def getHostNameCtl_Linux():
     pref, suff = '', ''
     try:
         proc = subprocess.run(['hostnamectl'], timeout=1, check=True, encoding='utf-8', stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     except:
         print(traceback.format_exc())
-        return preff, suff
+        return pref, suff
     for line in proc.stdout.split('\n'):
         words = line.split(':',1)
         if len(words) != 2:
@@ -66,15 +65,51 @@ def getHostNameCtl_Linux():
             suff += ' ' + words[1].strip()
     return pref, suff
 
-
 def getHWInfo_Linux():
     cpu = getCPUInfo_Linux()
     pref, suff = getHostNameCtl_Linux()
     #print('"%s" "%s" "%s"' % (pref, cpu, suff))
     return '%s%s%s' % (pref, cpu, suff)
 
+def getCPUInfo_Windows():
+    info = ''
+    try:
+        proc = subprocess.run(['wmic','cpu','get','name'], timeout=1, check=True, encoding='utf-8', stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    except:
+        print(traceback.format_exc())
+        return info
+    info = proc.stdout.strip()
+    if len(info) == 0:
+        return info
+    info = info.split("\n")[-1]
+    for regexp in RegExps:
+        info = re.sub(regexp[0], regexp[1], info)
+    return info.strip()
+
+def getModel_Windows():
+    pref, suff = '', ''
+    try:
+        proc = subprocess.run(['wmic','computersystem','get','model,manufacturer','/format:list'], timeout=1, check=True, encoding='utf-8', stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    except:
+        print(traceback.format_exc())
+        return pref, suff
+    model = ''
+    for line in proc.stdout.split('\n'):
+        words = line.split('=',1)
+        if len(words) != 2:
+            continue
+        if words[0].lower().find('model') != -1:
+            pref = words[1].strip().upper()[0] + ' '
+            model = ' ' + words[1].strip()
+        if words[0].lower().find('manufacturer') != -1:
+            suff += ' ' + words[1].strip()
+    return pref, model + suff
+
 def getHWInfo_Windows():
-    return ''
+    cpu = getCPUInfo_Windows()
+    pref, suff = getModel_Windows()
+    #print('"%s" "%s" "%s"' % (pref, cpu, suff))
+    return '%s%s%s' % (pref, cpu, suff)
 
 def getHWInfo():
     global HwInfo
