@@ -58,7 +58,6 @@ RenderNode.prototype.init = function() {
 	this.elName.classList.add('prestar');
 
 	this.elHWInfo = cm_ElCreateText(this.element, 'Hardware Info');
-	this.elEngine = cm_ElCreateText(this.element, 'Client Version');
 
 	if (cm_IsSith())
 	{
@@ -71,6 +70,7 @@ RenderNode.prototype.init = function() {
 		this.elPriority = cm_ElCreateFloatText(this.element, 'right', 'Priority');
 
 	this.elUserName = cm_ElCreateFloatText(this.element, 'right', 'User Name and "Nimby" Status');
+	this.elEngine = cm_ElCreateFloatText(this.element, 'right', 'Client Version');
 
 	this.elResources = document.createElement('div');
 	this.element.appendChild(this.elResources);
@@ -84,6 +84,7 @@ RenderNode.prototype.init = function() {
 	this.elRunTasks.classList.add('prestar');
 	this.elCapacity = cm_ElCreateText(this.element, 'Capacity');
 	this.elStateTime = cm_ElCreateFloatText(this.element, 'right', 'Busy/Free Status and Time');
+	this.elProperties = cm_ElCreateFloatText(this.element, 'right', 'Host Properties');
 
 	this.elServices = document.createElement('div');
 	this.element.appendChild(this.elServices);
@@ -420,6 +421,14 @@ RenderNode.prototype.update = function(i_obj) {
 	else if (this.state.NBY)
 		user = 'NIMBY(<b>' + user + '</b>)<b>N</b>';
 	this.elUserName.innerHTML = user;
+
+	let properties = '';
+	if (this.params.power_host)
+		properties += ' ' + this.params.power_host;
+	if (this.params.properties_host)
+		properties += ' ' + this.params.properties_host;
+	this.elProperties.textContent = properties;
+
 
 	if (this.params.annotation)
 		this.elAnnotation.innerHTML = this.params.annotation;
