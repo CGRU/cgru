@@ -741,18 +741,28 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 		}
 	}
 
+	QRect rect;
+
 	// Paint offline render and exit.
 	if (false == m_online)
 	{
 		i_painter->setPen(  afqt::QEnvironment::qclr_black);
 		i_painter->setFont( afqt::QEnvironment::f_info);
-		i_painter->drawText(x+5, y_cur, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignRight, ann_state);
+		i_painter->drawText(x+5, y_cur, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignRight, ann_state, &rect);
 
+		i_painter->setFont( afqt::QEnvironment::f_thin);
+		i_painter->drawText(x+5, y_cur, w-10-rect.width()-10, HeightOffline, Qt::AlignVCenter | Qt::AlignRight, 'v' + m_engine);
+
+		i_painter->setFont( afqt::QEnvironment::f_info);
 		QRect rect_center;
 		i_painter->drawText(x+5, y_cur, w-10, HeightOffline,
 				Qt::AlignVCenter | Qt::AlignHCenter, offlineState_time, &rect_center);
 		i_painter->drawText(x+5, y_cur, (w>>1)-10-(rect_center.width()>>1), HeightOffline,
-				Qt::AlignVCenter | Qt::AlignLeft, m_name + ' ' + m_engine + ' ' + m_hw_info);
+				Qt::AlignVCenter | Qt::AlignLeft, m_name, &rect);
+
+		i_painter->setFont( afqt::QEnvironment::f_thin);
+		i_painter->drawText(x+5+rect.width()+10, y_cur, (w>>1)-10-(rect_center.width()>>1)-rect.width()-10, HeightOffline,
+				Qt::AlignVCenter | Qt::AlignLeft, m_hw_info);
 
 		y_cur += HeightOffline;
 
@@ -778,7 +788,6 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 		return;
 	}
 
-	QRect rect;
 	switch (afqt::QEnvironment::render_item_size.n)
 	{
 	case ListRenders::ESmallSize:
@@ -787,11 +796,14 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 		i_painter->drawText(left_text_x, y_cur, left_text_w, h, Qt::AlignTop | Qt::AlignLeft, m_name, &rect);
 		i_painter->setFont(afqt::QEnvironment::f_thin);
 		i_painter->drawText(left_text_x + rect.width()+5, y_cur-1, left_text_w, h, Qt::AlignTop | Qt::AlignLeft,
-				m_capacity_usage + ' ' + m_loggedin_users + ' ' + m_engine + ' ' + m_hw_info);
+				m_capacity_usage + ' ' + m_loggedin_users + ' ' + m_hw_info);
 
 		i_painter->setPen(clrTextInfo(i_option));
 		i_painter->setFont(afqt::QEnvironment::f_info);
-		i_painter->drawText(right_text_x, y_cur, right_text_w, h, Qt::AlignTop | Qt::AlignRight, ann_state);
+		i_painter->drawText(right_text_x, y_cur, right_text_w, h, Qt::AlignTop | Qt::AlignRight, ann_state, &rect);
+
+		i_painter->setFont(afqt::QEnvironment::f_thin);
+		i_painter->drawText(right_text_x, y_cur+1, right_text_w-rect.width()-5, h, Qt::AlignTop | Qt::AlignRight, 'v' + m_engine);
 
 		break;
 	default:
@@ -800,11 +812,14 @@ void ItemRender::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyl
 		i_painter->drawText(left_text_x, y_cur, left_text_w, h, Qt::AlignTop | Qt::AlignLeft, m_name, &rect);
 
 		i_painter->setFont(afqt::QEnvironment::f_thin);
-		i_painter->drawText(left_text_x + rect.width()+5, y_cur, left_text_w, h, Qt::AlignTop | Qt::AlignLeft, m_hw_info + ' ' + m_engine);
+		i_painter->drawText(left_text_x + rect.width()+5, y_cur, left_text_w, h, Qt::AlignTop | Qt::AlignLeft, m_hw_info);
 
 		i_painter->setPen(afqt::QEnvironment::qclr_black );
 		i_painter->setFont(afqt::QEnvironment::f_info);
-		i_painter->drawText(right_text_x, y_cur+2, right_text_w, h, Qt::AlignTop | Qt::AlignRight, ann_state );
+		i_painter->drawText(right_text_x, y_cur+1, right_text_w, h, Qt::AlignTop | Qt::AlignRight, ann_state, &rect);
+
+		i_painter->setFont(afqt::QEnvironment::f_thin);
+		i_painter->drawText(right_text_x, y_cur, right_text_w-rect.width()-5, h, Qt::AlignTop | Qt::AlignRight, 'v' + m_engine);
 
 		i_painter->setPen(clrTextInfo(i_option));
 		i_painter->setFont(afqt::QEnvironment::f_info);
