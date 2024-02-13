@@ -140,7 +140,6 @@ void TaskExec::jsonWrite( std::ostringstream & o_str, int i_type) const
 
 void TaskExec::v_readwrite( Msg * msg)
 {
-AF_LOG << "TaskExec::v_readwrite:"; msg->v_stdOut();
 	switch( msg->type())
 	{
 	case Msg::TRenderEvents:
