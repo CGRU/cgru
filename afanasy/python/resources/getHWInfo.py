@@ -20,8 +20,9 @@ Intel(R) Xeon(R) CPU           E5530  @ 2.40GHz
 
 RegExps = [
     [re.compile(r'.*Intel.*Xeon.* (\w+\d+-?\d+\s?v?\d?) .*', re.I),r'X:\1'],
+    [re.compile(r'.*Intel.*Core.* (i\d+-?\d+\S+) .*', re.I),r'I:\1'],
     [re.compile(r'AMD.* (\w*\d+\w*) .*', re.I),r'A:\1'],
-    [re.compile(r'.*Intel.*Core.* (i\d+-?\d+\S+) .*', re.I),r'I:\1']
+    [re.compile(r'AMD (\w*) .*', re.I),r'A:\1']
 ]
 
 HwInfo = None
@@ -89,20 +90,26 @@ def getCPUInfo_Windows():
 def getModel_Windows():
     pref, suff = '', ''
     try:
-        proc = subprocess.run(['wmic','computersystem','get','model,manufacturer','/format:list'], timeout=1, check=True, encoding='utf-8', stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        proc = subprocess.run(['wmic','computersystem','get','model,manufacturer,hypervisorpresent','/format:list'], timeout=1, check=True, encoding='utf-8', stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     except:
         print(traceback.format_exc())
         return pref, suff
     model = ''
+    virtual = False
     for line in proc.stdout.split('\n'):
         words = line.split('=',1)
         if len(words) != 2:
             continue
-        if words[0].lower().find('model') != -1:
+        elif words[0].lower().find('model') != -1:
             pref = words[1].strip().upper()[0] + ' '
             model = ' ' + words[1].strip()
-        if words[0].lower().find('manufacturer') != -1:
+        elif words[0].lower().find('manufacturer') != -1:
             suff += ' ' + words[1].strip()
+        elif words[0].lower().find('hypervisorpresent') != -1:
+            if words[1].lower().find('true') != -1:
+                virtual = True
+    if virtual:
+        pref = 'V '
     return pref, model + suff
 
 def getHWInfo_Windows():
