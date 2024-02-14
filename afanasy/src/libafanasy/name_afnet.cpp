@@ -41,6 +41,7 @@ int readdata( int fd, char* data, int data_len, int buffer_maxlen)
 #else
 		int r = read( fd, data+bytes, buffer_maxlen-bytes);
 #endif
+//static int cycle = 0; if (++cycle > 12) return -1;
 		if( r < 0)
 		{
 			AFERRPE("readdata: read");

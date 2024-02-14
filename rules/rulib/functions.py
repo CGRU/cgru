@@ -182,7 +182,7 @@ def readObj(i_file, o_out = None, i_lock = True):
 
 
 def writeObj(i_file, i_obj, o_out=None):
-    if fileWrite(i_file, json.dumps(i_obj, indent='\t', sort_keys=True), o_out):
+    if fileWrite(i_file, json.dumps(i_obj, indent='\t', sort_keys=False), o_out):
         return True
 
     return False
@@ -313,6 +313,38 @@ def writeUser(i_user, i_full):
         os.unlink(ufile_bookmarks)
 
     return True
+
+
+def userChangedTasks(i_uid, i_tasks):
+    if i_uid is None:
+        i_uid = getCurUser()
+
+    # Read acctivity from file, or initialize empty
+    activity = dict()
+    activity_file = '%s/users/%s/%s-activity.json' % (rulib.CGRU_LOCATION, i_uid, i_uid)
+    if os.path.isfile(activity_file):
+        activity = readObj(activity_file)
+
+    curtime = getCurSeconds()
+    for path in i_tasks:
+        record = dict()
+        # Get record by path, or create a new:
+        if path in activity:
+            record = activity.pop(path)
+        else:
+            record['ctime'] = curtime
+        record['mtime'] = curtime
+        record['task'] = i_tasks[path]
+
+        # Insert activity as fisrt item (the latest time)
+        activity = {path:record, **activity}
+
+    # Keep maximum number of records:
+    while len(activity) > 1000: #TODO
+        activity.popitem()
+
+    # Write activity file:
+    writeObj(activity_file, activity)
 
 
 def skipFile(i_filename):

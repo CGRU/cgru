@@ -100,16 +100,20 @@ def setTask(paths=None, uid=None, name=None, tags=None, artists=None, flags=None
         paths = [None]
 
     statuses = []
+    tasks = dict()
     some_progress_changed = False
 
     for path in paths:
         st = status.Status(uid, path)
-        st.setTask(name=name, tags=tags, artists=artists, flags=flags, progress=progress, annotation=annotation, deleted=deleted, out=out)
-        if 'error' in out:
+        task = st.setTask(name=name, tags=tags, artists=artists, flags=flags, progress=progress, annotation=annotation, deleted=deleted, out=out)
+        if task is None or 'error' in out:
             break
         if st.progress_changed:
             some_progress_changed = True
         statuses.append(st)
+        tasks[path] = task
+
+    functions.userChangedTasks(uid, tasks)
 
     # News & Bookmarks:
     # At first we should emit news,
