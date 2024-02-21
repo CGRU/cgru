@@ -505,9 +505,14 @@ class AfanasyScheduler(CallbackServerMixin, PyScheduler):
         # Append task and block and send job
         block.tasks.append(task)
         job.blocks.append(block)
-        job.send()
+        status, struct = job.send()
+        print(status, struct)
+        job_uri = ''
+        job_id = 0
+        if status and struct and 'id' in struct:
+            job_id = struct['id']
 
-        return None
+        return job_uri, job_id
 
 
 # Register Afanasy Scheduler type
