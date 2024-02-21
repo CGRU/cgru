@@ -151,7 +151,9 @@ function shot_ResultsReceived( i_data, i_args)
 		// We skip it for thumbnails, if some other path already added.
 		// As better to make thumbnail from sequences, not movies (that just converted from that sequences)
 		if ((i < (i_data.length - 1)) || (shot_thumb_paths.length == 0))
-			shot_thumb_paths.push(path);
+			if (false == path.includes('PRECOMP'))
+				shot_thumb_paths.push(path);
+				//^ Skip precomps (masks, cleanup, key can spoil animatic thumbnail)
 
 		let fva = {};
 		fva.el = el;
