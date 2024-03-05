@@ -421,15 +421,14 @@ function ArtPage(i_el, i_artist)
 	this.elInfo.classList.add('info');
 	this.elInfo.innerHTML = info;
 
-	// Bookmarks:
-	this.elBmrks = document.createElement('div');
-	this.elRoot.appendChild(this.elBmrks);
-	this.elBmrks.classList.add('ap_bmrks_div');
+	// Body:
+	this.elBody = document.createElement('div');
+	this.elRoot.appendChild(this.elBody);
 
 	// Show bookmarks per project:
 	for (let project of this.artist.projects)
 	{
-		let prj = new ArtPagePrj(this.elBmrks, project, this.artist);
+		let prj = new ArtPagePrj(this.elBody, project, this.artist);
 		ab_art_projects.push(prj);
 	}
 }
@@ -444,15 +443,133 @@ function ArtPagePrj(i_el, i_project, i_artist)
 	this.elParent.appendChild(this.elRoot);
 	this.elRoot.classList.add('artpage_prj')
 
+	this.elPanel = document.createElement('div');
+	this.elRoot.appendChild(this.elPanel);
+	this.elPanel.classList.add('panel');
+
+	this.elBtnExpand = document.createElement('div');
+	this.elPanel.appendChild(this.elBtnExpand);
+	this.elBtnExpand.classList.add('button');
+	this.elBtnExpand.textContent = 'Expand';
+	this.elBtnExpand.m_this = this;
+	this.elBtnExpand.onclick = function(e){e.currentTarget.m_this.expand();}
+
+	this.elBtnCollapse = document.createElement('div');
+	this.elPanel.appendChild(this.elBtnCollapse);
+	this.elBtnCollapse.classList.add('button');
+	this.elBtnCollapse.textContent = 'Collapse';
+	this.elBtnCollapse.m_this = this;
+	this.elBtnCollapse.onclick = function(e){e.currentTarget.m_this.collapse();}
+	this.elBtnCollapse.style.display = 'none';
+
 	this.elTitle = document.createElement('div');
-	this.elRoot.appendChild(this.elTitle);
+	this.elPanel.appendChild(this.elTitle);
 	this.elTitle.textContent = this.project.name;
 	this.elTitle.classList.add('title');
 
-	this.elBmrks = document.createElement('div');
-	this.elRoot.appendChild(this.elBmrks);
-	this.elBmrks.classList.add('ap_bmrks_div');
+	this.elStat = document.createElement('div');
+	this.elRoot.appendChild(this.elStat);
+	this.elStat.classList.add('prj_stat');
 
+	this.showStat();
+}
+
+ArtPagePrj.prototype.showStat = function()
+{
+	let prj_bms = [];
+	for (let scene of this.project.scenes)
+		prj_bms = prj_bms.concat(scene.bms);
+
+	prj_bms.sort(ab_CompareBookmarks(this.artist.id));
+
+	let acts = {};
+
+	for (let bm of prj_bms)
+	{
+		if (bm.status == null) continue;
+		if (bm.status.tasks == null) continue;
+		for (let name in bm.status.tasks)
+		{
+			let t = bm.status.tasks[name];
+			if (t.artists == null) continue;
+			if (t.artists.indexOf(this.artist.id) == -1) continue;
+
+			let act = {};
+			if (name in acts)
+				act = acts[name]
+			else
+			{
+				act.count = 0;
+				act.flags = {};
+			}
+
+			act.count += 1;
+
+			if (t.flags )
+				for (let f of t.flags)
+					if (f in act.flags)
+						act.flags[f] += 1;
+					else
+						act.flags[f] = 1;
+
+			acts[name] = act;
+		}
+	}
+
+	for (let act in acts)
+	{
+		let elAct = document.createElement('div');
+		this.elStat.appendChild(elAct);
+		elAct.classList.add('prj_act');
+
+		let elName = document.createElement('div');
+		elAct.appendChild(elName);
+		elName.classList.add('name');
+		elName.innerHTML = '<b>' + act + '</b> x ' + acts[act].count;
+
+		if ('flags' in acts[act])
+			for (let flag in acts[act].flags)
+			{
+				let elFlag = document.createElement('div');
+				elAct.appendChild(elFlag);
+				elFlag.classList.add('tag','flag');
+				elFlag.textContent = c_GetFlagTitle(flag) + ' x ' + acts[act].flags[flag];
+				elFlag.title = c_GetFlagTip(flag);
+				let clr = null;
+				if (RULES.flags[flag] && RULES.flags[flag].clr)
+					clr = RULES.flags[flag].clr;
+				if (clr)
+					st_SetElColor({"color": clr}, elFlag);
+			}
+	}
+}
+
+ArtPagePrj.prototype.expand = function()
+{
+	this.elBtnExpand.style.display = 'none';
+	this.elBtnCollapse.style.display = 'block';
+
+	if (this.elBmrks)
+	{
+		this.elBmrks.style.display = 'block';
+	}
+	else
+	{
+		this.elBmrks = document.createElement('div');
+		this.elRoot.appendChild(this.elBmrks);
+		this.showFull();
+	}
+}
+
+ArtPagePrj.prototype.collapse = function()
+{
+	this.elBtnCollapse.style.display = 'none';
+	this.elBtnExpand.style.display = 'block';
+	this.elBmrks.style.display = 'none';
+}
+
+ArtPagePrj.prototype.showFull = function()
+{
 	// Collect bookmarks of all project scenes:
 	let prj_bms = [];
 	for (let scene of this.project.scenes)

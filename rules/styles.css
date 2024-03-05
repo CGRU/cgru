@@ -1485,9 +1485,20 @@ text-decoration: line-through;
 font-style: italic;
 font-weight: normal;
 }
-.artpage_prj .title {
-font-weight: bold;
+.artpage_prj {
+border: 2px solid rgba(98,98,98,.5);
+border-radius: 2px;
+margin: 3px;
+padding: 3px;
 }
+.artpage_prj .title {font-weight: bold;}
+.artpage_prj .panel .button {float: right;}
+.artpage_prj .prj_act {
+border-top: 1px solid rgba(98,98,98,.5);
+margin: 1px;
+padding: 1px;
+}
+.artpage_prj .prj_act .name {float: left;}
 .artpage_bm {
 float: left;
 padding: 4px;
