@@ -431,7 +431,107 @@ function ArtPage(i_el, i_artist)
 		let prj = new ArtPagePrj(this.elBody, project, this.artist);
 		ab_art_projects.push(prj);
 	}
+
+	// Activity:
+	this.elActRoot = document.createElement('div');
+	this.elBody.appendChild(this.elActRoot);
+	this.elActRoot.classList.add('artpage_actroot');
+
+	let elActPanel = document.createElement('div');
+	this.elActRoot.appendChild(elActPanel);
+	elActPanel.classList.add('panel');
+
+	this.elActivity = document.createElement('div');
+	this.elActRoot.appendChild(this.elActivity);
+	this.elActivity.classList.add('artpage_activity');
+
+	let elBtnActLoad = document.createElement('div');
+	elActPanel.appendChild(elBtnActLoad);
+	elBtnActLoad.classList.add('button');
+	elBtnActLoad.textContent = 'Load Activity';
+	elBtnActLoad.m_this = this;
+	elBtnActLoad.onclick = function(e){e.currentTarget.m_this.activityLoad();}
 }
+
+function ad_GetUserActivityFileName(i_id){return ad_GetUserFileName(i_id, 'activity');}
+ArtPage.prototype.activityLoad = function()
+{
+	n_GetFile({
+		'path': ad_GetUserActivityFileName(this.artist.id),
+		'func': ad_UserActivityReceived,
+		'object': this,
+		'info': 'activity',
+		'cache_time': -1,
+		'parse': true,
+		'local': false
+	});
+}
+function ad_UserActivityReceived(i_data, i_args)
+{
+	i_args.object.activityReceived(i_data);
+}
+ArtPage.prototype.activityReceived = function(i_data)
+{
+	this.elActivity.textContent = '';
+
+	for (let path in i_data)
+	{
+		let act = i_data[path];
+
+		let elAct = document.createElement('div');
+		this.elActivity.appendChild(elAct);
+		elAct.classList.add('artpage_act');
+
+		let elPath = document.createElement('a');
+		elAct.appendChild(elPath);
+		elPath.classList.add('path');
+		elPath.textContent = path;
+		elPath.href = '#' + path;
+		elPath.target = '_blank';
+
+		let elTask = document.createElement('div');
+		elAct.appendChild(elTask);
+		elTask.classList.add('task');
+
+		if (act.task.cuser)
+		{
+			let elCUser = document.createElement('div');
+			elAct.appendChild(elCUser);
+			st_SetElArtists({'artists':[act.task.cuser]}, elCUser);
+			elCUser.classList.add('user','cuser');
+			let tip = 'Created by ' + c_GetUserTitle(act.task.cuser);
+			if (act.task.ctime)
+				tip += '\n' + c_DT_StrFromSec(act.task.ctime);
+			elCUser.title = tip;
+		}
+
+		task_DrawBadges({'tasks':[act.task]}, elTask, {'full_names':true});
+
+		if (act.task.muser)
+		{
+			let elMUser = document.createElement('div');
+			elAct.appendChild(elMUser);
+			st_SetElArtists({'artists':[act.task.muser]}, elMUser);
+			elMUser.classList.add('user','muser');
+			let tip = 'Modified by ' + c_GetUserTitle(act.task.muser);
+			if (act.task.mtime)
+				tip += '\n' + c_DT_StrFromSec(act.task.mtime);
+			elMUser.title = tip;
+		}
+
+		let elTime = document.createElement('div');
+		elAct.appendChild(elTime);
+		elTime.classList.add('time');
+		let time = '';
+		if (act.ctime)
+			time = c_DT_StrFromSec(act.ctime);
+		time += ' - ';
+		if (act.mtime)
+			time += c_DT_StrFromSec(act.mtime);
+		elTime.textContent = time;
+	}
+}
+
 
 function ArtPagePrj(i_el, i_project, i_artist)
 {
