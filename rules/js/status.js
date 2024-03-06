@@ -556,42 +556,9 @@ function st_SetElArtists(i_status, i_el, i_short, i_clickable, i_onclick)
 
 	for (let i = 0; i < i_status.artists.length; i++)
 	{
-		let el = document.createElement('div');
+		let el = st_CreateElArtist(i_status.artists[i], i_short);
 		elements.push(el);
 		i_el.appendChild(el);
-		el.classList.add('tag');
-		el.classList.add('artist');
-		el.textContent = c_GetUserTitle(i_status.artists[i], null, i_short);
-
-		if (g_users[i_status.artists[i]] && g_users[i_status.artists[i]].disabled)
-			el.classList.add('disabled');
-
-		if (i_short)
-		{
-			el.classList.add('short');
-			if (g_auth_user && (g_auth_user.id == i_status.artists[i]))
-				el.title = 'It`s me!';
-			else
-				el.title = c_GetUserTitle(i_status.artists[i]);
-		}
-
-		if (g_auth_user && (g_auth_user.id == i_status.artists[i]))
-		{
-			el.classList.add('me');
-
-			if (i_short !== true)
-			{
-				el.title = 'It`s me!\n - may be i should do something here?';
-			}
-		}
-
-		let avatar = c_GetAvatar(i_status.artists[i]);
-		if (avatar)
-		{
-			el.classList.add('with_icon');
-			el.style.backgroundImage = 'url(' + avatar + ')';
-		}
-
 		el.m_name = i_status.artists[i];
 		st_TagHilight(el, 'artist');
 
@@ -605,6 +572,44 @@ function st_SetElArtists(i_status, i_el, i_short, i_clickable, i_onclick)
 	}
 
 	return elements;
+}
+function st_CreateElArtist(i_id, i_short)
+{
+	let el = document.createElement('div');
+	el.classList.add('tag');
+	el.classList.add('artist');
+	el.textContent = c_GetUserTitle(i_id, null, i_short);
+
+	if (g_users[i_id] && g_users[i_id].disabled)
+		el.classList.add('disabled');
+
+	if (i_short)
+	{
+		el.classList.add('short');
+		if (g_auth_user && (g_auth_user.id == i_id))
+			el.title = 'It`s me!';
+		else
+			el.title = c_GetUserTitle(i_id);
+	}
+
+	if (g_auth_user && (g_auth_user.id == i_id))
+	{
+		el.classList.add('me');
+
+		if (i_short !== true)
+		{
+			el.title = 'It`s me!\n - may be i should do something here?';
+		}
+	}
+
+	let avatar = c_GetAvatar(i_id);
+	if (avatar)
+	{
+		el.classList.add('with_icon');
+		el.style.backgroundImage = 'url(' + avatar + ')';
+	}
+
+	return el;
 }
 function st_SetElFlags(i_status, i_elFlags, i_short, i_clickable)
 {

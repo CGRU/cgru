@@ -432,6 +432,9 @@ function ArtPage(i_el, i_artist)
 		ab_art_projects.push(prj);
 	}
 
+	if (this.artist.projects.length == 0)
+		return;
+
 	// Activity:
 	this.elActRoot = document.createElement('div');
 	this.elBody.appendChild(this.elActRoot);
@@ -441,16 +444,20 @@ function ArtPage(i_el, i_artist)
 	this.elActRoot.appendChild(elActPanel);
 	elActPanel.classList.add('panel');
 
+	this.elBtnActLoad = document.createElement('div');
+	elActPanel.appendChild(this.elBtnActLoad);
+	this.elBtnActLoad.classList.add('button');
+	this.elBtnActLoad.textContent = 'Load Activity';
+	this.elBtnActLoad.m_this = this;
+	this.elBtnActLoad.onclick = function(e){e.currentTarget.m_this.activityLoad();}
+
+	this.elInfo = document.createElement('div');
+	elActPanel.appendChild(this.elInfo);
+	this.elInfo.classList.add('info');
+
 	this.elActivity = document.createElement('div');
 	this.elActRoot.appendChild(this.elActivity);
 	this.elActivity.classList.add('artpage_activity');
-
-	let elBtnActLoad = document.createElement('div');
-	elActPanel.appendChild(elBtnActLoad);
-	elBtnActLoad.classList.add('button');
-	elBtnActLoad.textContent = 'Load Activity';
-	elBtnActLoad.m_this = this;
-	elBtnActLoad.onclick = function(e){e.currentTarget.m_this.activityLoad();}
 }
 
 function ad_GetUserActivityFileName(i_id){return ad_GetUserFileName(i_id, 'activity');}
@@ -472,7 +479,21 @@ function ad_UserActivityReceived(i_data, i_args)
 }
 ArtPage.prototype.activityReceived = function(i_data)
 {
+	if ((i_data == null) || (i_data.error))
+	{
+		this.elActRoot.textContent = 'No activity found.';
+		c_Log(JSON.stringify(i_data));
+		return;
+	}
+
+	this.elBtnActLoad.style.display = 'none';
 	this.elActivity.textContent = '';
+
+	let stat = {};
+	stat.count = 0;
+	stat.time_min = 0;
+	stat.time_max = 0;
+	stat.flags = {};
 
 	for (let path in i_data)
 	{
@@ -489,15 +510,10 @@ ArtPage.prototype.activityReceived = function(i_data)
 		elPath.href = '#' + path;
 		elPath.target = '_blank';
 
-		let elTask = document.createElement('div');
-		elAct.appendChild(elTask);
-		elTask.classList.add('task');
-
 		if (act.task.cuser)
 		{
-			let elCUser = document.createElement('div');
+			let elCUser = st_CreateElArtist(act.task.cuser, true);
 			elAct.appendChild(elCUser);
-			st_SetElArtists({'artists':[act.task.cuser]}, elCUser);
 			elCUser.classList.add('user','cuser');
 			let tip = 'Created by ' + c_GetUserTitle(act.task.cuser);
 			if (act.task.ctime)
@@ -505,13 +521,16 @@ ArtPage.prototype.activityReceived = function(i_data)
 			elCUser.title = tip;
 		}
 
+		let elTask = document.createElement('div');
+		elAct.appendChild(elTask);
+		elTask.classList.add('task');
+
 		task_DrawBadges({'tasks':[act.task]}, elTask, {'full_names':true});
 
 		if (act.task.muser)
 		{
-			let elMUser = document.createElement('div');
+			let elMUser = st_CreateElArtist(act.task.muser, true);
 			elAct.appendChild(elMUser);
-			st_SetElArtists({'artists':[act.task.muser]}, elMUser);
 			elMUser.classList.add('user','muser');
 			let tip = 'Modified by ' + c_GetUserTitle(act.task.muser);
 			if (act.task.mtime)
@@ -529,6 +548,51 @@ ArtPage.prototype.activityReceived = function(i_data)
 		if (act.mtime)
 			time += c_DT_StrFromSec(act.mtime);
 		elTime.textContent = time;
+
+		// Collect stat:
+		stat.count += 1;
+		if (act.mtime)
+		{
+			if (stat.count == 1)
+			{
+				stat.time_min = act.mtime;
+				stat.time_max = act.mtime;
+			}
+			else
+			{
+				if (stat.time_min > act.mtime)
+					stat.time_min = act.mtime;
+				if (stat.time_max < act.mtime)
+					stat.time_max = act.mtime;
+			}
+		}
+		if (act.task.flags)
+		{
+			for (let flag of act.task.flags)
+			{
+				if (flag in stat.flags)
+					stat.flags[flag] += 1;
+				else
+					stat.flags[flag] = 1;
+			}
+		}
+	}
+	let info = 'Count = ' + stat.count;
+	info += ' ' + c_DT_StrFromSec(stat.time_min) + ' - ' + c_DT_StrFromSec(stat.time_max);
+	this.elInfo.textContent = info;
+
+	for (let flag in stat.flags)
+	{
+		let elFlag = document.createElement('div');
+		this.elInfo.appendChild(elFlag);
+		elFlag.classList.add('tag','flag');
+		elFlag.textContent = c_GetFlagTitle(flag) + ' x ' + stat.flags[flag];
+		elFlag.title = c_GetFlagTip(flag);
+		let clr = null;
+		if (RULES.flags[flag] && RULES.flags[flag].clr)
+			clr = RULES.flags[flag].clr;
+		if (clr)
+			st_SetElColor({"color": clr}, elFlag);
 	}
 }
 

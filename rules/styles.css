@@ -1480,6 +1480,7 @@ background-position: center;
 .artpage .brief .title {
 font-weight: bold;
 }
+.artpage .panel .button {float: left;}
 .artpage.disabled .brief .title {
 text-decoration: line-through;
 font-style: italic;
@@ -1519,7 +1520,7 @@ padding: 1px;
 }
 .artpage_act .path {float: left; font-size: 12px;}
 .artpage_act .cuser {float: left; font-size: 12px;}
-.artpage_act .muser {float: right; font-size: 12px;}
+.artpage_act .muser {float: left; font-size: 12px;}
 .artpage_act .task {
 float: left;
 font-size: 12px;
