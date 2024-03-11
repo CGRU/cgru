@@ -1481,6 +1481,7 @@ background-position: center;
 font-weight: bold;
 }
 .artpage .panel .button {float: left;}
+.artpage .panel .button.close {float: right;}
 .artpage.disabled .brief .title {
 text-decoration: line-through;
 font-style: italic;

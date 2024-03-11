@@ -451,13 +451,29 @@ function ArtPage(i_el, i_artist)
 	this.elBtnActLoad.m_this = this;
 	this.elBtnActLoad.onclick = function(e){e.currentTarget.m_this.activityLoad();}
 
-	this.elInfo = document.createElement('div');
-	elActPanel.appendChild(this.elInfo);
-	this.elInfo.classList.add('info');
+	this.elBtnActClose = document.createElement('div');
+	elActPanel.appendChild(this.elBtnActClose);
+	this.elBtnActClose.classList.add('button','close');
+	this.elBtnActClose.textContent = 'Close Activity';
+	this.elBtnActClose.m_this = this;
+	this.elBtnActClose.onclick = function(e){e.currentTarget.m_this.activityClose();}
+	this.elBtnActClose.style.display = 'none';
+
+	this.elActivityInfo = document.createElement('div');
+	elActPanel.appendChild(this.elActivityInfo);
+	this.elActivityInfo.classList.add('info');
 
 	this.elActivity = document.createElement('div');
 	this.elActRoot.appendChild(this.elActivity);
 	this.elActivity.classList.add('artpage_activity');
+}
+
+ArtPage.prototype.activityClose = function()
+{
+	this.elBtnActLoad.style.display = 'block';
+	this.elBtnActClose.style.display = 'none';
+	this.elActivityInfo.textContent = '';
+	this.elActivity.textContent = '';
 }
 
 function ad_GetUserActivityFileName(i_id){return ad_GetUserFileName(i_id, 'activity');}
@@ -487,6 +503,7 @@ ArtPage.prototype.activityReceived = function(i_data)
 	}
 
 	this.elBtnActLoad.style.display = 'none';
+	this.elBtnActClose.style.display = 'block';
 	this.elActivity.textContent = '';
 
 	let stat = {};
@@ -577,14 +594,20 @@ ArtPage.prototype.activityReceived = function(i_data)
 			}
 		}
 	}
-	let info = 'Count = ' + stat.count;
-	info += ' ' + c_DT_StrFromSec(stat.time_min) + ' - ' + c_DT_StrFromSec(stat.time_max);
-	this.elInfo.textContent = info;
+
+
+	let elCount = document.createElement('div');
+	this.elActivityInfo.appendChild(elCount);
+	elCount.textContent = 'Count = ' + stat.count;
+
+	let elTime = document.createElement('div');
+	this.elActivityInfo.appendChild(elTime);
+	elTime.textContent = c_DT_StrFromSec(stat.time_min) + ' - ' + c_DT_StrFromSec(stat.time_max);
 
 	for (let flag in stat.flags)
 	{
 		let elFlag = document.createElement('div');
-		this.elInfo.appendChild(elFlag);
+		this.elActivityInfo.appendChild(elFlag);
 		elFlag.classList.add('tag','flag');
 		elFlag.textContent = c_GetFlagTitle(flag) + ' x ' + stat.flags[flag];
 		elFlag.title = c_GetFlagTip(flag);
