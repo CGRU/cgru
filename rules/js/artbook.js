@@ -655,6 +655,7 @@ ArtPagePrj.prototype.showStat = function()
 		for (let name in bm.status.tasks)
 		{
 			let t = bm.status.tasks[name];
+			if (t.deleted) continue;
 			if (t.artists == null) continue;
 			if (t.artists.indexOf(this.artist.id) == -1) continue;
 
