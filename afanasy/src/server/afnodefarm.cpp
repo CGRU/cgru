@@ -220,7 +220,7 @@ bool AfNodeFarm::actionTicket(Action & i_action)
 	af::jr_bool("host", tk_host, operation);
 
 	// Choose to pool or host tickets to operate
-	std::map<std::string, af::Farm::Tiks> * tickets;
+	std::unordered_map<std::string, af::Farm::Tiks> * tickets;
 	if (tk_host)
 	{
 		tickets = &m_farm->m_tickets_host;
@@ -237,7 +237,7 @@ bool AfNodeFarm::actionTicket(Action & i_action)
 	}
 
 	// Find ticket and get usage:
-	std::map<std::string, af::Farm::Tiks>::iterator it = tickets->find(tk_name);
+	std::unordered_map<std::string, af::Farm::Tiks>::iterator it = tickets->find(tk_name);
 	int32_t tk_usage = 0;
 	if (it != tickets->end())
 		tk_usage = it->second.usage;
@@ -314,7 +314,7 @@ bool AfNodeFarm::canRunService(const std::string & i_service_name, bool i_hasSer
 
 bool AfNodeFarm::hasHostTicket(const std::string & i_name, const int32_t & i_count) const
 {
-	std::map<std::string, af::Farm::Tiks>::const_iterator it = m_farm->m_tickets_host.find(i_name);
+	std::unordered_map<std::string, af::Farm::Tiks>::const_iterator it = m_farm->m_tickets_host.find(i_name);
 	if (it != m_farm->m_tickets_host.end())
 	{
 		if (it->second.count == -1)

@@ -475,7 +475,7 @@ void PoolSrv::actionDeleteRenders(Action & i_action, const std::string & i_log)
 
 bool PoolSrv::hasPoolTicket(const std::string & i_name, const int32_t & i_count, const bool i_ticket_running) const
 {
-	std::map<std::string, af::Farm::Tiks>::const_iterator it = m_farm->m_tickets_pool.find(i_name);
+	std::unordered_map<std::string, af::Farm::Tiks>::const_iterator it = m_farm->m_tickets_pool.find(i_name);
 	if (it != m_farm->m_tickets_pool.end())
 	{
 		if (it->second.count == -1)
@@ -521,7 +521,7 @@ void PoolSrv::taskAcuire(const af::TaskExec * i_taskexec, const std::list<std::s
 	// Increment tickets:
 	for (auto const& eIt : i_taskexec->getTickets())
 	{
-		std::map<std::string, af::Farm::Tiks>::iterator it = m_tickets_pool.find(eIt.first);
+		std::unordered_map<std::string, af::Farm::Tiks>::iterator it = m_tickets_pool.find(eIt.first);
 		if (it != m_tickets_pool.end())
 			it->second.usage += eIt.second;
 		else
@@ -556,7 +556,7 @@ void PoolSrv::taskRelease(const af::TaskExec * i_taskexec, const std::list<std::
 	// Decrement tickets
 	for (auto const& eIt : i_taskexec->getTickets())
 	{
-		std::map<std::string, af::Farm::Tiks>::iterator it = m_tickets_pool.find(eIt.first);
+		std::unordered_map<std::string, af::Farm::Tiks>::iterator it = m_tickets_pool.find(eIt.first);
 		if (it != m_tickets_pool.end())
 		{
 			it->second.usage -= eIt.second;
@@ -681,7 +681,7 @@ void PoolSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, Monitor
 		i_monitoring->addEvent(af::Monitor::EVT_pools_change, m_id);
 
 	// Remove dummy tickets that were needed to store usage only
-	std::map<std::string, Tiks>::iterator pIt = m_tickets_pool.begin();
+	std::unordered_map<std::string, Tiks>::iterator pIt = m_tickets_pool.begin();
 	while (pIt != m_tickets_pool.end())
 	{
 		if ((pIt->second.count < 0) && (pIt->second.usage <= 0))
@@ -689,7 +689,7 @@ void PoolSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, Monitor
 		else
 			pIt++;
 	}
-	std::map<std::string, Tiks>::iterator hIt = m_tickets_host.begin();
+	std::unordered_map<std::string, Tiks>::iterator hIt = m_tickets_host.begin();
 	while (hIt != m_tickets_host.end())
 	{
 		if ((hIt->second.count < 0) && (hIt->second.usage <= 0))
