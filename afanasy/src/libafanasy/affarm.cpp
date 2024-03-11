@@ -49,13 +49,13 @@ void Farm::readwrite(Msg *msg)
 	rw_String (m_properties_host, msg);
 }
 
-void Farm::rw_Tickets(std::map<std::string, Tiks> & io_tickets, Msg * io_msg)
+void Farm::rw_Tickets(std::unordered_map<std::string, Tiks> & io_tickets, Msg * io_msg)
 {
 	uint32_t size = io_tickets.size();
 	rw_uint32_t(size, io_msg);
 
 	if (io_msg->isWriting())
-		for (std::map<std::string, Tiks>::iterator it = io_tickets.begin(); it != io_tickets.end(); it++)
+		for (std::unordered_map<std::string, Tiks>::iterator it = io_tickets.begin(); it != io_tickets.end(); it++)
 		{
 			w_String  (it->first,        io_msg);
 			rw_int32_t(it->second.count, io_msg);
@@ -91,7 +91,7 @@ void Farm::jsonRead(const JSON &i_object, std::string *io_changes)
 	jr_Tickets("tickets_host", m_tickets_host, i_object);
 }
 
-bool Farm::jr_Tickets(const char * i_name, std::map<std::string, Tiks> & o_tickets, const JSON & i_object)
+bool Farm::jr_Tickets(const char * i_name, std::unordered_map<std::string, Tiks> & o_tickets, const JSON & i_object)
 {
 	const JSON & jObj = i_object[i_name];
 	if( false == jObj.IsObject())
@@ -162,10 +162,10 @@ void Farm::jsonWrite(std::ostringstream &o_str, int i_type) const
 		o_str << ",\n\"properties_host\":\"" << m_properties_host << "\"";
 }
 
-void Farm::jw_Tickets(const char * i_name, const std::map<std::string, Tiks> & i_tickets, std::ostringstream & o_str)
+void Farm::jw_Tickets(const char * i_name, const std::unordered_map<std::string, Tiks> & i_tickets, std::ostringstream & o_str)
 {
 	o_str << ",\n\"" << i_name << "\":{";
-	for (std::map<std::string, Tiks>::const_iterator it = i_tickets.begin(); it != i_tickets.end(); it++)
+	for (std::unordered_map<std::string, Tiks>::const_iterator it = i_tickets.begin(); it != i_tickets.end(); it++)
 	{
 		if (it != i_tickets.begin())
 			o_str << "\n,";

@@ -806,7 +806,7 @@ bool RenderAf::hasTickets(const std::map<std::string, int32_t> & i_tickets) cons
 		if (m_parent)
 		{
 			bool ticket_running = false;
-			std::map<std::string, af::Farm::Tiks>::const_iterator rIt = m_farm->m_tickets_host.find(it.first);
+			std::unordered_map<std::string, af::Farm::Tiks>::const_iterator rIt = m_farm->m_tickets_host.find(it.first);
 			if (rIt != m_tickets_host.end())
 			{
 				if (rIt->second.usage > 0)
@@ -848,7 +848,7 @@ void RenderAf::addTask(af::TaskExec * i_taskexec, MonitorContainer * i_monitorin
 	std::list<std::string> new_tickets;
 	for (auto & tIt : i_taskexec->getTickets())
 	{
-		std::map<std::string, af::Farm::Tiks>::iterator hIt = m_tickets_host.find(tIt.first);
+		std::unordered_map<std::string, af::Farm::Tiks>::iterator hIt = m_tickets_host.find(tIt.first);
 		if (hIt != m_tickets_host.end())
 		{
 			if (hIt->second.usage == 0)
@@ -901,7 +901,7 @@ void RenderAf::removeTask(const af::TaskExec * i_taskexec, MonitorContainer * i_
 	std::list<std::string> exp_tickets;
 	for (auto & tIt : i_taskexec->getTickets())
 	{
-		std::map<std::string, af::Farm::Tiks>::iterator hIt = m_tickets_host.find(tIt.first);
+		std::unordered_map<std::string, af::Farm::Tiks>::iterator hIt = m_tickets_host.find(tIt.first);
 		if (hIt != m_tickets_host.end())
 		{
 			hIt->second.usage -= tIt.second;
@@ -1005,7 +1005,7 @@ void RenderAf::v_refresh( time_t i_current_time,  AfContainer * pointer, Monitor
 
 	// Remove dummy tickets that were needed to store usage only
 	bool dummy_ticket_found = false;
-	std::map<std::string, Tiks>::iterator hIt = m_tickets_host.begin();
+	std::unordered_map<std::string, Tiks>::iterator hIt = m_tickets_host.begin();
 	while (hIt != m_tickets_host.end())
 	{
 		if ((hIt->second.count < 0) && (hIt->second.usage <= 0))

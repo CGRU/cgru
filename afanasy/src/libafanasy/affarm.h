@@ -68,8 +68,8 @@ protected:
 	std::vector<std::string> m_services;
 	std::vector<std::string> m_services_disabled;
 
-	std::map<std::string, Tiks> m_tickets_pool;
-	std::map<std::string, Tiks> m_tickets_host;
+	std::unordered_map<std::string, Tiks> m_tickets_pool;
+	std::unordered_map<std::string, Tiks> m_tickets_host;
 
 	int32_t m_max_tasks_host;
 	int32_t m_capacity_host;
@@ -78,8 +78,8 @@ protected:
 	std::string m_properties_host;
 
 private:
-	static void rw_Tickets(std::map<std::string, Tiks> & io_tickets, Msg * io_msg);
-	static bool jr_Tickets(const char * i_name, std::map<std::string, Tiks> & o_map, const JSON & i_object);
-	static void jw_Tickets(const char * i_name, const std::map<std::string, Tiks> & i_map, std::ostringstream & o_str);
+	static void rw_Tickets(std::unordered_map<std::string, Tiks> & io_tickets, Msg * io_msg);
+	static bool jr_Tickets(const char * i_name, std::unordered_map<std::string, Tiks> & o_map, const JSON & i_object);
+	static void jw_Tickets(const char * i_name, const std::unordered_map<std::string, Tiks> & i_map, std::ostringstream & o_str);
 };
 }
