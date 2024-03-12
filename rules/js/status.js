@@ -671,17 +671,10 @@ function st_SetElTags(i_status, i_elTags, i_short, i_clickable)
 	if (i_status && i_status.tags)
 		for (let i = 0; i < i_status.tags.length; i++)
 		{
-			let el = document.createElement('div');
+			let el = st_CreateElTag(i_status.tags[i], i_short);
 			elements.push(el);
 			i_elTags.appendChild(el);
 			i_elTags.m_elTags.push(el);
-			el.classList.add('tag');
-			if (i_short)
-				el.textContent = c_GetTagShort(i_status.tags[i]);
-			else
-				el.textContent = c_GetTagTitle(i_status.tags[i]);
-			el.title = c_GetTagTip(i_status.tags[i]);
-			el.m_name = i_status.tags[i];
 
 			st_TagHilight(el, 'tag');
 
@@ -695,6 +688,21 @@ function st_SetElTags(i_status, i_elTags, i_short, i_clickable)
 		}
 
 	return elements;
+}
+function st_CreateElTag(i_tag, i_short, i_suffix)
+{
+	let el = document.createElement('div');
+	el.classList.add('tag');
+	let label = c_GetTagTitle(i_tag);
+	if (i_short)
+		label = c_GetTagShort(i_tag);
+	if (i_suffix)
+		label += i_suffix;
+	el.textContent = label;
+	el.title = c_GetTagTip(i_tag);
+	el.m_name = i_tag;
+
+	return el;
 }
 function st_TagHilight(i_el, i_key)
 {

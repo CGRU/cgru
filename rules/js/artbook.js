@@ -513,6 +513,7 @@ ArtPage.prototype.activityReceived = function(i_data)
 	stat.time_min = 0;
 	stat.time_max = 0;
 	stat.flags = {};
+	stat.tags = {};
 
 	for (let path in i_data)
 	{
@@ -600,17 +601,41 @@ ArtPage.prototype.activityReceived = function(i_data)
 					stat.flags[flag] = 1;
 			}
 		}
+
+		elAct.m_tags = [];
+		if (act.task.tags)
+		{
+			for (let tag of act.task.tags)
+			{
+				elAct.m_tags.push(tag);
+
+				if (tag in stat.tags)
+					stat.tags[tag] += 1;
+				else
+					stat.tags[tag] = 1;
+			}
+		}
 	}
 
 
 	let elCount = document.createElement('div');
 	this.elActivityInfo.appendChild(elCount);
-	elCount.textContent = 'Count = ' + stat.count;
+	elCount.textContent = 'Total count = ' + stat.count;
 
 	let elTime = document.createElement('div');
 	this.elActivityInfo.appendChild(elTime);
 	elTime.textContent = c_DT_StrFromSec(stat.time_min) + ' - ' + c_DT_StrFromSec(stat.time_max);
 
+	this.actTagsSelected = [];
+	for (let tag in stat.tags)
+	{
+		let elTag = st_CreateElTag(tag, false, (': ' + stat.tags[tag]));
+		this.elActivityInfo.appendChild(elTag);
+		elTag.m_artpage = this;
+		elTag.onclick = ab_ActivityTagClicked;
+	}
+
+	this.actFlagsSelected = [];
 	for (let flag in stat.flags)
 	{
 		let elFlag = st_CreateElFlag(flag, false, (': ' + stat.flags[flag]));
@@ -618,13 +643,42 @@ ArtPage.prototype.activityReceived = function(i_data)
 		elFlag.m_artpage = this;
 		elFlag.onclick = ab_ActivityFlagClicked;
 	}
-	this.actFlagsSelected = [];
+}
+function ab_ActivityTagClicked(e)
+{
+	let el = e.currentTarget;
+	c_ElToggleSelected(el);
+	el.m_artpage.activityTagClicked(el.m_name);
 }
 function ab_ActivityFlagClicked(e)
 {
 	let el = e.currentTarget;
 	c_ElToggleSelected(el);
 	el.m_artpage.activityFlagClicked(el.m_name);
+}
+ArtPage.prototype.activityTagClicked = function(i_tag)
+{
+	if (this.actTagsSelected.includes(i_tag))
+		this.actTagsSelected.splice(this.actTagsSelected.indexOf(i_tag), 1);
+	else
+		this.actTagsSelected.push(i_tag);
+
+	for (let elAct of this.elActsArray)
+	{
+		if (this.actTagsSelected.length == 0)
+		{
+			elAct.style.display = 'block';
+			continue;
+		}
+
+		elAct.style.display = 'none';
+		for (let tag of this.actTagsSelected)
+			if (elAct.m_tags.includes(tag))
+			{
+				elAct.style.display = 'block';
+				break;
+			}
+	}
 }
 ArtPage.prototype.activityFlagClicked = function(i_flag)
 {
@@ -744,7 +798,7 @@ ArtPagePrj.prototype.showStat = function()
 		let elName = document.createElement('div');
 		elAct.appendChild(elName);
 		elName.classList.add('name');
-		elName.innerHTML = '<b>' + act + '</b> x ' + acts[act].count;
+		elName.innerHTML = '<b>' + act + '</b>: ' + acts[act].count;
 
 		if ('flags' in acts[act])
 			for (let flag in acts[act].flags)
