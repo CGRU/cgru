@@ -1514,6 +1514,7 @@ border-radius: 2px;
 font-style: italic;
 opacity: 0.5;
 }
+.artpage_actroot .panel .flag.selected {box-shadow: 0 0 6px #8FF, 0 0 6px #8FF inset;}
 .artpage_act {
 border-top: 1px solid rgba(98,98,98,.5);
 margin: 1px;

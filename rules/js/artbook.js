@@ -506,6 +506,8 @@ ArtPage.prototype.activityReceived = function(i_data)
 	this.elBtnActClose.style.display = 'block';
 	this.elActivity.textContent = '';
 
+	this.elActsArray = [];
+
 	let stat = {};
 	stat.count = 0;
 	stat.time_min = 0;
@@ -518,6 +520,7 @@ ArtPage.prototype.activityReceived = function(i_data)
 
 		let elAct = document.createElement('div');
 		this.elActivity.appendChild(elAct);
+		this.elActsArray.push(elAct);
 		elAct.classList.add('artpage_act');
 
 		let elPath = document.createElement('a');
@@ -583,10 +586,14 @@ ArtPage.prototype.activityReceived = function(i_data)
 					stat.time_max = act.mtime;
 			}
 		}
+
+		elAct.m_flags = [];
 		if (act.task.flags)
 		{
 			for (let flag of act.task.flags)
 			{
+				elAct.m_flags.push(flag);
+
 				if (flag in stat.flags)
 					stat.flags[flag] += 1;
 				else
@@ -606,19 +613,43 @@ ArtPage.prototype.activityReceived = function(i_data)
 
 	for (let flag in stat.flags)
 	{
-		let elFlag = document.createElement('div');
+		let elFlag = st_CreateElFlag(flag, false, (': ' + stat.flags[flag]));
 		this.elActivityInfo.appendChild(elFlag);
-		elFlag.classList.add('tag','flag');
-		elFlag.textContent = c_GetFlagTitle(flag) + ' x ' + stat.flags[flag];
-		elFlag.title = c_GetFlagTip(flag);
-		let clr = null;
-		if (RULES.flags[flag] && RULES.flags[flag].clr)
-			clr = RULES.flags[flag].clr;
-		if (clr)
-			st_SetElColor({"color": clr}, elFlag);
+		elFlag.m_artpage = this;
+		elFlag.onclick = ab_ActivityFlagClicked;
+	}
+	this.actFlagsSelected = [];
+}
+function ab_ActivityFlagClicked(e)
+{
+	let el = e.currentTarget;
+	c_ElToggleSelected(el);
+	el.m_artpage.activityFlagClicked(el.m_name);
+}
+ArtPage.prototype.activityFlagClicked = function(i_flag)
+{
+	if (this.actFlagsSelected.includes(i_flag))
+		this.actFlagsSelected.splice(this.actFlagsSelected.indexOf(i_flag), 1);
+	else
+		this.actFlagsSelected.push(i_flag);
+
+	for (let elAct of this.elActsArray)
+	{
+		if (this.actFlagsSelected.length == 0)
+		{
+			elAct.style.display = 'block';
+			continue;
+		}
+
+		elAct.style.display = 'none';
+		for (let flag of this.actFlagsSelected)
+			if (elAct.m_flags.includes(flag))
+			{
+				elAct.style.display = 'block';
+				break;
+			}
 	}
 }
-
 
 function ArtPagePrj(i_el, i_project, i_artist)
 {
@@ -718,16 +749,8 @@ ArtPagePrj.prototype.showStat = function()
 		if ('flags' in acts[act])
 			for (let flag in acts[act].flags)
 			{
-				let elFlag = document.createElement('div');
+				let elFlag = st_CreateElFlag(flag, false, (': ' + acts[act].flags[flag]));
 				elAct.appendChild(elFlag);
-				elFlag.classList.add('tag','flag');
-				elFlag.textContent = c_GetFlagTitle(flag) + ' x ' + acts[act].flags[flag];
-				elFlag.title = c_GetFlagTip(flag);
-				let clr = null;
-				if (RULES.flags[flag] && RULES.flags[flag].clr)
-					clr = RULES.flags[flag].clr;
-				if (clr)
-					st_SetElColor({"color": clr}, elFlag);
 			}
 	}
 }

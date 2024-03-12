@@ -362,19 +362,7 @@ function bm_Show()
 		}
 
 		for (let flag in prj_flags)
-		{
-			let el = document.createElement('div');
-			el.textContent = c_GetFlagShort(flag) + ': ' + prj_flags[flag];
-			el.title = c_GetFlagTitle(flag);
-			el.classList.add('tag','flag');
-			let clr = null;
-			if (RULES.flags[flag] && RULES.flags[flag].clr)
-				clr = RULES.flags[flag].clr;
-			if (clr)
-				st_SetElColor({"color": clr}, el);
-
-			project.elStat.appendChild(el);
-		}
+			project.elStat.appendChild(st_CreateElFlag(flag, true, (': ' + prj_flags[flag])));
 
 		let label = project.name + ' - ' + project_count;
 		project.elLabel.textContent = label;
