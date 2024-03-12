@@ -617,6 +617,9 @@ ArtPage.prototype.activityReceived = function(i_data)
 		}
 	}
 
+	this.elActivityFilteredCounts = document.createElement('div');
+	this.elActivityInfo.appendChild(this.elActivityFilteredCounts);
+	this.elActivityFilteredCounts.classList.add('activity_filtered_counts');
 
 	let elCount = document.createElement('div');
 	this.elActivityInfo.appendChild(elCount);
@@ -676,6 +679,9 @@ ArtPage.prototype.activityFlagClicked = function(i_flag)
 }
 ArtPage.prototype.activityFilter = function()
 {
+	let shown = 0;
+	let hidden = 0;
+
 	for (let elAct of this.elActsArray)
 	{
 		let found = true;
@@ -703,10 +709,21 @@ ArtPage.prototype.activityFilter = function()
 		}
 
 		if (found)
+		{
 			elAct.style.display = 'block';
+			shown += 1;
+		}
 		else
+		{
 			elAct.style.display = 'none';
+			hidden += 1;
+		}
 	}
+
+	if (hidden)
+		this.elActivityFilteredCounts.textContent = ' Filtered count = ' + shown;
+	else
+		this.elActivityFilteredCounts.textContent = '';
 }
 
 function ArtPagePrj(i_el, i_project, i_artist)
