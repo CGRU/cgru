@@ -663,22 +663,7 @@ ArtPage.prototype.activityTagClicked = function(i_tag)
 	else
 		this.actTagsSelected.push(i_tag);
 
-	for (let elAct of this.elActsArray)
-	{
-		if (this.actTagsSelected.length == 0)
-		{
-			elAct.style.display = 'block';
-			continue;
-		}
-
-		elAct.style.display = 'none';
-		for (let tag of this.actTagsSelected)
-			if (elAct.m_tags.includes(tag))
-			{
-				elAct.style.display = 'block';
-				break;
-			}
-	}
+	this.activityFilter();
 }
 ArtPage.prototype.activityFlagClicked = function(i_flag)
 {
@@ -687,21 +672,40 @@ ArtPage.prototype.activityFlagClicked = function(i_flag)
 	else
 		this.actFlagsSelected.push(i_flag);
 
+	this.activityFilter();
+}
+ArtPage.prototype.activityFilter = function()
+{
 	for (let elAct of this.elActsArray)
 	{
-		if (this.actFlagsSelected.length == 0)
+		let found = true;
+
+		if (found && this.actTagsSelected.length)
 		{
-			elAct.style.display = 'block';
-			continue;
+			found = false;
+			for (let tag of this.actTagsSelected)
+				if (elAct.m_tags.includes(tag))
+				{
+					found = true;
+					break;
+				}
 		}
 
-		elAct.style.display = 'none';
-		for (let flag of this.actFlagsSelected)
-			if (elAct.m_flags.includes(flag))
-			{
-				elAct.style.display = 'block';
-				break;
-			}
+		if (found && this.actFlagsSelected.length)
+		{
+			found = false;
+			for (let flag of this.actFlagsSelected)
+				if (elAct.m_flags.includes(flag))
+				{
+					found = true;
+					break;
+				}
+		}
+
+		if (found)
+			elAct.style.display = 'block';
+		else
+			elAct.style.display = 'none';
 	}
 }
 
