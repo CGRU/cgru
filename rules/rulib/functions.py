@@ -315,36 +315,37 @@ def writeUser(i_user, i_full):
     return True
 
 
-def userChangedTasks(i_uid, i_tasks):
-    if i_uid is None:
-        i_uid = getCurUser()
+def taskChanged(i_task, i_path):
 
-    # Read acctivity from file, or initialize empty
-    activity = dict()
-    activity_file = '%s/users/%s/%s-activity.json' % (rulib.CGRU_LOCATION, i_uid, i_uid)
-    if os.path.isfile(activity_file):
-        activity = readObj(activity_file)
+    if not 'artists' in i_task:
+        return
 
-    curtime = getCurSeconds()
-    for path in i_tasks:
+    for uid in i_task['artists']:
+        # Read acctivity from file, or initialize empty
+        activity = dict()
+        activity_file = '%s/users/%s/%s-activity.json' % (rulib.CGRU_LOCATION, uid, uid)
+        if os.path.isfile(activity_file):
+            activity = readObj(activity_file)
+
+        curtime = getCurSeconds()
         record = dict()
         # Get record by path, or create a new:
-        if path in activity:
-            record = activity.pop(path)
+        if i_path in activity:
+            record = activity.pop(i_path)
         else:
             record['ctime'] = curtime
         record['mtime'] = curtime
-        record['task'] = i_tasks[path]
+        record['task'] = i_task
 
         # Insert activity as fisrt item (the latest time)
-        activity = {path:record, **activity}
+        activity = {i_path:record, **activity}
 
-    # Keep maximum number of records:
-    while len(activity) > 1000: #TODO
-        activity.popitem()
+        # Keep maximum number of records:
+        while len(activity) > 1000: #TODO
+            activity.popitem()
 
-    # Write activity file:
-    writeObj(activity_file, activity)
+        # Write activity file:
+        writeObj(activity_file, activity)
 
 
 def skipFile(i_filename):
