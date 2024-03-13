@@ -44,8 +44,12 @@ function ab_Init()
 
 function ab_OpenWindow(i_close_header)
 {
+	if (false == g_admin)
+		return;
+
 	if (i_close_header)
 		u_OpenCloseHeader();
+
 	ab_wnd = new cgru_Window({"name": 'artbook', "title": 'ArtBook', 'padding': '3% 1%'});
 	ab_wnd.elContent.classList.add('artbook');
 
@@ -627,7 +631,12 @@ ArtPage.prototype.activityReceived = function(i_data)
 
 	let elTime = document.createElement('div');
 	this.elActivityInfo.appendChild(elTime);
-	elTime.textContent = c_DT_StrFromSec(stat.time_min) + ' - ' + c_DT_StrFromSec(stat.time_max);
+
+	this.elActivityTimeEdit = document.createElement('div');
+	elTime.appendChild(this.elActivityTimeEdit);
+	this.elActivityTimeEdit.contentEditable = true;
+	this.elActivityTimeEdit.classList.add('editing','time_edit');
+	this.elActivityTimeEdit.textContent = c_DT_StrFromSec(stat.time_min) + ' - ' + c_DT_StrFromSec(stat.time_max);
 
 	this.actTagsSelected = [];
 	for (let tag in stat.tags)

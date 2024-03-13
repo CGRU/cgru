@@ -1516,6 +1516,7 @@ opacity: 0.5;
 }
 .artpage_actroot .panel .flag.selected {box-shadow: 0 0 6px #8FF, 0 0 6px #8FF inset;}
 .artpage_actroot .activity_filtered_counts {float: left; font-style: italic; padding: 0px 10px;}
+.artpage_actroot .time_edit {float: left; margin: 4px;}
 .artpage_act {
 border-top: 1px solid rgba(98,98,98,.5);
 margin: 1px;
