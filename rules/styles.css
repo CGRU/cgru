@@ -1521,15 +1521,15 @@ border-top: 1px solid rgba(98,98,98,.5);
 margin: 1px;
 padding: 1px;
 }
-.artpage_act .path {float: left; font-size: 12px;}
-.artpage_act .cuser {float: left; font-size: 12px;}
-.artpage_act .muser {float: left; font-size: 12px;}
+.artpage_act .path {float: left; font-size: 12px; width: 30%; margin: 6px;}
+.artpage_act .cuser {float: left; font-size: 12px; margin: 6px;}
+.artpage_act .muser {float: left; font-size: 12px; margin: 6px;}
 .artpage_act .task {
 float: left;
 font-size: 12px;
 margin: 0px 20px;
 }
-.artpage_act .time {float: right; font-size: 12px;}
+.artpage_act .time {float: right; font-size: 12px; margin: 6px;}
 .ab_bot_panel {
 margin: 8px;
 border-top: 1px solid rgba(98,98,98,.5);
