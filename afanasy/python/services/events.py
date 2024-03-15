@@ -34,9 +34,6 @@ class events(service.service):
         if objects is None:
             return
 
-        print('Event object:')
-        print(json.dumps(objects, sort_keys=True, indent=4))
-
         # Check received events:
         if 'events' not in objects:
             print('ERROR: Received data does not contain events.')
@@ -55,9 +52,6 @@ class events(service.service):
         custom_obj = dict()
         for key in objects:
             self.combineCustomObj(custom_obj, objects[key])
-
-        print('Combined custom data:')
-        print(json.dumps(custom_obj, sort_keys=True, indent=4))
 
         if len(custom_obj) == 0:
             # print('No configured data found.')
@@ -130,7 +124,6 @@ class events(service.service):
                 cmd += '</p>"'
             cmd += ' "<p>Job Name: <b>%s</b></p>"' % cgruutils.toStr(task_info['job_name'])
             cmd += ' "<p>User Name: <b>%s</b></p>"' % cgruutils.toStr(task_info['user_name'])
-            print(cmd)
             self.taskInfo['command'] = cmd
 
 
