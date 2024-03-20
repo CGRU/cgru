@@ -576,6 +576,8 @@ ArtPage.prototype.activityReceived = function(i_data)
 
 		// Collect stat:
 		stat.count += 1;
+
+		elAct.mtime = 0;
 		if (act.mtime)
 		{
 			if (stat.count == 1)
@@ -590,6 +592,7 @@ ArtPage.prototype.activityReceived = function(i_data)
 				if (stat.time_max < act.mtime)
 					stat.time_max = act.mtime;
 			}
+			elAct.mtime = act.mtime;
 		}
 
 		elAct.m_flags = [];
@@ -629,14 +632,22 @@ ArtPage.prototype.activityReceived = function(i_data)
 	this.elActivityInfo.appendChild(elCount);
 	elCount.textContent = 'Total count = ' + stat.count;
 
-	let elTime = document.createElement('div');
-	this.elActivityInfo.appendChild(elTime);
+	let elTimeDiv = document.createElement('div');
+	this.elActivityInfo.appendChild(elTimeDiv);
+	elTimeDiv.classList.add('time_div')
 
 	this.elActivityTimeEdit = document.createElement('div');
-	elTime.appendChild(this.elActivityTimeEdit);
+	elTimeDiv.appendChild(this.elActivityTimeEdit);
 	this.elActivityTimeEdit.contentEditable = true;
 	this.elActivityTimeEdit.classList.add('editing','time_edit');
-	this.elActivityTimeEdit.textContent = c_DT_StrFromSec(stat.time_min) + ' - ' + c_DT_StrFromSec(stat.time_max);
+	this.elActivityTimeEdit.textContent = c_DT_FormStrFromSec(stat.time_min) + ' - ' + c_DT_FormStrFromSec(stat.time_max);
+
+	let elActivityTimeBtn = document.createElement('div');
+	elTimeDiv.appendChild(elActivityTimeBtn);
+	elActivityTimeBtn.classList.add('button');
+	elActivityTimeBtn.textContent = 'Filter';
+	elActivityTimeBtn.m_page = this;
+	elActivityTimeBtn.onclick = function(e){e.currentTarget.m_page.activityFilter()};
 
 	this.actTagsSelected = [];
 	for (let tag in stat.tags)
@@ -688,12 +699,22 @@ ArtPage.prototype.activityFlagClicked = function(i_flag)
 }
 ArtPage.prototype.activityFilter = function()
 {
+	let time_edit = this.elActivityTimeEdit.textContent;
+	time_edit = time_edit.split(' - ');
+	let time_min = c_DT_SecFromStr(time_edit[0]);
+	let time_max = c_DT_SecFromStr(time_edit[1]) + 60; // Add a minute as seconds are not displayed
+
 	let shown = 0;
 	let hidden = 0;
 
 	for (let elAct of this.elActsArray)
 	{
 		let found = true;
+
+		if (found && (time_min > 0) && (elAct.mtime < time_min))
+			found = false;
+		if (found && (time_max > 0) && (elAct.mtime > time_max))
+			found = false;
 
 		if (found && this.actTagsSelected.length)
 		{
