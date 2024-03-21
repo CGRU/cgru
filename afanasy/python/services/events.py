@@ -18,6 +18,7 @@ class events(service.service):
         service.service.__init__(self, task_info, i_verbose)
         data = self.taskInfo['command']
         self.taskInfo['command'] = ''
+        self.skip_task = True
 
         # print('Event data:\n%s' % data)
 
@@ -125,6 +126,9 @@ class events(service.service):
             cmd += ' "<p>Job Name: <b>%s</b></p>"' % cgruutils.toStr(task_info['job_name'])
             cmd += ' "<p>User Name: <b>%s</b></p>"' % cgruutils.toStr(task_info['user_name'])
             self.taskInfo['command'] = cmd
+
+        if len(self.taskInfo['command']):
+            self.skip_task = False
 
 
     def combineCustomObj(self, o_output_obj, i_input_obj):
