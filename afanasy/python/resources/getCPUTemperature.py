@@ -6,20 +6,23 @@ import subprocess
 import sys
 import traceback
 
+CallCounter = 0
+
 def outError(i_msg):
-    print('Error getting CPU temperature: ' + i_msg)
+    if CallCounter == 1:
+        print('Error getting CPU temperature: ' + i_msg)
 
 def getCPUTemperatureLinux():
     try:
         proc = subprocess.run(['sensors','-j'], timeout=1, check=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     except:
-        print(traceback.format_exc())
+        outError(traceback.format_exc())
         return 0
     text = proc.stdout
     try:
         obj = json.loads(text)
     except:
-        print(traceback.format_exc())
+        outError(traceback.format_exc())
         return 0
     if type(obj) is not dict:
         outError('Root is not an object.')
@@ -43,7 +46,7 @@ def getCPUTemperatureLinux():
                     continue
                 temperatures.append(int(t))
     if len(temperatures) == 0:
-        print('No valid sensors found.')
+        outError('No valid sensors found.')
         return 0
     temperatures.sort()
     return temperatures[-1]
@@ -52,6 +55,8 @@ def getCPUTemperatureWindows():
     return 40
 
 def getCPUTemperature():
+    global CallCounter
+    CallCounter += 1
     if sys.platform.find('linux') == 0:
         return getCPUTemperatureLinux()
     if sys.platform.find('win') == 0:
