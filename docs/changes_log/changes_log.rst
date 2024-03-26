@@ -12,7 +12,21 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
   You can upgrade only one client or server for changes.
 
 
+
+v3.4.0
+======
+
+*2024.03.26 NOT RELEASED*
+
+- AfWatch Delete Done Jobs confirm dialog.
+
+- AfRender can get CPU temperature and hardware info by Python modules. AfWatch can show it.
+
+- AfRender Python service class skip task proceeded by a special function (variable). Empty command is threated not as skipped but as error now. As empty command can happen on some error in service class.
+
+
 .. _changes-log-latest:
+
 
 v3.3.1
 ======
