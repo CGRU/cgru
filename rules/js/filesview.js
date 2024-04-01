@@ -199,6 +199,14 @@ generate thumbnails.";
 	el.onclick = function(e) { e.currentTarget.m_view.convert(); };
 	el.title = 'Convert selected sequences (folders) or movies (files)';
 
+	el = document.createElement('div');
+	this.elPanel.appendChild(el);
+	el.classList.add('button');
+	el.style.backgroundImage = 'url(rules/icons/audio.png)';
+	el.m_view = this;
+	el.onclick = function(e) {e.currentTarget.m_view.extractSound();};
+	el.title = 'Extract sound from video files';
+
 	var el = document.createElement('div');
 	this.elPanel.appendChild(el);
 	el.classList.add('button');
@@ -1351,6 +1359,21 @@ FilesView.prototype.convert = function() {
 		c_Error('No items selected.');
 	else
 		d_Convert(args);
+};
+
+FilesView.prototype.extractSound = function() {
+	let args = {};
+	args.paths = [];
+	args.filesview = this;
+
+	for (let el of this.elItems)
+		if (el.m_selected && c_FileIsMovie(el.m_path))
+			args.paths.push(el.m_path);
+
+	if (args.paths.length < 1)
+		c_Error('No video files selected.');
+	else
+		fu_ExtractSound(args);
 };
 
 FilesView.prototype.archivate = function() {

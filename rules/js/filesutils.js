@@ -713,6 +713,180 @@ function fu_ArchivateProcessGUI(i_wnd)
 	i_wnd.destroy();
 }
 
+/* ---------------- [ Extract sound structs and functions ] ---------------------------------------------------- */
+var fu_extract_sound_params = {};
+function fu_ExtractSound(i_args)
+{
+	let path = c_PathPM_Rules2Client(i_args.paths[0]);
+	i_args.probe_path = path;
+	let cmd = 'rules/bin/ffprobe';
+	cmd += ' -v quiet  -print_format json -show_format -show_streams';
+	cmd += ' "' + path + '"'
+	n_Request({
+		"send": {"cmdexec": {"cmds": [cmd]}},
+		"func": fu_ExtractSoundShowGUI,
+		"info": 'ffprobe',
+		"args": i_args,
+		"local": true
+	});
+}
+function fu_ExtractSoundShowGUI(i_data, i_args)
+{
+	i_args = i_args.args;
+	let wnd = new cgru_Window({"name": 'extractsound', "title": 'Extract Sound'});
+	wnd.m_args = i_args;
+
+	gui_Create(wnd.elContent, fu_extract_sound_params, [RULES.dailies]);
+	let types = {
+			"wav" : {"name":"WAV",  "tooltip":"Waveform Audio File Format"},
+			"flac": {"name":"FLAC", "tooltip":"Free Lossless Audio Codec"}};
+	gui_CreateChoices({
+		"wnd": wnd.elContent,
+		"name": 'type',
+		"value": 'wav',
+		"label": 'Type:',
+		"keys": types
+	});
+
+	let elBtns = document.createElement('div');
+	wnd.elContent.appendChild(elBtns);
+	elBtns.style.clear = 'both';
+	elBtns.classList.add('buttons');
+
+	let elResults = document.createElement('div');
+	wnd.elContent.appendChild(elResults);
+	wnd.m_elResults = elResults;
+	elResults.classList.add('output','error');
+
+
+	if ((i_data.cmdexec == null) && (i_data.cmdexec.length == null) && (i_data.cmdexec.length == 0))
+	{
+		elResults.textContent = 'ERROR:<br>' + JSON.stringify(i_data);
+		return;
+	}
+	let data = i_data.cmdexec[0];
+	if (data.streams == null)
+	{
+		elResults.textContent = 'No streams found in ' + i_args.probe_path;
+		return;
+	}
+
+	let output = '<p>' + i_args.probe_path + '</p>';
+	let audio_found = false;
+	let count = 0;
+	let fps = null;
+	for (let stream of data.streams)
+	{
+		//console.log(JSON.stringify(stream));
+		output += '<p>';
+
+		if (stream.codec_type && (stream.codec_type == 'video'))
+		{
+			fps = stream.r_frame_rate;
+			fps = fps.split('/');
+			fps = parseInt(fps[0])/parseInt(fps[1]);
+
+			output += 'Video #' + count + ':';
+			output += ' ' + stream.codec_name;
+			output += ' ' + (parseFloat(stream.duration)).toFixed(3) + ' sec';
+			output += ' ' + fps + ' FPS';
+			output += ' ' + (parseFloat(stream.bit_rate)/1000).toFixed() + ' kb/s';
+		}
+
+		if (stream.codec_type && (stream.codec_type == 'audio'))
+		{
+			audio_found = true;
+			output += 'Audio #' + count + ':';
+			output += ' ' + stream.codec_name;
+			output += ' ' + (parseFloat(stream.duration)).toFixed(3) + ' sec';
+			output += '*' + stream.channels;
+			output += ' ' + (parseFloat(stream.sample_rate)/1000).toFixed(1) + ' kHZ';
+			output += ' ' + (parseFloat(stream.bit_rate)/1000).toFixed() + ' kb/s';
+		}
+
+		output += '</p>';
+		count += 1;
+	}
+
+
+	if (false == audio_found)
+	{
+		output += '<p>No audio streams found.</p>';
+		elResults.innerHTML = output;
+		return;
+	}
+
+	if (fps != RULES.fps)
+	{
+		output += '<p>Project and video FPS mismatch!</p>';
+	}
+	else
+		elResults.classList.remove('error');
+
+	elResults.innerHTML = output;
+
+	let elBntExtractSound = document.createElement('div');
+	elBtns.appendChild(elBntExtractSound);
+	elBntExtractSound.textContent = 'Extract Sound';
+	elBntExtractSound.classList.add('button');
+	elBntExtractSound.m_wnd = wnd;
+	elBntExtractSound.onclick = function(e) {fu_ExtractSoundProcessGUI(e.currentTarget.m_wnd);};
+
+}
+function fu_ExtractSoundProcessGUI(i_wnd)
+{
+	let paths = i_wnd.m_args.paths;
+	for (let i = 0; i < paths.length; i++)
+		paths[i] = c_PathPM_Rules2Server(paths[i]);
+
+	let params = gui_GetParams(i_wnd.elContent, fu_arch_params);
+	if (i_wnd.elContent.m_choises)
+		for (let key in i_wnd.elContent.m_choises)
+			params[key] = i_wnd.elContent.m_choises[key].value;
+
+	let cmds = [];
+	for (let path of paths)
+	{
+		let cmd = 'rules/bin/ffmpeg';
+		cmd += ' -i "' + path + '"';
+		cmd += ' -vn';
+		cmd += ' "' + path + '.' + params.type + '"';
+		cmds.push(cmd);
+	}
+
+	n_Request({
+		"send": {"cmdexec": {"cmds": cmds}},
+		"func": fu_ExtractSoundFinished,
+		"info": 'ffmpeg',
+		"wnd":  i_wnd,
+		"local": true
+	});
+}
+function fu_ExtractSoundFinished(i_data, i_args)
+{
+	let wnd = i_args.wnd;
+	let elResults = wnd.m_elResults;
+
+	elResults.classList.add('error');
+
+	if ((i_data.cmdexec == null) || (i_data.cmdexec.length == null) || (i_data.cmdexec.length == 0))
+	{
+		elResults.textContent = JSON.stringify(i_data);
+		return;
+	}
+	for (let cmdexec of i_data.cmdexec)
+	{
+		if (cmdexec.error)
+		{
+			elResults.textContent = cmdexec.error;
+			return;
+		}
+	}
+
+	elResults.classList.remove('error');
+	wnd.m_args.filesview.refresh();
+	wnd.destroy();
+}
 /* ---------------- [ Walk structs and functions ] ------------------------------------------------------- */
 var fu_walk_params = {
 	path: {},
