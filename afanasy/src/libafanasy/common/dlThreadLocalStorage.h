@@ -34,7 +34,7 @@ private:
 #if defined(MACOSX)
 	void *m_id;
 #else
-	unsigned m_id;
+	unsigned long m_id;
 #endif
 };
 

@@ -48,7 +48,7 @@ private:
 #if defined(__x86_64__) || defined(__powerpc64__)
 	unsigned m_data[10];
 #else
-	unsigned m_data[6];
+	unsigned m_data[16];
 #endif
 #elif defined(MACOSX)
 	unsigned m_data[16];
