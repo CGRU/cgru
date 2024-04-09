@@ -717,7 +717,7 @@ function fu_ArchivateProcessGUI(i_wnd)
 var fu_extract_sound_params = {};
 function fu_ExtractSound(i_args)
 {
-	let path = c_PathPM_Rules2Client(i_args.paths[0]);
+	let path = c_PathPM_Rules2Server(i_args.paths[0]);
 	i_args.probe_path = path;
 	let cmd = 'rules/bin/ffprobe';
 	cmd += ' -v quiet  -print_format json -show_format -show_streams';
