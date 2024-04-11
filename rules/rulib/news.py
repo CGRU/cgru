@@ -314,8 +314,8 @@ def isUserAssignedInStatus(i_user, i_obj):
             if 'changed' in task and task['changed']:
                 return True
 
-            # Below situations for not done tasks only
-            if not 'progress' in task or task['progress'] >= 100:
+            # Below situations for not done or omit tasks
+            if not 'progress' in task or task['progress'] >= 100 or task['progress'] < 0:
                 continue
 
             # If status head changed, all tasks users should receive news (if task is not done)
