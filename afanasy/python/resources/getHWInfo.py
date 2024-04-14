@@ -16,11 +16,12 @@ Intel(R) Core(TM) i5-4590 CPU @ 3.30GHz
 Intel(R) Xeon(R) CPU E5-2670 0 @ 2.60GHz
 Intel(R) Xeon(R) CPU           E5530  @ 2.40GHz
 11th Gen Intel(R) Core(TM) i5-11300H @ 3.10GHz
+12th Gen Intel(R) Core(TM) i9-12900K
 '''
 
 RegExps = [
-    [re.compile(r'.*Intel.*Xeon.* (\w+\d+-?\d+\s?v?\d?) .*', re.I),r'X:\1'],
-    [re.compile(r'.*Intel.*Core.* (i\d+-?\d+\S+) .*', re.I),r'I:\1'],
+    [re.compile(r'.*Intel.*Xeon.* (\w+\d+-?\d+\s?v?\d?).*', re.I),r'X:\1'],
+    [re.compile(r'.*Intel.*Core.* (i\d+-?\d+\S+).*', re.I),r'I:\1'],
     [re.compile(r'AMD.* (\w*\d+\w*) .*', re.I),r'A:\1'],
     [re.compile(r'AMD (\w*) .*', re.I),r'A:\1']
 ]
