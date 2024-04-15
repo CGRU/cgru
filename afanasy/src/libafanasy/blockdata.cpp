@@ -1518,6 +1518,8 @@ bool BlockData::updateProgress(JobProgress *progress)
 
 	if (new_tasks_warning) m_state = m_state | AFJOB::STATE_WARNING_MASK;
 
+	if (new_tasks_suspended) m_state = m_state | AFJOB::STATE_SUSPENDED_MASK;
+
 	if (new_tasks_error) m_state = m_state | AFJOB::STATE_ERROR_MASK;
 
 	if (new_tasks_skipped) m_state = m_state | AFJOB::STATE_SKIPPED_MASK;

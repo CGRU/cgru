@@ -220,6 +220,9 @@ void Item::printfState( const uint32_t state, int posx, int posy, QPainter * pai
 
 	painter->setPen( clrTextState( option, state & AFJOB::STATE_OFFLINE_MASK));
 	painter->drawText( posx, posy, AFJOB::STATE_OFFLINE_NAME_S); posx+=posx_d;
+
+	painter->setPen(clrTextState( option, state & AFJOB::STATE_SUSPENDED_MASK));
+	painter->drawText(posx, posy, AFJOB::STATE_SUSPENDED_NAME_S); posx+=posx_d;
 }
 
 const QString Item::generateErrorsSolvingInfo( int i_block, int i_task, int i_retries)

@@ -100,6 +100,7 @@ public:
 	static AttrColor clr_itemjobppa;
 	static AttrColor clr_itemjobwtime;
 	static AttrColor clr_itemjobwdep;
+	static AttrColor clr_itemjobsuspended;
 	static AttrColor clr_itemjobdone;
 	static AttrColor clr_itemjoberror;
 	static AttrColor clr_itemjobwarning;

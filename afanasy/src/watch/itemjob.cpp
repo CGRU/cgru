@@ -492,6 +492,8 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 	else if(state & AFJOB::STATE_DONE_MASK)       itemColor = &(afqt::QEnvironment::clr_itemjobdone.c);
 	else if(state & AFJOB::STATE_WAITTIME_MASK)   itemColor = &(afqt::QEnvironment::clr_itemjobwtime.c);
 	else if(state & AFJOB::STATE_WAITDEP_MASK)    itemColor = &(afqt::QEnvironment::clr_itemjobwdep.c);
+	else if(state & AFJOB::STATE_RUNNING_MASK)    itemColor = &(afqt::QEnvironment::clr_itemjob.c);
+	else if(state & AFJOB::STATE_SUSPENDED_MASK)  itemColor = &(afqt::QEnvironment::clr_itemjobsuspended.c);
 
 	// Draw standart backgroud
 	drawBack(i_painter, i_rect, i_option, itemColor);
@@ -588,7 +590,7 @@ void ItemJob::v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOp
 		i_painter->setOpacity(0.2);
 		i_painter->setPen(afqt::QEnvironment::qclr_black);
 		i_painter->setBrush(afqt::QEnvironment::clr_outline.c);
-		i_painter->drawRoundedRect(_x-4, _y+3, 204, -11, 2, 2);
+		i_painter->drawRoundedRect(_x-4, _y+3, 226, -11, 2, 2);
 		i_painter->setOpacity(1.0);
 
 		printfState(state, _x, _y, i_painter, i_option);

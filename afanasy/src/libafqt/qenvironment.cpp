@@ -89,6 +89,7 @@ AttrColor QEnvironment::clr_itemjoboff(      "clr_itemjoboff",       "Offline Jo
 AttrColor QEnvironment::clr_itemjobppa(      "clr_itemjobppa",       "Preview Pending Approval",AFGUI::CLR_ITEMJOBPPA          );
 AttrColor QEnvironment::clr_itemjobwtime(    "clr_itemjobwtime",     "Wainting Time Job",       AFGUI::CLR_ITEMJOBWTIME        );
 AttrColor QEnvironment::clr_itemjobwdep(     "clr_itemjobwdep",      "Job Waits Depends",       AFGUI::CLR_ITEMJOBWDEP         );
+AttrColor QEnvironment::clr_itemjobsuspended("clr_itemjobsuspended", "Suspended Job",           AFGUI::CLR_ITEMJOBSUSPENDED    );
 AttrColor QEnvironment::clr_itemjobdone(     "clr_itemjobdone",      "Done Job",                AFGUI::CLR_ITEMJOBDONE         );
 AttrColor QEnvironment::clr_itemjoberror(    "clr_itemjoberror",     "Job With Error(s)",       AFGUI::CLR_ITEMJOBERROR        );
 AttrColor QEnvironment::clr_itemjobwarning(  "clr_itemjobwarning",   "Job Warning",             AFGUI::CLR_ITEMJOBWARNING      );

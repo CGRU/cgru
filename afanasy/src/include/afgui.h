@@ -69,6 +69,7 @@ namespace AFGUI
 	const char CLR_ITEMJOBPPA[]      = "887711";
 	const char CLR_ITEMJOBWTIME[]    = "477777";
 	const char CLR_ITEMJOBWDEP[]     = "61546E";
+	const char CLR_JOBSUSPENDED[]    = "888811";
 	const char CLR_ITEMJOBDONE[]     = "2A394C";
 	const char CLR_ITEMJOBWARNING[]  = "D67F50";
 	const char CLR_TASKWARNINGRUN[]  = "CCCC55";
@@ -134,6 +135,7 @@ namespace AFGUI
 	const char CLR_ITEMJOBPPA[]      = "887711";
 	const char CLR_ITEMJOBWTIME[]    = "477777";
 	const char CLR_ITEMJOBWDEP[]     = "61546E";
+	const char CLR_ITEMJOBSUSPENDED[]= "888811";
 	const char CLR_ITEMJOBDONE[]     = "3D664C";
 	const char CLR_ITEMJOBWARNING[]  = "246221";
 	const char CLR_TASKWARNINGRUN[]  = "DC7C50";
