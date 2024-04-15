@@ -294,6 +294,16 @@ void Task::skip(const std::string & i_message, RenderContainer * i_renders, Moni
 	if (m_progress->state & AFJOB::STATE_DONE_MASK)
 		return;
 
+	if (i_state == AFJOB::STATE_READY_MASK)
+	{
+		// This is a request to continue task.
+		if (!(m_progress->state & AFJOB::STATE_SUSPENDED_MASK))
+		{
+			// We should continue only suspended tasks.
+			return;
+		}
+	}
+
 	if (m_run)
 		m_run->skip(i_message, i_renders, i_monitoring, i_state);
 	else

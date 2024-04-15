@@ -415,6 +415,7 @@ void af::jw_stateJob(const int64_t & i_state, std::ostringstream & o_str)
 	if (i_state & AFJOB::STATE_ERROR_READY_MASK    ) o_str << " RER";
 	if (i_state & AFJOB::STATE_WAITRECONNECT_MASK  ) o_str << " WRC";
 	if (i_state & AFJOB::STATE_TRYTHISTASKNEXT_MASK) o_str << " TRY";
+	if (i_state & AFJOB::STATE_SUSPENDED_MASK      ) o_str << " SUS";
 
 	o_str << "\"";
 }

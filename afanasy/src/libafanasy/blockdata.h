@@ -50,16 +50,17 @@ public:
 
 	enum Flags
 	{
-		FNumeric = 1ULL << 0,
-		FVarCapacity = 1ULL << 1,
-		FMultiHost = 1ULL << 2,
-		FMasterOnSlave = 1ULL << 3,
-		FDependSubTask = 1ULL << 4,
-		FSkipThumbnails = 1ULL << 5,
-		FSkipExistingFiles = 1ULL << 6,
-		FCheckRenderedFiles = 1ULL << 7,
-		FSlaveLostIgnore = 1ULL << 8,
-		FAppendedTasks = 1ULL << 9
+		FNumeric            = 1ULL <<  0,
+		FVarCapacity        = 1ULL <<  1,
+		FMultiHost          = 1ULL <<  2,
+		FMasterOnSlave      = 1ULL <<  3,
+		FDependSubTask      = 1ULL <<  4,
+		FSkipThumbnails     = 1ULL <<  5,
+		FSkipExistingFiles  = 1ULL <<  6,
+		FCheckRenderedFiles = 1ULL <<  7,
+		FSlaveLostIgnore    = 1ULL <<  8,
+		FAppendedTasks      = 1ULL <<  9,
+		FSuspendNewTasks    = 1ULL << 10
 	};
 
 	static const char DataMode_Progress[];
@@ -129,8 +130,11 @@ public:
 		m_flags |= FAppendedTasks;
 	} ///< Set flag on the block signaling that it has tasks appended
 
+
 	inline bool isSkippingExistingFiles() const {return m_flags & FSkipExistingFiles;}
 	inline bool isCheckingRenderedFiles() const {return m_flags & FCheckRenderedFiles;}
+
+	inline bool isSuspendingNewTasks() const {return m_flags & FSuspendNewTasks;}
 
 	inline bool isSequential() const { return m_sequential == 1; }
 	inline bool notSequential() const { return m_sequential != 1; }
@@ -281,6 +285,7 @@ public:
 	inline int getProgressTasksWarning() const { return p_tasks_warning; }
 	inline int getProgressTasksWaitReconn() const { return p_tasks_waitrec; }
 	inline int getProgressTasksWaitDep() const { return p_tasks_waitdep; }
+	inline int getProgressTasksSuspended() const { return p_tasks_suspended; }
 	inline long long getProgressTasksSumRunTime() const { return p_tasks_run_time; }
 
 	inline void setState(uint32_t value) { m_state = value; }
@@ -443,6 +448,7 @@ private:
 	int32_t p_tasks_skipped;  ///< Number of skipped tasks.
 	int32_t p_tasks_waitrec;  ///< Number of tasks waiting for reconnect.
 	int32_t p_tasks_waitdep;  ///< Number of tasks waiting for dependencies.
+	int32_t p_tasks_suspended;  ///< Number of tasks waiting for dependencies.
 	int64_t p_tasks_run_time; ///< Tasks run time summ.
 };
 }

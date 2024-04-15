@@ -96,6 +96,7 @@ AttrColor QEnvironment::clr_taskwarningrun(  "clr_taskwarningrun",   "Warning Ru
 AttrColor QEnvironment::clr_taskskipped(     "clr_taskskipped",      "Skipped Task",            AFGUI::CLR_TASKSKIPPED         );
 AttrColor QEnvironment::clr_taskwaitreconn(  "clr_taskwaitreconn",   "Waiting Reconnect Task",  AFGUI::CLR_TASKWAITRECONN      );
 AttrColor QEnvironment::clr_tasktrynext(     "clr_tasktrynext",      "Trying This Task Next",   AFGUI::CLR_TASKTRYNEXT         );
+AttrColor QEnvironment::clr_tasksuspended(   "clr_tasksuspended",    "Suspended Task",          AFGUI::CLR_TASKSUSPENDED       );
 AttrColor QEnvironment::clr_itemrender(      "clr_itemrender",       "Render Item",             AFGUI::CLR_ITEMRENDER          );
 AttrColor QEnvironment::clr_itemrenderoff(   "clr_itemrenderoff",    "Offine Render",           AFGUI::CLR_ITEMRENDEROFF       );
 AttrColor QEnvironment::clr_itemrenderbusy(  "clr_itemrenderbusy",   "Busy Render",             AFGUI::CLR_ITEMRENDERBUSY      );

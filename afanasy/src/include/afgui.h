@@ -75,6 +75,7 @@ namespace AFGUI
 	const char CLR_TASKSKIPPED[]     = "555555";
 	const char CLR_TASKWAITRECONN[]  = "4099CC";
 	const char CLR_TASKTRYNEXT[]     = "AAAAAA";
+	const char CLR_TASKSUSPENDED[]   = "AAAA11";
 	const char CLR_ITEMRENDER[]      = "6D6C69";
 	const char CLR_ITEMRENDEROFF[]   = "50544C";
 	const char CLR_ITEMRENDERBUSY[]  = "637840";
@@ -139,6 +140,7 @@ namespace AFGUI
 	const char CLR_TASKSKIPPED[]     = "444444";
 	const char CLR_TASKWAITRECONN[]  = "4099CC";
 	const char CLR_TASKTRYNEXT[]     = "AAAAAA";
+	const char CLR_TASKSUSPENDED[]   = "AAAA11";
 	const char CLR_ITEMRENDER[]      = "43764A";
 	const char CLR_ITEMRENDEROFF[]   = "50544C";
 	const char CLR_ITEMRENDERBUSY[]  = "637840";

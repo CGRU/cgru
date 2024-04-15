@@ -799,6 +799,10 @@ void BlockInfo::drawProgress(
 			i_painter->setBrush( QBrush( afqt::QEnvironment::clr_itemjobwarning.c, Qt::SolidPattern ));
 			i_painter->drawRect( x, posy, w+offset, height);
 			break;
+		case 'U': // STATE_SUSPENDED_MASK | STATE_WAITDEP_MASK
+			i_painter->setBrush( QBrush( afqt::QEnvironment::clr_tasksuspended.c, Qt::SolidPattern ));
+			i_painter->drawRect( x, posy, w+offset, height);
+			break;
 		}
 		last_x = x + w + offset;
 //printf("%c", progress[i]);

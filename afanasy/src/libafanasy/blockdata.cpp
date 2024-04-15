@@ -116,6 +116,7 @@ void BlockData::initDefaults()
 	p_tasks_warning /***/ = 0;
 	p_tasks_waitrec /***/ = 0;
 	p_tasks_waitdep /***/ = 0;
+	p_tasks_suspended/**/ = 0;
 	p_tasks_run_time /**/ = 0;
 
 	memset(p_progressbar, AFJOB::ASCII_PROGRESS_STATES[0], AFJOB::ASCII_PROGRESS_LENGTH);
@@ -510,6 +511,7 @@ void BlockData::jsonWrite(std::ostringstream &o_str, int i_type) const
 			if (p_tasks_warning > 0) o_str << ",\n\"p_tasks_warning\":" << p_tasks_warning;
 			if (p_tasks_waitrec > 0) o_str << ",\n\"p_tasks_waitrec\":" << p_tasks_waitrec;
 			if (p_tasks_waitdep > 0) o_str << ",\n\"p_tasks_waitdep\":" << p_tasks_waitdep;
+			if (p_tasks_suspended > 0) o_str << ",\n\"p_tasks_suspended\":" << p_tasks_suspended;
 			if (p_tasks_run_time > 0) o_str << ",\n\"p_tasks_run_time\":" << p_tasks_run_time;
 
 			if (m_srv_info.size())
@@ -664,6 +666,7 @@ void BlockData::v_readwrite(Msg *msg)
 			rw_int32_t(p_tasks_warning, msg);
 			rw_int32_t(p_tasks_waitrec, msg);
 			rw_int32_t(p_tasks_waitdep, msg);
+			// rw_int32_t(p_tasks_suspended, msg); NEW_VERSION
 			rw_int64_t(p_tasks_run_time, msg);
 
 			rw_int64_t(m_state, msg);
@@ -1422,6 +1425,7 @@ bool BlockData::updateProgress(JobProgress *progress)
 	int new_tasks_warning = 0;
 	int new_tasks_waitrec = 0;
 	int new_tasks_waitdep = 0;
+	int new_tasks_suspended = 0;
 	long long new_tasks_run_time = 0;
 
 	for (int t = 0; t < m_tasks_num; t++)
@@ -1473,6 +1477,10 @@ bool BlockData::updateProgress(JobProgress *progress)
 		{
 			new_tasks_waitdep++;
 		}
+		if (task_state & AFJOB::STATE_SUSPENDED_MASK)
+		{
+			new_tasks_suspended++;
+		}
 
 		new_percentage += task_percent;
 	}
@@ -1482,6 +1490,7 @@ bool BlockData::updateProgress(JobProgress *progress)
 		|| (p_tasks_error != new_tasks_error) || (p_tasks_skipped != new_tasks_skipped)
 		|| (p_tasks_warning != new_tasks_warning) || (p_tasks_waitrec != new_tasks_waitrec)
 		|| (p_tasks_waitdep != new_tasks_waitdep)
+		|| (p_tasks_suspended != new_tasks_suspended)
 		|| (p_percentage != new_percentage) || (p_tasks_run_time != new_tasks_run_time))
 		changed = true;
 
@@ -1492,6 +1501,7 @@ bool BlockData::updateProgress(JobProgress *progress)
 	p_tasks_warning = new_tasks_warning;
 	p_tasks_waitrec = new_tasks_waitrec;
 	p_tasks_waitdep = new_tasks_waitdep;
+	p_tasks_suspended = new_tasks_suspended;
 	p_percentage = new_percentage;
 	p_tasks_run_time = new_tasks_run_time;
 

@@ -358,7 +358,7 @@ TaskItem.prototype.thumbsReceived = function(i_obj) {
 };
 
 TaskItem.createPanels = function(i_monitor) {
-	var acts = {};
+	let acts = {};
 	acts.skip = {
 		'handle': 'mh_Oper',
 		'label': 'SKIP',
@@ -367,8 +367,14 @@ TaskItem.createPanels = function(i_monitor) {
 	};
 	acts.restart = {
 		'handle': 'mh_Oper',
-		'label': 'RES',
+		'label': 'RESTART',
 		'tooltip': 'Double click to restart selected task(s).',
+		'ondblclick': true
+	};
+	acts.continue = {
+		'handle': 'mh_Oper',
+		'label': 'CONTINUE',
+		'tooltip': 'Double click to continue suspended task(s).',
 		'ondblclick': true
 	};
 	i_monitor.createCtrlBtns(acts);

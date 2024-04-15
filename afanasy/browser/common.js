@@ -35,7 +35,7 @@ var cm_Attrs = [
 var cm_UILevels = ['Padawan', 'Jedi', 'Sith'];
 
 var cm_States = [
-	'ONL', 'RDY', 'RUN', 'DON', 'WRN', 'ERR', 'SKP', 'OFF', 'WDP', 'WTM', 'DRT', 'NbY',
+	'ONL', 'RDY', 'RUN', 'DON', 'WRN', 'ERR', 'SKP', 'OFF', 'WDP', 'WTM', 'DRT', 'NbY', 'SUS',
 	'NBY', 'PAU', 'PER', 'PBR', 'PSC', 'WFL', 'WSL', 'WWK', 'PPA', 'RER', 'WRC', 'SIC'
 ];
 

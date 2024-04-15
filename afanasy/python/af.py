@@ -573,6 +573,9 @@ class Block:
             return
         self.data['flags'] = afcommon.setBlockFlag(self.data['flags'], 'slavelostignore')
 
+    def setTasksSuspended(self):
+        self.data['flags'] = afcommon.setBlockFlag(self.data['flags'], 'suspendnewtasks')
+
     def fillTasks(self):
         """Missing DocString
         """

@@ -15,7 +15,8 @@ BlockFlags = {
     'skipexistingfiles':  1 << 6,
     'checkrenderedfiles': 1 << 7,
     'slavelostignore':    1 << 8,
-    'appendedtasks':      1 << 9
+    'appendedtasks':      1 << 9,
+    'suspendnewtasks':    1 << 10
 }
 
 JobFlags = {

@@ -205,7 +205,7 @@ void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 	QString timeString = af::time2strHMS(taskprogress.time_done - taskprogress.time_start).c_str();
 
 	//
-	// Paint strings:
+	// Draw background:
 
 	if (taskprogress.state & AFJOB::STATE_RUNNING_MASK)
 	{
@@ -226,7 +226,8 @@ void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 		| AFJOB::STATE_SKIPPED_MASK
 		| AFJOB::STATE_DONE_MASK
 		| AFJOB::STATE_ERROR_READY_MASK
-		| AFJOB::STATE_TRYTHISTASKNEXT_MASK))
+		| AFJOB::STATE_TRYTHISTASKNEXT_MASK
+		| AFJOB::STATE_SUSPENDED_MASK))
 	{
 		i_painter->setPen(Qt::NoPen );
 
@@ -246,9 +247,14 @@ void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_tasktrynext.c, Qt::SolidPattern));
 		else if (taskprogress.state & AFJOB::STATE_WAITDEP_MASK)
 			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_itemjobwdep.c, Qt::SolidPattern));
+		else if (taskprogress.state & AFJOB::STATE_SUSPENDED_MASK)
+			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_tasksuspended.c, Qt::SolidPattern));
 
 		i_painter->drawRect(x, y, w - WidthInfo, Height-1);
 	}
+
+	//
+	// Paint strings:
 
 	i_painter->setFont(afqt::QEnvironment::f_info);
 

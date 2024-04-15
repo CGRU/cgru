@@ -49,6 +49,7 @@ parser.add_argument(      '--timeout',      dest='timeout',      type=int,   def
 parser.add_argument(      '--pkp',          dest='pkp',          type=int,   default=1,  help='Parser key percentage')
 parser.add_argument(      '--send',         dest='sendjob',      type=int,   default=1,  help='send job')
 parser.add_argument('-w', '--waittime',     dest='waittime',     type=int,   default=0,  help='set job to wait to start time')
+parser.add_argument(      '--suspended',    dest='suspended',    action='store_true', default=False, help='Job tasks will be suspended.')
 parser.add_argument(      '--os',           dest='os',           type=str,   default=None, help='OS needed')
 parser.add_argument('-c', '--capacity',     dest='capacity',     type=int,   default=0,  help='tasks capacity')
 parser.add_argument(      '--capmin',       dest='capmin',       type=int,   default=-1, help='tasks variable capacity coeff min')
@@ -195,8 +196,8 @@ for b in range(numblocks):
     if Args.sequential != None:
         block.setSequential( Args.sequential)
 
-    if Args.ppapproval:
-        job.setPPApproval()
+    if Args.suspended:
+        block.setTasksSuspended()
 
     if Args.environment:
         for env in Args.environment.split(';'):
@@ -304,6 +305,9 @@ if Args.cmdpre != '':
     job.setCmdPre(Args.cmdpre)
 if Args.cmdpost != '':
     job.setCmdPost(Args.cmdpost)
+
+if Args.ppapproval:
+    job.setPPApproval()
 
 if Args.waittime:
     job.setWaitTime(int(time.time()) + Args.waittime)

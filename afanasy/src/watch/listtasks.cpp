@@ -334,6 +334,13 @@ void ListTasks::generateMenu(QMenu &o_menu, Item * i_item)
 			connect( action, SIGNAL( triggered() ), this, SLOT( actTasksRestart() ));
 			o_menu.addAction( action);
 
+			if (itemTask->taskprogress.state & AFJOB::STATE_SUSPENDED_MASK)
+			{
+				action = new QAction("Continue Tasks", this);
+				connect(action, SIGNAL(triggered() ), this, SLOT(actTasksContinue()));
+				o_menu.addAction(action);
+			}
+
 			break;
 		}
 		default:
@@ -677,6 +684,7 @@ void ListTasks::actTaskOpen()
 void ListTasks::actTasksSkip()   {tasksOperation("skip");   }
 void ListTasks::actTasksDone()   {tasksOperation("done");   }
 void ListTasks::actTasksRestart(){tasksOperation("restart");}
+void ListTasks::actTasksContinue(){tasksOperation("continue");}
 void ListTasks::actTaskTryNext() {tasksOperation("trynext","append");}
 void ListTasks::actTaskDoNotTry(){tasksOperation("trynext","remove");}
 

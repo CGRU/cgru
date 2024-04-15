@@ -570,6 +570,10 @@ bool Block::action( Action & i_action)
 		{
 			skipRestartTasks(true, "Tasks skip by " + i_action.author, i_action, operation, AFJOB::STATE_SKIPPED_MASK | AFJOB::STATE_DONE_MASK);
 		}
+		else if (type == "continue")
+		{
+			skipRestartTasks(true, "Tasks continue by " + i_action.author, i_action, operation, AFJOB::STATE_READY_MASK);
+		}
 		else if (type == "done")
 		{
 			skipRestartTasks(true, "Tasks set done by " + i_action.author, i_action, operation, AFJOB::STATE_DONE_MASK);

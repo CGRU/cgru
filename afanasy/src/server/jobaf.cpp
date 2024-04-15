@@ -337,7 +337,15 @@ void JobAf::checkStates()
 		{
 			uint32_t taskstate = m_progress->tp[b][t]->state;
 
-			if ((taskstate == 0) || (taskstate == AFJOB::STATE_WARNING_MASK))
+			if (taskstate == 0)
+			{
+				// This is a new job, not from database
+				if (m_blocks_data[b]->isSuspendingNewTasks())
+					taskstate = AFJOB::STATE_SUSPENDED_MASK;
+				else
+					taskstate = AFJOB::STATE_READY_MASK;
+			}
+			else if (taskstate == AFJOB::STATE_WARNING_MASK)
 			{
 				taskstate = AFJOB::STATE_READY_MASK;
 			}
@@ -369,7 +377,10 @@ void JobAf::checkStatesOnAppend()
 
 			if( taskstate == 0 )
 			{
-				taskstate = AFJOB::STATE_READY_MASK;
+				if (m_blocks_data[b]->isSuspendingNewTasks())
+					taskstate = AFJOB::STATE_SUSPENDED_MASK;
+				else
+					taskstate = AFJOB::STATE_READY_MASK;
 				m_progress->tp[b][t]->state = taskstate;
 			}
 		}
