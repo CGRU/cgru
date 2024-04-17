@@ -7,6 +7,8 @@
 
 #include "listnodes.h"
 
+#include "cinemotion/cnPreferense.h"
+
 class ListJobs : public ListNodes
 {
 	Q_OBJECT
@@ -85,6 +87,9 @@ private slots:
 	void slot_BlocksMenuNotAll();
 
 	void slot_BlockAction(int i_bum, QString i_json);
+	//----------------------------------
+	// added by Suren
+	void lunchPreviewJob();
 
 private:
 
@@ -124,4 +129,7 @@ private:
 
 	// Needed to store where a menu for all blocks manipulation opened
 	bool m_all_blocks_menu_shown;
+public:
+	// Af job info
+	std::vector<cn::JobInfo> 	g_job_info;
 };

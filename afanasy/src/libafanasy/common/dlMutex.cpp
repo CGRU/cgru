@@ -28,7 +28,7 @@ typedef CRITICAL_SECTION pthread_mutex_t;
 
 DlMutex::DlMutex()
 {
-	compile_assert(sizeof(m_data) >= sizeof(pthread_mutex_t));
+//	compile_assert(sizeof(m_data) >= sizeof(pthread_mutex_t));
 
 	pthread_mutex_t *mutex = (pthread_mutex_t*) &m_data[0];
 

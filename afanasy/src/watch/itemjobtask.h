@@ -59,6 +59,7 @@ public:
 
 	inline const af::MCTaskPos getTaskPos() const { return af::MCTaskPos( m_job_id, m_blocknum, m_tasknum);}
 	
+	ItemJobBlock* get_block() const { return m_block;}
 protected:
 	virtual void v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const;
 
@@ -66,12 +67,13 @@ private:
 	void processFiles();
 	void thumbsCLear();
 
-private:
-	ListTasks * m_list;
-
+public:
 	int m_job_id;
 	int m_blocknum;
 	int m_tasknum;
+private:
+	ListTasks * m_list;
+	
 	ItemJobBlock * m_block;
 
 	long long m_frame_first;
@@ -79,8 +81,8 @@ private:
 	long long m_frames_num;
 
 	std::vector<std::string> m_files;
-	bool m_files_ready;
 
+	bool m_files_ready;
 	QVector<QImage*> m_thumbs_imgs;
 	QVector<QString> m_thumbs_names;
 };

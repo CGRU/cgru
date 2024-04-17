@@ -25,7 +25,7 @@
 #include <QScrollArea>
 #include <QSplitter>
 #include <QTextEdit>
-
+#include "itemjobtask.h"
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -33,22 +33,24 @@
 
 std::vector<WndTask*> WndTask::ms_wndtasks;
 
-WndTask * WndTask::openTask(const af::MCTaskPos & i_tp, ListTasks * i_parent)
-{
-	std::vector<WndTask*>::iterator it = ms_wndtasks.begin();
-	while(it != ms_wndtasks.end())
-		if ((*it)->isSameTask(i_tp))
-		{
-			(*it)->setVisible(true);
-			(*it)->showNormal();
-			(*it)->raise();
-			return (*it);
-		}
-		else
-			it++;
+WndTask * WndTask::openTask(const af::MCTaskPos & i_tp,
+							ListTasks * i_parent, 
+							ItemJobTask* task_ptr)
+							{
+								std::vector<WndTask*>::iterator it = ms_wndtasks.begin();
+								while(it != ms_wndtasks.end())
+									if ((*it)->isSameTask(i_tp))
+									{
+										(*it)->setVisible(true);
+										(*it)->showNormal();
+										(*it)->raise();
+										return (*it);
+									}
+									else
+										it++;
 
-	return new WndTask(i_tp, i_parent);
-}
+								return new WndTask(i_tp, i_parent, task_ptr);
+							}
 
 bool WndTask::showTask(af::MCTask & i_mctask)
 {
@@ -62,7 +64,7 @@ bool WndTask::showTask(af::MCTask & i_mctask)
 	return false;
 }
 
-WndTask::WndTask(const af::MCTaskPos & i_tp, ListTasks * i_parent):
+WndTask::WndTask(const af::MCTaskPos & i_tp, ListTasks * i_parent, ItemJobTask* task_ptr):
 	Wnd("Task"),
 	m_parent(i_parent),
 	m_pos(i_tp),
@@ -72,7 +74,8 @@ WndTask::WndTask(const af::MCTaskPos & i_tp, ListTasks * i_parent):
 	m_outputs_count(-1),
 	m_output_current(-1),
 	m_tab_current(NULL),
-	m_listening(false)
+	m_listening(false),
+	m_task_ptr(task_ptr)
 {
 	ms_wndtasks.push_back(this);
 
@@ -557,7 +560,7 @@ void WndTask::showExec(af::MCTask & i_mctask)
 		fileField->setReadOnly(true);
 		fileField->setText(afqt::stoq(files[i]));
 
-		ButtonMenu * btnBrowse = new ButtonMenu(afqt::stoq(files[i]), wdir, exec->getEnv(), m_tab_exec);
+		ButtonMenu * btnBrowse = new ButtonMenu(afqt::stoq(files[i]), wdir, exec->getEnv(), m_tab_exec,m_task_ptr);
 		layoutR->addWidget(btnBrowse);
 	}
 
@@ -618,12 +621,15 @@ void WndTask::showListen(const af::MCTask & i_mctask)
 
 
 ButtonMenu::ButtonMenu(const QString & i_file, const QString & i_wdir,
-		const std::map<std::string,std::string> i_env, QWidget * i_parent):
+		const std::map<std::string,std::string> i_env, QWidget * i_parent,
+		ItemJobTask* task_ptr ):
 	QPushButton("Launch", i_parent),
 	m_file(i_file),
 	m_wdir(i_wdir),
-	m_env(i_env)
+	m_env(i_env),
+	m_task_ptr(task_ptr)
 {
+	//CN_OK("ButtonMenu:m_task_ptr =",m_task_ptr);
 	std::vector<std::string>::const_iterator it = af::Environment::getPreviewCmds().begin();
 	for(; it != af::Environment::getPreviewCmds().end(); it++)
 	{
@@ -660,7 +666,94 @@ void ButtonMenu::contextMenuEvent(QContextMenuEvent * i_event)
 		connect(action, SIGNAL(triggeredId(int)), this, SLOT(launchCmd(int)));
 		menu.addAction(action);
 	}
+	//============================================================================
+	// By Suren
+	//============================================================================
+	menu.addSeparator();
+	if (m_task_ptr != nullptr)
+	{
+		std::set<std::string> l_all_services;
+		auto l_block_ptr 		= m_task_ptr->get_block();
+		m_task_info.m_job_id   	= m_task_ptr->m_job_id;
+		m_task_info.m_service 	= m_task_ptr->get_block()->service.toStdString();
+		m_task_info.m_id  	 	= m_task_ptr->m_tasknum;
+		m_task_info.m_block_id  = m_task_ptr->m_blocknum;
+		m_task_info.m_done 		= (l_block_ptr->state & AFJOB::STATE_DONE_MASK)>0;	;//(l_block_ptr->time_done > l_block_ptr->time_started);
+		bool l_all_done = m_task_info.m_done;
+		l_all_services.insert(m_task_info.m_service);
+		//create menus
+		const auto& l_popups = cn::Pref::get()->get_popups();
+		for (const auto& l_popup:l_popups )
+		{
+			if (l_popup.second->has_stage("task") == false ) continue;
+			l_popup.second->reset_env_nan();
+			l_popup.second->add_dict_val("STAGE","TASK");
 
+			const auto& l_menus = l_popup.second->get_menus("task");
+			if (l_menus.empty() == true) continue;
+
+			QMenu * submenu = new QMenu( QString::fromStdString(l_popup.first), this );
+			for (const auto& l_menu: l_menus) 
+			{
+				auto qaction = new QAction( QString::fromStdString(l_menu->get_name()), this);
+				submenu->addAction( qaction);
+				// Add lambda as menu funstion
+				QObject::connect( qaction,&QAction::triggered, 
+					[this, l_menu]() {
+						std::string l_cmd = l_menu->get_cmd();
+						std::string l_arg = l_menu->get_arg();
+						std::vector<std::string> l_cmd_base, l_arg_base;
+						std::vector<std::string> l_cmd_sec,  l_arg_sec;
+						bool  l_parse_cmd_res = cn::StringParser::parse_to_vectors(l_cmd_base, l_cmd_sec, l_cmd.c_str());
+						bool  l_parse_arg_res = cn::StringParser::parse_to_vectors(l_arg_base, l_arg_sec, l_arg.c_str());
+						
+						if (l_parse_cmd_res == false || l_parse_arg_res == false)
+						{
+							auto l_src = l_menu->get_popup_menu()->get_source();
+							auto l_stg = l_menu->get_stage()->get_name();
+							CN_ERR("Failed to parse command and arg");
+							CN_WARN("File: ",l_src);
+							CN_WARN("Stage: ",l_stg);
+							CN_WARN("CMD: ", l_cmd);
+							CN_WARN("ARG: ", l_arg);
+							return;
+						}
+						
+						l_menu->get_popup_menu()->add_dict_val("JOB_ID",   std::to_string(m_task_info.m_job_id) );
+						l_menu->get_popup_menu()->add_dict_val("BLOCK_ID", std::to_string(m_task_info.m_block_id) );
+						l_menu->get_popup_menu()->add_dict_val("TASK_ID",  std::to_string(m_task_info.m_id) );
+						l_menu->get_popup_menu()->add_dict_val("SERVICE",  m_task_info.m_service);
+						std::string l_cmd_solved = "";
+
+						// fill cmd
+						l_menu->get_popup_menu()->generate_cmd(l_cmd_base, l_cmd_sec, l_cmd_solved);
+						l_cmd_solved += " ";
+						l_menu->get_popup_menu()->generate_cmd(l_arg_base, l_arg_sec, l_cmd_solved);
+						l_cmd_solved += " ";
+						CN_OK(l_cmd_solved);
+						QString qcmd = QString::fromStdString(l_cmd_solved);
+						Watch::startProcess(qcmd,"");
+
+						l_cmd = "";
+						l_arg = "";
+				});
+
+				std::string l_ext_str;
+				if (l_menu->get_enable_for( false,
+											l_all_done,
+											l_all_services,
+											l_ext_str) == false)
+				{
+					qaction->setDisabled(true);
+					qaction->setText(QString::fromStdString(l_ext_str));
+				}
+			}
+			//submenu->setStyleSheet("QMenu::item:disabled { color: gray !important; padding-left: 20px !important; }");
+			submenu->setStyleSheet("QMenu::item:disabled { color: gray !important; }");
+			menu.addMenu(submenu);
+		}
+
+	}
 	menu.exec(i_event->globalPos());
 }
 

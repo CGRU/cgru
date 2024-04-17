@@ -360,6 +360,7 @@ bool MonitorEvents::isEmpty() const
 
 void MonitorEvents::v_generateInfoStream( std::ostringstream & o_str, bool i_full) const
 {
+	return;
 	o_str << "MonitorEvents:";
 
 	for( int i = 0; i < m_events.size(); i++)

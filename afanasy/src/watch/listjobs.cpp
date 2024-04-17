@@ -24,10 +24,16 @@
 #include <QMenu>
 #include <QSplitter>
 
+#include "cinemotion/cnCommon.h"
+#include "cinemotion/cnStdLoger.h"
+#include "cinemotion/cnPreferense.h"
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
+#include "cinemotion/cnPreferense.h"
+#include "cinemotion/cnStringParser.h"
+
 
 int     ListJobs::ms_SortType1      = CtrlSortFilter::TNONE;
 int     ListJobs::ms_SortType2      = CtrlSortFilter::TNONE;
@@ -54,6 +60,9 @@ ListJobs::ListJobs(QWidget * i_parent, bool i_listwork, const std::string & i_na
 	m_listwork(i_listwork),
 	m_all_blocks_menu_shown(false)
 {
+	auto g_pref = cn::Pref::get();
+	std::string l_env = cn::Common::get_env("CGRU_LOCATION");
+	//CN_OK("CGRU CN ENV_PATH ",l_env);
 	if( af::Environment::VISOR() || m_listwork)
 		m_ctrl_sf = new CtrlSortFilter( this,
 			&ms_SortType1_SU, &ms_SortAscending1_SU,
@@ -268,7 +277,7 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	ItemJob* jobitem = (ItemJob*)getCurrentItem();
 	if( jobitem == NULL ) return;
 	int selectedItemsCount = getSelectedItemsCount();
-
+	
 	if( jobitem->folders.size())
 	{
 		if( af::Environment::hasRULES())
@@ -496,6 +505,7 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	connect( action, SIGNAL( triggered() ), this, SLOT( actListenJob() ));
 	menu.addAction( action);
 
+	//=======================================================================
 	menu.addSeparator();
 
 	// System job ID is 1, and can not be deleted
@@ -516,7 +526,125 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 
 		menu.addMenu( submenu);
 	}
+	//---------------------------------------------------------------------------
+	// Lunch Menu added by Suren
+	//=======================================================================
+	menu.addSeparator();
 
+	// fill pref storage
+	g_job_info.clear();
+	bool 					l_all_done = true;
+	std::set<std::string> 	l_all_services;
+	const QList<Item*> 		l_selected_items =  getSelectedItems();
+
+	for (const auto& l_item : l_selected_items)
+	{
+		auto l_job_ptr = (ItemJob*)l_item;
+
+		cn::JobInfo l_job;
+		l_job.m_service = l_job_ptr->service.toStdString();
+		l_job.m_id 		= l_job_ptr->getId();
+		//l_job.m_done 	= (l_job_ptr->time_done > l_job_ptr->time_started);
+		l_job.m_done 	= ( l_job_ptr->state &  AFJOB::STATE_DONE_MASK ) > 0;
+		l_all_done 		= l_all_done && l_job.m_done;
+		g_job_info.push_back(l_job);
+		l_all_services.insert(l_job.m_service);
+	}
+
+	// create menus
+	const auto& l_popups = cn::Pref::get()->get_popups();
+	for (const auto& l_popup:l_popups )
+	{
+		if (l_popup.second->has_stage("job") == false ) continue;
+
+		l_popup.second->reset_env_nan();
+		l_popup.second->add_dict_val("STAGE","JOB");
+
+		const auto& l_menus = l_popup.second->get_menus("job");
+		if (l_menus.empty() == true) continue;
+
+		submenu = new QMenu( QString::fromStdString(l_popup.first), this );
+		
+		for (const auto& l_menu: l_menus) {
+			action = new QAction( QString::fromStdString(l_menu->get_name()), this);
+			submenu->addAction( action);
+
+			// Add lambda as menu funstion
+			QObject::connect( action,&QAction::triggered, 
+					[this, l_menu]() {
+						std::string l_cmd = l_menu->get_cmd();
+						std::string l_arg = l_menu->get_arg();
+						std::vector<std::string> l_cmd_base, l_arg_base;
+						std::vector<std::string> l_cmd_sec, l_arg_sec;
+						bool  l_parse_cmd_res = cn::StringParser::parse_to_vectors(l_cmd_base, l_cmd_sec, l_cmd.c_str());
+						bool  l_parse_arg_res = cn::StringParser::parse_to_vectors(l_arg_base, l_arg_sec, l_arg.c_str());
+						
+						if (l_parse_cmd_res == false || l_parse_arg_res == false)
+						{
+							auto l_src = l_menu->get_popup_menu()->get_source();
+							auto l_stg = l_menu->get_stage()->get_name();
+
+							CN_ERR("Failed to parse command and arg");
+							CN_WARN("File: ", l_src);
+							CN_WARN("Stage: ",l_stg);
+							CN_WARN("CMD: ",  l_cmd);
+							CN_WARN("ARG: ",  l_arg);
+							return;
+						}
+
+						for (int i = 0; i < (int)g_job_info.size(); ++i) 
+						{
+							l_menu->get_popup_menu()->add_dict_val("JOB_ID",  std::to_string(g_job_info[i].m_id) );
+							//l_menu->get_popup_menu()->add_dict_val("BLOCK_ID","NAN" );
+							//l_menu->get_popup_menu()->add_dict_val("TASK_ID", "NAN" );
+							l_menu->get_popup_menu()->add_dict_val("SERVICE", g_job_info[i].m_service);
+							std::string l_cmd_solved = "";
+							// fill cmd
+							l_menu->get_popup_menu()->generate_cmd(l_cmd_base, l_cmd_sec, l_cmd_solved);							
+							l_cmd_solved += " ";
+							l_menu->get_popup_menu()->generate_cmd(l_arg_base, l_arg_sec, l_cmd_solved);
+							l_cmd_solved += " ";
+							CN_OK(l_cmd_solved);
+							QString qcmd = QString::fromStdString(l_cmd_solved);
+							Watch::startProcess(qcmd,"");
+						}
+
+						l_cmd = "";
+						l_arg = "";
+						// combine 
+						std::cout << "called " << l_menu->get_name() << g_job_info.size() << std::endl;
+					} );
+			
+			std::string l_ext_str;
+			//CN_OK("MULTI ", selectedItemsCount > 1);
+			if (l_menu->get_enable_for( selectedItemsCount > 1,
+										l_all_done,
+										l_all_services,
+										l_ext_str) == false)
+			{
+				action->setDisabled(true);
+				action->setEnabled(false);
+				action->setText(QString::fromStdString(l_ext_str));
+			}
+			/*
+			//support many			
+			if (l_menu->is_multi() == false && selectedItemsCount > 1) {
+				action->setDisabled(true);
+				action->setText(action->text() +" (Not For Multiple Jobs.)");
+			}
+			//support done job
+			if (l_menu->is_enable_when_done() == true && l_all_done == false){
+				action->setDisabled(true);
+				action->setText(action->text() +" (Not Done Yet)");
+			}
+			*/
+		}
+		//submenu->setStyleSheet("QMenu::item:disabled { color: gray; text-decoration: line-through; }");
+		submenu->setStyleSheet("QMenu::item:disabled { color: gray !important; }");
+		//submenu->setStyleSheet("QMenu::item:disabled { color: gray; }");
+		menu.addMenu( submenu);
+	}
+	//=======================================================================
 	menu.exec(event->globalPos());
 }
 void ListJobs::slot_BlocksMenuForAll() {m_all_blocks_menu_shown = true; }
@@ -912,3 +1040,25 @@ bool ListJobs::v_filesReceived( const af::MCTaskUp & i_taskup )
 	return false;
 }
 
+void ListJobs::lunchPreviewJob(){	
+	Item* items_array = getCurrentItem();
+	Item* item = getCurrentItem();
+    if (item == NULL)
+    {
+        displayError("No items selected.");
+        return;
+    }
+    if (item->getType() != Item::TJob)
+    {
+        displayWarning("This action for job only.");
+        return;
+    }
+
+    ItemJob* job_item = (ItemJob*)item;
+	auto job_id   = job_item->getId();
+	
+	//QString cmd(afqt::stoq(af::Environment::getPreviewCmds()[num_cmd]));
+	std::cout << "!!!!!!!!!!!!!!! lunchPreviewJob !!!!!!!!!!!!!!!!!!!!!! " << std::endl;
+	//std::cout << cmd.toStdString() << std::endl;
+	std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+}

@@ -8,6 +8,10 @@
 
 #include "listitems.h"
 
+#include "cinemotion/cnPreferense.h"
+#include "cinemotion/cnStringParser.h"
+#include "cinemotion/cnLoger.h" 
+
 class QListWidget;
 class QListWidgetItem;
 
@@ -104,4 +108,9 @@ private:
 
 	void tasksOperation(const std::string & i_type, const std::string & i_mode = std::string());
 	void setWindowTitleProgress();
+
+private:
+	// Af Block and Task info
+	std::vector<cn::BlockInfo> 	g_block_info;
+	std::vector<cn::TaskInfo> 	g_task_info;
 };

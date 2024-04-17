@@ -40,6 +40,10 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
+#include "cinemotion/cnPreferense.h"
+#include "cinemotion/cnStringParser.h"
+#include "cinemotion/cnLoger.h"
+
 ListTasks::ListTasks( QWidget* parent, int JobId, const QString & JobName):
 	ListItems(parent, "tasks"),
 	m_job_id(JobId),
@@ -166,13 +170,15 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
 void ListTasks::generateMenu(QMenu &o_menu, Item * i_item)
 {
 	QAction *action;
-
+	//CN_OK("LIST TASKS ",i_item );
 	switch (i_item->getType())
 	{
 		case Item::TBlock:
 		{
+			CN_OK("TBLOCK");
 			ItemJobBlock *itemBlock = static_cast<ItemJobBlock*>(i_item);
-			
+			if 	(itemBlock == nullptr) break;
+
 			if (itemBlock->hasFiles())
 			{
 				action = new QAction("Browse Files...", this);
@@ -212,128 +218,352 @@ void ListTasks::generateMenu(QMenu &o_menu, Item * i_item)
 
 			// Operations on the current block item
 			itemBlock->getInfo()->generateMenu(&o_menu, submenu);
+			{
+				o_menu.addMenu( submenu);
+				
+				o_menu.addSeparator();
+				// Operations on all the selected blocks
 
-			o_menu.addMenu( submenu);
-			
+				submenu = new QMenu( "Change Tasks", this);
+				o_menu.addMenu( submenu);
+
+				action = new QAction( "Set Command", this);
+				connect( action, SIGNAL( triggered() ), this, SLOT( actBlockCommand() ));
+				submenu->addAction( action);
+
+				action = new QAction( "Set Working Directory", this);
+				connect( action, SIGNAL( triggered() ), this, SLOT( actBlockWorkingDir() ));
+				submenu->addAction( action);
+
+				action = new QAction( "Set Environment", this);
+				connect( action, SIGNAL( triggered() ), this, SLOT( actBlockEnvironment() ));
+				submenu->addAction( action);
+
+				action = new QAction( "Set Post Command", this);
+				connect( action, SIGNAL( triggered() ), this, SLOT( actBlockCmdPost() ));
+				submenu->addAction( action);
+
+				action = new QAction( "Set Files", this);
+				connect( action, SIGNAL( triggered() ), this, SLOT( actBlockFiles() ));
+				submenu->addAction( action);
+
+				action = new QAction( "Set Service Type", this);
+				connect( action, SIGNAL( triggered() ), this, SLOT( actBlockService() ));
+				submenu->addAction( action);
+
+				action = new QAction( "Set Parser Type", this);
+				connect( action, SIGNAL( triggered() ), this, SLOT( actBlockParser() ));
+				submenu->addAction( action);
+			}
+			//=======================================================================
+			// by Suren(Block)
+			//=======================================================================
 			o_menu.addSeparator();
-			// Operations on all the selected blocks
 
-			submenu = new QMenu( "Change Tasks", this);
-			o_menu.addMenu( submenu);
+			// fill pref storage
+			g_block_info.clear();
+			std::set<std::string> l_all_services;
+			bool 				  l_all_done 	= true;
+			const QList<Item*> l_selected_items =  getSelectedItems();
+			int   selectedItemsCount 			=  getSelectedItemsCount();			
 
-			action = new QAction( "Set Command", this);
-			connect( action, SIGNAL( triggered() ), this, SLOT( actBlockCommand() ));
-			submenu->addAction( action);
+			for ( const auto& l_item : l_selected_items) 
+			{
+				auto l_block_ptr = dynamic_cast<ItemJobBlock*>(l_item);
+				if (l_block_ptr == nullptr) continue;
+				cn::BlockInfo l_block;
+				
+				l_block.m_job_id 	= l_block_ptr->job_id;
+				l_block.m_service 	= l_block_ptr->service.toStdString();
+				l_block.m_id  	 	= l_block_ptr->numblock;
+				//l_block.m_id  	= l_block_ptr->getId();numblock
+				l_block.m_service 	= l_block_ptr->service.toStdString();
+				l_block.m_done 		= (l_block_ptr->state & AFJOB::STATE_DONE_MASK) > 0;//(l_block_ptr->time_done > l_block_ptr->time_started);
+				//l_all_done 			= l_all_done && l_block.m_done;
+				l_all_done 			= l_all_done && l_block.m_done;		
+				//CN_OK("Time Done: ",l_block_ptr->time_done," Time Started: ", l_block_ptr->time_started );
+				//CN_OK("DONE ",l_block.m_done);
+				g_block_info.push_back(l_block);
+				l_all_services.insert(l_block.m_service);
+			}
+			//CN_OK("BLOCK");
+			//create menus
+			const auto& l_popups = cn::Pref::get()->get_popups();
+			for (const auto& l_popup:l_popups )
+			{
+				if (l_popup.second->has_stage("block") == false ) continue;
 
-			action = new QAction( "Set Working Directory", this);
-			connect( action, SIGNAL( triggered() ), this, SLOT( actBlockWorkingDir() ));
-			submenu->addAction( action);
+				l_popup.second->reset_env_nan();
+				l_popup.second->add_dict_val("STAGE","BLOCK");
+				const auto& l_menus = l_popup.second->get_menus("block");
+				if (l_menus.empty() == true) continue;
 
-			action = new QAction( "Set Environment", this);
-			connect( action, SIGNAL( triggered() ), this, SLOT( actBlockEnvironment() ));
-			submenu->addAction( action);
+				submenu = new QMenu( QString::fromStdString(l_popup.first), this );
+				
+				for (const auto& l_menu: l_menus) 
+				{
+					action = new QAction( QString::fromStdString(l_menu->get_name()), this);
+					submenu->addAction( action);
+					// Add lambda as menu funstion
+					QObject::connect( action,&QAction::triggered, 
+					[this, l_menu]() {
+						std::string l_cmd = l_menu->get_cmd();
+						std::string l_arg = l_menu->get_arg();
+						std::vector<std::string> l_cmd_base, l_arg_base;
+						std::vector<std::string> l_cmd_sec, l_arg_sec;
+						bool  l_parse_cmd_res = cn::StringParser::parse_to_vectors(l_cmd_base, l_cmd_sec, l_cmd.c_str());
+						bool  l_parse_arg_res = cn::StringParser::parse_to_vectors(l_arg_base, l_arg_sec, l_arg.c_str());
+						if (l_parse_cmd_res == false || l_parse_arg_res == false)
+						{
+							auto l_src = l_menu->get_popup_menu()->get_source();
+							auto l_stg = l_menu->get_stage()->get_name();
+							CN_ERR("Failed to parse command and arg");
+							CN_WARN("File: ", l_src);
+							CN_WARN("Stage: ",l_stg);
+							CN_WARN("CMD: ",  l_cmd);
+							CN_WARN("ARG: ",  l_arg);
+							return;
+						} 
+						
+						for (int i = 0; i < (int)g_block_info.size(); ++i) 
+						{
+							l_menu->get_popup_menu()->add_dict_val("JOB_ID",   std::to_string(g_block_info[i].m_job_id) );
+							l_menu->get_popup_menu()->add_dict_val("BLOCK_ID", std::to_string(g_block_info[i].m_id) );
+							//l_menu->get_popup_menu()->add_dict_val("TASK_ID", "NAN" );
+							l_menu->get_popup_menu()->add_dict_val("SERVICE",  g_block_info[i].m_service);
+							std::string l_cmd_solved = "";
+							// fill cmd
+							l_menu->get_popup_menu()->generate_cmd(l_cmd_base, l_cmd_sec, l_cmd_solved);
+							l_cmd_solved += " ";
+							l_menu->get_popup_menu()->generate_cmd(l_arg_base, l_arg_sec, l_cmd_solved);
+							l_cmd_solved += " ";
+							CN_OK(l_cmd_solved);
+							QString qcmd = QString::fromStdString(l_cmd_solved);
+							Watch::startProcess(qcmd,"");
+						}
 
-			action = new QAction( "Set Post Command", this);
-			connect( action, SIGNAL( triggered() ), this, SLOT( actBlockCmdPost() ));
-			submenu->addAction( action);
+						l_cmd = "";
+						l_arg = "";
+						// combine 
+						std::cout << "called " << l_menu->get_name() << g_block_info.size() << std::endl;
+						
+					} );
+			
+					std::string l_ext_str;
+					if (l_menu->get_enable_for( selectedItemsCount > 1,
+												l_all_done,
+												l_all_services,
+												l_ext_str) == false)
+					{
+						action->setDisabled(true);
+						action->setText(QString::fromStdString(l_ext_str));
+					}
+				}
+				//submenu->setStyleSheet("QMenu::item:disabled { color: gray; text-decoration: line-through; }");
+				submenu->setStyleSheet("QMenu::item:disabled { color: gray !important; }");
 
-			action = new QAction( "Set Files", this);
-			connect( action, SIGNAL( triggered() ), this, SLOT( actBlockFiles() ));
-			submenu->addAction( action);
-
-			action = new QAction( "Set Service Type", this);
-			connect( action, SIGNAL( triggered() ), this, SLOT( actBlockService() ));
-			submenu->addAction( action);
-
-			action = new QAction( "Set Parser Type", this);
-			connect( action, SIGNAL( triggered() ), this, SLOT( actBlockParser() ));
-			submenu->addAction( action);
+				o_menu.addMenu( submenu);
+			}
 
 			break;
 		}
 		case Item::TTask:
 		{
-			ItemJobTask *itemTask = static_cast<ItemJobTask*>(i_item);
-
-			action = new QAction("Open Task", this);
-			connect(action, SIGNAL(triggered() ), this, SLOT(actTaskOpen()));
-			o_menu.addAction(action);
-
-			o_menu.addSeparator();
-
-			if (itemTask->hasFiles())
+			CN_OK("TTASK a");
+			ItemJobTask *itemTask = static_cast<ItemJobTask*>(i_item);			
+			//ItemJobTask *itemTask = dynamic_cast<ItemJobTask*>(i_item);	
+			if 	(itemTask == nullptr) break;
+			//CN_OK("TTASK b ", itemTask);
 			{
-				const std::vector<std::string> files = itemTask->getFiles();
-
-				o_menu.addSeparator();
-
-				action = new QAction("Browse Files...", this);
-				connect(action, SIGNAL(triggered() ), this, SLOT(actBrowseFolder()));
-				o_menu.addAction(action);
-
-				const std::vector<std::string> preview_cmds = af::Environment::getPreviewCmds();
-				if (preview_cmds.size())
-                {
-                    QMenu * submenu_cmd = new QMenu("Launch", this);
-                    for (int i = 0; i < files.size(); i++)
-                    {
-                        action = new QAction(afqt::stoq(files[i]).right(55), this);
-                        action->setEnabled(false);
-                        QFont f = action->font();
-                        f.setItalic(true);
-                        action->setFont(f);
-                        submenu_cmd->addAction(action);
-                        for (int p = 0; p < preview_cmds.size(); p++)
-                        {
-                            QString cmd = afqt::stoq(preview_cmds[p]);
-                            QStringList cmdSplit = cmd.split("|");
-                                
-                            ActionIdId * actionid = new ActionIdId(p, i, QString("    " + cmdSplit.first()), this);
-                            connect(actionid, SIGNAL(triggeredId(int,int) ), this, SLOT(actTaskPreview(int,int)));
-                            submenu_cmd->addAction(actionid);
-                        }
-                        submenu_cmd->addSeparator();
-                    }
-                    o_menu.addMenu(submenu_cmd);
-                }
-                o_menu.addSeparator();
-			}
-
-			if ((itemTask->taskprogress.state & AFJOB::STATE_READY_MASK) &&
-				(false == (itemTask->taskprogress.state & AFJOB::STATE_TRYTHISTASKNEXT_MASK)))
-			{
-				action = new QAction("Try This Task Next", this);
-				connect(action, SIGNAL(triggered()), this, SLOT(actTaskTryNext()));
+				action = new QAction("Open Task", this);
+				connect(action, SIGNAL(triggered() ), this, SLOT(actTaskOpen()));
 				o_menu.addAction(action);
 
 				o_menu.addSeparator();
-			}
-			if (itemTask->taskprogress.state & AFJOB::STATE_TRYTHISTASKNEXT_MASK)
-			{
-				action = new QAction("Do Not Try Next", this);
-				connect(action, SIGNAL(triggered()), this, SLOT(actTaskDoNotTry()));
-				o_menu.addAction(action);
+
+				if (itemTask->hasFiles())
+				{
+					const std::vector<std::string> files = itemTask->getFiles();
+
+					o_menu.addSeparator();
+
+					action = new QAction("Browse Files...", this);
+					connect(action, SIGNAL(triggered() ), this, SLOT(actBrowseFolder()));
+					o_menu.addAction(action);
+
+					const std::vector<std::string> preview_cmds = af::Environment::getPreviewCmds();
+					if (preview_cmds.size())
+					{
+						QMenu * submenu_cmd = new QMenu("Launch", this);
+						for (int i = 0; i < files.size(); i++)
+						{
+							action = new QAction(afqt::stoq(files[i]).right(55), this);
+							action->setEnabled(false);
+							QFont f = action->font();
+							f.setItalic(true);
+							action->setFont(f);
+							submenu_cmd->addAction(action);
+							for (int p = 0; p < preview_cmds.size(); p++)
+							{
+								QString cmd = afqt::stoq(preview_cmds[p]);
+								QStringList cmdSplit = cmd.split("|");
+									
+								ActionIdId * actionid = new ActionIdId(p, i, QString("    " + cmdSplit.first()), this);
+								connect(actionid, SIGNAL(triggeredId(int,int) ), this, SLOT(actTaskPreview(int,int)));
+								submenu_cmd->addAction(actionid);
+							}
+							submenu_cmd->addSeparator();
+						}
+						o_menu.addMenu(submenu_cmd);
+					}
+					o_menu.addSeparator();
+				}
+				if ((itemTask->taskprogress.state & AFJOB::STATE_READY_MASK) &&
+					(false == (itemTask->taskprogress.state & AFJOB::STATE_TRYTHISTASKNEXT_MASK)))
+				{
+					action = new QAction("Try This Task Next", this);
+					connect(action, SIGNAL(triggered()), this, SLOT(actTaskTryNext()));
+					o_menu.addAction(action);
+
+					o_menu.addSeparator();
+				}
+				if (itemTask->taskprogress.state & AFJOB::STATE_TRYTHISTASKNEXT_MASK)
+				{
+					action = new QAction("Do Not Try Next", this);
+					connect(action, SIGNAL(triggered()), this, SLOT(actTaskDoNotTry()));
+					o_menu.addAction(action);
+
+					o_menu.addSeparator();
+				}
 
 				o_menu.addSeparator();
-			}
-
-			o_menu.addSeparator();
 			
-			action = new QAction( "Skip Tasks", this);
-			connect( action, SIGNAL( triggered() ), this, SLOT( actTasksSkip() ));
-			o_menu.addAction( action);
+				action = new QAction( "Skip Tasks", this);
+				connect( action, SIGNAL( triggered() ), this, SLOT( actTasksSkip() ));
+				o_menu.addAction( action);
 
-			if (af::Environment::VISOR())
-			{
-				action = new QAction("Done Tasks", this);
-				connect(action, SIGNAL(triggered()), this, SLOT(actTasksDone()));
-				o_menu.addAction(action);
+				if (af::Environment::VISOR())
+				{
+					action = new QAction("Done Tasks", this);
+					connect(action, SIGNAL(triggered()), this, SLOT(actTasksDone()));
+					o_menu.addAction(action);
+				}
+
+				action = new QAction( "Restart Tasks", this);
+				connect( action, SIGNAL( triggered() ), this, SLOT( actTasksRestart() ));
+				o_menu.addAction( action);
 			}
+			//=======================================================================
+			// by Suren (Task)
+			//=======================================================================
+			o_menu.addSeparator();			
+			//CN_OK("TTASK");
+			// fill pref storage
+			g_task_info.clear();
+			bool l_all_done = true;
+			std::set<std::string> l_all_services;
+			const QList<Item*> l_selected_items = getSelectedItems();
+			int selectedItemsCount 				= getSelectedItemsCount();
+			//CN_OK("TASK");
+			for ( const auto& l_item : l_selected_items) 
+			{
+				auto l_task_ptr = dynamic_cast<ItemJobTask*>(l_item);
+				if (l_task_ptr == nullptr) continue;
+				auto l_block_ptr = l_task_ptr->get_block();
+				cn::TaskInfo 	l_task;
+				l_task.m_job_id 	= l_task_ptr->m_job_id;
+				l_task.m_service 	= l_task_ptr->get_block()->service.toStdString();
+				l_task.m_id  	 	= l_task_ptr->m_tasknum;
+				l_task.m_block_id   = l_task_ptr->m_blocknum;
+				l_task.m_done 		= (l_block_ptr->state & AFJOB::STATE_DONE_MASK) > 0;	;//(l_block_ptr->time_done > l_block_ptr->time_started);
+				//l_task.m_done 		= l_task_ptr->taskprogress.state == 16;	
+				l_all_done 			= l_all_done && l_task.m_done;
+				
+				//CN_OK("Time Done: ", l_task.m_done );
+				//CN_OK("DONE ",l_block.m_done);
+				g_task_info.push_back(l_task);
+				l_all_services.insert(l_task.m_service);
+				//CN_OK("TASK_STATE",l_task_ptr->taskprogress.state);
+			}
+			//create menus
+			const auto& l_popups = cn::Pref::get()->get_popups();
+			for (const auto& l_popup:l_popups )
+			{
+				if (l_popup.second->has_stage("task") == false ) continue;
 
-			action = new QAction( "Restart Tasks", this);
-			connect( action, SIGNAL( triggered() ), this, SLOT( actTasksRestart() ));
-			o_menu.addAction( action);
+				l_popup.second->reset_env_nan();
+				l_popup.second->add_dict_val("STAGE","TASK");
+				const auto& l_menus = l_popup.second->get_menus("task");
+				if (l_menus.empty() == true) continue;
 
+				QMenu * submenu = new QMenu( QString::fromStdString(l_popup.first), this );
+				
+				for (const auto& l_menu: l_menus) 
+				{
+					action = new QAction( QString::fromStdString(l_menu->get_name()), this);
+					submenu->addAction( action);
+
+					// Add lambda as menu funstion
+					QObject::connect( action,&QAction::triggered, 
+					[this, l_menu]() {
+						std::string l_cmd = l_menu->get_cmd();
+						std::string l_arg = l_menu->get_arg();
+						std::vector<std::string> l_cmd_base, l_arg_base;
+						std::vector<std::string> l_cmd_sec,  l_arg_sec;
+						bool  l_parse_cmd_res = cn::StringParser::parse_to_vectors(l_cmd_base, l_cmd_sec, l_cmd.c_str());
+						bool  l_parse_arg_res = cn::StringParser::parse_to_vectors(l_arg_base, l_arg_sec, l_arg.c_str());
+						
+						if (l_parse_cmd_res == false || l_parse_arg_res == false)
+						{
+							auto l_src = l_menu->get_popup_menu()->get_source();
+							auto l_stg = l_menu->get_stage()->get_name();
+							CN_ERR("Failed to parse command and arg");
+							CN_WARN("File: ",l_src);
+							CN_WARN("Stage: ",l_stg);
+							CN_WARN("CMD: ", l_cmd);
+							CN_WARN("ARG: ", l_arg);
+							return;
+						} 
+					
+						for (int i = 0; i < (int)g_task_info.size(); ++i) 
+						{
+							l_menu->get_popup_menu()->add_dict_val("JOB_ID",   std::to_string(g_task_info[i].m_job_id) );
+							l_menu->get_popup_menu()->add_dict_val("BLOCK_ID", std::to_string(g_task_info[i].m_block_id) );
+							l_menu->get_popup_menu()->add_dict_val("TASK_ID",  std::to_string(g_task_info[i].m_id) );
+							l_menu->get_popup_menu()->add_dict_val("SERVICE",  g_task_info[i].m_service);
+							std::string l_cmd_solved = "";
+							// fill cmd
+							l_menu->get_popup_menu()->generate_cmd(l_cmd_base, l_cmd_sec, l_cmd_solved);
+							l_cmd_solved += " ";
+							l_menu->get_popup_menu()->generate_cmd(l_arg_base, l_arg_sec, l_cmd_solved);
+							l_cmd_solved += " ";
+							CN_OK(l_cmd_solved);
+							QString qcmd = QString::fromStdString(l_cmd_solved);
+							Watch::startProcess(qcmd,"");
+						}
+
+						l_cmd = "";
+						l_arg = "";
+						// combine 
+						//std::cout << "called " << l_menu->get_name() << g_task_info.size() << std::endl;
+					
+					} );
+					//CN_OK(l_menu->get_name()," ALL_DONE ",l_all_done, " Menu_enable ", l_menu->is_enable_when_done() );
+					std::string l_ext_str;
+					if (l_menu->get_enable_for( selectedItemsCount > 1,
+												l_all_done,
+												l_all_services,
+												l_ext_str) == false)
+					{
+						action->setDisabled(true);
+						action->setText(QString::fromStdString(l_ext_str));
+					}
+				}
+				//submenu->setStyleSheet("QMenu::item:disabled { color: gray; text-decoration: line-through; }");
+				submenu->setStyleSheet("QMenu::item:disabled { color: gray !important; }");
+
+				o_menu.addMenu(submenu);
+			}
 			break;
 		}
 		default:
@@ -682,7 +912,7 @@ void ListTasks::actTaskDoNotTry(){tasksOperation("trynext","remove");}
 
 void ListTasks::openTask( ItemJobTask * i_itemTask)
 {
-	m_wndtasks.push_back( WndTask::openTask( i_itemTask->getTaskPos(), this));
+	m_wndtasks.push_back( WndTask::openTask( i_itemTask->getTaskPos(), this,i_itemTask));
 }
 
 void ListTasks::taskWindowClosed( WndTask * i_wndtask)
@@ -860,6 +1090,7 @@ void ListTasks::actBrowseFolder()
 
 void ListTasks::actTaskPreview(int i_num_cmd, int i_num_img)
 {
+	//std::cout << "!!!!!!!!!!!!!!ListTasks::actTaskPreview" << std::endl;
 	Item* item = getCurrentItem();
 	if (item == NULL)
 	{
@@ -891,6 +1122,26 @@ void ListTasks::actTaskPreview(int i_num_cmd, int i_num_img)
 	}
 
 	QString cmd(afqt::stoq(af::Environment::getPreviewCmds()[i_num_cmd]));
+	// Andrew Appalikov improove
+	//if (true == true)
+	if (cmd.contains("@JOB_ID@"))	
+	{
+		cmd = cmd.replace("\"@JOB_ID@\"", "");
+
+		auto job_id   = taskitem->m_job_id;
+		auto block_id = taskitem->m_blocknum;
+		auto task_id  = taskitem->m_tasknum;
+
+		QStringList cmdSplit = cmd.split("|");
+		cmdSplit.last() = cmdSplit.last() + " \"" + QString::number(job_id) + 
+							"|" + QString::number(block_id) +
+							"|" + QString::number(task_id) + "\"";
+		std::cout << "!!!!!!!!!!!!!!! actTaskPreview !!!!!!!!!!!!!!!!!!!!!! " << std::endl;
+		std::cout << cmdSplit.last().toStdString() << std::endl;
+		std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+		Watch::startProcess(cmdSplit.last(), afqt::stoq(taskitem->getWDir()));
+		return;
+	}
 	cmd = cmd.replace(AFWATCH::CMDS_ARGUMENT, arg);
 	QStringList cmdSplit = cmd.split("|");
 
@@ -930,9 +1181,28 @@ void ListTasks::actBlockPreview( int num_cmd, int num_img)
     }
 
     QString cmd(afqt::stoq(af::Environment::getPreviewCmds()[num_cmd]));
-    cmd = cmd.replace(AFWATCH::CMDS_ARGUMENT, arg);
-    QStringList cmdSplit = cmd.split("|");
+	// Andrew Appalikov improove
+	//if (true == true)
+	if (cmd.contains("@JOB_ID@"))	
+	{
+		cmd = cmd.replace("\"@JOB_ID@\"", "");
+		auto job_id   = blockitem->job_id;
+		auto block_id = blockitem->numblock;
+		QStringList cmdSplit = cmd.split("|");
+		cmdSplit.last() = cmdSplit.last() + " \"" + QString::number(job_id) + "|" + QString::number(block_id) + "0\"";
+		std::cout << "!!!!!!!!!!!!!!! actBlockPreview !!!!!!!!!!!!!!!!!!!!!! " << std::endl;
+		std::cout << cmdSplit.last().toStdString() << std::endl;
+		std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+		Watch::startProcess(cmdSplit.last(), afqt::stoq(blockitem->getWDir()));
+		return;
+	}
 
+	cmd = cmd.replace(AFWATCH::CMDS_ARGUMENT, arg);    
+	//std::cout << "!!!!!!!!!!!!!!! Parsed Cmd!!!!!!!!!!!!!!!!!!!!!! " << std::endl;
+	//std::cout << cmd.toStdString() << std::endl;
+	//std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+
+    QStringList cmdSplit = cmd.split("|");		
     Watch::startProcess(cmdSplit.last(), afqt::stoq(blockitem->getWDir()));
 }
 

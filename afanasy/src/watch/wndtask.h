@@ -4,12 +4,16 @@
 #include "../libafanasy/name_af.h"
 #include "../libafanasy/taskprogress.h"
 
+#include "cinemotion/cnStringParser.h"
+#include "cinemotion/cnLoger.h"
+
 #include "receiver.h"
 #include "wnd.h"
 
 #include <QPushButton>
 #include <QTabWidget>
 
+#include "cinemotion/cnPreferense.h"
 class QCloseEvent;
 class QContextMenuEvent;
 
@@ -18,12 +22,12 @@ class ListTasks;
 class QAfTextWidget;
 
 /// This class designed to request and show any task information
-
+class ItemJobTask;
 class WndTask : public Wnd
 {
 	Q_OBJECT
 protected:
-	WndTask( const af::MCTaskPos & i_tp, ListTasks * i_parent);
+	WndTask( const af::MCTaskPos & i_tp, ListTasks * i_parent, ItemJobTask* task_ptr = nullptr);
 
 public:
 	~WndTask();
@@ -31,7 +35,7 @@ public:
 	/// Static function will try to find task window.
 	/// If founded, it will be raised.
 	// If not it opens one.
-	static WndTask * openTask( const af::MCTaskPos & i_tp, ListTasks * i_parent = NULL);
+	static WndTask * openTask( const af::MCTaskPos & i_tp, ListTasks * i_parent = NULL,  ItemJobTask* task_ptr = nullptr);
 	/// ( all WndTask windows are stored in a static array )
 
 
@@ -52,7 +56,7 @@ public:
 	/// Update task progress.
 	/// Called from tasks list ( it receives task progresses updates )
 	void updateProgress( const af::TaskProgress & i_progress);
-
+	ItemJobTask* get_task() const {return m_task_ptr;}
 protected:
 	virtual void closeEvent( QCloseEvent * i_evt);
 
@@ -117,6 +121,7 @@ private:
 	bool m_listening;
 
 private:
+	ItemJobTask* m_task_ptr = nullptr;
 	static std::vector<WndTask*> ms_wndtasks;
 };
 
@@ -127,7 +132,8 @@ Q_OBJECT
 public:
 	ButtonMenu( const QString & i_file, const QString & i_wdir,
 			const std::map<std::string,std::string> i_env,
-			QWidget * i_parent);
+			QWidget * i_parent,
+			ItemJobTask* task_ptr =  nullptr);
 
 public slots:
 	void pushed_slot();
@@ -142,5 +148,8 @@ private:
 	std::map<std::string,std::string> m_env;
 	QStringList m_labels;
 	QStringList m_cmds;
+	ItemJobTask* m_task_ptr;
+	cn::TaskInfo m_task_info;
+
 };
 

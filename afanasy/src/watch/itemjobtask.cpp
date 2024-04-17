@@ -228,14 +228,14 @@ void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 
 		if (taskprogress.state & AFJOB::STATE_SKIPPED_MASK)
 			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_taskskipped.c, Qt::SolidPattern));
-		else if (taskprogress.state & AFJOB::STATE_WARNING_MASK)
-			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_itemjobwarning.c, Qt::SolidPattern));
-		else if (taskprogress.state & AFJOB::STATE_DONE_MASK)
-			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_done.c, Qt::SolidPattern));
 		else if (taskprogress.state & AFJOB::STATE_ERROR_READY_MASK)
 			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_errorready.c, Qt::SolidPattern));
 		else if (taskprogress.state & AFJOB::STATE_ERROR_MASK)
 			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_error.c, Qt::SolidPattern));
+		else if (taskprogress.state & AFJOB::STATE_WARNING_MASK)
+			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_itemjobwarning.c, Qt::SolidPattern));
+		else if (taskprogress.state & AFJOB::STATE_DONE_MASK)
+			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_done.c, Qt::SolidPattern));
 		else if (taskprogress.state & AFJOB::STATE_WAITRECONNECT_MASK)
 			i_painter->setBrush(QBrush(afqt::QEnvironment::clr_taskwaitreconn.c, Qt::SolidPattern));
 		else if (taskprogress.state & AFJOB::STATE_TRYTHISTASKNEXT_MASK)
