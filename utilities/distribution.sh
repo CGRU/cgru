@@ -76,6 +76,8 @@ export ARCHITECTURE=`uname -m`
 function debianArch(){
 	if [ "${ARCHITECTURE}" == "x86_64" ]; then
 		export ARCHITECTURE="amd64"
+	elif [ "${ARCHITECTURE}" == "aarch64" ]; then
+		export ARCHITECTURE="arm64"
 	else
 		export ARCHITECTURE="i386"
 	fi

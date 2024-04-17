@@ -33,6 +33,8 @@ public:
 private:
 #if defined(MACOSX)
 	void *m_id;
+#elif defined(__aarch64__)
+	unsigned long m_id;
 #else
 	unsigned m_id;
 #endif
