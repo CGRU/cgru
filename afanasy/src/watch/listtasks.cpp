@@ -334,10 +334,17 @@ void ListTasks::generateMenu(QMenu &o_menu, Item * i_item)
 			connect( action, SIGNAL( triggered() ), this, SLOT( actTasksRestart() ));
 			o_menu.addAction( action);
 
+			if (itemTask->taskprogress.state & (AFJOB::STATE_READY_MASK | AFJOB::STATE_RUNNING_MASK | AFJOB::STATE_SKIPPED_MASK))
+			{
+				action = new QAction("Suspend Tasks", this);
+				connect(action, SIGNAL(triggered()), this, SLOT(actTasksSuspend()));
+				o_menu.addAction(action);
+			}
+
 			if (itemTask->taskprogress.state & AFJOB::STATE_SUSPENDED_MASK)
 			{
 				action = new QAction("Continue Tasks", this);
-				connect(action, SIGNAL(triggered() ), this, SLOT(actTasksContinue()));
+				connect(action, SIGNAL(triggered()), this, SLOT(actTasksContinue()));
 				o_menu.addAction(action);
 			}
 
@@ -684,6 +691,7 @@ void ListTasks::actTaskOpen()
 void ListTasks::actTasksSkip()   {tasksOperation("skip");   }
 void ListTasks::actTasksDone()   {tasksOperation("done");   }
 void ListTasks::actTasksRestart(){tasksOperation("restart");}
+void ListTasks::actTasksSuspend(){tasksOperation("suspend");}
 void ListTasks::actTasksContinue(){tasksOperation("continue");}
 void ListTasks::actTaskTryNext() {tasksOperation("trynext","append");}
 void ListTasks::actTaskDoNotTry(){tasksOperation("trynext","remove");}

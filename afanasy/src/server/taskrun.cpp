@@ -74,9 +74,10 @@ TaskRun::~TaskRun()
 {
 AFINFA("TaskRun:: ~ TaskRun: %s[%d][%d]:", m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum(), m_tasknum)
 
-   if( m_progress->state & AFJOB::STATE_DONE_MASK    ) return;
-   if( m_progress->state & AFJOB::STATE_ERROR_MASK   ) return;
-   if( m_progress->state & AFJOB::STATE_SKIPPED_MASK ) return;
+	if( m_progress->state & AFJOB::STATE_DONE_MASK     ) return;
+	if( m_progress->state & AFJOB::STATE_ERROR_MASK    ) return;
+	if( m_progress->state & AFJOB::STATE_SKIPPED_MASK  ) return;
+	if( m_progress->state & AFJOB::STATE_SUSPENDED_MASK) return;
 
    m_progress->state = AFJOB::STATE_READY_MASK;
 }
@@ -307,7 +308,10 @@ void TaskRun::stop(const std::string & message, RenderContainer * renders, Monit
    }
 
 	if (i_state)
+	{
+		// Set new task state if provided (non zero)
 		m_progress->state |= i_state;
+	}
 
    m_stopTime = time( NULL);
 
@@ -353,21 +357,7 @@ void TaskRun::finish( const std::string & message, RenderContainer * renders, Mo
    m_task->v_appendLog( message);
    m_zombie = true;
 }
-/*
-replaced by stop()
-void TaskRun::restart(const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring)
-{
-	if (m_zombie) return;
-	stop(i_message + " Is running.", i_renders, i_monitoring);
-}
 
-void TaskRun::skip(const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state)
-{
-   if (m_zombie) return;
-   m_progress->state |= i_state;
-   stop(i_message + " Is running.", i_renders, i_monitoring);
-}
-*/
 int TaskRun::v_getRunningRenderID( std::string & o_error) const
 {
 	if( NULL == m_exec)

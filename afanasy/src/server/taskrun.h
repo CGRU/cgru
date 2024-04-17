@@ -40,14 +40,7 @@ public:
 
 /// Do some work every period of time. Return true if there are some changes for database and monitoring.
    virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId);
-/*
-replaced by stop()
-/// Restrart running task, it generate 'stop' message to remote host and send it (do nothing if it is already a zombie).
-	void restart(const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring);
 
-/// Same as 'restart' function but with switch to given i_state.
-	void skip(const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state);
-*/
 /// Return running render id:
 	virtual int v_getRunningRenderID( std::string & o_error) const;
 

@@ -262,60 +262,7 @@ void Task::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCont
    
    deleteRunningZombie();
 }
-/*
-void Task::restart( const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state)
-{
-	if( i_state != 0 )
-	{
-		// If request is to restart done tasks, we shoud skip skipped tasks
-		// which are always done too
-		if(( i_state == AFJOB::STATE_DONE_MASK ) && ( m_progress->state & AFJOB::STATE_SKIPPED_MASK ))
-			return;
 
-		if(( m_progress->state & i_state ) == 0 )
-			return;
-	}
-
-	if( m_run )
-	{
-		m_run->stop( i_message, i_renders, i_monitoring);
-		return;
-	}
-
-	m_progress->state = AFJOB::STATE_READY_MASK;
-	m_progress->errors_count = 0;
-	v_store();
-	v_monitor( i_monitoring);
-	v_appendLog( i_message);
-}
-
-void Task::skip(const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state)
-{
-	if (m_progress->state & AFJOB::STATE_DONE_MASK)
-		return;
-
-	if (i_state == AFJOB::STATE_READY_MASK)
-	{
-		// This is a request to continue task.
-		if (!(m_progress->state & AFJOB::STATE_SUSPENDED_MASK))
-		{
-			// We should continue only suspended tasks.
-			return;
-		}
-	}
-
-	if (m_run)
-		m_run->stop(i_message, i_renders, i_monitoring, i_state);
-	else
-	{
-		m_progress->state = i_state;
-		m_progress->errors_count = 0;
-		v_store();
-		v_monitor(i_monitoring);
-		v_appendLog(i_message);
-	}
-}
-*/
 void Task::operation(const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_with_state, uint32_t i_set_state)
 {
 	if (i_with_state != 0 )

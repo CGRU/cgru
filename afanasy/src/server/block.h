@@ -104,7 +104,7 @@ private:
 
 	bool editTickets(Action & i_action, const JSON & operation);
 
-	void tasksOperation(bool i_skip, const std::string & i_message, const Action & i_action, const JSON & i_operation, uint32_t i_with_state, uint32_t i_set_state);
+	void tasksOperation(const std::string & i_message, const Action & i_action, const JSON & i_operation, uint32_t i_with_state, uint32_t i_set_state);
 
 	bool tryTasksNext(Action & i_action, const JSON & i_operation);
 
