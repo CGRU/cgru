@@ -101,7 +101,7 @@ Gizmo {
 	singlejob       1
 
 	tmpscene        1
-	tickets_use     0
+	tickets_use     1
 	tickets_data    NUKE:1,NET:100
 	pools_use       0
 	pools_data      farm:10,work:-10,comp:10,sim:-10

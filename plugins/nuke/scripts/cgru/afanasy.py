@@ -333,6 +333,34 @@ class BlockParameters:
         self.dependmask = ''
         self.tasksdependmask = ''
 
+    def cinergy_block_environs(self,block):
+        cinergy=None
+        assetids=''
+        try:
+            import pipeline
+        except:
+            pass
+        try:
+            import cinergy
+        except:
+            pass
+        if cinergy !=None:
+            asset_ids = cinergy.scan_asset_ids(nuke.allNodes())
+            for a in asset_ids:
+                assetids+=str(a)+'|'
+            if assetids.endswith('|'):
+                assetids=assetids[:-1]
+            block.setEnv('CNM_ASSETS_IDS',assetids)
+
+        if pipeline is not None:
+            context_file=nuke.root().name()
+            block.setEnv('CNM_CONTEXT_FILE',context_file)
+            context = pipeline.get_context(filename=context_file)
+            for k in context.keys():
+                block.setEnv('CNM_'+k.upper(),str(context[k]))
+        return block
+
+
     def addTasksDependMask(self, mask):
         if self.tasksdependmask == '':
             self.tasksdependmask = mask
@@ -379,6 +407,9 @@ class BlockParameters:
                     block.addTicket(ticket[0], int(ticket[1]))
 
             cmd = os.getenv('NUKE_AF_RENDER', 'nuke')
+
+            cmd += ' --version={0}'.format(nuke.NUKE_VERSION_STRING)
+
             if self.tmpimage or self.pathsmap:
                 cgru_location = os.getenv('CGRU_LOCATION')
                 if cgru_location is None:
@@ -402,7 +433,7 @@ class BlockParameters:
                     if not self.pathsmap:
                         cmd += ' --nopathsmap'
 
-            cmd += ' -X %s -F @#@-@#@x%d -x \"%s\"' % \
+            cmd += ' -X %s -F@#@-@#@x%d -x \"%s\"' % \
                    (self.writename, self.frameinc, i_scene_path)
 
             block.setCommand(cmd)
@@ -447,6 +478,7 @@ class BlockParameters:
                 self.hostsmaskexclude = str(self.hostsmaskexclude)
                 if self.hostsmaskexclude != '':
                     block.setHostsMaskExclude(self.hostsmaskexclude)
+        self.cinergy_block_environs(block=block)
 
         return block
 
@@ -718,7 +750,7 @@ class JobParameters:
         f_output = None
         for block in blocks:
             if 'files' in block.data and len(block.data['files']):
-                f_output = os.path.abspath(block.data['files'][0])
+                f_output = block.data['files'][0]
                 break
         if f_output is not None:
             job.setFolder('output', os.path.dirname( f_output))

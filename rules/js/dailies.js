@@ -1053,10 +1053,11 @@ var d_cutparams = {
 	af_pertask    : {"label": 'Frames Per Task', 'width': '25%', 'lwidth': '140px'},
 	af_maxtasks   : {"label": 'Max Run Tasks', 'width': '25%', 'lwidth': '120px'},
 	af_perhost    : {"label": 'Per Host', 'width': '25%', 'lwidth': '140px'},
-	af_capacity   : {"label": 'Capacity', 'width': '25%'},
-	af_maxruntime : {"label": 'Max Run Time', 'width': '25%', 'lwidth': '140px'},
-	skipnosrc     : {"label": 'Skip No Src', 'width': '25%', 'lwidth': '120px', 'type':'bool', default: false},
-	flipversion   : {"label": 'Flip Version', 'width': '25%', 'lwidth': '140px', 'type':'bool', default: false},
+	af_capacity   : {"label": 'Capacity', 'width': '20%'},
+	af_maxruntime : {"label": 'Max Run Time', 'width': '20%', 'lwidth': '140px'},
+	skipnosrc     : {"label": 'Skip No Src', 'width': '20%', 'lwidth': '120px', 'type':'bool', default: false},
+	getcomments   : {"label": 'Get Comments', 'width': '20%', 'lwidth': '140px', 'type':'bool', default: false},
+	flipversion   : {"label": 'Flip Version', 'width': '20%', 'lwidth': '140px', 'type':'bool', default: false},
 	output        : {}
 };
 
@@ -1164,6 +1165,9 @@ function d_CutProcessGUI(i_wnd, i_test)
 	cmd += ' -r "' + params.format + '"';
 	cmd += ' -c "' + params.codec + '"';
 	cmd += ' --colorspace "' + params.colorspace + '"';
+
+	if (params.getcomments)
+		cmd += ' --getcomments';
 
 	if (params.skipnosrc)
 		cmd += ' --skipnosrc'
