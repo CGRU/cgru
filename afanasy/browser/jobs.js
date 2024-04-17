@@ -27,7 +27,7 @@ var Block_ProgressBarHeight = 10;
 
 var BarDONrgb = '#363';
 var BarSKPrgb = '#444';
-var BarDWRrgb = '#292';
+var BarDWRrgb = '#2C2';
 var BarSUSrgb = '#AA1';
 var BarWDPrgb = '#A2A';
 var BarRUNrgb = '#FF0';
