@@ -262,7 +262,7 @@ void Task::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCont
    
    deleteRunningZombie();
 }
-
+/*
 void Task::restart( const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state)
 {
 	if( i_state != 0 )
@@ -315,7 +315,7 @@ void Task::skip(const std::string & i_message, RenderContainer * i_renders, Moni
 		v_appendLog(i_message);
 	}
 }
-
+*/
 void Task::operation(const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_with_state, uint32_t i_set_state)
 {
 	if (i_with_state != 0 )
