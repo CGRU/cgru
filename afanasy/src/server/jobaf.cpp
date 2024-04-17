@@ -1318,14 +1318,14 @@ void JobAf::emitEvents(const std::vector<std::string> & i_events) const
 		m_user_name, m_name, i_events[0]);
 }
 
-void JobAf::restartAllTasks( const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state)
+void JobAf::restartAllTasks(const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_with_state)
 {
 	for( int b = 0; b < m_blocks_num; b++)
 	{
 		int numtasks = m_blocks_data[b]->getTasksNum();
 		for( int t = 0; t < numtasks; t++)
 		{
-			m_blocks[b]->m_tasks[t]->restart( i_message, i_renders, i_monitoring, i_state);
+			m_blocks[b]->m_tasks[t]->operation(i_message, i_renders, i_monitoring, i_with_state, AFJOB::STATE_READY_MASK);
 		}
 	}
 

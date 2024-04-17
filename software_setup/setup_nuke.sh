@@ -48,6 +48,17 @@ if [ -z "$NUKE_EXEC" ]; then
 	NUKE_EXEC="${NUKE_LOCATION}/${NUKE_EXEC}"
 fi
 
+export APP_DIR=$NUKE_LOCATION
+export APP_EXE=$NUKE_EXEC
+
+#override nuke location based on locate_nuke.sh
+locate_nuke="$CGRU_LOCATION/software_setup/locate_nuke.sh"
+[ -f "$locate_nuke" ] && source "$locate_nuke"
+echo "NUKE = '${APP_EXE}'"
+
+export NUKE_LOCATION="$APP_DIR"
+export NUKE_EXEC="$APP_EXE"
+
 # Check that Nuke is correctly found:
 if [ -z "$NUKE_LOCATION" ]; then
 	echo "Can't find Nuke in $NUKE_INSTALL_DIR"
@@ -86,12 +97,3 @@ export CGRU_DAILIES_LINE169="200,200,200"
 export CGRU_DAILIES_LINE235="200,200,200"
 export CGRU_DAILIES_NAMING="(s)_(v)_(d)"
 
-
-export APP_DIR=$NUKE_LOCATION
-export APP_EXE=$NUKE_EXEC
-
-#override nuke location based on locate_nuke.sh
-locate_nuke="$CGRU_LOCATION/software_setup/locate_nuke.sh"
-[ -f $locate_nuke ] && source $locate_nuke
-
-echo "NUKE = '${APP_EXE}'"

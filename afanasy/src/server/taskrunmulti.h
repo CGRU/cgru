@@ -40,12 +40,12 @@ public:
 
 	virtual void stdOut( bool full = false) const;
 
-protected:
-
 /// Stop runnig task. Request from remote render host to stop it. Host will send message with new status back to finish session.
 /** Stop slave hosts if they run any service.
 **/
-	virtual void stop(    const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
+	virtual void stop(const std::string & message, RenderContainer * renders, MonitorContainer * monitoring, uint32_t i_state = 0);
+
+protected:
 
 /// Catch master task finishing session. Launch multi host task stopping.
 	virtual void finish(  const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);

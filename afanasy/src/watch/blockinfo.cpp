@@ -791,7 +791,7 @@ void BlockInfo::drawProgress(
 			i_painter->setBrush( QBrush( afqt::QEnvironment::clr_taskskipped.c, Qt::SolidPattern ));
 			i_painter->drawRect( x, posy, w+offset, height);
 			break;
-		case 'N': // STATE_RUNNING_MASK_MASK | STATE_WARNING_MASK
+		case 'N': // STATE_RUNNING_MASK | STATE_WARNING_MASK
 			i_painter->setBrush( QBrush( afqt::QEnvironment::clr_taskwarningrun.c, Qt::SolidPattern ));
 			i_painter->drawRect( x, posy, w+offset, height);
 			break;
@@ -819,7 +819,8 @@ void BlockInfo::generateMenu(QMenu * i_menu, QMenu * i_params_submenu) const
 		"restart_errors",    "Restart Errors",
 		"restart_running",   "Restart Running",
 		"restart_skipped",   "Restart Skipped",
-		"restart_done",      "Restart Done"};
+		"restart_done",      "Restart Done",
+		"continue",          "Continue Suspended"};
 
 	for (int i = 0; i < operations.size(); i+=2)
 	{

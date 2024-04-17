@@ -168,7 +168,7 @@ private:
 	void checkDepends();
 	
 	/// Restart tasks, can restart only matching state mask.
-	void restartAllTasks( const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state = 0);
+	void restartAllTasks( const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_with_state = 0);
 
 	bool checkTryTasksNext();
 	void resetTryTasksNext();

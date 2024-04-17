@@ -364,7 +364,7 @@ bool TaskRunMulti::refresh( time_t currentTime, RenderContainer * renders, Monit
 	return changed;
 }
 
-void TaskRunMulti::stop( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
+void TaskRunMulti::stop(const std::string & message, RenderContainer * renders, MonitorContainer * monitoring, uint32_t i_state)
 {
 //printf("TaskRunMulti::stop: %s[%d][%d]\n\t%s\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum, message.toUtf8().data());
 
@@ -414,7 +414,7 @@ void TaskRunMulti::stop( const std::string & message, RenderContainer * renders,
 	if( m_master_running)
 	{
 		// Stop master if it is running
-		TaskRun::stop( "Stopping running master.", renders, monitoring);
+		TaskRun::stop( "Stopping running master.", renders, monitoring, i_state);
 	}
 	else if( m_execs.size() == 0)
 	{
