@@ -94,6 +94,7 @@ AttrColor QEnvironment::clr_itemjobdone(     "clr_itemjobdone",      "Done Job",
 AttrColor QEnvironment::clr_itemjoberror(    "clr_itemjoberror",     "Job With Error(s)",       AFGUI::CLR_ITEMJOBERROR        );
 AttrColor QEnvironment::clr_itemjobwarning(  "clr_itemjobwarning",   "Job Warning",             AFGUI::CLR_ITEMJOBWARNING      );
 AttrColor QEnvironment::clr_taskwarningrun(  "clr_taskwarningrun",   "Warning Run Task",        AFGUI::CLR_TASKWARNINGRUN      );
+AttrColor QEnvironment::clr_taskwarningdone( "clr_taskwarningdone",  "Warning Done Task",       AFGUI::CLR_TASKWARNINGDONE     );
 AttrColor QEnvironment::clr_taskskipped(     "clr_taskskipped",      "Skipped Task",            AFGUI::CLR_TASKSKIPPED         );
 AttrColor QEnvironment::clr_taskwaitreconn(  "clr_taskwaitreconn",   "Waiting Reconnect Task",  AFGUI::CLR_TASKWAITRECONN      );
 AttrColor QEnvironment::clr_tasktrynext(     "clr_tasktrynext",      "Trying This Task Next",   AFGUI::CLR_TASKTRYNEXT         );

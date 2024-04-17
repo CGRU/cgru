@@ -796,7 +796,7 @@ void BlockInfo::drawProgress(
 			i_painter->drawRect( x, posy, w+offset, height);
 			break;
 		case 'G': // STATE_DONE_MASK | STATE_WARNING_MASK
-			i_painter->setBrush( QBrush( afqt::QEnvironment::clr_itemjobwarning.c, Qt::SolidPattern ));
+			i_painter->setBrush( QBrush( afqt::QEnvironment::clr_taskwarningdone.c, Qt::SolidPattern ));
 			i_painter->drawRect( x, posy, w+offset, height);
 			break;
 		case 'U': // STATE_SUSPENDED_MASK | STATE_WAITDEP_MASK
