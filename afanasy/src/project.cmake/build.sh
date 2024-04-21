@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Get sources folder:
 pushd .. > /dev/null
@@ -98,6 +98,9 @@ case ${DISTRIBUTIVE} in
         ;;
     MacOSX)
         export AF_QT_VER="5"
+        ;;
+    FreeBSD)
+        export AF_ADD_LFLAGS="$AF_ADD_LFLAGS -lpthread"
         ;;
     *)
         echo "Warning: Untested system: '${DISTRIBUTIVE}'"

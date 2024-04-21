@@ -1175,7 +1175,7 @@ printf("%s - refresh.\n", name().c_str());
 	{
 		_tasks_error += m_blocks[b]->m_data->getProgressTasksError();
 
-		if (m_blocks[b]->m_data->getState() && AFJOB::STATE_READY_MASK)
+		if (m_blocks[b]->m_data->getState() & AFJOB::STATE_READY_MASK)
 			_tasks_ready += m_blocks[b]->m_data->getProgressTasksReady();
 	}
 	// Compare changes
