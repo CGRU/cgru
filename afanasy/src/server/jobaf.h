@@ -120,6 +120,9 @@ public:
 
 	inline Block * getBlock(int i_num) {if ((i_num < 0) || (i_num >= m_blocks_num)) return NULL; return m_blocks[i_num];}
 
+	/// Force refresh, that can be skipped on DONE job.
+	inline void forceRefresh() {m_force_refresh = true;}
+
 public:
 	/// Set Jobs Container.
 	inline static void setJobContainer( JobContainer *Jobs){ ms_jobs = Jobs;}
@@ -140,6 +143,8 @@ protected:
 
 private:
 	bool m_deletion; ///< Whether the job is deleting.
+
+	bool m_force_refresh;
 
 	BranchSrv * m_branch_srv;
 

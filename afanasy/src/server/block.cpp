@@ -716,6 +716,8 @@ void Block::tasksOperation(const std::string & i_message, const Action & i_actio
 		}
 
 		m_tasks[t]->operation(i_message, i_action.renders, i_action.monitors, i_with_state, i_set_state);
+
+		m_job->forceRefresh();
 	}
 }
 

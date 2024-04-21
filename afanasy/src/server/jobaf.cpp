@@ -124,6 +124,8 @@ void JobAf::readStore()
 
 void JobAf::initializeValues()
 {
+	m_force_refresh    = true;
+
 	m_branch_srv       = NULL;
 	m_user             = NULL;
 	m_blocks           = NULL;
@@ -519,6 +521,7 @@ void JobAf::v_action( Action & i_action)
 		if (job_changed)
 		{
 			i_action.monitors->addJobEvent( af::Monitor::EVT_jobs_change, getId(), getUid());
+			m_force_refresh = true;
 			store();
 		}
 
@@ -610,6 +613,7 @@ void JobAf::v_action( Action & i_action)
 		}
 		appendLog("Operation \"" + type + "\" by " + i_action.author);
 		i_action.monitors->addJobEvent( af::Monitor::EVT_jobs_change, getId(), getUid());
+		m_force_refresh = true;
 		store();
 		return;
 	}
@@ -672,6 +676,7 @@ void JobAf::v_action( Action & i_action)
 	{
 		// Not empty log means some parameter change:
 		store();
+		m_force_refresh = true;
 		i_action.monitors->addJobEvent( af::Monitor::EVT_jobs_change, getId(), getUid());
 	}
 }
@@ -1117,7 +1122,13 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 	// No more calculations needed for a locked job:
 	if (isLocked())
 		return;
-	
+
+	// Skip DONE job refresh if it is not forced:
+	if (isDone() && (false == m_force_refresh))
+		return;
+
+printf("%s - refresh.\n", name().c_str());
+
 	// for database and monitoring
 	uint32_t old_state = m_state;
 	uint32_t jobchanged = 0;
@@ -1287,6 +1298,9 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 	}
 	
 	if(( monitoring ) &&  ( jobchanged )) monitoring->addJobEvent( jobchanged, getId(), getUid());
+
+	if (isDone())
+		m_force_refresh = false;
 }
 
 void JobAf::emitEvents(const std::vector<std::string> & i_events) const
