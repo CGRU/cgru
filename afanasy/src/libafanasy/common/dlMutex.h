@@ -44,7 +44,7 @@ private:
 #else
 	unsigned m_data[6];
 #endif
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(BSD)
 #if defined(__x86_64__) || defined(__powerpc64__)
 	unsigned m_data[10];
 #elif defined(__aarch64__)

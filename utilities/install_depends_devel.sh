@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Detect Linux distrubution:
 source ./distribution.sh
@@ -131,6 +131,19 @@ function archArch(){
 	pkg_extension=""
 }
 
+# Packages for Arch Linux distributions:
+function bsdArch(){
+	packages="$packages neovim"
+	packages="$packages py39-cython-devel"
+	packages="$packages postgresql-libpqxx"
+	packages="$packages devel/qt6"
+	packages="$packages py39-pyside6-6.6.2"
+	#packages="$packages libsysinfo"
+
+	pkg_manager_cmd="pkg install"
+	pkg_extension=""
+}
+
 # Packages for MacOSX
 function macosxArch(){
 	packages="yasm"
@@ -176,6 +189,9 @@ case ${DISTRIBUTIVE} in
 		;;
 	MacOSX)
 		macosxArch
+		;;
+	FreeBSD)
+		bsdArch
 		;;
 	*)
 		redhatArch

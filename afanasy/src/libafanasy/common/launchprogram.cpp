@@ -445,6 +445,8 @@ int LaunchProgramV(
 			if( i_environ )
 #ifdef MACOSX
 				err = execve( i_program, const_cast<char*const*>(Args), i_environ);
+#elif defined BSD // TODO: BSD environment support
+				err = execvp(  i_program, const_cast<char*const*>(Args));
 #else
 				err = execvpe( i_program, const_cast<char*const*>(Args), i_environ);
 #endif
