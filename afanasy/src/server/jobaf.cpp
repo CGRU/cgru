@@ -1127,8 +1127,6 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 	if (isDone() && (false == m_force_refresh))
 		return;
 
-printf("%s - refresh.\n", name().c_str());
-
 	// for database and monitoring
 	uint32_t old_state = m_state;
 	uint32_t jobchanged = 0;
