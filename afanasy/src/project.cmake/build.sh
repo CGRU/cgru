@@ -42,6 +42,7 @@ export AF_ADD_CFLAGS="$AF_ADD_CFLAGS -std=c++17"
 if [ "${warn}" == "YES" ]; then
 	export AF_ADD_CFLAGS="-Waddress -Wbool-compare -Wbool-operation -Wcatch-value -Wformat -Wformat-overflow -Wformat-truncation -Wint-in-bool-context -Winit-self -Wlogical-not-parentheses -Wmaybe-uninitialized -Wmemset-elt-size -Wmemset-transposed-args -Wmisleading-indentation -Wmissing-attributes -Wnarrowing -Wpessimizing-move -Wrestrict -Wreturn-type -Wsequence-point -Wsizeof-pointer-div -Wsizeof-pointer-memaccess -Wstrict-aliasing -Wstrict-overflow=1 -Wswitch -Wtautological-compare -Wtrigraphs -Wuninitialized -Wunknown-pragmas -Wunused-function -Wvolatile-register-var -Wcast-function-type -Wempty-body -Wmissing-field-initializers -Wredundant-move -Wtype-limits -Wuninitialized -Wdangling-else -Wenum-compare -Winline"
 	export AF_ADD_CFLAGS="${AF_ADD_CFLAGS} -Wignored-qualifiers"
+	export AF_ADD_CFLAGS="${AF_ADD_CFLAGS} -Wsuggest-override"
 	#export AF_ADD_CFLAGS="${AF_ADD_CFLAGS} -Wconversion"
 fi
 export AF_ADD_CFLAGS="${AF_ADD_CFLAGS}${debug}"
