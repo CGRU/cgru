@@ -59,7 +59,7 @@ Solver::Solver(
 
 Solver::~Solver(){}
 
-struct MostReadyRender : public std::binary_function <RenderAf*,RenderAf*,bool>
+struct MostReadyRender
 {
 	const AfNodeSolve * m_node;
 	MostReadyRender(const AfNodeSolve * i_node) {m_node = i_node;}
@@ -99,7 +99,7 @@ struct MostReadyRender : public std::binary_function <RenderAf*,RenderAf*,bool>
 };
 
 // Functor for sorting algorithm
-struct GreaterNeed : public std::binary_function<AfNodeSolve*,AfNodeSolve*,bool>
+struct GreaterNeed
 {
 	inline bool operator()(const AfNodeSolve * a, const AfNodeSolve * b)
 	{
@@ -108,7 +108,7 @@ struct GreaterNeed : public std::binary_function<AfNodeSolve*,AfNodeSolve*,bool>
 };
 
 // Other functor for an alternative sorting algorithm
-struct GreaterPriorityThenOlderCreation : public std::binary_function<AfNodeSolve*,AfNodeSolve*,bool>
+struct GreaterPriorityThenOlderCreation
 {
 	inline bool operator()(const AfNodeSolve * a, const AfNodeSolve * b)
 	{
