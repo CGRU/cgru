@@ -134,6 +134,7 @@ function archArch(){
 # Packages for Arch Linux distributions:
 function bsdArch(){
 	packages="$packages neovim"
+	packages="$packages lang/python"
 	packages="$packages py39-cython-devel"
 	packages="$packages postgresql-libpqxx"
 	packages="$packages devel/qt6"
