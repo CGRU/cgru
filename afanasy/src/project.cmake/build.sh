@@ -36,7 +36,7 @@ export AF_POSTGRESQL=$sql
 export AF_GUI=$gui
 export AF_FERMER=$fermer
 export AF_QT_VER="5"
-export AF_ADD_CFLAGS="$AF_ADD_CFLAGS -std=c++17"
+#export AF_ADD_CFLAGS="$AF_ADD_CFLAGS -std=c++17"
 
 # Configure building
 if [ "${warn}" == "YES" ]; then
