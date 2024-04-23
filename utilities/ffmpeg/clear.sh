@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 rm -rvf faac* lame* libogg* libtheora* libvorbis* nasm* yasm*
 rm -rvf x264

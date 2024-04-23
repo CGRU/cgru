@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ver=4.8.5
 [ -z "$1" ] || ver=$1

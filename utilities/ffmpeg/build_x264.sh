@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 nasm_ver=2.13.01
 nasm_folder=$PWD/nasm-$nasm_ver

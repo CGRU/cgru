@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Source general for all soft directives:
 source "$CGRU_LOCATION/software_setup/setup__all.sh"

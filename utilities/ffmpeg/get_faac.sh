@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ver="1.28"
 arch="faac-$ver.tar.bz2"

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 yasm="${PWD}/yasm"
 faac="${PWD}/faac"

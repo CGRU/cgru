@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ -z "$CGRU_LOCATION" ]; then
    if [ -L "$0" ]; then

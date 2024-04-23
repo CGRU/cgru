@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ver=1.4.10
 location="http://rubyforge.org/frs/download.php/53915"

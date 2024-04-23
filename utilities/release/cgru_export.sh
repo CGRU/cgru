@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 dest="/media/sf_cgru/utilities/release/archives/linux"
 

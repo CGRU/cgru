@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 CMD="python ${CGRU_LOCATION}/afanasy/python/afjob.py"
 

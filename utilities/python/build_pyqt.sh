@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 pyqt="PyQt*"
 sip="$PWD/sip"

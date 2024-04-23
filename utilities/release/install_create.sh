@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 output="$1"
 install_cgru="install_cgru.sh"

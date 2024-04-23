@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 icons="keeper regexp dailies scanscan afanasy afwatch"
 size="128"

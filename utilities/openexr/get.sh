@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 packages="ilmbase-2.2.0 openexr-2.2.0"
 location="http://download.savannah.nongnu.org/releases/openexr"

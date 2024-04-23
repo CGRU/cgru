@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Name=Submit Job...
 # Icon=afanasy.png
 

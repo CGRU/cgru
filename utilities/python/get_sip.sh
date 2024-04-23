@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ver=4.14.6
 location="http://sourceforge.net/projects/pyqt/files/sip"

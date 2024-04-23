@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ -z "${CGRU_PYTHONEXE}" ]; then
    export CGRU_PYTHONEXE="python2"

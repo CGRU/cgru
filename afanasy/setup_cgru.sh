@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script tries to setup CGRU, if was not.
 # It searches "setup.sh" in upper folders and sources it.

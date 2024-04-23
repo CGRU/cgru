@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Name=Open CGRU Folder
 
 source "`dirname "$0"`/_setup.sh"

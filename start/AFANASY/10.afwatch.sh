@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Name=Start Watch...
 # Icon=afwatch.png
 # Separator

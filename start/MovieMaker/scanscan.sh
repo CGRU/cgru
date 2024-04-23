@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Name=Scan Scan...
 # Icon=scanscan.png
 source "`dirname "$0"`/_setup.sh"

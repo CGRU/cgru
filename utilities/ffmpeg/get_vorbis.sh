@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ver="1.3.3"
 arch="libogg-$ver.tar.gz"

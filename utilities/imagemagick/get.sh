@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 package="ImageMagick"
 location="https://download.imagemagick.org/ImageMagick/download"

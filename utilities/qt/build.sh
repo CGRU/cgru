@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ver=4.8.4
 qtsrc=qt-everywhere-opensource-src-$ver

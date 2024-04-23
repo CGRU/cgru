@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 export UNIXTYPE="MACOSX"
 export MXX_RU_CPP_TOOLSET=gcc_darwin

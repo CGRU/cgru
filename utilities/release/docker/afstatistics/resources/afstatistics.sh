@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
 while /opt/cgru/afanasy/bin/afcmd db_check 2>&1 | grep -q "NOT WORKING"

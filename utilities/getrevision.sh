@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #echo PWD=$PWD
 #echo prog=$0

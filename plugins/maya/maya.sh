@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # CGRU add-ons for Maya location, override it, or simple launch from current folder as an example
 export MAYA_CGRU_LOCATION=$PWD

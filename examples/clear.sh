@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script clears CGRU Examples, delete rendered images and temporary scenes:
 

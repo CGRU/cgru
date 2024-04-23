@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ver=4.10.1
 location="http://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-$ver"

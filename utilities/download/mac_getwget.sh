@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 archive="wget-latest.tar.gz"
 

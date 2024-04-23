@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Name=Dailies...
 # Icon=dailies.png
 source "`dirname "$0"`/_setup.sh"

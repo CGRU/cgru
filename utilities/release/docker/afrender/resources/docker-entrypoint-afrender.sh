@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -eo pipefail
 
 while ! ping -c 1 $AF_SERVERNAME 2> /dev/null

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ -z $CGRU_LOCATION ] ; then
    pushd `dirname $0`/.. >> /dev/null

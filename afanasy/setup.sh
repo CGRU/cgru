@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Set Afanasy root:
 export AF_ROOT=$PWD

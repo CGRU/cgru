@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 for folder in `ls`; do
    [ ! -d $folder ] && continue

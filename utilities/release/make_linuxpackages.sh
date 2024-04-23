@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 for arg in "$@"; do
 	 if [ $arg == "--skipcheck" ]; then

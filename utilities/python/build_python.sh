@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 pythonver=$1
 [ -z "$pythonver" ] && pythonver=3.3.2
