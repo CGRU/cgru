@@ -101,7 +101,10 @@ def serve( i_port):
     if httpd is None:
         return None
 
-    httpd.socket = ssl.wrap_socket (httpd.socket, certfile=certificate, server_side=True)
+    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    ssl_context.load_cert_chain(certificate)
+    httpd.socket = ssl_context.wrap_socket(httpd.socket, server_side=True)
+
     thread = threading.Thread(target = httpd.serve_forever)
     thread.daemon = True
     thread.start()
