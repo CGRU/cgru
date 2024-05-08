@@ -658,7 +658,8 @@ else:
 
 if Audio is not None and EncType == 'ffmpeg':
 	inputmask += '"'
-	inputmask += ' -itsoffset %.3f' % ( 1.0 / float(Options.fps))
+    if Options.slate is not None:
+	    inputmask += ' -itsoffset %.3f' % ( 1.0 / float(Options.fps))
 	inputmask += ' -i "%s"' % Audio
 	inputmask += ' -af apad -shortest'
 	inputmask += ' -acodec "%s' % Options.acodec
