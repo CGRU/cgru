@@ -205,8 +205,10 @@ class Status:
     def setTask(self, name=None, tags=None, artists=None, flags=None, progress=None, annotation=None, deleted=None, out=None):
 
         task = self.findTask(name, tags)
+        new_task = False
 
         if task is None:
+            new_task = True
             # Create a new task:
             task = dict()
             if tags is None or not type(tags) is list or len(tags) == 0:
@@ -248,6 +250,7 @@ class Status:
             task['deleted'] = True
         elif 'deleted' in task:
             del task['deleted']
+            new_task = True
 
         if progress is not None and type(progress) is int:
             if progress < -1: progress = -1
@@ -272,7 +275,7 @@ class Status:
                 if p_max is not None and progress > p_max: progress = p_max
 
         # Set task progress if it changes:
-        if not 'progress' in task or task['progress'] != progress:
+        if not 'progress' in task or task['progress'] != progress or new_task:
             task['progress'] = progress
 
             # Calculate status progress - tasks progress average
