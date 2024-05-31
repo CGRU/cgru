@@ -115,8 +115,12 @@ class Status:
         self.setItems('tags',    items_keep=tags_keep,    items_add=tags)
         self.setItems('artists', items_keep=artists_keep, items_add=artists)
 
+        # OLD WAY:
         # If shot progress is 100% all tasks should be 100% done.
-        if self.data.get('progress') == 100 and 'tasks' in self.data:
+        # if self.data.get('progress') == 100 and 'tasks' in self.data:
+        # NEW WAY:
+        # If shot shot is DONE, all tasks should be DONE
+        if 'flags' in self.data and 'done' in self.data['flags'] and 'tasks' in self.data:
             for t in self.data['tasks']:
                 task = self.data['tasks'][t]
                 if task.get('progress') != 100:
