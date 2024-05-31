@@ -63,6 +63,7 @@
 	"textur"  :{"title":"Textur",   "short":"Tx",  "tip":"Texturing"},
 	"track"   :{"title":"Track",    "short":"Tr",  "koeff":0.1, "tip":"Tracking"},
 	"cbb"     :{"title":"CBB",      "short":"CBB", "tip":"Could be better"},
+	"draft"   :{"title":"Draft",    "short":"DRF", "koeff":0.1, "tip":"Draft"},
 
 
 	"other"   :{"title":"Other",    "short":"Ot",  "tip":"Something else",
