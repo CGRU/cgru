@@ -628,6 +628,7 @@ function g_GroupCreate(i_elFolders, i_elParent, i_elPrevFolder, i_prefix)
 	let elGroup = document.createElement('div');
 	elGroup.classList.add('group');
 	elGroup.m_elFolders = [];
+	elGroup.m_name = i_prefix;
 	elGroup.m_hidden_folders = false;
 
 	i_elParent.m_elFBody.insertBefore(elGroup, i_elPrevFolder);
@@ -677,12 +678,7 @@ function g_GroupHideFolders(i_elGroup)
 	if (true == i_elGroup.m_hidden_folders)
 		return;
 
-	for (let i = 0; i < i_elGroup.m_elFolders.length; i++)
-	{
-		let elFolder = i_elGroup.m_elFolders[i];
-		elFolder.style.display = 'none';
-	}
-
+	i_elGroup.m_elFBody.style.display = 'none';
 	i_elGroup.classList.add('closed');
 	i_elGroup.classList.remove('opened');
 	i_elGroup.m_hidden_folders = true;
@@ -693,12 +689,7 @@ function g_GroupShowFolders(i_elGroup)
 	if (false == i_elGroup.m_hidden_folders)
 		return;
 
-	for (let i = 0; i < i_elGroup.m_elFolders.length; i++)
-	{
-		let elFolder = i_elGroup.m_elFolders[i];
-		elFolder.style.display = 'block';
-	}
-
+	i_elGroup.m_elFBody.style.display = 'block';
 	i_elGroup.classList.remove('closed');
 	i_elGroup.classList.add('opened');
 	i_elGroup.m_hidden_folders = false;
