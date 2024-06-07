@@ -661,7 +661,7 @@ function g_GroupCreate(i_elFolders, i_elParent, i_elPrevFolder, i_prefix)
 	}
 
 	if (avg_percent > 0)
-		elPercent.textContent = (Math.floor(avg_percent)/i_elFolders.length) + '%';
+		elPercent.textContent = (Math.floor(avg_percent/i_elFolders.length)) + '%';
 
 	c_Log('Group "' + i_elParent.m_path + ': ' + i_prefix + '" created"');
 
