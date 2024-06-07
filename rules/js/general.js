@@ -633,9 +633,13 @@ function g_GroupCreate(i_elFolders, i_elParent, i_elPrevFolder, i_prefix)
 	i_elParent.m_elFBody.insertBefore(elGroup, i_elPrevFolder);
 	i_elParent.m_elGroups.push(elGroup);
 
+	let elPercent = document.createElement('div');
+	elGroup.appendChild(elPercent);
+	elPercent.classList.add('gpercent');
+
 	let elName = document.createElement('div');
 	elGroup.appendChild(elName);
-	elName.classList.add('name');
+	elName.classList.add('gname');
 	elName.textContent = i_prefix;
 
 	let elFBody = document.createElement('div');
@@ -643,13 +647,20 @@ function g_GroupCreate(i_elFolders, i_elParent, i_elPrevFolder, i_prefix)
 	elFBody.classList.add('fbody');
 	elGroup.m_elFBody = elFBody;
 
+	let avg_percent = 0;
 	for (let i = 0; i < i_elFolders.length; i++)
 	{
 		let elFolder = i_elFolders[i];
 		elFolder.m_elGroup = elGroup;
 		elFBody.appendChild(elFolder);
 		elGroup.m_elFolders.push(elFolder);
+
+		if (elFolder.m_fobject.status && elFolder.m_fobject.status.progress)
+			avg_percent += elFolder.m_fobject.status.progress;
 	}
+
+	if (avg_percent > 0)
+		elPercent.textContent = (Math.floor(avg_percent)/i_elFolders.length) + '%';
 
 	c_Log('Group "' + i_elParent.m_path + ': ' + i_prefix + '" created"');
 
