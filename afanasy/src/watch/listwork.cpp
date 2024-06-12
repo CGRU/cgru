@@ -340,7 +340,7 @@ void ListWork::slot_JobSetBranch()
 	if (false == ok)
 		return;
 
-	branch = QString("\"%1\"").arg(branch);
+	branch = QString("%1").arg(branch);
 
 	setParameterQStr(Item::TJob, "branch", branch);
 
