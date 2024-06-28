@@ -6,9 +6,9 @@ import stat
 import sys
 import time
 
-import mediainfo
-
 import cgruutils
+import mediainfo
+from thumbnail import thumbnail
 
 from optparse import OptionParser
 
@@ -23,7 +23,8 @@ Parser.add_option('-o', '--output',   dest='output',   type = 'string',     defa
 Parser.add_option('-u', '--upparents',dest='upparents',type = 'int',        default=0,                  help='Update parent folders count (-1 = infinite, up to the root).')
 Parser.add_option('-m', '--mediainfo',dest='mediainfo',action='store_true', default=False,              help='Get media information.')
 Parser.add_option('-p', '--progress', dest='progress', action='store_true', default=False,              help='Output progress percentage.')
-Parser.add_option('-t', '--thumb',    dest='thumb',    type = 'int',        default=None,               help='Make thumbnail frequency.')
+Parser.add_option(      '--genthumbs',dest='genthumbs',action='store_true', default=False,              help='Generate thumbnails.')
+Parser.add_option('-t', '--thumb',    dest='thumb',    type = 'int',        default=None,               help='Output image for thumbnail frequency.')
 Parser.add_option('-r', '--report',   dest='report',   type = 'int',        default=None,               help='Print report frequency.')
 Parser.add_option('-V', '--verbose',  dest='verbose',  type = 'int',        default=0,                  help='Verbose mode.')
 Parser.add_option('-D', '--debug',    dest='debug',    action='store_true', default=False,              help='Debug mode.')
@@ -105,6 +106,14 @@ def checkDict(io_dict, i_reset_counts = False):
                 io_dict[key] = 0
 
 
+def genThumbnail(i_path):
+    tfile = os.path.dirname(i_path)
+    tfile = os.path.join(tfile, '.rules')
+    tfile = os.path.join(tfile, ('thumbnail.' + os.path.basename(i_path)))
+    tfile += '.jpg'
+    print(thumbnail({"input":i_path,"time":99,"output":tfile}))
+
+
 def walkdir(i_path, i_upwalk = False, i_curdepth = 0):
     global Progress
     global PrevFiles
@@ -165,6 +174,8 @@ def walkdir(i_path, i_upwalk = False, i_curdepth = 0):
             fout = None
             if not i_upwalk:
                 # Recursively walk in a subfolder:
+                if Options.genthumbs:
+                    genThumbnail(path)
                 if Options.maxdepth < 0 or i_curdepth <= Options.maxdepth:
                     fout = walkdir(path, False, i_curdepth + 1)
             else:
@@ -201,6 +212,8 @@ def walkdir(i_path, i_upwalk = False, i_curdepth = 0):
             if entry[0] != '.':
                 out['num_files'] += 1
                 if cgruutils.isImageExt( path):
+                    if Options.genthumbs:
+                        genThumbnail(path)
                     if out['num_images'] == 0:
                         if Options.thumb is not None:
                             if ThumbFolderCount % Options.thumb == 0 and size < 10000000:
@@ -214,10 +227,13 @@ def walkdir(i_path, i_upwalk = False, i_curdepth = 0):
                                 out['exif'] = obj['mediainfo']['exif']
                                 out['exif']['file'] = os.path.basename(path)
                     out['num_images'] += 1
-                elif cgruutils.isMovieExt( path) and Options.mediainfo:
-                    obj = mediainfo.processMovie( path)
-                    if obj and 'mediainfo' in obj:
-                        out['files'][entry] = obj['mediainfo']
+                elif cgruutils.isMovieExt(path):
+                    if Options.genthumbs:
+                        genThumbnail(path)
+                    if Options.mediainfo:
+                        obj = mediainfo.processMovie( path)
+                        if obj and 'mediainfo' in obj:
+                            out['files'][entry] = obj['mediainfo']
                 if Options.fileinfo:
                     if not entry in out['files']:
                         out['files'][entry] = dict()

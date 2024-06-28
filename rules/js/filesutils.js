@@ -889,19 +889,13 @@ function fu_ExtractSoundFinished(i_data, i_args)
 }
 /* ---------------- [ Walk structs and functions ] ------------------------------------------------------- */
 var fu_walk_params = {
-	path: {},
-	verbose: {"label": 'Verbose Level', "default": 2, "lwidth": '170px', "width": '33%'},
-	upparents: {
-		"label": 'Update Parent Folders',
-		'type': "bool",
-		'default': true,
-		"lwidth": '200px',
-		"width": '33%'
-	},
-	mediainfo:
-		{"label": 'Get Media Info', 'type': "bool", 'default': false, "lwidth": '170px', "width": '34%'},
-	af_hostsmask: {'label': 'Hosts Mask', 'width': '50%', 'lwidth': '160px'},
-	af_paused: {'label': 'Paused', 'width': '50%', 'lwidth': '50px', 'type': 'bool'}
+	path:         {},
+	verbose:      {'label': 'Verbose Level',         'width':'25%', 'lwidth':'170px', 'default': 2},
+	upparents:    {'label': 'Update Parent Folders', 'width':'25%', 'lwidth':'170px', 'type': 'bool','default': true},
+	genthumbs:    {'label': 'Generate Thumbnails',   'width':'25%', 'lwidth':'170px', 'type': 'bool','default': false},
+	mediainfo:    {'label': 'Get Media Info',        'width':'25%', 'lwidth':'170px', 'type': 'bool','default': false},
+	af_hostsmask: {'label': 'Hosts Mask',            'width':'50%', 'lwidth':'160px'},
+	af_paused:    {'label': 'Paused',                'width':'50%', 'lwidth':'50px',  'type': 'bool'}
 };
 
 function fu_Walk(i_args)
@@ -969,6 +963,8 @@ function fu_WalkProcessGUI(i_wnd)
 		cmd += ' --upparents -1';
 	if (params.mediainfo)
 		cmd += ' --mediainfo';
+	if (params.genthumbs)
+		cmd += ' --genthumbs';
 	cmd += ' -V ' + params.verbose;
 	cmd += ' "' + c_PathPM_Client2Server(params.path) + '"';
 	task.command = cmd;
