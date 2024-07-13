@@ -61,7 +61,7 @@ Parser.add_option('--afconvcap',        dest='afconvcap',   type  ='int',       
 Parser.add_option('--afenccap',         dest='afenccap',    type  ='int',        default=-1,          help='Afanasy encode task capacity, -1=default')
 Parser.add_option('--afuser',           dest='afuser',      type  ='string',     default='',          help='Change Afanasy job user, ''=current')
 Parser.add_option('--tmpdir',           dest='tmpdir',      type  ='string',     default='',          help='Temporary directory, if not specified, .makemovie+date will be used')
-Parser.add_option('--tmpformat',        dest='tmpformat',   type  ='string',     default='tga',       help='Temporary images format')
+Parser.add_option('--tmpformat',        dest='tmpformat',   type  ='string',     default='bmp',       help='Temporary images format')
 Parser.add_option('--tmpquality',       dest='tmpquality',  type  ='string',     default='',          help='Temporary image quality, or format options')
 Parser.add_option('--audio',            dest='audio',       type  ='string',     default=None,        help='Add sound from audio file')
 Parser.add_option('--acodec',           dest='acodec',      type  ='string',     default='aac',       help='Audio codec')
@@ -162,8 +162,8 @@ elif os.path.basename(Codec).find('dnxhd') == 0:
 
 # Definitions:
 tmpname   = 'img'
-tmplgs    = 'logo_slate.tga'
-tmplgf    = 'logo_frame.tga'
+tmplgs    = 'logo_slate.' + Options.tmpformat
+tmplgf    = 'logo_frame.' + Options.tmpformat
 
 need_convert = False
 if Stereo:
