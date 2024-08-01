@@ -23,6 +23,8 @@ var bm_clicked = false;
 var bm_projects = [];
 var bm_elements = [];
 
+var bm_flags_selected = []
+
 function bm_Init()
 {
 	// Init localStorage:
@@ -299,14 +301,18 @@ function bm_Show()
 			}
 
 			// Scene bookmarks:
+			scene.elBms = document.createElement('div');
+			scene.elBms.classList.add('bookmarks_div');
+			scene.el.appendChild(scene.elBms);
 			for (let b = 0; b < scene.bms.length; b++)
 			{
 				let bm = scene.bms[b];
 
 				// Bookmark element:
 				let el = bm_CreateBookmark(bm);
+				bm.el = el;
 				bm_elements.push(el);
-				scene.el.appendChild(el);
+				scene.elBms.appendChild(el);
 
 				if (bm.status && bm.status.flags)
 				{
@@ -361,8 +367,15 @@ function bm_Show()
 			project_count += scene.bms.length;
 		}
 
+		project.elFlags = [];
 		for (let flag in prj_flags)
-			project.elStat.appendChild(st_CreateElFlag(flag, true, (': ' + prj_flags[flag])));
+		{
+			let elFlag = st_CreateElFlag(flag, true, (': ' + prj_flags[flag]));
+			elFlag.onclick = bm_FlagClicked;
+			elFlag.m_count = prj_flags[flag];
+			project.elStat.appendChild(elFlag);
+			project.elFlags.push(elFlag);
+		}
 
 		let label = project.name + ' - ' + project_count;
 		project.elLabel.textContent = label;
@@ -495,6 +508,85 @@ function bm_SceneClicked(i_evt)
 	}
 
 	localStorage.bookmarks_scenes_closed = list;
+}
+
+function bm_FlagClicked(i_evt)
+{
+	let flag = i_evt.currentTarget.m_name;
+
+	if (bm_flags_selected.indexOf(flag) == -1)
+		bm_flags_selected.push(flag);
+	else
+		bm_flags_selected.splice(bm_flags_selected.indexOf(flag));
+
+	for (let prj of bm_projects)
+	{
+		let count_prj = 0;
+
+		for (let el of prj.elFlags)
+			if (bm_flags_selected.indexOf(el.m_name) != -1)
+				el.classList.add('selected');
+			else
+				el.classList.remove('selected');
+
+		for (let scn of prj.scenes)
+		{
+			let count_scn = 0;
+			for (let bm of scn.bms)
+			{
+				if (bm_Filter(bm))
+				{
+					count_scn += 1;
+					bm.el.style.display = 'block';
+				}
+				else
+					bm.el.style.display = 'none';
+			}
+			let label = scn.name + ' - ' + scn.bms.length;
+			if (bm_flags_selected.length)
+				label += ' (' + count_scn + ')';
+			scn.elLabel.textContent = label;
+
+			count_prj += count_scn;
+		}
+	}
+}
+function bm_Filter(i_bm)
+{
+	if (bm_flags_selected.length == 0)
+		return true;
+
+	if (i_bm.status == null)
+		return false;
+
+	let statuses = [i_bm.status];
+	let tasks = i_bm.status.tasks;
+	if (tasks) for (let task in tasks)
+	{
+		task = tasks[task];
+		if (task.deleted)
+			continue;
+		if (task.artists == null)
+			continue;
+		if (task.artists.indexOf(g_auth_user.id) == -1)
+			continue;
+
+		statuses.push(task);
+	}
+
+	for (let stat of statuses)
+	{
+		let flags = stat.flags;
+
+		if (flags == null)
+			continue;
+
+		for (let flag of flags)
+			if (bm_flags_selected.indexOf(flag) != -1)
+				return true;
+	}
+
+	return false;
 }
 
 function bm_NavigatePost()

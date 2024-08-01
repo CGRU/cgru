@@ -671,13 +671,14 @@ margin: 0px 4px 0px 4px;
 cursor: pointer;
 }
 #bookmarks .project .statistics {font-size: 10px;}
+#bookmarks .project .statistics .flag.selected {border: 2px solid #FF5;}
 #bookmarks .project .label:hover {
 text-shadow: 0 0 2px rgba( 100, 255, 255, .5);
 }
 #bookmarks .project.closed .label, #bookmarks .project .scene.closed .label {
 font-style: italic;
 }
-#bookmarks .project.closed .scene, #bookmarks .project .scene.closed .bookmark {
+#bookmarks .project.closed .scene, #bookmarks .project .scene.closed .bookmarks_div {
 display: none;
 }
 #bookmarks .project .scene .label {
