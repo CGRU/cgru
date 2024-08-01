@@ -571,7 +571,7 @@ var fu_arch_params = {
 function fu_Archive(i_args)
 {
 	// console.log( JSON.stringify( i_args));
-	var title = i_args.archive ? 'Archive' : 'Extract Archive';
+	var title = i_args.archive ? 'Archive Folder(s)' : 'Extract Archive(s)';
 	var wnd = new cgru_Window({"name": 'archive', "title": title});
 	wnd.m_args = i_args;
 

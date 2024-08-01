@@ -1379,24 +1379,28 @@ FilesView.prototype.extractSound = function() {
 FilesView.prototype.archivate = function() {
 	var args = {};
 	args.paths = [];
-	args.archive = true;
+	args.archive = null;
 
 	var items = this.getSelected();
 	for (var i = 0; i < items.length; i++)
 	{
+		if (items[i].m_isFile && (false == c_FileIsArchive(items[i].m_path)))
+			continue;
+
 		if (args.paths.length == 0)
 		{
-			if (items[i].classList.contains('file') && c_FileIsArchive(items[i].m_path))
+			if (items[i].m_isFile)
 			{
 				args.archive = false;
 				args.extract = true;
 			}
 			else
+				args.archive = true;
 				args.extract = false;
 		}
 		else
 		{
-			if (items[i].classList.contains('file') && c_FileIsArchive(items[i].m_path))
+			if (items[i].m_isFile)
 			{
 				if (args.archive)
 					continue;
@@ -1412,7 +1416,7 @@ FilesView.prototype.archivate = function() {
 	}
 
 	if (args.paths.length < 1)
-		c_Error('No items selected.');
+		c_Error('Select folders to archive or archives to extract.');
 	else
 		fu_Archive(args);
 };
