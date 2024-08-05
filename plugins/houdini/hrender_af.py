@@ -311,6 +311,15 @@ if drivertypename in multisampled_rops or fetched_rop in multisampled_rops:
             ignore_inputs=ignoreInputs,
             output_progress=True
         )
+elif drivertypename in ["usdrender_rop"] and ropnode.parm("allframesatonce").eval():
+    render_range = (frame, end, by)
+    ropnode.render(
+        frame_range=render_range,
+        output_file=render_output,
+        method=hou.renderMethod.FrameByFrame,
+        ignore_inputs=ignoreInputs,
+        output_progress=True
+    )
 else:
     time_prev = None
     while frame <= end:
