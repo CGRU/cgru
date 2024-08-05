@@ -1122,6 +1122,19 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 	// No more calculations needed for a locked job:
 	if (isLocked())
 		return;
+	
+	// Check age and delete if life finished:
+	if (m_id != AFJOB::SYSJOB_ID) // skip system job
+	{
+		int result_lifetime = m_time_life;
+		if (result_lifetime < 0) result_lifetime = m_user->getJobsLifeTime(); // get default value from user
+		if((result_lifetime > 0) && ((currentTime - m_time_creation) > result_lifetime))
+		{
+			appendLog( std::string("Life %1 finished.") + af::time2strHMS( result_lifetime, true));
+			m_user->appendLog( std::string("Job \"") + m_name + "\" life " + af::time2strHMS( result_lifetime, true) + " finished.");
+			deleteNode(renders, monitoring);
+		}
+	}
 
 	// Skip DONE job refresh if it is not forced:
 	if (isDone() && (false == m_force_refresh))
@@ -1279,20 +1292,6 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 		jobchanged = af::Monitor::EVT_jobs_change;
 		m_thumb_changed = false;
 		m_report_changed = false;
-	}
-	
-	// Check age and delete if life finished:
-	if( m_id != AFJOB::SYSJOB_ID ) // skip system job
-	{
-		int result_lifetime = m_time_life;
-		if( result_lifetime < 0 ) result_lifetime = m_user->getJobsLifeTime(); // get default value from user
-		if((result_lifetime > 0) && ((currentTime - m_time_creation) > result_lifetime))
-		{
-			appendLog( std::string("Life %1 finished.") + af::time2strHMS( result_lifetime, true));
-			m_user->appendLog( std::string("Job \"") + m_name + "\" life " + af::time2strHMS( result_lifetime, true) + " finished.");
-			deleteNode( renders, monitoring);
-			jobchanged = af::Monitor::EVT_jobs_del, getId(), getUid();
-		}
 	}
 	
 	if(( monitoring ) &&  ( jobchanged )) monitoring->addJobEvent( jobchanged, getId(), getUid());
