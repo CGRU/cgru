@@ -214,7 +214,10 @@ class Admin:
             i_args['groups'].insert(0, 'admins')
 
         lines = []
-        lines.append('AuthMerging Or')
+
+        path = os.path.normpath(i_args['path'])
+        if len(path.split('/')) > 1:
+            lines.append('AuthMerging Or')
 
         if 'groups' in i_args and len(i_args['groups']):
             lines.append('Require group ' + ' '.join(i_args['groups']))
@@ -224,7 +227,7 @@ class Admin:
 
         data = '\n'.join(lines) + '\n'
 
-        htaccess = os.path.join(i_args['path'], rulib.HT_ACCESS_FILE_NAME)
+        htaccess = os.path.join(path, rulib.HT_ACCESS_FILE_NAME)
         if not functions.fileWrite(htaccess, data):
             o_out['error'] = 'Unable to write into the file.'
 
