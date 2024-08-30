@@ -57,6 +57,7 @@
 	"mimic"   :{"title":"Mimic",    "short":"Mim", "tip":"Mimic"},
 	"model"   :{"title":"Model",    "short":"Md",  "tip":"Modeling"},
 	"paint"   :{"title":"Paint",    "short":"Pt",  "tip":"Painting"},
+	"matte"   :{"title":"Matte",    "short":"Mt",  "tip":"Matte"},
 	"render"  :{"title":"Render",   "short":"Rn",  "tip":"Rendering"},
 	"rig"     :{"title":"Rig",      "short":"Rig", "tip":"Rigging"},
 	"roto"    :{"title":"Roto",     "short":"Ro",  "tip":"Rotoscoping"},
