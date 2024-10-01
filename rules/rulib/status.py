@@ -305,11 +305,11 @@ class Status:
 
 
         # Remove status tags, artists and flags if the task has the same
-        for arr in ['tags','artists','flags']:
-            if arr in self.data and len(self.data[arr]):
-                for item in task[arr]:
-                    if item in self.data[arr]:
-                        self.data[arr].remove(item)
+        #for arr in ['tags','artists','flags']:
+        #    if arr in self.data and len(self.data[arr]):
+        #        for item in task[arr]:
+        #            if item in self.data[arr]:
+        #                self.data[arr].remove(item)
 
         # Set task changed.
         # It needed for news to know what was changed in status.
