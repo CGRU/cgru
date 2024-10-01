@@ -111,7 +111,7 @@ def getRules(i_path = None, i_verbose = False):
             print('File: "%s"' % afile)
 
         try:
-            fobj = open(afile, 'r')
+            fobj = open(afile, 'r', encoding="utf-8")
         except:
             print(traceback.format_exc())
             continue
@@ -120,6 +120,7 @@ def getRules(i_path = None, i_verbose = False):
         try:
             obj = json.load(fobj)
         except:
+            print('Error reading "%s"' % afile)
             print(traceback.format_exc())
             continue
 
