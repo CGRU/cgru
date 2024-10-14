@@ -237,8 +237,18 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 	{
 		if (false == dependmask_global.isEmpty()) m_str_props += QString(" Global Depends(%1)").arg(dependmask_global);
 		if (false == dependmask.isEmpty()       ) m_str_props += QString(" Depends(%1)").arg(dependmask);
-		if (false == hostsmask.isEmpty()        ) m_str_props += QString(" HostsMask(%1)").arg(hostsmask);
-		if (false == hostsmask_exclude.isEmpty()) m_str_props += QString(" ExcludeHosts(%1)").arg(hostsmask_exclude);
+		if (false == hostsmask.isEmpty())
+		{
+			m_str_props += QString(" HostsMask(%1)").arg(hostsmask);
+			if (hosts_mask_regex)
+				m_str_props += "RegEx";
+		}
+		if (false == hostsmask_exclude.isEmpty())
+		{
+			m_str_props += QString(" ExcludeHosts(%1)").arg(hostsmask_exclude);
+			if (hosts_mask_regex)
+				m_str_props += "RegEx";
+		}
 		if (false == need_os.isEmpty()          ) m_str_props += QString(" OS:%1").arg(need_os);
 		if (false == need_properties.isEmpty()  ) m_str_props += QString(" Properities(%1)").arg(need_properties);
 		if (need_memory != -1) m_str_props += QString(" Mem>%1").arg(afqt::stoq(af::toKMG(int64_t(need_memory)*(1<<20), 1<<10)));
@@ -255,8 +265,18 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 	{
 		if (false == dependmask_global.isEmpty()) m_str_props += QString(" GDep(%1)").arg(dependmask_global);
 		if (false == dependmask.isEmpty()       ) m_str_props += QString(" Dep(%1)").arg(dependmask);
-		if (false == hostsmask.isEmpty()        ) m_str_props += QString(" Host(%1)").arg(hostsmask);
-		if (false == hostsmask_exclude.isEmpty()) m_str_props += QString(" Exclude(%1)").arg(hostsmask_exclude);
+		if (false == hostsmask.isEmpty())
+		{
+			m_str_props += QString(" Hosts(%1)").arg(hostsmask);
+			if (hosts_mask_regex)
+				m_str_props += "RE";
+		}
+		if (false == hostsmask_exclude.isEmpty())
+		{
+			m_str_props += QString(" Exclude(%1)").arg(hostsmask_exclude);
+			if (hosts_mask_regex)
+				m_str_props += "RE";
+		}
 		if (false == need_os.isEmpty()          ) m_str_props += QString(" OS:%1").arg(need_os);
 		if (false == need_properties.isEmpty()  ) m_str_props += QString(" Props(%1)").arg(need_properties);
 		if (need_memory != -1) m_str_props += QString(" Mem>%1").arg(afqt::stoq(af::toKMG(int64_t(need_memory)*(1<<20), 1<<10)));
@@ -273,8 +293,18 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 	{
 		if (false == dependmask_global.isEmpty()) m_str_props += QString(" g(%1)").arg(dependmask_global);
 		if (false == dependmask.isEmpty()       ) m_str_props += QString(" d(%1)").arg(dependmask      );
-		if (false == hostsmask.isEmpty()        ) m_str_props += QString(" h(%1)").arg(hostsmask       );
-		if (false == hostsmask_exclude.isEmpty()) m_str_props += QString(" e(%1)").arg(hostsmask_exclude);
+		if (false == hostsmask.isEmpty())
+		{
+			m_str_props += QString(" h(%1)").arg(hostsmask);
+			if (hosts_mask_regex)
+				m_str_props += "r";
+		}
+		if (false == hostsmask_exclude.isEmpty())
+		{
+			m_str_props += QString(" e(%1)").arg(hostsmask_exclude);
+			if (hosts_mask_regex)
+				m_str_props += "r";
+		}
 		if (false == need_os.isEmpty()          ) m_str_props += QString(" %1").arg(need_os);
 		if (false == need_properties.isEmpty()  ) m_str_props += QString(" p(%1)").arg(need_properties);
 		if (need_memory != -1) m_str_props += QString(" m>%1").arg(afqt::stoq(af::toKMG(int64_t(need_memory)*(1<<20), 1<<10)));

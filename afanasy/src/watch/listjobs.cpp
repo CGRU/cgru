@@ -165,6 +165,14 @@ ListJobs::ListJobs(QWidget * i_parent, bool i_listwork, const std::string & i_na
 
 	resetButtonsMenu();
 
+	addButtonsMenu(Item::TAny, "Hosts Mask","Set hosts mask type.");
+	bp = addButtonPanel(Item::TAny, "FIND",  "users_hosts_mask_find","Use simple find algorithm for hosts mask.");
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actHostsMaskFind()));
+	bp = addButtonPanel(Item::TAny, "REGEX","users_hosts_mask_regex","Use regular expressions for hosts mask.");
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actHostsMaskRegEx()));
+
+	resetButtonsMenu();
+
 	bp = addButtonPanel(Item::TJob, "LISTEN","jobs_listen","Listen job running tasks ouput.");
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actListenJob()));
 
@@ -420,6 +428,16 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	
 	menu.addMenu( submenu);
 	
+	menu.addSeparator();
+
+	submenu = new QMenu("Hosts Mask Type", this);
+	action = new QAction("Find", this);
+	connect(action, SIGNAL(triggered() ), this, SLOT(actHostsMaskFind()));
+	submenu->addAction(action);
+	action = new QAction("RegEx", this);
+	connect(action, SIGNAL(triggered() ), this, SLOT(actHostsMaskRegEx()));
+	submenu->addAction(action);
+	menu.addMenu( submenu);
 	menu.addSeparator();
 
 	submenu = new QMenu( "Set Parameter", this);
@@ -784,6 +802,9 @@ void ListJobs::actUnsetHidden() {setParameter(Item::TJob, "hidden", "false");}
 
 void ListJobs::actPreviewApproval()   {setParameter(Item::TJob, "ppa", "true" );}
 void ListJobs::actNoPreviewApproval() {setParameter(Item::TJob, "ppa", "false");}
+
+void ListJobs::actHostsMaskFind()  {setParameter(Item::TAny, "hosts_mask_type", "\"find\"");}
+void ListJobs::actHostsMaskRegEx() {setParameter(Item::TAny, "hosts_mask_type", "\"regex\"");}
 
 void ListJobs::actSetUser()
 {

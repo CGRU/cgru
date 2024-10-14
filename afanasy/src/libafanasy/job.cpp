@@ -277,8 +277,8 @@ void Job::initDefaultValues()
 	m_thumb_data = NULL;
 	m_blocks_data = NULL;
 
-	m_depend_mask.setCaseSensitive();
-	m_depend_mask_global.setCaseSensitive();
+	m_depend_mask.setRegEx();
+	m_depend_mask_global.setRegEx();
 }
 
 bool Job::isValid( std::string * o_err) const

@@ -123,6 +123,9 @@ public:
 	/// Force refresh, that can be skipped on DONE job.
 	inline void forceRefresh() {m_force_refresh = true;}
 
+	virtual void v_setHostsMaskFind()  override;
+	virtual void v_setHostsMaskRegEx() override;
+
 public:
 	/// Set Jobs Container.
 	inline static void setJobContainer( JobContainer *Jobs){ ms_jobs = Jobs;}

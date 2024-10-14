@@ -46,7 +46,8 @@ Pool::Pool(int i_id)
 
 void Pool::initDefaultValues()
 {
-	m_pattern.setCaseInsensitive();
+	m_pattern.setRegEx();
+	m_pattern.setCaseIns();
 
 	m_time_creation = 0;
 

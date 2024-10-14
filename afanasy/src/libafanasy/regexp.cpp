@@ -8,111 +8,116 @@
 
 using namespace af;
 
-const int RegExp::compile_flags = REG_EXTENDED;
-
 RegExp::RegExp():
-	contain( false),
-	exclude( false),
-	cflags( RegExp::compile_flags)
+	m_flags(0)
 {
 }
 
 RegExp::~RegExp()
 {
-#ifndef REGEX_STD
-	if( false == pattern.empty()) regfree( &regexp);
-#endif
 }
 
-bool RegExp::setPattern( const std::string & str, std::string * strError)
+void RegExp::setFind()
 {
-#ifdef REGEX_STD
-	if( RegExp::Validate( str, strError))
+	m_flags = m_flags & (~FRegEx);
+	if (m_pattern.size())
+		setPattern(m_pattern);
+}
+
+void RegExp::setRegEx()
+{
+	m_flags = m_flags | FRegEx;
+	if (m_pattern.size())
+		setPattern(m_pattern);
+}
+
+bool RegExp::setPattern(const std::string & i_str, std::string * o_strError)
+{
+	m_pattern = i_str;
+
+	if (isFind())
 	{
-		pattern = str;
-		if( cflags & REG_ICASE )
-			regexp = std::regex( pattern, std::regex_constants::icase);
+		m_strings.clear();
+
+		if (m_pattern.empty())
+			return true;
+
+		std::vector<std::string> strings = af::strSplit(m_pattern);
+		for (auto & str : strings)
+			if (str.size())
+				m_strings.push_back(str);
+
+		if (m_strings.size() == 0)
+			m_pattern.clear();
+
+		return true;
+	}
+
+	if (RegExp::Validate(i_str, o_strError))
+	{
+		if (isCaseIns())
+			m_regexp = std::regex(m_pattern, std::regex_constants::icase);
 		else
-			regexp = std::regex( pattern);
+			m_regexp = std::regex(m_pattern);
 		return true;
 	}
 	else
 	{
 		return false;
 	}
-#else
-
-	if( str.empty())
-	{
-		if( false == pattern.empty())
-		{
-			pattern.clear();
-			regfree( &regexp);
-		}
-		return true;
-	}
-
-	if( false == RegExp::Validate( str, strError )) return false;
-
-	if( false == pattern.empty()) regfree( &regexp);
-	pattern = str;
-	regcomp( &regexp, pattern.c_str(), cflags);
-	return true;
-
-#endif
 }
 
-bool RegExp::match( const std::string & str) const
+bool RegExp::match(const std::string & i_str) const
 {
-	if( pattern.empty()) return true;
-
-#ifdef REGEX_STD
+	if (m_pattern.empty())
+		return true;
 
 	int retval = 1;
-	if( contain )
+
+	if (isFind())
 	{
-		if( regex_search( str.begin(), str.end(), regexp))
-			retval = 0;
+		for (auto & str : m_strings)
+			if (i_str.find(str) != i_str.npos)
+			{
+				retval = 0;
+				break;
+			}
 	}
 	else
 	{
-		if( regex_match( str.begin(), str.end(), regexp))
-			retval = 0;
-	}
-#else
-
-	regmatch_t regmatch;
-
-	int retval = regexec( &regexp, str.c_str(), 1, &regmatch, 0);
-	if(( retval == 0 ) && ( false == contain ))
-	{
-		if( regmatch.rm_so != 0 ) retval = 1;
-		if( regmatch.rm_eo < str.size() ) retval = 1;
+		if (isContain())
+		{
+			if (regex_search(i_str.begin(), i_str.end(), m_regexp))
+				retval = 0;
+		}
+		else
+		{
+			if (regex_match(i_str.begin(), i_str.end(), m_regexp))
+				retval = 0;
+		}
 	}
 
-#endif
-
-	return ((retval == 0) != exclude );
+	return ((retval == 0) != isExclude());
 }
 
 int RegExp::weigh() const
 {
-	return sizeof(RegExp) + af::weigh( pattern);
+	return sizeof(RegExp) + af::weigh(m_pattern);
 }
 
-bool RegExp::Validate( const std::string & str, std::string * errOutput)
+bool RegExp::Validate(const std::string & i_str, std::string * o_errOutput)
 {
-	if( str.empty()) return true;
-
-#ifdef REGEX_STD
+	if (i_str.empty())
+		return true;
 
 	bool valid = true;
+
 	std::string errStr;
 	try 
 	{
-		std::regex rx( str);
+		std::regex rx(i_str);
 	}
-	catch( const std::regex_error& rerr)
+	catch(const std::regex_error& rerr)
 	{
 		errStr = rerr.what();
 		valid = false;
@@ -122,33 +127,11 @@ bool RegExp::Validate( const std::string & str, std::string * errOutput)
 		errStr = "Unknown exception.";
 		valid = false;
 	}
-	if( false == valid )
+	if (false == valid)
 	{
-		if( errOutput ) *errOutput = errStr;
+		if (o_errOutput) *o_errOutput = errStr;
 		else
 			AF_ERR << errStr;
 	}
 	return valid;
-
-#else
-
-	regex_t check_re;
-	int retval = regcomp( &check_re, str.c_str(), compile_flags);
-
-	if( retval != 0 )
-	{
-		static const int buflen = 0xff;
-		char buffer[ buflen];
-		regerror( retval, &check_re, buffer, buflen);
-		if( errOutput )
-			*errOutput = buffer;
-		else
-			AF_ERR << buffer;
-	}
-
-	regfree( &check_re);
-
-	return retval == 0;
-
-#endif
 }

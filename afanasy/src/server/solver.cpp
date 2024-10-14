@@ -118,7 +118,7 @@ struct GreaterPriorityThenOlderCreation
 
 void Solver::SortList(std::list<AfNodeSolve*> & i_list, int i_solving_flags)
 {
-	if (i_solving_flags & af::Work::SolvePriority)
+	if (i_solving_flags & af::Work::FSolvePriority)
 		i_list.sort(GreaterNeed());
 	else
 		i_list.sort(GreaterPriorityThenOlderCreation());

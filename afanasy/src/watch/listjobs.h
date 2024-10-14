@@ -53,6 +53,8 @@ private slots:
 	void actUnsetHidden();
 	void actPreviewApproval();
 	void actNoPreviewApproval();
+	void actHostsMaskFind();
+	void actHostsMaskRegEx();
 
 	void actStart();
 	void actStop();

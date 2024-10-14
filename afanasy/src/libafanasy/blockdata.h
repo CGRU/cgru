@@ -141,6 +141,9 @@ public:
 	inline void setSequential(int64_t i_value) { m_sequential = i_value; } ///< Used in afcmd cmd_numeric
 	inline int64_t getSequential() const { return m_sequential; }
 
+	inline void setHostsMaskFind()  {m_hosts_mask.setFind();  m_hosts_mask_exclude.setFind(); }
+	inline void setHostsMaskRegEx() {m_hosts_mask.setRegEx(); m_hosts_mask_exclude.setRegEx();}
+
 	inline void setParserCoeff(int value) { m_parser_coeff = value; }
 
     /// Set block tasks command. Used in system job.

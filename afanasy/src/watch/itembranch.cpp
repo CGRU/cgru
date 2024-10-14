@@ -102,8 +102,18 @@ void ItemBranch::v_updateValues(af::Node * i_afnode, int i_msgType)
 		if (branch->isSolveCapacity()) strParameters += ",Capacity"; else strParameters += ",RunTasks";
 		if (max_running_tasks != -1) strParameters += QString(" MaxRuningTasks:%1").arg(max_running_tasks);
 		if (max_running_tasks_per_host != -1) strParameters += QString(" MaxRunTasksPerHost:%1").arg(max_running_tasks_per_host);
-		if (false == hostsmask.isEmpty()) strParameters += QString(" HostsMask(%1)").arg(hostsmask);
-		if (false == hostsmask_exclude.isEmpty()) strParameters += QString(" ExcludeHosts(%1)").arg(hostsmask_exclude);
+		if (false == hostsmask.isEmpty())
+		{
+			strParameters += QString(" HostsMask(%1)").arg(hostsmask);
+			if (hosts_mask_regex)
+				strParameters += "RegEx";
+		}
+		if (false == hostsmask_exclude.isEmpty())
+		{
+			strParameters += QString(" ExcludeHosts(%1)").arg(hostsmask_exclude);
+			if (hosts_mask_regex)
+				strParameters += "RegEx";
+		}
 	}
 	else if (Watch::isJedi())
 	{
@@ -130,8 +140,18 @@ void ItemBranch::v_updateValues(af::Node * i_afnode, int i_msgType)
 		if (branch->isSolveCapacity()) strParameters += ",Capacity"; else strParameters += ",MaxTasks";
 		if (max_running_tasks != -1) strParameters += QString(" MaxTasks:%1").arg(max_running_tasks);
 		if (max_running_tasks_per_host != -1) strParameters += QString(" MaxPerHost:%1").arg(max_running_tasks_per_host);
-		if (false == hostsmask.isEmpty()) strParameters += QString(" Hosts(%1)").arg(hostsmask);
-		if (false == hostsmask_exclude.isEmpty()) strParameters += QString(" Exclude(%1)").arg(hostsmask_exclude);
+		if (false == hostsmask.isEmpty())
+		{
+			strParameters += QString(" Hosts(%1)").arg(hostsmask);
+			if (hosts_mask_regex)
+				strParameters += "RE";
+		}
+		if (false == hostsmask_exclude.isEmpty())
+		{
+			strParameters += QString(" Exclude(%1)").arg(hostsmask_exclude);
+			if (hosts_mask_regex)
+				strParameters += "RE";
+		}
 	}
 	else
 	{
@@ -158,8 +178,18 @@ void ItemBranch::v_updateValues(af::Node * i_afnode, int i_msgType)
 		if (branch->isSolveCapacity()) strParameters += ",cap"; else strParameters += ",mt";
 		if (max_running_tasks != -1) strParameters += QString(" m%1").arg(max_running_tasks);
 		if (max_running_tasks_per_host != -1) strParameters += QString(" mph%1").arg(max_running_tasks_per_host);
-		if (false == hostsmask.isEmpty()) strParameters += QString(" h(%1)").arg(hostsmask);
-		if (false == hostsmask_exclude.isEmpty()) strParameters += QString(" e(%1)").arg(hostsmask_exclude);
+		if (false == hostsmask.isEmpty())
+		{
+			strParameters += QString(" h(%1)").arg(hostsmask);
+			if (hosts_mask_regex)
+				strParameters += "r";
+		}
+		if (false == hostsmask_exclude.isEmpty())
+		{
+			strParameters += QString(" e(%1)").arg(hostsmask_exclude);
+			if (hosts_mask_regex)
+				strParameters += "r";
+		}
 	}
 
 	ItemNode::updateStrParameters(strParameters);

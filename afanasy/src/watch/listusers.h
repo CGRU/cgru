@@ -35,6 +35,9 @@ private slots:
 	void actSolveJobsByCapacity();
 	void actSolveJobsByTasksNum();
 
+	void actHostsMaskFind();
+	void actHostsMaskRegEx();
+
 	void actDelete();
 
 private:

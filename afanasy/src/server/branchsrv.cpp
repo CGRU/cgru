@@ -528,7 +528,7 @@ RenderAf * BranchSrv::v_solve(std::list<RenderAf*> & i_renders_list, MonitorCont
 			if (false == node->canRun())
 				continue;
 
-			node->calcNeed(m_solving_flags);
+			node->calcNeed(m_work_flags);
 
 			solve_list.push_back(node);
 		}
@@ -543,7 +543,7 @@ RenderAf * BranchSrv::v_solve(std::list<RenderAf*> & i_renders_list, MonitorCont
 			if (false == node->canRun())
 				continue;
 
-			node->calcNeed(m_solving_flags);
+			node->calcNeed(m_work_flags);
 
 			solve_list.push_back(node);
 		}
@@ -566,7 +566,7 @@ RenderAf * BranchSrv::v_solve(std::list<RenderAf*> & i_renders_list, MonitorCont
 		}
 	}
 
-	Solver::SortList(solve_list, m_solving_flags);
+	Solver::SortList(solve_list, m_work_flags);
 
 	return Solver::SolveList(solve_list, i_renders_list, this);
 }

@@ -32,21 +32,31 @@ public:
 	virtual ~Work();
 
 
-	enum SolvingFlags
+	enum WorkFlags
 	{
-		SolvePriority = 1 << 0,   ///< Solve by order or prioruty
-		SolveCapacity = 1 << 1    ///< Solve by running tasks number or total capacity
+		FSolvePriority = 1 << 0,   ///< Solve by order or prioruty
+		FSolveCapacity = 1 << 1,   ///< Solve by running tasks number or total capacity
+
+		FHostsMask_Find  = 1 << 2,
+		FHostsMask_RegEx = 1 << 3
 	};
 
-	inline void setSolvePriority() { m_solving_flags |= SolvePriority; }
-	inline void setSolveOrder()    { m_solving_flags &=~SolvePriority; }
-	inline void setSolveCapacity() { m_solving_flags |= SolveCapacity; }
-	inline void setSolveTasksNum() { m_solving_flags &=~SolveCapacity; }
+	virtual void v_setHostsMaskFind();
+	virtual void v_setHostsMaskRegEx();
 
-	inline bool isSolvePriority() const {return  m_solving_flags & SolvePriority;}
-	inline bool isSolveOrder()    const {return (m_solving_flags & SolvePriority) == false;}
-	inline bool isSolveCapacity() const {return  m_solving_flags & SolveCapacity;}
-	inline bool isSolveTasksNum() const {return (m_solving_flags & SolveCapacity) == false;}
+	inline bool isHostsMaskInherit() const {return (m_work_flags & (FHostsMask_Find | FHostsMask_RegEx)) == 0;}
+	inline bool isHostsMaskFind()    const {return (m_work_flags & FHostsMask_Find);}
+	inline bool isHostsMaskRegEx()   const {return (m_work_flags & FHostsMask_RegEx);}
+
+	inline void setSolvePriority() { m_work_flags |= FSolvePriority; }
+	inline void setSolveOrder()    { m_work_flags &=~FSolvePriority; }
+	inline void setSolveCapacity() { m_work_flags |= FSolveCapacity; }
+	inline void setSolveTasksNum() { m_work_flags &=~FSolveCapacity; }
+
+	inline bool isSolvePriority() const {return  m_work_flags & FSolvePriority;}
+	inline bool isSolveOrder()    const {return (m_work_flags & FSolvePriority) == false;}
+	inline bool isSolveCapacity() const {return  m_work_flags & FSolveCapacity;}
+	inline bool isSolveTasksNum() const {return (m_work_flags & FSolveCapacity) == false;}
 
 
 	void generateInfoStream(std::ostringstream &o_str, bool full = false) const; /// Generate information.
@@ -115,7 +125,7 @@ protected:
 	void readwrite(Msg *msg); ///< Read or write node attributes in message
 
 protected:
-	int8_t m_solving_flags;
+	int8_t m_work_flags;
 
 	int32_t m_max_tasks_per_second;
 

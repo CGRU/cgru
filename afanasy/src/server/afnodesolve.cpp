@@ -136,7 +136,7 @@ void AfNodeSolve::calcNeed(int i_flags, int i_resourcesquantity)
 
 	if (resourcesquantity < 0)
 	{
-		if (i_flags & af::Work::SolveCapacity)
+		if (i_flags & af::Work::FSolveCapacity)
 			resourcesquantity = m_work->getRunningCapacityTotal();
 		else
 			resourcesquantity = m_work->getRunningTasksNum();

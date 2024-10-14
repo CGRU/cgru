@@ -144,16 +144,10 @@ void BlockData::construct()
 	m_running_tasks_counter = 0;
 	m_running_capacity_counter = 0;
 
-	m_depend_mask.setCaseSensitive();
-	m_tasks_depend_mask.setCaseSensitive();
+	m_depend_mask.setRegEx();
+	m_tasks_depend_mask.setRegEx();
 
-	m_hosts_mask.setCaseInsensitive();
-
-	m_hosts_mask_exclude.setCaseInsensitive();
 	m_hosts_mask_exclude.setExclude();
-
-	m_need_properties.setCaseSensitive();
-	m_need_properties.setContain();
 }
 
 /// Construct data from JSON:

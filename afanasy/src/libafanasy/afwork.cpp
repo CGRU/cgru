@@ -30,20 +30,14 @@ using namespace af;
 
 Work::Work()
 {
-	m_solving_flags = 0;
+	m_work_flags = 0;
 	m_max_tasks_per_second = -1;
 
 	m_max_running_tasks = af::Environment::getMaxRunningTasksNumber();
 	m_max_running_tasks_per_host = -1;
 
-	m_hosts_mask.setCaseInsensitive();
-	m_hosts_mask_exclude.setCaseInsensitive();
 	m_hosts_mask_exclude.setExclude();
 
-	m_need_os.setCaseInsensitive();
-	m_need_os.setContain();
-	m_need_properties.setCaseSensitive();
-	m_need_properties.setContain();
 	m_need_power  = -1;
 	m_need_memory = -1;
 	m_need_hdd    = -1;
@@ -58,7 +52,7 @@ Work::~Work()
 
 void Work::readwrite(Msg *msg)
 {
-	rw_int8_t(m_solving_flags, msg);
+	rw_int8_t(m_work_flags, msg);
 
 	rw_int32_t(m_max_tasks_per_second, msg);
 
@@ -146,6 +140,19 @@ void Work::jsonRead(const JSON &i_object, std::string *io_changes)
 		else
 			setSolveTasksNum();
 	}
+
+	std::string hosts_mask_type;
+	if (jr_string("hosts_mask_type", hosts_mask_type, i_object, io_changes))
+	{
+		if (hosts_mask_type == "find")
+		{
+			v_setHostsMaskFind();
+		}
+		else if (hosts_mask_type == "regex")
+		{
+			v_setHostsMaskRegEx();
+		}
+	}
 }
 
 void Work::jsonWrite(std::ostringstream &o_str, int i_type) const
@@ -174,8 +181,28 @@ void Work::jsonWrite(std::ostringstream &o_str, int i_type) const
 	o_str << ",\n\"solve_method\":\"" << (isSolvePriority() ? "solve_priority" : "solve_order")    << "\"";
 	o_str << ",\n\"solve_need\":\""   << (isSolveCapacity() ? "solve_capacity" : "solve_tasksnum") << "\"";
 
+	if (isHostsMaskRegEx())
+		o_str << ",\n\"hosts_mask_type\":\"regex\"";
+	if (isHostsMaskFind())
+		o_str << ",\n\"hosts_mask_type\":\"find\"";
+
 	if (m_running_tasks_num > 0) o_str << ",\n\"running_tasks_num\":" << m_running_tasks_num;
 	if (m_running_capacity_total > 0) o_str << ",\n\"running_capacity_total\":" << m_running_capacity_total;
+}
+
+void Work::v_setHostsMaskFind()
+{
+	m_work_flags = m_work_flags |   FHostsMask_Find;
+	m_work_flags = m_work_flags & (~FHostsMask_RegEx);
+	m_hosts_mask.setFind();
+	m_hosts_mask_exclude.setFind();
+}
+void Work::v_setHostsMaskRegEx()
+{
+	m_work_flags = m_work_flags & (~FHostsMask_Find);
+	m_work_flags = m_work_flags |   FHostsMask_RegEx;
+	m_hosts_mask.setRegEx();
+	m_hosts_mask_exclude.setRegEx();
 }
 
 int Work::getPoolPriority(const std::string & i_pool, bool & o_canrunon) const

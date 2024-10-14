@@ -1,12 +1,6 @@
 #pragma once
 
-#ifdef REGEX_STD
 #include <regex>
-static const int REG_EXTENDED = 0;
-static const int REG_ICASE = 1;
-#else
-#include <regex.h>
-#endif
 
 #include "name_af.h"
 
@@ -22,39 +16,54 @@ public:
 
 	~RegExp();
 
-	inline bool empty() const { return pattern.empty(); }
-	inline bool notEmpty() const { return false == pattern.empty(); }
-	inline const std::string & getPattern() const { return pattern;}
+	enum Flags
+	{
+		FRegEx   = 1 << 0,
+		FCaseIns = 1 << 1,
+		FContain = 1 << 2,
+		FExclude = 1 << 3
+	};
 
-	static bool Validate( const std::string & str, std::string * errOutput = NULL);
+	void setFind();
+	void setRegEx();
 
-	bool setPattern( const std::string & str, std::string * strError = NULL);
+	inline bool isFind()    const {return (m_flags & FRegEx) == 0;}
+	inline bool isRegEx()   const {return (m_flags & FRegEx);}
+	inline bool isCaseSen() const {return (m_flags & FCaseIns) == 0;}
+	inline bool isCaseIns() const {return (m_flags & FCaseIns);}
+	inline bool isMatch()   const {return (m_flags & FContain) == 0;}
+	inline bool isContain() const {return (m_flags & FContain);}
+	inline bool isInclude() const {return (m_flags & FExclude) == 0;}
+	inline bool isExclude() const {return (m_flags & FExclude);}
 
-	inline void setCaseSensitive()   { cflags = compile_flags; }
-	inline void setCaseInsensitive() { cflags = compile_flags | REG_ICASE; }
+	inline bool empty() const {return m_pattern.empty();}
+	inline bool notEmpty() const {return false == m_pattern.empty();}
+	inline const std::string & getPattern() const {return m_pattern;}
 
-	inline void setMatch()   { contain = false; }
-	inline void setContain() { contain = true;  }
-	inline void setInclude() { exclude = false; }
-	inline void setExclude() { exclude = true;  }
+	bool setPattern(const std::string & i_str, std::string * o_strError = NULL);
 
-	bool match( const std::string & str) const;
+	inline void setCaseSen() {m_flags = m_flags & (~FCaseIns);}
+	inline void setCaseIns() {m_flags = m_flags |   FCaseIns; }
+	inline void setMatch()   {m_flags = m_flags & (~FContain);}
+	inline void setContain() {m_flags = m_flags |   FContain; }
+	inline void setInclude() {m_flags = m_flags & (~FExclude);}
+	inline void setExclude() {m_flags = m_flags |   FExclude; }
+
+	bool match(const std::string & i_str) const;
 
 	int weigh() const;
 
+public:
+	static bool Validate(const std::string & i_str, std::string * o_errOutput = NULL);
+
 private:
 
-	int cflags;
-	bool exclude;
-	bool contain;
-	std::string pattern;
+	int m_flags;
 
-#ifdef REGEX_STD
-	std::regex regexp;
-#else
-	regex_t regexp;
-#endif
+	std::string m_pattern;
 
-	static const int compile_flags;
+	std::regex m_regexp;
+
+	std::vector<std::string> m_strings;
 };
 }

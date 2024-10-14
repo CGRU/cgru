@@ -260,6 +260,27 @@ bool JobAf::initialize()
 	}
 
 	//
+	// Inherit hosts mask type from user if not set:
+	if (isHostsMaskInherit())
+	{
+		if (m_user->isHostsMaskRegEx())
+			v_setHostsMaskRegEx();
+		else
+			v_setHostsMaskFind();
+	}
+	else
+	{
+		// Set blocks host mask the same type as job:
+		for (int b = 0; b < m_blocks_num; b++)
+		{
+			if (isHostsMaskRegEx())
+				m_blocks_data[b]->setHostsMaskRegEx();
+			else
+				m_blocks_data[b]->setHostsMaskFind();
+		}
+	}
+
+	//
 	// Store job ( if not stored )
 	if( isFromStore() == false )
 	{
@@ -324,6 +345,19 @@ bool JobAf::initialize()
 	v_refresh( time(NULL), NULL, NULL);
 
 	return true;
+}
+
+void JobAf::v_setHostsMaskFind()
+{
+	Work::v_setHostsMaskFind();
+	for (int b = 0; b < m_blocks_num; b++)
+		m_blocks_data[b]->setHostsMaskFind();
+}
+void JobAf::v_setHostsMaskRegEx()
+{
+	Work::v_setHostsMaskRegEx();
+	for (int b = 0; b < m_blocks_num; b++)
+		m_blocks_data[b]->setHostsMaskRegEx();
 }
 
 void JobAf::checkStates()

@@ -41,6 +41,7 @@ void ItemWork::updateWorkValues(af::Work * i_afwork)
 	max_running_tasks_per_host = i_afwork->getMaxRunTasksPerHost();
 	hostsmask                  = afqt::stoq(i_afwork->getHostsMask());
 	hostsmask_exclude          = afqt::stoq(i_afwork->getHostsMaskExclude());
+	hosts_mask_regex           = i_afwork->isHostsMaskRegEx();
 
 	running_tasks_num          = i_afwork->getRunningTasksNum();
 	running_capacity_total     = i_afwork->getRunningCapacityTotal();

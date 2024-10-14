@@ -88,6 +88,17 @@ ListUsers::ListUsers( QWidget* parent):
 
 	resetButtonsMenu();
 
+	bm = addButtonsMenu(Item::TUser, "Hosts Mask","Set hosts mask type.");
+	bm->openMenu();
+
+	bp = addButtonPanel(Item::TUser, "FIND",  "users_hosts_mask_find","Use simple find algorithm for hosts mask.");
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actHostsMaskFind()));
+
+	bp = addButtonPanel(Item::TUser, "REGEX","users_hosts_mask_regex","Use regular expressions for hosts mask.");
+	connect(bp, SIGNAL(sigClicked()), this, SLOT(actHostsMaskRegEx()));
+
+	resetButtonsMenu();
+
 	bp = addButtonPanel(Item::TAny, "CUSTOM DATA","node_custom_data","Edit node custom data.");
 	connect(bp, SIGNAL(sigClicked()), this, SLOT(actCustomData()));
 
@@ -215,6 +226,8 @@ void ListUsers::actSolveJobsByOrder()    {setParameterStr(Item::TUser, "solve_me
 void ListUsers::actSolveJobsByPriority() {setParameterStr(Item::TUser, "solve_method", "solve_priority"); }
 void ListUsers::actSolveJobsByCapacity() {setParameterStr(Item::TUser, "solve_need",   "solve_capacity"); }
 void ListUsers::actSolveJobsByTasksNum() {setParameterStr(Item::TUser, "solve_need",   "solve_tasksnum"); }
+void ListUsers::actHostsMaskFind()       {setParameterStr(Item::TUser, "hosts_mask_type", "find"); }
+void ListUsers::actHostsMaskRegEx()      {setParameterStr(Item::TUser, "hosts_mask_type", "regex");}
 
 void ListUsers::actRequestLog() { getItemInfo(Item::TAny, "log"); }
 

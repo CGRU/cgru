@@ -21,6 +21,7 @@ public:
 	int max_running_tasks_per_host;
 	QString hostsmask;
 	QString hostsmask_exclude;
+	bool hosts_mask_regex;
 
 	int running_tasks_num;
 	int64_t running_capacity_total;
