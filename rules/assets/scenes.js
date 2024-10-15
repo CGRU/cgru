@@ -795,7 +795,7 @@ function scenes_GetSelectedShots()
 
 function sc_FilterShots(i_args)
 {
-	var o_res = {};
+	let o_res = {};
 	o_res.artists = [];
 	o_res.flags = [];
 	o_res.tags = [];
@@ -806,8 +806,7 @@ function sc_FilterShots(i_args)
 	if (i_args == null)
 		i_args = {};
 
-
-	// Prepare speial flags and tags:
+	// Prepare special flags and tags:
 	let flags_and = false;
 	let flags_tsk = false;
 	if (i_args.flags)
@@ -844,8 +843,7 @@ function sc_FilterShots(i_args)
 		}
 	}
 
-
-	var anns = null;
+	let anns = null;
 	if (i_args.ann )
 	{
 		let anns_or = i_args.ann.split('|');
@@ -854,7 +852,7 @@ function sc_FilterShots(i_args)
 			anns.push( anns_or[o].split('+'));
 	}
 
-	var bodies = null;
+	let bodies = null;
 	if (i_args.body)
 	{
 		let bodies_or = i_args.body.split('|');
@@ -1029,39 +1027,55 @@ function sc_FilterShots(i_args)
 					if (found && i_args.flags && i_args.flags.length)
 					{
 						found = false;
+						let flags = [];
+						// Join this task flags with status flags
+						if (st_obj.flags && st_obj.flags.length)
+							flags = flags.concat(st_obj.flags);
 						if (task.flags && task.flags.length)
-							for (let i = 0; i < i_args.flags.length; i++)
-								if (task.flags.includes(i_args.flags[i]))
-								{
-									found = true;
-									if (false == flags_and)
-										break;
-								}
-								else
-								{
-									found = false;
-									if (flags_and)
-										break;
-								}
+							flags = flags.concat(task.flags);
+
+						for (let i = 0; i < i_args.flags.length; i++)
+						{
+							if (flags.includes(i_args.flags[i]))
+							{
+								found = true;
+								if (false == flags_and)
+									break;
+							}
+							else
+							{
+								found = false;
+								if (flags_and)
+									break;
+							}
+						}
 					}
 
 					if (found && i_args.tags && i_args.tags.length)
 					{
 						found = false;
+						let tags = [];
+						// Join this task tags with status tags
+						if (st_obj.tags && st_obj.tags.length)
+							tags = tags.concat(st_obj.tags);
 						if (task.tags && task.tags.length)
-							for (let i = 0; i < i_args.tags.length; i++)
-								if (task.tags.includes(i_args.tags[i]))
-								{
-									found = true;
-									if (false == tags_and)
-										break;
-								}
-								else
-								{
-									found = false;
-									if (tags_and)
-										break;
-								}
+							tags = tags.concat(task.tags);
+
+						for (let i = 0; i < i_args.tags.length; i++)
+						{
+							if (tags.includes(i_args.tags[i]))
+							{
+								found = true;
+								if (false == tags_and)
+									break;
+							}
+							else
+							{
+								found = false;
+								if (tags_and)
+									break;
+							}
+						}
 					}
 
 					// We found one task matching flags and tags.
@@ -1133,6 +1147,11 @@ function sc_FilterShots(i_args)
 					if (task.tags)
 						o_res.tags = o_res.tags.concat(task.tags);
 				}
+
+			// Remove duplicates from arrays:
+			o_res.artists = Array.from(new Set(o_res.artists));
+			o_res.flags   = Array.from(new Set(o_res.flags));
+			o_res.tags    = Array.from(new Set(o_res.tags));
 		}
 		else
 		{
