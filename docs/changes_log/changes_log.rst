@@ -18,11 +18,41 @@ v3.4.0
 
 *2024.03.26 NOT RELEASED*
 
-- AfWatch Delete Done Jobs confirm dialog.
+-   AfWatch Delete Done Jobs confirm dialog.
 
-- AfRender can get CPU temperature and hardware info by Python modules. AfWatch can show it.
+-   AfRender can get CPU temperature and hardware info by Python modules.
+    AfWatch marks "hot" renders with red color and shows hardware info.
 
-- AfRender Python service class skip task proceeded by a special function (variable). Empty command is threated not as skipped but as error now. As empty command can happen on some error in service class.
+-   AfRender Python service class skip task proceeded by a special function (variable).
+    Empty command is treated not as skipped but as error launch now.
+    As empty command can happen on some error in service class.
+
+-   Afserver skips refresh of a done jobs.
+    It refreshes it only on some parameter change.
+    Now done job does not consume noticeable CPU time (only life time processesed).
+
+-   **SUSPENDED task state.**
+    Task will not run if it is suspended.
+    You can continue suspended task(s) from GUI and API (continue suspended means remove suspended flag).
+    Suspended is like skipped task, but skipped task treated as done.
+    Job with skipped tasks treated as done.
+    Suspended task is not done, job with such tasks is suspended.
+    So depended jobs will not run.
+    You can control tasks dependencies from outside by manipulating suspended state.
+    Block can have *FSuspendNewTasks* flag.
+    This means that its tasks will be suspended.
+
+-   **Now find function is used to match hosts mask and hosts exclude mask**.
+    This is the default behaviour for user, job and branch.
+    You can configure user, job and branch to use Regular Expressions.
+    New jobs w/o hosts mask type parameters set, will inherit from user.
+    So, if you want previous behaviour, set user hosts mask type to *regex*.
+    Find work much faster then regex match, and it is noticeable on a big amount of jobs and renders.
+
+    .. note::
+
+        If you want previous hosts mask **REGEX** behaviour, you should set user hosts masks type to **REGEX**
+
 
 
 .. _changes-log-latest:
