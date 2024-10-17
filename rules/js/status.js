@@ -1769,12 +1769,12 @@ function st_SetStatusFlags(o_status, i_flags)
 			a++;
 
 	// Store existing flags to check was it ON before:
-	let _flags = [];
+	let existing_flags = [];
 	for (let a = 0; a < o_status.flags.length; a++)
-		_flags.push(o_status.flags[a]);
+		existing_flags.push(o_status.flags[a]);
 
 	for (let id in i_flags)
-		if ((i_flags[id].selected) && (_flags.indexOf(id) == -1))
+		if ((i_flags[id].selected) && (existing_flags.indexOf(id) == -1))
 		{
 			if (RULES.flags[id])
 			{
@@ -1792,12 +1792,14 @@ function st_SetStatusFlags(o_status, i_flags)
 				if (progress != null)
 					o_status.progress = progress;
 
-				// Flag can be exclusive, so we should delete other flags:
-				if (RULES.flags[id].mode && (
-							(RULES.flags[id].mode == 'stage') ||
-							(RULES.flags[id].mode == 'super')
-							))
-					o_status.flags = [];
+				// Stage flag shuold remove other stage flags:
+				if (RULES.flags[id].mode && (RULES.flags[id].mode == 'stage'))
+				{
+					o_status.flags.forEach((item, index) => {
+						if (RULES.flags[item].mode === 'stage')
+							o_status.flags.splice(index, 1);
+					});
+				}
 			}
 
 			o_status.flags.push(id);
