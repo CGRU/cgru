@@ -1,0 +1,4 @@
+sphinx_rtd_theme==0.4.3
+msmb_theme==1.2.0
+sphinxcontrib-images==0.8.0
+recommonmark==0.5.0
