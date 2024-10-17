@@ -77,6 +77,9 @@ public:
 
 	static void filesReceived( const af::MCTaskUp & i_taskup);
 
+	static void queueJobThumbnail(int32_t i_jobid);
+	static void getJobThumbnail(int32_t i_jobid);
+
 	static void setWindowTitle( const QString & title);
 
 	static void displayInfo(    const QString &message);
@@ -150,4 +153,6 @@ private:
 	static QMap<QString, QPixmap *> ms_services_icons_small;
 	static QMap<QString, QPixmap *> ms_services_icons_tiny;
 	static QMap<QString, QPixmap *> ms_tickets_icons;
+
+	static QList<int32_t> ms_jobs_thumbnail_ids;
 };

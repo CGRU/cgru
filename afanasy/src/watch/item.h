@@ -103,8 +103,11 @@ public:
 
 	virtual bool calcHeight();
 
-	inline void setHidden(bool i_hidden) {m_hidden = i_hidden;}
+	inline void setHidden(bool i_hidden) {v_processHidden(i_hidden); m_hidden = i_hidden;}
 	inline bool isHidden() const {return m_hidden;}
+
+	// Job item gets thumbnail here:
+	virtual void v_processHidden(bool i_hidden) {};
 
 	inline bool hasParam(const QString & i_name) const {return m_params.contains(i_name);}
 	const QVariant & getParamVar(const QString & i_name) const;

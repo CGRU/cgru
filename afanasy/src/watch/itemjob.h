@@ -72,9 +72,9 @@ public:
 
 	bool calcHeight();
 
-	virtual void v_filesReceived(const af::MCTaskUp & i_taskup);
+	virtual void v_filesReceived(const af::MCTaskUp & i_taskup) override;
 
-	void getThumbnail() const;
+	virtual void v_processHidden(bool i_hidden) override;
 
 	void resizeThumbnails();
 
@@ -129,6 +129,7 @@ private:
 	QList<QImage*> m_thumbs;
 	QList<QString> m_thumbs_paths;
 	mutable int m_thumbs_visible;
+	QString m_thumb_path_new;
 
 	int m_block_height;
 

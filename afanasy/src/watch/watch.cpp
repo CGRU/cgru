@@ -58,6 +58,8 @@ QMap<QString, QPixmap *> Watch::ms_services_icons_small;
 QMap<QString, QPixmap *> Watch::ms_services_icons_tiny;
 QMap<QString, QPixmap *> Watch::ms_tickets_icons;
 
+QList<int32_t> Watch::ms_jobs_thumbnail_ids;
+
 QApplication * Watch::ms_app = NULL;
 Dialog * Watch::ms_d = NULL;
 
@@ -358,15 +360,54 @@ void Watch::caseMessage( af::Msg * i_msg)
 
 void Watch::filesReceived( const af::MCTaskUp & i_taskup)
 {
+	bool found = false;
+
 	for (QList<Receiver*>::iterator rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
 	{
 		if((*rIt)->v_filesReceived( i_taskup))
-			return;
+		{
+			found = true;
+			break;
+		}
 	}
 
-	printf("Watch::filesReceived: Recipient not found:\n");
-	i_taskup.v_stdOut();
+	if (false == found)
+	{
+		printf("Watch::filesReceived: Recipient not found:\n");
+		i_taskup.v_stdOut();
+	}
+
+	ms_jobs_thumbnail_ids.removeAll(i_taskup.getNumJob());
+	//printf("Watch::filesReceived: ms_jobs_thumbnail_ids.size = %d\n", ms_jobs_thumbnail_ids.size());
+	if (ms_jobs_thumbnail_ids.size())
+		getJobThumbnail(ms_jobs_thumbnail_ids.first());
+
 	return;
+}
+
+void Watch::queueJobThumbnail(int32_t i_jobid)
+{
+	//printf("Watch::queueJobThumbnail: ms_jobs_thumbnail_ids.size = %d\n", ms_jobs_thumbnail_ids.size());
+
+	// Check if we are already waiting this job thumbnail
+	if (ms_jobs_thumbnail_ids.contains(i_jobid))
+		return;
+
+	if (ms_jobs_thumbnail_ids.empty())
+		getJobThumbnail(i_jobid);
+
+	ms_jobs_thumbnail_ids.push_back(i_jobid);
+}
+
+void Watch::getJobThumbnail(int32_t i_jobid)
+{
+	std::ostringstream str;
+	str << "{\"get\":{\"type\":\"jobs\",\"mode\":\"thumbnail\"";
+	str << ",\"ids\":[" << i_jobid << "]";
+	str << ",\"binary\":true}}";
+
+	af::Msg * msg = af::jsonMsg(str);
+	sendMsg(msg);
 }
 
 void Watch::listenJob( int id, const QString & name)

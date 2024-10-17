@@ -187,7 +187,7 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 	if (m_inworklist)
 		setParentPath(branch);
 
-	QString new_thumb_path = afqt::stoq(job->getThumbPath());
+	m_thumb_path_new = afqt::stoq(job->getThumbPath());
 
 	m_compact_display = true;
 
@@ -338,11 +338,6 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 	updateInfo(job);
 
 	calcHeight();
-
-	if (thumb_path != new_thumb_path)
-		getThumbnail();
-	thumb_path = new_thumb_path;
-
 
 	// Notifications:
 	if (prev_state != 0) //< This is not item creation:
@@ -881,26 +876,21 @@ void ItemJob::v_setFilterType(int i_type)
 	}
 }
 
-void ItemJob::getThumbnail() const
+void ItemJob::v_processHidden(bool i_hidden)
 {
-	if (isHidden())
+	if (i_hidden)
 		return;
 
-	if (getThumbsHeight() < 1)
-		return;
+	if (thumb_path != m_thumb_path_new)
+		if (getThumbsHeight() > 0)
+			Watch::queueJobThumbnail(getId());
 
-	std::ostringstream str;
-	str << "{\"get\":{\"type\":\"jobs\",\"mode\":\"thumbnail\"";
-	str << ",\"ids\":[" << getId() << "]";
-	str << ",\"binary\":true}}";
-
-	af::Msg * msg = af::jsonMsg(str);
-	Watch::sendMsg(msg);
+	thumb_path = m_thumb_path_new;
 }
 
 void ItemJob::v_filesReceived(const af::MCTaskUp & i_taskup)
 {
-//printf("ItemJob::v_filesReceived:\n"); i_taskup.v_stdOut();
+//printf("ItemJob::v_filesReceived:%s\n", m_name.toUtf8().data()); i_taskup.v_stdOut(1);
 
 	if (i_taskup.getFilesNum() == 0)
 		return;
