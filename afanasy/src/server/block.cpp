@@ -935,6 +935,27 @@ int Block::blackListWeight() const
    return weight;
 }
 
+void Block::checkStatesOnAppend()
+{
+	for (int t = 0; t < m_data->getTasksNum(); t++)
+	{
+		uint32_t taskstate = m_jobprogress->tp[m_data->getBlockNum()][t]->state;
+
+		if (taskstate == 0)
+		{
+			if (m_data->isSuspendingNewTasks())
+				taskstate = AFJOB::STATE_SUSPENDED_MASK;
+			else
+				taskstate = AFJOB::STATE_READY_MASK;
+			m_jobprogress->tp[m_data->getBlockNum()][t]->state = taskstate;
+		}
+	}
+
+	constructDependBlocks();
+	if (m_dependTasksBlocks.size())
+		constructDependTasks();
+}
+
 bool Block::appendTasks(Action & i_action, const JSON & i_operation)
 {
 	if (m_job->getId() == AFJOB::SYSJOB_ID)
@@ -966,7 +987,7 @@ bool Block::appendTasks(Action & i_action, const JSON & i_operation)
 	storeTasks();
 
 	// Set new tasks ready
-	m_job->checkStatesOnAppend();
+	checkStatesOnAppend();
 
 	// Emit an event for monitors (afwatch ListTasks)
 	i_action.monitors->addBlock(af::Msg::TBlocks, m_data);

@@ -364,7 +364,6 @@ void JobAf::checkStates()
 {
 	// This function is called on a job initialization,
 	// When a new job created, or from database on server restart.
-	// Also it called on a block(s) appending.
 
 	for( int b = 0; b < m_blocks_num; b++)
 	{
@@ -399,29 +398,6 @@ void JobAf::checkStates()
 	}
 
 	// If job is not done, just set WAITDEP state to not make it to run before a refresh.
-	if(( m_state & AFJOB::STATE_DONE_MASK) == false ) m_state = m_state | AFJOB::STATE_WAITDEP_MASK;
-}
-
-void JobAf::checkStatesOnAppend()
-{
-	for( int b = 0; b < m_blocks_num; b++)
-	{
-		int numtasks = m_blocks_data[b]->getTasksNum();
-		for( int t = 0; t < numtasks; t++)
-		{
-			uint32_t taskstate = m_progress->tp[b][t]->state;
-
-			if( taskstate == 0 )
-			{
-				if (m_blocks_data[b]->isSuspendingNewTasks())
-					taskstate = AFJOB::STATE_SUSPENDED_MASK;
-				else
-					taskstate = AFJOB::STATE_READY_MASK;
-				m_progress->tp[b][t]->state = taskstate;
-			}
-		}
-	}
-
 	if(( m_state & AFJOB::STATE_DONE_MASK) == false ) m_state = m_state | AFJOB::STATE_WAITDEP_MASK;
 }
 
@@ -1686,6 +1662,7 @@ void JobAf::appendBlocks(Action & i_action, const JSON & i_operation)
 		m_blocks_data[b]->setJobId( m_id);
 		m_blocks[b]->storeTasks();
 		m_blocks[b]->setUser( m_user);
+		m_blocks[b]->checkStatesOnAppend();
 
 		// Emit an event for monitors (afwatch ListTasks)
 		i_action.monitors->addBlock(af::Msg::TBlocks, m_blocks[b]->m_data);
@@ -1696,9 +1673,6 @@ void JobAf::appendBlocks(Action & i_action, const JSON & i_operation)
 	}
 	answer += "]}";
 	i_action.answerObject(answer);
-
-	checkDepends();
-	checkStatesOnAppend();
 
 	// Emit an event for monitors (afwatch ListJobs)
 	i_action.monitors->addJobEvent(af::Monitor::EVT_jobs_change, getId(), getUid());

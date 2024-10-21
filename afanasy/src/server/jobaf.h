@@ -90,9 +90,8 @@ public:
 	/// Initialize new job, came to Afanasy container.
 	bool initialize();
 
-	/// Set state of new tasks
+	/// Set state of tasks
 	void checkStates();
-	void checkStatesOnAppend();
 
 	int getUid() const;
 
