@@ -867,6 +867,12 @@ void RenderAf::addTask(af::TaskExec * i_taskexec, MonitorContainer * i_monitorin
 
 	// Acuire task on pool
 	m_parent->taskAcuire(i_taskexec, new_tickets, i_monitoring);
+
+	// Add some render capacities
+	i_taskexec->setDataInteger("render_capacity_total", findCapacity());
+	i_taskexec->setDataInteger("render_capacity_used",  m_capacity_used);
+	i_taskexec->setDataInteger("render_tasks_maximum",  findMaxTasks());
+	i_taskexec->setDataInteger("render_tasks_running",  m_tasks.size());
 }
 
 void RenderAf::removeTask(const af::TaskExec * i_taskexec, MonitorContainer * i_monitoring)
