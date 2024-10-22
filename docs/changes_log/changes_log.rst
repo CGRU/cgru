@@ -16,9 +16,14 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
 v3.4.0
 ======
 
-*2024.03.26 NOT RELEASED*
+*2024.10.22 NOT RELEASED*
 
 -   AfWatch Delete Done Jobs confirm dialog.
+
+-   AfWatch asks server for jobs thumbnails one by one, not all at once.
+    Also it does not ask for thumbnail of a hidden jobs.
+    This can speeds up interface on a big amout of jobs and/or slow connection.
+    It is especially useful on a Work (Branches) view.
 
 -   AfRender can get CPU temperature and hardware info by Python modules.
     AfWatch marks "hot" renders with red color and shows hardware info.
@@ -53,7 +58,9 @@ v3.4.0
 
         If you want previous hosts mask **REGEX** behaviour, you should set user hosts masks type to **REGEX**
 
+- **Bugfixes:**
 
+    - *appendBlocks()* and a new block tasks depend mask works fine.
 
 .. _changes-log-latest:
 
