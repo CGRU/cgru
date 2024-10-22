@@ -815,6 +815,7 @@ void BlockInfo::generateMenu(QMenu * i_menu, QMenu * i_params_submenu) const
 	static const QStringList operations = {
 		"reset_error_hosts", "Reset Error Hosts",
 		"skip",              "Skip Block Tasks",
+		"suspend",           "Suspend Block Tasks",
 		"restart",           "Restart Block Tasks",
 		"restart_errors",    "Restart Errors",
 		"restart_running",   "Restart Running",
