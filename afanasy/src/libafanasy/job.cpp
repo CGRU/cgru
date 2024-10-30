@@ -343,10 +343,9 @@ void Job::v_readwrite( Msg * msg)
 	rw_int64_t(m_time_started,  msg);
 	rw_int64_t(m_time_done,     msg);
 	rw_int32_t(m_time_life,     msg);
-	/* NEW_VERSION
 	rw_int32_t(m_tasks_ready,   msg);
 	rw_int32_t(m_tasks_error,   msg);
-	*/
+
 	rw_String(m_user_name,    msg);
 	rw_String(m_host_name,    msg);
 	rw_String(m_command_pre,  msg);

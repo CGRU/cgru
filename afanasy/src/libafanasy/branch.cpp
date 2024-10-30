@@ -84,17 +84,16 @@ void Branch::v_readwrite(Msg *msg)
 
 	rw_String(m_parent_path, msg);
 
-	rw_int32_t(m_tasks_ready,    msg);
 	rw_int32_t(m_branches_total, msg);
-	rw_int32_t(m_jobs_running,   msg);
+
 	rw_int32_t(m_jobs_total,     msg);
-	/*
-	NEW_VERSION
+	rw_int32_t(m_jobs_running,   msg);
 	rw_int32_t(m_jobs_done,      msg);
-	rw_int32_t(m_jobs_error,     msg);
 	rw_int32_t(m_jobs_ready,     msg);
+	rw_int32_t(m_jobs_error,     msg);
+
+	rw_int32_t(m_tasks_ready,    msg);
 	rw_int32_t(m_tasks_error,    msg);
-	*/
 }
 
 void Branch::v_jsonWrite(std::ostringstream &o_str, int i_type) const
