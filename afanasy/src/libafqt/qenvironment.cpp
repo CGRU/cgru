@@ -156,6 +156,8 @@ QString QEnvironment::ms_hostname;
 
 QEnvironment::QEnvironment( const QString & i_name)
 {
+	printf("Qt version = \"%s\"\n", qVersion());
+
     ms_appname = i_name;
 
     ms_attrs_prefs.append( &level              );
@@ -366,8 +368,6 @@ QEnvironment::QEnvironment( const QString & i_name)
     initFonts();
 
     solveServerAddress();
-
-    printf("Qt version = \"%s\"\n", qVersion());
 }
 
 void QEnvironment::initFonts()
@@ -576,12 +576,12 @@ void QEnvironment::solveServerAddress()
       printf("Looking up server name \"%s\"...\n", af::Environment::getServerName().c_str());
       QHostInfo qhostinfo = QHostInfo::fromName( ms_servername);
       adresses = qhostinfo.addresses();
-      if( adresses.size() < 1 )
-      {
-         AFERRAR("Can't solve server name '%s'", serveraddrnum_arg.c_str())
-         ms_valid = false;
-         return;
-      }
+		if (adresses.size() < 1)
+		{
+			AF_ERR << "Can't solve server name \"" << af::Environment::getServerName().c_str() << "\"";
+			ms_valid = false;
+			return;
+		}
    }
    if( adresses.size() > 1 )
    {
