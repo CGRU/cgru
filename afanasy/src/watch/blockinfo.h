@@ -46,6 +46,7 @@ public:
 	int p_tasks_done;
 	int p_tasks_error;
 	int p_tasks_skipped;
+	int p_tasks_suspended;
 	int p_tasks_waitdep;
 	int p_tasks_warning;
 	int p_tasks_waitrec;

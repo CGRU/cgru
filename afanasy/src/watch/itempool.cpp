@@ -117,22 +117,22 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 	if (Watch::isPadawan())
 	{
 		if (pool->getPoolsTotal())
-			strLeftBottom += QString(" Pools Total: %1").arg(pool->getPoolsTotal());
+			strLeftBottom += QString(" Pools:%1").arg(pool->getPoolsTotal());
 
 		if (pool->getRendersTotal())
-			strLeftBottom += QString(" Renders Total: %1").arg(pool->getRendersTotal());
-		if (pool->getRendersBusy())    strLeftBottom += QString(" Busy: %1"   ).arg(pool->getRendersBusy());
-		if (pool->getRendersReady())   strLeftBottom += QString(" Ready: %1"  ).arg(pool->getRendersReady());
-		if (pool->getRendersOnline())  strLeftBottom += QString(" Online: %1" ).arg(pool->getRendersOnline());
-		if (pool->getRendersOffline()) strLeftBottom += QString(" Offline: %1").arg(pool->getRendersOffline());
-		if (pool->getRendersNimby())   strLeftBottom += QString(" Nimby: %1"  ).arg(pool->getRendersNimby());
-		if (pool->getRendersPaused())  strLeftBottom += QString(" Paused: %1" ).arg(pool->getRendersPaused());
-		if (pool->getRendersSick())    strLeftBottom += QString(" Sick: %1"   ).arg(pool->getRendersSick());
+			strLeftBottom += QString(" Renders:%1").arg(pool->getRendersTotal());
+		if (pool->getRendersBusy())    strLeftBottom += QString(" Busy:%1"   ).arg(pool->getRendersBusy());
+		if (pool->getRendersReady())   strLeftBottom += QString(" Ready:%1"  ).arg(pool->getRendersReady());
+		if (pool->getRendersOnline())  strLeftBottom += QString(" Online:%1" ).arg(pool->getRendersOnline());
+		if (pool->getRendersOffline()) strLeftBottom += QString(" Offline:%1").arg(pool->getRendersOffline());
+		if (pool->getRendersNimby())   strLeftBottom += QString(" Nimby:%1"  ).arg(pool->getRendersNimby());
+		if (pool->getRendersPaused())  strLeftBottom += QString(" Paused:%1" ).arg(pool->getRendersPaused());
+		if (pool->getRendersSick())    strLeftBottom += QString(" Sick:%1"   ).arg(pool->getRendersSick());
 
 		if (pool->getRunTasks())
-			strLeftBottom += QString(" Running Tasks: %1").arg(pool->getRunTasks());
+			strLeftBottom += QString(" RunningTasks:%1").arg(pool->getRunTasks());
 		if (pool->getRunCapacity())
-			strLeftBottom += QString(" Running Capacity: %1").arg(pool->getRunCapacity());
+			strLeftBottom += QString(" RunningCapacity:%1").arg(pool->getRunCapacity());
 
 		if (pool->isNewRenderNimby())
 			strRightTop += " NewRender:Nimby";
@@ -148,22 +148,22 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 	else if(Watch::isJedi())
 	{
 		if (pool->getPoolsTotal())
-			strLeftBottom += QString(" Pools: %1").arg(pool->getPoolsTotal());
+			strLeftBottom += QString(" Pools:%1").arg(pool->getPoolsTotal());
 
 		if (pool->getRendersTotal())
-			strLeftBottom += QString(" Renders: %1").arg(pool->getRendersTotal());
-		if (pool->getRendersBusy())    strLeftBottom += QString(" Busy: %1").arg(pool->getRendersBusy());
-		if (pool->getRendersReady())   strLeftBottom += QString(" RDY: %1" ).arg(pool->getRendersReady());
-		if (pool->getRendersOnline())  strLeftBottom += QString(" ON: %1"  ).arg(pool->getRendersOnline());
-		if (pool->getRendersOffline()) strLeftBottom += QString(" OFF: %1" ).arg(pool->getRendersOffline());
-		if (pool->getRendersNimby())   strLeftBottom += QString(" Nby: %1" ).arg(pool->getRendersNimby());
-		if (pool->getRendersPaused())  strLeftBottom += QString(" Pau: %1" ).arg(pool->getRendersPaused());
-		if (pool->getRendersSick())    strLeftBottom += QString(" Sick: %1").arg(pool->getRendersSick());
+			strLeftBottom += QString(" Renders:%1").arg(pool->getRendersTotal());
+		if (pool->getRendersBusy())    strLeftBottom += QString(" Busy:%1").arg(pool->getRendersBusy());
+		if (pool->getRendersReady())   strLeftBottom += QString(" RDY:%1" ).arg(pool->getRendersReady());
+		if (pool->getRendersOnline())  strLeftBottom += QString(" ON:%1"  ).arg(pool->getRendersOnline());
+		if (pool->getRendersOffline()) strLeftBottom += QString(" OFF:%1" ).arg(pool->getRendersOffline());
+		if (pool->getRendersNimby())   strLeftBottom += QString(" Nby:%1" ).arg(pool->getRendersNimby());
+		if (pool->getRendersPaused())  strLeftBottom += QString(" Pau:%1" ).arg(pool->getRendersPaused());
+		if (pool->getRendersSick())    strLeftBottom += QString(" Sick:%1").arg(pool->getRendersSick());
 
 		if (pool->getRunTasks())
-			strLeftBottom += QString(" Tasks: %1").arg(pool->getRunTasks());
+			strLeftBottom += QString(" Tasks:%1").arg(pool->getRunTasks());
 		if (pool->getRunCapacity())
-			strLeftBottom += QString(" Capacity: %1").arg(pool->getRunCapacity());
+			strLeftBottom += QString(" Capacity:%1").arg(pool->getRunCapacity());
 
 		if (pool->isNewRenderNimby())
 			strRightTop += " New:Nimby";
@@ -179,17 +179,17 @@ void ItemPool::v_updateValues(af::Node * i_afnode, int i_msgType)
 	else
 	{
 		if (pool->getPoolsTotal())
-			strLeftBottom += QString(" p:%1").arg(pool->getPoolsTotal());
+			strLeftBottom += QString(" P:%1").arg(pool->getPoolsTotal());
 
 		if (pool->getRendersTotal())
-			strLeftBottom += QString(" r: %1").arg(pool->getRendersTotal());
-		if (pool->getRendersBusy())    strLeftBottom += QString(" b: %1"  ).arg(pool->getRendersBusy());
-		if (pool->getRendersReady())   strLeftBottom += QString(" r: %1"  ).arg(pool->getRendersReady());
-		if (pool->getRendersOnline())  strLeftBottom += QString(" on: %1" ).arg(pool->getRendersOnline());
-		if (pool->getRendersOffline()) strLeftBottom += QString(" off: %1").arg(pool->getRendersOffline());
-		if (pool->getRendersNimby())   strLeftBottom += QString(" n: %1"  ).arg(pool->getRendersNimby());
-		if (pool->getRendersPaused())  strLeftBottom += QString(" p: %1"  ).arg(pool->getRendersPaused());
-		if (pool->getRendersSick())    strLeftBottom += QString(" s: %1"  ).arg(pool->getRendersSick());
+			strLeftBottom += QString(" R:%1").arg(pool->getRendersTotal());
+		if (pool->getRendersBusy())    strLeftBottom += QString(" b:%1"  ).arg(pool->getRendersBusy());
+		if (pool->getRendersReady())   strLeftBottom += QString(" r:%1"  ).arg(pool->getRendersReady());
+		if (pool->getRendersOnline())  strLeftBottom += QString(" on:%1" ).arg(pool->getRendersOnline());
+		if (pool->getRendersOffline()) strLeftBottom += QString(" off:%1").arg(pool->getRendersOffline());
+		if (pool->getRendersNimby())   strLeftBottom += QString(" n:%1"  ).arg(pool->getRendersNimby());
+		if (pool->getRendersPaused())  strLeftBottom += QString(" p:%1"  ).arg(pool->getRendersPaused());
+		if (pool->getRendersSick())    strLeftBottom += QString(" s:%1"  ).arg(pool->getRendersSick());
 
 			strLeftBottom += QString(" t:%1").arg(pool->getRunTasks());
 		if (pool->getRunCapacity())

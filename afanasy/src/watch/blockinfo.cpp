@@ -36,6 +36,7 @@ BlockInfo::BlockInfo(const af::BlockData * i_data, Item * i_item, ListItems * i_
 	p_tasks_done(0),
 	p_tasks_error(0),
 	p_tasks_skipped(0),
+	p_tasks_suspended(0),
 	p_tasks_waitdep(0),
 	p_tasks_warning(0),
 	p_tasks_waitrec(0),
@@ -234,6 +235,7 @@ bool BlockInfo::update( const af::BlockData* block, int type)
 		p_tasks_done       = block->getProgressTasksDone();
 		p_tasks_error      = block->getProgressTasksError();
 		p_tasks_skipped    = block->getProgressTasksSkipped();
+		p_tasks_suspended  = block->getProgressTasksSuspended();
 		p_tasks_waitdep    = block->getProgressTasksWaitDep();
 		p_tasks_warning    = block->getProgressTasksWarning();
 		p_tasks_waitrec    = block->getProgressTasksWaitReconn();
@@ -538,42 +540,46 @@ void BlockInfo::refresh()
 	str_left_bottom = QString::number( p_percentage) + "%";
 	if( Watch::isPadawan())
 	{
-		if (p_tasks_running ) str_left_bottom += QString(" Running:%1"         ).arg(p_tasks_running);
-		if (p_capacity_total) str_left_bottom += QString(" Capacity:%1"        ).arg(af::toKMG(p_capacity_total).c_str());
-		if (p_tasks_done    ) str_left_bottom += QString(" Done:%1"            ).arg(p_tasks_done);
-		if (p_tasks_error   ) str_left_bottom += QString(" Errors:%1"          ).arg(p_tasks_error);
-		if (p_tasks_skipped ) str_left_bottom += QString(" Skipped:%1"         ).arg(p_tasks_skipped);
-		if (p_tasks_waitdep ) str_left_bottom += QString(" WaitDepends:%1"     ).arg(p_tasks_waitdep);
-		if (p_tasks_warning ) str_left_bottom += QString(" Warnings:%1"        ).arg(p_tasks_warning);
-		if (p_tasks_waitrec ) str_left_bottom += QString(" WaitingReconnect:%1").arg(p_tasks_waitrec);
+		if (p_tasks_running  ) str_left_bottom += QString(" Running:%1"         ).arg(p_tasks_running);
+		if (p_capacity_total ) str_left_bottom += QString(" Capacity:%1"        ).arg(af::toKMG(p_capacity_total).c_str());
+		if (p_tasks_done     ) str_left_bottom += QString(" Done:%1"            ).arg(p_tasks_done);
+		if (p_tasks_error    ) str_left_bottom += QString(" Errors:%1"          ).arg(p_tasks_error);
+		if (p_tasks_skipped  ) str_left_bottom += QString(" Skipped:%1"         ).arg(p_tasks_skipped);
+		if (p_tasks_suspended) str_left_bottom += QString(" Suspended:%1"       ).arg(p_tasks_suspended);
+		if (p_tasks_waitdep  ) str_left_bottom += QString(" WaitDepends:%1"     ).arg(p_tasks_waitdep);
+		if (p_tasks_warning  ) str_left_bottom += QString(" Warnings:%1"        ).arg(p_tasks_warning);
+		if (p_tasks_waitrec  ) str_left_bottom += QString(" WaitingReconnect:%1").arg(p_tasks_waitrec);
+		if (p_tasks_ready    ) str_left_bottom += QString(" Ready:%1"           ).arg(p_tasks_ready);
 	}
 	else if( Watch::isJedi())
 	{
-		if (p_tasks_running ) str_left_bottom += QString(" Run:%1" ).arg(p_tasks_running);
-		if (p_capacity_total) str_left_bottom += QString(" Cap:%1" ).arg(af::toKMG(p_capacity_total).c_str());
-		if (p_tasks_done    ) str_left_bottom += QString(" Done:%1").arg(p_tasks_done);
-		if (p_tasks_error   ) str_left_bottom += QString(" Err:%1" ).arg(p_tasks_error);
-		if (p_tasks_skipped ) str_left_bottom += QString(" Skp:%1" ).arg(p_tasks_skipped);
-		if (p_tasks_waitdep ) str_left_bottom += QString(" WDP:%1" ).arg(p_tasks_waitdep);
-		if (p_tasks_warning ) str_left_bottom += QString(" Wrn:%1" ).arg(p_tasks_warning);
-		if (p_tasks_waitrec ) str_left_bottom += QString(" WRC:%1" ).arg(p_tasks_waitrec);
+		if (p_tasks_running  ) str_left_bottom += QString(" Run:%1" ).arg(p_tasks_running);
+		if (p_capacity_total ) str_left_bottom += QString(" Cap:%1" ).arg(af::toKMG(p_capacity_total).c_str());
+		if (p_tasks_done     ) str_left_bottom += QString(" Done:%1").arg(p_tasks_done);
+		if (p_tasks_error    ) str_left_bottom += QString(" Err:%1" ).arg(p_tasks_error);
+		if (p_tasks_skipped  ) str_left_bottom += QString(" Skp:%1" ).arg(p_tasks_skipped);
+		if (p_tasks_suspended) str_left_bottom += QString(" Sus:%1" ).arg(p_tasks_suspended);
+		if (p_tasks_waitdep  ) str_left_bottom += QString(" WDP:%1" ).arg(p_tasks_waitdep);
+		if (p_tasks_warning  ) str_left_bottom += QString(" Wrn:%1" ).arg(p_tasks_warning);
+		if (p_tasks_waitrec  ) str_left_bottom += QString(" WRC:%1" ).arg(p_tasks_waitrec);
+		if (p_tasks_ready    ) str_left_bottom += QString(" Rdy:%1" ).arg(p_tasks_ready);
 	}
 	else
 	{
-		if (p_tasks_running ) str_left_bottom += QString(" r%1"  ).arg(p_tasks_running);
-		if (p_capacity_total) str_left_bottom += QString(" c%1"  ).arg(af::toKMG(p_capacity_total).c_str());
-		if (p_tasks_done    ) str_left_bottom += QString(" d%1"  ).arg(p_tasks_done);
-		if (p_tasks_error   ) str_left_bottom += QString(" e%1"  ).arg(p_tasks_error);
-		if (p_tasks_skipped ) str_left_bottom += QString(" s%1"  ).arg(p_tasks_skipped);
-		if (p_tasks_waitdep ) str_left_bottom += QString(" wdp%1").arg(p_tasks_waitdep);
-		if (p_tasks_warning ) str_left_bottom += QString(" w%1"  ).arg(p_tasks_warning);
-		if (p_tasks_waitrec ) str_left_bottom += QString(" wrc%1").arg(p_tasks_waitrec);
+		if (p_tasks_running  ) str_left_bottom += QString(" R%1"  ).arg(p_tasks_running);
+		if (p_capacity_total ) str_left_bottom += QString(" c%1"  ).arg(af::toKMG(p_capacity_total).c_str());
+		if (p_tasks_done     ) str_left_bottom += QString(" d%1"  ).arg(p_tasks_done);
+		if (p_tasks_error    ) str_left_bottom += QString(" e%1"  ).arg(p_tasks_error);
+		if (p_tasks_skipped  ) str_left_bottom += QString(" s%1"  ).arg(p_tasks_skipped);
+		if (p_tasks_suspended) str_left_bottom += QString(" s%1"  ).arg(p_tasks_suspended);
+		if (p_tasks_waitdep  ) str_left_bottom += QString(" wdp%1").arg(p_tasks_waitdep);
+		if (p_tasks_warning  ) str_left_bottom += QString(" w%1"  ).arg(p_tasks_warning);
+		if (p_tasks_waitrec  ) str_left_bottom += QString(" wrc%1").arg(p_tasks_waitrec);
+		if (p_tasks_ready    ) str_left_bottom += QString(" r:%1" ).arg(p_tasks_ready);
 	}
 
-	if (server_info.size()) str_left_bottom += QString(" %1").arg(server_info);
-
-	if (m_jobid == AFJOB::SYSJOB_ID ) str_left_bottom += QString(" Ready:%1").arg( p_tasks_ready);
-
+	if (server_info.size())
+		str_left_bottom += QString(" %1").arg(server_info);
 
 	// Right bottom: server info, errors&avoids
 	str_right_bottom.clear();
