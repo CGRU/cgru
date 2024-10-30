@@ -371,7 +371,7 @@
 },
 
 "cut":{
-	"input":"RESULT/ANIM,RESULT/PNG,RESULT/JPG,RESULT/TIF,RESULT/DPX,RESULT/EXR",
+	"input":"RESULT/ANIM,RESULT/JPG,RESULT/EXR",
 	"output":"COMMON/RESULT/JPG",
 	"af_capacity":500,
 	"af_maxtasks":10,
@@ -385,7 +385,7 @@
 },
 
 "put":{
-	"input":"RESULT/PNG,RESULT/TIF,RESULT/DPX,RESULT/EXR,RESULT/MOV",
+	"input":"RESULT/EXR,RESULT/DAILIES",
 	"dest":"OUT",
 	"-dest":"/incoming",
 	"cmd":"python3 /cgru/utilities/put.py",

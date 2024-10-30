@@ -265,7 +265,7 @@ function fu_ChecksumDo(i_wnd)
 /* ---------------- [ Multi Put structs and functions ] -------------------------------------------------- */
 var fu_putmulti_params = {
 	input /*********/: {"label": 'Result Paths', "width":'70%'},
-	filesext         : {"label": 'Files Extensions', "default":'mov', "width":'30%', "lwidth":'150px'},
+	filesext         : {"label": 'Files Extensions', "default":'mp4,mov', "width":'30%', "lwidth":'150px'},
 	skipexisting /**/: {"label": 'Skip Existing', 'type': "bool", 'default': true, "width": '33%'},
 	skiperrors /****/: {"label": 'Skip Errors', 'type': "bool", 'default': true, "width": '33%'},
 	skipcheck /*****/: {"label": 'Skip Check', 'type': "bool", 'default': false, "width": '33%'},
@@ -531,12 +531,16 @@ function fu_PutMultiDo(i_wnd)
 		if (res.exist && params.skipexisting)
 			continue;
 
+		let name = res.name;
+		if (res.file)
+			name = res.file;
+
 		var cmd = put;
 		cmd += ' -s "' + res.src + '"';
-		cmd += ' -n "' + res.name + '"';
+		cmd += ' -n "' + name + '"';
 
 		var task = {};
-		task.name = res.name;
+		task.name = name;
 		task.command = cmd;
 		block.tasks.push(task);
 	}

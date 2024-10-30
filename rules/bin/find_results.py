@@ -16,7 +16,7 @@ Parser = OptionParser(
 )
 
 Parser.add_option('-r', '--respaths',     dest='respaths',     type  ='string',     default='RESULT/JPG,RESULT/TIF,RESULT/DPX')
-Parser.add_option('-f', '--filesext',     dest='filesext',     type  ='string',     default='mov', help='Include files with extensions')
+Parser.add_option('-f', '--filesext',     dest='filesext',     type  ='string',     default='mp4,mov', help='Include files with extensions')
 Parser.add_option('-d', '--dest',         dest='dest',         type  ='string',     default=None,  help='Destination')
 Parser.add_option('-p', '--padding',      dest='padding',      type  ='int',        default=3,     help='Version padding')
 Parser.add_option('-s', '--skipcheck',    dest='skipcheck',    action='store_true', default=False, help='Skip destination check')
