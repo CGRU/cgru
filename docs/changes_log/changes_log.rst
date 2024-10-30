@@ -22,7 +22,7 @@ v3.4.0
 
 -   AfWatch asks server for jobs thumbnails one by one, not all at once.
     Also it does not ask for thumbnail of a hidden jobs.
-    This can speeds up interface on a big amout of jobs and/or slow connection.
+    This can speeds up interface on a big amount of jobs and/or slow connection.
     It is especially useful on a Work (Branches) view.
 
 -   AfRender can get CPU temperature and hardware info by Python modules.
@@ -32,11 +32,16 @@ v3.4.0
     Empty command is treated not as skipped but as error launch now.
     As empty command can happen on some error in service class.
 
--   Afserver skips refresh of a done jobs.
+-   AfServer skips refresh of a done jobs.
     It refreshes it only on some parameter change.
     Now done job does not consume noticeable CPU time (only life time processesed).
 
--   **SUSPENDED task state.**
+-   **FATAL_ERROR** task state.
+    Errors automatic restart settings will be ignored.
+    This state can be set by parser
+    `fatalerror <../afanasy/render.html#self-fatalerror-false-true>`_ property.
+
+-   **SUSPENDED** task state.
     Task will not run if it is suspended.
     You can continue suspended task(s) from GUI and API (continue suspended means remove suspended flag).
     Suspended is like skipped task, but skipped task treated as done.

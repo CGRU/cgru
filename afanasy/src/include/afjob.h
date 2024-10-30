@@ -91,6 +91,9 @@ namespace AFJOB
 	const int64_t STATE_SUSPENDED_MASK             = 1ULL<<20;
 	const   char  STATE_SUSPENDED_NAME[]           = "Suspended";
 	const   char  STATE_SUSPENDED_NAME_S[]         = "SUS";
+	const int64_t STATE_PARSERFATALERROR_MASK      = 1ULL<<21;
+	const   char  STATE_PARSERFATALERROR_NAME[]    = "Parser Fatal Error";
+	const   char  STATE_PARSERFATALERROR_NAME_S[]  = "PFE";
 
 	const int64_t STATE_SOLVED_MASK                = 1ULL<<62;
 

@@ -20,6 +20,7 @@ public:
 	inline bool hasProgressChanged()  const { return m_progress_changed;}
 	inline bool hasWarning()          const { return m_warning;         }
 	inline bool hasError()            const { return m_error;           }
+	inline bool hasFatalError()       const { return m_fatalerror;      }
 	inline bool isBadResult()         const { return m_badresult;       }
 	inline bool isFinishedSuccess()   const { return m_finishedsuccess; }
 	inline std::string getActivity()  const { return m_activity;        }
@@ -35,6 +36,7 @@ private:
 	int  m_percentframe;
 	bool m_progress_changed;
 	bool m_error;
+	bool m_fatalerror;
 	bool m_warning;
 	bool m_badresult;
 	bool m_finishedsuccess;

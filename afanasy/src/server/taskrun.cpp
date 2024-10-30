@@ -197,6 +197,12 @@ void TaskRun::update(const af::MCTaskUp& taskup, RenderContainer * renders, Moni
          message = "Parser error.";
          m_progress->state = m_progress->state | AFJOB::STATE_PARSERERROR_MASK;
       }
+	case af::TaskExec::UPFinishedParserFatalError:
+		if (message.size() == 0)
+		{
+			message = "Parser fatal error.";
+			m_progress->state = m_progress->state | AFJOB::STATE_PARSERFATALERROR_MASK;
+		}
    case af::TaskExec::UPFinishedParserBadResult:
       if( message.size() == 0)
       {

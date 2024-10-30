@@ -117,28 +117,29 @@ public:
 		/* 06 */ UPFinishedError,
 		/* 07 */ UPFinishedKilled,
 		/* 08 */ UPFinishedParserError,
-		/* 09 */ UPFinishedParserBadResult,
-		/* 10 */ UPFinishedParserSuccess,
-		/* 11 */ UPFinishedFailedPost,
-		/* 12 */ UPBadRenderedFiles,
+		/* 09 */ UPFinishedParserFatalError,
+		/* 10 */ UPFinishedParserBadResult,
+		/* 11 */ UPFinishedParserSuccess,
+		/* 12 */ UPFinishedFailedPost,
+		/* 13 */ UPBadRenderedFiles,
 
-		/* 13 */ UPRenderDeregister,
-		/* 14 */ UPRenderExit,
-		/* 15 */ UPRenderZombie,
+		/* 14 */ UPRenderDeregister,
+		/* 15 */ UPRenderExit,
+		/* 16 */ UPRenderZombie,
 
-		/* 16 */ UPTimeOut,
-		/* 17 */ UPMaxRunTime,
+		/* 17 */ UPTimeOut,
+		/* 18 */ UPMaxRunTime,
 
-		/* 18 */ UPStop,
-		/* 19 */ UPSkip,
-		/* 20 */ UPRestart,
-		/* 21 */ UPEject,
+		/* 19 */ UPStop,
+		/* 20 */ UPSkip,
+		/* 21 */ UPRestart,
+		/* 22 */ UPEject,
 
-		/* 22 */ UPFailedToStart,
-		/* 23 */ UPNoTaskRunning,
-		/* 24 */ UPNoJob,
+		/* 23 */ UPFailedToStart,
+		/* 24 */ UPNoTaskRunning,
+		/* 25 */ UPNoJob,
 
-		/* 25 */ UPLAST
+		/* 26 */ UPLAST
 	};
 
 	enum Flags{

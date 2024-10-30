@@ -471,9 +471,10 @@ void TaskProcess::readProcess( const std::string & i_mode)
 		m_listened += output;
 	}
 
-	if( m_parser->hasWarning() && ( m_update_status != af::TaskExec::UPWarning               ) &&
-	                              ( m_update_status != af::TaskExec::UPFinishedParserError   ) &&
-	                              ( m_update_status != af::TaskExec::UPFinishedParserSuccess ))
+	if( m_parser->hasWarning() && ( m_update_status != af::TaskExec::UPWarning                  ) &&
+	                              ( m_update_status != af::TaskExec::UPFinishedParserError      ) &&
+	                              ( m_update_status != af::TaskExec::UPFinishedParserFatalError ) &&
+	                              ( m_update_status != af::TaskExec::UPFinishedParserSuccess    ))
 	{
 		AF_LOG << "Parser notification.";
 		m_update_status = af::TaskExec::UPWarning;
@@ -489,6 +490,14 @@ void TaskProcess::readProcess( const std::string & i_mode)
 	        m_update_status = af::TaskExec::UPFinishedParserError;
 	        stop();
 	    }
+
+	    if( m_parser->hasFatalError())
+	    {
+	        AF_LOG << "Parser fatal error. Stopping task.";
+	        m_update_status = af::TaskExec::UPFinishedParserFatalError;
+	        stop();
+	    }
+
 	    if( m_parser->isFinishedSuccess())
 	    {
 	        AF_LOG << "Parser finished success. Stopping task.";
@@ -544,6 +553,7 @@ void TaskProcess::sendTaskSate()
 				break;
 			case af::TaskExec::UPFinishedParserBadResult:
 			case af::TaskExec::UPFinishedParserError:
+			case af::TaskExec::UPFinishedParserFatalError:
 			case af::TaskExec::UPFinishedError:
 				printf("ERR");
 				break;
@@ -639,11 +649,17 @@ void TaskProcess::processFinished( int i_exitCode)
 			if ((m_stop_time != 0) || WIFSIGNALED(i_exitCode))
 #endif
 			{
-				if ((m_update_status != af::TaskExec::UPFinishedParserError  ) &&
+				if ((m_update_status != af::TaskExec::UPFinishedParserError) &&
+					(m_update_status != af::TaskExec::UPFinishedParserFatalError) &&
 					(m_update_status != af::TaskExec::UPFinishedParserSuccess))
 					m_update_status  = af::TaskExec::UPFinishedKilled;
 			}
 		}
+	}
+	else if(m_parser->hasFatalError())
+	{
+		m_update_status = af::TaskExec::UPFinishedParserFatalError;
+		AF_LOG << "Fatal error from parser.";
 	}
 	else if(m_parser->hasError())
 	{

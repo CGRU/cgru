@@ -390,7 +390,7 @@ void Service::parse(const std::string & i_mode, int i_pid,
 		int & o_percent, int & o_frame, int & o_percentframe,
 		std::string & o_activity, std::string & o_report,
 		bool & o_progress_changed,
-		bool & o_warning, bool & o_error, bool & o_badresult, bool & o_finishedsuccess) const
+		bool & o_warning, bool & o_error, bool & o_fatalerror, bool & o_badresult, bool & o_finishedsuccess) const
 {
 	PyObject * pArgs = PyTuple_New(1);
 	PyObject * dict = PyDict_New();
@@ -417,6 +417,7 @@ void Service::parse(const std::string & i_mode, int i_pid,
 			af::PyGetAttrBool(pClass,"progress_changed",o_progress_changed,err);
 			af::PyGetAttrBool(pClass,"warning",         o_warning,         err);
 			af::PyGetAttrBool(pClass,"error",           o_error,           err);
+			af::PyGetAttrBool(pClass,"fatalerror",      o_fatalerror,      err);
 			af::PyGetAttrBool(pClass,"badresult",       o_badresult,       err);
 			af::PyGetAttrBool(pClass,"finishedsuccess", o_finishedsuccess, err);
 

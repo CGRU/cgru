@@ -14,6 +14,7 @@ class generic(parser.parser):
 
         self.str_warning =         ['[ PARSER WARNING ]']
         self.str_error =           ['[ PARSER ERROR ]']
+        self.str_fatalerror =      ['[ PARSER FATAL ERROR ]']
         self.str_badresult =       ['[ PARSER BAD RESULT ]']
         self.str_finishedsuccess = ['[ PARSER FINISHED SUCCESS ]']
 

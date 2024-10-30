@@ -240,15 +240,17 @@ void Task::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCont
       if( m_run ) changed = m_run->refresh( currentTime, renders, monitoring, errorHostId);
       else
       {
-         // Retry errors:
-         if((m_progress->state & AFJOB::STATE_ERROR_MASK) && (m_progress->errors_count <= m_block->getErrorsRetries()))
-         {
+			// Retry errors:
+			if ((m_progress->state & AFJOB::STATE_ERROR_MASK) &&
+				(false == (m_progress->state & AFJOB::STATE_PARSERFATALERROR_MASK)) &&
+				(m_progress->errors_count <= m_block->getErrorsRetries()))
+			{
             m_progress->state = m_progress->state |   AFJOB::STATE_READY_MASK;
             m_progress->state = m_progress->state |   AFJOB::STATE_ERROR_READY_MASK;
             m_progress->state = m_progress->state & (~AFJOB::STATE_ERROR_MASK);
             v_appendLog( std::string("Automatically retrying error task") + af::itos( m_progress->errors_count) + " of " + af::itos( m_block->getErrorsRetries()) + ".");
             if( changed == false) changed = true;
-         }
+			}
       }
    }
 

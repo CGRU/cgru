@@ -56,7 +56,7 @@ public:
 				int & o_percent, int & o_frame, int & o_percentframe,
 				std::string & o_activity, std::string & o_report,
 				bool & o_progress_changed,
-				bool & o_warning, bool & o_error, bool & o_badresult, bool & o_finishedsuccess) const;
+				bool & o_warning, bool & o_error, bool & o_fatalerror, bool & o_badresult, bool & o_finishedsuccess) const;
 
 	const std::string toHTML( const std::string & i_data) const;
 

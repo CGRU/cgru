@@ -438,6 +438,11 @@ self.error(False/True)
 ----------------------
 Error. Render will try to terminate a task and later kill if task ignored termination.
 
+self.fatalerror(False/True)
+---------------------------
+Fatal error. Render will try to terminate a task and later kill if task ignored termination.
+Errors automatic restart settings will be ignored.
+
 self.badresult(False/True)
 --------------------------
 Error. Task will finish with an error.

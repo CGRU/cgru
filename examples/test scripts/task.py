@@ -50,7 +50,7 @@ frame_start = Options.start
 frame_end = Options.end
 frame_inc = Options.increment
 
-ParserKeys = ['[ PARSER WARNING ]', '[ PARSER ERROR ]',
+ParserKeys = ['[ PARSER WARNING ]', '[ PARSER ERROR ]', '[ PARSER FATAL ERROR ]',
               '[ PARSER BAD RESULT ]', '[ PARSER FINISHED SUCCESS ]']
 
 StdOut = None

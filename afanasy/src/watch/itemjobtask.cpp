@@ -148,10 +148,11 @@ void ItemJobTask::v_paint(QPainter * i_painter, const QRect & i_rect, const QSty
 	QString leftString = m_name;
 
 	QString rightString;
-	if (taskprogress.state & AFJOB::STATE_WARNING_MASK        ) rightString += "Warning! ";
-	if (taskprogress.state & AFJOB::STATE_PARSERERROR_MASK    ) rightString += "Bad Output! ";
-	if (taskprogress.state & AFJOB::STATE_PARSERBADRESULT_MASK) rightString += "Bad Result! ";
-	if (taskprogress.state & AFJOB::STATE_PARSERSUCCESS_MASK  ) rightString += "Parser Success. ";
+	if (taskprogress.state & AFJOB::STATE_WARNING_MASK         ) rightString += "Warning! ";
+	if (taskprogress.state & AFJOB::STATE_PARSERERROR_MASK     ) rightString += "Bad Output! ";
+	if (taskprogress.state & AFJOB::STATE_PARSERFATALERROR_MASK) rightString += "FATAL ERROR! ";
+	if (taskprogress.state & AFJOB::STATE_PARSERBADRESULT_MASK ) rightString += "Bad Result! ";
+	if (taskprogress.state & AFJOB::STATE_PARSERSUCCESS_MASK   ) rightString += "Parser Success. ";
 	if (false == taskprogress.hostname.empty()) rightString += afqt::stoq( taskprogress.hostname);
 	if (false == taskprogress.activity.empty()) rightString += QString(": ") + afqt::stoq( taskprogress.activity);
 

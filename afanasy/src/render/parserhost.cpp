@@ -55,6 +55,7 @@ ParserHost::ParserHost( af::Service * i_service):
 	m_percentframe( 0),
 	m_progress_changed(false),
 	m_error( false),
+	m_fatalerror(false),
 	m_warning( false),
 	m_badresult( false),
 	m_finishedsuccess( false),
@@ -179,6 +180,7 @@ void ParserHost::parse(const std::string & i_mode, int i_pid, std::string & io_o
 {
 	bool _warning         = false;
 	bool _error           = false;
+	bool _fatalerror      = false;
 	bool _badresult       = false;
 	bool _finishedsuccess = false;
 
@@ -189,9 +191,10 @@ void ParserHost::parse(const std::string & i_mode, int i_pid, std::string & io_o
 			m_percent, m_frame, m_percentframe,
 			m_activity, m_report,
 			m_progress_changed,
-			_warning, _error, _badresult, _finishedsuccess);
+			_warning, _error, _fatalerror, _badresult, _finishedsuccess);
 
 	if ( _error           ) m_error           = true;
+	if ( _fatalerror      ) m_fatalerror      = true;
 	if ( _warning         ) m_warning         = true;
 	if ( _badresult       ) m_badresult       = true;
 	if ( _finishedsuccess ) m_finishedsuccess = true;
@@ -200,6 +203,7 @@ void ParserHost::parse(const std::string & i_mode, int i_pid, std::string & io_o
 	printf("; FRAME: %d", m_frame);
 	printf("; PERCENTFRAME: %d%%", m_percentframe);
 	if( _error           ) printf("; ERROR");
+	if( _fatalerror      ) printf("; FATALERROR");
 	if( _warning         ) printf("; WARNING");
 	if( _badresult       ) printf("; BAD RESULT");
 	if( _finishedsuccess ) printf("; FINISHED SUCCESS");
