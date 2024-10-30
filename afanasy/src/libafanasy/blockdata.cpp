@@ -660,7 +660,7 @@ void BlockData::v_readwrite(Msg *msg)
 			rw_int32_t(p_tasks_warning, msg);
 			rw_int32_t(p_tasks_waitrec, msg);
 			rw_int32_t(p_tasks_waitdep, msg);
-			rw_int32_t(p_tasks_suspended, msg)
+			rw_int32_t(p_tasks_suspended, msg);
 			rw_int64_t(p_tasks_run_time, msg);
 
 			rw_int64_t(m_state, msg);

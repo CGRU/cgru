@@ -112,11 +112,7 @@ void Pool::v_jsonWrite(std::ostringstream & o_str, int i_type) const // Thread-s
 	o_str << ",\n\"time_creation\":"  << m_time_creation;
 
 	o_str << ",\n\"pools_total\":"     << m_pools_total;
-	o_str << ",\n\"pools_num\":"       << m_pools_num;
-
 	o_str << ",\n\"renders_total\":"   << m_renders_total;
-	o_str << ",\n\"renders_num\":"     << m_renders_num;
-
 	o_str << ",\n\"renders_busy\":"    << m_renders_busy;
 	o_str << ",\n\"renders_ready\":"   << m_renders_ready;
 	o_str << ",\n\"renders_online\":"  << m_renders_online;
@@ -266,11 +262,7 @@ void Pool::v_readwrite(Msg * msg)
 	rw_int32_t(m_sick_errors_count,      msg);
 
 	rw_int32_t(m_pools_total,            msg);
-	rw_int32_t(m_pools_num,              msg);
-
 	rw_int32_t(m_renders_total,          msg);
-	rw_int32_t(m_renders_num,            msg);
-
 	rw_int32_t(m_renders_busy,           msg);
 	rw_int32_t(m_renders_ready,          msg);
 	rw_int32_t(m_renders_online,         msg);
