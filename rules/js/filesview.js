@@ -553,7 +553,7 @@ FilesView.prototype.showCounts = function() {
 		this.elCounts.appendChild(el);
 		el.classList.add('frames_count');
 		el.textContent = 'sF:' + frames_count;
-		el.title = 'All folders files sum.\nDouble click to update status frames number.';
+		el.title = 'All folders files sum.\nDouble click to store status frames number.';
 		el.m_frames_count = frames_count;
 		el.onclick = function(e) { e.stopPropagation(); };
 		el.ondblclick = function(e) {
@@ -665,7 +665,8 @@ FilesView.prototype.showAttrs = function(i_el, i_obj) {
 		else
 			i_el.m_el_num_files.textContent = 'F:' + f_count;
 
-		var title = 'Double click to update status frames number.\n';
+		let title = 'Middle click to update.\n';
+		title += 'Double click to store status frames number.\n';
 
 		title += '\nFiles quantity: ' + num_files + ' (without subfolders)';
 		if (i_el.m_obj.num_images)
@@ -732,7 +733,7 @@ FilesView.prototype.showAttrs = function(i_el, i_obj) {
 			}
 
 			i_el.m_el_num_files.textContent = 'F:' + video.frame_count;
-			i_el.m_el_num_files.title = 'Frames quantity: ' + video.frame_count + '\nDouble click to update status frames number.';
+			i_el.m_el_num_files.title = 'Frames quantity: ' + video.frame_count + '\nDouble click to store status frames number.';
 			i_el.m_el_num_files.m_num_files = video.frame_count;
 			i_el.m_el_num_files.onclick = function(e) { e.stopPropagation(); };
 			i_el.m_el_num_files.ondblclick = function(e) {
