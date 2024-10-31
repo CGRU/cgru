@@ -26,7 +26,7 @@ public:
 	/// Set some node attribute by incoming message.
 	void action( Action & i_action);
 
-	virtual void v_action( Action & i_action);
+	virtual void v_action( Action & i_action) = 0;
 
 	/// Refresh node information
 	virtual void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);

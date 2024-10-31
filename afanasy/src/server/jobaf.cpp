@@ -621,7 +621,7 @@ void JobAf::v_action( Action & i_action)
 			i_action.answerError("Unknown operation: " + type);
 			return;
 		}
-		appendLog("Operation \"" + type + "\" by " + i_action.author);
+		i_action.log = "Operation \"" + type + "\"";
 		i_action.monitors->addJobEvent( af::Monitor::EVT_jobs_change, getId(), getUid());
 		m_force_refresh = true;
 		store();

@@ -183,6 +183,8 @@ void AfNodeSrv::action( Action & i_action)
 	}
 	else
 		i_action.users->updateTimeActivity( i_action.user_name);
+
+	i_action.log.clear();
 }
 
 void AfNodeSrv::v_action( Action & i_action){}
