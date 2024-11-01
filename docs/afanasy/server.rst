@@ -295,6 +295,9 @@ Database Setup
         createdb afanasy
         psql afanasy
         CREATE USER afadmin PASSWORD 'AfPassword';
+        GRANT ALL ON DATABASE afanasy TO afadmin;
+        ALTER DATABASE afanasy OWNER TO afadmin;
+
 
 Create Tables
 ~~~~~~~~~~~~~
