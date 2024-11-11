@@ -28,6 +28,7 @@
 	"ready"       :{"title":"READY",       "clr":[230,230,130], "short":"Rdy",             "p_max": 1, "mode":"stage", "tip":"Ready"},
 	"inprogress"  :{"title":"INPROGRESS",  "clr":[210,210,210], "short":"IP",  "p_min":1,  "p_max":90, "mode":"stage", "tip":"In progress"},
 	"on_farm"     :{"title":"ONFARM",      "clr":[250,150,100], "short":"OF",  "p_min":20, "p_max":20, "mode":null,    "tip":"On farm"},
+	"draft"       :{"title":"DRAFT",       "clr":[120,120,100], "short":"DFT",                         "mode":null,    "tip":"Draft"},
 	"check"       :{"title":"CHECK",       "clr":[ 77, 77,177], "short":"Chk", "p_min":60, "p_max":90, "mode":"stage", "tip":"To check"},
 	"comment"     :{"title":"COMMENT",     "clr":[222,111,222], "short":"Cmm",             "p_max":50, "mode":"stage", "tip":"Comment"},
 	"update"      :{"title":"UPDATE",      "clr":[250,120, 90], "short":"UP",                          "mode":null,    "tip":"Update."},
@@ -40,7 +41,7 @@
 	"closed"      :{"title":"CLOSED",      "clr":[ 11, 55, 11], "short":"CLS", "p_min":100,            "mode":"stage", "tip":"Closed"},
 	"aux"         :{"title":"AUX",         "clr":[127,127,127], "short":"AUX",             "p_max":-1, "mode":"stage", "tip":"Auxiliary",
 		"new_line":true},
-	"precomp"    :{"title":"PRECOMP",  "clr":[ 80, 96,115], "short":"PC", "p_min":10, "p_max":30, "excl":true, "tip":"Precomp exists"}
+	"precomp"     :{"title":"PRECOMP",     "clr":[ 80, 96,115], "short":"PC",  "p_min":10, "p_max":30, "tip":"Precomp exists"}
 
 },
 
