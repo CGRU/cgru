@@ -77,7 +77,7 @@ bool RegExp::match(const std::string & i_str) const
 	if (isFind())
 	{
 		for (auto & str : m_strings)
-			if (i_str.find(str) != i_str.npos)
+			if (i_str.find(str) == 0)
 			{
 				retval = 0;
 				break;
