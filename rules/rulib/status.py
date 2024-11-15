@@ -115,20 +115,19 @@ class Status:
         self.setItems('tags',    items_keep=tags_keep,    items_add=tags)
         self.setItems('artists', items_keep=artists_keep, items_add=artists)
 
-        # OLD WAY:
-        # If shot progress is 100% all tasks should be 100% done.
-        # if self.data.get('progress') == 100 and 'tasks' in self.data:
-        # NEW WAY:
-        # If shot shot is DONE, all tasks should be DONE
-        if 'flags' in self.data and 'done' in self.data['flags'] and 'tasks' in self.data:
-            for t in self.data['tasks']:
-                task = self.data['tasks'][t]
-                if task.get('progress') != 100:
-                    task['progress'] = 100;
-                    task['changed'] = True
-                if 'flags' in task and 'done' not in task['flags']:
-                    task['flags'] = ['done']
-                    task['changed'] = True
+        # If shot shot is DONE or flag has 'done' mode, all tasks should be DONE
+        if 'flags' in self.data:
+            for f in self.data['flags']:
+                if f == 'done' or (f in rulib.RULES_TOP['flags'] and 'mode' in rulib.RULES_TOP['flags'][f] and rulib.RULES_TOP['flags'][f]['mode'] == 'done'):
+                    if 'tasks' in self.data:
+                        for t in self.data['tasks']:
+                            task = self.data['tasks'][t]
+                            if task.get('progress') != 100:
+                                task['progress'] = 100;
+                                task['changed'] = True
+                            if 'flags' in task and 'done' not in task['flags']:
+                                task['flags'] = ['done']
+                                task['changed'] = True
 
         # If shot has OMIT flags, all tasks should be omitted
         if 'flags' in self.data and 'omit' in self.data['flags'] and 'tasks' in self.data:
