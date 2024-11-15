@@ -332,7 +332,9 @@ Status.prototype.showTasks = function()
 
 	if (this.obj && this.obj.tasks)
 	{
-		for (let t in this.obj.tasks)
+		let keys = Object.keys(this.obj.tasks);
+		keys.sort();
+		for (let t of keys)
 		{
 			let task = new Task(this, this.obj.tasks[t]);
 			if (this.multi)
