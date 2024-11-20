@@ -451,13 +451,19 @@ void TaskProcess::readProcess( const std::string & i_mode)
 
 	std::string output;
 
-	int readsize = readPipe( m_io_output);
-	if( readsize > 0 )
-		output = std::string( m_readbuffer, readsize);
+	int readsize = 0;
+	do {
+		readsize = readPipe( m_io_output);
+		if ( readsize > 0 )
+			output += std::string( m_readbuffer, readsize);
+	} while ( readsize > 0 );
 
-	readsize = readPipe( m_io_outerr);
-	if( readsize > 0 )
-		output += std::string( m_readbuffer, readsize);
+	do {
+		readsize = readPipe( m_io_outerr);
+		if ( readsize > 0 )
+			output += std::string( m_readbuffer, readsize);
+	} while ( readsize > 0 );
+
 
 	std::string resources;
 	resources += "{\n";
