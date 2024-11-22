@@ -55,10 +55,17 @@ function d_Make(i_path, i_outfolder)
 {
 	c_Log('Make Dailies: ' + i_path);
 
-	var out_path = c_PathDir(i_path);
+	let activity = RULES.dailies.activity;
+	if (activity_Current)
+		activity = activity_Current;
+
+	let out_path = c_PathDir(i_path);
 	if (ASSET && (ASSET.dailies))
 	{
 		out_path = ASSET.path + '/' + ASSET.dailies.path[0];
+
+		if (ASSET.dailies.path_precomp && (activity != RULES.dailies.activity))
+			out_path = ASSET.path + '/' + ASSET.dailies.path_precomp;
 
 		if (ASSET.dailies.folders)
 		{
@@ -94,9 +101,7 @@ function d_Make(i_path, i_outfolder)
 
 	params.input = i_path;
 	params.output = c_PathPM_Rules2Client(out_path);
-	params.activity = RULES.dailies.activity;
-	if (activity_Current)
-		params.activity = activity_Current;
+	params.activity = activity;
 
 	d_params.general.artist = {"width": '50%'};
 	params.artist = c_GetUserTitle();
