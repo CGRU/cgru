@@ -16,6 +16,7 @@ Parser = OptionParser(
 )
 
 Parser.add_option('-r', '--respaths',     dest='respaths',     type  ='string',     default='RESULT/JPG,RESULT/TIF,RESULT/DPX')
+Parser.add_option('-a', '--activity',     dest='activity',     type  ='string',     default=None,  help='Activity (comp,anim)')
 Parser.add_option('-f', '--filesext',     dest='filesext',     type  ='string',     default='mp4,mov', help='Include files with extensions')
 Parser.add_option('-d', '--dest',         dest='dest',         type  ='string',     default=None,  help='Destination')
 Parser.add_option('-p', '--padding',      dest='padding',      type  ='int',        default=3,     help='Version padding')
@@ -83,6 +84,15 @@ for src in args:
         for item in os.listdir(respath):
             if item[0] in '._':
                 continue
+
+            if Options.activity is not None and len(Options.activity):
+                found = False
+                for act in Options.activity.split(','):
+                    if item.find(act) != -1:
+                        found = True
+                        break
+                if not found:
+                    continue
 
             path = os.path.join(respath, item)
             if os.path.isfile(path):
