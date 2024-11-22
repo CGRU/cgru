@@ -204,7 +204,7 @@ def thumbnailArgs(i_args):
         cmd = '%s -y' % i_args.avcmd
         cmd += ' -i "%s"' % Movie
         cmd += ' -f image2'
-        cmd += ' -filter:v "select=gte(n\,%d)*not(mod(n\,%d))"' % ( mod, mod)
+        cmd += r' -filter:v "select=gte(n\,%d)*not(mod(n\,%d))"' % ( mod, mod)
         cmd += ' -frames:v %d' % i_args.number
         cmd += ' -vsync vfr'
         cmd += ' "%s"' % frame
