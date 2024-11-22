@@ -1,5 +1,8 @@
 var $ = function(id) { return document.getElementById(id); };
 
+var SERVER = '/server'
+//var SERVER = 'server.php'
+
 g_actions = {};
 g_actions.jobs_table =  {"label":'Jobs Tables' ,'func':'g_Action_JobsTable'};
 g_actions.tasks_table = {"label":'Tasks Tables','func':'g_Action_TasksTable'};
@@ -30,6 +33,7 @@ function g_Init()
 	window.onhashchange = g_HashChanged;
 	g_Info('Initializing...');
 	g_Request({"send":{"init":null},"func":g_Start});
+g_ShowLog();
 }
 
 function g_Start(i_data, i_args)
@@ -98,6 +102,7 @@ function g_WaintingReset() { g_WaintingSet(false); }
 
 function g_FoldersInit(i_data)
 {
+console.log(JSON.stringify(i_data));
 	g_folders = i_data.folders;
 	if ((g_folders == null) || (g_folders.length == 0))
 	{
@@ -936,7 +941,7 @@ function g_Request(i_args)
 
 	xhr.overrideMimeType('application/json');
 //	xhr.onerror = function() { g_Error(xhr.status + ':' + xhr.statusText); }
-	xhr.open('POST', 'server.php', i_args.wait ? false : true); 
+	xhr.open('POST', SERVER);
 	xhr.send(send_str);
 
 	if (i_args.wait)
