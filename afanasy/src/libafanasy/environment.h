@@ -187,6 +187,8 @@ public:
 	static inline int getRenderOverflowSwap() {return render_overflow_swap;}
 	static inline int getRenderOverflowHDD()  {return render_overflow_hdd; }
 
+	static inline int getRenderTaskReadBufferSize()  {return render_task_read_buffer_size; }
+
 	static inline int getAfNodeLogLinesMax() { return afnode_log_lines_max; }
 
 	static inline const std::string & getStoreFolder()        { return store_folder;         }
@@ -362,6 +364,8 @@ private:
 	static int render_overflow_mem;
 	static int render_overflow_swap;
 	static int render_overflow_hdd;
+
+	static int render_task_read_buffer_size;
 
 	static int errors_avoid_host;
 	static int task_error_retries;

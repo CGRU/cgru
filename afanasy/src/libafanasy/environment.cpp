@@ -96,6 +96,7 @@ std::string Environment::render_get_hw_info_mod         = AFPYNAMES::RES_MOD_GET
 int Environment::render_overflow_mem  = -1;
 int Environment::render_overflow_swap = -1;
 int Environment::render_overflow_hdd  = -1;
+int Environment::render_task_read_buffer_size  =       AFRENDER::TASK_READ_BUFFER_SIZE;
 
 std::string Environment::pswd_visor =                  AFUSER::PSWD_VISOR;
 std::string Environment::pswd_god =                    AFUSER::PSWD_GOD;
@@ -308,6 +309,7 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, render_overflow_mem,               "af_render_overflow_mem"               );
 	getVar( i_obj, render_overflow_swap,              "af_render_overflow_swap"              );
 	getVar( i_obj, render_overflow_hdd,               "af_render_overflow_hdd"               );
+	getVar( i_obj, render_task_read_buffer_size,      "af_render_task_read_buffer_size"      );
 	getVar( i_obj, rendercmds,                        "af_rendercmds"                        );
 	getVar( i_obj, rendercmds_admin,                  "af_rendercmds_admin"                  );
 	getVar( i_obj, render_launch_cmds,                "af_render_launch_cmds"                );

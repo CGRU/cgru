@@ -137,6 +137,8 @@
 		"":"Percentage of a free memomry, swap and hdd, to consider thar render overflowed",
 		"":"-1 disables checking.",
 
+	"af_render_task_read_buffer_size":1000000,
+
 	"af_render_cut_domain_name":true,
 
 	"":"",
