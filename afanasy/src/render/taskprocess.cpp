@@ -74,7 +74,7 @@ int setNonblocking(int fd)
 	// by sysctl and can be raised there.
 
 	std::ifstream pipe_max_size_file("/proc/sys/fs/pipe-max-size");
-    if (pipe_max_size_file.is_open()) {
+	if (pipe_max_size_file.is_open()) {
 		int max_pipe_size = 0;
 		if (pipe_max_size_file >> max_pipe_size) {
 			int new_size = fcntl(fd, F_SETPIPE_SZ, max_pipe_size);
