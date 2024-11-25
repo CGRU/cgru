@@ -109,9 +109,9 @@ private:
 #endif
 
 	// Read buffer:
-	static const int m_readbuffer_size = AFRENDER::TASK_READ_BUFFER_SIZE;
-	char m_readbuffer[m_readbuffer_size];
+	int m_readbuffer_size;
+	char * m_readbuffer;
 	// Will be set to FILEs:
-	char m_filebuffer_out[m_readbuffer_size];
-	char m_filebuffer_err[m_readbuffer_size];
+	char * m_filebuffer_out;
+	char * m_filebuffer_err;
 };

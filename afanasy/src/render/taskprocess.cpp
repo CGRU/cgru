@@ -94,6 +94,19 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec, RenderHost * i_render):
 	m_cycle(0),
 	m_dead_cycle(0)
 {
+	m_readbuffer_size = af::Environment::getRenderTaskReadBufferSize();
+
+	if (af::Environment::isVerboseMode())
+		AF_LOG << "Allocating i/o buffers size = " << m_readbuffer_size;
+	m_readbuffer = new char[m_readbuffer_size];
+	m_filebuffer_out = new char[m_readbuffer_size];
+	m_filebuffer_err = new char[m_readbuffer_size];
+	if ((m_readbuffer == NULL) ||(m_readbuffer == NULL) || (m_readbuffer == NULL))
+	{
+		AF_ERR << "Can not allocate buffers size = " << m_readbuffer_size;
+		return;
+	}
+
 	m_store_dir = af::Environment::getStoreFolder() + AFGENERAL::PATH_SEPARATOR + "tasks" + AFGENERAL::PATH_SEPARATOR;
 	m_store_dir += af::itos( m_taskexec->getJobId());
 	m_store_dir += '.' + af::itos( m_taskexec->getBlockNum());
@@ -300,6 +313,10 @@ TaskProcess::~TaskProcess()
 		delete m_parser;
 
 	af::removeDir( m_store_dir);
+
+	if (m_readbuffer    ) delete [] m_readbuffer;
+	if (m_filebuffer_out) delete [] m_filebuffer_out;
+	if (m_filebuffer_err) delete [] m_filebuffer_err;
 }
 
 void TaskProcess::closeHandles()

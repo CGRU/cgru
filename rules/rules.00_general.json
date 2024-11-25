@@ -175,6 +175,8 @@
 		},
 		"dailies":{
 			"path":["RESULT/DAILIES"],
+			"path_precomp":"RESULT/PRECOMP",
+				"":"put not 'comp' activity dailies in precomp",
 			"folders":{
 				"result/freelance":"RESULT/FREELANCE",
 				"result/anim":"RESULT/ANIM",

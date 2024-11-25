@@ -264,8 +264,9 @@ function fu_ChecksumDo(i_wnd)
 
 /* ---------------- [ Multi Put structs and functions ] -------------------------------------------------- */
 var fu_putmulti_params = {
-	input /*********/: {"label": 'Result Paths', "width":'70%'},
-	filesext         : {"label": 'Files Extensions', "default":'mp4,mov', "width":'30%', "lwidth":'150px'},
+	input /*********/: {"label": 'Result Paths', "width":'50%'},
+	activity         : {"label": 'Activity', "width":'25%'},
+	filesext         : {"label": 'Files Extensions', "default":'mp4,mov', "width":'25%', "lwidth":'150px'},
 	skipexisting /**/: {"label": 'Skip Existing', 'type': "bool", 'default': true, "width": '33%'},
 	skiperrors /****/: {"label": 'Skip Errors', 'type': "bool", 'default': true, "width": '33%'},
 	skipcheck /*****/: {"label": 'Skip Check', 'type': "bool", 'default': false, "width": '33%'},
@@ -277,6 +278,7 @@ var fu_putmulti_params = {
 	af_paused /*****/: {'label': 'Paused', 'width': '15%', 'lwidth': '50px', 'type': 'bool'}
 };
 var fu_findres_params = {
+	activity: {},
 	filesext: {},
 	input: {},
 	dest: {},
@@ -362,6 +364,8 @@ function fu_ResultsFind(i_wnd)
 
 	var cmd = 'rules/bin/find_results.py';
 	cmd += ' -r "' + params.input + '"';
+	if (params.activity.length)
+		cmd += ' --activity "' + params.activity + '"';
 	if (params.filesext.length)
 		cmd += ' --filesext "' + params.filesext + '"';
 	cmd += ' -d "' + c_PathPM_Client2Server(params.dest) + '"';
