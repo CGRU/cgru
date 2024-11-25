@@ -28,6 +28,7 @@ bool    ListMonitors::ms_SortAscending2 = true;
 int     ListMonitors::ms_FilterType     = CtrlSortFilter::TNAME;
 bool    ListMonitors::ms_FilterInclude  = true;
 bool    ListMonitors::ms_FilterMatch    = false;
+bool    ListMonitors::ms_FilterRegEx    = false;
 std::string ListMonitors::ms_FilterString   = "";
 
 ListMonitors::ListMonitors( QWidget* parent):
@@ -36,7 +37,7 @@ ListMonitors::ListMonitors( QWidget* parent):
 	m_ctrl_sf = new CtrlSortFilter( this,
 			&ms_SortType1, &ms_SortAscending1,
 			&ms_SortType2, &ms_SortAscending2,
-			&ms_FilterType, &ms_FilterInclude, &ms_FilterMatch, &ms_FilterString);
+			&ms_FilterType, &ms_FilterInclude, &ms_FilterMatch, &ms_FilterRegEx, &ms_FilterString);
 	m_ctrl_sf->addSortType(   CtrlSortFilter::TNONE);
 	m_ctrl_sf->addSortType(   CtrlSortFilter::TNAME);
 	m_ctrl_sf->addSortType(   CtrlSortFilter::TTIMELAUNCHED);

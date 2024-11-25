@@ -148,6 +148,8 @@ void BlockData::construct()
 	m_tasks_depend_mask.setRegEx();
 
 	m_hosts_mask_exclude.setExclude();
+
+	m_need_properties.setContain();
 }
 
 /// Construct data from JSON:

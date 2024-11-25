@@ -64,7 +64,7 @@ const char * CtrlSortFilter::TNAMES_SHORT[] = {
 CtrlSortFilter::CtrlSortFilter( ListItems * i_parent,
 		int * i_sorttype1, bool * i_sortascending1,
 		int * i_sorttype2, bool * i_sortascending2,
-		int * i_filtertype, bool * i_filterinclude, bool * i_filtermatch, std::string * i_filterstring):
+		int * i_filtertype, bool * i_filterinclude, bool * i_filtermatch, bool * i_filterregex, std::string * i_filterstring):
 	QFrame(           i_parent         ),
 	m_sorttype1(      i_sorttype1      ),
 	m_sorttype2(      i_sorttype2      ),
@@ -74,6 +74,7 @@ CtrlSortFilter::CtrlSortFilter( ListItems * i_parent,
 	m_filtertype(     i_filtertype     ),
 	m_filterinclude(  i_filterinclude  ),
 	m_filtermatch(    i_filtermatch    ),
+	m_filterregex(    i_filterregex    ),
 	m_parernlist(     i_parent         )
 {
 	setToolTip("Sort&filter control.\nUse RMB menu for options.");
@@ -112,6 +113,8 @@ CtrlSortFilter::CtrlSortFilter( ListItems * i_parent,
 	else m_filter_re.setExclude();
 	if( *m_filtermatch ) m_filter_re.setMatch();
 	else m_filter_re.setContain();
+	if (*m_filterregex) m_filter_re.setRegEx();
+	else m_filter_re.setFind();
 
 	connect( lineEdit, SIGNAL( textChanged( const QString & )), this, SLOT( actFilter( const QString & )) );
 
@@ -186,6 +189,8 @@ void CtrlSortFilter::contextMenuEvent(QContextMenuEvent *i_event)
 	connect( action, SIGNAL( triggered() ), this, SLOT( actFilterInclude() ));
 	menu.addAction( action);
 
+	menu.addSeparator();
+
 	action = new QAction( "Filter Match", this);
 	action->setCheckable( true);
 	action->setChecked( *m_filtermatch);
@@ -197,6 +202,20 @@ void CtrlSortFilter::contextMenuEvent(QContextMenuEvent *i_event)
 	action->setChecked( *m_filtermatch == false);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actFilterMatch() ));
 	menu.addAction( action);
+
+	menu.addSeparator();
+
+	action = new QAction("Filter RegEx", this);
+	action->setCheckable(true);
+	action->setChecked(*m_filterregex);
+	connect(action, SIGNAL(triggered()), this, SLOT(actFilterRegEx()));
+	menu.addAction(action);
+
+	action = new QAction("Filter Find", this);
+	action->setCheckable(true);
+	action->setChecked(*m_filterregex == false);
+	connect(action, SIGNAL(triggered()), this, SLOT(actFilterRegEx()));
+	menu.addAction(action);
 
 	menu.exec( i_event->globalPos());
 }
@@ -245,6 +264,24 @@ void CtrlSortFilter::actFilterMatch()
 	{
 		*m_filtermatch = true;
 		m_filter_re.setMatch();
+	}
+
+	selLabel();
+
+	emit filterSettingsChanged();
+}
+
+void CtrlSortFilter::actFilterRegEx()
+{
+	if (*m_filterregex)
+	{
+		*m_filterregex = false;
+		m_filter_re.setFind();
+	}
+	else
+	{
+		*m_filterregex = true;
+		m_filter_re.setRegEx();
 	}
 
 	selLabel();

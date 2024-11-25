@@ -20,7 +20,7 @@ public:
 	CtrlSortFilter( ListItems * i_parent,
 		int * i_sorttype1, bool * i_sortascending1,
 		int * i_sorttype2, bool * i_sortascending2,
-		int * i_filtertype, bool * i_filterinclude, bool * i_filtermatch, std::string * i_filterstring);
+		int * i_filtertype, bool * i_filterinclude, bool * i_filtermatch, bool * i_filterregex, std::string * i_filterstring);
 	~CtrlSortFilter();
 
 	inline void addSortType(   int i_type) { if( i_type < TLAST) m_sort_types.push_back(   i_type); }
@@ -44,6 +44,8 @@ public:
 	inline bool isFilterExclude()       const { return !(*m_filterinclude); }
 	inline bool isFilterMatch()         const { return   *m_filtermatch;    }
 	inline bool isFilterContain()       const { return !(*m_filtermatch);   }
+	inline bool isFilterRegex()         const { return   *m_filterregex;    }
+	inline bool isFilterFind()          const { return !(*m_filterregex);   }
 
 	inline const af::RegExp & getFilterRE() const { return m_filter_re; }
 
@@ -93,6 +95,7 @@ private slots:
 	void actFilter( const QString & i_str);
 	void actFilterInclude();
 	void actFilterMatch();
+	void actFilterRegEx();
 	void actFilterType( int i_type);
 
 private:
@@ -117,6 +120,7 @@ private:
 	int  * m_filtertype;
 	bool * m_filterinclude;
 	bool * m_filtermatch;
+	bool * m_filterregex;
 	af::RegExp m_filter_re;
 
 	CtrlSortFilterMenu * m_sort_menu1;

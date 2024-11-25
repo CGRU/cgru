@@ -37,6 +37,7 @@ bool    ListJobs::ms_SortAscending2 = false;
 int     ListJobs::ms_FilterType     = CtrlSortFilter::TNAME;
 bool    ListJobs::ms_FilterInclude  = true;
 bool    ListJobs::ms_FilterMatch    = false;
+bool    ListJobs::ms_FilterRegEx    = true;
 std::string ListJobs::ms_FilterString = "";
 
 int     ListJobs::ms_SortType1_SU      = CtrlSortFilter::TTIMECREATION;
@@ -46,6 +47,7 @@ bool    ListJobs::ms_SortAscending2_SU = false;
 int     ListJobs::ms_FilterType_SU     = CtrlSortFilter::TUSERNAME;
 bool    ListJobs::ms_FilterInclude_SU  = true;
 bool    ListJobs::ms_FilterMatch_SU    = false;
+bool    ListJobs::ms_FilterRegEx_SU    = true;
 std::string ListJobs::ms_FilterString_SU = "";
 
 uint32_t ListJobs::ms_hide_flags = e_HideHidden;
@@ -59,12 +61,12 @@ ListJobs::ListJobs(QWidget * i_parent, bool i_listwork, const std::string & i_na
 		m_ctrl_sf = new CtrlSortFilter( this,
 			&ms_SortType1_SU, &ms_SortAscending1_SU,
 			&ms_SortType2_SU, &ms_SortAscending2_SU,
-			&ms_FilterType_SU, &ms_FilterInclude_SU, &ms_FilterMatch_SU, &ms_FilterString_SU);
+			&ms_FilterType_SU, &ms_FilterInclude_SU, &ms_FilterMatch_SU, &ms_FilterRegEx_SU, &ms_FilterString_SU);
 	else
 		m_ctrl_sf = new CtrlSortFilter( this,
 			&ms_SortType1, &ms_SortAscending1,
 			&ms_SortType2, &ms_SortAscending2,
-			&ms_FilterType, &ms_FilterInclude, &ms_FilterMatch, &ms_FilterString);
+			&ms_FilterType, &ms_FilterInclude, &ms_FilterMatch, &ms_FilterRegEx, &ms_FilterString);
 
 	m_ctrl_sf->addSortType(   CtrlSortFilter::TNONE);
 	m_ctrl_sf->addSortType(   CtrlSortFilter::TTIMECREATION);

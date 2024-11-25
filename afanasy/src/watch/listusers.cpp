@@ -31,6 +31,7 @@ bool    ListUsers::ms_SortAscending2 = false;
 int     ListUsers::ms_FilterType     = CtrlSortFilter::TNAME;
 bool    ListUsers::ms_FilterInclude  = true;
 bool    ListUsers::ms_FilterMatch    = false;
+bool    ListUsers::ms_FilterRegEx    = false;
 std::string ListUsers::ms_FilterString = "";
 
 ListUsers::ListUsers( QWidget* parent):
@@ -39,7 +40,7 @@ ListUsers::ListUsers( QWidget* parent):
 	m_ctrl_sf = new CtrlSortFilter( this,
 			&ms_SortType1, &ms_SortAscending1,
 			&ms_SortType2, &ms_SortAscending2,
-			&ms_FilterType, &ms_FilterInclude, &ms_FilterMatch, &ms_FilterString);
+			&ms_FilterType, &ms_FilterInclude, &ms_FilterMatch, &ms_FilterRegEx, &ms_FilterString);
 	m_ctrl_sf->addSortType(   CtrlSortFilter::TNONE);
 	m_ctrl_sf->addSortType(   CtrlSortFilter::TPRIORITY);
 	m_ctrl_sf->addSortType(   CtrlSortFilter::TNAME);

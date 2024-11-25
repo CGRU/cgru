@@ -77,11 +77,24 @@ bool RegExp::match(const std::string & i_str) const
 	if (isFind())
 	{
 		for (auto & str : m_strings)
-			if (i_str.find(str) == 0)
+		{
+			if (isContain())
 			{
-				retval = 0;
-				break;
+				if (i_str.find(str) != std::string::npos)
+				{
+					retval = 0;
+					break;
+				}
 			}
+			else
+			{
+				if (i_str.find(str) == 0)
+				{
+					retval = 0;
+					break;
+				}
+			}
+		}
 	}
 	else
 	{

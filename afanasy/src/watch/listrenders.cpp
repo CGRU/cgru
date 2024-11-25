@@ -40,7 +40,8 @@ bool    ListRenders::ms_SortAscending1 = true;
 bool    ListRenders::ms_SortAscending2 = true;
 int     ListRenders::ms_FilterType     = CtrlSortFilter::TNAME;
 bool    ListRenders::ms_FilterInclude  = true;
-bool    ListRenders::ms_FilterMatch    = false;
+bool    ListRenders::ms_FilterMatch    = true;
+bool    ListRenders::ms_FilterRegEx    = false;
 std::string ListRenders::ms_FilterString = "";
 
 uint32_t ListRenders::ms_hide_flags = e_HideHidden;
@@ -58,7 +59,7 @@ ListRenders::ListRenders( QWidget* parent):
 	m_ctrl_sf = new CtrlSortFilter( this,
 			&ms_SortType1, &ms_SortAscending1,
 			&ms_SortType2, &ms_SortAscending2,
-			&ms_FilterType, &ms_FilterInclude, &ms_FilterMatch, &ms_FilterString
+			&ms_FilterType, &ms_FilterInclude, &ms_FilterMatch, &ms_FilterRegEx, &ms_FilterString
 		);
 	m_ctrl_sf->addSortType(   CtrlSortFilter::TNONE);
 	m_ctrl_sf->addSortType(   CtrlSortFilter::TPRIORITY);

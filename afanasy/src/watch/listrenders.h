@@ -123,6 +123,7 @@ private:
 	static int     ms_FilterType;
 	static bool    ms_FilterInclude;
 	static bool    ms_FilterMatch;
+	static bool    ms_FilterRegEx;
 	static std::string ms_FilterString;
 
 	// To store what to hide

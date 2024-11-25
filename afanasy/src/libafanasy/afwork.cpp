@@ -38,6 +38,9 @@ Work::Work()
 
 	m_hosts_mask_exclude.setExclude();
 
+	m_need_os.setContain();
+	m_need_properties.setContain();
+
 	m_need_power  = -1;
 	m_need_memory = -1;
 	m_need_hdd    = -1;

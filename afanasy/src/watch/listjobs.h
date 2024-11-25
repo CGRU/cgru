@@ -109,6 +109,7 @@ private:
 	static int     ms_FilterType;
 	static bool    ms_FilterInclude;
 	static bool    ms_FilterMatch;
+	static bool    ms_FilterRegEx;
 	static std::string ms_FilterString;
 
 	// Sorting filtering settings for super user:
@@ -119,6 +120,7 @@ private:
 	static int     ms_FilterType_SU;
 	static bool    ms_FilterInclude_SU;
 	static bool    ms_FilterMatch_SU;
+	static bool    ms_FilterRegEx_SU;
 	static std::string ms_FilterString_SU;
 
 	// To store what to hide
