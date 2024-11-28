@@ -122,9 +122,12 @@ void Work::jsonRead(const JSON &i_object, std::string *io_changes)
 	jr_int32( "need_memory",     m_need_memory,     i_object, io_changes);
 	jr_int32( "need_hdd",        m_need_hdd,        i_object, io_changes);
 
-	m_pools.clear();
-	jr_intmap("pools", m_pools, i_object, io_changes);
-	checkPools();
+	std::map<std::string, int32_t> _pools;
+	if (jr_intmap("pools", _pools, i_object, io_changes))
+	{
+		m_pools = _pools;
+		checkPools();
+	}
 
 	std::string solve_method;
 	if (jr_string("solve_method", solve_method, i_object, io_changes))
