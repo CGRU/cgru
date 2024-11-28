@@ -16,7 +16,7 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
 v3.4.0
 ======
 
-*2024.10.22 NOT RELEASED*
+*2024.11.28 NOT RELEASED*
 
 -   AfWatch Delete Done Jobs confirm dialog.
 
@@ -66,6 +66,7 @@ v3.4.0
 - **Bugfixes:**
 
     - *appendBlocks()* and a new block tasks depend mask works fine.
+    - Changing any job parameter now does not resets *pools* parameter. This was a server side bug.
 
 .. _changes-log-latest:
 
