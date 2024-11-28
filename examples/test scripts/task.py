@@ -14,9 +14,9 @@ print('COMMAND:')
 print(sys.argv)
 print('WORKING DIRECTORY:')
 print(os.getcwd())
-print('ENVIRONMENT ("CG_"):')
+print('ENVIRONMENT ("CG_","AF_"):')
 for env in os.environ:
-    if env.find('CG_') == 0:
+    if (env.find('CG_') == 0) or (env.find('AF_') == 0):
        print('%s=%s' % (env, os.environ[env]))
 
 
