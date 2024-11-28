@@ -1156,7 +1156,7 @@ void ItemRender::v_setFilterType( int i_type )
 			m_filter_str = afqt::qtos( m_name);
 			break;
 		case CtrlSortFilter::TUSERNAME:
-	        m_filter_str = afqt::qtos( m_username);
+	        m_filter_str = afqt::qtos(QString("%1,%2").arg(m_username, m_loggedin_users));
 			break;
 		case CtrlSortFilter::TTASKUSER:
 	        m_filter_str = afqt::qtos( m_tasksusers);
