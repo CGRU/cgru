@@ -253,6 +253,11 @@ bool ItemNode::filter()
 {
 	bool hide = false;
 
+	switch (getType())
+	case TPool:
+	case TBranch:
+		return hide;
+
 	if( false == m_ctrl_sf->isFilterEnabled())
 		return hide;
 
