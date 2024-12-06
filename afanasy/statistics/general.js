@@ -33,7 +33,6 @@ function g_Init()
 	window.onhashchange = g_HashChanged;
 	g_Info('Initializing...');
 	g_Request({"send":{"init":null},"func":g_Start});
-g_ShowLog();
 }
 
 function g_Start(i_data, i_args)
@@ -102,7 +101,6 @@ function g_WaintingReset() { g_WaintingSet(false); }
 
 function g_FoldersInit(i_data)
 {
-console.log(JSON.stringify(i_data));
 	g_folders = i_data.folders;
 	if ((g_folders == null) || (g_folders.length == 0))
 	{
@@ -788,8 +786,24 @@ function g_FolderDelete(i_evt)
 }
 function g_FoldersDeleted(i_data, i_args)
 {
-//console.log(JSON.stringify(i_data));
-	g_HashChanged();
+	//console.log(JSON.stringify(i_data));
+	let info = '';
+	let deleted = 0;
+	if (i_data.deleted_jobs)
+	{
+		deleted += i_data.deleted_jobs;
+		info += 'Jobs deleted: ' + i_data.deleted_jobs;
+	}
+	if (i_data.deleted_tasks)
+	{
+		deleted += i_data.deleted_tasks;
+		info += '; Tasks deleted: ' + i_data.deleted_tasks;
+	}
+	if (deleted)
+	{
+		g_Info(info);
+		g_HashChanged();
+	}
 }
 
 function g_TimeKeyDown(i_evt)
