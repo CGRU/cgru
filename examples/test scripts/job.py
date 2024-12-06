@@ -226,7 +226,7 @@ for b in range(numblocks):
             negative_pertask = True
 
     cmd = 'task.py'
-    cmd = "\"%s\"" % os.path.join(os.getcwd(), cmd)
+    cmd = "\"%s\"" % os.path.join(os.path.dirname(__file__), cmd)
     cmd = "%s %s" % (os.getenv('CGRU_PYTHONEXE','python3'), cmd)
     cmd += ' --exitstatus %d ' % Args.exitstatus
 
