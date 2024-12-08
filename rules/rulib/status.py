@@ -172,12 +172,12 @@ class Status:
                 _items.append(i)
         self.data[item_name] = _items
 
+        # We should not add items that are already set:
+        for i in self.data[item_name]:
+           items_add.remove(i)
+
         # Add items:
         for i in items_add:
-            # Skip items that are already set
-            if i in self.data[item_name]:
-                continue
-
             if item_name == 'flags' and i in rulib.RULES_TOP[item_name]:
                 # Flag can limit minimum and maximum progress percentage:
                 p_min = rulib.RULES_TOP[item_name][i].get('p_min')
@@ -193,10 +193,14 @@ class Status:
                 if progress is not None:
                     self.data['progress'] = progress
 
-                # Flag can be exclusive, so we should delete other items:
+                # Stage flag should remove other stage flags:
                 mode = rulib.RULES_TOP[item_name][i].get('mode')
-                if mode == 'stage' or mode == 'super':
-                    self.data[item_name] = []
+                if mode == 'stage':
+                    for f in self.data[item_name]:
+                        if f in rulib.RULES_TOP[item_name]:
+                            other_mode = rulib.RULES_TOP[item_name][f].get('mode')
+                            if other_mode == 'stage':
+                                self.data[item_name].remove(f)
 
             self.data[item_name].append(i)
 
