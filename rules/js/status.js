@@ -677,7 +677,6 @@ function st_SetElTags(i_status, i_elTags, i_short, i_clickable)
 			elements.push(el);
 			i_elTags.appendChild(el);
 			i_elTags.m_elTags.push(el);
-
 			st_TagHilight(el, 'tag');
 
 			if (i_clickable)
@@ -703,6 +702,12 @@ function st_CreateElTag(i_tag, i_short, i_suffix)
 	el.textContent = label;
 	el.title = c_GetTagTip(i_tag);
 	el.m_name = i_tag;
+
+	let clr = null;
+	if (RULES.tags[i_tag] && RULES.tags[i_tag].clr)
+		clr = RULES.tags[i_tag].clr;
+	if (clr)
+		st_SetElColor({"color": clr}, el);
 
 	return el;
 }
@@ -779,11 +784,19 @@ function st_SetElColor(i_status, i_elBack, i_elColor, i_setNone)
 	if (i_setNone == null)
 		i_setNone = true;
 
-	var c = null;
-	var a = 1;
+	let c = null;
+	let a = 1;
 	if (i_status && i_status.color)
 	{
 		c = i_status.color;
+	}
+	else if (i_status && i_status.tags && i_status.tags.length)
+	{
+		let tag = i_status.tags[i_status.tags.length - 1];
+		if (RULES.tags[tag] && RULES.tags[tag].clr)
+		{
+			c = RULES.tags[tag].clr;
+		}
 	}
 	else if (i_status && i_status.flags && i_status.flags.length)
 	{

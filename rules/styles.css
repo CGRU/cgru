@@ -954,10 +954,11 @@ box-shadow: 0 0 4px rgba(100,255,255,1), 0 0 4px rgba(100,255,255,1) inset;
 .edit_tags_list > .button { margin:0 4px; padding:0 4px; width: 50px; float: left; }
 .edit_tags_list .tag { cursor: pointer; margin: 4px; }
 .edit_tags_list .tag .button.delete { margin: 1px 1px 1px 6px; width: 10px; height: 10px;}
-.edit_tags_list .flag { border-width: 0px; margin: 7px; padding: 0px 2px; opacity: 0.5;}
+.edit_tags_list .flag { border-width: 0px; margin: 7px; padding: 0px 2px; opacity: 0.6;}
 .edit_tags_list .flag.selected { border-width: 4px; margin: 3px; opacity: 1.0; _border-color: rgba( 100, 255, 255, 1.0) }
 .edit_tags_list .flag.half_selected { border-width: 0px; margin: 7px; opacity: 1.0; _border-color: rgba( 100, 255, 255, 1.0) }
 .edit_tags_list .editing { width: 96px; height: 18px;}
+.edit_tags_list.editing .tag.selected { box-shadow: 0 0 8px rgba( 100, 255, 255, 1.0), 0 0 8px rgba( 100, 255, 255, 1.0) inset;}
 .edit_tags_list .menu {
 clear: both;
 margin: 4px;

@@ -92,11 +92,12 @@ EditList.prototype.appendItem = function(i_id, i_item)
 	if (this.list_all[i_id] && this.list_all[i_id].tip)
 		el.title = this.list_all[i_id].tip;
 
+	if (RULES[this.name][i_id])
+		st_SetElColor({"color": RULES[this.name][i_id].clr}, el);
+
 	if (this.name == 'flags')
 	{
 		el.classList.add('flag');
-		if (RULES.flags[i_id])
-			st_SetElColor({"color": RULES.flags[i_id].clr}, el);
 	}
 	if (this.name == 'artists')
 	{
@@ -282,15 +283,16 @@ EditList.prototype.showAllItems = function()
 		this.elRoot.appendChild(el);
 		el.classList.add('tag');
 
+		if (RULES[this.name][item] && RULES[this.name][item].clr)
+		{
+			let c = RULES[this.name][item].clr;
+			el.style.borderColor = 'rgb(' + c[0]*0.5 + ',' + c[1]*0.5 + ',' + c[2]*0.5 + ')';
+			el.style.backgroundColor = 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
+		}
+
 		if (this.name == 'flags')
 		{
 			el.classList.add('flag');
-			if (RULES.flags[item] && RULES.flags[item].clr)
-			{
-				let c = RULES.flags[item].clr;
-				el.style.borderColor = 'rgb(' + c[0]*0.5 + ',' + c[1]*0.5 + ',' + c[2]*0.5 + ')';
-				el.style.backgroundColor = 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
-			}
 		}
 
 		el.m_item = item;
