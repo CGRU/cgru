@@ -32,7 +32,7 @@
 	"check"       :{"title":"CHECK",       "clr":[ 77, 77,177], "short":"Chk", "p_min":60, "p_max":90, "mode":"stage", "tip":"To check"},
 	"comment"     :{"title":"COMMENT",     "clr":[222,111,222], "short":"Cmm",             "p_max":50, "mode":"stage", "tip":"Comment"},
 	"update"      :{"title":"UPDATE",      "clr":[250,120, 90], "short":"UP",                          "mode":null,    "tip":"Update."},
-	"send_ready"  :{"title":"SENDREADY",   "clr":[ 77,177,177], "short":"SR",  "p_min":70, "p_max":90, "mode":"done",  "tip":"Ready to send."},
+	"send_ready"  :{"title":"SENDREADY",   "clr":[ 77,177,177], "short":"SR",  "p_min":70, "p_max":90, "mode":"stage",  "tip":"Ready to send."},
 	"sent"        :{"title":"SENT",        "clr":[222,222,191], "short":"SNT", "p_min":80, "p_max":90, "mode":"stage", "tip":"Was sent"},
 	"omit"        :{"title":"OMIT",        "clr":[ 99, 99, 99], "short":"Om",              "p_max":-1, "mode":"stage", "tip":"Omit"},
 	"hqres"       :{"title":"HQRES",       "clr":[100,250,100], "short":"HQR", "p_min":98, "p_max":98, "mode":"stage", "tip":"Render high quality results"},

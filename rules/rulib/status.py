@@ -174,7 +174,8 @@ class Status:
 
         # We should not add items that are already set:
         for i in self.data[item_name]:
-           items_add.remove(i)
+            if i in items_add:
+                items_add.remove(i)
 
         # Add items:
         for i in items_add:
