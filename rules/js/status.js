@@ -653,11 +653,7 @@ function st_CreateElFlag(i_flag, i_short, i_suffix)
 	el.title = c_GetFlagTip(i_flag);
 	el.m_name = i_flag;
 
-	let clr = null;
-	if (RULES.flags[i_flag] && RULES.flags[i_flag].clr)
-		clr = RULES.flags[i_flag].clr;
-	if (clr)
-		st_SetElColor({"color": clr}, el);
+	st_SetTagStyle('flags', i_flag, el);
 
 	return el;
 }
@@ -703,13 +699,26 @@ function st_CreateElTag(i_tag, i_short, i_suffix)
 	el.title = c_GetTagTip(i_tag);
 	el.m_name = i_tag;
 
-	let clr = null;
-	if (RULES.tags[i_tag] && RULES.tags[i_tag].clr)
-		clr = RULES.tags[i_tag].clr;
-	if (clr)
-		st_SetElColor({"color": clr}, el);
+	st_SetTagStyle('tags', i_tag, el);
 
 	return el;
+}
+function st_SetTagStyle(i_name, i_tag, i_el)
+{
+	if (RULES[i_name] == null)
+		return;
+
+	let obj = RULES[i_name][i_tag];
+	if (obj == null)
+		return;
+
+	st_SetElColor({"color": obj.clr}, i_el);
+
+	if (obj.size)
+		i_el.style.fontSize = obj.size + 'px';
+
+	if (obj.img)
+		i_el.style.backgroundImage = 'url(' + obj.img + ')';
 }
 function st_TagHilight(i_el, i_key)
 {
@@ -786,11 +795,15 @@ function st_SetElColor(i_status, i_elBack, i_elColor, i_setNone)
 
 	let c = null;
 	let a = 1;
-	if (i_status && i_status.color)
+	if (i_status && i_status.flags && i_status.flags.length)
 	{
-		c = i_status.color;
+		var flag = i_status.flags[i_status.flags.length - 1];
+		if (RULES.flags[flag] && RULES.flags[flag].clr)
+		{
+			c = RULES.flags[flag].clr;
+		}
 	}
-	else if (i_status && i_status.tags && i_status.tags.length)
+	if (i_status && i_status.tags && i_status.tags.length)
 	{
 		let tag = i_status.tags[i_status.tags.length - 1];
 		if (RULES.tags[tag] && RULES.tags[tag].clr)
@@ -798,13 +811,9 @@ function st_SetElColor(i_status, i_elBack, i_elColor, i_setNone)
 			c = RULES.tags[tag].clr;
 		}
 	}
-	else if (i_status && i_status.flags && i_status.flags.length)
+	if (i_status && i_status.color)
 	{
-		var flag = i_status.flags[i_status.flags.length - 1];
-		if (RULES.flags[flag] && RULES.flags[flag].clr)
-		{
-			c = RULES.flags[flag].clr;
-		}
+		c = i_status.color;
 	}
 
 	if (c)

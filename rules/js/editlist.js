@@ -92,8 +92,7 @@ EditList.prototype.appendItem = function(i_id, i_item)
 	if (this.list_all[i_id] && this.list_all[i_id].tip)
 		el.title = this.list_all[i_id].tip;
 
-	if (RULES[this.name] && RULES[this.name][i_id])
-		st_SetElColor({"color": RULES[this.name][i_id].clr}, el);
+	st_SetTagStyle(this.name, i_id, el);
 
 	if (this.name == 'flags')
 	{
@@ -283,12 +282,7 @@ EditList.prototype.showAllItems = function()
 		this.elRoot.appendChild(el);
 		el.classList.add('tag');
 
-		if (RULES[this.name] && RULES[this.name][item] && RULES[this.name][item].clr)
-		{
-			let c = RULES[this.name][item].clr;
-			el.style.borderColor = 'rgb(' + c[0]*0.5 + ',' + c[1]*0.5 + ',' + c[2]*0.5 + ')';
-			el.style.backgroundColor = 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
-		}
+		st_SetTagStyle(this.name, item, el);
 
 		if (this.name == 'flags')
 		{
