@@ -135,20 +135,6 @@ void ItemJob::v_updateValues(af::Node * i_afnode, int i_msgType)
 	m_params["time_wait"]          = job->getTimeWait();
 	m_params["time_life"]          = job->getTimeLife();
 
-	// Collect pools
-	pools.clear();
-	QMap<QString, QVariant> qv_pools;
-	for (auto const & it : job->getPools())
-	{
-		if (pools.size()) pools += ",";
-		pools += QString("%1:%2").arg(afqt::stoq(it.first)).arg(it.second);
-
-		qv_pools[afqt::stoq(it.first)] = it.second;
-	}
-	if (pools.size())
-		pools = QString("{%1}").arg(pools);
-	m_params["pools"] = qv_pools;
-
 	// Set flags that will be used to hide/show node in list:
 	setHideFlag_Hidden( job->isHidden() );
 	setHideFlag_Offline(job->isOffline() && (false == isRunning()));

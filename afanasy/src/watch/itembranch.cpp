@@ -76,6 +76,8 @@ void ItemBranch::v_updateValues(af::Node * i_afnode, int i_msgType)
 	strParameters.clear();
 	strCounts.clear();
 
+	strParameters += " " + pools;
+
 	if (Watch::isPadawan())
 	{
 		// Counts:

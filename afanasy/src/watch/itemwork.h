@@ -17,6 +17,8 @@ public:
 
 	void setParentBranch(ItemBranch * i_parent_branch);
 
+	QString pools;
+
 	int max_running_tasks;
 	int max_running_tasks_per_host;
 	QString hostsmask;

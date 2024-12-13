@@ -210,7 +210,7 @@ ListJobs::ListJobs(QWidget * i_parent, bool i_listwork, const std::string & i_na
 	}
 	addParam_Str(Item::TAny, "annotation",                "Annotation",         "Annotation string");
 	addParam_separator();
-	addParam_MSI(Item::TJob, "pools",                     "Pools",              "Pools priorities");
+	addParam_MSI(Item::TAny, "pools",                     "Pools",              "Pools priorities");
 	addParam_separator();
 	addParam_Tim(Item::TJob, "time_wait",                 "Wait Time",          "Time to wait to start");
 	addParam_separator();

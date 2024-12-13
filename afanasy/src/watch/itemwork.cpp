@@ -36,6 +36,19 @@ void ItemWork::updateWorkValues(af::Work * i_afwork)
 	m_params["need_memory"]                = i_afwork->getNeedMemory();
 	m_params["need_hdd"]                   = i_afwork->getNeedHDD();
 
+	// Collect pools
+	pools.clear();
+	QMap<QString, QVariant> qv_pools;
+	for (auto const & it : i_afwork->getPools())
+	{
+		if (pools.size()) pools += ",";
+		pools += QString("%1:%2").arg(afqt::stoq(it.first)).arg(it.second);
+
+		qv_pools[afqt::stoq(it.first)] = it.second;
+	}
+	if (pools.size())
+		pools = QString("{%1}").arg(pools);
+	m_params["pools"] = qv_pools;
 
 	max_running_tasks          = i_afwork->getMaxRunningTasks();
 	max_running_tasks_per_host = i_afwork->getMaxRunTasksPerHost();

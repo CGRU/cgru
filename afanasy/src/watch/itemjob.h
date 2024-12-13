@@ -35,7 +35,6 @@ public:
 
 	bool has_tasks_trying_next;
 
-	QString pools;
 	QString service;
 	QString hostname;
 	QString username;
