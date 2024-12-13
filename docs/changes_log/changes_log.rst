@@ -25,6 +25,8 @@ v3.4.0
     This can speeds up interface on a big amount of jobs and/or slow connection.
     It is especially useful on a Work (Branches) view.
 
+-   Branches *pools* parameter can be edited and viewed in AfWatch.
+
 -   AfRender can get CPU temperature and hardware info by Python modules.
     AfWatch marks "hot" renders with red color and shows hardware info.
 
