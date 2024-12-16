@@ -289,7 +289,9 @@ public:
 	inline int getProgressTasksWaitReconn() const { return p_tasks_waitrec; }
 	inline int getProgressTasksWaitDep() const { return p_tasks_waitdep; }
 	inline int getProgressTasksSuspended() const { return p_tasks_suspended; }
-	inline long long getProgressTasksSumRunTime() const { return p_tasks_run_time; }
+	inline int       getProgressTasksMinRunTime() const { return p_tasks_run_time_min; }
+	inline int       getProgressTasksMaxRunTime() const { return p_tasks_run_time_max; }
+	inline long long getProgressTasksSumRunTime() const { return p_tasks_run_time_sum; }
 
 	inline void setState(uint32_t value) { m_state = value; }
 	inline void setProgressTasksReady(int value) { p_tasks_ready = value; }
@@ -452,6 +454,8 @@ private:
 	int32_t p_tasks_waitrec;  ///< Number of tasks waiting for reconnect.
 	int32_t p_tasks_waitdep;  ///< Number of tasks waiting for dependencies.
 	int32_t p_tasks_suspended;  ///< Number of tasks waiting for dependencies.
-	int64_t p_tasks_run_time; ///< Tasks run time summ.
+	int32_t p_tasks_run_time_min;
+	int32_t p_tasks_run_time_max;
+	int64_t p_tasks_run_time_sum;
 };
 }

@@ -106,18 +106,20 @@ void BlockData::initDefaults()
 	m_time_started /***********/ = 0;
 	m_time_done /**************/ = 0;
 
-	p_percentage /******/ = 0;
-	p_error_hosts /*****/ = 0;
-	p_avoid_hosts /*****/ = 0;
-	p_tasks_ready /*****/ = 0;
-	p_tasks_done /******/ = 0;
-	p_tasks_error /*****/ = 0;
-	p_tasks_skipped /***/ = 0;
-	p_tasks_warning /***/ = 0;
-	p_tasks_waitrec /***/ = 0;
-	p_tasks_waitdep /***/ = 0;
-	p_tasks_suspended/**/ = 0;
-	p_tasks_run_time /**/ = 0;
+	p_percentage         = 0;
+	p_error_hosts        = 0;
+	p_avoid_hosts        = 0;
+	p_tasks_ready        = 0;
+	p_tasks_done         = 0;
+	p_tasks_error        = 0;
+	p_tasks_skipped      = 0;
+	p_tasks_warning      = 0;
+	p_tasks_waitrec      = 0;
+	p_tasks_waitdep      = 0;
+	p_tasks_suspended    = 0;
+	p_tasks_run_time_min = 0;
+	p_tasks_run_time_max = 0;
+	p_tasks_run_time_sum = 0;
 
 	memset(p_progressbar, AFJOB::ASCII_PROGRESS_STATES[0], AFJOB::ASCII_PROGRESS_LENGTH);
 }
@@ -508,7 +510,9 @@ void BlockData::jsonWrite(std::ostringstream &o_str, int i_type) const
 			if (p_tasks_waitrec > 0) o_str << ",\n\"p_tasks_waitrec\":" << p_tasks_waitrec;
 			if (p_tasks_waitdep > 0) o_str << ",\n\"p_tasks_waitdep\":" << p_tasks_waitdep;
 			if (p_tasks_suspended > 0) o_str << ",\n\"p_tasks_suspended\":" << p_tasks_suspended;
-			if (p_tasks_run_time > 0) o_str << ",\n\"p_tasks_run_time\":" << p_tasks_run_time;
+			if (p_tasks_run_time_min > 0) o_str << ",\n\"p_tasks_run_time_min\":" << p_tasks_run_time_min;
+			if (p_tasks_run_time_max > 0) o_str << ",\n\"p_tasks_run_time_max\":" << p_tasks_run_time_max;
+			if (p_tasks_run_time_sum > 0) o_str << ",\n\"p_tasks_run_time_sum\":" << p_tasks_run_time_sum;
 
 			if (m_srv_info.size())
 				o_str << ",\n\"srv_info\":\"" << m_srv_info << "\"";
@@ -663,7 +667,11 @@ void BlockData::v_readwrite(Msg *msg)
 			rw_int32_t(p_tasks_waitrec, msg);
 			rw_int32_t(p_tasks_waitdep, msg);
 			rw_int32_t(p_tasks_suspended, msg);
-			rw_int64_t(p_tasks_run_time, msg);
+			/* NEW_VERSION
+			rw_int32_t(p_tasks_run_time_min, msg);
+			rw_int32_t(p_tasks_run_time_max, msg);
+			*/
+			rw_int64_t(p_tasks_run_time_sum, msg);
 
 			rw_int64_t(m_state, msg);
 			rw_int32_t(m_job_id, msg);
@@ -1341,8 +1349,8 @@ void BlockData::generateInfoStreamTyped(std::ostringstream &o_str, int type, boo
 			if (full) o_str << "\nRunning Progress:";
 
 			if (p_tasks_done)
-				o_str << "\n Run Time: Sum = " << af::time2strHMS(p_tasks_run_time, true)
-					  << " / Average = " << af::time2strHMS(p_tasks_run_time / p_tasks_done, true);
+				o_str << "\n Run Time: Sum = " << af::time2strHMS(p_tasks_run_time_sum, true)
+					  << " / Average = " << af::time2strHMS(p_tasks_run_time_sum / p_tasks_done, true);
 
 			if (full) o_str << "\n Tasks Ready = " << p_tasks_ready;
 			if (full) o_str << "\n Tasks Done = " << p_tasks_done;
@@ -1422,7 +1430,11 @@ bool BlockData::updateProgress(JobProgress *progress)
 	int new_tasks_waitrec = 0;
 	int new_tasks_waitdep = 0;
 	int new_tasks_suspended = 0;
-	long long new_tasks_run_time = 0;
+	int new_tasks_run_time_min = 0;
+	int new_tasks_run_time_max = 0;
+	long long new_tasks_run_time_sum = 0;
+
+	long long currentTime = time(NULL);
 
 	for (int t = 0; t < m_tasks_num; t++)
 	{
@@ -1438,8 +1450,15 @@ bool BlockData::updateProgress(JobProgress *progress)
 			new_tasks_done++;
 			task_percent = 100;
 			if (false == (task_state & AFJOB::STATE_SKIPPED_MASK))
-				new_tasks_run_time +=
-					progress->tp[m_block_num][t]->time_done - progress->tp[m_block_num][t]->time_start;
+			{
+				int run_time = progress->tp[m_block_num][t]->time_done - progress->tp[m_block_num][t]->time_start;
+
+				new_tasks_run_time_sum += run_time;
+				if (new_tasks_run_time_max < run_time)
+					new_tasks_run_time_max = run_time;
+				if ((new_tasks_run_time_min == 0) || (new_tasks_run_time_min > run_time))
+					new_tasks_run_time_min = run_time;
+			}
 		}
 		if (task_state & AFJOB::STATE_RUNNING_MASK)
 		{
@@ -1448,12 +1467,17 @@ bool BlockData::updateProgress(JobProgress *progress)
 				task_percent = 0;
 			else if (task_percent > 99)
 				task_percent = 99;
+
+			int run_time = currentTime - progress->tp[m_block_num][t]->time_start;
+
+			if (new_tasks_run_time_max < run_time)
+				new_tasks_run_time_max = run_time;
 		}
 		if (task_state & AFJOB::STATE_ERROR_MASK)
 		{
 			new_tasks_error++;
 			task_percent = 0;
-			new_tasks_run_time +=
+			new_tasks_run_time_sum +=
 				progress->tp[m_block_num][t]->time_done - progress->tp[m_block_num][t]->time_start;
 		}
 		if (task_state & AFJOB::STATE_SKIPPED_MASK)
@@ -1487,7 +1511,8 @@ bool BlockData::updateProgress(JobProgress *progress)
 		|| (p_tasks_warning != new_tasks_warning) || (p_tasks_waitrec != new_tasks_waitrec)
 		|| (p_tasks_waitdep != new_tasks_waitdep)
 		|| (p_tasks_suspended != new_tasks_suspended)
-		|| (p_percentage != new_percentage) || (p_tasks_run_time != new_tasks_run_time))
+		|| (p_percentage != new_percentage) || (p_tasks_run_time_sum != new_tasks_run_time_sum)
+		|| (p_tasks_run_time_min != new_tasks_run_time_min) || (p_tasks_run_time_max != new_tasks_run_time_max))
 		changed = true;
 
 	p_tasks_ready = new_tasks_ready;
@@ -1499,7 +1524,9 @@ bool BlockData::updateProgress(JobProgress *progress)
 	p_tasks_waitdep = new_tasks_waitdep;
 	p_tasks_suspended = new_tasks_suspended;
 	p_percentage = new_percentage;
-	p_tasks_run_time = new_tasks_run_time;
+	p_tasks_run_time_min = new_tasks_run_time_min;
+	p_tasks_run_time_max = new_tasks_run_time_max;
+	p_tasks_run_time_sum = new_tasks_run_time_sum;
 
 	if (new_tasks_ready && (false == (m_state & AFJOB::STATE_WAITDEP_MASK)))
 		m_state = m_state | AFJOB::STATE_READY_MASK;

@@ -916,9 +916,9 @@ JobBlock.prototype.update = function(i_displayFull) {
 		}
 		this.elErrSolving.title = errTit;
 
-		var runtime_sum = cm_TimeStringFromSeconds(this.params.p_tasks_run_time);
-		var runtime_avg =
-			cm_TimeStringFromSeconds(Math.round(this.params.p_tasks_run_time / this.params.p_tasks_done));
+		let runtime_sum = cm_TimeStringFromSeconds(this.params.p_tasks_run_time_sum);
+		let runtime_avg =
+			cm_TimeStringFromSeconds(Math.round(this.params.p_tasks_run_time_sum / this.params.p_tasks_done));
 
 		if (cm_IsPadawan())
 		{
@@ -999,9 +999,15 @@ JobBlock.prototype.update = function(i_displayFull) {
 			else
 				this.elNeedProperties.textContent = '';
 
-			if (this.params.p_tasks_run_time && this.params.p_tasks_done)
-				this.elRunTime.innerHTML =
-					'Render Timings: Sum:<b>' + runtime_sum + '</b> / Average:<b>' + runtime_avg + '</b>';
+			let timings = '';
+			if (this.params.p_tasks_run_time_sum && this.params.p_tasks_done)
+				timings += ' Sum:<b>' + runtime_sum + '</b> / Average:<b>' + runtime_avg + '</b>';
+			if (this.params.p_tasks_run_time_min > 0)
+				timings += ' Min:<b>' + cm_TimeStringFromSeconds(this.params.p_tasks_run_time_min) + '</b>';
+			if (this.params.p_tasks_run_time_max > 0)
+				timings += ' Max:<b>' + cm_TimeStringFromSeconds(this.params.p_tasks_run_time_max) + '</b>';
+			if (timings.length)
+				this.elRunTime.innerHTML = 'Render Timings:' + timings;
 		}
 		else if (cm_IsJedi())
 		{
@@ -1082,9 +1088,15 @@ JobBlock.prototype.update = function(i_displayFull) {
 			else
 				this.elNeedProperties.textContent = '';
 
-			if (this.params.p_tasks_run_time && this.params.p_tasks_done)
-				this.elRunTime.innerHTML =
-					'Timings: Sum:<b>' + runtime_sum + '</b> / Avg:<b>' + runtime_avg + '</b>';
+			let timings = '';
+			if (this.params.p_tasks_run_time_sum && this.params.p_tasks_done)
+				timings += ' Sum:<b>' + runtime_sum + '</b> / Average:<b>' + runtime_avg + '</b>';
+			if (this.params.p_tasks_run_time_min > 0)
+				timings += ' Min:<b>' + cm_TimeStringFromSeconds(this.params.p_tasks_run_time_min) + '</b>';
+			if (this.params.p_tasks_run_time_max > 0)
+				timings += ' Max:<b>' + cm_TimeStringFromSeconds(this.params.p_tasks_run_time_max) + '</b>';
+			if (timings.length)
+				this.elRunTime.innerHTML = 'Timings:' + timings;
 		}
 		else
 		{
@@ -1164,15 +1176,31 @@ JobBlock.prototype.update = function(i_displayFull) {
 			else
 				this.elNeedProperties.textContent = '';
 
-			if (this.params.p_tasks_run_time && this.params.p_tasks_done)
+			if (this.params.p_tasks_run_time_sum && this.params.p_tasks_done)
 				this.elRunTime.innerHTML = 'rt:s<b>' + runtime_sum + '</b>/a<b>' + runtime_avg + '</b>';
+
+			let timings = '';
+			if (this.params.p_tasks_run_time_sum && this.params.p_tasks_done)
+				timings += 's<b>' + runtime_sum + '</b>/a<b>' + runtime_avg + '</b>';
+			if (this.params.p_tasks_run_time_min > 0)
+				timings += ':(<b>' + cm_TimeStringFromSeconds(this.params.p_tasks_run_time_min) + '</b>';
+			if (this.params.p_tasks_run_time_max > 0)
+				timings += '-<b>' + cm_TimeStringFromSeconds(this.params.p_tasks_run_time_max) + '</b>)';
+			if (timings.length)
+				this.elRunTime.innerHTML = 'rt:' + timings;
 		}
 
-		if (this.params.p_tasks_run_time && this.params.p_tasks_done)
+		if ((this.params.p_tasks_run_time_sum && this.params.p_tasks_done) || (this.params.p_tasks_run_time_min > 0) || (this.params.p_tasks_run_time_max > 0))
 		{
+			let timings = 'Tasks Running Time:';
+			if (this.params.p_tasks_run_time_sum && this.params.p_tasks_done)
+				timings += '\nTotal Sum: ' + runtime_sum + '\nAverage per task: ' + runtime_avg;
+			if (this.params.p_tasks_run_time_min > 0)
+				timings += '\nMinimum: ' + cm_TimeStringFromSeconds(this.params.p_tasks_run_time_min);
+			if (this.params.p_tasks_run_time_max > 0)
+				timings += '\nMaximum: ' + cm_TimeStringFromSeconds(this.params.p_tasks_run_time_max);
+			this.elRunTime.title = timings;
 			this.elRunTime.style.display = 'inline';
-			this.elRunTime.title =
-				'Running Time:\nTotal Sum: ' + runtime_sum + '\nAverage per task: ' + runtime_avg;
 		}
 		else
 		{
