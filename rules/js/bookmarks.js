@@ -652,22 +652,25 @@ function bm_StatusesChanged(i_args)
 
 function bm_HighlightCurrent()
 {
+	let cur_path = g_CurPath();
 	for (let i = 0; i < bm_elements.length; i++)
 	{
-		if (bm_elements[i].m_bookmark.path == g_CurPath())
+		if (cur_path && (cur_path.indexOf(bm_elements[i].m_bookmark.path) != -1))
 		{
 			bm_elements[i].classList.add('cur_path');
 
-			if ((bm_clicked == false) && (nw_clicked == false))
+			if (bm_elements[i].m_bookmark.path == cur_path)
 			{
-				bm_elements[i].scrollIntoView({behavior:'auto',block:'center',inline:'center'});
-			}
+				if ((bm_clicked == false) && (nw_clicked == false))
+				{
+					bm_elements[i].scrollIntoView({behavior:'auto',block:'center',inline:'center'});
+				}
 
-			if (g_CurPathDummy() || (false == bm_ActualStatus(RULES.status)))
-			{
-				bm_elements[i].classList.add('obsolete');
+				if (g_CurPathDummy() || (false == bm_ActualStatus(RULES.status)))
+				{
+					bm_elements[i].classList.add('obsolete');
+				}
 			}
-			// bm_elements[i].scrollIntoView();
 		}
 		else
 		{
