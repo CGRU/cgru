@@ -148,6 +148,8 @@ public:
 	static QFont f_plotter;
 	static QFont f_min;
 
+	static AttrNumber jobs_run_time_max_secs;
+	static AttrNumber work_run_time_max_secs;
 	static AttrNumber thumb_jobs_height;
 	static AttrNumber thumb_work_height;
 	static AttrNumber render_item_size;

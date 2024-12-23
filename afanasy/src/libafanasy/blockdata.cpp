@@ -667,10 +667,8 @@ void BlockData::v_readwrite(Msg *msg)
 			rw_int32_t(p_tasks_waitrec, msg);
 			rw_int32_t(p_tasks_waitdep, msg);
 			rw_int32_t(p_tasks_suspended, msg);
-			/* NEW_VERSION
 			rw_int32_t(p_tasks_run_time_min, msg);
 			rw_int32_t(p_tasks_run_time_max, msg);
-			*/
 			rw_int64_t(p_tasks_run_time_sum, msg);
 
 			rw_int64_t(m_state, msg);

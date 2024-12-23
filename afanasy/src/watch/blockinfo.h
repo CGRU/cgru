@@ -20,7 +20,7 @@ class BlockInfo: public QObject
 	Q_OBJECT
 
 public:
-	BlockInfo(const af::BlockData * i_data, Item * i_item, ListItems * i_listitems);
+	BlockInfo(const af::BlockData * i_data, Item * i_item, ListItems * i_listitems, bool i_inworklist = false);
 	~BlockInfo();
 
 	inline const QString & getName() const {return m_name;}
@@ -53,7 +53,9 @@ public:
 	int p_avoid_hosts;
 	int p_error_hosts;
 	long long p_capacity_total;
-	long long p_tasks_sumruntime;
+	int       p_tasks_runtimemin;
+	int       p_tasks_runtimemax;
+	long long p_tasks_runtimesum;
 
 //private:
 	uint32_t state;
@@ -157,6 +159,7 @@ private:
 private:
 	ListItems * m_listitems;
 	Item      * m_item;
+	bool        m_inworklist;
 
 	int     m_blocknum;
 	int     m_jobid;

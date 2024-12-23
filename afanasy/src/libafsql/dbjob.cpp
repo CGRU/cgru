@@ -63,7 +63,7 @@ void DBJob::add( const af::Job * i_job, std::list<std::string> * o_queries)
 		m_service = block->getService();
 		m_tasks_quantity = block->getTasksNum();
 		m_tasks_done = block->getProgressTasksDone();
-		m_run_time_sum = block->getProgressTasksSumRunTime();
+		m_run_time_sum = block->getProgressTasksRunTimeSum();
 
 		// Skip blocks with no run time:
 		if( m_tasks_quantity == 0 ) continue;

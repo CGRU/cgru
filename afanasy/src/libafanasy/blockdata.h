@@ -289,9 +289,9 @@ public:
 	inline int getProgressTasksWaitReconn() const { return p_tasks_waitrec; }
 	inline int getProgressTasksWaitDep() const { return p_tasks_waitdep; }
 	inline int getProgressTasksSuspended() const { return p_tasks_suspended; }
-	inline int       getProgressTasksMinRunTime() const { return p_tasks_run_time_min; }
-	inline int       getProgressTasksMaxRunTime() const { return p_tasks_run_time_max; }
-	inline long long getProgressTasksSumRunTime() const { return p_tasks_run_time_sum; }
+	inline int       getProgressTasksRunTimeMin() const { return p_tasks_run_time_min; }
+	inline int       getProgressTasksRunTimeMax() const { return p_tasks_run_time_max; }
+	inline long long getProgressTasksRunTimeSum() const { return p_tasks_run_time_sum; }
 
 	inline void setState(uint32_t value) { m_state = value; }
 	inline void setProgressTasksReady(int value) { p_tasks_ready = value; }

@@ -27,8 +27,11 @@ CtrlJobs::CtrlJobs(QWidget * i_parent, ListJobs * i_listjobs, bool i_inworklist)
 	setFrameShadow(QFrame::Raised);
 
 	QHBoxLayout * layout = new QHBoxLayout(this);
+	layout->setSizeConstraint(QLayout::SetMaximumSize);
 
-	layout->addWidget(new QLabel("Thumbs:", this));
+	QLabel * lThumbs = new QLabel("Thumbs:", this);
+	lThumbs->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+	layout->addWidget(lThumbs);
 
 	for (int i = 0; i < ms_thumbs_names.size(); i++)
 	{
@@ -49,6 +52,24 @@ CtrlJobs::CtrlJobs(QWidget * i_parent, ListJobs * i_listjobs, bool i_inworklist)
 
 		m_thumbs_btns.append(btn);
 	}
+
+	QLabel * lMax = new QLabel("Max(hrs):", this);
+	lMax->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+	lMax->setToolTip("Mark job blocks with tasks maximum running time above this value.");
+	layout->addWidget(lMax);
+
+	m_max_runtime_edit = new QLineEdit(this);
+	QDoubleValidator * dv = new QDoubleValidator(0, 24*10, 2, m_max_runtime_edit);
+	dv->setNotation(QDoubleValidator::StandardNotation);
+	m_max_runtime_edit->setValidator(dv);
+	m_max_runtime_edit->setFixedWidth(32);
+	connect(m_max_runtime_edit, SIGNAL(editingFinished()), this, SLOT(slot_MaxEditingFinished()));
+	layout->addWidget(m_max_runtime_edit);
+	int seconds = afqt::QEnvironment::jobs_run_time_max_secs.n;
+	if (m_inworklist)
+		seconds = afqt::QEnvironment::work_run_time_max_secs.n;
+	if (seconds)
+		m_max_runtime_edit->setText(QString::number(double(seconds) / 60.0 / 60.0, 'f', 2));
 
 	CtrlJobsViewOptions * viewOpts = new CtrlJobsViewOptions(this, m_listjobs, m_inworklist);
 	layout->addWidget(viewOpts);
@@ -88,11 +109,28 @@ void CtrlJobs::slot_ThumsButtonClicked(Button * i_btn)
 	m_listjobs->jobsHeightRecalculate();
 }
 
+void CtrlJobs::slot_MaxEditingFinished()
+{
+	QString text = m_max_runtime_edit->text();
+	double hours = text.toDouble();
+	if (hours <= 0)
+		m_max_runtime_edit->clear();
+	int seconds = int(hours * 60 * 60);
+	if (seconds < 0)
+		seconds = 0;
+	if (m_inworklist)
+		afqt::QEnvironment::work_run_time_max_secs.n = seconds;
+	else
+		afqt::QEnvironment::jobs_run_time_max_secs.n = seconds;
+	m_listjobs->repaintItems();
+}
+
 CtrlJobsViewOptions::CtrlJobsViewOptions(QWidget * i_parent, ListJobs * i_listjobs, bool i_inworklist):
 	QLabel("View Options", i_parent),
 	m_listjobs(i_listjobs),
 	m_inworklist(i_inworklist)
 {
+	setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	setFrameShape(QFrame::StyledPanel);
 	setFrameShadow(QFrame::Raised);
 

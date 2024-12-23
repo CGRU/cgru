@@ -25,9 +25,10 @@
 const int BlockInfo::Height        = 48;
 const int BlockInfo::HeightCompact = 16;
 
-BlockInfo::BlockInfo(const af::BlockData * i_data, Item * i_item, ListItems * i_listitems):
+BlockInfo::BlockInfo(const af::BlockData * i_data, Item * i_item, ListItems * i_listitems, bool i_inworklist):
 	m_item(i_item),
 	m_listitems(i_listitems),
+	m_inworklist(i_inworklist),
 
 	p_percentage(0),
 	p_tasks_ready(0),
@@ -42,7 +43,9 @@ BlockInfo::BlockInfo(const af::BlockData * i_data, Item * i_item, ListItems * i_
 	p_tasks_waitrec(0),
 	p_error_hosts(0),
 	p_avoid_hosts(0),
-	p_tasks_sumruntime(0),
+	p_tasks_runtimemin(0),
+	p_tasks_runtimemax(0),
+	p_tasks_runtimesum(0),
 
 	errors_retries(-1),
 	errors_avoid_host(-1),
@@ -241,7 +244,9 @@ bool BlockInfo::update( const af::BlockData* block, int type)
 		p_tasks_waitrec    = block->getProgressTasksWaitReconn();
 		p_avoid_hosts      = block->getProgressAvoidHostsNum();
 		p_error_hosts      = block->getProgressErrorHostsNum();
-		p_tasks_sumruntime = block->getProgressTasksSumRunTime();
+		p_tasks_runtimemin = block->getProgressTasksRunTimeMin();
+		p_tasks_runtimemax = block->getProgressTasksRunTimeMax();
+		p_tasks_runtimesum = block->getProgressTasksRunTimeSum();
 
 		server_info = afqt::stoq(block->getSrvInfo());
 
@@ -362,9 +367,17 @@ void BlockInfo::refresh()
 	str_right_top.clear();
 	if( Watch::isPadawan())
 	{
-		if ((p_tasks_done - p_tasks_skipped) > 0) str_right_top += QString(" Render Timings: Sum:%1 / Average:%2")
-			.arg(af::time2strHMS(p_tasks_sumruntime, true).c_str())
-			.arg(af::time2strHMS(p_tasks_sumruntime/(p_tasks_done - p_tasks_skipped), true).c_str());
+		QString timings;
+		if ((p_tasks_done - p_tasks_skipped) > 0)
+			timings += QString("Sum:%1 / Average:%2")
+			.arg(af::time2strHMS(p_tasks_runtimesum, true).c_str())
+			.arg(af::time2strHMS(p_tasks_runtimesum/(p_tasks_done - p_tasks_skipped), true).c_str());
+		if (p_tasks_runtimemin)
+			timings += QString(" Min:%1").arg(af::time2strHMS(p_tasks_runtimemin, true).c_str());
+		if (p_tasks_runtimemax)
+			timings += QString(" Max:%1").arg(af::time2strHMS(p_tasks_runtimemax, true).c_str());
+		if (timings.size())
+			str_right_top += QString(" Render Timings: ") + timings;
 
 		if(( errors_avoid_host >= 0 ) || ( errors_task_same_host >= 0 ) || ( errors_retries >= 0 ))
 			str_right_top += Item::generateErrorsSolvingInfo( errors_avoid_host, errors_task_same_host, errors_retries);
@@ -420,9 +433,17 @@ void BlockInfo::refresh()
 	}
 	else if( Watch::isJedi())
 	{
-		if ((p_tasks_done - p_tasks_skipped) > 0) str_right_top += QString(" Timings: Sum:%1/Avg:%2")
-			.arg(af::time2strHMS(p_tasks_sumruntime, true).c_str())
-			.arg(af::time2strHMS(p_tasks_sumruntime/(p_tasks_done - p_tasks_skipped), true).c_str());
+		QString timings;
+		if ((p_tasks_done - p_tasks_skipped) > 0)
+			timings += QString("Sum:%1/Avg:%2")
+			.arg(af::time2strHMS(p_tasks_runtimesum, true).c_str())
+			.arg(af::time2strHMS(p_tasks_runtimesum/(p_tasks_done - p_tasks_skipped), true).c_str());
+		if (p_tasks_runtimemin)
+			timings += QString(" Min:%1").arg(af::time2strHMS(p_tasks_runtimemin, true).c_str());
+		if (p_tasks_runtimemax)
+			timings += QString(" Max:%1").arg(af::time2strHMS(p_tasks_runtimemax, true).c_str());
+		if (timings.size())
+			str_right_top += QString(" Timings: ") + timings;
 
 		if(( errors_avoid_host >= 0 ) || ( errors_task_same_host >= 0 ) || ( errors_retries >= 0 ))
 			str_right_top += Item::generateErrorsSolvingInfo( errors_avoid_host, errors_task_same_host, errors_retries);
@@ -478,9 +499,17 @@ void BlockInfo::refresh()
 	}
 	else
 	{
-		if ((p_tasks_done - p_tasks_skipped) > 0) str_right_top += QString(" rt:s%1/a%2")
-			.arg(af::time2strHMS(p_tasks_sumruntime, true).c_str())
-			.arg(af::time2strHMS(p_tasks_sumruntime/(p_tasks_done - p_tasks_skipped), true).c_str());
+		QString timings;
+		if ((p_tasks_done - p_tasks_skipped) > 0)
+			timings += QString("s:%1/a:%2")
+			.arg(af::time2strHMS(p_tasks_runtimesum, true).c_str())
+			.arg(af::time2strHMS(p_tasks_runtimesum/(p_tasks_done - p_tasks_skipped), true).c_str());
+		if (p_tasks_runtimemin)
+			timings += QString(" m:%1").arg(af::time2strHMS(p_tasks_runtimemin, true).c_str());
+		if (p_tasks_runtimemax)
+			timings += QString(" M:%1").arg(af::time2strHMS(p_tasks_runtimemax, true).c_str());
+		if (timings.size())
+			str_right_top += QString(" rt: ") + timings;
 
 		if(( errors_avoid_host >= 0 ) || ( errors_task_same_host >= 0 ) || ( errors_retries >= 0 ))
 			str_right_top += Item::generateErrorsSolvingInfo( errors_avoid_host, errors_task_same_host, errors_retries);
@@ -651,10 +680,41 @@ void BlockInfo::paint( QPainter * i_painter, const QStyleOptionViewItem &option,
 		}
 	}
 
-
 	// Paint border:
-	i_painter->setPen(afqt::QEnvironment::clr_outline.c );
 	i_painter->setBrush(Qt::NoBrush);
+	QColor borderColor(afqt::QEnvironment::clr_outline.c);
+	QPen borderPen(borderColor);
+	int run_time_max_sec = afqt::QEnvironment::jobs_run_time_max_secs.n;
+	if (m_inworklist)
+		run_time_max_sec = afqt::QEnvironment::work_run_time_max_secs.n;
+	if (p_tasks_runtimemax && run_time_max_sec && (p_tasks_runtimemax >= run_time_max_sec))
+	{
+		int clr_badly[3] = {150, 80, 80};
+		int clr_worse[3] = {250, 80, 80};
+		float factor = float(p_tasks_runtimemax) / float(run_time_max_sec);
+		if (factor < 1)
+		{
+			factor = 1 - (1 - factor) * 4;
+			clr_worse[0] = clr_badly[0];
+			clr_worse[1] = clr_badly[1];
+			clr_worse[2] = clr_badly[2];
+			clr_badly[0] = borderColor.red();
+			clr_badly[1] = borderColor.green();
+			clr_badly[2] = borderColor.blue();
+		}
+		else
+		{
+			factor = factor - 1;
+		}
+		if (factor < 0) factor = 0;
+		if (factor > 1) factor = 1;
+		int clr[3] = {0,0,0};
+		for (int i = 0; i < 3; i++)
+			clr[i] = int((1.0 - factor) * clr_badly[i] + factor * clr_worse[i]);
+		borderPen.setColor(QColor(clr[0], clr[1], clr[2]));
+		i_painter->setBrush(QColor(clr[0], clr[1], clr[2], 80));
+	}
+	i_painter->setPen(borderPen);
 	i_painter->drawRoundedRect(x+xoffset-3, y-1, w+4-xoffset, i_compact_display ? HeightCompact : Height, 3, 3);
 
 
