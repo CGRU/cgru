@@ -25,6 +25,7 @@
 #include <sys/ioctl.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <fstream>
 extern void (*fp_setupChildProcess)( void);
 #endif
 
@@ -65,6 +66,22 @@ int setNonblocking(int fd)
 	/* Fixme: O_NONBLOCK is defined but broken on SunOS 4.1.x and AIX 3.2.5. */
 	if (-1 == (flags = fcntl(fd, F_GETFL, 0)))
 		flags = 0;
+	
+	// We increase the pipe size of our subprocess pipes here to the 
+	// system maximum. We do this because if a subprocess prints a lot it is 
+	// blocked by a full system pipe buffer. On CentOS 7 the default PIPE 
+	// size is 65KB butcan be increased to ~1MB, which is again limited
+	// by sysctl and can be raised there.
+
+	std::ifstream pipe_max_size_file("/proc/sys/fs/pipe-max-size");
+	if (pipe_max_size_file.is_open()) {
+		int max_pipe_size = 0;
+		if (pipe_max_size_file >> max_pipe_size) {
+			int new_size = fcntl(fd, F_SETPIPE_SZ, max_pipe_size);
+			AF_DEBUG << "Set pipe size: " << new_size << " max: " << max_pipe_size;
+		}
+	}
+
 	return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 #else
 	/* Otherwise, use the old way of doing it */
@@ -468,13 +485,21 @@ void TaskProcess::readProcess( const std::string & i_mode)
 
 	std::string output;
 
-	int readsize = readPipe( m_io_output);
-	if( readsize > 0 )
-		output = std::string( m_readbuffer, readsize);
+	int readsize = 0;
+	do {
+		readsize = readPipe( m_io_output);
+		AF_DEBUG << "readsize pipe stdout: " << readsize;
+		if ( readsize > 0 )
+			output += std::string( m_readbuffer, readsize);
+	} while ( readsize > 0 );
 
-	readsize = readPipe( m_io_outerr);
-	if( readsize > 0 )
-		output += std::string( m_readbuffer, readsize);
+	do {
+		readsize = readPipe( m_io_outerr);
+		AF_DEBUG << "readsize pipe stderr: " << readsize;
+		if ( readsize > 0 )
+			output += std::string( m_readbuffer, readsize);
+	} while ( readsize > 0 );
+
 
 	std::string resources;
 	resources += "{\n";
