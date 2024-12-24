@@ -687,20 +687,24 @@ void BlockInfo::paint( QPainter * i_painter, const QStyleOptionViewItem &option,
 	int run_time_max_sec = afqt::QEnvironment::jobs_run_time_max_secs.n;
 	if (m_inworklist)
 		run_time_max_sec = afqt::QEnvironment::work_run_time_max_secs.n;
-	if (p_tasks_runtimemax && run_time_max_sec && (p_tasks_runtimemax >= run_time_max_sec))
+	float factor_warning = 0.8;
+	if (p_tasks_runtimemax && run_time_max_sec && (p_tasks_runtimemax >= (factor_warning * run_time_max_sec)))
 	{
+		int clr_warn[3]  = { 80, 80, 30};
 		int clr_badly[3] = {150, 80, 80};
 		int clr_worse[3] = {250, 80, 80};
+		int alpha = 80;
 		float factor = float(p_tasks_runtimemax) / float(run_time_max_sec);
 		if (factor < 1)
 		{
-			factor = 1 - (1 - factor) * 4;
-			clr_worse[0] = clr_badly[0];
-			clr_worse[1] = clr_badly[1];
-			clr_worse[2] = clr_badly[2];
+			factor = 1 - (1 - factor) / (1 - factor_warning);
 			clr_badly[0] = borderColor.red();
 			clr_badly[1] = borderColor.green();
 			clr_badly[2] = borderColor.blue();
+			clr_worse[0] = clr_warn[0];
+			clr_worse[1] = clr_warn[1];
+			clr_worse[2] = clr_warn[2];
+			alpha *= factor;
 		}
 		else
 		{
@@ -712,7 +716,7 @@ void BlockInfo::paint( QPainter * i_painter, const QStyleOptionViewItem &option,
 		for (int i = 0; i < 3; i++)
 			clr[i] = int((1.0 - factor) * clr_badly[i] + factor * clr_worse[i]);
 		borderPen.setColor(QColor(clr[0], clr[1], clr[2]));
-		i_painter->setBrush(QColor(clr[0], clr[1], clr[2], 80));
+		i_painter->setBrush(QColor(clr[0], clr[1], clr[2], alpha));
 	}
 	i_painter->setPen(borderPen);
 	i_painter->drawRoundedRect(x+xoffset-3, y-1, w+4-xoffset, i_compact_display ? HeightCompact : Height, 3, 3);
