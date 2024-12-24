@@ -991,7 +991,47 @@ void ItemRender::drawTask(QPainter * i_painter, const QStyleOptionViewItem & i_o
 		const af::TaskExec * i_exec, int i_percent,
 		int i_x, int i_y, int i_w, int i_h) const
 {
-	int tw = 0;
+	int runtime = time(NULL) - i_exec->getTimeStart();
+
+	// Draw task border:
+	i_painter->setBrush(Qt::NoBrush);
+	QColor borderColor(afqt::QEnvironment::clr_outline.c);
+	QPen borderPen(borderColor);
+	int run_time_max_sec = afqt::QEnvironment::renders_run_time_max_secs.n;
+	float factor_warning = 0.8;
+	if (runtime && run_time_max_sec && (runtime >= (factor_warning * run_time_max_sec)))
+	{
+		int clr_warn[3]  = { 80, 80, 30};
+		int clr_badly[3] = {150, 80, 80};
+		int clr_worse[3] = {250, 80, 80};
+		int alpha = 80;
+		float factor = float(runtime) / float(run_time_max_sec);
+		if (factor < 1)
+		{
+			factor = 1 - (1 - factor) / (1 - factor_warning);
+			clr_badly[0] = borderColor.red();
+			clr_badly[1] = borderColor.green();
+			clr_badly[2] = borderColor.blue();
+			clr_worse[0] = clr_warn[0];
+			clr_worse[1] = clr_warn[1];
+			clr_worse[2] = clr_warn[2];
+			alpha *= factor;
+		}
+		else
+		{
+			factor = factor - 1;
+		}
+		if (factor < 0) factor = 0;
+		if (factor > 1) factor = 1;
+		int clr[3] = {0,0,0};
+		for (int i = 0; i < 3; i++)
+			clr[i] = int((1.0 - factor) * clr_badly[i] + factor * clr_worse[i]);
+		borderPen.setColor(QColor(clr[0], clr[1], clr[2]));
+		i_painter->setBrush(QColor(clr[0], clr[1], clr[2], alpha));
+	}
+	i_painter->setPen(borderPen);
+	i_painter->drawRoundedRect(i_x, i_y, i_w, i_h, 1.0, 1.0);
+
 	// Prepare strings
 	QString taskstr = QString("%1").arg(i_exec->getCapacity());
 	if (i_exec->getCapCoeff())
@@ -1004,7 +1044,7 @@ void ItemRender::drawTask(QPainter * i_painter, const QStyleOptionViewItem & i_o
 
 	QString user_time = QString("%1 - %2")
 		.arg(QString::fromUtf8(i_exec->getUserName().c_str()))
-		.arg( af::time2strHMS( time(NULL) - i_exec->getTimeStart()).c_str());
+		.arg(af::time2strHMS(runtime).c_str());
 
 	// Show task percent
 	if (i_percent > 0)
@@ -1020,6 +1060,7 @@ void ItemRender::drawTask(QPainter * i_painter, const QStyleOptionViewItem & i_o
 	}
 
 	// Draw an icon if exists:
+	int tw = 0;
 	const QPixmap * icon = Watch::getServiceIconSmall(afqt::stoq(i_exec->getServiceType()));
 	if (icon)
 	{
@@ -1050,11 +1091,6 @@ void ItemRender::drawTask(QPainter * i_painter, const QStyleOptionViewItem & i_o
 
 	i_painter->drawText(i_x+5 + tw, i_y, i_w-15 - tw - rect_usertime.width(), i_h,
 			Qt::AlignVCenter | Qt::AlignLeft, taskstr);
-
-	// Draw task border:
-	i_painter->setPen(afqt::QEnvironment::clr_outline.c);
-	i_painter->setBrush(Qt::NoBrush);
-	i_painter->drawRoundedRect(i_x, i_y, i_w, i_h, 1.0, 1.0);
 }
 
 void ItemRender::v_setSortType( int i_type1, int i_type2 )

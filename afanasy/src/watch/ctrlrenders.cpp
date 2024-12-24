@@ -21,8 +21,11 @@ CtrlRenders::CtrlRenders(QWidget * i_parent, ListRenders * i_listrenders):
 	setFrameShadow(QFrame::Raised);
 
 	QHBoxLayout * layout = new QHBoxLayout(this);
+	layout->setSizeConstraint(QLayout::SetMaximumSize);
 
-	layout->addWidget(new QLabel("Size:", this));
+	QLabel * lSize = new QLabel("Size:", this);
+	lSize->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+	layout->addWidget(lSize);
 
 	for (int i = 0; i < ms_sizes_names.size(); i++)
 	{
@@ -38,6 +41,22 @@ CtrlRenders::CtrlRenders(QWidget * i_parent, ListRenders * i_listrenders):
 		if (i == 0)
 			btn->setToolTip("Variable size.");
 	}
+
+	QLabel * lMax = new QLabel("Max(hrs):", this);
+	lMax->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+	lMax->setToolTip("Mark tasks maximum running time above this value.\nType zero to disable.");
+	layout->addWidget(lMax);
+
+	m_max_runtime_edit = new QLineEdit(this);
+	QDoubleValidator * dv = new QDoubleValidator(0, 24*10, 2, m_max_runtime_edit);
+	dv->setNotation(QDoubleValidator::StandardNotation);
+	m_max_runtime_edit->setValidator(dv);
+	m_max_runtime_edit->setFixedWidth(32);
+	connect(m_max_runtime_edit, SIGNAL(editingFinished()), this, SLOT(slot_MaxEditingFinished()));
+	layout->addWidget(m_max_runtime_edit);
+	int seconds = afqt::QEnvironment::renders_run_time_max_secs.n;
+	if (seconds)
+		m_max_runtime_edit->setText(QString::number(double(seconds) / 60.0 / 60.0, 'f', 2));
 
 	CtrlRendersViewOptions * viewOpts = new CtrlRendersViewOptions(this, m_listrenders);
 	layout->addWidget(viewOpts);
@@ -66,11 +85,24 @@ void CtrlRenders::slot_ThumsButtonClicked(Button * i_btn)
 	m_listrenders->itemsSizeChanged();
 }
 
+void CtrlRenders::slot_MaxEditingFinished()
+{
+	QString text = m_max_runtime_edit->text();
+	double hours = text.toDouble();
+	if (hours <= 0)
+		m_max_runtime_edit->clear();
+	int seconds = int(hours * 60 * 60);
+	if (seconds < 0)
+		seconds = 0;
+	afqt::QEnvironment::renders_run_time_max_secs.n = seconds;
+	m_listrenders->repaintItems();
+}
 
 CtrlRendersViewOptions::CtrlRendersViewOptions(QWidget * i_parent, ListRenders * i_listrenders):
 	QLabel("View Options", i_parent),
 	m_listrenders(i_listrenders)
 {
+	setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	setFrameShape(QFrame::StyledPanel);
 	setFrameShadow(QFrame::Raised);
 }

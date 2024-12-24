@@ -120,6 +120,7 @@ AttrColor QEnvironment::clr_textdone(        "clr_textdone",         "Done Text"
 AttrColor QEnvironment::clr_textmuted(       "clr_textmuted",        "Muted Text",              AFGUI::CLR_TEXTMUTED           );
 AttrColor QEnvironment::clr_textstars(       "clr_textstars",        "Stars Text",              AFGUI::CLR_TEXTSTARS           );
 
+AttrNumber QEnvironment::renders_run_time_max_secs("renders_run_time_max_secs", "Renders Item Run Time Max", 0);
 AttrNumber QEnvironment::jobs_run_time_max_secs("jobs_run_time_max_secs", "Job Item Run Time Max", 0);
 AttrNumber QEnvironment::work_run_time_max_secs("work_run_time_max_secs", "Job Item Run Time Max", 0);
 AttrNumber QEnvironment::thumb_jobs_height("thumb_jobs_height", "Job Item Height",      AFGUI::THUMB_JOBS_HEIGHT);
@@ -173,6 +174,7 @@ QEnvironment::QEnvironment( const QString & i_name)
     ms_attrs_prefs.append(&showServerPort      );
     ms_attrs_prefs.append( &showOfflineNoise   );
 
+	ms_attrs_prefs.append(&renders_run_time_max_secs);
 	ms_attrs_prefs.append(&jobs_run_time_max_secs);
 	ms_attrs_prefs.append(&work_run_time_max_secs);
 	ms_attrs_prefs.append(&thumb_jobs_height);

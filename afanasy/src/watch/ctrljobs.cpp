@@ -55,7 +55,7 @@ CtrlJobs::CtrlJobs(QWidget * i_parent, ListJobs * i_listjobs, bool i_inworklist)
 
 	QLabel * lMax = new QLabel("Max(hrs):", this);
 	lMax->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-	lMax->setToolTip("Mark job blocks with tasks maximum running time above this value.");
+	lMax->setToolTip("Mark job blocks with tasks maximum running time above this value.\nType zero to disable.");
 	layout->addWidget(lMax);
 
 	m_max_runtime_edit = new QLineEdit(this);

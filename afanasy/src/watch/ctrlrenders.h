@@ -4,6 +4,7 @@
 
 #include <QFrame>
 #include <QLabel>
+#include <QLineEdit>
 
 class Button;
 class ListRenders;
@@ -17,11 +18,14 @@ public:
 
 private slots:
 	void slot_ThumsButtonClicked(Button*);
+	void slot_MaxEditingFinished();
 
 private:
 	QList<Button*> m_thumbs_btns;
 	static const QStringList ms_sizes_names;
 	static const QList<int>  ms_sizes_enums;
+
+	QLineEdit * m_max_runtime_edit;
 
 	ListRenders * m_listrenders;
 };
