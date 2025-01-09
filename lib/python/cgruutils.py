@@ -46,11 +46,11 @@ def sepThousands(i_int):
 
 
 def timecodeToFrame( i_tc, i_fps = 24):
-    tc = re.findall('\d.*\d', i_tc)
+    tc = re.findall(r'\d.*\d', i_tc)
     if len( tc) == 0:
         return None
 
-    tc = re.findall('\d+', tc[0])
+    tc = re.findall(r'\d+', tc[0])
     if len( tc) == 0:
         return None
 
@@ -89,7 +89,7 @@ def timecodesFromFrameRange( i_ffirst, i_flast, i_fps = 24):
 
 def memStrToBytes(i_str):
     units = {"b": 1, "kb": 2**10, "mb": 2**20, "gb": 2**30, "tb": 2**40}
-    match = re.match('(\d{1,}\.?\d*)\s*(\w*)', i_str.strip().lower())
+    match = re.match(r'(\d{1,}\.?\d*)\s*(\w*)', i_str.strip().lower())
     if match is None: return None
     try:
         fnum = float(match.group(1))
