@@ -1,6 +1,6 @@
 var $ = function(id) { return document.getElementById(id); };
 
-var SERVER = '/server'
+var SERVER = '/afstatsrv'
 //var SERVER = 'server.php'
 
 g_actions = {};
