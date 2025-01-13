@@ -22,7 +22,7 @@ Require valid-user
 
 # Needed utils:
 # sudo apt-get install apache2-utils libapache2-mod-wsgi-py3 python3-psycopg2
-# sudo apt-get install exiftool mediainfo
+# sudo apt-get install exiftool mediainfo imagemagick ffmpeg
 # # Usage: htdigest [-c] passwordfile realm username
 # # The -c flag creates a new file.
 # htdigest -c .htdigest CGRU admin
