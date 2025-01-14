@@ -36,7 +36,11 @@ def processMovie(i_file):
     inform = '--Inform=Video;{' + inform + '}'
 
     data = subprocess.check_output(['mediainfo', inform, out['infile']])
-    data = cgruutils.toStr(data)
+    if len(data) == 0:
+        return None
+    data = cgruutils.toStr(data).strip()
+    if len(data) == 0:
+        return None
 
     inform = None
     try:
