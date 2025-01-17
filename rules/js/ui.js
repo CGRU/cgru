@@ -264,6 +264,8 @@ function u_Finish()
 	u_ViewsFuncsClose();
 
 	$('location_info').textContent = '';
+	$('body_body').innerHTML = '';
+	u_body_text = '';
 
 	$('body_avatar_c').style.display = 'none';
 	$('body_avatar_m').style.display = 'none';
