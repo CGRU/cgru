@@ -1052,6 +1052,7 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 			{
 				var cmd = cmds[c].cmd;
 				cmd = cmd.replace('@PATH@', c_PathPM_Rules2Client(path));
+				cmd = cmd.replace('@USER@', g_auth_user.id);
 				cmd = cmd.replace('@FPS@', RULES.fps);
 
 				var elParent = elBody;
