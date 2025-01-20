@@ -1043,7 +1043,21 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 		el.title = "Open RULES player in a new window.";
 	}
 
-	// Folder play sequence button:
+	// Sequence execute on server custom buttons:
+	if (i_isFolder && RULES.cmdexec_server && RULES.cmdexec_server.sequence)
+	{
+		for (let exec of RULES.cmdexec_server.sequence)
+		{
+			let el = u_CmdExecServerCreate(exec, path);
+
+			let elParent = elBody;
+			if (exec.submenu)
+				elParent = elItem.m_elMenu;
+			elParent.appendChild(el);
+		}
+	}
+
+	// Folder play sequence custom buttons:
 	if (i_isFolder && c_HasFileSystem())
 	{
 		var cmds = RULES.cmdexec.play_sequence;

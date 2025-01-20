@@ -1319,3 +1319,56 @@ function u_ExecClicked(i_evt)
 
 	u_ExecuteShow($('execute_btn').classList.contains('pushed'));
 }
+
+
+// Button to execute command on server side:
+function u_CmdExecServerCreate(i_exec, i_path)
+{
+	let el = document.createElement('div');
+	el.classList.add('cmdexec_server');
+	el.textContent = i_exec.name;
+	el.title = i_exec.tooltip;
+
+	let cmd = i_exec.cmd;
+	cmd = cmd.replace('@PATH@', c_PathPM_Rules2Server(i_path));
+	cmd = cmd.replace('@USER@', g_auth_user.id);
+	el.m_cmd = cmd;
+
+	el.onclick = u_CmdExecServerOnClick;
+	el.ondblclick = u_CmdExecServerOnDblClick;
+
+	return el;
+}
+
+function u_CmdExecServerOnClick(i_evt)
+{
+	i_evt.stopPropagation();
+	let el = i_evt.currentTarget;
+	c_Info(el.m_cmd, false);
+}
+
+function u_CmdExecServerOnDblClick(i_evt)
+{
+	i_evt.stopPropagation();
+	let el = i_evt.currentTarget;
+	c_Info('Executing:\n' + el.m_cmd);
+
+	n_Request({
+		"send": {"cmdexec": {"cmds": [el.m_cmd]}},
+		"func": u_CmdExecServerFinished,
+		"el"  : el,
+		"info": 'cmdexec_server'
+	});
+
+	el.classList.add('running');
+}
+
+function u_CmdExecServerFinished(i_data, i_args)
+{
+	//console.log(i_args);
+	//console.log(i_data);
+
+	let el = i_args.el;
+	el.classList.remove('running');
+}
+

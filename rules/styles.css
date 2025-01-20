@@ -1057,6 +1057,22 @@ font-size: 10px;
 padding: 0px 8px;
 }
 
+.cmdexec_server {
+-moz-user-select: none;
+-webkit-user-select: none;
+cursor: pointer;
+font-weight: bold;
+border: 1px solid rgba(98,98,98,.5);
+background-color: rgba(255,155,55,.5);
+padding: 1px 4px;
+}
+.cmdexec_server:hover {
+border: 1px solid rgba(255,255,55,.8);
+}
+.cmdexec_server.running {
+background-color: rgba(255,200,55,1);
+}
+
 .filesview { /*border: 1px solid rgba(98,98,98,.5); border-radius: 2px;*/ }
 .filesview.closed { magrin: 0px; padding: 0px; }
 .filesview.closed .panel { display: none; }
