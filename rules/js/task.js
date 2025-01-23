@@ -802,16 +802,16 @@ function task_PriorityStyle(i_el, i_priority)
 	let r = Math.round(i_priority / 10.0 * 255);
 	let g = 255;
 	let b = 0;
-	let a = 0.1 + (Math.abs(i_priority) / 20.0)
+	let a = 0.2 + (Math.abs(i_priority) / 20.0)
 
 	if (i_priority > 10)
-		g = 255 * Math.round(1-((i_priority - 10.0) / 20.0))
+		g = Math.round(255 * (1-((i_priority - 10.0) / 20.0)));
 
 	if (i_priority < 0)
 	{
 		r = 0;
 		g = 0;
-		b = 255 * Math.round(1.0-(i_priority / 20.0));
+		b = Math.round(255 * (1.0-(i_priority / 20.0)));
 	}
 
 	if (r > 255) r = 255;
@@ -825,8 +825,8 @@ function task_PriorityStyle(i_el, i_priority)
 	i_el.style.backgroundColor = 'rgba('+r+','+g+','+b+','+a+')';
 
 	// Font size:
-	let size = 10 + Math.round(i_priority / 2.0);
+	let size = 14 + Math.round(i_priority / 2.0);
 	if (size > 100) size = 100;
-	if (size < 10) size = 10;
+	if (size < 14) size = 14;
 	i_el.style.fontSize = size + 'px';
 }

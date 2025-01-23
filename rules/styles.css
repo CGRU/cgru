@@ -534,6 +534,7 @@ border-radius: 4px;
 .task_badge div {float: left;}
 .task_badge .name {padding: 2px;}
 .task_badge .artist {margin: 0px; padding-top: 2px;; padding-bottom: 2px;}
+.task_badge .priority {padding: 0px 4px;}
 .task_badge .progress {clear: both; width: 100%}
 .task_badge .progressbar {height: 6px;}
 
@@ -927,7 +928,7 @@ border: 2px solid rgba(255,255,0,1);
 }
 .status .tasks .task.deleted            {display: none;}
 .status .tasks .task .show_div          {clear: both;}
-.status .tasks .task .show_div .priority{float: left; margin: 0px 2px; padding: 2px; border-radius: 4px;}
+.status .tasks .task .show_div .priority{float: left; margin: 0px 2px; padding: 2px 8px; border-radius: 4px;}
 .status .tasks .task .show_div .artists {float: left;}
 .status .tasks .task .show_div .flags   {float: left;}
 .status .tasks .task .show_div .percent {float: right;}
