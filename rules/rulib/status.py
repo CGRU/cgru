@@ -206,7 +206,7 @@ class Status:
             self.data[item_name].append(i)
 
 
-    def setTask(self, name=None, tags=None, artists=None, flags=None, progress=None, annotation=None, deleted=None, out=None):
+    def setTask(self, name=None, tags=None, artists=None, flags=None, priority=None, progress=None, annotation=None, deleted=None, out=None):
 
         task = self.findTask(name, tags)
         new_task = False
@@ -232,6 +232,7 @@ class Status:
             task['tags'] = tags
             task['artists'] = []
             task['flags'] = []
+            task['priority'] = 0
             task['progress'] = 0
             task['cuser'] = self.data['muser']
             task['ctime'] = self.data['mtime']
@@ -255,6 +256,9 @@ class Status:
         elif 'deleted' in task:
             del task['deleted']
             new_task = True
+
+        if priority is not None and type(priority) is int:
+            task['priority'] = priority
 
         if progress is not None and type(progress) is int:
             if progress < -1: progress = -1

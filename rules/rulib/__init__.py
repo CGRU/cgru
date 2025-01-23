@@ -93,7 +93,7 @@ def setStatus(paths=None, uid=None, name=None, tags=None, tags_keep=None, artist
     return out
 
 
-def setTask(paths=None, uid=None, name=None, tags=None, artists=None, flags=None, progress=None, annotation=None, deleted=None, nonews=False, out=None):
+def setTask(paths=None, uid=None, name=None, tags=None, artists=None, flags=None, priority=None, progress=None, annotation=None, deleted=None, nonews=False, out=None):
     if out is None:
         out = dict()
     if paths is None or paths == []:
@@ -104,7 +104,7 @@ def setTask(paths=None, uid=None, name=None, tags=None, artists=None, flags=None
 
     for path in paths:
         st = status.Status(uid, path)
-        task = st.setTask(name=name, tags=tags, artists=artists, flags=flags, progress=progress, annotation=annotation, deleted=deleted, out=out)
+        task = st.setTask(name=name, tags=tags, artists=artists, flags=flags, priority=priority, progress=progress, annotation=annotation, deleted=deleted, out=out)
         if task is None or 'error' in out:
             break
         if st.progress_changed:

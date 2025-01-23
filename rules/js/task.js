@@ -89,6 +89,8 @@ function Task(i_statusClass, i_task, i_args)
 		this.obj.artists = [];
 	if (null == this.obj.flags)
 		this.obj.flags = [];
+	if (null == this.obj.priority)
+		this.obj.priority = 0;
 	if (null == this.obj.progress)
 		this.obj.progress = 0;
 	if (null == this.obj.deleted)
@@ -114,6 +116,11 @@ function Task(i_statusClass, i_task, i_args)
 	if (false == this.multi)
 		this.elName.onclick = function(e){e.currentTarget.m_task.select()};
 	this.elShow.appendChild(this.elName);
+
+
+	this.elPriority = document.createElement('div');
+	this.elPriority.classList.add('priority');
+	this.elShow.appendChild(this.elPriority);
 
 
 	this.elArtists = document.createElement('div');
@@ -187,6 +194,17 @@ Task.prototype.show = function()
 
 	//st_SetElTags(this.obj, this.elName);
 	this.elName.textContent = this.obj.name;
+
+	if (this.obj.priority)
+	{
+		this.elPriority.textContent = this.obj.priority;
+		this.elPriority.style.display = 'block';
+	}
+	else
+	{
+		this.elPriority.textContent = '';
+		this.elPriority.style.display = 'none';
+	}
 
 	st_SetElArtists(this.obj, this.elArtists,/*short = */false,/*clickable = */true);
 	st_SetElFlags(this.obj, this.elFlags,/*short = */false,/*clickable = */true);
@@ -295,6 +313,22 @@ Task.prototype.edit = function(i_args)
 	this.elBtnSave.m_task = this;
 	this.elBtnSave.onclick = function(e){e.stopPropagation();e.currentTarget.m_task.editProcess(i_args);}
 	this.elEdit.appendChild(this.elBtnSave);
+
+
+	this.elEditPriorityDiv = document.createElement('div');
+	this.elEditPriorityDiv.classList.add('priority');
+	this.elEdit.appendChild(this.elEditPriorityDiv);
+
+	this.elEditPriorityLabel = document.createElement('div');
+	this.elEditPriorityLabel.textContent = 'Priority:';
+	this.elEditPriorityLabel.classList.add('label');
+	this.elEditPriorityDiv.appendChild(this.elEditPriorityLabel);
+
+	this.elEditPriorityContent = document.createElement('div');
+	this.elEditPriorityContent.classList.add('content','editing');
+	this.elEditPriorityContent.contentEditable = true;
+	this.elEditPriorityContent.textContent = this.obj.priority;
+	this.elEditPriorityDiv.appendChild(this.elEditPriorityContent);
 
 
 	this.elEditPercentDiv = document.createElement('div');
@@ -456,6 +490,20 @@ Task.prototype.editProcess = function(i_args)
 		this.obj.mtime = c_DT_CurSeconds();
 	}
 
+	// Get priority
+	let priority_edit = this.elEditPriorityContent.textContent;
+	if (priority_edit.length && (priority_edit != st_MultiValue))
+	{
+		priority_edit = c_Strip(priority_edit);
+		let priority = parseInt(priority_edit);
+		if (isNaN(priority))
+		{
+			c_Error('Invalid priority: ' + c_Strip(priority_edit));
+		}
+		else
+			this.obj.priority = priority;
+	}
+
 	// Get progress
 	let progress_edit = this.elEditPercentContent.textContent;
 	if (progress_edit.length && (progress_edit != st_MultiValue))
@@ -516,7 +564,7 @@ Task.prototype.editProcess = function(i_args)
 	else
 		obj.paths = [this.statusClass.path];
 
-	let fields = ['name','artists','flags','tags','progress','annotation'];
+	let fields = ['name','artists','flags','tags','priority','progress','annotation'];
 	for (let f of fields)
 		obj[f] = this.obj[f];
 	if (nw_disabled)
@@ -685,6 +733,14 @@ function task_DrawBadges(i_status, i_el, i_args)
 		elName.classList.add('name');
 		elName.textContent = task.tags.join('_');
 		elTask.appendChild(elName);
+
+		if (task.priority)
+		{
+			let elPri = document.createElement('div');
+			elPri.classList.add('priority');
+			elPri.textContent = task.priority;
+			elTask.appendChild(elPri);
+		}
 
 		if ( ! i_args.hide_artists)
 		{

@@ -927,6 +927,7 @@ border: 2px solid rgba(255,255,0,1);
 }
 .status .tasks .task.deleted            {display: none;}
 .status .tasks .task .show_div          {clear: both;}
+.status .tasks .task .show_div .priority{float: left; margin: 0px 4px; padding: 0px;}
 .status .tasks .task .show_div .artists {float: left;}
 .status .tasks .task .show_div .flags   {float: left;}
 .status .tasks .task .show_div .percent {float: right;}
@@ -934,6 +935,8 @@ border: 2px solid rgba(255,255,0,1);
 .status .tasks .task .edit_div .tags    {float: left;}
 .status .tasks .task .edit_div .percent {float: right; width: 64px;}
 .status .tasks .task .edit_div .percent .label {float: right; padding: 2px; margin: 2px; margin-right: 8px;}
+.status .tasks .task .edit_div .priority {float: left; width: 128px;}
+.status .tasks .task .edit_div .priority .label {float: left; padding: 2px; margin: 2px; margin-right: 8px;}
 .status .tasks .task .edit_div .annotation {margin: 4px; border-top: 1px solid rgba(98,98,98,.5);}
 .status .tasks .task .progress          {clear: both; border-radius: 4px;}
 .status .tasks .task .progressbar       {height: 6px; border-radius: 2px;}

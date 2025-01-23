@@ -343,6 +343,7 @@ class Requests:
         tags       = None
         artists    = None
         flags      = None
+        priority   = None
         progress   = None
         annotation = None
         deleted    = None
@@ -352,12 +353,13 @@ class Requests:
         if 'tags'       in i_args: tags       = i_args['tags']
         if 'artists'    in i_args: artists    = i_args['artists']
         if 'flags'      in i_args: flags      = i_args['flags']
+        if 'priority'   in i_args: priority   = i_args['priority']
         if 'progress'   in i_args: progress   = i_args['progress']
         if 'annotation' in i_args: annotation = i_args['annotation']
         if 'deleted'    in i_args: deleted    = i_args['deleted']
         if 'nonews'     in i_args and i_args['nonews']: nonews = True
 
-        rulib.setTask(uid=self.session.USER_ID, paths=i_args['paths'], name=name, tags=tags, artists=artists, flags=flags, progress=progress, annotation=annotation, deleted=deleted, nonews=nonews, out=out)
+        rulib.setTask(uid=self.session.USER_ID, paths=i_args['paths'], name=name, tags=tags, artists=artists, flags=flags, priority=priority, progress=progress, annotation=annotation, deleted=deleted, nonews=nonews, out=out)
 
         return
 
