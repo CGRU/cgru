@@ -120,6 +120,7 @@ function Task(i_statusClass, i_task, i_args)
 
 	this.elPriority = document.createElement('div');
 	this.elPriority.classList.add('priority');
+	this.elPriority.title = 'Task priority';
 	this.elShow.appendChild(this.elPriority);
 
 
@@ -199,6 +200,7 @@ Task.prototype.show = function()
 	{
 		this.elPriority.textContent = this.obj.priority;
 		this.elPriority.style.display = 'block';
+		task_PriorityStyle(this.elPriority, this.obj.priority)
 	}
 	else
 	{
@@ -740,6 +742,7 @@ function task_DrawBadges(i_status, i_el, i_args)
 			elPri.classList.add('priority');
 			elPri.textContent = task.priority;
 			elTask.appendChild(elPri);
+			task_PriorityStyle(elPri, task.priority);
 		}
 
 		if ( ! i_args.hide_artists)
@@ -793,3 +796,37 @@ function task_StatusArtistClicked(i_name)
 	new Task(null, {'artists':[i_name],'tags':tags});
 }
 
+function task_PriorityStyle(i_el, i_priority)
+{
+	// Backgound color:
+	let r = Math.round(i_priority / 10.0 * 255);
+	let g = 255;
+	let b = 0;
+	let a = 0.1 + (Math.abs(i_priority) / 20.0)
+
+	if (i_priority > 10)
+		g = 255 * Math.round(1-((i_priority - 10.0) / 20.0))
+
+	if (i_priority < 0)
+	{
+		r = 0;
+		g = 0;
+		b = 255 * Math.round(1.0-(i_priority / 20.0));
+	}
+
+	if (r > 255) r = 255;
+	if (g > 255) g = 255;
+	if (b > 255) b = 255;
+	if (r < 0) r = 0;
+	if (g < 0) g = 0;
+	if (b < 0) b = 0;
+	if (a > 1.0) a = 1.0;
+
+	i_el.style.backgroundColor = 'rgba('+r+','+g+','+b+','+a+')';
+
+	// Font size:
+	let size = 10 + Math.round(i_priority / 2.0);
+	if (size > 100) size = 100;
+	if (size < 10) size = 10;
+	i_el.style.fontSize = size + 'px';
+}
