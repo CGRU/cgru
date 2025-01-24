@@ -821,7 +821,9 @@ else:
 	print('ACTIVITY: Encode')
 	print(cmd_encode)
 	sys.stdout.flush()
-	os.system(cmd_encode)
+	if (os.system(cmd_encode) != 0):
+		shutil.rmtree(TmpDir)
+		sys.exit(1)
 
 	if cmd_preview != '':
 		print('ACTIVITY: Preview')
