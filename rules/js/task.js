@@ -196,7 +196,7 @@ Task.prototype.show = function()
 	//st_SetElTags(this.obj, this.elName);
 	this.elName.textContent = this.obj.name;
 
-	if (this.obj.priority)
+	if (this.obj.priority && (this.obj.progress != 100))
 	{
 		this.elPriority.textContent = this.obj.priority;
 		this.elPriority.style.display = 'block';
@@ -736,7 +736,7 @@ function task_DrawBadges(i_status, i_el, i_args)
 		elName.textContent = task.tags.join('_');
 		elTask.appendChild(elName);
 
-		if (task.priority)
+		if (task.priority && (task.progress != 100))
 		{
 			let elPri = document.createElement('div');
 			elPri.classList.add('priority');
