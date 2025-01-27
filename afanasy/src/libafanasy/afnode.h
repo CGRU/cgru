@@ -118,8 +118,5 @@ protected:
 	std::string m_srv_info;       ///< Some info that server can show to user.
 
 	std::map<std::string, int32_t> m_running_services;
-
-private:
-	std::list<std::string> m_log; ///< Log.
 };
 }
