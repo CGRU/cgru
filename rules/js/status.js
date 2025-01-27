@@ -806,7 +806,7 @@ function st_SetElColor(i_status, i_elBack, i_elColor, i_setNone)
 	if (i_status && i_status.tags && i_status.tags.length)
 	{
 		let tag = i_status.tags[i_status.tags.length - 1];
-		if (RULES.tags[tag] && RULES.tags[tag].clr)
+		if (RULES.tags[tag] && RULES.tags[tag].clr && RULES.tags[tag].clr_up)
 		{
 			c = RULES.tags[tag].clr;
 		}
