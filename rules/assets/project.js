@@ -22,7 +22,7 @@ function prj_InitHTML( i_data)
 		$('asset_top_left').appendChild(el);
 		el.classList.add('button');
 		el.textContent = 'CREATE NEW PROJECT';
-		el.title = 'Create new scene.';
+		el.title = 'Create new project.';
 		el.onclick = prj_Create_Project;
 	}
 
@@ -122,12 +122,14 @@ function prj_TagsEdit()
 	elTr.appendChild(elTh);
 	elTh.textContent = 'name';
 	elTh.classList.add('name');
+	elTh.style.width = '10%';
 	elTh = document.createElement('th');
 	elTr.appendChild(elTh);
 	elTh.textContent = 'Title';
 	elTh = document.createElement('th');
 	elTr.appendChild(elTh);
 	elTh.textContent = 'Short';
+	elTh.style.width = '10%';
 	elTh = document.createElement('th');
 	elTr.appendChild(elTh);
 	elTh.textContent = 'Tip';
@@ -165,6 +167,7 @@ function prj_TagsEdit()
 		let elTd = document.createElement('td');
 		elTag.appendChild(elTd);
 		elTd.classList.add('td_btn');
+		elTd.style.width = '8%';
 		let elBtn = document.createElement('div');
 		elTd.appendChild(elBtn);
 		elBtn.classList.add('button');
@@ -173,6 +176,7 @@ function prj_TagsEdit()
 		{
 			// Existing tag:
 			elBtn.textContent = 'DEL';
+			elBtn.title = 'Double click to delete tag.'
 			elBtn.m_name = tag;
 			elBtn.ondblclick = prj_TagRemove;
 			continue;
@@ -190,8 +194,9 @@ function prj_TagsEdit()
 		elTip.classList.add('editing');
 
 		elBtn.textContent = 'ADD';
+		elBtn.title = 'Click to add tag.'
 		elBtn.m_elTag = elTag;
-		elBtn.ondblclick = function(){
+		elBtn.onlclick = function(){
 			let name = elName.textContent;
 			let title = elTitle.textContent;
 			let short = elShort.textContent;
