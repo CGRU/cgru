@@ -67,13 +67,18 @@ function prj_TagsReceived(i_data, i_args)
 	if (i_data.error)
 	{
 		if (i_data.error.indexOf('No such file') != -1)
+		{
+			if (i_args.edit)
+				prj_TagsEdit();
 			return;
+		}
 	}
 
 	if (i_data.tags == null)
 	{
 		c_Error('Invalid tags data received.');
 		c_Log(i_data);
+		return;
 	}
 
 	let tags = [];
