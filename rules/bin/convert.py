@@ -11,7 +11,7 @@ import af
 
 from optparse import OptionParser
 
-ImgTypes = ['jpg','jpeg','dpx','cin','exr','tif','tiff','tga','png','psd']
+ImgTypes = ['jpg','jpeg','dpx','cin','exr','tif','tiff','tga','png','psd','nef']
 
 Parser = OptionParser(
     usage="%prog [options] inarg\ntype \"%prog -h\" for help",
