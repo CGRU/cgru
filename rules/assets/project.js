@@ -196,7 +196,7 @@ function prj_TagsEdit()
 		elBtn.textContent = 'ADD';
 		elBtn.title = 'Click to add tag.'
 		elBtn.m_elTag = elTag;
-		elBtn.onlclick = function(){
+		elBtn.onclick = function(){
 			let name = elName.textContent;
 			let title = elTitle.textContent;
 			let short = elShort.textContent;
