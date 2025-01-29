@@ -608,6 +608,12 @@ function c_CanCreateProject(i_user)
 		return true;
 	return false;
 }
+function c_CanEditProjectTags(i_user)
+{
+	if (g_admin)
+		return true;
+	return false;
+}
 
 function c_HasFileSystem()
 {

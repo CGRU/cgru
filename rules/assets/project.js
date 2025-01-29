@@ -3,6 +3,9 @@ if( ASSETS.project && ( ASSETS.project.path == g_CurPath()))
 	prj_Init();
 }
 
+var prj_tags = {};
+var prj_tags_file = "rules.project.tags.json"
+
 function prj_Init()
 {
 	a_SetLabel('Project');
@@ -22,6 +25,12 @@ function prj_InitHTML( i_data)
 		el.title = 'Create new scene.';
 		el.onclick = prj_Create_Project;
 	}
+
+	if (c_CanEditProjectTags())
+		$('project_tags_edit_btn').style.display = 'block';
+
+	// Load project specific tags:
+	prj_TagsLoad();
 }
 
 function prj_Create_Project()
@@ -33,6 +42,208 @@ function prj_Create_Project()
 	args.name = 'PROJECT_NAME';
 	a_Copy(args);
 }
+
+
+function prj_TagsLoad(i_edit = false)
+{
+	let args = {};
+	args.path = c_GetRuFilePath(prj_tags_file);
+	args.info = 'tags';
+	args.func = prj_TagsReceived;
+	args.edit = i_edit;
+	args.cache_time = -1;
+	n_GetFile(args);
+}
+
+function prj_TagsReceived(i_data, i_args)
+{
+	prj_tags = {};
+
+	if (i_data == null)
+	{
+		return;
+	}
+
+	if (i_data.error)
+	{
+		if (i_data.error.indexOf('No such file') != -1)
+			return;
+	}
+
+	if (i_data.tags == null)
+	{
+		c_Error('Invalid tags data received.');
+		c_Log(i_data);
+	}
+
+	let tags = [];
+	for (let tag in i_data.tags)
+		if (tag.length)
+		{
+			tags.push(tag);
+			prj_tags[tag] = i_data.tags[tag];
+		}
+
+	st_SetElTags({"tags":tags}, $('project_tags'));
+
+	let info = '';
+	if (i_data.tags_last_edit_by)
+		info += ' by ' + c_GetUserTitle(i_data.tags_last_edit_by);
+	if (i_data.tags_last_edit_time)
+		info += ' at ' + c_DT_StrFromSec(i_data.tags_last_edit_time);
+	if (info.length)
+		$('project_tags_info').textContent = 'Last modified' + info;
+	else
+		$('project_tags_info').textContent = '';
+
+	if (i_args.edit)
+		prj_TagsEdit();
+}
+
+
+function prj_TagsEdit()
+{
+	$('project_tags').style.display = 'none';
+	$('project_tags_edit').style.display = 'block';
+	$('project_tags_edit_btn').style.display = 'none';
+
+	let elTable = document.createElement('table');
+	$('project_tags_edit').appendChild(elTable);
+
+	let elTr = document.createElement('tr');
+	elTable.appendChild(elTr);
+
+	let elTh = document.createElement('th');
+	elTr.appendChild(elTh);
+	elTh.textContent = 'name';
+	elTh.classList.add('name');
+	elTh = document.createElement('th');
+	elTr.appendChild(elTh);
+	elTh.textContent = 'Title';
+	elTh = document.createElement('th');
+	elTr.appendChild(elTh);
+	elTh.textContent = 'Short';
+	elTh = document.createElement('th');
+	elTr.appendChild(elTh);
+	elTh.textContent = 'Tip';
+	elTh.style.width = '50%';
+
+	let table_tags = {};
+	for (tag in prj_tags)
+		table_tags[tag] = prj_tags[tag];
+	table_tags[""] = {};
+	for (let tag in table_tags)
+	{
+		let elTag = document.createElement('tr');
+		elTable.appendChild(elTag);
+
+		let elName = document.createElement('td');
+		elTag.appendChild(elName);
+		elName.classList.add('name');
+		elName.textContent = tag;
+
+		let elTitle = document.createElement('td');
+		elTag.appendChild(elTitle);
+		elTitle.classList.add('title');
+		elTitle.textContent = table_tags[tag].title;
+
+		let elShort = document.createElement('td');
+		elTag.appendChild(elShort);
+		elShort.classList.add('short');
+		elShort.textContent = table_tags[tag].short;
+
+		let elTip = document.createElement('td');
+		elTag.appendChild(elTip);
+		elTip.classList.add('tip');
+		elTip.textContent = table_tags[tag].tip;
+
+		let elTd = document.createElement('td');
+		elTag.appendChild(elTd);
+		elTd.classList.add('td_btn');
+		let elBtn = document.createElement('div');
+		elTd.appendChild(elBtn);
+		elBtn.classList.add('button');
+
+		if (tag.length)
+		{
+			// Existing tag:
+			elBtn.textContent = 'DEL';
+			elBtn.m_name = tag;
+			elBtn.ondblclick = prj_TagRemove;
+			continue;
+		}
+
+		// New tag:
+		elTag.classList.add('add_new');
+		elName.contentEditable = true;
+		elName.classList.add('editing');
+		elTitle.contentEditable = true;
+		elTitle.classList.add('editing');
+		elShort.contentEditable = true;
+		elShort.classList.add('editing');
+		elTip.contentEditable = true;
+		elTip.classList.add('editing');
+
+		elBtn.textContent = 'ADD';
+		elBtn.m_elTag = elTag;
+		elBtn.ondblclick = function(){
+			let name = elName.textContent;
+			let title = elTitle.textContent;
+			let short = elShort.textContent;
+			let tip = elTip.textContent;
+			prj_TagAdd(name, {"title":title,"short":short,"tip":tip});
+		}
+	}
+}
+
+function prj_TagRemove(i_evt)
+{
+	i_evt.stopPropagation();
+	let tag = i_evt.currentTarget.m_name;
+	delete prj_tags[tag];
+	delete RULES.tags[tag];
+	prj_TagsSave();
+}
+
+function prj_TagAdd(i_name, i_data)
+{
+	prj_tags[i_name] = i_data;
+	RULES.tags[i_name] = i_data;
+	let keys = Object.keys(prj_tags).sort();
+	let new_tags = {};
+	for (let k of keys)
+		new_tags[k] = prj_tags[k];
+	prj_tags = new_tags;
+	prj_TagsSave();
+}
+
+function prj_TagsSave()
+{
+//console.log(JSON.stringify(prj_tags));
+	let obj = {};
+	obj.tags = prj_tags;
+	obj.tags_last_edit_by = g_auth_user.id;
+	obj.tags_last_edit_time = c_DT_CurSeconds();
+	n_Request({
+		"send": {"save": {"file": c_GetRuFilePath(prj_tags_file), "data": JSON.stringify(obj, null, 4)}},
+		"func": prj_TagsSaveFinished,
+		"info": 'tags save'
+	});
+}
+
+function prj_TagsSaveFinished()
+{
+	$('project_tags').style.display = 'block';
+	$('project_tags_edit').style.display = 'none';
+	$('project_tags_edit').textContent = '';
+	$('project_tags_edit_btn').style.display = 'block';
+
+	prj_TagsLoad();
+}
+
+//######################################################################
+//##################   Deploy shots   ##################################
+//######################################################################
 
 prj_deploy_shots_params = {};
 prj_deploy_shots_params.sources = {};

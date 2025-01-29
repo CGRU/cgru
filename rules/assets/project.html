@@ -1,6 +1,12 @@
 <style type="text/css">
 
-#project > .button { float: left; margin: 4px 12px; padding: 2px 8px; }
+#project .button { float: left; margin: 4px 12px; padding: 2px 8px; }
+#project_tags_div table {border-collapse: collapse; width: 100%;}
+#project_tags_div table td {padding: 4px 12px; border: 1px solid rgba(98,98,98,.5);}
+#project_tags_div table .name {font: 14px monospace;}
+#project_tags_div table .button {font-size: 10px; padding: 1px 4px; margin: 1px 4px; border-radius: 4px;}
+#project_tags_div table .add_new {}
+
 .deploy_shots .button { float: left; }
 
 .deploy_shots .output table { border-collapse: collapse; }
@@ -20,7 +26,17 @@
 
 <div id="project">
 
-<div class="button" onclick="prj_ShotsDeploy()">Deploy Shots</div>
+<div id="project_tags_div" style="border: 1px solid rgba(98,98,98,.5); border-radius: 6px; margin: 8px; padding: 8px;">
+	<div style="margin: 6px 12px;">Tags</div>
+	<div id="project_tags" class="tags"></div>
+	<div id="project_tags_edit" style="display: none;"></div>
+	<div id="project_tags_edit_btn" class="button" style="float: left; display: none;" onclick="prj_TagsLoad(true)">Edit Tags</div>
+	<div id="project_tags_info" style="float: right; margin: 1px 8px; padding: 1px 8px; font-style: italic; font-size: 10px"></div>
+</div>
+
+<div style="clear: both;">
+	<div class="button" style="float: left;" onclick="prj_ShotsDeploy()">Deploy Shots</div>
+</div>
 
 </div>
 
