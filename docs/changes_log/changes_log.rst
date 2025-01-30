@@ -16,7 +16,12 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
 v3.4.0
 ======
 
-*2024.11.28 NOT RELEASED*
+*2025.01.30 NOT RELEASED*
+
+-   AfWatch render item marks task with running time over specified value.
+
+-   AfWatch job item marks block with task running time over specified value.
+    Block task max run time is calculated on server side, along with min average.
 
 -   AfWatch Delete Done Jobs confirm dialog.
 
@@ -69,6 +74,7 @@ v3.4.0
 
     - *appendBlocks()* and a new block tasks depend mask works fine.
     - Changing any job parameter now does not resets *pools* parameter. This was a server side bug.
+    - AfRender slows task process with a lots of output problem solved.
 
 .. _changes-log-latest:
 
