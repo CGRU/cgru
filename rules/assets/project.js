@@ -217,6 +217,53 @@ function prj_TagRemove(i_evt)
 
 function prj_TagAdd(i_name, i_data)
 {
+	// Check tag props
+	if (i_name.length == 0)
+	{
+		c_Error('Tag name is not specified.');
+		return;
+	}
+	if (i_name.length < 3)
+	{
+		c_Error('Tag name should be at least 3 characters length.');
+		return;
+	}
+	if (/^[a-z0-9]+$/.test(i_name) == false)
+	{
+		c_Error('Tag name should contain only a-z and 0-9.');
+		return;
+	}
+	if (/[0-9]/.test(i_name[0]))
+	{
+		c_Error('Tag name should not start with a number.');
+		return;
+	}
+	if (i_data.title.length == 0)
+	{
+		c_Error('Tag title is not specified.');
+		return;
+	}
+	if (i_data.title.length < 3)
+	{
+		c_Error('Tag title should be at least 3 characters length.');
+		return;
+	}
+	if (i_data.short.length == 0)
+	{
+		c_Error('Tag short is not specified.');
+		return;
+	}
+	if (i_data.short.length > 4)
+	{
+		c_Error('Tag short should be maximum 4 characters length.');
+		return;
+	}
+	if (i_data.tip.length == 0)
+	{
+		c_Error('Tag tip is not specified.');
+		return;
+	}
+
 	prj_tags[i_name] = i_data;
 	RULES.tags[i_name] = i_data;
 	let keys = Object.keys(prj_tags).sort();
