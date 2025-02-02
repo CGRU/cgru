@@ -20,7 +20,7 @@ function debianArch(){
 	packages="$packages libpq-dev"
 	packages="$packages p7zip-full"
 	packages="$packages libzip-dev"
-	packages="$packages glibc-tools"
+	packages="$packages rsync"
 
 	# Qt5:
 	packages="$packages qtbase5-dev"
