@@ -237,7 +237,7 @@ class Status:
             task['cuser'] = self.data['muser']
             task['ctime'] = self.data['mtime']
 
-            if not 'tasks' in self.data:
+            if (not 'tasks' in self.data) or (type(self.data['tasks'] is not dict)):
                 self.data['tasks'] = dict()
             self.data['tasks'][name] = task
 
