@@ -12,11 +12,13 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
   You can upgrade only one client or server for changes.
 
 
+.. _changes-log-latest:
+
 
 v3.4.0
 ======
 
-*2025.01.30 NOT RELEASED*
+2025.02.04
 
 -   AfWatch render item marks task with running time over specified value.
 
@@ -75,8 +77,6 @@ v3.4.0
     - *appendBlocks()* and a new block tasks depend mask works fine.
     - Changing any job parameter now does not resets *pools* parameter. This was a server side bug.
     - AfRender slows task process with a lots of output problem solved.
-
-.. _changes-log-latest:
 
 
 v3.3.1
