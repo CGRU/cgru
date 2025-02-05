@@ -301,9 +301,9 @@ void ListRenders::renderAdded( ItemNode * node, const QModelIndex & index)
 	ItemRender * render = (ItemRender*)node;
 	if (af::Environment::VISOR() == false)
 	{
-	   if (render->getName() == QString::fromUtf8(af::Environment::getComputerName().c_str()))
+		if (render->getName() == QString::fromUtf8(af::Environment::getHostName().c_str()))
 		{
-		   m_view->selectionModel()->setCurrentIndex(index, QItemSelectionModel::Select);
+			m_view->selectionModel()->setCurrentIndex(index, QItemSelectionModel::Select);
 		}
 	}
 }
