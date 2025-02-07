@@ -8,7 +8,7 @@ export MAYA_CGRU_LOCATION="$CGRU_LOCATION/plugins/maya"
 export PYTHONPATH="${MAYA_CGRU_LOCATION}:${PYTHONPATH}"
 
 # Locate Maya:
-MAYA_EXEC=""
+# MAYA_EXEC=""
 
 if [ -z "$MAYA_LOCATION" ]; then
   MAYA_INSTALL_DIR="/usr/autodesk"
@@ -26,7 +26,15 @@ else
   echo "MAYA_LOCATION is already set: ${MAYA_LOCATION}"
 fi
 
-export MAYA_EXEC="${MAYA_LOCATION}/bin/maya${MAYA_VERSION}"
+if [ -z "$MAYA_EXEC" ]; then
+  if [ -z "$MAYA_LOCATION" ]; then
+    echo "Maya location is not found."
+    return
+  fi
+  MAYA_EXEC="${MAYA_LOCATION}/bin/maya${MAYA_VERSION}"
+else
+  echo "MAYA_EXEC is already set: ${MAYA_EXEC}"
+fi
 echo "MAYA: ${MAYA_EXEC}"
 echo "MAYA_VERSION: ${MAYA_VERSION}"
 export MAYA_LOCATION
@@ -36,7 +44,7 @@ export MAYA_VERSION
 # The name of Maya main window menu
 export MAYA_CGRU_MENUS_NAME="CGRU"
 
-# Set more standard (to all distributives) temporary directory:
+# Set more standard (to all distributions) temporary directory:
 export TMPDIR=/tmp
 
 # overrides (set custom values there):
