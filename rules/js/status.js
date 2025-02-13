@@ -797,7 +797,7 @@ function st_SetElColor(i_status, i_elBack, i_elColor, i_setNone)
 	let a = 1;
 	if (i_status && i_status.flags && i_status.flags.length)
 	{
-		var flag = i_status.flags[i_status.flags.length - 1];
+		let flag = i_status.flags[i_status.flags.length - 1];
 		if (RULES.flags[flag] && RULES.flags[flag].clr)
 		{
 			c = RULES.flags[flag].clr;
@@ -805,10 +805,12 @@ function st_SetElColor(i_status, i_elBack, i_elColor, i_setNone)
 	}
 	if (i_status && i_status.tags && i_status.tags.length)
 	{
-		let tag = i_status.tags[i_status.tags.length - 1];
-		if (RULES.tags[tag] && RULES.tags[tag].clr && RULES.tags[tag].clr_up)
+		for (let tag of i_status.tags)
 		{
-			c = RULES.tags[tag].clr;
+			if (RULES.tags[tag] && RULES.tags[tag].clr && RULES.tags[tag].clr_up)
+			{
+				c = RULES.tags[tag].clr;
+			}
 		}
 	}
 	if (i_status && i_status.color)
