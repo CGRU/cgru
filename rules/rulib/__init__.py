@@ -1,3 +1,9 @@
+'''
+# Example:
+
+python3 -c 'import sys; sys.path.append("/data/cgru/rules"); import rulib; print(rulib.setTask(name="comp",paths=["/TEST/SHOTS/SER_01/SER_01_SHOT_0010","/TEST/SHOTS/SER_01/SER_01_SHOT_0020"],flags=["check"]));'
+
+'''
 import os
 import sys
 import traceback
