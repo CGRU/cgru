@@ -1,3 +1,9 @@
+'''
+# Example:
+
+python3 -c 'import sys; sys.path.append("/data/cgru/rules"); import rulib; print(rulib.setTask(paths=["/TEST/SHOTS/API/API_0010","/TEST/SHOTS/API/API_0020"],tags=["comp"],flags=["check"]));'
+
+'''
 import json
 import os
 import traceback
@@ -63,6 +69,8 @@ class Status:
 
     def findTask(self, name=None, tags=None, out=None):
         if 'tasks' not in self.data:
+            return None
+        if not type(self.data['tasks']) is dict:
             return None
         if len(self.data['tasks']) == 0:
             return None
@@ -237,7 +245,7 @@ class Status:
             task['cuser'] = self.data['muser']
             task['ctime'] = self.data['mtime']
 
-            if (not 'tasks' in self.data) or (not type(self.data['tasks'] is dict)):
+            if (not 'tasks' in self.data) or (type(self.data['tasks']) is not dict):
                 self.data['tasks'] = dict()
             self.data['tasks'][name] = task
 
