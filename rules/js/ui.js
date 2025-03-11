@@ -1262,8 +1262,8 @@ function u_CreateActions(i_actions, i_el)
 		{
 			cmd = c_PathPM_Server2Client(action.cmd);
 			cmd = cmd.replace(/@PATH@/g, c_PathPM_Rules2Client(g_CurPath()));
-
 			cmd = cmd.replace(/@SHOT@/g, c_PathPM_Rules2Client(ASSETS.shot.path));
+			cmd = cmd.replace(/@USER@/g, g_auth_user.id);
 
 			if (action.show_on_activity)
 			{
@@ -1274,18 +1274,28 @@ function u_CreateActions(i_actions, i_el)
 			}
 		}
 
-		// Process open:
-		let open = null;
-		if (action.open)
-			open = action.open.replace(/@PATH@/g, c_PathPM_Rules2Client(g_CurPath()));
+		if (action.server)
+		{
+			el.m_cmd = cmd;
+			el.classList.add('cmdexec_server');
+			el.onclick = u_CmdExecServerOnClick;
+			el.ondblclick = u_CmdExecServerOnDblClick;
+		}
+		else
+		{
+			// Process open:
+			let open = null;
+			if (action.open)
+				open = action.open.replace(/@PATH@/g, c_PathPM_Rules2Client(g_CurPath()));
 
-		// Process terminal:
-		let terminal = null;
-		if (action.terminal)
-			terminal = action.terminal.replace(/@PATH@/g, c_PathPM_Rules2Client(g_CurPath()));
+			// Process terminal:
+			let terminal = null;
+			if (action.terminal)
+				terminal = action.terminal.replace(/@PATH@/g, c_PathPM_Rules2Client(g_CurPath()));
 
-		// Make an executable button:
-		cgru_CmdExecProcess({'element':el,'cmd':cmd,'open':open,'terminal':terminal});
+			// Make an executable button:
+			cgru_CmdExecProcess({'element':el,'cmd':cmd,'open':open,'terminal':terminal});
+		}
 
 		// Add action on CTRL or SHIFT click to add/remove favourites
 		el.m_action = action;

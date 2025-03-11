@@ -1068,7 +1068,11 @@ cursor: pointer;
 font-weight: bold;
 border: 1px solid rgba(98,98,98,.5);
 background-color: rgba(255,155,55,.5);
-padding: 1px 4px;
+background-size: 22px;
+background-repeat: no-repeat;
+}
+#execute_div .cmdexec_server {
+padding: 4px 8px;
 }
 .cmdexec_server:hover {
 border: 1px solid rgba(255,255,55,.8);
