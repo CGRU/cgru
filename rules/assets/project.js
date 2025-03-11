@@ -228,7 +228,7 @@ function prj_TagAdd(i_name, i_data)
 		c_Error('Tag name should be at least 3 characters length.');
 		return;
 	}
-	if (/^[a-z0-9]+$/.test(i_name) == false)
+	if (/^[a-z_0-9]+$/.test(i_name) == false)
 	{
 		c_Error('Tag name should contain only a-z and 0-9.');
 		return;
