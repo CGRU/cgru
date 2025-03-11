@@ -39,6 +39,23 @@ function fv_makeFolderFinished(i_data, i_args)
 	c_Info('Folder created: ' + i_args.fview.path + '/' + i_data.makefolder);
 }
 
+function fv_GetSelectedPaths()
+{
+	let o_paths = [];
+	for (let fv of fv_views)
+		for (let i of fv.getSelected())
+			o_paths.push(c_PathPM_Rules2Server(i.m_path));
+	return o_paths;
+}
+
+function fv_CmdExecFilter(i_cmd)
+{
+	let o_cmd = i_cmd;
+	for (let path of fv_GetSelectedPaths())
+		o_cmd += ' \"' + path + "\"";
+	return o_cmd;
+}
+
 function FilesView(i_args)
 {
 	if (!fv_first_created)

@@ -1354,17 +1354,23 @@ function u_CmdExecServerOnClick(i_evt)
 {
 	i_evt.stopPropagation();
 	let el = i_evt.currentTarget;
-	c_Info(el.m_cmd, false);
+	let cmd = el.m_cmd;
+	cmd = activity_ChangeCmd(cmd);
+	cmd = fv_CmdExecFilter(cmd);
+	c_Info(cmd , false);
 }
 
 function u_CmdExecServerOnDblClick(i_evt)
 {
 	i_evt.stopPropagation();
 	let el = i_evt.currentTarget;
-	c_Info('Executing:\n' + el.m_cmd);
+	let cmd = el.m_cmd;
+	cmd = activity_ChangeCmd(cmd);
+	cmd = fv_CmdExecFilter(cmd);
+	c_Info('Executing:\n' + cmd);
 
 	n_Request({
-		"send": {"cmdexec": {"cmds": [el.m_cmd]}},
+		"send": {"cmdexec": {"cmds": [cmd]}},
 		"func": u_CmdExecServerFinished,
 		"el"  : el,
 		"info": 'cmdexec_server'
