@@ -1242,6 +1242,9 @@ function u_CreateActions(i_actions, i_el)
 
 	for (let action of i_actions)
 	{
+		if (action.disabled)
+			continue;
+
 		let el = document.createElement('div');
 		i_el.appendChild(el);
 		el.textContent = action.label;
