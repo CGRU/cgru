@@ -14,6 +14,13 @@ import services.service
 VERBOSE = 0
 
 
+def displayMessage(i_msg):
+    if hou.isUIAvailable():
+        hou.ui.displayMessage(i_msg)
+    else:
+        print(msg)
+
+
 class BlockParameters:
     def __init__(self, afnode, ropnode, subblock, prefix, frame_range, for_job_only=False):
         if VERBOSE == 2:
@@ -163,15 +170,15 @@ class BlockParameters:
                     self.fullrangedepend = True
 
         if self.frame_last < self.frame_first:
-            hou.ui.displayMessage('Last frame < first frame for "%s"' % opname)
+            displayMessage('Last frame < first frame for "%s"' % opname)
             return
 
         if self.frame_inc < 1:
-            hou.ui.displayMessage('Frame increment < 1 for "%s"' % opname)
+            displayMessage('Frame increment < 1 for "%s"' % opname)
             return
 
         if self.frame_pertask < 1:
-            hou.ui.displayMessage('Frames per task < 1 for "%s"' % opname)
+            displayMessage('Frames per task < 1 for "%s"' % opname)
             return
 
         if self.single_task:
@@ -187,9 +194,7 @@ class BlockParameters:
             self.tickets['HYTHON'] = 1
 
             if not isinstance(ropnode, hou.RopNode):
-                hou.ui.displayMessage(
-                    '"%s" is not a ROP node' % ropnode.path()
-                )
+                displayMessage('"%s" is not a ROP node' % ropnode.path())
                 return
 
             self.ropnode = ropnode
@@ -202,7 +207,7 @@ class BlockParameters:
 
             if roptype == 'ifd':
                 if ropnode.node(ropnode.parm('camera').eval()) is None:
-                    hou.ui.displayMessage("Camera in %s is not valid" % ropnode.name(), severity=hou.severityType.Error)
+                    displayMessage("Camera in %s is not valid" % ropnode.name())
                     return
 
                 if not ropnode.parm('soho_outputmode').eval():
@@ -369,7 +374,7 @@ class BlockParameters:
                         )
                         
             elif not for_job_only:
-                hou.ui.displayMessage('Can\'t process "%s"' % afnode.path())
+                displayMessage('Can\'t process "%s"' % afnode.path())
                 return
 
         # Try to set driver foreground mode
@@ -383,36 +388,38 @@ class BlockParameters:
                             soho_foreground.set(1)
                             self.soho_foreground = 0
                         except:  # TODO: too broad exception clause
-                            hou.ui.displayMessage(
-                                'Set "Block Until Render Complete" on "%s" '
-                                'node' % ropnode.path()
-                            )
+                            displayMessage('Set "Block Until Render Complete" on "%s" node' % ropnode.path())
                             return
 
         # Try to create output folder:
         if self.preview != '' and afnode.parm('check_output_folder').eval():
             folder = os.path.dirname(self.preview)
             if not os.path.isdir(folder):
-                if hou.ui.displayMessage(folder, buttons=('Create', 'Abort'),
-                                         default_choice=0, close_choice=1,
-                                         title='Output Folder Does Not Exist',
-                                         details=folder) == 0:
-                    try:
-                        os.makedirs(folder)
-                    except Exception as e:
-                        hou.ui.displayMessage(folder, buttons=('Abort',),
-                                              default_choice=0, close_choice=1,
-                                              title='Error Creating Output Folder',
-                                              details=str(e))
-                        return
-                    if not os.path.isdir(folder):
-                        hou.ui.displayMessage(folder, buttons=('Abort',),
-                                              default_choice=0, close_choice=1,
-                                              title='Can`t Create Output Folder',
-                                              details=folder)
+                if hou.isUIAvailable():
+                    if hou.ui.displayMessage(folder, buttons=('Create', 'Abort'),
+                                             default_choice=0, close_choice=1,
+                                             title='Output Folder Does Not Exist',
+                                             details=folder) == 0:
+                        try:
+                            os.makedirs(folder)
+                        except Exception as e:
+                            hou.ui.displayMessage(folder, buttons=('Abort',),
+                                                  default_choice=0, close_choice=1,
+                                                  title='Error Creating Output Folder',
+                                                  details=str(e))
+                            return
+                        if not os.path.isdir(folder):
+                            hou.ui.displayMessage(folder, buttons=('Abort',),
+                                                  default_choice=0, close_choice=1,
+                                                  title='Can`t Create Output Folder',
+                                                  details=folder)
+                            return
+                    else:
                         return
                 else:
-                    return
+                    print('Output folder does not exist. Creating folder:')
+                    print(folder)
+                    os.makedirs(folder)
 
         self.valid = True
 
@@ -519,7 +526,7 @@ class BlockParameters:
                 for ticket in self.tickets_aux_data.split(','):
                     ticket = ticket.strip().split(':')
                     if len(ticket) != 2:
-                        hou.ui.displayMessage('Invalid ticket data: "%s".' % ticket)
+                        displayMessage('Invalid ticket data: "%s".' % ticket)
                         continue
                     block.addTicket(ticket[0], int(ticket[1]))
 
@@ -603,7 +610,7 @@ class BlockParameters:
             for pool in self.pools_data.split(','):
                 pool = pool.strip().split(':')
                 if len(pool) != 2:
-                    hou.ui.displayMessage('Invalid pool data: "%s".' % pool)
+                    displayMessage('Invalid pool data: "%s".' % pool)
                     continue
                 pools[pool[0]] = int(pool[1])
             if len(pools):
@@ -682,14 +689,10 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
 
         if read_rop or run_rop:
             if not block_generate.ropnode:
-                hou.ui.displayMessage(
-                    'Can`t find ROP for processing "%s"' % afnode.path()
-                )
+                displayMessage('Can`t find ROP for processing "%s"' % afnode.path())
 
             if not isinstance(ropnode, hou.RopNode):
-                hou.ui.displayMessage(
-                    '"%s" is not a ROP node' % block_generate.ropnode.path()
-                )
+                displayMessage('"%s" is not a ROP node' % block_generate.ropnode.path())
 
         if join_render:
             block_generate.name += '-Separate'
@@ -860,12 +863,12 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
         ds_node_path = str(afnode.parm('ds_node').eval())
         ds_node = hou.node(ds_node_path)
         if not ds_node:
-            hou.ui.displayMessage('No such control node: "%s"' % ds_node_path)
+            displayMessage('No such control node: "%s"' % ds_node_path)
             return
         parms = ['address', 'port', 'slice']
         for parm in parms:
             if not ds_node.parm(parm):
-                hou.ui.displayMessage('Control node "%s" does not have "%s" parameter' % (ds_node_path, parm))
+                displayMessage('Control node "%s" does not have "%s" parameter' % (ds_node_path, parm))
                 return
 
         enable_tracker = not afnode.parm('ds_tracker_manual').eval()
@@ -968,7 +971,7 @@ def getJobParameters(afnode, subblock=False, frame_range=None, prefix=''):
         if output_driver:
             nodes.insert(0, output_driver)
         else:
-            hou.ui.displayMessage('Can`t find output drive node: "%s"' % output_driver_path)
+            displayMessage('Can`t find output drive node: "%s"' % output_driver_path)
 
     if afnode.parm('cmd_mode').eval():
         nodes.append(None)
@@ -1096,7 +1099,7 @@ def render(afnode):
                 print('Executing post submit script on "%s":\n%s' % (afnode.name(), parm.post_submit_script))
                 eval(parm.post_submit_script)
     else:
-        hou.ui.displayMessage(
+        displayMessage(
             'No tasks found for:'
             '\n%s'
             '\nIs it connected to some valid ROP node?'
