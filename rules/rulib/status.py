@@ -181,12 +181,16 @@ class Status:
         self.data[item_name] = _items
 
         # We should not add items that are already set:
-        for i in self.data[item_name]:
-            if i in items_add:
-                items_add.remove(i)
+        #for i in self.data[item_name]:
+        #    if i in items_add:
+        #        items_add.remove(i)
 
         # Add items:
         for i in items_add:
+            if i in self.data[item_name]:
+                # We should not add items that are already set:
+                continue
+
             if item_name == 'flags' and i in rulib.RULES_TOP[item_name]:
                 # Flag can limit minimum and maximum progress percentage:
                 p_min = rulib.RULES_TOP[item_name][i].get('p_min')

@@ -962,7 +962,8 @@ box-shadow: 0 0 4px rgba(100,255,255,1), 0 0 4px rgba(100,255,255,1) inset;
 .edit_tags_list .flag.selected { border-width: 4px; margin: 3px; opacity: 1.0; _border-color: rgba( 100, 255, 255, 1.0) }
 .edit_tags_list .flag.half_selected { border-width: 0px; margin: 7px; opacity: 1.0; _border-color: rgba( 100, 255, 255, 1.0) }
 .edit_tags_list .editing { width: 96px; height: 18px;}
-.edit_tags_list.editing .tag.selected { box-shadow: 0 0 8px rgba( 100, 255, 255, 1.0), 0 0 8px rgba( 100, 255, 255, 1.0) inset;}
+.edit_tags_list.editing .tag.selected      { box-shadow: 0 0 8px rgba( 100, 255, 255, 1.0), 0 0 8px rgba( 100, 255, 255, 1.0) inset;}
+.edit_tags_list.editing .tag.half_selected { box-shadow: 0 0 8px rgba( 255, 255, 100, 0.7), 0 0 8px rgba( 255, 255, 100, 0.7) inset;}
 .edit_tags_list .menu {
 clear: both;
 margin: 4px;
