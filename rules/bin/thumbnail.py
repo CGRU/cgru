@@ -168,7 +168,8 @@ def thumbnailArgs(i_args):
             inf_obj = None
 
         if inf_obj and 'mediainfo' in inf_obj and 'video' in inf_obj['mediainfo']:
-            frame_count = inf_obj['mediainfo']['video']['frame_count']
+            if 'frame_count' in inf_obj['mediainfo']['video']:
+                frame_count = inf_obj['mediainfo']['video']['frame_count']
 
             # Write to file (to store in walk):
             walk_obj = {}
