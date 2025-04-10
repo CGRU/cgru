@@ -410,18 +410,18 @@ af::Msg * AfContainer::action(Action & i_action, const af::Msg * i_msg)
 			if (i_action.ids[i] >= m_capacity)
 			{
 				std::string errlog = std::string("Action node ID above container capacity: ")
-									 + af::itos(i_action.ids[i]) + " >= " + af::itos(m_capacity)
-									 + ": " + i_msg->v_generateInfoString();
-				AFCommon::QueueLogError(errlog);
+									 + af::itos(i_action.ids[i]) + " >= " + af::itos(m_capacity) + ".";
+				AFCommon::QueueLogError(errlog + i_msg->v_generateInfoString());
+				i_action.answerError(errlog);
 				continue;
 			}
 
 			AfNodeSrv *node = m_nodes_table[i_action.ids[i]];
 			if (NULL == node)
 			{
-				std::string errlog = std::string("Action node ID not found: ") + af::itos(i_action.ids[i])
-									 + ": " + i_msg->v_generateInfoString();
-				AFCommon::QueueLogError(errlog);
+				std::string errlog = std::string("Action node ID not found: ") + af::itos(i_action.ids[i]) + ".";
+				AFCommon::QueueLogError(errlog + i_msg->v_generateInfoString());
+				i_action.answerError(errlog);
 				continue;
 			}
 
@@ -434,13 +434,12 @@ af::Msg * AfContainer::action(Action & i_action, const af::Msg * i_msg)
 	{
 		std::string err_msg;
 		af::RegExp rx;
-		rx.setPattern(i_action.mask, &err_msg);
-		if (rx.empty())
+		rx.setRegEx();
+		if (false == rx.setPattern(i_action.mask, &err_msg))
 		{
-			std::string errlog =
-				"AfContainer::action: Name pattern '" + i_action.mask + ("' is invalid: ") + err_msg
-								+ ": " + i_msg->v_generateInfoString();
-			AFCommon::QueueLogError(errlog);
+			std::string errlog = "AfContainer::action: Name pattern '" + i_action.mask + ("' is invalid: ") + err_msg;
+			AFCommon::QueueLogError(errlog + i_msg->v_generateInfoString());
+			i_action.answerError(errlog);
 		}
 		else
 		{
@@ -455,9 +454,9 @@ af::Msg * AfContainer::action(Action & i_action, const af::Msg * i_msg)
 
 			if (false == found)
 			{
-				std::string errlog = m_name + ": No node matches '" + i_action.mask + "' found: "
-									+ i_msg->v_generateInfoString();
-				AFCommon::QueueLogError(errlog);
+				std::string errlog = m_name + ": No node matches '" + i_action.mask + "' found.";
+				AFCommon::QueueLogError(errlog + i_msg->v_generateInfoString());
+				i_action.answerError(errlog);
 			}
 		}
 	}
@@ -467,16 +466,17 @@ af::Msg * AfContainer::action(Action & i_action, const af::Msg * i_msg)
 		if (i_action.without_answer)
 			return NULL;
 
-		if (i_action.isAnswerEmpty())
-			return af::jsonMsgInfo("log", "Action processed.");
-
 		if (i_action.getAnswerType() == Action::ATObject)
 			return af::jsonMsgObject(i_action.getAnswer());
 
+		if (i_action.hasAnswer())
+			return af::jsonMsgInfo(i_action.answerTypeToStr(), i_action.getAnswer());
+
+		return af::jsonMsgInfo("log", "Action processed.");
+	}
+
+	if (i_action.hasAnswer())
 		return af::jsonMsgInfo(i_action.answerTypeToStr(), i_action.getAnswer());
-	}
-	else
-	{
-		return af::jsonMsgError("Action node(s) not found.");
-	}
+
+	return af::jsonMsgError("Action node(s) not found.");
 }

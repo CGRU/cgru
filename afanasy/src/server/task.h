@@ -2,6 +2,7 @@
 
 #include "../include/afjob.h"
 
+#include "../libafanasy/log.h"
 #include "../libafanasy/msgclasses/mctask.h"
 #include "../libafanasy/name_af.h"
 #include "../libafanasy/taskprogress.h"
@@ -37,12 +38,14 @@ public:
 
 	virtual void v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId);
 
-	void operation(const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_with_state, uint32_t i_set_state);
+	void operation(const af::Log & i_log, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_with_state, uint32_t i_set_state);
 
 	bool tryNext(bool i_enable, MonitorContainer * i_monitoring);
 
-	virtual void v_appendLog( const std::string  & message);
-	inline const std::list<std::string> & getLog() { return m_logStringList; }
+	virtual void v_appendLog(const af::Log & i_log, bool i_store = false);
+	inline const std::list<af::Log> & getLog() const {return m_log;}
+	const std::list<std::string> sprintfLog() const;
+	void appendTaskLog(const std::string & i_info);
 
 	void errorHostsAppend( const std::string & hostname);
 	bool avoidHostsCheck( const std::string & hostname) const;
@@ -93,7 +96,7 @@ public:
 
 protected:
 	af::TaskProgress * m_progress;
-	std::list<std::string> m_logStringList;    ///< Task log.
+	std::list<af::Log> m_log;    ///< Task log.
 	Block * m_block;
 
 private:

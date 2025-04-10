@@ -92,16 +92,21 @@ void SysTask::v_monitor( MonitorContainer * monitoring) const {}
 void SysTask::v_store() {}
 void SysTask::v_writeTaskOutput( const char * i_data, int i_size) const {}
 
-void SysTask::v_appendLog( const std::string & message)
+void SysTask::v_appendLog(const af::Log & i_log, bool i_store)
 {
-	((SysBlock*)(m_block))->appendTaskLog( std::string("#") + af::itos( getNumber()) + ": " + message + ": "
-       + m_syscmd->user_name + ": \"" + m_syscmd->job_name + "\":\n"
-       + m_syscmd->command);
+	af::Log log(i_log);
+	log.appendType("system");
+	log.subject = m_syscmd->job_name + "@" + m_syscmd->user_name;
+	log.appendObject(std::string("#") + af::itos( getNumber()));
+	(static_cast<SysBlock*>(m_block))->appendTaskLog(log, i_store);
+//	((SysBlock*)(m_block))->appendTaskLog( std::string("#") + af::itos( getNumber()) + ": " + message + ": "
+//       + m_syscmd->user_name + ": \"" + m_syscmd->job_name + "\":\n"
+//       + m_syscmd->command);
 }
 
-void SysTask::appendSysJobLog( const std::string & message)
+void SysTask::appendSysJobLog(const std::string & message)
 {
-	SysJob::appendJobLog( std::string("Task[") + af::itos( getNumber()) + "]: " + message + ": "
+	SysJob::appendSysJobLog(std::string("Task[") + af::itos( getNumber()) + "]: " + message + ": "
 	    + m_syscmd->user_name + ": \"" + m_syscmd->job_name + "\":\n"
 	    + m_syscmd->command);
 }
@@ -130,9 +135,9 @@ AFINFO("SysTask::refresh:");
 	{
 		// Probably sys tasts can`t run (no service, nimby, etc)
 		std::string message = std::string("Error: Task age(") + af::itos( currentTime - m_birthtime) + ") > " + af::itos( af::Environment::getSysJobTaskLife());
-		v_appendLog( message);
+		appendTaskLog(message);
 		// Store error in job log
-		appendSysJobLog( message);
+		appendSysJobLog(message);
 		m_progress->state = AFJOB::STATE_ERROR_MASK;
 	}
 //stdOut();
@@ -171,10 +176,10 @@ void SysTask::v_updateState( const af::MCTaskUp & taskup, RenderContainer * rend
 	}
 
 	// Store error in job log
-	appendSysJobLog( message);
+	appendSysJobLog(message);
 
 	// Store error task output in task log
-	if( taskup.getDataLen() > 0)
+	if (taskup.getDataLen() > 0)
 	{
 		message = "Error task output:";
 		message += "\n";
@@ -183,7 +188,8 @@ void SysTask::v_updateState( const af::MCTaskUp & taskup, RenderContainer * rend
 		message += std::string( taskup.getData(), taskup.getDataLen());
 		message += "\n";
 		message += "=======================================================";
-		((SysBlock*)(m_block))->appendTaskLog(message);
+		//((SysBlock*)(m_block))->appendTaskLog(message);
+		appendTaskLog(message);
 	}
 }
 
@@ -312,7 +318,7 @@ AFINFO("SysBlock::addTask:");
 	{
 		std::string message = std::string("Can't find task number (max=") + af::itos(af::Environment::getSysJobTasksMax()) + ")";
 		AFCommon::QueueLogError( std::string("SysBlock::addTask: %s") + message.c_str());
-		appendJobLog( message);
+		appendJobLog(message);
 		return NULL;
 	}
 
@@ -342,7 +348,7 @@ void SysBlock::v_errorHostsAppend( int task, int hostId, RenderContainer * rende
 	RenderContainerIt rendersIt( renders);
 	RenderAf* render = rendersIt.getRender( hostId);
 	if( render == NULL ) return;
-	if( Block::v_errorHostsAppend( render->getName())) appendJobLog( render->getName() + " - AVOIDING HOST !");
+	if( Block::v_errorHostsAppend( render->getName())) appendJobLog(render->getName() + " - AVOIDING HOST !");
 	SysTask * systask = getTask( task, "errorHostsAppend");
 	if( systask) systask->errorHostsAppend( render->getName());
 }
@@ -620,9 +626,9 @@ void SysJob::v_getTaskOutput( af::MCTask & io_mctask, std::string & o_error) con
 	o_error = "This is an empty dummy task in a system job block.\nError tasks output are stored in this task log.";
 }
 
-void SysJob::appendJobLog( const std::string & message)
+void SysJob::appendSysJobLog(const std::string & message)
 {
-	ms_sysjob->appendLog( message);
+	ms_sysjob->appendJobLog(message);
 }
 
 bool SysJob::initSystem()

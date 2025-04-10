@@ -46,7 +46,9 @@ public:
 
 	virtual void v_action(Action & i_action);
 
-	void logAction(const Action & i_action, const std::string & i_node_name);
+//	void logAction(const Action & i_action, const std::string & i_node_name);
+
+	inline void appendPoolLog(const std::string & i_info, bool i_store = true){appendLog(af::Log("pool", getName(),i_info), i_store);}
 
 	virtual int v_calcWeight() const;
 
@@ -152,10 +154,10 @@ private:
 	void actionDelete(Action & i_action);
 	void actionService(Action & i_action);
 	void actionHealSick(Action & i_action);
-	void actionLaunchCmd(Action & i_action, const std::string & i_cmd, bool i_exit, const std::string & i_log);
-	void actionEjectTasks(Action & i_action, const std::string & i_log);
-	void actionExitRenders(Action & i_action, const std::string & i_log);
-	void actionDeleteRenders(Action & i_action, const std::string & i_log);
+	void actionLaunchCmd(Action & i_action, const std::string & i_cmd, bool i_exit);
+	void actionEjectTasks(Action & i_action);
+	void actionExitRenders(Action & i_action);
+	void actionDeleteRenders(Action & i_action);
 
 	void dispatchFarmConfig();
 

@@ -47,8 +47,8 @@ public:
 	af::Msg * writeErrorHosts( bool i_binary) const;
 	af::Msg * writeErrorHosts( int b, int t) const;
 	
-	/// Get \c task task from \c block log.
-	const std::list<std::string> & getTaskLog( int block, int task) const;
+	/// Print task log info string list \c task task from \c block log.
+	const std::list<std::string> sprintfTaskLog(int block, int task) const;
 	
 	/// Construct MCTaskOutput with render ID
 	/// for retrieveing output from running remote host
@@ -122,6 +122,11 @@ public:
 	/// Force refresh, that can be skipped on DONE job.
 	inline void forceRefresh() {m_force_refresh = true;}
 
+	inline void appendJobLog(const std::string & i_info, bool i_store = true){
+		appendLog(af::Log("jobs", getName() + "@" + m_user_name, i_info), i_store);}
+	inline void appendJobTypeLog(const std::string & i_type, const std::string & i_info, bool i_store = true){
+		appendLog(af::Log("jobs " + i_type, getName() + "@" + m_user_name, i_info), i_store);}
+
 	virtual void v_setHostsMaskFind()  override;
 	virtual void v_setHostsMaskRegEx() override;
 
@@ -175,7 +180,7 @@ private:
 	void checkDepends();
 	
 	/// Restart tasks, can restart only matching state mask.
-	void restartAllTasks( const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_with_state = 0);
+	void restartAllTasks(const af::Log & i_log, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_with_state = 0);
 
 	bool checkTryTasksNext();
 	void resetTryTasksNext();

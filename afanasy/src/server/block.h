@@ -76,7 +76,7 @@ public:
 	UserAf * m_user;
 
 protected:
-	void appendJobLog( const std::string & message);
+	void appendJobLog(const std::string & i_info);
     bool v_errorHostsAppend( const std::string & hostname);
 
 private:
@@ -106,7 +106,7 @@ private:
 
 	bool editTickets(Action & i_action, const JSON & operation);
 
-	void tasksOperation(const std::string & i_message, const Action & i_action, const JSON & i_operation, uint32_t i_with_state, uint32_t i_set_state);
+	void tasksOperation(Action & i_action, const JSON & i_operation, uint32_t i_with_state, uint32_t i_set_state);
 
 	bool tryTasksNext(Action & i_action, const JSON & i_operation);
 

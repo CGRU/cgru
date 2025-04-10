@@ -82,11 +82,16 @@ void MonitorAf::deregister()
 
 void MonitorAf::v_action( Action & i_action)
 {
+	i_action.log.type = "monitors";
+
 	const JSON & operation = (*i_action.data)["operation"];
 	if( operation.IsObject())
 	{
 		std::string optype;
 		af::jr_string("type", optype, operation);
+
+		i_action.log.appendType(optype);
+
 		if( optype == "exit")
 		{
 			m_e.m_instruction = "exit";
@@ -188,7 +193,6 @@ void MonitorAf::v_action( Action & i_action)
 			}
 			else
 			{
-				appendLog("Unknown operation '" + optype + "' class '" + opclass + "' status '" + opstatus + "' by " + i_action.author);
 				i_action.answerError("Unknown operation '" + optype + "' class '" + opclass + "'.");
 				return;
 			}
@@ -198,7 +202,10 @@ void MonitorAf::v_action( Action & i_action)
 				setEvents( eids, subscribe);
 			}
 			m_monitors->addEvent( af::Monitor::EVT_monitors_change, getId());
-			appendLog("Operation '" + optype + "' class '" + opclass + "' status '" + opstatus + "' by " + i_action.author);
+
+			i_action.log.appendType(opstatus);
+			//appendLog("Operation '" + optype + "' class '" + opclass + "' status '" + opstatus + "' by " + i_action.author);
+
 			m_time_activity = time( NULL);
 			return;
 		}
@@ -206,17 +213,16 @@ void MonitorAf::v_action( Action & i_action)
 		{
 			std::string text;
 			af::jr_string("text", text, operation);
-			text += "\n - " + i_action.author;
+			text += "\n - " + i_action.log.subject;
 			sendMessage( text);
 			i_action.answerLog("Message sent.");
 		}
 		else
 		{
-			appendLog("Unknown operation '" + optype + "' by " + i_action.author);
 			i_action.answerError("Unknown operation '" + optype + "'.");
 			return;
 		}
-		appendLog("Operation '" + optype + "' by " + i_action.author);
+		//appendLog("Operation '" + optype + "' by " + i_action.author);
 	}
 }
 

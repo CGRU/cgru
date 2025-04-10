@@ -36,7 +36,7 @@ UserAf::UserAf( const std::string & username, const std::string & host):
 	af::User( username, host),
 	AfNodeSolve( this)
 {
-	appendLog("Registered from job.");
+	appendUserLog("Registered from job.");
 }
 
 UserAf::UserAf( JSON & i_object):
@@ -79,7 +79,7 @@ bool UserAf::initialize()
 			if( getTimeActivity() == 0 ) updateTimeActivity();
 			store();
 		}
-		appendLog("Initialized from store.");
+		appendUserLog("Initialized from store.");
 	}
 	else
 	{
@@ -87,7 +87,7 @@ bool UserAf::initialize()
 		updateTimeActivity();
 		setStoreDir( AFCommon::getStoreDirUser( *this));
 		store();
-		appendLog("Registered.");
+		appendUserLog("Registered.");
 	}
 
 	return true;
@@ -99,6 +99,8 @@ UserAf::~UserAf()
 
 void UserAf::v_action( Action & i_action)
 {
+	i_action.log.type = "users";
+
 	const JSON & operation = (*i_action.data)["operation"];
 	if( operation.IsObject())
 	{
@@ -122,17 +124,16 @@ void UserAf::v_action( Action & i_action)
 		else if( type == "delete")
 		{
 			if( m_jobs_num != 0 ) return;
-			appendLog( std::string("Deleted by ") + i_action.author);
-			deleteNode( i_action.monitors);
+			deleteNode(i_action.monitors);
 			return;
 		}
 	}
 
 	const JSON & params = (*i_action.data)["params"];
-	if( params.IsObject())
-		jsonRead( params, &i_action.log);
+	if (params.IsObject())
+		jsonRead(params, &i_action.log.info);
 
-	if( i_action.log.size() )
+	if (i_action.log.info.size())
 	{
 		store();
 		i_action.monitors->addEvent( af::Monitor::EVT_users_change, m_id);
@@ -147,19 +148,19 @@ void UserAf::jobPriorityChanged( JobAf * i_job, MonitorContainer * i_monitoring)
 	i_monitoring->addUser( this);
 }
 
-void UserAf::logAction( const Action & i_action, const std::string & i_node_name)
+void UserAf::logAction(const Action & i_action, const std::string & i_node_name)
 {
-	if( i_action.log.empty())
+	if (i_action.log.info.empty())
 		return;
 
-	appendLog( std::string("Action[") + i_action.type + "][" +  i_node_name + "]: " + i_action.log);
+	appendLog(i_action.log);
 	updateTimeActivity();
 }
 
 void UserAf::deleteNode( MonitorContainer * i_monitoring)
 {
 	AFCommon::QueueLog("Deleting user: " + v_generateInfoString( false));
-	appendLog("Became a zombie.");
+	appendUserLog("Became a zombie.");
 
 	setZombie();
 
@@ -168,7 +169,7 @@ void UserAf::deleteNode( MonitorContainer * i_monitoring)
 
 void UserAf::addJob( JobAf * i_job)
 {
-	appendLog( std::string("Adding a job: ") + i_job->getName());
+	appendUserLog(std::string("Adding a job: ") + i_job->getName());
 
 	updateTimeActivity();
 
@@ -188,7 +189,7 @@ void UserAf::addJob( JobAf * i_job)
 
 void UserAf::removeJob( JobAf * i_job)
 {
-	appendLog( std::string("Removing a job: ") + i_job->getName());
+	appendUserLog(std::string("Removing a job: ") + i_job->getName());
 
 	// Remove running counts (runnig tasks num and capacity total) from Af::Work
 	remRunningCounts(*i_job);

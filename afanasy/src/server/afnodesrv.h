@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../libafanasy/afnode.h"
+#include "../libafanasy/log.h"
 
 class Action;
 
@@ -47,9 +48,9 @@ public:
 	// Request to delete a node.
 	void setZombie();
    
-	void appendLog( const std::string & message);  ///< Append task log with a \c message .
-	inline const std::list<std::string> & getLog() { return m_log; }    ///< Get log.
-	af::Msg * writeLog( bool i_binary) const;
+	void appendLog(const af::Log & i_log, bool i_store = true);  ///< Append task log with a \c message .
+	inline const std::list<af::Log> & getLog() { return m_log; }    ///< Get log.
+	af::Msg * writeLog(bool i_binary) const;
 	int calcLogWeight() const;
 
 protected:
@@ -71,5 +72,6 @@ private:
 /// Next node pointer. Next container node has a less or equal priority.
 	AfNodeSrv * m_next_ptr;
 
-	std::list<std::string> m_log;                          ///< Log.
+//	std::list<std::string> m_log;                          ///< Log.
+	std::list<af::Log> m_log;
 };

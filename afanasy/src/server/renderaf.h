@@ -103,7 +103,7 @@ public:
 	void taskFinished(const af::TaskExec * i_exec, int64_t i_state, MonitorContainer * i_monitoring);
 
 	/// Refresh parameters.
-	void v_refresh(time_t i_current_time, AfContainer * pointer, MonitorContainer * monitoring);
+	void v_refresh(time_t i_current_time, AfContainer * pointer, MonitorContainer * monitoring) override;
 
 	// Perform post solving calculations:
 	void v_postSolve(time_t i_current_time, MonitorContainer * i_monitoring);
@@ -113,7 +113,7 @@ public:
 /// Deregister render, on SIGINT client recieving.
 	void deregister( JobContainer * jobs, MonitorContainer * monitoring );
 
-	virtual void v_action( Action & i_action);
+	virtual void v_action( Action & i_action) override;
 
 	inline const std::list<std::string> & getTasksLog() { return m_tasks_log; }  ///< Get tasks log list.
 
@@ -186,6 +186,11 @@ private:
 
 	// Check resources, on overflow emit RENDER_OVERLOAD event
 	bool checkOverload();
+
+	inline void appendRenderLog(const std::string & i_info, bool i_store = true){
+		appendLog(af::Log("renders", getName() + "@" + m_user_name, i_info), i_store);}
+	inline void appendRenderTypeLog(const std::string & i_type, const std::string & i_info, bool i_store = true){
+		appendLog(af::Log("renders " + i_type, getName() + "@" + m_user_name, i_info), i_store);}
 
 private:
 	std::list<std::string> m_tasks_log;							///< Tasks Log.

@@ -31,7 +31,13 @@
 af::Msg *threadRunJSON(ThreadArgs *i_args, const af::Msg *i_msg)
 {
 	Action action(i_msg, i_args);
-	if (action.isInvalid()) return af::jsonMsgError("Invalid action.");
+	if (action.isInvalid())
+	{
+		if (action.hasAnswer())
+			return af::jsonMsgInfo(action.answerTypeToStr(), action.getAnswer());
+
+		return af::jsonMsgError("Invalid action.");
+	}
 
 	if (action.type == "branches") return i_args->branches->action(action, i_msg);
 	if (action.type == "monitors") return i_args->monitors->action(action, i_msg);

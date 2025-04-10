@@ -35,16 +35,16 @@ public:
 	SysTask( af::TaskExec * i_taskexec, SysCmd * i_system_command, Block * i_block, int i_task_number);
 	virtual ~SysTask();
 
-	virtual void v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring);
-	virtual void v_refresh( time_t i_currentTime, RenderContainer * i_renders, MonitorContainer * i_monitoring, int & i_errorHostId);
-	virtual void v_updateState( const af::MCTaskUp & i_taskup, RenderContainer * i_renders, MonitorContainer * i_monitoring, bool & i_errorHost);
-	virtual void v_writeTaskOutput( const char * i_data, int i_size) const;  ///< Write task output in tasksOutputDir.
-	virtual const std::string v_getInfo( bool i_full = false) const;
-	virtual void v_appendLog( const std::string & i_message);
-	virtual void v_monitor( MonitorContainer * i_monitoring) const;
+	virtual void v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring) override;
+	virtual void v_refresh( time_t i_currentTime, RenderContainer * i_renders, MonitorContainer * i_monitoring, int & i_errorHostId) override;
+	virtual void v_updateState( const af::MCTaskUp & i_taskup, RenderContainer * i_renders, MonitorContainer * i_monitoring, bool & i_errorHost) override;
+	virtual void v_writeTaskOutput( const char * i_data, int i_size) const override;  ///< Write task output in tasksOutputDir.
+	virtual const std::string v_getInfo( bool i_full = false) const override;
+	virtual void v_appendLog(const af::Log & i_log, bool i_store = false) override;
+	virtual void v_monitor( MonitorContainer * i_monitoring) const override;
 
 	// This function does nothing in system job
-	virtual void v_store();
+	virtual void v_store() override;
 
 private:
 	void appendSysJobLog( const std::string & i_message);
@@ -69,17 +69,17 @@ public:
 
 	void clearCommands();
 
-	virtual bool v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
-	virtual void v_getErrorHostsList( std::list<std::string> & o_list) const;
-	virtual bool v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
-	virtual void v_errorHostsAppend( int task, int hostId, RenderContainer * renders);
-	virtual void v_errorHostsReset();
+	virtual bool v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring) override;
+	virtual void v_getErrorHostsList( std::list<std::string> & o_list) const override;
+	virtual bool v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring) override;
+	virtual void v_errorHostsAppend( int task, int hostId, RenderContainer * renders) override;
+	virtual void v_errorHostsReset() override;
 
 	inline int getNumCommands() const { return m_commands.size();}
 	inline int getNumSysTasks() const { return m_systasks.size();}
 	SysTask * getReadySysTask() const;
 
-	inline void appendTaskLog( const std::string & message) const { m_tasks[0]->v_appendLog( message);}
+	inline void appendTaskLog(af::Log & i_log, bool i_store = false) const {m_tasks[0]->v_appendLog(i_log, i_store);}
 
 	bool initSystem();
 
@@ -121,18 +121,18 @@ public:
 
 	bool initSystem();
 
-	virtual bool v_canRun();
-	virtual RenderAf * v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * monitoring, BranchSrv * i_branch);
-	virtual void v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
-	virtual void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
+	virtual bool v_canRun() override;
+	virtual RenderAf * v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * monitoring, BranchSrv * i_branch) override;
+	virtual void v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring) override;
+	virtual void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring) override;
 
-	static void appendJobLog( const std::string & message);
+	static void appendSysJobLog(const std::string & message);
 
 	// Functions than informate that it is a system task, and this info is not abailable:
-	virtual void v_getTaskOutput( af::MCTask & io_mctask, std::string & o_error) const;
+	virtual void v_getTaskOutput( af::MCTask & io_mctask, std::string & o_error) const override;
 
 protected:
-	virtual Block * v_newBlock( int numBlock);
+	virtual Block * v_newBlock( int numBlock) override;
 
 private:
 	bool isReady();

@@ -81,9 +81,13 @@ const std::string Block::getStoreTasksFileName() const
 	return m_job->getStoreDir() + AFGENERAL::PATH_SEPARATOR + "block" + af::itos( m_data->getBlockNum()) + "_tasks.json";
 }
 
-void Block::appendJobLog( const std::string & message)
+void Block::appendJobLog(const std::string & i_info)
 {
-   m_job->appendLog("B[\"" + m_data->getName() + "\"]: " + message);
+	af::Log log;
+	log.type = "jobs";
+	log.object = m_job->getName();
+	log.info = "Block[\"" + m_data->getName() + "\"]: " + i_info;
+	m_job->appendLog(log);
 }
 
 void Block::v_errorHostsAppend( int task, int hostId, RenderContainer * renders)
@@ -559,6 +563,8 @@ bool Block::action( Action & i_action)
 	{
 		std::string type;
 		af::jr_string("type", type, operation);
+		i_action.log.appendType(type);
+
 		if (type == "reset_error_hosts")
 		{
 			v_errorHostsReset();
@@ -568,40 +574,49 @@ bool Block::action( Action & i_action)
 		}
 		else if (type == "skip")
 		{
-			tasksOperation("Tasks skip by " + i_action.author, i_action, operation, ~AFJOB::STATE_DONE_MASK, AFJOB::STATE_SKIPPED_MASK | AFJOB::STATE_DONE_MASK);
+			//tasksOperation("Tasks skip by " + i_action.author, i_action, operation, ~AFJOB::STATE_DONE_MASK, AFJOB::STATE_SKIPPED_MASK | AFJOB::STATE_DONE_MASK);
+			tasksOperation(i_action, operation, ~AFJOB::STATE_DONE_MASK, AFJOB::STATE_SKIPPED_MASK | AFJOB::STATE_DONE_MASK);
 		}
 		else if (type == "suspend")
 		{
-			tasksOperation("Tasks suspend by " + i_action.author, i_action, operation,
+			//tasksOperation("Tasks suspend by " + i_action.author, i_action, operation,
+			tasksOperation(i_action, operation,
 					AFJOB::STATE_READY_MASK | AFJOB::STATE_RUNNING_MASK | AFJOB::STATE_SKIPPED_MASK, AFJOB::STATE_SUSPENDED_MASK);
 		}
 		else if (type == "continue")
 		{
-			tasksOperation("Tasks continue by " + i_action.author, i_action, operation, AFJOB::STATE_SUSPENDED_MASK, AFJOB::STATE_READY_MASK);
+			//tasksOperation("Tasks continue by " + i_action.author, i_action, operation, AFJOB::STATE_SUSPENDED_MASK, AFJOB::STATE_READY_MASK);
+			tasksOperation(i_action, operation, AFJOB::STATE_SUSPENDED_MASK, AFJOB::STATE_READY_MASK);
 		}
 		else if (type == "done")
 		{
-			tasksOperation("Tasks set done by " + i_action.author, i_action, operation, ~AFJOB::STATE_DONE_MASK, AFJOB::STATE_DONE_MASK);
+			//tasksOperation("Tasks set done by " + i_action.author, i_action, operation, ~AFJOB::STATE_DONE_MASK, AFJOB::STATE_DONE_MASK);
+			tasksOperation(i_action, operation, ~AFJOB::STATE_DONE_MASK, AFJOB::STATE_DONE_MASK);
 		}
 		else if (type == "restart")
 		{
-			tasksOperation("Tasks restart by " + i_action.author, i_action, operation, 0 /*with any task*/, AFJOB::STATE_READY_MASK);
+			//tasksOperation("Tasks restart by " + i_action.author, i_action, operation, 0 /*with any task*/, AFJOB::STATE_READY_MASK);
+			tasksOperation(i_action, operation, 0 /*with any task*/, AFJOB::STATE_READY_MASK);
 		}
 		else if (type == "restart_running")
 		{
-			tasksOperation("Restart running tasks by " + i_action.author, i_action, operation, AFJOB::STATE_RUNNING_MASK, 0 /*does not set any state*/);
+			//tasksOperation("Restart running tasks by " + i_action.author, i_action, operation, AFJOB::STATE_RUNNING_MASK, 0 /*does not set any state*/);
+			tasksOperation(i_action, operation, AFJOB::STATE_RUNNING_MASK, 0 /*does not set any state*/);
 		}
 		else if (type == "restart_skipped")
 		{
-			tasksOperation("Restart skipped tasks by " + i_action.author, i_action, operation, AFJOB::STATE_SKIPPED_MASK, AFJOB::STATE_READY_MASK);
+			//tasksOperation("Restart skipped tasks by " + i_action.author, i_action, operation, AFJOB::STATE_SKIPPED_MASK, AFJOB::STATE_READY_MASK);
+			tasksOperation(i_action, operation, AFJOB::STATE_SKIPPED_MASK, AFJOB::STATE_READY_MASK);
 		}
 		else if (type == "restart_done")
 		{
-			tasksOperation("Restart done tasks by " + i_action.author, i_action, operation, AFJOB::STATE_DONE_MASK, AFJOB::STATE_READY_MASK);
+			//tasksOperation("Restart done tasks by " + i_action.author, i_action, operation, AFJOB::STATE_DONE_MASK, AFJOB::STATE_READY_MASK);
+			tasksOperation(i_action, operation, AFJOB::STATE_DONE_MASK, AFJOB::STATE_READY_MASK);
 		}
 		else if (type == "restart_errors")
 		{
-			tasksOperation("Restart error tasks by " + i_action.author, i_action, operation, AFJOB::STATE_ERROR_MASK, AFJOB::STATE_READY_MASK);
+			//tasksOperation("Restart error tasks by " + i_action.author, i_action, operation, AFJOB::STATE_ERROR_MASK, AFJOB::STATE_READY_MASK);
+			tasksOperation(i_action, operation, AFJOB::STATE_ERROR_MASK, AFJOB::STATE_READY_MASK);
 		}
 		else if (type == "trynext")
 		{
@@ -616,7 +631,7 @@ bool Block::action( Action & i_action)
 			if (appendTasks(i_action, operation))
 			{
 				// Add a log line so that store() is called at the job level (a bit hacky)
-				i_action.log += "\nBlock['" + m_data->getName() + "']: Append tasks";
+				i_action.log.info += "\nBlock['" + m_data->getName() + "']: Append tasks";
 				return true;
 			}
 			return false;
@@ -631,12 +646,11 @@ bool Block::action( Action & i_action)
 		}
 		else
 		{
-			appendJobLog("Unknown block operation \"" + type + "\" by " + i_action.author);
 			i_action.answerError("Unknown operation: " + type);
 			return false;
 		}
 
-		appendJobLog("Operation \"" + type + "\" by " + i_action.author);
+		//appendJobLog("Operation \"" + type + "\" by " + i_action.author);
 	}
 	else
 	{
@@ -645,11 +659,12 @@ bool Block::action( Action & i_action)
 		{
 			std::string changes;
 			m_data->jsonRead( params, &changes);
+			i_action.log.appendType("params");
 
 			if( changes.empty())
 				return false;
 
-			i_action.log += "\nBlock['" + m_data->getName() + "']:" + changes;
+			i_action.log.info += "\bBlock['" + m_data->getName() + "']: " + changes;
 
 			blockchanged_type = af::Msg::TBlocksProperties;
 			job_changed = true;
@@ -692,7 +707,7 @@ bool Block::editTickets(Action & i_action, const JSON & operation)
 	return true;
 }
 
-void Block::tasksOperation(const std::string & i_message, const Action & i_action, const JSON & i_operation, uint32_t i_with_state, uint32_t i_set_state)
+void Block::tasksOperation(Action & i_action, const JSON & i_operation, uint32_t i_with_state, uint32_t i_set_state)
 {
 	std::vector<int32_t> tasks_vec;
 	af::jr_int32vec("task_ids", tasks_vec, i_operation);
@@ -709,13 +724,12 @@ void Block::tasksOperation(const std::string & i_message, const Action & i_actio
 			t = tasks_vec[i];
 			if(( t >= m_data->getTasksNum()) || ( t < 0 ))
 			{
-				appendJobLog( i_message);
-				appendJobLog("Invalid operation task numer = " + af::itos(t));
-				break;
+				i_action.answerError("Invalid operation task numer = " + af::itos(t));
+				return;
 			}
 		}
 
-		m_tasks[t]->operation(i_message, i_action.renders, i_action.monitors, i_with_state, i_set_state);
+		m_tasks[t]->operation(i_action.log, i_action.renders, i_action.monitors, i_with_state, i_set_state);
 
 		m_job->forceRefresh();
 	}
@@ -759,7 +773,6 @@ bool Block::tryTasksNext(Action & i_action, const JSON & i_operation)
 		if ((t >= m_data->getTasksNum()) || ( t < 0 ))
 		{
 			i_action.answerError("Invalid operation task numer = " + af::itos(t));
-			appendJobLog(i_action.getAnswer());
 			break;
 		}
 

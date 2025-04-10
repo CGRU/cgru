@@ -41,7 +41,7 @@ BranchSrv::BranchSrv(BranchSrv * i_parent, const std::string & i_path):
 	m_parent(i_parent),
 	AfNodeSolve(this)
 {
-	appendLog("Created from job.");
+	appendBranchLog("Created from job.");
 }
 
 BranchSrv::BranchSrv(const std::string & i_store_dir):
@@ -107,7 +107,7 @@ bool BranchSrv::initialize()
 			m_time_creation = time(NULL);
 			store();
 		}
-		appendLog("Initialized from store.");
+		appendBranchLog("Initialized from store.");
 	}
 	else
 	{
@@ -139,7 +139,7 @@ bool BranchSrv::initialize()
 
 		setStoreDir(AFCommon::getStoreDirBranch(*this));
 		store();
-		appendLog("Initialized.");
+		appendBranchLog("Initialized.");
 	}
 
 	return true;
@@ -151,6 +151,8 @@ BranchSrv::~BranchSrv()
 
 void BranchSrv::v_action(Action & i_action)
 {
+	i_action.log.type = "branches";
+
 	const JSON & operation = (*i_action.data)["operation"];
 	if (operation.IsObject())
 	{
@@ -181,11 +183,10 @@ void BranchSrv::v_action(Action & i_action)
 		else
 		{
 			i_action.answerError("Unknown operation '" + type + "'");
-			appendLog("Unknown operation \"" + type + "\" by " + i_action.author);
 			return;
 		}
 
-		appendLog("Operation \"" + type + "\" by " + i_action.author);
+		//appendLog("Operation \"" + type + "\" by " + i_action.author);
 		i_action.monitors->addEvent(af::Monitor::EVT_branches_change, m_id);
 		store();
 		return;
@@ -193,16 +194,16 @@ void BranchSrv::v_action(Action & i_action)
 
 	const JSON & params = (*i_action.data)["params"];
 	if (params.IsObject())
-		jsonRead(params, &i_action.log);
+		jsonRead(params, &i_action.log.info);
 
-	if (i_action.log.size())
+	if (i_action.log.info.size())
 	{
 		store();
 		i_action.answerLog("Branch(es) parameter(s) changed.");
 		i_action.monitors->addEvent(af::Monitor::EVT_branches_change, m_id);
 	}
 }
-
+/*
 void BranchSrv::logAction(const Action & i_action, const std::string & i_node_name)
 {
 	if (i_action.log.empty())
@@ -210,7 +211,7 @@ void BranchSrv::logAction(const Action & i_action, const std::string & i_node_na
 
 	appendLog(std::string("Action[") + i_action.type + "][" +  i_node_name + "]: " + i_action.log);
 }
-
+*/
 void BranchSrv::deleteBranch(Action & o_action, MonitorContainer * i_monitoring)
 {
 	if (isRoot())
@@ -225,7 +226,7 @@ void BranchSrv::deleteBranch(Action & o_action, MonitorContainer * i_monitoring)
 		return;
 	}
 
-	appendLog(std::string("Deleted by ") + o_action.author);
+	//appendLog(std::string("Deleted by ") + o_action.author);
 	setZombie();
 
 	if (i_monitoring)
@@ -253,14 +254,14 @@ void BranchSrv::deleteDoneJobs(Action & o_action, MonitorContainer * i_monitorin
 
 void BranchSrv::addBranch(BranchSrv * i_branch)
 {
-	appendLog(std::string("Adding a branch: ") + i_branch->getName());
+	appendBranchLog(std::string("Adding a branch: ") + i_branch->getName());
 
 	m_branches_list.add(i_branch);
 }
 
 void BranchSrv::removeBranch(BranchSrv * i_branch)
 {
-	appendLog(std::string("Removing a branch: ") + i_branch->getName());
+	appendBranchLog(std::string("Removing a branch: ") + i_branch->getName());
 
 	m_branches_list.remove(i_branch);
 }
@@ -273,7 +274,7 @@ void BranchSrv::addJob(JobAf * i_job, UserAf * i_user)
 		return;
 	}
 
-	appendLog(std::string("Adding a job: ") + i_job->getName());
+	appendBranchLog(std::string("Adding a job: ") + i_job->getName());
 
 	m_jobs_list.add(i_job);
 
@@ -304,7 +305,7 @@ void BranchSrv::addUserJob(JobAf * i_job, UserAf * i_user)
 
 void BranchSrv::removeJob(JobAf * i_job, UserAf * i_user)
 {
-	appendLog(std::string("Removing a job: ") + i_job->getName());
+	appendBranchLog(std::string("Removing a job: ") + i_job->getName());
 
 	m_jobs_list.remove(i_job);
 

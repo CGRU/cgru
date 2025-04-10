@@ -312,14 +312,14 @@ bool JobAf::initialize()
 		if( false == m_command_pre.empty())
 		{
 			AFCommon::executeCmd( m_command_pre);
-			appendLog( std::string("Job pre command executed:\n") + m_command_pre);
+			appendJobTypeLog("pre command", m_command_pre);
 		}
 		for( int b = 0; b < m_blocks_num; b++)
 		{
 			if( m_blocks_data[b]->hasCmdPre() )
 			{
 				AFCommon::executeCmd( m_blocks_data[b]->getCmdPre());
-				appendLog( std::string("Block[") + m_blocks_data[b]->getName() + "] pre command executed:\n" + m_blocks_data[b]->getCmdPre());
+				appendJobTypeLog("pre command", std::string("Block[") + m_blocks_data[b]->getName() + "]: " + m_blocks_data[b]->getCmdPre());
 			}
 		}
 		// Process event
@@ -333,11 +333,11 @@ bool JobAf::initialize()
 			}
 		}
 
-		appendLog("Initialized.");
+		appendJobLog("Initialized.", false);
 	}
 	else
 	{
-		appendLog("Initialized from database.");
+		appendJobLog("Initialized from database.", false);
 	}
 
 	checkStates();
@@ -389,8 +389,7 @@ void JobAf::checkStates()
 				taskstate = taskstate | AFJOB::STATE_WAITRECONNECT_MASK;
 				taskstate = taskstate & (~AFJOB::STATE_RUNNING_MASK );
 				m_progress->tp[b][t]->time_done = time(NULL);
-				m_blocks[b]->m_tasks[t]->v_appendLog(
-						"Task was running at server start. Waiting for render reconnect...");
+				m_blocks[b]->m_tasks[t]->appendTaskLog("Task was running at server start. Waiting for render reconnect...");
 			}
 
 			m_progress->tp[b][t]->state = taskstate;
@@ -428,8 +427,9 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 		
 		if (getRunningTasksNum() && (renders != NULL) && (monitoring != NULL))
 		{
-			restartAllTasks("Job deletion.", renders, monitoring, AFJOB::STATE_RUNNING_MASK);
-			if( monitoring ) monitoring->addJobEvent( af::Monitor::EVT_jobs_change, getId(), getUid());
+			af::Log log("jobs delete", getName(), "Job deletion");
+			restartAllTasks(log, renders, monitoring, AFJOB::STATE_RUNNING_MASK);
+			if (monitoring) monitoring->addJobEvent( af::Monitor::EVT_jobs_change, getId(), getUid());
 			return;
 		}
 	}
@@ -444,7 +444,7 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 	if (false == m_command_post.empty())
 	{
 		SysJob::AddPostCommand( m_command_post, m_blocks_num > 0 ? m_blocks_data[0]->getWDir(): "", m_user_name, m_name);
-		appendLog( std::string("Executing job post command:\n") + m_command_post);
+		appendJobTypeLog("post command", m_command_post);
 	}
 	// Process blocks post commands:
 	for (int b = 0; b < m_blocks_num; b++)
@@ -452,7 +452,7 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 		if (m_blocks_data[b]->hasCmdPost())
 		{
 			SysJob::AddPostCommand( m_blocks_data[b]->getCmdPost(), m_blocks_data[b]->getWDir(), m_user_name, m_name);
-			appendLog( std::string("Executing block[") + m_blocks_data[b]->getName() + "] post command:\n" + m_blocks_data[b]->getCmdPost());
+			appendJobTypeLog("post command", std::string("Block[") + m_blocks_data[b]->getName() + "]: " + m_blocks_data[b]->getCmdPost());
 		}
 	}
 	
@@ -474,6 +474,8 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 
 void JobAf::v_action( Action & i_action)
 {
+	i_action.log.type = "jobs";
+
 	// If action has blocks ids array - action to for blocks
 	if( i_action.data->HasMember("block_ids") || i_action.data->HasMember("block_mask"))
 	{
@@ -494,15 +496,15 @@ void JobAf::v_action( Action & i_action)
 
 		// Try to fill ids from mask:
 		const JSON & j_block_mask = (*i_action.data)["block_mask"];
-		if( j_block_mask.IsString())
+		if (j_block_mask.IsString())
 		{
 			std::string mask;
 			af::jr_string("block_mask", mask, *i_action.data);
 			af::RegExp re;
 			std::string re_err;
-			if( false == re.setPattern( mask, &re_err))
+			if (false == re.setPattern( mask, &re_err))
 			{
-				appendLog("Invalid block mask = " + mask + " from " + i_action.author);
+				i_action.answerError("Invalid block mask: \"" + mask + "\"");
 				return;
 			}
 			for( int b = 0; b < m_blocks_num; b++)
@@ -510,18 +512,18 @@ void JobAf::v_action( Action & i_action)
 					block_ids.push_back( m_blocks[b]->m_data->getBlockNum());
 		}
 
-		if( block_ids.empty())
+		if (block_ids.empty())
 		{
-			appendLog("\"block_ids\" array does not contain any integers or invalid \"block_mask\" from " + i_action.author);
+			i_action.answerError("\"block_ids\" array does not contain any integers or invalid \"block_mask\"");
 			return;
 		}
 
 		bool job_changed = false;
-		for( int b = 0; b < block_ids.size(); b++)
+		for (int b = 0; b < block_ids.size(); b++)
 		{
-			if(( block_ids[b] >= getBlocksNum()) || ( block_ids[b] < 0 ))
+			if ((block_ids[b] >= getBlocksNum()) || (block_ids[b] < 0))
 			{
-				appendLog("Invalid block number = " + af::itos(block_ids[b]) + " " + i_action.author);
+				i_action.answerError("Invalid block number: " + af::itos(block_ids[b]));
 				continue;
 			}
 			if( m_blocks[block_ids[b]]->action( i_action))
@@ -543,16 +545,21 @@ void JobAf::v_action( Action & i_action)
 	{
 		std::string type;
 		af::jr_string("type", type, operation);
+
+		i_action.log.appendType(type);
+
 		if( type == "delete")
 		{
 			if( m_id == AFJOB::SYSJOB_ID )
 			{
-				appendLog("System job can't be deleted by " + i_action.author);
+				const std::string err = "System job can't be deleted.";
+				appendJobTypeLog("delete error", err);
+				AFCommon::QueueLogError(err + " By " + i_action.log.subject);
+				i_action.answerError(err);
 				return;
 			}
-			appendLog("Deleted by " + i_action.author);
-			m_user->appendLog( "Job \"" + m_name + "\" deleted by " + i_action.author);
-			deleteNode( i_action.renders, i_action.monitors);
+			m_user->appendLog(i_action.log);
+			deleteNode(i_action.renders, i_action.monitors);
 			return;
 		}
 		else if( type == "start")
@@ -565,29 +572,34 @@ void JobAf::v_action( Action & i_action)
 		}
 		else if( type == "stop")
 		{
-		   restartAllTasks("Job stopped by " + i_action.author, i_action.renders, i_action.monitors, AFJOB::STATE_RUNNING_MASK);
+		   //restartAllTasks("Job stopped by " + i_action.author, i_action.renders, i_action.monitors, AFJOB::STATE_RUNNING_MASK);
+		   restartAllTasks(i_action.log, i_action.renders, i_action.monitors, AFJOB::STATE_RUNNING_MASK);
 		   m_state = m_state | AFJOB::STATE_OFFLINE_MASK;
 		}
 		else if( type == "restart_warnings")
 		{
-			restartAllTasks("Job restart warnings by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_WARNING_MASK);
+			//restartAllTasks("Job restart warnings by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_WARNING_MASK);
+			restartAllTasks(i_action.log, i_action.renders, i_action.monitors, AFJOB::STATE_WARNING_MASK);
 		}
 		else if( type == "restart_running")
 		{
-			restartAllTasks("Job restart running by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_RUNNING_MASK);
+			//restartAllTasks("Job restart running by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_RUNNING_MASK);
+			restartAllTasks(i_action.log,  i_action.renders, i_action.monitors, AFJOB::STATE_RUNNING_MASK);
 		}
 		else if( type == "restart_skipped")
 		{
-			restartAllTasks("Job restart skipped by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_SKIPPED_MASK);
+			//restartAllTasks("Job restart skipped by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_SKIPPED_MASK);
+			restartAllTasks(i_action.log,  i_action.renders, i_action.monitors, AFJOB::STATE_SKIPPED_MASK);
 		}
 		else if( type == "restart_done")
 		{
-			restartAllTasks("Job restart done by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_DONE_MASK);
+			//restartAllTasks("Job restart done by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_DONE_MASK);
+			restartAllTasks(i_action.log,  i_action.renders, i_action.monitors, AFJOB::STATE_DONE_MASK);
 		}
 		else if( type == "reset_error_hosts")
 		{
 			for( int b = 0; b < m_blocks_num; b++)
-				m_blocks[b]->action( i_action);
+				m_blocks[b]->action(i_action);
 		}
 		else if(type == "reset_trying_next_tasks")
 		{
@@ -595,17 +607,20 @@ void JobAf::v_action( Action & i_action)
 		}
 		else if( type == "restart")
 		{
-			restartAllTasks("Job restarted by " + i_action.author,  i_action.renders, i_action.monitors);
+			//restartAllTasks("Job restarted by " + i_action.author,  i_action.renders, i_action.monitors);
+			restartAllTasks(i_action.log,  i_action.renders, i_action.monitors);
 			checkDepends();
 			m_time_started = 0;
 		}
 		else if( type == "restart_errors")
 		{
-			restartAllTasks("Job errors restarted by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_ERROR_MASK);
+			//restartAllTasks("Job errors restarted by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_ERROR_MASK);
+			restartAllTasks(i_action.log,  i_action.renders, i_action.monitors, AFJOB::STATE_ERROR_MASK);
 		}
 		else if( type == "restart_pause")
 		{
-			restartAllTasks("Job restarted ( and paused ) by " + i_action.author,  i_action.renders, i_action.monitors);
+			//restartAllTasks("Job restarted ( and paused ) by " + i_action.author,  i_action.renders, i_action.monitors);
+			restartAllTasks(i_action.log,  i_action.renders, i_action.monitors);
 			checkDepends();
 			m_state = m_state | AFJOB::STATE_OFFLINE_MASK;
 			m_time_started = 0;
@@ -617,11 +632,9 @@ void JobAf::v_action( Action & i_action)
 		}
 		else
 		{
-			appendLog("Unknown operation \"" + type + "\" by " + i_action.author);
 			i_action.answerError("Unknown operation: " + type);
 			return;
 		}
-		i_action.log = "Operation \"" + type + "\"";
 		i_action.monitors->addJobEvent( af::Monitor::EVT_jobs_change, getId(), getUid());
 		m_force_refresh = true;
 		store();
@@ -634,7 +647,7 @@ void JobAf::v_action( Action & i_action)
 
 	const JSON & params = (*i_action.data)["params"];
 	if( params.IsObject())
-		jsonRead( params, &i_action.log);
+		jsonRead( params, &i_action.log.info);
 
 	if( m_user_name != _user_name )
 	{
@@ -682,7 +695,7 @@ void JobAf::v_action( Action & i_action)
 		i_action.monitors->addEvent(af::Monitor::EVT_branches_change, m_branch_srv->getId());
 	}
 
-	if (i_action.log.size())
+	if (i_action.log.info.size())
 	{
 		// Not empty log means some parameter change:
 		store();
@@ -1049,7 +1062,7 @@ bool JobAf::solveTaskOnRender(RenderAf * i_render, int i_block_num, int i_task_n
 	if( m_time_started == 0 )
 	{
 		m_time_started = time(NULL);
-		appendLog("Started.");
+		appendJobLog("Started.", false);
 		store();
 	}
 
@@ -1140,8 +1153,8 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 		if (result_lifetime < 0) result_lifetime = m_user->getJobsLifeTime(); // get default value from user
 		if((result_lifetime > 0) && ((currentTime - m_time_creation) > result_lifetime))
 		{
-			appendLog( std::string("Life %1 finished.") + af::time2strHMS( result_lifetime, true));
-			m_user->appendLog( std::string("Job \"") + m_name + "\" life " + af::time2strHMS( result_lifetime, true) + " finished.");
+			af::Log log("jobs", getName(), "Life time finished: " + af::time2strHMS( result_lifetime, true));
+			m_user->appendLog(log);
 			deleteNode(renders, monitoring);
 		}
 	}
@@ -1241,9 +1254,9 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 			if( m_time_started == 0 )
 			{
 				m_time_started = m_time_done;
-				appendLog("Started.");
+				appendJobLog("Started.", false);
 			}
-			appendLog("Done.");
+			appendJobLog("Done.", false);
 			jobchanged = af::Monitor::EVT_jobs_change;
 			store();
 		}
@@ -1339,14 +1352,14 @@ void JobAf::emitEvents(const std::vector<std::string> & i_events) const
 		m_user_name, m_name, i_events[0]);
 }
 
-void JobAf::restartAllTasks(const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_with_state)
+void JobAf::restartAllTasks(const af::Log & i_log, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_with_state)
 {
 	for( int b = 0; b < m_blocks_num; b++)
 	{
 		int numtasks = m_blocks_data[b]->getTasksNum();
 		for( int t = 0; t < numtasks; t++)
 		{
-			m_blocks[b]->m_tasks[t]->operation(i_message, i_renders, i_monitoring, i_with_state, AFJOB::STATE_READY_MASK);
+			m_blocks[b]->m_tasks[t]->operation(i_log, i_renders, i_monitoring, i_with_state, AFJOB::STATE_READY_MASK);
 		}
 	}
 
@@ -1438,8 +1451,8 @@ af::Msg * JobAf::writeTask( int i_b, int i_t, const std::string & i_mode, bool i
 	}
 	else if( i_mode == "log" )
 	{
-		mctask.setLog( getTaskLog( i_b, i_t));
-		return mctask.generateMessage( i_binary);
+		mctask.setLog(sprintfTaskLog(i_b, i_t));
+		return mctask.generateMessage(i_binary);
 	}
 	else if( i_mode == "error_hosts")
 	{
@@ -1466,11 +1479,16 @@ af::Msg * JobAf::writeTask( int i_b, int i_t, const std::string & i_mode, bool i
 	return af::jsonMsg( str);
 }
 
-const std::list<std::string> & JobAf::getTaskLog( int block, int task) const
+const std::list<std::string> JobAf::sprintfTaskLog(int block, int task) const
 {
-	static const std::list<std::string> emptylog;
-	if( false == checkBlockTaskNumbers( block, task, "getTaskLog")) return emptylog;
-	return m_blocks[block]->m_tasks[task]->getLog();
+	if (false == checkBlockTaskNumbers(block, task, "sprintfTaskLog"))
+	{
+		std::list<std::string> log;
+		log.push_back("Invalid block/task numbers.");
+		return log;
+	}
+
+	return m_blocks[block]->m_tasks[task]->sprintfLog();
 }
 
 af::Msg * JobAf::writeErrorHosts( bool i_binary) const

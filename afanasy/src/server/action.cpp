@@ -62,7 +62,9 @@ Action::Action(const af::Msg *i_msg, ThreadArgs *i_args):
 		af::jr_string("mask", mask, *data);
 		if (mask.empty())
 		{
-			AFCommon::QueueLogError("JSON action should have nodes ids or mask to operate with: " + i_msg->v_generateInfoString());
+			static const std::string error = "JSON action should have nodes ids or mask to operate with.";
+			AFCommon::QueueLogError(error + i_msg->v_generateInfoString());
+			answerError(error);
 			return;
 		}
 	}
@@ -71,17 +73,22 @@ Action::Action(const af::Msg *i_msg, ThreadArgs *i_args):
 	af::jr_string("host_name", host_name, *data);
 	if (user_name.empty())
 	{
-		AFCommon::QueueLogError("Action should have a not empty \"user_name\" string: " + i_msg->v_generateInfoString());
+		static const std::string error = "Action should have a not empty \"user_name\" string.";
+		AFCommon::QueueLogError(error + i_msg->v_generateInfoString());
+		answerError(error);
 		return;
 	}
 	if (host_name.empty())
 	{
-		AFCommon::QueueLogError("Action should have a not empty \"host_name\" string: " + i_msg->v_generateInfoString());
+		static const std::string error = "Action should have a not empty \"host_name\" string.";
+		AFCommon::QueueLogError(error + i_msg->v_generateInfoString());
+		answerError(error);
 		return;
 	}
-	author = user_name + '@' + host_name;
 
 	m_valid = true;
+
+	log.subject = user_name + '@' + host_name + " " + i_msg->getAddress().generateIPString();
 }
 
 Action::~Action()

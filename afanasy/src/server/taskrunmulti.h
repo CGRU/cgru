@@ -27,28 +27,28 @@ public:
 	int calcWeight() const;
 
 /// Add a host. Start task if there is enought hosts quantity.
-	void addHost( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
+	void addHost(af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
 
 /// Update task state by sent message, almost often from remote render host
-	virtual void update( const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost);
+	virtual void update(const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost) override;
 
 /// Do some work every period of time. Return true if there are some changes for database and monitoring.
-	virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId);
+	virtual bool refresh(time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId) override;
 
 	/// Multi hosts tast can be running but still ready (acception hosts).
-	virtual int v_getRunningRenderID( std::string & o_error) const;
+	virtual int v_getRunningRenderID( std::string & o_error) const override;
 
-	virtual void stdOut( bool full = false) const;
+	void stdOut(bool full = false) const;
 
 /// Stop runnig task. Request from remote render host to stop it. Host will send message with new status back to finish session.
 /** Stop slave hosts if they run any service.
 **/
-	virtual void stop(const std::string & message, RenderContainer * renders, MonitorContainer * monitoring, uint32_t i_state = 0);
+	virtual void stop(const std::string & message, RenderContainer * renders, MonitorContainer * monitoring, uint32_t i_state = 0) override;
 
 protected:
 
 /// Catch master task finishing session. Launch multi host task stopping.
-	virtual void finish(  const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
+	virtual void finish(const std::string & message, RenderContainer * renders, MonitorContainer * monitoring) override;
 
 private:
 	void setMasterTask();

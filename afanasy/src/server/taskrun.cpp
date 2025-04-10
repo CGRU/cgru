@@ -67,7 +67,7 @@ TaskRun::TaskRun( Task * runningTask,
    render->setTask( m_exec, monitoring);
    m_task->v_monitor( monitoring );
    m_task->v_store();
-   m_task->v_appendLog( std::string("SESSION #") + af::itos( m_progress->starts_count) + ": Starting on \"" + render->getName() + "\"");
+   m_task->appendTaskLog( std::string("SESSION #") + af::itos( m_progress->starts_count) + ": Starting on \"" + render->getName() + "\"");
 }
 
 TaskRun::~TaskRun()
@@ -328,7 +328,7 @@ void TaskRun::stop(const std::string & message, RenderContainer * renders, Monit
       if( render ) render->stopTask( m_exec);
    }
 
-   m_task->v_appendLog( message);
+   m_task->appendTaskLog(message);
 }
 
 void TaskRun::finish( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
@@ -360,8 +360,8 @@ void TaskRun::finish( const std::string & message, RenderContainer * renders, Mo
    m_task->v_monitor( monitoring );
    m_task->v_store();
 
-   m_task->v_appendLog( message);
-   m_zombie = true;
+	m_task->appendTaskLog(message);
+	m_zombie = true;
 }
 
 int TaskRun::v_getRunningRenderID( std::string & o_error) const

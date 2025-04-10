@@ -41,7 +41,7 @@ public:
 	bool v_canRunOn( RenderAf * i_render);
 
 	/// Generate task for \c render from list, return \c render if task generated or NULL.
-	virtual RenderAf * v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring, BranchSrv* i_branch); 
+	virtual RenderAf * v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring, BranchSrv* i_branch) override; 
 
 	void jobsinfo( af::MCAfNodes &mcjobs); ///< Generate all uses jobs information.
 	
@@ -49,9 +49,9 @@ public:
 
 	void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);///< Refresh user attributes corresponding on jobs information.
 
-	virtual void v_action( Action & i_action);
+	virtual void v_action( Action & i_action) override;
 
-	virtual int v_calcWeight() const; ///< Calculate and return memory size.
+	virtual int v_calcWeight() const override; ///< Calculate and return memory size.
 
 	inline AfList * getJobsList() { return &m_jobs_list; }
 
@@ -68,6 +68,12 @@ public:
 
 	void addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
 	void remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
+
+	
+	inline void appendUserLog(const std::string & i_info, bool i_store = true){
+		appendLog(af::Log("users", getName(), i_info), i_store);}
+	inline void appendUserTypeLog(const std::string & i_type, const std::string & i_info, bool i_store = true){
+		appendLog(af::Log("users " + i_type, getName(), i_info), i_store);}
 
 private:
 	bool refreshCounters();

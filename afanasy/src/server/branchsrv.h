@@ -82,7 +82,9 @@ public:
 	/// Set container.
 	inline static void setBranchesContainer(BranchesContainer * i_branches ) { ms_branches = i_branches;}
 
-	void logAction(const Action & i_action, const std::string & i_node_name);
+//	void logAction(const Action & i_action, const std::string & i_node_name);
+
+	inline void appendBranchLog(const std::string & i_info){appendLog(af::Log("branches", getName(),i_info));}
 
 private:
 	void deleteBranch(Action & o_action, MonitorContainer * i_monitoring);

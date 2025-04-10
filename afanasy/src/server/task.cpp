@@ -15,7 +15,7 @@
 #include "renderaf.h"
 #include "rendercontainer.h"
 #include "taskrun.h"
-#include "taskrunmulti.h"
+//#include "taskrunmulti.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -98,7 +98,7 @@ af::TaskExec * Task::genExec() const
 
 void Task::v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring)
 {
-   if( m_block->m_data->isMultiHost())
+/* TODO   if( m_block->m_data->isMultiHost())
    {
       if( m_run )
          ((TaskRunMulti*)(m_run))->addHost( i_taskexec, i_render, i_monitoring);
@@ -106,7 +106,7 @@ void Task::v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorConta
          m_run = new TaskRunMulti( this, i_taskexec, m_progress, m_block, i_render, i_monitoring);
       return;
    }
-
+*/
    if( m_run)
    {
       AF_ERR << "Task is already running.";
@@ -123,13 +123,13 @@ void Task::reconnect( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorCon
 {
 	if( m_progress->state & AFJOB::STATE_WAITRECONNECT_MASK )
 	{
-		v_appendLog("Reconnecting previously run...");
+		appendTaskLog("Reconnecting previously run...");
 		AF_LOG << "Reconnecting task: \"" << *i_taskexec << "\" with\nRender: " << *i_render;
 		v_start( i_taskexec, i_render, i_monitoring);
 	}
 	else
 	{
-		v_appendLog("Reconnection failed: task was not waiting it.");
+		appendTaskLog("Reconnection failed: task was not waiting it.");
 		i_render->stopTask( i_taskexec);
 		delete i_taskexec;
 	}
@@ -153,8 +153,8 @@ void Task::v_updateState( const af::MCTaskUp & taskup, RenderContainer * renders
 	m_run->update( taskup, renders, monitoring, errorHost);
 
 	std::string log = taskup.getLog();
-	if( log.size())
-		v_appendLog( log);
+	if (log.size())
+		appendTaskLog(log);
 
 	if( taskup.getDataLen() || log.size())
 	{
@@ -205,68 +205,70 @@ void Task::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCont
 	{
 		if (currentTime - m_progress->time_done > af::Environment::getTaskReconnectTimeout())
 		{
-			v_appendLog("Reconnect timeout reached. Setting state to READY.");
+			appendTaskLog("Reconnect timeout reached. Setting state to READY.");
 			m_progress->state = AFJOB::STATE_READY_MASK;
             if (false == changed) changed = true;
 		}
 	}
 
 
-   // forgive error hosts
-   if(( false == m_errorHosts.empty() ) && ( m_block->getErrorsForgiveTime() > 0 ))
-   {
-      std::list<std::string>::iterator hIt = m_errorHosts.begin();
-      std::list<int>::iterator cIt = m_errorHostsCounts.begin();
-      std::list<time_t>::iterator tIt = m_errorHostsTime.begin();
-      while( hIt != m_errorHosts.end() )
-         if( currentTime - *tIt > m_block->getErrorsForgiveTime())
-         {
-            v_appendLog( std::string("Forgived error host \"") + *hIt + "\" since " + af::time2str(*tIt) + ".");
-            hIt = m_errorHosts.erase( hIt);
-            cIt = m_errorHostsCounts.erase( cIt);
-            tIt = m_errorHostsTime.erase( tIt);
-         }
-         else
-         {
-            hIt++;
-            cIt++;
-            tIt++;
-         }
-    }
+	// forgive error hosts
+	if ((false == m_errorHosts.empty()) && (m_block->getErrorsForgiveTime() > 0))
+	{
+		std::list<std::string>::iterator hIt = m_errorHosts.begin();
+		std::list<int>::iterator cIt = m_errorHostsCounts.begin();
+		std::list<time_t>::iterator tIt = m_errorHostsTime.begin();
+		while (hIt != m_errorHosts.end())
+			if (currentTime - *tIt > m_block->getErrorsForgiveTime())
+			{
+				appendTaskLog( std::string("Forgived error host \"") + *hIt + "\" since " + af::time2str(*tIt) + ".");
+				hIt = m_errorHosts.erase( hIt);
+				cIt = m_errorHostsCounts.erase( cIt);
+				tIt = m_errorHostsTime.erase( tIt);
+			}
+			else
+			{
+				hIt++;
+				cIt++;
+				tIt++;
+			}
+	}
 
 
-   if( renders != NULL )
-   {
-      if( m_run ) changed = m_run->refresh( currentTime, renders, monitoring, errorHostId);
-      else
-      {
+	if( renders != NULL )
+	{
+		if( m_run ) changed = m_run->refresh( currentTime, renders, monitoring, errorHostId);
+		else
+		{
 			// Retry errors:
 			if ((m_progress->state & AFJOB::STATE_ERROR_MASK) &&
 				(false == (m_progress->state & AFJOB::STATE_PARSERFATALERROR_MASK)) &&
 				(m_progress->errors_count <= m_block->getErrorsRetries()))
 			{
-            m_progress->state = m_progress->state |   AFJOB::STATE_READY_MASK;
-            m_progress->state = m_progress->state |   AFJOB::STATE_ERROR_READY_MASK;
-            m_progress->state = m_progress->state & (~AFJOB::STATE_ERROR_MASK);
-            v_appendLog( std::string("Automatically retrying error task") + af::itos( m_progress->errors_count) + " of " + af::itos( m_block->getErrorsRetries()) + ".");
-            if( changed == false) changed = true;
+				m_progress->state = m_progress->state |   AFJOB::STATE_READY_MASK;
+				m_progress->state = m_progress->state |   AFJOB::STATE_ERROR_READY_MASK;
+				m_progress->state = m_progress->state & (~AFJOB::STATE_ERROR_MASK);
+				appendTaskLog(std::string("Automatically retrying error task") + af::itos( m_progress->errors_count) + " of " + af::itos( m_block->getErrorsRetries()) + ".");
+				if (changed == false)
+					changed = true;
 			}
-      }
-   }
+		}
+	}
 
 
-   if( changed)
-   {
-      v_monitor( monitoring);
-      v_store();
-   }
+	if(changed)
+	{
+		v_monitor(monitoring);
+		v_store();
+	}
 
-   
-   deleteRunningZombie();
+	deleteRunningZombie();
 }
 
-void Task::operation(const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_with_state, uint32_t i_set_state)
+void Task::operation(const af::Log & i_log, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_with_state, uint32_t i_set_state)
 {
+	af::Log log(i_log);
+
 	if (i_with_state != 0 )
 	{
 		// We should apply operation to tasks with specified state
@@ -286,7 +288,8 @@ void Task::operation(const std::string & i_message, RenderContainer * i_renders,
 	{
 		// Running task can't be ready immediately, it should be stopped before.
 		i_set_state = i_set_state & (~AFJOB::STATE_READY_MASK);
-		m_run->stop(i_message + " (is running)", i_renders, i_monitoring, i_set_state);
+		log.info = "running";
+		m_run->stop(log.info, i_renders, i_monitoring, i_set_state);
 	}
 	else
 	{
@@ -294,7 +297,7 @@ void Task::operation(const std::string & i_message, RenderContainer * i_renders,
 		m_progress->errors_count = 0;
 		v_store();
 		v_monitor(i_monitoring);
-		v_appendLog(i_message);
+		v_appendLog(log);
 	}
 }
 
@@ -323,31 +326,31 @@ bool Task::tryNext(bool i_enable, MonitorContainer * i_monitoring)
 
 void Task::errorHostsAppend( const std::string & hostname)
 {
-   std::list<std::string>::iterator hIt = m_errorHosts.begin();
-   std::list<int>::iterator cIt = m_errorHostsCounts.begin();
-   std::list<time_t>::iterator tIt = m_errorHostsTime.begin();
+	std::list<std::string>::iterator hIt = m_errorHosts.begin();
+	std::list<int>::iterator cIt = m_errorHostsCounts.begin();
+	std::list<time_t>::iterator tIt = m_errorHostsTime.begin();
 
-   std::string blockName = m_block->m_data->getName();
-   std::string jobLog = "B[\"" + blockName + "\"]"
-                      + " Task[" + std::to_string(m_number) + "]: "
-                      + hostname + " - AVOIDING HOST!";
+	std::string object = m_block->m_job->getName() + "@" + m_block->m_job->getUserName();
+	object += " B[\"" + m_block->m_data->getName() + "\"]";
+	object += " T[" + af::itos(m_number) + "]";
+	af::Log log("jobs avoid", object, "AVOIDING HOST: " + hostname);
 
-   for( ; hIt != m_errorHosts.end(); hIt++, tIt++, cIt++ )
-      if( *hIt == hostname )
-      {
-         (*cIt)++;
-         *tIt = time(NULL);
-         if( *cIt >= m_block->getErrorsTaskSameHost() )
-         {
-            v_appendLog( hostname + " - AVOIDING HOST !");
-            m_block->m_job->appendLog(jobLog);
-         }
-         return;
-      }
+	for (; hIt != m_errorHosts.end(); hIt++, tIt++, cIt++ )
+		if (*hIt == hostname )
+		{
+			(*cIt)++;
+			*tIt = time(NULL);
+			if (*cIt >= m_block->getErrorsTaskSameHost() )
+			{
+				v_appendLog(log, false);
+				m_block->m_job->appendLog(log, false);
+			}
+			return;
+		}
 
-   m_errorHosts.push_back( hostname);
-   m_errorHostsCounts.push_back( 1);
-   m_errorHostsTime.push_back( time(NULL));
+	m_errorHosts.push_back( hostname);
+	m_errorHostsCounts.push_back( 1);
+	m_errorHostsTime.push_back( time(NULL));
 }
 
 bool Task::avoidHostsCheck( const std::string & hostname) const
@@ -405,10 +408,33 @@ void Task::v_store()
 		m_store_dir));
 }
 
-void Task::v_appendLog( const std::string & message)
+void Task::v_appendLog(const af::Log & i_log, bool i_store)
 {
-   m_logStringList.push_back( af::time2str() + " : " + message);
-   while( m_logStringList.size() > af::Environment::getTaskLogLinesMax() ) m_logStringList.pop_front();
+   m_log.push_back(i_log);
+   while (m_log.size() > af::Environment::getTaskLogLinesMax())
+	   m_log.pop_front();
+}
+
+void Task::appendTaskLog(const std::string & i_info)
+{
+	std::string object = m_block->m_job->getName() + "[" + m_block->m_data->getName() + "][" + af::itos(m_number) + "]";
+	v_appendLog(af::Log("jobs", object, i_info));
+}
+
+const std::list<std::string> Task::sprintfLog() const
+{
+	std::list<std::string> list;
+	for (const auto it : m_log)
+	{
+		std::string line;
+		line = af::time2str(it.ltime);
+		line += ": " + it.subject;
+		line += ": " + it.info;
+
+		list.push_back(line);
+	}
+
+	return list;
 }
 
 void Task::v_writeTaskOutput( const char * i_data, int i_size) const
@@ -576,24 +602,26 @@ const std::string Task::v_getInfo( bool full) const
    return info;
 }
 
-void Task::stdOut( bool full) const
+void Task::stdOut(bool full) const
 {
-   std::cout << v_getInfo( full) << std::endl;
+	std::cout << v_getInfo(full) << std::endl;
 }
 
 int Task::calcWeight() const
 {
-   int weight = sizeof( Task);
-   if( m_run ) weight += m_run->calcWeight();
-   return weight;
+	// TODO it is wrong!
+	int weight = sizeof(Task);
+	if (m_run)
+		weight += m_run->calcWeight();
+	return weight;
 }
 
 int Task::logsWeight() const
 {
-   int weight = 0;
-   for( std::list<std::string>::const_iterator it = m_logStringList.begin(); it != m_logStringList.end(); it++)
-      weight += af::weigh( *it);
-   return weight;
+	int weight = 0;
+	for (auto const & it : m_log)
+		weight += it.weight();
+	return weight;
 }
 
 int Task::blackListWeight() const

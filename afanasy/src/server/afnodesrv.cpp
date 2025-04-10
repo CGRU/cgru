@@ -127,89 +127,116 @@ void AfNodeSrv::action( Action & i_action)
 	if( m_node->isLocked())
 		return;
 
+	i_action.log.object = m_node->getName();
+
 	bool valid = false;
 	if( i_action.data->HasMember("operation"))
 	{
 		const JSON & operation = (*i_action.data)["operation"];
 		if( false == operation.IsObject())
 		{
-			AFCommon::QueueLogError("Action \"operation\" should be an object, " + i_action.author);
+			static const std::string errlog = "Action \"operation\" should be an object.";
+			AFCommon::QueueLogError(errlog + i_action.log.subject);
+			i_action.answerError(errlog);
 			return;
 		}
 		const JSON & type = operation["type"];
 		if( false == type.IsString())
 		{
-			AFCommon::QueueLogError("Action \"operation\" \"type\" should be a string, " + i_action.author);
+			static const std::string errlog = "Action \"operation\" \"type\" should be a string.";
+			AFCommon::QueueLogError(errlog + i_action.log.subject);
+			i_action.answerError(errlog);
 			return;
 		}
 		if( strlen( type.GetString()) == 0)
 		{
-			AFCommon::QueueLogError("Action \"operation\" \"type\" string is empty, " + i_action.author);
+			static const std::string errlog = "Action \"operation\" \"type\" string is empty.";
+			AFCommon::QueueLogError(errlog + i_action.log.subject);
+			i_action.answerError(errlog);
 			return;
 		}
 		valid = true;
 	}
 
-	if( i_action.data->HasMember("params"))
+	if (i_action.data->HasMember("params"))
 	{
 		const JSON & params = (*i_action.data)["params"];
-		if( params.IsObject())
+		if (params.IsObject())
 		{
-			m_node->jsonRead( params, &i_action.log, i_action.monitors);
+			m_node->jsonRead(params, i_action.getInfoPtr(), i_action.monitors);
 			valid = true;
 		}
 		else
 		{
-			AFCommon::QueueLogError("Action \"params\" should be an object, " + i_action.author);
+			static const std::string errlog = "Action \"params\" should be an object.";
+			AFCommon::QueueLogError(errlog + i_action.log.subject);
+			i_action.answerError(errlog);
 			return;
 		}
 	}
 
-	if( valid == false )
+	if (valid == false)
 	{
-		AFCommon::QueueLogError("Action should have an \"operation\" or(and) \"params\" object, " + i_action.author);
+		static const std::string errlog = "Action should have an \"operation\" or(and) \"params\" object.";
+		AFCommon::QueueLogError(errlog + i_action.log.subject);
+		i_action.answerError(errlog);
 		return;
 	}
 
-	v_action( i_action);
+	v_action(i_action);
 
-	if( i_action.log.size())
+	if (i_action.log.info.size())
 	{
-		if( i_action.log[0] == '\n' )
-			i_action.log[0] = ' ';
-		i_action.users->logAction( i_action, m_node->getName());
-		i_action.log += std::string(" by ") + i_action.author;
-		appendLog( i_action.log);
+		if (i_action.log.info[0] == '\n')
+			i_action.log.info[0] = ' ';
+//		i_action.users->logAction(i_action, m_node->getName());
+//		i_action.log += std::string(" by ") + i_action.author;
+//		appendLog(i_action.log);
 	}
-	else
-		i_action.users->updateTimeActivity( i_action.user_name);
+//	else
+//		i_action.users->updateTimeActivity(i_action.user_name);
 
-	i_action.log.clear();
+	i_action.users->logAction(i_action, m_node->getName());
+	appendLog(i_action.log);
+
+	i_action.log.type.clear();
+	i_action.log.object.clear();
+	i_action.log.info.clear();
 }
 
-void AfNodeSrv::v_action( Action & i_action){}
+void AfNodeSrv::v_action(Action & i_action){}
 
-void AfNodeSrv::appendLog( const std::string & message)
+void AfNodeSrv::appendLog(const af::Log & i_log, bool i_store)
 {
-	m_log.push_back( af::time2str() + " : " + message);
-	while( m_log.size() > af::Environment::getAfNodeLogLinesMax() ) m_log.pop_front();
+	m_log.push_back(i_log);
+
+	while (m_log.size() > af::Environment::getAfNodeLogLinesMax())
+		m_log.pop_front();
 }
 
 int AfNodeSrv::calcLogWeight() const
 {
 	int weight = 0;
-	for( std::list<std::string>::const_iterator it = m_log.begin(); it != m_log.end(); it++)
-		weight += af::weigh( *it);
+	for(auto const & i : m_log)
+		weight += i.weight();
     return weight;
 }
 
-af::Msg * AfNodeSrv::writeLog( bool i_binary) const
+af::Msg * AfNodeSrv::writeLog(bool i_binary) const
 {
-	if( false == i_binary )
-		return af::jsonMsg( "log", m_node->getName(), m_log);
+	std::list<std::string> list;
+	for (auto const & i : m_log)
+		list.push_back(af::time2str(i.ltime)
+				+ ": " + i.subject
+				+ ": " + i.type
+				+ ": " + i.object
+				+ ": " + i.info);
+
+	if (false == i_binary)
+		return af::jsonMsg("log", m_node->getName(), list);
 
 	af::Msg * msg = new af::Msg;
-	msg->setStringList( m_log );
+	msg->setStringList(list);
 	return msg;
 }
 

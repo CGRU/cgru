@@ -17,6 +17,7 @@
 #pragma once
 
 #include "../libafanasy/name_af.h"
+#include "../libafanasy/log.h"
 
 #include "threadargs.h"
 
@@ -34,13 +35,14 @@ public:
 	std::vector<int32_t> ids;
 	std::string mask;
 
+	std::string address;
 	std::string type;
 	std::string user_name;
 	std::string host_name;
-	std::string author;
 
-	// This is for Node changes log
-	std::string log;
+	af::Log log;
+
+	std::string * getInfoPtr() {return &(log.info);}
 
 	enum AnswerType {
 		ATObject,
@@ -53,14 +55,15 @@ public:
 	inline void setAnwer(AnswerType i_type, const std::string & i_answer) {m_answer_type = i_type; m_answer = i_answer;}
 
 	inline void answerError( const std::string & i_msg) {setAnwer(ATError,  i_msg);}
-	inline void answerLog(   const std::string & i_msg) {setAnwer(ATLog,    i_msg);}
-	inline void answerInfo(  const std::string & i_msg) {setAnwer(ATInfo,   i_msg);}
+	inline void answerLog(   const std::string & i_msg) {setAnwer(ATLog,    i_msg); log.info = i_msg;}
+	inline void answerInfo(  const std::string & i_msg) {setAnwer(ATInfo,   i_msg); log.info = i_msg;}
 	inline void answerObject(const std::string & i_msg) {setAnwer(ATObject, i_msg);}
 
 	inline const std::string & answerTypeToStr() const {
 		return ms_answer_type_str[m_answer_type < ATLast ? m_answer_type : ATInfo];
 	}
 
+	inline bool hasAnswer() const {return false == m_answer.empty();}
 	inline bool isAnswerEmpty() const {return m_answer.empty();}
 	inline AnswerType getAnswerType() const {return m_answer_type;}
 	inline const std::string & getAnswer() const {return m_answer;}

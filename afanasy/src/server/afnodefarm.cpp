@@ -42,7 +42,6 @@ bool AfNodeFarm::actionFarm(Action & i_action)
 	std::string mode;
 	if (false == af::jr_string("mode", mode, operation))
 	{
-		appendLog("Service operation mode is not set by " + i_action.author);
 		i_action.answerError("Service operation mode is not set.\
 			Valid modes are: 'service_add','service_remove','service_enable','service_disable'.");
 		return false;
@@ -53,29 +52,25 @@ bool AfNodeFarm::actionFarm(Action & i_action)
 		std::string name;
 		if (false == af::jr_string("name", name, operation))
 		{
-			appendLog("Service add: Service name is not specified by " + i_action.author);
 			i_action.answerError("Service name is not specified.");
 			return false;
 		}
 
 		if (name.size() == 0)
 		{
-			appendLog("Service add: Service name is empty by " + i_action.author);
 			i_action.answerError("Service name is empty.");
 			return false;
 		}
 
 		if (hasService(name))
 		{
-			appendLog("Service add: Service \"" + name + "\" already exists by " + i_action.author);
 			i_action.answerError("Service '" + name + "' already exists.");
 			return false;
 		}
 
 		m_farm->m_services.push_back(name);
 
-		appendLog("Service \"" + name + "\" added by " + i_action.author);
-		i_action.answerLog("Service '" + name + "' added.");
+		i_action.answerLog("Service \"" + name + "\" added.");
 
 		return true;
 	}
@@ -85,7 +80,6 @@ bool AfNodeFarm::actionFarm(Action & i_action)
 		af::RegExp mask;
 		if (false == af::jr_regexp("mask", mask, operation))
 		{
-			appendLog("Service add: Invalid service mask by " + i_action.author);
 			i_action.answerError("Invalid service mask.");
 			return false;
 		}
@@ -122,7 +116,7 @@ bool AfNodeFarm::actionFarm(Action & i_action)
 				{
 					m_farm->m_services_disabled.push_back(*it);
 					found = true;
-					appendLog("Service \"" + *it + "\" disabled by " + i_action.author);
+					i_action.answerLog("Service \"" + *it + "\" disabled");
 				}
 				else if ((mode == "service_enable") && isServiceDisabled(*it))
 				{
@@ -142,11 +136,10 @@ bool AfNodeFarm::actionFarm(Action & i_action)
 			{
 				m_farm->m_services_disabled.push_back(mask.getPattern());
 				found = true;
-				appendLog("Service \"" + mask.getPattern() + "\" disabled by " + i_action.author);
+				i_action.answerLog("Service \"" + mask.getPattern() + "\" disabled");
 			}
 			else
 			{
-				appendLog("No services found matching mask \"" + mask.getPattern() + "\" by " + i_action.author);
 				i_action.answerError("No services found mathing pattern " + mask.getPattern());
 				return false;
 			}
@@ -182,7 +175,6 @@ bool AfNodeFarm::actionFarm(Action & i_action)
 		}
 	}
 
-	appendLog("Unknown farm operation mode \"" + mode + "\" by " + i_action.author);
 	i_action.answerError("Unknown farm operation mode: " + mode);
 
 	return false;
@@ -196,7 +188,6 @@ bool AfNodeFarm::actionTicket(Action & i_action)
 	// Check that ticket name is specified:
 	if (false == af::jr_string("name", tk_name, operation))
 	{
-		appendLog("Ticket name is not specified by " + i_action.author);
 		i_action.answerError("Ticket name is not specified.");
 		return false;
 	}
@@ -205,7 +196,6 @@ bool AfNodeFarm::actionTicket(Action & i_action)
 	// Check that ticket count is specified:
 	if (false == af::jr_int32("count", tk_count, operation))
 	{
-		appendLog("Ticket count is not specified by " + i_action.author);
 		i_action.answerError("Ticket count is not specified.");
 		return false;
 	}
@@ -229,7 +219,6 @@ bool AfNodeFarm::actionTicket(Action & i_action)
 	{
 		if (m_type != TPool)
 		{
-			appendLog("This node['" + name() + "'] is not a pool (by " + i_action.author + ")");
 			i_action.answerError("Node['" + name() + "'] is not a pool.");
 			return false;
 		}
@@ -248,11 +237,10 @@ bool AfNodeFarm::actionTicket(Action & i_action)
 		size_t size = tickets->erase(tk_name);
 		if (size == 0)
 		{
-			appendLog("This node['" + name() + "'] has no '" + tk_name + "' ticket (by " + i_action.author + ")");
 			i_action.answerError("Node['" + name() + "'] has no '" + tk_name + "' ticket.");
 			return false;
 		}
-
+		i_action.answerLog("Ticket " + tk_name + " erased");
 		return true;
 	}
 
@@ -262,6 +250,7 @@ bool AfNodeFarm::actionTicket(Action & i_action)
 		(*tickets)[tk_name] = af::Farm::Tiks(tk_count, 0);
 		if ((false == tk_host) && tk_max_hosts_specified)
 			(*tickets)[tk_name].max_hosts = tk_max_hosts;
+		i_action.answerLog("Ticket " + tk_name + " added");
 	}
 	else
 	{
@@ -269,6 +258,7 @@ bool AfNodeFarm::actionTicket(Action & i_action)
 		it->second.count = tk_count;
 		if ((false == tk_host) && tk_max_hosts_specified)
 			it->second.max_hosts = tk_max_hosts;
+		i_action.answerLog("Ticket " + tk_name + " modified");
 	}
 
 

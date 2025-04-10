@@ -37,7 +37,7 @@ PoolSrv::PoolSrv(PoolSrv * i_parent, const std::string & i_path):
 	af::Pool(i_path),
 	AfNodeFarm(this, this, AfNodeFarm::TPool, i_parent)
 {
-	appendLog("Created.");
+	appendPoolLog("Created.");
 }
 
 PoolSrv::PoolSrv(const std::string & i_store_dir):
@@ -88,7 +88,7 @@ bool PoolSrv::initialize()
 			m_time_creation = time(NULL);
 			store();
 		}
-		appendLog("Initialized from store.");
+		appendPoolLog("Initialized from store.");
 	}
 	else
 	{
@@ -103,7 +103,7 @@ bool PoolSrv::initialize()
 
 		setStoreDir(AFCommon::getStoreDirPool(*this));
 		store();
-		appendLog("Initialized.");
+		appendPoolLog("Initialized.");
 	}
 
 	return true;
@@ -115,11 +115,15 @@ PoolSrv::~PoolSrv()
 
 void PoolSrv::v_action(Action & i_action)
 {
+	i_action.log.type = "pools";
+
 	const JSON & operation = (*i_action.data)["operation"];
 	if (operation.IsObject())
 	{
 		std::string type;
 		af::jr_string("type", type, operation);
+
+		i_action.log.appendType(type);
 
 		if (type == "delete")
 		{
@@ -151,48 +155,44 @@ void PoolSrv::v_action(Action & i_action)
 			std::string cmd;
 			if (false == af::jr_string("cmd", cmd, operation))
 			{
-				appendLog("Launch command request by " + i_action.author + "has no 'cmd'");
 				i_action.answerError("Launch command request has no command");
 				return;
 			}
 
 			bool exit = false;
 			af::jr_bool("exit", exit, operation);
-			std::string log = "Launch command";
 			if (exit)
-				log += " and exit";
-			log += " request by " + i_action.author + " on pool " + m_name + "\n" + cmd;
+				i_action.log.appendType("exit");
+			i_action.log.info = cmd;
+			//log += " request by " + i_action.author + " on pool " + m_name + "\n" + cmd;
 
-			actionLaunchCmd(i_action, cmd, exit, log);
+			actionLaunchCmd(i_action, cmd, exit);
 
 			return;
 		}
 		else if (type == "eject_tasks")
 		{
-			std::string log = "Eject tasks request by " + i_action.author + " on pool " + m_name;
-			actionEjectTasks(i_action, log);
+			actionEjectTasks(i_action);
 			return;
 		}
 		else if (type == "exit")
 		{
-			std::string log = "Exit renders request by " + i_action.author + " on pool " + m_name;
-			actionExitRenders(i_action, log);
+			actionExitRenders(i_action);
 			return;
 		}
 		else if (type == "delete_renders")
 		{
-			std::string log = "Delete renders by " + i_action.author + " on pool " + m_name;
-			actionDeleteRenders(i_action, log);
+			actionDeleteRenders(i_action);
 			return;
 		}
 		else
 		{
-			appendLog("Unknown operation \"" + type + "\" by " + i_action.author);
 			i_action.answerError("Unknown operation: " + type);
 			return;
 		}
 
-		appendLog("Operation \"" + type + "\" by " + i_action.author);
+		//appendLog("Operation \"" + type + "\" by " + i_action.author);
+
 		i_action.monitors->addEvent( af::Monitor::EVT_pools_change, m_id);
 		store();
 		return;
@@ -200,16 +200,16 @@ void PoolSrv::v_action(Action & i_action)
 
 	const JSON & params = (*i_action.data)["params"];
 	if (params.IsObject())
-		jsonRead(params, &i_action.log);
+		jsonRead(params, &i_action.log.info);
 
-	if (i_action.log.size())
+	if (i_action.log.info.size())
 	{
 		store();
 		i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_id);
 		dispatchFarmConfig();
 	}
 }
-
+/*
 void PoolSrv::logAction(const Action & i_action, const std::string & i_node_name)
 {
 	if (i_action.log.empty())
@@ -217,7 +217,7 @@ void PoolSrv::logAction(const Action & i_action, const std::string & i_node_name
 
 	appendLog(std::string("Action[") + i_action.type + "][" +  i_node_name + "]: " + i_action.log);
 }
-
+*/
 void PoolSrv::dispatchFarmConfig()
 {
 	for (auto & it : m_pools_list)
@@ -246,7 +246,7 @@ void PoolSrv::actionDelete(Action & i_action)
 	i_action.monitors->addEvent(af::Monitor::EVT_pools_del, m_id);
 	i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_parent->getId());
 
-	appendLog(std::string("Deleted by ") + i_action.author);
+	//appendLog(std::string("Deleted by ") + i_action.author);
 	setZombie();
 }
 
@@ -328,13 +328,13 @@ bool PoolSrv::addPool(PoolSrv * i_pool)
 		return false;
 	}
 
-	appendLog(std::string("Adding a pool: ") + i_pool->getName());
+	appendPoolLog(std::string("Adding a pool: ") + i_pool->getName());
 
 	i_pool->m_parent = this;
 
 	if (false == ms_pools->addPoolToContainer(i_pool))
 	{
-		appendLog("Failed to add pool to container. See server log for details.");
+		appendPoolLog("ERROR: Failed to add pool to container. See server log for details.");
 		return false;
 	}
 
@@ -345,7 +345,7 @@ bool PoolSrv::addPool(PoolSrv * i_pool)
 
 void PoolSrv::removePool(PoolSrv * i_pool)
 {
-	appendLog(std::string("Removing a pool: ") + i_pool->getName());
+	appendPoolLog(std::string("Removing a pool: ") + i_pool->getName());
 
 	m_pools_list.remove(i_pool);
 }
@@ -358,14 +358,14 @@ void PoolSrv::addRender(RenderAf * i_render)
 		return;
 	}
 
-	appendLog(std::string("Adding a render: ") + i_render->getName());
+	appendPoolLog(std::string("Adding a render: ") + i_render->getName());
 
 	m_renders_list.push_back(i_render);
 }
 
 void PoolSrv::removeRender(RenderAf * i_render)
 {
-	appendLog(std::string("Removing a render: ") + i_render->getName());
+	appendPoolLog(std::string("Removing a render: ") + i_render->getName());
 
 	m_renders_list.remove(i_render);
 }
@@ -399,64 +399,66 @@ void PoolSrv::actionHealSick(Action & i_action)
 	for (auto & it : m_pools_list)
 		it->actionHealSick(i_action);
 
-	appendLog(std::string("Healed by ") + i_action.author);
+	appendLog(i_action.log);
 }
 
-void PoolSrv::actionLaunchCmd(Action & i_action, const std::string & i_cmd, bool i_exit, const std::string & i_log)
+void PoolSrv::actionLaunchCmd(Action & i_action, const std::string & i_cmd, bool i_exit)
 {
-	appendLog(i_log);
-
 	for (auto & it : m_renders_list)
 	{
 		if (it->isOffline())
 			continue;
 
-		it->appendLog(i_log);
+		it->appendLog(i_action.log);
 		it->launchAndExit(i_cmd, i_exit);
 	}
 
 	for (auto & it : m_pools_list)
-		it->actionLaunchCmd(i_action, i_cmd, i_exit, i_log);
+	{
+		it->actionLaunchCmd(i_action, i_cmd, i_exit);
+		it->appendLog(i_action.log);
+	}
 }
 
-void PoolSrv::actionEjectTasks(Action & i_action, const std::string & i_log)
+void PoolSrv::actionEjectTasks(Action & i_action)
 {
-	appendLog(i_log);
 
 	for (auto & it : m_renders_list)
 	{
 		if (false == it->isBusy())
 			continue;
 
-		it->appendLog(i_log);
+		it->appendLog(i_action.log);
 		it->ejectTasks(i_action.jobs, i_action.monitors, af::TaskExec::UPEject);
 	}
 
 	for (auto & it : m_pools_list)
-		it->actionEjectTasks(i_action, i_log);
+	{
+		it->actionEjectTasks(i_action);
+		it->appendLog(i_action.log);
+	}
 }
 
-void PoolSrv::actionExitRenders(Action & i_action, const std::string & i_log)
+void PoolSrv::actionExitRenders(Action & i_action)
 {
-	appendLog(i_log);
-
 	for (auto & it : m_renders_list)
 	{
 		if (it->isOffline())
 			continue;
 
-		it->appendLog(i_log);
+		it->appendLog(i_action.log);
 		it->exitClient("exit", i_action.jobs, i_action.monitors);
 	}
 
 	for (auto & it : m_pools_list)
-		it->actionExitRenders(i_action, i_log);
+	{
+		it->actionExitRenders(i_action);
+		it->appendLog(i_action.log);
+	}
 }
 
-void PoolSrv::actionDeleteRenders(Action & i_action, const std::string & i_log)
+void PoolSrv::actionDeleteRenders(Action & i_action)
 {
-	appendLog(i_log);
-
 	// We should operate a temporary list, as on deletion, primary list will change.
 	// And we can't perform a simple for cycle on a changing list.
 	std::list<RenderAf*> _renders_list(m_renders_list);
@@ -465,12 +467,15 @@ void PoolSrv::actionDeleteRenders(Action & i_action, const std::string & i_log)
 		if (it->isOnline())
 			continue;
 
-		it->appendLog(i_log);
+		it->appendLog(i_action.log);
 		it->offline(NULL, 0, i_action.monitors, true);
 	}
 
 	for (auto & it : m_pools_list)
-		it->actionDeleteRenders(i_action, i_log);
+	{
+		it->actionDeleteRenders(i_action);
+		it->appendLog(i_action.log);
+	}
 }
 
 bool PoolSrv::hasPoolTicket(const std::string & i_name, const int32_t & i_count, const bool i_ticket_running) const
