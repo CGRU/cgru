@@ -151,13 +151,17 @@ def walkdir(i_path, i_upwalk = False, i_curdepth = 0):
         #entry = entry.encode('utf8','replace').decode('utf8')
         #entry = entry.encode('utf8','backslashreplace').decode('utf8','replace')
         entry = entry.encode('utf8','surrogateescape').decode('utf8','replace')
+
+        if entry == '.rules':
+            continue
+
         path = os.path.join(i_path, entry)
 
         st = None
         try:
             st = os.lstat( path)
         except:
-            outInfo('error_listdir',str(sys.exc_info()[1]))
+            outInfo('error_lstat',str(sys.exc_info()[1]))
             continue
 
         # We are not walking in links:
@@ -252,9 +256,9 @@ def walkdir(i_path, i_upwalk = False, i_curdepth = 0):
             Progress = cur_progress
             outInfo('progress','PROGRESS: %d%%' % Progress)
 
-    # Skip soting data in .rules folders, or we will create '.rules/.rules' folders
-    if os.path.basename(i_path) == os.path.dirname(Options.output):
-        return out
+    # Skip storing data in .rules folders, or we will create '.rules/.rules' folders
+    #if os.path.basename(i_path) == os.path.dirname(Options.output):
+    #    return out
             
     # Store current walk data:
     filename = os.path.join(i_path, Options.output)
