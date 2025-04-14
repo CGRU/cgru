@@ -43,6 +43,7 @@ void DBAttr::init()
 	DBName[_errors_count          ] = "errors_count";
 	DBName[_errors_retries        ] = "errors_retries";
 	DBName[_errors_tasksamehost   ] = "errorstasksamehost";
+	DBName[_info                  ] = "info";
 	DBName[_files                 ] = "files";
 	DBName[_filesize_max          ] = "filesize_max";
 	DBName[_filesize_min          ] = "filesize_min";
@@ -71,6 +72,7 @@ void DBAttr::init()
 	DBName[_multihost_waitmax     ] = "multihost_waitmax";
 	DBName[_multihost_waitsrv     ] = "multihost_waitsrv";
 	DBName[_name                  ] = "name";
+	DBName[_object                ] = "object";
 	DBName[_need_hdd              ] = "need_hdd";
 	DBName[_need_memory           ] = "need_memory";
 	DBName[_need_power            ] = "need_power";
@@ -84,6 +86,7 @@ void DBAttr::init()
 	DBName[_run_time_sum          ] = "run_time_sum";
 	DBName[_serial                ] = "serial";
 	DBName[_service               ] = "service";
+	DBName[_subject               ] = "subject";
 	DBName[_services_disabled     ] = "services_disabled";
 	DBName[_starts_count          ] = "starts_count";
 	DBName[_state                 ] = "state";
@@ -91,7 +94,9 @@ void DBAttr::init()
 	DBName[_tasks_done            ] = "tasks_done";
 	DBName[_tasksmaxruntime       ] = "tasksmaxruntime";
 	DBName[_tasksname             ] = "tasksname";
+	DBName[_type                  ] = "type";
 	DBName[_tasks_quantity        ] = "tasks_quantity";
+	DBName[_time                  ] = "time";
 	DBName[_time_creation         ] = "time_creation";
 	DBName[_time_done             ] = "time_done";
 	DBName[_time_register         ] = "time_register";

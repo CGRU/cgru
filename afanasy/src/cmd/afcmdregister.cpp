@@ -110,6 +110,7 @@ void AfCmd::RegisterCommands()
 	addCmd(new CmdPasswd);
 
 	addCmd(new CmdDBCheck);
+	addCmd(new CmdDBResetLogs);
 	addCmd(new CmdDBResetJobs);
 	addCmd(new CmdDBResetTasks);
 	addCmd(new CmdDBResetAll);

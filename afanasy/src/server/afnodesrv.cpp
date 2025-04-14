@@ -212,6 +212,9 @@ void AfNodeSrv::appendLog(const af::Log & i_log, bool i_store)
 
 	while (m_log.size() > af::Environment::getAfNodeLogLinesMax())
 		m_log.pop_front();
+
+	if (i_store)
+		AFCommon::DBAddLog(&i_log);
 }
 
 int AfNodeSrv::calcLogWeight() const

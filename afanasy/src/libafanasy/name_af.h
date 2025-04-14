@@ -61,6 +61,7 @@ namespace af
 
 	class Environment;
 
+	class Log;
 	class RegExp;
 	class NetIF;
 	class Address;

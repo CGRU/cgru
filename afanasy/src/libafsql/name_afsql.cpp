@@ -6,6 +6,7 @@
 
 #include "dbattr.h"
 #include "dbconnection.h"
+#include "dblog.h"
 #include "dbjob.h"
 #include "dbtask.h"
 
@@ -51,12 +52,30 @@ bool afsql::execute( PGconn * i_conn, const std::list<std::string> * i_queries)
 	return o_result;
 }
 
+void afsql::ResetLogs(DBConnection * dbconnenction)
+{
+	if (dbconnenction->isWorking() == false)
+		return;
+
+	if (dbconnenction->isOpen()	== false)
+	{
+		AFERROR("DBConnection::ResetLogs: Database connection is not open")
+		return;
+	}
+
+	DBLog statistics;
+	dbconnenction->dropTable(statistics.v_dbGetTableName());
+	std::list<std::string> queries;
+	statistics.dbCreateTable(&queries);
+	dbconnenction->execute(&queries);
+}
+
 void afsql::ResetJobs( DBConnection * dbconnenction)
 {
 	if( dbconnenction->isWorking() == false ) return;
 	if( dbconnenction->isOpen()	 == false )
 	{
-		AFERROR("DBConnection::ResetArchive: Database connection is not open")
+		AFERROR("DBConnection::ResetJobs: Database connection is not open")
 		return;
 	}
 	DBJob statistics;
@@ -71,7 +90,7 @@ void afsql::ResetTasks( DBConnection * dbconnenction)
 	if( dbconnenction->isWorking() == false ) return;
 	if( dbconnenction->isOpen()	 == false )
 	{
-		AFERROR("DBConnection::ResetArchive: Database connection is not open")
+		AFERROR("DBConnection::ResetTasks: Database connection is not open")
 		return;
 	}
 	DBTask statistics;

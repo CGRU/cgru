@@ -1,5 +1,7 @@
 #pragma once
 
+#include "name_af.h"
+
 #include "af.h"
 
 namespace af

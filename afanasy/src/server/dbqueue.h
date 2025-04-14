@@ -2,6 +2,7 @@
 
 #include "../libafanasy/afqueue.h"
 
+#include "../libafsql/dblog.h"
 #include "../libafsql/dbjob.h"
 #include "../libafsql/dbtask.h"
 #include "../libafsql/name_afsql.h"
@@ -33,7 +34,8 @@ public:
 	void delItem(    const afsql::DBItem * item);
 	void updateItem( const afsql::DBItem * item, int attr = -1);
 
-	void addJob( const af::Job * i_job);
+	void addLog(const af::Log * i_log);
+	void addJob(const af::Job * i_job);
 	void addTask(
 		const af::TaskExec * i_exec,
 		const af::TaskProgress * i_progress,
@@ -61,6 +63,7 @@ private:
 	MonitorContainer * m_monitors;
 	bool m_working;
 
+	afsql::DBLog m_dblog;
 	afsql::DBJob m_dbjob;
 	afsql::DBTask m_dbtask;
 };

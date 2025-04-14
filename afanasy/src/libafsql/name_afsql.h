@@ -19,7 +19,9 @@ namespace afsql
 	class DBAttrUInt32;
 
 	class DBItem;
+	class DBLog;
 	class DBJob;
+	class DBTask;
 
 	bool connect( PGconn * i_conn);
 	bool execute( PGconn * i_conn, const std::list<std::string> * i_queries);
@@ -27,6 +29,7 @@ namespace afsql
 /// Database comlex procedures interface.
 	class DBConnection;
 
+	void ResetLogs(  DBConnection * dbconnenction);
 	void ResetJobs(  DBConnection * dbconnenction);
 	void ResetTasks( DBConnection * dbconnenction);
 	void ResetAll(   DBConnection * dbconnenction);

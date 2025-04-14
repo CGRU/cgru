@@ -23,6 +23,21 @@ bool CmdDBCheck::v_processArguments( int argc, char** argv, af::Msg &msg)
 	return true;
 }
 
+CmdDBResetLogs::CmdDBResetLogs()
+{
+	setCmd("db_reset_logs");
+	setInfo("Reset (create) logs statistics table.");
+}
+CmdDBResetLogs::~CmdDBResetLogs(){}
+bool CmdDBResetLogs::v_processArguments( int argc, char** argv, af::Msg &msg)
+{
+	afsql::DBConnection DB("afanasy.cmd.ResetLogs");
+	DB.DBOpen();
+	afsql::ResetLogs(&DB);
+	DB.DBClose();
+	return true;
+}
+
 CmdDBResetJobs::CmdDBResetJobs()
 {
 	setCmd("db_reset_jobs");

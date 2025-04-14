@@ -9,6 +9,11 @@ class CmdDBCheck : public Cmd { public:
 	~CmdDBCheck();
 	bool v_processArguments(int argc, char** argv, af::Msg &msg) final;
 };
+class CmdDBResetLogs: public Cmd { public:
+	CmdDBResetLogs();
+	~CmdDBResetLogs();
+	bool v_processArguments(int argc, char** argv, af::Msg &msg) final;
+};
 class CmdDBResetJobs: public Cmd { public:
 	CmdDBResetJobs();
 	~CmdDBResetJobs();
