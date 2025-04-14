@@ -109,6 +109,7 @@ void afsql::ResetAll( DBConnection * dbconnenction)
 		return;
 	}
 	dbconnenction->dropAllTables();
+	ResetLogs(dbconnenction);
 	ResetJobs( dbconnenction);
 	ResetTasks( dbconnenction);
 }
