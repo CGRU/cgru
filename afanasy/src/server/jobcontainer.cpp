@@ -89,7 +89,7 @@ void JobContainer::reconnectTask( af::TaskExec * i_taskexec, RenderAf & i_render
 	return job->reconnectTask( i_taskexec, i_render, i_monitoring);
 }
 
-af::Msg * JobContainer::registerJob(JSON & i_object, BranchesContainer * i_branches, UserContainer * i_users, MonitorContainer * i_monitors)
+af::Msg * JobContainer::registerJob(JSON & i_object, const af::Address & i_address, BranchesContainer * i_branches, UserContainer * i_users, MonitorContainer * i_monitors)
 {
 	JobAf * job = new JobAf(i_object);
 
@@ -107,15 +107,26 @@ af::Msg * JobContainer::registerJob(JSON & i_object, BranchesContainer * i_branc
 	oss << "\n\"id\":" << id;
 	oss << ",\n\"serial\":" << serial;
 
+	af::Log log;
+	log.subject = job->getUserName() + "@" + job->getHostName() + " " + i_address.generateIPString();
+	log.type = "jobs register";
+	log.object = job->getName() + "@" + job->getUserName();
+	log.info = "New job registered: " + log.object;
+
 	if (err.size())
 	{
 		oss << ",\n\"error\":\"" << err << "\"";
+		log.appendType("error");
+		log.info = err;
 	}
 	else if (job == NULL)
 	{
 		oss << ",\n\"error\":\"Job registration failed. See server log for details.\"";
+		log.appendType("error");
+		log.info = "Job registration failed: " + log.object;
 	}
 
+	AFCommon::DBAddLog(&log);
 
 	oss << "\n}";
 

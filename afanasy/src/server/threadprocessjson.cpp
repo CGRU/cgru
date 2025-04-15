@@ -415,7 +415,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 			// No containers locks needed here.
 			// Job registration is a complex procedure.
 			// It locks and unlocks needed containers itself.
-			o_msg_response = i_args->jobs->registerJob( document["job"], i_args->branches, i_args->users, i_args->monitors);
+			o_msg_response = i_args->jobs->registerJob(document["job"], i_msg->getAddress(), i_args->branches, i_args->users, i_args->monitors);
 		}
 	}
 	else if( document.HasMember("monitor"))

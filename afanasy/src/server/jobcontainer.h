@@ -38,7 +38,7 @@ public:
 	~JobContainer();
 
 	/// Register a new job:
-	af::Msg * registerJob(JSON & i_object, BranchesContainer * i_branches, UserContainer * i_users, MonitorContainer * i_monitoring);
+	af::Msg * registerJob(JSON & i_object, const af::Address & i_address, BranchesContainer * i_branches, UserContainer * i_users, MonitorContainer * i_monitoring);
 	bool registerJob(JobAf *job, std::string & o_err, BranchesContainer * i_branches, UserContainer *users, MonitorContainer * monitoring);
 
 	/// Update some task state of some job.
