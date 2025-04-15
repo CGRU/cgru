@@ -558,7 +558,7 @@ void JobAf::v_action( Action & i_action)
 				i_action.answerError(err);
 				return;
 			}
-			m_user->appendLog(i_action.log);
+			//m_user->appendLog(i_action.log);
 			deleteNode(i_action.renders, i_action.monitors);
 			return;
 		}
