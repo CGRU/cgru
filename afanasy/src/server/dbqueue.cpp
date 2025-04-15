@@ -148,6 +148,16 @@ void DBQueue::delItem( const afsql::DBItem * item)
 	push( queries);
 }
 
+void DBQueue::writeLog(const af::Log * i_log)
+{
+	if (false == m_working)
+		return;
+
+	Queries * queries = new Queries();
+	m_dblog.add(i_log, queries);
+	writeItem(queries);
+}
+
 void DBQueue::addLog(const af::Log * i_log)
 {
 	if (false == m_working)

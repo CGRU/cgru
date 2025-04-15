@@ -114,6 +114,10 @@ public:
 	inline static void QueueLogError(const std::string &log) { OutputLogQueue->pushLog(log, LogData::Error); }
 	inline static void QueueLogErrno(const std::string &log) { OutputLogQueue->pushLog(log, LogData::Errno); }
 
+	inline static void DBWriteLog(const af::Log * i_log)
+	{
+		if (ms_DBQueue) ms_DBQueue->writeLog(i_log);
+	}
 	inline static void DBAddLog(const af::Log * i_log)
 	{
 		if (ms_DBQueue) ms_DBQueue->addLog(i_log);

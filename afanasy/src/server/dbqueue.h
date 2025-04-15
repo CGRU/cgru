@@ -34,6 +34,7 @@ public:
 	void delItem(    const afsql::DBItem * item);
 	void updateItem( const afsql::DBItem * item, int attr = -1);
 
+	void writeLog(const af::Log * i_log);
 	void addLog(const af::Log * i_log);
 	void addJob(const af::Job * i_job);
 	void addTask(

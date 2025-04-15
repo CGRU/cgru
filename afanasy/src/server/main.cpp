@@ -173,6 +173,10 @@ int main(int argc, char *argv[])
 		afdb_upTables.DBClose();
 	}
 
+	{
+		af::Log log("server","server","Starting server. Reading store...");
+		AFCommon::DBWriteLog(&log);
+	}
 	//
 	// Get Pools from store:
 	//
@@ -357,10 +361,20 @@ int main(int argc, char *argv[])
 	DlThread RunCycleThread;
 	RunCycleThread.Start( &threadRunCycle, &threadArgs);
 
+	{
+		af::Log log("server","server","Server started. Reading store finished.");
+		AFCommon::DBWriteLog(&log);
+	}
+
 	/* Do nothing since everything is done in our threads. */
 	while( AFRunning )
 	{
 		DlThread::Self()->Sleep( 1 );
+	}
+
+	{
+		af::Log log("server","server","Server shutdown.");
+		AFCommon::DBWriteLog(&log);
 	}
 
 	AF_LOG << "Waiting child threads to exit...";
