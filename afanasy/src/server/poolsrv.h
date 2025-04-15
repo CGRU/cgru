@@ -46,8 +46,6 @@ public:
 
 	virtual void v_action(Action & i_action);
 
-//	void logAction(const Action & i_action, const std::string & i_node_name);
-
 	inline void appendPoolLog(const std::string & i_info, bool i_store = true){appendLog(af::Log("pool", getName(),i_info), i_store);}
 
 	virtual int v_calcWeight() const;

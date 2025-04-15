@@ -153,7 +153,7 @@ void UserAf::logAction(const Action & i_action, const std::string & i_node_name)
 	if (i_action.log.info.empty())
 		return;
 
-	appendLog(i_action.log, i_action.store_log);
+	appendLog(i_action.log, false);
 	updateTimeActivity();
 }
 

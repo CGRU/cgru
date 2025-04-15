@@ -209,15 +209,7 @@ void PoolSrv::v_action(Action & i_action)
 		dispatchFarmConfig();
 	}
 }
-/*
-void PoolSrv::logAction(const Action & i_action, const std::string & i_node_name)
-{
-	if (i_action.log.empty())
-		return;
 
-	appendLog(std::string("Action[") + i_action.type + "][" +  i_node_name + "]: " + i_action.log);
-}
-*/
 void PoolSrv::dispatchFarmConfig()
 {
 	for (auto & it : m_pools_list)

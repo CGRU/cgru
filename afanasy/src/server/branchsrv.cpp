@@ -203,15 +203,7 @@ void BranchSrv::v_action(Action & i_action)
 		i_action.monitors->addEvent(af::Monitor::EVT_branches_change, m_id);
 	}
 }
-/*
-void BranchSrv::logAction(const Action & i_action, const std::string & i_node_name)
-{
-	if (i_action.log.empty())
-		return;
 
-	appendLog(std::string("Action[") + i_action.type + "][" +  i_node_name + "]: " + i_action.log);
-}
-*/
 void BranchSrv::deleteBranch(Action & o_action, MonitorContainer * i_monitoring)
 {
 	if (isRoot())

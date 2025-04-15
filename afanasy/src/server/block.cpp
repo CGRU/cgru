@@ -81,13 +81,13 @@ const std::string Block::getStoreTasksFileName() const
 	return m_job->getStoreDir() + AFGENERAL::PATH_SEPARATOR + "block" + af::itos( m_data->getBlockNum()) + "_tasks.json";
 }
 
-void Block::appendJobLog(const std::string & i_info)
+void Block::appendJobLog(const std::string & i_info, bool i_store)
 {
 	af::Log log;
 	log.type = "jobs";
 	log.object = m_job->getName();
 	log.info = "Block[\"" + m_data->getName() + "\"]: " + i_info;
-	m_job->appendLog(log);
+	m_job->appendLog(log, i_store);
 }
 
 void Block::v_errorHostsAppend( int task, int hostId, RenderContainer * renders)
@@ -100,7 +100,7 @@ void Block::v_errorHostsAppend( int task, int hostId, RenderContainer * renders)
    RenderContainerIt rendersIt( renders);
    RenderAf* render = rendersIt.getRender( hostId);
    if( render == NULL ) return;
-   if( v_errorHostsAppend( render->getName())) appendJobLog( render->getName()+ " - AVOIDING HOST !");
+   if( v_errorHostsAppend( render->getName())) appendJobLog( render->getName()+ " - AVOIDING HOST !", false);
    m_tasks[task]->errorHostsAppend( render->getName());
 }
 
@@ -361,7 +361,7 @@ bool Block::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCon
 	  while( hIt != m_errorHosts.end() )
          if( currentTime - *tIt > getErrorsForgiveTime())
          {
-            appendJobLog( std::string("Forgived error host \"") + *hIt + "\" since " + af::time2str(*tIt) + ".");
+            appendJobLog( std::string("Forgived error host \"") + *hIt + "\" since " + af::time2str(*tIt) + ".", false);
 			hIt = m_errorHosts.erase( hIt);
 			cIt = m_errorHostsCounts.erase( cIt);
 			tIt = m_errorHostsTime.erase( tIt);

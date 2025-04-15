@@ -76,7 +76,7 @@ public:
 	UserAf * m_user;
 
 protected:
-	void appendJobLog(const std::string & i_info);
+	void appendJobLog(const std::string & i_info, bool i_store = true);
     bool v_errorHostsAppend( const std::string & hostname);
 
 private:
