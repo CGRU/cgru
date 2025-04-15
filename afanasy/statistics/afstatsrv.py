@@ -74,6 +74,19 @@ class Requests:
                 o_out['folders'].append(line['folder'])
 
 
+    def req_get_logs_table(self, i_args, o_out):
+        time_min = i_args['time_min']
+        time_max = i_args['time_max']
+        order    = i_args['order']
+
+        # Select:
+        query=("SELECT * FROM \"logs\"" \
+        "\n WHERE time BETWEEN " + str(time_min) + " AND " + str(time_max) + \
+        "\n ORDER BY " + order + " DESC;")
+
+        o_out['table'] = self.execQuery(query)
+
+
     def req_get_jobs_folders(self, i_args, o_out):
         table = 'jobs'
 

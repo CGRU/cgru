@@ -54,3 +54,8 @@ out = dict()
 args['folder'] = '/xxx'
 r.req_folder_delete(args, out)
 print(json.dumps(out, indent=4))
+
+out = dict()
+args['order'] = 'time'
+r.req_get_logs_table(args, out)
+print(json.dumps(out, indent=4))

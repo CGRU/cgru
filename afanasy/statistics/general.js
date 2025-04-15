@@ -4,6 +4,7 @@ var SERVER = '/afstatsrv'
 //var SERVER = 'server.php'
 
 g_actions = {};
+g_actions.logs_table =  {"label":'Logs Table',  'func':'g_Action_LogsTable'};
 g_actions.jobs_table =  {"label":'Jobs Tables' ,'func':'g_Action_JobsTable'};
 g_actions.tasks_table = {"label":'Tasks Tables','func':'g_Action_TasksTable'};
 g_actions.tasks_graph = {"label":'Tasks Graphs','func':'g_Action_TasksGraph'};
@@ -277,6 +278,14 @@ function g_HashChanged()
 	window[g_actions[g_args.action].func](args);
 }
 
+function g_Action_LogsTable(i_args)
+{
+	g_Info('Requesting logs table...');
+	i_args.table = 'logs';
+	i_args.order = 'time';
+	g_Request({"send":{"get_logs_table":i_args},"func":g_ShowTable,"args":i_args});
+}
+
 function g_Action_JobsTable(i_args)
 {
 	g_Info('Requesting jobs folders statistics table...');
@@ -314,6 +323,7 @@ function g_ShowTable(i_data, i_args)
 
 	g_Info('Statistics received.');
 
+	let table    = i_args.args.table;
 	let select   = i_data.select;
 	let vaforite = i_data.favorite;
 
@@ -321,10 +331,13 @@ function g_ShowTable(i_data, i_args)
 	$('content').appendChild(elTableDiv);
 	elTableDiv.classList.add('table_div');
 
-	let elTableName = document.createElement('div');
-	elTableDiv.appendChild(elTableName);
-	elTableName.classList.add('title');
-	elTableName.textContent = select;
+	if (select)
+	{
+		let elTableName = document.createElement('div');
+		elTableDiv.appendChild(elTableName);
+		elTableName.classList.add('title');
+		elTableName.textContent = select;
+	}
 
 	let elTable = document.createElement('table');
 	elTableDiv.appendChild(elTable);
@@ -345,6 +358,12 @@ function g_ShowTable(i_data, i_args)
 			elCol.textContent = g_parm[col].label;
 		else
 			elCol.textContent = [col];
+
+		if (table == 'logs')
+		{
+			elCol.style.backgroundColor = '#FF0';
+			elCol.contentEditable = true;
+		}
 	}
 
 	for (let r = 0; r < i_data.table.length; r++)
@@ -368,6 +387,7 @@ function g_ShowTable(i_data, i_args)
 				if (g_parm[col].percent) value = Math.round(100 * value) + '%';
 				else if (g_parm[col].round) value = Math.round(value);
 				else if (g_parm[col].time) value = g_SecToHMS(value);
+				else if (g_parm[col].datetime) value = g_SecToStr(value);
 			}
 
 			if (col == 'folder') value = g_FolderStrip(value);
@@ -873,6 +893,15 @@ function g_SecToHMS(i_sec)
 		hms = days + 'd ' + hms;
 	return hms;
 }
+function g_SecToStr(i_time)
+{
+	if (i_time == null)
+		return '';
+	let date = new Date(i_time*1000);
+	date = date.toString();
+	date = date.substr(0, date.indexOf(' GMT'));
+	return date;
+}
 function g_Info(i_msg)
 {
 	$('info').innerHTML = i_msg;
@@ -1016,5 +1045,6 @@ g_parm.service             = {"label":'Service'};
 g_parm.tasks_done_percent  = {"label":'Done',             "percent":true};
 g_parm.tasks_quantity      = {"label":'Tasks Quantity'};
 g_parm.tasks_quantity_avg  = {"label":'Average Quantity', "round":true};
+g_parm.time                = {"label":'Date Time',        "datetime":true};
 g_parm.username            = {"label":'User'};
 
