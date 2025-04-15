@@ -79,7 +79,7 @@ bool UserAf::initialize()
 			if( getTimeActivity() == 0 ) updateTimeActivity();
 			store();
 		}
-		appendUserLog("Initialized from store.");
+		appendUserLog("Initialized from store.", false);
 	}
 	else
 	{
@@ -87,7 +87,7 @@ bool UserAf::initialize()
 		updateTimeActivity();
 		setStoreDir( AFCommon::getStoreDirUser( *this));
 		store();
-		appendUserLog("Registered.");
+		appendUserLog("Registered.", false);
 	}
 
 	return true;
@@ -153,7 +153,7 @@ void UserAf::logAction(const Action & i_action, const std::string & i_node_name)
 	if (i_action.log.info.empty())
 		return;
 
-	appendLog(i_action.log);
+	appendLog(i_action.log, i_action.store_log);
 	updateTimeActivity();
 }
 
@@ -169,7 +169,7 @@ void UserAf::deleteNode( MonitorContainer * i_monitoring)
 
 void UserAf::addJob( JobAf * i_job)
 {
-	appendUserLog(std::string("Adding a job: ") + i_job->getName());
+	appendUserLog(std::string("Adding a job: ") + i_job->getName(), false);
 
 	updateTimeActivity();
 
@@ -189,7 +189,7 @@ void UserAf::addJob( JobAf * i_job)
 
 void UserAf::removeJob( JobAf * i_job)
 {
-	appendUserLog(std::string("Removing a job: ") + i_job->getName());
+	appendUserLog(std::string("Removing a job: ") + i_job->getName(), false);
 
 	// Remove running counts (runnig tasks num and capacity total) from Af::Work
 	remRunningCounts(*i_job);

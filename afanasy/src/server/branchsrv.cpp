@@ -107,7 +107,7 @@ bool BranchSrv::initialize()
 			m_time_creation = time(NULL);
 			store();
 		}
-		appendBranchLog("Initialized from store.");
+		appendBranchLog("Initialized from store.", false);
 	}
 	else
 	{
@@ -139,7 +139,7 @@ bool BranchSrv::initialize()
 
 		setStoreDir(AFCommon::getStoreDirBranch(*this));
 		store();
-		appendBranchLog("Initialized.");
+		appendBranchLog("Initialized.", false);
 	}
 
 	return true;
@@ -254,14 +254,14 @@ void BranchSrv::deleteDoneJobs(Action & o_action, MonitorContainer * i_monitorin
 
 void BranchSrv::addBranch(BranchSrv * i_branch)
 {
-	appendBranchLog(std::string("Adding a branch: ") + i_branch->getName());
+	appendBranchLog(std::string("Adding a branch: ") + i_branch->getName(), false);
 
 	m_branches_list.add(i_branch);
 }
 
 void BranchSrv::removeBranch(BranchSrv * i_branch)
 {
-	appendBranchLog(std::string("Removing a branch: ") + i_branch->getName());
+	appendBranchLog(std::string("Removing a branch: ") + i_branch->getName(), false);
 
 	m_branches_list.remove(i_branch);
 }
@@ -274,7 +274,7 @@ void BranchSrv::addJob(JobAf * i_job, UserAf * i_user)
 		return;
 	}
 
-	appendBranchLog(std::string("Adding a job: ") + i_job->getName());
+	appendBranchLog(std::string("Adding a job: ") + i_job->getName(), false);
 
 	m_jobs_list.add(i_job);
 
@@ -305,7 +305,7 @@ void BranchSrv::addUserJob(JobAf * i_job, UserAf * i_user)
 
 void BranchSrv::removeJob(JobAf * i_job, UserAf * i_user)
 {
-	appendBranchLog(std::string("Removing a job: ") + i_job->getName());
+	appendBranchLog(std::string("Removing a job: ") + i_job->getName(), false);
 
 	m_jobs_list.remove(i_job);
 

@@ -31,6 +31,7 @@ Action::Action(const af::Msg *i_msg, ThreadArgs *i_args):
 	pools(i_args->pools),
 	renders(i_args->renders),
 	users(i_args->users),
+	store_log(true),
 	m_buffer(NULL),
 	m_valid(false)
 {

@@ -156,7 +156,6 @@ void DBQueue::addLog(const af::Log * i_log)
 	Queries * queries = new Queries();
 	m_dblog.add(i_log, queries);
 	push(queries);
-queries->stdOut();
 }
 
 void DBQueue::addJob( const af::Job * i_job)

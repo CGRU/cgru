@@ -84,7 +84,8 @@ public:
 
 //	void logAction(const Action & i_action, const std::string & i_node_name);
 
-	inline void appendBranchLog(const std::string & i_info){appendLog(af::Log("branches", getName(),i_info));}
+	inline void appendBranchLog(const std::string & i_info, bool i_store = true){
+		appendLog(af::Log("branches", getName(),i_info), i_store);}
 
 private:
 	void deleteBranch(Action & o_action, MonitorContainer * i_monitoring);

@@ -41,6 +41,7 @@ public:
 	std::string host_name;
 
 	af::Log log;
+	bool store_log;
 
 	std::string * getInfoPtr() {return &(log.info);}
 

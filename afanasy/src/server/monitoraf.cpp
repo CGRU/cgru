@@ -83,6 +83,7 @@ void MonitorAf::deregister()
 void MonitorAf::v_action( Action & i_action)
 {
 	i_action.log.type = "monitors";
+	i_action.store_log = false;
 
 	const JSON & operation = (*i_action.data)["operation"];
 	if( operation.IsObject())

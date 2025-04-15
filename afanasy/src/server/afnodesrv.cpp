@@ -197,7 +197,7 @@ void AfNodeSrv::action( Action & i_action)
 //		i_action.users->updateTimeActivity(i_action.user_name);
 
 	i_action.users->logAction(i_action, m_node->getName());
-	appendLog(i_action.log);
+	appendLog(i_action.log, i_action.store_log);
 
 	i_action.log.type.clear();
 	i_action.log.object.clear();
