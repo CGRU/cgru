@@ -378,6 +378,7 @@ function g_ShowTable(i_data, i_args)
 		for (let col in i_data.table[r])
 		{
 			let elCol = document.createElement('td');
+			elCol.classList.add(col);
 			elRow.appendChild(elCol);
 
 			let value = i_data.table[r][col];
