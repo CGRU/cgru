@@ -427,7 +427,7 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 		
 		if (getRunningTasksNum() && (renders != NULL) && (monitoring != NULL))
 		{
-			af::Log log("jobs delete", getName(), "Job deletion");
+			af::Log log("jobs delete", getName() + "@" + getUserName(), "Job deletion");
 			restartAllTasks(log, renders, monitoring, AFJOB::STATE_RUNNING_MASK);
 			if (monitoring) monitoring->addJobEvent( af::Monitor::EVT_jobs_change, getId(), getUid());
 			return;
@@ -475,6 +475,7 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 void JobAf::v_action( Action & i_action)
 {
 	i_action.log.type = "jobs";
+	i_action.log.object = getName() + "@" + getUserName();
 
 	// If action has blocks ids array - action to for blocks
 	if( i_action.data->HasMember("block_ids") || i_action.data->HasMember("block_mask"))
