@@ -342,6 +342,7 @@ function g_ShowTable(i_data, i_args)
 	let elTable = document.createElement('table');
 	elTableDiv.appendChild(elTable);
 	elTable.classList.add('table');
+	elTable.classList.add(table);
 
 	let elRow = document.createElement('tr');
 	elTable.appendChild(elRow);
@@ -353,6 +354,7 @@ function g_ShowTable(i_data, i_args)
 	for (let col in i_data.table[0])
 	{
 		let elCol = document.createElement('th');
+		elCol.classList.add(col);
 		elRow.appendChild(elCol);
 		if (g_parm[col] && g_parm[col].label)
 			elCol.textContent = g_parm[col].label;
@@ -373,7 +375,11 @@ function g_ShowTable(i_data, i_args)
 
 		let elNum = document.createElement('td');
 		elRow.appendChild(elNum);
-		elNum.textContent = r;
+		elNum.classList.add('number');
+		if (table == 'logs')
+			elNum.textContent = i_data.table.length - r - 1;
+		else
+			elNum.textContent = r;
 
 		for (let col in i_data.table[r])
 		{
@@ -899,9 +905,12 @@ function g_SecToStr(i_time)
 	if (i_time == null)
 		return '';
 	let date = new Date(i_time*1000);
-	date = date.toString();
-	date = date.substr(0, date.indexOf(' GMT'));
-	return date;
+	date = date.toISOString().split('T');
+	time = date[1];
+	time = time.substr(0, time.indexOf('.'));
+	date = date[0].split('-');
+	date = date[1] + '.' + date[2];
+	return date + ' ' + time;
 }
 function g_Info(i_msg)
 {

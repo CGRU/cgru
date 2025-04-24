@@ -137,17 +137,28 @@ table.table th, table.table td {
 text-align: center;
 background: rgba(255,255,255,.1);
 box-shadow: 0 0 3px rgba(0,0,0,.8) inset;
-padding: 2px;
+padding: 2px 6px;
 white-space: nowrap;
+text-overflow: ellipsis;
+overflow: hidden;
 }
 table.table th {
 border-radius: 8px 8px 0px 0px;
 background: rgba(255,255,255,.2);
 font-weight: normal;
 }
+table.table .number {
+font-size: 12px;
+}
 table.table .info {
 text-align: left;
 padding: 2px 8px;
+}
+table.table.logs .time {
+font-size: 12px;
+}
+table.table.logs .object {
+max-width: 360px;
 }
 
 svg {
