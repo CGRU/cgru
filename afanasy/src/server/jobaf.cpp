@@ -601,6 +601,8 @@ void JobAf::v_action( Action & i_action)
 		{
 			for( int b = 0; b < m_blocks_num; b++)
 				m_blocks[b]->action(i_action);
+			// Each block will append the same time, so we should reset it
+			i_action.log.type = type;
 		}
 		else if(type == "reset_trying_next_tasks")
 		{
@@ -1154,7 +1156,7 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 		if (result_lifetime < 0) result_lifetime = m_user->getJobsLifeTime(); // get default value from user
 		if((result_lifetime > 0) && ((currentTime - m_time_creation) > result_lifetime))
 		{
-			af::Log log("jobs", getName(), "Life time finished: " + af::time2strHMS( result_lifetime, true));
+			af::Log log("jobs", getName() + "@" + getUserName(), "Life time finished: " + af::time2strHMS( result_lifetime, true));
 			m_user->appendLog(log);
 			deleteNode(renders, monitoring);
 		}

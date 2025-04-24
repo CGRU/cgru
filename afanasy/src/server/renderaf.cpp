@@ -199,9 +199,8 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
 		store();
 	}
 
-	log += ": " + m_hres.v_generateInfoString();
 	AFCommon::QueueLog(log);
-	appendRenderLog(log);
+	appendRenderLog(log, false);
 }
 
 void RenderAf::getPoolConfig()
@@ -964,8 +963,9 @@ void RenderAf::v_refresh( time_t i_current_time,  AfContainer * pointer, Monitor
 		zombie_time = AFRENDER::ZOMBIETIME;
 	if (isOnline() && (getTimeUpdate() < (i_current_time - zombie_time)))
 	{
-		appendRenderTypeLog("zombie", std::string("ZOMBIETIME: ") + af::itos(zombie_time) + " seconds.");
-		AFCommon::QueueLog( std::string("Render: \"") + getName() + "\" - ZOMBIETIME");
+		std::string info = std::string("ZOMBIETIME: ") + af::itos(zombie_time) + "s:" + m_hres.v_generateInfoString();
+		appendRenderTypeLog("zombie", info);
+		AFCommon::QueueLog( std::string("Render: \"") + getName() + "\" - " + info);
 		emitEvents(std::vector<std::string>(1, "RENDER_ZOMBIE"));
 		offline( jobs, af::TaskExec::UPRenderZombie, monitoring);
 		return;
