@@ -293,10 +293,7 @@ void RenderAf::online( RenderAf * render, JobContainer * i_jobs, MonitorContaine
 	// them from being cleaned by render's dtor:
 	render->m_tasks.clear();
 	
-
-
-	std::string log = "Online '" + m_engine + "'.";
-	appendRenderLog(log);
+	appendRenderTypeLog("online",std::string("Online '") + m_engine + "'.");
 
 	if (monitoring)
 		monitoring->addEvent(af::Monitor::EVT_renders_change, m_id);
