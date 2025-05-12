@@ -916,12 +916,13 @@ function g_SecToStr(i_time)
 	if (i_time == null)
 		return '';
 	let date = new Date(i_time*1000);
-	date = date.toISOString().split('T');
-	time = date[1];
-	time = time.substr(0, time.indexOf('.'));
-	date = date[0].split('-');
-	date = date[1] + '.' + date[2];
-	return date + ' ' + time;
+	str = '';
+	str += date.getMonth() + 1;
+	str += '.' + date.getDate();
+	str += ' ' + date.getHours();
+	str += ':' + date.getMinutes();
+	str += ':' + date.getSeconds();
+	return str;
 }
 function g_Info(i_msg)
 {
