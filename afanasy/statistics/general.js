@@ -21,8 +21,8 @@ g_graph_intervals.week   = {"seconds":60 * 60 * 24 * 7,"intervals":[ 1 ],"offset
 
 g_args = {};
 g_args.action = 'jobs_table';
-g_args.time_max = Math.round((new Date()).valueOf() / 1000);
-g_args.time_min = g_args.time_max - (60*60 * 24 * 48);
+//g_args.time_max = Math.round((new Date()).valueOf() / 1000);
+g_args.time_min = Math.round((new Date()).valueOf() / 1000) - (60*60 * 24 * 48);
 g_args.folder = '/';
 
 g_folders = [];
@@ -843,7 +843,12 @@ function g_TimeKeyDown(i_evt)
 
 	for (let i = 0; i < g_time_ids.length; i++)
 	{
-		let date = new Date(Date.parse($(g_time_ids[i]).textContent));
+		let str = $(g_time_ids[i]).textContent;
+		if ((str == null) || (str.length == 0))
+			continue;
+		let date = new Date(Date.parse(str));
+		if (date == null)
+			continue;
 		time = Math.round(date.valueOf() / 1000);
 		g_args[g_time_ids[i]] = time;
 	}
@@ -855,6 +860,9 @@ function g_TimeShow()
 {
 	for (let i = 0; i < g_time_ids.length; i++)
 	{
+		let secs = g_args[g_time_ids[i]];
+		if (secs == null)
+			continue;
 		let date = new Date(1000 * g_args[g_time_ids[i]]);
 		date = date.toISOString();
 		date = date.substr(0, date.indexOf('T'));
@@ -866,7 +874,10 @@ function g_TimeIntervalGet()
 {
 	let interval = 1;
 	let i = 0;
-	while((g_args.time_max - g_args.time_min) / interval > 100)
+	time_max = g_args.time_max;
+	if ((time_max == null) || (time_max == 0))
+		time_max = Math.round((new Date()).valueOf() / 1000);
+	while((time_max - g_args.time_min) / interval > 100)
 	{
 		if (i < g_graph_intervals.names.length)
 			interval = g_graph_intervals[g_graph_intervals.names[i]].seconds;

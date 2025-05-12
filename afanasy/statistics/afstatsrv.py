@@ -2,6 +2,7 @@ import cgi
 import json
 import os
 import sys
+import time
 import traceback
 
 # Python <-> PostgreSQL module
@@ -76,7 +77,7 @@ class Requests:
 
     def req_get_logs_table(self, i_args, o_out):
         time_min = i_args['time_min']
-        time_max = i_args['time_max']
+        time_max = getTimeMax(i_args)
         order    = i_args['order']
 
         # Select:
@@ -92,7 +93,7 @@ class Requests:
 
         select   = i_args['select']
         time_min = i_args['time_min']
-        time_max = i_args['time_max']
+        time_max = getTimeMax(i_args)
         folder   = i_args['folder'].rstrip('/')
         f_depth  = folder.count('/') + 1
         order    = 'jobs_quantity'
@@ -173,7 +174,7 @@ class Requests:
         select   = i_args['select']
         favorite = i_args['favorite']
         time_min = i_args['time_min']
-        time_max = i_args['time_max']
+        time_max = getTimeMax(i_args)
         folder   = i_args['folder'].rstrip('/')
 
         if 'order_u' in i_args: order_u = i_args['order_u']
@@ -231,7 +232,7 @@ class Requests:
 
         select   = i_args['select']
         time_min = i_args['time_min']
-        time_max = i_args['time_max']
+        time_max = getTimeMax(i_args)
         folder   = i_args['folder'].rstrip('/')
         f_depth  = folder.count('/') + 1
         order    = 'tasks_quantity'
@@ -309,7 +310,7 @@ class Requests:
         select   = i_args['select']
         favorite = i_args['favorite']
         time_min = i_args['time_min']
-        time_max = i_args['time_max']
+        time_max = getTimeMax(i_args)
         folder   = i_args['folder']
 
         order_s = 'run_time_sum'
@@ -365,7 +366,7 @@ class Requests:
 
         select   = i_args['select']
         time_min = i_args['time_min']
-        time_max = i_args['time_max']
+        time_max = getTimeMax(i_args)
         interval = i_args['interval']
         folder   = i_args['folder'].rstrip('/')
         f_depth  = folder.count('/') + 1
@@ -423,7 +424,7 @@ class Requests:
 
         table    = 'tasks'
         time_min = i_args['time_min']
-        time_max = i_args['time_max']
+        time_max = getTimeMax(i_args)
         interval = i_args['interval']
         folder   = i_args['folder']
         select   = i_args['select']
@@ -521,3 +522,11 @@ def application(environ, start_response):
 
     return [rawout]
 
+
+def getTimeMax(i_args):
+    time_max = None
+    if 'time_max' in i_args:
+        time_max = i_args['time_max']
+    if time_max is None or time_max == 0:
+        time_max = int(time.time()) + (60*60*24)
+    return time_max

@@ -21,8 +21,8 @@ print('Folder = "%s"' % folder)
 args = dict()
 args['table'] = 'jobs'
 args['select'] = 'folder'
-args['time_max'] = int(time.time())
-args['time_min'] = args['time_max'] - 60*60 * 24 * 48
+#args['time_max'] = int(time.time())
+args['time_min'] = int(time.time()) - 60*60 * 24 * 48
 args['folder'] = folder
 out = dict()
 r.req_get_jobs_folders(args, out)
