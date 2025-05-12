@@ -917,11 +917,11 @@ function g_SecToStr(i_time)
 		return '';
 	let date = new Date(i_time*1000);
 	str = '';
-	str += date.getMonth() + 1;
-	str += '.' + date.getDate();
-	str += ' ' + date.getHours();
-	str += ':' + date.getMinutes();
-	str += ':' + date.getSeconds();
+	str += (date.getMonth() + 1).toString().padStart(2,'0');
+	str += '.' + date.getDate().toString().padStart(2,'0');
+	str += ' ' + date.getHours().toString().padStart(2,'0');
+	str += ':' + date.getMinutes().toString().padStart(2,'0');
+	str += ':' + date.getSeconds().toString().padStart(2,'0');
 	return str;
 }
 function g_Info(i_msg)
