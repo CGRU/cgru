@@ -904,6 +904,20 @@ function sc_FilterShots(i_args)
 							if (st_obj[key].indexOf(val) == -1)
 								st_obj[key].push(val);
 					}
+
+				// Calc maximum priority:
+				if (task.priority != null)
+				{
+					if (st_obj.priority == null)
+					{
+						st_obj.priority = task.priority;
+					}
+					else
+					{
+						if (task.priority > st_obj.priority)
+							st_obj.priority = task.priority;
+					}
+				}
 			}
 		}
 
@@ -1098,6 +1112,15 @@ function sc_FilterShots(i_args)
 						{ found = true; break; }
 			}
 			else if (i_args.artists.indexOf('_null_') != -1)
+				found = true;
+		}
+
+		if( i_args.priority && found )
+		{
+			found = false;
+			if ((st_obj.priority != null) &&
+				((i_args.priority[0] == null) || (st_obj.priority >= i_args.priority[0])) &&
+				((i_args.priority[1] == null) || (st_obj.priority <= i_args.priority[1])))
 				found = true;
 		}
 

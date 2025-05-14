@@ -798,20 +798,31 @@ function task_StatusArtistClicked(i_name)
 
 function task_PriorityStyle(i_el, i_priority)
 {
+	let priority = 0;
+	if (i_priority == 1)
+		priority = 5;
+	else if (i_priority == 2)
+		priority = 10;
+	else if (i_priority == 3)
+		priority = 25;
+	else if (i_priority >= 4)
+		priority = 100;
+	else priority = i_priority;
+
 	// Backgound color:
-	let r = Math.round(i_priority / 10.0 * 255);
+	let r = Math.round(priority / 10.0 * 255);
 	let g = 255;
 	let b = 0;
-	let a = 0.2 + (Math.abs(i_priority) / 20.0)
+	let a = 0.2 + (Math.abs(priority) / 20.0)
 
-	if (i_priority > 10)
-		g = Math.round(255 * (1-((i_priority - 10.0) / 20.0)));
+	if (priority > 10)
+		g = Math.round(255 * (1-((priority - 10.0) / 20.0)));
 
-	if (i_priority < 0)
+	if (priority < 0)
 	{
 		r = 0;
 		g = 0;
-		b = Math.round(255 * (1.0-(i_priority / 20.0)));
+		b = Math.round(255 * (1.0-(priority / 20.0)));
 	}
 
 	if (r > 255) r = 255;
@@ -825,7 +836,7 @@ function task_PriorityStyle(i_el, i_priority)
 	i_el.style.backgroundColor = 'rgba('+r+','+g+','+b+','+a+')';
 
 	// Font size:
-	let size = 14 + Math.round(i_priority / 2.0);
+	let size = 14 + Math.round(priority / 2.0);
 	if (size > 100) size = 100;
 	if (size < 14) size = 14;
 	i_el.style.fontSize = size + 'px';

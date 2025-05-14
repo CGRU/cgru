@@ -435,7 +435,7 @@ function s_ProcessGUI()
 				args.tags.push($('search_tags').m_elTags[i].m_tag);
 			}
 
-	var parm = ['percent', 'finish', 'statmod', 'bodymod'];
+	let parm = ['priority','percent', 'finish', 'statmod', 'bodymod'];
 	for (let i = 0; i < parm.length; i++)
 	{
 		let min = c_GetElInteger($('search_' + parm[i] + 'min'));
@@ -473,22 +473,22 @@ function s_Search(i_args)
 	if (i_args.ann)
 		$('search_annotation').textContent = i_args.ann;
 	if (i_args.artists)
-		for (i = 0; i < $('search_artists').m_elArtists.length; i++)
+		for (let i = 0; i < $('search_artists').m_elArtists.length; i++)
 			c_ElSetSelected(
 				$('search_artists').m_elArtists[i],
 				i_args.artists.indexOf($('search_artists').m_elArtists[i].m_user.id) != -1);
 	if (i_args.flags)
-		for (i = 0; i < $('search_flags').m_elFlags.length; i++)
+		for (let i = 0; i < $('search_flags').m_elFlags.length; i++)
 			c_ElSetSelected(
 				$('search_flags').m_elFlags[i],
 				i_args.flags.indexOf($('search_flags').m_elFlags[i].m_flag) != -1);
 	if (i_args.tags)
-		for (i = 0; i < $('search_tags').m_elTags.length; i++)
+		for (let i = 0; i < $('search_tags').m_elTags.length; i++)
 			c_ElSetSelected(
 				$('search_tags').m_elTags[i], i_args.tags.indexOf($('search_tags').m_elTags[i].m_tag) != -1)
 
-				var parm = ['percent', 'finish', 'statmod', 'bodymod'];
-	for (var i = 0; i < parm.length; i++)
+	let parm = ['priority','percent', 'finish', 'statmod', 'bodymod'];
+	for (let i = 0; i < parm.length; i++)
 		if (i_args[parm[i]])
 		{
 			if ((i_args[parm[i]][0] != null) && (i_args[parm[i]][1] != null) &&
