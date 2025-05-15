@@ -598,8 +598,6 @@ void JobAf::v_action( Action & i_action)
 		{
 			for( int b = 0; b < m_blocks_num; b++)
 				m_blocks[b]->action(i_action);
-			// Each block will append the same time, so we should reset it
-			i_action.log.type = type;
 		}
 		else if(type == "reset_trying_next_tasks")
 		{

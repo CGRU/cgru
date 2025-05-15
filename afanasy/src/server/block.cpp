@@ -563,7 +563,6 @@ bool Block::action( Action & i_action)
 	{
 		std::string type;
 		af::jr_string("type", type, operation);
-		i_action.log.appendType(type);
 
 		if (type == "reset_error_hosts")
 		{
@@ -659,7 +658,6 @@ bool Block::action( Action & i_action)
 		{
 			std::string changes;
 			m_data->jsonRead( params, &changes);
-			i_action.log.appendType("params");
 
 			if( changes.empty())
 				return false;
