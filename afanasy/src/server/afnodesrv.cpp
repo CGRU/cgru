@@ -13,17 +13,18 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-AfNodeSrv::AfNodeSrv( af::Node * i_node, const std::string & i_store_dir):
-    m_from_store( false),
-	m_stored_ok( false),
-    m_prev_ptr( NULL),
-    m_next_ptr( NULL),
-	m_node( i_node)
+AfNodeSrv::AfNodeSrv(af::Node * i_node, const std::string & i_type_name, const std::string & i_store_dir):
+	m_from_store(false),
+	m_stored_ok(false),
+	m_prev_ptr(NULL),
+	m_next_ptr(NULL),
+	m_node(i_node),
+	m_type_name(i_type_name)
 {
-	if( i_store_dir.size())
+	if(i_store_dir.size())
 	{
 		m_from_store = true;
-		setStoreDir( i_store_dir);
+		setStoreDir(i_store_dir);
 	}
 }
 
@@ -128,6 +129,7 @@ void AfNodeSrv::action( Action & i_action)
 		return;
 
 	i_action.log.object = m_node->getName();
+	i_action.log.type = m_type_name + "s";
 
 	bool valid = false;
 	if( i_action.data->HasMember("operation"))
@@ -155,6 +157,8 @@ void AfNodeSrv::action( Action & i_action)
 			i_action.answerError(errlog);
 			return;
 		}
+
+		i_action.log.appendType(type.GetString());
 		valid = true;
 	}
 
@@ -164,6 +168,7 @@ void AfNodeSrv::action( Action & i_action)
 		if (params.IsObject())
 		{
 			m_node->jsonRead(params, i_action.getInfoPtr(), i_action.monitors);
+			i_action.log.appendType("params");
 			valid = true;
 		}
 		else

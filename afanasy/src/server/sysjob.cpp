@@ -628,7 +628,7 @@ void SysJob::v_getTaskOutput( af::MCTask & io_mctask, std::string & o_error) con
 
 void SysJob::appendSysJobLog(const std::string & message)
 {
-	ms_sysjob->appendJobLog(message);
+	ms_sysjob->appendLogInfo(message);
 }
 
 bool SysJob::initSystem()

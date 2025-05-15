@@ -69,12 +69,6 @@ public:
 	void addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
 	void remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
 
-	
-	inline void appendUserLog(const std::string & i_info, bool i_store = true){
-		appendLog(af::Log("users", getName(), i_info), i_store);}
-	inline void appendUserTypeLog(const std::string & i_type, const std::string & i_info, bool i_store = true){
-		appendLog(af::Log("users " + i_type, getName(), i_info), i_store);}
-
 private:
 	bool refreshCounters();
 

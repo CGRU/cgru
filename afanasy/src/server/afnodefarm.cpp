@@ -12,8 +12,8 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-AfNodeFarm::AfNodeFarm(af::Node * i_node, af::Farm * i_farm, int i_type, PoolSrv * i_parent, const std::string & i_store_dir):
-	AfNodeSrv(i_node, i_store_dir),
+AfNodeFarm::AfNodeFarm(af::Node * i_node, af::Farm * i_farm, int i_type, const std::string & i_type_name, PoolSrv * i_parent, const std::string & i_store_dir):
+	AfNodeSrv(i_node, i_type_name, i_store_dir),
 	m_type(i_type),
 	m_parent(i_parent),
 	m_farm(i_farm),

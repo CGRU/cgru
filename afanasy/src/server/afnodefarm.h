@@ -10,7 +10,7 @@ class PoolSrv;
 class AfNodeFarm: public AfNodeSrv
 {
 public:
-	AfNodeFarm(af::Node * i_node, af::Farm * i_farm, int i_type, PoolSrv * i_parent, const std::string & i_store_dir = "");
+	AfNodeFarm(af::Node * i_node, af::Farm * i_farm, int i_type, const std::string & i_type_name, PoolSrv * i_parent, const std::string & i_store_dir);
 	virtual ~AfNodeFarm();
 
 	enum Type {

@@ -39,15 +39,15 @@ BranchesContainer * BranchSrv::ms_branches = NULL;
 BranchSrv::BranchSrv(BranchSrv * i_parent, const std::string & i_path):
 	af::Branch(i_path),
 	m_parent(i_parent),
-	AfNodeSolve(this)
+	AfNodeSolve(this, "branch", "")
 {
-	appendBranchLog("Created from job.");
+	appendLogInfo("Created from job.");
 }
 
 BranchSrv::BranchSrv(const std::string & i_store_dir):
 	af::Branch(),
 	m_parent(NULL),
-	AfNodeSolve(this, i_store_dir)
+	AfNodeSolve(this, "branch", i_store_dir)
 {
 	int size;
 	char * data = af::fileRead(getStoreFile(), &size);
@@ -107,7 +107,7 @@ bool BranchSrv::initialize()
 			m_time_creation = time(NULL);
 			store();
 		}
-		appendBranchLog("Initialized from store.", false);
+		appendLogInfo("Initialized from store.", false);
 	}
 	else
 	{
@@ -139,7 +139,7 @@ bool BranchSrv::initialize()
 
 		setStoreDir(AFCommon::getStoreDirBranch(*this));
 		store();
-		appendBranchLog("Initialized.", false);
+		appendLogInfo("Initialized.", false);
 	}
 
 	return true;
@@ -151,8 +151,6 @@ BranchSrv::~BranchSrv()
 
 void BranchSrv::v_action(Action & i_action)
 {
-	i_action.log.type = "branches";
-
 	const JSON & operation = (*i_action.data)["operation"];
 	if (operation.IsObject())
 	{
@@ -246,14 +244,14 @@ void BranchSrv::deleteDoneJobs(Action & o_action, MonitorContainer * i_monitorin
 
 void BranchSrv::addBranch(BranchSrv * i_branch)
 {
-	appendBranchLog(std::string("Adding a branch: ") + i_branch->getName(), false);
+	appendLogInfo(std::string("Adding a branch: ") + i_branch->getName(), false);
 
 	m_branches_list.add(i_branch);
 }
 
 void BranchSrv::removeBranch(BranchSrv * i_branch)
 {
-	appendBranchLog(std::string("Removing a branch: ") + i_branch->getName(), false);
+	appendLogInfo(std::string("Removing a branch: ") + i_branch->getName(), false);
 
 	m_branches_list.remove(i_branch);
 }
@@ -266,7 +264,7 @@ void BranchSrv::addJob(JobAf * i_job, UserAf * i_user)
 		return;
 	}
 
-	appendBranchLog(std::string("Adding a job: ") + i_job->getName(), false);
+	appendLogInfo(std::string("Adding a job: ") + i_job->getName(), false);
 
 	m_jobs_list.add(i_job);
 
@@ -297,7 +295,7 @@ void BranchSrv::addUserJob(JobAf * i_job, UserAf * i_user)
 
 void BranchSrv::removeJob(JobAf * i_job, UserAf * i_user)
 {
-	appendBranchLog(std::string("Removing a job: ") + i_job->getName(), false);
+	appendLogInfo(std::string("Removing a job: ") + i_job->getName(), false);
 
 	m_jobs_list.remove(i_job);
 

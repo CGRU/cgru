@@ -25,7 +25,7 @@ class BranchSrv;
 class AfNodeSolve : public AfNodeSrv
 {
 public:
-	AfNodeSolve(af::Work *i_work, const std::string &i_store_dir = "");
+	AfNodeSolve(af::Work *i_work, const std::string & i_type_name, const std::string &i_store_dir);
 	virtual ~AfNodeSolve();
 
 	// Just interesting - good to show server load

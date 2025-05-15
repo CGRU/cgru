@@ -8,7 +8,7 @@ class Action;
 class AfNodeSrv
 {
 public:
-	AfNodeSrv( af::Node * i_node, const std::string & i_store_dir = "");
+	AfNodeSrv( af::Node * i_node, const std::string & i_type_name, const std::string & i_store_dir);
 	virtual ~AfNodeSrv();
 
 	inline af::Node * node() { return m_node; }
@@ -53,6 +53,11 @@ public:
 	af::Msg * writeLog(bool i_binary) const;
 	int calcLogWeight() const;
 
+	inline void appendLogInfo(const std::string & i_info, bool i_store = true){
+		appendLog(af::Log(m_type_name + "s", m_node->getName(), i_info), i_store);}
+	inline void appendLogTypeInfo(const std::string & i_type, const std::string & i_info, bool i_store = true){
+		appendLog(af::Log(m_type_name + "s " + i_type, m_node->getName(), i_info), i_store);}
+
 protected:
 	void setStoreDir( const std::string & i_store_dir);
 
@@ -64,6 +69,8 @@ private:
 	bool m_stored_ok;          ///< Store read successfuly
 	std::string m_store_dir;   ///< Store directory.
 	std::string m_store_file;  ///< Store file.
+
+	std::string m_type_name;
 
 private:
 /// Previous node pointer. Previous container node has a greater or equal priority.

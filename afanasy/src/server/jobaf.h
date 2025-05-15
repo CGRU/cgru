@@ -122,11 +122,6 @@ public:
 	/// Force refresh, that can be skipped on DONE job.
 	inline void forceRefresh() {m_force_refresh = true;}
 
-	inline void appendJobLog(const std::string & i_info, bool i_store = true){
-		appendLog(af::Log("jobs", getName() + "@" + m_user_name, i_info), i_store);}
-	inline void appendJobTypeLog(const std::string & i_type, const std::string & i_info, bool i_store = true){
-		appendLog(af::Log("jobs " + i_type, getName() + "@" + m_user_name, i_info), i_store);}
-
 	virtual void v_setHostsMaskFind()  override;
 	virtual void v_setHostsMaskRegEx() override;
 

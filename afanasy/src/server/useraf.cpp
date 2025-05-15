@@ -32,23 +32,23 @@
 
 UserContainer * UserAf::ms_users = NULL;
 
-UserAf::UserAf( const std::string & username, const std::string & host):
-	af::User( username, host),
-	AfNodeSolve( this)
+UserAf::UserAf(const std::string & username, const std::string & host):
+	af::User(username, host),
+	AfNodeSolve(this, "user", "")
 {
-	appendUserLog("Registered from job.");
+	appendLogInfo("Registered from job.");
 }
 
-UserAf::UserAf( JSON & i_object):
-    af::User(),
-	AfNodeSolve( this)
+UserAf::UserAf(JSON & i_object):
+	af::User(),
+	AfNodeSolve(this, "user", "")
 {
-	jsonRead( i_object);
+	jsonRead(i_object);
 }
 
 UserAf::UserAf( const std::string & i_store_dir):
 	af::User(),
-	AfNodeSolve( this, i_store_dir)
+	AfNodeSolve(this, "user", i_store_dir)
 {
 	int size;
 	char * data = af::fileRead( getStoreFile(), &size);
@@ -79,7 +79,7 @@ bool UserAf::initialize()
 			if( getTimeActivity() == 0 ) updateTimeActivity();
 			store();
 		}
-		appendUserLog("Initialized from store.", false);
+		appendLogInfo("Initialized from store.", false);
 	}
 	else
 	{
@@ -87,7 +87,7 @@ bool UserAf::initialize()
 		updateTimeActivity();
 		setStoreDir( AFCommon::getStoreDirUser( *this));
 		store();
-		appendUserLog("Registered.", false);
+		appendLogInfo("Registered.", false);
 	}
 
 	return true;
@@ -99,8 +99,6 @@ UserAf::~UserAf()
 
 void UserAf::v_action( Action & i_action)
 {
-	i_action.log.type = "users";
-
 	const JSON & operation = (*i_action.data)["operation"];
 	if( operation.IsObject())
 	{
@@ -160,7 +158,7 @@ void UserAf::logAction(const Action & i_action, const std::string & i_node_name)
 void UserAf::deleteNode( MonitorContainer * i_monitoring)
 {
 	AFCommon::QueueLog("Deleting user: " + v_generateInfoString( false));
-	appendUserLog("Became a zombie.");
+	appendLogInfo("Became a zombie.");
 
 	setZombie();
 
@@ -169,7 +167,7 @@ void UserAf::deleteNode( MonitorContainer * i_monitoring)
 
 void UserAf::addJob( JobAf * i_job)
 {
-	appendUserLog(std::string("Adding a job: ") + i_job->getName(), false);
+	appendLogInfo(std::string("Adding a job: ") + i_job->getName(), false);
 
 	updateTimeActivity();
 
@@ -189,7 +187,7 @@ void UserAf::addJob( JobAf * i_job)
 
 void UserAf::removeJob( JobAf * i_job)
 {
-	appendUserLog(std::string("Removing a job: ") + i_job->getName(), false);
+	appendLogInfo(std::string("Removing a job: ") + i_job->getName(), false);
 
 	// Remove running counts (runnig tasks num and capacity total) from Af::Work
 	remRunningCounts(*i_job);

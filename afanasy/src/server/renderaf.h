@@ -187,11 +187,6 @@ private:
 	// Check resources, on overflow emit RENDER_OVERLOAD event
 	bool checkOverload();
 
-	inline void appendRenderLog(const std::string & i_info, bool i_store = true){
-		appendLog(af::Log("renders", getName() + "@" + m_user_name, i_info), i_store);}
-	inline void appendRenderTypeLog(const std::string & i_type, const std::string & i_info, bool i_store = true){
-		appendLog(af::Log("renders " + i_type, getName() + "@" + m_user_name, i_info), i_store);}
-
 private:
 	std::list<std::string> m_tasks_log;							///< Tasks Log.
 

@@ -45,7 +45,7 @@ JobContainer *JobAf::ms_jobs  = NULL;
 
 JobAf::JobAf( JSON & i_object):
 	af::Job(),
-	AfNodeSolve( this)
+	AfNodeSolve(this, "job", "")
 {
 	initializeValues();
 	
@@ -67,7 +67,7 @@ JobAf::JobAf( JSON & i_object):
 
 JobAf::JobAf( const std::string & i_store_dir, bool i_system):
 	af::Job(),
-	AfNodeSolve( this, i_store_dir)
+	AfNodeSolve(this, "job", i_store_dir)
 {
 	AF_DEBUG << "store dir = " << i_store_dir;
 	
@@ -312,14 +312,14 @@ bool JobAf::initialize()
 		if( false == m_command_pre.empty())
 		{
 			AFCommon::executeCmd( m_command_pre);
-			appendJobTypeLog("pre command", m_command_pre);
+			appendLogTypeInfo("pre command", m_command_pre);
 		}
 		for( int b = 0; b < m_blocks_num; b++)
 		{
 			if( m_blocks_data[b]->hasCmdPre() )
 			{
 				AFCommon::executeCmd( m_blocks_data[b]->getCmdPre());
-				appendJobTypeLog("pre command", std::string("Block[") + m_blocks_data[b]->getName() + "]: " + m_blocks_data[b]->getCmdPre());
+				appendLogTypeInfo("pre command", std::string("Block[") + m_blocks_data[b]->getName() + "]: " + m_blocks_data[b]->getCmdPre());
 			}
 		}
 		// Process event
@@ -333,11 +333,11 @@ bool JobAf::initialize()
 			}
 		}
 
-		appendJobLog("Initialized.", false);
+		appendLogInfo("Initialized.", false);
 	}
 	else
 	{
-		appendJobLog("Initialized from database.", false);
+		appendLogInfo("Initialized from database.", false);
 	}
 
 	checkStates();
@@ -444,7 +444,7 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 	if (false == m_command_post.empty())
 	{
 		SysJob::AddPostCommand( m_command_post, m_blocks_num > 0 ? m_blocks_data[0]->getWDir(): "", m_user_name, m_name);
-		appendJobTypeLog("post command", m_command_post);
+		appendLogTypeInfo("post command", m_command_post);
 	}
 	// Process blocks post commands:
 	for (int b = 0; b < m_blocks_num; b++)
@@ -452,7 +452,7 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 		if (m_blocks_data[b]->hasCmdPost())
 		{
 			SysJob::AddPostCommand( m_blocks_data[b]->getCmdPost(), m_blocks_data[b]->getWDir(), m_user_name, m_name);
-			appendJobTypeLog("post command", std::string("Block[") + m_blocks_data[b]->getName() + "]: " + m_blocks_data[b]->getCmdPost());
+			appendLogTypeInfo("post command", std::string("Block[") + m_blocks_data[b]->getName() + "]: " + m_blocks_data[b]->getCmdPost());
 		}
 	}
 	
@@ -474,7 +474,6 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 
 void JobAf::v_action( Action & i_action)
 {
-	i_action.log.type = "jobs";
 	i_action.log.object = getName() + "@" + getUserName();
 
 	// If action has blocks ids array - action to for blocks
@@ -547,14 +546,12 @@ void JobAf::v_action( Action & i_action)
 		std::string type;
 		af::jr_string("type", type, operation);
 
-		i_action.log.appendType(type);
-
 		if( type == "delete")
 		{
 			if( m_id == AFJOB::SYSJOB_ID )
 			{
 				const std::string err = "System job can't be deleted.";
-				appendJobTypeLog("delete error", err);
+				appendLogTypeInfo("delete error", err);
 				AFCommon::QueueLogError(err + " By " + i_action.log.subject);
 				i_action.answerError(err);
 				return;
@@ -1065,7 +1062,7 @@ bool JobAf::solveTaskOnRender(RenderAf * i_render, int i_block_num, int i_task_n
 	if( m_time_started == 0 )
 	{
 		m_time_started = time(NULL);
-		appendJobLog("Started.", false);
+		appendLogInfo("Started.", false);
 		store();
 	}
 
@@ -1257,9 +1254,9 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 			if( m_time_started == 0 )
 			{
 				m_time_started = m_time_done;
-				appendJobLog("Started.", false);
+				appendLogInfo("Started.", false);
 			}
-			appendJobLog("Done.", false);
+			appendLogInfo("Done.", false);
 			jobchanged = af::Monitor::EVT_jobs_change;
 			store();
 		}

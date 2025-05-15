@@ -33,9 +33,9 @@
 
 MonitorContainer * MonitorAf::m_monitors = NULL;
 
-MonitorAf::MonitorAf( af::Msg * msg, UserContainer * i_users):
-	af::Monitor( msg),
-	AfNodeSrv( this)
+MonitorAf::MonitorAf(af::Msg * msg, UserContainer * i_users):
+	af::Monitor(msg),
+	AfNodeSrv(this, "monitor", "")
 {
 	UserAf * user = i_users->getUser( m_user_name);
 	if( user )
@@ -45,9 +45,9 @@ MonitorAf::MonitorAf( af::Msg * msg, UserContainer * i_users):
 	}
 }
 
-MonitorAf::MonitorAf( const JSON & i_obj, UserContainer * i_users):
-	AfNodeSrv( this),
-	af::Monitor( i_obj)
+MonitorAf::MonitorAf(const JSON & i_obj, UserContainer * i_users):
+	AfNodeSrv(this, "monitor", ""),
+	af::Monitor(i_obj)
 {
 	UserAf * user = i_users->getUser( m_user_name);
 	if( user )

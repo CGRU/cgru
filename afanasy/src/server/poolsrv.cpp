@@ -35,14 +35,14 @@ PoolsContainer * PoolSrv::ms_pools = NULL;
 
 PoolSrv::PoolSrv(PoolSrv * i_parent, const std::string & i_path):
 	af::Pool(i_path),
-	AfNodeFarm(this, this, AfNodeFarm::TPool, i_parent)
+	AfNodeFarm(this, this, AfNodeFarm::TPool, "pool", i_parent, "")
 {
-	appendPoolLog("Created.");
+	appendLogInfo("Created.");
 }
 
 PoolSrv::PoolSrv(const std::string & i_store_dir):
 	af::Pool(),
-	AfNodeFarm(this, this, AfNodeFarm::TPool, NULL, i_store_dir)
+	AfNodeFarm(this, this, AfNodeFarm::TPool, "pool", NULL, i_store_dir)
 {
 	int size;
 	char * data = af::fileRead(getStoreFile(), &size);
@@ -88,7 +88,7 @@ bool PoolSrv::initialize()
 			m_time_creation = time(NULL);
 			store();
 		}
-		appendPoolLog("Initialized from store.", false);
+		appendLogInfo("Initialized from store.", false);
 	}
 	else
 	{
@@ -103,7 +103,7 @@ bool PoolSrv::initialize()
 
 		setStoreDir(AFCommon::getStoreDirPool(*this));
 		store();
-		appendPoolLog("Initialized.", false);
+		appendLogInfo("Initialized.", false);
 	}
 
 	return true;
@@ -115,15 +115,11 @@ PoolSrv::~PoolSrv()
 
 void PoolSrv::v_action(Action & i_action)
 {
-	i_action.log.type = "pools";
-
 	const JSON & operation = (*i_action.data)["operation"];
 	if (operation.IsObject())
 	{
 		std::string type;
 		af::jr_string("type", type, operation);
-
-		i_action.log.appendType(type);
 
 		if (type == "delete")
 		{
@@ -320,13 +316,13 @@ bool PoolSrv::addPool(PoolSrv * i_pool)
 		return false;
 	}
 
-	appendPoolLog(std::string("Adding a pool: ") + i_pool->getName(), false);
+	appendLogInfo(std::string("Adding a pool: ") + i_pool->getName(), false);
 
 	i_pool->m_parent = this;
 
 	if (false == ms_pools->addPoolToContainer(i_pool))
 	{
-		appendPoolLog("ERROR: Failed to add pool to container. See server log for details.");
+		appendLogInfo("ERROR: Failed to add pool to container. See server log for details.");
 		return false;
 	}
 
@@ -337,7 +333,7 @@ bool PoolSrv::addPool(PoolSrv * i_pool)
 
 void PoolSrv::removePool(PoolSrv * i_pool)
 {
-	appendPoolLog(std::string("Removing a pool: ") + i_pool->getName(), false);
+	appendLogInfo(std::string("Removing a pool: ") + i_pool->getName(), false);
 
 	m_pools_list.remove(i_pool);
 }
@@ -350,14 +346,14 @@ void PoolSrv::addRender(RenderAf * i_render)
 		return;
 	}
 
-	appendPoolLog(std::string("Adding a render: ") + i_render->getName(), false);
+	appendLogInfo(std::string("Adding a render: ") + i_render->getName(), false);
 
 	m_renders_list.push_back(i_render);
 }
 
 void PoolSrv::removeRender(RenderAf * i_render)
 {
-	appendPoolLog(std::string("Removing a render: ") + i_render->getName(), false);
+	appendLogInfo(std::string("Removing a render: ") + i_render->getName(), false);
 
 	m_renders_list.remove(i_render);
 }
