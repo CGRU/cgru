@@ -185,9 +185,42 @@ function ab_CompareFlags(a,b)
 	return 0;
 }
 
+function ab_CollectPriority(i_bm, i_uid)
+{
+	let priority = 0;
+	if (null == i_bm.status)
+		return priority;
+	if (null == i_bm.status.tasks)
+		return priority;
+
+	for (let t in i_bm.status.tasks)
+	{
+		let task = i_bm.status.tasks[t];
+
+		if (task.priority == null)
+			continue;
+		if (task.artists == null)
+			continue;
+		if (task.artists.indexOf(i_uid) == -1)
+			continue;
+
+		if (task.priority > priority)
+			priority = task.priority;
+	}
+
+	return priority;
+}
+
 function ab_CompareBookmarks(i_uid) {
 return function (a,b)
 {
+	let priority_a = ab_CollectPriority(a, i_uid);
+	let priority_b = ab_CollectPriority(b, i_uid);
+	if (priority_a < priority_b)
+		return 1;
+	if (priority_a > priority_b)
+		return -1;
+
 	return ab_CompareFlags(ab_CollectFlags(a, i_uid), ab_CollectFlags(b, i_uid));
 }}
 

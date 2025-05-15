@@ -905,8 +905,8 @@ function sc_FilterShots(i_args)
 								st_obj[key].push(val);
 					}
 
-				// Calc maximum priority:
-				if (task.priority != null)
+				// Calc maximum priority, but task should be completed:
+				if ((task.priority != null) && (task.progress < 100) && (task.flags.indexOf('done') == -1))
 				{
 					if (st_obj.priority == null)
 					{
