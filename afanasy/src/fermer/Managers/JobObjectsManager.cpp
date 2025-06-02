@@ -102,7 +102,7 @@ bool JobObjectsManager::setMaxRunningTaskPerBlades(const QList<int>& i_ids, int 
 bool JobObjectsManager::setSlots(const QList<int>& i_ids, int i_value) {return m_RLS->jobSetSlots(i_ids, i_value);}
 bool JobObjectsManager::setNeedMemory(const QList<int>& i_ids, int i_value) {return m_RLS->jobSetNeedMemory(i_ids, i_value);}
 bool JobObjectsManager::setNeedHdd(const QList<int>& i_ids, int i_value) {return m_RLS->jobSetNeedHdd(i_ids, i_value);}
-bool JobObjectsManager::setNeedPower(const QList<int>& i_ids, int i_value) {return m_RLS->jobSetNeedMemory(i_ids, i_value);}
+bool JobObjectsManager::setNeedPower(const QList<int>& i_ids, int i_value) {return m_RLS->jobSetNeedPower(i_ids, i_value);}
 bool JobObjectsManager::setErrorAvoidHost(const QList<int>& i_ids, int i_value) {return m_RLS->jobSetErrorAvoidHost(i_ids, i_value);}
 
 QString JobObjectsManager::getInfo(int i_id, const QString& i_key)
