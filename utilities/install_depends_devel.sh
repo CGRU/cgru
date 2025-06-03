@@ -18,6 +18,7 @@ function debianArch(){
 	packages="$packages python3-dev"
 	packages="$packages python3-pyqt5"
 	packages="$packages libpq-dev"
+	packages="$packages make"
 	packages="$packages p7zip-full"
 	packages="$packages libzip-dev"
 	packages="$packages rsync"
