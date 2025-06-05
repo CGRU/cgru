@@ -209,4 +209,4 @@ for package in $packages_noarch; do
 done
 
 echo $cmd
-$cmd
+$cmd "$@"
