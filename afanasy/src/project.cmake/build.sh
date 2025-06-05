@@ -88,7 +88,7 @@ case ${DISTRIBUTIVE} in
 			export AF_ADD_CFLAGS="$AF_ADD_CFLAGS -std=c++11"
 		fi
         ;;
-    RedHat|Rocky)
+    RedHat|Rocky|AlmaLinux)
         export AF_ADD_LFLAGS="$AF_ADD_LFLAGS -lpthread -ldl"
         ;;
     Mageia|ROSA)
