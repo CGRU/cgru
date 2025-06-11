@@ -12,33 +12,24 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-AfNodeFarm::AfNodeFarm(af::Node * i_node, af::Farm * i_farm, int i_type, const std::string & i_type_name, PoolSrv * i_parent, const std::string & i_store_dir):
-	AfNodeSrv(i_node, i_type_name, i_store_dir),
-	m_type(i_type),
-	m_parent(i_parent),
-	m_farm(i_farm),
-	m_change_event(0)
+AfNodeFarm::AfNodeFarm(af::Node *i_node, af::Farm *i_farm, int i_type, const std::string &i_type_name,
+					   PoolSrv *i_parent, const std::string &i_store_dir)
+	: AfNodeSrv(i_node, i_type_name, i_store_dir), m_type(i_type), m_parent(i_parent), m_farm(i_farm),
+	  m_change_event(0)
 {
-	switch(m_type)
+	switch (m_type)
 	{
-	case AfNodeFarm::TPool:
-		m_change_event = af::Monitor::EVT_pools_change;
-		break;
-	case AfNodeFarm::TRenderer:
-		m_change_event = af::Monitor::EVT_renders_change;
-		break;
-	default:
-		AF_ERR << "AfNodeFarm invalid type: " << m_type;
+		case AfNodeFarm::TPool: m_change_event = af::Monitor::EVT_pools_change; break;
+		case AfNodeFarm::TRenderer: m_change_event = af::Monitor::EVT_renders_change; break;
+		default: AF_ERR << "AfNodeFarm invalid type: " << m_type;
 	}
 }
 
-AfNodeFarm::~AfNodeFarm()
-{
-}
+AfNodeFarm::~AfNodeFarm() {}
 
-bool AfNodeFarm::actionFarm(Action & i_action)
+bool AfNodeFarm::actionFarm(Action &i_action)
 {
-	const JSON & operation = (*i_action.data)["operation"];
+	const JSON &operation = (*i_action.data)["operation"];
 	std::string mode;
 	if (false == af::jr_string("mode", mode, operation))
 	{
@@ -91,12 +82,12 @@ bool AfNodeFarm::actionFarm(Action & i_action)
 
 		if (mode == "service_enable")
 		{
-			it  = m_farm->m_services_disabled.begin();
+			it = m_farm->m_services_disabled.begin();
 			end = m_farm->m_services_disabled.end();
 		}
 		else
 		{
-			it  = m_farm->m_services.begin();
+			it = m_farm->m_services.begin();
 			end = m_farm->m_services.end();
 		}
 
@@ -107,7 +98,7 @@ bool AfNodeFarm::actionFarm(Action & i_action)
 
 				if (mode == "service_remove")
 				{
-					it  = m_farm->m_services.erase(it);
+					it = m_farm->m_services.erase(it);
 					end = m_farm->m_services.end();
 					found = true;
 					continue;
@@ -120,7 +111,7 @@ bool AfNodeFarm::actionFarm(Action & i_action)
 				}
 				else if ((mode == "service_enable") && isServiceDisabled(*it))
 				{
-					it  = m_farm->m_services_disabled.erase(it);
+					it = m_farm->m_services_disabled.erase(it);
 					end = m_farm->m_services_disabled.end();
 					found = true;
 					continue;
@@ -180,9 +171,9 @@ bool AfNodeFarm::actionFarm(Action & i_action)
 	return false;
 }
 
-bool AfNodeFarm::actionTicket(Action & i_action)
+bool AfNodeFarm::actionTicket(Action &i_action)
 {
-	const JSON & operation = (*i_action.data)["operation"];
+	const JSON &operation = (*i_action.data)["operation"];
 
 	std::string tk_name;
 	// Check that ticket name is specified:
@@ -210,7 +201,7 @@ bool AfNodeFarm::actionTicket(Action & i_action)
 	af::jr_bool("host", tk_host, operation);
 
 	// Choose to pool or host tickets to operate
-	std::unordered_map<std::string, af::Farm::Tiks> * tickets;
+	std::unordered_map<std::string, af::Farm::Tiks> *tickets;
 	if (tk_host)
 	{
 		tickets = &m_farm->m_tickets_host;
@@ -261,27 +252,26 @@ bool AfNodeFarm::actionTicket(Action & i_action)
 		i_action.answerLog("Ticket " + tk_name + " modified");
 	}
 
-
 	return true;
 }
 
-bool AfNodeFarm::hasService(const std::string & i_service_name) const
+bool AfNodeFarm::hasService(const std::string &i_service_name) const
 {
-	for (const std::string & s : m_farm->m_services)
+	for (const std::string &s : m_farm->m_services)
 		if (s == i_service_name)
 			return true;
 	return false;
 }
 
-bool AfNodeFarm::isServiceDisabled(const std::string & i_service_name) const
+bool AfNodeFarm::isServiceDisabled(const std::string &i_service_name) const
 {
-	for (const std::string & s : m_farm->m_services_disabled)
+	for (const std::string &s : m_farm->m_services_disabled)
 		if (s == i_service_name)
 			return true;
 	return false;
 }
 
-bool AfNodeFarm::canRunService(const std::string & i_service_name, bool i_hasServicesSetup) const
+bool AfNodeFarm::canRunService(const std::string &i_service_name, bool i_hasServicesSetup) const
 {
 	if (isServiceDisabled(i_service_name))
 		return false;
@@ -302,7 +292,7 @@ bool AfNodeFarm::canRunService(const std::string & i_service_name, bool i_hasSer
 	return false == i_hasServicesSetup;
 }
 
-bool AfNodeFarm::hasHostTicket(const std::string & i_name, const int32_t & i_count) const
+bool AfNodeFarm::hasHostTicket(const std::string &i_name, const int32_t &i_count) const
 {
 	std::unordered_map<std::string, af::Farm::Tiks>::const_iterator it = m_farm->m_tickets_host.find(i_name);
 	if (it != m_farm->m_tickets_host.end())

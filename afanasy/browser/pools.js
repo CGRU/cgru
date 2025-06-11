@@ -14,7 +14,7 @@
 	pools.js - methods and structs for monitoring and handling of pools
 */
 
-"use strict";
+'use strict';
 
 var pools = null;
 
@@ -24,9 +24,7 @@ PoolNode.onMonitorCreate = function() {
 	pools = {};
 };
 
-function PoolNode()
-{
-}
+function PoolNode() {}
 
 PoolNode.prototype.init = function() {
 	this.element.classList.add('pool');
@@ -36,7 +34,7 @@ PoolNode.prototype.init = function() {
 	this.element.appendChild(this.elName);
 	this.elName.title = 'Pool name (path)';
 
-	this.elParams = cm_ElCreateFloatText(this.element,'right','Parameters');
+	this.elParams = cm_ElCreateFloatText(this.element, 'right', 'Parameters');
 
 	this.element.appendChild(document.createElement('br'));
 
@@ -101,7 +99,7 @@ PoolNode.prototype.update = function(i_obj) {
 	if (renders_pools[this.params.name])
 		for (let render of renders_pools[this.params.name])
 			render.offsetHierarchy();
-			//^ this function requires filled in pools object
+	//^ this function requires filled in pools object
 
 	cm_GetState(this.params.state, this.state, this.element);
 
@@ -170,7 +168,7 @@ PoolNode.prototype.update = function(i_obj) {
 		this.element.classList.remove('running');
 
 
-	var name = '<b>' + cm_PathBase(this.params.name)  + '/</b>';
+	var name = '<b>' + cm_PathBase(this.params.name) + '/</b>';
 	if (this.params.pattern)
 		name += ' [' + this.params.pattern + ']';
 	this.elName.innerHTML = name;
@@ -184,17 +182,27 @@ PoolNode.prototype.update = function(i_obj) {
 		this.elPoolsCounts.innerHTML = counts;
 
 		let renders = '';
-		if (this.params.renders_total)   renders += 'Renders Total:<b>' + this.params.renders_total   + '</b>';
-		if (this.params.renders_busy)    renders += ' Busy:<b>'         + this.params.renders_busy    + '</b>';
-		if (this.params.renders_ready)   renders += ' Ready:<b>'        + this.params.renders_ready   + '</b>';
-		if (this.params.renders_online)  renders += ' Online:<b>'       + this.params.renders_online  + '</b>';
-		if (this.params.renders_offline) renders += ' Offline:<b>'      + this.params.renders_offline + '</b>';
-		if (this.params.renders_nimby)   renders += ' Nimby:<b>'        + this.params.renders_nimby   + '</b>';
-		if (this.params.renders_paused)  renders += ' Paused:<b>'       + this.params.renders_paused  + '</b>';
-		if (this.params.renders_sick)    renders += ' Sick:<b>'         + this.params.renders_sick    + '</b>';
+		if (this.params.renders_total)
+			renders += 'Renders Total:<b>' + this.params.renders_total + '</b>';
+		if (this.params.renders_busy)
+			renders += ' Busy:<b>' + this.params.renders_busy + '</b>';
+		if (this.params.renders_ready)
+			renders += ' Ready:<b>' + this.params.renders_ready + '</b>';
+		if (this.params.renders_online)
+			renders += ' Online:<b>' + this.params.renders_online + '</b>';
+		if (this.params.renders_offline)
+			renders += ' Offline:<b>' + this.params.renders_offline + '</b>';
+		if (this.params.renders_nimby)
+			renders += ' Nimby:<b>' + this.params.renders_nimby + '</b>';
+		if (this.params.renders_paused)
+			renders += ' Paused:<b>' + this.params.renders_paused + '</b>';
+		if (this.params.renders_sick)
+			renders += ' Sick:<b>' + this.params.renders_sick + '</b>';
 
-		if (this.params.run_tasks   ) renders += ' Running Tasks:<b>' + this.params.run_tasks    + '</b>';
-		if (this.params.run_capacity) renders += ' Capacity:<b>'      + this.params.run_capacity + '</b>';
+		if (this.params.run_tasks)
+			renders += ' Running Tasks:<b>' + this.params.run_tasks + '</b>';
+		if (this.params.run_capacity)
+			renders += ' Capacity:<b>' + this.params.run_capacity + '</b>';
 
 		this.elRendersCounts.innerHTML = renders;
 	}
@@ -206,17 +214,27 @@ PoolNode.prototype.update = function(i_obj) {
 		this.elPoolsCounts.innerHTML = counts;
 
 		let renders = '';
-		if (this.params.renders_total)   renders += 'Renders:<b>' + this.params.renders_total   + '</b>';
-		if (this.params.renders_busy)    renders += ' Busy:<b>'   + this.params.renders_busy    + '</b>';
-		if (this.params.renders_ready)   renders += ' RDY:<b>'    + this.params.renders_ready   + '</b>';
-		if (this.params.renders_online)  renders += ' ON:<b>'     + this.params.renders_online  + '</b>';
-		if (this.params.renders_offline) renders += ' OFF:<b>'    + this.params.renders_offline + '</b>';
-		if (this.params.renders_nimby)   renders += ' Nby:<b>'    + this.params.renders_nimby   + '</b>';
-		if (this.params.renders_paused)  renders += ' Pau:<b>'    + this.params.renders_paused  + '</b>';
-		if (this.params.renders_sick)    renders += ' Sick:<b>'   + this.params.renders_sick    + '</b>';
+		if (this.params.renders_total)
+			renders += 'Renders:<b>' + this.params.renders_total + '</b>';
+		if (this.params.renders_busy)
+			renders += ' Busy:<b>' + this.params.renders_busy + '</b>';
+		if (this.params.renders_ready)
+			renders += ' RDY:<b>' + this.params.renders_ready + '</b>';
+		if (this.params.renders_online)
+			renders += ' ON:<b>' + this.params.renders_online + '</b>';
+		if (this.params.renders_offline)
+			renders += ' OFF:<b>' + this.params.renders_offline + '</b>';
+		if (this.params.renders_nimby)
+			renders += ' Nby:<b>' + this.params.renders_nimby + '</b>';
+		if (this.params.renders_paused)
+			renders += ' Pau:<b>' + this.params.renders_paused + '</b>';
+		if (this.params.renders_sick)
+			renders += ' Sick:<b>' + this.params.renders_sick + '</b>';
 
-		if (this.params.run_tasks   ) renders += ' Tasks:<b>'    + this.params.run_tasks    + '</b>';
-		if (this.params.run_capacity) renders += ' Capacity:<b>' + this.params.run_capacity + '</b>';
+		if (this.params.run_tasks)
+			renders += ' Tasks:<b>' + this.params.run_tasks + '</b>';
+		if (this.params.run_capacity)
+			renders += ' Capacity:<b>' + this.params.run_capacity + '</b>';
 
 		this.elRendersCounts.innerHTML = renders;
 	}
@@ -228,17 +246,27 @@ PoolNode.prototype.update = function(i_obj) {
 		this.elPoolsCounts.innerHTML = counts;
 
 		let renders = '';
-		if (this.params.renders_total)   renders += 'Renders:<b>' + this.params.renders_total   + '</b>';
-		if (this.params.renders_busy)    renders += ' B:<b>'      + this.params.renders_busy    + '</b>';
-		if (this.params.renders_ready)   renders += ' RDY:<b>'    + this.params.renders_ready   + '</b>';
-		if (this.params.renders_online)  renders += ' ON:<b>'     + this.params.renders_online  + '</b>';
-		if (this.params.renders_offline) renders += ' OFF:<b>'    + this.params.renders_offline + '</b>';
-		if (this.params.renders_nimby)   renders += ' N:<b>'      + this.params.renders_nimby   + '</b>';
-		if (this.params.renders_paused)  renders += ' P:<b>'      + this.params.renders_paused  + '</b>';
-		if (this.params.renders_sick)    renders += ' S:<b>'      + this.params.renders_sick    + '</b>';
+		if (this.params.renders_total)
+			renders += 'Renders:<b>' + this.params.renders_total + '</b>';
+		if (this.params.renders_busy)
+			renders += ' B:<b>' + this.params.renders_busy + '</b>';
+		if (this.params.renders_ready)
+			renders += ' RDY:<b>' + this.params.renders_ready + '</b>';
+		if (this.params.renders_online)
+			renders += ' ON:<b>' + this.params.renders_online + '</b>';
+		if (this.params.renders_offline)
+			renders += ' OFF:<b>' + this.params.renders_offline + '</b>';
+		if (this.params.renders_nimby)
+			renders += ' N:<b>' + this.params.renders_nimby + '</b>';
+		if (this.params.renders_paused)
+			renders += ' P:<b>' + this.params.renders_paused + '</b>';
+		if (this.params.renders_sick)
+			renders += ' S:<b>' + this.params.renders_sick + '</b>';
 
-		if (this.params.run_tasks   ) renders += ' T:<b>' + this.params.run_tasks    + '</b>';
-		if (this.params.run_capacity) renders += ' C:<b>' + this.params.run_capacity + '</b>';
+		if (this.params.run_tasks)
+			renders += ' T:<b>' + this.params.run_tasks + '</b>';
+		if (this.params.run_capacity)
+			renders += ' C:<b>' + this.params.run_capacity + '</b>';
 
 		this.elRendersCounts.innerHTML = renders;
 	}
@@ -253,7 +281,7 @@ PoolNode.prototype.update = function(i_obj) {
 
 	// Show servives:
 	this.elServices.textContent = '';
-	farm_showServices(this.elServices, this.params,'pool');
+	farm_showServices(this.elServices, this.params, 'pool');
 
 	// Show tickets:
 	this.elTickets.textContent = '';
@@ -270,22 +298,18 @@ PoolNode.prototype.update = function(i_obj) {
 PoolNode.prototype.refresh = function() {};
 
 PoolNode.createPanels = function(i_monitor) {
-
 	// Admin related functions:
 	if (!g_GOD())
 		return;
 
 	var acts = {};
-	acts.add_pool = {
-		'label': 'ADD POOL',
-		'node_type': 'pools',
-		'handle': 'addPoolDialog',
-		'tooltip': 'Add pool'};
-/*	acts.revert_renders = {
-		'label': 'REVERT',
-		'node_type': 'pools',
-		'handle': 'mh_Oper',
-		'tooltip': 'Revert renders'};*/
+	acts.add_pool =
+		{'label': 'ADD POOL', 'node_type': 'pools', 'handle': 'addPoolDialog', 'tooltip': 'Add pool'};
+	/*	acts.revert_renders = {
+			'label': 'REVERT',
+			'node_type': 'pools',
+			'handle': 'mh_Oper',
+			'tooltip': 'Revert renders'};*/
 	i_monitor.createCtrlBtns(acts);
 
 
@@ -350,13 +374,13 @@ PoolNode.prototype.updatePanels = function() {
 // We can't use PoolNode as this is not prototype function.
 RenderNode.addPoolDialog = function(i_args) {
 	new cgru_Dialog({
-		"wnd": i_args.monitor.window,
-		"receiver": i_args.monitor.cur_item,
-		"handle": 'addPoolDo',
-		"param": i_args.name,
-		"name": 'add_pool',
-		"title": 'Add a child pool to this poll',
-		"info": 'Enter a new child pool name:'
+		'wnd': i_args.monitor.window,
+		'receiver': i_args.monitor.cur_item,
+		'handle': 'addPoolDo',
+		'param': i_args.name,
+		'name': 'add_pool',
+		'title': 'Add a child pool to this poll',
+		'info': 'Enter a new child pool name:'
 	});
 };
 
@@ -404,32 +428,32 @@ PoolNode.prototype.editTicket = function(i_value, i_param) {
 
 
 PoolNode.prototype.onDoubleClick = function(e) {
-	g_ShowObject({"object": this.params}, {"evt": e, "wnd": this.monitor.window});
+	g_ShowObject({'object': this.params}, {'evt': e, 'wnd': this.monitor.window});
 };
 
 PoolNode.params_pool = {
-	pattern               : {'type':'str', 'label':'Pattern'},
-	priority              : {'type':'num', 'label':'Priority'},
-	max_tasks_host        : {'type':'num', 'label':'Host Max Tasks'},
-	capacity_host         : {'type':'num', 'label':'Host Max Capacity'},
-	sick_errors_count     : {'type':'num', 'label':'Sick Errors Count'},
-	annotation            : {'type':'str', 'label':'Annotation'},
+	pattern: {'type': 'str', 'label': 'Pattern'},
+	priority: {'type': 'num', 'label': 'Priority'},
+	max_tasks_host: {'type': 'num', 'label': 'Host Max Tasks'},
+	capacity_host: {'type': 'num', 'label': 'Host Max Capacity'},
+	sick_errors_count: {'type': 'num', 'label': 'Sick Errors Count'},
+	annotation: {'type': 'str', 'label': 'Annotation'},
 
-	idle_wolsleep_time    : {'type':'num', 'label':'Idle WOL sleep time'},
-	idle_free_time        : {'type':'num', 'label':'Idle FREE time'},
-	busy_nimby_time       : {'type':'num', 'label':'Busy NIMBY time'},
-	idle_cpu              : {'type':'num', 'label':'Idle CPU percent'},
-	busy_cpu              : {'type':'num', 'label':'Busy CPU percent'},
-	idle_mem              : {'type':'num', 'label':'Idle memory percent'},
-	busy_mem              : {'type':'num', 'label':'Busy memory percent'},
-	idle_swp              : {'type':'num', 'label':'Idle swap percent'},
-	busy_swp              : {'type':'num', 'label':'Busy swap percent'},
-	idle_hddgb            : {'type':'num', 'label':'Idle HDD Gb'},
-	busy_hddgb            : {'type':'num', 'label':'Busy HDD Gb'},
-	idle_hddio            : {'type':'num', 'label':'Idle HDD I/O'},
-	busy_hddio            : {'type':'num', 'label':'Busy HDD I/O'},
-	idle_netmbs           : {'type':'num', 'label':'Idle Network Mb/sec'},
-	busy_netmbs           : {'type':'num', 'label':'Busy Network Mb/sec'}
+	idle_wolsleep_time: {'type': 'num', 'label': 'Idle WOL sleep time'},
+	idle_free_time: {'type': 'num', 'label': 'Idle FREE time'},
+	busy_nimby_time: {'type': 'num', 'label': 'Busy NIMBY time'},
+	idle_cpu: {'type': 'num', 'label': 'Idle CPU percent'},
+	busy_cpu: {'type': 'num', 'label': 'Busy CPU percent'},
+	idle_mem: {'type': 'num', 'label': 'Idle memory percent'},
+	busy_mem: {'type': 'num', 'label': 'Busy memory percent'},
+	idle_swp: {'type': 'num', 'label': 'Idle swap percent'},
+	busy_swp: {'type': 'num', 'label': 'Busy swap percent'},
+	idle_hddgb: {'type': 'num', 'label': 'Idle HDD Gb'},
+	busy_hddgb: {'type': 'num', 'label': 'Busy HDD Gb'},
+	idle_hddio: {'type': 'num', 'label': 'Idle HDD I/O'},
+	busy_hddio: {'type': 'num', 'label': 'Busy HDD I/O'},
+	idle_netmbs: {'type': 'num', 'label': 'Idle Network Mb/sec'},
+	busy_netmbs: {'type': 'num', 'label': 'Busy Network Mb/sec'}
 };
 
 PoolNode.createParams = function() {
@@ -446,4 +470,3 @@ PoolNode.createParams = function() {
 
 	PoolNode.params_created = true;
 };
-

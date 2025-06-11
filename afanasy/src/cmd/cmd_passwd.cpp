@@ -14,24 +14,24 @@ CmdPasswd::CmdPasswd()
 	setHelp("md5 [string] Calculate and print MD5.");
 }
 
-CmdPasswd::~CmdPasswd(){}
+CmdPasswd::~CmdPasswd() {}
 
-bool CmdPasswd::v_processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdPasswd::v_processArguments(int argc, char **argv, af::Msg &msg)
 {
-	std::string str( argv[0]);
+	std::string str(argv[0]);
 	unsigned char key[32];
 
 	MD5_CTX context;
-	MD5Init   ( &context);
-	MD5Update ( &context, (unsigned char *)str.c_str(), str.size());
-	MD5Final  ( key, &context);
+	MD5Init(&context);
+	MD5Update(&context, (unsigned char *)str.c_str(), str.size());
+	MD5Final(key, &context);
 
 	std::string md5;
 	char buffer[3];
 	buffer[2] = '\0';
-	for( int i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
-		sprintf( buffer, "%02x", key[i]);
+		sprintf(buffer, "%02x", key[i]);
 		md5 += buffer;
 	}
 

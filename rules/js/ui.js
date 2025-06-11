@@ -14,16 +14,16 @@
 	ui.js - TODO: description
 */
 
-"use strict";
+'use strict';
 
 var u_elements = ['asset', 'assets', 'info', 'log', 'navig', 'cycle', 'thumbnail'];
 var u_el = {};
 var u_views = ['asset', 'files', 'body', 'comments'];
 
 var u_guest_attrs = [
-	{"name": 'id', "label": 'Login Name', "required": true}, {"name": 'title', "label": 'Full Name'},
-	{"name": 'email', "label": 'Email', "info": 'gravarar, hidden'},
-	{"name": 'avatar', "label": 'Avatar', "info": 'link'}, {"name": 'signature', "label": 'Signature'}
+	{'name': 'id', 'label': 'Login Name', 'required': true}, {'name': 'title', 'label': 'Full Name'},
+	{'name': 'email', 'label': 'Email', 'info': 'gravarar, hidden'},
+	{'name': 'avatar', 'label': 'Avatar', 'info': 'link'}, {'name': 'signature', 'label': 'Signature'}
 ];
 
 var u_body_filename = 'body.html';
@@ -38,7 +38,7 @@ cgru_params.push(['back_body', 'Body', '', 'Enter background style']);
 cgru_params.push(['back_files', 'Files', '', 'Enter background style']);
 cgru_params.push(['back_comments', 'Comments', '', 'Enter background style']);
 
-var u_gui_size_handle = '6px';  // with a border
+var u_gui_size_handle = '6px';	// with a border
 
 var u_thumbstime = {};
 var u_resizing_name = null;
@@ -61,8 +61,13 @@ function View_body_Close()
 function View_files_Open()
 {
 	if (g_elCurFolder)
-		new FilesView(
-			{"el": $('files'), "path": g_elCurFolder.m_path, "walk": g_elCurFolder.m_dir, "limits": false, 'name':'files'});
+		new FilesView({
+			'el': $('files'),
+			'path': g_elCurFolder.m_path,
+			'walk': g_elCurFolder.m_dir,
+			'limits': false,
+			'name': 'files'
+		});
 }
 
 function View_files_Close()
@@ -120,7 +125,7 @@ function u_Init()
 	if (localStorage.execute_soft == null)
 		localStorage.execute_soft = 'OFF';
 	$('execute_soft').textContent = localStorage.execute_soft;
-	
+
 	if (localStorage.navig_filter_flags_include)
 		u_navig_filter_flags_include = localStorage.navig_filter_flags_include.split(',');
 	if (localStorage.navig_filter_flags_exclude)
@@ -139,7 +144,7 @@ function u_BodyEditOnKeyDown(i_e)
 {
 	if (u_body_editing)
 	{
-		if ((i_e.keyCode == 13) && i_e.ctrlKey)  // CTRL + ENTER
+		if ((i_e.keyCode == 13) && i_e.ctrlKey)	 // CTRL + ENTER
 		{
 			u_BodyEditSave();
 			i_e.currentTarget.blur();
@@ -157,9 +162,7 @@ function u_InitAuth()
 		$('execute_div').style.display = 'block';
 }
 
-function u_InitConfigured()
-{
-}
+function u_InitConfigured() {}
 
 function u_Process()
 {
@@ -215,7 +218,7 @@ function u_Process()
 	if (c_HasFileSystem())
 	{
 		$('open').style.display = 'block';
-		cgru_CmdExecProcess({"element": $('open'), "open": path});
+		cgru_CmdExecProcess({'element': $('open'), 'open': path});
 	}
 	else
 	{
@@ -230,10 +233,10 @@ function u_Process()
 	if (c_RuFileExists('location.json'))
 	{
 		n_GetFile({
-			"path": c_GetRuFilePath('location.json'),
-			"func": u_LocationInfoReceived,
-			"info": 'location.json',
-			"local": true
+			'path': c_GetRuFilePath('location.json'),
+			'func': u_LocationInfoReceived,
+			'info': 'location.json',
+			'local': true
 		});
 	}
 }
@@ -376,12 +379,12 @@ function u_ApplyStyles()
 	{
 		u_background = localStorage.background;
 		document.body.style.background = localStorage.background;
-/* It can be just inherited, no need to set it to children (background: inherit;)
-		var backs =
-			['header', 'footer', 'navig_div', 'sidepanel_div', 'content', 'navig_handle', 'sidepanel_handle'];
-		for (var i = 0; i < backs.length; i++)
-			$(backs[i]).style.background = localStorage.background;
-*/
+		/* It can be just inherited, no need to set it to children (background: inherit;)
+				var backs =
+					['header', 'footer', 'navig_div', 'sidepanel_div', 'content', 'navig_handle',
+		   'sidepanel_handle']; for (var i = 0; i < backs.length; i++)
+					$(backs[i]).style.background = localStorage.background;
+		*/
 	}
 
 	if (localStorage.text_color && localStorage.text_color.length)
@@ -475,29 +478,31 @@ function u_NavigSettingsOnClick()
 }
 function u_NavigFiltersRefresh()
 {
-//	if ($('navig_settings').m_opened != true)
-//		return;
+	//	if ($('navig_settings').m_opened != true)
+	//		return;
 
 	localStorage.navig_filter_flags_exclude = u_navig_filter_flags_exclude.join(',');
 	localStorage.navig_filter_flags_include = u_navig_filter_flags_include.join(',');
 
-	let elFlagsEx = st_SetElFlags({"flags":u_navig_filter_flags_exclude}, $('navig_filter_flags_exclude'), true);
+	let elFlagsEx =
+		st_SetElFlags({'flags': u_navig_filter_flags_exclude}, $('navig_filter_flags_exclude'), true);
 	for (let el of elFlagsEx)
 	{
-		el.title = "Double click to remove.";
-		el.ondblclick = function(e)
-		{
-			u_navig_filter_flags_exclude = u_navig_filter_flags_exclude.filter(i => i !== e.currentTarget.m_name);
+		el.title = 'Double click to remove.';
+		el.ondblclick = function(e) {
+			u_navig_filter_flags_exclude =
+				u_navig_filter_flags_exclude.filter(i => i !== e.currentTarget.m_name);
 			u_NavigFiltersRefresh();
 		}
 	}
-	let elFlagsIn = st_SetElFlags({"flags":u_navig_filter_flags_include}, $('navig_filter_flags_include'), true);
+	let elFlagsIn =
+		st_SetElFlags({'flags': u_navig_filter_flags_include}, $('navig_filter_flags_include'), true);
 	for (let el of elFlagsIn)
 	{
-		el.title = "Double click to remove.";
-		el.ondblclick = function(e)
-		{
-			u_navig_filter_flags_include = u_navig_filter_flags_include.filter(i => i !== e.currentTarget.m_name);
+		el.title = 'Double click to remove.';
+		el.ondblclick = function(e) {
+			u_navig_filter_flags_include =
+				u_navig_filter_flags_include.filter(i => i !== e.currentTarget.m_name);
 			u_NavigFiltersRefresh();
 		}
 	}
@@ -513,13 +518,14 @@ function u_NavigFiltersRefresh()
 	for (let elFolder of elFolders)
 	{
 		let fobject = elFolder.m_fobject;
-		if (fobject == null) continue;
+		if (fobject == null)
+			continue;
 
 		let flags = [];
 		if (fobject.status && fobject.status.flags)
 			flags = fobject.status.flags;
 
-//		let toHide = false;
+		//		let toHide = false;
 		let toHide = (u_navig_filter_flags_include.length > 0);
 		for (let flag of flags)
 		{
@@ -547,13 +553,21 @@ function u_NavigFiltersRefresh()
 
 	let elFlagsColl = $('navig_filter_flags_collected');
 
-	let elFlags = st_SetElFlags({"flags":flags_coll}, elFlagsColl, true);
+	let elFlags = st_SetElFlags({'flags': flags_coll}, elFlagsColl, true);
 
 	for (let elFlag of elFlags)
-		elFlag.onclick = function(e){c_ElToggleSelected(e.currentTarget)};
+		elFlag.onclick = function(e) {
+			c_ElToggleSelected(e.currentTarget)
+		};
 }
-function u_NavigFilterIncludeOnClick() {u_NavigFilterInExOnClick('include');}
-function u_NavigFilterExcludeOnClick() {u_NavigFilterInExOnClick('exclude');}
+function u_NavigFilterIncludeOnClick()
+{
+	u_NavigFilterInExOnClick('include');
+}
+function u_NavigFilterExcludeOnClick()
+{
+	u_NavigFilterInExOnClick('exclude');
+}
 function u_NavigFilterInExOnClick(i_inex)
 {
 	let elFlagsColl = $('navig_filter_flags_collected');
@@ -566,8 +580,8 @@ function u_NavigFilterInExOnClick(i_inex)
 			flags.push(el.m_name);
 
 	for (let flag of flags)
-		if (window['u_navig_filter_flags_'+i_inex].indexOf(flag) == -1)
-			window['u_navig_filter_flags_'+i_inex].push(flag);
+		if (window['u_navig_filter_flags_' + i_inex].indexOf(flag) == -1)
+			window['u_navig_filter_flags_' + i_inex].push(flag);
 
 	u_NavigFiltersRefresh();
 }
@@ -672,7 +686,9 @@ function u_DrawColorBars(i_args)
 			// window.console.log('rgb('+r+','+g+','+b+')');
 
 			el.m_data = data;
-			el.onclick = function(e) { onclick(e.currentTarget.m_color, e.currentTarget.m_data); };
+			el.onclick = function(e) {
+				onclick(e.currentTarget.m_color, e.currentTarget.m_data);
+			};
 		}
 	}
 }
@@ -696,12 +712,12 @@ function u_BodyLoad(i_args)
 		cache = 0;
 
 	n_GetFile({
-		"path": c_GetRuFilePath(u_body_filename),
-		"func": u_BodyReceived,
-		"cache_time": cache,
-		"info": 'body.html',
-		"parse": false,
-		"local": true
+		'path': c_GetRuFilePath(u_body_filename),
+		'func': u_BodyReceived,
+		'cache_time': cache,
+		'info': 'body.html',
+		'parse': false,
+		'local': true
 	});
 }
 
@@ -793,7 +809,7 @@ function u_BodyEditStart()
 	$('body_panel').style.display = 'none';
 	$('body_panel_edit').style.display = 'block';
 
-	ec_EditingStart({'el':$('body_body'),'form':'body'});
+	ec_EditingStart({'el': $('body_body'), 'form': 'body'});
 
 	u_body_editing = true;
 }
@@ -814,7 +830,7 @@ function u_BodyEditCancel(i_text)
 	$('body_panel').style.display = 'block';
 	$('body_panel_edit').style.display = 'none';
 
-	ec_EditingFinish({'el':$('body_body')});
+	ec_EditingFinish({'el': $('body_body')});
 }
 
 function u_BodyEditSave()
@@ -832,9 +848,9 @@ function u_BodyEditSave()
 	st_SetTimeCode($('body_timecode_edit_value').textContent);
 
 	var res = n_Request({
-		"send": {"save": {"file": c_GetRuFilePath(u_body_filename), "data": text}},
-		"func": u_BodyEditSaveFinished,
-		"info": 'body save'
+		'send': {'save': {'file': c_GetRuFilePath(u_body_filename), 'data': text}},
+		'func': u_BodyEditSaveFinished,
+		'info': 'body save'
 	});
 	// console.log('RES:'+JSON.stringify( res));
 }
@@ -850,7 +866,7 @@ function u_BodyEditSaveFinished(i_data, i_args)
 	// console.log('ARG'+JSON.stringify( i_args));
 	st_BodyModified();
 
-	nw_MakeNews({"title": 'body'});
+	nw_MakeNews({'title': 'body'});
 
 	u_BodyEditCancel();
 
@@ -858,7 +874,7 @@ function u_BodyEditSaveFinished(i_data, i_args)
 	c_RuFileAdd(u_body_filename);
 	// Body file be new and does exist before saving.
 
-	u_BodyLoad({"cache": false});
+	u_BodyLoad({'cache': false});
 }
 
 function u_BodyEditMarkup()
@@ -1129,10 +1145,10 @@ function u_ThumbnailMake(i_args)
 		cmd += ' --nomovie';
 
 	n_Request({
-		"send": {"cmdexec": {"cmds": [cmd]}},
-		"func": u_ThumbnailShow,
-		"info": i_args.info + ' thumbnail',
-		"local": true
+		'send': {'cmdexec': {'cmds': [cmd]}},
+		'func': u_ThumbnailShow,
+		'info': i_args.info + ' thumbnail',
+		'local': true
 	});
 }
 function u_ThumbnailShow(i_data)
@@ -1297,7 +1313,7 @@ function u_CreateActions(i_actions, i_el)
 				terminal = action.terminal.replace(/@PATH@/g, c_PathPM_Rules2Client(g_CurPath()));
 
 			// Make an executable button:
-			cgru_CmdExecProcess({'element':el,'cmd':cmd,'open':open,'terminal':terminal});
+			cgru_CmdExecProcess({'element': el, 'cmd': cmd, 'open': open, 'terminal': terminal});
 		}
 
 		// Add action on CTRL or SHIFT click to add/remove favourites
@@ -1360,7 +1376,7 @@ function u_CmdExecServerOnClick(i_evt)
 	let cmd = el.m_cmd;
 	cmd = activity_ChangeCmd(cmd);
 	cmd = fv_CmdExecFilter(cmd);
-	c_Info(cmd , false);
+	c_Info(cmd, false);
 }
 
 function u_CmdExecServerOnDblClick(i_evt)
@@ -1373,10 +1389,10 @@ function u_CmdExecServerOnDblClick(i_evt)
 	c_Info('Executing:\n' + cmd);
 
 	n_Request({
-		"send": {"cmdexec": {"cmds": [cmd]}},
-		"func": u_CmdExecServerFinished,
-		"el"  : el,
-		"info": 'cmdexec_server'
+		'send': {'cmdexec': {'cmds': [cmd]}},
+		'func': u_CmdExecServerFinished,
+		'el': el,
+		'info': 'cmdexec_server'
 	});
 
 	el.classList.add('running');
@@ -1384,10 +1400,9 @@ function u_CmdExecServerOnDblClick(i_evt)
 
 function u_CmdExecServerFinished(i_data, i_args)
 {
-	//console.log(i_args);
-	//console.log(i_data);
+	// console.log(i_args);
+	// console.log(i_data);
 
 	let el = i_args.el;
 	el.classList.remove('running');
 }
-

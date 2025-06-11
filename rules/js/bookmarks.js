@@ -14,7 +14,7 @@
 	bookmarks.js - TODO: description
 */
 
-"use strict";
+'use strict';
 
 var bm_initialized = false;
 
@@ -25,36 +25,34 @@ var bm_elements = [];
 
 var bm_flags_selected = []
 
-function bm_Init()
-{
-	// Init localStorage:
-	if (localStorage.bookmarks_opened == null)
-		localStorage.bookmarks_opened = 'false';
+	function bm_Init() {
+		// Init localStorage:
+		if (localStorage.bookmarks_opened == null)
+			localStorage.bookmarks_opened = 'false';
 
-	if (localStorage.bookmarks_projects_closed == null)
-		localStorage.bookmarks_projects_closed = '';
+		if (localStorage.bookmarks_projects_closed == null)
+			localStorage.bookmarks_projects_closed = '';
 
-	if (localStorage.bookmarks_scenes_closed == null)
-		localStorage.bookmarks_scenes_closed = '';
+		if (localStorage.bookmarks_scenes_closed == null)
+			localStorage.bookmarks_scenes_closed = '';
 
-	if (localStorage.bookmarks_thumbnails_show == null)
-		localStorage.bookmarks_thumbnails_show = 'false';
+		if (localStorage.bookmarks_thumbnails_show == null)
+			localStorage.bookmarks_thumbnails_show = 'false';
 
 
-	// Bookmarks are not available for guests:
-	if (g_auth_user == null)
-		return;
+		// Bookmarks are not available for guests:
+		if (g_auth_user == null)
+			return;
 
-	// Bookmarks are available only for artists:
-	if (c_IsNotAnArtist())
-		return;
+		// Bookmarks are available only for artists:
+		if (c_IsNotAnArtist())
+			return;
 
-	$('sidepanel_bookmarks').style.display = 'block';
-	bm_initialized = true;
-}
+		$('sidepanel_bookmarks').style.display = 'block';
+		bm_initialized = true;
+	}
 
-function bm_InitConfigured()
-{
+function bm_InitConfigured() {
 	if (false == bm_initialized)
 		return;
 
@@ -70,13 +68,11 @@ function bm_InitConfigured()
 	setInterval(bm_Load, RULES.bookmarks.refresh * 1000);
 }
 
-function bm_GetUserFileName()
-{
+function bm_GetUserFileName() {
 	return ad_GetUserFileName(g_auth_user.id, 'bookmarks');
 }
 
-function bm_OnClick()
-{
+function bm_OnClick() {
 	if ($('sidepanel').classList.contains('opened'))
 	{
 		if ($('sidepanel_bookmarks').classList.contains('opened'))
@@ -91,15 +87,13 @@ function bm_OnClick()
 	}
 }
 
-function bm_Close()
-{
+function bm_Close() {
 	$('sidepanel_bookmarks').classList.remove('opened');
 	$('bookmarks').innerHTML = '';
 	localStorage.bookmarks_opened = 'false';
 }
 
-function bm_Open(i_load)
-{
+function bm_Open(i_load) {
 	if (false == bm_initialized)
 		return;
 
@@ -107,13 +101,12 @@ function bm_Open(i_load)
 	localStorage.bookmarks_opened = 'true';
 
 	if (i_load !== false)
-		bm_Load({"info": 'open'});
+		bm_Load({'info': 'open'});
 	else
 		bm_Show();
 }
 
-function bm_Load(i_args)
-{
+function bm_Load(i_args) {
 	if (false == bm_initialized)
 		return;
 
@@ -136,8 +129,7 @@ function bm_Load(i_args)
 	});
 }
 
-function bm_Received(i_user, i_args)
-{
+function bm_Received(i_user, i_args) {
 	if (false == bm_initialized)
 		return;
 
@@ -162,8 +154,7 @@ function bm_Received(i_user, i_args)
 	bm_Show();
 }
 
-function bm_Compare(a, b)
-{
+function bm_Compare(a, b) {
 	if (a == null)
 		return 1;
 	if (b == null)
@@ -175,8 +166,7 @@ function bm_Compare(a, b)
 	return 0;
 }
 
-function bm_CollectProjects(i_bookmarks)
-{
+function bm_CollectProjects(i_bookmarks) {
 	i_bookmarks.sort(bm_Compare);
 
 	let collection = [];
@@ -225,8 +215,7 @@ function bm_CollectProjects(i_bookmarks)
 	return collection;
 }
 
-function bm_Show()
-{
+function bm_Show() {
 	if (false == bm_initialized)
 		return;
 
@@ -359,9 +348,8 @@ function bm_Show()
 				let label = scene.name + ' - ' + scene.bms.length;
 				scene.elLabel.textContent = label;
 
-				scene.elLabel.title = scene.path
-						+ '\nBookmarks count: ' + scene.bms.length
-						+ '\nClick to toggle collapse';
+				scene.elLabel.title =
+					scene.path + '\nBookmarks count: ' + scene.bms.length + '\nClick to toggle collapse';
 			}
 
 			project_count += scene.bms.length;
@@ -380,9 +368,8 @@ function bm_Show()
 		let label = project.name + ' - ' + project_count;
 		project.elLabel.textContent = label;
 
-		project.elLabel.title = 'Project: ' + project.name
-				+ '\nBookmarks count: ' + project_count
-				+ '\nClick to toggle collapse';
+		project.elLabel.title =
+			'Project: ' + project.name + '\nBookmarks count: ' + project_count + '\nClick to toggle collapse';
 	}
 
 	bm_HighlightCurrent();
@@ -392,10 +379,9 @@ function bm_Show()
 	bm_DeleteObsoleteForTime();
 }
 
-function bm_CreateBookmark(i_bm)
-{
+function bm_CreateBookmark(i_bm) {
 	let name = i_bm.path.split('/');
-	name = name[name.length-1];
+	name = name[name.length - 1];
 
 	let el = document.createElement('div');
 	el.classList.add('bookmark');
@@ -405,7 +391,9 @@ function bm_CreateBookmark(i_bm)
 	elDel.classList.add('button');
 	elDel.classList.add('delete');
 	elDel.m_path = i_bm.path;
-	elDel.ondblclick = function(e) { bm_Delete([e.currentTarget.m_path]); };
+	elDel.ondblclick = function(e) {
+		bm_Delete([e.currentTarget.m_path]);
+	};
 	elDel.title = 'Double click to delete.';
 
 	let elFav = document.createElement('div');
@@ -413,26 +401,31 @@ function bm_CreateBookmark(i_bm)
 	elFav.classList.add('favourite_toggle');
 	elFav.m_bm = i_bm;
 	elFav.title = 'Double click to toggle favourite.';
-	elFav.ondblclick = function(e) {bm_FavouriteToggle(e.currentTarget.m_bm);};
+	elFav.ondblclick = function(e) {
+		bm_FavouriteToggle(e.currentTarget.m_bm);
+	};
 
 	var elPath = document.createElement('a');
 	el.appendChild(elPath);
 	elPath.classList.add('name');
 	elPath.textContent = name;
 	elPath.href = '#' + i_bm.path;
-	elPath.onclick = function(e){bm_clicked = true};
+	elPath.onclick = function(e) {
+		bm_clicked = true
+	};
 
 	el.m_elThumb_div = document.createElement('div');
 	el.appendChild(el.m_elThumb_div);
-	el.m_elThumb_div.classList.add('thumb_div','activity_filter');
+	el.m_elThumb_div.classList.add('thumb_div', 'activity_filter');
 	el.m_elThumb_div.m_tags = [];
 	if (i_bm.status && i_bm.status.tasks)
 		for (let t in i_bm.status.tasks)
 		{
 			let task = i_bm.status.tasks[t];
 			if (task.artists && (task.artists.indexOf(g_auth_user.id) != -1))
-				if (task.tags) for (let tag of task.tags)
-					el.m_elThumb_div.m_tags.push(tag);
+				if (task.tags)
+					for (let tag of task.tags)
+						el.m_elThumb_div.m_tags.push(tag);
 		}
 
 	// Display status:
@@ -460,8 +453,7 @@ function bm_CreateBookmark(i_bm)
 	return el;
 }
 
-function bm_ProjectClicked(i_evt)
-{
+function bm_ProjectClicked(i_evt) {
 	let el = i_evt.currentTarget.parentElement;
 	el.classList.toggle('opened');
 	el.classList.toggle('closed');
@@ -481,8 +473,7 @@ function bm_ProjectClicked(i_evt)
 	localStorage.bookmarks_projects_closed = list;
 }
 
-function bm_SceneClicked(i_evt)
-{
+function bm_SceneClicked(i_evt) {
 	let el = i_evt.currentTarget.parentElement;
 	el.classList.toggle('opened');
 	el.classList.toggle('closed');
@@ -492,7 +483,7 @@ function bm_SceneClicked(i_evt)
 	{
 		for (let s = 0; s < bm_projects[p].scenes.length; s++)
 		{
-			let scene =  bm_projects[p].scenes[s];
+			let scene = bm_projects[p].scenes[s];
 
 			if (scene.path == null)
 				continue;
@@ -510,8 +501,7 @@ function bm_SceneClicked(i_evt)
 	localStorage.bookmarks_scenes_closed = list;
 }
 
-function bm_FlagClicked(i_evt)
-{
+function bm_FlagClicked(i_evt) {
 	let flag = i_evt.currentTarget.m_name;
 
 	if (bm_flags_selected.indexOf(flag) == -1)
@@ -550,9 +540,7 @@ function bm_FlagClicked(i_evt)
 			count_prj += count_scn;
 		}
 	}
-}
-function bm_Filter(i_bm)
-{
+} function bm_Filter(i_bm) {
 	if (bm_flags_selected.length == 0)
 		return true;
 
@@ -561,18 +549,19 @@ function bm_Filter(i_bm)
 
 	let statuses = [i_bm.status];
 	let tasks = i_bm.status.tasks;
-	if (tasks) for (let task in tasks)
-	{
-		task = tasks[task];
-		if (task.deleted)
-			continue;
-		if (task.artists == null)
-			continue;
-		if (task.artists.indexOf(g_auth_user.id) == -1)
-			continue;
+	if (tasks)
+		for (let task in tasks)
+		{
+			task = tasks[task];
+			if (task.deleted)
+				continue;
+			if (task.artists == null)
+				continue;
+			if (task.artists.indexOf(g_auth_user.id) == -1)
+				continue;
 
-		statuses.push(task);
-	}
+			statuses.push(task);
+		}
 
 	for (let stat of statuses)
 	{
@@ -589,16 +578,14 @@ function bm_Filter(i_bm)
 	return false;
 }
 
-function bm_NavigatePost()
-{
+function bm_NavigatePost() {
 	if ($('sidepanel').classList.contains('opened') != true)
 		return;
 
 	bm_HighlightCurrent();
 }
 
-function bm_ActualStatus(i_status, i_user)
-{
+function bm_ActualStatus(i_status, i_user) {
 	if (i_status == null)
 		return false;
 
@@ -645,13 +632,11 @@ function bm_ActualStatus(i_status, i_user)
 	return true;
 }
 
-function bm_StatusesChanged(i_args)
-{
+function bm_StatusesChanged(i_args) {
 	bm_Load({'info': 'statuses'});
 }
 
-function bm_HighlightCurrent()
-{
+function bm_HighlightCurrent() {
 	let cur_path = g_CurPath();
 	for (let i = 0; i < bm_elements.length; i++)
 	{
@@ -663,7 +648,7 @@ function bm_HighlightCurrent()
 			{
 				if ((bm_clicked == false) && (nw_clicked == false))
 				{
-					bm_elements[i].scrollIntoView({behavior:'auto',block:'center',inline:'center'});
+					bm_elements[i].scrollIntoView({behavior: 'auto', block: 'center', inline: 'center'});
 				}
 
 				if (g_CurPathDummy() || (false == bm_ActualStatus(RULES.status)))
@@ -681,27 +666,25 @@ function bm_HighlightCurrent()
 	bm_clicked = false;
 }
 
-function bm_Delete(i_paths)
-{
+function bm_Delete(i_paths) {
 	if (i_paths.length == 0)
 	{
 		c_Error('No bookmarks to delete.');
-		bm_Load({"info": 'not deleted'});
+		bm_Load({'info': 'not deleted'});
 		return;
 	}
 
 	var obj = {};
 	obj.objects = [];
 	for (var i = 0; i < i_paths.length; i++)
-		obj.objects.push({"path": i_paths[i]});
+		obj.objects.push({'path': i_paths[i]});
 	obj.delarray = 'bookmarks';
 
 	obj.file = bm_GetUserFileName();
-	n_Request({"send": {"editobj": obj}, "func": bm_DeleteFinished});
+	n_Request({'send': {'editobj': obj}, 'func': bm_DeleteFinished});
 }
 
-function bm_DeleteFinished(i_data)
-{
+function bm_DeleteFinished(i_data) {
 	if ((i_data == null) || (i_data.error))
 	{
 		c_Error(i_data.error);
@@ -709,23 +692,21 @@ function bm_DeleteFinished(i_data)
 	}
 
 	c_Info('Bookmarks deleted');
-	bm_Load({"info": 'deleted'});
+	bm_Load({'info': 'deleted'});
 }
 
-function bm_FavouriteToggle(i_bm)
-{
+function bm_FavouriteToggle(i_bm) {
 	let favourite = (true != i_bm.favourite);
 	let obj = {};
 	obj.replace = true;
 	obj.objects = [];
-	obj.objects.push({"path": i_bm.path,"favourite":favourite});
+	obj.objects.push({'path': i_bm.path, 'favourite': favourite});
 	obj.id = 'path';
 	obj.file = bm_GetUserFileName();
-	n_Request({"send": {"editobj": obj}, "func": bm_FavouriteToggle_Finished});
+	n_Request({'send': {'editobj': obj}, 'func': bm_FavouriteToggle_Finished});
 }
 
-function bm_FavouriteToggle_Finished(i_data)
-{
+function bm_FavouriteToggle_Finished(i_data) {
 	if ((i_data == null) || (i_data.error))
 	{
 		c_Error(i_data.error);
@@ -734,19 +715,16 @@ function bm_FavouriteToggle_Finished(i_data)
 
 	c_Info('Bookmark favourite toggled.');
 	bm_clicked = true;
-	bm_Load({"info": 'favourite'});
+	bm_Load({'info': 'favourite'});
 }
 
-function bm_DeleteObsoleteOnClick()
-{
+function bm_DeleteObsoleteOnClick() {
 	let bookmarks_deleted = bm_DeleteObsoleteForTime(true);
 	if (bookmarks_deleted == 0)
 		c_Info('No obsolete bookmarks found.');
 	else
 		c_Info('Bookmarks deleted: ' + bookmarks_deleted);
-}
-function bm_DeleteObsoleteForTime(i_delete_any_time)
-{
+} function bm_DeleteObsoleteForTime(i_delete_any_time) {
 	let paths = [];
 	let cur_seconds = c_DT_CurSeconds();
 	for (let i = 0; i < bm_elements.length; i++)
@@ -757,7 +735,7 @@ function bm_DeleteObsoleteForTime(i_delete_any_time)
 		if (bm.favourite)
 			continue;
 
-		if ( ! bm.mtime)
+		if (!bm.mtime)
 		{
 			paths.push(bm.path);
 			c_Log('Deleting invalid bookmark: ' + bm.path + ' - no modification time.');
@@ -770,8 +748,9 @@ function bm_DeleteObsoleteForTime(i_delete_any_time)
 			if ((cur_seconds - bm.mtime) > (RULES.bookmarks.inactive_delete_days * 24 * 60 * 60))
 			{
 				paths.push(bm.path);
-				c_Log('Deleting inactive bookmark: ' + bm.path + ' - '
-						+ c_DT_StrFromSec(bm.mtime) + ' - ' + RULES.bookmarks.inactive_delete_days + ' days.');
+				c_Log(
+					'Deleting inactive bookmark: ' + bm.path + ' - ' + c_DT_StrFromSec(bm.mtime) + ' - ' +
+					RULES.bookmarks.inactive_delete_days + ' days.');
 			}
 
 			continue;
@@ -789,8 +768,9 @@ function bm_DeleteObsoleteForTime(i_delete_any_time)
 		if ((cur_seconds - bm.mtime) > (RULES.bookmarks.obsolete_delete_days * 24 * 60 * 60))
 		{
 			paths.push(bm.path);
-			c_Log('Deleting obsolete bookmark: ' + bm.path + ' - '
-					+ c_DT_StrFromSec(bm.mtime) + ' - ' + RULES.bookmarks.obsolete_delete_days + ' days.');
+			c_Log(
+				'Deleting obsolete bookmark: ' + bm.path + ' - ' + c_DT_StrFromSec(bm.mtime) + ' - ' +
+				RULES.bookmarks.obsolete_delete_days + ' days.');
 			continue;
 		}
 	}
@@ -803,8 +783,7 @@ function bm_DeleteObsoleteForTime(i_delete_any_time)
 
 /* ---------------- [ thumbnail functions ] -------------------------------------------------------------- */
 
-function bm_ThumbnailsOnClick()
-{
+function bm_ThumbnailsOnClick() {
 	if (localStorage.bookmarks_thumbnails_show == 'true')
 		localStorage.bookmarks_thumbnails_show = 'false';
 	else
@@ -812,16 +791,14 @@ function bm_ThumbnailsOnClick()
 	bm_ThumbnailsShowHide();
 }
 
-function bm_ThumbnailsShowHide()
-{
+function bm_ThumbnailsShowHide() {
 	if (localStorage.bookmarks_thumbnails_show == 'true')
 		bm_ThumbnailsShow();
 	else
 		bm_ThumbnailsHide();
 }
 
-function bm_ThumbnailsShow()
-{
+function bm_ThumbnailsShow() {
 	c_ElSetSelected($('bookmarks_thumbs_btn'), true);
 
 	for (let i = 0; i < bm_elements.length; i++)
@@ -838,7 +815,9 @@ function bm_ThumbnailsShow()
 			el.m_elThumb.appendChild(img);
 			img.src = RULES.root + el.m_bookmark.path + '/' + RUFOLDER + '/thumbnail.jpg';
 			img.style.display = 'none';
-			img.onload = function(i_el) { i_el.currentTarget.style.display = 'block'; }
+			img.onload = function(i_el) {
+				i_el.currentTarget.style.display = 'block';
+			}
 		}
 
 		el.m_elThumb.style.display = 'block';
@@ -846,8 +825,7 @@ function bm_ThumbnailsShow()
 	}
 }
 
-function bm_ThumbnailsHide()
-{
+function bm_ThumbnailsHide() {
 	c_ElSetSelected($('bookmarks_thumbs_btn'), false);
 
 	for (let i = 0; i < bm_elements.length; i++)

@@ -35,7 +35,7 @@ namespace af
 /// Afanasy Node.
 class Node : public Af
 {
-public:
+  public:
 	Node();
 	virtual ~Node();
 
@@ -47,14 +47,14 @@ public:
 	inline int64_t getFlags() const { return m_flags; }
 	inline int64_t getState() const { return m_state; }
 
-	inline bool hasCustomData() const {return m_custom_data.size() != 0;}
-	inline bool  noCustomData() const {return m_custom_data.size() == 0;}
+	inline bool hasCustomData() const { return m_custom_data.size() != 0; }
+	inline bool noCustomData() const { return m_custom_data.size() == 0; }
 
-    inline const std::string & getAnnotation() const {return m_annotation; }
-	inline const std::string & getCustomData() const {return m_custom_data;}
-	inline const std::string & getSrvInfo()    const {return m_srv_info;   }
+	inline const std::string &getAnnotation() const { return m_annotation; }
+	inline const std::string &getCustomData() const { return m_custom_data; }
+	inline const std::string &getSrvInfo() const { return m_srv_info; }
 
-    friend class ::AfContainer;
+	friend class ::AfContainer;
 	friend class ::AfList;
 
 	virtual int v_calcWeight() const; ///< Calculate and return memory size.
@@ -77,23 +77,23 @@ public:
 
 	virtual inline long long getTimeCreation() const { return 0; }
 
-	void jsonRead(
-		const JSON &i_object, std::string *io_changes = NULL, MonitorContainer *i_monitoring = NULL);
+	void jsonRead(const JSON &i_object, std::string *io_changes = NULL,
+				  MonitorContainer *i_monitoring = NULL);
 	virtual void v_jsonWrite(std::ostringstream &o_str, int i_type) const;
 
-	inline const std::map<std::string, int32_t> & getRunnigServices() const {return m_running_services;}
+	inline const std::map<std::string, int32_t> &getRunnigServices() const { return m_running_services; }
 
-protected:
+  protected:
 	virtual void v_readwrite(Msg *msg); ///< Read or write node attributes in message
 
 	virtual void v_priorityChanged(MonitorContainer *i_monitoring);
 
-	void incrementService(const std::string & i_name, int count = 1);
-	void decrementService(const std::string & i_name, int count = 1);
+	void incrementService(const std::string &i_name, int count = 1);
+	void decrementService(const std::string &i_name, int count = 1);
 
-	inline void clearRunningServices() {m_running_services.clear();}
+	inline void clearRunningServices() { m_running_services.clear(); }
 
-protected:
+  protected:
 	/// Node id, unique for nodes of the same type. It is a position in container where node is stored.
 	int32_t m_id;
 
@@ -115,8 +115,8 @@ protected:
 
 	std::string m_annotation;
 	std::string m_custom_data;
-	std::string m_srv_info;       ///< Some info that server can show to user.
+	std::string m_srv_info; ///< Some info that server can show to user.
 
 	std::map<std::string, int32_t> m_running_services;
 };
-}
+} // namespace af

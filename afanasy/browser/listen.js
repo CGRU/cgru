@@ -15,7 +15,7 @@
 	This is used for monitoring all output for a job, or inside the task to see the task output
 */
 
-"use strict";
+'use strict';
 
 var listen_wnds = [];
 
@@ -24,7 +24,7 @@ var listen_Start = function(i_args) {
 	if (i_args.task != null)
 		name = 'Listen Task';
 
-	var wnd = new cgru_Window({"name": name, "wnd": i_args.parent_window});
+	var wnd = new cgru_Window({'name': name, 'wnd': i_args.parent_window});
 	wnd.elContent.classList.add('listen');
 
 	wnd.listen = i_args;

@@ -38,7 +38,7 @@ std::vector<char *> HttpGet::http_get_blacklist_files = {
 };
 */
 static const int http_get_blacklist_files_len = 4;
-static const char * http_get_blacklist_files[http_get_blacklist_files_len] = {
+static const char *http_get_blacklist_files[http_get_blacklist_files_len] = {
 	"..",		// do not allow escaping the document root of the webserver
 	"htdigest", // do not allow access to the .htdigest file
 	"htaccess", // do not allow access to the .htaccess file
@@ -111,8 +111,8 @@ std::string HttpGet::getFileNameFromInMsg(const af::Msg *i_msg)
 		file_name = std::string(get + get_start, get_finish - get_start);
 		if (false == HttpGet::getValidateFileName(file_name))
 		{
-			AFCommon::QueueLogError("GET: Invalid file name from "
-									+ i_msg->getAddress().v_generateInfoString() + "\n" + file_name);
+			AFCommon::QueueLogError("GET: Invalid file name from " +
+									i_msg->getAddress().v_generateInfoString() + "\n" + file_name);
 			file_name.clear();
 		}
 		else if (file_name.find(tasks_file) == 0)
@@ -121,8 +121,8 @@ std::string HttpGet::getFileNameFromInMsg(const af::Msg *i_msg)
 			file_name = std::string(get + get_start, get_finish - get_start);
 			if (file_name.find(af::Environment::getStoreFolder()) != 0)
 			{
-				AFCommon::QueueLogError("GET: Invalid @TMP@ folder from "
-										+ i_msg->getAddress().v_generateInfoString() + "\n" + file_name);
+				AFCommon::QueueLogError("GET: Invalid @TMP@ folder from " +
+										i_msg->getAddress().v_generateInfoString() + "\n" + file_name);
 				file_name.clear();
 			}
 			// printf("GET TMP FILE: %s\n", file_name.c_str());
@@ -130,7 +130,7 @@ std::string HttpGet::getFileNameFromInMsg(const af::Msg *i_msg)
 		else
 		{
 			// Add a directory index
-			if (file_name[file_name.size()-1] == '/')
+			if (file_name[file_name.size() - 1] == '/')
 				file_name += af::Environment::getHTTPDirecoryIndex();
 			else if (file_name.find('.') == std::string::npos)
 				file_name = file_name + AFGENERAL::PATH_SEPARATOR + af::Environment::getHTTPDirecoryIndex();
@@ -149,11 +149,16 @@ std::string HttpGet::getFileNameFromInMsg(const af::Msg *i_msg)
 std::string HttpGet::getMimeTypeFromFileName(const std::string &filename)
 {
 	const std::string extension = filename.substr(filename.find_last_of(".") + 1);
-	if (extension == "css") return "text/css";
-	if (extension == "js") return "text/javascript";
-	if (extension == "png") return "image/png";
-	if (extension == "jpeg" || extension == "jpg") return "image/jpeg";
-	if (extension == "gif") return "image/gif";
+	if (extension == "css")
+		return "text/css";
+	if (extension == "js")
+		return "text/javascript";
+	if (extension == "png")
+		return "image/png";
+	if (extension == "jpeg" || extension == "jpg")
+		return "image/jpeg";
+	if (extension == "gif")
+		return "image/gif";
 
 	return "text/html; charset=UTF-8";
 }
@@ -161,24 +166,25 @@ std::string HttpGet::getMimeTypeFromFileName(const std::string &filename)
 bool HttpGet::getValidateFileName(const std::string &i_name)
 {
 	// do not serve files, which match an entry on the blacklist
-	//for (int i = 0; i < http_get_blacklist_files.size(); i++)
+	// for (int i = 0; i < http_get_blacklist_files.size(); i++)
 	for (int i = 0; i < http_get_blacklist_files_len; i++)
-		if (i_name.find(http_get_blacklist_files[i]) != -1) return false;
+		if (i_name.find(http_get_blacklist_files[i]) != -1)
+			return false;
 
 	return true;
 }
 
 std::string HttpGet::get404Content(const std::string &filename)
 {
-	return std::string("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>AFANASY 404</title>")
-		   + "<link type=\"text/css\" rel=\"stylesheet\" href=\"lib/styles.css\">"
-		   + "<link type=\"text/css\" rel=\"stylesheet\" href=\"afanasy/browser/style.css\">"
-		   + "</head><body id=\"afbody\" style=\"position: absolute; top: 50%;"
-		   + "transform: translateY(-50%); text-align: center; width: 100%\">"
-		   + "<span style=\"font-size: 30px;\">Arghh, page not found!</span><br>"
-		   + "<span style=\"font-size: 100px; font-weight: bold;\">¯\\_(ツ)_/¯<br>404 Error</span><br>"
-		   + "<span style=\"font-size: 20px;\">The requested file (" + filename
-		   + ") could not be found on the server.</span><br>"
-		   + "<span style=\"font-size: 15px;\">Contact the <a href=\"http://forum.cgru.info/\">forum</a>, "
-		   + "if you think this is an error.</span></body></html>";
+	return std::string("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>AFANASY 404</title>") +
+		   "<link type=\"text/css\" rel=\"stylesheet\" href=\"lib/styles.css\">" +
+		   "<link type=\"text/css\" rel=\"stylesheet\" href=\"afanasy/browser/style.css\">" +
+		   "</head><body id=\"afbody\" style=\"position: absolute; top: 50%;" +
+		   "transform: translateY(-50%); text-align: center; width: 100%\">" +
+		   "<span style=\"font-size: 30px;\">Arghh, page not found!</span><br>" +
+		   "<span style=\"font-size: 100px; font-weight: bold;\">¯\\_(ツ)_/¯<br>404 Error</span><br>" +
+		   "<span style=\"font-size: 20px;\">The requested file (" + filename +
+		   ") could not be found on the server.</span><br>" +
+		   "<span style=\"font-size: 15px;\">Contact the <a href=\"http://forum.cgru.info/\">forum</a>, " +
+		   "if you think this is an error.</span></body></html>";
 }

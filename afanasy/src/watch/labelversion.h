@@ -3,40 +3,41 @@
 #include "../libafanasy/environment.h"
 #include "../libafqt/qenvironment.h"
 
-#include <QtCore/QTimer>
 #include <QWidget>
+#include <QtCore/QTimer>
 
 class LabelVersion : public QWidget
 {
 	Q_OBJECT
 
-public:
+  public:
 	LabelVersion(QWidget *parent);
 	~LabelVersion();
 
-	void showMessage(const std::string & str);
+	void showMessage(const std::string &str);
 
-	static int getStringStatus(const std::string & str);
+	static int getStringStatus(const std::string &str);
 
-	enum Status {
+	enum Status
+	{
 		SS_None = 0,
 		SS_Info,
 		SS_Alarm,
 		SS_Last
 	};
 
-protected:
-	void paintEvent(QPaintEvent * event);
-	void mousePressEvent(QMouseEvent * event);
-	void mouseDoubleClickEvent(QMouseEvent * event);
+  protected:
+	void paintEvent(QPaintEvent *event);
+	void mousePressEvent(QMouseEvent *event);
+	void mouseDoubleClickEvent(QMouseEvent *event);
 
-private slots:
+  private slots:
 	void refreshMessage();
 
-private:
+  private:
 	void resetMessage();
 
-private:
+  private:
 	QFont m_font;
 	QString m_label;
 	QString m_tooltip;

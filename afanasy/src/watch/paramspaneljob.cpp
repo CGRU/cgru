@@ -1,10 +1,10 @@
 #include "paramspaneljob.h"
 
-#include <QClipboard>
 #include <QBoxLayout>
-#include <QInputDialog>
+#include <QClipboard>
 #include <QFrame>
 #include <QGuiApplication>
+#include <QInputDialog>
 #include <QLabel>
 #include <QPushButton>
 
@@ -21,11 +21,10 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-ParamsPanelJob::ParamsPanelJob():
-	m_editable(true)
+ParamsPanelJob::ParamsPanelJob() : m_editable(true)
 {
 	// Construct folders widgets:
-	QFrame * folders_frame = new QFrame();
+	QFrame *folders_frame = new QFrame();
 	getPublicLayout()->insertWidget(0, folders_frame);
 	folders_frame->setFrameShape(QFrame::StyledPanel);
 	folders_frame->setFrameShadow(QFrame::Plain);
@@ -33,10 +32,10 @@ ParamsPanelJob::ParamsPanelJob():
 	m_folders_layout = new QVBoxLayout(folders_frame);
 	m_folders_layout->setSpacing(0);
 
-	QHBoxLayout * hlayout = new QHBoxLayout();
+	QHBoxLayout *hlayout = new QHBoxLayout();
 	m_folders_layout->addLayout(hlayout);
 
-	QLabel * folders_label = new QLabel("<b>Folders</b>");
+	QLabel *folders_label = new QLabel("<b>Folders</b>");
 	hlayout->addWidget(folders_label);
 
 	m_rules_btn = new QPushButton("RULES");
@@ -55,7 +54,7 @@ ParamsPanelJob::ParamsPanelJob():
 	connect(m_rules_btn, SIGNAL(clicked()), this, SLOT(slot_Rules()));
 
 	// Constuct blocks widgets:
-	QFrame * blocks_frame = new QFrame();
+	QFrame *blocks_frame = new QFrame();
 	blocks_frame->setContentsMargins(0, 0, 0, 0);
 	getPublicLayout()->insertWidget(1, blocks_frame);
 
@@ -68,15 +67,13 @@ ParamsPanelJob::ParamsPanelJob():
 	m_blocks_layout->addWidget(m_blocks_label);
 }
 
-ParamsPanelJob::~ParamsPanelJob()
-{
-}
+ParamsPanelJob::~ParamsPanelJob() {}
 
-void ParamsPanelJob::v_updatePanel(Item * i_item, const QList<Item*> * i_selected)
+void ParamsPanelJob::v_updatePanel(Item *i_item, const QList<Item *> *i_selected)
 {
 	if (i_item && (i_item->getType() == Item::TJob))
 	{
-		ItemJob * job_item = static_cast<ItemJob*>(i_item);
+		ItemJob *job_item = static_cast<ItemJob *>(i_item);
 
 		m_blocks_label->setHidden(true);
 		constructFolders(job_item);
@@ -92,7 +89,7 @@ void ParamsPanelJob::v_updatePanel(Item * i_item, const QList<Item*> * i_selecte
 	ParamsPanel::v_updatePanel(i_item, i_selected);
 }
 
-void ParamsPanelJob::constructFolders(ItemJob * i_item_job)
+void ParamsPanelJob::constructFolders(ItemJob *i_item_job)
 {
 	if (i_item_job->folders.size() == 0)
 	{
@@ -132,7 +129,8 @@ void ParamsPanelJob::constructFolders(ItemJob * i_item_job)
 			{
 				if (root.left(c) == it.value().left(c))
 					c++;
-				else break;
+				else
+					break;
 			}
 
 			c--;
@@ -140,23 +138,23 @@ void ParamsPanelJob::constructFolders(ItemJob * i_item_job)
 				root = root.left(c);
 		}
 
-		QMap<QString, FolderWidget*>::iterator fwIt = m_folders_map.find(it.key());
+		QMap<QString, FolderWidget *>::iterator fwIt = m_folders_map.find(it.key());
 		if (fwIt != m_folders_map.end())
 		{
 			// Update exisintg folder widget:
-			FolderWidget * fw = fwIt.value();
+			FolderWidget *fw = fwIt.value();
 			fw->setValue(it.value());
 		}
 		else
 		{
 			// Create a new folder widget:
-			FolderWidget * fw = new FolderWidget(it.key(), it.value(), m_folders_layout);
+			FolderWidget *fw = new FolderWidget(it.key(), it.value(), m_folders_layout);
 			m_folders_map[it.key()] = fw;
 		}
 	}
 
 	// Delete not existing folder widgets:
-	QMap<QString, FolderWidget*>::iterator fwIt = m_folders_map.begin();
+	QMap<QString, FolderWidget *>::iterator fwIt = m_folders_map.begin();
 	while (fwIt != m_folders_map.end())
 	{
 		if (false == i_item_job->folders.contains(fwIt.key()))
@@ -177,7 +175,7 @@ void ParamsPanelJob::clearFolders()
 	m_rules_btn->setHidden(true);
 	m_folders_root->setHidden(true);
 
-	QMapIterator <QString, FolderWidget*> it(m_folders_map);
+	QMapIterator<QString, FolderWidget *> it(m_folders_map);
 	while (it.hasNext())
 	{
 		it.next();
@@ -193,7 +191,7 @@ void ParamsPanelJob::slot_Rules()
 	Watch::startProcess(cmd);
 }
 
-void ParamsPanelJob::updateBlocks(ItemJob * i_item)
+void ParamsPanelJob::updateBlocks(ItemJob *i_item)
 {
 	// (Re)Construct blocks, if job ID or blocks number is changed
 	if ((m_cur_item && (m_cur_item->getId() != i_item->getId())) ||
@@ -207,14 +205,14 @@ void ParamsPanelJob::updateBlocks(ItemJob * i_item)
 		m_blocks_widgets[b]->update();
 }
 
-void ParamsPanelJob::constructBlocks(ItemJob * i_item)
+void ParamsPanelJob::constructBlocks(ItemJob *i_item)
 {
 	if (m_blocks_widgets.size())
 		clearBlocks();
 
 	for (int b = 0; b < i_item->getBlocksNum(); b++)
 	{
-		BlockCaptionWidget * bw = new BlockCaptionWidget(i_item->getBlockInfo(b));
+		BlockCaptionWidget *bw = new BlockCaptionWidget(i_item->getBlockInfo(b));
 		bw->setEditable(m_editable);
 
 		// Open block, if job has only one
@@ -248,16 +246,15 @@ void ParamsPanelJob::v_setEditable(bool i_editable)
 
 ///////////// Folders:
 
-FolderWidget::FolderWidget(const QString & i_name, const QString & i_value, QLayout * i_layout):
-	m_name(i_name),
-	m_value(i_value)
+FolderWidget::FolderWidget(const QString &i_name, const QString &i_value, QLayout *i_layout)
+	: m_name(i_name), m_value(i_value)
 {
 	i_layout->addWidget(this);
 
-	QHBoxLayout * layout = new QHBoxLayout(this);
+	QHBoxLayout *layout = new QHBoxLayout(this);
 	layout->setContentsMargins(0, 4, 0, 4);
 
-	QPushButton * btn_open = new QPushButton(m_name);
+	QPushButton *btn_open = new QPushButton(m_name);
 	layout->addWidget(btn_open);
 	btn_open->setToolTip("Click to open folder");
 	btn_open->setFixedWidth(72);
@@ -268,31 +265,29 @@ FolderWidget::FolderWidget(const QString & i_name, const QString & i_value, QLay
 	m_value_widget->setToolTip(m_value);
 	layout->addWidget(m_value_widget);
 
-	QPushButton * btn_copy = new QPushButton("C");
+	QPushButton *btn_copy = new QPushButton("C");
 	layout->addWidget(btn_copy);
 	btn_copy->setToolTip("Copy to clipboard");
 	btn_copy->setFixedSize(16, 24);
 	connect(btn_copy, SIGNAL(clicked()), this, SLOT(slot_Copy()));
 
-	QPushButton * btn_term = new QPushButton("T");
+	QPushButton *btn_term = new QPushButton("T");
 	layout->addWidget(btn_term);
 	btn_term->setToolTip("Open terminal");
 	btn_term->setFixedSize(16, 24);
 	connect(btn_term, SIGNAL(clicked()), this, SLOT(slot_Term()));
 }
 
-FolderWidget::~FolderWidget()
-{
-}
+FolderWidget::~FolderWidget() {}
 
-void FolderWidget::setValue(const QString & i_value)
+void FolderWidget::setValue(const QString &i_value)
 {
 	m_value = i_value;
 	m_value_widget->setText(i_value);
 	m_value_widget->setToolTip(i_value);
 }
 
-void FolderWidget::paintEvent(QPaintEvent * event)
+void FolderWidget::paintEvent(QPaintEvent *event)
 {
 	QPainter painter(this);
 
@@ -320,18 +315,17 @@ void FolderWidget::slot_Term()
 	Watch::openTerminal(afqt::stoq(service.getWDir()));
 }
 
-
 FValueWidget::FValueWidget()
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
 	setFixedHeight(24);
 }
 
-FValueWidget::~FValueWidget(){}
+FValueWidget::~FValueWidget() {}
 
-void FValueWidget::setText(const QString & i_text)
+void FValueWidget::setText(const QString &i_text)
 {
-	m_text =  i_text;
+	m_text = i_text;
 	repaint();
 }
 
@@ -346,10 +340,8 @@ void FValueWidget::paintEvent(QPaintEvent *event)
 	painter.drawText(rect(), Qt::AlignVCenter | Qt::AlignRight, m_text);
 }
 
-
-
 //////////// Blocks:
-BlockNameLabel::BlockNameLabel(const QString & i_name): m_name(i_name) {}
+BlockNameLabel::BlockNameLabel(const QString &i_name) : m_name(i_name) {}
 BlockNameLabel::~BlockNameLabel() {}
 void BlockNameLabel::paintEvent(QPaintEvent *event)
 {
@@ -366,10 +358,8 @@ void BlockNameLabel::paintEvent(QPaintEvent *event)
 	painter.drawText(rect(), Qt::AlignVCenter | Qt::AlignLeft, m_name);
 }
 
-BlockCaptionWidget::BlockCaptionWidget(const BlockInfo * i_info):
-	m_editable(true),
-	m_info(i_info),
-	m_info_widget(NULL)
+BlockCaptionWidget::BlockCaptionWidget(const BlockInfo *i_info)
+	: m_editable(true), m_info(i_info), m_info_widget(NULL)
 {
 	setFrameShape(QFrame::StyledPanel);
 	setFrameShadow(QFrame::Plain);
@@ -377,13 +367,13 @@ BlockCaptionWidget::BlockCaptionWidget(const BlockInfo * i_info):
 	m_layout = new QVBoxLayout(this);
 	m_layout->setContentsMargins(0, 0, 0, 0);
 
-	QWidget * top_widget = new QWidget();
+	QWidget *top_widget = new QWidget();
 	m_layout->addWidget(top_widget);
 
-	QHBoxLayout * h_layout = new QHBoxLayout(top_widget);
+	QHBoxLayout *h_layout = new QHBoxLayout(top_widget);
 	h_layout->setContentsMargins(10, 2, 10, 2);
 
-	BlockNameLabel * label = new BlockNameLabel(m_info->getName());
+	BlockNameLabel *label = new BlockNameLabel(m_info->getName());
 	h_layout->addWidget(label);
 
 	m_btn_open = new QPushButton("open");
@@ -398,9 +388,7 @@ BlockCaptionWidget::BlockCaptionWidget(const BlockInfo * i_info):
 	connect(m_btn_close, SIGNAL(clicked()), this, SLOT(slot_CloseInfo()));
 }
 
-BlockCaptionWidget::~BlockCaptionWidget()
-{
-}
+BlockCaptionWidget::~BlockCaptionWidget() {}
 
 void BlockCaptionWidget::slot_OpenInfo()
 {
@@ -447,15 +435,13 @@ void BlockCaptionWidget::update()
 		m_info_widget->update();
 }
 
-BlockInfoWidget::BlockInfoWidget(const BlockInfo * i_info):
-	m_editable(true),
-	m_info(i_info),
-	m_params_show_all(false)
+BlockInfoWidget::BlockInfoWidget(const BlockInfo *i_info)
+	: m_editable(true), m_info(i_info), m_params_show_all(false)
 {
-	QVBoxLayout * layout = new QVBoxLayout(this);
+	QVBoxLayout *layout = new QVBoxLayout(this);
 
 	// Tickets:
-	QHBoxLayout * tcaplayout = new QHBoxLayout();
+	QHBoxLayout *tcaplayout = new QHBoxLayout();
 	layout->addLayout(tcaplayout);
 	tcaplayout->addWidget(new QLabel("<b>Tickets</b>:"));
 
@@ -468,7 +454,7 @@ BlockInfoWidget::BlockInfoWidget(const BlockInfo * i_info):
 	layout->addLayout(m_tickets_layout);
 
 	// Parameters:
-	QHBoxLayout * pcaplayout = new QHBoxLayout();
+	QHBoxLayout *pcaplayout = new QHBoxLayout();
 	layout->addLayout(pcaplayout);
 	pcaplayout->addWidget(new QLabel("<b>Block Parameters</b>"));
 
@@ -480,27 +466,25 @@ BlockInfoWidget::BlockInfoWidget(const BlockInfo * i_info):
 	m_params_layout = new QVBoxLayout();
 	layout->addLayout(m_params_layout);
 
-	QListIterator<Param*> pIt(m_info->getParamsList());
+	QListIterator<Param *> pIt(m_info->getParamsList());
 	while (pIt.hasNext())
 		addBlockParamWidget(pIt.next());
 
 	update();
 }
 
-BlockInfoWidget::~BlockInfoWidget()
-{
-}
+BlockInfoWidget::~BlockInfoWidget() {}
 
-void BlockInfoWidget::addBlockParamWidget(Param * i_param)
+void BlockInfoWidget::addBlockParamWidget(Param *i_param)
 {
 	if (i_param->isSeparator())
 	{
-		ParamSeparator * ps = new ParamSeparator(i_param);
+		ParamSeparator *ps = new ParamSeparator(i_param);
 		m_params_layout->addWidget(ps);
 		m_separatos.append(ps);
 		return;
 	}
-	ParamWidget * pw = new ParamWidget(i_param);
+	ParamWidget *pw = new ParamWidget(i_param);
 	m_params_layout->addWidget(pw);
 	m_params_widgets.append(pw);
 	connect(pw, SIGNAL(sig_changeParam(const Param *)), m_info, SLOT(slot_BlockChangeParam(const Param *)));
@@ -510,11 +494,11 @@ void BlockInfoWidget::slot_BlockParamsShowAll()
 {
 	m_btn_params_show_all->setHidden(true);
 
-	QList<ParamWidget*>::iterator pIt;
+	QList<ParamWidget *>::iterator pIt;
 	for (pIt = m_params_widgets.begin(); pIt != m_params_widgets.end(); pIt++)
 		(*pIt)->setHidden(false);
 
-	QList<ParamSeparator*>::iterator sIt;
+	QList<ParamSeparator *>::iterator sIt;
 	for (sIt = m_separatos.begin(); sIt != m_separatos.end(); sIt++)
 		(*sIt)->setHidden(false);
 
@@ -530,11 +514,11 @@ void BlockInfoWidget::setEditable(bool i_editable)
 
 	m_btn_ticket_add->setHidden(false == i_editable);
 
-	QMap<QString, ParamTicket*>::iterator pIt = m_map_params_ticket.begin();
+	QMap<QString, ParamTicket *>::iterator pIt = m_map_params_ticket.begin();
 	for (; pIt != m_map_params_ticket.end(); pIt++)
 		pIt.value()->setEditable(i_editable);
 
-	QList<ParamWidget*>::iterator wIt = m_params_widgets.begin();
+	QList<ParamWidget *>::iterator wIt = m_params_widgets.begin();
 	for (; wIt != m_params_widgets.end(); wIt++)
 		(*wIt)->v_setEditable(i_editable);
 }
@@ -542,7 +526,7 @@ void BlockInfoWidget::setEditable(bool i_editable)
 void BlockInfoWidget::update()
 {
 	// Update or delete tickets:
-	QMap<QString, ParamTicket*>::iterator pIt = m_map_params_ticket.begin();
+	QMap<QString, ParamTicket *>::iterator pIt = m_map_params_ticket.begin();
 	while (pIt != m_map_params_ticket.end())
 	{
 		QMap<QString, int>::const_iterator bIt = m_info->tickets.find(pIt.key());
@@ -562,10 +546,10 @@ void BlockInfoWidget::update()
 	QMap<QString, int>::const_iterator bIt = m_info->tickets.begin();
 	while (bIt != m_info->tickets.end())
 	{
-		QMap<QString, ParamTicket*>::const_iterator pIt = m_map_params_ticket.find(bIt.key());
+		QMap<QString, ParamTicket *>::const_iterator pIt = m_map_params_ticket.find(bIt.key());
 		if (pIt == m_map_params_ticket.end())
 		{
-			ParamTicket * pt = new ParamTicket(bIt.key(), bIt.value());
+			ParamTicket *pt = new ParamTicket(bIt.key(), bIt.value());
 			pt->setEditable(m_editable);
 			m_map_params_ticket[bIt.key()] = pt;
 			m_tickets_layout->addWidget(pt);
@@ -575,7 +559,7 @@ void BlockInfoWidget::update()
 	}
 
 	// Update parametes:
-	QList<ParamWidget*>::iterator wIt = m_params_widgets.begin();
+	QList<ParamWidget *>::iterator wIt = m_params_widgets.begin();
 	for (; wIt != m_params_widgets.end(); wIt++)
 		(*wIt)->update(m_info->getParamsVars(), m_params_show_all);
 }

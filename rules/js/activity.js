@@ -14,7 +14,7 @@
 	activity.js - Task is a GUI item, it stands for an artist activity
 */
 
-"use strict";
+'use strict';
 
 var activity_Current = null;
 var activity_Selected = null;
@@ -23,7 +23,7 @@ var activity_Items = {};
 
 function activity_Init()
 {
-//console.log(localStorage.activity);
+	// console.log(localStorage.activity);
 
 	let array = c_Parse(localStorage.activity);
 	if (null == array)
@@ -35,7 +35,7 @@ function activity_Init()
 
 function activity_Finish()
 {
-//console.log('activity_Finish')
+	// console.log('activity_Finish')
 	if (activity_Selected)
 	{
 		activity_Items[activity_Selected].el.classList.remove('selected');
@@ -50,9 +50,8 @@ function activity_ChangeCmd(i_cmd)
 
 	let activity = '--activity '
 	if (activity_Selected)
-		activity += activity_Selected;
-	else
-		activity = '';
+	activity += activity_Selected;
+	else activity = '';
 
 	return i_cmd.replace(/@ACTIVITY@/g, activity);
 }
@@ -104,24 +103,29 @@ function activity_Set(i_activity)
 function activity_AddItem(i_item)
 {
 	let el = document.createElement('div');
-	el.onclick = function(){activity_Clicked(i_item.name);}
-	el.classList.add('notselectable');
+	el.onclick = function() {
+		activity_Clicked(i_item.name);
+	} el.classList.add('notselectable');
 	$('activity').appendChild(el);
 	i_item.el = el;
 
 	let elBtnDel = document.createElement('div');
-	elBtnDel.classList.add('button','delete','right');
-	elBtnDel.onclick = function(){activity_Delete(i_item.name);}
-	el.appendChild(elBtnDel);
+	elBtnDel.classList.add('button', 'delete', 'right');
+	elBtnDel.onclick = function() {
+		activity_Delete(i_item.name);
+	} el.appendChild(elBtnDel);
 
 	let elName = document.createElement('div');
 	elName.classList.add('name');
 	elName.textContent = i_item.name;
 	el.appendChild(elName);
 
-	if (i_item.selected) i_item.el.classList.add('selected');
-	if (i_item.pinned  ) i_item.el.classList.add('pinned');
-	if (i_item.filter  ) i_item.el.classList.add('filter');
+	if (i_item.selected)
+		i_item.el.classList.add('selected');
+	if (i_item.pinned)
+		i_item.el.classList.add('pinned');
+	if (i_item.filter)
+		i_item.el.classList.add('filter');
 
 	activity_Items[i_item.name] = i_item;
 
@@ -134,7 +138,7 @@ function activity_Clicked(i_activity)
 	if (null == item)
 		return;
 
-	if ( ! item.pinned)
+	if (!item.pinned)
 	{
 		item.pinned = true;
 		item.el.classList.add('pinned');
@@ -191,9 +195,12 @@ function activity_Changed()
 
 		let obj = {};
 		obj.name = item.name;
-		if (item.selected) obj.selected = true;
-		if (item.pinned  ) obj.pinned   = true;
-		if (item.filter  ) obj.filter   = true;
+		if (item.selected)
+			obj.selected = true;
+		if (item.pinned)
+			obj.pinned = true;
+		if (item.filter)
+			obj.filter = true;
 
 		array.push(obj);
 	}
@@ -210,7 +217,7 @@ function activity_Changed()
 		else
 			el.style.display = 'none';
 
-	//console.log(JSON.stringify(array));
+	// console.log(JSON.stringify(array));
 	localStorage.activity = JSON.stringify(array);
 }
 

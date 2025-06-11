@@ -35,326 +35,316 @@ extern char **environ;
 #include "logger.h"
 
 #ifdef WINNT
-bool LaunchProgramV(
-	PROCESS_INFORMATION * o_pinfo,
-	HANDLE * o_in,
-	HANDLE * o_out,
-	HANDLE * o_err,
-	const char * i_commanline,
-    const char * i_wdir,
-	char * i_environ,
-    DWORD i_flags,
-	bool alwaysCreateWindow);
+bool LaunchProgramV(PROCESS_INFORMATION *o_pinfo, HANDLE *o_in, HANDLE *o_out, HANDLE *o_err,
+					const char *i_commanline, const char *i_wdir, char *i_environ, DWORD i_flags,
+					bool alwaysCreateWindow);
 
-bool af::launchProgram( PROCESS_INFORMATION * o_pinfo,
-                       const std::string & i_commandline, const std::string & i_wdir, char * i_environ,
-                       HANDLE * o_in, HANDLE * o_out, HANDLE * o_err,
+bool af::launchProgram(PROCESS_INFORMATION *o_pinfo, const std::string &i_commandline,
+					   const std::string &i_wdir, char *i_environ, HANDLE *o_in, HANDLE *o_out, HANDLE *o_err,
 					   DWORD i_flags, bool alwaysCreateWindow)
 {
-    const char * wdir = NULL;
-    if( i_wdir.size() > 0 )
-        wdir = i_wdir.c_str();
+	const char *wdir = NULL;
+	if (i_wdir.size() > 0)
+		wdir = i_wdir.c_str();
 
 	std::string shell_commandline = af::Environment::getCmdShell() + " ";
 	shell_commandline += i_commandline;
 
-	return LaunchProgramV( o_pinfo, o_in, o_out, o_err, shell_commandline.c_str(), wdir, i_environ, i_flags, alwaysCreateWindow);
+	return LaunchProgramV(o_pinfo, o_in, o_out, o_err, shell_commandline.c_str(), wdir, i_environ, i_flags,
+						  alwaysCreateWindow);
 }
-void af::launchProgram( const std::string & i_commandline, const std::string & i_wdir)
+void af::launchProgram(const std::string &i_commandline, const std::string &i_wdir)
 {
-    PROCESS_INFORMATION pinfo;
-    af::launchProgram( &pinfo, i_commandline, i_wdir);
+	PROCESS_INFORMATION pinfo;
+	af::launchProgram(&pinfo, i_commandline, i_wdir);
 }
 #else
-int LaunchProgramV(
-    FILE **o_in,
-    FILE **o_out,
-    FILE **o_err,
-    const char * i_program,
-    const char * i_args[],
-    const char * wdir = NULL,
-	char ** i_environ = NULL);
+int LaunchProgramV(FILE **o_in, FILE **o_out, FILE **o_err, const char *i_program, const char *i_args[],
+				   const char *wdir = NULL, char **i_environ = NULL);
 
-int af::launchProgram( const std::string & i_commandline, const std::string & i_wdir, char ** i_environ,
-                       FILE ** o_in, FILE ** o_out, FILE ** o_err)
+int af::launchProgram(const std::string &i_commandline, const std::string &i_wdir, char **i_environ,
+					  FILE **o_in, FILE **o_out, FILE **o_err)
 {
-    const char * wdir = NULL;
-    if (i_wdir.size() > 0)
+	const char *wdir = NULL;
+	if (i_wdir.size() > 0)
 	{
-        wdir = i_wdir.c_str();
+		wdir = i_wdir.c_str();
 	}
 
-	std::vector<std::string> shellWithArgs = af::strSplit( af::Environment::getCmdShell());
-	if( shellWithArgs.size() == 0 )
+	std::vector<std::string> shellWithArgs = af::strSplit(af::Environment::getCmdShell());
+	if (shellWithArgs.size() == 0)
 	{
 		AFERROR("af::launchProgram: Shell is not defined.")
 		return 0;
 	}
 
-	const char * shell = shellWithArgs.front().c_str();
-	
-	if( shellWithArgs.size() == 2)
+	const char *shell = shellWithArgs.front().c_str();
+
+	if (shellWithArgs.size() == 2)
 	{
 		// Shell has one argunet - most common case:
 		// "bash -c" or "cmd.exe /c"
-		const char * args[] = { shellWithArgs.back().c_str(), i_commandline.c_str(), NULL};
-		return LaunchProgramV( o_in, o_out, o_err, shell, args, wdir, i_environ);
+		const char *args[] = {shellWithArgs.back().c_str(), i_commandline.c_str(), NULL};
+		return LaunchProgramV(o_in, o_out, o_err, shell, args, wdir, i_environ);
 	}
-	else if( shellWithArgs.size() == 1)
+	else if (shellWithArgs.size() == 1)
 	{
 		// Shell has no arguments:
-		const char * args[] = { i_commandline.c_str(), NULL};
-		return LaunchProgramV( o_in, o_out, o_err, shell, args, wdir, i_environ);
+		const char *args[] = {i_commandline.c_str(), NULL};
+		return LaunchProgramV(o_in, o_out, o_err, shell, args, wdir, i_environ);
 	}
 	else
 	{
 		// Collect each shell argument pointer in a single array:
-		const char ** args = new const char *[ shellWithArgs.size()+1];
+		const char **args = new const char *[shellWithArgs.size() + 1];
 		std::vector<std::string>::iterator it = shellWithArgs.begin();
 		it++;
 		int i = 0;
-		while( i < shellWithArgs.size() - 1)
+		while (i < shellWithArgs.size() - 1)
 			args[i++] = (*(it++)).c_str();
-		args[shellWithArgs.size()-1] = i_commandline.c_str();
+		args[shellWithArgs.size() - 1] = i_commandline.c_str();
 		args[shellWithArgs.size()] = NULL;
-		int result = LaunchProgramV( o_in, o_out, o_err, shell, args, wdir, i_environ);
-		delete [] args;
+		int result = LaunchProgramV(o_in, o_out, o_err, shell, args, wdir, i_environ);
+		delete[] args;
 		return result;
 	}
 }
 #endif
 
 #ifdef WINNT
-char *  af::processEnviron( const std::map<std::string, std::string> & i_env_map)
+char *af::processEnviron(const std::map<std::string, std::string> &i_env_map)
 #else
-char ** af::processEnviron( const std::map<std::string, std::string> & i_env_map)
+char **af::processEnviron(const std::map<std::string, std::string> &i_env_map)
 #endif
 {
-	if( i_env_map.empty())
+	if (i_env_map.empty())
 		return NULL;
 
 	std::vector<std::string> env_vec;
 	int env_size = 0;
-	#ifdef WINNT
-	char * env_str = GetEnvironmentStrings();
-	while( env_str[env_size] != '\0')
+#ifdef WINNT
+	char *env_str = GetEnvironmentStrings();
+	while (env_str[env_size] != '\0')
 	{
 		std::string str(env_str + env_size);
 		env_size += str.size() + 1; ///< For "name=value" '\0' termination
-		if( str.empty()) continue;
-		env_vec.push_back( str);
+		if (str.empty())
+			continue;
+		env_vec.push_back(str);
 	}
-	FreeEnvironmentStrings( env_str);
-	#else
-	for (char ** e = environ; *e != 0; e++)
+	FreeEnvironmentStrings(env_str);
+#else
+	for (char **e = environ; *e != 0; e++)
 	{
 		std::string str(*e);
-		if (str.empty()) continue;
+		if (str.empty())
+			continue;
 		env_vec.push_back(str);
 		env_size += str.size() + 1; ///< For "name=value" '\0' termination
 	}
-	#endif
+#endif
 
-	for( std::map<std::string,std::string>::const_iterator it = i_env_map.begin(); it != i_env_map.end(); it++)
+	for (std::map<std::string, std::string>::const_iterator it = i_env_map.begin(); it != i_env_map.end();
+		 it++)
 		if ((it->first).size() && (it->second).size())
 		{
 			std::string str = it->first + '=' + it->second;
-			env_vec.push_back( str);
+			env_vec.push_back(str);
 			env_size += str.size() + 1; ///< For "name=value" '\0' termination
 		}
 
 	env_size++; ///< For the last '\0' termination
 
-	#ifdef WINNT
-	char * o_environ = new char[env_size];
+#ifdef WINNT
+	char *o_environ = new char[env_size];
 	int pos = 0;
 	for (int i = 0; i < env_vec.size(); i++)
 	{
-		strncpy( o_environ + pos, env_vec[i].c_str(), env_vec[i].size());
+		strncpy(o_environ + pos, env_vec[i].c_str(), env_vec[i].size());
 		pos += env_vec[i].size();
 		o_environ[pos] = '\0'; ///< "name=value" '\0' termination
 		pos += 1;
 	}
-	o_environ[env_size-1] = '\0'; /// The last '\0' termination
-	#else
-	char ** o_environ = new char*[env_vec.size()+1];
-	for( int i = 0; i < env_vec.size(); i++)
+	o_environ[env_size - 1] = '\0'; /// The last '\0' termination
+#else
+	char **o_environ = new char *[env_vec.size() + 1];
+	for (int i = 0; i < env_vec.size(); i++)
 	{
-		o_environ[i] = new char[env_vec[i].size()+1];
-		memcpy( o_environ[i], env_vec[i].c_str(), env_vec[i].size());
+		o_environ[i] = new char[env_vec[i].size() + 1];
+		memcpy(o_environ[i], env_vec[i].c_str(), env_vec[i].size());
 		o_environ[i][env_vec[i].size()] = '\0'; ///< "name=value" '\0' termination
 	}
 	o_environ[env_vec.size()] = NULL; /// The last '\0' termination
-	#endif
+#endif
 
 	return o_environ;
 }
 
-void af::outError( const char * errMsg, const char * baseMsg)
+void af::outError(const char *errMsg, const char *baseMsg)
 {
-   if( baseMsg )
-      AFERRAR("%s: %s", baseMsg, errMsg)
-   else
-      AFERRAR("%s", errMsg)
+	if (baseMsg)
+		AFERRAR("%s: %s", baseMsg, errMsg)
+	else
+		AFERRAR("%s", errMsg)
 }
 
-void af::sleep_sec(  int i_seconds )
+void af::sleep_sec(int i_seconds)
 {
 #ifdef WINNT
-	Sleep( 1000 * i_seconds);
+	Sleep(1000 * i_seconds);
 #else
-	sleep( i_seconds);
+	sleep(i_seconds);
 #endif
 }
 
-void af::sleep_msec( int i_mseconds)
+void af::sleep_msec(int i_mseconds)
 {
 #ifdef WINNT
-	Sleep(  i_mseconds);
+	Sleep(i_mseconds);
 #else
-    usleep( 1000 * i_mseconds);
+	usleep(1000 * i_mseconds);
 #endif
 }
 
-void af::printTime( time_t time_sec, const char * time_format)
-{
-   std::cout << time2str( time_sec, time_format);
-}
+void af::printTime(time_t time_sec, const char *time_format) { std::cout << time2str(time_sec, time_format); }
 
-const std::string af::sockAddrToStr( const struct sockaddr_storage * i_ss )
+const std::string af::sockAddrToStr(const struct sockaddr_storage *i_ss)
 {
 	std::ostringstream str;
-	af::sockAddrToStr( str, i_ss);
+	af::sockAddrToStr(str, i_ss);
 	return str.str();
 }
-void af::sockAddrToStr( std::ostringstream & o_str, const struct sockaddr_storage * i_ss )
+void af::sockAddrToStr(std::ostringstream &o_str, const struct sockaddr_storage *i_ss)
 {
 	static const int buffer_len = 256;
 	char buffer[buffer_len];
-	const char * addr_str = NULL;
+	const char *addr_str = NULL;
 	uint16_t port = 0;
-	switch( i_ss->ss_family)
+	switch (i_ss->ss_family)
 	{
-	case AF_INET:
+		case AF_INET:
+		{
+			const struct sockaddr_in *sa = (const struct sockaddr_in *)(i_ss);
+			port = sa->sin_port;
+			addr_str = inet_ntoa(sa->sin_addr);
+			break;
+		}
+		case AF_INET6:
+		{
+			const struct sockaddr_in6 *sa = (const struct sockaddr_in6 *)(i_ss);
+			port = sa->sin6_port;
+			addr_str = inet_ntop(AF_INET6, &(sa->sin6_addr), buffer, buffer_len);
+			break;
+		}
+		default: o_str << "Unknown protocol";
+	}
+	if (addr_str)
+		o_str << addr_str << ":" << port;
+}
+void af::printAddress(const struct sockaddr_storage *i_ss)
+{
+	printf("Address = %s\n", af::sockAddrToStr(i_ss).c_str());
+}
+
+bool af::setRegExp(RegExp &regexp, const std::string &str, const std::string &name, std::string *errOutput)
+{
+	std::string errString;
+	if (regexp.setPattern(str, &errString))
+		return true;
+
+	if (errOutput)
+		*errOutput = std::string("REGEXP: '") + name + "': " + errString;
+	else
+		AFERRAR("REGEXP: '%s': %s", name.c_str(), errString.c_str())
+
+	return false;
+}
+
+void af::rw_int32(int32_t &integer, char *data, bool write)
+{
+	int32_t bytes;
+	if (write)
 	{
-		const struct sockaddr_in * sa = (const struct sockaddr_in*)(i_ss);
-		port = sa->sin_port;
-		addr_str = inet_ntoa( sa->sin_addr );
-		break;
+		bytes = htonl(integer);
+		memcpy(data, &bytes, 4);
 	}
-	case AF_INET6:
+	else
 	{
-		const struct sockaddr_in6 * sa = (const struct sockaddr_in6*)(i_ss);
-		port = sa->sin6_port;
-		addr_str = inet_ntop( AF_INET6, &(sa->sin6_addr), buffer, buffer_len);
-		break;
+		memcpy(&bytes, data, 4);
+		integer = ntohl(bytes);
 	}
-	default:
-		o_str << "Unknown protocol";
+}
+
+void af::rw_uint32(uint32_t &integer, char *data, bool write)
+{
+	uint32_t bytes;
+	if (write)
+	{
+		bytes = htonl(integer);
+		memcpy(data, &bytes, 4);
 	}
-	if( addr_str ) o_str << addr_str << ":" << port;
-}
-void af::printAddress( const struct sockaddr_storage * i_ss )
-{
-	printf("Address = %s\n", af::sockAddrToStr( i_ss).c_str());
-}
-
-bool af::setRegExp( RegExp & regexp, const std::string & str, const std::string & name, std::string * errOutput)
-{
-   std::string errString;
-   if( regexp.setPattern( str, &errString)) return true;
-
-   if( errOutput ) *errOutput = std::string("REGEXP: '") + name + "': " + errString;
-   else AFERRAR("REGEXP: '%s': %s", name.c_str(), errString.c_str())
-
-   return false;
+	else
+	{
+		memcpy(&bytes, data, 4);
+		integer = ntohl(bytes);
+	}
 }
 
-void af::rw_int32( int32_t& integer, char * data, bool write)
-{
-   int32_t bytes;
-   if( write)
-   {
-      bytes = htonl( integer);
-      memcpy( data, &bytes, 4);
-   }
-   else
-   {
-      memcpy( &bytes, data, 4);
-      integer = ntohl( bytes);
-   }
-}
-
-void af::rw_uint32( uint32_t& integer, char * data, bool write)
-{
-   uint32_t bytes;
-   if( write)
-   {
-      bytes = htonl( integer);
-      memcpy( data, &bytes, 4);
-   }
-   else
-   {
-      memcpy( &bytes, data, 4);
-      integer = ntohl( bytes);
-   }
-}
-
-bool af::addUniqueToList( std::list<int32_t> & o_list, int i_value)
+bool af::addUniqueToList(std::list<int32_t> &o_list, int i_value)
 {
 	std::list<int32_t>::iterator it = o_list.begin();
 	std::list<int32_t>::iterator end_it = o_list.end();
-	while( it != end_it)
-		if( (*it++) == i_value)
+	while (it != end_it)
+		if ((*it++) == i_value)
 			return false;
-	o_list.push_back( i_value);
+	o_list.push_back(i_value);
 	return true;
 }
 
-bool af::addUniqueToVect( std::vector<int> & o_vect, int i_value)
+bool af::addUniqueToVect(std::vector<int> &o_vect, int i_value)
 {
-	for( int i = 0; i < o_vect.size(); i++)
-		if( o_vect[i] == i_value)
+	for (int i = 0; i < o_vect.size(); i++)
+		if (o_vect[i] == i_value)
 			return false;
-	o_vect.push_back( i_value);
+	o_vect.push_back(i_value);
 	return true;
 }
 
-bool af::addUniqueToVect( std::vector<std::string> & o_vect, const std::string & i_str)
+bool af::addUniqueToVect(std::vector<std::string> &o_vect, const std::string &i_str)
 {
-	for( int i = 0; i < o_vect.size(); i++)
-		if( o_vect[i] == i_str)
+	for (int i = 0; i < o_vect.size(); i++)
+		if (o_vect[i] == i_str)
 			return false;
-	o_vect.push_back( i_str);
+	o_vect.push_back(i_str);
 	return true;
 }
 
-const std::string af::fillNumbers( const std::string & i_pattern, long long i_start, long long i_end)
+const std::string af::fillNumbers(const std::string &i_pattern, long long i_start, long long i_end)
 {
 	std::string str;
 	int pos = 0;
 	int nstart = -1;
 	int part = 0;
 	long long number = i_start;
-	while( pos < i_pattern.size())
+	while (pos < i_pattern.size())
 	{
-	    if( i_pattern[pos] == ';')
-	    {
-	        // If we find ";" character reset number to beginning.
-	        // Used for m_files
-	        number = i_start;
-	    }
-		if( i_pattern[pos] == '@')
+		if (i_pattern[pos] == ';')
 		{
-			if(( nstart != -1) && (( pos - nstart ) > 1))
+			// If we find ";" character reset number to beginning.
+			// Used for m_files
+			number = i_start;
+		}
+		if (i_pattern[pos] == '@')
+		{
+			if ((nstart != -1) && ((pos - nstart) > 1))
 			{
 				// we found the second "@" character in some pattern pair
 				// store input string from the last pattern
-				str += std::string( i_pattern.data()+part, nstart-part);
+				str += std::string(i_pattern.data() + part, nstart - part);
 
 				// check for a negative number value
 				bool negative;
-				if( number < 0 )
+				if (number < 0)
 				{
 					number = -number;
 					negative = true;
@@ -365,31 +355,31 @@ const std::string af::fillNumbers( const std::string & i_pattern, long long i_st
 				}
 
 				// convert integer to string
-				std::string number_str = af::itos( number);
+				std::string number_str = af::itos(number);
 				int number_str_size = number_str.size();
-				if( negative )
+				if (negative)
 				{
 					// increase size for padding zeors by 1 for "-" character
 					// as it will be added after
-					number_str_size ++;
+					number_str_size++;
 				}
-				if( number_str_size < ( pos - nstart - 1))
+				if (number_str_size < (pos - nstart - 1))
 				{
-					number_str = std::string( pos - nstart - 1 - number_str_size, '0') + number_str;
+					number_str = std::string(pos - nstart - 1 - number_str_size, '0') + number_str;
 				}
-				if( negative )
+				if (negative)
 				{
 					number_str = '-' + number_str;
 				}
 				str += number_str;
 
 				// Change numbder from start to end and back (cycle)
-				if( negative )
+				if (negative)
 				{
 					// return negative if was so
 					number = -number;
 				}
-				if( number == i_start )
+				if (number == i_start)
 				{
 					// if last replacement was start, next "should" be "end"
 					number = i_end;
@@ -413,9 +403,9 @@ const std::string af::fillNumbers( const std::string & i_pattern, long long i_st
 				nstart = pos;
 			}
 		}
-		else if( nstart != -1) // "@" was started
+		else if (nstart != -1) // "@" was started
 		{
-			if( i_pattern[pos] != '#') // but character is not "#"
+			if (i_pattern[pos] != '#') // but character is not "#"
 			{
 				// reset start position, considering that it is not a pattern
 				nstart = -1;
@@ -426,130 +416,140 @@ const std::string af::fillNumbers( const std::string & i_pattern, long long i_st
 		pos++;
 	}
 
-	if( str.empty() )
+	if (str.empty())
 	{
 		// no patterns were found
 		// returning and input string unchanged
 		return i_pattern;
 	}
 
-	if(( part > 0 ) && ( part < i_pattern.size()))
+	if ((part > 0) && (part < i_pattern.size()))
 	{
 		// there were some pattern replacements
 		// add unchanged string tail (all data from the last replacement)
-		str += std::string( i_pattern.data()+part, i_pattern.size()-part);
+		str += std::string(i_pattern.data() + part, i_pattern.size() - part);
 	}
 
 	return str;
 }
 
-const std::string af::replaceArgs( const std::string & pattern, const std::string & arg)
+const std::string af::replaceArgs(const std::string &pattern, const std::string &arg)
 {
-   if( pattern.empty()) return arg;
+	if (pattern.empty())
+		return arg;
 
-   std::string str( pattern);
-   size_t pos = str.find("@#@");
-   while( pos != std::string::npos )
-   {
-      str.replace( pos, 3, arg);
-      pos = str.find("@#@");
-   }
+	std::string str(pattern);
+	size_t pos = str.find("@#@");
+	while (pos != std::string::npos)
+	{
+		str.replace(pos, 3, arg);
+		pos = str.find("@#@");
+	}
 
-   return str;
+	return str;
 }
 
-int af::weigh( const std::string & str)
-{
-   return int( str.capacity());
-}
+int af::weigh(const std::string &str) { return int(str.capacity()); }
 
-int af::weigh( const std::list<std::string> & strlist)
-{
-   int w = 0;
-   for( std::list<std::string>::const_iterator it = strlist.begin(); it != strlist.end(); it++) w += weigh( *it);
-   return w;
-}
-
-int af::weigh( const std::vector<std::string> & i_list)
-{
-   int w = 0;
-   for( int i = 0; i < i_list.size(); i++) w += weigh( i_list[i]);
-   return w;
-}
-
-int af::weigh( const std::map<std::string, std::string> & i_map)
+int af::weigh(const std::list<std::string> &strlist)
 {
 	int w = 0;
-	for( std::map<std::string,std::string>::const_iterator it = i_map.begin(); it != i_map.end(); it++)
+	for (std::list<std::string>::const_iterator it = strlist.begin(); it != strlist.end(); it++)
+		w += weigh(*it);
+	return w;
+}
+
+int af::weigh(const std::vector<std::string> &i_list)
+{
+	int w = 0;
+	for (int i = 0; i < i_list.size(); i++)
+		w += weigh(i_list[i]);
+	return w;
+}
+
+int af::weigh(const std::map<std::string, std::string> &i_map)
+{
+	int w = 0;
+	for (std::map<std::string, std::string>::const_iterator it = i_map.begin(); it != i_map.end(); it++)
 		w += weigh(it->first) + weigh(it->second);
 	return w;
 }
 
-int af::weigh( const std::map<std::string, int32_t> & i_map)
+int af::weigh(const std::map<std::string, int32_t> &i_map)
 {
 	int w = 0;
-	for( std::map<std::string,int32_t>::const_iterator it = i_map.begin(); it != i_map.end(); it++)
+	for (std::map<std::string, int32_t>::const_iterator it = i_map.begin(); it != i_map.end(); it++)
 		w += weigh(it->first) + sizeof(it->second);
 	return w;
 }
 
-const std::string af::getenv( const std::string & i_name) { return af::getenv( i_name.c_str()); }
-const std::string af::getenv( const char * i_name)
+const std::string af::getenv(const std::string &i_name) { return af::getenv(i_name.c_str()); }
+const std::string af::getenv(const char *i_name)
 {
 	std::string envvar;
-	char * ptr = ::getenv( i_name);
-	if( ptr != NULL ) envvar = ptr;
+	char *ptr = ::getenv(i_name);
+	if (ptr != NULL)
+		envvar = ptr;
 	return envvar;
 }
 
-bool isDec( char c)
+bool isDec(char c)
 {
-   if(( c >= '0' ) && ( c <= '9' )) return true;
-   return false;
+	if ((c >= '0') && (c <= '9'))
+		return true;
+	return false;
 }
-bool isHex( char c)
+bool isHex(char c)
 {
-   if(( c >= '0' ) && ( c <= '9' )) return true;
-   if(( c >= 'a' ) && ( c <= 'f' )) return true;
-   if(( c >= 'A' ) && ( c <= 'F' )) return true;
-   return false;
+	if ((c >= '0') && (c <= '9'))
+		return true;
+	if ((c >= 'a') && (c <= 'f'))
+		return true;
+	if ((c >= 'A') && (c <= 'F'))
+		return true;
+	return false;
 }
-bool af::netIsIpAddr( const std::string & addr, bool verbose)
+bool af::netIsIpAddr(const std::string &addr, bool verbose)
 {
-   bool isIPv4 = false;
-   bool isIPv6 = false;
-   for( int i = 0; i < addr.size(); i++)
-   {
-      if(( isIPv6 == false ) && ( addr[i] == '.' ))
-      {
-         isIPv4 = true;
-         continue;
-      }
-      if(( isIPv4 == false ) && ( addr[i] == ':' ))
-      {
-         isIPv6 = true;
-         continue;
-      }
-      if( isDec( addr[i])) continue;
-      if( isIPv4 )
-      {
-         isIPv4 = false;
-         break;
-      }
-      if( false == isHex( addr[i]))
-      {
-         isIPv6 = false;
-         break;
-      }
-   }
-   if( verbose)
-   {
-      if( isIPv4 ) printf("IPv4 address.\n");
-      else if ( isIPv6 ) printf("IPv6 address.\n");
-      else printf("Not an IP adress.\n");
-   }
-   if(( isIPv4 == false ) && ( isIPv6 == false )) return false;
-   return true;
+	bool isIPv4 = false;
+	bool isIPv6 = false;
+	for (int i = 0; i < addr.size(); i++)
+	{
+		if ((isIPv6 == false) && (addr[i] == '.'))
+		{
+			isIPv4 = true;
+			continue;
+		}
+		if ((isIPv4 == false) && (addr[i] == ':'))
+		{
+			isIPv6 = true;
+			continue;
+		}
+		if (isDec(addr[i]))
+			continue;
+		if (isIPv4)
+		{
+			isIPv4 = false;
+			break;
+		}
+		if (false == isHex(addr[i]))
+		{
+			isIPv6 = false;
+			break;
+		}
+	}
+	if (verbose)
+	{
+		if (isIPv4)
+			printf("IPv4 address.\n");
+		else if (isIPv6)
+			printf("IPv6 address.\n");
+		else
+			printf("Not an IP adress.\n");
+	}
+	if ((isIPv4 == false) && (isIPv6 == false))
+		return false;
+	return true;
 }
 
 #ifdef WINNT
@@ -561,14 +561,8 @@ std::string af::GetLastErrorStdStr()
 	{
 		LPVOID lpMsgBuf;
 		DWORD bufLen = FormatMessage(
-			FORMAT_MESSAGE_ALLOCATE_BUFFER |
-			FORMAT_MESSAGE_FROM_SYSTEM |
-			FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL,
-			error,
-			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-			(LPTSTR)&lpMsgBuf,
-			0, NULL);
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL,
+			error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL);
 		if (bufLen)
 		{
 			LPCSTR lpMsgStr = (LPCSTR)lpMsgBuf;

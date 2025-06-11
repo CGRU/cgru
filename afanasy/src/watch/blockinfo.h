@@ -15,30 +15,28 @@ class QMenu;
 class ListItems;
 class Param;
 
-class BlockInfo: public QObject
+class BlockInfo : public QObject
 {
 	Q_OBJECT
 
-public:
-	BlockInfo(const af::BlockData * i_data, Item * i_item, ListItems * i_listitems, bool i_inworklist = false);
+  public:
+	BlockInfo(const af::BlockData *i_data, Item *i_item, ListItems *i_listitems, bool i_inworklist = false);
 	~BlockInfo();
 
-	inline const QString & getName() const {return m_name;}
+	inline const QString &getName() const { return m_name; }
 
-	bool update( const af::BlockData* block, int type);
+	bool update(const af::BlockData *block, int type);
 
-	void paint( QPainter * i_painter, const QStyleOptionViewItem &option,
-		int x, int y, int w,
-		bool i_compact_display = false,
-		const QColor * i_backcolor = NULL ) const;
+	void paint(QPainter *i_painter, const QStyleOptionViewItem &option, int x, int y, int w,
+			   bool i_compact_display = false, const QColor *i_backcolor = NULL) const;
 
 	static const int Height;
 	static const int HeightCompact;
 
-	inline const QList<Param*> & getParamsList() const {return m_params; }
-	inline const QMap<QString, QVariant> & getParamsVars() const {return m_var_map;}
+	inline const QList<Param *> &getParamsList() const { return m_params; }
+	inline const QMap<QString, QVariant> &getParamsVars() const { return m_var_map; }
 
-	void generateMenu(QMenu * i_menu, QMenu * i_params_submenu = NULL) const;
+	void generateMenu(QMenu *i_menu, QMenu *i_params_submenu = NULL) const;
 
 	int p_percentage;
 	int p_tasks_ready;
@@ -53,13 +51,12 @@ public:
 	int p_avoid_hosts;
 	int p_error_hosts;
 	long long p_capacity_total;
-	int       p_tasks_runtimemin;
-	int       p_tasks_runtimemax;
+	int p_tasks_runtimemin;
+	int p_tasks_runtimemax;
 	long long p_tasks_runtimesum;
 
-//private:
+	// private:
 	uint32_t state;
-
 
 	QString service;
 
@@ -72,15 +69,15 @@ public:
 
 	int tasksnum;
 
-	bool numeric;              ///< Whether the block is numeric.
+	bool numeric; ///< Whether the block is numeric.
 	bool varcapacity;
 	bool multihost;
 	bool multihost_samemaster;
 
-	long long frame_first;     ///< First tasks frame.
-	long long frame_last;      ///< Last tasks frame.
-	long long frame_pertask;   ///< Tasks frames per task.
-	long long frame_inc;       ///< Tasks frames increment.
+	long long frame_first;	 ///< First tasks frame.
+	long long frame_last;	 ///< Last tasks frame.
+	long long frame_pertask; ///< Tasks frames per task.
+	long long frame_inc;	 ///< Tasks frames increment.
 	long long sequential;
 
 	int errors_retries;
@@ -93,16 +90,16 @@ public:
 
 	char progress[AFJOB::ASCII_PROGRESS_LENGTH];
 
-	int     capacity;
-	int     max_running_tasks;
-	int     max_running_tasks_per_host;
-	int     need_memory;
-	int     need_gpu_mem_mb;
-	int     need_cpu_freq_mgz;
-	int     need_cpu_cores;
-	int     need_cpu_freq_cores;
-	int     need_power;
-	int     need_hdd;
+	int capacity;
+	int max_running_tasks;
+	int max_running_tasks_per_host;
+	int need_memory;
+	int need_gpu_mem_mb;
+	int need_cpu_freq_mgz;
+	int need_cpu_cores;
+	int need_cpu_freq_cores;
+	int need_power;
+	int need_hdd;
 	QString need_properties;
 
 	bool check_rendered_files;
@@ -110,10 +107,10 @@ public:
 	long long filesize_min;
 	long long filesize_max;
 
-	int  capcoeff_min;
-	int  capcoeff_max;
-	uint8_t  multihost_min;
-	uint8_t  multihost_max;
+	int capcoeff_min;
+	int capcoeff_max;
+	uint8_t multihost_min;
+	uint8_t multihost_max;
 	uint16_t multihost_waitmax;
 	uint16_t multihost_waitsrv;
 
@@ -128,47 +125,49 @@ public:
 
 	QMap<QString, int> tickets;
 
-signals:
+  signals:
 	void sig_BlockAction(int, QString);
 
-private slots:
+  private slots:
 	void slot_BlockOperation(QString i_operation);
-	void slot_BlockChangeParam(const Param * i_param);
+	void slot_BlockChangeParam(const Param *i_param);
 	void slot_BlockTicketAdd();
 	void slot_BlockTicketEdit(QString i_name);
 
-private:
+  private:
 	void addParam_separator();
-	void addParam_Num(const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = 1<<30);
-	void addParam_Str(const QString & i_name, const QString & i_label, const QString & i_tip);
-	void addParam_MSS(const QString & i_name, const QString & i_label, const QString & i_tip);
-	void addParam_REx(const QString & i_name, const QString & i_label, const QString & i_tip);
-	void addParam_Hrs(const QString & i_name, const QString & i_label, const QString & i_tip);
-	void addParam_MiB(const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = 1<<30);
-	void addParam_GiB(const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = 1<<30);
-	void addParam_Meg(const QString & i_name, const QString & i_label, const QString & i_tip, int i_min = -1, int i_max = 1<<30);
+	void addParam_Num(const QString &i_name, const QString &i_label, const QString &i_tip, int i_min = -1,
+					  int i_max = 1 << 30);
+	void addParam_Str(const QString &i_name, const QString &i_label, const QString &i_tip);
+	void addParam_MSS(const QString &i_name, const QString &i_label, const QString &i_tip);
+	void addParam_REx(const QString &i_name, const QString &i_label, const QString &i_tip);
+	void addParam_Hrs(const QString &i_name, const QString &i_label, const QString &i_tip);
+	void addParam_MiB(const QString &i_name, const QString &i_label, const QString &i_tip, int i_min = -1,
+					  int i_max = 1 << 30);
+	void addParam_GiB(const QString &i_name, const QString &i_label, const QString &i_tip, int i_min = -1,
+					  int i_max = 1 << 30);
+	void addParam_Meg(const QString &i_name, const QString &i_label, const QString &i_tip, int i_min = -1,
+					  int i_max = 1 << 30);
 
-	void drawProgress(
-		QPainter * i_painter,
-		int posx, int posy, int width, int height,
-		const QColor * i_backcolor = NULL ) const;
+	void drawProgress(QPainter *i_painter, int posx, int posy, int width, int height,
+					  const QColor *i_backcolor = NULL) const;
 
-	void stdOutFlags( char* data, int size) const;
+	void stdOutFlags(char *data, int size) const;
 	void refresh();
 
-private:
-	ListItems * m_listitems;
-	Item      * m_item;
-	bool        m_inworklist;
+  private:
+	ListItems *m_listitems;
+	Item *m_item;
+	bool m_inworklist;
 
-	int     m_blocknum;
-	int     m_jobid;
+	int m_blocknum;
+	int m_jobid;
 	QString m_name;
 
-	QList<Param*> m_params;
+	QList<Param *> m_params;
 
 	QMap<QString, QVariant> m_var_map;
 
-	const QPixmap * m_icon_large;
-	const QPixmap * m_icon_small;
+	const QPixmap *m_icon_large;
+	const QPixmap *m_icon_small;
 };

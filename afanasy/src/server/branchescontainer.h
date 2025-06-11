@@ -25,39 +25,42 @@ class MsgAf;
 class RenderAf;
 
 /// Users container.
-class BranchesContainer: public AfContainer
+class BranchesContainer : public AfContainer
 {
-public:
+  public:
 	BranchesContainer();
 	~BranchesContainer();
 
-	/// Add user, called when job registering, if user with this name exists it's hostname set to \c hostname only.
-	BranchSrv * addBranchFromPath(const std::string & i_path, MonitorContainer * i_monitors);
+	/// Add user, called when job registering, if user with this name exists it's hostname set to \c hostname
+	/// only.
+	BranchSrv *addBranchFromPath(const std::string &i_path, MonitorContainer *i_monitors);
 
 	/// Add user, called on start with user created from batadase
-	bool addBranchFromStore(BranchSrv * i_branch);
+	bool addBranchFromStore(BranchSrv *i_branch);
 
-	BranchSrv * getBranch(const std::string & i_path);
+	BranchSrv *getBranch(const std::string &i_path);
 
-	BranchSrv * getRootBranch() {return m_root_branch;}
+	BranchSrv *getRootBranch() { return m_root_branch; }
 
-private:
-	BranchSrv * m_root_branch;
-	int addBranchToContainer(BranchSrv * i_branch);
+  private:
+	BranchSrv *m_root_branch;
+	int addBranchToContainer(BranchSrv *i_branch);
 };
 
-//########################## Iterator ##############################
+// ########################## Iterator ##############################
 
 /// Users iterator.
-class BranchesContainerIt: public AfContainerIt
+class BranchesContainerIt : public AfContainerIt
 {
-public:
-	BranchesContainerIt(BranchesContainer * i_container, bool i_skipZombies = true);
+  public:
+	BranchesContainerIt(BranchesContainer *i_container, bool i_skipZombies = true);
 	~BranchesContainerIt();
 
-	inline BranchSrv * branch() { return (BranchSrv*)(getNode()); }
-	inline BranchSrv * getBranch(int i_id, const af::Msg * i_msg = NULL) {return static_cast<BranchSrv*>(get(i_id, i_msg));}
+	inline BranchSrv *branch() { return (BranchSrv *)(getNode()); }
+	inline BranchSrv *getBranch(int i_id, const af::Msg *i_msg = NULL)
+	{
+		return static_cast<BranchSrv *>(get(i_id, i_msg));
+	}
 
-private:
+  private:
 };
-

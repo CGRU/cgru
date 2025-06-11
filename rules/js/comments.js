@@ -14,11 +14,11 @@
 	comments.js - TODO: description
 */
 
-"use strict";
+'use strict';
 
 var cm_file = 'comments.json';
 var cm_durations = [
-	'.25', '.5', '1',  '1.5', '2',  '3',  '4',  '5',  '6',  '7',  '8',
+	'.25', '.5', '1',  '1.5', '2',	'3',  '4',	'5',  '6',	'7',  '8',
 	'9',   '10', '12', '14',  '16', '18', '20', '24', '32', '40', '80'
 ];
 var cm_array = [];
@@ -27,380 +27,389 @@ var cm_elStat = null;
 
 var cm_filter_tags = []
 
-function cm_Init()
-{
-	let array = c_Parse(localStorage.comments_filter_tags);
-	if (null == array)
-		return;
-
-	for (let item of array)
-		cm_filter_tags.push(item);
-}
-
-function View_comments_Open()
-{
-	cm_Load();
-}
-
-function cm_Finish()
-{
-	cm_array = [];
-
-	if (cm_elStat)
-	{
-		cm_elStat.textContent = '';
-		cm_elStat = null;
-	}
-}
-
-function cm_Load()
-{
-	$('comments').textContent = '';
-	if (ASSET && ASSET.comments_reversed)
-	{
-		let el = $('comments_btn_add');
-		$('comments_show').removeChild(el);
-		$('comments_show').appendChild(el);
-	}
-
-	cm_array = [];
-
-	if (false == c_RuFileExists(cm_file))
-		return;
-
-	$('comments').textContent = 'Loading...';
-
-	n_GetFile({
-		"path": c_GetRuFilePath(cm_file),
-		"func": cm_Received,
-		"cache_time": RULES.cache_time,
-		"info": 'comments',
-		"parse": true,
-		"local": true
-	});
-}
-
-function cm_Received(i_data)
-{
-	$('comments').textContent = '';
-	if (i_data == null)
-		return;
-	if (i_data.comments == null)
-	{
-		c_Error('Invalid comments data received.');
-		c_Log(JSON.stringify(i_data));
-		return;
-	}
-
-	let obj_array = [];
-	for (let key in i_data.comments)
-	{
-		i_data.comments[key].key = key;
-		obj_array.push(i_data.comments[key]);
-	}
-
-	obj_array.sort(function(a, b) {
-		if (a.key < b.key)
-			return -1;
-		if (a.key > b.key)
-			return 1;
-		return 0;
-	});
-
-	let i = 0;
-	for (let i = 0; i < obj_array.length; i++)
-		cm_array.push(new Comment(obj_array[i]));
-
-	cm_DisplayStat();
-	cm_Filter();
-
-	g_POST('comments');
-}
-
-function cm_DisplayStat()
-{
-	if (cm_elStat)
-		cm_elStat.textContent = '';
-	else
-	{
-		if (cm_array.length == 0)
-			return;
-
-		cm_elStat = document.createElement('div');
-		$('comments').insertBefore(cm_elStat, $('comments').firstChild);
-		cm_elStat.classList.add('comments_stat');
-	}
-
-	let tags_counts = {};
-
-	for (let cm of cm_array)
-	{
-		if (cm.obj.deleted)
-			continue;
-
-		let tags = cm.obj.tags;
-		if ((tags == null) || (tags.length == 0))
-			continue;
-
-		for (let tag of tags)
-		{
-			if (tags_counts[tag])
-				tags_counts[tag] += 1;
-			else
-				tags_counts[tag] = 1;
-		}
-	}
-
-	for (let tag in tags_counts)
-	{
-		let el = document.createElement('div');
-		el.classList.add('tag');
-		el.textContent = c_GetTagTitle(tag) + ':' + tags_counts[tag];
-		el.m_tag = tag;
-		el.onclick = cm_TagClicked;
-		el.title = 'This is comments tags count.'
-			+ '\n ' + tags_counts[tag] + ' comment(s) has \"' + c_GetTagTitle(tag) + '\" tag.'
-			+ '\n Click to filter comments by tag.'
-			+ '\n Hold CTRL or SHIFT to select several tags.';
-		if (cm_filter_tags.indexOf(tag) != -1)
-			el.classList.add('selected');
-
-		cm_elStat.appendChild(el);
-	}
-
-	// Display 'empty' tag filters.
-	// This can be if some filter was selected in one location,
-	// but there is no such comments in another location.
-	for (let tag of cm_filter_tags)
-	{
-		if (tags_counts[tag])
-			continue;
-
-		let el = document.createElement('div');
-		el.classList.add('tag');
-		el.textContent = c_GetTagTitle(tag) + ':0';
-		el.m_tag = tag;
-		el.onclick = cm_TagClicked;
-		el.classList.add('selected');
-		el.classList.add('empty');
-
-		cm_elStat.appendChild(el);
-	}
-}
-
-function cm_TagClicked(i_evt)
-{
-	let tag = i_evt.currentTarget.m_tag;
-
-	cm_filter_tags = [];
-	for (let el of cm_elStat.childNodes)
-	{
-		if (el.m_tag == tag)
-			el.classList.toggle('selected');
-		else if ((i_evt.shiftKey == false) && (i_evt.ctrlKey == false))
-			el.classList.remove('selected');
-
-		if (el.classList.contains('selected'))
-			cm_filter_tags.push(el.m_tag);
-	}
-
-	cm_Filter();
-
-	localStorage.comments_filter_tags = JSON.stringify(cm_filter_tags);
-}
-
-function cm_Filter()
-{
-	for (let cm of cm_array)
-		cm.filter();
-}
-
-function cm_NewOnClick(i_text)
-{
-	let comment = new Comment();
-	if (i_text)
-		comment.elText.innerHTML = i_text;
-	comment.edit();
-}
-
-function cm_ColorOnclick(i_clr, i_data)
-{
-	i_data.comment.setColor(i_clr);
-}
-
-function cm_Goto(i_key)
-{
-	c_Log('cm_Goto: ' + i_key);
-	//	console.log('cm_Goto: ' + i_key);
-
-	if (i_key == null)
-		return;
-
-	// This function is async, but this works.
-	// As post function will be called once more
-	//  after comments will be received.
-	if (localStorage['view_comments'] !== 'true')
-		u_OpenCloseView('comments', true, true);
-
-	let cm = null;
-
-	for (let i = 0; i < cm_array.length; i++)
-		if (cm_array[i].obj.key == i_key)
-			cm = cm_array[i];
-		else
-			cm_array[i].el.classList.remove('goto');
-
-	if (cm)
-	{
-		cm.el.scrollIntoView();
-		cm.el.classList.add('goto');
-		c_Info('Comment highlighted.');
-	}
-	else if (cm_array.length)
-		c_Error('Comment with key=' + i_key + ' not found.');
-}
-
-
-function Comment(i_obj)
-{
-	// Translate OLD user vars:
-	if (i_obj)
-	{
-		if (i_obj.user_name)  {i_obj.cuser = i_obj.user_name;  delete i_obj.user_name;}
-		if (i_obj.muser_name) {i_obj.muser = i_obj.muser_name; delete i_obj.muser_name;}
-	}
-
-
-	// window.console.log( JSON.stringify( i_obj));
-	this.el = document.createElement('div');
-	if (ASSET && ASSET.comments_reversed)
-		$('comments').appendChild(this.el);
-	else
-	{
-		if (cm_array.length)
-			$('comments').insertBefore(this.el, cm_array[cm_array.length-1].el);
-		else
-			$('comments').appendChild(this.el);
-	}
-	this.el.classList.add('comment');
-	this.el.m_comment = this;
-
-	this.elPanel = document.createElement('div');
-	this.el.appendChild(this.elPanel);
-	this.elPanel.classList.add('panel');
-
-	this.elEdit = document.createElement('div');
-	this.elPanel.appendChild(this.elEdit);
-	this.elEdit.classList.add('button');
-	this.elEdit.classList.add('edit');
-	this.elEdit.title = 'Edit comment';
-	this.elEdit.onclick = function(e) { e.currentTarget.m_comment.edit(); };
-	this.elEdit.m_comment = this;
-
-	this.elEditBtnsDiv = document.createElement('div');
-	this.elPanel.appendChild(this.elEditBtnsDiv);
-	this.elEditBtnsDiv.classList.add('edit_btns_div');
-
-	this.elCancel = document.createElement('div');
-	this.elEditBtnsDiv.appendChild(this.elCancel);
-	this.elCancel.classList.add('button');
-	this.elCancel.textContent = 'Cancel';
-	this.elCancel.title = 'Cancel comment editing.';
-	this.elCancel.m_comment = this;
-	this.elCancel.onclick = function(e) { e.currentTarget.m_comment.editCancel(); };
-
-	this.elSave = document.createElement('div');
-	this.elEditBtnsDiv.appendChild(this.elSave);
-	this.elSave.classList.add('button');
-	this.elSave.innerHTML = '<b>Save</b> <small>(CTRL+ENTER)</small>';
-	this.elSave.title = 'Save comment.\n(CTRL+ENTER)';
-	this.elSave.m_comment = this;
-	this.elSave.onclick = function(e) { e.currentTarget.m_comment.save(); };
-
-	this.elRemMU = document.createElement('div');
-	this.elEditBtnsDiv.appendChild(this.elRemMU);
-	this.elRemMU.classList.add('button');
-	this.elRemMU.textContent = 'Remove all markup';
-	this.elRemMU.title = 'Double click to remove all markup from comment.';
-	this.elRemMU.m_comment = this;
-	this.elRemMU.ondblclick = function(e) { c_elMarkupRemove(e.currentTarget.m_comment.elText) };
-
-	this.elDel = document.createElement('div');
-	this.elEditBtnsDiv.appendChild(this.elDel);
-	this.elDel.classList.add('button');
-	this.elDel.textContent = 'Delete';
-	this.elDel.title = 'Double click to delete comment.';
-	this.elDel.ondblclick = function(e) { e.currentTarget.m_comment.destroy(); };
-	this.elDel.m_comment = this;
-
-	let elTypeTagsDiv = document.createElement('div');
-	this.elPanel.appendChild(elTypeTagsDiv);
-	elTypeTagsDiv.classList.add('type_tags');
-
-	this.elType = document.createElement('a');
-	elTypeTagsDiv.appendChild(this.elType);
-//	this.elType.classList.add('tag');
-	this.elType.classList.add('type');
-
-	this.elTags = document.createElement('div');
-	this.elTags.classList.add('tags');
-	elTypeTagsDiv.appendChild(this.elTags);
-
-	this.elAvatar = document.createElement('img');
-	this.elAvatar.classList.add('avatar');
-	this.elPanel.appendChild(this.elAvatar);
-
-	this.elUser = document.createElement('div');
-	this.elUser.classList.add('user');
-	this.elPanel.appendChild(this.elUser);
-
-	this.elReport = document.createElement('div');
-	this.elPanel.appendChild(this.elReport);
-	this.elReport.classList.add('report');
-
-	this.elDuration = document.createElement('div');
-	this.elDuration.classList.add('duration');
-	this.elReport.appendChild(this.elDuration);
-
-	this.elDate = document.createElement('div');
-	this.elDate.classList.add('date');
-	this.elPanel.appendChild(this.elDate);
-
-	this.elInfo = document.createElement('div');
-	this.elInfo.classList.add('info');
-	this.elPanel.appendChild(this.elInfo);
-
-	this.elText = document.createElement('div');
-	this.el.appendChild(this.elText);
-	this.elText.classList.add('text');
-	this.elText.m_obj = this;
-	this.elText.onkeydown = function(e) { e.currentTarget.m_obj.textOnKeyDown(e); };
-
-	this.elForEdit = document.createElement('div');
-	this.el.appendChild(this.elForEdit);
-	this.elForEdit.classList.add('edit');
-
-	this.elUploads = document.createElement('div');
-	this.el.appendChild(this.elUploads);
-	this.elUploads.classList.add('uploads');
-	this.elUploads.style.display = 'none';
-
-	this.elSignature = document.createElement('div');
-	this.el.appendChild(this.elSignature);
-	this.elSignature.classList.add('signature');
-
-	this.obj = i_obj;
-	this.init();
-}
-
-Comment.prototype.init = function() {
+					 function cm_Init() {
+						 let array = c_Parse(localStorage.comments_filter_tags);
+						 if (null == array)
+							 return;
+
+						 for (let item of array)
+							 cm_filter_tags.push(item);
+					 }
+
+					 function View_comments_Open() {
+						 cm_Load();
+					 }
+
+					 function cm_Finish() {
+						 cm_array = [];
+
+						 if (cm_elStat)
+						 {
+							 cm_elStat.textContent = '';
+							 cm_elStat = null;
+						 }
+					 }
+
+					 function cm_Load() {
+						 $('comments').textContent = '';
+						 if (ASSET && ASSET.comments_reversed)
+						 {
+							 let el = $('comments_btn_add');
+							 $('comments_show').removeChild(el);
+							 $('comments_show').appendChild(el);
+						 }
+
+						 cm_array = [];
+
+						 if (false == c_RuFileExists(cm_file))
+							 return;
+
+						 $('comments').textContent = 'Loading...';
+
+						 n_GetFile({
+							 'path': c_GetRuFilePath(cm_file),
+							 'func': cm_Received,
+							 'cache_time': RULES.cache_time,
+							 'info': 'comments',
+							 'parse': true,
+							 'local': true
+						 });
+					 }
+
+					 function cm_Received(i_data) {
+						 $('comments').textContent = '';
+						 if (i_data == null)
+							 return;
+						 if (i_data.comments == null)
+						 {
+							 c_Error('Invalid comments data received.');
+							 c_Log(JSON.stringify(i_data));
+							 return;
+						 }
+
+						 let obj_array = [];
+						 for (let key in i_data.comments)
+						 {
+							 i_data.comments[key].key = key;
+							 obj_array.push(i_data.comments[key]);
+						 }
+
+						 obj_array.sort(function(a, b) {
+							 if (a.key < b.key)
+								 return -1;
+							 if (a.key > b.key)
+								 return 1;
+							 return 0;
+						 });
+
+						 let i = 0;
+						 for (let i = 0; i < obj_array.length; i++)
+							 cm_array.push(new Comment(obj_array[i]));
+
+						 cm_DisplayStat();
+						 cm_Filter();
+
+						 g_POST('comments');
+					 }
+
+					 function cm_DisplayStat() {
+						 if (cm_elStat)
+							 cm_elStat.textContent = '';
+						 else
+						 {
+							 if (cm_array.length == 0)
+								 return;
+
+							 cm_elStat = document.createElement('div');
+							 $('comments').insertBefore(cm_elStat, $('comments').firstChild);
+							 cm_elStat.classList.add('comments_stat');
+						 }
+
+						 let tags_counts = {};
+
+						 for (let cm of cm_array)
+						 {
+							 if (cm.obj.deleted)
+								 continue;
+
+							 let tags = cm.obj.tags;
+							 if ((tags == null) || (tags.length == 0))
+								 continue;
+
+							 for (let tag of tags)
+							 {
+								 if (tags_counts[tag])
+									 tags_counts[tag] += 1;
+								 else
+									 tags_counts[tag] = 1;
+							 }
+						 }
+
+						 for (let tag in tags_counts)
+						 {
+							 let el = document.createElement('div');
+							 el.classList.add('tag');
+							 el.textContent = c_GetTagTitle(tag) + ':' + tags_counts[tag];
+							 el.m_tag = tag;
+							 el.onclick = cm_TagClicked;
+							 el.title = 'This is comments tags count.' +
+								 '\n ' + tags_counts[tag] + ' comment(s) has \"' + c_GetTagTitle(tag) +
+								 '\" tag.' +
+								 '\n Click to filter comments by tag.' +
+								 '\n Hold CTRL or SHIFT to select several tags.';
+							 if (cm_filter_tags.indexOf(tag) != -1)
+								 el.classList.add('selected');
+
+							 cm_elStat.appendChild(el);
+						 }
+
+						 // Display 'empty' tag filters.
+						 // This can be if some filter was selected in one location,
+						 // but there is no such comments in another location.
+						 for (let tag of cm_filter_tags)
+						 {
+							 if (tags_counts[tag])
+								 continue;
+
+							 let el = document.createElement('div');
+							 el.classList.add('tag');
+							 el.textContent = c_GetTagTitle(tag) + ':0';
+							 el.m_tag = tag;
+							 el.onclick = cm_TagClicked;
+							 el.classList.add('selected');
+							 el.classList.add('empty');
+
+							 cm_elStat.appendChild(el);
+						 }
+					 }
+
+					 function cm_TagClicked(i_evt) {
+						 let tag = i_evt.currentTarget.m_tag;
+
+						 cm_filter_tags = [];
+						 for (let el of cm_elStat.childNodes)
+						 {
+							 if (el.m_tag == tag)
+								 el.classList.toggle('selected');
+							 else if ((i_evt.shiftKey == false) && (i_evt.ctrlKey == false))
+								 el.classList.remove('selected');
+
+							 if (el.classList.contains('selected'))
+								 cm_filter_tags.push(el.m_tag);
+						 }
+
+						 cm_Filter();
+
+						 localStorage.comments_filter_tags = JSON.stringify(cm_filter_tags);
+					 }
+
+					 function cm_Filter() {
+						 for (let cm of cm_array)
+							 cm.filter();
+					 }
+
+					 function cm_NewOnClick(i_text) {
+						 let comment = new Comment();
+						 if (i_text)
+							 comment.elText.innerHTML = i_text;
+						 comment.edit();
+					 }
+
+					 function cm_ColorOnclick(i_clr, i_data) {
+						 i_data.comment.setColor(i_clr);
+					 }
+
+					 function cm_Goto(i_key) {
+						 c_Log('cm_Goto: ' + i_key);
+						 //	console.log('cm_Goto: ' + i_key);
+
+						 if (i_key == null)
+							 return;
+
+						 // This function is async, but this works.
+						 // As post function will be called once more
+						 //  after comments will be received.
+						 if (localStorage['view_comments'] !== 'true')
+							 u_OpenCloseView('comments', true, true);
+
+						 let cm = null;
+
+						 for (let i = 0; i < cm_array.length; i++)
+							 if (cm_array[i].obj.key == i_key)
+								 cm = cm_array[i];
+							 else
+								 cm_array[i].el.classList.remove('goto');
+
+						 if (cm)
+						 {
+							 cm.el.scrollIntoView();
+							 cm.el.classList.add('goto');
+							 c_Info('Comment highlighted.');
+						 }
+						 else if (cm_array.length)
+							 c_Error('Comment with key=' + i_key + ' not found.');
+					 }
+
+
+					 function Comment(i_obj) {
+						 // Translate OLD user vars:
+						 if (i_obj)
+						 {
+							 if (i_obj.user_name)
+							 {
+								 i_obj.cuser = i_obj.user_name;
+								 delete i_obj.user_name;
+							 }
+							 if (i_obj.muser_name)
+							 {
+								 i_obj.muser = i_obj.muser_name;
+								 delete i_obj.muser_name;
+							 }
+						 }
+
+
+						 // window.console.log( JSON.stringify( i_obj));
+						 this.el = document.createElement('div');
+						 if (ASSET && ASSET.comments_reversed)
+							 $('comments').appendChild(this.el);
+						 else
+						 {
+							 if (cm_array.length)
+								 $('comments').insertBefore(this.el, cm_array[cm_array.length - 1].el);
+							 else
+								 $('comments').appendChild(this.el);
+						 }
+						 this.el.classList.add('comment');
+						 this.el.m_comment = this;
+
+						 this.elPanel = document.createElement('div');
+						 this.el.appendChild(this.elPanel);
+						 this.elPanel.classList.add('panel');
+
+						 this.elEdit = document.createElement('div');
+						 this.elPanel.appendChild(this.elEdit);
+						 this.elEdit.classList.add('button');
+						 this.elEdit.classList.add('edit');
+						 this.elEdit.title = 'Edit comment';
+						 this.elEdit.onclick = function(e) {
+							 e.currentTarget.m_comment.edit();
+						 };
+						 this.elEdit.m_comment = this;
+
+						 this.elEditBtnsDiv = document.createElement('div');
+						 this.elPanel.appendChild(this.elEditBtnsDiv);
+						 this.elEditBtnsDiv.classList.add('edit_btns_div');
+
+						 this.elCancel = document.createElement('div');
+						 this.elEditBtnsDiv.appendChild(this.elCancel);
+						 this.elCancel.classList.add('button');
+						 this.elCancel.textContent = 'Cancel';
+						 this.elCancel.title = 'Cancel comment editing.';
+						 this.elCancel.m_comment = this;
+						 this.elCancel.onclick = function(e) {
+							 e.currentTarget.m_comment.editCancel();
+						 };
+
+						 this.elSave = document.createElement('div');
+						 this.elEditBtnsDiv.appendChild(this.elSave);
+						 this.elSave.classList.add('button');
+						 this.elSave.innerHTML = '<b>Save</b> <small>(CTRL+ENTER)</small>';
+						 this.elSave.title = 'Save comment.\n(CTRL+ENTER)';
+						 this.elSave.m_comment = this;
+						 this.elSave.onclick = function(e) {
+							 e.currentTarget.m_comment.save();
+						 };
+
+						 this.elRemMU = document.createElement('div');
+						 this.elEditBtnsDiv.appendChild(this.elRemMU);
+						 this.elRemMU.classList.add('button');
+						 this.elRemMU.textContent = 'Remove all markup';
+						 this.elRemMU.title = 'Double click to remove all markup from comment.';
+						 this.elRemMU.m_comment = this;
+						 this.elRemMU.ondblclick = function(e) {
+							 c_elMarkupRemove(e.currentTarget.m_comment.elText)
+						 };
+
+						 this.elDel = document.createElement('div');
+						 this.elEditBtnsDiv.appendChild(this.elDel);
+						 this.elDel.classList.add('button');
+						 this.elDel.textContent = 'Delete';
+						 this.elDel.title = 'Double click to delete comment.';
+						 this.elDel.ondblclick = function(e) {
+							 e.currentTarget.m_comment.destroy();
+						 };
+						 this.elDel.m_comment = this;
+
+						 let elTypeTagsDiv = document.createElement('div');
+						 this.elPanel.appendChild(elTypeTagsDiv);
+						 elTypeTagsDiv.classList.add('type_tags');
+
+						 this.elType = document.createElement('a');
+						 elTypeTagsDiv.appendChild(this.elType);
+						 //	this.elType.classList.add('tag');
+						 this.elType.classList.add('type');
+
+						 this.elTags = document.createElement('div');
+						 this.elTags.classList.add('tags');
+						 elTypeTagsDiv.appendChild(this.elTags);
+
+						 this.elAvatar = document.createElement('img');
+						 this.elAvatar.classList.add('avatar');
+						 this.elPanel.appendChild(this.elAvatar);
+
+						 this.elUser = document.createElement('div');
+						 this.elUser.classList.add('user');
+						 this.elPanel.appendChild(this.elUser);
+
+						 this.elReport = document.createElement('div');
+						 this.elPanel.appendChild(this.elReport);
+						 this.elReport.classList.add('report');
+
+						 this.elDuration = document.createElement('div');
+						 this.elDuration.classList.add('duration');
+						 this.elReport.appendChild(this.elDuration);
+
+						 this.elDate = document.createElement('div');
+						 this.elDate.classList.add('date');
+						 this.elPanel.appendChild(this.elDate);
+
+						 this.elInfo = document.createElement('div');
+						 this.elInfo.classList.add('info');
+						 this.elPanel.appendChild(this.elInfo);
+
+						 this.elText = document.createElement('div');
+						 this.el.appendChild(this.elText);
+						 this.elText.classList.add('text');
+						 this.elText.m_obj = this;
+						 this.elText.onkeydown = function(e) {
+							 e.currentTarget.m_obj.textOnKeyDown(e);
+						 };
+
+						 this.elForEdit = document.createElement('div');
+						 this.el.appendChild(this.elForEdit);
+						 this.elForEdit.classList.add('edit');
+
+						 this.elUploads = document.createElement('div');
+						 this.el.appendChild(this.elUploads);
+						 this.elUploads.classList.add('uploads');
+						 this.elUploads.style.display = 'none';
+
+						 this.elSignature = document.createElement('div');
+						 this.el.appendChild(this.elSignature);
+						 this.elSignature.classList.add('signature');
+
+						 this.obj = i_obj;
+						 this.init();
+					 }
+
+					 Comment.prototype.init = function() {
 	this.elTags.textContent = '';
 	this.elForEdit.innerHTML = '';
 	this.editing = false;
 	this.el.classList.remove('edit');
 	this.elEditBtnsDiv.style.display = 'none';
 
-	ec_EditingFinish({'el':this.elText});
+	ec_EditingFinish({'el': this.elText});
 
 	if (localStorage.text_color && (localStorage.text_color != ''))
 		this.elText.style.color = localStorage.text_color;
@@ -517,7 +526,7 @@ Comment.prototype.init = function() {
 
 	if (this.obj.uploads && (this.uploads_created != true))
 	{
-		//console.log(JSON.stringify(this.obj.uploads));
+		// console.log(JSON.stringify(this.obj.uploads));
 		this.uploads_created = true;
 		this.elUploads.style.display = 'block';
 		for (let i = 0; i < this.obj.uploads.length; i++)
@@ -546,7 +555,7 @@ Comment.prototype.init = function() {
 
 	this.color = this.obj.color;
 
-	st_SetElColor({"color": this.color}, this.el, null, false);
+	st_SetElColor({'color': this.color}, this.el, null, false);
 
 	if (this.obj.deleted)
 		this.el.style.display = 'none';
@@ -563,7 +572,7 @@ Comment.prototype.setElType = function(i_type) {
 		if (RULES.comments[i_type])
 		{
 			this.elType.textContent = RULES.comments[i_type].title;
-			st_SetElColor({"color": RULES.comments[i_type].color}, this.el);
+			st_SetElColor({'color': RULES.comments[i_type].color}, this.el);
 		}
 		else
 		{
@@ -579,7 +588,8 @@ Comment.prototype.setElType = function(i_type) {
 	}
 };
 
-Comment.prototype.filter = function() {
+Comment.prototype.filter =
+	function() {
 	if (this.obj.deleted)
 	{
 		this.el.style.display = 'none';
@@ -603,7 +613,7 @@ Comment.prototype.filter = function() {
 	this.el.style.display = 'block';
 }
 
-Comment.prototype.edit = function() {
+	Comment.prototype.edit = function() {
 	if (this._new != true)
 	{
 		if (g_auth_user == null)
@@ -640,8 +650,10 @@ Comment.prototype.edit = function() {
 		el.textContent = RULES.comments[type].title;
 		el.m_type = type;
 		el.m_comment = this;
-		el.onclick = function(e) { e.currentTarget.m_comment.setType(e.currentTarget.m_type); };
-		st_SetElColor({"color": RULES.comments[type].color}, el);
+		el.onclick = function(e) {
+			e.currentTarget.m_comment.setType(e.currentTarget.m_type);
+		};
+		st_SetElColor({'color': RULES.comments[type].color}, el);
 	}
 
 	this.elEditTags = document.createElement('div');
@@ -701,12 +713,14 @@ Comment.prototype.edit = function() {
 		el.classList.add('sample');
 		el.textContent = cm_durations[i];
 		el.m_elDrtn = this.elEditDuration;
-		el.onclick = function(e) { e.currentTarget.m_elDrtn.textContent = e.currentTarget.textContent; }
+		el.onclick = function(e) {
+			e.currentTarget.m_elDrtn.textContent = e.currentTarget.textContent;
+		}
 	}
 
 	this.elColor = document.createElement('div');
 	this.elForEdit.appendChild(this.elColor);
-	u_DrawColorBars({"el": this.elColor, "onclick": cm_ColorOnclick, "data":{"comment":this}});
+	u_DrawColorBars({'el': this.elColor, 'onclick': cm_ColorOnclick, 'data': {'comment': this}});
 	// Store that some (or empty) color was chosen.
 	// If empty color was clicked, we should reset color by sending an empty array ("color"=[]).
 	this.color_changed = false;
@@ -717,20 +731,20 @@ Comment.prototype.edit = function() {
 	this.elText.style.backgroundColor = '#DDDDDD';
 	this.elText.style.color = '#000000';
 
-	ec_EditingStart({'el':this.elText,'form':'comment'});
+	ec_EditingStart({'el': this.elText, 'form': 'comment'});
 };
 
 Comment.prototype.setColor = function(i_clr) {
 	this.color = i_clr;
 	this.color_changed = true;
 	this.setElType(this.type);
-	st_SetElColor({"color": this.color}, this.el, null, false);
+	st_SetElColor({'color': this.color}, this.el, null, false);
 };
 
 Comment.prototype.setType = function(i_type) {
 	this.type = i_type;
 	this.setElType(i_type);
-	st_SetElColor({"color": this.color}, this.el, null, false);
+	st_SetElColor({'color': this.color}, this.el, null, false);
 };
 
 Comment.prototype.editCancel = function() {
@@ -743,7 +757,7 @@ Comment.prototype.editCancel = function() {
 Comment.prototype.textOnKeyDown = function(i_e) {
 	if (this.editing)
 	{
-		if ((i_e.keyCode == 13) && i_e.ctrlKey)  // CTRL + ENTER
+		if ((i_e.keyCode == 13) && i_e.ctrlKey)	 // CTRL + ENTER
 		{
 			this.save();
 			this.elText.blur();
@@ -757,79 +771,79 @@ Comment.prototype.destroy = function() {
 };
 
 Comment.prototype.save = function() {
-/*
-	if (g_auth_user == null)
-	{
-		this.obj.guest = u_GuestAttrsGet(this.elForEdit);
-		this.obj.cuser = this.obj.guest.id;
-	}
+	/*
+		if (g_auth_user == null)
+		{
+			this.obj.guest = u_GuestAttrsGet(this.elForEdit);
+			this.obj.cuser = this.obj.guest.id;
+		}
 
-	this.obj.text = c_LinksProcess(this.elText.innerHTML);
-	this.obj.color = this.color;
-	this.obj.type = this.type;
-	if (this.obj.deleted != true)
-		this.processUploads();
+		this.obj.text = c_LinksProcess(this.elText.innerHTML);
+		this.obj.color = this.color;
+		this.obj.type = this.type;
+		if (this.obj.deleted != true)
+			this.processUploads();
 
-	this.obj.tags = [];
-	for (let i = 0; i < this.elEditTags.m_elTags.length; i++)
-	{
-		let el = this.elEditTags.m_elTags[i];
-		if (el.classList.contains('selected'))
-			this.obj.tags.push(el.m_tag);
-	}
+		this.obj.tags = [];
+		for (let i = 0; i < this.elEditTags.m_elTags.length; i++)
+		{
+			let el = this.elEditTags.m_elTags[i];
+			if (el.classList.contains('selected'))
+				this.obj.tags.push(el.m_tag);
+		}
 
-	this.obj.duration = -1;
-	let duration = parseFloat(this.elEditDuration.textContent);
-	if (false == isNaN(duration))
-		this.obj.duration = duration;
+		this.obj.duration = -1;
+		let duration = parseFloat(this.elEditDuration.textContent);
+		if (false == isNaN(duration))
+			this.obj.duration = duration;
 
-	if (this._new)
-	{
-		this._new = false;
-		cm_array.push(this);
-	}
-	else
-	{
-		this.obj.mtime = (new Date()).getTime();
-		this.obj.muser = g_auth_user.id;
-	}
+		if (this._new)
+		{
+			this._new = false;
+			cm_array.push(this);
+		}
+		else
+		{
+			this.obj.mtime = (new Date()).getTime();
+			this.obj.muser = g_auth_user.id;
+		}
 
-	let key = this.obj.ctime + '_' + this.obj.cuser;
+		let key = this.obj.ctime + '_' + this.obj.cuser;
 
-	this.obj.key = key;
-	this.init();
+		this.obj.key = key;
+		this.init();
 
-	cm_DisplayStat();
+		cm_DisplayStat();
 
-	let file = c_GetRuFilePath(cm_file);
-	n_GetFileFlushCache(file);
+		let file = c_GetRuFilePath(cm_file);
+		n_GetFileFlushCache(file);
 
-	let comments = {};
-	comments[key] = this.obj;
-	let edit = {};
-	edit.object = {"comments": comments};
-	edit.add = true;
-	edit.file = file;
+		let comments = {};
+		comments[key] = this.obj;
+		let edit = {};
+		edit.object = {"comments": comments};
+		edit.add = true;
+		edit.file = file;
 
-	n_Request({"send": {"editobj": edit}, "func": this.saveFinished, "this": this});
-*/
+		n_Request({"send": {"editobj": edit}, "func": this.saveFinished, "this": this});
+	*/
 	let obj = {};
 	obj.paths = [g_CurPath()];
 
 	if (g_auth_user == null)
 	{
 		obj.guest = u_GuestAttrsGet(this.elForEdit);
-		//this.obj.cuser = this.obj.guest.id;
+		// this.obj.cuser = this.obj.guest.id;
 	}
 
 	obj.text = c_LinksProcess(this.elText.innerHTML);
 	obj.ctype = this.type;
-	if (this.color_changed) // Some (or empty) color was clicked during edit
+	if (this.color_changed)	 // Some (or empty) color was clicked during edit
 	{
 		if (this.color)
 			obj.color = this.color;
 		else
-			obj.color = []; // An empty array resets color
+			obj.color = [];	 // An empty array resets color
 	}
 	if (this.obj.deleted)
 		obj.deleted = true;
@@ -859,13 +873,19 @@ Comment.prototype.save = function() {
 	if (nw_disabled)
 		obj.nonews = true;
 
-	//console.log(JSON.stringify(obj));
-	n_Request({'send':{'setcomment':obj},'func':cm_SaveFinished, "comment": this,'info':'setComment','wait':false});
+	// console.log(JSON.stringify(obj));
+	n_Request({
+		'send': {'setcomment': obj},
+		'func': cm_SaveFinished,
+		'comment': this,
+		'info': 'setComment',
+		'wait': false
+	});
 };
 
 function cm_SaveFinished(i_data, i_args)
 {
-	//console.log(JSON.stringify(i_data));
+	// console.log(JSON.stringify(i_data));
 
 	if (c_NullOrErrorMsg(i_data))
 		return;
@@ -880,15 +900,14 @@ function cm_SaveFinished(i_data, i_args)
 	}
 }
 
-Comment.prototype.saveFinished = function(i_data)
-{
+Comment.prototype.saveFinished = function(i_data) {
 	if (i_data.comments == null)
 	{
 		c_Error('No comments created.');
 		return;
 	}
 
-    let obj = i_data.comments[g_CurPath()];
+	let obj = i_data.comments[g_CurPath()];
 	if (obj == null)
 	{
 		c_Error('No new comment created.');
@@ -906,22 +925,22 @@ Comment.prototype.saveFinished = function(i_data)
 	this.init();
 
 	cm_DisplayStat();
-/*
-	let news_user = i_args.this.obj.cuser;
-	if (i_args.this.obj.muser)
-		news_user = i_args.this.obj.muser;
+	/*
+		let news_user = i_args.this.obj.cuser;
+		if (i_args.this.obj.muser)
+			news_user = i_args.this.obj.muser;
 
-	let news_title = 'comment';
-	if (i_args.this.obj.type == 'report')
-		news_title = 'report';
+		let news_title = 'comment';
+		if (i_args.this.obj.type == 'report')
+			news_title = 'report';
 
-	nw_MakeNews({
-		"title": news_title,
-		"link": i_args.this.getLink(),
-		"user": news_user,
-		"guest": i_args.this.obj.guest
-	});
-*/
+		nw_MakeNews({
+			"title": news_title,
+			"link": i_args.this.getLink(),
+			"user": news_user,
+			"guest": i_args.this.obj.guest
+		});
+	*/
 	this.updateStatus();
 
 	this.sendEmails();
@@ -995,22 +1014,22 @@ Comment.prototype.updateStatus = function() {
 
 		reports.push(rep);
 	}
-/*
-	// If this is a report, we add artist and tags to current status
-	if ((this.obj.type == 'report') && (this.obj.deleted !== true))
-	{
-		// Add tags:
-		if (this.obj.tags && this.obj.tags.length)
-			for (let tag of this.obj.tags)
-				if (RULES.status.tags.indexOf(tag) == -1)
-					RULES.status.tags.push(tag);
+	/*
+		// If this is a report, we add artist and tags to current status
+		if ((this.obj.type == 'report') && (this.obj.deleted !== true))
+		{
+			// Add tags:
+			if (this.obj.tags && this.obj.tags.length)
+				for (let tag of this.obj.tags)
+					if (RULES.status.tags.indexOf(tag) == -1)
+						RULES.status.tags.push(tag);
 
-		// Add artist:
-		if (this.obj.cuser && this.obj.cuser.length)
-			if (RULES.status.artists.indexOf(this.obj.cuser) == -1)
-				RULES.status.artists.push(this.obj.cuser);
-	}
-*/
+			// Add artist:
+			if (this.obj.cuser && this.obj.cuser.length)
+				if (RULES.status.artists.indexOf(this.obj.cuser) == -1)
+					RULES.status.artists.push(this.obj.cuser);
+		}
+	*/
 	RULES.status.reports = reports;
 	st_Save();
 	st_Show(RULES.status);
@@ -1032,7 +1051,7 @@ Comment.prototype.processUploads = function() {
 		let file = {};
 		file.name = el.m_upfile.name;
 		file.size = el.m_upfile.size;
-		upfiles.push({"path": path, "file": file});
+		upfiles.push({'path': path, 'file': file});
 	}
 
 	if (upfiles.length == 0)
@@ -1067,12 +1086,12 @@ Comment.prototype.showFile = function(i_el, i_path, i_file) {
 	let el = document.createElement('div');
 	i_el.appendChild(el);
 	el.classList.add('file');
-/*
-	let elThumb = document.createElement('img');
-	el.appendChild(elThumb);
-	elThumb.classList.add('thumbnail');
-	elThumb.src = RULES.root + c_GetThumbFileName(i_path + '/' + i_file.name);
-*/
+	/*
+		let elThumb = document.createElement('img');
+		el.appendChild(elThumb);
+		elThumb.classList.add('thumbnail');
+		elThumb.src = RULES.root + c_GetThumbFileName(i_path + '/' + i_file.name);
+	*/
 	let elSize = document.createElement('div');
 	el.appendChild(elSize);
 	elSize.classList.add('size');
@@ -1087,6 +1106,5 @@ Comment.prototype.showFile = function(i_el, i_path, i_file) {
 };
 
 Comment.prototype.getLink = function(i_absolute) {
-	return g_GetLocationArgs({"cm_Goto": this.obj.key}, i_absolute);
+	return g_GetLocationArgs({'cm_Goto': this.obj.key}, i_absolute);
 };
-

@@ -8,8 +8,8 @@
 #include "afcommon.h"
 #include "jobaf.h"
 #include "monitorcontainer.h"
-#include "rendercontainer.h"
 #include "renderaf.h"
+#include "rendercontainer.h"
 #include "task.h"
 
 #define AFOUTPUT
@@ -17,71 +17,73 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-Block::Block( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress):
-   m_job( blockJob),
-   m_data( blockData),
-   m_tasks( NULL),
-   m_user( NULL),
-   m_jobprogress( progress),
-   m_initialized( false)
+Block::Block(JobAf *blockJob, af::BlockData *blockData, af::JobProgress *progress)
+	: m_job(blockJob), m_data(blockData), m_tasks(NULL), m_user(NULL), m_jobprogress(progress),
+	  m_initialized(false)
 {
-   if (!allocateTasks())
-      return;
-   constructDependBlocks();
-   m_initialized = true;
+	if (!allocateTasks())
+		return;
+	constructDependBlocks();
+	m_initialized = true;
 }
 
 Block::~Block()
 {
-   if( m_tasks)
-   {
-	  for( int t = 0; t < m_data->getTasksNum(); t++) if( m_tasks[t]) delete m_tasks[t];
-	  delete [] m_tasks;
-   }
+	if (m_tasks)
+	{
+		for (int t = 0; t < m_data->getTasksNum(); t++)
+			if (m_tasks[t])
+				delete m_tasks[t];
+		delete[] m_tasks;
+	}
 }
 
 bool Block::storeTasks()
 {
-	if( m_data->isNumeric()) return true;
+	if (m_data->isNumeric())
+		return true;
 
 	std::ostringstream str;
 	str << "{\n";
-	m_data->jsonWriteTasks( str);
+	m_data->jsonWriteTasks(str);
 	str << "\n}";
 
-	return AFCommon::writeFile( str, getStoreTasksFileName());
+	return AFCommon::writeFile(str, getStoreTasksFileName());
 }
 
 bool Block::readStoredTasks()
 {
-	if( m_data->isNumeric()) return true;
+	if (m_data->isNumeric())
+		return true;
 
 	int size;
-	char * data = af::fileRead( getStoreTasksFileName(), &size);
-	if( data == NULL ) return false;
+	char *data = af::fileRead(getStoreTasksFileName(), &size);
+	if (data == NULL)
+		return false;
 
 	rapidjson::Document document;
-	char * res = af::jsonParseData( document, data, size);
-	if( res == NULL )
+	char *res = af::jsonParseData(document, data, size);
+	if (res == NULL)
 	{
-		delete [] data;
+		delete[] data;
 		return false;
 	}
 
-	m_data->jsonReadTasks( document);
+	m_data->jsonReadTasks(document);
 
-	delete [] data;
-	delete [] res;
+	delete[] data;
+	delete[] res;
 
 	return true;
 }
 
 const std::string Block::getStoreTasksFileName() const
 {
-	return m_job->getStoreDir() + AFGENERAL::PATH_SEPARATOR + "block" + af::itos( m_data->getBlockNum()) + "_tasks.json";
+	return m_job->getStoreDir() + AFGENERAL::PATH_SEPARATOR + "block" + af::itos(m_data->getBlockNum()) +
+		   "_tasks.json";
 }
 
-void Block::appendJobLog(const std::string & i_info, bool i_store)
+void Block::appendJobLog(const std::string &i_info, bool i_store)
 {
 	af::Log log;
 	log.type = "jobs";
@@ -90,116 +92,124 @@ void Block::appendJobLog(const std::string & i_info, bool i_store)
 	m_job->appendLog(log, i_store);
 }
 
-void Block::v_errorHostsAppend( int task, int hostId, RenderContainer * renders)
+void Block::v_errorHostsAppend(int task, int hostId, RenderContainer *renders)
 {
-   if( task >= m_data->getTasksNum())
-   {
-	  AFERRAR("Block::errorHostsAppend: task >= tasksnum (%d>=%d)", task, m_data->getTasksNum())
-      return;
-   }
-   RenderContainerIt rendersIt( renders);
-   RenderAf* render = rendersIt.getRender( hostId);
-   if( render == NULL ) return;
-   if( v_errorHostsAppend( render->getName())) appendJobLog( render->getName()+ " - AVOIDING HOST !", false);
-   m_tasks[task]->errorHostsAppend( render->getName());
+	if (task >= m_data->getTasksNum())
+	{
+		AFERRAR("Block::errorHostsAppend: task >= tasksnum (%d>=%d)", task, m_data->getTasksNum())
+		return;
+	}
+	RenderContainerIt rendersIt(renders);
+	RenderAf *render = rendersIt.getRender(hostId);
+	if (render == NULL)
+		return;
+	if (v_errorHostsAppend(render->getName()))
+		appendJobLog(render->getName() + " - AVOIDING HOST !", false);
+	m_tasks[task]->errorHostsAppend(render->getName());
 }
 
-bool Block::v_errorHostsAppend( const std::string & hostname)
+bool Block::v_errorHostsAppend(const std::string &hostname)
 {
-   std::list<std::string>::iterator hIt = m_errorHosts.begin();
-   std::list<int>::iterator cIt = m_errorHostsCounts.begin();
-   std::list<time_t>::iterator tIt = m_errorHostsTime.begin();
-   for( ; hIt != m_errorHosts.end(); hIt++, tIt++, cIt++ )
-      if( *hIt == hostname )
-      {
-         (*cIt)++;
-         *tIt = time(NULL);
-         if( *cIt >= getErrorsAvoidHost()) return true;
-         return false;
-      }
+	std::list<std::string>::iterator hIt = m_errorHosts.begin();
+	std::list<int>::iterator cIt = m_errorHostsCounts.begin();
+	std::list<time_t>::iterator tIt = m_errorHostsTime.begin();
+	for (; hIt != m_errorHosts.end(); hIt++, tIt++, cIt++)
+		if (*hIt == hostname)
+		{
+			(*cIt)++;
+			*tIt = time(NULL);
+			if (*cIt >= getErrorsAvoidHost())
+				return true;
+			return false;
+		}
 
-   m_errorHosts.push_back( hostname);
-   m_errorHostsCounts.push_back( 1);
-   m_errorHostsTime.push_back( time(NULL));
-   return false;
+	m_errorHosts.push_back(hostname);
+	m_errorHostsCounts.push_back(1);
+	m_errorHostsTime.push_back(time(NULL));
+	return false;
 }
 
-bool Block::avoidHostsCheck( const std::string & hostname) const
+bool Block::avoidHostsCheck(const std::string &hostname) const
 {
-   if( getErrorsAvoidHost() < 1 ) return false;
-   std::list<std::string>::const_iterator hIt = m_errorHosts.begin();
-   std::list<int>::const_iterator cIt = m_errorHostsCounts.begin();
-   std::list<time_t>::const_iterator tIt = m_errorHostsTime.begin();
-   for( ; hIt != m_errorHosts.end(); hIt++, tIt++, cIt++ )
-      if( *hIt == hostname )
-      {
-         if( *cIt >= getErrorsAvoidHost() )
-         {
-            return true;
-         }
-         else
-         {
-            return false;
-         }
-      }
+	if (getErrorsAvoidHost() < 1)
+		return false;
+	std::list<std::string>::const_iterator hIt = m_errorHosts.begin();
+	std::list<int>::const_iterator cIt = m_errorHostsCounts.begin();
+	std::list<time_t>::const_iterator tIt = m_errorHostsTime.begin();
+	for (; hIt != m_errorHosts.end(); hIt++, tIt++, cIt++)
+		if (*hIt == hostname)
+		{
+			if (*cIt >= getErrorsAvoidHost())
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
 
-   return false;
+	return false;
 }
 
-void Block::v_getErrorHostsList( std::list<std::string> & o_list) const
+void Block::v_getErrorHostsList(std::list<std::string> &o_list) const
 {
-	o_list.push_back( std::string("Block['") + m_data->getName() + "'] error hosts:");
-   std::list<std::string>::const_iterator hIt = m_errorHosts.begin();
-   std::list<int>::const_iterator cIt = m_errorHostsCounts.begin();
-   std::list<time_t>::const_iterator tIt = m_errorHostsTime.begin();
-   for( ; hIt != m_errorHosts.end(); hIt++, tIt++, cIt++ )
-   {
-		std::string str = *hIt + ": " + af::itos( *cIt) + " at " + af::time2str( *tIt);
-      if(( getErrorsAvoidHost() > 0 ) && ( *cIt >= getErrorsAvoidHost())) str += " - ! AVOIDING !";
-		o_list.push_back( str);
-   }
+	o_list.push_back(std::string("Block['") + m_data->getName() + "'] error hosts:");
+	std::list<std::string>::const_iterator hIt = m_errorHosts.begin();
+	std::list<int>::const_iterator cIt = m_errorHostsCounts.begin();
+	std::list<time_t>::const_iterator tIt = m_errorHostsTime.begin();
+	for (; hIt != m_errorHosts.end(); hIt++, tIt++, cIt++)
+	{
+		std::string str = *hIt + ": " + af::itos(*cIt) + " at " + af::time2str(*tIt);
+		if ((getErrorsAvoidHost() > 0) && (*cIt >= getErrorsAvoidHost()))
+			str += " - ! AVOIDING !";
+		o_list.push_back(str);
+	}
 
-	for( int t = 0; t < m_data->getTasksNum(); t++)
-		m_tasks[t]->getErrorHostsList( o_list);
+	for (int t = 0; t < m_data->getTasksNum(); t++)
+		m_tasks[t]->getErrorHostsList(o_list);
 }
 
 void Block::v_errorHostsReset()
 {
-   m_errorHosts.clear();
-   m_errorHostsCounts.clear();
-   m_errorHostsTime.clear();
-   for( int t = 0; t < m_data->getTasksNum(); t++) m_tasks[t]->errorHostsReset();
+	m_errorHosts.clear();
+	m_errorHostsCounts.clear();
+	m_errorHostsTime.clear();
+	for (int t = 0; t < m_data->getTasksNum(); t++)
+		m_tasks[t]->errorHostsReset();
 }
 
-bool Block::v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
+bool Block::v_startTask(af::TaskExec *taskexec, RenderAf *render, MonitorContainer *monitoring)
 {
-   // Set variable capacity to maximum value:
-   if( m_data->canVarCapacity() && (taskexec->getCapacity() > 0))
-   {
-      int cap_coeff = render->findCapacityFree() / taskexec->getCapacity();
-	  if( cap_coeff < m_data->getCapCoeffMin())
-      {
-		 AFERRAR("Block::startTask: cap_coeff < data->getCapCoeffMin(%d<%d)", cap_coeff, m_data->getCapCoeffMin())
-      }
-      else
-      {
-		 if(( m_data->getCapCoeffMax() > 0 ) && (cap_coeff > m_data->getCapCoeffMax())) cap_coeff = m_data->getCapCoeffMax();
-         taskexec->setCapCoeff( cap_coeff);
-      }
-   }
+	// Set variable capacity to maximum value:
+	if (m_data->canVarCapacity() && (taskexec->getCapacity() > 0))
+	{
+		int cap_coeff = render->findCapacityFree() / taskexec->getCapacity();
+		if (cap_coeff < m_data->getCapCoeffMin())
+		{
+			AFERRAR("Block::startTask: cap_coeff < data->getCapCoeffMin(%d<%d)", cap_coeff,
+					m_data->getCapCoeffMin())
+		}
+		else
+		{
+			if ((m_data->getCapCoeffMax() > 0) && (cap_coeff > m_data->getCapCoeffMax()))
+				cap_coeff = m_data->getCapCoeffMax();
+			taskexec->setCapCoeff(cap_coeff);
+		}
+	}
 
-   m_tasks[taskexec->getTaskNum()]->v_start( taskexec, render, monitoring);
+	m_tasks[taskexec->getTaskNum()]->v_start(taskexec, render, monitoring);
 
-   return true;
+	return true;
 }
 
-void Block::reconnectTask(af::TaskExec *i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring)
+void Block::reconnectTask(af::TaskExec *i_taskexec, RenderAf &i_render, MonitorContainer *i_monitoring)
 {
-	Task * task = m_tasks[i_taskexec->getTaskNum()];
-	task->reconnect( i_taskexec, &i_render, i_monitoring);
+	Task *task = m_tasks[i_taskexec->getTaskNum()];
+	task->reconnect(i_taskexec, &i_render, i_monitoring);
 }
 
-bool Block::canRunOn( RenderAf * render)
+bool Block::canRunOn(RenderAf *render)
 {
 	// Check max running tasks on the same host:
 	if (m_data->getMaxRunTasksPerHost() == 0)
@@ -220,7 +230,8 @@ bool Block::canRunOn( RenderAf * render)
 		return false;
 
 	// check maximum hosts:
-	if ((m_data->getMaxRunningTasks() >= 0) && (m_data->getRunningTasksNumber() >= m_data->getMaxRunningTasks()))
+	if ((m_data->getMaxRunningTasks() >= 0) &&
+		(m_data->getRunningTasksNumber() >= m_data->getMaxRunningTasks()))
 		return false;
 
 	// Check block avoid hosts list:
@@ -232,7 +243,8 @@ bool Block::canRunOn( RenderAf * render)
 		return false;
 
 	// Check needed GPU memory:
-	if (m_data->getNeedGPUMemMb() > (render->getHostRes().gpu_mem_total_mb - render->getHostRes().gpu_mem_used_mb))
+	if (m_data->getNeedGPUMemMb() >
+		(render->getHostRes().gpu_mem_total_mb - render->getHostRes().gpu_mem_used_mb))
 		return false;
 
 	// Check needed CPU frequency:
@@ -270,7 +282,7 @@ bool Block::canRunOn( RenderAf * render)
 	return true;
 }
 
-void Block::addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
+void Block::addSolveCounts(MonitorContainer *i_monitoring, af::TaskExec *i_exec, RenderAf *i_render)
 {
 	addRenderCount(i_render);
 
@@ -279,7 +291,7 @@ void Block::addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exe
 	m_job->addSolveCounts(i_monitoring, i_exec, i_render);
 }
 
-void Block::remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
+void Block::remSolveCounts(MonitorContainer *i_monitoring, af::TaskExec *i_exec, RenderAf *i_render)
 {
 	remRenderCount(i_render);
 
@@ -288,12 +300,12 @@ void Block::remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exe
 	m_job->remSolveCounts(i_monitoring, i_exec, i_render);
 }
 
-void Block::addRenderCount(RenderAf * i_render)
+void Block::addRenderCount(RenderAf *i_render)
 {
-	std::list<RenderAf*>::iterator rit = m_renders_ptrs.begin();
+	std::list<RenderAf *>::iterator rit = m_renders_ptrs.begin();
 	std::list<int>::iterator cit = m_renders_counts.begin();
-	for ( ; rit != m_renders_ptrs.end(); rit++, cit++)
-		if (i_render == *rit )
+	for (; rit != m_renders_ptrs.end(); rit++, cit++)
+		if (i_render == *rit)
 		{
 			(*cit)++;
 			return;
@@ -302,21 +314,21 @@ void Block::addRenderCount(RenderAf * i_render)
 	m_renders_counts.push_back(1);
 }
 
-int Block::getRenderCount(RenderAf * i_render) const
+int Block::getRenderCount(RenderAf *i_render) const
 {
-	std::list<RenderAf*>::const_iterator rit = m_renders_ptrs.begin();
+	std::list<RenderAf *>::const_iterator rit = m_renders_ptrs.begin();
 	std::list<int>::const_iterator cit = m_renders_counts.begin();
-	for ( ; rit != m_renders_ptrs.end(); rit++, cit++)
+	for (; rit != m_renders_ptrs.end(); rit++, cit++)
 		if (i_render == *rit)
 			return *cit;
 	return 0;
 }
 
-void Block::remRenderCount(RenderAf * i_render)
+void Block::remRenderCount(RenderAf *i_render)
 {
-	std::list<RenderAf*>::iterator rit = m_renders_ptrs.begin();
+	std::list<RenderAf *>::iterator rit = m_renders_ptrs.begin();
 	std::list<int>::iterator cit = m_renders_counts.begin();
-	for( ; rit != m_renders_ptrs.end(); rit++, cit++)
+	for (; rit != m_renders_ptrs.end(); rit++, cit++)
 		if (i_render == *rit)
 		{
 			if (*cit > 1)
@@ -330,69 +342,72 @@ void Block::remRenderCount(RenderAf * i_render)
 		}
 }
 
-bool Block::v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring)
+bool Block::v_refresh(time_t currentTime, RenderContainer *renders, MonitorContainer *monitoring)
 {
-   if( m_user == NULL)
-   {
-      AFERROR("Block::refresh: User is not set.")
-      return false;
-   }
+	if (m_user == NULL)
+	{
+		AFERROR("Block::refresh: User is not set.")
+		return false;
+	}
 
-   // refresh tasks
-   for( int t = 0; t < m_data->getTasksNum(); t++)
-   {
-      int errorHostId = -1;
-	  m_tasks[t]->v_refresh( currentTime, renders, monitoring, errorHostId);
-      if( errorHostId != -1 ) v_errorHostsAppend( t, errorHostId, renders);
-   }
+	// refresh tasks
+	for (int t = 0; t < m_data->getTasksNum(); t++)
+	{
+		int errorHostId = -1;
+		m_tasks[t]->v_refresh(currentTime, renders, monitoring, errorHostId);
+		if (errorHostId != -1)
+			v_errorHostsAppend(t, errorHostId, renders);
+	}
 
-   // For block progress monitoring in jobs list and in tasks list
-   bool blockProgress_changed = false;
+	// For block progress monitoring in jobs list and in tasks list
+	bool blockProgress_changed = false;
 
-   // store old state to know if monitoring and database udate needed
-   uint32_t old_block_state = m_data->getState();
+	// store old state to know if monitoring and database udate needed
+	uint32_t old_block_state = m_data->getState();
 
-   // forgive error hosts
-   if(( false == m_errorHosts.empty() ) && ( getErrorsForgiveTime() > 0 ))
-   {
-	  std::list<std::string>::iterator hIt = m_errorHosts.begin();
-	  std::list<int>::iterator cIt = m_errorHostsCounts.begin();
-	  std::list<time_t>::iterator tIt = m_errorHostsTime.begin();
-	  while( hIt != m_errorHosts.end() )
-         if( currentTime - *tIt > getErrorsForgiveTime())
-         {
-            appendJobLog( std::string("Forgived error host \"") + *hIt + "\" since " + af::time2str(*tIt) + ".", false);
-			hIt = m_errorHosts.erase( hIt);
-			cIt = m_errorHostsCounts.erase( cIt);
-			tIt = m_errorHostsTime.erase( tIt);
-         }
-         else
-         {
-            hIt++;
-            cIt++;
-            tIt++;
-         }
-    }
+	// forgive error hosts
+	if ((false == m_errorHosts.empty()) && (getErrorsForgiveTime() > 0))
+	{
+		std::list<std::string>::iterator hIt = m_errorHosts.begin();
+		std::list<int>::iterator cIt = m_errorHostsCounts.begin();
+		std::list<time_t>::iterator tIt = m_errorHostsTime.begin();
+		while (hIt != m_errorHosts.end())
+			if (currentTime - *tIt > getErrorsForgiveTime())
+			{
+				appendJobLog(std::string("Forgived error host \"") + *hIt + "\" since " + af::time2str(*tIt) +
+								 ".",
+							 false);
+				hIt = m_errorHosts.erase(hIt);
+				cIt = m_errorHostsCounts.erase(cIt);
+				tIt = m_errorHostsTime.erase(tIt);
+			}
+			else
+			{
+				hIt++;
+				cIt++;
+				tIt++;
+			}
+	}
 
+	// calculate number of error and avoid hosts for monitoring
+	{
+		int avoidhostsnum = 0;
+		int errorhostsnum = m_errorHosts.size();
+		if ((errorhostsnum != 0) && (getErrorsAvoidHost() > 0))
+			for (std::list<int>::const_iterator cIt = m_errorHostsCounts.begin();
+				 cIt != m_errorHostsCounts.end(); cIt++)
+				if (*cIt >= getErrorsAvoidHost())
+					avoidhostsnum++;
 
-   // calculate number of error and avoid hosts for monitoring
-   {
-      int avoidhostsnum = 0;
-	  int errorhostsnum = m_errorHosts.size();
-      if(( errorhostsnum != 0 ) && ( getErrorsAvoidHost() > 0 ))
-		 for( std::list<int>::const_iterator cIt = m_errorHostsCounts.begin(); cIt != m_errorHostsCounts.end(); cIt++)
-            if( *cIt >= getErrorsAvoidHost())
-               avoidhostsnum++;
+		if ((m_data->getProgressErrorHostsNum() != errorhostsnum) ||
+			(m_data->getProgressAvoidHostsNum() != avoidhostsnum))
+		{
+			blockProgress_changed = true;
+		}
 
-	  if(( m_data->getProgressErrorHostsNum() != errorhostsnum ) ||
-		 ( m_data->getProgressAvoidHostsNum() != avoidhostsnum ) )
-      {
-         blockProgress_changed = true;
-      }
-
-	  m_data->setProgressErrorHostsNum( errorhostsnum);
-	  m_data->setProgressAvoidHostsNum( avoidhostsnum);
-   }
+		m_data->setProgressErrorHostsNum(errorhostsnum);
+		m_data->setProgressAvoidHostsNum(avoidhostsnum);
+	}
 
 	// No need to update progress in sys job block, it will be updated in virtual function customly
 	// ( if it will be updated here, it will always return that it changes )
@@ -413,20 +428,20 @@ bool Block::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCon
 	if (old_block_state != m_data->getState())
 		blockProgress_changed = true;
 
-   // update block monitoring and database if needed
-   if( blockProgress_changed && monitoring )
-		monitoring->addBlock( af::Msg::TBlocksProgress, m_data);
+	// update block monitoring and database if needed
+	if (blockProgress_changed && monitoring)
+		monitoring->addBlock(af::Msg::TBlocksProgress, m_data);
 
-   return blockProgress_changed;
+	return blockProgress_changed;
 }
 
-bool Block::checkBlockDependStatus(MonitorContainer * i_monitoring)
+bool Block::checkBlockDependStatus(MonitorContainer *i_monitoring)
 {
 	bool was_depend = m_data->getState() & AFJOB::STATE_WAITDEP_MASK;
 	bool now_depend = false;
 
-	if( m_dependBlocks.size())
-		for( std::list<int>::const_iterator bIt = m_dependBlocks.begin(); bIt != m_dependBlocks.end(); bIt++)
+	if (m_dependBlocks.size())
+		for (std::list<int>::const_iterator bIt = m_dependBlocks.begin(); bIt != m_dependBlocks.end(); bIt++)
 		{
 			if (m_job->getBlockData(*bIt)->getState() & AFJOB::STATE_DONE_MASK)
 				continue;
@@ -435,9 +450,9 @@ bool Block::checkBlockDependStatus(MonitorContainer * i_monitoring)
 			break;
 		}
 
-	if( now_depend != was_depend )
+	if (now_depend != was_depend)
 	{
-		m_data->setStateDependent( now_depend);
+		m_data->setStateDependent(now_depend);
 
 		if (false == now_depend)
 		{
@@ -446,8 +461,8 @@ bool Block::checkBlockDependStatus(MonitorContainer * i_monitoring)
 			m_data->updateProgress(m_jobprogress);
 		}
 
-		if( i_monitoring )
-			i_monitoring->addBlock( af::Msg::TBlocksProgress, m_data);
+		if (i_monitoring)
+			i_monitoring->addBlock(af::Msg::TBlocksProgress, m_data);
 
 		return true;
 	}
@@ -455,7 +470,7 @@ bool Block::checkBlockDependStatus(MonitorContainer * i_monitoring)
 	return false;
 }
 
-bool Block::resetTasksDependStatus(MonitorContainer * i_monitoring)
+bool Block::resetTasksDependStatus(MonitorContainer *i_monitoring)
 {
 	bool some_task_state_changed = false;
 
@@ -480,7 +495,7 @@ bool Block::resetTasksDependStatus(MonitorContainer * i_monitoring)
 	return some_task_state_changed;
 }
 
-bool Block::checkTasksDependStatus(MonitorContainer * i_monitoring)
+bool Block::checkTasksDependStatus(MonitorContainer *i_monitoring)
 {
 	if (m_job->getBlocksNum() < 2)
 		return false;
@@ -505,7 +520,7 @@ bool Block::checkTasksDependStatus(MonitorContainer * i_monitoring)
 
 		for (int t = 0; t < m_tasks[task]->m_depend_on.size(); t++)
 		{
-			Task * dep_on_task = m_tasks[task]->m_depend_on[t];
+			Task *dep_on_task = m_tasks[task]->m_depend_on[t];
 
 			if (dep_on_task->isDone())
 				continue;
@@ -518,12 +533,12 @@ bool Block::checkTasksDependStatus(MonitorContainer * i_monitoring)
 				if (m_data->isNumeric() && dep_on_task->getBlock()->m_data->isNotNumeric())
 				{
 					firstdependframe -= m_data->getFrameFirst();
-					lastdependframe  -= m_data->getFrameFirst();
+					lastdependframe -= m_data->getFrameFirst();
 				}
 				else if (m_data->isNotNumeric() && dep_on_task->getBlock()->m_data->isNumeric())
 				{
 					firstdependframe += dep_on_task->getBlock()->m_data->getFrameFirst();
-					lastdependframe  += dep_on_task->getBlock()->m_data->getFrameFirst();
+					lastdependframe += dep_on_task->getBlock()->m_data->getFrameFirst();
 				}
 
 				if (dep_on_task->getBlock()->m_data->getFramePerTask() < 0)
@@ -553,13 +568,13 @@ bool Block::checkTasksDependStatus(MonitorContainer * i_monitoring)
 	return some_task_state_changed;
 }
 
-bool Block::action( Action & i_action)
+bool Block::action(Action &i_action)
 {
 	uint32_t blockchanged_type = 0;
 	bool job_changed = false;
 
-	const JSON & operation = (*i_action.data)["operation"];
-	if( operation.IsObject())
+	const JSON &operation = (*i_action.data)["operation"];
+	if (operation.IsObject())
 	{
 		std::string type;
 		af::jr_string("type", type, operation);
@@ -573,48 +588,58 @@ bool Block::action( Action & i_action)
 		}
 		else if (type == "skip")
 		{
-			//tasksOperation("Tasks skip by " + i_action.author, i_action, operation, ~AFJOB::STATE_DONE_MASK, AFJOB::STATE_SKIPPED_MASK | AFJOB::STATE_DONE_MASK);
-			tasksOperation(i_action, operation, ~AFJOB::STATE_DONE_MASK, AFJOB::STATE_SKIPPED_MASK | AFJOB::STATE_DONE_MASK);
+			// tasksOperation("Tasks skip by " + i_action.author, i_action, operation,
+			// ~AFJOB::STATE_DONE_MASK, AFJOB::STATE_SKIPPED_MASK | AFJOB::STATE_DONE_MASK);
+			tasksOperation(i_action, operation, ~AFJOB::STATE_DONE_MASK,
+						   AFJOB::STATE_SKIPPED_MASK | AFJOB::STATE_DONE_MASK);
 		}
 		else if (type == "suspend")
 		{
-			//tasksOperation("Tasks suspend by " + i_action.author, i_action, operation,
+			// tasksOperation("Tasks suspend by " + i_action.author, i_action, operation,
 			tasksOperation(i_action, operation,
-					AFJOB::STATE_READY_MASK | AFJOB::STATE_RUNNING_MASK | AFJOB::STATE_SKIPPED_MASK, AFJOB::STATE_SUSPENDED_MASK);
+						   AFJOB::STATE_READY_MASK | AFJOB::STATE_RUNNING_MASK | AFJOB::STATE_SKIPPED_MASK,
+						   AFJOB::STATE_SUSPENDED_MASK);
 		}
 		else if (type == "continue")
 		{
-			//tasksOperation("Tasks continue by " + i_action.author, i_action, operation, AFJOB::STATE_SUSPENDED_MASK, AFJOB::STATE_READY_MASK);
+			// tasksOperation("Tasks continue by " + i_action.author, i_action, operation,
+			// AFJOB::STATE_SUSPENDED_MASK, AFJOB::STATE_READY_MASK);
 			tasksOperation(i_action, operation, AFJOB::STATE_SUSPENDED_MASK, AFJOB::STATE_READY_MASK);
 		}
 		else if (type == "done")
 		{
-			//tasksOperation("Tasks set done by " + i_action.author, i_action, operation, ~AFJOB::STATE_DONE_MASK, AFJOB::STATE_DONE_MASK);
+			// tasksOperation("Tasks set done by " + i_action.author, i_action, operation,
+			// ~AFJOB::STATE_DONE_MASK, AFJOB::STATE_DONE_MASK);
 			tasksOperation(i_action, operation, ~AFJOB::STATE_DONE_MASK, AFJOB::STATE_DONE_MASK);
 		}
 		else if (type == "restart")
 		{
-			//tasksOperation("Tasks restart by " + i_action.author, i_action, operation, 0 /*with any task*/, AFJOB::STATE_READY_MASK);
+			// tasksOperation("Tasks restart by " + i_action.author, i_action, operation, 0 /*with any task*/,
+			// AFJOB::STATE_READY_MASK);
 			tasksOperation(i_action, operation, 0 /*with any task*/, AFJOB::STATE_READY_MASK);
 		}
 		else if (type == "restart_running")
 		{
-			//tasksOperation("Restart running tasks by " + i_action.author, i_action, operation, AFJOB::STATE_RUNNING_MASK, 0 /*does not set any state*/);
+			// tasksOperation("Restart running tasks by " + i_action.author, i_action, operation,
+			// AFJOB::STATE_RUNNING_MASK, 0 /*does not set any state*/);
 			tasksOperation(i_action, operation, AFJOB::STATE_RUNNING_MASK, 0 /*does not set any state*/);
 		}
 		else if (type == "restart_skipped")
 		{
-			//tasksOperation("Restart skipped tasks by " + i_action.author, i_action, operation, AFJOB::STATE_SKIPPED_MASK, AFJOB::STATE_READY_MASK);
+			// tasksOperation("Restart skipped tasks by " + i_action.author, i_action, operation,
+			// AFJOB::STATE_SKIPPED_MASK, AFJOB::STATE_READY_MASK);
 			tasksOperation(i_action, operation, AFJOB::STATE_SKIPPED_MASK, AFJOB::STATE_READY_MASK);
 		}
 		else if (type == "restart_done")
 		{
-			//tasksOperation("Restart done tasks by " + i_action.author, i_action, operation, AFJOB::STATE_DONE_MASK, AFJOB::STATE_READY_MASK);
+			// tasksOperation("Restart done tasks by " + i_action.author, i_action, operation,
+			// AFJOB::STATE_DONE_MASK, AFJOB::STATE_READY_MASK);
 			tasksOperation(i_action, operation, AFJOB::STATE_DONE_MASK, AFJOB::STATE_READY_MASK);
 		}
 		else if (type == "restart_errors")
 		{
-			//tasksOperation("Restart error tasks by " + i_action.author, i_action, operation, AFJOB::STATE_ERROR_MASK, AFJOB::STATE_READY_MASK);
+			// tasksOperation("Restart error tasks by " + i_action.author, i_action, operation,
+			// AFJOB::STATE_ERROR_MASK, AFJOB::STATE_READY_MASK);
 			tasksOperation(i_action, operation, AFJOB::STATE_ERROR_MASK, AFJOB::STATE_READY_MASK);
 		}
 		else if (type == "trynext")
@@ -649,17 +674,17 @@ bool Block::action( Action & i_action)
 			return false;
 		}
 
-		//appendJobLog("Operation \"" + type + "\" by " + i_action.author);
+		// appendJobLog("Operation \"" + type + "\" by " + i_action.author);
 	}
 	else
 	{
-		const JSON & params = (*i_action.data)["params"];
-		if( params.IsObject())
+		const JSON &params = (*i_action.data)["params"];
+		if (params.IsObject())
 		{
 			std::string changes;
-			m_data->jsonRead( params, &changes);
+			m_data->jsonRead(params, &changes);
 
-			if( changes.empty())
+			if (changes.empty())
 				return false;
 
 			i_action.log.info += "\bBlock['" + m_data->getName() + "']: " + changes;
@@ -675,16 +700,16 @@ bool Block::action( Action & i_action)
 		}
 	}
 
-	if( blockchanged_type )
+	if (blockchanged_type)
 	{
-//AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)m_data);
-		i_action.monitors->addBlock( af::Msg::TBlocksProperties, m_data);
+		// AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)m_data);
+		i_action.monitors->addBlock(af::Msg::TBlocksProperties, m_data);
 	}
 
 	return job_changed;
 }
 
-bool Block::editTickets(Action & i_action, const JSON & operation)
+bool Block::editTickets(Action &i_action, const JSON &operation)
 {
 	std::string name;
 	if (false == af::jr_string("name", name, operation))
@@ -705,22 +730,23 @@ bool Block::editTickets(Action & i_action, const JSON & operation)
 	return true;
 }
 
-void Block::tasksOperation(Action & i_action, const JSON & i_operation, uint32_t i_with_state, uint32_t i_set_state)
+void Block::tasksOperation(Action &i_action, const JSON &i_operation, uint32_t i_with_state,
+						   uint32_t i_set_state)
 {
 	std::vector<int32_t> tasks_vec;
 	af::jr_int32vec("task_ids", tasks_vec, i_operation);
 
 	int length = m_data->getTasksNum();
-	if( tasks_vec.size())
+	if (tasks_vec.size())
 		length = tasks_vec.size();
 
-	for( int i = 0; i < length; i++)
+	for (int i = 0; i < length; i++)
 	{
 		int t = i;
-		if( tasks_vec.size())
+		if (tasks_vec.size())
 		{
 			t = tasks_vec[i];
-			if(( t >= m_data->getTasksNum()) || ( t < 0 ))
+			if ((t >= m_data->getTasksNum()) || (t < 0))
 			{
 				i_action.answerError("Invalid operation task numer = " + af::itos(t));
 				return;
@@ -733,7 +759,7 @@ void Block::tasksOperation(Action & i_action, const JSON & i_operation, uint32_t
 	}
 }
 
-bool Block::tryTasksNext(Action & i_action, const JSON & i_operation)
+bool Block::tryTasksNext(Action &i_action, const JSON &i_operation)
 {
 	if (m_job->isMaintenanceFlag())
 	{
@@ -768,7 +794,7 @@ bool Block::tryTasksNext(Action & i_action, const JSON & i_operation)
 	{
 		int t = tasks_vec[i];
 
-		if ((t >= m_data->getTasksNum()) || ( t < 0 ))
+		if ((t >= m_data->getTasksNum()) || (t < 0))
 		{
 			i_action.answerError("Invalid operation task numer = " + af::itos(t));
 			break;
@@ -807,13 +833,13 @@ bool Block::allocateTasks(int alreadyAllocated)
 	{
 		AFERROR("Blocl::Block: Can't allocate memory for tasks.")
 		if (NULL != old_tasks)
-			delete [] old_tasks;
+			delete[] old_tasks;
 		return false;
 	}
 	for (int t = 0; t < m_data->getTasksNum(); t++)
 		m_tasks[t] = t < alreadyAllocated ? old_tasks[t] : NULL;
 	if (NULL != old_tasks)
-		delete [] old_tasks;
+		delete[] old_tasks;
 	for (int t = alreadyAllocated; t < m_data->getTasksNum(); t++)
 	{
 		m_tasks[t] = new Task(this, m_jobprogress->tp[m_data->getBlockNum()][t], t);
@@ -828,40 +854,42 @@ bool Block::allocateTasks(int alreadyAllocated)
 
 void Block::constructDependBlocks()
 {
-	if( m_job->getBlocksNum() <= 1 )
-    {
-        // There is only one block, no one other to denend on
-        return;
-    }
+	if (m_job->getBlocksNum() <= 1)
+	{
+		// There is only one block, no one other to denend on
+		return;
+	}
 
 	m_dependBlocks.clear();
 	m_dependTasksBlocks.clear();
 
-	if( m_data->hasDependMask())
-    {
-		for( int bd = 0; bd < m_job->getBlocksNum(); bd++)
-        {
-            // skip if it is the same block
-			if( bd == m_data->getBlockNum() ) continue;
+	if (m_data->hasDependMask())
+	{
+		for (int bd = 0; bd < m_job->getBlocksNum(); bd++)
+		{
+			// skip if it is the same block
+			if (bd == m_data->getBlockNum())
+				continue;
 
-            // store block if name match mask
+			// store block if name match mask
 			if (m_data->checkDependMask(m_job->getBlockData(bd)->getName()))
-            m_dependBlocks.push_back( bd);
-        }
-    }
+				m_dependBlocks.push_back(bd);
+		}
+	}
 
-	if( m_data->hasTasksDependMask())
-    {
-		for( int bd = 0; bd < m_job->getBlocksNum(); bd++)
-        {
-            // skip if it is the same block
-			if( bd == m_data->getBlockNum() ) continue;
+	if (m_data->hasTasksDependMask())
+	{
+		for (int bd = 0; bd < m_job->getBlocksNum(); bd++)
+		{
+			// skip if it is the same block
+			if (bd == m_data->getBlockNum())
+				continue;
 
-            // store block if name match mask
+			// store block if name match mask
 			if (m_data->checkTasksDependMask(m_job->getBlockData(bd)->getName()))
-            m_dependTasksBlocks.push_back( bd);
-        }
-    }
+				m_dependTasksBlocks.push_back(bd);
+		}
+	}
 }
 
 void Block::constructDependTasks()
@@ -877,19 +905,19 @@ void Block::constructDependTasks()
 		m_tasks[task]->m_dependent.clear();
 		m_tasks[task]->m_depend_on.clear();
 
-		for (int & b : m_dependTasksBlocks)
+		for (int &b : m_dependTasksBlocks)
 		{
 			long long firstdependframe, lastdependframe;
 			m_data->genNumbers(firstdependframe, lastdependframe, task);
 			if (m_data->isNumeric() && m_job->getBlockData(b)->isNotNumeric())
 			{
 				firstdependframe -= m_data->getFrameFirst();
-				lastdependframe  -= m_data->getFrameFirst();
+				lastdependframe -= m_data->getFrameFirst();
 			}
 			else if (m_data->isNotNumeric() && m_job->getBlockData(b)->isNumeric())
 			{
 				firstdependframe += m_job->getBlockData(b)->getFrameFirst();
-				lastdependframe  += m_job->getBlockData(b)->getFrameFirst();
+				lastdependframe += m_job->getBlockData(b)->getFrameFirst();
 			}
 
 			if (m_job->getBlockData(b)->getFramePerTask() < 0)
@@ -898,52 +926,56 @@ void Block::constructDependTasks()
 			int firstdependtask, lastdependtask;
 			bool inValidRange;
 			firstdependtask = m_job->getBlockData(b)->calcTaskNumber(firstdependframe, inValidRange);
-			lastdependtask  = m_job->getBlockData(b)->calcTaskNumber( lastdependframe, inValidRange);
+			lastdependtask = m_job->getBlockData(b)->calcTaskNumber(lastdependframe, inValidRange);
 			if (inValidRange)
 				if (m_job->getBlockData(b)->getFramePerTask() < 0)
 					lastdependtask--;
 
 			for (int t = firstdependtask; t <= lastdependtask; t++)
 			{
-				Task * depTask = m_job->getBlock(b)->m_tasks[t];
+				Task *depTask = m_job->getBlock(b)->m_tasks[t];
 				m_tasks[task]->m_depend_on.push_back(depTask);
 				depTask->m_dependent.push_back(m_tasks[task]);
-//				af::addUniqueToVect(m_tasks[task]->m_depend_on, t);
-//				af::addUniqueToVect(m_tasks[t]->m_dependent, task);
-//if (m_jobprogress->tp[b][t]->state & (AFJOB::STATE_DONE_MASK | AFJOB::STATE_SKIPPED_MASK))
+				//				af::addUniqueToVect(m_tasks[task]->m_depend_on, t);
+				//				af::addUniqueToVect(m_tasks[t]->m_dependent, task);
+				// if (m_jobprogress->tp[b][t]->state & (AFJOB::STATE_DONE_MASK | AFJOB::STATE_SKIPPED_MASK))
 			}
 		}
 	}
 }
 
-bool Block::tasksDependsOn( int block)
+bool Block::tasksDependsOn(int block)
 {
-    for( std::list<int>::const_iterator it = m_dependTasksBlocks.begin(); it != m_dependTasksBlocks.end(); it++)
-        if( *it == block )
-            return true;
-    return false;
+	for (std::list<int>::const_iterator it = m_dependTasksBlocks.begin(); it != m_dependTasksBlocks.end();
+		 it++)
+		if (*it == block)
+			return true;
+	return false;
 }
 
 int Block::calcWeight() const
 {
-   int weight = sizeof( Block) + m_data->calcWeight();
-   for( int t = 0; t < m_data->getTasksNum(); t++) weight += m_tasks[t]->calcWeight();
-   return weight;
+	int weight = sizeof(Block) + m_data->calcWeight();
+	for (int t = 0; t < m_data->getTasksNum(); t++)
+		weight += m_tasks[t]->calcWeight();
+	return weight;
 }
 
 int Block::logsWeight() const
 {
-   int weight = 0;
-   for( int t = 0; t < m_data->getTasksNum(); t++) weight += m_tasks[t]->logsWeight();
-   return weight;
+	int weight = 0;
+	for (int t = 0; t < m_data->getTasksNum(); t++)
+		weight += m_tasks[t]->logsWeight();
+	return weight;
 }
 
 int Block::blackListWeight() const
 {
-   int weight = sizeof(int) * m_errorHostsCounts.size();
-   weight += af::weigh( m_errorHosts);
-   for( int t = 0; t < m_data->getTasksNum(); t++) weight += m_tasks[t]->blackListWeight();
-   return weight;
+	int weight = sizeof(int) * m_errorHostsCounts.size();
+	weight += af::weigh(m_errorHosts);
+	for (int t = 0; t < m_data->getTasksNum(); t++)
+		weight += m_tasks[t]->blackListWeight();
+	return weight;
 }
 
 void Block::checkStatesOnAppend()
@@ -967,7 +999,7 @@ void Block::checkStatesOnAppend()
 		constructDependTasks();
 }
 
-bool Block::appendTasks(Action & i_action, const JSON & i_operation)
+bool Block::appendTasks(Action &i_action, const JSON &i_operation)
 {
 	if (m_job->getId() == AFJOB::SYSJOB_ID)
 	{

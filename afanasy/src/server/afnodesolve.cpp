@@ -32,18 +32,14 @@
 // it means that node was not solved at all.
 unsigned long long AfNodeSolve::sm_solve_cycle = 1;
 
-AfNodeSolve::AfNodeSolve(af::Work *i_work, const std::string & i_type_name, const std::string &i_store_dir):
-	AfNodeSrv(i_work, i_type_name, i_store_dir),
-	m_work(i_work),
-	m_solve_need(0.0),
-	m_solve_cycle(0), // 0 means that it was not solved at all
-	m_solves_count(0)
+AfNodeSolve::AfNodeSolve(af::Work *i_work, const std::string &i_type_name, const std::string &i_store_dir)
+	: AfNodeSrv(i_work, i_type_name, i_store_dir), m_work(i_work), m_solve_need(0.0),
+	  m_solve_cycle(0), // 0 means that it was not solved at all
+	  m_solves_count(0)
 {
 }
 
-AfNodeSolve::~AfNodeSolve()
-{
-}
+AfNodeSolve::~AfNodeSolve() {}
 
 void AfNodeSolve::setZombie()
 {
@@ -81,7 +77,8 @@ int AfNodeSolve::getRenderCount(RenderAf *i_render) const
 {
 	// Get render count, to check max run tasks per host limit:
 	std::map<int, int>::const_iterator it = m_renders_counts.find(i_render->getId());
-	if (it != m_renders_counts.end()) return (*it).second;
+	if (it != m_renders_counts.end())
+		return (*it).second;
 	return 0;
 }
 
@@ -95,7 +92,8 @@ void AfNodeSolve::remRenderCount(int i_render_id, int i_count)
 
 		if ((*it).second < 0)
 		{
-			AF_ERR << "AfNodeSolve::remRenderCount[" << m_node->getName() << "]: Render[" << i_render_id << "] count is negative: " << (*it).second;
+			AF_ERR << "AfNodeSolve::remRenderCount[" << m_node->getName() << "]: Render[" << i_render_id
+				   << "] count is negative: " << (*it).second;
 			(*it).second = 0;
 		}
 
@@ -104,28 +102,29 @@ void AfNodeSolve::remRenderCount(int i_render_id, int i_count)
 	}
 }
 
-void AfNodeSolve::addRendersCounts(const AfNodeSolve & i_other)
+void AfNodeSolve::addRendersCounts(const AfNodeSolve &i_other)
 {
 	std::map<int, int>::const_iterator it = i_other.m_renders_counts.begin();
 	for (; it != i_other.m_renders_counts.end(); it++)
 		addRenderCount((*it).first, (*it).second);
 }
 
-void AfNodeSolve::remRendersCounts(const AfNodeSolve & i_other)
+void AfNodeSolve::remRendersCounts(const AfNodeSolve &i_other)
 {
 	std::map<int, int>::const_iterator it = i_other.m_renders_counts.begin();
 	for (; it != i_other.m_renders_counts.end(); it++)
 		remRenderCount((*it).first, (*it).second);
 }
 
-void AfNodeSolve::v_preSolve(time_t i_curtime, MonitorContainer * i_monitors)
+void AfNodeSolve::v_preSolve(time_t i_curtime, MonitorContainer *i_monitors)
 {
 	// Resets solves count to max_tasks_per_second limit
 	m_solves_count = 0;
 }
 
 /// Solving function should be implemented in child classes (if solving needed):
-RenderAf *AfNodeSolve::v_solve(std::list<RenderAf *> &i_renders_list, MonitorContainer *i_monitoring, BranchSrv * i_branch)
+RenderAf *AfNodeSolve::v_solve(std::list<RenderAf *> &i_renders_list, MonitorContainer *i_monitoring,
+							   BranchSrv *i_branch)
 {
 	AF_ERR << "AfNodeSrv::v_solve(): Not implemented: " << m_node->getName();
 	return NULL;
@@ -141,7 +140,6 @@ void AfNodeSolve::calcNeed(int i_flags, int i_resourcesquantity)
 		else
 			resourcesquantity = m_work->getRunningTasksNum();
 	}
-
 
 	// Less resources less need
 	m_solve_need = pow(1.1, m_node->getPriority()) / (resourcesquantity + 1.0);
@@ -198,8 +196,8 @@ bool AfNodeSolve::v_canRun()
 bool AfNodeSolve::canRunOn(RenderAf *i_render)
 {
 	// Check maximum running tasks per host
-	if ((m_work->getMaxRunTasksPerHost() > 0)
-		&& (getRenderCount(i_render) >= m_work->getMaxRunTasksPerHost()))
+	if ((m_work->getMaxRunTasksPerHost() > 0) &&
+		(getRenderCount(i_render) >= m_work->getMaxRunTasksPerHost()))
 	{
 		return false;
 	}
@@ -246,7 +244,6 @@ bool AfNodeSolve::canRunOn(RenderAf *i_render)
 		return false;
 	}
 
-
 	bool canrunon;
 	int priority = m_work->getPoolPriority(i_render->getPool(), canrunon);
 	if (false == canrunon)
@@ -261,7 +258,7 @@ bool AfNodeSolve::v_canRunOn(RenderAf *i_render)
 	return false;
 }
 
-int AfNodeSolve::getPoolPriority(const RenderAf * i_render) const
+int AfNodeSolve::getPoolPriority(const RenderAf *i_render) const
 {
 	int priority = i_render->calcPoolPriority();
 
@@ -274,9 +271,11 @@ int AfNodeSolve::getPoolPriority(const RenderAf * i_render) const
 /// Compare nodes need for solve:
 bool AfNodeSolve::greaterNeed(const AfNodeSolve *i_other) const
 {
-	if (m_solve_need > i_other->m_solve_need) return true;
+	if (m_solve_need > i_other->m_solve_need)
+		return true;
 
-	if (m_solve_need < i_other->m_solve_need) return false;
+	if (m_solve_need < i_other->m_solve_need)
+		return false;
 
 	/// If need parameters are equal,
 	/// Greater node is a node that was solved earlier
@@ -297,7 +296,8 @@ bool AfNodeSolve::greaterPriorityThenOlderCreation(const AfNodeSolve *i_other) c
 	return m_solve_cycle < i_other->m_solve_cycle;
 }
 
-RenderAf *AfNodeSolve::solve(std::list<RenderAf *> &i_renders_list, MonitorContainer *i_monitoring, BranchSrv * i_branch)
+RenderAf *AfNodeSolve::solve(std::list<RenderAf *> &i_renders_list, MonitorContainer *i_monitoring,
+							 BranchSrv *i_branch)
 {
 	RenderAf *render = v_solve(i_renders_list, i_monitoring, i_branch);
 

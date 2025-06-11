@@ -1,10 +1,11 @@
 #ifndef RAPIDJSON_STRINGBUFFER_H_
 #define RAPIDJSON_STRINGBUFFER_H_
 
-#include "rapidjson.h"
 #include "internal/stack.h"
+#include "rapidjson.h"
 
-namespace rapidjson {
+namespace rapidjson
+{
 
 //! Represents an in-memory output stream.
 /*!
@@ -12,18 +13,22 @@ namespace rapidjson {
 	\tparam Allocator type for allocating memory buffer.
 	\implements Stream
 */
-template <typename Encoding, typename Allocator = CrtAllocator>
-struct GenericStringBuffer {
+template <typename Encoding, typename Allocator = CrtAllocator> struct GenericStringBuffer
+{
 	typedef typename Encoding::Ch Ch;
 
-	GenericStringBuffer(Allocator* allocator = 0, size_t capacity = kDefaultCapacity) : stack_(allocator, capacity) {}
+	GenericStringBuffer(Allocator *allocator = 0, size_t capacity = kDefaultCapacity)
+		: stack_(allocator, capacity)
+	{
+	}
 
 	void Put(Ch c) { *stack_.template Push<Ch>() = c; }
 	void Flush() {}
 
 	void Clear() { stack_.Clear(); }
 
-	const Ch* GetString() const {
+	const Ch *GetString() const
+	{
 		// Push and pop a null terminator. This is safe.
 		*stack_.template Push<Ch>() = '\0';
 		stack_.template Pop<Ch>(1);
@@ -37,11 +42,11 @@ struct GenericStringBuffer {
 	mutable internal::Stack<Allocator> stack_;
 };
 
-typedef GenericStringBuffer<UTF8<> > StringBuffer;
+typedef GenericStringBuffer<UTF8<>> StringBuffer;
 
 //! Implement specialized version of PutN() with memset() for better performance.
-template<>
-inline void PutN(GenericStringBuffer<UTF8<> >& stream, char c, size_t n) {
+template <> inline void PutN(GenericStringBuffer<UTF8<>> &stream, char c, size_t n)
+{
 	memset(stream.stack_.Push<char>(n), c, n * sizeof(c));
 }
 

@@ -30,10 +30,10 @@ namespace af
 {
 /// Job block class.
 /** Blocks store tasks information, and can produce them.
-**/
+ **/
 class BlockData : public Af
 {
-public:
+  public:
 	/// New empty block constructor..
 	BlockData();
 
@@ -50,17 +50,17 @@ public:
 
 	enum Flags
 	{
-		FNumeric            = 1ULL <<  0,
-		FVarCapacity        = 1ULL <<  1,
-		FMultiHost          = 1ULL <<  2,
-		FMasterOnSlave      = 1ULL <<  3,
-		FDependSubTask      = 1ULL <<  4,
-		FSkipThumbnails     = 1ULL <<  5,
-		FSkipExistingFiles  = 1ULL <<  6,
-		FCheckRenderedFiles = 1ULL <<  7,
-		FSlaveLostIgnore    = 1ULL <<  8,
-		FAppendedTasks      = 1ULL <<  9,
-		FSuspendNewTasks    = 1ULL << 10
+		FNumeric = 1ULL << 0,
+		FVarCapacity = 1ULL << 1,
+		FMultiHost = 1ULL << 2,
+		FMasterOnSlave = 1ULL << 3,
+		FDependSubTask = 1ULL << 4,
+		FSkipThumbnails = 1ULL << 5,
+		FSkipExistingFiles = 1ULL << 6,
+		FCheckRenderedFiles = 1ULL << 7,
+		FSlaveLostIgnore = 1ULL << 8,
+		FAppendedTasks = 1ULL << 9,
+		FSuspendNewTasks = 1ULL << 10
 	};
 
 	static const char DataMode_Progress[];
@@ -89,7 +89,8 @@ public:
 	**/
 	TaskExec *genTask(int num) const;
 
-	bool genNumbers(long long &start, long long &end, int num,
+	bool genNumbers(
+		long long &start, long long &end, int num,
 		long long *frames_num = NULL) const; ///< Generate first and last frame numbers for \c num task.
 	int calcTaskNumber(long long i_frame, bool &o_valid_range) const;
 	int getReadyTaskNumber(TaskProgress **i_tp, const int64_t &i_job_flags, const Render *i_render);
@@ -130,26 +131,33 @@ public:
 		m_flags |= FAppendedTasks;
 	} ///< Set flag on the block signaling that it has tasks appended
 
+	inline bool isSkippingExistingFiles() const { return m_flags & FSkipExistingFiles; }
+	inline bool isCheckingRenderedFiles() const { return m_flags & FCheckRenderedFiles; }
 
-	inline bool isSkippingExistingFiles() const {return m_flags & FSkipExistingFiles;}
-	inline bool isCheckingRenderedFiles() const {return m_flags & FCheckRenderedFiles;}
-
-	inline bool isSuspendingNewTasks() const {return m_flags & FSuspendNewTasks;}
+	inline bool isSuspendingNewTasks() const { return m_flags & FSuspendNewTasks; }
 
 	inline bool isSequential() const { return m_sequential == 1; }
 	inline bool notSequential() const { return m_sequential != 1; }
 	inline void setSequential(int64_t i_value) { m_sequential = i_value; } ///< Used in afcmd cmd_numeric
 	inline int64_t getSequential() const { return m_sequential; }
 
-	inline void setHostsMaskFind()  {m_hosts_mask.setFind();  m_hosts_mask_exclude.setFind(); }
-	inline void setHostsMaskRegEx() {m_hosts_mask.setRegEx(); m_hosts_mask_exclude.setRegEx();}
+	inline void setHostsMaskFind()
+	{
+		m_hosts_mask.setFind();
+		m_hosts_mask_exclude.setFind();
+	}
+	inline void setHostsMaskRegEx()
+	{
+		m_hosts_mask.setRegEx();
+		m_hosts_mask_exclude.setRegEx();
+	}
 
 	inline void setParserCoeff(int value) { m_parser_coeff = value; }
 
-    /// Set block tasks command. Used in system job.
+	/// Set block tasks command. Used in system job.
 	inline void setCommand(const std::string &str) { m_command = str; }
 
-    bool setNumeric(long long start, long long end, long long perTask = 1, long long increment = 1);
+	bool setNumeric(long long start, long long end, long long perTask = 1, long long increment = 1);
 	void setFramesPerTask(long long perTask); ///< For string tasks and per tasr dependency solve
 
 	inline const std::string &getName() const { return m_name; }			  ///< Get name.
@@ -160,12 +168,12 @@ public:
 	inline bool hasFiles() const { return m_files.size(); }					///< Whether block has files.
 	inline const std::vector<std::string> &getFiles() const { return m_files; } ///< Get tasks files.
 	inline bool hasEnvironment() const { return m_environment.size(); } ///< Whether extra environment is set.
-	inline const std::map<std::string, std::string> &getEnvironment()   ///< Get extra environment.
+	inline const std::map<std::string, std::string> &getEnvironment()	///< Get extra environment.
 		const
 	{
 		return m_environment;
 	}
-	inline const std::map<std::string, int32_t> & getTickets() const { return m_tickets;}
+	inline const std::map<std::string, int32_t> &getTickets() const { return m_tickets; }
 
 	inline bool hasDependMask() const { return m_depend_mask.notEmpty(); } ///< Whether depend mask is set.
 	inline bool hasTasksDependMask() const
@@ -212,33 +220,38 @@ public:
 	}
 
 	inline bool checkNeedProperties(const std::string &str) const { return m_need_properties.match(str); }
-	inline bool checkNeedPower(int i_val) const {if (m_need_power <= 0) return true; return m_need_power <= i_val;}
+	inline bool checkNeedPower(int i_val) const
+	{
+		if (m_need_power <= 0)
+			return true;
+		return m_need_power <= i_val;
+	}
 
 	inline int getCapacity() const { return m_capacity; }
 	inline int getNeedMemory() const { return m_need_memory; }
 	inline int getNeedPower() const { return m_need_power; }
 	inline int getNeedHDD() const { return m_need_hdd; }
 
-	inline int getNeedCPUFreqMHz()   const {return m_need_cpu_freq_mgz;}
-	inline int getNeedCPUCores()     const {return m_need_cpu_cores;}
-	inline int getNeedCPUFreqCores() const {return m_need_cpu_freq_cores;}
-	inline int getNeedGPUMemMb()     const {return m_need_gpu_mem_mb;}
+	inline int getNeedCPUFreqMHz() const { return m_need_cpu_freq_mgz; }
+	inline int getNeedCPUCores() const { return m_need_cpu_cores; }
+	inline int getNeedCPUFreqCores() const { return m_need_cpu_freq_cores; }
+	inline int getNeedGPUMemMb() const { return m_need_gpu_mem_mb; }
 
 	inline uint32_t getState() const { return m_state; }			   ///< Get state.
 	inline int getTasksNum() const { return m_tasks_num; }			   ///< Get tasks quantity.
 	inline int getBlockNum() const { return m_block_num; }			   ///< Get block number in job.
 	inline const std::string &getService() const { return m_service; } ///< Get tasks type description.
 	inline const std::string &getParser() const { return m_parser; }   ///< Get tasks parser type.
-	inline uint32_t getTaskMaxRunTime()             const { return m_task_max_run_time;            }
-	inline uint32_t getTaskMinRunTime()             const { return m_task_min_run_time;            }
-	inline int getTaskProgressChangeTimeout()       const { return m_task_progress_change_timeout; }
-	inline int getMaxRunningTasks()                 const { return m_max_running_tasks;            }
-	inline int getMaxRunTasksPerHost()              const { return m_max_running_tasks_per_host;   }
-	inline const std::string &getMultiHostService() const { return m_multihost_service;            }
+	inline uint32_t getTaskMaxRunTime() const { return m_task_max_run_time; }
+	inline uint32_t getTaskMinRunTime() const { return m_task_min_run_time; }
+	inline int getTaskProgressChangeTimeout() const { return m_task_progress_change_timeout; }
+	inline int getMaxRunningTasks() const { return m_max_running_tasks; }
+	inline int getMaxRunTasksPerHost() const { return m_max_running_tasks_per_host; }
+	inline const std::string &getMultiHostService() const { return m_multihost_service; }
 
-	inline long long getFrameFirst()   const { return m_frame_first;     } ///< Get first task frame ( if numeric).
-	inline long long getFrameLast()    const { return m_frame_last;      } ///< Get last task frame  ( if numeric).
-	inline long long getFrameInc()     const { return m_frames_inc;      } ///< Get frame increment  ( if numeric).
+	inline long long getFrameFirst() const { return m_frame_first; } ///< Get first task frame ( if numeric).
+	inline long long getFrameLast() const { return m_frame_last; }	 ///< Get last task frame  ( if numeric).
+	inline long long getFrameInc() const { return m_frames_inc; }	 ///< Get frame increment  ( if numeric).
 	inline long long getFramePerTask() const { return m_frames_per_task; } ///< Get frames per task.
 
 	inline long long getFileSizeMin() const { return m_file_size_min; }
@@ -256,7 +269,7 @@ public:
 	}
 
 	inline bool hasCmdPre() const { return m_command_pre.size(); }			///< Whether pre command is set.
-	inline const std::string &getCmdPre() const { return m_command_pre; }   ///< Get pre command.
+	inline const std::string &getCmdPre() const { return m_command_pre; }	///< Get pre command.
 	inline bool hasCmdPost() const { return m_command_post.size(); }		///< Whether post command is set.
 	inline const std::string &getCmdPost() const { return m_command_post; } ///< Get post command.
 
@@ -268,8 +281,8 @@ public:
 	inline int32_t getRunningTasksNumber() const { return m_running_tasks_counter; }
 	inline int64_t getRunningCapacityTotal() const { return m_running_capacity_counter; }
 
-	void addSolveCounts(TaskExec * i_exec, Render * i_render);
-	void remSolveCounts(TaskExec * i_exec, Render * i_render);
+	void addSolveCounts(TaskExec *i_exec, Render *i_render);
+	void remSolveCounts(TaskExec *i_exec, Render *i_render);
 
 	bool updateProgress(JobProgress *progress);
 
@@ -289,8 +302,8 @@ public:
 	inline int getProgressTasksWaitReconn() const { return p_tasks_waitrec; }
 	inline int getProgressTasksWaitDep() const { return p_tasks_waitdep; }
 	inline int getProgressTasksSuspended() const { return p_tasks_suspended; }
-	inline int       getProgressTasksRunTimeMin() const { return p_tasks_run_time_min; }
-	inline int       getProgressTasksRunTimeMax() const { return p_tasks_run_time_max; }
+	inline int getProgressTasksRunTimeMin() const { return p_tasks_run_time_min; }
+	inline int getProgressTasksRunTimeMax() const { return p_tasks_run_time_max; }
 	inline long long getProgressTasksRunTimeSum() const { return p_tasks_run_time_sum; }
 
 	inline void setState(uint32_t value) { m_state = value; }
@@ -319,19 +332,19 @@ public:
 	void setTimeStarted(long long value, bool reset = false);
 	void setTimeDone(long long value);
 
-	const TaskData * getTaskData(int i_num_task) const;
+	const TaskData *getTaskData(int i_num_task) const;
 
-	void editTicket(std::string & i_name, int32_t & i_count);
+	void editTicket(std::string &i_name, int32_t &i_count);
 
-	inline const std::string & getSrvInfo() const {return m_srv_info;}
-	inline void setSrvInfo(const std::string & i_str) {m_srv_info = i_str;}
+	inline const std::string &getSrvInfo() const { return m_srv_info; }
+	inline void setSrvInfo(const std::string &i_str) { m_srv_info = i_str; }
 
-protected:
+  protected:
 	/// Read or write block.
 	virtual void v_readwrite(Msg *msg);
 
-protected:
-	int32_t m_job_id;	///< Block job id.
+  protected:
+	int32_t m_job_id;	 ///< Block job id.
 	int32_t m_block_num; ///< Number of block in job.
 
 	std::string m_name; ///< Block name.
@@ -340,11 +353,11 @@ protected:
 	int64_t m_flags; ///< Block type flags.
 
 	int32_t m_tasks_num;	   ///< Number of tasks in block.
-	int64_t m_frame_first;	 ///< First tasks frame.
-	int64_t m_frame_last;	  ///< Last tasks frame.
+	int64_t m_frame_first;	   ///< First tasks frame.
+	int64_t m_frame_last;	   ///< Last tasks frame.
 	int64_t m_frames_per_task; ///< Tasks frames per task.
-	int64_t m_frames_inc;	  ///< Tasks frames increment.
-	int64_t m_sequential;	  ///< Tasks solve sequential.
+	int64_t m_frames_inc;	   ///< Tasks frames increment.
+	int64_t m_sequential;	   ///< Tasks solve sequential.
 
 	int32_t m_running_tasks_counter;	///< Number of running tasks counter.
 	int64_t m_running_capacity_counter; ///< Number of running tasks total capacity counter.
@@ -372,16 +385,16 @@ protected:
 	int32_t m_need_gpu_mem_mb;
 
 	std::string m_tasks_name; ///< Tasks name pattern;
-	std::string m_service;	///< Tasks service name.
-	std::string m_parser;	 ///< Tasks parser type.
-	int32_t m_parser_coeff;   ///< Parser coefficient.
+	std::string m_service;	  ///< Tasks service name.
+	std::string m_parser;	  ///< Tasks parser type.
+	int32_t m_parser_coeff;	  ///< Parser coefficient.
 
 	std::string m_working_directory;				  ///< Block tasks working directory.
 	std::map<std::string, std::string> m_environment; ///< Block tasks extra environment.
 
 	std::map<std::string, int32_t> m_tickets;
 
-	std::string m_command_pre;  ///< Pre command.
+	std::string m_command_pre;	///< Pre command.
 	std::string m_command_post; ///< Post command.
 
 	std::string m_command;			  ///< Command.
@@ -425,7 +438,7 @@ protected:
 	// Here it used to show running host.
 	std::string m_srv_info;
 
-private:
+  private:
 	void initDefaults(); ///< Initialize default values
 	void construct();
 
@@ -441,21 +454,21 @@ private:
 	/// Set progress bits in \c array with \c size at \c pos to \c value .
 	void setProgress(uint8_t *array, int task, bool value);
 
-private:
+  private:
 	char p_progressbar[AFJOB::ASCII_PROGRESS_LENGTH];
-	uint8_t p_percentage;	 ///< Tasks average percentage.
-	int32_t p_error_hosts;	///< Number of error host of the block.
-	int32_t p_avoid_hosts;	///< Number of error host block avoiding.
-	int32_t p_tasks_ready;	///< Number of ready tasks.
-	int32_t p_tasks_done;	 ///< Number of done tasks.
-	int32_t p_tasks_error;	///< Number of error (failed) tasks.
-	int32_t p_tasks_warning;  ///< Number of skipped with warnings.
-	int32_t p_tasks_skipped;  ///< Number of skipped tasks.
-	int32_t p_tasks_waitrec;  ///< Number of tasks waiting for reconnect.
-	int32_t p_tasks_waitdep;  ///< Number of tasks waiting for dependencies.
-	int32_t p_tasks_suspended;  ///< Number of tasks waiting for dependencies.
+	uint8_t p_percentage;	   ///< Tasks average percentage.
+	int32_t p_error_hosts;	   ///< Number of error host of the block.
+	int32_t p_avoid_hosts;	   ///< Number of error host block avoiding.
+	int32_t p_tasks_ready;	   ///< Number of ready tasks.
+	int32_t p_tasks_done;	   ///< Number of done tasks.
+	int32_t p_tasks_error;	   ///< Number of error (failed) tasks.
+	int32_t p_tasks_warning;   ///< Number of skipped with warnings.
+	int32_t p_tasks_skipped;   ///< Number of skipped tasks.
+	int32_t p_tasks_waitrec;   ///< Number of tasks waiting for reconnect.
+	int32_t p_tasks_waitdep;   ///< Number of tasks waiting for dependencies.
+	int32_t p_tasks_suspended; ///< Number of tasks waiting for dependencies.
 	int32_t p_tasks_run_time_min;
 	int32_t p_tasks_run_time_max;
 	int64_t p_tasks_run_time_sum;
 };
-}
+} // namespace af

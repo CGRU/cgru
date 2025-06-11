@@ -14,23 +14,23 @@
 	filesutils.js - TODO: description
 */
 
-"use strict";
+'use strict';
 
 /* ---------------- [ Put structs and functions ] -------------------------------------------------------- */
 var fu_put_params = {
 	// src : {"label":'Source', "disabled":true},
-	dest: {"label": 'Destination'}
+	dest: {'label': 'Destination'}
 	// name : {}
 };
 var fu_putftp_params = {
-	host: {"label": 'FTP Server'},
-	user: {"label": 'FTP User', "width": '50%'},
-	pass: {"lwidth": '150px', "label": 'FTP Password', "width": '50%'}
+	host: {'label': 'FTP Server'},
+	user: {'label': 'FTP User', 'width': '50%'},
+	pass: {'lwidth': '150px', 'label': 'FTP Password', 'width': '50%'}
 };
 
 function fu_Put(i_args)
 {
-	var wnd = new cgru_Window({"name": 'put', "title": 'Put Folder'});
+	var wnd = new cgru_Window({'name': 'put', 'title': 'Put Folder'});
 	wnd.m_args = i_args;
 	i_args.names = [];
 	var params = {};
@@ -70,7 +70,9 @@ function fu_Put(i_args)
 	elAfDiv.appendChild(elSend);
 	elSend.textContent = 'Send Job';
 	elSend.classList.add('button');
-	elSend.onclick = function(e) { fu_PutDo(e.currentTarget.m_wnd); };
+	elSend.onclick = function(e) {
+		fu_PutDo(e.currentTarget.m_wnd);
+	};
 	elSend.m_wnd = wnd;
 
 	var elResults = document.createElement('div');
@@ -168,9 +170,9 @@ function fu_PutDo(i_wnd)
 
 /* ---------------- [ Checksum structs and functions ] --------------------------------------------------- */
 var fu_sum_params = {
-	path /********/: {"label": 'Path', "disabled": true},
-	type /********/: {"label": 'Type', "disabled": true},
-	update_all /**/: {"label": 'Update All', 'type': "bool", 'default': false}
+	path /********/: {'label': 'Path', 'disabled': true},
+	type /********/: {'label': 'Type', 'disabled': true},
+	update_all /**/: {'label': 'Update All', 'type': 'bool', 'default': false}
 };
 
 function fu_Checksum(i_args)
@@ -182,7 +184,7 @@ function fu_Checksum(i_args)
 		return;
 	}
 
-	var wnd = new cgru_Window({"name": 'put', "title": 'Put Folder'});
+	var wnd = new cgru_Window({'name': 'put', 'title': 'Put Folder'});
 	wnd.i_walk = i_args.walk;
 
 	var params = i_args;
@@ -207,7 +209,9 @@ function fu_Checksum(i_args)
 	elAfDiv.appendChild(elSend);
 	elSend.textContent = 'Send Job';
 	elSend.classList.add('button');
-	elSend.onclick = function(e) { fu_ChecksumDo(e.currentTarget.m_wnd); };
+	elSend.onclick = function(e) {
+		fu_ChecksumDo(e.currentTarget.m_wnd);
+	};
 	elSend.m_wnd = wnd;
 
 	var elRules = document.createElement('div');
@@ -264,13 +268,13 @@ function fu_ChecksumDo(i_wnd)
 
 /* ---------------- [ Multi Put structs and functions ] -------------------------------------------------- */
 var fu_putmulti_params = {
-	input /*********/: {"label": 'Result Paths', "width":'50%'},
-	activity         : {"label": 'Activity', "width":'25%'},
-	filesext         : {"label": 'Files Extensions', "default":'mp4,mov', "width":'25%', "lwidth":'150px'},
-	skipexisting /**/: {"label": 'Skip Existing', 'type': "bool", 'default': true, "width": '33%'},
-	skiperrors /****/: {"label": 'Skip Errors', 'type': "bool", 'default': true, "width": '33%'},
-	skipcheck /*****/: {"label": 'Skip Check', 'type': "bool", 'default': false, "width": '33%'},
-	dest /**********/: {"label": 'Destination'},
+	input /*********/: {'label': 'Result Paths', 'width': '50%'},
+	activity: {'label': 'Activity', 'width': '25%'},
+	filesext: {'label': 'Files Extensions', 'default': 'mp4,mov', 'width': '25%', 'lwidth': '150px'},
+	skipexisting /**/: {'label': 'Skip Existing', 'type': 'bool', 'default': true, 'width': '33%'},
+	skiperrors /****/: {'label': 'Skip Errors', 'type': 'bool', 'default': true, 'width': '33%'},
+	skipcheck /*****/: {'label': 'Skip Check', 'type': 'bool', 'default': false, 'width': '33%'},
+	dest /**********/: {'label': 'Destination'},
 	af_capacity /***/: {'label': 'Capacity', 'width': '20%', 'type': 'int'},
 	af_maxtasks /***/: {'label': 'Max Tasks', 'width': '15%', 'lwidth': '80px', 'type': 'int'},
 	af_perhost /****/: {'label': 'Per Host', 'width': '15%', 'lwidth': '80px', 'type': 'int'},
@@ -282,14 +286,14 @@ var fu_findres_params = {
 	filesext: {},
 	input: {},
 	dest: {},
-	skiperrors: {'type': "bool", 'default': true},
-	skipcheck: {'type': "bool", 'default': false}
+	skiperrors: {'type': 'bool', 'default': true},
+	skipcheck: {'type': 'bool', 'default': false}
 };
 
 function fu_PutMultiDialog(i_args)
 {
 	// console.log( JSON.stringify( i_args));
-	var wnd = new cgru_Window({"name": 'put', "title": 'Put Results'});
+	var wnd = new cgru_Window({'name': 'put', 'title': 'Put Results'});
 	wnd.m_args = i_args;
 
 	var params = {};
@@ -327,7 +331,9 @@ function fu_PutMultiDialog(i_args)
 	elSendJob.classList.add('button');
 	elSendJob.style.display = 'none';
 	elSendJob.m_wnd = wnd;
-	elSendJob.onclick = function(e) { fu_PutMultiDo(e.currentTarget.m_wnd); };
+	elSendJob.onclick = function(e) {
+		fu_PutMultiDo(e.currentTarget.m_wnd);
+	};
 	wnd.m_res_btns_show = [elSendJob];
 
 	var elFind = document.createElement('div');
@@ -336,7 +342,9 @@ function fu_PutMultiDialog(i_args)
 	elFind.classList.add('button');
 	elFind.style.cssFloat = 'right';
 	elFind.m_wnd = wnd;
-	elFind.onclick = function(e) { fu_ResultsFind(e.currentTarget.m_wnd); };
+	elFind.onclick = function(e) {
+		fu_ResultsFind(e.currentTarget.m_wnd);
+	};
 
 	var elResults = document.createElement('div');
 	wnd.elContent.appendChild(elResults);
@@ -377,7 +385,11 @@ function fu_ResultsFind(i_wnd)
 	for (var i = 0; i < paths.length; i++)
 		cmd += ' "' + c_PathPM_Client2Server(paths[i]) + '"';
 
-	n_Request({"send": {"cmdexec": {"cmds": [cmd], 'ignore_errors': true}}, "func": fu_ResultsReceived, "wnd": i_wnd});
+	n_Request({
+		'send': {'cmdexec': {'cmds': [cmd], 'ignore_errors': true}},
+		'func': fu_ResultsReceived,
+		'wnd': i_wnd
+	});
 }
 
 function fu_ResultsReceived(i_data, i_args)
@@ -580,7 +592,7 @@ function fu_Archive(i_args)
 {
 	// console.log( JSON.stringify( i_args));
 	var title = i_args.archive ? 'Archive Folder(s)' : 'Extract Archive(s)';
-	var wnd = new cgru_Window({"name": 'archive', "title": title});
+	var wnd = new cgru_Window({'name': 'archive', 'title': title});
 	wnd.m_args = i_args;
 
 	var params = {};
@@ -588,11 +600,11 @@ function fu_Archive(i_args)
 	gui_Create(wnd.elContent, fu_arch_params, [RULES.archive]);
 	if (i_args.archive)
 		gui_CreateChoices({
-			"wnd": wnd.elContent,
-			"name": 'type',
-			"value": RULES.archive.default,
-			"label": 'Type:',
-			"keys": RULES.archive.types
+			'wnd': wnd.elContent,
+			'name': 'type',
+			'value': RULES.archive.default,
+			'label': 'Type:',
+			'keys': RULES.archive.types
 		});
 
 	var elBtns = document.createElement('div');
@@ -615,7 +627,9 @@ function fu_Archive(i_args)
 	elSend.textContent = 'Send Job';
 	elSend.classList.add('button');
 	elSend.m_wnd = wnd;
-	elSend.onclick = function(e) { fu_ArchivateProcessGUI(e.currentTarget.m_wnd); };
+	elSend.onclick = function(e) {
+		fu_ArchivateProcessGUI(e.currentTarget.m_wnd);
+	};
 
 	var elResults = document.createElement('div');
 	wnd.elContent.appendChild(elResults);
@@ -721,7 +735,8 @@ function fu_ArchivateProcessGUI(i_wnd)
 	i_wnd.destroy();
 }
 
-/* ---------------- [ Extract sound structs and functions ] ---------------------------------------------------- */
+/* ---------------- [ Extract sound structs and functions ]
+ * ---------------------------------------------------- */
 var fu_extract_sound_params = {};
 function fu_ExtractSound(i_args)
 {
@@ -731,30 +746,26 @@ function fu_ExtractSound(i_args)
 	cmd += ' -v quiet  -print_format json -show_format -show_streams';
 	cmd += ' "' + path + '"'
 	n_Request({
-		"send": {"cmdexec": {"cmds": [cmd]}},
-		"func": fu_ExtractSoundShowGUI,
-		"info": 'ffprobe',
-		"args": i_args,
-		"local": true
+		'send': {'cmdexec': {'cmds': [cmd]}},
+		'func': fu_ExtractSoundShowGUI,
+		'info': 'ffprobe',
+		'args': i_args,
+		'local': true
 	});
 }
 function fu_ExtractSoundShowGUI(i_data, i_args)
 {
 	i_args = i_args.args;
-	let wnd = new cgru_Window({"name": 'extractsound', "title": 'Extract Sound'});
+	let wnd = new cgru_Window({'name': 'extractsound', 'title': 'Extract Sound'});
 	wnd.m_args = i_args;
 
 	gui_Create(wnd.elContent, fu_extract_sound_params, [RULES.dailies]);
 	let types = {
-			"wav" : {"name":"WAV",  "tooltip":"Waveform Audio File Format"},
-			"flac": {"name":"FLAC", "tooltip":"Free Lossless Audio Codec"}};
-	gui_CreateChoices({
-		"wnd": wnd.elContent,
-		"name": 'type',
-		"value": 'wav',
-		"label": 'Type:',
-		"keys": types
-	});
+		'wav': {'name': 'WAV', 'tooltip': 'Waveform Audio File Format'},
+		'flac': {'name': 'FLAC', 'tooltip': 'Free Lossless Audio Codec'}
+	};
+	gui_CreateChoices(
+		{'wnd': wnd.elContent, 'name': 'type', 'value': 'wav', 'label': 'Type:', 'keys': types});
 
 	let elBtns = document.createElement('div');
 	wnd.elContent.appendChild(elBtns);
@@ -764,7 +775,7 @@ function fu_ExtractSoundShowGUI(i_data, i_args)
 	let elResults = document.createElement('div');
 	wnd.elContent.appendChild(elResults);
 	wnd.m_elResults = elResults;
-	elResults.classList.add('output','error');
+	elResults.classList.add('output', 'error');
 
 
 	if ((i_data.cmdexec == null) && (i_data.cmdexec.length == null) && (i_data.cmdexec.length == 0))
@@ -785,20 +796,20 @@ function fu_ExtractSoundShowGUI(i_data, i_args)
 	let fps = null;
 	for (let stream of data.streams)
 	{
-		//console.log(JSON.stringify(stream));
+		// console.log(JSON.stringify(stream));
 		output += '<p>';
 
 		if (stream.codec_type && (stream.codec_type == 'video'))
 		{
 			fps = stream.r_frame_rate;
 			fps = fps.split('/');
-			fps = parseInt(fps[0])/parseInt(fps[1]);
+			fps = parseInt(fps[0]) / parseInt(fps[1]);
 
 			output += 'Video #' + count + ':';
 			output += ' ' + stream.codec_name;
 			output += ' ' + (parseFloat(stream.duration)).toFixed(3) + ' sec';
 			output += ' ' + fps + ' FPS';
-			output += ' ' + (parseFloat(stream.bit_rate)/1000).toFixed() + ' kb/s';
+			output += ' ' + (parseFloat(stream.bit_rate) / 1000).toFixed() + ' kb/s';
 		}
 
 		if (stream.codec_type && (stream.codec_type == 'audio'))
@@ -808,8 +819,8 @@ function fu_ExtractSoundShowGUI(i_data, i_args)
 			output += ' ' + stream.codec_name;
 			output += ' ' + (parseFloat(stream.duration)).toFixed(3) + ' sec';
 			output += '*' + stream.channels;
-			output += ' ' + (parseFloat(stream.sample_rate)/1000).toFixed(1) + ' kHZ';
-			output += ' ' + (parseFloat(stream.bit_rate)/1000).toFixed() + ' kb/s';
+			output += ' ' + (parseFloat(stream.sample_rate) / 1000).toFixed(1) + ' kHZ';
+			output += ' ' + (parseFloat(stream.bit_rate) / 1000).toFixed() + ' kb/s';
 		}
 
 		output += '</p>';
@@ -838,8 +849,9 @@ function fu_ExtractSoundShowGUI(i_data, i_args)
 	elBntExtractSound.textContent = 'Extract Sound';
 	elBntExtractSound.classList.add('button');
 	elBntExtractSound.m_wnd = wnd;
-	elBntExtractSound.onclick = function(e) {fu_ExtractSoundProcessGUI(e.currentTarget.m_wnd);};
-
+	elBntExtractSound.onclick = function(e) {
+		fu_ExtractSoundProcessGUI(e.currentTarget.m_wnd);
+	};
 }
 function fu_ExtractSoundProcessGUI(i_wnd)
 {
@@ -863,11 +875,11 @@ function fu_ExtractSoundProcessGUI(i_wnd)
 	}
 
 	n_Request({
-		"send": {"cmdexec": {"cmds": cmds}},
-		"func": fu_ExtractSoundFinished,
-		"info": 'ffmpeg',
-		"wnd":  i_wnd,
-		"local": true
+		'send': {'cmdexec': {'cmds': cmds}},
+		'func': fu_ExtractSoundFinished,
+		'info': 'ffmpeg',
+		'wnd': i_wnd,
+		'local': true
 	});
 }
 function fu_ExtractSoundFinished(i_data, i_args)
@@ -897,18 +909,26 @@ function fu_ExtractSoundFinished(i_data, i_args)
 }
 /* ---------------- [ Walk structs and functions ] ------------------------------------------------------- */
 var fu_walk_params = {
-	path:         {},
-	verbose:      {'label': 'Verbose Level',         'width':'25%', 'lwidth':'170px', 'default': 2},
-	upparents:    {'label': 'Update Parent Folders', 'width':'25%', 'lwidth':'170px', 'type': 'bool','default': true},
-	genthumbs:    {'label': 'Generate Thumbnails',   'width':'25%', 'lwidth':'170px', 'type': 'bool','default': false},
-	mediainfo:    {'label': 'Get Media Info',        'width':'25%', 'lwidth':'170px', 'type': 'bool','default': false},
-	af_hostsmask: {'label': 'Hosts Mask',            'width':'50%', 'lwidth':'160px'},
-	af_paused:    {'label': 'Paused',                'width':'50%', 'lwidth':'50px',  'type': 'bool'}
+	path: {},
+	verbose: {'label': 'Verbose Level', 'width': '25%', 'lwidth': '170px', 'default': 2},
+	upparents: {
+		'label': 'Update Parent Folders',
+		'width': '25%',
+		'lwidth': '170px',
+		'type': 'bool',
+		'default': true
+	},
+	genthumbs:
+		{'label': 'Generate Thumbnails', 'width': '25%', 'lwidth': '170px', 'type': 'bool', 'default': false},
+	mediainfo:
+		{'label': 'Get Media Info', 'width': '25%', 'lwidth': '170px', 'type': 'bool', 'default': false},
+	af_hostsmask: {'label': 'Hosts Mask', 'width': '50%', 'lwidth': '160px'},
+	af_paused: {'label': 'Paused', 'width': '50%', 'lwidth': '50px', 'type': 'bool'}
 };
 
 function fu_Walk(i_args)
 {
-	var wnd = new cgru_Window({"name": 'walk', "title": 'Send Walk Job'});
+	var wnd = new cgru_Window({'name': 'walk', 'title': 'Send Walk Job'});
 	wnd.m_args = i_args;
 	var params = {};
 	params.path = c_PathPM_Rules2Client(i_args.path);
@@ -935,7 +955,9 @@ function fu_Walk(i_args)
 	elSend.textContent = 'Send Job';
 	elSend.classList.add('button');
 	elSend.m_wnd = wnd;
-	elSend.onclick = function(e) { fu_WalkProcessGUI(e.currentTarget.m_wnd); };
+	elSend.onclick = function(e) {
+		fu_WalkProcessGUI(e.currentTarget.m_wnd);
+	};
 
 	var elRules = document.createElement('div');
 	wnd.elContent.appendChild(elRules);
@@ -1019,7 +1041,9 @@ function fu_BufferAdd(i_path)
 	elItem.appendChild(el);
 	el.classList.add('button');
 	el.m_elItem = elItem;
-	el.ondblclick = function(e) { fu_BufferRemove(e.currentTarget.m_elItem) };
+	el.ondblclick = function(e) {
+		fu_BufferRemove(e.currentTarget.m_elItem)
+	};
 	el.title = 'Double click to delete an item.';
 
 	var el = document.createElement('div');
@@ -1027,7 +1051,9 @@ function fu_BufferAdd(i_path)
 	el.classList.add('name');
 	el.textContent = i_path;
 	el.m_elItem = elItem;
-	el.onclick = function(e) { fu_BufferClick(e.currentTarget.m_elItem) };
+	el.onclick = function(e) {
+		fu_BufferClick(e.currentTarget.m_elItem)
+	};
 
 	fv_BufferAdded();
 }

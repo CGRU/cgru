@@ -14,7 +14,7 @@
 	branches.js - methods and structs for monitoring and handling of branches
 */
 
-"use strict";
+'use strict';
 
 var branches = null;
 var branches_active_jobs = {};
@@ -26,9 +26,7 @@ BranchNode.onMonitorCreate = function(i_monitor) {
 	i_monitor.sortDirection = true;
 };
 
-function BranchNode()
-{
-}
+function BranchNode() {}
 
 BranchNode.prototype.init = function() {
 	this.element.classList.add('branch');
@@ -158,12 +156,18 @@ BranchNode.prototype.update = function(i_obj) {
 		else
 			jobs += '<b>0</b>';
 
-		if (this.params.jobs_running) jobs += ' Running:<b>'     + this.params.jobs_running + '</b>';
-		if (this.params.jobs_done   ) jobs += ' Done:<b>'        + this.params.jobs_done    + '</b>';
-		if (this.params.jobs_ready  ) jobs += ' Ready:<b>'       + this.params.jobs_ready   + '</b>';
-		if (this.params.jobs_error  ) jobs += ' Error:<b>'       + this.params.jobs_error   + '</b>';
-		if (this.params.tasks_ready ) jobs += ' Tasks Ready:<b>' + this.params.tasks_ready  + '</b>';
-		if (this.params.tasks_error ) jobs += ' Tasks Error:<b>' + this.params.tasks_error  + '</b>';
+		if (this.params.jobs_running)
+			jobs += ' Running:<b>' + this.params.jobs_running + '</b>';
+		if (this.params.jobs_done)
+			jobs += ' Done:<b>' + this.params.jobs_done + '</b>';
+		if (this.params.jobs_ready)
+			jobs += ' Ready:<b>' + this.params.jobs_ready + '</b>';
+		if (this.params.jobs_error)
+			jobs += ' Error:<b>' + this.params.jobs_error + '</b>';
+		if (this.params.tasks_ready)
+			jobs += ' Tasks Ready:<b>' + this.params.tasks_ready + '</b>';
+		if (this.params.tasks_error)
+			jobs += ' Tasks Error:<b>' + this.params.tasks_error + '</b>';
 
 		this.elJobsCounts.innerHTML = jobs;
 	}
@@ -180,12 +184,18 @@ BranchNode.prototype.update = function(i_obj) {
 		else
 			jobs += '<b>0</b>';
 
-		if (this.params.jobs_running) jobs += ' Run:<b>'  + this.params.jobs_running + '</b>';
-		if (this.params.jobs_done   ) jobs += ' Done:<b>' + this.params.jobs_done    + '</b>';
-		if (this.params.jobs_ready  ) jobs += ' Rdy:<b>'  + this.params.jobs_ready   + '</b>';
-		if (this.params.jobs_error  ) jobs += ' Err:<b>'  + this.params.jobs_error   + '</b>';
-		if (this.params.tasks_ready ) jobs += ' TRdy:<b>' + this.params.tasks_ready  + '</b>';
-		if (this.params.tasks_error ) jobs += ' TErr:<b>' + this.params.tasks_error  + '</b>';
+		if (this.params.jobs_running)
+			jobs += ' Run:<b>' + this.params.jobs_running + '</b>';
+		if (this.params.jobs_done)
+			jobs += ' Done:<b>' + this.params.jobs_done + '</b>';
+		if (this.params.jobs_ready)
+			jobs += ' Rdy:<b>' + this.params.jobs_ready + '</b>';
+		if (this.params.jobs_error)
+			jobs += ' Err:<b>' + this.params.jobs_error + '</b>';
+		if (this.params.tasks_ready)
+			jobs += ' TRdy:<b>' + this.params.tasks_ready + '</b>';
+		if (this.params.tasks_error)
+			jobs += ' TErr:<b>' + this.params.tasks_error + '</b>';
 
 		this.elJobsCounts.innerHTML = jobs;
 	}
@@ -202,12 +212,18 @@ BranchNode.prototype.update = function(i_obj) {
 		else
 			jobs += '<b>0</b>';
 
-		if (this.params.jobs_running) jobs +=  ' R:<b>' + this.params.jobs_running + '</b>';
-		if (this.params.jobs_done   ) jobs +=  ' d:<b>' + this.params.jobs_done    + '</b>';
-		if (this.params.jobs_ready  ) jobs +=  ' r:<b>' + this.params.jobs_ready   + '</b>';
-		if (this.params.jobs_error  ) jobs +=  ' E:<b>' + this.params.jobs_error   + '</b>';
-		if (this.params.tasks_ready ) jobs += ' tr:<b>' + this.params.tasks_ready  + '</b>';
-		if (this.params.tasks_error ) jobs += ' te:<b>' + this.params.tasks_error  + '</b>';
+		if (this.params.jobs_running)
+			jobs += ' R:<b>' + this.params.jobs_running + '</b>';
+		if (this.params.jobs_done)
+			jobs += ' d:<b>' + this.params.jobs_done + '</b>';
+		if (this.params.jobs_ready)
+			jobs += ' r:<b>' + this.params.jobs_ready + '</b>';
+		if (this.params.jobs_error)
+			jobs += ' E:<b>' + this.params.jobs_error + '</b>';
+		if (this.params.tasks_ready)
+			jobs += ' tr:<b>' + this.params.tasks_ready + '</b>';
+		if (this.params.tasks_error)
+			jobs += ' te:<b>' + this.params.tasks_error + '</b>';
 
 		this.elJobsCounts.innerHTML = jobs;
 	}
@@ -288,11 +304,12 @@ BranchNode.prototype.refresh = function() {
 	this.elBar.innerHTML = label;
 };
 
-BranchNode.updatingFinished = function() {
+BranchNode.updatingFinished =
+	function() {
 	BranchActiveJob.clearNotUpdated();
 }
 
-BranchNode.createPanels = function(i_monitor) {
+	BranchNode.createPanels = function(i_monitor) {
 	// Work:
 	work_CreatePanels(i_monitor, 'branches');
 
@@ -329,7 +346,7 @@ BranchNode.createPanels = function(i_monitor) {
 		'handle': 'mh_Param'
 	};
 
-	acts.delete = {"label": "DELETE", "tooltip": 'Double click to delete branch.', "ondblclick": true};
+	acts.delete = {'label': 'DELETE', 'tooltip': 'Double click to delete branch.', 'ondblclick': true};
 
 	i_monitor.createCtrlBtns(acts);
 };
@@ -350,7 +367,7 @@ BranchNode.prototype.updatePanels = function() {
 };
 
 BranchNode.prototype.onDoubleClick = function(e) {
-	g_ShowObject({"object": this.params}, {"evt": e, "wnd": this.monitor.window});
+	g_ShowObject({'object': this.params}, {'evt': e, 'wnd': this.monitor.window});
 };
 
 BranchNode.params_branch = {};
@@ -413,7 +430,8 @@ BranchActiveJob.prototype.update = function(i_params) {
 
 	this.elInfo.innerHTML = this.params.name + '<small>@' + this.params.user_name + '</small>';
 
-	this.elRunningCounts.innerHTML = '<b>' + this.params.state + '</b> ' + work_generateRunningCountsString(this.params, 'branch');
+	this.elRunningCounts.innerHTML =
+		'<b>' + this.params.state + '</b> ' + work_generateRunningCountsString(this.params, 'branch');
 
 	this.el.style.display = 'block';
 	this.updated = true;
@@ -477,7 +495,8 @@ BranchActiveJob.prototype.setSelected = function(i_select) {
 	}
 };
 
-BranchActiveJob.clearNotUpdated = function() {
+BranchActiveJob.clearNotUpdated =
+	function() {
 	// Clear not updated (deleted) jobs:
 	for (var jid in branches_active_jobs)
 	{
@@ -494,7 +513,7 @@ BranchActiveJob.clearNotUpdated = function() {
 	}
 }
 
-BranchActiveJob.deselectAll = function(i_monitor) {
+	BranchActiveJob.deselectAll = function(i_monitor) {
 	while (branches_active_jobs_selected.length)
 		branches_active_jobs_selected[0].setSelected(false);
 
@@ -544,7 +563,9 @@ BranchActiveJob.prototype.updatePanels = function() {
 	elChange.classList.add('button');
 	elChange.textContent = 'Change Branch';
 	elChange.m_active_job = this;
-	elChange.onclick = function(e) { e.currentTarget.m_active_job.changeBranch(); };
+	elChange.onclick = function(e) {
+		e.currentTarget.m_active_job.changeBranch();
+	};
 };
 
 BranchActiveJob.resetPanels = function(i_monitor) {
@@ -558,15 +579,14 @@ BranchActiveJob.resetPanels = function(i_monitor) {
 
 BranchActiveJob.prototype.changeBranch = function() {
 	new cgru_Dialog({
-		"wnd": this.branch.monitor.window,
-		"receiver": this,
-		"handle": 'setParameter',
-		"param": 'branch',
-		"type": 'str',
-		"value": this.branch.params.name,
-		"name": 'Change Job Branch'
+		'wnd': this.branch.monitor.window,
+		'receiver': this,
+		'handle': 'setParameter',
+		'param': 'branch',
+		'type': 'str',
+		'value': this.branch.params.name,
+		'name': 'Change Job Branch'
 	});
-
 };
 
 BranchActiveJob.prototype.setParameter = function(i_value, i_param) {

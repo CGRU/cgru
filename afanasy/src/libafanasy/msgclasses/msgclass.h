@@ -7,13 +7,12 @@ namespace af
 
 class MsgClass : public Af
 {
-public:
-   MsgClass();
-   virtual ~MsgClass();
+  public:
+	MsgClass();
+	virtual ~MsgClass();
 
-   virtual void v_generateInfoStream( std::ostringstream & stream, bool full = false) const = 0;
+	virtual void v_generateInfoStream(std::ostringstream &stream, bool full = false) const = 0;
 
-protected:
-
+  protected:
 };
-}
+} // namespace af

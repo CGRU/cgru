@@ -29,9 +29,7 @@ CmdPath::CmdPath()
 		"path [operation] [path] For testing purposes. Operations: abs fname fpath up home isdir listdir.");
 }
 
-CmdPath::~CmdPath()
-{
-}
+CmdPath::~CmdPath() {}
 
 bool CmdPath::v_processArguments(int argc, char **argv, af::Msg &msg)
 {

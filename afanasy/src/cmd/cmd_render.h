@@ -2,90 +2,124 @@
 
 #include "cmd.h"
 
-class CmdRenderList : public Cmd { public:
+class CmdRenderList : public Cmd
+{
+  public:
 	CmdRenderList();
 	~CmdRenderList();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg);
-	void v_msgOut(af::Msg& msg);
+	bool v_processArguments(int argc, char **argv, af::Msg &msg);
+	void v_msgOut(af::Msg &msg);
 };
-class CmdRenderResoucesList : public Cmd { public:
+class CmdRenderResoucesList : public Cmd
+{
+  public:
 	CmdRenderResoucesList();
 	~CmdRenderResoucesList();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg);
-	void v_msgOut(af::Msg& msg);
+	bool v_processArguments(int argc, char **argv, af::Msg &msg);
+	void v_msgOut(af::Msg &msg);
 };
-class CmdRenderPriority : public Cmd { public:
+class CmdRenderPriority : public Cmd
+{
+  public:
 	CmdRenderPriority();
 	~CmdRenderPriority();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg);
+	bool v_processArguments(int argc, char **argv, af::Msg &msg);
 };
-class CmdRenderNimby : public Cmd { public:
+class CmdRenderNimby : public Cmd
+{
+  public:
 	CmdRenderNimby();
 	~CmdRenderNimby();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg);
+	bool v_processArguments(int argc, char **argv, af::Msg &msg);
 };
-class CmdRenderNIMBY: public Cmd { public:
+class CmdRenderNIMBY : public Cmd
+{
+  public:
 	CmdRenderNIMBY();
 	~CmdRenderNIMBY();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg);
+	bool v_processArguments(int argc, char **argv, af::Msg &msg);
 };
-class CmdRenderUser : public Cmd { public:
+class CmdRenderUser : public Cmd
+{
+  public:
 	CmdRenderUser();
 	~CmdRenderUser();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg);
+	bool v_processArguments(int argc, char **argv, af::Msg &msg);
 };
-class CmdRenderFree : public Cmd { public:
+class CmdRenderFree : public Cmd
+{
+  public:
 	CmdRenderFree();
 	~CmdRenderFree();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg);
+	bool v_processArguments(int argc, char **argv, af::Msg &msg);
 };
-class CmdRenderPause : public Cmd { public:
+class CmdRenderPause : public Cmd
+{
+  public:
 	CmdRenderPause();
 	~CmdRenderPause();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg);
+	bool v_processArguments(int argc, char **argv, af::Msg &msg);
 };
-class CmdRenderUnpause : public Cmd { public:
+class CmdRenderUnpause : public Cmd
+{
+  public:
 	CmdRenderUnpause();
 	~CmdRenderUnpause();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg);
+	bool v_processArguments(int argc, char **argv, af::Msg &msg);
 };
-class CmdRenderEjectTasks : public Cmd { public:
+class CmdRenderEjectTasks : public Cmd
+{
+  public:
 	CmdRenderEjectTasks();
 	~CmdRenderEjectTasks();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg);
+	bool v_processArguments(int argc, char **argv, af::Msg &msg);
 };
-class CmdRenderEjectNotMyTasks : public Cmd { public:
+class CmdRenderEjectNotMyTasks : public Cmd
+{
+  public:
 	CmdRenderEjectNotMyTasks();
 	~CmdRenderEjectNotMyTasks();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg);
+	bool v_processArguments(int argc, char **argv, af::Msg &msg);
 };
-class CmdRenderExit : public Cmd { public:
+class CmdRenderExit : public Cmd
+{
+  public:
 	CmdRenderExit();
 	~CmdRenderExit();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg);
+	bool v_processArguments(int argc, char **argv, af::Msg &msg);
 };
-class CmdRenderDelete : public Cmd { public:
+class CmdRenderDelete : public Cmd
+{
+  public:
 	CmdRenderDelete();
 	~CmdRenderDelete();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg);
+	bool v_processArguments(int argc, char **argv, af::Msg &msg);
 };
-class CmdRenderWOLSleep : public Cmd { public:
+class CmdRenderWOLSleep : public Cmd
+{
+  public:
 	CmdRenderWOLSleep();
 	~CmdRenderWOLSleep();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg);
+	bool v_processArguments(int argc, char **argv, af::Msg &msg);
 };
-class CmdRenderWOLWake : public Cmd { public:
+class CmdRenderWOLWake : public Cmd
+{
+  public:
 	CmdRenderWOLWake();
 	~CmdRenderWOLWake();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg);
+	bool v_processArguments(int argc, char **argv, af::Msg &msg);
 };
-class CmdRenderServiceOn : public Cmd { public:
+class CmdRenderServiceOn : public Cmd
+{
+  public:
 	CmdRenderServiceOn();
 	~CmdRenderServiceOn();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg);
+	bool v_processArguments(int argc, char **argv, af::Msg &msg);
 };
-class CmdRenderServiceOff : public Cmd { public:
+class CmdRenderServiceOff : public Cmd
+{
+  public:
 	CmdRenderServiceOff();
 	~CmdRenderServiceOff();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg);
+	bool v_processArguments(int argc, char **argv, af::Msg &msg);
 };

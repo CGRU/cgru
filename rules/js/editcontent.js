@@ -16,7 +16,7 @@
 	Used in comments, body.
 */
 
-"use strict";
+'use strict';
 
 var ec_form = null;
 var ec_process_image = null;
@@ -33,7 +33,7 @@ function ec_EditingStart(i_args)
 
 	el.addEventListener('paste', ec_OnPaste);
 	el.addEventListener('dragenter', ec_OnDragEnter);
-	el.addEventListener('dragover',  ec_OnDragOver);
+	el.addEventListener('dragover', ec_OnDragOver);
 	el.addEventListener('dragleave', ec_OnDragLeave);
 	el.addEventListener('drop', ec_OnDrop);
 
@@ -49,14 +49,14 @@ function ec_EditingFinish(i_args)
 
 	el.removeEventListener('paste', ec_OnPaste);
 	el.removeEventListener('dragenter', ec_OnDragEnter);
-	el.removeEventListener('dragover',  ec_OnDragOver);
+	el.removeEventListener('dragover', ec_OnDragOver);
 	el.removeEventListener('dragleave', ec_OnDragLeave);
 	el.removeEventListener('drop', ec_OnDrop);
 };
 
 function ec_OnPaste(i_evt)
 {
-    i_evt.preventDefault();
+	i_evt.preventDefault();
 	if (ec_process_image)
 		return;
 
@@ -66,24 +66,33 @@ function ec_OnPaste(i_evt)
 
 	// Process text
 	let text = (i_evt.clipboardData || window.clipboardData).getData('text/plain');
-	text.replace('\n','<br>\n');
+	text.replace('\n', '<br>\n');
 	if (text && text.length)
 		document.execCommand('insertHTML', false, text);
 }
 
-function ec_OnDragEnter(i_evt){ec_DragSetStyle(i_evt, true);}
-function ec_OnDragOver( i_evt){ec_DragSetStyle(i_evt, true);}
-function ec_OnDragLeave(i_evt){ec_DragSetStyle(i_evt, false);}
+function ec_OnDragEnter(i_evt)
+{
+	ec_DragSetStyle(i_evt, true);
+}
+function ec_OnDragOver(i_evt)
+{
+	ec_DragSetStyle(i_evt, true);
+}
+function ec_OnDragLeave(i_evt)
+{
+	ec_DragSetStyle(i_evt, false);
+}
 function ec_DragSetStyle(i_evt, i_on)
 {
-//console.log(i_evt);
-	// Preventing defaults means that element accept drop
+	// console.log(i_evt);
+	//  Preventing defaults means that element accept drop
 	i_evt.preventDefault();
 	i_evt.stopPropagation();
 
 	// This can be not element but element text node
 	let el = i_evt.target;
-	if (! el.classList)
+	if (!el.classList)
 		return;
 
 	// Child element can accept this event too,
@@ -119,7 +128,7 @@ function ec_OnDrop(i_evt)
 
 function ec_DataTransfer(i_data)
 {
-//console.log(i_data);
+	// console.log(i_data);
 	if (null == i_data)
 	{
 		c_Error('Transfered data is null.');
@@ -163,8 +172,8 @@ function ec_DataTransfer(i_data)
 
 function ec_ProcessImage(i_file)
 {
-	//console.log(i_file);
-	let name = (new Date()).toISOString().replace(/[:.Z]/g,'-') +  g_auth_user.id + '-' + i_file.name;
+	// console.log(i_file);
+	let name = (new Date()).toISOString().replace(/[:.Z]/g, '-') + g_auth_user.id + '-' + i_file.name;
 	// By default, image will be uploaded in the current folder
 	let path = RULES.root + g_CurPath();
 	// Asset can specify folder to place images (body and comment form)
@@ -257,7 +266,7 @@ function ec_ProcessImageUpload()
 
 	var xhr = new XMLHttpRequest();
 	xhr.upload.addEventListener('progress', ec_ProcessImageUploadProgress, false);
-	xhr.addEventListener('load',  ec_ProcessImageUpload_Load,  false);
+	xhr.addEventListener('load', ec_ProcessImageUpload_Load, false);
 	xhr.addEventListener('error', ec_ProcessImageUpload_Error, false);
 	xhr.addEventListener('abort', ec_ProcessImageUpload_Abort, false);
 	xhr.open('POST', n_server);
@@ -278,23 +287,27 @@ function ec_ProcessImageUpload()
 
 function ec_ProcessImageUpload_Load()
 {
-	if (null == ec_process_image) return;
+	if (null == ec_process_image)
+		return;
 	ec_process_image.el_status.innerHTML = 'Uploading';
 }
 function ec_ProcessImageUpload_Error()
 {
-	if (null == ec_process_image) return;
+	if (null == ec_process_image)
+		return;
 	ec_process_image.el_status.innerHTML = 'Error';
 }
 function ec_ProcessImageUpload_Abort()
 {
-	if (null == ec_process_image) return;
+	if (null == ec_process_image)
+		return;
 	ec_process_image.el_status.innerHTML = 'Aborting';
 }
 
 function ec_ProcessImageUploadProgress(i_evt)
 {
-	if (null == ec_process_image) return;
+	if (null == ec_process_image)
+		return;
 
 	var dur = c_DT_DurFromNow(ec_process_image.up_time);
 	var text = dur;
@@ -306,7 +319,9 @@ function ec_ProcessImageUploadProgress(i_evt)
 			let percent = Math.round(100 * i_evt.loaded / i_evt.total);
 			if (ec_process_image.up_percent > percent)
 			{
-				c_Error('Upload: New progress lowered (' + ec_process_image.up_percent + ' > ' + percent + ') at ' + dur);
+				c_Error(
+					'Upload: New progress lowered (' + ec_process_image.up_percent + ' > ' + percent +
+					') at ' + dur);
 			}
 			text += ' ' + percent + '%';
 			ec_process_image.el_progress.style.width = percent + '%';
@@ -350,13 +365,18 @@ function ec_ProcessImageFileUploaded(i_file)
 	cmd = cmd.replace('@INPUT@', i_file.path);
 	cmd = cmd.replace('@OUTPUT@', i_file.thumbnail);
 
-	n_Request({"send":{"cmdexec":{"cmds":[cmd]}}, "func": ec_ProcessImageTumbnailed, "file": i_file, "info":'thumbnail'});
+	n_Request({
+		'send': {'cmdexec': {'cmds': [cmd]}},
+		'func': ec_ProcessImageTumbnailed,
+		'file': i_file,
+		'info': 'thumbnail'
+	});
 }
 
 function ec_ProcessImageTumbnailed(i_data, i_args)
 {
-//console.log(JSON.stringify(i_args));
-//console.log(JSON.stringify(i_data));
+	// console.log(JSON.stringify(i_args));
+	// console.log(JSON.stringify(i_data));
 	var file = i_args.file;
 
 	if ((null == i_data.cmdexec) || (i_data.cmdexec.length == 0))
@@ -405,7 +425,8 @@ function ec_ProcessImageInsertHTML(i_file)
 
 function ec_ProcessImageClose()
 {
-	if (null == ec_process_image) return;
+	if (null == ec_process_image)
+		return;
 
 	let elParent = ec_process_image.el_root.parentElement;
 	if (elParent)

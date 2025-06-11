@@ -14,11 +14,9 @@
 	users.js - methods and structs for monitoring and handling of users
 */
 
-"use strict";
+'use strict';
 
-function UserNode()
-{
-}
+function UserNode() {}
 
 UserNode.onMonitorCreate = function() {
 	UserNode.createParams();
@@ -245,7 +243,7 @@ UserNode.prototype.updatePanels = function() {
 };
 
 UserNode.prototype.onDoubleClick = function(e) {
-	g_ShowObject({"object": this.params}, {"evt": e, "wnd": this.monitor.window});
+	g_ShowObject({'object': this.params}, {'evt': e, 'wnd': this.monitor.window});
 };
 
 UserNode.params_user = {

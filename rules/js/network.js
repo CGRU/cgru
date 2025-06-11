@@ -14,7 +14,7 @@
 	network.js - TODO: description
 */
 
-"use strict";
+'use strict';
 
 var n_server = '/server';
 var n_connection_lost = false;
@@ -33,7 +33,7 @@ function n_Init()
 	if (document.location.hostname == 'u5fx.ru')
 		n_server = '/les/server';
 
-	//n_server = 'rules.php';
+	// n_server = 'rules.php';
 
 	n_LogResponses();
 }
@@ -68,8 +68,8 @@ function n_WalkDir(i_args)
 	var request = {};
 	request.walkdir = paths;
 	request.depth = i_args.depth;
-    if (i_args.rufolder)
-	    request.rufolder = i_args.rufolder;
+	if (i_args.rufolder)
+		request.rufolder = i_args.rufolder;
 	request.showhidden = (localStorage.show_hidden == 'ON');
 	if (i_args.rufiles)
 		request.rufiles = i_args.rufiles;
@@ -90,7 +90,7 @@ function n_WalkDir(i_args)
 		return;
 	}
 
-	var data = n_Request({"send": request});
+	var data = n_Request({'send': request});
 	var response = c_Parse(data);
 
 	if (response == null)
@@ -248,7 +248,8 @@ function n_XHRHandler()
 
 		if (this.status == 200)
 		{
-			let log = '<b><i style="color:#048">recv ' + this.m_args.id + ' (' + n_conn_count + ')</i> ' + this.m_args.info + '</b> ';
+			let log = '<b><i style="color:#048">recv ' + this.m_args.id + ' (' + n_conn_count + ')</i> ' +
+				this.m_args.info + '</b> ';
 			if (n_log_responses || this.m_args.force_log)
 			{
 				log += ': ' + this.responseText.replace(/[<>]/g, '*');
@@ -339,7 +340,7 @@ function n_SendJob(job)
 	obj.sender_id = 0;
 	obj.magick_number = 1;
 
-	n_Request({"send": obj, "func": n_JobSent});
+	n_Request({'send': obj, 'func': n_JobSent});
 }
 
 function n_JobSent(i_data)
@@ -370,7 +371,7 @@ function n_GetRuFile(i_file, i_noCheck)
 	if (i_noCheck != true)
 		if (false == c_RuFileExists(i_file))
 			return null;
-	return n_Request({"send": {"getfile": c_GetRuFilePath(i_file)}});
+	return n_Request({'send': {'getfile': c_GetRuFilePath(i_file)}});
 	//	return n_Get( c_GetRuFilePath( i_file));
 }
 
@@ -390,18 +391,18 @@ function n_GetFile(i_args)
 		return;
 	}
 	n_Request({
-		"send": {"getfile": i_args.path},
-		"func": n_GetFileReceived,
-		"info": 'get ' + i_args.info,
-		"parse": i_args.parse,
-		"get_args": i_args,
-		"local": i_args.local
+		'send': {'getfile': i_args.path},
+		'func': n_GetFileReceived,
+		'info': 'get ' + i_args.info,
+		'parse': i_args.parse,
+		'get_args': i_args,
+		'local': i_args.local
 	});
 }
 
 function n_GetFileReceived(i_data, i_args)
 {
-	n_gets[i_args.get_args.path] = {"data": i_data, "time": c_DT_CurSeconds()};
+	n_gets[i_args.get_args.path] = {'data': i_data, 'time': c_DT_CurSeconds()};
 	i_args.get_args.func(i_data, i_args.get_args);
 }
 
@@ -422,7 +423,7 @@ function n_SendMail(i_address, i_subject, i_body)
 	obj.body = i_body;
 
 	//	var result = c_Parse( n_Request({"send":{"sendmail":obj}}));
-	n_Request({"send": {"sendmail": obj}, "func": n_SendMailReceived});
+	n_Request({'send': {'sendmail': obj}, 'func': n_SendMailReceived});
 }
 
 function n_SendMailReceived(i_data, i_args)

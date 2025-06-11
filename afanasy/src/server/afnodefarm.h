@@ -7,34 +7,36 @@
 class Action;
 class PoolSrv;
 
-class AfNodeFarm: public AfNodeSrv
+class AfNodeFarm : public AfNodeSrv
 {
-public:
-	AfNodeFarm(af::Node * i_node, af::Farm * i_farm, int i_type, const std::string & i_type_name, PoolSrv * i_parent, const std::string & i_store_dir);
+  public:
+	AfNodeFarm(af::Node *i_node, af::Farm *i_farm, int i_type, const std::string &i_type_name,
+			   PoolSrv *i_parent, const std::string &i_store_dir);
 	virtual ~AfNodeFarm();
 
-	enum Type {
+	enum Type
+	{
 		TPool,
 		TRenderer
 	};
 
-	bool canRunService(const std::string & i_service_name, bool i_hasServicesSetup = false) const;
+	bool canRunService(const std::string &i_service_name, bool i_hasServicesSetup = false) const;
 
 	// On success return true for monitoring/storing
-	bool actionFarm(Action & i_action);
-	bool actionTicket(Action & i_action);
+	bool actionFarm(Action &i_action);
+	bool actionTicket(Action &i_action);
 
-	bool hasHostTicket(const std::string & i_name, const int32_t & i_count) const;
+	bool hasHostTicket(const std::string &i_name, const int32_t &i_count) const;
 
-protected:
-	PoolSrv * m_parent;
-	af::Farm * m_farm;
+  protected:
+	PoolSrv *m_parent;
+	af::Farm *m_farm;
 
-private:
-	bool hasService(const std::string & i_service_name) const;
-	bool isServiceDisabled(const std::string & i_service_name) const;
+  private:
+	bool hasService(const std::string &i_service_name) const;
+	bool isServiceDisabled(const std::string &i_service_name) const;
 
-private:
+  private:
 	int m_type;
 	int m_change_event;
 };

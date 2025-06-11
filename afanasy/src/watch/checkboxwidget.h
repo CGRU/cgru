@@ -6,14 +6,14 @@
 
 class CheckBoxWidget : public QWidget
 {
-Q_OBJECT
-public:
-    CheckBoxWidget( QWidget * parent, afqt::AttrNumber * attrNumber);
-    ~CheckBoxWidget();
+	Q_OBJECT
+  public:
+	CheckBoxWidget(QWidget *parent, afqt::AttrNumber *attrNumber);
+	~CheckBoxWidget();
 
-private slots:
-    void valueChanged( int value);
+  private slots:
+	void valueChanged(int value);
 
-private:
-    afqt::AttrNumber * num;
+  private:
+	afqt::AttrNumber *num;
 };

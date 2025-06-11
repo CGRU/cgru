@@ -14,7 +14,7 @@
 	general.js - TODO: description
 */
 
-"use strict";
+'use strict';
 
 var p_PLAYER = false;
 
@@ -33,9 +33,12 @@ var g_arguments = null;
 var g_sort_aux_bottom = false;
 
 var g_navig_infos = {
-	all     : ['annotation', 'size', 'flags', 'artists', 'tags', 'thumbs', 'tasks','tasks_only_my', 'duration', 'price', 'frames', 'percent'],
-	default : ['annotation', 'flags', 'tags', 'artists', 'thumbs', 'tasks', 'percent'],
-	current : []
+	all: [
+		'annotation', 'size', 'flags', 'artists', 'tags', 'thumbs', 'tasks', 'tasks_only_my', 'duration',
+		'price', 'frames', 'percent'
+	],
+	default: ['annotation', 'flags', 'tags', 'artists', 'thumbs', 'tasks', 'percent'],
+	current: []
 };
 
 function cgru_params_OnChange(i_param, i_value)
@@ -54,7 +57,7 @@ function g_Init()
 	activity_Init();
 	cm_Init();
 
-	n_Request({"send": {"start": {}}, "func": g_Init_Server, "info": 'start', "force_log": true});
+	n_Request({'send': {'start': {}}, 'func': g_Init_Server, 'info': 'start', 'force_log': true});
 
 	window.onbeforeunload = g_OnClose;
 }
@@ -77,7 +80,7 @@ function g_Init_Server(i_data)
 
 	var url = decodeURI(document.location.href);
 
-	n_Request({"send": {"initialize": {'url': url}}, "func": g_Init_Config, "info": 'init'});
+	n_Request({'send': {'initialize': {'url': url}}, 'func': g_Init_Config, 'info': 'init'});
 }
 
 function g_Init_Config(i_data)
@@ -117,13 +120,13 @@ function g_Init_Config(i_data)
 	ab_Init();
 
 	c_RulesMergeObjs(RULES_TOP, config.rules_top);
-    if (RULES_TOP.ruerror)
-    {
-        if (RULES_TOP.ruerror.info)
-            c_Log(RULES_TOP.ruerror.info);
-        c_Error(RULES_TOP.ruerror.error);
-        c_ConstantError(RULES_TOP.ruerror.error);
-    }
+	if (RULES_TOP.ruerror)
+	{
+		if (RULES_TOP.ruerror.info)
+			c_Log(RULES_TOP.ruerror.info);
+		c_Error(RULES_TOP.ruerror.error);
+		c_ConstantError(RULES_TOP.ruerror.error);
+	}
 
 	if (RULES_TOP.cgru_config)
 		cgru_ConfigJoin(RULES_TOP.cgru_config);
@@ -195,7 +198,7 @@ function g_OnKeyDown(e)
 		if (ec_process_image && (ec_process_image.uploading != true))
 			ec_ProcessImageClose();
 	}
-	else if (e.keyCode == 13) // ENTER
+	else if (e.keyCode == 13)  // ENTER
 	{
 		// Close comments images processing
 		if (ec_process_image && (ec_process_image.uploading != true))
@@ -272,7 +275,7 @@ function g_NavigatePost()
 
 	if (g_nav_clicked == false)
 	{
-		g_elCurFolder.scrollIntoView({behavior:'auto',block:'center',inline:'center'});
+		g_elCurFolder.scrollIntoView({behavior: 'auto', block: 'center', inline: 'center'});
 	}
 
 	g_nav_clicked = false;
@@ -480,7 +483,7 @@ function g_Goto(i_folder, i_path, i_walk)
 		//		g_elCurFolder = g_AppendFolder( g_elCurFolder, {"name":i_folder,"dummy":true});
 		//		c_Info('Dummy folder "'+i_folder+'" pushed: "'+g_elCurFolder.m_path+'"');
 
-		g_elCurFolder = g_AppendFolder(g_elCurFolder, {"name": i_folder, "dummy": dummy});
+		g_elCurFolder = g_AppendFolder(g_elCurFolder, {'name': i_folder, 'dummy': dummy});
 	}
 
 	g_elCurFolder.m_dir = i_walk;
@@ -532,7 +535,7 @@ function g_OpenFolder(i_elFolder)
 		g_WaitingSet();
 		return;
 	}
-	g_OpenFolderDo(null, {"element": i_elFolder});
+	g_OpenFolderDo(null, {'element': i_elFolder});
 }
 
 function g_OpenFolderDo(i_data, i_args)
@@ -661,7 +664,7 @@ function g_GroupCreate(i_elFolders, i_elParent, i_elPrevFolder, i_prefix)
 	}
 
 	if (avg_percent > 0)
-		elPercent.textContent = (Math.floor(avg_percent/i_elFolders.length)) + '%';
+		elPercent.textContent = (Math.floor(avg_percent / i_elFolders.length)) + '%';
 
 	c_Log('Group "' + i_elParent.m_path + ': ' + i_prefix + '" created"');
 
@@ -834,7 +837,8 @@ function g_AppendFolder(i_elParent, i_fobject)
 
 	elName.href = '#' + elFolder.m_path;
 	if (i_fobject.thumbnail)
-		elFolder.m_elThumb.style.backgroundImage = 'url(' + c_GetRuFilePath(RULES.thumbnail.filename, elFolder.m_path) + ')';
+		elFolder.m_elThumb.style.backgroundImage =
+			'url(' + c_GetRuFilePath(RULES.thumbnail.filename, elFolder.m_path) + ')';
 
 	elFolder.onclick = g_FolderOnClick;
 	elFolder.oncontextmenu = function(e) {
@@ -1003,7 +1007,7 @@ function g_FolderSetStatus(i_status, i_elFolder, i_up_params)
 	if ((i_up_params == null) || i_up_params.flags)
 		st_SetElFlags(i_status, i_elFolder.m_elFlags, true);
 	if ((i_up_params == null) || i_up_params.tasks)
-		task_DrawBadges(i_status, i_elFolder.m_elTasks, {'update':(i_up_params && i_up_params.tasks)});
+		task_DrawBadges(i_status, i_elFolder.m_elTasks, {'update': (i_up_params && i_up_params.tasks)});
 
 	if (i_elFolder.m_fobject.auxiliary)
 	{
@@ -1097,7 +1101,7 @@ function g_CloseFolder(i_elFolder)
 			let elGroup = i_elFolder.m_elGroups[i];
 
 			// For now parent folder remove all child foders from any parent
-			//for (let f = 0; f < elGroup.m_elFolders.length; f++)
+			// for (let f = 0; f < elGroup.m_elFolders.length; f++)
 			//	elGroup.removeChild(elGroup.m_elFolders[f]);
 
 			elGroup.parentNode.removeChild(elGroup);

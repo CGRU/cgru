@@ -2,58 +2,58 @@
 
 #include "watch.h"
 
-#include <QtGui/QImage>
 #include <QWidget>
+#include <QtGui/QImage>
 
 class ButtonMonitor : public QWidget
 {
-   Q_OBJECT
+	Q_OBJECT
 
-public:
-   ButtonMonitor( int wType, QWidget *parent);
-   ~ButtonMonitor();
+  public:
+	ButtonMonitor(int wType, QWidget *parent);
+	~ButtonMonitor();
 
-   static void refreshImages();
+	static void refreshImages();
 
-   static void pushButton( int wType);
+	static void pushButton(int wType);
 
-   static const int ButtonsHeight;
+	static const int ButtonsHeight;
 
-   static void unset();
+	static void unset();
 
-protected:
-   void contextMenuEvent( QContextMenuEvent *event);
+  protected:
+	void contextMenuEvent(QContextMenuEvent *event);
 
-   void paintEvent ( QPaintEvent * event );
+	void paintEvent(QPaintEvent *event);
 
-   void enterEvent( QEvent * event);
-   void leaveEvent( QEvent *event);
-   void mousePressEvent( QMouseEvent * event );
-   void mouseReleaseEvent( QMouseEvent * event );
+	void enterEvent(QEvent *event);
+	void leaveEvent(QEvent *event);
+	void mousePressEvent(QMouseEvent *event);
+	void mouseReleaseEvent(QMouseEvent *event);
 
-private slots:
-   void open_SLOT();
+  private slots:
+	void open_SLOT();
 
-private:
-   void createImage();
-   void openMonitor( bool inSeparateWindow);
+  private:
+	void createImage();
+	void openMonitor(bool inSeparateWindow);
 
-private:
-   bool hovered;
-   bool pressed;
-   int type;
+  private:
+	bool hovered;
+	bool pressed;
+	int type;
 
-   int width;
-   int height;
+	int width;
+	int height;
 
-   bool useimages;
-   QImage img;
-   QImage img_h;
-   QImage img_p;
-   QImage img_t;
+	bool useimages;
+	QImage img;
+	QImage img_h;
+	QImage img_p;
+	QImage img_t;
 
-private:
-   static ButtonMonitor *Buttons[Watch::WLAST];
-   static ButtonMonitor *Current;
-   static int CurrentType;
+  private:
+	static ButtonMonitor *Buttons[Watch::WLAST];
+	static ButtonMonitor *Current;
+	static int CurrentType;
 };

@@ -51,126 +51,128 @@
 #include "highlighter.h"
 
 //! [0]
-Highlighter::Highlighter(QTextDocument *parent)
-    : QSyntaxHighlighter(parent)
+Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent)
 {
-    HighlightingRule rule;
+	HighlightingRule rule;
 
-    keywordFormat.setForeground(QColor("#f92672"));//#66d9ef
-    //keywordFormat.setFontWeight(QFont::Bold);
-    QStringList keywordPatterns;
-    keywordPatterns << "\\bprint\\b" << "\\bimport\\b" << "\\bfrom\\b"
-                    << "\\band\\b" << "\\bdel\\b" << "\\bwhile\\b"
-                    << "\\bnot\\b" << "\\bas\\b" << "\\belif\\b"
-                    << "\\bglobal\\b" << "\\bor\\b" << "\\bwith\\b"
-                    << "\\bassert\\b" << "\\belse\\b" << "\\bif\\b"
-                    << "\\bpass\\b" << "\\byield\\b" << "\\bbreak\\b"
-                    << "\\bexcept\\b" << "\\bexec\\b" << "\\bin\\b"
-                    << "\\braise\\b" << "\\bcontinue\\b" << "\\bfinally\\b"
-                    << "\\bis\\b" << "\\breturn\\b" << "\\bfor\\b";
-    foreach (const QString &pattern, keywordPatterns) {
-        rule.pattern = QRegExp(pattern);
-        rule.format = keywordFormat;
-        highlightingRules.append(rule);
-    }
-//! [1]
-    keywordFormat.setForeground(QColor("#66d9ef"));
-    QStringList specKeywordPatterns;
-    specKeywordPatterns << "\\bdef\\b"<< "\\blambda\\b"<< "\\bclass\\b"<<"\\b__init__\\b"
-                           <<"\\bsuper\\b";
-    foreach (const QString &pattern, specKeywordPatterns) {
-        rule.pattern = QRegExp(pattern);
-        rule.format = keywordFormat;
-        highlightingRules.append(rule);
-    }
+	keywordFormat.setForeground(QColor("#f92672")); // #66d9ef
+	// keywordFormat.setFontWeight(QFont::Bold);
+	QStringList keywordPatterns;
+	keywordPatterns << "\\bprint\\b" << "\\bimport\\b" << "\\bfrom\\b"
+					<< "\\band\\b" << "\\bdel\\b" << "\\bwhile\\b"
+					<< "\\bnot\\b" << "\\bas\\b" << "\\belif\\b"
+					<< "\\bglobal\\b" << "\\bor\\b" << "\\bwith\\b"
+					<< "\\bassert\\b" << "\\belse\\b" << "\\bif\\b"
+					<< "\\bpass\\b" << "\\byield\\b" << "\\bbreak\\b"
+					<< "\\bexcept\\b" << "\\bexec\\b" << "\\bin\\b"
+					<< "\\braise\\b" << "\\bcontinue\\b" << "\\bfinally\\b"
+					<< "\\bis\\b" << "\\breturn\\b" << "\\bfor\\b";
+	foreach (const QString &pattern, keywordPatterns)
+	{
+		rule.pattern = QRegExp(pattern);
+		rule.format = keywordFormat;
+		highlightingRules.append(rule);
+	}
+	//! [1]
+	keywordFormat.setForeground(QColor("#66d9ef"));
+	QStringList specKeywordPatterns;
+	specKeywordPatterns << "\\bdef\\b" << "\\blambda\\b" << "\\bclass\\b" << "\\b__init__\\b"
+						<< "\\bsuper\\b";
+	foreach (const QString &pattern, specKeywordPatterns)
+	{
+		rule.pattern = QRegExp(pattern);
+		rule.format = keywordFormat;
+		highlightingRules.append(rule);
+	}
 
-    keywordFormat.setForeground(QColor("#d07f1f"));
-    QStringList spec2KeywordPatterns;
-    spec2KeywordPatterns << "\\bself\\b"<< "\\bTrue\\b"<< "\\bFalse\\b";
-    foreach (const QString &pattern, spec2KeywordPatterns) {
-        rule.pattern = QRegExp(pattern);
-        rule.format = keywordFormat;
-        highlightingRules.append(rule);
-    }
-//! [2]
-    numbersFormat.setForeground(QColor("#ae81ff"));
-    rule.pattern = QRegExp("\\b[0-9]+\\b");//rule.pattern = QRegExp("\\bQ[A-Za-z]+\\b");
-    rule.format = numbersFormat;
-    highlightingRules.append(rule);
-//! [2]
-//! [5]
-    functionFormat.setFontItalic(true);
-    functionFormat.setForeground(QColor("#a6e22e"));
-    rule.pattern = QRegExp("\\b[A-Za-z0-9_]+(?=\\()");
-    rule.format = functionFormat;
-    highlightingRules.append(rule);
-//! [5]
+	keywordFormat.setForeground(QColor("#d07f1f"));
+	QStringList spec2KeywordPatterns;
+	spec2KeywordPatterns << "\\bself\\b" << "\\bTrue\\b" << "\\bFalse\\b";
+	foreach (const QString &pattern, spec2KeywordPatterns)
+	{
+		rule.pattern = QRegExp(pattern);
+		rule.format = keywordFormat;
+		highlightingRules.append(rule);
+	}
+	//! [2]
+	numbersFormat.setForeground(QColor("#ae81ff"));
+	rule.pattern = QRegExp("\\b[0-9]+\\b"); // rule.pattern = QRegExp("\\bQ[A-Za-z]+\\b");
+	rule.format = numbersFormat;
+	highlightingRules.append(rule);
+	//! [2]
+	//! [5]
+	functionFormat.setFontItalic(true);
+	functionFormat.setForeground(QColor("#a6e22e"));
+	rule.pattern = QRegExp("\\b[A-Za-z0-9_]+(?=\\()");
+	rule.format = functionFormat;
+	highlightingRules.append(rule);
+	//! [5]
 
-//! [3]
-    singleLineCommentFormat.setForeground(QColor("#75715e"));
-    rule.pattern = QRegExp("#[^\n]*");
-    rule.format = singleLineCommentFormat;
-    highlightingRules.append(rule);
+	//! [3]
+	singleLineCommentFormat.setForeground(QColor("#75715e"));
+	rule.pattern = QRegExp("#[^\n]*");
+	rule.format = singleLineCommentFormat;
+	highlightingRules.append(rule);
 
-    multiLineCommentFormat.setForeground(QColor("#e6db74"));
-//! [3]
+	multiLineCommentFormat.setForeground(QColor("#e6db74"));
+	//! [3]
 
-//! [4]
-    quotationFormat.setForeground(QColor("#e6db74"));
-    rule.pattern = QRegExp("\".*\"");
-    rule.format = quotationFormat;
-    highlightingRules.append(rule);
+	//! [4]
+	quotationFormat.setForeground(QColor("#e6db74"));
+	rule.pattern = QRegExp("\".*\"");
+	rule.format = quotationFormat;
+	highlightingRules.append(rule);
 
-    singleQuotationFormat.setForeground(QColor("#e6dd84"));
-    rule.pattern = QRegExp("\'.*\'");
-    rule.format = singleQuotationFormat;
-    highlightingRules.append(rule);
-//! [4]
+	singleQuotationFormat.setForeground(QColor("#e6dd84"));
+	rule.pattern = QRegExp("\'.*\'");
+	rule.format = singleQuotationFormat;
+	highlightingRules.append(rule);
+	//! [4]
 
-
-
-//! [6]
-    commentStartExpression = QRegExp("\'");
-    commentEndExpression = QRegExp("\'");
+	//! [6]
+	commentStartExpression = QRegExp("\'");
+	commentEndExpression = QRegExp("\'");
 }
 //! [6]
 
 //! [7]
 void Highlighter::highlightBlock(const QString &text)
 {
-    foreach (const HighlightingRule &rule, highlightingRules) {
-        QRegExp expression(rule.pattern);
-        int index = expression.indexIn(text);
-        while (index >= 0) {
-            int length = expression.matchedLength();
-            setFormat(index, length, rule.format);
-            index = expression.indexIn(text, index + length);
-        }
-    }
-//! [7] //! [8]
-    setCurrentBlockState(0);
-//! [8]
-/*
-//! [9]
-    int startIndex = 0;
-    if (previousBlockState() != 1)
-        startIndex = commentStartExpression.indexIn(text);
+	foreach (const HighlightingRule &rule, highlightingRules)
+	{
+		QRegExp expression(rule.pattern);
+		int index = expression.indexIn(text);
+		while (index >= 0)
+		{
+			int length = expression.matchedLength();
+			setFormat(index, length, rule.format);
+			index = expression.indexIn(text, index + length);
+		}
+	}
+	//! [7] //! [8]
+	setCurrentBlockState(0);
+	//! [8]
+	/*
+	//! [9]
+		int startIndex = 0;
+		if (previousBlockState() != 1)
+			startIndex = commentStartExpression.indexIn(text);
 
-//! [9] //! [10]
-    while (startIndex >= 0) {
-//! [10] //! [11]
-        int endIndex = commentEndExpression.indexIn(text, startIndex);
-        int commentLength;
-        if (endIndex == -1) {
-            setCurrentBlockState(1);
-            commentLength = text.length() - startIndex;
-        } else {
-            commentLength = endIndex - startIndex
-                            + commentEndExpression.matchedLength();
-        }
-        setFormat(startIndex, commentLength, multiLineCommentFormat);
-        startIndex = commentStartExpression.indexIn(text, startIndex + commentLength);
-    }
-    */
+	//! [9] //! [10]
+		while (startIndex >= 0) {
+	//! [10] //! [11]
+			int endIndex = commentEndExpression.indexIn(text, startIndex);
+			int commentLength;
+			if (endIndex == -1) {
+				setCurrentBlockState(1);
+				commentLength = text.length() - startIndex;
+			} else {
+				commentLength = endIndex - startIndex
+								+ commentEndExpression.matchedLength();
+			}
+			setFormat(startIndex, commentLength, multiLineCommentFormat);
+			startIndex = commentStartExpression.indexIn(text, startIndex + commentLength);
+		}
+		*/
 }
 //! [11]

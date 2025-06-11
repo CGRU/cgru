@@ -10,17 +10,16 @@ class QLabel;
 
 class ParamsPanelTask : public ParamsPanel
 {
-Q_OBJECT
-public:
+	Q_OBJECT
+  public:
 	ParamsPanelTask();
 	virtual ~ParamsPanelTask();
 
-	void updateResources(const QMap<QString, QVector<float>> & i_resmap);
+	void updateResources(const QMap<QString, QVector<float>> &i_resmap);
 
-private:
-	const QStringList processResource(const QString & i_name, float min, float avg, float max) const;
+  private:
+	const QStringList processResource(const QString &i_name, float min, float avg, float max) const;
 
-private:
-	QLabel * m_resources_label;
+  private:
+	QLabel *m_resources_label;
 };
-

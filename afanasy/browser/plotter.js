@@ -15,7 +15,7 @@
 	This view is used inside the render node
 */
 
-"use strict";
+'use strict';
 
 var Plotter_H = 25;
 

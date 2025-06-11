@@ -1,10 +1,10 @@
 #include "button.h"
 
+#include <QAction>
 #include <QtCore/QEvent>
 #include <QtCore/QTimer>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
-#include <QAction>
 
 #include "../libafqt/qenvironment.h"
 
@@ -13,24 +13,12 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-Button::Button(
-		const QString & i_label,
-		const QString & i_name,
-		const QString & i_tooltip,
-		bool i_dblclick,
-		bool i_radio,
-		int  i_clicked_ms):
-	m_label     (i_label),
-	m_name      (i_name),
-	m_tooltip   (i_tooltip),
-	m_dblclick  (i_dblclick),
-	m_radio     (i_radio),
-	m_clicked_ms(i_clicked_ms),
+Button::Button(const QString &i_label, const QString &i_name, const QString &i_tooltip, bool i_dblclick,
+			   bool i_radio, int i_clicked_ms)
+	: m_label(i_label), m_name(i_name), m_tooltip(i_tooltip), m_dblclick(i_dblclick), m_radio(i_radio),
+	  m_clicked_ms(i_clicked_ms),
 
-	m_enabled(true),
-	m_active (false),
-	m_hovered(false),
-	m_clicked(false)
+	  m_enabled(true), m_active(false), m_hovered(false), m_clicked(false)
 {
 	if (m_name.isEmpty())
 		m_name = m_label;
@@ -43,7 +31,7 @@ Button::Button(
 
 Button::~Button() {}
 
-void Button::paintEvent(QPaintEvent * i_evt)
+void Button::paintEvent(QPaintEvent *i_evt)
 {
 	QPainter painter(this);
 	painter.setRenderHint(QPainter::Antialiasing);
@@ -64,7 +52,7 @@ void Button::paintEvent(QPaintEvent * i_evt)
 		color.setAlphaF(.2);
 	painter.setPen(pen);
 	painter.setBrush(QBrush(color, Qt::SolidPattern));
-	painter.drawRoundedRect(1, 1, width()-2, height()-2, 2.5, 2.5);
+	painter.drawRoundedRect(1, 1, width() - 2, height() - 2, 2.5, 2.5);
 
 	if (false == m_enabled)
 		painter.setOpacity(0.5);
@@ -74,11 +62,19 @@ void Button::paintEvent(QPaintEvent * i_evt)
 	painter.drawText(rect(), Qt::AlignHCenter | Qt::AlignVCenter, m_label);
 }
 
-void Button::enterEvent(QEvent * i_evt){m_hovered = true;  repaint();}
-void Button::leaveEvent(QEvent * i_evt){m_hovered = false; repaint();}
-void Button::mousePressEvent(      QMouseEvent * i_evt) {clicked(i_evt, false);}
-void Button::mouseDoubleClickEvent(QMouseEvent * i_evt) {clicked(i_evt, true);}
-void Button::clicked(QMouseEvent * i_evt, bool i_dbl)
+void Button::enterEvent(QEvent *i_evt)
+{
+	m_hovered = true;
+	repaint();
+}
+void Button::leaveEvent(QEvent *i_evt)
+{
+	m_hovered = false;
+	repaint();
+}
+void Button::mousePressEvent(QMouseEvent *i_evt) { clicked(i_evt, false); }
+void Button::mouseDoubleClickEvent(QMouseEvent *i_evt) { clicked(i_evt, true); }
+void Button::clicked(QMouseEvent *i_evt, bool i_dbl)
 {
 	if (false == m_enabled)
 		return;
@@ -86,7 +82,8 @@ void Button::clicked(QMouseEvent * i_evt, bool i_dbl)
 	if (m_active)
 		return;
 
-	if (i_dbl != m_dblclick) return;
+	if (i_dbl != m_dblclick)
+		return;
 
 	if (i_evt->button() == Qt::LeftButton)
 		emitSignal();
@@ -109,4 +106,3 @@ void Button::slot_ClickedFinished()
 	m_clicked = false;
 	repaint();
 }
-

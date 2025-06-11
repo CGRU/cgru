@@ -9,13 +9,14 @@ class ItemBranch;
 
 class ItemWork : public ItemNode
 {
-public:
-	ItemWork(ListNodes * i_list_nodes, af::Node * i_afnode, Item::EType i_type, const CtrlSortFilter * i_ctrl_sf);
+  public:
+	ItemWork(ListNodes *i_list_nodes, af::Node *i_afnode, Item::EType i_type,
+			 const CtrlSortFilter *i_ctrl_sf);
 	~ItemWork();
 
-	void updateWorkValues(af::Work * i_afwork);
+	void updateWorkValues(af::Work *i_afwork);
 
-	void setParentBranch(ItemBranch * i_parent_branch);
+	void setParentBranch(ItemBranch *i_parent_branch);
 
 	QString pools;
 
@@ -34,12 +35,12 @@ public:
 	int need_memory;
 	int need_hdd;
 
-protected:
+  protected:
 	int calcHeightWork() const;
-	void updateInfo(const af::Work * i_afwork);
+	void updateInfo(const af::Work *i_afwork);
 
-protected:
-	ItemBranch * m_parent_branch;
+  protected:
+	ItemBranch *m_parent_branch;
 
-private:
+  private:
 };

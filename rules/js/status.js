@@ -14,7 +14,7 @@
 	status.js - TODO: description
 */
 
-"use strict";
+'use strict';
 
 var st_Status = null;
 
@@ -23,7 +23,7 @@ var st_Statuses = [];
 var st_MultiValue = '[...]';
 
 var st_Hilighted = {};
-var st_HilightedKeys = ['tag','flag','artist'];
+var st_HilightedKeys = ['tag', 'flag', 'artist'];
 
 function st_Init()
 {
@@ -191,7 +191,7 @@ function Status(i_obj, i_args)
 		this.elEditBtn.m_status = this;
 		this.elEditBtn.onclick = function(e) {
 			e.stopPropagation();
-			e.currentTarget.m_status.reloadFile(/*edit=*/true);
+			e.currentTarget.m_status.reloadFile(/*edit=*/ true);
 		};
 		if (false == c_CanEditShot())
 			this.elEditBtn.style.display = 'none';
@@ -207,8 +207,7 @@ function Status(i_obj, i_args)
 	this.show();
 }
 
-Status.prototype.show = function(i_status, i_update = false)
-{
+Status.prototype.show = function(i_status, i_update = false) {
 	if (i_status)
 	{
 		if (i_update && this.obj)
@@ -287,7 +286,7 @@ Status.prototype.show = function(i_status, i_update = false)
 
 	if (this.args.tasks_badges)
 	{
-		let elBages = task_DrawBadges(this.obj, this.elTasksBadges/*, {'only_my':this.args.display_short}*/);
+		let elBages = task_DrawBadges(this.obj, this.elTasksBadges /*, {'only_my':this.args.display_short}*/);
 		if (this.multi)
 		{
 			if (elBages && elBages.length)
@@ -295,7 +294,7 @@ Status.prototype.show = function(i_status, i_update = false)
 				for (let el of elBages)
 				{
 					el.m_status = this;
-					el.onclick = function(e){
+					el.onclick = function(e) {
 						e.stopPropagation();
 						e.currentTarget.m_status.elTasksBadges.style.display = 'none';
 						e.currentTarget.m_status.args.tasks_badges = false;
@@ -326,8 +325,8 @@ Status.prototype.show = function(i_status, i_update = false)
 	this.elParent.classList.remove('updating');
 };
 
-Status.prototype.showTasks = function()
-{
+Status.prototype.showTasks =
+	function() {
 	tasks_Finish();
 
 	if (this.obj && this.obj.tasks)
@@ -344,14 +343,13 @@ Status.prototype.showTasks = function()
 
 	if (this.multi)
 		this.createAddTaskButton();
-}
-Status.prototype.createAddTaskButton = function()
-{
+} Status.prototype.createAddTaskButton =
+		function() {
 	let el = document.createElement('div');
 	el.classList.add('button');
 	el.textContent = 'Add Task';
 	el.m_status = this;
-	el.onclick = function(e){
+	el.onclick = function(e) {
 		e.stopPropagation();
 		sc_AddTask(e.currentTarget.m_status);
 		return false;
@@ -363,8 +361,8 @@ Status.prototype.createAddTaskButton = function()
 		this.elTasks.appendChild(el);
 }
 
-Status.prototype.update = function(i_status)
-{
+		Status.prototype.update =
+			function(i_status) {
 	this.show(i_status);
 
 	this.elParent.classList.remove('fading');
@@ -375,14 +373,14 @@ Status.prototype.update = function(i_status)
 	c_Info('Status updated.');
 }
 
-function st_UpdatingFinished()
-{
-	if (st_Status == null) return;
-	st_Status.updatingFinished();
-}
+			function st_UpdatingFinished() {
+				if (st_Status == null)
+					return;
+				st_Status.updatingFinished();
+			}
 
-Status.prototype.updatingFinished = function()
-{
+			Status.prototype.updatingFinished =
+				function() {
 	if (this.elParent.classList.contains('fading'))
 	{
 		this.elParent.classList.remove('fading');
@@ -395,604 +393,558 @@ Status.prototype.updatingFinished = function()
 	setTimeout(st_UpdatingFinished, 1000);
 }
 
-function st_SetElProgress(i_status, i_elProgressBar, i_elProgressHide, i_elPercentage)
-{
-	var clr = 'rgba(0,255,0,.4)';
+				function st_SetElProgress(i_status, i_elProgressBar, i_elProgressHide, i_elPercentage) {
+					var clr = 'rgba(0,255,0,.4)';
 
-	if (i_elPercentage)
-	{
-		i_elPercentage.classList.remove('done');
-		i_elPercentage.classList.remove('started');
-		i_elPercentage.classList.add('notstarted');
-	}
-	if (i_elProgressBar)
-	{
-		i_elProgressBar.classList.remove('done');
-		i_elProgressBar.classList.remove('started');
-		i_elProgressBar.classList.add('notstarted');
-	}
-	if (i_elProgressHide)
-	{
-		i_elProgressHide.classList.remove('done');
-		i_elProgressHide.classList.remove('started');
-		i_elProgressHide.classList.add('notstarted');
-	}
+					if (i_elPercentage)
+					{
+						i_elPercentage.classList.remove('done');
+						i_elPercentage.classList.remove('started');
+						i_elPercentage.classList.add('notstarted');
+					}
+					if (i_elProgressBar)
+					{
+						i_elProgressBar.classList.remove('done');
+						i_elProgressBar.classList.remove('started');
+						i_elProgressBar.classList.add('notstarted');
+					}
+					if (i_elProgressHide)
+					{
+						i_elProgressHide.classList.remove('done');
+						i_elProgressHide.classList.remove('started');
+						i_elProgressHide.classList.add('notstarted');
+					}
 
-	if (i_status && (i_status.progress != null) && (i_status.progress >= 0))
-	{
-		if (i_status.progress < 100)
-		{
-			clr = 255 - Math.round(2.55 * i_status.progress);
-			clr = 'rgba(' + clr + ',255,0,.8)';
-		}
+					if (i_status && (i_status.progress != null) && (i_status.progress >= 0))
+					{
+						if (i_status.progress < 100)
+						{
+							clr = 255 - Math.round(2.55 * i_status.progress);
+							clr = 'rgba(' + clr + ',255,0,.8)';
+						}
 
-		if (i_elProgressBar)
-		{
-			i_elProgressBar.style.width = i_status.progress + '%';
-			if (i_status.progress > 0)
-			{
-				i_elProgressBar.classList.add('started');
-				i_elProgressBar.classList.remove('notstarted');
-			}
-			if (i_status.progress >= 100)
-				i_elProgressBar.classList.add('done');
-		}
-		if (i_elPercentage)
-		{
-			//i_elPercentage.style.display = 'block';
-			i_elPercentage.textContent = i_status.progress + '%';
-			if (i_status.progress > 0)
-			{
-				i_elPercentage.classList.add('started');
-				i_elPercentage.classList.remove('notstarted');
-			}
-			if (i_status.progress >= 100)
-				i_elPercentage.classList.add('done');
-		}
-		if (i_elProgressHide)
-		{
-			i_elProgressHide.style.display = 'block';
-			i_elProgressHide.title = i_status.progress + '%';
-			if (i_status.progress > 0)
-			{
-				i_elProgressHide.classList.add('started');
-				i_elProgressHide.classList.remove('notstarted');
-			}
-			if (i_status.progress >= 100)
-				i_elProgressHide.classList.add('done');
-		}
-	}
-	else
-	{
-		if (i_elProgressBar)
-			i_elProgressBar.style.width = '0';
-		if (i_elPercentage)
-		{
-			i_elPercentage.textContent = '';
-			i_elPercentage.style.display = 'none';
-		}
-		if (i_elProgressHide)
-		{
-			i_elProgressHide.style.display = 'none';
-			i_elProgressHide.title = null;
-		}
-	}
+						if (i_elProgressBar)
+						{
+							i_elProgressBar.style.width = i_status.progress + '%';
+							if (i_status.progress > 0)
+							{
+								i_elProgressBar.classList.add('started');
+								i_elProgressBar.classList.remove('notstarted');
+							}
+							if (i_status.progress >= 100)
+								i_elProgressBar.classList.add('done');
+						}
+						if (i_elPercentage)
+						{
+							// i_elPercentage.style.display = 'block';
+							i_elPercentage.textContent = i_status.progress + '%';
+							if (i_status.progress > 0)
+							{
+								i_elPercentage.classList.add('started');
+								i_elPercentage.classList.remove('notstarted');
+							}
+							if (i_status.progress >= 100)
+								i_elPercentage.classList.add('done');
+						}
+						if (i_elProgressHide)
+						{
+							i_elProgressHide.style.display = 'block';
+							i_elProgressHide.title = i_status.progress + '%';
+							if (i_status.progress > 0)
+							{
+								i_elProgressHide.classList.add('started');
+								i_elProgressHide.classList.remove('notstarted');
+							}
+							if (i_status.progress >= 100)
+								i_elProgressHide.classList.add('done');
+						}
+					}
+					else
+					{
+						if (i_elProgressBar)
+							i_elProgressBar.style.width = '0';
+						if (i_elPercentage)
+						{
+							i_elPercentage.textContent = '';
+							i_elPercentage.style.display = 'none';
+						}
+						if (i_elProgressHide)
+						{
+							i_elProgressHide.style.display = 'none';
+							i_elProgressHide.title = null;
+						}
+					}
 
-	if (i_elProgressBar)
-		i_elProgressBar.style.backgroundColor = clr;
-}
+					if (i_elProgressBar)
+						i_elProgressBar.style.backgroundColor = clr;
+				}
 
-function st_SetElLabel(i_status, i_el, i_full)
-{
-	if (i_full == null)
-		i_full = false;
-	st_SetElAnnotation(i_status, i_el, i_full);
-}
-function st_SetElFramesNum(i_status, i_el, i_full)
-{
-	if (i_full == null)
-		i_full = true;
+				function st_SetElLabel(i_status, i_el, i_full) {
+					if (i_full == null)
+						i_full = false;
+					st_SetElAnnotation(i_status, i_el, i_full);
+				} function st_SetElFramesNum(i_status, i_el, i_full) {
+					if (i_full == null)
+						i_full = true;
 
-	var num = '';
-	if (i_status && i_status.frames_num)
-	{
-		num = i_status.frames_num;
-		i_el.title = ' ~ ' + Math.round(num / RULES.fps) + 'sec';
-		if (i_full)
-			i_el.parentNode.style.display = 'block';
-		else
-			num = 'F:' + num;
-	}
-	else if (i_full)
-		i_el.parentNode.style.display = 'none';
+					var num = '';
+					if (i_status && i_status.frames_num)
+					{
+						num = i_status.frames_num;
+						i_el.title = ' ~ ' + Math.round(num / RULES.fps) + 'sec';
+						if (i_full)
+							i_el.parentNode.style.display = 'block';
+						else
+							num = 'F:' + num;
+					}
+					else if (i_full)
+						i_el.parentNode.style.display = 'none';
 
-	if (i_full)
-	{
-		i_el.parentNode.classList.remove('updated');
-		i_el.parentNode.title = null;
-	}
+					if (i_full)
+					{
+						i_el.parentNode.classList.remove('updated');
+						i_el.parentNode.title = null;
+					}
 
-	i_el.textContent = num;
-}
-function st_SetElPrice(i_status, i_el)
-{
-	var price = '';
-	if (i_status && i_status.price)
-		price = i_status.price;
+					i_el.textContent = num;
+				} function st_SetElPrice(i_status, i_el) {
+					var price = '';
+					if (i_status && i_status.price)
+						price = i_status.price;
 
-	i_el.textContent = price;
-}
-function st_SetElDuration(i_status, i_el)
-{
-	var duration = '';
-	if (i_status && i_status.duration)
-		duration = i_status.duration;
+					i_el.textContent = price;
+				} function st_SetElDuration(i_status, i_el) {
+					var duration = '';
+					if (i_status && i_status.duration)
+						duration = i_status.duration;
 
-	i_el.textContent = duration;
-}
-function st_SetElAnnotation(i_status, i_el, i_full)
-{
-	st_SetElText(i_status, i_el, 'annotation', i_full);
-}
-function st_SetElText(i_status, i_el, i_field, i_full)
-{
-	if (i_full == null)
-		i_full = true;
-	if (i_status && i_status[i_field])
-	{
-		if (i_full)
-			i_el.innerHTML = i_status[i_field];
-		else
-			i_el.innerHTML = i_status[i_field].replace(/^\s+/, '').split(' ')[0];
-	}
-	else
-		i_el.innerHTML = '';
-}
-function st_SetElArtists(i_status, i_el, i_short, i_clickable, i_onclick)
-{
-	i_el.textContent = '';
-	let elements = [];
+					i_el.textContent = duration;
+				} function st_SetElAnnotation(i_status, i_el, i_full) {
+					st_SetElText(i_status, i_el, 'annotation', i_full);
+				} function st_SetElText(i_status, i_el, i_field, i_full) {
+					if (i_full == null)
+						i_full = true;
+					if (i_status && i_status[i_field])
+					{
+						if (i_full)
+							i_el.innerHTML = i_status[i_field];
+						else
+							i_el.innerHTML = i_status[i_field].replace(/^\s+/, '').split(' ')[0];
+					}
+					else
+						i_el.innerHTML = '';
+				} function st_SetElArtists(i_status, i_el, i_short, i_clickable, i_onclick) {
+					i_el.textContent = '';
+					let elements = [];
 
-	if ((i_status == null) || (i_status.artists == null))
-		return elements;
+					if ((i_status == null) || (i_status.artists == null))
+						return elements;
 
-	for (let i = 0; i < i_status.artists.length; i++)
-	{
-		let el = st_CreateElArtist(i_status.artists[i], i_short);
-		elements.push(el);
-		i_el.appendChild(el);
-		el.m_name = i_status.artists[i];
-		st_TagHilight(el, 'artist');
+					for (let i = 0; i < i_status.artists.length; i++)
+					{
+						let el = st_CreateElArtist(i_status.artists[i], i_short);
+						elements.push(el);
+						i_el.appendChild(el);
+						el.m_name = i_status.artists[i];
+						st_TagHilight(el, 'artist');
 
-		if (i_clickable)
-		{
-			el.onclick = st_TagClicked;
-			el.ondblclick = st_ArtistDblClicked;
+						if (i_clickable)
+						{
+							el.onclick = st_TagClicked;
+							el.ondblclick = st_ArtistDblClicked;
 
-			el.onmousedown = st_ArtistMouseDown;
-		}
-	}
+							el.onmousedown = st_ArtistMouseDown;
+						}
+					}
 
-	return elements;
-}
-function st_CreateElArtist(i_id, i_short)
-{
-	let el = document.createElement('div');
-	el.classList.add('tag');
-	el.classList.add('artist');
-	el.textContent = c_GetUserTitle(i_id, null, i_short);
+					return elements;
+				} function st_CreateElArtist(i_id, i_short) {
+					let el = document.createElement('div');
+					el.classList.add('tag');
+					el.classList.add('artist');
+					el.textContent = c_GetUserTitle(i_id, null, i_short);
 
-	if (g_users[i_id] && g_users[i_id].disabled)
-		el.classList.add('disabled');
+					if (g_users[i_id] && g_users[i_id].disabled)
+						el.classList.add('disabled');
 
-	if (i_short)
-	{
-		el.classList.add('short');
-		if (g_auth_user && (g_auth_user.id == i_id))
-			el.title = 'It`s me!';
-		else
-			el.title = c_GetUserTitle(i_id);
-	}
+					if (i_short)
+					{
+						el.classList.add('short');
+						if (g_auth_user && (g_auth_user.id == i_id))
+							el.title = 'It`s me!';
+						else
+							el.title = c_GetUserTitle(i_id);
+					}
 
-	if (g_auth_user && (g_auth_user.id == i_id))
-	{
-		el.classList.add('me');
+					if (g_auth_user && (g_auth_user.id == i_id))
+					{
+						el.classList.add('me');
 
-		if (i_short !== true)
-		{
-			el.title = 'It`s me!\n - may be i should do something here?';
-		}
-	}
+						if (i_short !== true)
+						{
+							el.title = 'It`s me!\n - may be i should do something here?';
+						}
+					}
 
-	let avatar = c_GetAvatar(i_id);
-	if (avatar)
-	{
-		el.classList.add('with_icon');
-		el.style.backgroundImage = 'url(' + avatar + ')';
-	}
+					let avatar = c_GetAvatar(i_id);
+					if (avatar)
+					{
+						el.classList.add('with_icon');
+						el.style.backgroundImage = 'url(' + avatar + ')';
+					}
 
-	return el;
-}
-function st_SetElFlags(i_status, i_elFlags, i_short, i_clickable)
-{
-	let elements = [];
+					return el;
+				} function st_SetElFlags(i_status, i_elFlags, i_short, i_clickable) {
+					let elements = [];
 
-	if (i_elFlags.m_elFlags)
-		for (let el of i_elFlags.m_elFlags)
-			i_elFlags.removeChild(el);
-	i_elFlags.m_elFlags = [];
+					if (i_elFlags.m_elFlags)
+						for (let el of i_elFlags.m_elFlags)
+							i_elFlags.removeChild(el);
+					i_elFlags.m_elFlags = [];
 
-	if (i_status && i_status.flags)
-		for (let flag of i_status.flags)
-		{
-			let el = st_CreateElFlag(flag, i_short);
-			elements.push(el);
-			i_elFlags.appendChild(el);
-			i_elFlags.m_elFlags.push(el);
-			st_TagHilight(el, 'flag');
+					if (i_status && i_status.flags)
+						for (let flag of i_status.flags)
+						{
+							let el = st_CreateElFlag(flag, i_short);
+							elements.push(el);
+							i_elFlags.appendChild(el);
+							i_elFlags.m_elFlags.push(el);
+							st_TagHilight(el, 'flag');
 
-			if (i_clickable)
-			{
-				el.onclick = st_TagClicked;
-				el.ondblclick = st_FlagDblClicked;
-			}
-		}
+							if (i_clickable)
+							{
+								el.onclick = st_TagClicked;
+								el.ondblclick = st_FlagDblClicked;
+							}
+						}
 
-	return elements;
-}
-function st_CreateElFlag(i_flag, i_short, i_suffix)
-{
-	let el = document.createElement('div');
-	el.classList.add('flag');
-	let label = c_GetFlagTitle(i_flag);
-	if (i_short)
-		label = c_GetFlagShort(i_flag);
-	if (i_suffix)
-		label += i_suffix;
-	el.textContent = label;
-	el.title = c_GetFlagTip(i_flag);
-	el.m_name = i_flag;
+					return elements;
+				} function st_CreateElFlag(i_flag, i_short, i_suffix) {
+					let el = document.createElement('div');
+					el.classList.add('flag');
+					let label = c_GetFlagTitle(i_flag);
+					if (i_short)
+						label = c_GetFlagShort(i_flag);
+					if (i_suffix)
+						label += i_suffix;
+					el.textContent = label;
+					el.title = c_GetFlagTip(i_flag);
+					el.m_name = i_flag;
 
-	st_SetTagStyle('flags', i_flag, el);
+					st_SetTagStyle('flags', i_flag, el);
 
-	return el;
-}
-function st_SetElTags(i_status, i_elTags, i_short, i_clickable)
-{
-	let elements = [];
+					return el;
+				} function st_SetElTags(i_status, i_elTags, i_short, i_clickable) {
+					let elements = [];
 
-	if (i_elTags.m_elTags)
-		for (let i = 0; i < i_elTags.m_elTags.length; i++)
-			i_elTags.removeChild(i_elTags.m_elTags[i]);
-	i_elTags.m_elTags = [];
+					if (i_elTags.m_elTags)
+						for (let i = 0; i < i_elTags.m_elTags.length; i++)
+							i_elTags.removeChild(i_elTags.m_elTags[i]);
+					i_elTags.m_elTags = [];
 
-	if (i_status && i_status.tags)
-		for (let i = 0; i < i_status.tags.length; i++)
-		{
-			let el = st_CreateElTag(i_status.tags[i], i_short);
-			elements.push(el);
-			i_elTags.appendChild(el);
-			i_elTags.m_elTags.push(el);
-			st_TagHilight(el, 'tag');
+					if (i_status && i_status.tags)
+						for (let i = 0; i < i_status.tags.length; i++)
+						{
+							let el = st_CreateElTag(i_status.tags[i], i_short);
+							elements.push(el);
+							i_elTags.appendChild(el);
+							i_elTags.m_elTags.push(el);
+							st_TagHilight(el, 'tag');
 
-			if (i_clickable)
-			{
-				el.onclick = st_TagClicked;
-				el.ondblclick = st_TagDblClicked;
+							if (i_clickable)
+							{
+								el.onclick = st_TagClicked;
+								el.ondblclick = st_TagDblClicked;
 
-				el.onmousedown = st_TagMouseDown;
-			}
-		}
+								el.onmousedown = st_TagMouseDown;
+							}
+						}
 
-	return elements;
-}
-function st_CreateElTag(i_tag, i_short, i_suffix)
-{
-	let el = document.createElement('div');
-	el.classList.add('tag');
-	let label = c_GetTagTitle(i_tag);
-	if (i_short)
-		label = c_GetTagShort(i_tag);
-	if (i_suffix)
-		label += i_suffix;
-	el.textContent = label;
-	el.title = c_GetTagTip(i_tag);
-	el.m_name = i_tag;
+					return elements;
+				} function st_CreateElTag(i_tag, i_short, i_suffix) {
+					let el = document.createElement('div');
+					el.classList.add('tag');
+					let label = c_GetTagTitle(i_tag);
+					if (i_short)
+						label = c_GetTagShort(i_tag);
+					if (i_suffix)
+						label += i_suffix;
+					el.textContent = label;
+					el.title = c_GetTagTip(i_tag);
+					el.m_name = i_tag;
 
-	st_SetTagStyle('tags', i_tag, el);
+					st_SetTagStyle('tags', i_tag, el);
 
-	return el;
-}
-function st_SetTagStyle(i_name, i_tag, i_el)
-{
-	if (RULES[i_name] == null)
-		return;
+					return el;
+				} function st_SetTagStyle(i_name, i_tag, i_el) {
+					if (RULES[i_name] == null)
+						return;
 
-	let obj = RULES[i_name][i_tag];
-	if (obj == null)
-		return;
+					let obj = RULES[i_name][i_tag];
+					if (obj == null)
+						return;
 
-	st_SetElColor({"color": obj.clr}, i_el);
+					st_SetElColor({'color': obj.clr}, i_el);
 
-	if (obj.size)
-		i_el.style.fontSize = obj.size + 'px';
+					if (obj.size)
+						i_el.style.fontSize = obj.size + 'px';
 
-	if (obj.img)
-		i_el.style.backgroundImage = 'url(' + obj.img + ')';
-}
-function st_TagHilight(i_el, i_key)
-{
-	if (st_Hilighted[i_key].indexOf(i_el.m_name) != -1)
-	{
-		i_el.classList.add('highlighted');
-		return true;
-	}
+					if (obj.img)
+						i_el.style.backgroundImage = 'url(' + obj.img + ')';
+				} function st_TagHilight(i_el, i_key) {
+					if (st_Hilighted[i_key].indexOf(i_el.m_name) != -1)
+					{
+						i_el.classList.add('highlighted');
+						return true;
+					}
 
-	return false;
-}
-function st_TagClicked(i_evt)
-{
-	i_evt.stopPropagation();
-	return false;
-}
-function st_TagDblClicked(i_evt)
-{
-	st_TagClicked(i_evt);
-	st_TagHilightToggle(i_evt.currentTarget, 'tag');
-}
-function st_TagMouseDown(i_evt)
-{
-	if (i_evt.button == 1)
-		task_StatusTagClicked(i_evt.currentTarget.m_name);
-}
-function st_FlagDblClicked(i_evt)
-{
-	st_TagClicked(i_evt);
-	st_TagHilightToggle(i_evt.currentTarget, 'flag');
-}
-function st_ArtistMouseDown(i_evt)
-{
-	if (i_evt.button == 1)
-		task_StatusArtistClicked(i_evt.currentTarget.m_name);
-}
-function st_ArtistDblClicked(i_evt)
-{
-	st_TagClicked(i_evt);
-	st_TagHilightToggle(i_evt.currentTarget, 'artist');
-}
-function st_TagHilightToggle(i_el, i_key)
-{
-	let name = i_el.m_name;
+					return false;
+				} function st_TagClicked(i_evt) {
+					i_evt.stopPropagation();
+					return false;
+				} function st_TagDblClicked(i_evt) {
+					st_TagClicked(i_evt);
+					st_TagHilightToggle(i_evt.currentTarget, 'tag');
+				} function st_TagMouseDown(i_evt) {
+					if (i_evt.button == 1)
+						task_StatusTagClicked(i_evt.currentTarget.m_name);
+				} function st_FlagDblClicked(i_evt) {
+					st_TagClicked(i_evt);
+					st_TagHilightToggle(i_evt.currentTarget, 'flag');
+				} function st_ArtistMouseDown(i_evt) {
+					if (i_evt.button == 1)
+						task_StatusArtistClicked(i_evt.currentTarget.m_name);
+				} function st_ArtistDblClicked(i_evt) {
+					st_TagClicked(i_evt);
+					st_TagHilightToggle(i_evt.currentTarget, 'artist');
+				} function st_TagHilightToggle(i_el, i_key) {
+					let name = i_el.m_name;
 
-	if (i_el.classList.contains('highlighted'))
-	{
-		let i = 0;
-		while (i < st_Hilighted[i_key].length)
-			if (st_Hilighted[i_key][i] === name)
-				st_Hilighted[i_key].splice(i, 1);
-			else
-				++i;
-	}
-	else
-	{
-		if (st_Hilighted[i_key].indexOf(name) == -1)
-			st_Hilighted[i_key].push(name)
-	}
+					if (i_el.classList.contains('highlighted'))
+					{
+						let i = 0;
+						while (i < st_Hilighted[i_key].length)
+							if (st_Hilighted[i_key][i] === name)
+								st_Hilighted[i_key].splice(i, 1);
+							else
+								++i;
+					}
+					else
+					{
+						if (st_Hilighted[i_key].indexOf(name) == -1)
+							st_Hilighted[i_key].push(name)
+					}
 
-	for (let el of document.getElementsByClassName(i_key))
-		if (st_Hilighted[i_key].indexOf(el.m_name) != -1)
-			el.classList.add('highlighted');
-		else
-			el.classList.remove('highlighted');
-}
+					for (let el of document.getElementsByClassName(i_key))
+						if (st_Hilighted[i_key].indexOf(el.m_name) != -1)
+							el.classList.add('highlighted');
+						else
+							el.classList.remove('highlighted');
+				}
 
-function st_SetElColor(i_status, i_elBack, i_elColor, i_setNone)
-{
-	if (i_elColor == null)
-		i_elColor = i_elBack;
-	if (i_setNone == null)
-		i_setNone = true;
+				function st_SetElColor(i_status, i_elBack, i_elColor, i_setNone) {
+					if (i_elColor == null)
+						i_elColor = i_elBack;
+					if (i_setNone == null)
+						i_setNone = true;
 
-	let c = null;
-	let a = 1;
-	if (i_status && i_status.flags && i_status.flags.length)
-	{
-		let flag = i_status.flags[i_status.flags.length - 1];
-		if (RULES.flags[flag] && RULES.flags[flag].clr)
-		{
-			c = RULES.flags[flag].clr;
-		}
-	}
-	if (i_status && i_status.tags && i_status.tags.length)
-	{
-		for (let tag of i_status.tags)
-		{
-			if (RULES.tags[tag] && RULES.tags[tag].clr && RULES.tags[tag].clr_up)
-			{
-				c = RULES.tags[tag].clr;
-			}
-		}
-	}
-	if (i_status && i_status.color)
-	{
-		c = i_status.color;
-	}
+					let c = null;
+					let a = 1;
+					if (i_status && i_status.flags && i_status.flags.length)
+					{
+						let flag = i_status.flags[i_status.flags.length - 1];
+						if (RULES.flags[flag] && RULES.flags[flag].clr)
+						{
+							c = RULES.flags[flag].clr;
+						}
+					}
+					if (i_status && i_status.tags && i_status.tags.length)
+					{
+						for (let tag of i_status.tags)
+						{
+							if (RULES.tags[tag] && RULES.tags[tag].clr && RULES.tags[tag].clr_up)
+							{
+								c = RULES.tags[tag].clr;
+							}
+						}
+					}
+					if (i_status && i_status.color)
+					{
+						c = i_status.color;
+					}
 
-	if (c)
-	{
-		i_elBack.style.backgroundColor = 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')';
-		st_SetElColorTextFromBack(c, i_elColor);
-		return true;
-	}
-	else if (i_setNone)
-	{
-		if (localStorage.background && localStorage.background.length)
-			i_elBack.style.background = localStorage.background;
-		else
-			i_elBack.style.background = u_background;
+					if (c)
+					{
+						i_elBack.style.backgroundColor =
+							'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')';
+						st_SetElColorTextFromBack(c, i_elColor);
+						return true;
+					}
+					else if (i_setNone)
+					{
+						if (localStorage.background && localStorage.background.length)
+							i_elBack.style.background = localStorage.background;
+						else
+							i_elBack.style.background = u_background;
 
-		if (localStorage.text_color && localStorage.text_color.length)
-			i_elColor.style.color = localStorage.text_color;
-		else
-			i_elColor.style.color = u_textColor;
-	}
-	return false;
-}
-function st_SetElColorTextFromBack(i_clr, i_el)
-{
-	if (i_clr[0] + i_clr[1] + .3 * i_clr[2] > 300)
-		i_el.style.color = '#000';
-	else
-		i_el.style.color = '#FFF';
-}
+						if (localStorage.text_color && localStorage.text_color.length)
+							i_elColor.style.color = localStorage.text_color;
+						else
+							i_elColor.style.color = u_textColor;
+					}
+					return false;
+				} function st_SetElColorTextFromBack(i_clr, i_el) {
+					if (i_clr[0] + i_clr[1] + .3 * i_clr[2] > 300)
+						i_el.style.color = '#000';
+					else
+						i_el.style.color = '#FFF';
+				}
 
-function st_SetElStatus(i_el, i_status, i_show_all_tasks, i_user = null)
-{
-	if (null == i_el)
-		return;
+				function st_SetElStatus(i_el, i_status, i_show_all_tasks, i_user = null) {
+					if (null == i_el)
+						return;
 
-	if (null == i_user)
-		i_user = g_auth_user;
+					if (null == i_user)
+						i_user = g_auth_user;
 
-	let elStatus = document.createElement('div');
-	i_el.appendChild(elStatus);
-	elStatus.classList.add('status');
+					let elStatus = document.createElement('div');
+					i_el.appendChild(elStatus);
+					elStatus.classList.add('status');
 
 
-	// Flags:
-	if (i_status && i_status.flags && i_status.flags.length)
-	{
-		let elFlags = document.createElement('div');
-		elStatus.appendChild(elFlags);
-		elFlags.classList.add('flags');
-		st_SetElFlags(i_status, elFlags);
-	}
+					// Flags:
+					if (i_status && i_status.flags && i_status.flags.length)
+					{
+						let elFlags = document.createElement('div');
+						elStatus.appendChild(elFlags);
+						elFlags.classList.add('flags');
+						st_SetElFlags(i_status, elFlags);
+					}
 
 
-	let elTasks = document.createElement('div');
-	elStatus.appendChild(elTasks);
-	elTasks.classList.add('tasks');
+					let elTasks = document.createElement('div');
+					elStatus.appendChild(elTasks);
+					elTasks.classList.add('tasks');
 
 
-	let tasks = {};
-	let found = false;
-	// If user has tasks, we should draw only tasks that user is assigned on.
-	// But if user subscribed on location, he should see all tasks.
-	if ((false == i_show_all_tasks) && i_status && i_status.tasks)
-	{
-		for (let t in i_status.tasks)
-		{
-			let task = i_status.tasks[t];
-			if (task.deleted)
-				continue;
+					let tasks = {};
+					let found = false;
+					// If user has tasks, we should draw only tasks that user is assigned on.
+					// But if user subscribed on location, he should see all tasks.
+					if ((false == i_show_all_tasks) && i_status && i_status.tasks)
+					{
+						for (let t in i_status.tasks)
+						{
+							let task = i_status.tasks[t];
+							if (task.deleted)
+								continue;
 
-			if (task.artists && (task.artists.indexOf(i_user.id) == -1))
-				continue;
+							if (task.artists && (task.artists.indexOf(i_user.id) == -1))
+								continue;
 
-			tasks[task.name] = task;
+							tasks[task.name] = task;
 
-			found = true;
-		}
-	}
+							found = true;
+						}
+					}
 
-	if (found)
-	{
-		task_DrawBadges({'tasks':tasks}, elTasks, {'hide_artists':true,'full_names':true});
-	}
-	else
-	{
-		// Draw all tasks if user received new, but was not assigned on any task.
-		// This situation when supervisor subscribed on location,
-		// and receiving news but does not assigned.
-		task_DrawBadges(i_status, elTasks);
-	}
+					if (found)
+					{
+						task_DrawBadges(
+							{'tasks': tasks}, elTasks, {'hide_artists': true, 'full_names': true});
+					}
+					else
+					{
+						// Draw all tasks if user received new, but was not assigned on any task.
+						// This situation when supervisor subscribed on location,
+						// and receiving news but does not assigned.
+						task_DrawBadges(i_status, elTasks);
+					}
 
-	// Show progress bar:
-	if (i_status && i_status.progress)
-	{
-		let elBar = document.createElement('div');
-		i_el.appendChild(elBar);
-		elBar.classList.add('bar');
-		st_SetElProgress(i_status, elBar);
-	}
+					// Show progress bar:
+					if (i_status && i_status.progress)
+					{
+						let elBar = document.createElement('div');
+						i_el.appendChild(elBar);
+						elBar.classList.add('bar');
+						st_SetElProgress(i_status, elBar);
+					}
 
-	// Status color:
-	st_SetElColor(i_status, i_el, i_el, false);
-	/*
-	if (i_status && i_status.color)
-	{
-		let c = i_status.color;
-		i_el.style.backgroundColor = 'rgba('+c[0]+','+c[1]+','+c[2]+')';
-		st_SetElColorTextFromBack(c, i_el);
-	}
-	*/
-}
+					// Status color:
+					st_SetElColor(i_status, i_el, i_el, false);
+					/*
+					if (i_status && i_status.color)
+					{
+						let c = i_status.color;
+						i_el.style.backgroundColor = 'rgba('+c[0]+','+c[1]+','+c[2]+')';
+						st_SetElColorTextFromBack(c, i_el);
+					}
+					*/
+				}
 
-function st_SetElFinish(i_status, i_elFinish, i_full)
-{
-	if (i_full == null)
-		i_full = true;
-	var text = '';
-	var shadow = '';
-	var alpha = 0;
-	if (i_status && i_status.finish)
-	{
-		var days = c_DT_DaysLeft(i_status.finish);
-		var alpha = 1 / (1 + days);
-		days = Math.round(days * 10) / 10;
-		if (alpha < 0)
-			alpha = 0;
-		if (alpha > 1)
-			alpha = 1;
-		if (days <= 1)
-			alpha = 1;
-		if (i_full)
-		{
-			text += 'Finish at: ';
-			text += c_DT_StrFromSec(i_status.finish).substr(0, 15);
-			text += ' (' + days + ' days left)';
-		}
-		else
-			text += days + 'days';
-	}
-	shadow = '0 0 2px rgba(255,0,0,' + alpha + '),';
-	shadow += '0 0 4px rgba(255,0,0,' + alpha + ')';
-	i_elFinish.style.textShadow = shadow;
-	i_elFinish.style.color = 'rgb(' + Math.round(150 * alpha) + ',0,0)';
-	i_elFinish.textContent = text;
-}
+				function st_SetElFinish(i_status, i_elFinish, i_full) {
+					if (i_full == null)
+						i_full = true;
+					var text = '';
+					var shadow = '';
+					var alpha = 0;
+					if (i_status && i_status.finish)
+					{
+						var days = c_DT_DaysLeft(i_status.finish);
+						var alpha = 1 / (1 + days);
+						days = Math.round(days * 10) / 10;
+						if (alpha < 0)
+							alpha = 0;
+						if (alpha > 1)
+							alpha = 1;
+						if (days <= 1)
+							alpha = 1;
+						if (i_full)
+						{
+							text += 'Finish at: ';
+							text += c_DT_StrFromSec(i_status.finish).substr(0, 15);
+							text += ' (' + days + ' days left)';
+						}
+						else
+							text += days + 'days';
+					}
+					shadow = '0 0 2px rgba(255,0,0,' + alpha + '),';
+					shadow += '0 0 4px rgba(255,0,0,' + alpha + ')';
+					i_elFinish.style.textShadow = shadow;
+					i_elFinish.style.color = 'rgb(' + Math.round(150 * alpha) + ',0,0)';
+					i_elFinish.textContent = text;
+				}
 
-Status.prototype.reloadFile = function(i_edit = false)
-{
+				Status.prototype.reloadFile =
+					function(i_edit = false) {
 	n_GetFile({
-		"path": c_GetRuFilePath('status.json', this.path),
-		"func": st_StatusReceived,
-		"status_object": this,
-		"edit": i_edit,
-		"info": 'status',
-		"parse": true,
-		"local": true,
-		"cache_time":-1
+		'path': c_GetRuFilePath('status.json', this.path),
+		'func': st_StatusReceived,
+		'status_object': this,
+		'edit': i_edit,
+		'info': 'status',
+		'parse': true,
+		'local': true,
+		'cache_time': -1
 	});
 }
 
-function st_StatusReceived(i_data, i_args)
-{
-	if (i_args.edit)
-		i_args.status_object.updateOrEdit(i_data.status);
-	else
-		i_args.status_object.update(i_data.status);
-}
+					function st_StatusReceived(i_data, i_args) {
+						if (i_args.edit)
+							i_args.status_object.updateOrEdit(i_data.status);
+						else
+							i_args.status_object.update(i_data.status);
+					}
 
-Status.prototype.updateOrEdit = function(i_status)
-{
+					Status.prototype.updateOrEdit =
+						function(i_status) {
 	if (i_status && i_status.mtime && (i_status.mtime > this.obj.mtime))
 		this.update(i_status);
 	else
 		this.edit();
 }
 
-Status.prototype.edit = function(i_args) {
+						Status.prototype.edit = function(i_args) {
 	// console.log( JSON.stringify( i_args));
 	// console.log(JSON.stringify(i_status));
 	if (g_auth_user == null)
@@ -1018,9 +970,13 @@ Status.prototype.edit = function(i_args) {
 	this.elEdit = document.createElement('div');
 	this.elParent.appendChild(this.elEdit);
 	this.elEdit.classList.add('status_edit');
-	this.elEdit.onclick = function(e) { e.stopPropagation(); };
+	this.elEdit.onclick = function(e) {
+		e.stopPropagation();
+	};
 	this.elEdit.m_status = this;
-	this.elEdit.onkeydown = function(e) { e.currentTarget.m_status.editOnKeyDown(e, i_args); };
+	this.elEdit.onkeydown = function(e) {
+		e.currentTarget.m_status.editOnKeyDown(e, i_args);
+	};
 
 	var elBtns = document.createElement('div');
 	this.elEdit.appendChild(elBtns);
@@ -1031,7 +987,9 @@ Status.prototype.edit = function(i_args) {
 	elBtnCancel.classList.add('button');
 	elBtnCancel.textContent = 'Cancel';
 	elBtnCancel.m_status = this;
-	elBtnCancel.onclick = function(e) { e.currentTarget.m_status.show(); };
+	elBtnCancel.onclick = function(e) {
+		e.currentTarget.m_status.show();
+	};
 
 	var elBtnSave = document.createElement('div');
 	elBtns.appendChild(elBtnSave);
@@ -1039,7 +997,9 @@ Status.prototype.edit = function(i_args) {
 	elBtnSave.textContent = 'Save';
 	elBtnSave.m_status = this;
 	elBtnSave.m_args = i_args;
-	elBtnSave.onclick = function(e) { e.currentTarget.m_status.editProcess(i_args); };
+	elBtnSave.onclick = function(e) {
+		e.currentTarget.m_status.editProcess(i_args);
+	};
 
 	var elDiv = document.createElement('div');
 	this.elEdit.appendChild(elDiv);
@@ -1052,7 +1012,9 @@ Status.prototype.edit = function(i_args) {
 	elFinishDiv.appendChild(elFinishLabel);
 	elFinishLabel.classList.add('label');
 	elFinishLabel.textContent = 'Fin:';
-	elFinishLabel.onclick = function(e) { e.currentTarget.m_elEdit_finish.textContent = c_DT_FormStrNow(); };
+	elFinishLabel.onclick = function(e) {
+		e.currentTarget.m_elEdit_finish.textContent = c_DT_FormStrNow();
+	};
 	elFinishLabel.title = 'Click to set current date.';
 	this.elEdit_finish = document.createElement('div');
 	elFinishDiv.appendChild(this.elEdit_finish);
@@ -1121,7 +1083,7 @@ Status.prototype.edit = function(i_args) {
 				{
 					let id = i_args.statuses[s].obj.artists[a];
 					if (artists[id] == null)
-						artists[id] = {"half_selected": true};
+						artists[id] = {'half_selected': true};
 				}
 			}
 			else
@@ -1136,10 +1098,9 @@ Status.prototype.edit = function(i_args) {
 
 				for (let a = 0; a < i_args.statuses[s].obj.flags.length; a++)
 				{
-
 					let id = i_args.statuses[s].obj.flags[a];
 					if (flags[id] == null)
-						flags[id] = {"half_selected": true};
+						flags[id] = {'half_selected': true};
 				}
 			}
 			else
@@ -1156,7 +1117,7 @@ Status.prototype.edit = function(i_args) {
 				{
 					let id = i_args.statuses[s].obj.tags[a];
 					if (tags[id] == null)
-						tags[id] = {"half_selected": true};
+						tags[id] = {'half_selected': true};
 				}
 			}
 			else
@@ -1166,22 +1127,27 @@ Status.prototype.edit = function(i_args) {
 
 	if (c_CanAssignArtists())
 		this.editAtrists = new EditList({
-			"name": 'artists',
-			"label": 'Artists:',
-			"list": artists,
-			"list_all": g_users,
-			"elParent": this.elEdit
+			'name': 'artists',
+			'label': 'Artists:',
+			'list': artists,
+			'list_all': g_users,
+			'elParent': this.elEdit
 		});
 
-	this.editFlags = new EditList(
-		{"name": 'flags', "label": 'Flags:', "list": flags, "list_all": RULES.flags, "elParent": this.elEdit});
+	this.editFlags = new EditList({
+		'name': 'flags',
+		'label': 'Flags:',
+		'list': flags,
+		'list_all': RULES.flags,
+		'elParent': this.elEdit
+	});
 	this.editTags = new EditList(
-		{"name": 'tags', "label": 'Tags:', "list": tags, "list_all": RULES.tags, "elParent": this.elEdit});
+		{'name': 'tags', 'label': 'Tags:', 'list': tags, 'list_all': RULES.tags, 'elParent': this.elEdit});
 
 	this.elEdit_Color = document.createElement('div');
 	this.elEdit.appendChild(this.elEdit_Color);
 	this.elEdit_Color.classList.add('color');
-	u_DrawColorBars({"el": this.elEdit_Color, "onclick": st_EditColorOnClick, "data": this});
+	u_DrawColorBars({'el': this.elEdit_Color, 'onclick': st_EditColorOnClick, 'data': this});
 
 
 	if (g_admin)
@@ -1244,7 +1210,7 @@ function st_EditColorOnClick(i_clr, i_data)
 {
 	i_data.elEdit_Color.m_color = i_clr;
 	i_data.elEdit_Color.m_color_changed = true;
-	st_SetElColor({"color": i_clr}, i_data.elColor);
+	st_SetElColor({'color': i_clr}, i_data.elColor);
 }
 Status.prototype.getMultiVale = function(i_key, i_statuses) {
 	if (i_statuses.indexOf(this) == -1)
@@ -1254,7 +1220,7 @@ Status.prototype.getMultiVale = function(i_key, i_statuses) {
 	if ((i_statuses.length == 1) && (i_statuses[0] == this))
 		return value;
 
-	if (value == "" || ((typeof value) == 'undefined'))
+	if (value == '' || ((typeof value) == 'undefined'))
 		value = null;
 
 	for (let i = 0; i < i_statuses.length; i++)
@@ -1263,7 +1229,7 @@ Status.prototype.getMultiVale = function(i_key, i_statuses) {
 		if ((i_statuses[i].obj) && (i_statuses[i].obj[i_key]))
 			other = i_statuses[i].obj[i_key];
 
-		if (other == "" || ((typeof other) == 'undefined'))
+		if (other == '' || ((typeof other) == 'undefined'))
 			other = null;
 
 		if (value != other)
@@ -1359,52 +1325,57 @@ Status.prototype.editProcess = function(i_args) {
 			statuses.push(this);
 	}
 
-	if (1)//document.location.hostname == 'localhost')
+	if (1)	// document.location.hostname == 'localhost')
 	{
-	let obj = {};
+		let obj = {};
 
-	obj.paths = [];
-	for (let st of statuses)
-		obj.paths.push(st.path);
+		obj.paths = [];
+		for (let st of statuses)
+			obj.paths.push(st.path);
 
-	if (annotation !== null)
-		obj.annotation = annotation;
-	if (adinfo !== null)
-		obj.adinfo = adinfo;
-	if (finish !== null)
-		obj.finish = finish;
-	if (progress !== null)
-		obj.progress = progress;
+		if (annotation !== null)
+			obj.annotation = annotation;
+		if (adinfo !== null)
+			obj.adinfo = adinfo;
+		if (finish !== null)
+			obj.finish = finish;
+		if (progress !== null)
+			obj.progress = progress;
 
-	if (this.editAtrists)
-	{
-		obj.artists = this.editAtrists.getSelectedNames();
-		obj.artists_keep = this.editAtrists.getHalfSelectedNames();
-	}
-	if (this.editFlags)
-	{
-		obj.flags = this.editFlags.getSelectedNames();
-		obj.flags_keep = this.editFlags.getHalfSelectedNames();
-	}
-	if (this.editTags)
-	{
-		obj.tags = this.editTags.getSelectedNames();
-		obj.tags_keep = this.editTags.getHalfSelectedNames();
-	}
+		if (this.editAtrists)
+		{
+			obj.artists = this.editAtrists.getSelectedNames();
+			obj.artists_keep = this.editAtrists.getHalfSelectedNames();
+		}
+		if (this.editFlags)
+		{
+			obj.flags = this.editFlags.getSelectedNames();
+			obj.flags_keep = this.editFlags.getHalfSelectedNames();
+		}
+		if (this.editTags)
+		{
+			obj.tags = this.editTags.getSelectedNames();
+			obj.tags_keep = this.editTags.getHalfSelectedNames();
+		}
 
-	if (this.elEdit_Color.m_color_changed)
-	{
-		obj.color = this.elEdit_Color.m_color;
-		if (obj.color == null)
-			obj.color = [];
-	}
+		if (this.elEdit_Color.m_color_changed)
+		{
+			obj.color = this.elEdit_Color.m_color;
+			if (obj.color == null)
+				obj.color = [];
+		}
 
-	if (nw_disabled)
-		obj.nonews = true;
+		if (nw_disabled)
+			obj.nonews = true;
 
-	n_Request({'send':{'setstatus':obj},'func':st_StatusesSaved,'info':'status.setStatuses','wait':false});
-	//console.log(JSON.stringify(obj));
-	return
+		n_Request({
+			'send': {'setstatus': obj},
+			'func': st_StatusesSaved,
+			'info': 'status.setStatuses',
+			'wait': false
+		});
+		// console.log(JSON.stringify(obj));
+		return
 	}
 
 	// Set values to statuses
@@ -1495,27 +1466,27 @@ Status.prototype.editProcess = function(i_args) {
 					task.progress = -1;
 					task.changed = true;
 				}
-/*
-		// Shot "super" flags resets tasks flags
-		if (statuses[i].obj.flags && statuses[i].obj.flags.length)
-			for (let f of statuses[i].obj.flags)
-				if (f && RULES.flags[f] && statuses[i].obj.tasks && RULES.flags[f].mode && (RULES.flags[f].mode == "super"))
-					for (let t in statuses[i].obj.tasks)
-					{
-						let task = statuses[i].obj.tasks[t];
+		/*
+				// Shot "super" flags resets tasks flags
+				if (statuses[i].obj.flags && statuses[i].obj.flags.length)
+					for (let f of statuses[i].obj.flags)
+						if (f && RULES.flags[f] && statuses[i].obj.tasks && RULES.flags[f].mode &&
+		   (RULES.flags[f].mode == "super")) for (let t in statuses[i].obj.tasks)
+							{
+								let task = statuses[i].obj.tasks[t];
 
-						// Skip done tasks
-						if (task.progress && (task.progress == 100))
-							continue;
+								// Skip done tasks
+								if (task.progress && (task.progress == 100))
+									continue;
 
-						if (task.flags &&
-							task.flags.length)
-						{
-							task.flags = [];
-							task.changed = true;
-						}
-					}
-*/
+								if (task.flags &&
+									task.flags.length)
+								{
+									task.flags = [];
+									task.changed = true;
+								}
+							}
+		*/
 		// If progress was changed we should update upper progress:
 		if (_progress != statuses[i].obj.progress)
 		{
@@ -1600,11 +1571,11 @@ function st_Save(i_status, i_path, i_func, i_args, i_navig_params_update)
 	n_walks[i_path] = null;
 
 	var obj = {};
-	obj.object = {"status": i_status};
+	obj.object = {'status': i_status};
 	obj.add = true;
 	obj.file = c_GetRuFilePath('status.json', i_path);
 	n_Request(
-		{"send": {"editobj": obj}, "func": i_func, "args": i_args, "wait": false, 'info': 'status save'});
+		{'send': {'editobj': obj}, 'func': i_func, 'args': i_args, 'wait': false, 'info': 'status save'});
 }
 
 function st_SaveFinished(i_data)
@@ -1612,7 +1583,7 @@ function st_SaveFinished(i_data)
 	if (i_data.info)
 		c_Info(i_data.info);
 
-	if(i_data.error)
+	if (i_data.error)
 	{
 		c_Error(i_data.error);
 		return;
@@ -1641,14 +1612,17 @@ function st_StatusesSaved(i_data)
 
 			// Update navigation folders
 			let el = g_elFolders[sdata.path];
-			if (el == null) continue;
+			if (el == null)
+				continue;
 
 			let fstat = el.m_fobject.status;
 			if (fstat)
 			{
 				// Update only if status time > folder status time
-				if (fstat.ctime && (fstat.ctime >= sdata.status.time)) continue;
-				if (fstat.mtime && (fstat.mtime >= sdata.status.time)) continue;
+				if (fstat.ctime && (fstat.ctime >= sdata.status.time))
+					continue;
+				if (fstat.mtime && (fstat.mtime >= sdata.status.time))
+					continue;
 			}
 
 			// Update folder status:
@@ -1666,7 +1640,7 @@ function st_StatusesSaved(i_data)
 	if (i_data.users_subscribed && (i_data.users_subscribed.indexOf(g_auth_user.id) != -1))
 	{
 		nw_NewsLoad();
-		nw_RecentLoad({"file_check": false});
+		nw_RecentLoad({'file_check': false});
 	}
 
 	// Get bookmarks:
@@ -1680,7 +1654,8 @@ function st_StatusesSaved(i_data)
 		let info = 'Subscribed users: ';
 		for (let i = 0; i < i_data.users_subscribed.length; i++)
 		{
-			if (i) info += ', ';
+			if (i)
+				info += ', ';
 			info += c_GetUserTitle(i_data.users_subscribed[i]);
 		}
 		c_Info(info);
@@ -1692,7 +1667,7 @@ function st_StatusesSaved(i_data)
 	{
 		for (let path in progresses)
 		{
-			g_FolderSetStatusPath({'progress':progresses[path]}, path, {'progress':true});
+			g_FolderSetStatusPath({'progress': progresses[path]}, path, {'progress': true});
 		}
 	}
 }
@@ -1855,13 +1830,13 @@ function st_UpdateProgresses(i_path, i_progresses)
 	// console.log( paths);
 	// console.log(JSON.stringify(i_progresses));
 	n_WalkDir({
-		"paths": paths,
-		"wfunc": st_UpdateProgressesWalkReceived,
-		"progresses": progresses,
-		"paths_skip_save": paths_skip_save,
-		"info": 'walk up statuses',
-		"rufiles": ['status'],
-		"lookahead": ['status']
+		'paths': paths,
+		'wfunc': st_UpdateProgressesWalkReceived,
+		'progresses': progresses,
+		'paths_skip_save': paths_skip_save,
+		'info': 'walk up statuses',
+		'rufiles': ['status'],
+		'lookahead': ['status']
 	});
 }
 function st_UpdateProgressesWalkReceived(i_walks, i_args)
@@ -1922,7 +1897,7 @@ function st_UpdateProgressesWalkReceived(i_walks, i_args)
 						continue;
 
 					// Save only progress:
-					st_Save({"progress": 0}, path, null, null, navig_params_update);
+					st_Save({'progress': 0}, path, null, null, navig_params_update);
 				}
 				else
 					cur_progress = folder.status.progress;
@@ -1965,7 +1940,7 @@ function st_UpdateProgressesWalkReceived(i_walks, i_args)
 		if (i_args.paths_skip_save.indexOf(path) != -1)
 			continue;
 
-		st_Save({"progress": progresses[path]}, path, /*func=*/null, /*args=*/null, navig_params_update);
+		st_Save({'progress': progresses[path]}, path, /*func=*/ null, /*args=*/ null, navig_params_update);
 		// console.log(path);
 	}
 }

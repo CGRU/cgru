@@ -14,7 +14,7 @@
 	farm.js - farm related methods for Pools and Renderers
 */
 
-"use strict";
+'use strict';
 
 function farm_showServices(i_el, i_params, i_type)
 {
@@ -151,16 +151,14 @@ function farm_showServicesInfo(i_node)
 					if (disabled)
 					{
 						elIcon.ondblclick = function(i_evt) {
-							i_node.serviceApply(srv,'service_enable');
-						}
-						title += '\nDouble click icon to enable it.';
+							i_node.serviceApply(srv, 'service_enable');
+						} title += '\nDouble click icon to enable it.';
 					}
 					else
 					{
 						elIcon.ondblclick = function(i_evt) {
-							i_node.serviceApply(srv,'service_disable');
-						}
-						title = '\nDouble click icon to disable it.';
+							i_node.serviceApply(srv, 'service_disable');
+						} title = '\nDouble click icon to disable it.';
 					}
 				}
 			}
@@ -173,7 +171,7 @@ function farm_showServicesInfo(i_node)
 				elBtn.classList.add('delete');
 				elBtn.title = 'Double click to remove service.';
 				elBtn.ondblclick = function(i_evt) {
-					i_node.serviceApply(srv,'service_remove');
+					i_node.serviceApply(srv, 'service_remove');
 				}
 			}
 
@@ -224,7 +222,7 @@ function farm_showServicesInfo(i_node)
 				elBtn.classList.add('delete');
 				elBtn.title = 'Double click to remove service.';
 				elBtn.ondblclick = function(i_evt) {
-					i_node.serviceApply(srv,'service_enable');
+					i_node.serviceApply(srv, 'service_enable');
 				}
 			}
 
@@ -271,7 +269,7 @@ function farm_showTickets(i_el, i_tickets, i_type, i_node)
 			elTk.classList.add('running');
 		if (usage >= count)
 			elTk.classList.add('limit_reached')
-		if ((max_hosts != null) && (max_hosts != -1) && (hosts >= max_hosts))
+			if ((max_hosts != null) && (max_hosts != -1) && (hosts >= max_hosts))
 			elTk.classList.add('limit_reached');
 
 		let label = '';
@@ -284,11 +282,14 @@ function farm_showTickets(i_el, i_tickets, i_type, i_node)
 		else
 			label = tk;
 
-		if (count >= 0) label += ' x' + count;
-		if (usage >  0) label += ': ' + usage;
-		if (hosts     ) label += '/'  + hosts;
+		if (count >= 0)
+			label += ' x' + count;
+		if (usage > 0)
+			label += ': ' + usage;
+		if (hosts)
+			label += '/' + hosts;
 		if ((max_hosts != null) && (max_hosts != -1))
-			label += '/'  + max_hosts;
+			label += '/' + max_hosts;
 
 		let elLabel = document.createElement('div');
 		elTk.appendChild(elLabel);
@@ -341,9 +342,12 @@ function farm_showTicketsInfo(i_node, i_type)
 		}
 
 		let label = tk + ':';
-		if (count !=-1) label += ' count:' + count;
-		if (usage  > 0) label += ' usage:' + usage;
-		if (hosts     ) label += ' hosts:' + hosts;
+		if (count != -1)
+			label += ' count:' + count;
+		if (usage > 0)
+			label += ' usage:' + usage;
+		if (hosts)
+			label += ' hosts:' + hosts;
 		if ((max_hosts != null) && (max_hosts != -1))
 			label += ' max:' + max_hosts;
 
@@ -357,7 +361,7 @@ function farm_showTicketsInfo(i_node, i_type)
 		elTk.m_max_hosts = max_hosts;
 		elTk.m_type = i_type;
 		elTk.m_node = i_node;
-		elTk.ondblclick = function(e){
+		elTk.ondblclick = function(e) {
 			var el = e.currentTarget;
 			farm_ticketEditDialog(el.m_name, el.m_count, el.m_max_hosts, el.m_type, el.m_node);
 		}
@@ -409,7 +413,8 @@ function farm_ticketEditDialog2(i_value, i_param)
 		args.value = -1;
 	args.name = 'ticket_edit';
 	args.title = 'Edit Ticket';
-	args.info = 'Enter  "' + i_param.name + '" ' + i_param.type + ' ticket max hosts:<br>Type -1 to disable limit.';
+	args.info =
+		'Enter  "' + i_param.name + '" ' + i_param.type + ' ticket max hosts:<br>Type -1 to disable limit.';
 
 	new cgru_Dialog(args);
 }

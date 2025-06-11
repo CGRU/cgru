@@ -14,7 +14,7 @@
 	news.js - TODO: description
 */
 
-"use strict";
+'use strict';
 
 var nw_recent_file = 'recent.json';
 var nw_initialized = false;
@@ -161,7 +161,9 @@ function nw_UpdateChannels()
 		elBtn.classList.add('button');
 		elBtn.classList.add('delete');
 		elBtn.m_path = path;
-		elBtn.ondblclick = function(e) { nw_Unsubscribe(e.currentTarget.m_path); };
+		elBtn.ondblclick = function(e) {
+			nw_Unsubscribe(e.currentTarget.m_path);
+		};
 		elBtn.title = 'Double click to remove channel';
 
 		var elLink = document.createElement('a');
@@ -247,7 +249,7 @@ function nw_Subscribe(i_path)
 	obj.add = true;
 	obj.file = ad_GetUserFileName();
 
-	n_Request({"send": {"editobj": obj}, "func": nw_SubscribeFinished, 'path': i_path});
+	n_Request({'send': {'editobj': obj}, 'func': nw_SubscribeFinished, 'path': i_path});
 }
 
 function nw_SubscribeFinished(i_data, i_args)
@@ -273,12 +275,12 @@ function nw_Unsubscribe(i_path)
 
 	var obj = {};
 
-	obj.objects = [{"id": i_path}];
+	obj.objects = [{'id': i_path}];
 	obj.delarray = 'channels';
 	obj.id = g_auth_user.id;
 	obj.file = ad_GetUserFileName();
 
-	n_Request({"send": {"editobj": obj}, "func": nw_UnsubscribeFinished, 'path': i_path});
+	n_Request({'send': {'editobj': obj}, 'func': nw_UnsubscribeFinished, 'path': i_path});
 }
 
 function nw_UnsubscribeFinished(i_data, i_args)
@@ -337,16 +339,16 @@ function nw_MakeNewsDialog()
 	if (g_auth_user == null)
 		return;
 	new cgru_Dialog({
-		"handle": 'nw_MakeNewsDialogApply',
-		"name": 'news',
-		"title": 'Create News',
-		"info": 'Enter News Title'
+		'handle': 'nw_MakeNewsDialogApply',
+		'name': 'news',
+		'title': 'Create News',
+		'info': 'Enter News Title'
 	});
 }
 
 function nw_MakeNewsDialogApply(i_title)
 {
-	nw_MakeNews({"title": i_title});
+	nw_MakeNews({'title': i_title});
 }
 
 function nw_MakeNews(i_news, i_args)
@@ -375,8 +377,7 @@ function nw_StatusesChanged(i_statuses)
 	{
 		let st = nw_FilterStatus(i_statuses[i].obj);
 
-		let request = nw_CreateNews(
-			{'title':'status','path':i_statuses[i].path,'status':st});
+		let request = nw_CreateNews({'title': 'status', 'path': i_statuses[i].path, 'status': st});
 		if (request)
 			news.push(request);
 
@@ -430,24 +431,24 @@ function nw_CreateNews(i_news)
 	// If news status is not set, we get the current:
 	if (news.status == null)
 		news.status = RULES.status;
-/*
-	var email_subject = c_GetUserTitle(news.user) + ' - ' + news.title;
-	var email_body = '<a href="';
-	email_body += document.location.protocol + '//' + document.location.host + document.location.pathname;
-	if (news.link)
-		email_body += news.link;
-	else
-		email_body += '#' + news.path;
-	email_body += '">' + news.path + '</a>';
+	/*
+		var email_subject = c_GetUserTitle(news.user) + ' - ' + news.title;
+		var email_body = '<a href="';
+		email_body += document.location.protocol + '//' + document.location.host + document.location.pathname;
+		if (news.link)
+			email_body += news.link;
+		else
+			email_body += '#' + news.path;
+		email_body += '">' + news.path + '</a>';
 
-	var request = {};
-	request.news = news;
-	request.email_from_title = c_EmailFromTitle();
-	request.email_subject = email_subject;
-	request.email_body = email_body;
+		var request = {};
+		request.news = news;
+		request.email_from_title = c_EmailFromTitle();
+		request.email_subject = email_subject;
+		request.email_body = email_body;
 
-	return request;
-*/
+		return request;
+	*/
 	return news;
 }
 
@@ -494,7 +495,7 @@ function nw_MakeNewsFinished(i_data, i_args)
 	if (p_PLAYER != true)
 	{
 		nw_NewsLoad();
-		nw_RecentLoad({"file_check": false});
+		nw_RecentLoad({'file_check': false});
 	}
 
 	if ((i_data.users_subscribed == null) || (i_data.users_subscribed.length == 0))
@@ -506,7 +507,8 @@ function nw_MakeNewsFinished(i_data, i_args)
 	let info = 'Subscribed users: ';
 	for (let i = 0; i < i_data.users_subscribed.length; i++)
 	{
-		if (i) info += ', ';
+		if (i)
+			info += ', ';
 		info += c_GetUserTitle(i_data.users_subscribed[i]);
 	}
 	c_Info(info);
@@ -583,8 +585,10 @@ function nw_NewsReceived(i_data)
 	for (let i = 0; i < g_auth_user.news.length; i++)
 	{
 		let news = g_auth_user.news[i];
-		if (news.path != g_CurPath()) continue;
-		if (news.status == null) continue;
+		if (news.path != g_CurPath())
+			continue;
+		if (news.status == null)
+			continue;
 
 		if (RULES.status && RULES.status.mtime && (RULES.status.mtime >= news.status.mtime))
 			continue;
@@ -637,7 +641,10 @@ function nw_NewsShow(i_update_folders)
 		el.classList.add('news');
 		el.m_news = news;
 		el.title = c_DT_StrFromSec(news.time);
-		el.onclick = function(e) { if (e.shiftKey) nw_ToggleSelected(e.currentTarget);};
+		el.onclick = function(e) {
+			if (e.shiftKey)
+				nw_ToggleSelected(e.currentTarget);
+		};
 
 		// Highlight news if artists is assigned,
 		// but only if artists has no subscribed channels
@@ -656,7 +663,9 @@ function nw_NewsShow(i_update_folders)
 			elAvatar.title =
 				c_GetUserTitle(news.user, news.guest) + '\nDouble click to delete all news from this user.';
 			elAvatar.m_news = news;
-			elAvatar.ondblclick = function(e) { nw_DeleteNewsUser(e.currentTarget.m_news); };
+			elAvatar.ondblclick = function(e) {
+				nw_DeleteNewsUser(e.currentTarget.m_news);
+			};
 		}
 
 
@@ -665,7 +674,9 @@ function nw_NewsShow(i_update_folders)
 		elBtn.classList.add('button');
 		elBtn.classList.add('delete');
 		elBtn.m_el = el;
-		elBtn.ondblclick = function(e) {nw_DeleteNewsOnDblclick(e.currentTarget.m_el);};
+		elBtn.ondblclick = function(e) {
+			nw_DeleteNewsOnDblclick(e.currentTarget.m_el);
+		};
 		elBtn.title = 'Double click to remove link';
 
 		let elLabel = document.createElement('div');
@@ -684,7 +695,9 @@ function nw_NewsShow(i_update_folders)
 		else
 			elLink.href = '#' + news.path;
 		elLink.textContent = news.path;
-		elLink.onclick = function(e){nw_clicked = true;};
+		elLink.onclick = function(e) {
+			nw_clicked = true;
+		};
 
 		// Display news status:
 		st_SetElStatus(el, news.status, c_IsUserSubsribedOnPath(news.path));
@@ -703,7 +716,9 @@ function nw_NewsShow(i_update_folders)
 		el.classList.add('button');
 		el.classList.add('nw_fb');
 		el.textContent = projects[i];
-		el.onclick = function(e) {nw_FilterBtn(e.currentTarget, e.currentTarget.textContent, true);};
+		el.onclick = function(e) {
+			nw_FilterBtn(e.currentTarget, e.currentTarget.textContent, true);
+		};
 
 		el.m_filter = projects[i];
 		el.m_project = true;
@@ -718,22 +733,29 @@ function nw_NewsShow(i_update_folders)
 		for (let i = 0; i < g_auth_user.news.length; i++)
 		{
 			let news = g_auth_user.news[i];
-			if (news.status == null) continue;
-			if (news.time == null) continue;
+			if (news.status == null)
+				continue;
+			if (news.time == null)
+				continue;
 
 			// Update status only when news title is status.
 			// There is no need to update status on body, comments change.
-			if (news.title != 'status') continue;
+			if (news.title != 'status')
+				continue;
 
 			let el = g_elFolders[news.path];
-			if (el == null) continue;
+			if (el == null)
+				continue;
 
 			let fstat = el.m_fobject.status;
-			if (fstat == null) continue;
+			if (fstat == null)
+				continue;
 
 			// Update only if news time > folder status time
-			if (fstat.ctime && (fstat.ctime >= news.time)) continue;
-			if (fstat.mtime && (fstat.mtime >= news.time)) continue;
+			if (fstat.ctime && (fstat.ctime >= news.time))
+				continue;
+			if (fstat.mtime && (fstat.mtime >= news.time))
+				continue;
 
 			// Update folder status:
 			g_FolderSetStatus(news.status, el);
@@ -780,11 +802,11 @@ function nw_ToggleSelected(i_el)
 	if (nw_elSelectedLast && (i_el != nw_elSelectedLast))
 	{
 		let index_last = nw_elArray.indexOf(nw_elSelectedLast);
-		let index_cur  = nw_elArray.indexOf(i_el);
+		let index_cur = nw_elArray.indexOf(i_el);
 		let dir = 1;
 		let i = index_last
 		if (i > index_cur)
-			dir = -1;
+		dir = -1;
 		i += dir;
 		while (i != index_cur)
 		{
@@ -876,7 +898,8 @@ function nw_Filter()
 	for (var i = 0; i < nw_elArray.length; i++)
 	{
 		if ((filter === null) || (project && (nw_elArray[i].m_news.path.indexOf(filter) == 1)) ||
-			(nw_elArray[i].m_news.title == filter) || (by_me && (g_auth_user.id == nw_elArray[i].m_news.user)) ||
+			(nw_elArray[i].m_news.title == filter) ||
+			(by_me && (g_auth_user.id == nw_elArray[i].m_news.user)) ||
 			(assigned && (nw_elArray[i].classList.contains('assigned'))))
 		{
 			nw_elArray[i].style.display = 'block';
@@ -924,10 +947,18 @@ function nw_DeleteNewsUser(i_news)
 
 /* ---------------- [ Filters functions ] ----------------------------------------------------------------- */
 var nw_filters = {};
-nw_filters.tags_include  = {"label": 'Tags IN'};
-nw_filters.tags_exclude  = {"label": 'Tags EX'};
-nw_filters.flags_include = {"label":'Flags IN'};
-nw_filters.flags_exclude = {"label":'Flags EX'};
+nw_filters.tags_include = {
+	'label': 'Tags IN'
+};
+nw_filters.tags_exclude = {
+	'label': 'Tags EX'
+};
+nw_filters.flags_include = {
+	'label': 'Flags IN'
+};
+nw_filters.flags_exclude = {
+	'label': 'Flags EX'
+};
 function nw_FiltersConstruct()
 {
 	for (let filter in nw_filters)
@@ -960,9 +991,11 @@ function NewsFilterClass(i_name)
 
 	this.elBtnEdit = document.createElement('div');
 	this.elShow.appendChild(this.elBtnEdit);
-	this.elBtnEdit.classList.add('button','edit');
+	this.elBtnEdit.classList.add('button', 'edit');
 	this.elBtnEdit.m_class = this;
-	this.elBtnEdit.onclick = function(e){e.currentTarget.m_class.edit()};
+	this.elBtnEdit.onclick = function(e) {
+		e.currentTarget.m_class.edit()
+	};
 
 	this.elList = document.createElement('div');
 	this.elShow.appendChild(this.elList);
@@ -971,24 +1004,24 @@ function NewsFilterClass(i_name)
 	nw_filters[this.name].fClass = this;
 }
 
-NewsFilterClass.prototype.update = function()
-{
+NewsFilterClass.prototype.update =
+	function() {
 	this.items = [];
 
 	if (g_auth_user && g_auth_user.news_filter && g_auth_user.news_filter[this.name])
 	{
 		this.items = g_auth_user.news_filter[this.name];
 		if (this.type == 'tags')
-			st_SetElTags({"tags":this.items}, this.elList,/*short = */false,/*clickable = */false);
+			st_SetElTags({'tags': this.items}, this.elList, /*short = */ false, /*clickable = */ false);
 		else
-			st_SetElFlags({"flags":this.items}, this.elList,/*short = */false,/*clickable = */false);
+			st_SetElFlags({'flags': this.items}, this.elList, /*short = */ false, /*clickable = */ false);
 	}
 
 	this.elShow.style.display = 'block';
 }
 
-NewsFilterClass.prototype.edit = function()
-{
+	NewsFilterClass.prototype.edit =
+		function() {
 	this.elShow.style.display = 'none';
 
 	this.elEdit = document.createElement('div');
@@ -997,35 +1030,40 @@ NewsFilterClass.prototype.edit = function()
 
 	this.elBtnCancel = document.createElement('div');
 	this.elEdit.appendChild(this.elBtnCancel);
-	this.elBtnCancel.classList.add('button','save');
+	this.elBtnCancel.classList.add('button', 'save');
 	this.elBtnCancel.textContent = 'Cancel';
 	this.elBtnCancel.m_class = this;
-	this.elBtnCancel.onclick = function(e){e.currentTarget.m_class.cancel()};
+	this.elBtnCancel.onclick = function(e) {
+		e.currentTarget.m_class.cancel()
+	};
 
 	this.elBtnSave = document.createElement('div');
 	this.elEdit.appendChild(this.elBtnSave);
-	this.elBtnSave.classList.add('button','save');
+	this.elBtnSave.classList.add('button', 'save');
 	this.elBtnSave.textContent = 'Save';
 	this.elBtnSave.m_class = this;
-	this.elBtnSave.onclick = function(e){e.currentTarget.m_class.save()};
+	this.elBtnSave.onclick = function(e) {
+		e.currentTarget.m_class.save()
+	};
 
 	this.editList = new EditList({
-			"name"    : this.type,
-			"label"   : this.label,
-			"list"    : this.items,
-			"list_all": RULES[this.type],
-			"elParent": this.elEdit});
+		'name': this.type,
+		'label': this.label,
+		'list': this.items,
+		'list_all': RULES[this.type],
+		'elParent': this.elEdit
+	});
 }
 
-NewsFilterClass.prototype.cancel = function()
-{
+		NewsFilterClass.prototype.cancel =
+			function() {
 	this.elEdit.textContent = '';
 	this.elRoot.removeChild(this.elEdit);
 	this.elShow.style.display = 'block';
 }
 
-NewsFilterClass.prototype.save = function()
-{
+			NewsFilterClass.prototype.save =
+				function() {
 	let items = this.editList.getSelectedNames();
 
 	let obj = {};
@@ -1035,14 +1073,13 @@ NewsFilterClass.prototype.save = function()
 	obj.add = true;
 	obj.file = ad_GetUserFileName();
 
-	n_Request({"send": {"editobj": obj}, "func": nw_FilterEditFinished});
+	n_Request({'send': {'editobj': obj}, 'func': nw_FilterEditFinished});
 
 	this.elEdit.textContent = '';
 	this.elRoot.removeChild(this.elEdit);
 }
 
-function nw_FilterEditFinished(i_data, i_args)
-{
+function nw_FilterEditFinished(i_data, i_args) {
 	if ((i_data == null) || (i_data.error))
 	{
 		c_Error(i_data.error);
@@ -1056,8 +1093,7 @@ function nw_FilterEditFinished(i_data, i_args)
 
 /* ---------------- [ Delete functions ] ----------------------------------------------------------------- */
 
-function nw_DeleteNews(i_ids)
-{
+function nw_DeleteNews(i_ids) {
 	// Delete all new if ids is not specified:
 	if (i_ids == null)
 	{
@@ -1077,15 +1113,14 @@ function nw_DeleteNews(i_ids)
 	var obj = {};
 	obj.objects = [];
 	for (var i = 0; i < i_ids.length; i++)
-		obj.objects.push({"id": i_ids[i]});
+		obj.objects.push({'id': i_ids[i]});
 	obj.delarray = 'news';
 
 	obj.file = nw_GetUserFileName();
-	n_Request({"send": {"editobj": obj}, "func": nw_DeleteNewsFinished});
+	n_Request({'send': {'editobj': obj}, 'func': nw_DeleteNewsFinished});
 }
 
-function nw_DeleteNewsFinished(i_data)
-{
+function nw_DeleteNewsFinished(i_data) {
 	if ((i_data == null) || (i_data.error))
 	{
 		c_Error(i_data.error);
@@ -1098,8 +1133,7 @@ function nw_DeleteNewsFinished(i_data)
 
 /* ---------------- [ Recent functions ] ----------------------------------------------------------------- */
 
-function nw_RecentOnClick()
-{
+function nw_RecentOnClick() {
 	if ($('sidepanel').classList.contains('opened'))
 	{
 		if ($('sidepanel_recent').classList.contains('opened'))
@@ -1114,23 +1148,20 @@ function nw_RecentOnClick()
 	}
 }
 
-function nw_RecentClose()
-{
+function nw_RecentClose() {
 	$('sidepanel_recent').classList.remove('opened');
 	$('recent').innerHTML = '';
 	localStorage.recent_opened = 'false';
 }
 
-function nw_RecentOpen(i_noload)
-{
+function nw_RecentOpen(i_noload) {
 	$('sidepanel_recent').classList.add('opened');
 	localStorage.recent_opened = 'true';
 	if (i_noload !== false)
 		nw_RecentLoad();
 }
 
-function nw_RecentLoad(i_args)
-{
+function nw_RecentLoad(i_args) {
 	if (i_args == null)
 		i_args = {};
 
@@ -1144,22 +1175,20 @@ function nw_RecentLoad(i_args)
 		cache = 0;
 
 	n_GetFile({
-		"path": c_GetRuFilePath(nw_recent_file),
-		"func": nw_RecentReceived,
-		"cache_time": cache,
-		"info": 'recent',
-		"parse": true,
-		"local": true
+		'path': c_GetRuFilePath(nw_recent_file),
+		'func': nw_RecentReceived,
+		'cache_time': cache,
+		'info': 'recent',
+		'parse': true,
+		'local': true
 	});
 }
 
-function nw_RecentRefresh()
-{
-	nw_RecentLoad({"cache": false});
+function nw_RecentRefresh() {
+	nw_RecentLoad({'cache': false});
 }
 
-function nw_RecentReceived(i_data, i_args)
-{
+function nw_RecentReceived(i_data, i_args) {
 	$('recent').innerHTML = '';
 	if (i_data == null)
 		return;

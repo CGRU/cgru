@@ -2,8 +2,6 @@
 
 using namespace af;
 
-MsgClass::MsgClass()
-{
-};
+MsgClass::MsgClass() {};
 
-MsgClass::~MsgClass(){};
+MsgClass::~MsgClass() {};

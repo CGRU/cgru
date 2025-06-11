@@ -14,7 +14,7 @@
 	renders.js - methods and structs for monitoring and handling of render machines
 */
 
-"use strict";
+'use strict';
 
 var renders_pools = null;
 
@@ -30,9 +30,7 @@ RenderNode.onMonitorCreate = function() {
 	renders_pools = {};
 };
 
-function RenderNode()
-{
-}
+function RenderNode() {}
 
 RenderNode.prototype.init = function() {
 	this.element.classList.add('render');
@@ -214,10 +212,12 @@ RenderNode.prototype.update = function(i_obj) {
 				this.plotter_GPU_GPU.setColor([50, 200, 20]);
 				this.plotters.push(this.plotter_GPU_GPU);
 
-				this.plotter_GPU_Mem = new Plotter(this.elResources, 'GM ' + (r.gpu_mem_total_mb / 1000.0).toFixed(1), 'GPU Mem');
+				this.plotter_GPU_Mem = new Plotter(
+					this.elResources, 'GM ' + (r.gpu_mem_total_mb / 1000.0).toFixed(1), 'GPU Mem');
 				this.plotter_GPU_Mem.addGraph();
 				this.plotter_GPU_Mem.setTitle(r.gpu_string + ':\nMemory Total: ' + r.gpu_mem_total_mb + 'Mb');
-				this.plotter_GPU_Mem.setScale(r.gpu_mem_total_mb, 85 * r.gpu_mem_total_mb / 100, r.gpu_mem_total_mb);
+				this.plotter_GPU_Mem.setScale(
+					r.gpu_mem_total_mb, 85 * r.gpu_mem_total_mb / 100, r.gpu_mem_total_mb);
 				this.plotter_GPU_Mem.setColor([50, 200, 20], [255, 0, 0]);
 				this.plotters.push(this.plotter_GPU_Mem);
 			}
@@ -246,17 +246,18 @@ RenderNode.prototype.update = function(i_obj) {
 		{
 			this.elTempBox.style.display = 'block';
 			this.elTempBar.style.width = r.cpu_temp + '%';
-			const clr_cold = [ 50, 50,100];
-			const clr_warm = [100,120,100];
-			const clr_hot  = [255,  5,  5];
+			const clr_cold = [50, 50, 100];
+			const clr_warm = [100, 120, 100];
+			const clr_hot = [255, 5, 5];
 			let hmin = cgru_Config.af_monitor_render_cpu_hot_min;
 			let hmax = cgru_Config.af_monitor_render_cpu_hot_max;
-			let clr = [0,0,0];
+			let clr = [0, 0, 0];
 			let factor = r.cpu_temp / hmin;
 			if (r.cpu_temp > hmin)
 			{
 				factor = (r.cpu_temp - hmin) / (hmax - hmin);
-				if (factor > 1.0) factor = 1.0;
+				if (factor > 1.0)
+					factor = 1.0;
 				for (let i = 0; i < 3; i++)
 					clr[i] = (1.0 - factor) * clr_warm[i] + factor * clr_hot[i];
 			}
@@ -265,9 +266,10 @@ RenderNode.prototype.update = function(i_obj) {
 				for (let i = 0; i < 3; i++)
 					clr[i] = (1.0 - factor) * clr_cold[i] + factor * clr_warm[i];
 			}
-			this.elTempBar.style.backgroundColor = 'rgb('+clr[0]+','+clr[1]+','+clr[2]+')';
+			this.elTempBar.style.backgroundColor = 'rgb(' + clr[0] + ',' + clr[1] + ',' + clr[2] + ')';
 
-			this.plotterC.setLabel('C ' + r.cpu_num + '*' + (r.cpu_mhz / 1000.0).toFixed(1) + ' ' + r.cpu_temp + 'C');
+			this.plotterC.setLabel(
+				'C ' + r.cpu_num + '*' + (r.cpu_mhz / 1000.0).toFixed(1) + ' ' + r.cpu_temp + 'C');
 		}
 		else
 			this.plotterC.setLabel('C ' + r.cpu_num + '*' + (r.cpu_mhz / 1000.0).toFixed(1));
@@ -294,13 +296,13 @@ RenderNode.prototype.update = function(i_obj) {
 		this.plotterH.addValues([r.hdd_total_gb - r.hdd_free_gb]);
 
 		this.plotterN.appendTitle(
-			'\nReceive: ' + Math.round(r.net_recv_kbsec / 1024) + ' MBytes/s\nSend: ' +
-			Math.round(r.net_send_kbsec / 1024) + ' MBytes/s');
+			'\nReceive: ' + Math.round(r.net_recv_kbsec / 1024) +
+			' MBytes/s\nSend: ' + Math.round(r.net_send_kbsec / 1024) + ' MBytes/s');
 		this.plotterN.addValues([r.net_recv_kbsec, r.net_send_kbsec]);
 
 		this.plotterD.appendTitle(
-			'\nRead: ' + Math.round(r.hdd_rd_kbsec / 1024) + 'MBytes/s\nWrite: ' +
-			Math.round(r.hdd_wr_kbsec / 1024) + ' MBytes/s\nBusy: ' + r.hdd_busy + '%');
+			'\nRead: ' + Math.round(r.hdd_rd_kbsec / 1024) +
+			'MBytes/s\nWrite: ' + Math.round(r.hdd_wr_kbsec / 1024) + ' MBytes/s\nBusy: ' + r.hdd_busy + '%');
 		this.plotterD.addValues([r.hdd_rd_kbsec, r.hdd_wr_kbsec], r.hdd_busy / 100);
 
 		// GPU resources:
@@ -308,16 +310,20 @@ RenderNode.prototype.update = function(i_obj) {
 		{
 			let plot_GPU_red_min = 65;
 			let plot_GPU_red_max = 95;
-			let plot_GPU_red = (r.gpu_gpu_temp - plot_GPU_red_min) * 100 / (plot_GPU_red_max - plot_GPU_red_min);
-			if (plot_GPU_red < 0) plot_GPU_red = 0;
-			if (plot_GPU_red > 100) plot_GPU_red = 100;
-			let plot_GPU_temp_r = 50 + (2*plot_GPU_red);
-			let plot_GPU_temp_g = 200 - (2*plot_GPU_red);
+			let plot_GPU_red =
+				(r.gpu_gpu_temp - plot_GPU_red_min) * 100 / (plot_GPU_red_max - plot_GPU_red_min);
+			if (plot_GPU_red < 0)
+				plot_GPU_red = 0;
+			if (plot_GPU_red > 100)
+				plot_GPU_red = 100;
+			let plot_GPU_temp_r = 50 + (2 * plot_GPU_red);
+			let plot_GPU_temp_g = 200 - (2 * plot_GPU_red);
 			let plot_GPU_temp_b = 20;
 			this.plotter_GPU_GPU.setColor([plot_GPU_temp_r, plot_GPU_temp_g, plot_GPU_temp_b]);
 			this.plotter_GPU_GPU.addValues([r.gpu_gpu_util]);
 			this.plotter_GPU_GPU.setLabel('GU ' + r.gpu_gpu_temp + 'C');
-			this.plotter_GPU_GPU.appendTitle('\nUtilization: ' + r.gpu_gpu_util + '%\nTemperature: ' + r.gpu_gpu_temp + 'C');
+			this.plotter_GPU_GPU.appendTitle(
+				'\nUtilization: ' + r.gpu_gpu_util + '%\nTemperature: ' + r.gpu_gpu_temp + 'C');
 
 			this.plotter_GPU_Mem.addValues([r.gpu_mem_used_mb]);
 			this.plotter_GPU_Mem.appendTitle('\nMemory used: ' + r.gpu_mem_used_mb + ' Mb');
@@ -480,7 +486,7 @@ RenderNode.prototype.update = function(i_obj) {
 		tasks_html += '/<b>' + this.params.max_tasks_host + '</b>';
 	if (this.params.capacity_host != null)
 		cap_html += '/<b>' + this.params.capacity_host + '</b>';
-	this.elRunTasks.innerHTML =	tasks_html;
+	this.elRunTasks.innerHTML = tasks_html;
 	this.elCapacity.innerHTML = cap_html;
 
 	if (this.state.RUN == true)
@@ -494,7 +500,7 @@ RenderNode.prototype.update = function(i_obj) {
 
 	// Show servives:
 	this.elServices.textContent = '';
-	farm_showServices(this.elServices, this.params,'renders');
+	farm_showServices(this.elServices, this.params, 'renders');
 
 	// Show tickets:
 	this.elTickets.textContent = '';
@@ -509,7 +515,8 @@ RenderNode.prototype.update = function(i_obj) {
 	this.refresh();
 };
 
-RenderNode.prototype.offsetHierarchy = function() {
+RenderNode.prototype.offsetHierarchy =
+	function() {
 	var depth = 0;
 	var parent_pool = pools[this.params.pool];
 	if (parent_pool)
@@ -518,7 +525,7 @@ RenderNode.prototype.offsetHierarchy = function() {
 	this.m_parent_pool = parent_pool;
 }
 
-RenderNode.prototype.plottersCsDelete = function() {
+	RenderNode.prototype.plottersCsDelete = function() {
 	if (this.plottersCs.length == 0)
 		return;
 
@@ -606,8 +613,8 @@ RenderNode.prototype.refresh = function() {
 		}
 		else if ((pool.getParmParent('idle_wolsleep_time') > 0) && (this.state.RUN != true))
 		{
-			stateTimeTitle +=
-				'\nWOL idle sleep time: ' + cm_TimeStringFromSeconds(pool.getParmParent('idle_wolsleep_time'));
+			stateTimeTitle += '\nWOL idle sleep time: ' +
+				cm_TimeStringFromSeconds(pool.getParmParent('idle_wolsleep_time'));
 			percent = Math.round(100.0 * idle_sec / pool.getParmParent('idle_wolsleep_time'));
 
 			idle_sec = Math.round(pool.getParmParent('idle_wolsleep_time') - idle_sec);
@@ -662,22 +669,22 @@ RenderNode.prototype.updateTasksPercents = function() {
 
 RenderNode.prototype.onDoubleClick = function(e) {
 	nw_request({
-		"send": {"get": {"type": 'renders', "ids": [this.params.id], "mode": 'full'}},
-		"func": g_ShowObject,
-		"evt": e,
-		"wnd": this.monitor.window
+		'send': {'get': {'type': 'renders', 'ids': [this.params.id], 'mode': 'full'}},
+		'func': g_ShowObject,
+		'evt': e,
+		'wnd': this.monitor.window
 	});
 };
 
 RenderNode.setService = function(i_args) {
 	new cgru_Dialog({
-		"wnd": i_args.monitor.window,
-		"receiver": i_args.monitor.cur_item,
-		"handle": 'serviceApply',
-		"param": i_args.name,
-		"name": 'service',
-		"title": i_args.tooltip,
-		"info": 'Enter Service Name:'
+		'wnd': i_args.monitor.window,
+		'receiver': i_args.monitor.cur_item,
+		'handle': 'serviceApply',
+		'param': i_args.name,
+		'name': 'service',
+		'title': i_args.tooltip,
+		'info': 'Enter Service Name:'
 	});
 };
 
@@ -701,13 +708,13 @@ RenderNode.clearServices = function(i_args) {
 
 RenderNode.editTicket = function(i_args) {
 	new cgru_Dialog({
-		"wnd": i_args.monitor.window,
-		"receiver": i_args.monitor.cur_item,
-		"handle": 'editTicket',
-		"param": i_args.name,
-		"name": i_args.name,
-		"title": i_args.tooltip,
-		"info": 'Enter Ticket Name:'
+		'wnd': i_args.monitor.window,
+		'receiver': i_args.monitor.cur_item,
+		'handle': 'editTicket',
+		'param': i_args.name,
+		'name': i_args.name,
+		'title': i_args.tooltip,
+		'info': 'Enter Ticket Name:'
 	});
 };
 
@@ -820,13 +827,13 @@ RenderTask.prototype.destroy = function() {
 RenderNode.launchCmdExit = function(i_args) {
 	// console.log( i_args);
 	new cgru_Dialog({
-		"wnd": i_args.monitor.window,
-		"receiver": i_args.monitor.cur_item,
-		"handle": 'launchCmdExitDo',
-		"param": i_args.name,
-		"name": 'farm',
-		"title": 'Launch Command' + (i_args.name == 'lcex' ? ' And Exit' : ''),
-		"info": 'Enter command:'
+		'wnd': i_args.monitor.window,
+		'receiver': i_args.monitor.cur_item,
+		'handle': 'launchCmdExitDo',
+		'param': i_args.name,
+		'name': 'farm',
+		'title': 'Launch Command' + (i_args.name == 'lcex' ? ' And Exit' : ''),
+		'info': 'Enter command:'
 	});
 };
 
@@ -842,13 +849,13 @@ RenderNode.prototype.launchCmdExitDo = function(i_value, i_name) {
 
 RenderNode.setPoolDialog = function(i_args) {
 	new cgru_Dialog({
-		"wnd": i_args.monitor.window,
-		"receiver": i_args.monitor.cur_item,
-		"handle": 'setPoolDo',
-		"param": i_args.name,
-		"name": 'set_pool',
-		"title": 'Assign render to poll',
-		"info": 'Enter a new pool name:'
+		'wnd': i_args.monitor.window,
+		'receiver': i_args.monitor.cur_item,
+		'handle': 'setPoolDo',
+		'param': i_args.name,
+		'name': 'set_pool',
+		'title': 'Assign render to poll',
+		'info': 'Enter a new pool name:'
 	});
 };
 
@@ -880,8 +887,8 @@ RenderNode.createPanels = function(i_monitor) {
 
 	// Pools:
 	acts = {};
-	acts.set_pool =      {'label':'Set',      'handle':'setPoolDialog', 'tooltip':'Set pool'};
-	acts.reassign_pool = {'label':'ReAssign', 'handle':'mh_Oper',       'tooltip':'Reassign pool'};
+	acts.set_pool = {'label': 'Set', 'handle': 'setPoolDialog', 'tooltip': 'Set pool'};
+	acts.reassign_pool = {'label': 'ReAssign', 'handle': 'mh_Oper', 'tooltip': 'Reassign pool'};
 	i_monitor.createCtrlBtn({
 		'name': 'pool',
 		'label': 'Pool',
@@ -944,7 +951,7 @@ RenderNode.createPanels = function(i_monitor) {
 	};
 	el.oncontextmenu = el.onclick;
 	// We can execute custom commands on renders only
-	el.m_act = {'node_type':'renders'};
+	el.m_act = {'node_type': 'renders'};
 
 	// Admin related functions:
 	if (!g_GOD())
@@ -971,39 +978,48 @@ RenderNode.createPanels = function(i_monitor) {
 
 	// Services:
 	acts = {};
-	acts.service_add     = {'handle':'setService', 'label':'Add',     'tooltip':'Add service.'};
-	acts.service_remove  = {'handle':'setService', 'label':'Remove',  'tooltip':'Remove service.'};
-	acts.service_enable  = {'handle':'setService', 'label':'Enable',  'tooltip':'Enable service.'};
-	acts.service_disable = {'handle':'setService', 'label':'Disable', 'tooltip':'Disable service.'};
-	acts.clear_services =
-		{'handle':'clearServices','label':'Clear','tooltip':'Double click to clear services.','ondblclick':true};
-	i_monitor.createCtrlBtn({
-		'name': 'services',
-		'label': 'Services',
-		'tooltip': 'Enable/Disable services.',
-		'sub_menu': acts
-	});
+	acts.service_add = {'handle': 'setService', 'label': 'Add', 'tooltip': 'Add service.'};
+	acts.service_remove = {'handle': 'setService', 'label': 'Remove', 'tooltip': 'Remove service.'};
+	acts.service_enable = {'handle': 'setService', 'label': 'Enable', 'tooltip': 'Enable service.'};
+	acts.service_disable = {'handle': 'setService', 'label': 'Disable', 'tooltip': 'Disable service.'};
+	acts.clear_services = {
+		'handle': 'clearServices',
+		'label': 'Clear',
+		'tooltip': 'Double click to clear services.',
+		'ondblclick': true
+	};
+	i_monitor.createCtrlBtn(
+		{'name': 'services', 'label': 'Services', 'tooltip': 'Enable/Disable services.', 'sub_menu': acts});
 
 
 	// Tickets:
 	acts = {};
-	acts.ticket_edit_pool = {'handle':'editTicket', 'label':'Ticket Pool', 'tooltip':'Add or edit pool ticket.','node_type':'pools'};
-	acts.ticket_edit_host = {'handle':'editTicket', 'label':'Ticket Host', 'tooltip':'Add or edit host ticket.'};
+	acts.ticket_edit_pool = {
+		'handle': 'editTicket',
+		'label': 'Ticket Pool',
+		'tooltip': 'Add or edit pool ticket.',
+		'node_type': 'pools'
+	};
+	acts.ticket_edit_host = {
+		'handle': 'editTicket',
+		'label': 'Ticket Host',
+		'tooltip': 'Add or edit host ticket.'
+	};
 	i_monitor.createCtrlBtns(acts);
-//	i_monitor.createCtrlBtn({
-//		'name': 'tickets',
-//		'label': 'Tickets',
-//		'tooltip': 'Edit tickets.',
-//		'sub_menu': acts
-//	});
+	//	i_monitor.createCtrlBtn({
+	//		'name': 'tickets',
+	//		'label': 'Tickets',
+	//		'tooltip': 'Edit tickets.',
+	//		'sub_menu': acts
+	//	});
 
 
 	// Power/WOL:
 	acts = {
 		wol_sleep /**/: {'label': 'WOLSleep', 'tooltip': 'Wake-On-Lan sleep.'},
-		wol_wake /***/: {'label': 'WOLWake',  'tooltip': 'Wake-On-Lan wake.'},
-		exit /*******/: {'label': 'Exit',     'tooltip': 'Exit client.'},
-		reboot /*****/: {'label': 'Reboot',   'tooltip': 'Reboot machine.'},
+		wol_wake /***/: {'label': 'WOLWake', 'tooltip': 'Wake-On-Lan wake.'},
+		exit /*******/: {'label': 'Exit', 'tooltip': 'Exit client.'},
+		reboot /*****/: {'label': 'Reboot', 'tooltip': 'Reboot machine.'},
 		shutdown /***/: {'label': 'Shutdown', 'tooltip': 'Shutdown machine.'}
 	};
 	i_monitor.createCtrlBtn(
@@ -1011,17 +1027,18 @@ RenderNode.createPanels = function(i_monitor) {
 
 	// Launch and Exit:
 	acts = {};
-	acts.lcmd = {'name': 'lcmd', 'label': 'Command',  'handle': 'launchCmdExit', 'tooltip': 'Launch command.'};
-	acts.lcex = {'name': 'lcex', 'label': 'Cmd&Exit', 'handle': 'launchCmdExit', 'tooltip': 'Launch command and exit.'};
-	i_monitor.createCtrlBtn({
-		'name': 'launch',
-		'label': 'Launch',
-		'tooltip': 'Launch command by afrender.',
-		'sub_menu': acts
-	});
+	acts.lcmd = {'name': 'lcmd', 'label': 'Command', 'handle': 'launchCmdExit', 'tooltip': 'Launch command.'};
+	acts.lcex = {
+		'name': 'lcex',
+		'label': 'Cmd&Exit',
+		'handle': 'launchCmdExit',
+		'tooltip': 'Launch command and exit.'
+	};
+	i_monitor.createCtrlBtn(
+		{'name': 'launch', 'label': 'Launch', 'tooltip': 'Launch command by afrender.', 'sub_menu': acts});
 
 	acts = {};
-	acts.delete = {"label": "DELETE", "tooltip": 'Double click to delete.', "ondblclick": true};
+	acts.delete = {'label': 'DELETE', 'tooltip': 'Double click to delete.', 'ondblclick': true};
 	i_monitor.createCtrlBtns(acts);
 };
 
@@ -1047,7 +1064,8 @@ RenderNode.prototype.updatePanels = function() {
 		info += ' HDD: <b>' + r.hdd_total_gb + '</b> Gb';
 		if (r.gpu_string)
 		{
-			info += '<br>GPU: <b>' + r.gpu_string + '</b> Mem: <b>' + (r.gpu_mem_total_mb / 1000.0).toFixed(1) + '</b>Gb'
+			info += '<br>GPU: <b>' + r.gpu_string + '</b> Mem: <b>' +
+				(r.gpu_mem_total_mb / 1000.0).toFixed(1) + '</b>Gb'
 		}
 		info += '</p>';
 
@@ -1068,7 +1086,8 @@ RenderNode.prototype.updatePanels = function() {
 	if (this.params.busy_time)
 		info += '<div>Busy since: ' + cm_DateTimeStrFromSec(this.params.busy_time) + '</div>';
 	if (this.task_start_finish_time)
-		info += '<div>Task finished at: ' + cm_DateTimeStrFromSec(this.params.task_start_finish_time) + '</div>';
+		info +=
+			'<div>Task finished at: ' + cm_DateTimeStrFromSec(this.params.task_start_finish_time) + '</div>';
 
 	this.monitor.setPanelInfo(info);
 
@@ -1086,20 +1105,20 @@ RenderNode.createActions = function() {
 	if (cgru_Config.af_rendercmds)
 		for (var i = 0; i < cgru_Config.af_rendercmds.length; i++)
 			RenderNode.actions.push({
-				"mode": 'cgru_cmdexec',
-				"name": 'cmd',
-				"handle": cgru_Config.af_rendercmds[i],
-				"label": cgru_Config.af_rendercmds[i]
+				'mode': 'cgru_cmdexec',
+				'name': 'cmd',
+				'handle': cgru_Config.af_rendercmds[i],
+				'label': cgru_Config.af_rendercmds[i]
 			});
 
 	if (cgru_Config.af_rendercmds_admin)
 		for (var i = 0; i < cgru_Config.af_rendercmds_admin.length; i++)
 			RenderNode.actions.push({
-				"mode": 'cgru_cmdexec',
-				"name": 'cmd',
-				"handle": cgru_Config.af_rendercmds_admin[i],
-				"label": cgru_Config.af_rendercmds_admin[i],
-				"permissions": 'god'
+				'mode': 'cgru_cmdexec',
+				'name': 'cmd',
+				'handle': cgru_Config.af_rendercmds_admin[i],
+				'label': cgru_Config.af_rendercmds_admin[i],
+				'permissions': 'god'
 			});
 
 	for (let p in PoolNode.params)
@@ -1109,11 +1128,11 @@ RenderNode.createActions = function() {
 };
 
 RenderNode.params_render = {
-	priority        : {'type':'num', 'label':'Priority'},
-	capacity_host   : {'type':'num', 'label':'Capacity'},
-	max_tasks_host  : {'type':'num', 'label':'Maximum Tasks'},
-	user_name       : {'type':'str', 'label':'User Name'},
-	annotation      : {'type':'str', 'label':'Annotation'}
+	priority: {'type': 'num', 'label': 'Priority'},
+	capacity_host: {'type': 'num', 'label': 'Capacity'},
+	max_tasks_host: {'type': 'num', 'label': 'Maximum Tasks'},
+	user_name: {'type': 'str', 'label': 'User Name'},
+	annotation: {'type': 'str', 'label': 'Annotation'}
 };
 
 RenderNode.sort = ['name', 'priority', 'user_name'];

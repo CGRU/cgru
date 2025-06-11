@@ -4,8 +4,8 @@
 // Copyright (c) 2011 Milo Yip (miloyip@gmail.com)
 // Version 0.1
 
-#include <cstdlib>	// malloc(), realloc(), free()
-#include <cstring>	// memcpy()
+#include <cstdlib> // malloc(), realloc(), free()
+#include <cstring> // memcpy()
 
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_NO_INT64DEFINE
@@ -25,8 +25,8 @@ typedef unsigned __int64 uint64_t;
 
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_ENDIAN
-#define RAPIDJSON_LITTLEENDIAN	0	//!< Little endian machine
-#define RAPIDJSON_BIGENDIAN		1	//!< Big endian machine
+#define RAPIDJSON_LITTLEENDIAN 0 //!< Little endian machine
+#define RAPIDJSON_BIGENDIAN 1	 //!< Big endian machine
 
 //! Endianness of the machine.
 /*!	GCC provided macro for detecting endianness of the target machine. But other
@@ -41,10 +41,9 @@ typedef unsigned __int64 uint64_t;
 #define RAPIDJSON_ENDIAN RAPIDJSON_BIGENDIAN
 #endif // __BYTE_ORDER__
 #else
-#define RAPIDJSON_ENDIAN RAPIDJSON_LITTLEENDIAN	// Assumes little endian otherwise.
+#define RAPIDJSON_ENDIAN RAPIDJSON_LITTLEENDIAN // Assumes little endian otherwise.
 #endif
 #endif // RAPIDJSON_ENDIAN
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_ALIGNSIZE
@@ -62,10 +61,10 @@ typedef unsigned __int64 uint64_t;
 // RAPIDJSON_SSE2/RAPIDJSON_SSE42/RAPIDJSON_SIMD
 
 // Enable SSE2 optimization.
-//#define RAPIDJSON_SSE2
+// #define RAPIDJSON_SSE2
 
 // Enable SSE4.2 optimization.
-//#define RAPIDJSON_SSE42
+// #define RAPIDJSON_SSE42
 
 #if defined(RAPIDJSON_SSE2) || defined(RAPIDJSON_SSE42)
 #define RAPIDJSON_SIMD
@@ -75,10 +74,11 @@ typedef unsigned __int64 uint64_t;
 // RAPIDJSON_NO_SIZETYPEDEFINE
 
 #ifndef RAPIDJSON_NO_SIZETYPEDEFINE
-namespace rapidjson {
+namespace rapidjson
+{
 //! Use 32-bit array/string indices even for 64-bit platform, instead of using size_t.
 /*! User may override the SizeType by defining RAPIDJSON_NO_SIZETYPEDEFINE.
-*/
+ */
 typedef unsigned SizeType;
 } // namespace rapidjson
 #endif
@@ -100,18 +100,27 @@ typedef unsigned SizeType;
 
 // Adopt from boost
 #ifndef RAPIDJSON_STATIC_ASSERT
-namespace rapidjson {
+namespace rapidjson
+{
 template <bool x> struct STATIC_ASSERTION_FAILURE;
-template <> struct STATIC_ASSERTION_FAILURE<true> { enum { value = 1 }; };
-template<int x> struct StaticAssertTest {};
+template <> struct STATIC_ASSERTION_FAILURE<true>
+{
+	enum
+	{
+		value = 1
+	};
+};
+template <int x> struct StaticAssertTest
+{
+};
 } // namespace rapidjson
 
 #define RAPIDJSON_JOIN(X, Y) RAPIDJSON_DO_JOIN(X, Y)
 #define RAPIDJSON_DO_JOIN(X, Y) RAPIDJSON_DO_JOIN2(X, Y)
 #define RAPIDJSON_DO_JOIN2(X, Y) X##Y
 
-#define RAPIDJSON_STATIC_ASSERT(x) typedef ::rapidjson::StaticAssertTest<\
-	sizeof(::rapidjson::STATIC_ASSERTION_FAILURE<bool(x) >)>\
+#define RAPIDJSON_STATIC_ASSERT(x)                                                                           \
+	typedef ::rapidjson::StaticAssertTest<sizeof(::rapidjson::STATIC_ASSERTION_FAILURE<bool(x)>)>            \
 	RAPIDJSON_JOIN(StaticAssertTypedef, __LINE__)
 #endif
 
@@ -121,7 +130,8 @@ template<int x> struct StaticAssertTest {};
 #include "allocators.h"
 #include "encodings.h"
 
-namespace rapidjson {
+namespace rapidjson
+{
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Stream
@@ -166,8 +176,8 @@ concept Stream {
 */
 
 //! Put N copies of a character to a stream.
-template<typename Stream, typename Ch>
-inline void PutN(Stream& stream, Ch c, size_t n) {
+template <typename Stream, typename Ch> inline void PutN(Stream &stream, Ch c, size_t n)
+{
 	for (size_t i = 0; i < n; i++)
 		stream.Put(c);
 }
@@ -177,9 +187,9 @@ inline void PutN(Stream& stream, Ch c, size_t n) {
 
 //! Read-only string stream.
 /*! \implements Stream
-*/
-template <typename Encoding>
-struct GenericStringStream {
+ */
+template <typename Encoding> struct GenericStringStream
+{
 	typedef typename Encoding::Ch Ch;
 
 	GenericStringStream(const Ch *src) : src_(src), head_(src) {}
@@ -188,16 +198,24 @@ struct GenericStringStream {
 	Ch Take() { return *src_++; }
 	size_t Tell() const { return src_ - head_; }
 
-	Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
+	Ch *PutBegin()
+	{
+		RAPIDJSON_ASSERT(false);
+		return 0;
+	}
 	void Put(Ch c) { RAPIDJSON_ASSERT(false); }
 	void Flush() { RAPIDJSON_ASSERT(false); }
-	size_t PutEnd(Ch* begin) { RAPIDJSON_ASSERT(false); return 0; }
+	size_t PutEnd(Ch *begin)
+	{
+		RAPIDJSON_ASSERT(false);
+		return 0;
+	}
 
-	const Ch* src_;		//!< Current read position.
-	const Ch* head_;	//!< Original head of the string.
+	const Ch *src_;	 //!< Current read position.
+	const Ch *head_; //!< Original head of the string.
 };
 
-typedef GenericStringStream<UTF8<> > StringStream;
+typedef GenericStringStream<UTF8<>> StringStream;
 
 ///////////////////////////////////////////////////////////////////////////////
 // InsituStringStream
@@ -206,8 +224,8 @@ typedef GenericStringStream<UTF8<> > StringStream;
 /*! This string stream is particularly designed for in-situ parsing.
 	\implements Stream
 */
-template <typename Encoding>
-struct GenericInsituStringStream {
+template <typename Encoding> struct GenericInsituStringStream
+{
 	typedef typename Encoding::Ch Ch;
 
 	GenericInsituStringStream(Ch *src) : src_(src), dst_(0), head_(src) {}
@@ -218,30 +236,35 @@ struct GenericInsituStringStream {
 	size_t Tell() { return src_ - head_; }
 
 	// Write
-	Ch* PutBegin() { return dst_ = src_; }
-	void Put(Ch c) { RAPIDJSON_ASSERT(dst_ != 0); *dst_++ = c; }
+	Ch *PutBegin() { return dst_ = src_; }
+	void Put(Ch c)
+	{
+		RAPIDJSON_ASSERT(dst_ != 0);
+		*dst_++ = c;
+	}
 	void Flush() {}
-	size_t PutEnd(Ch* begin) { return dst_ - begin; }
+	size_t PutEnd(Ch *begin) { return dst_ - begin; }
 
-	Ch* src_;
-	Ch* dst_;
-	Ch* head_;
+	Ch *src_;
+	Ch *dst_;
+	Ch *head_;
 };
 
-typedef GenericInsituStringStream<UTF8<> > InsituStringStream;
+typedef GenericInsituStringStream<UTF8<>> InsituStringStream;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Type
 
 //! Type of JSON value
-enum Type {
-	kNullType = 0,		//!< null
-	kFalseType = 1,		//!< false
-	kTrueType = 2,		//!< true
-	kObjectType = 3,	//!< object
-	kArrayType = 4,		//!< array 
-	kStringType = 5,	//!< string
-	kNumberType = 6,	//!< number
+enum Type
+{
+	kNullType = 0,	 //!< null
+	kFalseType = 1,	 //!< false
+	kTrueType = 2,	 //!< true
+	kObjectType = 3, //!< object
+	kArrayType = 4,	 //!< array
+	kStringType = 5, //!< string
+	kNumberType = 6, //!< number
 };
 
 } // namespace rapidjson

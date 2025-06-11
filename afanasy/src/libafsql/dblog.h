@@ -6,24 +6,24 @@
 
 namespace afsql
 {
-class DBLog: public DBItem
+class DBLog : public DBItem
 {
-public:
+  public:
 	DBLog();
 	virtual ~DBLog();
 
-	void add(const af::Log * i_log, std::list<std::string> * o_queries);
+	void add(const af::Log *i_log, std::list<std::string> *o_queries);
 
-	inline const std::string & v_dbGetTableName() const {return ms_TableName;}
+	inline const std::string &v_dbGetTableName() const { return ms_TableName; }
 
-private:
+  private:
 	int64_t ltime;
 	std::string subject;
 	std::string type;
 	std::string object;
 	std::string info;
 
-private:
+  private:
 	static const std::string ms_TableName;
 };
-}
+} // namespace afsql

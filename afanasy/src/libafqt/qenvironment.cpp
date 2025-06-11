@@ -1,7 +1,7 @@
 #include "qenvironment.h"
 
-#include <QtCore/QFile>
 #include <QtCore/QDir>
+#include <QtCore/QFile>
 #include <QtNetwork/QHostInfo>
 #include <QtXml/QDomDocument>
 
@@ -21,115 +21,126 @@ using namespace afqt;
 
 AttrNumber QEnvironment::level("level", "UI Level", AFGUI::PADAWAN);
 
-Attr       QEnvironment::theme("theme", "Theme", AFGUI::THEME );
+Attr QEnvironment::theme("theme", "Theme", AFGUI::THEME);
 
 AttrNumber QEnvironment::scroll_step("scroll_step", "Scroll Step", AFGUI::SCROLL_SIZE);
 
-Attr       QEnvironment::image_back(            "image_back",            "Items Background",        "");
-Attr       QEnvironment::image_border_top(      "image_border_top",      "Border Top",              "");
-Attr       QEnvironment::image_border_topleft(  "image_border_topleft",  "Border Top Left",         "");
-Attr       QEnvironment::image_border_topright( "image_border_topright", "Border Top Right",        "");
-Attr       QEnvironment::image_border_bot(      "image_border_bot",      "Border Bottom",           "");
-Attr       QEnvironment::image_border_botleft(  "image_border_botleft",  "Border Bottom Left",      "");
-Attr       QEnvironment::image_border_botright( "image_border_botright", "Border Bottom Right",     "");
-Attr       QEnvironment::image_snap_leftoff(    "image_snap_leftoff",    "Snap Left Off",           "");
-Attr       QEnvironment::image_snap_lefton(     "image_snap_lefton",     "Snap Left On",            "");
-Attr       QEnvironment::image_snap_rightoff(   "image_snap_rightoff",   "Snap Right Off",          "");
-Attr       QEnvironment::image_snap_righton(    "image_snap_righton",    "Snap Right On",           "");
+Attr QEnvironment::image_back("image_back", "Items Background", "");
+Attr QEnvironment::image_border_top("image_border_top", "Border Top", "");
+Attr QEnvironment::image_border_topleft("image_border_topleft", "Border Top Left", "");
+Attr QEnvironment::image_border_topright("image_border_topright", "Border Top Right", "");
+Attr QEnvironment::image_border_bot("image_border_bot", "Border Bottom", "");
+Attr QEnvironment::image_border_botleft("image_border_botleft", "Border Bottom Left", "");
+Attr QEnvironment::image_border_botright("image_border_botright", "Border Bottom Right", "");
+Attr QEnvironment::image_snap_leftoff("image_snap_leftoff", "Snap Left Off", "");
+Attr QEnvironment::image_snap_lefton("image_snap_lefton", "Snap Left On", "");
+Attr QEnvironment::image_snap_rightoff("image_snap_rightoff", "Snap Right Off", "");
+Attr QEnvironment::image_snap_righton("image_snap_righton", "Snap Right On", "");
 
-AttrNumber QEnvironment::star_numpoints( "star_numpoints", "Edges Number", AFGUI::STAR_NUMPOINTS );
-AttrNumber QEnvironment::star_radiusout( "star_radiusout", "Outer Radius", AFGUI::STAR_RADIUSOUT );
-AttrNumber QEnvironment::star_radiusin(  "star_radiusin",  "Inner Radius", AFGUI::STAR_RADIUSIN  );
-AttrNumber QEnvironment::star_rotate(    "star_rotate",    "Rotate Angle", AFGUI::STAR_ROTATE    );
+AttrNumber QEnvironment::star_numpoints("star_numpoints", "Edges Number", AFGUI::STAR_NUMPOINTS);
+AttrNumber QEnvironment::star_radiusout("star_radiusout", "Outer Radius", AFGUI::STAR_RADIUSOUT);
+AttrNumber QEnvironment::star_radiusin("star_radiusin", "Inner Radius", AFGUI::STAR_RADIUSIN);
+AttrNumber QEnvironment::star_rotate("star_rotate", "Rotate Angle", AFGUI::STAR_ROTATE);
 
-AttrNumber QEnvironment::ntf_job_added_alert("ntf_job_added_alert", "Alert", 0 );
-Attr       QEnvironment::ntf_job_added_sound("ntf_job_added_sound", "Sound", "");
-AttrNumber QEnvironment::ntf_job_done_alert( "ntf_job_done_alert",  "Alert", 0 );
-Attr       QEnvironment::ntf_job_done_sound( "ntf_job_done_sound",  "Sound", "");
-AttrNumber QEnvironment::ntf_job_error_alert("ntf_job_error_alert", "Alert", 0 );
-Attr       QEnvironment::ntf_job_error_sound("ntf_job_error_sound", "Sound", "");
+AttrNumber QEnvironment::ntf_job_added_alert("ntf_job_added_alert", "Alert", 0);
+Attr QEnvironment::ntf_job_added_sound("ntf_job_added_sound", "Sound", "");
+AttrNumber QEnvironment::ntf_job_done_alert("ntf_job_done_alert", "Alert", 0);
+Attr QEnvironment::ntf_job_done_sound("ntf_job_done_sound", "Sound", "");
+AttrNumber QEnvironment::ntf_job_error_alert("ntf_job_error_alert", "Alert", 0);
+Attr QEnvironment::ntf_job_error_sound("ntf_job_error_sound", "Sound", "");
 
-AttrNumber QEnvironment::savePrefsOnExit(    "saveprefsonexit",      "Save On Exit",            AFGUI::SAVEPREFSONEXIT         );
-AttrNumber QEnvironment::saveWndRectsOnExit( "savewndrectonexit",    "Save Windows Geometry",   AFGUI::SAVEWNDRECTS            );
-AttrNumber QEnvironment::saveGUIOnExit(      "saveguionexit",        "Save Gui Settings",       AFGUI::SAVEGUI                 );
-AttrNumber QEnvironment::saveHotkeysOnExit(  "savehotkeysonexit",    "Save Hotkeys",            AFGUI::SAVEHOTKEYS             );
-AttrNumber QEnvironment::showServerName(     "showservername",       "Show Server Name",        0                              );
-AttrNumber QEnvironment::showServerPort(     "showserverport",       "Show Server Port",        0                              );
-AttrNumber QEnvironment::showOfflineNoise(   "showofflinenoise",     "Show Offline Noise",      AFGUI::SHOWOFFLINENOISE        );
+AttrNumber QEnvironment::savePrefsOnExit("saveprefsonexit", "Save On Exit", AFGUI::SAVEPREFSONEXIT);
+AttrNumber QEnvironment::saveWndRectsOnExit("savewndrectonexit", "Save Windows Geometry",
+											AFGUI::SAVEWNDRECTS);
+AttrNumber QEnvironment::saveGUIOnExit("saveguionexit", "Save Gui Settings", AFGUI::SAVEGUI);
+AttrNumber QEnvironment::saveHotkeysOnExit("savehotkeysonexit", "Save Hotkeys", AFGUI::SAVEHOTKEYS);
+AttrNumber QEnvironment::showServerName("showservername", "Show Server Name", 0);
+AttrNumber QEnvironment::showServerPort("showserverport", "Show Server Port", 0);
+AttrNumber QEnvironment::showOfflineNoise("showofflinenoise", "Show Offline Noise", AFGUI::SHOWOFFLINENOISE);
 
-Attr       QEnvironment::font_family(        "font_family",          "Font Family",             AFGUI::FONT_FAMILY             );
-AttrNumber QEnvironment::font_sizename(      "font_sizename",        "Size Name",               AFGUI::FONT_SIZENAME           );
-AttrNumber QEnvironment::font_sizeinfo(      "font_sizeinfo",        "Size Info",               AFGUI::FONT_SIZEINFO           );
-AttrNumber QEnvironment::font_sizemin(       "font_sizemin",         "Size Minimum",            AFGUI::FONT_SIZEMIN            );
-AttrNumber QEnvironment::font_sizeplotter(   "font_sizeplotter",     "Size Plotter",            AFGUI::FONT_SIZEPLOTTER        );
+Attr QEnvironment::font_family("font_family", "Font Family", AFGUI::FONT_FAMILY);
+AttrNumber QEnvironment::font_sizename("font_sizename", "Size Name", AFGUI::FONT_SIZENAME);
+AttrNumber QEnvironment::font_sizeinfo("font_sizeinfo", "Size Info", AFGUI::FONT_SIZEINFO);
+AttrNumber QEnvironment::font_sizemin("font_sizemin", "Size Minimum", AFGUI::FONT_SIZEMIN);
+AttrNumber QEnvironment::font_sizeplotter("font_sizeplotter", "Size Plotter", AFGUI::FONT_SIZEPLOTTER);
 
-AttrColor QEnvironment::clr_Window(          "clr_Window",           "Window",                  AFGUI::CLR_WINDOW              );
-AttrColor QEnvironment::clr_WindowText(      "clr_WindowText",       "Window Text",             AFGUI::CLR_WINDOWTEXT          );
-AttrColor QEnvironment::clr_DisabledText(    "clr_DisabledText",     "Disabled Text",           AFGUI::CLR_DISABLEDTEXT        );
-AttrColor QEnvironment::clr_Base(            "clr_Base",             "Base Color",              AFGUI::CLR_BASE                );
-//AttrColor QEnvironment::clr_AlternateBase AFGUI::CLR_ALTERNATEBASE
-AttrColor QEnvironment::clr_Text(            "clr_Text",             "Text",                    AFGUI::CLR_TEXT                );
-AttrColor QEnvironment::clr_Button(          "clr_Button",           "Button",                  AFGUI::CLR_BUTTON              );
+AttrColor QEnvironment::clr_Window("clr_Window", "Window", AFGUI::CLR_WINDOW);
+AttrColor QEnvironment::clr_WindowText("clr_WindowText", "Window Text", AFGUI::CLR_WINDOWTEXT);
+AttrColor QEnvironment::clr_DisabledText("clr_DisabledText", "Disabled Text", AFGUI::CLR_DISABLEDTEXT);
+AttrColor QEnvironment::clr_Base("clr_Base", "Base Color", AFGUI::CLR_BASE);
+// AttrColor QEnvironment::clr_AlternateBase AFGUI::CLR_ALTERNATEBASE
+AttrColor QEnvironment::clr_Text("clr_Text", "Text", AFGUI::CLR_TEXT);
+AttrColor QEnvironment::clr_Button("clr_Button", "Button", AFGUI::CLR_BUTTON);
 
-AttrColor QEnvironment::clr_Light(           "clr_Light",            "Light",                   AFGUI::CLR_LIGHT               );
-AttrColor QEnvironment::clr_Midlight(        "clr_Midlight",         "Midlight",                AFGUI::CLR_MIDLIGHT            );
-AttrColor QEnvironment::clr_Dark(            "clr_Dark",             "Dark",                    AFGUI::CLR_DARK                );
-AttrColor QEnvironment::clr_Mid(             "clr_Mid",              "Mid & Nodes List",        AFGUI::CLR_MID                 );
-AttrColor QEnvironment::clr_Shadow(          "clr_Shadow",           "Shadow",                  AFGUI::CLR_SHADOW              );
+AttrColor QEnvironment::clr_Light("clr_Light", "Light", AFGUI::CLR_LIGHT);
+AttrColor QEnvironment::clr_Midlight("clr_Midlight", "Midlight", AFGUI::CLR_MIDLIGHT);
+AttrColor QEnvironment::clr_Dark("clr_Dark", "Dark", AFGUI::CLR_DARK);
+AttrColor QEnvironment::clr_Mid("clr_Mid", "Mid & Nodes List", AFGUI::CLR_MID);
+AttrColor QEnvironment::clr_Shadow("clr_Shadow", "Shadow", AFGUI::CLR_SHADOW);
 
-AttrColor QEnvironment::clr_Highlight(       "clr_Highlight",        "Highlight",               AFGUI::CLR_HIGHLIGHT           );
-AttrColor QEnvironment::clr_HighlightedText( "clr_HighlightedText",  "Highlighted Text",        AFGUI::CLR_HIGHLIGHTEDTEXT     );
-AttrColor QEnvironment::clr_Link(            "clr_Link",             "Link",                    AFGUI::CLR_LINK                );
-AttrColor QEnvironment::clr_LinkVisited(     "clr_LinkVisited",      "VisitedLink",             AFGUI::CLR_LINKVISITED         );
+AttrColor QEnvironment::clr_Highlight("clr_Highlight", "Highlight", AFGUI::CLR_HIGHLIGHT);
+AttrColor QEnvironment::clr_HighlightedText("clr_HighlightedText", "Highlighted Text",
+											AFGUI::CLR_HIGHLIGHTEDTEXT);
+AttrColor QEnvironment::clr_Link("clr_Link", "Link", AFGUI::CLR_LINK);
+AttrColor QEnvironment::clr_LinkVisited("clr_LinkVisited", "VisitedLink", AFGUI::CLR_LINKVISITED);
 
-AttrColor QEnvironment::clr_item(            "clr_item",             "Item",                    AFGUI::CLR_ITEM                );
-AttrColor QEnvironment::clr_selected(        "clr_selected",         "Selected Item",           AFGUI::CLR_SELECTED            );
-AttrColor QEnvironment::clr_itemjob(         "clr_itemjob",          "Job Item",                AFGUI::CLR_ITEMJOB             );
-AttrColor QEnvironment::clr_itemjoboff(      "clr_itemjoboff",       "Offline Job",             AFGUI::CLR_ITEMJOBOFF          );
-AttrColor QEnvironment::clr_itemjobppa(      "clr_itemjobppa",       "Preview Pending Approval",AFGUI::CLR_ITEMJOBPPA          );
-AttrColor QEnvironment::clr_itemjobwtime(    "clr_itemjobwtime",     "Wainting Time Job",       AFGUI::CLR_ITEMJOBWTIME        );
-AttrColor QEnvironment::clr_itemjobwdep(     "clr_itemjobwdep",      "Job Waits Depends",       AFGUI::CLR_ITEMJOBWDEP         );
-AttrColor QEnvironment::clr_itemjobsuspended("clr_itemjobsuspended", "Suspended Job",           AFGUI::CLR_ITEMJOBSUSPENDED    );
-AttrColor QEnvironment::clr_itemjobdone(     "clr_itemjobdone",      "Done Job",                AFGUI::CLR_ITEMJOBDONE         );
-AttrColor QEnvironment::clr_itemjoberror(    "clr_itemjoberror",     "Job With Error(s)",       AFGUI::CLR_ITEMJOBERROR        );
-AttrColor QEnvironment::clr_itemjobwarning(  "clr_itemjobwarning",   "Job Warning",             AFGUI::CLR_ITEMJOBWARNING      );
-AttrColor QEnvironment::clr_taskwarningrun(  "clr_taskwarningrun",   "Warning Run Task",        AFGUI::CLR_TASKWARNINGRUN      );
-AttrColor QEnvironment::clr_taskwarningdone( "clr_taskwarningdone",  "Warning Done Task",       AFGUI::CLR_TASKWARNINGDONE     );
-AttrColor QEnvironment::clr_taskskipped(     "clr_taskskipped",      "Skipped Task",            AFGUI::CLR_TASKSKIPPED         );
-AttrColor QEnvironment::clr_taskwaitreconn(  "clr_taskwaitreconn",   "Waiting Reconnect Task",  AFGUI::CLR_TASKWAITRECONN      );
-AttrColor QEnvironment::clr_tasktrynext(     "clr_tasktrynext",      "Trying This Task Next",   AFGUI::CLR_TASKTRYNEXT         );
-AttrColor QEnvironment::clr_tasksuspended(   "clr_tasksuspended",    "Suspended Task",          AFGUI::CLR_TASKSUSPENDED       );
-AttrColor QEnvironment::clr_itemrender(      "clr_itemrender",       "Render Item",             AFGUI::CLR_ITEMRENDER          );
-AttrColor QEnvironment::clr_itemrenderoff(   "clr_itemrenderoff",    "Offine Render",           AFGUI::CLR_ITEMRENDEROFF       );
-AttrColor QEnvironment::clr_itemrenderbusy(  "clr_itemrenderbusy",   "Busy Render",             AFGUI::CLR_ITEMRENDERBUSY      );
-AttrColor QEnvironment::clr_itemrendernimby( "clr_itemrendernimby",  "Render With nimby",       AFGUI::CLR_ITEMRENDERnimby     );
-AttrColor QEnvironment::clr_itemrenderNIMBY( "clr_itemrenderNIMBY",  "Render With NIMBY",       AFGUI::CLR_ITEMRENDERNIMBY     );
-AttrColor QEnvironment::clr_itemrenderpaused("clr_itemrenderpaused", "Paused Render",           AFGUI::CLR_ITEMRENDERPAUSED    );
-AttrColor QEnvironment::clr_itemrendersick(  "clr_itemrendersick",   "Sick Render",             AFGUI::CLR_ITEMRENDERSICK      );
-AttrColor QEnvironment::clr_itemrenderpltclr("clr_itemrenderpltclr", "Plotter Text Label",      AFGUI::CLR_ITEMRENDERPLTCLR    );
-AttrColor QEnvironment::clr_running(         "clr_running",          "Running Bar",             AFGUI::CLR_RUNNING             );
-AttrColor QEnvironment::clr_done(            "clr_done",             "Done Bar",                AFGUI::CLR_DONE                );
-AttrColor QEnvironment::clr_error(           "clr_error",            "Error Bar",               AFGUI::CLR_ERROR               );
-AttrColor QEnvironment::clr_errorready(      "clr_errorready",       "Error Ready Bar",         AFGUI::CLR_ERRORREADY          );
-AttrColor QEnvironment::clr_outline(         "clr_outline",          "Bars Outline",            AFGUI::CLR_OUTLINE             );
-AttrColor QEnvironment::clr_star(            "clr_star",             "Star",                    AFGUI::CLR_STAR                );
-AttrColor QEnvironment::clr_starline(        "clr_starline",         "Star Outline",            AFGUI::CLR_STARLINE            );
+AttrColor QEnvironment::clr_item("clr_item", "Item", AFGUI::CLR_ITEM);
+AttrColor QEnvironment::clr_selected("clr_selected", "Selected Item", AFGUI::CLR_SELECTED);
+AttrColor QEnvironment::clr_itemjob("clr_itemjob", "Job Item", AFGUI::CLR_ITEMJOB);
+AttrColor QEnvironment::clr_itemjoboff("clr_itemjoboff", "Offline Job", AFGUI::CLR_ITEMJOBOFF);
+AttrColor QEnvironment::clr_itemjobppa("clr_itemjobppa", "Preview Pending Approval", AFGUI::CLR_ITEMJOBPPA);
+AttrColor QEnvironment::clr_itemjobwtime("clr_itemjobwtime", "Wainting Time Job", AFGUI::CLR_ITEMJOBWTIME);
+AttrColor QEnvironment::clr_itemjobwdep("clr_itemjobwdep", "Job Waits Depends", AFGUI::CLR_ITEMJOBWDEP);
+AttrColor QEnvironment::clr_itemjobsuspended("clr_itemjobsuspended", "Suspended Job",
+											 AFGUI::CLR_ITEMJOBSUSPENDED);
+AttrColor QEnvironment::clr_itemjobdone("clr_itemjobdone", "Done Job", AFGUI::CLR_ITEMJOBDONE);
+AttrColor QEnvironment::clr_itemjoberror("clr_itemjoberror", "Job With Error(s)", AFGUI::CLR_ITEMJOBERROR);
+AttrColor QEnvironment::clr_itemjobwarning("clr_itemjobwarning", "Job Warning", AFGUI::CLR_ITEMJOBWARNING);
+AttrColor QEnvironment::clr_taskwarningrun("clr_taskwarningrun", "Warning Run Task",
+										   AFGUI::CLR_TASKWARNINGRUN);
+AttrColor QEnvironment::clr_taskwarningdone("clr_taskwarningdone", "Warning Done Task",
+											AFGUI::CLR_TASKWARNINGDONE);
+AttrColor QEnvironment::clr_taskskipped("clr_taskskipped", "Skipped Task", AFGUI::CLR_TASKSKIPPED);
+AttrColor QEnvironment::clr_taskwaitreconn("clr_taskwaitreconn", "Waiting Reconnect Task",
+										   AFGUI::CLR_TASKWAITRECONN);
+AttrColor QEnvironment::clr_tasktrynext("clr_tasktrynext", "Trying This Task Next", AFGUI::CLR_TASKTRYNEXT);
+AttrColor QEnvironment::clr_tasksuspended("clr_tasksuspended", "Suspended Task", AFGUI::CLR_TASKSUSPENDED);
+AttrColor QEnvironment::clr_itemrender("clr_itemrender", "Render Item", AFGUI::CLR_ITEMRENDER);
+AttrColor QEnvironment::clr_itemrenderoff("clr_itemrenderoff", "Offine Render", AFGUI::CLR_ITEMRENDEROFF);
+AttrColor QEnvironment::clr_itemrenderbusy("clr_itemrenderbusy", "Busy Render", AFGUI::CLR_ITEMRENDERBUSY);
+AttrColor QEnvironment::clr_itemrendernimby("clr_itemrendernimby", "Render With nimby",
+											AFGUI::CLR_ITEMRENDERnimby);
+AttrColor QEnvironment::clr_itemrenderNIMBY("clr_itemrenderNIMBY", "Render With NIMBY",
+											AFGUI::CLR_ITEMRENDERNIMBY);
+AttrColor QEnvironment::clr_itemrenderpaused("clr_itemrenderpaused", "Paused Render",
+											 AFGUI::CLR_ITEMRENDERPAUSED);
+AttrColor QEnvironment::clr_itemrendersick("clr_itemrendersick", "Sick Render", AFGUI::CLR_ITEMRENDERSICK);
+AttrColor QEnvironment::clr_itemrenderpltclr("clr_itemrenderpltclr", "Plotter Text Label",
+											 AFGUI::CLR_ITEMRENDERPLTCLR);
+AttrColor QEnvironment::clr_running("clr_running", "Running Bar", AFGUI::CLR_RUNNING);
+AttrColor QEnvironment::clr_done("clr_done", "Done Bar", AFGUI::CLR_DONE);
+AttrColor QEnvironment::clr_error("clr_error", "Error Bar", AFGUI::CLR_ERROR);
+AttrColor QEnvironment::clr_errorready("clr_errorready", "Error Ready Bar", AFGUI::CLR_ERRORREADY);
+AttrColor QEnvironment::clr_outline("clr_outline", "Bars Outline", AFGUI::CLR_OUTLINE);
+AttrColor QEnvironment::clr_star("clr_star", "Star", AFGUI::CLR_STAR);
+AttrColor QEnvironment::clr_starline("clr_starline", "Star Outline", AFGUI::CLR_STARLINE);
 
-AttrColor QEnvironment::clr_textbright(      "clr_textbright",       "Bright Text",             AFGUI::CLR_TEXTBRIGHT          );
-AttrColor QEnvironment::clr_textdone(        "clr_textdone",         "Done Text",               AFGUI::CLR_TEXTDONE            );
-AttrColor QEnvironment::clr_textmuted(       "clr_textmuted",        "Muted Text",              AFGUI::CLR_TEXTMUTED           );
-AttrColor QEnvironment::clr_textstars(       "clr_textstars",        "Stars Text",              AFGUI::CLR_TEXTSTARS           );
+AttrColor QEnvironment::clr_textbright("clr_textbright", "Bright Text", AFGUI::CLR_TEXTBRIGHT);
+AttrColor QEnvironment::clr_textdone("clr_textdone", "Done Text", AFGUI::CLR_TEXTDONE);
+AttrColor QEnvironment::clr_textmuted("clr_textmuted", "Muted Text", AFGUI::CLR_TEXTMUTED);
+AttrColor QEnvironment::clr_textstars("clr_textstars", "Stars Text", AFGUI::CLR_TEXTSTARS);
 
-AttrNumber QEnvironment::renders_run_time_max_secs("renders_run_time_max_secs", "Renders Item Run Time Max", 0);
+AttrNumber QEnvironment::renders_run_time_max_secs("renders_run_time_max_secs", "Renders Item Run Time Max",
+												   0);
 AttrNumber QEnvironment::jobs_run_time_max_secs("jobs_run_time_max_secs", "Job Item Run Time Max", 0);
 AttrNumber QEnvironment::work_run_time_max_secs("work_run_time_max_secs", "Job Item Run Time Max", 0);
-AttrNumber QEnvironment::thumb_jobs_height("thumb_jobs_height", "Job Item Height",      AFGUI::THUMB_JOBS_HEIGHT);
-AttrNumber QEnvironment::thumb_work_height("thumb_work_height", "Work Job Item Height", AFGUI::THUMB_JOBS_HEIGHT);
-AttrNumber QEnvironment::render_item_size ("render_item_size",  "Render Item Size",     AFGUI::RENDER_ITEM_SIZE );
+AttrNumber QEnvironment::thumb_jobs_height("thumb_jobs_height", "Job Item Height", AFGUI::THUMB_JOBS_HEIGHT);
+AttrNumber QEnvironment::thumb_work_height("thumb_work_height", "Work Job Item Height",
+										   AFGUI::THUMB_JOBS_HEIGHT);
+AttrNumber QEnvironment::render_item_size("render_item_size", "Render Item Size", AFGUI::RENDER_ITEM_SIZE);
 
-QColor QEnvironment::qclr_black(   0,   0,   0);
-QColor QEnvironment::qclr_white( 255, 255, 255);
-
+QColor QEnvironment::qclr_black(0, 0, 0);
+QColor QEnvironment::qclr_white(255, 255, 255);
 
 QString QEnvironment::ms_filename;
 QString QEnvironment::ms_themes_folder;
@@ -140,10 +151,10 @@ QFont QEnvironment::f_thin;
 QFont QEnvironment::f_muted;
 QFont QEnvironment::f_plotter;
 QFont QEnvironment::f_min;
-QList<Attr*>     QEnvironment::ms_attrs_prefs;
-QList<AttrRect*> QEnvironment::ms_attrs_wndrects;
-QList<Attr*>     QEnvironment::ms_attrs_gui;
-QMap<QString,Attr*> QEnvironment::ms_attrs_hotkeys;
+QList<Attr *> QEnvironment::ms_attrs_prefs;
+QList<AttrRect *> QEnvironment::ms_attrs_wndrects;
+QList<Attr *> QEnvironment::ms_attrs_gui;
+QMap<QString, Attr *> QEnvironment::ms_attrs_hotkeys;
 QStringList QEnvironment::ms_hotkeys_names;
 QMap<QString, AttrNumber> QEnvironment::ms_attrs_panel;
 QList<int64_t> QEnvironment::ms_jobs_serials_collapsed;
@@ -157,138 +168,138 @@ QString QEnvironment::ms_servername;
 QString QEnvironment::ms_username;
 QString QEnvironment::ms_hostname;
 
-QEnvironment::QEnvironment( const QString & i_name)
+QEnvironment::QEnvironment(const QString &i_name)
 {
 	printf("Qt version = \"%s\"\n", qVersion());
 
-    ms_appname = i_name;
+	ms_appname = i_name;
 
-    ms_attrs_prefs.append( &level              );
-    ms_attrs_prefs.append( &theme              );
-    ms_attrs_prefs.append(&scroll_step         );
-    ms_attrs_prefs.append( &savePrefsOnExit    );
-    ms_attrs_prefs.append( &saveWndRectsOnExit );
-    ms_attrs_prefs.append( &saveGUIOnExit      );
-    ms_attrs_prefs.append( &saveHotkeysOnExit  );
-    ms_attrs_prefs.append(&showServerName      );
-    ms_attrs_prefs.append(&showServerPort      );
-    ms_attrs_prefs.append( &showOfflineNoise   );
+	ms_attrs_prefs.append(&level);
+	ms_attrs_prefs.append(&theme);
+	ms_attrs_prefs.append(&scroll_step);
+	ms_attrs_prefs.append(&savePrefsOnExit);
+	ms_attrs_prefs.append(&saveWndRectsOnExit);
+	ms_attrs_prefs.append(&saveGUIOnExit);
+	ms_attrs_prefs.append(&saveHotkeysOnExit);
+	ms_attrs_prefs.append(&showServerName);
+	ms_attrs_prefs.append(&showServerPort);
+	ms_attrs_prefs.append(&showOfflineNoise);
 
 	ms_attrs_prefs.append(&renders_run_time_max_secs);
 	ms_attrs_prefs.append(&jobs_run_time_max_secs);
 	ms_attrs_prefs.append(&work_run_time_max_secs);
 	ms_attrs_prefs.append(&thumb_jobs_height);
 	ms_attrs_prefs.append(&thumb_work_height);
-	ms_attrs_prefs.append(&render_item_size );
+	ms_attrs_prefs.append(&render_item_size);
 
-    ms_attrs_prefs.append( &ntf_job_added_alert );
-    ms_attrs_prefs.append( &ntf_job_added_sound );
-    ms_attrs_prefs.append( &ntf_job_done_alert  );
-    ms_attrs_prefs.append( &ntf_job_done_sound  );
-    ms_attrs_prefs.append( &ntf_job_error_alert );
-    ms_attrs_prefs.append( &ntf_job_error_sound );
+	ms_attrs_prefs.append(&ntf_job_added_alert);
+	ms_attrs_prefs.append(&ntf_job_added_sound);
+	ms_attrs_prefs.append(&ntf_job_done_alert);
+	ms_attrs_prefs.append(&ntf_job_done_sound);
+	ms_attrs_prefs.append(&ntf_job_error_alert);
+	ms_attrs_prefs.append(&ntf_job_error_sound);
 
-	ms_attrs_gui.append( &image_back            );
-    ms_attrs_gui.append( &image_border_top      );
-    ms_attrs_gui.append( &image_border_topleft  );
-    ms_attrs_gui.append( &image_border_topright );
-    ms_attrs_gui.append( &image_border_bot      );
-    ms_attrs_gui.append( &image_border_botleft  );
-    ms_attrs_gui.append( &image_border_botright );
-    ms_attrs_gui.append( &image_snap_leftoff    );
-    ms_attrs_gui.append( &image_snap_lefton     );
-    ms_attrs_gui.append( &image_snap_rightoff   );
-    ms_attrs_gui.append( &image_snap_righton    );
+	ms_attrs_gui.append(&image_back);
+	ms_attrs_gui.append(&image_border_top);
+	ms_attrs_gui.append(&image_border_topleft);
+	ms_attrs_gui.append(&image_border_topright);
+	ms_attrs_gui.append(&image_border_bot);
+	ms_attrs_gui.append(&image_border_botleft);
+	ms_attrs_gui.append(&image_border_botright);
+	ms_attrs_gui.append(&image_snap_leftoff);
+	ms_attrs_gui.append(&image_snap_lefton);
+	ms_attrs_gui.append(&image_snap_rightoff);
+	ms_attrs_gui.append(&image_snap_righton);
 
-    ms_attrs_gui.append( &star_numpoints );
-    ms_attrs_gui.append( &star_radiusout );
-    ms_attrs_gui.append( &star_radiusin  );
-    ms_attrs_gui.append( &star_rotate    );
+	ms_attrs_gui.append(&star_numpoints);
+	ms_attrs_gui.append(&star_radiusout);
+	ms_attrs_gui.append(&star_radiusin);
+	ms_attrs_gui.append(&star_rotate);
 
-    ms_attrs_gui.append( &font_family         );
-    ms_attrs_gui.append( &font_sizename       );
-    ms_attrs_gui.append( &font_sizeinfo       );
-    ms_attrs_gui.append( &font_sizemin        );
-    ms_attrs_gui.append( &font_sizeplotter    );
+	ms_attrs_gui.append(&font_family);
+	ms_attrs_gui.append(&font_sizename);
+	ms_attrs_gui.append(&font_sizeinfo);
+	ms_attrs_gui.append(&font_sizemin);
+	ms_attrs_gui.append(&font_sizeplotter);
 
-    ms_attrs_gui.append( &clr_Window          );
-    ms_attrs_gui.append( &clr_WindowText      );
-    ms_attrs_gui.append( &clr_DisabledText    );
-    ms_attrs_gui.append( &clr_Base            );
-    //attrs_gui.append( &clr_AlternateBase   );
-    ms_attrs_gui.append( &clr_Text            );
-    ms_attrs_gui.append( &clr_Button          );
+	ms_attrs_gui.append(&clr_Window);
+	ms_attrs_gui.append(&clr_WindowText);
+	ms_attrs_gui.append(&clr_DisabledText);
+	ms_attrs_gui.append(&clr_Base);
+	// attrs_gui.append( &clr_AlternateBase   );
+	ms_attrs_gui.append(&clr_Text);
+	ms_attrs_gui.append(&clr_Button);
 
-    ms_attrs_gui.append( &clr_Light           );
-    ms_attrs_gui.append( &clr_Midlight        );
-    ms_attrs_gui.append( &clr_Mid             );
-    ms_attrs_gui.append( &clr_Dark            );
-    ms_attrs_gui.append( &clr_Shadow          );
+	ms_attrs_gui.append(&clr_Light);
+	ms_attrs_gui.append(&clr_Midlight);
+	ms_attrs_gui.append(&clr_Mid);
+	ms_attrs_gui.append(&clr_Dark);
+	ms_attrs_gui.append(&clr_Shadow);
 
-    ms_attrs_gui.append( &clr_Highlight       );
-    ms_attrs_gui.append( &clr_HighlightedText );
-    ms_attrs_gui.append( &clr_Link            );
-    ms_attrs_gui.append( &clr_LinkVisited     );
+	ms_attrs_gui.append(&clr_Highlight);
+	ms_attrs_gui.append(&clr_HighlightedText);
+	ms_attrs_gui.append(&clr_Link);
+	ms_attrs_gui.append(&clr_LinkVisited);
 
-    ms_attrs_gui.append( &clr_item            );
-    ms_attrs_gui.append( &clr_selected        );
-    ms_attrs_gui.append( &clr_itemjob         );
-    ms_attrs_gui.append( &clr_itemjoboff      );
-    ms_attrs_gui.append( &clr_itemjobwtime    );
-    ms_attrs_gui.append( &clr_itemjobwdep     );
-    ms_attrs_gui.append( &clr_itemjobdone     );
-    ms_attrs_gui.append( &clr_itemjoberror    );
-    ms_attrs_gui.append( &clr_itemrender      );
-    ms_attrs_gui.append( &clr_itemrenderoff   );
-    ms_attrs_gui.append( &clr_itemrenderbusy  );
-    ms_attrs_gui.append( &clr_itemrendernimby );
-    ms_attrs_gui.append( &clr_itemrenderNIMBY );
-    ms_attrs_gui.append( &clr_itemrenderpaused);
-    ms_attrs_gui.append( &clr_itemrendersick  );
-    ms_attrs_gui.append( &clr_itemrenderpltclr);
-    ms_attrs_gui.append( &clr_running         );
-    ms_attrs_gui.append( &clr_done            );
-    ms_attrs_gui.append( &clr_error           );
-    ms_attrs_gui.append( &clr_errorready      );
-    ms_attrs_gui.append( &clr_star            );
-    ms_attrs_gui.append( &clr_outline         );
-    ms_attrs_gui.append( &clr_starline        );
+	ms_attrs_gui.append(&clr_item);
+	ms_attrs_gui.append(&clr_selected);
+	ms_attrs_gui.append(&clr_itemjob);
+	ms_attrs_gui.append(&clr_itemjoboff);
+	ms_attrs_gui.append(&clr_itemjobwtime);
+	ms_attrs_gui.append(&clr_itemjobwdep);
+	ms_attrs_gui.append(&clr_itemjobdone);
+	ms_attrs_gui.append(&clr_itemjoberror);
+	ms_attrs_gui.append(&clr_itemrender);
+	ms_attrs_gui.append(&clr_itemrenderoff);
+	ms_attrs_gui.append(&clr_itemrenderbusy);
+	ms_attrs_gui.append(&clr_itemrendernimby);
+	ms_attrs_gui.append(&clr_itemrenderNIMBY);
+	ms_attrs_gui.append(&clr_itemrenderpaused);
+	ms_attrs_gui.append(&clr_itemrendersick);
+	ms_attrs_gui.append(&clr_itemrenderpltclr);
+	ms_attrs_gui.append(&clr_running);
+	ms_attrs_gui.append(&clr_done);
+	ms_attrs_gui.append(&clr_error);
+	ms_attrs_gui.append(&clr_errorready);
+	ms_attrs_gui.append(&clr_star);
+	ms_attrs_gui.append(&clr_outline);
+	ms_attrs_gui.append(&clr_starline);
 
-    ms_attrs_gui.append( &clr_textbright      );
-    ms_attrs_gui.append( &clr_textmuted       );
-    ms_attrs_gui.append( &clr_textdone        );
-    ms_attrs_gui.append( &clr_textstars       );
+	ms_attrs_gui.append(&clr_textbright);
+	ms_attrs_gui.append(&clr_textmuted);
+	ms_attrs_gui.append(&clr_textdone);
+	ms_attrs_gui.append(&clr_textstars);
 
-	ms_attrs_panel["farm_pos"]               = AttrNumber("panel_farm_pos",               AFGUI::RIGHT);
-	ms_attrs_panel["farm_size_right_0"]      = AttrNumber("panel_farm_size_right_0",      600);
-	ms_attrs_panel["farm_size_right_1"]      = AttrNumber("panel_farm_size_right_1",      200);
-	ms_attrs_panel["farm_size_bottom_0"]     = AttrNumber("panel_farm_size_bottom_0",     600);
-	ms_attrs_panel["farm_size_bottom_1"]     = AttrNumber("panel_farm_size_bottom_1",     200);
-	ms_attrs_panel["jobs_pos"]               = AttrNumber("panel_jobs_pos",               AFGUI::RIGHT);
-	ms_attrs_panel["jobs_size_right_0"]      = AttrNumber("panel_jobs_size_right_0",      600);
-	ms_attrs_panel["jobs_size_right_1"]      = AttrNumber("panel_jobs_size_right_1",      200);
-	ms_attrs_panel["jobs_size_bottom_0"]     = AttrNumber("panel_jobs_size_bottom_0",     600);
-	ms_attrs_panel["jobs_size_bottom_1"]     = AttrNumber("panel_jobs_size_bottom_1",     200);
-	ms_attrs_panel["monitors_pos"]           = AttrNumber("panel_monitors_pos",           AFGUI::RIGHT);
-	ms_attrs_panel["monitors_size_right_0"]  = AttrNumber("panel_monitors_size_right_0",  600);
-	ms_attrs_panel["monitors_size_right_1"]  = AttrNumber("panel_monitors_size_right_1",  200);
+	ms_attrs_panel["farm_pos"] = AttrNumber("panel_farm_pos", AFGUI::RIGHT);
+	ms_attrs_panel["farm_size_right_0"] = AttrNumber("panel_farm_size_right_0", 600);
+	ms_attrs_panel["farm_size_right_1"] = AttrNumber("panel_farm_size_right_1", 200);
+	ms_attrs_panel["farm_size_bottom_0"] = AttrNumber("panel_farm_size_bottom_0", 600);
+	ms_attrs_panel["farm_size_bottom_1"] = AttrNumber("panel_farm_size_bottom_1", 200);
+	ms_attrs_panel["jobs_pos"] = AttrNumber("panel_jobs_pos", AFGUI::RIGHT);
+	ms_attrs_panel["jobs_size_right_0"] = AttrNumber("panel_jobs_size_right_0", 600);
+	ms_attrs_panel["jobs_size_right_1"] = AttrNumber("panel_jobs_size_right_1", 200);
+	ms_attrs_panel["jobs_size_bottom_0"] = AttrNumber("panel_jobs_size_bottom_0", 600);
+	ms_attrs_panel["jobs_size_bottom_1"] = AttrNumber("panel_jobs_size_bottom_1", 200);
+	ms_attrs_panel["monitors_pos"] = AttrNumber("panel_monitors_pos", AFGUI::RIGHT);
+	ms_attrs_panel["monitors_size_right_0"] = AttrNumber("panel_monitors_size_right_0", 600);
+	ms_attrs_panel["monitors_size_right_1"] = AttrNumber("panel_monitors_size_right_1", 200);
 	ms_attrs_panel["monitors_size_bottom_0"] = AttrNumber("panel_monitors_size_bottom_0", 600);
 	ms_attrs_panel["monitors_size_bottom_1"] = AttrNumber("panel_monitors_size_bottom_1", 200);
-	ms_attrs_panel["tasks_pos"]              = AttrNumber("panel_tasks_pos",              AFGUI::RIGHT);
-	ms_attrs_panel["tasks_size_right_0"]     = AttrNumber("panel_tasks_size_right_0",     600);
-	ms_attrs_panel["tasks_size_right_1"]     = AttrNumber("panel_tasks_size_right_1",     200);
-	ms_attrs_panel["tasks_size_bottom_0"]    = AttrNumber("panel_tasks_size_bottom_0",    600);
-	ms_attrs_panel["tasks_size_bottom_1"]    = AttrNumber("panel_tasks_size_bottom_1",    200);
-	ms_attrs_panel["users_pos"]              = AttrNumber("panel_users_pos",              AFGUI::RIGHT);
-	ms_attrs_panel["users_size_right_0"]     = AttrNumber("panel_users_size_right_0",     600);
-	ms_attrs_panel["users_size_right_1"]     = AttrNumber("panel_users_size_right_1",     200);
-	ms_attrs_panel["users_size_bottom_0"]    = AttrNumber("panel_users_size_bottom_0",    600);
-	ms_attrs_panel["users_size_bottom_1"]    = AttrNumber("panel_users_size_bottom_1",    200);
-	ms_attrs_panel["work_pos"]               = AttrNumber("panel_work_pos",           AFGUI::RIGHT);
-	ms_attrs_panel["work_size_right_0"]      = AttrNumber("panel_work_size_right_0",  600);
-	ms_attrs_panel["work_size_right_1"]      = AttrNumber("panel_work_size_right_1",  200);
-	ms_attrs_panel["work_size_bottom_0"]     = AttrNumber("panel_work_size_bottom_0", 600);
-	ms_attrs_panel["work_size_bottom_1"]     = AttrNumber("panel_work_size_bottom_1", 200);
+	ms_attrs_panel["tasks_pos"] = AttrNumber("panel_tasks_pos", AFGUI::RIGHT);
+	ms_attrs_panel["tasks_size_right_0"] = AttrNumber("panel_tasks_size_right_0", 600);
+	ms_attrs_panel["tasks_size_right_1"] = AttrNumber("panel_tasks_size_right_1", 200);
+	ms_attrs_panel["tasks_size_bottom_0"] = AttrNumber("panel_tasks_size_bottom_0", 600);
+	ms_attrs_panel["tasks_size_bottom_1"] = AttrNumber("panel_tasks_size_bottom_1", 200);
+	ms_attrs_panel["users_pos"] = AttrNumber("panel_users_pos", AFGUI::RIGHT);
+	ms_attrs_panel["users_size_right_0"] = AttrNumber("panel_users_size_right_0", 600);
+	ms_attrs_panel["users_size_right_1"] = AttrNumber("panel_users_size_right_1", 200);
+	ms_attrs_panel["users_size_bottom_0"] = AttrNumber("panel_users_size_bottom_0", 600);
+	ms_attrs_panel["users_size_bottom_1"] = AttrNumber("panel_users_size_bottom_1", 200);
+	ms_attrs_panel["work_pos"] = AttrNumber("panel_work_pos", AFGUI::RIGHT);
+	ms_attrs_panel["work_size_right_0"] = AttrNumber("panel_work_size_right_0", 600);
+	ms_attrs_panel["work_size_right_1"] = AttrNumber("panel_work_size_right_1", 200);
+	ms_attrs_panel["work_size_bottom_0"] = AttrNumber("panel_work_size_bottom_0", 600);
+	ms_attrs_panel["work_size_bottom_1"] = AttrNumber("panel_work_size_bottom_1", 200);
 	{
 		QMutableMapIterator<QString, AttrNumber> it(ms_attrs_panel);
 		while (it.hasNext())
@@ -322,150 +333,151 @@ QEnvironment::QEnvironment( const QString & i_name)
 	ms_hotkeys_names << "users_solve_parallel";
 	ms_hotkeys_names << "monitors_log";
 	ms_hotkeys_names << "monitors_exit";
-	for( int i = 0; i < ms_hotkeys_names.size(); i++)
+	for (int i = 0; i < ms_hotkeys_names.size(); i++)
 	{
-		Attr * a = new Attr( ms_hotkeys_names.at(i),"","");
+		Attr *a = new Attr(ms_hotkeys_names.at(i), "", "");
 		ms_attrs_hotkeys[ms_hotkeys_names.at(i)] = a;
 	}
 
+	ms_filename = stoq(af::Environment::getHomeAfanasy()) + AFGENERAL::PATH_SEPARATOR +
+				  ms_appname.toUtf8().data() + ".json";
+	ms_themes_folder = stoq(af::Environment::getAfRoot().c_str()) + AFGENERAL::PATH_SEPARATOR + "icons" +
+					   AFGENERAL::PATH_SEPARATOR + "watch";
 
-    ms_filename = stoq( af::Environment::getHomeAfanasy())
-           + AFGENERAL::PATH_SEPARATOR + ms_appname.toUtf8().data() + ".json";
-    ms_themes_folder = stoq( af::Environment::getAfRoot().c_str())
-           + AFGENERAL::PATH_SEPARATOR + "icons" + AFGENERAL::PATH_SEPARATOR + "watch";
+	ms_servername = QString::fromUtf8(af::Environment::getServerName().c_str());
+	ms_username = QString::fromUtf8(af::Environment::getUserName().c_str());
+	ms_hostname = QString::fromUtf8(af::Environment::getHostName().c_str());
 
-    ms_servername  = QString::fromUtf8( af::Environment::getServerName().c_str());
-    ms_username    = QString::fromUtf8( af::Environment::getUserName().c_str());
-    ms_hostname    = QString::fromUtf8( af::Environment::getHostName().c_str());
+	ms_valid = true;
 
-    ms_valid = true;
-
-    loadAttrs( ms_filename);
+	loadAttrs(ms_filename);
 
 	bool theme_loaded = true;
-    if( false == loadTheme( theme.str))
+	if (false == loadTheme(theme.str))
 	{
-		loadTheme( AFGUI::THEME);
+		loadTheme(AFGUI::THEME);
 		theme_loaded = false;
-		
 	}
-    loadAttrs( ms_filename); // We should reload attts, as theme colors can be customized
-	if( false == theme_loaded )
+	loadAttrs(ms_filename); // We should reload attts, as theme colors can be customized
+	if (false == theme_loaded)
 		theme.str = AFGUI::THEME;
 
 	int datalen = -1;
-	char * data = af::fileRead( qtos( ms_filename), &datalen);
-	if( data )
+	char *data = af::fileRead(qtos(ms_filename), &datalen);
+	if (data)
 	{
 		rapidjson::Document doc;
-		char * buffer = af::jsonParseData( doc, data, datalen);
-		if( buffer )
+		char *buffer = af::jsonParseData(doc, data, datalen);
+		if (buffer)
 		{
-			const JSON & obj = doc["watch"];
+			const JSON &obj = doc["watch"];
 
 			loadWndRects(obj);
 			loadCollapsedJobsSerials(obj);
 
-			delete [] buffer;
+			delete[] buffer;
 		}
-		delete [] data;
+		delete[] data;
 	}
 
-    initFonts();
+	initFonts();
 
-    solveServerAddress();
+	solveServerAddress();
 }
 
 void QEnvironment::initFonts()
 {
-	f_name.setBold(         true               );
-	f_name.setPointSize(    font_sizename.n    );
+	f_name.setBold(true);
+	f_name.setPointSize(font_sizename.n);
 
-	f_info.setBold(         true               );
-	f_info.setPointSize(    font_sizeinfo.n    );
+	f_info.setBold(true);
+	f_info.setPointSize(font_sizeinfo.n);
 
-	f_thin.setBold(         false              );
-	f_thin.setPointSize(    font_sizeinfo.n    );
+	f_thin.setBold(false);
+	f_thin.setPointSize(font_sizeinfo.n);
 
-	f_muted.setItalic(      true               );
-	f_muted.setPointSize(   font_sizeinfo.n    );
+	f_muted.setItalic(true);
+	f_muted.setPointSize(font_sizeinfo.n);
 
-	f_min.setBold(          true               );
-	f_min.setPointSize(     font_sizemin.n     );
+	f_min.setBold(true);
+	f_min.setPointSize(font_sizemin.n);
 
-	f_plotter.setBold(      false              );
-	f_plotter.setPointSize( font_sizeplotter.n );
+	f_plotter.setBold(false);
+	f_plotter.setPointSize(font_sizeplotter.n);
 
-	if( font_family.str.size())
+	if (font_family.str.size())
 	{
-		f_name.setFamily(           font_family.str        );
-		f_info.setFamily(           font_family.str        );
-		f_muted.setFamily(          font_family.str        );
-		f_min.setFamily(            font_family.str        );
-		f_plotter.setFamily(        font_family.str        );
+		f_name.setFamily(font_family.str);
+		f_info.setFamily(font_family.str);
+		f_muted.setFamily(font_family.str);
+		f_min.setFamily(font_family.str);
+		f_plotter.setFamily(font_family.str);
 	}
 }
 
 QEnvironment::~QEnvironment()
 {
-   if( savePrefsOnExit.n != 0) save();
-   for( int i = 0; i < ms_attrs_wndrects.size(); i++) delete ms_attrs_wndrects[i];
+	if (savePrefsOnExit.n != 0)
+		save();
+	for (int i = 0; i < ms_attrs_wndrects.size(); i++)
+		delete ms_attrs_wndrects[i];
 }
 
-void QEnvironment::setPalette( QPalette & palette)
+void QEnvironment::setPalette(QPalette &palette)
 {
-	palette.setColor( QPalette::Window,          clr_Window.c          );
-	palette.setColor( QPalette::WindowText,      clr_WindowText.c      );
-	palette.setColor( QPalette::Base,            clr_Base.c            );
-	palette.setColor( QPalette::Text,            clr_Text.c            );
-	palette.setColor( QPalette::Button,          clr_Button.c          );
+	palette.setColor(QPalette::Window, clr_Window.c);
+	palette.setColor(QPalette::WindowText, clr_WindowText.c);
+	palette.setColor(QPalette::Base, clr_Base.c);
+	palette.setColor(QPalette::Text, clr_Text.c);
+	palette.setColor(QPalette::Button, clr_Button.c);
 
-	palette.setColor( QPalette::ButtonText,      clr_Text.c            );
-	palette.setColor( QPalette::BrightText,      clr_Text.c            );
-	palette.setColor( QPalette::ToolTipBase,     clr_Window.c          );
-	palette.setColor( QPalette::ToolTipText,     clr_WindowText.c      );
-	palette.setColor( QPalette::AlternateBase,   clr_Base.c            );
+	palette.setColor(QPalette::ButtonText, clr_Text.c);
+	palette.setColor(QPalette::BrightText, clr_Text.c);
+	palette.setColor(QPalette::ToolTipBase, clr_Window.c);
+	palette.setColor(QPalette::ToolTipText, clr_WindowText.c);
+	palette.setColor(QPalette::AlternateBase, clr_Base.c);
 
-	palette.setColor( QPalette::Light,           clr_Light.c           );
-	palette.setColor( QPalette::Midlight,        clr_Midlight.c        );
-	palette.setColor( QPalette::Mid,             clr_Mid.c             );
-	palette.setColor( QPalette::Dark,            clr_Dark.c            );
-	palette.setColor( QPalette::Shadow,          clr_Shadow.c          );
+	palette.setColor(QPalette::Light, clr_Light.c);
+	palette.setColor(QPalette::Midlight, clr_Midlight.c);
+	palette.setColor(QPalette::Mid, clr_Mid.c);
+	palette.setColor(QPalette::Dark, clr_Dark.c);
+	palette.setColor(QPalette::Shadow, clr_Shadow.c);
 
-	palette.setColor( QPalette::Highlight,       clr_Highlight.c       );
-	palette.setColor( QPalette::HighlightedText, clr_HighlightedText.c );
-	palette.setColor( QPalette::Link,            clr_Link.c            );
-	palette.setColor( QPalette::LinkVisited,     clr_LinkVisited.c     );
+	palette.setColor(QPalette::Highlight, clr_Highlight.c);
+	palette.setColor(QPalette::HighlightedText, clr_HighlightedText.c);
+	palette.setColor(QPalette::Link, clr_Link.c);
+	palette.setColor(QPalette::LinkVisited, clr_LinkVisited.c);
 
-	palette.setColor( QPalette::Disabled, QPalette::WindowText, clr_DisabledText.c );
-	palette.setColor( QPalette::Disabled, QPalette::Highlight,  clr_Window.c       );
+	palette.setColor(QPalette::Disabled, QPalette::WindowText, clr_DisabledText.c);
+	palette.setColor(QPalette::Disabled, QPalette::Highlight, clr_Window.c);
 }
 
 bool QEnvironment::save()
 {
-   QByteArray data;
+	QByteArray data;
 
-	data.append( QByteArray("{\"watch\":{\n\"\":\"Created by ") + ms_appname.toUtf8() + "\",\n");
+	data.append(QByteArray("{\"watch\":{\n\"\":\"Created by ") + ms_appname.toUtf8() + "\",\n");
 
-	for( int i = 0; i < ms_attrs_prefs.size(); i++)
+	for (int i = 0; i < ms_attrs_prefs.size(); i++)
 	{
-		if( i ) data.append(",\n");
-		ms_attrs_prefs[i]->v_write( data);
+		if (i)
+			data.append(",\n");
+		ms_attrs_prefs[i]->v_write(data);
 	}
-	if( saveGUIOnExit.n != 0)
+	if (saveGUIOnExit.n != 0)
 	{
 		data.append(",\n");
-		saveGUI( data);
+		saveGUI(data);
 	}
-	if( saveHotkeysOnExit.n != 0)
+	if (saveHotkeysOnExit.n != 0)
 	{
 		data.append(",\n");
-		saveHotkeys( data);
+		saveHotkeys(data);
 	}
-	if( saveWndRectsOnExit.n != 0)
+	if (saveWndRectsOnExit.n != 0)
 	{
 		data.append(",\n");
-		saveWndRects( data);
+		saveWndRects(data);
 	}
 
 	data.append(",\n");
@@ -473,245 +485,254 @@ bool QEnvironment::save()
 
 	data.append("\n}}\n");
 
-   QFile file( ms_filename);
-   if( file.open( QIODevice::WriteOnly) == false)
-   {
-      AFERRAR("afqt::QEnvironment::save: Can't write to '%s'", ms_filename.toUtf8().data())
-      return false;
-   }
-   file.write( data);
-   file.flush();
-   file.close();
-   return true;
+	QFile file(ms_filename);
+	if (file.open(QIODevice::WriteOnly) == false)
+	{
+		AFERRAR("afqt::QEnvironment::save: Can't write to '%s'", ms_filename.toUtf8().data())
+		return false;
+	}
+	file.write(data);
+	file.flush();
+	file.close();
+	return true;
 }
 
-void QEnvironment::saveGUI( QByteArray & data)
+void QEnvironment::saveGUI(QByteArray &data)
 {
-	for( int i = 0; i < ms_attrs_gui.size(); i++)
+	for (int i = 0; i < ms_attrs_gui.size(); i++)
 	{
-		if( i ) data.append(",\n");
-		ms_attrs_gui[i]->v_write( data);
+		if (i)
+			data.append(",\n");
+		ms_attrs_gui[i]->v_write(data);
 	}
 }
-void QEnvironment::saveHotkeys( QByteArray & data)
+void QEnvironment::saveHotkeys(QByteArray &data)
 {
-	QMapIterator<QString, Attr*> i(ms_attrs_hotkeys);
+	QMapIterator<QString, Attr *> i(ms_attrs_hotkeys);
 	bool first = true;
-	while( i.hasNext())
+	while (i.hasNext())
 	{
-		if( false == first )
+		if (false == first)
 			data.append(",\n");
 		first = false;
 		i.next();
-		(i.value())->v_write( data);
+		(i.value())->v_write(data);
 	}
 }
-void QEnvironment::saveWndRects(QByteArray & o_data)
+void QEnvironment::saveWndRects(QByteArray &o_data)
 {
 	o_data.append("    \"wnd_rects\":[");
 	for (int i = 0; i < ms_attrs_wndrects.size(); i++)
 	{
-		if (i) o_data.append(",");
+		if (i)
+			o_data.append(",");
 		o_data.append("\n        ");
 		ms_attrs_wndrects[i]->v_write(o_data);
 	}
 	o_data.append("\n    ]");
 }
 
-void QEnvironment::loadWndRects(const JSON & i_obj)
+void QEnvironment::loadWndRects(const JSON &i_obj)
 {
-	const JSON & wndrects = i_obj["wnd_rects"];
+	const JSON &wndrects = i_obj["wnd_rects"];
 	if (false == wndrects.IsArray())
 		return;
 
 	for (int i = 0; i < wndrects.Size(); i++)
 	{
-		AttrRect * attrrect = AttrRect::readObj(wndrects[i]);
-		if (attrrect == NULL) continue;
+		AttrRect *attrrect = AttrRect::readObj(wndrects[i]);
+		if (attrrect == NULL)
+			continue;
 		ms_attrs_wndrects.append(attrrect);
 	}
 }
 
-bool QEnvironment::getRect( const QString & i_name, QRect & rect)
+bool QEnvironment::getRect(const QString &i_name, QRect &rect)
 {
-   for( int i = 0; i < ms_attrs_wndrects.size(); i++)
-   {
-      if( ms_attrs_wndrects[i]->getName() == i_name)
-      {
-         rect = ms_attrs_wndrects[i]->r;
-         return true;
-      }
-   }
-   AttrRect * attrrect = new AttrRect( i_name, rect);
-   ms_attrs_wndrects.append( attrrect);
-   return false;
+	for (int i = 0; i < ms_attrs_wndrects.size(); i++)
+	{
+		if (ms_attrs_wndrects[i]->getName() == i_name)
+		{
+			rect = ms_attrs_wndrects[i]->r;
+			return true;
+		}
+	}
+	AttrRect *attrrect = new AttrRect(i_name, rect);
+	ms_attrs_wndrects.append(attrrect);
+	return false;
 }
 
-void QEnvironment::setRect( const QString & i_name, const QRect & rect)
+void QEnvironment::setRect(const QString &i_name, const QRect &rect)
 {
-   for( int i = 0; i < ms_attrs_wndrects.size(); i++)
-   {
-      if( ms_attrs_wndrects[i]->getName() == i_name)
-      {
-         ms_attrs_wndrects[i]->r = rect;
-         return;
-      }
-   }
+	for (int i = 0; i < ms_attrs_wndrects.size(); i++)
+	{
+		if (ms_attrs_wndrects[i]->getName() == i_name)
+		{
+			ms_attrs_wndrects[i]->r = rect;
+			return;
+		}
+	}
 }
 
 void QEnvironment::resetAllRects()
 {
-   for (int i = 0; i < ms_attrs_wndrects.size(); i++)
-	   delete ms_attrs_wndrects[i];
+	for (int i = 0; i < ms_attrs_wndrects.size(); i++)
+		delete ms_attrs_wndrects[i];
 
-   ms_attrs_wndrects.clear();
+	ms_attrs_wndrects.clear();
 }
 
 void QEnvironment::solveServerAddress()
 {
-   static std::string serveraddrnum_arg("-srvaddrnum");
-   af::Environment::addUsage( serveraddrnum_arg + " [number]", "Use specified server address number.");
-   QList<QHostAddress> adresses;
-   if( af::netIsIpAddr( af::Environment::getServerName()))
-   {
-      printf("Server address IP direct literals specified.\n");
-      adresses << QHostAddress ( ms_servername);
-   }
-   else
-   {
-      printf("Looking up server name \"%s\"...\n", af::Environment::getServerName().c_str());
-      QHostInfo qhostinfo = QHostInfo::fromName( ms_servername);
-      adresses = qhostinfo.addresses();
+	static std::string serveraddrnum_arg("-srvaddrnum");
+	af::Environment::addUsage(serveraddrnum_arg + " [number]", "Use specified server address number.");
+	QList<QHostAddress> adresses;
+	if (af::netIsIpAddr(af::Environment::getServerName()))
+	{
+		printf("Server address IP direct literals specified.\n");
+		adresses << QHostAddress(ms_servername);
+	}
+	else
+	{
+		printf("Looking up server name \"%s\"...\n", af::Environment::getServerName().c_str());
+		QHostInfo qhostinfo = QHostInfo::fromName(ms_servername);
+		adresses = qhostinfo.addresses();
 		if (adresses.size() < 1)
 		{
 			AF_ERR << "Can't solve server name \"" << af::Environment::getServerName().c_str() << "\"";
 			ms_valid = false;
 			return;
 		}
-   }
-   if( adresses.size() > 1 )
-   {
-      printf( "Solved several server addresses:\n");
-      for( int i = 0; i < adresses.size(); i++) printf( "%s\n", adresses[i].toString().toUtf8().data());
-   }
+	}
+	if (adresses.size() > 1)
+	{
+		printf("Solved several server addresses:\n");
+		for (int i = 0; i < adresses.size(); i++)
+			printf("%s\n", adresses[i].toString().toUtf8().data());
+	}
 
-   // Use the first IP address, if no address number not provided
-   int serveraddrnum = -1;
+	// Use the first IP address, if no address number not provided
+	int serveraddrnum = -1;
 
-   std::string serveraddrnum_str;
-   if( af::Environment::getArgument( serveraddrnum_arg, serveraddrnum_str))
-   {
-      if( false == serveraddrnum_str.empty())
-      {
-         int number = atoi(serveraddrnum_str.c_str());
-         if( number >= adresses.size())
-         {
-				AF_ERR << "Server address number >= server addresses size (" << number << ">=" << adresses.size() << "), using the last.";
-            number = adresses.size() - 1;
-         }
-         serveraddrnum = number;
-      }
-      else
-      {
-         AFERRAR("No argument provided to: '%s'", serveraddrnum_arg.c_str())
-         ms_valid = false;
-      }
-   }
+	std::string serveraddrnum_str;
+	if (af::Environment::getArgument(serveraddrnum_arg, serveraddrnum_str))
+	{
+		if (false == serveraddrnum_str.empty())
+		{
+			int number = atoi(serveraddrnum_str.c_str());
+			if (number >= adresses.size())
+			{
+				AF_ERR << "Server address number >= server addresses size (" << number
+					   << ">=" << adresses.size() << "), using the last.";
+				number = adresses.size() - 1;
+			}
+			serveraddrnum = number;
+		}
+		else
+		{
+			AFERRAR("No argument provided to: '%s'", serveraddrnum_arg.c_str())
+			ms_valid = false;
+		}
+	}
 
-   if( serveraddrnum == -1 )
-   {
-      serveraddrnum = 0;
-      if( adresses.size() > 1 )
-         printf( "Using the first, or provide argument: %s number\n", serveraddrnum_arg.c_str());
-   }
+	if (serveraddrnum == -1)
+	{
+		serveraddrnum = 0;
+		if (adresses.size() > 1)
+			printf("Using the first, or provide argument: %s number\n", serveraddrnum_arg.c_str());
+	}
 
-   ms_qafserveraddress = QHostAddress( adresses[serveraddrnum]);
-   printf( "Server address = '%s:%u'\n", ms_qafserveraddress.toString().toUtf8().data(), af::Environment::getServerPort());
+	ms_qafserveraddress = QHostAddress(adresses[serveraddrnum]);
+	printf("Server address = '%s:%u'\n", ms_qafserveraddress.toString().toUtf8().data(),
+		   af::Environment::getServerPort());
 }
 
 const QStringList QEnvironment::getThemes()
 {
-    QStringList list;
+	QStringList list;
 
-    QDir qdir( ms_themes_folder);
-    if( false == qdir.exists())
-        return list;
+	QDir qdir(ms_themes_folder);
+	if (false == qdir.exists())
+		return list;
 
-    QStringList entryList = qdir.entryList( QDir::AllDirs, QDir::Name);
-    for( int i = 0; i < entryList.size(); i++)
-        if( entryList[i][0] != '.' )
-            list.append( entryList[i]);
+	QStringList entryList = qdir.entryList(QDir::AllDirs, QDir::Name);
+	for (int i = 0; i < entryList.size(); i++)
+		if (entryList[i][0] != '.')
+			list.append(entryList[i]);
 
-    return list;
+	return list;
 }
 
-bool QEnvironment::loadTheme( const QString & i_theme)
+bool QEnvironment::loadTheme(const QString &i_theme)
 {
-    QString filename = ms_themes_folder + AFGENERAL::PATH_SEPARATOR + i_theme + AFGENERAL::PATH_SEPARATOR + "watch.json";
-    if( loadAttrs( filename))
-        return true;
+	QString filename =
+		ms_themes_folder + AFGENERAL::PATH_SEPARATOR + i_theme + AFGENERAL::PATH_SEPARATOR + "watch.json";
+	if (loadAttrs(filename))
+		return true;
 
-    AFERRAR("QEnvironment::loadTheme: Failed to load theme '%s' from:\n%s",
-            i_theme.toUtf8().data(), filename.toUtf8().data())
-    return false;
+	AFERRAR("QEnvironment::loadTheme: Failed to load theme '%s' from:\n%s", i_theme.toUtf8().data(),
+			filename.toUtf8().data())
+	return false;
 }
 
-bool QEnvironment::loadAttrs( const QString & i_filename )
+bool QEnvironment::loadAttrs(const QString &i_filename)
 {
 	int datalen = -1;
-	char * data = af::fileRead( qtos( i_filename), &datalen);
-	if( data == NULL )
+	char *data = af::fileRead(qtos(i_filename), &datalen);
+	if (data == NULL)
 	{
 		AFERRAR("AFQT: Unable to load config file:\n%s", i_filename.toUtf8().data())
 		return false;
 	}
 
 	rapidjson::Document doc;
-	char * buffer = af::jsonParseData( doc, data, datalen);
-	if( buffer == NULL )
+	char *buffer = af::jsonParseData(doc, data, datalen);
+	if (buffer == NULL)
 	{
-		delete [] data;
+		delete[] data;
 		return false;
 	}
 
-	const JSON & obj = doc["watch"];
-	if( obj.IsObject())
+	const JSON &obj = doc["watch"];
+	if (obj.IsObject())
 	{
-		for( int i = 0; i < ms_attrs_prefs.size(); i++) ms_attrs_prefs[i]->v_read( obj);
-		for( int i = 0; i < ms_attrs_gui.size(); i++) ms_attrs_gui[i]->v_read( obj);
+		for (int i = 0; i < ms_attrs_prefs.size(); i++)
+			ms_attrs_prefs[i]->v_read(obj);
+		for (int i = 0; i < ms_attrs_gui.size(); i++)
+			ms_attrs_gui[i]->v_read(obj);
 
-		QMapIterator<QString, Attr*> i(ms_attrs_hotkeys);
-		while( i.hasNext())
+		QMapIterator<QString, Attr *> i(ms_attrs_hotkeys);
+		while (i.hasNext())
 		{
 			i.next();
-			(i.value())->v_read( obj);
+			(i.value())->v_read(obj);
 		}
 	}
 
-	delete [] buffer;
-	delete [] data;
+	delete[] buffer;
+	delete[] data;
 
-    initFonts();
+	initFonts();
 
-    return true;
+	return true;
 }
 
-void QEnvironment::getHotkey( const QString & i_name, QString & o_str)
+void QEnvironment::getHotkey(const QString &i_name, QString &o_str)
 {
-	if( false == ms_attrs_hotkeys.contains( i_name))
+	if (false == ms_attrs_hotkeys.contains(i_name))
 		return;
 
 	QString str = ms_attrs_hotkeys[i_name]->str;
-	if( str.size())
+	if (str.size())
 		o_str = str;
 }
-void QEnvironment::setHotkey( const QString & i_name, const QString & i_str)
+void QEnvironment::setHotkey(const QString &i_name, const QString &i_str)
 {
-	if( ms_attrs_hotkeys.contains( i_name))
+	if (ms_attrs_hotkeys.contains(i_name))
 		ms_attrs_hotkeys[i_name]->str = i_str;
 }
 
-const QString & QEnvironment::getDateTimeFormat()
+const QString &QEnvironment::getDateTimeFormat()
 {
 	static const QString date_time_format("yyyy.MM.dd HH:mm:ss");
 	return date_time_format;
@@ -730,34 +751,30 @@ void QEnvironment::addCollapsedJobSerial(int64_t i_serial)
 	ms_jobs_serials_collapsed.append(i_serial);
 }
 
-void QEnvironment::delCollapsedJobSerial(int64_t i_serial)
-{
-	ms_jobs_serials_collapsed.removeAll(i_serial);
-}
+void QEnvironment::delCollapsedJobSerial(int64_t i_serial) { ms_jobs_serials_collapsed.removeAll(i_serial); }
 
-void QEnvironment::clearCollapsedJobSerials()
-{
-	ms_jobs_serials_collapsed.clear();
-}
+void QEnvironment::clearCollapsedJobSerials() { ms_jobs_serials_collapsed.clear(); }
 
-void QEnvironment::saveCollapsedJobsSerials(QByteArray & o_data)
+void QEnvironment::saveCollapsedJobsSerials(QByteArray &o_data)
 {
-	o_data.append(QString("    \"jobs_collapsed_new\":%1").arg(ms_jobs_collapse_new ? "true":"false").toUtf8());
+	o_data.append(
+		QString("    \"jobs_collapsed_new\":%1").arg(ms_jobs_collapse_new ? "true" : "false").toUtf8());
 
 	o_data.append(",\n    \"jobs_serials_collapsed\":[");
 	for (int i = 0; i < ms_jobs_serials_collapsed.size(); i++)
 	{
-		if (i) o_data.append(",");
+		if (i)
+			o_data.append(",");
 		o_data.append(QString("\n        %1").arg(ms_jobs_serials_collapsed.at(i)).toUtf8());
 	}
 	o_data.append("\n    ]");
 }
 
-void QEnvironment::loadCollapsedJobsSerials(const JSON & i_obj)
+void QEnvironment::loadCollapsedJobsSerials(const JSON &i_obj)
 {
 	af::jr_bool("jobs_collapsed_new", ms_jobs_collapse_new, i_obj);
 
-	const JSON & serials = i_obj["jobs_serials_collapsed"];
+	const JSON &serials = i_obj["jobs_serials_collapsed"];
 	if (false == serials.IsArray())
 		return;
 
@@ -765,4 +782,3 @@ void QEnvironment::loadCollapsedJobsSerials(const JSON & i_obj)
 		if (serials[i].IsInt64())
 			ms_jobs_serials_collapsed.append(serials[i].GetInt64());
 }
-

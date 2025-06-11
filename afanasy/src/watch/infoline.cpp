@@ -1,14 +1,8 @@
 #include "infoline.h"
 
-InfoLine::InfoLine(QWidget * parent):
-	QLineEdit(parent)
-{
-	setReadOnly(true);
-}
+InfoLine::InfoLine(QWidget *parent) : QLineEdit(parent) { setReadOnly(true); }
 
-InfoLine::~InfoLine()
-{
-}
+InfoLine::~InfoLine() {}
 
 void InfoLine::clear()
 {

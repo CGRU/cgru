@@ -11,7 +11,7 @@
 
 class Store
 {
-public:
+  public:
 	Store();
 	~Store();
 
@@ -19,20 +19,22 @@ public:
 	void save();
 
 	inline int64_t getJobSerial()
-		{ int64_t serial = ++m_jobs_serial; save(); return serial; }
+	{
+		int64_t serial = ++m_jobs_serial;
+		save();
+		return serial;
+	}
 
-private:
-	void read( const JSON & i_object);
+  private:
+	void read(const JSON &i_object);
 
-private:
-
+  private:
 	int64_t m_time_created;
 	int64_t m_time_started;
 	int64_t m_time_modified;
 
 	int64_t m_jobs_serial;
 
-private:
-
+  private:
 	std::string m_filename;
 };

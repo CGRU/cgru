@@ -17,90 +17,92 @@ CmdJSON::CmdJSON()
 	setCmd("json");
 	setInfo("JSON file or stdin.");
 	setHelp("json [send|force_send] [file] JSON file, send or not, force send even error JSON.");
-	setMsgType( af::Msg::TJSON);
+	setMsgType(af::Msg::TJSON);
 }
 
-CmdJSON::~CmdJSON(){}
+CmdJSON::~CmdJSON() {}
 
-void outJSON( rapidjson::Value & i_value, int i_depth = 0)
+void outJSON(rapidjson::Value &i_value, int i_depth = 0)
 {
-	if( i_value.IsObject())
+	if (i_value.IsObject())
 	{
 		printf("{");
 		rapidjson::Value::MemberIterator it = i_value.MemberBegin();
-		while( it != i_value.MemberEnd())
+		while (it != i_value.MemberEnd())
 		{
-			if( strlen(it->name.GetString()) && ( it->name.GetString()[0] != '-'))
+			if (strlen(it->name.GetString()) && (it->name.GetString()[0] != '-'))
 			{
 				printf("\n");
-				for(int i = 0; i < i_depth; i++ ) printf("   ");
-				printf("%s:", (char *) it->name.GetString());
-				outJSON( it->value, i_depth+1);
+				for (int i = 0; i < i_depth; i++)
+					printf("   ");
+				printf("%s:", (char *)it->name.GetString());
+				outJSON(it->value, i_depth + 1);
 			}
 			it++;
 		}
 		printf("}");
 	}
-	else if( i_value.IsArray())
+	else if (i_value.IsArray())
 	{
 		printf("[");
-		for( int i = 0; i < i_value.Size(); i++)
+		for (int i = 0; i < i_value.Size(); i++)
 		{
-			if( i != 0 )
+			if (i != 0)
 				printf(",");
-			outJSON( i_value[i], i_depth);
+			outJSON(i_value[i], i_depth);
 		}
 		printf("]");
 	}
-	else if( i_value.IsString())
-		printf("'%s'", (char *) i_value.GetString());
-	else if( i_value.IsNumber())
+	else if (i_value.IsString())
+		printf("'%s'", (char *)i_value.GetString());
+	else if (i_value.IsNumber())
 		printf("'%d'", i_value.GetInt());
-	else if( i_value.IsBool())
+	else if (i_value.IsBool())
 		printf("'%s'", i_value.GetBool() ? "True" : "False");
-	else if( i_value.IsNull())
+	else if (i_value.IsNull())
 	{
 		printf("\n");
-		for(int i = 0; i < i_depth; i++ ) printf("   ");
+		for (int i = 0; i < i_depth; i++)
+			printf("   ");
 		printf("null");
 	}
 }
 
-bool CmdJSON::v_processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdJSON::v_processArguments(int argc, char **argv, af::Msg &msg)
 {
-	char * data = NULL;
+	char *data = NULL;
 	bool send = false;
 	bool force = false;
 	int datalen;
 
 	if (argc > 1)
 	{
-		if (strcmp(argv[0],"send") == 0)
+		if (strcmp(argv[0], "send") == 0)
 			send = true;
 
-		if (strcmp(argv[0],"force_send") == 0)
+		if (strcmp(argv[0], "force_send") == 0)
 		{
 			send = true;
 			force = true;
 		}
 	}
 
-	if( argc > 0 )
+	if (argc > 0)
 	{
-		std::string filename( argv[argc-1]);
+		std::string filename(argv[argc - 1]);
 
-		if( false == af::pathFileExists( filename))
+		if (false == af::pathFileExists(filename))
 		{
 			AFERRAR("File not found:\n%s", filename.c_str())
 			return false;
 		}
 
-		if( Verbose )
+		if (Verbose)
 			printf("Trying to open:\n%s\n", filename.c_str());
 
-		data = af::fileRead( filename, &datalen);
+		data = af::fileRead(filename, &datalen);
 
-		if( data == NULL )
+		if (data == NULL)
 		{
 			AFERRAR("Unable to load file:\n%s", filename.c_str())
 			return true;
@@ -109,12 +111,12 @@ bool CmdJSON::v_processArguments( int argc, char** argv, af::Msg &msg)
 	else
 	{
 		datalen = 1 << 20;
-		data = new char[ datalen];
+		data = new char[datalen];
 		int readed = 0;
-		for(;;)
+		for (;;)
 		{
-			int bytes = read( 0, data + readed, datalen-readed-2);
-			if( bytes <= 0)
+			int bytes = read(0, data + readed, datalen - readed - 2);
+			if (bytes <= 0)
 				break;
 			readed += bytes;
 		}
@@ -123,18 +125,18 @@ bool CmdJSON::v_processArguments( int argc, char** argv, af::Msg &msg)
 	}
 
 	rapidjson::Document document;
-	char * data_copy = af::jsonParseData( document, data, datalen);
+	char *data_copy = af::jsonParseData(document, data, datalen);
 	if ((data_copy == NULL) && (false == force))
 	{
-		delete [] data;
+		delete[] data;
 		return false;
 	}
 
-	if( document.IsObject())
+	if (document.IsObject())
 	{
-		if( Verbose )
+		if (Verbose)
 		{
-			outJSON( document);
+			outJSON(document);
 			printf("\n");
 		}
 	}
@@ -145,7 +147,7 @@ bool CmdJSON::v_processArguments( int argc, char** argv, af::Msg &msg)
 		if (false == force)
 			return true;
 	}
-	
+
 	std::ostringstream stream;
 	stream << "{\n";
 
@@ -153,17 +155,17 @@ bool CmdJSON::v_processArguments( int argc, char** argv, af::Msg &msg)
 
 	if ((false == force) && (document.HasMember("job")))
 	{
-		af::Job job( document["job"]);
-		if( Verbose )
+		af::Job job(document["job"]);
+		if (Verbose)
 		{
 			job.stdOutJobBlocksTasks();
 			printf("\n");
 		}
-		if( send_stream )
+		if (send_stream)
 			stream << ",\n";
 		stream << "\"job\":";
-		job.v_jsonWrite( stream, af::Msg::TJob);
-		if( job.isValid())
+		job.v_jsonWrite(stream, af::Msg::TJob);
+		if (job.isValid())
 		{
 			send_stream = true;
 		}
@@ -175,19 +177,19 @@ bool CmdJSON::v_processArguments( int argc, char** argv, af::Msg &msg)
 
 	stream << "}";
 
-	if( send_stream )
+	if (send_stream)
 		printf("%s\n", stream.str().c_str());
 
-	if( send )
+	if (send)
 	{
-		if( send_stream )
-			msg.setData( stream.str().size(), stream.str().c_str(), af::Msg::TJSONBIN);
+		if (send_stream)
+			msg.setData(stream.str().size(), stream.str().c_str(), af::Msg::TJSONBIN);
 		else
-			msg.setData( datalen, data, af::Msg::TJSONBIN);
+			msg.setData(datalen, data, af::Msg::TJSONBIN);
 	}
 
-	delete [] data;
-	delete [] data_copy;
+	delete[] data;
+	delete[] data_copy;
 
 	return true;
 }

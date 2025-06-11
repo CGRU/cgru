@@ -9,55 +9,52 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-AfCmd::AfCmd():
-	command( NULL)
-{
-	RegisterCommands();
-}
+AfCmd::AfCmd() : command(NULL) { RegisterCommands(); }
 
 AfCmd::~AfCmd()
 {
-	 for( CmdList::iterator it = commands.begin(); it != commands.end(); it++) delete (*it);
+	for (CmdList::iterator it = commands.begin(); it != commands.end(); it++)
+		delete (*it);
 }
 
-void AfCmd::addCmd( Cmd * cmd)
-{
-	 commands.push_back( cmd);
-}
+void AfCmd::addCmd(Cmd *cmd) { commands.push_back(cmd); }
 
-bool AfCmd::processCommand( int argc, char** argv, af::Msg &msg)
+bool AfCmd::processCommand(int argc, char **argv, af::Msg &msg)
 {
-	if( argc <= 1 ) return true;
+	if (argc <= 1)
+		return true;
 	std::string arg = argv[1];
-	if( arg.empty()) return true;
+	if (arg.empty())
+		return true;
 
 	bool command_found = false;
-	for( int i = 1; i < argc; i++)
+	for (int i = 1; i < argc; i++)
 	{
 		arg = argv[i];
-		for( CmdList::iterator it = commands.begin(); it != commands.end(); it++)
+		for (CmdList::iterator it = commands.begin(); it != commands.end(); it++)
 		{
-			if( i >= argc) break;
+			if (i >= argc)
+				break;
 			command = *it;
-			if( command->isCmd( argv[i]))
+			if (command->isCmd(argv[i]))
 			{
-				if( Help)
+				if (Help)
 				{
 					command->v_printHelp();
 					return true;
 				}
 				i++;
-				if( command->hasArgsCount( argc - i))
+				if (command->hasArgsCount(argc - i))
 				{
-					if( command->v_processArguments( argc - i, argv + i, msg))
+					if (command->v_processArguments(argc - i, argv + i, msg))
 					{
 						command_found = true;
-						if( msg.isNull())
+						if (msg.isNull())
 						{
 							std::string str = command->getStreamString();
-							if( str.size())
+							if (str.size())
 							{
-								msg.setData( str.size(), str.c_str(), af::Msg::TJSON);
+								msg.setData(str.size(), str.c_str(), af::Msg::TJSON);
 								msg.setJSONBIN();
 							}
 							else
@@ -75,7 +72,8 @@ bool AfCmd::processCommand( int argc, char** argv, af::Msg &msg)
 		}
 	}
 
-	if( command_found && (Help == false)) return true;
+	if (command_found && (Help == false))
+		return true;
 
 	printf("Usage: afcmd command [options] [node_name|nodes_mask]\n");
 	for (CmdList::iterator it = commands.begin(); it != commands.end(); it++)
@@ -86,40 +84,34 @@ bool AfCmd::processCommand( int argc, char** argv, af::Msg &msg)
 	return false;
 }
 
-void AfCmd::msgOutput( af::Msg &msg)
+void AfCmd::msgOutput(af::Msg &msg)
 {
-	if( command->isMsgOutType( msg.type()))
+	if (command->isMsgOutType(msg.type()))
 	{
-		command->v_msgOut( msg);
+		command->v_msgOut(msg);
 	}
 	else
 	{
-		switch( msg.type())
+		switch (msg.type())
 		{
 			case af::Msg::TDATA:
 			case af::Msg::TJSON:
 			case af::Msg::TJSONBIN:
 			case af::Msg::TString:
-			case af::Msg::TStringList:
-				msg.stdOutData( false);
-				break;
-			case af::Msg::TConfirm:
-				printf("Confirm(%d) message received.\n", msg.int32());
-				break;
-			case af::Msg::TNULL:
-				printf("None information message.\n");
-				break;
-			case af::Msg::TInvalid:
-				printf("Invalid message.\n");
-				break;
-			case af::Msg::TTask:
-				af::MCTask(&msg).v_stdOut( true);
-				break;
+			case af::Msg::TStringList: msg.stdOutData(false); break;
+			case af::Msg::TConfirm: printf("Confirm(%d) message received.\n", msg.int32()); break;
+			case af::Msg::TNULL: printf("None information message.\n"); break;
+			case af::Msg::TInvalid: printf("Invalid message.\n"); break;
+			case af::Msg::TTask: af::MCTask(&msg).v_stdOut(true); break;
 			default:
 				printf("Unknown (for afcmd) message received.\n");
 				msg.stdOutData();
 				break;
 		}
 	}
-	if( Verbose) { printf("AfCmd::msgOut: "); msg.v_stdOut();}
+	if (Verbose)
+	{
+		printf("AfCmd::msgOut: ");
+		msg.v_stdOut();
+	}
 }

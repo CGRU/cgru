@@ -33,69 +33,66 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-RenderContainer * RenderAf::ms_renders = NULL;
+RenderContainer *RenderAf::ms_renders = NULL;
 
-RenderAf::RenderAf( af::Msg * msg):
-	af::Render(msg),
-	AfNodeFarm(this, this, AfNodeFarm::TRenderer, "render", NULL, "")
+RenderAf::RenderAf(af::Msg *msg)
+	: af::Render(msg), AfNodeFarm(this, this, AfNodeFarm::TRenderer, "render", NULL, "")
 {
 	initDefaultValues();
 }
 
-RenderAf::RenderAf(const std::string & i_store_dir):
-	af::Render(),
-	AfNodeFarm(this, this, AfNodeFarm::TRenderer, "render", NULL, i_store_dir)
+RenderAf::RenderAf(const std::string &i_store_dir)
+	: af::Render(), AfNodeFarm(this, this, AfNodeFarm::TRenderer, "render", NULL, i_store_dir)
 {
 	initDefaultValues();
 
 	int size;
-	char * data = af::fileRead( getStoreFile(), &size);
-	if( data == NULL ) return;
+	char *data = af::fileRead(getStoreFile(), &size);
+	if (data == NULL)
+		return;
 
 	rapidjson::Document document;
-	char * res = af::jsonParseData( document, data, size);
-	if( res == NULL )
+	char *res = af::jsonParseData(document, data, size);
+	if (res == NULL)
 	{
-		delete [] data;
+		delete[] data;
 		return;
 	}
 
-	if( jsonRead( document))
+	if (jsonRead(document))
 		setStoredOk();
 
-	delete [] res;
-	delete [] data;
+	delete[] res;
+	delete[] data;
 
 	// This render came from store on server start, it can't be online or busy
 	setOffline();
-	setBusy( false);
+	setBusy(false);
 }
 
 void RenderAf::initDefaultValues()
 {
 	m_parent = NULL;
 
-	setBusy( false);
-	setWOLFalling( false);
-	setWOLSleeping( false);
-	setWOLWaking( false);
+	setBusy(false);
+	setWOLFalling(false);
+	setWOLSleeping(false);
+	setWOLWaking(false);
 
-	m_no_task_time        = 0;
+	m_no_task_time = 0;
 	m_no_task_event_count = 0;
 
-	m_overload_time  = 0;
+	m_overload_time = 0;
 	m_overload_seconds = 0;
 }
 
-RenderAf::~RenderAf()
-{
-}
+RenderAf::~RenderAf() {}
 
-void RenderAf::setRegistered(PoolsContainer * i_pools)
+void RenderAf::setRegistered(PoolsContainer *i_pools)
 {
 	findPool(i_pools);
 
-	if( isFromStore())
+	if (isFromStore())
 	{
 		appendLogInfo("Initialized from store.", false);
 	}
@@ -114,7 +111,7 @@ void RenderAf::setRegistered(PoolsContainer * i_pools)
 			log += " paused";
 		}
 
-		setStoreDir( AFCommon::getStoreDirRender( *this));
+		setStoreDir(AFCommon::getStoreDirRender(*this));
 		store();
 
 		appendLogInfo(log + ".");
@@ -128,7 +125,7 @@ void RenderAf::setRegistered(PoolsContainer * i_pools)
 	m_busy_time = m_idle_time;
 }
 
-void RenderAf::findPool(PoolsContainer * i_pools)
+void RenderAf::findPool(PoolsContainer *i_pools)
 {
 	if (m_parent)
 	{
@@ -153,49 +150,50 @@ void RenderAf::findPool(PoolsContainer * i_pools)
 	m_parent->addRender(this);
 }
 
-void RenderAf::setPool(PoolSrv * i_pool)
+void RenderAf::setPool(PoolSrv *i_pool)
 {
 	m_pool = i_pool->getName();
 	m_parent = i_pool;
 }
 
-void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorContainer * monitoring, bool toZombie )
+void RenderAf::offline(JobContainer *jobs, uint32_t updateTaskState, MonitorContainer *monitoring,
+					   bool toZombie)
 {
 	setOffline();
-	setBusy( false);
-	if( isWOLFalling())
+	setBusy(false);
+	if (isWOLFalling())
 	{
-		setWOLFalling( false);
-		setWOLSleeping( true);
+		setWOLFalling(false);
+		setWOLSleeping(true);
 	}
 
-	if( jobs && updateTaskState)
-		ejectTasks( jobs, monitoring, updateTaskState);
+	if (jobs && updateTaskState)
+		ejectTasks(jobs, monitoring, updateTaskState);
 
 	// There is need to send pending tasks to offline render.
 	m_re.clearTaskExecs();
 
 	std::string log;
 
-	if (toZombie )
+	if (toZombie)
 	{
 		log = "Deleting";
 		if (m_parent)
 		{
 			m_parent->removeRender(this);
 			if (monitoring)
-				monitoring->addEvent( af::Monitor::EVT_pools_change, m_parent->getId());
+				monitoring->addEvent(af::Monitor::EVT_pools_change, m_parent->getId());
 		}
 		setZombie();
 		if (monitoring)
-			monitoring->addEvent( af::Monitor::EVT_renders_del, m_id);
+			monitoring->addEvent(af::Monitor::EVT_renders_del, m_id);
 	}
 	else
 	{
 		log = "Offline.";
 		m_time_launch = 0;
 		if (monitoring)
-			monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
+			monitoring->addEvent(af::Monitor::EVT_renders_change, m_id);
 		store();
 	}
 
@@ -208,24 +206,24 @@ void RenderAf::getPoolConfig()
 	if (NULL == m_parent)
 		return;
 
-	m_re.m_heartbeat_sec           = m_parent->getHeartBeatSec();
+	m_re.m_heartbeat_sec = m_parent->getHeartBeatSec();
 	m_re.m_resources_update_period = m_parent->getResourcesUpdatePeriod();
-	m_re.m_zombie_time             = m_parent->getZombieTime();
-	m_re.m_exit_no_task_time       = m_parent->getExitNoTaskTime();
+	m_re.m_zombie_time = m_parent->getZombieTime();
+	m_re.m_exit_no_task_time = m_parent->getExitNoTaskTime();
 }
 
-af::Msg * RenderAf::writeRenderEventsMsg()
+af::Msg *RenderAf::writeRenderEventsMsg()
 {
 	m_re.m_id = m_id;
 
-	af::Msg * msg = new af::Msg(af::Msg::TRenderEvents, &m_re);
+	af::Msg *msg = new af::Msg(af::Msg::TRenderEvents, &m_re);
 
 	m_re.clear();
 
 	return msg;
 }
 
-af::Msg * RenderAf::writeConnectedMsg(const std::string & i_log)
+af::Msg *RenderAf::writeConnectedMsg(const std::string &i_log)
 {
 	m_re.m_log = i_log;
 
@@ -234,30 +232,30 @@ af::Msg * RenderAf::writeConnectedMsg(const std::string & i_log)
 	return writeRenderEventsMsg();
 }
 
-af::Msg * RenderAf::update( const af::RenderUpdate & i_up)
+af::Msg *RenderAf::update(const af::RenderUpdate &i_up)
 {
 	updateTime();
 
-	if( i_up.hasResources())
-		m_hres.copy( *i_up.getResources());
+	if (i_up.hasResources())
+		m_hres.copy(*i_up.getResources());
 
-	if( i_up.m_taskups.size())
-		for( int i = 0; i < i_up.m_taskups.size(); i++)
-			if( i_up.m_taskups[i]->getStatus() > af::TaskExec::UPWarning )
-				m_re.addTaskClose( af::MCTaskPos( *i_up.m_taskups[i]));
+	if (i_up.m_taskups.size())
+		for (int i = 0; i < i_up.m_taskups.size(); i++)
+			if (i_up.m_taskups[i]->getStatus() > af::TaskExec::UPWarning)
+				m_re.addTaskClose(af::MCTaskPos(*i_up.m_taskups[i]));
 
-	if( m_re.isEmpty())
+	if (m_re.isEmpty())
 	{
 		// If there is no new events just return its id back.
-		return new af::Msg( af::Msg::TRenderId, getId());
+		return new af::Msg(af::Msg::TRenderId, getId());
 	}
 
 	return writeRenderEventsMsg();
 }
 
-void RenderAf::online( RenderAf * render, JobContainer * i_jobs, MonitorContainer * monitoring)
+void RenderAf::online(RenderAf *render, JobContainer *i_jobs, MonitorContainer *monitoring)
 {
-	if( isOnline())
+	if (isOnline())
 	{
 		AF_ERR << "Render is already online.";
 		return;
@@ -282,18 +280,17 @@ void RenderAf::online( RenderAf * render, JobContainer * i_jobs, MonitorContaine
 	grabNetIFs(render->m_netIFs);
 	m_hres.copy(render->getHostRes());
 
-
 	// Reconnect tasks if any:
-	std::list<af::TaskExec*>::iterator it;
-	for( it = render->m_tasks.begin() ; it != render->m_tasks.end() ; ++it)
+	std::list<af::TaskExec *>::iterator it;
+	for (it = render->m_tasks.begin(); it != render->m_tasks.end(); ++it)
 	{
-		i_jobs->reconnectTask( *it, *this, monitoring);
+		i_jobs->reconnectTask(*it, *this, monitoring);
 	}
 	// Job::reconnectTask took the ownership of the taskexecs, so we prevent
 	// them from being cleaned by render's dtor:
 	render->m_tasks.clear();
-	
-	appendLogTypeInfo("online",std::string("Online '") + m_engine + "'.");
+
+	appendLogTypeInfo("online", std::string("Online '") + m_engine + "'.");
 
 	if (monitoring)
 		monitoring->addEvent(af::Monitor::EVT_renders_change, m_id);
@@ -301,7 +298,7 @@ void RenderAf::online( RenderAf * render, JobContainer * i_jobs, MonitorContaine
 	store();
 }
 
-void RenderAf::deregister( JobContainer * jobs, MonitorContainer * monitoring )
+void RenderAf::deregister(JobContainer *jobs, MonitorContainer *monitoring)
 {
 	if (isOffline())
 	{
@@ -313,14 +310,14 @@ void RenderAf::deregister( JobContainer * jobs, MonitorContainer * monitoring )
 	offline(jobs, af::TaskExec::UPRenderDeregister, monitoring);
 }
 
-void RenderAf::setTask( af::TaskExec *taskexec, MonitorContainer * monitoring, bool start)
+void RenderAf::setTask(af::TaskExec *taskexec, MonitorContainer *monitoring, bool start)
 {
-  if( isOffline())
+	if (isOffline())
 	{
 		AF_ERR << "Render is offline.";
 		return;
 	}
-	if( taskexec == NULL)
+	if (taskexec == NULL)
 	{
 		AF_ERR << "taskexec == NULL.";
 		return;
@@ -328,66 +325,68 @@ void RenderAf::setTask( af::TaskExec *taskexec, MonitorContainer * monitoring, b
 
 	addTask(taskexec, monitoring);
 
-	if( monitoring ) monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
+	if (monitoring)
+		monitoring->addEvent(af::Monitor::EVT_renders_change, m_id);
 
-	if( start)
+	if (start)
 	{
 		// Add exec pointer to events,
 		// so on refresh, render will receive a task to execute.
-		m_re.addTaskExec( taskexec);
+		m_re.addTaskExec(taskexec);
 
 		// Log:
 		std::string str = "Starting task: ";
-		str += taskexec->v_generateInfoString( false);
-		appendTasksLog( str);
+		str += taskexec->v_generateInfoString(false);
+		appendTasksLog(str);
 	}
 	else
 	{
 		// This is multihost task.
 		std::string str = "Captured by task: ";
-		str += taskexec->v_generateInfoString( false);
-		appendTasksLog( str);
+		str += taskexec->v_generateInfoString(false);
+		appendTasksLog(str);
 	}
 }
 
 // Needed for mulihost tasks
-void RenderAf::startTask( af::TaskExec *taskexec)
+void RenderAf::startTask(af::TaskExec *taskexec)
 {
-	if( isOffline())
+	if (isOffline())
 	{
 		AF_ERR << "Render is offline.";
 		return;
 	}
-	for( std::list<af::TaskExec*>::const_iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
+	for (std::list<af::TaskExec *>::const_iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
 	{
-		if( taskexec != *it) continue;
+		if (taskexec != *it)
+			continue;
 
-		m_re.m_tasks.push_back( taskexec);
+		m_re.m_tasks.push_back(taskexec);
 
 		std::string str = "Starting service: ";
-		str += taskexec->v_generateInfoString( false);
+		str += taskexec->v_generateInfoString(false);
 		appendLogInfo(str);
 
 		return;
 	}
 
 	AF_ERR << "No such task.";
-	taskexec->v_stdOut( false);
+	taskexec->v_stdOut(false);
 }
 
-void RenderAf::v_action(Action & i_action)
+void RenderAf::v_action(Action &i_action)
 {
-	const JSON & params = (*i_action.data)["params"];
+	const JSON &params = (*i_action.data)["params"];
 	if (params.IsObject())
 		jsonRead(params, &i_action.log.info);
 
 	if (i_action.log.info.size())
 	{
 		store();
-		i_action.monitors->addEvent( af::Monitor::EVT_renders_change, m_id);
+		i_action.monitors->addEvent(af::Monitor::EVT_renders_change, m_id);
 	}
 
-	const JSON & operation = (*i_action.data)["operation"];
+	const JSON &operation = (*i_action.data)["operation"];
 	if (operation.IsObject())
 	{
 		std::string type;
@@ -397,7 +396,7 @@ void RenderAf::v_action(Action & i_action)
 		{
 			if (false == isOnline())
 				return;
-			//appendLog("Exit by " + i_action.author);
+			// appendLog("Exit by " + i_action.author);
 			exitClient("exit", i_action.jobs, i_action.monitors);
 			return;
 		}
@@ -411,7 +410,7 @@ void RenderAf::v_action(Action & i_action)
 			if (false == isOnline())
 				return;
 			std::string cmd;
-			if( af::jr_string("cmd", cmd, operation))
+			if (af::jr_string("cmd", cmd, operation))
 			{
 				bool exit = false;
 				af::jr_bool("exit", exit, operation);
@@ -430,7 +429,7 @@ void RenderAf::v_action(Action & i_action)
 		{
 			if (false == isBusy())
 				return;
-			//appendLog("Task(s) ejected by " + i_action.author);
+			// appendLog("Task(s) ejected by " + i_action.author);
 			ejectTasks(i_action.jobs, i_action.monitors, af::TaskExec::UPEject);
 			return;
 		}
@@ -438,7 +437,7 @@ void RenderAf::v_action(Action & i_action)
 		{
 			if (false == isBusy())
 				return;
-			//appendLog("Task(s) ejected keeping own by " + i_action.author);
+			// appendLog("Task(s) ejected keeping own by " + i_action.author);
 			ejectTasks(i_action.jobs, i_action.monitors, af::TaskExec::UPEject, &i_action.user_name);
 			return;
 		}
@@ -449,15 +448,15 @@ void RenderAf::v_action(Action & i_action)
 				i_action.answerError("Can`t delete online render.");
 				return;
 			}
-			//appendLog( std::string("Deleted by ") + i_action.author);
-			offline( NULL, 0, i_action.monitors, true);
+			// appendLog( std::string("Deleted by ") + i_action.author);
+			offline(NULL, 0, i_action.monitors, true);
 			return;
 		}
 		else if (type == "reboot")
 		{
 			if (false == isOnline())
 				return;
-			//appendLog( std::string("Reboot computer by ") + i_action.author);
+			// appendLog( std::string("Reboot computer by ") + i_action.author);
 			exitClient("reboot", i_action.jobs, i_action.monitors);
 			return;
 		}
@@ -465,7 +464,7 @@ void RenderAf::v_action(Action & i_action)
 		{
 			if (false == isOnline())
 				return;
-			//appendLog( std::string("Shutdown computer by ") + i_action.author);
+			// appendLog( std::string("Shutdown computer by ") + i_action.author);
 			exitClient("shutdown", i_action.jobs, i_action.monitors);
 			return;
 		}
@@ -497,20 +496,19 @@ void RenderAf::v_action(Action & i_action)
 		}
 		else
 		{
-			//appendLog("Unknown operation \"" + type + "\" by " + i_action.author);
+			// appendLog("Unknown operation \"" + type + "\" by " + i_action.author);
 			i_action.answerError("Unknown operation: " + type);
 			return;
 		}
 
-		//appendLog("Operation \"" + type + "\" by " + i_action.author);
-		i_action.monitors->addEvent( af::Monitor::EVT_renders_change, m_id);
+		// appendLog("Operation \"" + type + "\" by " + i_action.author);
+		i_action.monitors->addEvent(af::Monitor::EVT_renders_change, m_id);
 		store();
 		return;
 	}
-
 }
 
-bool RenderAf::actionSetPool(const std::string & i_pool_name, Action & i_action)
+bool RenderAf::actionSetPool(const std::string &i_pool_name, Action &i_action)
 {
 	if (isBusy())
 	{
@@ -524,7 +522,7 @@ bool RenderAf::actionSetPool(const std::string & i_pool_name, Action & i_action)
 		return false;
 	}
 
-	PoolSrv * pool = i_action.pools->getPool(i_pool_name);
+	PoolSrv *pool = i_action.pools->getPool(i_pool_name);
 	if (NULL == pool)
 	{
 		i_action.answerError("Pool '" + i_pool_name + "' does not exist.");
@@ -552,7 +550,7 @@ bool RenderAf::actionSetPool(const std::string & i_pool_name, Action & i_action)
 	return true;
 }
 
-bool RenderAf::actionReassignPool(Action & i_action)
+bool RenderAf::actionReassignPool(Action &i_action)
 {
 	if (isBusy())
 	{
@@ -573,53 +571,55 @@ bool RenderAf::actionReassignPool(Action & i_action)
 	return true;
 }
 
-void RenderAf::ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus, const std::string * i_keeptasks_username )
+void RenderAf::ejectTasks(JobContainer *jobs, MonitorContainer *monitoring, uint32_t upstatus,
+						  const std::string *i_keeptasks_username)
 {
-	if( m_tasks.size() < 1)
+	if (m_tasks.size() < 1)
 		return;
 
-	std::list<int>id_jobs;
-	std::list<int>id_blocks;
-	std::list<int>id_tasks;
-	std::list<int>numbers;
-	for( std::list<af::TaskExec*>::const_iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
+	std::list<int> id_jobs;
+	std::list<int> id_blocks;
+	std::list<int> id_tasks;
+	std::list<int> numbers;
+	for (std::list<af::TaskExec *>::const_iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
 	{
-		 // Skip if username to keep tasks provided:
-		 if( i_keeptasks_username != NULL )
-			  if( *i_keeptasks_username == (*it)->getUserName())
-					continue;
-		id_jobs.push_back( (*it)->getJobId());
-		id_blocks.push_back( (*it)->getBlockNum());
-		id_tasks.push_back( (*it)->getTaskNum());
-		numbers.push_back( (*it)->getNumber());
+		// Skip if username to keep tasks provided:
+		if (i_keeptasks_username != NULL)
+			if (*i_keeptasks_username == (*it)->getUserName())
+				continue;
+		id_jobs.push_back((*it)->getJobId());
+		id_blocks.push_back((*it)->getBlockNum());
+		id_tasks.push_back((*it)->getTaskNum());
+		numbers.push_back((*it)->getNumber());
 		appendLogTypeInfo("eject_tasks", (*it)->v_generateInfoString(false));
 	}
 
-	JobContainerIt jobsIt( jobs);
+	JobContainerIt jobsIt(jobs);
 	std::list<int>::const_iterator jIt = id_jobs.begin();
 	std::list<int>::const_iterator bIt = id_blocks.begin();
 	std::list<int>::const_iterator tIt = id_tasks.begin();
 	std::list<int>::const_iterator nIt = numbers.begin();
 	std::list<int>::const_iterator end = numbers.end();
-	for( ; nIt != end; jIt++, bIt++, tIt++, nIt++)
+	for (; nIt != end; jIt++, bIt++, tIt++, nIt++)
 	{
-		JobAf* job = jobsIt.getJob( *jIt);
-		if( job != NULL )
+		JobAf *job = jobsIt.getJob(*jIt);
+		if (job != NULL)
 		{
-			af::MCTaskUp taskup( m_id, *jIt, *bIt, *tIt, *nIt, upstatus);
-			job->v_updateTaskState( taskup, ms_renders, monitoring);
+			af::MCTaskUp taskup(m_id, *jIt, *bIt, *tIt, *nIt, upstatus);
+			job->v_updateTaskState(taskup, ms_renders, monitoring);
 		}
 	}
 }
 
-void RenderAf::exitClient( const std::string & i_type, JobContainer * i_jobs, MonitorContainer * i_monitoring)
+void RenderAf::exitClient(const std::string &i_type, JobContainer *i_jobs, MonitorContainer *i_monitoring)
 {
-	if( false == isOnline() ) return;
+	if (false == isOnline())
+		return;
 
 	m_re.m_instruction = i_type;
 }
 
-void RenderAf::launchAndExit(const std::string & i_cmd, bool i_exit)
+void RenderAf::launchAndExit(const std::string &i_cmd, bool i_exit)
 {
 	if (false == isOnline())
 		return;
@@ -628,48 +628,50 @@ void RenderAf::launchAndExit(const std::string & i_cmd, bool i_exit)
 	m_re.m_command = i_cmd;
 }
 
-void RenderAf::wolSleep(MonitorContainer * monitoring)
+void RenderAf::wolSleep(MonitorContainer *monitoring)
 {
 	if (isWOLSleeping())
 	{
-		appendLogTypeInfo("wol error","Render is already sleeping.");
+		appendLogTypeInfo("wol error", "Render is already sleeping.");
 		return;
 	}
 	if (isWOLWaking())
 	{
-		appendLogTypeInfo("wol error","Can't sleep waking up render.");
+		appendLogTypeInfo("wol error", "Can't sleep waking up render.");
 		return;
 	}
 	if (isOffline())
 	{
-		appendLogTypeInfo("wol error","Can't sleep offline render.");
+		appendLogTypeInfo("wol error", "Can't sleep offline render.");
 		return;
 	}
 	if (isBusy())
 	{
-		appendLogTypeInfo("wol error","Can't perform Wake-On-Line operations. Render is busy.");
+		appendLogTypeInfo("wol error", "Can't perform Wake-On-Line operations. Render is busy.");
 		return;
 	}
 	if (m_netIFs.size() < 1)
 	{
-		appendLogTypeInfo("wol error","Can't perform Wake-On-Line operations. No network interfaces information.");
+		appendLogTypeInfo("wol error",
+						  "Can't perform Wake-On-Line operations. No network interfaces information.");
 		return;
 	}
 
 	setWOLFalling(true);
-	appendLogTypeInfo("wol","Sending WOL sleep request.");
-	m_wol_operation_time = time( NULL);
+	appendLogTypeInfo("wol", "Sending WOL sleep request.");
+	m_wol_operation_time = time(NULL);
 	store();
-	if( monitoring ) monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
+	if (monitoring)
+		monitoring->addEvent(af::Monitor::EVT_renders_change, m_id);
 
 	std::ostringstream str;
-	v_jsonWrite( str, af::Msg::TRendersList);
+	v_jsonWrite(str, af::Msg::TRendersList);
 
 	m_re.m_instruction = "sleep";
 	m_re.m_command = str.str();
 }
 
-void RenderAf::wolWake(  MonitorContainer * i_monitoring, const std::string & i_msg)
+void RenderAf::wolWake(MonitorContainer *i_monitoring, const std::string &i_msg)
 {
 	if (isOnline())
 	{
@@ -684,14 +686,15 @@ void RenderAf::wolWake(  MonitorContainer * i_monitoring, const std::string & i_
 
 	if (m_netIFs.size() < 1)
 	{
-		appendLogTypeInfo("wol error", i_msg + "Can't perform Wake-On-Line operations. No network interfaces information.");
+		appendLogTypeInfo(
+			"wol error", i_msg + "Can't perform Wake-On-Line operations. No network interfaces information.");
 		return;
 	}
 
 	appendLogTypeInfo("wol", i_msg + " Sending WOL wake request.");
 
-	setWOLWaking( true);
-	m_wol_operation_time = time( NULL);
+	setWOLWaking(true);
+	m_wol_operation_time = time(NULL);
 	store();
 	if (i_monitoring)
 		i_monitoring->addEvent(af::Monitor::EVT_renders_change, m_id);
@@ -702,15 +705,16 @@ void RenderAf::wolWake(  MonitorContainer * i_monitoring, const std::string & i_
 	SysJob::AddWOLCommand(str.str(), "", m_name, m_name);
 }
 
-void RenderAf::stopTask( int jobid, int blocknum, int tasknum, int number)
+void RenderAf::stopTask(int jobid, int blocknum, int tasknum, int number)
 {
-	//printf("RenderAf::stopTask: j%d b%d t%d n%d\n", jobid, blocknum, tasknum, number);
-	if( isOffline()) return;
+	// printf("RenderAf::stopTask: j%d b%d t%d n%d\n", jobid, blocknum, tasknum, number);
+	if (isOffline())
+		return;
 
-	m_re.addTaskStop( af::MCTaskPos( jobid, blocknum, tasknum, number));
+	m_re.addTaskStop(af::MCTaskPos(jobid, blocknum, tasknum, number));
 }
 
-void RenderAf::taskFinished(const af::TaskExec * i_exec, int64_t i_state, MonitorContainer * i_monitoring)
+void RenderAf::taskFinished(const af::TaskExec *i_exec, int64_t i_state, MonitorContainer *i_monitoring)
 {
 	removeTask(i_exec, i_monitoring);
 
@@ -733,10 +737,10 @@ void RenderAf::taskFinished(const af::TaskExec * i_exec, int64_t i_state, Monito
 	}
 
 	if (i_monitoring)
-		i_monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
+		i_monitoring->addEvent(af::Monitor::EVT_renders_change, m_id);
 }
 
-void RenderAf::addErrorTask(const af::TaskExec * i_exec)
+void RenderAf::addErrorTask(const af::TaskExec *i_exec)
 {
 	const int SickErrorsCount = m_parent->getSickErrorsCount();
 
@@ -747,22 +751,22 @@ void RenderAf::addErrorTask(const af::TaskExec * i_exec)
 		return;
 	}
 
-	std::list<ErrorTaskData*>::iterator it = m_error_tasks.begin();
+	std::list<ErrorTaskData *>::iterator it = m_error_tasks.begin();
 	int i = 0;
 	while (it != m_error_tasks.end())
 	{
-		if (((*it)->user_name == i_exec->getUserName()) ||
-			(i + 1 == SickErrorsCount))
+		if (((*it)->user_name == i_exec->getUserName()) || (i + 1 == SickErrorsCount))
 		{
 			delete *it;
 			it = m_error_tasks.erase(it);
 			continue;
 		}
 
-		it++; i++;
+		it++;
+		i++;
 	}
 
-	ErrorTaskData * etd = new ErrorTaskData;
+	ErrorTaskData *etd = new ErrorTaskData;
 
 	etd->when = time(NULL);
 	etd->service = i_exec->getServiceType();
@@ -775,21 +779,21 @@ void RenderAf::addErrorTask(const af::TaskExec * i_exec)
 		setSick();
 		emitEvents(std::vector<std::string>(1, "RENDER_SICK"));
 		std::string msg = std::string("Got sick after ") + af::itos(SickErrorsCount) + " errors:";
-		for (const auto & it : m_error_tasks)
-			msg += "\n" +  it->user_name + " - " + it->service + ": " + af::time2str(it->when);
+		for (const auto &it : m_error_tasks)
+			msg += "\n" + it->user_name + " - " + it->service + ": " + af::time2str(it->when);
 		appendLogTypeInfo("sick", msg);
 	}
 }
 
 void RenderAf::clearErrorTasks()
 {
-	for (auto & it : m_error_tasks)
+	for (auto &it : m_error_tasks)
 		delete it;
 
 	m_error_tasks.clear();
 }
 
-void RenderAf::actionHealSick(Action & i_action)
+void RenderAf::actionHealSick(Action &i_action)
 {
 	if (isNotSick())
 		return;
@@ -800,12 +804,12 @@ void RenderAf::actionHealSick(Action & i_action)
 
 	i_action.monitors->addEvent(af::Monitor::EVT_renders_change, m_id);
 
-	//appendLog(std::string("Healed by ") + i_action.author);
+	// appendLog(std::string("Healed by ") + i_action.author);
 }
 
-bool RenderAf::hasTickets(const std::map<std::string, int32_t> & i_tickets) const
+bool RenderAf::hasTickets(const std::map<std::string, int32_t> &i_tickets) const
 {
-	for (auto const& it : i_tickets)
+	for (auto const &it : i_tickets)
 	{
 		if (false == hasHostTicket(it.first, it.second))
 			return false;
@@ -813,7 +817,8 @@ bool RenderAf::hasTickets(const std::map<std::string, int32_t> & i_tickets) cons
 		if (m_parent)
 		{
 			bool ticket_running = false;
-			std::unordered_map<std::string, af::Farm::Tiks>::const_iterator rIt = m_farm->m_tickets_host.find(it.first);
+			std::unordered_map<std::string, af::Farm::Tiks>::const_iterator rIt =
+				m_farm->m_tickets_host.find(it.first);
 			if (rIt != m_tickets_host.end())
 			{
 				if (rIt->second.usage > 0)
@@ -828,7 +833,7 @@ bool RenderAf::hasTickets(const std::map<std::string, int32_t> & i_tickets) cons
 	return true;
 }
 
-void RenderAf::addTask(af::TaskExec * i_taskexec, MonitorContainer * i_monitoring)
+void RenderAf::addTask(af::TaskExec *i_taskexec, MonitorContainer *i_monitoring)
 {
 	// If render was not busy it has become busy now
 	if (false == isBusy())
@@ -838,9 +843,9 @@ void RenderAf::addTask(af::TaskExec * i_taskexec, MonitorContainer * i_monitorin
 		store();
 	}
 
-	#ifdef AFOUTPUT
+#ifdef AFOUTPUT
 	AF_DEBUG << *i_taskexec;
-	#endif
+#endif
 
 	m_tasks.push_back(i_taskexec);
 
@@ -853,7 +858,7 @@ void RenderAf::addTask(af::TaskExec * i_taskexec, MonitorContainer * i_monitorin
 
 	// Add task tickets
 	std::list<std::string> new_tickets;
-	for (auto & tIt : i_taskexec->getTickets())
+	for (auto &tIt : i_taskexec->getTickets())
 	{
 		std::unordered_map<std::string, af::Farm::Tiks>::iterator hIt = m_tickets_host.find(tIt.first);
 		if (hIt != m_tickets_host.end())
@@ -877,12 +882,12 @@ void RenderAf::addTask(af::TaskExec * i_taskexec, MonitorContainer * i_monitorin
 
 	// Add some render capacities
 	i_taskexec->setDataInteger("render_capacity_total", findCapacity());
-	i_taskexec->setDataInteger("render_capacity_used",  m_capacity_used);
-	i_taskexec->setDataInteger("render_tasks_maximum",  findMaxTasks());
-	i_taskexec->setDataInteger("render_tasks_running",  m_tasks.size());
+	i_taskexec->setDataInteger("render_capacity_used", m_capacity_used);
+	i_taskexec->setDataInteger("render_tasks_maximum", findMaxTasks());
+	i_taskexec->setDataInteger("render_tasks_running", m_tasks.size());
 }
 
-void RenderAf::removeTask(const af::TaskExec * i_taskexec, MonitorContainer * i_monitoring)
+void RenderAf::removeTask(const af::TaskExec *i_taskexec, MonitorContainer *i_monitoring)
 {
 	// Do not set free status here, even if this task was last.
 	// May it will take another task in this run cycle
@@ -891,7 +896,7 @@ void RenderAf::removeTask(const af::TaskExec * i_taskexec, MonitorContainer * i_
 	// As this af::TaskExec will be deleted by TaskRun very soon.
 
 	// Remove exec pointer:
-	for (std::list<af::TaskExec*>::iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
+	for (std::list<af::TaskExec *>::iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
 	{
 		if (*it == i_taskexec)
 		{
@@ -905,14 +910,16 @@ void RenderAf::removeTask(const af::TaskExec * i_taskexec, MonitorContainer * i_
 	// Remove task capacity
 	if (m_capacity_used < i_taskexec->getCapResult())
 	{
-		AF_ERR << "Capacity_used < getCapResult() (" << m_capacity_used << " < " << i_taskexec->getCapResult() << ")";
+		AF_ERR << "Capacity_used < getCapResult() (" << m_capacity_used << " < " << i_taskexec->getCapResult()
+			   << ")";
 		m_capacity_used = 0;
 	}
-	else m_capacity_used -= i_taskexec->getCapResult();
+	else
+		m_capacity_used -= i_taskexec->getCapResult();
 
 	// Remove task tickets
 	std::list<std::string> exp_tickets;
-	for (auto & tIt : i_taskexec->getTickets())
+	for (auto &tIt : i_taskexec->getTickets())
 	{
 		std::unordered_map<std::string, af::Farm::Tiks>::iterator hIt = m_tickets_host.find(tIt.first);
 		if (hIt != m_tickets_host.end())
@@ -920,9 +927,8 @@ void RenderAf::removeTask(const af::TaskExec * i_taskexec, MonitorContainer * i_
 			hIt->second.usage -= tIt.second;
 			if (hIt->second.usage < 0)
 			{
-				AF_ERR << "Render \"" << getName()
-					<< "\" has got a negative ticket \"" << hIt->first
-					<< "\" count. Resetting to zero.";
+				AF_ERR << "Render \"" << getName() << "\" has got a negative ticket \"" << hIt->first
+					   << "\" count. Resetting to zero.";
 				hIt->second.usage = 0;
 			}
 
@@ -938,11 +944,12 @@ void RenderAf::removeTask(const af::TaskExec * i_taskexec, MonitorContainer * i_
 	m_parent->taskRelease(i_taskexec, exp_tickets, i_monitoring);
 }
 
-void RenderAf::v_refresh( time_t i_current_time,  AfContainer * pointer, MonitorContainer * monitoring)
+void RenderAf::v_refresh(time_t i_current_time, AfContainer *pointer, MonitorContainer *monitoring)
 {
-	if( isLocked() ) return;
+	if (isLocked())
+		return;
 
-	JobContainer * jobs = (JobContainer*)pointer;
+	JobContainer *jobs = (JobContainer *)pointer;
 
 	if ((NULL == m_parent) && isOnline())
 	{
@@ -957,11 +964,12 @@ void RenderAf::v_refresh( time_t i_current_time,  AfContainer * pointer, Monitor
 		zombie_time = AFRENDER::ZOMBIETIME;
 	if (isOnline() && (getTimeUpdate() < (i_current_time - zombie_time)))
 	{
-		std::string info = std::string("ZOMBIETIME: ") + af::itos(zombie_time) + "s:" + m_hres.v_generateInfoString();
+		std::string info =
+			std::string("ZOMBIETIME: ") + af::itos(zombie_time) + "s:" + m_hres.v_generateInfoString();
 		appendLogTypeInfo("zombie", info);
-		AFCommon::QueueLog( std::string("Render: \"") + getName() + "\" - " + info);
+		AFCommon::QueueLog(std::string("Render: \"") + getName() + "\" - " + info);
 		emitEvents(std::vector<std::string>(1, "RENDER_ZOMBIE"));
-		offline( jobs, af::TaskExec::UPRenderZombie, monitoring);
+		offline(jobs, af::TaskExec::UPRenderZombie, monitoring);
 		return;
 	}
 
@@ -972,8 +980,8 @@ void RenderAf::v_refresh( time_t i_current_time,  AfContainer * pointer, Monitor
 		if ((i_current_time - m_no_task_time) > _no_task_event_timeout)
 		{
 			std::ostringstream str;
-			str << "RENDER_NO_TASK: " << m_parent->getNoTaskEventTime()
-				<< " x2^"  << m_no_task_event_count << " = " << _no_task_event_timeout << " seconds.";
+			str << "RENDER_NO_TASK: " << m_parent->getNoTaskEventTime() << " x2^" << m_no_task_event_count
+				<< " = " << _no_task_event_timeout << " seconds.";
 			appendLogTypeInfo("no_task", str.str());
 			emitEvents(std::vector<std::string>(1, "RENDER_NO_TASK"));
 
@@ -993,10 +1001,11 @@ void RenderAf::v_refresh( time_t i_current_time,  AfContainer * pointer, Monitor
 		if ((i_current_time - m_overload_time) > m_overload_seconds)
 		{
 			std::ostringstream str;
-			str << "RENDER_OVERLOAD: For "  << m_overload_seconds << " seconds:";
+			str << "RENDER_OVERLOAD: For " << m_overload_seconds << " seconds:";
 			str << "\nMem: free = " << m_hres.mem_free_mb << "MB, total = " << m_hres.mem_total_mb << "MB"
 				<< ", overflow limit = " << af::Environment::getRenderOverflowMem() << "%";
-			str << "\nSwap: free = " << (m_hres.swap_total_mb - m_hres.swap_used_mb) << "MB, total = " << m_hres.swap_total_mb << "MB"
+			str << "\nSwap: free = " << (m_hres.swap_total_mb - m_hres.swap_used_mb)
+				<< "MB, total = " << m_hres.swap_total_mb << "MB"
 				<< ", overflow limit = " << af::Environment::getRenderOverflowSwap() << "%";
 			str << "\nHDD: free = " << m_hres.hdd_free_gb << "GB, total = " << m_hres.hdd_total_gb << "GB"
 				<< ", overflow limit = " << af::Environment::getRenderOverflowHDD() << "%";
@@ -1012,7 +1021,7 @@ void RenderAf::v_refresh( time_t i_current_time,  AfContainer * pointer, Monitor
 	}
 	else
 	{
-		m_overload_time  = i_current_time;
+		m_overload_time = i_current_time;
 		m_overload_seconds = 0;
 	}
 
@@ -1033,7 +1042,7 @@ void RenderAf::v_refresh( time_t i_current_time,  AfContainer * pointer, Monitor
 		monitoring->addEvent(af::Monitor::EVT_renders_change, m_id);
 
 	// Later auto nimby operations not needed if render is not online:
-	if( isOffline())
+	if (isOffline())
 	{
 		m_busy_time = i_current_time;
 		m_idle_time = i_current_time;
@@ -1041,27 +1050,28 @@ void RenderAf::v_refresh( time_t i_current_time,  AfContainer * pointer, Monitor
 	}
 
 	// Update busy with no task time:
-	if(( isFree() == false ) || isBusy()) // already nimby or has task(s)
+	if ((isFree() == false) || isBusy()) // already nimby or has task(s)
 	{
 		m_busy_time = i_current_time;
 	}
 	else
 	{
-		int cpu=0,mem=0,swp=0,hgb=0,hio=0,net=0;
+		int cpu = 0, mem = 0, swp = 0, hgb = 0, hio = 0, net = 0;
 
 		// CPU % busy:
-		if ((m_parent->get_busy_cpu() <= 0) ||
-			((100 - m_hres.cpu_idle) < m_parent->get_busy_cpu()))
+		if ((m_parent->get_busy_cpu() <= 0) || ((100 - m_hres.cpu_idle) < m_parent->get_busy_cpu()))
 			cpu = 1;
 
 		// Mem % used:
 		if ((m_hres.mem_total_mb <= 0) || (m_parent->get_busy_mem() <= 0) ||
-			((100 * (m_hres.mem_total_mb - m_hres.mem_free_mb) / m_hres.mem_total_mb) < m_parent->get_busy_mem()))
+			((100 * (m_hres.mem_total_mb - m_hres.mem_free_mb) / m_hres.mem_total_mb) <
+			 m_parent->get_busy_mem()))
 			mem = 1;
 
 		// Swap % used:
-		if ((m_hres.swap_total_mb <= 0) || ((m_parent->get_busy_swp() <= 0) ||
-			(100 * m_hres.swap_used_mb / m_hres.swap_total_mb) < m_parent->get_busy_swp()))
+		if ((m_hres.swap_total_mb <= 0) ||
+			((m_parent->get_busy_swp() <= 0) ||
+			 (100 * m_hres.swap_used_mb / m_hres.swap_total_mb) < m_parent->get_busy_swp()))
 			swp = 1;
 
 		// Hdd free GB:
@@ -1070,8 +1080,7 @@ void RenderAf::v_refresh( time_t i_current_time,  AfContainer * pointer, Monitor
 			hgb = 1;
 
 		// Hdd I/O %:
-		if ((m_parent->get_busy_hddio() <= 0) ||
-			(m_hres.hdd_busy < m_parent->get_busy_hddio()))
+		if ((m_parent->get_busy_hddio() <= 0) || (m_hres.hdd_busy < m_parent->get_busy_hddio()))
 			hio = 1;
 
 		// Net MB/s:
@@ -1084,46 +1093,45 @@ void RenderAf::v_refresh( time_t i_current_time,  AfContainer * pointer, Monitor
 		{
 			m_busy_time = i_current_time;
 		}
-		else if ((m_parent->get_busy_nimby_time() > 0) && (i_current_time - m_busy_time > m_parent->get_busy_nimby_time()))
+		else if ((m_parent->get_busy_nimby_time() > 0) &&
+				 (i_current_time - m_busy_time > m_parent->get_busy_nimby_time()))
 		{
-		// Automatic Nimby ON:
+			// Automatic Nimby ON:
 			std::string log("Automatic Nimby: ");
-			log += "\n Busy since: " + af::time2str (m_busy_time);// + " CPU >= " + af::itos (m_parent->get_busy_cpu) + "%";
-			log += "\n Nimby busy free time = " + af::time2strHMS (m_parent->get_busy_nimby_time(), true);
+			log += "\n Busy since: " +
+				   af::time2str(m_busy_time); // + " CPU >= " + af::itos (m_parent->get_busy_cpu) + "%";
+			log += "\n Nimby busy free time = " + af::time2strHMS(m_parent->get_busy_nimby_time(), true);
 			appendLogTypeInfo("auto nimby", log);
 			setNIMBY();
-			monitoring->addEvent (af::Monitor::EVT_renders_change, m_id);
+			monitoring->addEvent(af::Monitor::EVT_renders_change, m_id);
 			store();
 		}
 	}
 
 	// Update idle time:
-	if( isBusy())
+	if (isBusy())
 	{
 		m_idle_time = i_current_time;
 	}
-	else if((m_parent->get_idle_cpu()    <= 0) &&
-			(m_parent->get_idle_mem()    <= 0) &&
-			(m_parent->get_idle_swp()    <= 0) &&
-			(m_parent->get_idle_hddgb()  <= 0) &&
-			(m_parent->get_idle_hddio()  <= 0) &&
-			(m_parent->get_idle_netmbs() <= 0))
+	else if ((m_parent->get_idle_cpu() <= 0) && (m_parent->get_idle_mem() <= 0) &&
+			 (m_parent->get_idle_swp() <= 0) && (m_parent->get_idle_hddgb() <= 0) &&
+			 (m_parent->get_idle_hddio() <= 0) && (m_parent->get_idle_netmbs() <= 0))
 	{
 		// If all params are 'off' there is no 'idle':
 		m_idle_time = i_current_time;
 	}
 	else
 	{
-		int cpu=0,mem=0,swp=0,hgb=0,hio=0,net=0;
+		int cpu = 0, mem = 0, swp = 0, hgb = 0, hio = 0, net = 0;
 
 		// CPU % busy:
-		if ((m_parent->get_idle_cpu() > 0) &&
-			((100 - m_hres.cpu_idle) > m_parent->get_idle_cpu()))
+		if ((m_parent->get_idle_cpu() > 0) && ((100 - m_hres.cpu_idle) > m_parent->get_idle_cpu()))
 			cpu = 1;
 
 		// Mem % used:
 		if ((m_hres.mem_total_mb > 0) && (m_parent->get_idle_mem() > 0) &&
-			((100 * (m_hres.mem_total_mb - m_hres.mem_free_mb) / m_hres.mem_total_mb) > m_parent->get_idle_mem()))
+			((100 * (m_hres.mem_total_mb - m_hres.mem_free_mb) / m_hres.mem_total_mb) >
+			 m_parent->get_idle_mem()))
 			mem = 1;
 
 		// Swap % used:
@@ -1137,8 +1145,7 @@ void RenderAf::v_refresh( time_t i_current_time,  AfContainer * pointer, Monitor
 			hgb = 1;
 
 		// Hdd I/O %:
-		if ((m_parent->get_idle_hddio() > 0) &&
-			(m_hres.hdd_busy > m_parent->get_idle_hddio()))
+		if ((m_parent->get_idle_hddio() > 0) && (m_hres.hdd_busy > m_parent->get_idle_hddio()))
 			hio = 1;
 
 		// Net MB/s:
@@ -1147,30 +1154,32 @@ void RenderAf::v_refresh( time_t i_current_time,  AfContainer * pointer, Monitor
 			net = 1;
 
 		// it will be treated as 'not idle' any param is 'not idle'
-		if( cpu | mem | swp | hio | hgb | net )
+		if (cpu | mem | swp | hio | hgb | net)
 		{
 			m_idle_time = i_current_time;
 		}
-		else 
+		else
 		{
 			// Automatic WOL sleep:
-			if ((m_parent->get_idle_wolsleep_time() > 0) && isOnline() && (isWOLSleeping() == false) && (isWOLFalling() == false)
-				&& (i_current_time - m_idle_time > m_parent->get_idle_wolsleep_time()))
+			if ((m_parent->get_idle_wolsleep_time() > 0) && isOnline() && (isWOLSleeping() == false) &&
+				(isWOLFalling() == false) &&
+				(i_current_time - m_idle_time > m_parent->get_idle_wolsleep_time()))
 			{
 				std::string log("Automatic WOL Sleep: ");
 				log += "\n Idle since: " + af::time2str(m_idle_time);
-				log += "\n WOL idle sleep time = " + af::time2strHMS(m_parent->get_idle_wolsleep_time(), true);
+				log +=
+					"\n WOL idle sleep time = " + af::time2strHMS(m_parent->get_idle_wolsleep_time(), true);
 				appendLogTypeInfo("auto wol sleep", log);
 				wolSleep(monitoring);
 			}
 
 			// Automatic Nimby Free:
-			if ((m_parent->get_idle_free_time() > 0) && isOnline() && (isNimby() || isNIMBY())
-				&& (i_current_time - m_idle_time > m_parent->get_idle_free_time()))
+			if ((m_parent->get_idle_free_time() > 0) && isOnline() && (isNimby() || isNIMBY()) &&
+				(i_current_time - m_idle_time > m_parent->get_idle_free_time()))
 			{
 				std::string log("Automatic Nimby Free: ");
 				log += "\n Idle since: " + af::time2str(m_idle_time);
-				log += "\n Nimby idle free time = " + af::time2strHMS(m_parent->get_idle_free_time(), true );
+				log += "\n Nimby idle free time = " + af::time2strHMS(m_parent->get_idle_free_time(), true);
 				appendLogTypeInfo("auto nimby free", log, false);
 				setFree();
 				monitoring->addEvent(af::Monitor::EVT_renders_change, m_id);
@@ -1180,7 +1189,7 @@ void RenderAf::v_refresh( time_t i_current_time,  AfContainer * pointer, Monitor
 	}
 }
 
-void RenderAf::v_postSolve(time_t i_current_time, MonitorContainer * i_monitoring)
+void RenderAf::v_postSolve(time_t i_current_time, MonitorContainer *i_monitoring)
 {
 	bool changed = false;
 
@@ -1201,51 +1210,54 @@ void RenderAf::v_postSolve(time_t i_current_time, MonitorContainer * i_monitorin
 	}
 }
 
-void RenderAf::appendTasksLog( const std::string & message)
+void RenderAf::appendTasksLog(const std::string &message)
 {
-	while( m_tasks_log.size() > af::Environment::getAfNodeLogLinesMax() ) m_tasks_log.pop_front();
-	m_tasks_log.push_back( af::time2str() + " : " + message);
+	while (m_tasks_log.size() > af::Environment::getAfNodeLogLinesMax())
+		m_tasks_log.pop_front();
+	m_tasks_log.push_back(af::time2str() + " : " + message);
 }
 
-af::Msg * RenderAf::writeTasksLog( bool i_binary)
+af::Msg *RenderAf::writeTasksLog(bool i_binary)
 {
-	if( false == i_binary )
+	if (false == i_binary)
 	{
-		if( m_tasks_log.empty())
+		if (m_tasks_log.empty())
 			return af::jsonMsg("tasks_log", m_name, "No tasks execution.");
 		else
 			return af::jsonMsg("tasks_log", m_name, m_tasks_log);
 	}
 
-	af::Msg * msg = new af::Msg;
+	af::Msg *msg = new af::Msg;
 
-	if( m_tasks_log.empty())
+	if (m_tasks_log.empty())
 		msg->setString("No tasks execution.");
 	else
-		msg->setStringList( m_tasks_log);
+		msg->setStringList(m_tasks_log);
 
 	return msg;
 }
 
-void RenderAf::closeLostTask( const af::MCTaskUp &taskup)
+void RenderAf::closeLostTask(const af::MCTaskUp &taskup)
 {
-	RenderContainerIt rIt( ms_renders);
-	RenderAf * render = rIt.getRender( taskup.getClientId());
-	if( render == NULL)
+	RenderContainerIt rIt(ms_renders);
+	RenderAf *render = rIt.getRender(taskup.getClientId());
+	if (render == NULL)
 	{
 		std::ostringstream stream;
 		stream << "RenderAf::closeLostTask: Render with id=" << taskup.getClientId() << " does not exists.";
-		AFCommon::QueueLogError( stream.str());
+		AFCommon::QueueLogError(stream.str());
 		return;
 	}
-	if( render->isOffline()) return;
+	if (render->isOffline())
+		return;
 
 	std::ostringstream stream;
 	stream << "RenderAf::closeLostTask: '" << render->getName() << "': ";
-	stream << "[" << taskup.getNumJob() << "][" << taskup.getNumBlock() << "][" << taskup.getNumTask() << "](" << taskup.getNumBlock() << ")";
-	AFCommon::QueueLogError( stream.str());
+	stream << "[" << taskup.getNumJob() << "][" << taskup.getNumBlock() << "][" << taskup.getNumTask() << "]("
+		   << taskup.getNumBlock() << ")";
+	AFCommon::QueueLogError(stream.str());
 
-	render->m_re.addTaskClose( taskup);
+	render->m_re.addTaskClose(taskup);
 }
 
 bool RenderAf::checkOverload()
@@ -1267,7 +1279,8 @@ bool RenderAf::checkOverload()
 
 	// Check swap
 	if (m_hres.swap_total_mb)
-		if (((100 * (m_hres.swap_total_mb - m_hres.swap_used_mb)) / m_hres.swap_total_mb) <= af::Environment::getRenderOverflowSwap())
+		if (((100 * (m_hres.swap_total_mb - m_hres.swap_used_mb)) / m_hres.swap_total_mb) <=
+			af::Environment::getRenderOverflowSwap())
 			return true;
 
 	// Check HDD
@@ -1278,7 +1291,7 @@ bool RenderAf::checkOverload()
 	return false;
 }
 
-void RenderAf::emitEvents(const std::vector<std::string> & i_events) const
+void RenderAf::emitEvents(const std::vector<std::string> &i_events) const
 {
 	// Processing command for system job if some events happened:
 	if (i_events.empty())
@@ -1289,7 +1302,7 @@ void RenderAf::emitEvents(const std::vector<std::string> & i_events) const
 	{
 		// Check all parent pools custom data exists:
 		bool found = false;
-		const PoolSrv * pool = m_parent;
+		const PoolSrv *pool = m_parent;
 		while (pool)
 		{
 			if (pool->hasCustomData())
@@ -1310,7 +1323,7 @@ void RenderAf::emitEvents(const std::vector<std::string> & i_events) const
 	m_hres.jsonWrite(str);
 
 	str << ",\n\"pools\":[";
-	const PoolSrv * pool = m_parent;
+	const PoolSrv *pool = m_parent;
 	while (pool)
 	{
 		str << "\n";
@@ -1331,21 +1344,22 @@ void RenderAf::emitEvents(const std::vector<std::string> & i_events) const
 
 	for (int i = 0; i < i_events.size(); i++)
 	{
-		if (i) str << ',';
+		if (i)
+			str << ',';
 		str << '"' << i_events[i] << '"';
 	}
 	str << "]\n}";
 
 	SysJob::AddEventCommand(str.str(),
-		"", // working directory - no matter
-		m_user_name, m_name, i_events[0]);
+							"", // working directory - no matter
+							m_user_name, m_name, i_events[0]);
 }
 
-af::Msg * RenderAf::writeFullInfo( bool i_binary) const
+af::Msg *RenderAf::writeFullInfo(bool i_binary) const
 {
 	if (i_binary)
 	{
-		af::Msg * o_msg = new af::Msg();
+		af::Msg *o_msg = new af::Msg();
 
 		std::string str = v_generateInfoString(true);
 
@@ -1355,7 +1369,7 @@ af::Msg * RenderAf::writeFullInfo( bool i_binary) const
 		if (m_error_tasks.size())
 		{
 			str += "\nError tasks:";
-			for(const auto & etd : m_error_tasks)
+			for (const auto &etd : m_error_tasks)
 				str += "\n" + af::time2str(etd->when) + ": " + etd->user_name + " - " + etd->service;
 		}
 
@@ -1371,23 +1385,23 @@ af::Msg * RenderAf::writeFullInfo( bool i_binary) const
 	str << ",\"id\":" << m_id;
 
 	str << ",\"render\":";
-	af::Render::v_jsonWrite( str, af::Msg::TRendersList);
+	af::Render::v_jsonWrite(str, af::Msg::TRendersList);
 
 	str << ",\"custom_data\":\"" << m_custom_data << '"';
 
-	if( isOnline())
+	if (isOnline())
 	{
 		str << ",";
-		m_hres.jsonWrite( str);
+		m_hres.jsonWrite(str);
 	}
-	
+
 	str << "}}";
-	return af::jsonMsg( str);
+	return af::jsonMsg(str);
 }
 
 int RenderAf::v_calcWeight() const
 {
 	int weight = Render::v_calcWeight();
-	weight += sizeof(RenderAf) - sizeof( Render);
+	weight += sizeof(RenderAf) - sizeof(Render);
 	return weight;
 }

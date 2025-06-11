@@ -6,16 +6,16 @@
 
 CmdInvalid::CmdInvalid()
 {
-   setCmd("inv");
-   setInfo("Try invalid message.");
-   setHelp("Send invalid type of message. For debug purposes.");
-   setMsgType( af::Msg::TInvalid);
+	setCmd("inv");
+	setInfo("Try invalid message.");
+	setHelp("Send invalid type of message. For debug purposes.");
+	setMsgType(af::Msg::TInvalid);
 }
 
-CmdInvalid::~CmdInvalid(){}
+CmdInvalid::~CmdInvalid() {}
 
-bool CmdInvalid::v_processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdInvalid::v_processArguments(int argc, char **argv, af::Msg &msg)
 {
-   msg.set( af::Msg::TInvalid);
-   return true;
+	msg.set(af::Msg::TInvalid);
+	return true;
 }

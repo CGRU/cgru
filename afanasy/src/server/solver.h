@@ -30,32 +30,28 @@ class UserContainer;
 
 class Solver
 {
-public:
-	Solver(
-			BranchesContainer * i_branchescontainer,
-			JobContainer      * i_jobcontainer,
-			RenderContainer   * i_rendercontainer,
-			UserContainer     * i_usercontainer,
-			MonitorContainer  * i_monitorcontainer
-		);
+  public:
+	Solver(BranchesContainer *i_branchescontainer, JobContainer *i_jobcontainer,
+		   RenderContainer *i_rendercontainer, UserContainer *i_usercontainer,
+		   MonitorContainer *i_monitorcontainer);
 
 	~Solver();
 
 	void solve();
 
-	static void SortList(std::list<AfNodeSolve*> & i_list, int i_solving_flags);
-	static RenderAf * SolveList(std::list<AfNodeSolve*> & i_list, std::list<RenderAf*> & i_renders, BranchSrv * i_branch);
+	static void SortList(std::list<AfNodeSolve *> &i_list, int i_solving_flags);
+	static RenderAf *SolveList(std::list<AfNodeSolve *> &i_list, std::list<RenderAf *> &i_renders,
+							   BranchSrv *i_branch);
 
-private:
-	static BranchesContainer * ms_branchescontainer;
-	static JobContainer      * ms_jobcontainer;
-	static RenderContainer   * ms_rendercontainer;
-	static UserContainer     * ms_usercontainer;
-	static MonitorContainer  * ms_monitorcontaier;
+  private:
+	static BranchesContainer *ms_branchescontainer;
+	static JobContainer *ms_jobcontainer;
+	static RenderContainer *ms_rendercontainer;
+	static UserContainer *ms_usercontainer;
+	static MonitorContainer *ms_monitorcontaier;
 
 	static uint64_t ms_run_cycle;
 	static const int ms_solve_cycles_limit;
 	static int ms_awaken_renders;
 	static const int ms_awaken_renders_max;
 };
-

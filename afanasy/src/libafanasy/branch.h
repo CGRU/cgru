@@ -23,7 +23,7 @@ namespace af
 {
 class Branch : public Work
 {
-public:
+  public:
 	Branch(const std::string &i_path);
 
 	Branch(Msg *msg);
@@ -43,38 +43,47 @@ public:
 
 	static const std::string FilterPath(const std::string &i_path);
 
-	inline bool isRoot()    const {return m_name == "/";}
-	inline bool isNotRoot() const {return m_name != "/";}
+	inline bool isRoot() const { return m_name == "/"; }
+	inline bool isNotRoot() const { return m_name != "/"; }
 
 	enum FlagsBranch
 	{
 		CreateChilds = 1 << 0,
-		SolveJobs    = 1 << 1,
-		Paused       = 1 << 2
+		SolveJobs = 1 << 1,
+		Paused = 1 << 2
 	};
 
 	inline bool isCreateChilds() const { return m_flags_branch & CreateChilds; }
-	inline void setCreateChilds(bool i_on) { m_flags_branch = i_on ? m_flags_branch | CreateChilds : m_flags_branch & (~CreateChilds); }
+	inline void setCreateChilds(bool i_on)
+	{
+		m_flags_branch = i_on ? m_flags_branch | CreateChilds : m_flags_branch & (~CreateChilds);
+	}
 
 	inline bool isSolveJobs() const { return m_flags_branch & SolveJobs; }
-	inline void setSolveJobs(bool i_on) { m_flags_branch = i_on ? m_flags_branch | SolveJobs : m_flags_branch & (~SolveJobs); }
+	inline void setSolveJobs(bool i_on)
+	{
+		m_flags_branch = i_on ? m_flags_branch | SolveJobs : m_flags_branch & (~SolveJobs);
+	}
 
 	inline bool isPaused() const { return m_flags_branch & Paused; }
-	inline void setPaused(bool i_on) { m_flags_branch = i_on ? m_flags_branch | Paused : m_flags_branch & (~Paused); }
+	inline void setPaused(bool i_on)
+	{
+		m_flags_branch = i_on ? m_flags_branch | Paused : m_flags_branch & (~Paused);
+	}
 
-	inline int32_t getBranchesTotal() const {return m_branches_total;}
-	inline int32_t getJobsTotal()     const {return m_jobs_total;    }
-	inline int32_t getJobsRunning()   const {return m_jobs_running;  }
-	inline int32_t getJobsDone()      const {return m_jobs_done;     }
-	inline int32_t getJobsError()     const {return m_jobs_error;    }
-	inline int32_t getJobsReady()     const {return m_jobs_ready;    }
-	inline int32_t getTasksReady()    const {return m_tasks_ready;   }
-	inline int32_t getTasksError()    const {return m_tasks_error;   }
+	inline int32_t getBranchesTotal() const { return m_branches_total; }
+	inline int32_t getJobsTotal() const { return m_jobs_total; }
+	inline int32_t getJobsRunning() const { return m_jobs_running; }
+	inline int32_t getJobsDone() const { return m_jobs_done; }
+	inline int32_t getJobsError() const { return m_jobs_error; }
+	inline int32_t getJobsReady() const { return m_jobs_ready; }
+	inline int32_t getTasksReady() const { return m_tasks_ready; }
+	inline int32_t getTasksError() const { return m_tasks_error; }
 
 	inline int64_t getTimeCreated() const { return m_time_creation; }
-	inline int64_t getTimeEmpty()   const { return m_time_empty;    }
+	inline int64_t getTimeEmpty() const { return m_time_empty; }
 
-protected:
+  protected:
 	std::string m_parent_path;
 
 	int8_t m_flags_branch;
@@ -94,25 +103,24 @@ protected:
 
 	struct BranchUserData
 	{
-		User * user;
+		User *user;
 		int32_t running_tasks_num;
 		int64_t running_capacity_total;
 
-		BranchUserData(User * i_user, int32_t i_running_tasks_num, int64_t i_running_capacity_total):
-			user(i_user),
-			running_tasks_num(i_running_tasks_num),
-			running_capacity_total(i_running_capacity_total)
+		BranchUserData(User *i_user, int32_t i_running_tasks_num, int64_t i_running_capacity_total)
+			: user(i_user), running_tasks_num(i_running_tasks_num),
+			  running_capacity_total(i_running_capacity_total)
 		{
 		}
 	};
-	std::list<BranchUserData*> m_active_users_list;
+	std::list<BranchUserData *> m_active_users_list;
 
 	int64_t m_time_creation;
 	int64_t m_time_empty;
 
-private:
+  private:
 	void v_readwrite(Msg *msg);
 
 	void initDefaultValues();
 };
-}
+} // namespace af

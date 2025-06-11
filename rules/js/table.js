@@ -14,19 +14,19 @@
 	table.js - TODO: description
 */
 
-"use strict";
+'use strict';
 
 var table_columns = {
-	name       : {'label': 'Name'},
-	frames_num : {'label': 'Frames'},
-	picture    : {'label': 'Picture'},
-	status     : {'label': 'Status'},
-	info       : {'label': 'Info'},
-	comments   : {'label': 'Comments'},
-	tasks      : {'label': 'Tasks'},
-	timecode   : {'label': 'TC'},
-	duration   : {'label': 'Dur'},
-	price      : {'label': 'Price'}
+	name: {'label': 'Name'},
+	frames_num: {'label': 'Frames'},
+	picture: {'label': 'Picture'},
+	status: {'label': 'Status'},
+	info: {'label': 'Info'},
+	comments: {'label': 'Comments'},
+	tasks: {'label': 'Tasks'},
+	timecode: {'label': 'TC'},
+	duration: {'label': 'Dur'},
+	price: {'label': 'Price'}
 };
 
 var table_args = null;
@@ -38,16 +38,16 @@ var table_functions = null;
 var table_function_num = null;
 
 var table_params = {
-	picture    : {'type': 'bool', 'default': true,  'width': '20%'},
-	status     : {'type': 'bool', 'default': true,  'width': '20%'},
-	tags       : {'type': 'bool', 'default': true,  'width': '20%'},
-	annotation : {'type': 'bool', 'default': false, 'width': '20%'},
-	comments   : {'type': 'bool', 'default': false, 'width': '20%'},
-	timecode   : {'type': 'bool', 'default': false, 'width': '20%'},
-	frames_num : {'type': 'bool', 'default': false, 'width': '20%'},
-	duration   : {'type': 'bool', 'default': true,  'width': '20%'},
-	tasks      : {'type': 'bool', 'default': false, 'width': '20%'},
-	price      : {'type': 'bool', 'default': true,  'width': '20%'}
+	picture: {'type': 'bool', 'default': true, 'width': '20%'},
+	status: {'type': 'bool', 'default': true, 'width': '20%'},
+	tags: {'type': 'bool', 'default': true, 'width': '20%'},
+	annotation: {'type': 'bool', 'default': false, 'width': '20%'},
+	comments: {'type': 'bool', 'default': false, 'width': '20%'},
+	timecode: {'type': 'bool', 'default': false, 'width': '20%'},
+	frames_num: {'type': 'bool', 'default': false, 'width': '20%'},
+	duration: {'type': 'bool', 'default': true, 'width': '20%'},
+	tasks: {'type': 'bool', 'default': false, 'width': '20%'},
+	price: {'type': 'bool', 'default': true, 'width': '20%'}
 };
 
 function table_Export(i_args)
@@ -63,7 +63,9 @@ function table_Export(i_args)
 	elExport.classList.add('button');
 	elExport.style.clear = 'both';
 	elExport.m_wnd = wnd;
-	elExport.onclick = function(e) { table_ExportDo(e.currentTarget.m_wnd); }
+	elExport.onclick = function(e) {
+		table_ExportDo(e.currentTarget.m_wnd);
+	}
 }
 
 function table_ExportDo(i_wnd)
@@ -328,7 +330,9 @@ function table_Gen_picture(i_shot)
 		}
 
 		var reader = new FileReader();
-		reader.onloadend = function() { table_PictureReceived(reader.result, i_shot); };
+		reader.onloadend = function() {
+			table_PictureReceived(reader.result, i_shot);
+		};
 		reader.readAsDataURL(xhr.response);
 	};
 	xhr.open('GET', url);

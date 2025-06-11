@@ -8,11 +8,11 @@ class ListWork;
 
 class ItemBranch : public ItemWork
 {
-public:
-	ItemBranch(ListWork * i_list_work, af::Branch * i_branch, const CtrlSortFilter * i_ctrl_sf);
+  public:
+	ItemBranch(ListWork *i_list_work, af::Branch *i_branch, const CtrlSortFilter *i_ctrl_sf);
 	~ItemBranch();
 
-	void v_updateValues(af::Node * i_afnode, int i_msgType);
+	void v_updateValues(af::Node *i_afnode, int i_msgType);
 
 	int branches_total;
 	int jobs_total;
@@ -33,13 +33,14 @@ public:
 
 	QString parent_path;
 
-protected:
-	virtual void v_paint(QPainter * i_painter, const QRect & i_rect, const QStyleOptionViewItem & i_option) const;
+  protected:
+	virtual void v_paint(QPainter *i_painter, const QRect &i_rect,
+						 const QStyleOptionViewItem &i_option) const;
 
-private:
-	void updateInfo(af::Branch * i_branch);
+  private:
+	void updateInfo(af::Branch *i_branch);
 
-private:
+  private:
 	static const int HeightBranch;
 	static const int HeightBranch_Idle;
 

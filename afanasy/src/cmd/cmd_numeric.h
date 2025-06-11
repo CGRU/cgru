@@ -4,18 +4,16 @@
 
 class CmdNumeric : public Cmd
 {
-public:
+  public:
 	CmdNumeric();
 	~CmdNumeric();
-	bool v_processArguments( int argc, char** argv, af::Msg &msg);
+	bool v_processArguments(int argc, char **argv, af::Msg &msg);
 };
-
 
 class CmdNumericCmd : public Cmd
 {
-public:
+  public:
 	CmdNumericCmd();
 	~CmdNumericCmd();
-	bool v_processArguments( int argc, char** argv, af::Msg &msg);
+	bool v_processArguments(int argc, char **argv, af::Msg &msg);
 };
-

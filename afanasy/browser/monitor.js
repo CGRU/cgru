@@ -18,7 +18,7 @@
 		right column  - meta data and key-value pairs associated with the entity
 */
 
-"use strict";
+'use strict';
 
 function Monitor(i_args)
 {
@@ -78,8 +78,12 @@ function Monitor(i_args)
 	this.elementsSU.push(this.elInfo);
 
 	this.elList.monitor = this;
-	this.elList.oncontextmenu = function(e) { return e.currentTarget.monitor.noneSelected(e); };
-	this.elList.onmousedown = function(e) { return e.currentTarget.monitor.noneSelected(e); };
+	this.elList.oncontextmenu = function(e) {
+		return e.currentTarget.monitor.noneSelected(e);
+	};
+	this.elList.onmousedown = function(e) {
+		return e.currentTarget.monitor.noneSelected(e);
+	};
 
 
 	// Sorting direction (can be overridden later in onMonitorCreate function):
@@ -127,7 +131,7 @@ function Monitor(i_args)
 	}
 
 	if (this.type != 'tasks')
-		this.createCtrlBtn({"name": 'log', "label": 'LOG', "tooltip": 'Show node log.', "handle": 'mh_Get'});
+		this.createCtrlBtn({'name': 'log', 'label': 'LOG', 'tooltip': 'Show node log.', 'handle': 'mh_Get'});
 
 	var el = document.createElement('div');
 	this.elPanelR.appendChild(el);
@@ -145,10 +149,10 @@ function Monitor(i_args)
 	el.classList.add('section');
 	// Show raw JSON object:
 	this.createCtrlBtn({
-		"name": 'obj',
-		"label": 'OBJ',
-		"tooltip": 'Show object.',
-		"handle": 'showObject',
+		'name': 'obj',
+		'label': 'OBJ',
+		'tooltip': 'Show object.',
+		'handle': 'showObject',
 		'elParent': this.elPanelR.m_elParams,
 		'always_active': true
 	});
@@ -159,8 +163,9 @@ function Monitor(i_args)
 	el.classList.add('caption');
 	el.title = 'Click to edit all parameters.';
 	el.m_monitor = this;
-	el.onclick = function(e) {e.currentTarget.m_monitor.panelShowAllParameters();}
-	el.oncontextmenu = el.onclick;
+	el.onclick = function(e) {
+		e.currentTarget.m_monitor.panelShowAllParameters();
+	} el.oncontextmenu = el.onclick;
 
 	if (this.nodeConstructor.params)
 		for (let p in this.nodeConstructor.params)
@@ -230,7 +235,9 @@ function Monitor(i_args)
 	this.elCtrlSortParam.classList.add('param');
 	this.elCtrlSortParam.textContent = 'null';
 	this.elCtrlSortParam.monitor = this;
-	this.elCtrlSortParam.ondblclick = function(e) { return e.currentTarget.monitor.sortDirChanged(e); };
+	this.elCtrlSortParam.ondblclick = function(e) {
+		return e.currentTarget.monitor.sortDirChanged(e);
+	};
 	this.elCtrlSortParam.title = 'Sort Parameter\nContext menu to select.\nDouble click to toggle direction.';
 	this.elCtrlSortParam.oncontextmenu = function(e) {
 		return e.currentTarget.monitor.sortFilterParmMenu(e, 'sort');
@@ -265,8 +272,12 @@ function Monitor(i_args)
 	this.elCtrlFilterInput.contentEditable = true;
 	this.elCtrlFilterInput.classList.add('text_selectable');
 	this.elCtrlFilterInput.monitor = this;
-	this.elCtrlFilterInput.onkeyup = function(e) { return e.currentTarget.monitor.filterKeyUp(e); };
-	this.elCtrlFilterInput.onmouseout = function(e) { return e.currentTarget.blur(); };
+	this.elCtrlFilterInput.onkeyup = function(e) {
+		return e.currentTarget.monitor.filterKeyUp(e);
+	};
+	this.elCtrlFilterInput.onmouseout = function(e) {
+		return e.currentTarget.blur();
+	};
 	this.elCtrlHidden = this.document.createElement('div');
 	this.elCtrl.appendChild(this.elCtrlHidden);
 	this.elCtrlHidden.textContent = 'H';
@@ -367,7 +378,7 @@ function Monitor(i_args)
 	// Add other node type to monitor:
 	if (this.type == 'renders')
 	{
-		this.types = ['pools','renders'];
+		this.types = ['pools', 'renders'];
 	}
 
 	if (this.type == 'tasks')
@@ -513,7 +524,7 @@ Monitor.prototype.processMsg = function(obj) {
 	for (let type of this.types)
 		if (obj[type] && obj[type].length)
 			for (let node of obj[type])
-				msg_nodes.push({'type':type,'id':node.id,'node':node});
+				msg_nodes.push({'type': type, 'id': node.id, 'node': node});
 
 	if (msg_nodes.length == 0)
 		return;
@@ -554,7 +565,7 @@ Monitor.prototype.processMsg = function(obj) {
 
 	var new_items = [];
 	for (let nnode of new_nodes)
-		new_items.push(this.createNodeItem(nnode.node,nnode.type));
+		new_items.push(this.createNodeItem(nnode.node, nnode.type));
 
 	if ((this.type == 'jobs') && (this.sortParm == 'order'))
 		if (new_items.length)  //|| updated_items.length )
@@ -578,7 +589,7 @@ Monitor.prototype.processMsg = function(obj) {
 		if (this.types.length == 2)
 		{
 			// Farm monitor has 2 node types:
-			nw_Subscribe(this.types[1],true);
+			nw_Subscribe(this.types[1], true);
 			nw_GetNodes(this.types[1]);
 		}
 	}
@@ -587,12 +598,13 @@ Monitor.prototype.processMsg = function(obj) {
 		this.nodeConstructor.updatingFinished();
 
 	this.setWindowTitle();
-//console.log('c' + this.cycle + ': nodes processed: ' + msg_nodes.length + ' new:' + new_nodes.length + ' up:' + updated_items.length);
+	// console.log('c' + this.cycle + ': nodes processed: ' + msg_nodes.length + ' new:' + new_nodes.length +
+	// ' up:' + updated_items.length);
 };
 
 Monitor.prototype.setWindowTitle = function() {
 	var title = null;
-//var i, tasks;
+	// var i, tasks;
 	if (this.type == 'jobs')
 	{
 		title = 'AJ:';
@@ -600,33 +612,40 @@ Monitor.prototype.setWindowTitle = function() {
 		let in_queue_tasks = 0;
 
 		let total_frames_to_be_rendered = 0;
-		for (let i = 0; i < this.items.length; i++){
-			if(this.items[i].state.RUN){
+		for (let i = 0; i < this.items.length; i++)
+		{
+			if (this.items[i].state.RUN)
+			{
 				tasks += this.items[i].running_tasks;
 			}
 
-			if (this.items[i].state.DON == false && this.items[i].params.name != "afanasy"){
+			if (this.items[i].state.DON == false && this.items[i].params.name != 'afanasy')
+			{
 				in_queue_tasks += this.items[i].blocks.length;
 
 				let current_block;
 				let block_start_frame, block_end_frame;
 				let percentage_done = this.items[i].percentage;
-				for (let j=0; j < this.items[i].blocks.length; j++){
+				for (let j = 0; j < this.items[i].blocks.length; j++)
+				{
 					current_block = this.items[i].blocks[j];
 					block_start_frame = current_block.params.frame_first;
 					block_end_frame = current_block.params.frame_last;
-					total_frames_to_be_rendered += Math.ceil((block_end_frame - block_start_frame) * (100 - percentage_done) / 100);
-				 }
+					total_frames_to_be_rendered +=
+						Math.ceil((block_end_frame - block_start_frame) * (100 - percentage_done) / 100);
+				}
 			}
 		}
 
 		if (tasks > 0)
 		{
 			title += ' ' + tasks;
-		} else {
+		}
+		else
+		{
 			title += ' 0';
 		}
-		title +=  '/' + in_queue_tasks + ' | F: ' + total_frames_to_be_rendered;
+		title += '/' + in_queue_tasks + ' | F: ' + total_frames_to_be_rendered;
 
 		if (this.cur_item)
 		{
@@ -664,7 +683,7 @@ Monitor.prototype.setWindowTitle = function() {
 		let run = 0;
 		let error = 0;
 		for (let i = 0; i < this.items.length; i++)
-			if(this.items[i].task_num)
+			if (this.items[i].task_num)
 			{
 				if (this.items[i].state.DON)
 					percent += 100;
@@ -743,24 +762,27 @@ Monitor.prototype.addItemSorted = function(i_item) {
 	var index = this.items.length;
 	var nodeBefore = null;
 
-	//console.log('addItemSorted='+i_item.params.name+' (len='+this.items.length+')');
+	// console.log('addItemSorted='+i_item.params.name+' (len='+this.items.length+')');
 	if (this.sortParm)
 		for (var i = 0; i < this.items.length; i++)
 		{
-		//var log = i_item.params.name+'['+this.sortParm+']='+i_item.params[this.sortParm]+' <> '+this.items[i].params[this.sortParm]+'=['+this.sortParm+']'+this.items[i].params.name + ' (' + this.sortDirection + '): ';
+			// var log = i_item.params.name+'['+this.sortParm+']='+i_item.params[this.sortParm]+' <>
+			// '+this.items[i].params[this.sortParm]+'=['+this.sortParm+']'+this.items[i].params.name + ' (' +
+			// this.sortDirection + '): ';
 			if (cm_CompareItems(i_item, this.items[i], this.sortParm, false == this.sortDirection))
 			{
-			//log += 'TRUE index='+index;console.log(log);
+				// log += 'TRUE index='+index;console.log(log);
 				index = i;
 				break;
 			}
-			//else log += 'FALSE'; console.log(log);
+			// else log += 'FALSE'; console.log(log);
 		}
 
 	if (index < this.items.length)
 		nodeBefore = this.items[index].element;
 
-	//if (index < this.items.length) console.log('Monitor.prototype.addItemSorted = '+i_item.params.name+'['+index+']');
+	// if (index < this.items.length) console.log('Monitor.prototype.addItemSorted =
+	// '+i_item.params.name+'['+index+']');
 	this.items.splice(index, 0, i_item);
 	this.elList.insertBefore(i_item.element, nodeBefore);
 };
@@ -786,8 +808,9 @@ Monitor.prototype.createItem = function(i_item, i_obj, i_appendChild) {
 
 	if (i_item.onDoubleClick)
 	{
-		i_item.element.ondblclick = function(e){
-			return e.currentTarget.item.onDoubleClick(e);};
+		i_item.element.ondblclick = function(e) {
+			return e.currentTarget.item.onDoubleClick(e);
+		};
 	}
 
 	i_item.element.oncontextmenu = function(e) {
@@ -858,7 +881,7 @@ Monitor.prototype.setSelected = function(i_item, on) {
 
 		// Function updatePanels was here at first.
 		// But for muiltiselection summary info, it should be called after selected_items changed.
-		//this.updatePanels(null, {'hide_params': true});
+		// this.updatePanels(null, {'hide_params': true});
 
 		this.info(this.cur_item.params.name);
 
@@ -966,7 +989,7 @@ Monitor.prototype.showObject = function(i_act, i_evt) {
 	if (this.hasSelection() == false)
 		return false;
 	if (this.cur_item && this.cur_item.params)
-		g_ShowObject({"object": this.cur_item.params}, {"evt": i_evt, "wnd": this.window});
+		g_ShowObject({'object': this.cur_item.params}, {'evt': i_evt, 'wnd': this.window});
 };
 
 Monitor.prototype.resetPanels = function(i_args) {
@@ -1165,14 +1188,14 @@ Monitor.prototype.addMenuItem = function(i_menu, i_action) {
 				cmds.push(cmd);
 			}
 		i_menu.addItem(
-			{"name": i_action.name, "receiver": 'cgru_cmdexec', "handle": cmds, "label": i_action.label});
+			{'name': i_action.name, 'receiver': 'cgru_cmdexec', 'handle': cmds, 'label': i_action.label});
 		return;
 	}
 
 	if (item.receiver[item.handle])
 		i_menu.addItem(item);
 	else
-		i_menu.addItem({"label": 'invalid ' + name, "enabled": false});
+		i_menu.addItem({'label': 'invalid ' + name, 'enabled': false});
 };
 
 Monitor.prototype.showMenu = function(i_evt, i_name, i_need_selection) {
@@ -1237,8 +1260,8 @@ Monitor.prototype.mh_Get = function(i_param, i_evt) {
 		return;
 	}
 
-	var get = {"type": this.cur_item.node_type, "ids": [this.cur_item.params.id], "mode": i_param.name};
-	nw_request({"send": {"get": get}, "func": g_ShowObject, "evt": i_evt, "wnd": this.window});
+	var get = {'type': this.cur_item.node_type, 'ids': [this.cur_item.params.id], 'mode': i_param.name};
+	nw_request({'send': {'get': get}, 'func': g_ShowObject, 'evt': i_evt, 'wnd': this.window});
 };
 
 Monitor.prototype.action = function(i_operation, i_params) {
@@ -1289,7 +1312,7 @@ Monitor.prototype.hasSelection = function() {
 	return (this.selected_items.length > 0);
 };
 
-Monitor.prototype.noneSelected = function(i_evt) {  // return false;
+Monitor.prototype.noneSelected = function(i_evt) {	// return false;
 	i_evt.stopPropagation();
 	if (i_evt.ctrlKey)
 		return false;
@@ -1367,7 +1390,7 @@ Monitor.prototype.sortByIds = function(i_ids) {
 		return;
 	}
 
-	//console.log('sortByIds: ');console.log(i_ids);
+	// console.log('sortByIds: ');console.log(i_ids);
 	var items = this.items.slice();
 
 	for (var i = 0; i < this.items.length; i++)
@@ -1394,12 +1417,12 @@ Monitor.prototype.createMenu = function(i_evt, i_name) {
 	if (this.menu)
 		this.menu.destroy();
 	var menu = new cgru_Menu({
-		"doc": this.document,
-		"parent": this.document.body,
-		"evt": i_evt,
-		"name": this.type + '_' + i_name,
-		"receiver": this,
-		"destroy": 'onMenuDestroy'
+		'doc': this.document,
+		'parent': this.document.body,
+		'evt': i_evt,
+		'name': this.type + '_' + i_name,
+		'receiver': this,
+		'destroy': 'onMenuDestroy'
 	});
 	this.menu = menu;
 	return menu;
@@ -1472,11 +1495,16 @@ Monitor.prototype.createCtrlBtn = function(i_args) {
 		if (i_args.ondblclick)
 		{
 			elBtn.ondblclick = Monitor.ctrlBtnClicked;
-			elBtn.onclick = function(e) { e.stopPropagation(); return false; }
+			elBtn.onclick = function(e) {
+				e.stopPropagation();
+				return false;
+			}
 		}
 		else
 			elBtn.onclick = Monitor.ctrlBtnClicked;
-		elBtn.oncontextmenu = function(e) { return false; }
+		elBtn.oncontextmenu = function(e) {
+			return false;
+		}
 	}
 
 	return elBtn;
@@ -1489,7 +1517,7 @@ Monitor.ctrlBtnClicked = function(e) {
 
 	var elBtn = el;
 	if (el.m_elBtn)
-		elBtn = el.m_elBtn;  // <-- this is sub-button in this case
+		elBtn = el.m_elBtn;	 // <-- this is sub-button in this case
 	if (elBtn.classList.contains('active') != true)
 		return false;
 
@@ -1703,8 +1731,8 @@ Monitor.prototype.jobProgress = function(progress) {
 	if (this.blocks.length != progress.length)
 	{
 		g_Error(
-			'Job progress bocks length mismatch: job_id=' + this.job_id + ' ' + this.blocks.length + '!=' +
-			progress.length);
+			'Job progress bocks length mismatch: job_id=' + this.job_id + ' ' + this.blocks.length +
+			'!=' + progress.length);
 		return;
 	}
 

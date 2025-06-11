@@ -101,27 +101,31 @@ const std::vector<std::string> AFCommon::getStoredFolders(const std::string &i_f
 #ifdef WINNT
 	HANDLE thousand_dir_handle;
 	WIN32_FIND_DATA thousand_dir_data;
-	if ((thousand_dir_handle = FindFirstFile((i_folder + "\\*").c_str(), &thousand_dir_data))
-		!= INVALID_HANDLE_VALUE)
+	if ((thousand_dir_handle = FindFirstFile((i_folder + "\\*").c_str(), &thousand_dir_data)) !=
+		INVALID_HANDLE_VALUE)
 	{
 		do
 		{
 			std::string thousand_dir(thousand_dir_data.cFileName);
-			if (thousand_dir.find(".") == 0) continue;
+			if (thousand_dir.find(".") == 0)
+				continue;
 			thousand_dir = i_folder + '\\' + thousand_dir;
-			if (false == af::pathIsFolder(thousand_dir)) continue;
+			if (false == af::pathIsFolder(thousand_dir))
+				continue;
 
 			HANDLE job_dir_handle;
 			WIN32_FIND_DATA node_dir_data;
-			if ((job_dir_handle = FindFirstFile((thousand_dir + "\\*").c_str(), &node_dir_data))
-				!= INVALID_HANDLE_VALUE)
+			if ((job_dir_handle = FindFirstFile((thousand_dir + "\\*").c_str(), &node_dir_data)) !=
+				INVALID_HANDLE_VALUE)
 			{
 				do
 				{
 					std::string job_dir(node_dir_data.cFileName);
-					if (job_dir.find('.') == 0) continue;
+					if (job_dir.find('.') == 0)
+						continue;
 					job_dir = thousand_dir + '\\' + job_dir;
-					if (false == af::pathIsFolder(job_dir)) continue;
+					if (false == af::pathIsFolder(job_dir))
+						continue;
 					o_folders.push_back(job_dir);
 				} while (FindNextFile(job_dir_handle, &node_dir_data));
 
@@ -167,11 +171,14 @@ const std::vector<std::string> AFCommon::getStoredFolders(const std::string &i_f
 		}
 
 		// The end of directory:
-		if (NULL == thousand_dir_ptr) break;
+		if (NULL == thousand_dir_ptr)
+			break;
 
-		if (thousand_dir_ptr->d_name[0] == '.') continue;
+		if (thousand_dir_ptr->d_name[0] == '.')
+			continue;
 		std::string thousand_dir = i_folder + '/' + thousand_dir_ptr->d_name;
-		if (false == af::pathIsFolder(thousand_dir)) continue;
+		if (false == af::pathIsFolder(thousand_dir))
+			continue;
 
 		DIR *job_dir_handle = opendir(thousand_dir.c_str());
 		if (job_dir_handle == NULL)
@@ -190,11 +197,14 @@ const std::vector<std::string> AFCommon::getStoredFolders(const std::string &i_f
 			}
 
 			// The end of directory:
-			if (NULL == node_dir_ptr) break;
+			if (NULL == node_dir_ptr)
+				break;
 
-			if (node_dir_ptr->d_name[0] == '.') continue;
+			if (node_dir_ptr->d_name[0] == '.')
+				continue;
 			std::string job_dir(thousand_dir + '/' + node_dir_ptr->d_name);
-			if (false == af::pathIsFolder(job_dir)) continue;
+			if (false == af::pathIsFolder(job_dir))
+				continue;
 			o_folders.push_back(job_dir);
 		}
 
@@ -214,12 +224,15 @@ const std::string trim_path_folder(const std::string &i_f)
 
 	// Trim last slash to cut store folder root
 	p = f.rfind('/');
-	if (std::string::npos == p) p = f.rfind('\\');
-	if (std::string::npos != p) f = std::string(f, p);
+	if (std::string::npos == p)
+		p = f.rfind('\\');
+	if (std::string::npos != p)
+		f = std::string(f, p);
 
 	// Trim first dot to cut ID
 	p = f.find('.');
-	if (std::string::npos != p) f = std::string(f, p);
+	if (std::string::npos != p)
+		f = std::string(f, p);
 
 	return f;
 }
@@ -233,7 +246,7 @@ bool sort_paths_folders(const std::string &i_a, const std::string &i_b)
 	// Parent path always has less path size
 	return (a.size() < b.size());
 }
-const std::vector<std::string> AFCommon::getStoredFoldersSortedPath(const std::string & i_folder)
+const std::vector<std::string> AFCommon::getStoredFoldersSortedPath(const std::string &i_folder)
 {
 	std::vector<std::string> folders = getStoredFolders(i_folder);
 
@@ -253,11 +266,12 @@ void AFCommon::executeCmd(const std::string &cmd)
 	}
 }
 
-void AFCommon::saveLog(
-	const std::list<std::string> &log, const std::string &dirname, const std::string &filename)
+void AFCommon::saveLog(const std::list<std::string> &log, const std::string &dirname,
+					   const std::string &filename)
 {
 	int lines = log.size();
-	if (lines < 1) return;
+	if (lines < 1)
+		return;
 	std::string bytes;
 	for (std::list<std::string>::const_iterator it = log.begin(); it != log.end(); it++)
 	{
@@ -309,7 +323,8 @@ bool AFCommon::writeFile(const char *data, const int length, const std::string &
 
 #ifdef WINNT
 	// On Windows we can't rename file in the existing one:
-	if (af::pathFileExists(filename.c_str())) remove(filename.c_str());
+	if (af::pathFileExists(filename.c_str()))
+		remove(filename.c_str());
 #endif
 	rename(filetemp.c_str(), filename.c_str());
 

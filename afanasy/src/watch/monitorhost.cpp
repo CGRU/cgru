@@ -10,7 +10,7 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-MonitorHost * MonitorHost::m_ = NULL;
+MonitorHost *MonitorHost::m_ = NULL;
 
 int MonitorHost::ms_uid = -1;
 
@@ -24,11 +24,9 @@ MonitorHost::MonitorHost()
 	ms_ids.push_back(0);
 }
 
-MonitorHost::~MonitorHost()
-{
-}
+MonitorHost::~MonitorHost() {}
 
-af::Msg * MonitorHost::genRegisterMsg()
+af::Msg *MonitorHost::genRegisterMsg()
 {
 	std::ostringstream str;
 
@@ -39,20 +37,20 @@ af::Msg * MonitorHost::genRegisterMsg()
 	str << ",\"engine\":\"" << af::Environment::getVersionCGRU() << "\"";
 	str << "}}";
 
-	af::Msg * msg = af::jsonMsg( str);
+	af::Msg *msg = af::jsonMsg(str);
 
 	return msg;
 }
 
 void MonitorHost::connectionLost()
 {
-	m_->m_id  =  0;
-	m_->m_uid =  0;
-	ms_uid    = -1;
-	ms_ids[0] =  0;
+	m_->m_id = 0;
+	m_->m_uid = 0;
+	ms_uid = -1;
+	ms_ids[0] = 0;
 }
 
-void MonitorHost::connectionEstablished( int i_id, int i_uid)
+void MonitorHost::connectionEstablished(int i_id, int i_uid)
 {
 	m_->m_id = i_id;
 	m_->m_uid = i_uid;
@@ -60,7 +58,7 @@ void MonitorHost::connectionEstablished( int i_id, int i_uid)
 	ms_ids[0] = i_id;
 }
 
-void MonitorHost::subscribe( const std::string & i_class, bool i_subscribe)
+void MonitorHost::subscribe(const std::string &i_class, bool i_subscribe)
 {
 	std::map<std::string, int>::iterator it = ms_subsribes_counts.find(i_class);
 	if (it == ms_subsribes_counts.end())
@@ -89,55 +87,54 @@ void MonitorHost::subscribe( const std::string & i_class, bool i_subscribe)
 	}
 
 	std::vector<int> ids;
-	ids.push_back( m_->getId());
+	ids.push_back(m_->getId());
 
 	std::ostringstream str;
-	af::jsonActionOperationStart( str,"monitors","watch", std::string(), ids);
+	af::jsonActionOperationStart(str, "monitors", "watch", std::string(), ids);
 	str << ",\"class\":\"" << i_class << "\"";
-	str << ",\"status\":\"" << ( i_subscribe ? "subscribe":"unsubscribe") << "\"";
-	af::jsonActionOperationFinish( str);
+	str << ",\"status\":\"" << (i_subscribe ? "subscribe" : "unsubscribe") << "\"";
+	af::jsonActionOperationFinish(str);
 
-	Watch::sendMsg( af::jsonMsg( str));
+	Watch::sendMsg(af::jsonMsg(str));
 }
 
-void MonitorHost::setJobId( int i_jid, bool i_add)
+void MonitorHost::setJobId(int i_jid, bool i_add)
 {
-AFINFA("MonitorHost::setJobId: jid=%d, add=%d", i_jid, i_add);
+	AFINFA("MonitorHost::setJobId: jid=%d, add=%d", i_jid, i_add);
 
 	std::vector<int> ids;
-	ids.push_back( m_->getId());
+	ids.push_back(m_->getId());
 
 	std::ostringstream str;
-	af::jsonActionOperationStart( str,"monitors","watch","", ids);
+	af::jsonActionOperationStart(str, "monitors", "watch", "", ids);
 	str << ",\"class\":\"tasks\"";
-	str << ",\"status\":\"" << ( i_add ? "subscribe" : "unsubscribe" ) << "\"";
+	str << ",\"status\":\"" << (i_add ? "subscribe" : "unsubscribe") << "\"";
 	str << ",\"ids\":[" << i_jid << "]";
-	af::jsonActionOperationFinish( str);
+	af::jsonActionOperationFinish(str);
 
-	Watch::sendMsg( af::jsonMsg( str));
+	Watch::sendMsg(af::jsonMsg(str));
 }
 
-void MonitorHost::setUid( int i_uid)
+void MonitorHost::setUid(int i_uid)
 {
-AFINFO("MonitorHost::setUid:");
+	AFINFO("MonitorHost::setUid:");
 
 	// If it is first time, we store it;
-	if( ms_uid < 0 )
+	if (ms_uid < 0)
 		ms_uid = i_uid;
 
 	// Negative value means restore original:
-	if( i_uid < 0 )
+	if (i_uid < 0)
 		i_uid = m_->m_uid;
 
 	std::vector<int> ids;
-	ids.push_back( m_->getId());
+	ids.push_back(m_->getId());
 
 	std::ostringstream str;
-	af::jsonActionOperationStart( str,"monitors","watch","", ids);
+	af::jsonActionOperationStart(str, "monitors", "watch", "", ids);
 	str << ",\"class\":\"perm\"";
 	str << ",\"uid\":" << i_uid;
-	af::jsonActionOperationFinish( str);
+	af::jsonActionOperationFinish(str);
 
-	Watch::sendMsg( af::jsonMsg( str));
+	Watch::sendMsg(af::jsonMsg(str));
 }
-

@@ -10,17 +10,17 @@ class ListItems;
 
 class WndList : public Wnd
 {
-public:
-	WndList( const QString & Name, int monType = 0);
+  public:
+	WndList(const QString &Name, int monType = 0);
 	~WndList();
 
-	void setList( ListItems * list);
-	inline ListItems * getList() { return itemslist; }
+	void setList(ListItems *list);
+	inline ListItems *getList() { return itemslist; }
 
 	void repaintItems();
 
-private:
+  private:
 	int type;
-	QVBoxLayout * layout;
-	ListItems * itemslist;
+	QVBoxLayout *layout;
+	ListItems *itemslist;
 };

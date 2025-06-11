@@ -1,10 +1,10 @@
 #include "ctrljobs.h"
 
+#include <QBoxLayout>
+#include <QLabel>
+#include <QMenu>
 #include <QtCore/QEvent>
 #include <QtGui/QContextMenuEvent>
-#include <QLabel>
-#include <QBoxLayout>
-#include <QMenu>
 
 #include "../libafqt/qenvironment.h"
 
@@ -15,29 +15,27 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-const QStringList CtrlJobs::ms_thumbs_names = {"S","M","L","XL"};
-const QList<int>  CtrlJobs::ms_thumbs_sizes = { 25, 50,100, 200};
+const QStringList CtrlJobs::ms_thumbs_names = {"S", "M", "L", "XL"};
+const QList<int> CtrlJobs::ms_thumbs_sizes = {25, 50, 100, 200};
 
-CtrlJobs::CtrlJobs(QWidget * i_parent, ListJobs * i_listjobs, bool i_inworklist):
-	QFrame(i_parent),
-	m_listjobs(i_listjobs),
-	m_inworklist(i_inworklist)
+CtrlJobs::CtrlJobs(QWidget *i_parent, ListJobs *i_listjobs, bool i_inworklist)
+	: QFrame(i_parent), m_listjobs(i_listjobs), m_inworklist(i_inworklist)
 {
 	setFrameShape(QFrame::StyledPanel);
 	setFrameShadow(QFrame::Raised);
 
-	QHBoxLayout * layout = new QHBoxLayout(this);
+	QHBoxLayout *layout = new QHBoxLayout(this);
 	layout->setSizeConstraint(QLayout::SetMaximumSize);
 
-	QLabel * lThumbs = new QLabel("Thumbs:", this);
+	QLabel *lThumbs = new QLabel("Thumbs:", this);
 	lThumbs->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	layout->addWidget(lThumbs);
 
 	for (int i = 0; i < ms_thumbs_names.size(); i++)
 	{
-		Button * btn = new Button(ms_thumbs_names[i], QString(), QString(), false, true);
+		Button *btn = new Button(ms_thumbs_names[i], QString(), QString(), false, true);
 		layout->addWidget(btn);
-		connect(btn, SIGNAL(sig_Clicked(Button*)), this, SLOT(slot_ThumsButtonClicked(Button*)));
+		connect(btn, SIGNAL(sig_Clicked(Button *)), this, SLOT(slot_ThumsButtonClicked(Button *)));
 
 		if (m_inworklist)
 		{
@@ -53,13 +51,14 @@ CtrlJobs::CtrlJobs(QWidget * i_parent, ListJobs * i_listjobs, bool i_inworklist)
 		m_thumbs_btns.append(btn);
 	}
 
-	QLabel * lMax = new QLabel("Max(hrs):", this);
+	QLabel *lMax = new QLabel("Max(hrs):", this);
 	lMax->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-	lMax->setToolTip("Mark job blocks with tasks maximum running time above this value.\nType zero to disable.");
+	lMax->setToolTip(
+		"Mark job blocks with tasks maximum running time above this value.\nType zero to disable.");
 	layout->addWidget(lMax);
 
 	m_max_runtime_edit = new QLineEdit(this);
-	QDoubleValidator * dv = new QDoubleValidator(0, 24*10, 2, m_max_runtime_edit);
+	QDoubleValidator *dv = new QDoubleValidator(0, 24 * 10, 2, m_max_runtime_edit);
 	dv->setNotation(QDoubleValidator::StandardNotation);
 	m_max_runtime_edit->setValidator(dv);
 	m_max_runtime_edit->setFixedWidth(32);
@@ -71,15 +70,13 @@ CtrlJobs::CtrlJobs(QWidget * i_parent, ListJobs * i_listjobs, bool i_inworklist)
 	if (seconds)
 		m_max_runtime_edit->setText(QString::number(double(seconds) / 60.0 / 60.0, 'f', 2));
 
-	CtrlJobsViewOptions * viewOpts = new CtrlJobsViewOptions(this, m_listjobs, m_inworklist);
+	CtrlJobsViewOptions *viewOpts = new CtrlJobsViewOptions(this, m_listjobs, m_inworklist);
 	layout->addWidget(viewOpts);
 }
 
-CtrlJobs::~CtrlJobs()
-{
-}
+CtrlJobs::~CtrlJobs() {}
 
-void CtrlJobs::slot_ThumsButtonClicked(Button * i_btn)
+void CtrlJobs::slot_ThumsButtonClicked(Button *i_btn)
 {
 	int size = 0;
 	for (int i = 0; i < ms_thumbs_names.size(); i++)
@@ -125,10 +122,8 @@ void CtrlJobs::slot_MaxEditingFinished()
 	m_listjobs->repaintItems();
 }
 
-CtrlJobsViewOptions::CtrlJobsViewOptions(QWidget * i_parent, ListJobs * i_listjobs, bool i_inworklist):
-	QLabel("View Options", i_parent),
-	m_listjobs(i_listjobs),
-	m_inworklist(i_inworklist)
+CtrlJobsViewOptions::CtrlJobsViewOptions(QWidget *i_parent, ListJobs *i_listjobs, bool i_inworklist)
+	: QLabel("View Options", i_parent), m_listjobs(i_listjobs), m_inworklist(i_inworklist)
 {
 	setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	setFrameShape(QFrame::StyledPanel);
@@ -137,15 +132,13 @@ CtrlJobsViewOptions::CtrlJobsViewOptions(QWidget * i_parent, ListJobs * i_listjo
 	setToolTip("Click RMB for options.");
 }
 
-CtrlJobsViewOptions::~CtrlJobsViewOptions()
-{
-}
+CtrlJobsViewOptions::~CtrlJobsViewOptions() {}
 
-void CtrlJobsViewOptions::contextMenuEvent(QContextMenuEvent * i_event)
+void CtrlJobsViewOptions::contextMenuEvent(QContextMenuEvent *i_event)
 {
 	QMenu menu(this);
-	QAction * action;
-	ActionId * action_id;
+	QAction *action;
+	ActionId *action_id;
 
 	action = new QAction("Hide:", this);
 	action->setEnabled(false);
@@ -221,4 +214,3 @@ void CtrlJobsViewOptions::slot_CollapseNewJobs(bool i_collapse)
 {
 	afqt::QEnvironment::setCollapseNewJobs(i_collapse);
 }
-

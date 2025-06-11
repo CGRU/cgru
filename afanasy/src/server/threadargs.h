@@ -41,11 +41,11 @@ class SocketsProcessing;
 struct ThreadArgs
 {
 	BranchesContainer *branches;
-	JobContainer      *jobs;
-	MonitorContainer  *monitors;
-	PoolsContainer    *pools;
-	RenderContainer   *renders;
-	UserContainer     *users;
+	JobContainer *jobs;
+	MonitorContainer *monitors;
+	PoolsContainer *pools;
+	RenderContainer *renders;
+	UserContainer *users;
 
 	SocketsProcessing *socketsProcessing;
 

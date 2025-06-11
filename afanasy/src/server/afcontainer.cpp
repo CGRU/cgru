@@ -32,11 +32,7 @@
 #include "../libafanasy/logger.h"
 
 AfContainer::AfContainer(std::string containerName, int maximumSize)
-	: m_count(0),
-	  m_capacity(maximumSize),
-	  m_name(containerName),
-	  m_first_ptr(NULL),
-	  m_last_ptr(NULL),
+	: m_count(0), m_capacity(maximumSize), m_name(containerName), m_first_ptr(NULL), m_last_ptr(NULL),
 	  m_initialized(false)
 {
 	m_nodes_table = new AfNodeSrv *[m_capacity];
@@ -62,7 +58,8 @@ AfContainer::~AfContainer()
 		m_first_ptr = m_first_ptr->m_next_ptr;
 		delete m_last_ptr;
 	}
-	if (NULL != m_nodes_table) delete[] m_nodes_table;
+	if (NULL != m_nodes_table)
+		delete[] m_nodes_table;
 }
 
 int AfContainer::add(AfNodeSrv *i_node)
@@ -131,7 +128,8 @@ int AfContainer::add(AfNodeSrv *i_node)
 					}
 					another = another->m_next_ptr;
 				}
-				if (unique) break;
+				if (unique)
+					break;
 			}
 		}
 
@@ -148,7 +146,8 @@ int AfContainer::add(AfNodeSrv *i_node)
 				break;
 			}
 			after = before->m_next_ptr;
-			if (NULL == after) break;
+			if (NULL == after)
+				break;
 			before = after;
 		}
 
@@ -175,7 +174,8 @@ int AfContainer::add(AfNodeSrv *i_node)
 		m_count++;
 	}
 
-	if (!found) AF_ERR << "Nodes table full.";
+	if (!found)
+		AF_ERR << "Nodes table full.";
 
 	AF_DEBUG << "new id = " << i_node->m_node->m_id << ", count = " << m_count;
 	return new_id;
@@ -186,27 +186,30 @@ void AfContainer::refresh(AfContainer *pointer, MonitorContainer *monitoring)
 	time_t currnet_time = time(NULL);
 	for (AfNodeSrv *node = m_first_ptr; node != NULL; node = node->m_next_ptr)
 	{
-		if (node->m_node->isZombie()) continue;
+		if (node->m_node->isZombie())
+			continue;
 		node->v_refresh(currnet_time, pointer, monitoring);
 	}
 }
 
-void AfContainer::preSolve(MonitorContainer * i_monitoring)
+void AfContainer::preSolve(MonitorContainer *i_monitoring)
 {
 	time_t currnet_time = time(NULL);
-	for (AfNodeSrv * node = m_first_ptr; node != NULL; node = node->m_next_ptr)
+	for (AfNodeSrv *node = m_first_ptr; node != NULL; node = node->m_next_ptr)
 	{
-		if (node->m_node->isZombie()) continue;
+		if (node->m_node->isZombie())
+			continue;
 		node->v_preSolve(currnet_time, i_monitoring);
 	}
 }
 
-void AfContainer::postSolve(MonitorContainer * i_monitoring)
+void AfContainer::postSolve(MonitorContainer *i_monitoring)
 {
 	time_t currnet_time = time(NULL);
-	for (AfNodeSrv * node = m_first_ptr; node != NULL; node = node->m_next_ptr)
+	for (AfNodeSrv *node = m_first_ptr; node != NULL; node = node->m_next_ptr)
 	{
-		if (node->m_node->isZombie()) continue;
+		if (node->m_node->isZombie())
+			continue;
 		node->v_postSolve(currnet_time, i_monitoring);
 	}
 }
@@ -226,12 +229,13 @@ af::Msg *AfContainer::generateList(int i_type)
 }
 
 af::Msg *AfContainer::generateList(int i_type, const std::string &i_type_name,
-	const std::vector<int32_t> &i_ids, const std::string &i_mask, bool i_json)
+								   const std::vector<int32_t> &i_ids, const std::string &i_mask, bool i_json)
 {
 	af::MCAfNodes mcnodes;
 	std::ostringstream str;
 
-	if (i_json) str << "{\"" << i_type_name << "\":[\n";
+	if (i_json)
+		str << "{\"" << i_type_name << "\":[\n";
 
 	if (i_ids.size())
 		generateListIDs(i_type, mcnodes, str, i_ids, i_json);
@@ -254,16 +258,18 @@ af::Msg *AfContainer::generateList(int i_type, const std::string &i_type_name,
 	return msg;
 }
 
-void AfContainer::generateListAll(
-	int i_type, af::MCAfNodes &o_mcnodes, std::ostringstream &o_str, bool i_json)
+void AfContainer::generateListAll(int i_type, af::MCAfNodes &o_mcnodes, std::ostringstream &o_str,
+								  bool i_json)
 {
 	bool added = false;
 
 	for (AfNodeSrv *node = m_first_ptr; node != NULL; node = node->m_next_ptr)
 	{
-		if (node->m_node->isZombie()) continue;
+		if (node->m_node->isZombie())
+			continue;
 
-		if (added && i_json) o_str << ",\n";
+		if (added && i_json)
+			o_str << ",\n";
 
 		if (i_json)
 			node->m_node->v_jsonWrite(o_str, i_type);
@@ -275,7 +281,7 @@ void AfContainer::generateListAll(
 }
 
 void AfContainer::generateListIDs(int i_type, af::MCAfNodes &o_mcnodes, std::ostringstream &o_str,
-	const std::vector<int32_t> &i_ids, bool i_json)
+								  const std::vector<int32_t> &i_ids, bool i_json)
 {
 	bool added = false;
 
@@ -287,13 +293,17 @@ void AfContainer::generateListIDs(int i_type, af::MCAfNodes &o_mcnodes, std::ost
 			continue;
 		}
 
-		if (i_ids[i] <= 0) continue;
+		if (i_ids[i] <= 0)
+			continue;
 
 		AfNodeSrv *node = m_nodes_table[i_ids[i]];
-		if (NULL == node) continue;
-		if (node->m_node->isZombie()) continue;
+		if (NULL == node)
+			continue;
+		if (node->m_node->isZombie())
+			continue;
 
-		if (added && i_json) o_str << ",\n";
+		if (added && i_json)
+			o_str << ",\n";
 
 		if (i_json)
 			node->m_node->v_jsonWrite(o_str, i_type);
@@ -304,10 +314,11 @@ void AfContainer::generateListIDs(int i_type, af::MCAfNodes &o_mcnodes, std::ost
 	}
 }
 
-void AfContainer::generateListMask(
-	int i_type, af::MCAfNodes &o_mcnodes, std::ostringstream &o_str, const std::string &i_mask, bool i_json)
+void AfContainer::generateListMask(int i_type, af::MCAfNodes &o_mcnodes, std::ostringstream &o_str,
+								   const std::string &i_mask, bool i_json)
 {
-	if (false == i_mask.size()) return;
+	if (false == i_mask.size())
+		return;
 
 	bool added = false;
 
@@ -322,10 +333,12 @@ void AfContainer::generateListMask(
 	{
 		for (AfNodeSrv *node = m_first_ptr; node != NULL; node = node->m_next_ptr)
 		{
-			if (node->m_node->isZombie()) continue;
+			if (node->m_node->isZombie())
+				continue;
 			if (rx.match(node->m_node->m_name))
 			{
-				if (added && i_json) o_str << ",\n";
+				if (added && i_json)
+					o_str << ",\n";
 
 				if (i_json)
 					node->m_node->v_jsonWrite(o_str, i_type);
@@ -380,12 +393,14 @@ void AfContainer::freeZombies()
 			if (NULL != m_last_ptr)
 			{
 				m_last_ptr->m_next_ptr = node;
-				if (NULL != node) node->m_prev_ptr = m_last_ptr;
+				if (NULL != node)
+					node->m_prev_ptr = m_last_ptr;
 			}
 			else
 			{
 				m_first_ptr = node;
-				if (NULL != node) m_first_ptr->m_prev_ptr = NULL;
+				if (NULL != node)
+					m_first_ptr->m_prev_ptr = NULL;
 			}
 			m_nodes_table[z_node->m_node->m_id] = NULL;
 
@@ -400,7 +415,7 @@ void AfContainer::freeZombies()
 	}
 }
 
-af::Msg * AfContainer::action(Action & i_action, const af::Msg * i_msg)
+af::Msg *AfContainer::action(Action &i_action, const af::Msg *i_msg)
 {
 	bool found = false;
 	if (i_action.ids.size())
@@ -409,8 +424,8 @@ af::Msg * AfContainer::action(Action & i_action, const af::Msg * i_msg)
 		{
 			if (i_action.ids[i] >= m_capacity)
 			{
-				std::string errlog = std::string("Action node ID above container capacity: ")
-									 + af::itos(i_action.ids[i]) + " >= " + af::itos(m_capacity) + ".";
+				std::string errlog = std::string("Action node ID above container capacity: ") +
+									 af::itos(i_action.ids[i]) + " >= " + af::itos(m_capacity) + ".";
 				AFCommon::QueueLogError(errlog + i_msg->v_generateInfoString());
 				i_action.answerError(errlog);
 				continue;
@@ -419,7 +434,8 @@ af::Msg * AfContainer::action(Action & i_action, const af::Msg * i_msg)
 			AfNodeSrv *node = m_nodes_table[i_action.ids[i]];
 			if (NULL == node)
 			{
-				std::string errlog = std::string("Action node ID not found: ") + af::itos(i_action.ids[i]) + ".";
+				std::string errlog =
+					std::string("Action node ID not found: ") + af::itos(i_action.ids[i]) + ".";
 				AFCommon::QueueLogError(errlog + i_msg->v_generateInfoString());
 				i_action.answerError(errlog);
 				continue;
@@ -437,7 +453,8 @@ af::Msg * AfContainer::action(Action & i_action, const af::Msg * i_msg)
 		rx.setRegEx();
 		if (false == rx.setPattern(i_action.mask, &err_msg))
 		{
-			std::string errlog = "AfContainer::action: Name pattern '" + i_action.mask + ("' is invalid: ") + err_msg;
+			std::string errlog =
+				"AfContainer::action: Name pattern '" + i_action.mask + ("' is invalid: ") + err_msg;
 			AFCommon::QueueLogError(errlog + i_msg->v_generateInfoString());
 			i_action.answerError(errlog);
 		}

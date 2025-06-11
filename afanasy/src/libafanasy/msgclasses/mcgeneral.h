@@ -10,50 +10,60 @@ namespace af
 
 class MCGeneral : public MsgClassUserHost
 {
-public:
-   MCGeneral();
-   MCGeneral( const std::string & String);
-   MCGeneral( int Number);
-   MCGeneral( const std::string & Name, int Number);
-   MCGeneral( const std::string & Name, const std::string & String);
+  public:
+	MCGeneral();
+	MCGeneral(const std::string &String);
+	MCGeneral(int Number);
+	MCGeneral(const std::string &Name, int Number);
+	MCGeneral(const std::string &Name, const std::string &String);
 
-   MCGeneral( Msg * msg);
-   virtual ~MCGeneral();
+	MCGeneral(Msg *msg);
+	virtual ~MCGeneral();
 
-   inline void setNumber( int Number) { number = Number;}
-   inline void setString( const std::string & String) { string = String;}
+	inline void setNumber(int Number) { number = Number; }
+	inline void setString(const std::string &String) { string = String; }
 
-   inline void addId( int ID) { list.push_back( ID);}
-	inline void addUniqueId( int i_id) { if( false == hasId( i_id)) list.push_back( i_id);}
-   inline void setId( int ID) { id = ID;}
+	inline void addId(int ID) { list.push_back(ID); }
+	inline void addUniqueId(int i_id)
+	{
+		if (false == hasId(i_id))
+			list.push_back(i_id);
+	}
+	inline void setId(int ID) { id = ID; }
 
-   virtual void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
+	virtual void v_generateInfoStream(std::ostringstream &stream, bool full = false) const;
 
-   inline const std::string & getName()   const { return name;   }
-   inline const std::string & getString() const { return string; }
+	inline const std::string &getName() const { return name; }
+	inline const std::string &getString() const { return string; }
 
-   inline size_t getCount() const { return list.size(); }
-   inline int getId( unsigned pos) const { if(pos<list.size())return list[pos]; else return -1; }
-   inline int getId() const { return id; }
-   bool hasId( int value);
+	inline size_t getCount() const { return list.size(); }
+	inline int getId(unsigned pos) const
+	{
+		if (pos < list.size())
+			return list[pos];
+		else
+			return -1;
+	}
+	inline int getId() const { return id; }
+	bool hasId(int value);
 
-   inline int getNumber() const { return number; }
+	inline int getNumber() const { return number; }
 
-   inline const std::vector<int32_t> & getList() const { return list; }
+	inline const std::vector<int32_t> &getList() const { return list; }
 
-	void setList( const std::list<int32_t> & i_list);
-	inline void setList( const std::vector<int32_t> & i_list) { list = i_list;}
+	void setList(const std::list<int32_t> &i_list);
+	inline void setList(const std::vector<int32_t> &i_list) { list = i_list; }
 
-   inline void clearIds() { list.clear(); }
+	inline void clearIds() { list.clear(); }
 
-private:
-   std::string name;
-   std::string string;
-   int32_t number;
-   int32_t id;
+  private:
+	std::string name;
+	std::string string;
+	int32_t number;
+	int32_t id;
 
-   std::vector<int32_t> list;
+	std::vector<int32_t> list;
 
-   void v_readwrite( Msg * msg);
+	void v_readwrite(Msg *msg);
 };
-}
+} // namespace af

@@ -27,14 +27,14 @@ enum Type{
    TNULL,
 
    TINTEGER_BEGIN,
-      TPriority,
-      TMaxHosts,
+	  TPriority,
+	  TMaxHosts,
    TINTEGER_END,
 
    TSTRING_BEGIN,
-      TJobName,
-      TUserName,
-      THostName,
+	  TJobName,
+	  TUserName,
+	  THostName,
    TSTRING_END,
 
    TLAST

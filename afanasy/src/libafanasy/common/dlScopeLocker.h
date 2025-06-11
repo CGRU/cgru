@@ -10,27 +10,20 @@
 
 /*
 	DlScopeLocker
-	
+
 	A class to grab mutex and have it automatically unlocked when going out of
 	scope. Useful when a function has several exit points or when the mutex may
 	or may not have been locked when the end of the function is reached.
 */
 
-template <typename MutexType>
-class DlGenericScopeLocker
+template <typename MutexType> class DlGenericScopeLocker
 {
-public:
+  public:
 	DlGenericScopeLocker() : m_mutex(0x0) {}
 
-	DlGenericScopeLocker(MutexType *i_mutex)
-	{
-		Lock(i_mutex);
-	}
+	DlGenericScopeLocker(MutexType *i_mutex) { Lock(i_mutex); }
 
-	~DlGenericScopeLocker()
-	{
-		Unlock();
-	}
+	~DlGenericScopeLocker() { Unlock(); }
 
 	void Lock(MutexType *i_mutex)
 	{
@@ -48,19 +41,19 @@ public:
 
 		return false;
 	}
-	
+
 	void Unlock()
 	{
 		if (m_mutex)
 			m_mutex->Unlock();
-		
+
 		m_mutex = 0x0;
 	}
 
 	/* Be careful as the single-thread implementation always returns true. */
 	bool Locked() const { return m_mutex != 0x0; }
 
-private:
+  private:
 	MutexType *m_mutex;
 };
 

@@ -12,25 +12,24 @@ class ModelNodes : public ModelItems
 {
 	Q_OBJECT
 
-public:
-
-	ModelNodes(ListNodes * i_list_nodes);
+  public:
+	ModelNodes(ListNodes *i_list_nodes);
 
 	virtual ~ModelNodes();
 
-	int addNode( ItemNode * node, int row = -1);
+	int addNode(ItemNode *node, int row = -1);
 
-	int addNodeSorted( ItemNode * node);
+	int addNodeSorted(ItemNode *node);
 
-	void sortnodes( const QList<ItemNode*> & itemstosort);
+	void sortnodes(const QList<ItemNode *> &itemstosort);
 
 	void sortnodes();
 
-	void sortMatch( const std::vector<int32_t> & i_list);
+	void sortMatch(const std::vector<int32_t> &i_list);
 
-signals:
+  signals:
 
-	void nodeAdded( ItemNode * node, const QModelIndex & index);
+	void nodeAdded(ItemNode *node, const QModelIndex &index);
 
-private:
+  private:
 };

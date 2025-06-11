@@ -26,22 +26,23 @@ class RenderAf;
 /// List of Afanasy's nodes.
 class AfList
 {
-public:
+  public:
 	AfList();
 
 	~AfList();
 
-	inline int getCount() const { return m_nodes_list.size();}
+	inline int getCount() const { return m_nodes_list.size(); }
 
-	bool has(const AfNodeSolve * i_node);
+	bool has(const AfNodeSolve *i_node);
 
-	int add( AfNodeSolve * i_node);    ///< Add node to list.
+	int add(AfNodeSolve *i_node); ///< Add node to list.
 
-	inline std::list<AfNodeSolve*> & getStdList() { return m_nodes_list; }
+	inline std::list<AfNodeSolve *> &getStdList() { return m_nodes_list; }
 
-	void moveNodes( const std::vector<int32_t> & i_list, int i_type);
+	void moveNodes(const std::vector<int32_t> &i_list, int i_type);
 
-	enum MoveType{
+	enum MoveType
+	{
 		MoveUp,
 		MoveDown,
 		MoveTop,
@@ -53,15 +54,13 @@ public:
 	friend class AfContainer;
 	friend class AfListIt;
 
-	void remove( AfNodeSolve * i_node); ///< Remove node from list.
+	void remove(AfNodeSolve *i_node); ///< Remove node from list.
 
-	int sortPriority( AfNodeSolve * i_node);   ///< Sort nodes by priority.
+	int sortPriority(AfNodeSolve *i_node); ///< Sort nodes by priority.
 
-private:
-	std::list<AfNodeSolve*> m_nodes_list;      ///< Nodes list.
+  private:
+	std::list<AfNodeSolve *> m_nodes_list; ///< Nodes list.
 };
-
-
 
 //////////////////////////////////////////////////////////////////////
 /////////////////////        Iterator        /////////////////////////
@@ -70,21 +69,20 @@ private:
 /// AFlist nodes iterator.
 class AfListIt
 {
-public:
-/// Create iterator for given \c aflist .
-	AfListIt( AfList* i_aflist);
+  public:
+	/// Create iterator for given \c aflist .
+	AfListIt(AfList *i_aflist);
 	~AfListIt();
 
-	inline AfNodeSolve * node() { return m_node; }   ///< Get current node.
-	void next();   ///< Set iterator to next node.
-	void reset();  ///< Reset iterator to initial position.
+	inline AfNodeSolve *node() { return m_node; } ///< Get current node.
+	void next();								  ///< Set iterator to next node.
+	void reset();								  ///< Reset iterator to initial position.
 
-protected:
-	AfNodeSolve* m_node;                              ///< Current node.
+  protected:
+	AfNodeSolve *m_node; ///< Current node.
 
-private:
-	AfList* m_list;                 ///< Iterator's list.
-	std::list<AfNodeSolve*>::iterator m_it;       ///< First node iterator.
-	std::list<AfNodeSolve*>::iterator m_it_end;   ///< Last node iterator.
+  private:
+	AfList *m_list;								 ///< Iterator's list.
+	std::list<AfNodeSolve *>::iterator m_it;	 ///< First node iterator.
+	std::list<AfNodeSolve *>::iterator m_it_end; ///< Last node iterator.
 };
-

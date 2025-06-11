@@ -16,7 +16,7 @@
 	all rules/*.js files.
 */
 
-"use strict";
+'use strict';
 
 var SERVER = null;
 var RULES = {};
@@ -58,24 +58,24 @@ function cgru_CmdExecFilter(i_cmd)
 	let cmd = i_cmd;
 
 	cmd = activity_ChangeCmd(cmd);
-/*
-	// '@arg@' will be replaced with '--arg [arg value]'
-	// Value will be the first defined in action, ASSET, RULES
-	// For example: '@fps@' will be replaces with '--fps 24'
-	let matches = cmd.match(/@\w*@/g);
-	if (matches && matches.length)
-		for (let i = 0; i < matches.length; i++)
-		{
-			let match = matches[i];
-			let arg = match.replace(/@/g,'');
-			let val = action[arg];
-			if (null == val) val = ASSET[arg];
-			if (null == val) val = RULES[arg];
-			if (val) val = '--' + arg + ' ' + val;
-			else val = '';
-			cmd = cmd.replace(match, val);
-		}
-*/
+	/*
+		// '@arg@' will be replaced with '--arg [arg value]'
+		// Value will be the first defined in action, ASSET, RULES
+		// For example: '@fps@' will be replaces with '--fps 24'
+		let matches = cmd.match(/@\w*@/g);
+		if (matches && matches.length)
+			for (let i = 0; i < matches.length; i++)
+			{
+				let match = matches[i];
+				let arg = match.replace(/@/g,'');
+				let val = action[arg];
+				if (null == val) val = ASSET[arg];
+				if (null == val) val = RULES[arg];
+				if (val) val = '--' + arg + ' ' + val;
+				else val = '';
+				cmd = cmd.replace(match, val);
+			}
+	*/
 	return cmd;
 }
 
@@ -197,19 +197,19 @@ function c_RulesMergeDir(o_rules, i_dir)
 	{
 		let obj = i_dir.rules[keys[k]];
 		if (obj == null)
-        {
+		{
 			c_Error('RULES file "' + keys[k] + '" in "' + g_CurPath() + '/' + RUFOLDER + '" is invalid.');
-            continue;
-        }
-        if (obj.ruerror)
-        {
-            if (obj.ruerror.info)
-                c_Log(obj.ruerror.info);
-            if (obj.ruerror.error)
-                c_Error(obj.ruerror.error);
+			continue;
+		}
+		if (obj.ruerror)
+		{
+			if (obj.ruerror.info)
+				c_Log(obj.ruerror.info);
+			if (obj.ruerror.error)
+				c_Error(obj.ruerror.error);
 			c_ConstantError(obj.ruerror.error);
-            continue;
-        }
+			continue;
+		}
 
 		c_RulesMergeObjs(o_rules, obj);
 	}
@@ -235,9 +235,8 @@ function c_RulesMergeObjs(o_rules, i_rules_new)
 					c_RulesMergeObjs(o_rules, i_rules_new[attr]);
 			continue;
 		}
-		if ((typeof(i_rules_new[attr]) == 'object') &&
-				(false == Array.isArray(i_rules_new[attr])) &&
-				(o_rules[attr] != null))
+		if ((typeof (i_rules_new[attr]) == 'object') && (false == Array.isArray(i_rules_new[attr])) &&
+			(o_rules[attr] != null))
 		{
 			c_RulesMergeObjs(o_rules[attr], i_rules_new[attr]);
 			continue;
@@ -526,7 +525,7 @@ function c_CanAssignArtists(i_user)
 
 function c_CanEditTasks(i_user)
 {
-// Not used now. Was used in OLD tasks.
+	// Not used now. Was used in OLD tasks.
 	return c_IsUserStateSet(i_user, 'edittasks');
 }
 
@@ -659,7 +658,7 @@ function c_GetRolesArtists(i_users)
 		let role = g_users[uid].role;
 
 		if (roles_obj[role] == null)
-			roles_obj[role] = {'users':[]};
+			roles_obj[role] = {'users': []};
 
 		roles_obj[role].users.push(g_users[uid]);
 	}
@@ -672,7 +671,8 @@ function c_GetRolesArtists(i_users)
 		{
 			let user = roles_obj[role].users[u];
 			let tag = user.tag;
-			if (tag == null) tag = '';
+			if (tag == null)
+				tag = '';
 
 			if (roles_obj[role].tags_obj[tag] == null)
 				roles_obj[role].tags_obj[tag] = [];
@@ -684,7 +684,9 @@ function c_GetRolesArtists(i_users)
 	var roles = [];
 	for (let role in roles_obj)
 	{
-		roles_obj[role].users.sort(function(a, b) { return a.title > b.title });
+		roles_obj[role].users.sort(function(a, b) {
+			return a.title > b.title
+		});
 
 		let role_obj = {};
 		role_obj.role = role;
@@ -693,17 +695,22 @@ function c_GetRolesArtists(i_users)
 
 		for (let tag in roles_obj[role].tags_obj)
 		{
-			roles_obj[role].tags_obj[tag].sort(function(a, b) { return a.title > b.title });
+			roles_obj[role].tags_obj[tag].sort(function(a, b) {
+				return a.title > b.title
+			});
 
-			role_obj.tags.push({'tag':tag,'artists':roles_obj[role].tags_obj[tag]});
+			role_obj.tags.push({'tag': tag, 'artists': roles_obj[role].tags_obj[tag]});
 		}
 
-		role_obj.tags.sort(function(a, b) { return a.tag > b.tag });
+		role_obj.tags.sort(function(a, b) {
+			return a.tag > b.tag
+		});
 
 		roles.push(role_obj);
-
 	}
-	roles.sort(function(a, b) { return a.role < b.role });
+	roles.sort(function(a, b) {
+		return a.role < b.role
+	});
 
 	return roles;
 }
@@ -850,7 +857,7 @@ function c_FileDragStart(i_evt, i_path)
 	dt.clearData()
 	dt.setData('text/plain', path);
 	dt.setData('text/uri-list', path);
-	//console.log(i_evt.dataTransfer);
+	// console.log(i_evt.dataTransfer);
 }
 
 /* ---------------- [ RU file functions ] ---------------------------------------------------------------- */
@@ -984,10 +991,10 @@ function c_MakeThumbnail(i_file, i_func)
 	cmd = cmd.replace(/@INPUT@/g, RULES.root + i_file);
 	cmd = cmd.replace(/@OUTPUT@/g, RULES.root + c_GetThumbFileName(i_file));
 	cmd += ' -c ' + RULES.thumbnail.colorspace;
-	n_Request({"send": {"cmdexec": {"cmds": [cmd]}}, "func": i_func, "file": i_file, "info": 'thumbnail'});
+	n_Request({'send': {'cmdexec': {'cmds': [cmd]}}, 'func': i_func, 'file': i_file, 'info': 'thumbnail'});
 }
 
-var c_file_good_symbols = ['_','-','.'];
+var c_file_good_symbols = ['_', '-', '.'];
 function c_IsFileGoodChar(i_char)
 {
 	var code = i_char.charCodeAt(0);
@@ -1051,10 +1058,10 @@ function c_PathDir(i_file)
 
 function c_PathSplitExt(i_file)
 {
-	let split = [i_file,''];
+	let split = [i_file, ''];
 	let dot = i_file.lastIndexOf('.');
 	if (dot != -1)
-		split = [i_file.substr(0, dot), i_file.substr(dot+1)];
+		split = [i_file.substr(0, dot), i_file.substr(dot + 1)];
 	return split;
 }
 
@@ -1225,7 +1232,7 @@ function c_HttpToLinks(i_text)
 			link = text.substr(0, pos);
 			text = text.substr(pos);
 		}
-		//text = text.replace(a_re, '<a target="_blank" class="link_auto" href="$1">$1</a>');
+		// text = text.replace(a_re, '<a target="_blank" class="link_auto" href="$1">$1</a>');
 		let found_links = [];
 		let matches = text.matchAll(a_re);
 		for (const match of matches)
@@ -1239,12 +1246,14 @@ function c_HttpToLinks(i_text)
 			if (name.includes('fv_Goto'))
 			{
 				name = name.split('fv_Goto');
-				name = name[name.length-1];
-				name = name.replace(/[:\"\{\}]|%22|%7D|/g,'');
+				name = name[name.length - 1];
+				name = name.replace(/[:\"\{\}]|%22|%7D|/g, '');
 			}
 			name = name.replace(g_CurPath(), '');
-			while ((name.indexOf('/') == 0) && name.length) name = name.substr(1);
-			text = text.replaceAll(href, '<a target="_blank" class="link_auto" href="' + href + '">' + name + '</a>');
+			while ((name.indexOf('/') == 0) && name.length)
+				name = name.substr(1);
+			text = text.replaceAll(
+				href, '<a target="_blank" class="link_auto" href="' + href + '">' + name + '</a>');
 		}
 		text = link + text;
 

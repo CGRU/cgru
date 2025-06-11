@@ -6,22 +6,18 @@
 
 namespace afsql
 {
-class DBTask: public DBItem
+class DBTask : public DBItem
 {
-public:
+  public:
 	DBTask();
 	virtual ~DBTask();
 
-	void add(
-		const af::TaskExec * i_exec,
-		const af::TaskProgress * i_progress,
-		const af::Job * i_job,
-		const af::Render * i_render,
-		std::list<std::string> * o_queries);
+	void add(const af::TaskExec *i_exec, const af::TaskProgress *i_progress, const af::Job *i_job,
+			 const af::Render *i_render, std::list<std::string> *o_queries);
 
-	inline const std::string & v_dbGetTableName()  const { return ms_TableName;}
+	inline const std::string &v_dbGetTableName() const { return ms_TableName; }
 
-private:
+  private:
 	std::string m_annotation;
 	std::string m_blockname;
 	std::string m_command;
@@ -45,7 +41,7 @@ private:
 	int64_t m_time_done;
 	int64_t m_time_start;
 
-private:
+  private:
 	static const std::string ms_TableName;
 };
-}
+} // namespace afsql

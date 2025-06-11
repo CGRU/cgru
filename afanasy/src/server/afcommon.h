@@ -35,15 +35,15 @@ struct ThreadArgs;
 */
 class AFCommon
 {
-public:
+  public:
 	AFCommon(ThreadArgs *i_threadArgs);
 	~AFCommon();
 
 	static void executeCmd(const std::string &cmd); ///< Execute command.
 
 	/// Save string list, perform log file rotation;
-	static void saveLog(
-		const std::list<std::string> &log, const std::string &dirname, const std::string &filename);
+	static void saveLog(const std::list<std::string> &log, const std::string &dirname,
+						const std::string &filename);
 
 	static bool writeFile(const char *data, const int length, const std::string &filename); ///< Write a file
 	inline static bool writeFile(const std::string &i_str, const std::string &i_file_name)
@@ -114,25 +114,29 @@ public:
 	inline static void QueueLogError(const std::string &log) { OutputLogQueue->pushLog(log, LogData::Error); }
 	inline static void QueueLogErrno(const std::string &log) { OutputLogQueue->pushLog(log, LogData::Errno); }
 
-	inline static void DBWriteLog(const af::Log * i_log)
+	inline static void DBWriteLog(const af::Log *i_log)
 	{
-		if (ms_DBQueue) ms_DBQueue->writeLog(i_log);
+		if (ms_DBQueue)
+			ms_DBQueue->writeLog(i_log);
 	}
-	inline static void DBAddLog(const af::Log * i_log)
+	inline static void DBAddLog(const af::Log *i_log)
 	{
-		if (ms_DBQueue) ms_DBQueue->addLog(i_log);
+		if (ms_DBQueue)
+			ms_DBQueue->addLog(i_log);
 	}
 	inline static void DBAddJob(const af::Job *i_job)
 	{
-		if (ms_DBQueue) ms_DBQueue->addJob(i_job);
+		if (ms_DBQueue)
+			ms_DBQueue->addJob(i_job);
 	}
 	inline static void DBAddTask(const af::TaskExec *i_exec, const af::TaskProgress *i_progress,
-		const af::Job *i_job, const af::Render *i_render)
+								 const af::Job *i_job, const af::Render *i_render)
 	{
-		if (ms_DBQueue) ms_DBQueue->addTask(i_exec, i_progress, i_job, i_render);
+		if (ms_DBQueue)
+			ms_DBQueue->addTask(i_exec, i_progress, i_job, i_render);
 	}
 
-private:
+  private:
 	static FileQueue *FileWriteQueue;
 	static LogQueue *OutputLogQueue;
 	static DBQueue *ms_DBQueue;

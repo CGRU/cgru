@@ -8,38 +8,37 @@
 
 class Profiler
 {
-public:
+  public:
 	Profiler();
 	~Profiler();
 
 	void processingStarted();
 	void processingFinished();
 
-public:
-	static void Collect( Profiler * i_prof);
+  public:
+	static void Collect(Profiler *i_prof);
 
 	static void Destroy(); //< Called on program exit to free mem
 
-private:
+  private:
 	static void Profile();
 
-private:
+  private:
 #if defined(LINUX) || defined(MACOSX)
 	static uint64_t ms_counter;
 
 	static int ms_meter;
 	static DlMutex ms_mutex;
-	static std::vector<Profiler*> ms_profiles;
+	static std::vector<Profiler *> ms_profiles;
 
 	static int ms_stat_count;
 	static int ms_stat_period;
 	static timespec ms_stat_time;
 
-private:
+  private:
 	timespec m_tinit;
 	timespec m_tstart;
 	timespec m_tfinish;
 	timespec m_tcollect;
 #endif
 };
-
