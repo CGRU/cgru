@@ -12,19 +12,19 @@ namespace af
 
 class MonitorEvents : public Af
 {
-public:
+  public:
 	MonitorEvents();
-	MonitorEvents( Msg * msg);
+	MonitorEvents(Msg *msg);
 
 	virtual ~MonitorEvents();
 
-	void v_generateInfoStream( std::ostringstream & o_str, bool i_full = false) const;
+	void v_generateInfoStream(std::ostringstream &o_str, bool i_full = false) const;
 
-public:
+  public:
+	std::vector<std::vector<int32_t>> m_events;
 
-	std::vector<std::vector<int32_t> > m_events;
-
-	struct MTaskProgresses {
+	struct MTaskProgresses
+	{
 		int32_t job_id;
 		std::vector<int32_t> blocks;
 		std::vector<int32_t> tasks;
@@ -32,7 +32,8 @@ public:
 	};
 	std::vector<MTaskProgresses> m_tp;
 
-	struct MBlocksIds {
+	struct MBlocksIds
+	{
 		int32_t job_id;
 		int32_t block_num;
 		int32_t mode;
@@ -49,19 +50,18 @@ public:
 
 	std::string m_message;
 
-public:
-
+  public:
 	bool isEmpty() const;
 
-	void addOutput( const MCTask & i_mctask);
+	void addOutput(const MCTask &i_mctask);
 
-	void addListened( const MCTask & i_mctask);
+	void addListened(const MCTask &i_mctask);
 
-	void jsonWrite( std::ostringstream & o_str) const;
+	void jsonWrite(std::ostringstream &o_str) const;
 
 	void clear();
 
-private:
-	void v_readwrite( Msg * msg);
+  private:
+	void v_readwrite(Msg *msg);
 };
-}
+} // namespace af

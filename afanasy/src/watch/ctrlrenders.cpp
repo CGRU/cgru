@@ -1,37 +1,36 @@
 #include "ctrlrenders.h"
 
+#include <QBoxLayout>
+#include <QLabel>
+#include <QMenu>
 #include <QtCore/QEvent>
 #include <QtGui/QContextMenuEvent>
-#include <QLabel>
-#include <QBoxLayout>
-#include <QMenu>
 
 #include "actionid.h"
 #include "button.h"
 #include "listrenders.h"
 
-const QStringList CtrlRenders::ms_sizes_names = {"VR","S","M","L"};
-const QList<int>  CtrlRenders::ms_sizes_enums = {  0 , 1 , 2 , 3 };
+const QStringList CtrlRenders::ms_sizes_names = {"VR", "S", "M", "L"};
+const QList<int> CtrlRenders::ms_sizes_enums = {0, 1, 2, 3};
 
-CtrlRenders::CtrlRenders(QWidget * i_parent, ListRenders * i_listrenders):
-	QFrame(i_parent),
-	m_listrenders(i_listrenders)
+CtrlRenders::CtrlRenders(QWidget *i_parent, ListRenders *i_listrenders)
+	: QFrame(i_parent), m_listrenders(i_listrenders)
 {
 	setFrameShape(QFrame::StyledPanel);
 	setFrameShadow(QFrame::Raised);
 
-	QHBoxLayout * layout = new QHBoxLayout(this);
+	QHBoxLayout *layout = new QHBoxLayout(this);
 	layout->setSizeConstraint(QLayout::SetMaximumSize);
 
-	QLabel * lSize = new QLabel("Size:", this);
+	QLabel *lSize = new QLabel("Size:", this);
 	lSize->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	layout->addWidget(lSize);
 
 	for (int i = 0; i < ms_sizes_names.size(); i++)
 	{
-		Button * btn = new Button(ms_sizes_names[i], QString(), QString(), false, true);
+		Button *btn = new Button(ms_sizes_names[i], QString(), QString(), false, true);
 		layout->addWidget(btn);
-		connect(btn, SIGNAL(sig_Clicked(Button*)), this, SLOT(slot_ThumsButtonClicked(Button*)));
+		connect(btn, SIGNAL(sig_Clicked(Button *)), this, SLOT(slot_ThumsButtonClicked(Button *)));
 
 		if (ms_sizes_enums[i] == afqt::QEnvironment::render_item_size.n)
 			btn->setActive(true);
@@ -42,13 +41,13 @@ CtrlRenders::CtrlRenders(QWidget * i_parent, ListRenders * i_listrenders):
 			btn->setToolTip("Variable size.");
 	}
 
-	QLabel * lMax = new QLabel("Max(hrs):", this);
+	QLabel *lMax = new QLabel("Max(hrs):", this);
 	lMax->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	lMax->setToolTip("Mark tasks maximum running time above this value.\nType zero to disable.");
 	layout->addWidget(lMax);
 
 	m_max_runtime_edit = new QLineEdit(this);
-	QDoubleValidator * dv = new QDoubleValidator(0, 24*10, 2, m_max_runtime_edit);
+	QDoubleValidator *dv = new QDoubleValidator(0, 24 * 10, 2, m_max_runtime_edit);
 	dv->setNotation(QDoubleValidator::StandardNotation);
 	m_max_runtime_edit->setValidator(dv);
 	m_max_runtime_edit->setFixedWidth(32);
@@ -58,15 +57,13 @@ CtrlRenders::CtrlRenders(QWidget * i_parent, ListRenders * i_listrenders):
 	if (seconds)
 		m_max_runtime_edit->setText(QString::number(double(seconds) / 60.0 / 60.0, 'f', 2));
 
-	CtrlRendersViewOptions * viewOpts = new CtrlRendersViewOptions(this, m_listrenders);
+	CtrlRendersViewOptions *viewOpts = new CtrlRendersViewOptions(this, m_listrenders);
 	layout->addWidget(viewOpts);
 }
 
-CtrlRenders::~CtrlRenders()
-{
-}
+CtrlRenders::~CtrlRenders() {}
 
-void CtrlRenders::slot_ThumsButtonClicked(Button * i_btn)
+void CtrlRenders::slot_ThumsButtonClicked(Button *i_btn)
 {
 	int size = 0;
 	for (int i = 0; i < ms_sizes_names.size(); i++)
@@ -98,24 +95,21 @@ void CtrlRenders::slot_MaxEditingFinished()
 	m_listrenders->repaintItems();
 }
 
-CtrlRendersViewOptions::CtrlRendersViewOptions(QWidget * i_parent, ListRenders * i_listrenders):
-	QLabel("View Options", i_parent),
-	m_listrenders(i_listrenders)
+CtrlRendersViewOptions::CtrlRendersViewOptions(QWidget *i_parent, ListRenders *i_listrenders)
+	: QLabel("View Options", i_parent), m_listrenders(i_listrenders)
 {
 	setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	setFrameShape(QFrame::StyledPanel);
 	setFrameShadow(QFrame::Raised);
 }
 
-CtrlRendersViewOptions::~CtrlRendersViewOptions()
-{
-}
+CtrlRendersViewOptions::~CtrlRendersViewOptions() {}
 
 void CtrlRendersViewOptions::contextMenuEvent(QContextMenuEvent *event)
 {
 	QMenu menu(this);
-	ActionId * action_id;
-	QAction * action;
+	ActionId *action_id;
+	QAction *action;
 
 	action = new QAction("Hide:", this);
 	action->setEnabled(false);

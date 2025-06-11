@@ -22,143 +22,146 @@ class ParamTicket;
 
 class ParamsPanelJob : public ParamsPanel
 {
-Q_OBJECT
-public:
+	Q_OBJECT
+  public:
 	ParamsPanelJob();
 	virtual ~ParamsPanelJob();
 
 	virtual void v_setEditable(bool i_editable);
 
-	virtual void v_updatePanel(Item * i_item = NULL, const QList<Item*> * i_selected = NULL) override;
+	virtual void v_updatePanel(Item *i_item = NULL, const QList<Item *> *i_selected = NULL) override;
 
-private:
-	void constructFolders(ItemJob * i_item);
+  private:
+	void constructFolders(ItemJob *i_item);
 	void clearFolders();
 
-	void updateBlocks(ItemJob * i_item);
-	void constructBlocks(ItemJob * i_item);
+	void updateBlocks(ItemJob *i_item);
+	void constructBlocks(ItemJob *i_item);
 	void clearBlocks();
 
-private slots:
+  private slots:
 	void slot_Rules();
 
-private:
+  private:
 	bool m_editable;
 
-	QVBoxLayout * m_folders_layout;
-	QPushButton * m_rules_btn;
-	QString       m_rules_path;
-	QLabel      * m_folders_root;
-	QMap<QString, FolderWidget*> m_folders_map;
+	QVBoxLayout *m_folders_layout;
+	QPushButton *m_rules_btn;
+	QString m_rules_path;
+	QLabel *m_folders_root;
+	QMap<QString, FolderWidget *> m_folders_map;
 
-	QVBoxLayout * m_blocks_layout;
-	QLabel * m_blocks_label;
-	QList<BlockCaptionWidget*> m_blocks_widgets;
+	QVBoxLayout *m_blocks_layout;
+	QLabel *m_blocks_label;
+	QList<BlockCaptionWidget *> m_blocks_widgets;
 };
 
-class FolderWidget: public QWidget
+class FolderWidget : public QWidget
 {
-Q_OBJECT
-public:
-	FolderWidget(const QString & i_name, const QString & i_value, QLayout * i_layout);
+	Q_OBJECT
+  public:
+	FolderWidget(const QString &i_name, const QString &i_value, QLayout *i_layout);
 	~FolderWidget();
 
-	void setValue(const QString & i_value);
+	void setValue(const QString &i_value);
 
-protected:
+  protected:
 	virtual void paintEvent(QPaintEvent *event);
 
-private slots:
+  private slots:
 	void slot_Open();
 	void slot_Copy();
 	void slot_Term();
 
-private:
+  private:
 	QString m_name;
 	QString m_value;
 
-	FValueWidget * m_value_widget;
+	FValueWidget *m_value_widget;
 };
 
-class FValueWidget: public QWidget
+class FValueWidget : public QWidget
 {
-public:
+  public:
 	FValueWidget();
 	~FValueWidget();
 
-	void setText(const QString & i_text);
+	void setText(const QString &i_text);
 
-protected:
+  protected:
 	virtual void paintEvent(QPaintEvent *event);
 
-private:
+  private:
 	QString m_text;
 };
 
-class BlockNameLabel: public QWidget
+class BlockNameLabel : public QWidget
 {
-public:
-	BlockNameLabel(const QString & i_name);
+  public:
+	BlockNameLabel(const QString &i_name);
 	~BlockNameLabel();
-protected:
+
+  protected:
 	virtual void paintEvent(QPaintEvent *event);
-private:
+
+  private:
 	QString m_name;
 };
-class BlockCaptionWidget: public QFrame
+class BlockCaptionWidget : public QFrame
 {
-Q_OBJECT;
-public:
-	BlockCaptionWidget(const BlockInfo * i_info);
+	Q_OBJECT;
+
+  public:
+	BlockCaptionWidget(const BlockInfo *i_info);
 	~BlockCaptionWidget();
 
 	void setEditable(bool i_editable);
 
 	void update();
 
-public slots:
+  public slots:
 	void slot_OpenInfo();
 	void slot_CloseInfo();
 
-private:
+  private:
 	bool m_editable;
-	const BlockInfo * m_info;
-	QVBoxLayout * m_layout;
-	QPushButton * m_btn_open;
-	QPushButton * m_btn_close;
-	BlockInfoWidget * m_info_widget;
+	const BlockInfo *m_info;
+	QVBoxLayout *m_layout;
+	QPushButton *m_btn_open;
+	QPushButton *m_btn_close;
+	BlockInfoWidget *m_info_widget;
 };
 
-class BlockInfoWidget: public QWidget
+class BlockInfoWidget : public QWidget
 {
-Q_OBJECT;
-public:
-	BlockInfoWidget(const BlockInfo * i_info);
+	Q_OBJECT;
+
+  public:
+	BlockInfoWidget(const BlockInfo *i_info);
 	~BlockInfoWidget();
 
 	void setEditable(bool i_editable);
 
 	void update();
 
-private slots:
+  private slots:
 	void slot_BlockParamsShowAll();
 
-private:
-	void addBlockParamWidget(Param * i_param);
+  private:
+	void addBlockParamWidget(Param *i_param);
 
-private:
+  private:
 	bool m_editable;
-	const BlockInfo * m_info;
+	const BlockInfo *m_info;
 
-	QPushButton * m_btn_ticket_add;
+	QPushButton *m_btn_ticket_add;
 
-	QVBoxLayout * m_tickets_layout;
-	QMap<QString, ParamTicket*> m_map_params_ticket;
+	QVBoxLayout *m_tickets_layout;
+	QMap<QString, ParamTicket *> m_map_params_ticket;
 
-	QVBoxLayout * m_params_layout;
-	QPushButton * m_btn_params_show_all;
-	QList<ParamWidget*> m_params_widgets;
-	QList<ParamSeparator*> m_separatos;
+	QVBoxLayout *m_params_layout;
+	QPushButton *m_btn_params_show_all;
+	QList<ParamWidget *> m_params_widgets;
+	QList<ParamSeparator *> m_separatos;
 	bool m_params_show_all;
 };
-

@@ -16,7 +16,7 @@
 	  TaskItem  - an atomic representation of work (e.g. rendering of one frame)
 */
 
-"use strict";
+'use strict';
 
 function BlockItem(i_block_num)
 {
@@ -138,8 +138,8 @@ TaskItem.prototype.updateProgress = function(i_progress) {
 		if (this.params.tdn && (this.state.RUN != true))
 		{
 			this.elTime.textContent = cm_TimeStringInterval(this.params.tst, this.params.tdn);
-			this.elTime.title = 'Started at: ' + cm_DateTimeStrFromSec(this.params.tst) + '\nFinished at: ' +
-				cm_DateTimeStrFromSec(this.params.tdn);
+			this.elTime.title = 'Started at: ' + cm_DateTimeStrFromSec(this.params.tst) +
+				'\nFinished at: ' + cm_DateTimeStrFromSec(this.params.tdn);
 		}
 		else
 		{
@@ -173,7 +173,7 @@ TaskItem.prototype.updateProgress = function(i_progress) {
 
 TaskItem.prototype.genName = function() {
 	var t = this.task_num;
-	var name = 'task ' + t;  //< This is the default task name
+	var name = 'task ' + t;	 //< This is the default task name
 
 	var tasks_name = this.block.params.tasks_name;
 
@@ -321,17 +321,19 @@ TaskItem.prototype.showThumbs = function() {
 	this.getBlockTasksIds(bids, tids);
 
 	var get = {
-		"type": 'jobs',
-		"ids": [this.job.id],
-		"mode": 'files',
-		"block_ids": [bids[0]],
-		"task_ids": [tids[0]]
+		'type': 'jobs',
+		'ids': [this.job.id],
+		'mode': 'files',
+		'block_ids': [bids[0]],
+		'task_ids': [tids[0]]
 	};
 
 	nw_request({
-		"send": {"get": get},
-		"task": this,
-		"func": function(i_obj, i_args) { i_args.task.thumbsReceived(i_obj) }
+		'send': {'get': get},
+		'task': this,
+		'func': function(i_obj, i_args) {
+			i_args.task.thumbsReceived(i_obj)
+		}
 	});
 };
 

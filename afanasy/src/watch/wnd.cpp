@@ -8,16 +8,14 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-Wnd::Wnd(const QString & Name):
-	QWidget(Watch::getDialog()),
-	name(Name)
+Wnd::Wnd(const QString &Name) : QWidget(Watch::getDialog()), name(Name)
 {
 	setWindowTitle(name);
 	setWindowFlags(Qt::Window);
-	setAttribute (Qt::WA_DeleteOnClose, true);
+	setAttribute(Qt::WA_DeleteOnClose, true);
 
 	QRect rect(Watch::getDialog()->geometry());
-	switch(ButtonSnapWnd::getType())
+	switch (ButtonSnapWnd::getType())
 	{
 		case ButtonSnapWnd::NoSnap:
 		{
@@ -27,7 +25,7 @@ Wnd::Wnd(const QString & Name):
 		}
 		case ButtonSnapWnd::Left:
 		{
-			rect.translate(-rect.width() , 0);
+			rect.translate(-rect.width(), 0);
 			break;
 		}
 		case ButtonSnapWnd::Right:
@@ -43,17 +41,18 @@ Wnd::Wnd(const QString & Name):
 
 	Watch::addWindow(this);
 
-AFINFO("Wnd::Wnd:\n");
+	AFINFO("Wnd::Wnd:\n");
 }
 
 Wnd::~Wnd()
 {
-AFINFO("Wnd::~Wnd:\n");
+	AFINFO("Wnd::~Wnd:\n");
 	Watch::removeWindow(this);
 }
 
-void Wnd::closeEvent(QCloseEvent * event)
+void Wnd::closeEvent(QCloseEvent *event)
 {
-AFINFA("Wnd::closeEvent: '%s' = %d, %d, %d, %d\n", name.toUtf8().data(), geometry().x(), geometry().y(), geometry().width(), geometry().height());
+	AFINFA("Wnd::closeEvent: '%s' = %d, %d, %d, %d\n", name.toUtf8().data(), geometry().x(), geometry().y(),
+		   geometry().width(), geometry().height());
 	afqt::QEnvironment::setRect(name, geometry());
 }

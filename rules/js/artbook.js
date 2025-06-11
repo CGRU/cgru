@@ -14,7 +14,7 @@
 	artbook.js - All artists bookmarks.
 */
 
-"use strict";
+'use strict';
 
 var ab_wnd = null;
 var ab_users = [];
@@ -29,7 +29,7 @@ var ab_art_projects = [];
 var ab_wnd_sort_prop = 'bm_count';
 var ab_wnd_sort_dir = 1;
 
-var ab_flags_order = ['precomp','check','comment','ready','inprogress','on_farm','sent'];
+var ab_flags_order = ['precomp', 'check', 'comment', 'ready', 'inprogress', 'on_farm', 'sent'];
 
 function ab_Init()
 {
@@ -50,7 +50,7 @@ function ab_OpenWindow(i_close_header)
 	if (i_close_header)
 		u_OpenCloseHeader();
 
-	ab_wnd = new cgru_Window({"name": 'artbook', "title": 'ArtBook', 'padding': '3% 1%'});
+	ab_wnd = new cgru_Window({'name': 'artbook', 'title': 'ArtBook', 'padding': '3% 1%'});
 	ab_wnd.elContent.classList.add('artbook');
 
 	ab_wnd.elTopPanel = document.createElement('div');
@@ -91,10 +91,7 @@ function ab_WndRefresh()
 	ab_filter_artists = [];
 	ab_filter_projects = [];
 
-	n_Request({
-		"send": {'getallusers':true},
-		"func": ab_WndArtistsReceived
-	});
+	n_Request({'send': {'getallusers': true}, 'func': ab_WndArtistsReceived});
 }
 
 function ab_WndArtistsReceived(i_data)
@@ -118,12 +115,13 @@ function ab_WndArtistsReceived(i_data)
 	ab_users = i_data.users;
 	ab_wnd.elArtistsDiv.innerHTML = '';
 	ab_wnd.editAritsts = new EditList({
-		"name"    : 'artists',
-		"label"   : 'Artists:',
-		"list"    : [],
-		"list_all": ab_users,
-		"elParent": ab_wnd.elArtistsDiv,
-		"onChange": ab_ArtistsListChanged});
+		'name': 'artists',
+		'label': 'Artists:',
+		'list': [],
+		'list_all': ab_users,
+		'elParent': ab_wnd.elArtistsDiv,
+		'onChange': ab_ArtistsListChanged
+	});
 
 	if (ab_wnd == null)
 		return;
@@ -164,7 +162,7 @@ function ab_CollectFlags(i_bm, i_uid)
 	return flags;
 }
 
-function ab_CompareFlags(a,b)
+function ab_CompareFlags(a, b)
 {
 	let max_index_a = -1;
 	let max_index_b = -1;
@@ -211,18 +209,19 @@ function ab_CollectPriority(i_bm, i_uid)
 	return priority;
 }
 
-function ab_CompareBookmarks(i_uid) {
-return function (a,b)
+function ab_CompareBookmarks(i_uid)
 {
-	let priority_a = ab_CollectPriority(a, i_uid);
-	let priority_b = ab_CollectPriority(b, i_uid);
-	if (priority_a < priority_b)
-		return 1;
-	if (priority_a > priority_b)
-		return -1;
+	return function(a, b) {
+		let priority_a = ab_CollectPriority(a, i_uid);
+		let priority_b = ab_CollectPriority(b, i_uid);
+		if (priority_a < priority_b)
+			return 1;
+		if (priority_a > priority_b)
+			return -1;
 
-	return ab_CompareFlags(ab_CollectFlags(a, i_uid), ab_CollectFlags(b, i_uid));
-}}
+		return ab_CompareFlags(ab_CollectFlags(a, i_uid), ab_CollectFlags(b, i_uid));
+	}
+}
 
 function ab_ProcessArtists()
 {
@@ -244,7 +243,7 @@ function ab_ProcessArtists()
 		// Skip not an artists
 		if (c_IsNotAnArtist(user))
 			continue;
-		
+
 		// Show only selected, or all if no selection
 		if (ab_filter_artists.length && (ab_filter_artists.indexOf(user.id) == -1))
 			continue;
@@ -274,7 +273,7 @@ function ab_ProcessArtists()
 			bookmarks.push(bm);
 		}
 
-		let artist =  user;
+		let artist = user;
 		artist.projects = [];
 		artist.bm_count = 0;
 		let projects = bm_CollectProjects(bookmarks);
@@ -322,14 +321,18 @@ function ab_ProcessArtists()
 	for (let pname in prj_infos_obj)
 		prj_infos_arr.push(prj_infos_obj[pname]);
 
-	prj_infos_arr.sort(function(a,b){if(a.count_art > b.count_art) return -1; return 1;});
+	prj_infos_arr.sort(function(a, b) {
+		if (a.count_art > b.count_art)
+			return -1;
+		return 1;
+	});
 	ab_wnd.elProjectsButtons = [];
 	ab_wnd.elProjectsDiv.innerHTML = '';
 	for (let prj of prj_infos_arr)
 	{
 		let el = document.createElement('div');
 		ab_wnd.elProjectsDiv.appendChild(el);
-		el.classList.add('button','project');
+		el.classList.add('button', 'project');
 		el.innerHTML = prj.name + ' <small>(' + prj.count_art + 'A)</small>';
 		el.m_prj_name = prj.name;
 		el.onclick = ab_ProjectClicked;
@@ -373,7 +376,7 @@ function ab_ProcessArtists()
 
 	info = ''
 	if (total_obsolete_bookmarks)
-		info += '<b>' + total_obsolete_bookmarks + '</b> Obsolete Bookmarks';
+	info += '<b>' + total_obsolete_bookmarks + '</b> Obsolete Bookmarks';
 	if (total_invalid_bookmarks)
 		info += ', <b>' + total_invalid_bookmarks + '</b> Invalid Bookmarks';
 	if (info.length)
@@ -486,15 +489,19 @@ function ArtPage(i_el, i_artist)
 	this.elBtnActLoad.classList.add('button');
 	this.elBtnActLoad.textContent = 'Load Activity';
 	this.elBtnActLoad.m_this = this;
-	this.elBtnActLoad.onclick = function(e){e.currentTarget.m_this.activityLoad();}
+	this.elBtnActLoad.onclick =
+		function(e) {
+		e.currentTarget.m_this.activityLoad();
+	}
 
-	this.elBtnActClose = document.createElement('div');
+		this.elBtnActClose = document.createElement('div');
 	elActPanel.appendChild(this.elBtnActClose);
-	this.elBtnActClose.classList.add('button','close');
+	this.elBtnActClose.classList.add('button', 'close');
 	this.elBtnActClose.textContent = 'Close Activity';
 	this.elBtnActClose.m_this = this;
-	this.elBtnActClose.onclick = function(e){e.currentTarget.m_this.activityClose();}
-	this.elBtnActClose.style.display = 'none';
+	this.elBtnActClose.onclick = function(e) {
+		e.currentTarget.m_this.activityClose();
+	} this.elBtnActClose.style.display = 'none';
 
 	this.elActivityInfo = document.createElement('div');
 	elActPanel.appendChild(this.elActivityInfo);
@@ -505,17 +512,18 @@ function ArtPage(i_el, i_artist)
 	this.elActivity.classList.add('artpage_activity');
 }
 
-ArtPage.prototype.activityClose = function()
-{
+ArtPage.prototype.activityClose =
+	function() {
 	this.elBtnActLoad.style.display = 'block';
 	this.elBtnActClose.style.display = 'none';
 	this.elActivityInfo.textContent = '';
 	this.elActivity.textContent = '';
 }
 
-function ad_GetUserActivityFileName(i_id){return ad_GetUserFileName(i_id, 'activity');}
-ArtPage.prototype.activityLoad = function()
-{
+	function ad_GetUserActivityFileName(i_id) {
+		return ad_GetUserFileName(i_id, 'activity');
+	} ArtPage.prototype.activityLoad =
+		function() {
 	n_GetFile({
 		'path': ad_GetUserActivityFileName(this.artist.id),
 		'func': ad_UserActivityReceived,
@@ -525,13 +533,10 @@ ArtPage.prototype.activityLoad = function()
 		'parse': true,
 		'local': false
 	});
-}
-function ad_UserActivityReceived(i_data, i_args)
-{
+} function ad_UserActivityReceived(i_data, i_args) {
 	i_args.object.activityReceived(i_data);
-}
-ArtPage.prototype.activityReceived = function(i_data)
-{
+} ArtPage.prototype.activityReceived =
+			function(i_data) {
 	if ((i_data == null) || (i_data.error))
 	{
 		this.elActRoot.textContent = 'No activity found.';
@@ -572,7 +577,7 @@ ArtPage.prototype.activityReceived = function(i_data)
 		{
 			let elCUser = st_CreateElArtist(act.task.cuser, true);
 			elAct.appendChild(elCUser);
-			elCUser.classList.add('user','cuser');
+			elCUser.classList.add('user', 'cuser');
 			let tip = 'Created by ' + c_GetUserTitle(act.task.cuser);
 			if (act.task.ctime)
 				tip += '\n' + c_DT_StrFromSec(act.task.ctime);
@@ -583,13 +588,13 @@ ArtPage.prototype.activityReceived = function(i_data)
 		elAct.appendChild(elTask);
 		elTask.classList.add('task');
 
-		task_DrawBadges({'tasks':[act.task]}, elTask, {'full_names':true});
+		task_DrawBadges({'tasks': [act.task]}, elTask, {'full_names': true});
 
 		if (act.task.muser)
 		{
 			let elMUser = st_CreateElArtist(act.task.muser, true);
 			elAct.appendChild(elMUser);
-			elMUser.classList.add('user','muser');
+			elMUser.classList.add('user', 'muser');
 			let tip = 'Modified by ' + c_GetUserTitle(act.task.muser);
 			if (act.task.mtime)
 				tip += '\n' + c_DT_StrFromSec(act.task.mtime);
@@ -667,20 +672,24 @@ ArtPage.prototype.activityReceived = function(i_data)
 
 	let elTimeDiv = document.createElement('div');
 	this.elActivityInfo.appendChild(elTimeDiv);
-	elTimeDiv.classList.add('time_div')
+	elTimeDiv.classList
+		.add('time_div')
 
-	this.elActivityTimeEdit = document.createElement('div');
+			this.elActivityTimeEdit = document.createElement('div');
 	elTimeDiv.appendChild(this.elActivityTimeEdit);
 	this.elActivityTimeEdit.contentEditable = true;
-	this.elActivityTimeEdit.classList.add('editing','time_edit');
-	this.elActivityTimeEdit.textContent = c_DT_FormStrFromSec(stat.time_min) + ' - ' + c_DT_FormStrFromSec(stat.time_max);
+	this.elActivityTimeEdit.classList.add('editing', 'time_edit');
+	this.elActivityTimeEdit.textContent =
+		c_DT_FormStrFromSec(stat.time_min) + ' - ' + c_DT_FormStrFromSec(stat.time_max);
 
 	let elActivityTimeBtn = document.createElement('div');
 	elTimeDiv.appendChild(elActivityTimeBtn);
 	elActivityTimeBtn.classList.add('button');
 	elActivityTimeBtn.textContent = 'Filter';
 	elActivityTimeBtn.m_page = this;
-	elActivityTimeBtn.onclick = function(e){e.currentTarget.m_page.activityFilter()};
+	elActivityTimeBtn.onclick = function(e) {
+		e.currentTarget.m_page.activityFilter()
+	};
 
 	this.actTagsSelected = [];
 	for (let tag in stat.tags)
@@ -699,43 +708,36 @@ ArtPage.prototype.activityReceived = function(i_data)
 		elFlag.m_artpage = this;
 		elFlag.onclick = ab_ActivityFlagClicked;
 	}
-}
-function ab_ActivityTagClicked(e)
-{
+} function ab_ActivityTagClicked(e) {
 	let el = e.currentTarget;
 	c_ElToggleSelected(el);
 	el.m_artpage.activityTagClicked(el.m_name);
-}
-function ab_ActivityFlagClicked(e)
-{
+} function ab_ActivityFlagClicked(e) {
 	let el = e.currentTarget;
 	c_ElToggleSelected(el);
 	el.m_artpage.activityFlagClicked(el.m_name);
-}
-ArtPage.prototype.activityTagClicked = function(i_tag)
-{
+} ArtPage.prototype.activityTagClicked =
+				function(i_tag) {
 	if (this.actTagsSelected.includes(i_tag))
 		this.actTagsSelected.splice(this.actTagsSelected.indexOf(i_tag), 1);
 	else
 		this.actTagsSelected.push(i_tag);
 
 	this.activityFilter();
-}
-ArtPage.prototype.activityFlagClicked = function(i_flag)
-{
+} ArtPage.prototype.activityFlagClicked =
+					function(i_flag) {
 	if (this.actFlagsSelected.includes(i_flag))
 		this.actFlagsSelected.splice(this.actFlagsSelected.indexOf(i_flag), 1);
 	else
 		this.actFlagsSelected.push(i_flag);
 
 	this.activityFilter();
-}
-ArtPage.prototype.activityFilter = function()
-{
+} ArtPage.prototype.activityFilter =
+						function() {
 	let time_edit = this.elActivityTimeEdit.textContent;
 	time_edit = time_edit.split(' - ');
 	let time_min = c_DT_SecFromStr(time_edit[0]);
-	let time_max = c_DT_SecFromStr(time_edit[1]) + 60; // Add a minute as seconds are not displayed
+	let time_max = c_DT_SecFromStr(time_edit[1]) + 60;	// Add a minute as seconds are not displayed
 
 	let shown = 0;
 	let hidden = 0;
@@ -789,49 +791,53 @@ ArtPage.prototype.activityFilter = function()
 		this.elActivityFilteredCounts.textContent = '';
 }
 
-function ArtPagePrj(i_el, i_project, i_artist)
-{
-	this.elParent = i_el;
-	this.project = i_project;
-	this.artist = i_artist;
+						function ArtPagePrj(i_el, i_project, i_artist) {
+							this.elParent = i_el;
+							this.project = i_project;
+							this.artist = i_artist;
 
-	this.elRoot = document.createElement('div');
-	this.elParent.appendChild(this.elRoot);
-	this.elRoot.classList.add('artpage_prj')
+							this.elRoot = document.createElement('div');
+							this.elParent.appendChild(this.elRoot);
+							this.elRoot.classList
+								.add('artpage_prj')
 
-	this.elPanel = document.createElement('div');
-	this.elRoot.appendChild(this.elPanel);
-	this.elPanel.classList.add('panel');
+									this.elPanel = document.createElement('div');
+							this.elRoot.appendChild(this.elPanel);
+							this.elPanel.classList.add('panel');
 
-	this.elBtnExpand = document.createElement('div');
-	this.elPanel.appendChild(this.elBtnExpand);
-	this.elBtnExpand.classList.add('button');
-	this.elBtnExpand.textContent = 'Expand';
-	this.elBtnExpand.m_this = this;
-	this.elBtnExpand.onclick = function(e){e.currentTarget.m_this.expand();}
+							this.elBtnExpand = document.createElement('div');
+							this.elPanel.appendChild(this.elBtnExpand);
+							this.elBtnExpand.classList.add('button');
+							this.elBtnExpand.textContent = 'Expand';
+							this.elBtnExpand.m_this = this;
+							this.elBtnExpand.onclick =
+								function(e) {
+								e.currentTarget.m_this.expand();
+							}
 
-	this.elBtnCollapse = document.createElement('div');
-	this.elPanel.appendChild(this.elBtnCollapse);
-	this.elBtnCollapse.classList.add('button');
-	this.elBtnCollapse.textContent = 'Collapse';
-	this.elBtnCollapse.m_this = this;
-	this.elBtnCollapse.onclick = function(e){e.currentTarget.m_this.collapse();}
-	this.elBtnCollapse.style.display = 'none';
+								this.elBtnCollapse = document.createElement('div');
+							this.elPanel.appendChild(this.elBtnCollapse);
+							this.elBtnCollapse.classList.add('button');
+							this.elBtnCollapse.textContent = 'Collapse';
+							this.elBtnCollapse.m_this = this;
+							this.elBtnCollapse.onclick = function(e) {
+								e.currentTarget.m_this.collapse();
+							} this.elBtnCollapse.style.display = 'none';
 
-	this.elTitle = document.createElement('div');
-	this.elPanel.appendChild(this.elTitle);
-	this.elTitle.textContent = this.project.name;
-	this.elTitle.classList.add('title');
+							this.elTitle = document.createElement('div');
+							this.elPanel.appendChild(this.elTitle);
+							this.elTitle.textContent = this.project.name;
+							this.elTitle.classList.add('title');
 
-	this.elStat = document.createElement('div');
-	this.elRoot.appendChild(this.elStat);
-	this.elStat.classList.add('prj_stat');
+							this.elStat = document.createElement('div');
+							this.elRoot.appendChild(this.elStat);
+							this.elStat.classList.add('prj_stat');
 
-	this.showStat();
-}
+							this.showStat();
+						}
 
-ArtPagePrj.prototype.showStat = function()
-{
+						ArtPagePrj.prototype.showStat =
+							function() {
 	let prj_bms = [];
 	for (let scene of this.project.scenes)
 		prj_bms = prj_bms.concat(scene.bms);
@@ -842,27 +848,31 @@ ArtPagePrj.prototype.showStat = function()
 
 	for (let bm of prj_bms)
 	{
-		if (bm.status == null) continue;
-		if (bm.status.tasks == null) continue;
+		if (bm.status == null)
+			continue;
+		if (bm.status.tasks == null)
+			continue;
 		for (let name in bm.status.tasks)
 		{
 			let t = bm.status.tasks[name];
-			if (t.deleted) continue;
-			if (t.artists == null) continue;
-			if (t.artists.indexOf(this.artist.id) == -1) continue;
+			if (t.deleted)
+				continue;
+			if (t.artists == null)
+				continue;
+			if (t.artists.indexOf(this.artist.id) == -1)
+				continue;
 
 			let act = {};
 			if (name in acts)
-				act = acts[name]
-			else
-			{
-				act.count = 0;
-				act.flags = {};
-			}
+				act = acts[name] else
+				{
+					act.count = 0;
+					act.flags = {};
+				}
 
 			act.count += 1;
 
-			if (t.flags )
+			if (t.flags)
 				for (let f of t.flags)
 					if (f in act.flags)
 						act.flags[f] += 1;
@@ -893,8 +903,8 @@ ArtPagePrj.prototype.showStat = function()
 	}
 }
 
-ArtPagePrj.prototype.expand = function()
-{
+							ArtPagePrj.prototype.expand =
+								function() {
 	this.elBtnExpand.style.display = 'none';
 	this.elBtnCollapse.style.display = 'block';
 
@@ -910,15 +920,15 @@ ArtPagePrj.prototype.expand = function()
 	}
 }
 
-ArtPagePrj.prototype.collapse = function()
-{
+								ArtPagePrj.prototype.collapse =
+									function() {
 	this.elBtnCollapse.style.display = 'none';
 	this.elBtnExpand.style.display = 'block';
 	this.elBmrks.style.display = 'none';
 }
 
-ArtPagePrj.prototype.showFull = function()
-{
+									ArtPagePrj.prototype.showFull =
+										function() {
 	// Collect bookmarks of all project scenes:
 	let prj_bms = [];
 	for (let scene of this.project.scenes)
@@ -932,14 +942,13 @@ ArtPagePrj.prototype.showFull = function()
 	}
 }
 
-function ArtPageBM(i_el, i_bm, i_artist)
-{
+function ArtPageBM(i_el, i_bm, i_artist) {
 	this.elParent = i_el;
 	this.bm = i_bm;
 	this.artist = i_artist;
 
 	this.name = this.bm.path.split('/');
-	this.name = this.name[this.name.length-1];
+	this.name = this.name[this.name.length - 1];
 
 	this.elRoot = document.createElement('div');
 	this.elParent.appendChild(this.elRoot);
@@ -956,4 +965,3 @@ function ArtPageBM(i_el, i_bm, i_artist)
 
 	st_SetElStatus(this.elRoot, this.bm.status, /*show all tasks = */ false, this.artist);
 }
-

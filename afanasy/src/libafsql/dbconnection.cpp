@@ -12,46 +12,44 @@ using namespace afsql;
 
 bool DBConnection::ms_enabled = true;
 
-DBConnection::DBConnection( const std::string & i_name):
-	m_name( i_name),
-	m_conn( NULL),
-	m_working( false),
-	m_opened( false)
+DBConnection::DBConnection(const std::string &i_name)
+	: m_name(i_name), m_conn(NULL), m_working(false), m_opened(false)
 {
-	if( false == ms_enabled )
+	if (false == ms_enabled)
 		return;
 
-	m_conn = PQconnectdb( af::Environment::get_DB_ConnInfo().c_str());
-	if( PQstatus( m_conn) != CONNECTION_OK)
+	m_conn = PQconnectdb(af::Environment::get_DB_ConnInfo().c_str());
+	if (PQstatus(m_conn) != CONNECTION_OK)
 	{
-		AFERRAR("%s: Database connect failed: %s", m_name.c_str(), PQerrorMessage( m_conn));
+		AFERRAR("%s: Database connect failed: %s", m_name.c_str(), PQerrorMessage(m_conn));
 	}
 	else
 	{
 		m_working = true;
 	}
-	PQfinish( m_conn);
+	PQfinish(m_conn);
 	m_conn = NULL;
 }
 
 DBConnection::~DBConnection()
 {
-	if( m_conn != NULL)
+	if (m_conn != NULL)
 	{
-		PQfinish( m_conn);
+		PQfinish(m_conn);
 	}
 }
 
 bool DBConnection::DBOpen()
 {
-	if( m_working == false ) return false;
+	if (m_working == false)
+		return false;
 	AFINFO("Trying to lock DB...")
 
 	m_mutex.Lock();
 
 	AFINFO(" - Done")
 
-	if( m_opened )
+	if (m_opened)
 	{
 		AFERRAR("%s: database is already open:", m_name.c_str())
 
@@ -60,14 +58,14 @@ bool DBConnection::DBOpen()
 		return false;
 	}
 
-	m_conn = PQconnectdb( af::Environment::get_DB_ConnInfo().c_str());
-	if( PQstatus( m_conn) != CONNECTION_OK)
+	m_conn = PQconnectdb(af::Environment::get_DB_ConnInfo().c_str());
+	if (PQstatus(m_conn) != CONNECTION_OK)
 	{
-		AFERRAR("%s: Database connect failed: %s", m_name.c_str(), PQerrorMessage( m_conn));
+		AFERRAR("%s: Database connect failed: %s", m_name.c_str(), PQerrorMessage(m_conn));
 
 		m_mutex.Unlock();
 
-		PQfinish( m_conn);
+		PQfinish(m_conn);
 		m_conn = NULL;
 
 		return false;
@@ -80,12 +78,12 @@ bool DBConnection::DBOpen()
 
 void DBConnection::DBClose()
 {
-	if( m_working == false )
+	if (m_working == false)
 	{
 		return;
 	}
 
-	PQfinish( m_conn);
+	PQfinish(m_conn);
 	m_conn = NULL;
 
 	m_opened = false;
@@ -99,45 +97,44 @@ const std::vector<std::string> DBConnection::getTables() const
 {
 	std::vector<std::string> tables;
 
-	if( m_working == false )
+	if (m_working == false)
 	{
 		return tables;
 	}
 
-	if( false == m_opened )
+	if (false == m_opened)
 	{
 		AFERRAR("DBConnection::getTables: Database connection '%s' is not open.", m_name.c_str())
 		return tables;
 	}
 
 	char query[] = "select relname from pg_stat_user_tables WHERE schemaname='public';";
-	PGresult * res = PQexec( m_conn, query);
-	if( PQresultStatus(res) != PGRES_TUPLES_OK)
+	PGresult *res = PQexec(m_conn, query);
+	if (PQresultStatus(res) != PGRES_TUPLES_OK)
 	{
-		AFERRAR("%s: Getting all tables names failed:\n%s\n%s",
-			m_name.c_str(), query, PQerrorMessage( m_conn))
+		AFERRAR("%s: Getting all tables names failed:\n%s\n%s", m_name.c_str(), query, PQerrorMessage(m_conn))
 		return tables;
 	}
 
-	for( int i = 0; i < PQntuples( res); i++)
+	for (int i = 0; i < PQntuples(res); i++)
 	{
-		for( int j = 0; j < PQnfields( res); j++)
+		for (int j = 0; j < PQnfields(res); j++)
 		{
-			tables.push_back( PQgetvalue(res, i, j));
+			tables.push_back(PQgetvalue(res, i, j));
 		}
 	}
-	PQclear( res);
+	PQclear(res);
 
 	return tables;
 }
 
 bool DBConnection::dropAllTables()
 {
-	if( m_working == false )
+	if (m_working == false)
 	{
 		return false;
 	}
-	if( false == m_opened )
+	if (false == m_opened)
 	{
 		AFERRAR("DBConnection::dropAllTables: Database connection '%s' is not open.", m_name.c_str())
 		return false;
@@ -146,88 +143,88 @@ bool DBConnection::dropAllTables()
 	std::vector<std::string> tables = getTables();
 
 	bool o_result = true;
-	for( int i = 0; i < tables.size(); i++)
+	for (int i = 0; i < tables.size(); i++)
 	{
 		std::string query = std::string("DROP TABLE ") + tables[i] + " CASCADE;";
 		std::cout << query << std::endl;
-		PGresult * res = PQexec( m_conn, query.c_str());
-		if( PQresultStatus(res) != PGRES_COMMAND_OK)
+		PGresult *res = PQexec(m_conn, query.c_str());
+		if (PQresultStatus(res) != PGRES_COMMAND_OK)
 		{
-			AFERRAR("%s: Drop table failed: %s",
-				m_name.c_str(), PQerrorMessage( m_conn));
+			AFERRAR("%s: Drop table failed: %s", m_name.c_str(), PQerrorMessage(m_conn));
 			o_result = false;
 		}
-		PQclear( res);
+		PQclear(res);
 	}
 
 	return o_result;
 }
 
-bool DBConnection::getItem( DBItem * item)
+bool DBConnection::getItem(DBItem *item)
 {
-	if( m_working == false ) return false;
-	return item->v_dbSelect( m_conn);
+	if (m_working == false)
+		return false;
+	return item->v_dbSelect(m_conn);
 }
 
-bool DBConnection::execute( const std::list<std::string> * i_queries)
+bool DBConnection::execute(const std::list<std::string> *i_queries)
 {
-	if( m_working == false )
+	if (m_working == false)
 	{
 		return false;
 	}
 	AFINFA("%s: Executing queries:", m_name.c_str())
 
-	return afsql::execute( m_conn, i_queries);
+	return afsql::execute(m_conn, i_queries);
 }
 
-const std::list<int> DBConnection::getIntegers( const std::string & i_query)
+const std::list<int> DBConnection::getIntegers(const std::string &i_query)
 {
 	std::list<int> o_intlinst;
-	if( m_working == false )
+	if (m_working == false)
 	{
 		return o_intlinst;
 	}
-	if( m_opened == false )
+	if (m_opened == false)
 	{
 		AFERRAR("DBConnection::getIntegers: Database '%s' connection is not open.", m_name.c_str())
 		return o_intlinst;
 	}
 
-	#ifdef AFOUTPUT
+#ifdef AFOUTPUT
 	printf("DBConnection::getIntegers: Executing query:\n");
 	printf("%s\n", i_query.c_str());
-	#endif
+#endif
 
-	PGresult * res = PQexec( m_conn, i_query.c_str());
-	if( PQresultStatus(res) != PGRES_TUPLES_OK)
+	PGresult *res = PQexec(m_conn, i_query.c_str());
+	if (PQresultStatus(res) != PGRES_TUPLES_OK)
 	{
-		AFERRAR("%s: Getting numbers failed:\n%s\n%s",
-				m_name.c_str(), i_query.c_str(), PQerrorMessage( m_conn));
+		AFERRAR("%s: Getting numbers failed:\n%s\n%s", m_name.c_str(), i_query.c_str(),
+				PQerrorMessage(m_conn));
 		return o_intlinst;
 	}
 
-	for( int i = 0; i < PQntuples( res); i++)
+	for (int i = 0; i < PQntuples(res); i++)
 	{
-		for( int j = 0; j < PQnfields( res); j++)
+		for (int j = 0; j < PQnfields(res); j++)
 		{
-			o_intlinst.push_back( af::stoi( PQgetvalue(res, i, j)));
+			o_intlinst.push_back(af::stoi(PQgetvalue(res, i, j)));
 		}
 	}
 
-	PQclear( res);
+	PQclear(res);
 
-	#ifdef AFOUTPUT
-	for( std::list<int>::iterator it = o_intlinst.begin(); it != o_intlinst.end(); it++)
+#ifdef AFOUTPUT
+	for (std::list<int>::iterator it = o_intlinst.begin(); it != o_intlinst.end(); it++)
 		printf(" %d", *it);
 	printf("\n");
-	#endif
+#endif
 
 	return o_intlinst;
 }
 
-bool DBConnection::dropTable( const std::string & i_tablename)
+bool DBConnection::dropTable(const std::string &i_tablename)
 {
-	if( m_opened == false )
+	if (m_opened == false)
 	{
 		AFERRAR("DBConnection::dropTable: Database connection '%s is not open.", m_name.c_str())
 		return false;
@@ -235,62 +232,62 @@ bool DBConnection::dropTable( const std::string & i_tablename)
 
 	std::vector<std::string> tables = getTables();
 	bool founded = false;
-	for( int i = 0; i < tables.size(); i++)
-		if( tables[i] == i_tablename )
+	for (int i = 0; i < tables.size(); i++)
+		if (tables[i] == i_tablename)
 			founded = true;
 
-	if( founded == false )
+	if (founded == false)
 		return true;
 
 	std::string query = std::string("DROP TABLE ") + i_tablename + ";";
 	AFINFA("%s: executing query:\n%s", m_name.c_str(), query.c_str())
-	PGresult * res = PQexec( m_conn, query.c_str());
-	if( PQresultStatus(res) != PGRES_COMMAND_OK)
+	PGresult *res = PQexec(m_conn, query.c_str());
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
 	{
-		AFERRAR("SQL Drop table failed: %s", PQerrorMessage( m_conn));
+		AFERRAR("SQL Drop table failed: %s", PQerrorMessage(m_conn));
 		return false;
 	}
 
-	PQclear( res);
+	PQclear(res);
 
 	return true;
 }
 
-const std::list<std::string> DBConnection::getTableColumns( const std::string & i_tablename)
+const std::list<std::string> DBConnection::getTableColumns(const std::string &i_tablename)
 {
 	std::list<std::string> o_columns;
-	if( m_opened == false )
+	if (m_opened == false)
 	{
 		AFERRAR("DBConnection::getTableColumnsNames: Database '%s' connection is not open.", m_name.c_str())
 		return o_columns;
 	}
 	std::string query = std::string("SELECT * FROM ") + i_tablename + " LIMIT 1;";
 
-	PGresult * res = PQexec( m_conn, query.c_str());
-	if( PQresultStatus(res) != PGRES_TUPLES_OK)
+	PGresult *res = PQexec(m_conn, query.c_str());
+	if (PQresultStatus(res) != PGRES_TUPLES_OK)
 	{
-		AFERRAR("%s: Getting table colums failed:\n%s\n%s",
-			   m_name.c_str(), query.c_str(), PQerrorMessage( m_conn));
+		AFERRAR("%s: Getting table colums failed:\n%s\n%s", m_name.c_str(), query.c_str(),
+				PQerrorMessage(m_conn));
 		return o_columns;
 	}
 
-	for( int i = 0; i < PQnfields( res); i++)
+	for (int i = 0; i < PQnfields(res); i++)
 	{
-		std::string fieldname = PQfname( res, i);
-		if( fieldname.size())
+		std::string fieldname = PQfname(res, i);
+		if (fieldname.size())
 		{
-			o_columns.push_back( fieldname);
+			o_columns.push_back(fieldname);
 		}
 	}
 
-	#ifdef AFOUTPUT
+#ifdef AFOUTPUT
 	printf("DBConnection::getTableColumns: Table '%s' has columns:\n", i_tablename.c_str());
-	for( std::list<std::string>::iterator it = o_columns.begin(); it != o_columns.end(); it++)
+	for (std::list<std::string>::iterator it = o_columns.begin(); it != o_columns.end(); it++)
 		printf(" %s", (*it).c_str());
 	printf("\n");
-	#endif
+#endif
 
-	PQclear( res);
+	PQclear(res);
 
 	return o_columns;
 }

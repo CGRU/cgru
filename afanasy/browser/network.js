@@ -1,4 +1,5 @@
-/** '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+/**
+ * '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
  *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
  *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
  *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
@@ -9,9 +10,10 @@
  *    -Mmo.  -omM:                                                      Copyright © 2012-17 by The CGRU team
  *    '          '
  * network.js - network request and response handlers
- * ....................................................................................................... */
+ * .......................................................................................................
+ */
 
-"use strict";
+'use strict';
 
 var nw_connected = false;
 var nw_error_count = 0;
@@ -20,7 +22,7 @@ var nw_error_total = 0;
 
 function nw_send(obj)
 {
-	nw_request({"send": obj});
+	nw_request({'send': obj});
 }
 
 function nw_request(i_args)
@@ -164,7 +166,7 @@ function nw_GetNodes(i_type, i_ids, i_mode, i_blocks, i_tasks, i_number, i_func)
 	if (i_number)
 		obj.get.number = i_number;
 
-	nw_request({"send": obj, "func": i_func});
+	nw_request({'send': obj, 'func': i_func});
 }
 
 function nw_GetBlocks(i_job_id, i_blocks, i_modes)
@@ -179,7 +181,7 @@ function nw_GetSoftwareIcons()
 	obj.get.type = 'files';
 	obj.get.path = 'icons/software';
 
-	nw_request({"send": obj, "func": cm_SoftwareIconsReceived});
+	nw_request({'send': obj, 'func': cm_SoftwareIconsReceived});
 }
 
 function nw_GetTicketsIcons()
@@ -189,7 +191,7 @@ function nw_GetTicketsIcons()
 	obj.get.type = 'files';
 	obj.get.path = 'icons/tickets';
 
-	nw_request({"send": obj, "func": cm_TicketsIconsReceived});
+	nw_request({'send': obj, 'func': cm_TicketsIconsReceived});
 }
 
 function nw_ConstructActionObject(i_type, i_ids)

@@ -30,7 +30,7 @@ struct RWLData
 	   mutex objects (which critical sections use) can't be locked by a thread
 	   and released by another thread. It seems to work anyway but I'll play
 	   safe and use the event. */
-	//DlMutex m_in_use;
+	// DlMutex m_in_use;
 	HANDLE m_in_use;
 
 	/* The number of active readers; used to lock/unlock m_in_use. */
@@ -47,12 +47,11 @@ DlRWLock::DlRWLock()
 	data->m_in_use = CreateEvent(0x0, false, true, 0x0);
 
 	m_data = data;
-	
 }
 
 DlRWLock::~DlRWLock()
 {
-	RWLData *data = (RWLData*) m_data;
+	RWLData *data = (RWLData *)m_data;
 
 	assert(data->m_reader_count == 0);
 	CloseHandle(data->m_in_use);
@@ -62,7 +61,7 @@ DlRWLock::~DlRWLock()
 
 void DlRWLock::ReadLock()
 {
-	RWLData *data = (RWLData*) m_data;
+	RWLData *data = (RWLData *)m_data;
 
 	/* This is so we'll block if a writer is waiting. */
 	data->m_new_reader.Lock();
@@ -73,7 +72,7 @@ void DlRWLock::ReadLock()
 
 	if (data->m_reader_count++ == 0)
 	{
-		//data->m_in_use.Lock();
+		// data->m_in_use.Lock();
 		WaitForSingleObject(data->m_in_use, INFINITE);
 	}
 
@@ -82,14 +81,14 @@ void DlRWLock::ReadLock()
 
 void DlRWLock::ReadUnlock()
 {
-	RWLData *data = (RWLData*) m_data;
+	RWLData *data = (RWLData *)m_data;
 
 	/* Decrement reader count and release the main lock if we're the last. */
 	data->m_count_mutex.Lock();
 
 	if (--data->m_reader_count == 0)
 	{
-		//data->m_in_use.Unlock();
+		// data->m_in_use.Unlock();
 		SetEvent(data->m_in_use);
 	}
 
@@ -98,13 +97,13 @@ void DlRWLock::ReadUnlock()
 
 void DlRWLock::WriteLock()
 {
-	RWLData *data = (RWLData*) m_data;
+	RWLData *data = (RWLData *)m_data;
 
 	/* Prevent new readers to avoid starvation. */
 	data->m_new_reader.Lock();
 
 	/* Mutual exclusion with all readers and other writers. */
-	//data->m_in_use.Lock();
+	// data->m_in_use.Lock();
 	WaitForSingleObject(data->m_in_use, INFINITE);
 
 	/* No need to hold this any longer; everyone will stall on m_in_use. */
@@ -113,10 +112,10 @@ void DlRWLock::WriteLock()
 
 void DlRWLock::WriteUnlock()
 {
-	RWLData *data = (RWLData*) m_data;
+	RWLData *data = (RWLData *)m_data;
 
 	/* Release everything. */
-	//data->m_in_use.Unlock();
+	// data->m_in_use.Unlock();
 	SetEvent(data->m_in_use);
 }
 
@@ -135,7 +134,7 @@ DlRWLock::DlRWLock()
 
 DlRWLock::~DlRWLock()
 {
-	pthread_rwlock_t *data = (pthread_rwlock_t*) m_data;
+	pthread_rwlock_t *data = (pthread_rwlock_t *)m_data;
 
 	pthread_rwlock_destroy(data);
 
@@ -144,28 +143,28 @@ DlRWLock::~DlRWLock()
 
 void DlRWLock::ReadLock()
 {
-	pthread_rwlock_t *data = (pthread_rwlock_t*) m_data;
+	pthread_rwlock_t *data = (pthread_rwlock_t *)m_data;
 
 	pthread_rwlock_rdlock(data);
 }
 
 void DlRWLock::ReadUnlock()
 {
-	pthread_rwlock_t *data = (pthread_rwlock_t*) m_data;
+	pthread_rwlock_t *data = (pthread_rwlock_t *)m_data;
 
 	pthread_rwlock_unlock(data);
 }
 
 void DlRWLock::WriteLock()
 {
-	pthread_rwlock_t *data = (pthread_rwlock_t*) m_data;
+	pthread_rwlock_t *data = (pthread_rwlock_t *)m_data;
 
 	pthread_rwlock_wrlock(data);
 }
 
 void DlRWLock::WriteUnlock()
 {
-	pthread_rwlock_t *data = (pthread_rwlock_t*) m_data;
+	pthread_rwlock_t *data = (pthread_rwlock_t *)m_data;
 
 	pthread_rwlock_unlock(data);
 }

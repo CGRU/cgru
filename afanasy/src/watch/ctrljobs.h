@@ -11,40 +11,40 @@ class ListJobs;
 
 class CtrlJobs : public QFrame
 {
-Q_OBJECT
-public:
-	CtrlJobs(QWidget * i_parent, ListJobs * i_listjobs, bool i_inworklist);
+	Q_OBJECT
+  public:
+	CtrlJobs(QWidget *i_parent, ListJobs *i_listjobs, bool i_inworklist);
 	~CtrlJobs();
 
-private slots:
-	void slot_ThumsButtonClicked(Button*);
+  private slots:
+	void slot_ThumsButtonClicked(Button *);
 	void slot_MaxEditingFinished();
 
-private:
-	QList<Button*> m_thumbs_btns;
+  private:
+	QList<Button *> m_thumbs_btns;
 	static const QStringList ms_thumbs_names;
-	static const QList<int>  ms_thumbs_sizes;
+	static const QList<int> ms_thumbs_sizes;
 
-	QLineEdit * m_max_runtime_edit;
+	QLineEdit *m_max_runtime_edit;
 
-	ListJobs * m_listjobs;
+	ListJobs *m_listjobs;
 	const bool m_inworklist;
 };
 
 class CtrlJobsViewOptions : public QLabel
 {
-Q_OBJECT
-public:
-	CtrlJobsViewOptions(QWidget * i_parent, ListJobs * i_listjobs, bool i_inworklist);
+	Q_OBJECT
+  public:
+	CtrlJobsViewOptions(QWidget *i_parent, ListJobs *i_listjobs, bool i_inworklist);
 	~CtrlJobsViewOptions();
 
-protected:
-	void contextMenuEvent(QContextMenuEvent * i_event);
+  protected:
+	void contextMenuEvent(QContextMenuEvent *i_event);
 
-private slots:
+  private slots:
 	void slot_CollapseNewJobs(bool i_collapse);
 
-private:
-	ListJobs * m_listjobs;
+  private:
+	ListJobs *m_listjobs;
 	const bool m_inworklist;
 };

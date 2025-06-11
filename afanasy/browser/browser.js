@@ -14,7 +14,7 @@
 	browser.js - structures and functions directly related to the entities in the browser
 */
 
-"use strict";
+'use strict';
 
 var g_cycle = 0;
 var g_last_msg_cycle = g_cycle;
@@ -79,8 +79,8 @@ function g_Init()
 
 function g_GetConfig()
 {
-	var obj = {"get": {"type": "config"}};
-	nw_request({"send": obj, "func": g_ConfigReceived});
+	var obj = {'get': {'type': 'config'}};
+	nw_request({'send': obj, 'func': g_ConfigReceived});
 }
 function g_ConfigReceived(i_obj)
 {
@@ -176,11 +176,11 @@ function g_DigestInit(i_obj)
 function g_DigestAsk()
 {
 	new cgru_Dialog({
-		"handle": 'g_DigestAskPasswd',
-		"type": 'str',
-		"name": 'settings',
-		"title": 'Login',
-		"info": 'Enter User Name'
+		'handle': 'g_DigestAskPasswd',
+		'type': 'str',
+		'name': 'settings',
+		'title': 'Login',
+		'info': 'Enter User Name'
 	});
 	//	new cgru_Dialog( window, window, 'g_DigestAskPasswd', null, 'str', '', 'settings', 'Login', 'Enter
 	// User Name');
@@ -189,11 +189,11 @@ function g_DigestAskPasswd(i_value)
 {
 	localStorage.user_name = i_value;
 	new cgru_Dialog({
-		"handle": 'g_DigestConstruct',
-		"type": 'str',
-		"name": 'settings',
-		"title": 'Login',
-		"info": 'Enter Password'
+		'handle': 'g_DigestConstruct',
+		'type': 'str',
+		'name': 'settings',
+		'title': 'Login',
+		'info': 'Enter Password'
 	});
 	//	new cgru_Dialog( window, window, 'g_DigestConstruct', null, 'str', '', 'settings', 'Login', 'Enter
 	// Password');
@@ -228,7 +228,7 @@ function g_RegisterSend(i_from_timer)
 		if (g_register_timer_id)
 		{
 			// Function will be called after timeout.
-			//alert('Server too busy...');
+			// alert('Server too busy...');
 			g_Error('Ignoring a double registration...');
 			return;
 		}
@@ -268,7 +268,7 @@ function g_ProcessMsg(i_obj)
 		for (var i = 0; i < i_obj.files.length; i++)
 		{
 			var img = new Image();
-			img.src = i_obj.path + "/" + i_obj.files[i];
+			img.src = i_obj.path + '/' + i_obj.files[i];
 			g_Images.push(img);
 		}
 		return;
@@ -364,7 +364,7 @@ function g_RegisterReceived(i_obj)
 	}
 
 	document.title = 'AF';
-	g_Info('Registered: ID = ' + g_id + ' User = "' + localStorage['user_name'] + '"[' + g_uid + "]");
+	g_Info('Registered: ID = ' + g_id + ' User = "' + localStorage['user_name'] + '"[' + g_uid + ']');
 	$('registered').textContent = 'Registered';
 	$('id').textContent = g_id;
 	$('uid').textContent = g_uid;
@@ -411,7 +411,7 @@ function g_MButtonClicked(i_type, i_evt)
 				g_monitor_buttons[i].classList.add('pushed');
 
 
-	g_OpenMonitor({"type": i_type, "evt": i_evt});
+	g_OpenMonitor({'type': i_type, 'evt': i_evt});
 }
 
 function g_MonitorClosed(i_monitor)
@@ -459,11 +459,11 @@ function g_OpenMonitor(i_args)
 		}
 
 		g_TopWindow = new cgru_Window({
-			"name": 'tasks',
-			"title": i_args.name,
-			"wnd": i_args.wnd,
-			"closeOnEsc": false,
-			"addClasses": ["cgru_absolute", "tasks"]
+			'name': 'tasks',
+			'title': i_args.name,
+			'wnd': i_args.wnd,
+			'closeOnEsc': false,
+			'addClasses': ['cgru_absolute', 'tasks']
 		});
 		g_TopWindow.closeOnEsc = false;
 		g_TopWindow.onDestroy = function() {
@@ -488,7 +488,9 @@ function g_OpenMonitor(i_args)
 	if (new_wnd)
 	{
 		i_args.wnd.monitor = monitor;
-		i_args.wnd.onbeforeunload = function(e) { e.currentTarget.monitor.destroy() };
+		i_args.wnd.onbeforeunload = function(e) {
+			e.currentTarget.monitor.destroy()
+		};
 	}
 	else if (i_args.type == 'tasks')
 	{
@@ -601,7 +603,7 @@ function g_OpenWindow(i_args)
 	}
 	else
 	{
-		wnd = new cgru_Window({"name": i_args.title, "wnd": wnd});
+		wnd = new cgru_Window({'name': i_args.title, 'wnd': wnd});
 	}
 
 	return wnd;
@@ -816,9 +818,9 @@ function g_OnKeyDown(e)
 		return false;
 	}
 	else if ((e.keyCode == 38) && g_cur_monitor)
-		g_cur_monitor.selectNext(e, true);  // UP
+		g_cur_monitor.selectNext(e, true);	// UP
 	else if ((e.keyCode == 40) && g_cur_monitor)
-		g_cur_monitor.selectNext(e, false);  // DOWN
+		g_cur_monitor.selectNext(e, false);	 // DOWN
 	//	else if(evt.keyCode==116) return false; // F5
 	//		$('test').textContent='key down: ' + e.keyCode;
 	//	return true;

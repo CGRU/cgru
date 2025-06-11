@@ -14,69 +14,52 @@
 #include "viewitems.h"
 #include "watch.h"
 
-#include <QtCore/QEvent>
-#include <QtGui/QKeyEvent>
 #include <QBoxLayout>
 #include <QLabel>
 #include <QScrollBar>
 #include <QSplitter>
+#include <QtCore/QEvent>
+#include <QtGui/QKeyEvent>
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-const std::string & ListItems::itemTypeToAf(Item::EType i_type)
+const std::string &ListItems::itemTypeToAf(Item::EType i_type)
 {
-	static const std::string branch ("branches");
-	static const std::string job    ("jobs"    );
+	static const std::string branch("branches");
+	static const std::string job("jobs");
 	static const std::string monitor("monitors");
-	static const std::string pool   ("pools"   );
-	static const std::string render ("renders" );
-	static const std::string user   ("users"   );
+	static const std::string pool("pools");
+	static const std::string render("renders");
+	static const std::string user("users");
 
-	static const std::string invalid("invalid" );
+	static const std::string invalid("invalid");
 
-	switch(i_type)
+	switch (i_type)
 	{
-	case Item::TBranch:
-		return branch;
-	case Item::TJob:
-		return job;
-	case Item::TMonitor:
-		return monitor;
-	case Item::TPool:
-		return pool;
-	case Item::TRender:
-		return render;
-	case Item::TUser:
-		return user;
-	case Item::TNone:
-		AF_ERR << "Can't translate Item::TNone to Afanasy.";
-		return invalid;
-	case Item::TAny:
-		AF_ERR << "Can't translate Item::TAny to Afanasy.";
-		return invalid;
-	default:
-		AF_ERR << "Can't translate unknown Item type to Afanasy.";
+		case Item::TBranch: return branch;
+		case Item::TJob: return job;
+		case Item::TMonitor: return monitor;
+		case Item::TPool: return pool;
+		case Item::TRender: return render;
+		case Item::TUser: return user;
+		case Item::TNone: AF_ERR << "Can't translate Item::TNone to Afanasy."; return invalid;
+		case Item::TAny: AF_ERR << "Can't translate Item::TAny to Afanasy."; return invalid;
+		default: AF_ERR << "Can't translate unknown Item type to Afanasy.";
 	}
 
 	return invalid;
 }
 
-ListItems::ListItems(QWidget * i_parent, const std::string & i_type):
-	QWidget(i_parent),
-	m_type(i_type),
-	m_model(NULL),
-	m_ctrl_sf(NULL),
-	m_paramspanel(NULL),
-	m_current_buttons_menu(NULL),
-	m_parentWindow(i_parent),
-	m_current_item(NULL)
+ListItems::ListItems(QWidget *i_parent, const std::string &i_type)
+	: QWidget(i_parent), m_type(i_type), m_model(NULL), m_ctrl_sf(NULL), m_paramspanel(NULL),
+	  m_current_buttons_menu(NULL), m_parentWindow(i_parent), m_current_item(NULL)
 {
-	setAttribute ( Qt::WA_DeleteOnClose, true );
+	setAttribute(Qt::WA_DeleteOnClose, true);
 
-	QHBoxLayout * hlayout = new QHBoxLayout(this);
+	QHBoxLayout *hlayout = new QHBoxLayout(this);
 
 	m_panel_lelf_widget = new QWidget();
 	hlayout->addWidget(m_panel_lelf_widget);
@@ -100,7 +83,7 @@ ListItems::ListItems(QWidget * i_parent, const std::string & i_type):
 	m_toplayout->setContentsMargins(0, 0, 0, 0);
 	m_vlayout->addLayout(m_toplayout);
 
-	QWidget * widget = new QWidget();
+	QWidget *widget = new QWidget();
 	m_splitter->addWidget(widget);
 	widget->setLayout(m_vlayout);
 
@@ -136,10 +119,12 @@ void ListItems::initListItems()
 	if (m_btns.size() == 0)
 		m_panel_lelf_widget->setHidden(true);
 
-	connect(m_view, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(doubleClicked_slot(const QModelIndex &)));
+	connect(m_view, SIGNAL(doubleClicked(const QModelIndex &)), this,
+			SLOT(doubleClicked_slot(const QModelIndex &)));
 
-	connect(m_view->selectionModel(), SIGNAL(  selectionChanged( const QItemSelection &, const QItemSelection &)),
-	                            this,   SLOT(  selectionChanged( const QItemSelection &, const QItemSelection &)));
+	connect(m_view->selectionModel(),
+			SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this,
+			SLOT(selectionChanged(const QItemSelection &, const QItemSelection &)));
 }
 
 ListItems::~ListItems()
@@ -148,22 +133,22 @@ ListItems::~ListItems()
 	// as storeState() uses m_splitter, that can be destroyed first.
 	m_paramspanel->storeState();
 
-	QList<Param*>::iterator it;
+	QList<Param *>::iterator it;
 	for (it = m_params.begin(); it != m_params.end(); it++)
 		delete (*it);
 }
 
-int ListItems::count() const { return m_model->count();}
+int ListItems::count() const { return m_model->count(); }
 
-void ListItems::setScrollStep(int i_step) {m_view->verticalScrollBar()->setSingleStep(i_step);}
+void ListItems::setScrollStep(int i_step) { m_view->verticalScrollBar()->setSingleStep(i_step); }
 
-bool ListItems::mousePressed(QMouseEvent * i_event)
+bool ListItems::mousePressed(QMouseEvent *i_event)
 {
 	QModelIndex index = m_view->indexAt(i_event->pos());
 	if (Item::isItemP(index.data()) == false)
 		return false;
 
-	Item * item = Item::toItemP(index.data());
+	Item *item = Item::toItemP(index.data());
 
 	int old_height = item->getHeight();
 
@@ -182,14 +167,14 @@ bool ListItems::mousePressed(QMouseEvent * i_event)
 	return false;
 }
 
-void ListItems::deleteAllItems() { m_model->deleteAllItems();}
-void ListItems::v_doubleClicked(Item * i_item) {}
-void ListItems::revertModel()  { m_model->revert();}
-void ListItems::itemsHeightChanged() { m_model->itemsHeightChanged();}
-void ListItems::itemsHeightCalc() { m_model->itemsHeightCalc();}
-void ListItems::repaintItems() { m_view->repaintViewport();}
+void ListItems::deleteAllItems() { m_model->deleteAllItems(); }
+void ListItems::v_doubleClicked(Item *i_item) {}
+void ListItems::revertModel() { m_model->revert(); }
+void ListItems::itemsHeightChanged() { m_model->itemsHeightChanged(); }
+void ListItems::itemsHeightCalc() { m_model->itemsHeightCalc(); }
+void ListItems::repaintItems() { m_view->repaintViewport(); }
 
-void ListItems::deleteItems(const std::vector<int32_t> & i_ids, Item::EType i_type)
+void ListItems::deleteItems(const std::vector<int32_t> &i_ids, Item::EType i_type)
 {
 	int row = 0;
 	while (row < m_model->count())
@@ -197,7 +182,7 @@ void ListItems::deleteItems(const std::vector<int32_t> & i_ids, Item::EType i_ty
 		bool deleted = false;
 		for (int i = 0; i < i_ids.size(); i++)
 		{
-			Item * item = m_model->item(row);
+			Item *item = m_model->item(row);
 
 			if (i_type != item->getType())
 				continue;
@@ -216,49 +201,45 @@ void ListItems::deleteItems(const std::vector<int32_t> & i_ids, Item::EType i_ty
 		row++;
 	}
 }
-void ListItems::v_itemToBeDeleted(Item * i_item){}
+void ListItems::v_itemToBeDeleted(Item *i_item) {}
 
-void ListItems::setAllowSelection( bool allow)
+void ListItems::setAllowSelection(bool allow)
 {
-	if( allow ) m_view->setSelectionMode( QAbstractItemView::ExtendedSelection  );
-	else        m_view->setSelectionMode( QAbstractItemView::NoSelection        );
+	if (allow)
+		m_view->setSelectionMode(QAbstractItemView::ExtendedSelection);
+	else
+		m_view->setSelectionMode(QAbstractItemView::NoSelection);
 }
 
-Item * ListItems::getCurrentItem() const
+Item *ListItems::getCurrentItem() const
 {
-	QModelIndex index( m_view->selectionModel()->currentIndex());
-	if( index.isValid())
-		if( Item::isItemP( index.data()))
-			return Item::toItemP( index.data());
+	QModelIndex index(m_view->selectionModel()->currentIndex());
+	if (index.isValid())
+		if (Item::isItemP(index.data()))
+			return Item::toItemP(index.data());
 
-	QList<Item*> items = getSelectedItems();
-	if( items.size())
+	QList<Item *> items = getSelectedItems();
+	if (items.size())
 		return items[0];
 
 	return NULL;
 }
 
-int ListItems::getSelectedItemsCount() const
-{
-	return m_view->selectionModel()->selectedIndexes().size();
-}
+int ListItems::getSelectedItemsCount() const { return m_view->selectionModel()->selectedIndexes().size(); }
 
-const QList<Item*> ListItems::getSelectedItems() const
+const QList<Item *> ListItems::getSelectedItems() const
 {
-	QList<Item*> items;
+	QList<Item *> items;
 
-	QModelIndexList indexes( m_view->selectionModel()->selectedIndexes());
-	for( int i = 0; i < indexes.count(); i++)
-		if( Item::isItemP( indexes[i].data()))
-			items << Item::toItemP( indexes[i].data());
+	QModelIndexList indexes(m_view->selectionModel()->selectedIndexes());
+	for (int i = 0; i < indexes.count(); i++)
+		if (Item::isItemP(indexes[i].data()))
+			items << Item::toItemP(indexes[i].data());
 
 	return items;
 }
 
-void ListItems::storeSelection()
-{
-	m_stored_selection = getSelectedItems();
-}
+void ListItems::storeSelection() { m_stored_selection = getSelectedItems(); }
 
 void ListItems::reStoreSelection()
 {
@@ -277,24 +258,25 @@ void ListItems::reStoreSelection()
 		}
 	}
 
-	if( lastselectedrow != -1)
-		m_view->selectionModel()->setCurrentIndex( m_model->index(lastselectedrow), QItemSelectionModel::Current);
+	if (lastselectedrow != -1)
+		m_view->selectionModel()->setCurrentIndex(m_model->index(lastselectedrow),
+												  QItemSelectionModel::Current);
 
 	m_stored_selection.clear();
 }
 
-void ListItems::doubleClicked_slot( const QModelIndex & index )
+void ListItems::doubleClicked_slot(const QModelIndex &index)
 {
 	if (Item::isItemP(index.data()))
 		v_doubleClicked(Item::toItemP(index.data()));
 }
 
-void ListItems::selectionChanged(const QItemSelection & i_selected, const QItemSelection & i_deselected)
+void ListItems::selectionChanged(const QItemSelection &i_selected, const QItemSelection &i_deselected)
 {
 	if (m_stored_selection.count())
 		return;
 
-	const QList<Item*> selected = getSelectedItems();
+	const QList<Item *> selected = getSelectedItems();
 
 	if (selected.size() == 0)
 	{
@@ -311,7 +293,7 @@ void ListItems::selectionChanged(const QItemSelection & i_selected, const QItemS
 	updatePanels(selected);
 }
 
-void ListItems::updatePanels(const QList<Item*> & i_selected)
+void ListItems::updatePanels(const QList<Item *> &i_selected)
 {
 	// Show hide panel button menus:
 	for (int i = 0; i < m_btn_menus.size(); i++)
@@ -358,9 +340,9 @@ void ListItems::updatePanels(const QList<Item*> & i_selected)
 	m_paramspanel->v_updatePanel(m_current_item, &i_selected);
 }
 
-void ListItems::getItemInfo(Item::EType i_type, const std::string & i_mode)
+void ListItems::getItemInfo(Item::EType i_type, const std::string &i_mode)
 {
-	Item * item = getCurrentItem();
+	Item *item = getCurrentItem();
 	if (item == NULL)
 		return;
 
@@ -372,7 +354,7 @@ void ListItems::getItemInfo(Item::EType i_type, const std::string & i_mode)
 	else
 		i_type = item->getType();
 
-	displayInfo(QString("GET: \"%1\"").arg( afqt::stoq(i_mode)));
+	displayInfo(QString("GET: \"%1\"").arg(afqt::stoq(i_mode)));
 
 	std::ostringstream str;
 
@@ -383,10 +365,11 @@ void ListItems::getItemInfo(Item::EType i_type, const std::string & i_mode)
 	str << ",\"mode\":\"" << i_mode << "\"";
 	str << "}}";
 
-	Watch::sendMsg( af::jsonMsg( str));
+	Watch::sendMsg(af::jsonMsg(str));
 }
 
-void ListItems::setParameter(Item::EType i_type, const std::string & i_name, const std::string & i_value, bool i_quote)
+void ListItems::setParameter(Item::EType i_type, const std::string &i_name, const std::string &i_value,
+							 bool i_quote)
 {
 	std::vector<int> ids = getSelectedIds(i_type);
 	if (ids.size() == 0)
@@ -395,7 +378,7 @@ void ListItems::setParameter(Item::EType i_type, const std::string & i_name, con
 		return;
 	}
 
-	displayInfo(QString("\"%1\" = \"%2\"").arg( afqt::stoq(i_name), afqt::stoq( i_value)));
+	displayInfo(QString("\"%1\" = \"%2\"").arg(afqt::stoq(i_name), afqt::stoq(i_value)));
 
 	std::ostringstream str;
 
@@ -406,12 +389,12 @@ void ListItems::setParameter(Item::EType i_type, const std::string & i_name, con
 	else
 		str << "\n\"" << i_name << "\":" << i_value;
 
-	af::jsonActionParamsFinish( str);
+	af::jsonActionParamsFinish(str);
 
-	Watch::sendMsg( af::jsonMsg( str));
+	Watch::sendMsg(af::jsonMsg(str));
 }
 
-void ListItems::operation(Item::EType i_type, const std::string & i_operation)
+void ListItems::operation(Item::EType i_type, const std::string &i_operation)
 {
 	std::vector<int> ids = getSelectedIds(i_type);
 	if (ids.size() == 0)
@@ -427,7 +410,7 @@ void ListItems::operation(Item::EType i_type, const std::string & i_operation)
 	displayInfo(QString("Operation: \"%1\".").arg(afqt::stoq(i_operation)));
 }
 
-const std::vector<int> ListItems::getSelectedIds(Item::EType & io_type) const
+const std::vector<int> ListItems::getSelectedIds(Item::EType &io_type) const
 {
 	std::vector<int> ids;
 
@@ -437,7 +420,7 @@ const std::vector<int> ListItems::getSelectedIds(Item::EType & io_type) const
 	for (int i = 0; i < indexes.count(); i++)
 		if (Item::isItemP(indexes[i].data()))
 		{
-			Item * item = Item::toItemP(indexes[i].data());
+			Item *item = Item::toItemP(indexes[i].data());
 			if (item->isHidden())
 				continue;
 
@@ -447,10 +430,10 @@ const std::vector<int> ListItems::getSelectedIds(Item::EType & io_type) const
 			{
 				if (type == Item::TNone)
 					type = item->getType();
-				else if(type != item->getType())
+				else if (type != item->getType())
 					continue;
 			}
-			else if(item->getType() != io_type)
+			else if (item->getType() != io_type)
 				continue;
 
 			ids.push_back(item->getId());
@@ -462,7 +445,7 @@ const std::vector<int> ListItems::getSelectedIds(Item::EType & io_type) const
 	return ids;
 }
 
-ButtonsMenu * ListItems::addButtonsMenu(Item::EType i_type, const QString & i_label, const QString & i_tip)
+ButtonsMenu *ListItems::addButtonsMenu(Item::EType i_type, const QString &i_label, const QString &i_tip)
 {
 	m_current_buttons_menu = new ButtonsMenu(this, i_type, i_label, i_tip);
 
@@ -473,22 +456,14 @@ ButtonsMenu * ListItems::addButtonsMenu(Item::EType i_type, const QString & i_la
 	return m_current_buttons_menu;
 }
 
-void ListItems::resetButtonsMenu()
-{
-	m_current_buttons_menu = NULL;
-}
+void ListItems::resetButtonsMenu() { m_current_buttons_menu = NULL; }
 
-ButtonPanel * ListItems::addButtonPanel(
-		Item::EType i_type,
-		const QString & i_label,
-		const QString & i_name,
-		const QString & i_description,
-		const QString & i_hotkey,
-		bool i_dblclick,
-		bool i_always_active)
+ButtonPanel *ListItems::addButtonPanel(Item::EType i_type, const QString &i_label, const QString &i_name,
+									   const QString &i_description, const QString &i_hotkey, bool i_dblclick,
+									   bool i_always_active)
 {
-	ButtonPanel * bp = new ButtonPanel(this, i_type, i_label, i_name, i_description,
-			i_hotkey, i_dblclick, i_always_active, m_current_buttons_menu);
+	ButtonPanel *bp = new ButtonPanel(this, i_type, i_label, i_name, i_description, i_hotkey, i_dblclick,
+									  i_always_active, m_current_buttons_menu);
 
 	if (m_current_buttons_menu)
 		m_current_buttons_menu->addButton(bp);
@@ -500,120 +475,87 @@ ButtonPanel * ListItems::addButtonPanel(
 	return bp;
 }
 
-void ListItems::keyPressEvent( QKeyEvent * i_evt)
+void ListItems::keyPressEvent(QKeyEvent *i_evt)
 {
-	if( i_evt->modifiers() & ( Qt::ControlModifier | Qt::AltModifier ))
+	if (i_evt->modifiers() & (Qt::ControlModifier | Qt::AltModifier))
 		return;
 
-	const QString str( i_evt->text());
-	if( str.isNull() || str.isEmpty() )
+	const QString str(i_evt->text());
+	if (str.isNull() || str.isEmpty())
 		return;
-//printf("ListItems::keyPressEvent: '%s'\n", str.toUtf8().data());
+	// printf("ListItems::keyPressEvent: '%s'\n", str.toUtf8().data());
 
-	if( ButtonPanel::setHotkey( str))
+	if (ButtonPanel::setHotkey(str))
 		return;
 
-	for( int i = 0; i < m_btns.size(); i++ )
-		m_btns[i]->keyPressed( str);
+	for (int i = 0; i < m_btns.size(); i++)
+		m_btns[i]->keyPressed(str);
 }
 
-void ListItems::addParam(Param * i_param)
-{
-	m_params.append(i_param);
-}
+void ListItems::addParam(Param *i_param) { m_params.append(i_param); }
 
 void ListItems::addParam_separator(Item::EType i_type)
 {
 	addParam(new Param(Param::tsep, i_type, "separator", "Separator", "This is parameters separator."));
 }
 
-void ListItems::addParam_Num(
-		Item::EType i_type,
-		const QString & i_name,
-		const QString & i_label,
-		const QString & i_tip,
-		int i_min, int i_max)
+void ListItems::addParam_Num(Item::EType i_type, const QString &i_name, const QString &i_label,
+							 const QString &i_tip, int i_min, int i_max)
 {
 	addParam(new Param(Param::TNum, i_type, i_name, i_label, i_tip, i_min, i_max));
 }
 
-void ListItems::addParam_MiB(
-		Item::EType i_type,
-		const QString & i_name,
-		const QString & i_label,
-		const QString & i_tip,
-		int i_min, int i_max)
+void ListItems::addParam_MiB(Item::EType i_type, const QString &i_name, const QString &i_label,
+							 const QString &i_tip, int i_min, int i_max)
 {
 	addParam(new Param(Param::TMiB, i_type, i_name, i_label, i_tip, i_min, i_max));
 }
 
-void ListItems::addParam_GiB(
-		Item::EType i_type,
-		const QString & i_name,
-		const QString & i_label,
-		const QString & i_tip,
-		int i_min, int i_max)
+void ListItems::addParam_GiB(Item::EType i_type, const QString &i_name, const QString &i_label,
+							 const QString &i_tip, int i_min, int i_max)
 {
 	addParam(new Param(Param::TGiB, i_type, i_name, i_label, i_tip, i_min, i_max));
 }
 
-void ListItems::addParam_Str(
-		Item::EType i_type,
-		const QString & i_name,
-		const QString & i_label,
-		const QString & i_tip)
+void ListItems::addParam_Str(Item::EType i_type, const QString &i_name, const QString &i_label,
+							 const QString &i_tip)
 {
 	addParam(new Param(Param::TStr, i_type, i_name, i_label, i_tip));
 }
 
-void ListItems::addParam_MSI(
-		Item::EType i_type,
-		const QString & i_name,
-		const QString & i_label,
-		const QString & i_tip)
+void ListItems::addParam_MSI(Item::EType i_type, const QString &i_name, const QString &i_label,
+							 const QString &i_tip)
 {
 	addParam(new Param(Param::TMSI, i_type, i_name, i_label, i_tip));
 }
 
-void ListItems::addParam_MSS(
-		Item::EType i_type,
-		const QString & i_name,
-		const QString & i_label,
-		const QString & i_tip)
+void ListItems::addParam_MSS(Item::EType i_type, const QString &i_name, const QString &i_label,
+							 const QString &i_tip)
 {
 	addParam(new Param(Param::TMSS, i_type, i_name, i_label, i_tip));
 }
 
-void ListItems::addParam_REx(
-		Item::EType i_type,
-		const QString & i_name,
-		const QString & i_label,
-		const QString & i_tip)
+void ListItems::addParam_REx(Item::EType i_type, const QString &i_name, const QString &i_label,
+							 const QString &i_tip)
 {
 	addParam(new Param(Param::TREx, i_type, i_name, i_label, i_tip));
 }
 
-void ListItems::addParam_Tim(
-		Item::EType i_type,
-		const QString & i_name,
-		const QString & i_label,
-		const QString & i_tip)
+void ListItems::addParam_Tim(Item::EType i_type, const QString &i_name, const QString &i_label,
+							 const QString &i_tip)
 {
 	addParam(new Param(Param::Time, i_type, i_name, i_label, i_tip));
 }
 
-void ListItems::addParam_Hrs(
-		Item::EType i_type,
-		const QString & i_name,
-		const QString & i_label,
-		const QString & i_tip)
+void ListItems::addParam_Hrs(Item::EType i_type, const QString &i_name, const QString &i_label,
+							 const QString &i_tip)
 {
 	addParam(new Param(Param::THrs, i_type, i_name, i_label, i_tip));
 }
 
-void ListItems::addMenuParameters(QMenu * i_menu)
+void ListItems::addMenuParameters(QMenu *i_menu)
 {
-	QList<Param*>::const_iterator it;
+	QList<Param *>::const_iterator it;
 	for (it = m_params.begin(); it != m_params.end(); it++)
 	{
 		if ((*it)->isSeparator())
@@ -622,15 +564,15 @@ void ListItems::addMenuParameters(QMenu * i_menu)
 			continue;
 		}
 
-		ActionParam * action = new ActionParam(*it);
+		ActionParam *action = new ActionParam(*it);
 		connect(action, SIGNAL(triggeredParam(const Param *)), this, SLOT(changeParam(const Param *)));
 		i_menu->addAction(action);
 	}
 }
 
-void ListItems::changeParam(const Param * i_param)
+void ListItems::changeParam(const Param *i_param)
 {
-	Item * item = getCurrentItem();
+	Item *item = getCurrentItem();
 	if (NULL == item)
 		return;
 
@@ -653,7 +595,7 @@ void ListItems::changeParam(const Param * i_param)
 	setParameter(i_param->itemtype, afqt::qtos(i_param->name), afqt::qtos(str));
 }
 
-void ListItems::setWindowTitleWithPrefix(const QString & i_windowTitle)
+void ListItems::setWindowTitleWithPrefix(const QString &i_windowTitle)
 {
 	if (afqt::QEnvironment::showServerName.n || afqt::QEnvironment::showServerPort.n)
 	{

@@ -28,7 +28,7 @@ class AfContainerIt;
 /// Afanasy nodes container.
 class AfContainer
 {
-public:
+  public:
 	/// Initialize container for \c maximumsize nodes.
 	AfContainer(std::string containerName, int maximumSize);
 	~AfContainer();
@@ -43,7 +43,7 @@ public:
 
 	/// Generate nodes message matching provided ids or mask:
 	af::Msg *generateList(int i_type, const std::string &i_type_name, const std::vector<int32_t> &i_ids,
-		const std::string &i_mask, bool i_json);
+						  const std::string &i_mask, bool i_json);
 
 	bool setZombie(int id);
 
@@ -53,11 +53,11 @@ public:
 	/// Refresh container nodes.
 	void refresh(AfContainer *pointer, MonitorContainer *monitoring);
 
-	void preSolve(MonitorContainer * i_monitoring);
-	void postSolve(MonitorContainer * i_monitoring); 
+	void preSolve(MonitorContainer *i_monitoring);
+	void postSolve(MonitorContainer *i_monitoring);
 
 	/// Perform an aciton:
-	af::Msg * action(Action & i_action, const af::Msg * i_msg = NULL);
+	af::Msg *action(Action &i_action, const af::Msg *i_msg = NULL);
 
 	void ReadLock(void) { m_rw_lock.ReadLock(); }
 	void WriteLock(void) { m_rw_lock.WriteLock(); }
@@ -71,30 +71,30 @@ public:
 
 	inline int getCount() const { return m_count; }
 
-protected:
+  protected:
 	int add(AfNodeSrv *node); ///< Add node to container.
 
-private:
+  private:
 	/// Generate all nodes:
 	void generateListAll(int i_type, af::MCAfNodes &o_mcnodes, std::ostringstream &o_str, bool i_json);
 
 	/// Generate nodes matching ids:
 	void generateListIDs(int i_type, af::MCAfNodes &o_mcnodes, std::ostringstream &o_str,
-		const std::vector<int32_t> &ids, bool json);
+						 const std::vector<int32_t> &ids, bool json);
 
 	/// Generate nodes matching mask:
 	void generateListMask(int i_type, af::MCAfNodes &o_mcnodes, std::ostringstream &o_str,
-		const std::string &i_mask, bool i_json);
+						  const std::string &i_mask, bool i_json);
 
-private:
+  private:
 	std::string m_name; ///< Container name.
 
 	DlRWLock m_rw_lock;
 
 	int m_count;			   ///< Number of nodes in container.
 	int m_capacity;			   ///< Container size ( maximun number of node can be stored).
-	AfNodeSrv *m_first_ptr;	///< Pointer to first node.
-	AfNodeSrv *m_last_ptr;	 ///< Pointer to last node.
+	AfNodeSrv *m_first_ptr;	   ///< Pointer to first node.
+	AfNodeSrv *m_last_ptr;	   ///< Pointer to last node.
 	AfNodeSrv **m_nodes_table; ///< Nodes pointers.
 	bool m_initialized;		   ///< Whether container was successfully initialized.
 };

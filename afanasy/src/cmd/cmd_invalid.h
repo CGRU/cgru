@@ -4,8 +4,8 @@
 
 class CmdInvalid : public Cmd
 {
-public:
+  public:
 	CmdInvalid();
 	~CmdInvalid();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg) final;
+	bool v_processArguments(int argc, char **argv, af::Msg &msg) final;
 };

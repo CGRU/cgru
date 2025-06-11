@@ -11,65 +11,64 @@ namespace af
 /// Afanasy render slave.
 class Pool : public Node, public Farm
 {
-public:
-
+  public:
 	Pool(const std::string &i_path);
 
 	// To construct from store:
 	Pool(int i_id = 0);
 
-	Pool(Msg * msg);
+	Pool(Msg *msg);
 
 	virtual ~Pool();
 
-	inline bool  isRoot() const { return m_name == "/"; }
+	inline bool isRoot() const { return m_name == "/"; }
 	inline bool notRoot() const { return m_name != "/"; }
 
-	void v_generateInfoStream(std::ostringstream & stream, bool full = false) const;
+	void v_generateInfoStream(std::ostringstream &stream, bool full = false) const;
 
 	virtual int v_calcWeight() const; ///< Calculate and return memory size.
 
-	virtual void v_jsonWrite(std::ostringstream & o_str, int type) const;
+	virtual void v_jsonWrite(std::ostringstream &o_str, int type) const;
 
-	bool jsonRead(const JSON & i_object, std::string * io_changes = NULL);
+	bool jsonRead(const JSON &i_object, std::string *io_changes = NULL);
 
-	inline bool isBusy() const {return (m_state & SBusy);}
-	inline void setBusy(bool set) {m_state = set ? m_state | SBusy : m_state & (~SBusy); }
+	inline bool isBusy() const { return (m_state & SBusy); }
+	inline void setBusy(bool set) { m_state = set ? m_state | SBusy : m_state & (~SBusy); }
 
-	inline bool isPaused() const { return (m_state & SPaused);}
+	inline bool isPaused() const { return (m_state & SPaused); }
 	inline void setPaused(bool set) { m_state = set ? m_state | SPaused : m_state & (~SPaused); }
 
-	inline const std::string & getParentPath() const { return m_parent_path; }
+	inline const std::string &getParentPath() const { return m_parent_path; }
 
-	inline const std::string & getPatternStr() const { return m_pattern.getPattern(); }
+	inline const std::string &getPatternStr() const { return m_pattern.getPattern(); }
 
 	inline long long getTimeCreation() const { return m_time_creation; }
 
-	inline bool isNewRenderNimby()  const { return m_new_nimby;  }
+	inline bool isNewRenderNimby() const { return m_new_nimby; }
 	inline bool isNewRenderPaused() const { return m_new_paused; }
 
-	inline int32_t getPoolsTotal()     const {return m_pools_total;    }
-	inline int32_t getRendersTotal()   const {return m_renders_total;  }
-	inline int32_t getRendersBusy()    const {return m_renders_busy;   }
-	inline int32_t getRendersReady()   const {return m_renders_ready;  }
-	inline int32_t getRendersOnline()  const {return m_renders_online; }
-	inline int32_t getRendersOffline() const {return m_renders_offline;}
-	inline int32_t getRendersNimby()   const {return m_renders_nimby;  }
-	inline int32_t getRendersPaused()  const {return m_renders_paused; }
-	inline int32_t getRendersSick()    const {return m_renders_sick;   }
+	inline int32_t getPoolsTotal() const { return m_pools_total; }
+	inline int32_t getRendersTotal() const { return m_renders_total; }
+	inline int32_t getRendersBusy() const { return m_renders_busy; }
+	inline int32_t getRendersReady() const { return m_renders_ready; }
+	inline int32_t getRendersOnline() const { return m_renders_online; }
+	inline int32_t getRendersOffline() const { return m_renders_offline; }
+	inline int32_t getRendersNimby() const { return m_renders_nimby; }
+	inline int32_t getRendersPaused() const { return m_renders_paused; }
+	inline int32_t getRendersSick() const { return m_renders_sick; }
 
-	inline int getRunTasks()    const { return m_run_tasks;   }
-	inline int getRunCapacity() const { return m_run_capacity;}
+	inline int getRunTasks() const { return m_run_tasks; }
+	inline int getRunCapacity() const { return m_run_capacity; }
 
-	inline int64_t getTaskStartFinishTime() const { return m_task_start_finish_time;}
+	inline int64_t getTaskStartFinishTime() const { return m_task_start_finish_time; }
 
-	inline int getSickErrorsCount() const {return m_sick_errors_count;}
+	inline int getSickErrorsCount() const { return m_sick_errors_count; }
 
-public:
+  public:
 	enum State
 	{
-		SBusy    = 1ULL << 0,
-		SPaused  = 1ULL << 1,
+		SBusy = 1ULL << 0,
+		SPaused = 1ULL << 1,
 	};
 
 	int32_t m_heartbeat_sec;
@@ -95,10 +94,10 @@ public:
 	int32_t m_idle_netmbs;
 	int32_t m_busy_netmbs;
 
-public:
-	static const std::string FilterName(const std::string & i_name);
+  public:
+	static const std::string FilterName(const std::string &i_name);
 
-protected:
+  protected:
 	RegExp m_pattern;
 
 	std::string m_parent_path;
@@ -125,10 +124,10 @@ protected:
 
 	int64_t m_task_start_finish_time; ///< Task start or finish time.
 
-private:
+  private:
 	void initDefaultValues();
 
-protected:
-	void v_readwrite(Msg * msg); ///< Read or write Pool in message.
+  protected:
+	void v_readwrite(Msg *msg); ///< Read or write Pool in message.
 };
-}
+} // namespace af

@@ -10,7 +10,7 @@
 
 /*
 	This class is an abstraction around thread-local storage.
-	
+
 	An instance of this class gives you access to a pointer which is stored in
 	an different physical location for each thread.
 
@@ -20,17 +20,17 @@
 
 class DlThreadLocalStorage
 {
-	DlThreadLocalStorage(const DlThreadLocalStorage&);
-	void operator=(const DlThreadLocalStorage&);
+	DlThreadLocalStorage(const DlThreadLocalStorage &);
+	void operator=(const DlThreadLocalStorage &);
 
-public:
+  public:
 	DlThreadLocalStorage();
 	~DlThreadLocalStorage();
 
 	void *Get();
 	void Set(void *i_value);
 
-private:
+  private:
 #if defined(MACOSX)
 	void *m_id;
 #elif defined(__aarch64__)

@@ -1,28 +1,24 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-
-static char base64_encoding_table[] = {
-'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
-'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
-'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
-'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
-'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-'w', 'x', 'y', 'z', '0', '1', '2', '3',
-'4', '5', '6', '7', '8', '9', '+', '/'};
-static char * base64_decoding_table = NULL;
+static char base64_encoding_table[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+									   'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+									   'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+									   'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+									   '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'};
+static char *base64_decoding_table = NULL;
 static int base64_mod_table[] = {0, 2, 1};
 
-
-char * base64_encode( const char * i_data, int i_length, int & o_length)
+char *base64_encode(const char *i_data, int i_length, int &o_length)
 {
 	o_length = 4 * ((i_length + 2) / 3);
 
-	char * encoded_data = new char[o_length];
-	if (encoded_data == NULL) return NULL;
+	char *encoded_data = new char[o_length];
+	if (encoded_data == NULL)
+		return NULL;
 
-	for (int i = 0, j = 0; i < i_length;) {
+	for (int i = 0, j = 0; i < i_length;)
+	{
 
 		uint32_t octet_a = i < i_length ? i_data[i++] : 0;
 		uint32_t octet_b = i < i_length ? i_data[i++] : 0;

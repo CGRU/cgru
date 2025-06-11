@@ -60,32 +60,31 @@ QT_END_NAMESPACE
 //! [0]
 class Highlighter : public QSyntaxHighlighter
 {
-    Q_OBJECT
+	Q_OBJECT
 
-public:
-    Highlighter(QTextDocument *parent = 0);
+  public:
+	Highlighter(QTextDocument *parent = 0);
 
-protected:
-    void highlightBlock(const QString &text) Q_DECL_OVERRIDE;
+  protected:
+	void highlightBlock(const QString &text) Q_DECL_OVERRIDE;
 
-private:
-    struct HighlightingRule
-    {
-        QRegExp pattern;
-        QTextCharFormat format;
-    };
-    QVector<HighlightingRule> highlightingRules;
+  private:
+	struct HighlightingRule
+	{
+		QRegExp pattern;
+		QTextCharFormat format;
+	};
+	QVector<HighlightingRule> highlightingRules;
 
-    QRegExp commentStartExpression;
-    QRegExp commentEndExpression;
+	QRegExp commentStartExpression;
+	QRegExp commentEndExpression;
 
-    QTextCharFormat keywordFormat;
-    QTextCharFormat numbersFormat;
-    QTextCharFormat singleLineCommentFormat;
-    QTextCharFormat multiLineCommentFormat;
-    QTextCharFormat quotationFormat;
-    QTextCharFormat singleQuotationFormat;
-    QTextCharFormat functionFormat;
+	QTextCharFormat keywordFormat;
+	QTextCharFormat numbersFormat;
+	QTextCharFormat singleLineCommentFormat;
+	QTextCharFormat multiLineCommentFormat;
+	QTextCharFormat quotationFormat;
+	QTextCharFormat singleQuotationFormat;
+	QTextCharFormat functionFormat;
 };
 //! [0]
-

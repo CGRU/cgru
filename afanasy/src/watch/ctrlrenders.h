@@ -11,35 +11,35 @@ class ListRenders;
 
 class CtrlRenders : public QFrame
 {
-Q_OBJECT
-public:
-	CtrlRenders(QWidget * i_parent, ListRenders * i_listrenders);
+	Q_OBJECT
+  public:
+	CtrlRenders(QWidget *i_parent, ListRenders *i_listrenders);
 	~CtrlRenders();
 
-private slots:
-	void slot_ThumsButtonClicked(Button*);
+  private slots:
+	void slot_ThumsButtonClicked(Button *);
 	void slot_MaxEditingFinished();
 
-private:
-	QList<Button*> m_thumbs_btns;
+  private:
+	QList<Button *> m_thumbs_btns;
 	static const QStringList ms_sizes_names;
-	static const QList<int>  ms_sizes_enums;
+	static const QList<int> ms_sizes_enums;
 
-	QLineEdit * m_max_runtime_edit;
+	QLineEdit *m_max_runtime_edit;
 
-	ListRenders * m_listrenders;
+	ListRenders *m_listrenders;
 };
 
 class CtrlRendersViewOptions : public QLabel
 {
-Q_OBJECT
-public:
-	CtrlRendersViewOptions(QWidget * i_parent, ListRenders * i_listrenders);
+	Q_OBJECT
+  public:
+	CtrlRendersViewOptions(QWidget *i_parent, ListRenders *i_listrenders);
 	~CtrlRendersViewOptions();
 
-protected:
+  protected:
 	void contextMenuEvent(QContextMenuEvent *event);
 
-private:
-	ListRenders * m_listrenders;
+  private:
+	ListRenders *m_listrenders;
 };

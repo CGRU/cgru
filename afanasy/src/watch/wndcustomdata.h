@@ -7,21 +7,21 @@ class QPlainTextEdit;
 
 class WndCustomData : public Wnd
 {
-Q_OBJECT
-public:
-	WndCustomData( const QString & i_name, const QString & i_text);
+	Q_OBJECT
+  public:
+	WndCustomData(const QString &i_name, const QString &i_text);
 	~WndCustomData();
 
-signals:
-	void textEdited( const QString & i_text);
+  signals:
+	void textEdited(const QString &i_text);
 
-private slots:
+  private slots:
 	void checkText();
 	void setText();
 
-private:
-	QPlainTextEdit * m_qText;
-	QLineEdit * m_qLine;
+  private:
+	QPlainTextEdit *m_qText;
+	QLineEdit *m_qLine;
 
 	QString m_text;
 	bool m_valid;

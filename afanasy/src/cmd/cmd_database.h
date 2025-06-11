@@ -4,33 +4,45 @@
 
 #include "cmd.h"
 
-class CmdDBCheck : public Cmd { public:
+class CmdDBCheck : public Cmd
+{
+  public:
 	CmdDBCheck();
 	~CmdDBCheck();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg) final;
+	bool v_processArguments(int argc, char **argv, af::Msg &msg) final;
 };
-class CmdDBResetLogs: public Cmd { public:
+class CmdDBResetLogs : public Cmd
+{
+  public:
 	CmdDBResetLogs();
 	~CmdDBResetLogs();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg) final;
+	bool v_processArguments(int argc, char **argv, af::Msg &msg) final;
 };
-class CmdDBResetJobs: public Cmd { public:
+class CmdDBResetJobs : public Cmd
+{
+  public:
 	CmdDBResetJobs();
 	~CmdDBResetJobs();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg) final;
+	bool v_processArguments(int argc, char **argv, af::Msg &msg) final;
 };
-class CmdDBResetTasks: public Cmd { public:
+class CmdDBResetTasks : public Cmd
+{
+  public:
 	CmdDBResetTasks();
 	~CmdDBResetTasks();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg) final;
+	bool v_processArguments(int argc, char **argv, af::Msg &msg) final;
 };
-class CmdDBResetAll : public Cmd { public:
+class CmdDBResetAll : public Cmd
+{
+  public:
 	CmdDBResetAll();
 	~CmdDBResetAll();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg) final;
+	bool v_processArguments(int argc, char **argv, af::Msg &msg) final;
 };
-class CmdDBUpdateTables : public Cmd { public:
+class CmdDBUpdateTables : public Cmd
+{
+  public:
 	CmdDBUpdateTables();
 	~CmdDBUpdateTables();
-	bool v_processArguments(int argc, char** argv, af::Msg &msg) final;
+	bool v_processArguments(int argc, char **argv, af::Msg &msg) final;
 };

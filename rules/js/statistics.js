@@ -14,7 +14,7 @@
 	statistics.js - TODO: description
 */
 
-"use strict";
+'use strict';
 
 function stcs_Show(i_args)
 {
@@ -33,8 +33,8 @@ function stcs_Show(i_args)
 	if (i_elReports == null)
 		return;
 
-    if (i_elTasks)
-        i_elTasks.textContent = '';
+	if (i_elTasks)
+		i_elTasks.textContent = '';
 
 	var tasks_types = {};
 	var tasks_artists = {};
@@ -91,12 +91,12 @@ function stcs_Show(i_args)
 
 					if (tasks_types[tag] == null)
 						tasks_types[tag] = {
-							"tags": [tag],
-							"duration": 0,
-							"done": 0,
-							"progress": 0,
-							"price": null,
-							"artists": []
+							'tags': [tag],
+							'duration': 0,
+							'done': 0,
+							'progress': 0,
+							'price': null,
+							'artists': []
 						};
 
 					if (task.artists && task.artists.length)
@@ -124,12 +124,12 @@ function stcs_Show(i_args)
 
 					if (tasks_artists[artist] == null)
 						tasks_artists[artist] = {
-							"artists": [artist],
-							"duration": 0,
-							"done": 0,
-							"progress": 0,
-							"price": null,
-							"tags": []
+							'artists': [artist],
+							'duration': 0,
+							'done': 0,
+							'progress': 0,
+							'price': null,
+							'tags': []
 						};
 
 					if (task.tags && task.tags.length)
@@ -220,9 +220,9 @@ function stcs_Show(i_args)
 	{
 		i_elTasksDiv.style.display = 'block';
 		if (tasks_t.length)
-			stcs_ShowTable({"el": i_elTasks, "data": tasks_t, "draw_bars": i_draw_bars, "main": "tags"});
+			stcs_ShowTable({'el': i_elTasks, 'data': tasks_t, 'draw_bars': i_draw_bars, 'main': 'tags'});
 		if (tasks_a.length && i_main_artists)
-			stcs_ShowTable({"el": i_elTasks, "data": tasks_a, "draw_bars": i_draw_bars, "main": "artists"});
+			stcs_ShowTable({'el': i_elTasks, 'data': tasks_a, 'draw_bars': i_draw_bars, 'main': 'artists'});
 	}
 	else if (i_elTasksDiv)
 		i_elTasksDiv.style.display = 'none';
@@ -240,10 +240,10 @@ function stcs_Show(i_args)
 	{
 		i_elReportsDiv.style.display = 'block';
 		if (reports_t.length)
-			stcs_ShowTable({"el": i_elReports, "data": reports_t, "draw_bars": i_draw_bars, "main": "tags"});
+			stcs_ShowTable({'el': i_elReports, 'data': reports_t, 'draw_bars': i_draw_bars, 'main': 'tags'});
 		if (reports_a.length && i_main_artists)
 			stcs_ShowTable(
-				{"el": i_elReports, "data": reports_a, "draw_bars": i_draw_bars, "main": "artists"});
+				{'el': i_elReports, 'data': reports_a, 'draw_bars': i_draw_bars, 'main': 'artists'});
 	}
 	else
 		i_elReportsDiv.style.display = 'none';
@@ -256,7 +256,7 @@ function stcs_Show(i_args)
 	if (tasks_t.length && reports_t.length)
 	{
 		i_elDifferDiv.style.display = 'block';
-		stcs_ShowDifference({"el": i_elDiffer, "tasks": tasks_t, "reports": reports_t});
+		stcs_ShowDifference({'el': i_elDiffer, 'tasks': tasks_t, 'reports': reports_t});
 	}
 	else
 		i_elDifferDiv.style.display = 'none';
@@ -317,7 +317,7 @@ function stcs_ShowTable(i_args)
 	else
 		elTr.appendChild(elTh);
 
-	var summs = {"duration": 0, "done": 0, "progress": 0, "price": 0};
+	var summs = {'duration': 0, 'done': 0, 'progress': 0, 'price': 0};
 	for (var r = 0; r < i_data.length; r++)
 	{
 		var elTr = document.createElement('tr');

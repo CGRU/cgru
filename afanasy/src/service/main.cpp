@@ -1,8 +1,8 @@
+#include <Windows.h>
 #include <io.h>
 #include <shlwapi.h>
 #include <sstream>
 #include <time.h>
-#include <Windows.h>
 
 std::string ServiceType = "render";
 char ServiceName[128] = "afservice";
@@ -24,14 +24,8 @@ std::string GetLastErrorStdStr()
 	{
 		LPVOID lpMsgBuf;
 		DWORD bufLen = FormatMessage(
-			FORMAT_MESSAGE_ALLOCATE_BUFFER |
-			FORMAT_MESSAGE_FROM_SYSTEM |
-			FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL,
-			error,
-			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-			(LPTSTR)&lpMsgBuf,
-			0, NULL);
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL,
+			error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL);
 		if (bufLen)
 		{
 			LPCSTR lpMsgStr = (LPCSTR)lpMsgBuf;
@@ -45,7 +39,7 @@ std::string GetLastErrorStdStr()
 	return std::string();
 }
 
-void OutLog(const std::string & i_log)
+void OutLog(const std::string &i_log)
 {
 	// Prefix
 	std::string log("SERVICE");
@@ -71,23 +65,25 @@ void OutLog(const std::string & i_log)
 	if (OutputHandle)
 		WriteFile(OutputHandle, log.c_str(), log.size(), NULL, NULL);
 	else
-		_write( 1, log.c_str(), log.size());
+		_write(1, log.c_str(), log.size());
 }
 
-void LogErr(const std::string & i_log)
+void LogErr(const std::string &i_log)
 {
 	OutLog(std::string("ERROR: ") + i_log + ": " + GetLastErrorStdStr());
 }
 
-std::string getLogFilename(const std::string & i_base)
+std::string getLogFilename(const std::string &i_base)
 {
 	// Log file name
-	char lpFilename[1024]; int nSize = 1024;
+	char lpFilename[1024];
+	int nSize = 1024;
 	nSize = GetModuleFileName(NULL, lpFilename, nSize);
 	std::string name_base(lpFilename, nSize);
 	// Cut executable (get dirname from full path)
 	size_t spos = name_base.rfind("\\");
-	if (spos != std::string::npos) name_base.resize(spos);
+	if (spos != std::string::npos)
+		name_base.resize(spos);
 	// Add service name and log
 	name_base = name_base + "\\" + i_base;
 
@@ -118,14 +114,8 @@ bool redirectServiceOutput()
 	sAttrs.nLength = sizeof(SECURITY_ATTRIBUTES);
 	sAttrs.bInheritHandle = true;
 	sAttrs.lpSecurityDescriptor = NULL;
-	OutputHandle = CreateFile(
-		logFilename.c_str(),
-		GENERIC_WRITE,
-		0,
-		&sAttrs,
-		CREATE_ALWAYS,
-		FILE_ATTRIBUTE_NORMAL,
-		NULL);
+	OutputHandle = CreateFile(logFilename.c_str(), GENERIC_WRITE, 0, &sAttrs, CREATE_ALWAYS,
+							  FILE_ATTRIBUTE_NORMAL, NULL);
 	if (OutputHandle == INVALID_HANDLE_VALUE)
 	{
 		LogErr(std::string("Unable to create log file: ") + logFilename);
@@ -160,7 +150,7 @@ bool redirectServiceOutput()
 	}
 	else
 	{
-		if( false == CloseHandle(hIn))
+		if (false == CloseHandle(hIn))
 			LogErr("CloseHandle:STD_INPUT_HANDLE");
 	}
 
@@ -168,17 +158,19 @@ bool redirectServiceOutput()
 }
 
 bool startCmd()
-{	
+{
 	// Construct command
 	// Get current executable path
-	char lpFilename[1024]; int nSize = 1024;
+	char lpFilename[1024];
+	int nSize = 1024;
 	nSize = GetModuleFileName(NULL, lpFilename, nSize);
 	std::string cgru(lpFilename, nSize);
 	// Get dirname from executable path 3 times:
 	for (int i = 0; i < 3; i++)
 	{
 		size_t spos = cgru.rfind("\\");
-		if (spos != std::string::npos) cgru.resize(spos);
+		if (spos != std::string::npos)
+			cgru.resize(spos);
 	}
 	// Add command
 	std::string cmd = cgru + "\\start\\AFANASY\\99.render.cmd";
@@ -192,18 +184,17 @@ bool startCmd()
 	startInfo.cb = sizeof(STARTUPINFO);
 	char cmd_buf[4096];
 	sprintf_s(cmd_buf, "%s", cmd.c_str());
-	BOOL processCreated = CreateProcess(
-		NULL,               /* Application name */
-		cmd_buf,            /* Command line */
-		NULL,               /* Proccess attributes */
-		NULL,               /* Thread attributes */
-		true,               /* Inherit Handles */
-		CREATE_SUSPENDED |  /* Creation flags */
-		CREATE_NEW_PROCESS_GROUP,
-		NULL,               /* Environment */
-		cgru.c_str(),       /* Wolring directory */
-		&startInfo,         /* Startup information */
-		&ProcessInformation /* Process information */
+	BOOL processCreated = CreateProcess(NULL,			   /* Application name */
+										cmd_buf,		   /* Command line */
+										NULL,			   /* Proccess attributes */
+										NULL,			   /* Thread attributes */
+										true,			   /* Inherit Handles */
+										CREATE_SUSPENDED | /* Creation flags */
+											CREATE_NEW_PROCESS_GROUP,
+										NULL,				/* Environment */
+										cgru.c_str(),		/* Wolring directory */
+										&startInfo,			/* Startup information */
+										&ProcessInformation /* Process information */
 	);
 	if (false == processCreated)
 	{
@@ -212,7 +203,7 @@ bool startCmd()
 	}
 
 	JobHandle = CreateJobObject(NULL, NULL);
-	JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = { 0 };
+	JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = {0};
 	jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
 	if (SetInformationJobObject(JobHandle, JobObjectExtendedLimitInformation, &jeli, sizeof(jeli)) == 0)
 		LogErr("SetInformationJobObject failed");
@@ -251,12 +242,12 @@ BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
 {
 	switch (fdwCtrlType)
 	{
-	case CTRL_C_EVENT:        OutLog("Ctrl-C event");        break;
-	case CTRL_CLOSE_EVENT:    OutLog("Ctrl-Close event");    break;
-	case CTRL_BREAK_EVENT:    OutLog("Ctrl-Break event");    break;
-	case CTRL_LOGOFF_EVENT:   OutLog("Ctrl-Logoff event");   break;
-	case CTRL_SHUTDOWN_EVENT: OutLog("Ctrl-Shutdown event"); break;
-	default:                  OutLog("Ctrl-UNKNOWN event");  return FALSE;
+		case CTRL_C_EVENT: OutLog("Ctrl-C event"); break;
+		case CTRL_CLOSE_EVENT: OutLog("Ctrl-Close event"); break;
+		case CTRL_BREAK_EVENT: OutLog("Ctrl-Break event"); break;
+		case CTRL_LOGOFF_EVENT: OutLog("Ctrl-Logoff event"); break;
+		case CTRL_SHUTDOWN_EVENT: OutLog("Ctrl-Shutdown event"); break;
+		default: OutLog("Ctrl-UNKNOWN event"); return FALSE;
 	}
 
 	stopService();
@@ -283,7 +274,8 @@ void runLoop()
 		else if (WAIT_TIMEOUT == result)
 		{
 			if (cycle == 0)
-				OutLog(std::string("Afservice running PID = ") + std::to_string(ProcessInformation.dwProcessId));
+				OutLog(std::string("Afservice running PID = ") +
+					   std::to_string(ProcessInformation.dwProcessId));
 			cycle++;
 		}
 		else if (WAIT_FAILED == result)
@@ -300,7 +292,7 @@ void runLoop()
 			Sleep(1000);
 	}
 
-	TerminateProcess(ProcessInformation.hProcess, 0);	
+	TerminateProcess(ProcessInformation.hProcess, 0);
 	TerminateJobObject(JobHandle, 0);
 	CloseHandle(JobHandle);
 }
@@ -309,18 +301,17 @@ void WINAPI ServiceControl(DWORD request)
 {
 	switch (request)
 	{
-	case SERVICE_CONTROL_STOP:
-		OutLog("SERVICE_CONTROL_STOP");
-		stopService();
-		break;
+		case SERVICE_CONTROL_STOP:
+			OutLog("SERVICE_CONTROL_STOP");
+			stopService();
+			break;
 
-	case SERVICE_CONTROL_SHUTDOWN:
-		OutLog("SERVICE_CONTROL_SHUTDOWN");
-		stopService();
-		break;
+		case SERVICE_CONTROL_SHUTDOWN:
+			OutLog("SERVICE_CONTROL_SHUTDOWN");
+			stopService();
+			break;
 
-	default:
-		SetServiceStatus(ServiceStatusHandle, &ServiceStatus);;
+		default: SetServiceStatus(ServiceStatusHandle, &ServiceStatus); ;
 	}
 
 	return;
@@ -357,13 +348,9 @@ void WINAPI ServiceMain(int argc, char *argv[])
 
 int startService(int argc, char *argv[])
 {
-	sprintf(ServiceName,"afservice_%s", ServiceType.c_str());
+	sprintf(ServiceName, "afservice_%s", ServiceType.c_str());
 
-	SERVICE_TABLE_ENTRY ServiceTable[] =
-	{
-		{ ServiceName, (LPSERVICE_MAIN_FUNCTION)ServiceMain },
-		{ NULL, NULL }
-	};
+	SERVICE_TABLE_ENTRY ServiceTable[] = {{ServiceName, (LPSERVICE_MAIN_FUNCTION)ServiceMain}, {NULL, NULL}};
 
 	if (false == StartServiceCtrlDispatcher(ServiceTable))
 	{

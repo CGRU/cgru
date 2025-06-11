@@ -9,22 +9,22 @@
 class QByteArray;
 class QDomNode;
 
-class afqt::AttrRect: public Attr
+class afqt::AttrRect : public Attr
 {
-public:
-    AttrRect( const QString & Name, const QRect & initRect);
-    ~AttrRect();
+  public:
+	AttrRect(const QString &Name, const QRect &initRect);
+	~AttrRect();
 
-	void v_write( QByteArray & o_data);
+	void v_write(QByteArray &o_data);
 
-public:
-    static AttrRect * readObj( const JSON & i_obj);
+  public:
+	static AttrRect *readObj(const JSON &i_obj);
 
-public:
-    static const QString WndTagName;
+  public:
+	static const QString WndTagName;
 
-public:
-    QRect r;
+  public:
+	QRect r;
 
-private:
+  private:
 };

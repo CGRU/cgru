@@ -14,7 +14,7 @@
 	filesview.js - TODO: description
 */
 
-"use strict";
+'use strict';
 
 var fv_views = [];
 var fv_thumbnails_tomake = 0;
@@ -52,7 +52,7 @@ function fv_CmdExecFilter(i_cmd)
 {
 	let o_cmd = i_cmd;
 	for (let path of fv_GetSelectedPaths())
-		o_cmd += ' \"' + path + "\"";
+		o_cmd += ' \"' + path + '"';
 	return o_cmd;
 }
 
@@ -109,9 +109,12 @@ function FilesView(i_args)
 	this.elClosedOpen.classList.add('button');
 	this.elClosedOpen.textContent = 'open';
 	this.elClosedOpen.m_view = this;
-	this.elClosedOpen.onclick = function(e) {e.currentTarget.m_view.open();}
+	this.elClosedOpen.onclick =
+		function(e) {
+		e.currentTarget.m_view.open();
+	}
 
-	c_CreateOpenButton({"parent": this.elClosed, "path": this.path});
+	c_CreateOpenButton({'parent': this.elClosed, 'path': this.path});
 
 	let elLink = document.createElement('a');
 	this.elClosed.appendChild(elLink);
@@ -151,14 +154,14 @@ function FilesView(i_args)
 	el.classList.add('infotooltip');
 	el.style.cssFloat = 'right';
 	//	el.style.cssFloat = 'left';
-	el.title = "This is files view.\n\
+	el.title = 'This is files view.\n\
 You can create folder,\n\
 archive and unpack,\n\
 convert images/movies,\n\
 put in other location (may be FTP),\n\
-generate thumbnails.";
+generate thumbnails.';
 
-	c_CreateOpenButton({"parent": this.elPanel, "path": this.path});
+	c_CreateOpenButton({'parent': this.elPanel, 'path': this.path});
 
 	var elPath = document.createElement('a');
 	this.elPanel.appendChild(elPath);
@@ -181,7 +184,9 @@ generate thumbnails.";
 		el.style.backgroundImage = 'url(rules/icons/refresh.png)';
 		el.title = 'Refresh this files view';
 		el.m_view = this;
-		el.onclick = function(e) { e.currentTarget.m_view.refresh() };
+		el.onclick = function(e) {
+			e.currentTarget.m_view.refresh()
+		};
 
 		var el = document.createElement('div');
 		this.elPanel.appendChild(el);
@@ -189,7 +194,9 @@ generate thumbnails.";
 		el.style.backgroundImage = 'url(rules/icons/folder_new.png)';
 		el.title = 'Add a new folder';
 		el.m_view = this;
-		el.onclick = function(e) { e.currentTarget.m_view.makeFolder() };
+		el.onclick = function(e) {
+			e.currentTarget.m_view.makeFolder()
+		};
 	}
 
 	var el = document.createElement('div');
@@ -198,7 +205,9 @@ generate thumbnails.";
 	el.style.backgroundImage = 'url(rules/icons/select_all.png)';
 	el.title = 'Select all';
 	el.m_view = this;
-	el.onclick = function(e) { e.currentTarget.m_view.selectAll() };
+	el.onclick = function(e) {
+		e.currentTarget.m_view.selectAll()
+	};
 
 	var el = document.createElement('div');
 	this.elPanel.appendChild(el);
@@ -206,14 +215,18 @@ generate thumbnails.";
 	el.style.backgroundImage = 'url(rules/icons/select_invert.png)';
 	el.title = 'Invert selection';
 	el.m_view = this;
-	el.onclick = function(e) { e.currentTarget.m_view.selectInvert() };
+	el.onclick = function(e) {
+		e.currentTarget.m_view.selectInvert()
+	};
 
 	var el = document.createElement('div');
 	this.elPanel.appendChild(el);
 	el.classList.add('button');
 	el.style.backgroundImage = 'url(rules/icons/convert.png)';
 	el.m_view = this;
-	el.onclick = function(e) { e.currentTarget.m_view.convert(); };
+	el.onclick = function(e) {
+		e.currentTarget.m_view.convert();
+	};
 	el.title = 'Convert selected sequences (folders) or movies (files)';
 
 	el = document.createElement('div');
@@ -221,7 +234,9 @@ generate thumbnails.";
 	el.classList.add('button');
 	el.style.backgroundImage = 'url(rules/icons/audio.png)';
 	el.m_view = this;
-	el.onclick = function(e) {e.currentTarget.m_view.extractSound();};
+	el.onclick = function(e) {
+		e.currentTarget.m_view.extractSound();
+	};
 	el.title = 'Extract sound from video files';
 
 	var el = document.createElement('div');
@@ -229,7 +244,9 @@ generate thumbnails.";
 	el.classList.add('button');
 	el.style.backgroundImage = 'url(rules/icons/archive.png)';
 	el.m_view = this;
-	el.onclick = function(e) { e.currentTarget.m_view.archivate(); };
+	el.onclick = function(e) {
+		e.currentTarget.m_view.archivate();
+	};
 	el.title = 'Archive files and folders';
 
 	var el = document.createElement('div');
@@ -237,7 +254,9 @@ generate thumbnails.";
 	el.classList.add('button');
 	el.style.backgroundImage = 'url(rules/icons/put.png)';
 	el.m_view = this;
-	el.onclick = function(e) { e.currentTarget.m_view.put(); };
+	el.onclick = function(e) {
+		e.currentTarget.m_view.put();
+	};
 	el.title = 'Put selected folders';
 
 	if (this.show_walk)
@@ -247,7 +266,9 @@ generate thumbnails.";
 		el.classList.add('button');
 		el.style.backgroundImage = 'url(rules/icons/walk.png)';
 		el.m_path = this.path;
-		el.onclick = function(e) { fu_Walk({"path": e.currentTarget.m_path}); };
+		el.onclick = function(e) {
+			fu_Walk({'path': e.currentTarget.m_path});
+		};
 		el.title = 'Top secret feature.';
 	}
 
@@ -258,7 +279,9 @@ generate thumbnails.";
 		el.classList.add('button');
 		el.style.backgroundImage = 'url(rules/icons/tmpfio.png)';
 		el.m_view = this;
-		el.onclick = function(e) { fu_TmpFio({"fview": e.currentTarget.m_view}); };
+		el.onclick = function(e) {
+			fu_TmpFio({'fview': e.currentTarget.m_view});
+		};
 		el.title = 'Create a shared folder.';
 	}
 
@@ -269,7 +292,9 @@ generate thumbnails.";
 		el.classList.add('button');
 		el.style.backgroundImage = 'url(rules/icons/buffer_add.png)';
 		el.m_view = this;
-		el.onclick = function(e) { e.currentTarget.m_view.bufferAdd(); };
+		el.onclick = function(e) {
+			e.currentTarget.m_view.bufferAdd();
+		};
 		el.title = 'Add selected files to buffer.';
 
 		var el = document.createElement('div');
@@ -277,7 +302,9 @@ generate thumbnails.";
 		el.classList.add('button');
 		el.style.backgroundImage = 'url(rules/icons/buffer_take.png)';
 		el.m_view = this;
-		el.onclick = function(e) { e.currentTarget.m_view.bufferPut(); };
+		el.onclick = function(e) {
+			e.currentTarget.m_view.bufferPut();
+		};
 		el.title = 'Put files from buffer.';
 		el.style.display = 'none';
 		this.elBufferPut = el;
@@ -294,7 +321,9 @@ generate thumbnails.";
 		el.classList.add('button');
 		el.style.backgroundImage = 'url(rules/icons/increase.png)';
 		el.m_view = this;
-		el.onclick = function(e) { e.currentTarget.m_view.thumbsBigger() };
+		el.onclick = function(e) {
+			e.currentTarget.m_view.thumbsBigger()
+		};
 		el.title = 'Show thumbnails bigger';
 
 		var el = document.createElement('div');
@@ -302,7 +331,9 @@ generate thumbnails.";
 		el.classList.add('button');
 		el.style.backgroundImage = 'url(rules/icons/decrease.png)';
 		el.m_view = this;
-		el.onclick = function(e) { e.currentTarget.m_view.thumbsSmaller() };
+		el.onclick = function(e) {
+			e.currentTarget.m_view.thumbsSmaller()
+		};
 		el.title = 'Show thumbnails smaller';
 
 		var el = document.createElement('div');
@@ -310,7 +341,9 @@ generate thumbnails.";
 		el.classList.add('button');
 		el.style.backgroundImage = 'url(rules/icons/crop.png)';
 		el.m_view = this;
-		el.onclick = function(e) { e.currentTarget.m_view.thumbsCrop() };
+		el.onclick = function(e) {
+			e.currentTarget.m_view.thumbsCrop()
+		};
 		el.title = 'Show thumbnails cropped';
 
 		this.elThumbsBtn = document.createElement('div');
@@ -318,7 +351,9 @@ generate thumbnails.";
 		this.elThumbsBtn.classList.add('button');
 		this.elThumbsBtn.style.backgroundImage = 'url(rules/icons/thumbnails.png)';
 		this.elThumbsBtn.m_view = this;
-		this.elThumbsBtn.onclick = function(e) { e.currentTarget.m_view.thumbsMake() };
+		this.elThumbsBtn.onclick = function(e) {
+			e.currentTarget.m_view.thumbsMake()
+		};
 		this.elThumbsBtn.title = 'Generate thumbnails';
 	}
 
@@ -335,7 +370,7 @@ generate thumbnails.";
 			this.elGenBtn.m_view = this;
 			this.elGenBtn.onclick = function(e) {
 				fu_Checksum(
-					{"path": e.currentTarget.m_view.path, "walk": e.currentTarget.m_view.walk, "type": sum})
+					{'path': e.currentTarget.m_view.path, 'walk': e.currentTarget.m_view.walk, 'type': sum})
 			};
 			this.elGenBtn.title = 'Generate ' + RULES.checksum[sum].name;
 		}
@@ -406,31 +441,31 @@ FilesView.prototype.limitsAdd = function() {
 
 	let elClose = document.createElement('div');
 	elLimitsDiv.appendChild(elClose);
-	elClose.classList.add('button','close');
+	elClose.classList.add('button', 'close');
 	elClose.textContent = 'close';
 	elClose.m_view = this;
-	elClose.onclick = function(e) {e.currentTarget.m_view.close();}
+	elClose.onclick = function(e) {
+		e.currentTarget.m_view.close();
+	}
 };
 
-FilesView.prototype.close = function()
-{
-	this.setLocalStorageAttr('closed','ON');
+FilesView.prototype.close =
+	function() {
+	this.setLocalStorageAttr('closed', 'ON');
 	this.processOpenClose();
-}
-FilesView.prototype.open = function()
-{
-	this.setLocalStorageAttr('closed','OFF');
+} FilesView.prototype.open =
+		function() {
+	this.setLocalStorageAttr('closed', 'OFF');
 	this.processOpenClose();
-}
-FilesView.prototype.processOpenClose = function()
-{
+} FilesView.prototype.processOpenClose =
+			function() {
 	if (this.getLocalStorageAttr('closed') == 'ON')
 		this.elRoot.classList.add('closed');
 	else
 		this.elRoot.classList.remove('closed');
 }
 
-FilesView.prototype.limitApply = function() {
+			FilesView.prototype.limitApply = function() {
 	if (false == this.has_limits)
 		return;
 
@@ -458,7 +493,7 @@ FilesView.prototype.limitApply = function() {
 };
 
 FilesView.prototype.refresh = function() {
-	n_WalkDir({"paths": [this.path], "wfunc": this.walkReceived, "this": this});
+	n_WalkDir({'paths': [this.path], 'wfunc': this.walkReceived, 'this': this});
 	c_LoadingElSet(this.elRoot);
 };
 
@@ -572,7 +607,9 @@ FilesView.prototype.showCounts = function() {
 		el.textContent = 'sF:' + frames_count;
 		el.title = 'All folders files sum.\nDouble click to store status frames number.';
 		el.m_frames_count = frames_count;
-		el.onclick = function(e) { e.stopPropagation(); };
+		el.onclick = function(e) {
+			e.stopPropagation();
+		};
 		el.ondblclick = function(e) {
 			e.stopPropagation();
 			st_SetFramesNumber(e.currentTarget.m_frames_count);
@@ -716,7 +753,9 @@ FilesView.prototype.showAttrs = function(i_el, i_obj) {
 
 		i_el.m_el_num_files.title = title;
 		i_el.m_el_num_files.m_num_files = f_count;
-		i_el.m_el_num_files.onclick = function(e) { e.stopPropagation(); };
+		i_el.m_el_num_files.onclick = function(e) {
+			e.stopPropagation();
+		};
 		i_el.m_el_num_files.ondblclick = function(e) {
 			e.stopPropagation();
 			st_SetFramesNumber(e.currentTarget.m_num_files);
@@ -750,9 +789,12 @@ FilesView.prototype.showAttrs = function(i_el, i_obj) {
 			}
 
 			i_el.m_el_num_files.textContent = 'F:' + video.frame_count;
-			i_el.m_el_num_files.title = 'Frames quantity: ' + video.frame_count + '\nDouble click to store status frames number.';
+			i_el.m_el_num_files.title =
+				'Frames quantity: ' + video.frame_count + '\nDouble click to store status frames number.';
 			i_el.m_el_num_files.m_num_files = video.frame_count;
-			i_el.m_el_num_files.onclick = function(e) { e.stopPropagation(); };
+			i_el.m_el_num_files.onclick = function(e) {
+				e.stopPropagation();
+			};
 			i_el.m_el_num_files.ondblclick = function(e) {
 				e.stopPropagation();
 				st_SetFramesNumber(e.currentTarget.m_num_files);
@@ -795,10 +837,11 @@ FilesView.prototype.showAttrs = function(i_el, i_obj) {
 			i_el.m_el_mediainfo.classList.add('mediainfo');
 		}
 		let info = '';
-		if (exif.width && exif.height) info += ' ' + exif.width + 'x' + exif.height;
-		//if (exif.bitdepth) info += ' ' + exif.bitdepth;
-		//if (exif.colortype) info += ' ' + exif.colortype;
-		//if (exif.compression) info += ' ' + exif.compression;
+		if (exif.width && exif.height)
+			info += ' ' + exif.width + 'x' + exif.height;
+		// if (exif.bitdepth) info += ' ' + exif.bitdepth;
+		// if (exif.colortype) info += ' ' + exif.colortype;
+		// if (exif.compression) info += ' ' + exif.compression;
 		if (exif.artist)
 			info += ' ' + exif.artist;
 		if (exif.comments)
@@ -857,7 +900,9 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 	elItem.m_path = path;
 	elItem.id = path;
 	elItem.m_view = this;
-	elItem.onclick = function(e) { e.currentTarget.m_view.onClick(e); };
+	elItem.onclick = function(e) {
+		e.currentTarget.m_view.onClick(e);
+	};
 	var type = 'file';
 	if (i_isFolder)
 	{
@@ -880,7 +925,7 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 	// Create open folder button when item is folder and has filesystem
 	if (i_isFolder)
 	{
-		let elOpenFoolder = c_CreateOpenButton({"parent": elItem, "path": path, "type": 'a'});
+		let elOpenFoolder = c_CreateOpenButton({'parent': elItem, 'path': path, 'type': 'a'});
 		if (elOpenFoolder)
 			elOpenFoolder.style.cssFloat = 'left';
 	}
@@ -910,7 +955,10 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 	// Drag&Drop:
 	elItem.m_elName.m_path = path;
 	elItem.m_elName.draggable = 'true';
-	elItem.m_elName.ondragstart = function(e){ c_FileDragStart( e, e.currentTarget.m_path);}
+	elItem.m_elName.ondragstart =
+		function(e) {
+		c_FileDragStart(e, e.currentTarget.m_path);
+	}
 
 	// Menu show/hide button:
 	var el = document.createElement('div');
@@ -937,7 +985,7 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 		elBody.appendChild(el);
 		el.classList.add('anchor');
 		el.title = 'Click to copy link to the item.';
-		el.m_path = g_GetLocationArgs({"fv_Goto": elItem.m_path});
+		el.m_path = g_GetLocationArgs({'fv_Goto': elItem.m_path});
 		el.onclick = function(e) {
 			e.stopPropagation();
 			let text = e.currentTarget.m_path;
@@ -959,7 +1007,7 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 		el.onclick = function(e) {
 			e.stopPropagation();
 			el = e.currentTarget;
-			var text = '<a href="' + g_GetLocationArgs({"fv_Goto": el.m_path}) + '">' +
+			var text = '<a href="' + g_GetLocationArgs({'fv_Goto': el.m_path}) + '">' +
 				c_PathBase(el.m_path) + '</a><br><br>';
 			cm_NewOnClick(text);
 		};
@@ -972,7 +1020,7 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 		elItem.m_elMenu.appendChild(el);
 		el.classList.add('button');
 		el.style.backgroundImage = 'url(rules/icons/count.png)';
-		el.title = "Count files.";
+		el.title = 'Count files.';
 		el.m_view = this;
 		el.m_path = path;
 		el.onclick = function(e) {
@@ -985,7 +1033,7 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 	var elAnchor = document.createElement('a');
 	elItem.m_elMenu.appendChild(elAnchor);
 	elAnchor.classList.add('anchor');
-	elAnchor.href = g_GetLocationArgs({"fv_Goto": path});
+	elAnchor.href = g_GetLocationArgs({'fv_Goto': path});
 	elAnchor.title = 'Anchor: Click to get link to the item.';
 
 	// Generate location (asset-shot) thumbnail from a folder or a movie:
@@ -998,7 +1046,7 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 		el.m_path = elItem.m_path;
 		el.onclick = function(e) {
 			e.stopPropagation();
-			u_ThumbnailMake({"paths": [e.currentTarget.m_path], "info": 'filesview', "no_cache": true});
+			u_ThumbnailMake({'paths': [e.currentTarget.m_path], 'info': 'filesview', 'no_cache': true});
 		};
 		el.title = 'Generate location thumbnail from this folder.';
 	}
@@ -1057,7 +1105,7 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 		el.setAttribute('href', 'player.html#' + play_path);
 		el.setAttribute('target', '_blank');
 		el.style.backgroundImage = 'url(rules/icons/player.png)';
-		el.title = "Open RULES player in a new window.";
+		el.title = 'Open RULES player in a new window.';
 	}
 
 	// Sequence execute on server custom buttons:
@@ -1091,7 +1139,7 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 					elParent = elItem.m_elMenu;
 
 				cgru_CmdExecCreate(
-					{"cmd": cmd, "parent": elParent, "label": cmds[c].name, "tooltip": cmds[c].tooltip});
+					{'cmd': cmd, 'parent': elParent, 'label': cmds[c].name, 'tooltip': cmds[c].tooltip});
 			}
 	}
 
@@ -1140,7 +1188,7 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 					elParent = elItem.m_elMenu;
 
 				cgru_CmdExecCreate(
-					{"cmd": cmd, "parent": elParent, "label": cmds[c].name, "tooltip": cmds[c].tooltip});
+					{'cmd': cmd, 'parent': elParent, 'label': cmds[c].name, 'tooltip': cmds[c].tooltip});
 			}
 	}
 
@@ -1169,7 +1217,7 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 			el.classList.add('preview_btn');
 			el.classList.add('button');
 			el.style.backgroundImage = 'url(rules/icons/play.png)';
-			el.title = "Preview";
+			el.title = 'Preview';
 			el.m_el_file = elItem;
 			el.onclick = function(e) {
 				e.stopPropagation();
@@ -1271,11 +1319,11 @@ FilesView.prototype.countFiles = function(i_path, i_args) {
 	c_LoadingElSet(this.elRoot);
 	var cmd = 'rules/bin/walk.sh --mediainfo --upparents 1 "' + RULES.root + i_path + '"';
 	n_Request({
-		"send": {"cmdexec": {"cmds": [cmd]}},
-		"func": this.countFilesFinished,
-		"this": this,
-		"wpath": i_path,
-		"post_args": i_args
+		'send': {'cmdexec': {'cmds': [cmd]}},
+		'func': this.countFilesFinished,
+		'this': this,
+		'wpath': i_path,
+		'post_args': i_args
 	});
 };
 
@@ -1312,9 +1360,9 @@ FilesView.prototype.countFilesFinished = function(i_data, i_args) {
 };
 
 FilesView.prototype.updateFromWalk = function(i_data, i_path) {
-	//console.log(i_path);
-	//console.log(JSON.stringify(i_data));
-	// Update folder item attrs:
+	// console.log(i_path);
+	// console.log(JSON.stringify(i_data));
+	//  Update folder item attrs:
 	for (var i = 0; i < this.elItems.length; i++)
 	{
 		if (this.elItems[i].m_path != i_path)
@@ -1336,7 +1384,7 @@ FilesView.prototype.updateFromWalk = function(i_data, i_path) {
 		for (var key in i_data.walk)
 			this.walk.folders[i][key] = i_data.walk[key]
 
-		break;
+										break;
 	}
 
 	this.showCounts();
@@ -1429,7 +1477,7 @@ FilesView.prototype.archivate = function() {
 			}
 			else
 				args.archive = true;
-				args.extract = false;
+			args.extract = false;
 		}
 		else
 		{
@@ -1539,28 +1587,28 @@ FilesView.prototype.thumbsMake = function() {
 
 FilesView.prototype.makeFolder = function() {
 	new cgru_Dialog({
-		"receiver": this,
-		"handle": 'makeFolderDo',
-		"name": 'make_folder',
-		"title": 'Make Folder',
-		"info": 'Enter new folder name:'
+		'receiver': this,
+		'handle': 'makeFolderDo',
+		'name': 'make_folder',
+		'title': 'Make Folder',
+		'info': 'Enter new folder name:'
 	});
 };
 
 FilesView.prototype.makeFolderDo = function(i_name) {
 	var path = c_PathPM_Rules2Server(this.path + '/' + i_name);
-	n_Request({"send": {"makefolder": {"path": path}}, "func": fv_makeFolderFinished, "fview": this});
+	n_Request({'send': {'makefolder': {'path': path}}, 'func': fv_makeFolderFinished, 'fview': this});
 };
 
 FilesView.prototype.rename = function(i_path) {
 	new cgru_Dialog({
-		"receiver": this,
-		"handle": 'renameDo',
-		"param": i_path,
-		"value": c_PathBase(i_path),
-		"name": 'rename',
-		"title": 'Rename',
-		"info": 'Enter a new name.'
+		'receiver': this,
+		'handle': 'renameDo',
+		'param': i_path,
+		'value': c_PathBase(i_path),
+		'name': 'rename',
+		'title': 'Rename',
+		'info': 'Enter a new name.'
 	});
 };
 FilesView.prototype.renameDo = function(i_value, i_path) {
@@ -1568,12 +1616,12 @@ FilesView.prototype.renameDo = function(i_value, i_path) {
 	var cmd = 'rules/bin/move.py "' + RULES.root + i_path + '" "' + new_path + '"';
 
 	n_Request({
-		"send": {"cmdexec": {"cmds": [cmd]}},
-		"func": this.renameFinished,
-		"this": this,
-		"old_path": i_path,
-		"new_path": new_path,
-		"info": 'rename'
+		'send': {'cmdexec': {'cmds': [cmd]}},
+		'func': this.renameFinished,
+		'this': this,
+		'old_path': i_path,
+		'new_path': new_path,
+		'info': 'rename'
 	});
 };
 FilesView.prototype.renameFinished = function(i_data, i_args) {
@@ -1587,12 +1635,12 @@ FilesView.prototype.renameFinished = function(i_data, i_args) {
 
 FilesView.prototype.deleteFilesDialog = function(i_path) {
 	new cgru_Dialog({
-		"receiver": this,
-		"handle": 'deleteFiles',
-		"param": i_path,
-		"name": 'delete',
-		"title": 'Delete',
-		"info": '<span style="font-size:20px;font-weight:bold;">' + i_path +
+		'receiver': this,
+		'handle': 'deleteFiles',
+		'param': i_path,
+		'name': 'delete',
+		'title': 'Delete',
+		'info': '<span style="font-size:20px;font-weight:bold;">' + i_path +
 			'</span><br>Are You Sure?<br>Type "yes".'
 	});
 };
@@ -1604,13 +1652,13 @@ FilesView.prototype.deleteFiles = function(i_value, i_path) {
 	// console.log(cmd);
 
 	n_Request({
-		"send": {"cmdexec": {"cmds": [cmd]}},
-		"func": this.filesDeleted,
-		"this": this,
-		"delpath": i_path,
-		"info": 'delete',
-		"wait": false,
-		"parse": true
+		'send': {'cmdexec': {'cmds': [cmd]}},
+		'func': this.filesDeleted,
+		'this': this,
+		'delpath': i_path,
+		'info': 'delete',
+		'wait': false,
+		'parse': true
 	});
 };
 FilesView.prototype.filesDeleted = function(i_data, i_args) {
@@ -1674,10 +1722,10 @@ FilesView.prototype.bufferPut = function() {
 		return;
 
 	n_Request({
-		"send": {"cmdexec": {"cmds": cmds}},
-		"func": this.bufferPutFinished,
-		"this": this,
-		"info": 'buffer move'
+		'send': {'cmdexec': {'cmds': cmds}},
+		'func': this.bufferPutFinished,
+		'this': this,
+		'info': 'buffer move'
 	});
 };
 FilesView.prototype.bufferPutFinished = function(i_data, i_args) {
@@ -1766,7 +1814,7 @@ FilesView.prototype.annotate = function(i_elItem) {
 
 	var elColors = document.createElement('div');
 	elPanel.appendChild(elColors);
-	u_DrawColorBars({"el": elColors, "onclick": fv_editColorOnClick, "data": {"el": i_elItem}});
+	u_DrawColorBars({'el': elColors, 'onclick': fv_editColorOnClick, 'data': {'el': i_elItem}});
 };
 function fv_editColorOnClick(i_clr, i_data)
 {
@@ -1806,7 +1854,7 @@ FilesView.prototype.annotateApply = function(i_elItem) {
 	obj.object = walk;
 	obj.file = c_GetRuFilePath('walk.json', this.path);
 
-	n_Request({"send": {"editobj": obj}, "func": fv_annotateFinished, "fv": this, "elItem": i_elItem});
+	n_Request({'send': {'editobj': obj}, 'func': fv_annotateFinished, 'fv': this, 'elItem': i_elItem});
 	// console.log( JSON.stringify( obj));
 };
 function fv_annotateFinished(i_data, i_args)
@@ -1852,7 +1900,9 @@ function fv_PreviewOpen(i_el)
 	i_el.m_elPreview = elPreview;
 	i_el.appendChild(elPreview);
 	elPreview.classList.add('preview');
-	elPreview.onclick = function(e) { e.stopPropagation(); };
+	elPreview.onclick = function(e) {
+		e.stopPropagation();
+	};
 
 	var el = document.createElement('div');
 	elPreview.appendChild(el);

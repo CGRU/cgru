@@ -15,24 +15,25 @@ CmdTestMsg::CmdTestMsg()
 	setArgsCount(2);
 	setInfo("Test message.");
 	setHelp("tmsg [string] [count]\nGenerate some strings. For debug purposes.");
-	setMsgType( af::Msg::TTESTDATA);
+	setMsgType(af::Msg::TTESTDATA);
 }
 
-CmdTestMsg::~CmdTestMsg(){}
+CmdTestMsg::~CmdTestMsg() {}
 
-bool CmdTestMsg::v_processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdTestMsg::v_processArguments(int argc, char **argv, af::Msg &msg)
 {
-	std::string qstring( argv[0]);
+	std::string qstring(argv[0]);
 	int count = atoi(argv[1]);
-	af::MCTest mctest( count, qstring);
-	for( int i = 0; i < count; i++) mctest.addString( af::itos(i) + ": " + qstring);
-	msg.set( af::Msg::TTESTDATA, &mctest);
-	if( Verbose ) msg.stdOutData();
+	af::MCTest mctest(count, qstring);
+	for (int i = 0; i < count; i++)
+		mctest.addString(af::itos(i) + ": " + qstring);
+	msg.set(af::Msg::TTESTDATA, &mctest);
+	if (Verbose)
+		msg.stdOutData();
 	return true;
 }
 
-void CmdTestMsg::v_msgOut( af::Msg& msg) {}
-
+void CmdTestMsg::v_msgOut(af::Msg &msg) {}
 
 CmdTestThreads::CmdTestThreads()
 {
@@ -42,51 +43,45 @@ CmdTestThreads::CmdTestThreads()
 	setHelp("tthr [count]\nRaise [count] number of threads. For debug purposes.");
 }
 
-CmdTestThreads::~CmdTestThreads(){}
+CmdTestThreads::~CmdTestThreads() {}
 
-void testThread( void * i_args)
+void testThread(void *i_args)
 {
-	int * ints = (int*)(i_args);
+	int *ints = (int *)(i_args);
 	printf("#%09d started.\n", ints[0]);
 	af::sleep_sec(1);
 	printf("#%09d finished.\n", ints[0]);
-	delete [] ints;
+	delete[] ints;
 }
 
-bool CmdTestThreads::v_processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdTestThreads::v_processArguments(int argc, char **argv, af::Msg &msg)
 {
 	int count = atoi(argv[0]);
 
-	for( int i = 0; i < count; i++)
+	for (int i = 0; i < count; i++)
 	{
 		af::sleep_msec(1);
 
 		DlThread *t = new DlThread();
-		int * args = new int[1024];
+		int *args = new int[1024];
 		args[0] = i;
 
 		t->SetDetached();
-		int result = t->Start( testThread, args);
+		int result = t->Start(testThread, args);
 
-		switch( result)
+		switch (result)
 		{
-			case 0:
-				continue;
+			case 0: continue;
 
-			case EAGAIN:
-				printf("Insufficient resources to create another thread [%d].\n", i);
-				break;
+			case EAGAIN: printf("Insufficient resources to create another thread [%d].\n", i); break;
 
-			case EINVAL:
-				printf("Invalid thread settings [%d].\n", i);
-				break;
+			case EINVAL: printf("Invalid thread settings [%d].\n", i); break;
 
 			case EPERM:
 				printf("No permission to set the scheduling policy and parameters specified [%d].\n", i);
 				break;
 
-			default:
-				AF_ERR << "Unknown error [" << i << "].";
+			default: AF_ERR << "Unknown error [" << i << "].";
 		}
 
 		return true;
@@ -97,5 +92,4 @@ bool CmdTestThreads::v_processArguments( int argc, char** argv, af::Msg &msg)
 	return true;
 }
 
-void CmdTestThreads::v_msgOut( af::Msg& msg) {}
-
+void CmdTestThreads::v_msgOut(af::Msg &msg) {}

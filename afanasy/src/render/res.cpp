@@ -22,27 +22,27 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-af::PyModule * PyMod_GetCPUTemperature = NULL;
-PyObject * PyFunc_GetCPUTemperature = NULL;
+af::PyModule *PyMod_GetCPUTemperature = NULL;
+PyObject *PyFunc_GetCPUTemperature = NULL;
 
-af::PyModule * PyMod_GetHWInfo = NULL;
-PyObject * PyFunc_GetHWInfo = NULL;
+af::PyModule *PyMod_GetHWInfo = NULL;
+PyObject *PyFunc_GetHWInfo = NULL;
 
 // Haders:
 void InitResources();
 
-void GetResources_LINUX(af::HostRes & hres, bool verbose = false);
-void GetResources_MACOSX(af::HostRes & hres, bool verbose = false);
-void GetResources_WINDOWS(af::HostRes & hres, bool verbose = false);
+void GetResources_LINUX(af::HostRes &hres, bool verbose = false);
+void GetResources_MACOSX(af::HostRes &hres, bool verbose = false);
+void GetResources_WINDOWS(af::HostRes &hres, bool verbose = false);
 
-bool GetGPUInfo_NVIDIA(af::HostRes & o_hres, bool i_verbose = false);
+bool GetGPUInfo_NVIDIA(af::HostRes &o_hres, bool i_verbose = false);
 
 int getCPUTemperature();
 
 const std::string getHWInfo();
 
 // Definitions:
-void GetResources(af::HostRes & o_hres, bool i_verbose)
+void GetResources(af::HostRes &o_hres, bool i_verbose)
 {
 	static int counter = 0;
 
@@ -63,9 +63,9 @@ void GetResources(af::HostRes & o_hres, bool i_verbose)
 
 	if (GetGPUInfo_NVIDIA(o_hres, i_verbose) == false)
 	{
-		o_hres.gpu_gpu_util     = 0;
-		o_hres.gpu_gpu_temp     = 0;
-		o_hres.gpu_mem_used_mb  = 0;
+		o_hres.gpu_gpu_util = 0;
+		o_hres.gpu_gpu_temp = 0;
+		o_hres.gpu_mem_used_mb = 0;
 		o_hres.gpu_mem_total_mb = 0;
 		o_hres.gpu_string.clear();
 	}
@@ -80,8 +80,10 @@ void GetResources(af::HostRes & o_hres, bool i_verbose)
 void InitResources()
 {
 	PyMod_GetCPUTemperature = new af::PyModule();
-	if (PyMod_GetCPUTemperature->init(AFPYNAMES::RES_CLASSESDIR,af::Environment::getRenderCPUTemperatureMod()))
-		PyFunc_GetCPUTemperature = PyMod_GetCPUTemperature->getFunction(af::Environment::getRenderCPUTemperatureMod());
+	if (PyMod_GetCPUTemperature->init(AFPYNAMES::RES_CLASSESDIR,
+									  af::Environment::getRenderCPUTemperatureMod()))
+		PyFunc_GetCPUTemperature =
+			PyMod_GetCPUTemperature->getFunction(af::Environment::getRenderCPUTemperatureMod());
 
 	PyMod_GetHWInfo = new af::PyModule();
 	if (PyMod_GetHWInfo->init(AFPYNAMES::RES_CLASSESDIR, af::Environment::getRenderHWInfoMod()))
@@ -99,7 +101,7 @@ int getCPUTemperature()
 	if (PyFunc_GetCPUTemperature == NULL)
 		return 0;
 
-	PyObject * pResult = PyObject_CallObject(PyFunc_GetCPUTemperature, NULL);
+	PyObject *pResult = PyObject_CallObject(PyFunc_GetCPUTemperature, NULL);
 	if (pResult == NULL)
 	{
 		if (PyErr_Occurred())
@@ -127,7 +129,7 @@ const std::string getHWInfo()
 	if (PyFunc_GetHWInfo == NULL)
 		return hw_info;
 
-	PyObject * pResult = PyObject_CallObject(PyFunc_GetHWInfo, NULL);
+	PyObject *pResult = PyObject_CallObject(PyFunc_GetHWInfo, NULL);
 	if (pResult == NULL)
 	{
 		if (PyErr_Occurred())

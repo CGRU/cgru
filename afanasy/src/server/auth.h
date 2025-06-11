@@ -9,31 +9,33 @@
 
 class Auth
 {
-public:
+  public:
 	Auth();
-	Auth( const JSON & i_obj, const af::Address & i_address);
+	Auth(const JSON &i_obj, const af::Address &i_address);
 	~Auth();
 
-public:
-	static bool process( const af::Msg * i_msg, af::Msg ** o_msg);
-	static const std::string md5( const std::string & i_str);
+  public:
+	static bool process(const af::Msg *i_msg, af::Msg **o_msg);
+	static const std::string md5(const std::string &i_str);
 	static void free();
 
-private:
+  private:
 	static const std::string newNonce();
 
-private:
+  private:
 	static std::map<std::string, Auth> ms_map;
 	static DlMutex m_mutex;
 
-private:
+  private:
 	bool isValid() const { return m_time != 0; }
-	bool check( const JSON & i_obj, const af::Address & i_address);
+	bool check(const JSON &i_obj, const af::Address &i_address);
 
 	inline const std::string calcResponse() const
-		{ return Auth::md5( m_digest + ':' + m_nonce + ':' + af::itos( m_nc)); }
+	{
+		return Auth::md5(m_digest + ':' + m_nonce + ':' + af::itos(m_nc));
+	}
 
-private:
+  private:
 	std::string m_user_name;
 	std::string m_digest;
 	std::string m_nonce;

@@ -14,7 +14,7 @@
 	asset.js - user administration page
 */
 
-"use strict";
+'use strict';
 
 var ASSETS = {};
 var ASSET = null;
@@ -135,7 +135,7 @@ function a_Append(i_path, i_rules)
 function a_AutoSeek()
 {
 	var log_console = false;
-	//log_console = true;
+	// log_console = true;
 	if (log_console)
 		console.log('a_AutoSeek(): "' + g_CurPath() + '"');
 
@@ -210,7 +210,7 @@ function a_AutoSeek()
 
 				if (log_console)
 					console.log(path + ' <> ' + seekpath);
-				let re = new RegExp('^' + seekpath + '$','i');
+				let re = new RegExp('^' + seekpath + '$', 'i');
 				if (path.match(re) != null)
 				{
 					// Verify whether an asset with the same path exists.
@@ -286,7 +286,7 @@ function a_Copy(i_args)
 	let title = i_args.title;
 	if (title == null)
 		title = 'Create Asset';
-	let wnd = new cgru_Window({"name": 'copy_asset', "title": title});
+	let wnd = new cgru_Window({'name': 'copy_asset', 'title': title});
 	wnd.m_args = i_args;
 
 	let params = {};
@@ -312,7 +312,9 @@ function a_Copy(i_args)
 	elCreate.textContent = 'Create';
 	elCreate.classList.add('button');
 	elCreate.m_wnd = wnd;
-	elCreate.onclick = function(e) {a_CopySend(e.currentTarget.m_wnd); };
+	elCreate.onclick = function(e) {
+		a_CopySend(e.currentTarget.m_wnd);
+	};
 
 	let elResults = document.createElement('div');
 	wnd.elContent.appendChild(elResults);
@@ -336,7 +338,7 @@ function a_CopySend(i_wnd)
 	request.destination = c_PathPM_Rules2Server(params.destination);
 	request.names = [params.name];
 
-	n_Request({"send": {"copytemplate": request}, "func": a_CopyReceived, "wnd": i_wnd});
+	n_Request({'send': {'copytemplate': request}, 'func': a_CopyReceived, 'wnd': i_wnd});
 
 	// Clear walk cache, as we need to navigate there later:
 	n_walks[params.destination] = null;
@@ -360,7 +362,7 @@ function a_CopyReceived(i_data, i_args)
 	{
 		if (item.error)
 		{
-			elResults.innerHTML = '<b>ERROR:</b><br>' + item.error.replace(/\n/g,'<br>');
+			elResults.innerHTML = '<b>ERROR:</b><br>' + item.error.replace(/\n/g, '<br>');
 			return;
 		}
 		if (item.exist)

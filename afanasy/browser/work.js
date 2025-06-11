@@ -14,11 +14,11 @@
 	work.js - work related methods for Branches, Jobs, Users
 */
 
-"use strict";
+'use strict';
 
 var work_params = {
 	priority /***************/: {'type': 'num', 'label': 'Priority'},
-	pools                     : {"type": 'msi', "label": 'Pools'},
+	pools: {'type': 'msi', 'label': 'Pools'},
 	max_running_tasks /******/: {'type': 'num', 'label': 'Max Running Tasks'},
 	max_running_tasks_per_host: {'type': 'num', 'label': 'Max Running Tasks Per Host'},
 	hosts_mask /*************/: {'type': 'reg', 'label': 'Hosts Mask'},
@@ -37,18 +37,18 @@ function work_generateParamsString(i_params, i_type)
 	if (cm_IsPadawan())
 	{
 		if ((i_params.max_running_tasks != null) && (i_params.max_running_tasks != -1))
-			str += " MaxRunTasks:<b>" + i_params.max_running_tasks + "</b>";
+			str += ' MaxRunTasks:<b>' + i_params.max_running_tasks + '</b>';
 		if ((i_params.max_running_tasks_per_host != null) && (i_params.max_running_tasks_per_host != -1))
-			str += " MaxPerHost:<b>" + i_params.max_running_tasks_per_host + "</b>";
+			str += ' MaxPerHost:<b>' + i_params.max_running_tasks_per_host + '</b>';
 		if (i_params.hosts_mask)
-			str += " HostsMask:<b>" + i_params.hosts_mask + "</b>";
+			str += ' HostsMask:<b>' + i_params.hosts_mask + '</b>';
 		if (i_params.hosts_mask_exclude)
-			str += " ExcludeHosts:<b>" + i_params.hosts_mask_exclude + "</b>";
+			str += ' ExcludeHosts:<b>' + i_params.hosts_mask_exclude + '</b>';
 		if (i_type != 'job')
 		{
-			str += " Solving:";
+			str += ' Solving:';
 			str += (i_params.solve_method == 'solve_priority') ? ' <b>Priority</b>' : ' <b>Order</b>';
-			str += (i_params.solve_need   == 'solve_capacity') ? ', <b>Capacity</b>' : ', <b>RunTasks</b>';
+			str += (i_params.solve_need == 'solve_capacity') ? ', <b>Capacity</b>' : ', <b>RunTasks</b>';
 		}
 		if (i_params.max_tasks_per_second != null)
 		{
@@ -58,23 +58,23 @@ function work_generateParamsString(i_params, i_type)
 				str += ' MTPS:<b>' + i_params.max_tasks_per_second + '</b>';
 		}
 
-		str += " Priority:<b>" + i_params.priority + "</b>";
+		str += ' Priority:<b>' + i_params.priority + '</b>';
 	}
 	else if (cm_IsJedi())
 	{
 		if ((i_params.max_running_tasks != null) && (i_params.max_running_tasks != -1))
-			str += " Max:<b>" + i_params.max_running_tasks + "</b>";
+			str += ' Max:<b>' + i_params.max_running_tasks + '</b>';
 		if ((i_params.max_running_tasks_per_host != null) && (i_params.max_running_tasks_per_host != -1))
-			str += " MPH:<b>" + i_params.max_running_tasks_per_host + "</b>";
+			str += ' MPH:<b>' + i_params.max_running_tasks_per_host + '</b>';
 		if (i_params.hosts_mask)
-			str += " Hosts:<b>" + i_params.hosts_mask + "</b>";
+			str += ' Hosts:<b>' + i_params.hosts_mask + '</b>';
 		if (i_params.hosts_mask_exclude)
-			str += " Exclude:<b>" + i_params.hosts_mask_exclude + "</b>";
+			str += ' Exclude:<b>' + i_params.hosts_mask_exclude + '</b>';
 		if (i_type != 'job')
 		{
-			str += " Slv:";
+			str += ' Slv:';
 			str += (i_params.solve_method == 'solve_priority') ? '<b>Priority</b>' : '<b>Order</b>';
-			str += (i_params.solve_need   == 'solve_capacity') ? ',<b>Capacity</b>' : ',<b>RunTasks</b>';
+			str += (i_params.solve_need == 'solve_capacity') ? ',<b>Capacity</b>' : ',<b>RunTasks</b>';
 		}
 		if (i_params.max_tasks_per_second != null)
 		{
@@ -83,23 +83,23 @@ function work_generateParamsString(i_params, i_type)
 			else
 				str += ' MTPS:<b>' + i_params.max_tasks_per_second + '</b>';
 		}
-		str += " Pri:<b>" + i_params.priority + "</b>";
+		str += ' Pri:<b>' + i_params.priority + '</b>';
 	}
 	else
 	{
 		if ((i_params.max_running_tasks != null) && (i_params.max_running_tasks != -1))
-			str += " m:<b>" + i_params.max_running_tasks + "</b>";
+			str += ' m:<b>' + i_params.max_running_tasks + '</b>';
 		if ((i_params.max_running_tasks_per_host != null) && (i_params.max_running_tasks_per_host != -1))
-			str += " mph:<b>" + i_params.max_running_tasks_per_host + "</b>";
+			str += ' mph:<b>' + i_params.max_running_tasks_per_host + '</b>';
 		if (i_params.hosts_mask)
-			str += " h:<b>" + i_params.hosts_mask + "</b>";
+			str += ' h:<b>' + i_params.hosts_mask + '</b>';
 		if (i_params.hosts_mask_exclude)
-			str += " e:<b>" + i_params.hosts_mask_exclude + "</b>";
+			str += ' e:<b>' + i_params.hosts_mask_exclude + '</b>';
 		if (i_type != 'job')
 		{
-			str += " s:";
+			str += ' s:';
 			str += (i_params.solve_method == 'solve_priority') ? '<b>pri</b>' : '<b>ord</b>';
-			str += (i_params.solve_need   == 'solve_capacity') ? ',<b>cap</b>' : ',<b>tasts</b>';
+			str += (i_params.solve_need == 'solve_capacity') ? ',<b>cap</b>' : ',<b>tasts</b>';
 		}
 		if (i_params.max_tasks_per_second != null)
 		{
@@ -108,7 +108,7 @@ function work_generateParamsString(i_params, i_type)
 			else
 				str += ' MTPS:<b>' + i_params.max_tasks_per_second + '</b>';
 		}
-		str += " <b>" + i_params.priority + "</b>";
+		str += ' <b>' + i_params.priority + '</b>';
 	}
 
 	return str;
@@ -124,23 +124,23 @@ function work_generateRunningCountsString(i_params, i_type)
 	if (cm_IsPadawan())
 	{
 		if (i_params.running_tasks_num)
-			str += "Running Tasks:<b>" + i_params.running_tasks_num + "</b>";
+			str += 'Running Tasks:<b>' + i_params.running_tasks_num + '</b>';
 		if (i_params.running_capacity_total)
-			str += " Capacity:<b>" + cm_ToKMG(i_params.running_capacity_total) + "</b>";
+			str += ' Capacity:<b>' + cm_ToKMG(i_params.running_capacity_total) + '</b>';
 	}
 	else if (cm_IsJedi())
 	{
 		if (i_params.running_tasks_num)
-			str += "Tasks:<b>" + i_params.running_tasks_num + "</b>";
+			str += 'Tasks:<b>' + i_params.running_tasks_num + '</b>';
 		if (i_params.running_capacity_total)
-			str += " Capacity:<b>" + cm_ToKMG(i_params.running_capacity_total) + "</b>";
+			str += ' Capacity:<b>' + cm_ToKMG(i_params.running_capacity_total) + '</b>';
 	}
 	else
 	{
 		if (i_params.running_tasks_num)
-			str += "t:<b>" + i_params.running_tasks_num + "</b>";
+			str += 't:<b>' + i_params.running_tasks_num + '</b>';
 		if (i_params.running_capacity_total)
-			str += " c:<b>" + cm_ToKMG(i_params.running_capacity_total) + "</b>";
+			str += ' c:<b>' + cm_ToKMG(i_params.running_capacity_total) + '</b>';
 	}
 
 	return str;

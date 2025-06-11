@@ -14,7 +14,7 @@
 	wndtask.js - contains the detail window for a task
 */
 
-"use strict";
+'use strict';
 
 var wt_windows = [];
 
@@ -57,7 +57,7 @@ function wt_FileOpen(i_evt)
 	for (var c = 0; c < cgru_Config.previewcmds.length; c++)
 	{
 		var cmd = cgru_Config.previewcmds[c].replace('@ARG@', file);
-		cgru_CmdExecCreate({"parent": elCmds, "cmd": cmd, "label": cmd});
+		cgru_CmdExecCreate({'parent': elCmds, 'cmd': cmd, 'label': cmd});
 	}
 
 	return false;
@@ -95,8 +95,12 @@ function WndTask(i_args)
 	i_args.title = this.name;
 	this.wnd = g_OpenWindow(i_args);
 	this.wnd.wndtask = this;
-	this.wnd.onbeforeunload = function(e) { e.currentTarget.wndtask.destroy() };
-	this.wnd.onDestroy = function(i_wnd) { i_wnd.wndtask.destroy(); };
+	this.wnd.onbeforeunload = function(e) {
+		e.currentTarget.wndtask.destroy()
+	};
+	this.wnd.onDestroy = function(i_wnd) {
+		i_wnd.wndtask.destroy();
+	};
 	this.elContent = this.wnd.elContent;
 	this.elContent.classList.add('wnd_task');
 
@@ -149,8 +153,12 @@ function WndTask(i_args)
 	this.elOutputNum.classList.add('output_num');
 	this.elOutputNum.contentEditable = true;
 	this.elOutputNum.m_wnd_task = this;
-	this.elOutputNum.onkeydown = function(e) { e.currentTarget.m_wnd_task.outNumPress(e); };
-	this.elOutputNum.onblur = function(e) { e.currentTarget.m_wnd_task.outNumBlur(e); };
+	this.elOutputNum.onkeydown = function(e) {
+		e.currentTarget.m_wnd_task.outNumPress(e);
+	};
+	this.elOutputNum.onblur = function(e) {
+		e.currentTarget.m_wnd_task.outNumBlur(e);
+	};
 
 	// Tabs:
 	var divTabs = document.createElement('div');
@@ -176,7 +184,9 @@ function WndTask(i_args)
 		el.textContent = wt_labels[i];
 		el.m_type = wt_types[i];
 		el.m_wndtask = this;
-		el.onclick = function(e) { e.currentTarget.m_wndtask.tabClicked(e.currentTarget.m_type); };
+		el.onclick = function(e) {
+			e.currentTarget.m_wndtask.tabClicked(e.currentTarget.m_type);
+		};
 		this.elTabs[wt_types[i]] = el;
 
 		var el = document.createElement('div');
@@ -209,14 +219,14 @@ WndTask.prototype.close = function() {
 };
 
 WndTask.prototype.get = function(i_mode) {
-	var get = {"type": 'jobs', "ids": [this.pos.job], "mode": i_mode};
+	var get = {'type': 'jobs', 'ids': [this.pos.job], 'mode': i_mode};
 	get.block_ids = [this.pos.block];
 	get.task_ids = [this.pos.task];
 	get.mon_id = g_id;
 	if ((i_mode == 'output') && this.output_number)
 		get.number = this.output_number;
 
-	nw_request({"send": {"get": get}, "func": WndTaskShow});
+	nw_request({'send': {'get': get}, 'func': WndTaskShow});
 };
 
 WndTask.prototype.tabClicked = function(i_type) {
@@ -384,7 +394,7 @@ WndTask.prototype.listen_Start = function(i_args) {
 	if (i_args.task != null)
 		name = 'Listen Task';
 
-	var wnd = new cgru_Window({"name": name, "wnd": i_args.parent_window});
+	var wnd = new cgru_Window({'name': name, 'wnd': i_args.parent_window});
 	wnd.elContent.classList.add('listen');
 
 	wnd.listen = i_args;
@@ -424,12 +434,12 @@ WndTask.prototype.showExec = function(i_obj) {
 
 	var t_attrs = {};
 	t_attrs.name = {};
-	t_attrs.capacity = {"float": 'left', "width": '24%'};
-	t_attrs.service = {"float": 'left', "width": '38%'};
-	t_attrs.parser = {"float": 'left', "width": '38%'};
-	t_attrs.command = {"pathmap": true};
-	t_attrs.working_directory = {"label": 'Directory', "pathmap": true};
-	t_attrs.environment = {"label": 'Environ'};
+	t_attrs.capacity = {'float': 'left', 'width': '24%'};
+	t_attrs.service = {'float': 'left', 'width': '38%'};
+	t_attrs.parser = {'float': 'left', 'width': '38%'};
+	t_attrs.command = {'pathmap': true};
+	t_attrs.working_directory = {'label': 'Directory', 'pathmap': true};
+	t_attrs.environment = {'label': 'Environ'};
 
 	var attrs = document.createElement('div');
 	elParent.appendChild(attrs);

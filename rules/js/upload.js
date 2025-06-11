@@ -14,7 +14,7 @@
 	upload.js - TODO: description
 */
 
-"use strict";
+'use strict';
 
 var up_elFiles = [];
 var up_counter = 0;
@@ -38,14 +38,14 @@ function up_InitConfigured()
 		return;
 
 	up_max_filesize = parseInt(RULES.upload_max_filesize);
-	if ( ! up_max_filesize)
+	if (!up_max_filesize)
 		return;
 
 	if (RULES.upload_max_filesize.includes('G'))
 		up_max_filesize *= 1000000000;
-	else if(RULES.upload_max_filesize.includes('M'))
+	else if (RULES.upload_max_filesize.includes('M'))
 		up_max_filesize *= 1000000;
-	else if(RULES.upload_max_filesize.includes('K'))
+	else if (RULES.upload_max_filesize.includes('K'))
 		up_max_filesize *= 1000;
 
 	up_max_filesize_str = c_Bytes2KMG(up_max_filesize);
@@ -159,7 +159,9 @@ function up_CreateFile(i_args)
 	elBtnAdd.classList.add('button');
 	elBtnAdd.textContent = '+';
 	elBtnAdd.m_elFile = el;
-	elBtnAdd.onclick = function(e) { up_Start(e.currentTarget.m_elFile); };
+	elBtnAdd.onclick = function(e) {
+		up_Start(e.currentTarget.m_elFile);
+	};
 	elBtnAdd.style.cssFloat = 'left';
 
 	var elBtnDel = document.createElement('div');
@@ -168,7 +170,9 @@ function up_CreateFile(i_args)
 	elBtnDel.classList.add('button');
 	elBtnDel.textContent = '-';
 	elBtnDel.m_elFile = el;
-	elBtnDel.onclick = function(e) { up_Remove(e.currentTarget.m_elFile); };
+	elBtnDel.onclick = function(e) {
+		up_Remove(e.currentTarget.m_elFile);
+	};
 	elBtnDel.style.cssFloat = 'right';
 
 	var elInfo = document.createElement('a');
@@ -178,7 +182,7 @@ function up_CreateFile(i_args)
 	let info = c_Bytes2KMG(file.size) + ' ' + file.name;
 	if (file.size > up_max_filesize)
 	{
-		info = "Size too big: "+ info;
+		info = 'Size too big: ' + info;
 		el.classList.add('error');
 		elBtnAdd.style.display = 'none';
 	}
@@ -335,7 +339,7 @@ function up_Received(i_args, i_el)
 
 	// File (path base) can be renamed during upload
 	path = c_PathDir(i_el.m_uppath) + '/' + c_PathBase(path);
-	let news_link = g_GetLocationArgs({"fv_Goto": path}, false, i_el.m_curpath);
+	let news_link = g_GetLocationArgs({'fv_Goto': path}, false, i_el.m_curpath);
 	news = nw_CreateNews({'title': i_el.m_uptitle, 'path': i_el.m_curpath, 'link': news_link});
 
 	nw_SendNews([news]);
@@ -362,7 +366,7 @@ function up_Done(i_el, i_file_info)
 	// Refresh files views same path:
 	fv_RefreshPath(c_PathDir(i_el.m_uppath));
 
-	//c_MakeThumbnail(c_PathDir(i_el.m_uppath) + '/' + c_PathBase(i_file_info.path));
+	// c_MakeThumbnail(c_PathDir(i_el.m_uppath) + '/' + c_PathBase(i_file_info.path));
 }
 
 function up_Remove(i_el)

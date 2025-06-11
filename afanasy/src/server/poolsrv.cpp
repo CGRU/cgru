@@ -22,8 +22,8 @@
 
 #include "action.h"
 #include "afcommon.h"
-#include "poolscontainer.h"
 #include "monitorcontainer.h"
+#include "poolscontainer.h"
 #include "renderaf.h"
 
 #define AFOUTPUT
@@ -31,36 +31,35 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-PoolsContainer * PoolSrv::ms_pools = NULL;
+PoolsContainer *PoolSrv::ms_pools = NULL;
 
-PoolSrv::PoolSrv(PoolSrv * i_parent, const std::string & i_path):
-	af::Pool(i_path),
-	AfNodeFarm(this, this, AfNodeFarm::TPool, "pool", i_parent, "")
+PoolSrv::PoolSrv(PoolSrv *i_parent, const std::string &i_path)
+	: af::Pool(i_path), AfNodeFarm(this, this, AfNodeFarm::TPool, "pool", i_parent, "")
 {
 	appendLogInfo("Created.");
 }
 
-PoolSrv::PoolSrv(const std::string & i_store_dir):
-	af::Pool(),
-	AfNodeFarm(this, this, AfNodeFarm::TPool, "pool", NULL, i_store_dir)
+PoolSrv::PoolSrv(const std::string &i_store_dir)
+	: af::Pool(), AfNodeFarm(this, this, AfNodeFarm::TPool, "pool", NULL, i_store_dir)
 {
 	int size;
-	char * data = af::fileRead(getStoreFile(), &size);
-	if (data == NULL) return;
+	char *data = af::fileRead(getStoreFile(), &size);
+	if (data == NULL)
+		return;
 
 	rapidjson::Document document;
-	char * res = af::jsonParseData(document, data, size);
+	char *res = af::jsonParseData(document, data, size);
 	if (res == NULL)
 	{
-		delete [] data;
+		delete[] data;
 		return;
 	}
 
 	if (jsonRead(document))
 		setStoredOk();
 
-	delete [] res;
-	delete [] data;
+	delete[] res;
+	delete[] data;
 }
 
 bool PoolSrv::initialize()
@@ -96,7 +95,7 @@ bool PoolSrv::initialize()
 		{
 			// The root pool is just created for the first time (not from store)
 			m_max_tasks_host = AFPOOL::ROOT_HOST_MAX_TASKS;
-			m_capacity_host  = AFPOOL::ROOT_HOST_CAPACITY;
+			m_capacity_host = AFPOOL::ROOT_HOST_CAPACITY;
 		}
 
 		m_time_creation = time(NULL);
@@ -109,13 +108,11 @@ bool PoolSrv::initialize()
 	return true;
 }
 
-PoolSrv::~PoolSrv()
-{
-}
+PoolSrv::~PoolSrv() {}
 
-void PoolSrv::v_action(Action & i_action)
+void PoolSrv::v_action(Action &i_action)
 {
-	const JSON & operation = (*i_action.data)["operation"];
+	const JSON &operation = (*i_action.data)["operation"];
 	if (operation.IsObject())
 	{
 		std::string type;
@@ -160,7 +157,7 @@ void PoolSrv::v_action(Action & i_action)
 			if (exit)
 				i_action.log.appendType("exit");
 			i_action.log.info = cmd;
-			//log += " request by " + i_action.author + " on pool " + m_name + "\n" + cmd;
+			// log += " request by " + i_action.author + " on pool " + m_name + "\n" + cmd;
 
 			actionLaunchCmd(i_action, cmd, exit);
 
@@ -187,14 +184,14 @@ void PoolSrv::v_action(Action & i_action)
 			return;
 		}
 
-		//appendLog("Operation \"" + type + "\" by " + i_action.author);
+		// appendLog("Operation \"" + type + "\" by " + i_action.author);
 
-		i_action.monitors->addEvent( af::Monitor::EVT_pools_change, m_id);
+		i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_id);
 		store();
 		return;
 	}
 
-	const JSON & params = (*i_action.data)["params"];
+	const JSON &params = (*i_action.data)["params"];
 	if (params.IsObject())
 		jsonRead(params, &i_action.log.info);
 
@@ -208,14 +205,14 @@ void PoolSrv::v_action(Action & i_action)
 
 void PoolSrv::dispatchFarmConfig()
 {
-	for (auto & it : m_pools_list)
+	for (auto &it : m_pools_list)
 		it->dispatchFarmConfig();
 
-	for (auto & it : m_renders_list)
+	for (auto &it : m_renders_list)
 		it->getPoolConfig();
 }
 
-void PoolSrv::actionDelete(Action & i_action)
+void PoolSrv::actionDelete(Action &i_action)
 {
 	if (NULL == m_parent)
 	{
@@ -234,21 +231,21 @@ void PoolSrv::actionDelete(Action & i_action)
 	i_action.monitors->addEvent(af::Monitor::EVT_pools_del, m_id);
 	i_action.monitors->addEvent(af::Monitor::EVT_pools_change, m_parent->getId());
 
-	//appendLog(std::string("Deleted by ") + i_action.author);
+	// appendLog(std::string("Deleted by ") + i_action.author);
 	setZombie();
 }
 
-bool PoolSrv::hasPool(const std::string & i_name) const
+bool PoolSrv::hasPool(const std::string &i_name) const
 {
-	for (std::list<PoolSrv*>::const_iterator it = m_pools_list.begin(); it != m_pools_list.end(); it++)
+	for (std::list<PoolSrv *>::const_iterator it = m_pools_list.begin(); it != m_pools_list.end(); it++)
 		if ((*it)->getName() == i_name)
 			return true;
 	return false;
 }
 
-bool PoolSrv::hasPool(const PoolSrv * i_pool) const
+bool PoolSrv::hasPool(const PoolSrv *i_pool) const
 {
-	for (std::list<PoolSrv*>::const_iterator it = m_pools_list.begin(); it != m_pools_list.end(); it++)
+	for (std::list<PoolSrv *>::const_iterator it = m_pools_list.begin(); it != m_pools_list.end(); it++)
 	{
 		if (*it == i_pool)
 			return true;
@@ -259,17 +256,17 @@ bool PoolSrv::hasPool(const PoolSrv * i_pool) const
 	return false;
 }
 
-bool PoolSrv::hasRender(const RenderAf * i_render) const
+bool PoolSrv::hasRender(const RenderAf *i_render) const
 {
-	for (std::list<RenderAf*>::const_iterator it = m_renders_list.begin(); it != m_renders_list.end(); it++)
+	for (std::list<RenderAf *>::const_iterator it = m_renders_list.begin(); it != m_renders_list.end(); it++)
 		if (*it == i_render)
 			return true;
 	return false;
 }
 
-void PoolSrv::actionAddPool(Action & i_action)
+void PoolSrv::actionAddPool(Action &i_action)
 {
-	const JSON & operation = (*i_action.data)["operation"];
+	const JSON &operation = (*i_action.data)["operation"];
 
 	std::string name;
 	if (false == af::jr_string("name", name, operation))
@@ -295,7 +292,7 @@ void PoolSrv::actionAddPool(Action & i_action)
 		return;
 	}
 
-	PoolSrv * pool = new PoolSrv(this, name);
+	PoolSrv *pool = new PoolSrv(this, name);
 
 	if (false == addPool(pool))
 	{
@@ -308,7 +305,7 @@ void PoolSrv::actionAddPool(Action & i_action)
 	i_action.answerInfo("Pool '" + pool->getName() + "' added to pool '" + getName() + "'");
 }
 
-bool PoolSrv::addPool(PoolSrv * i_pool)
+bool PoolSrv::addPool(PoolSrv *i_pool)
 {
 	if (hasPool(i_pool))
 	{
@@ -331,14 +328,14 @@ bool PoolSrv::addPool(PoolSrv * i_pool)
 	return true;
 }
 
-void PoolSrv::removePool(PoolSrv * i_pool)
+void PoolSrv::removePool(PoolSrv *i_pool)
 {
 	appendLogInfo(std::string("Removing a pool: ") + i_pool->getName(), false);
 
 	m_pools_list.remove(i_pool);
 }
 
-void PoolSrv::addRender(RenderAf * i_render)
+void PoolSrv::addRender(RenderAf *i_render)
 {
 	if (hasRender(i_render))
 	{
@@ -351,14 +348,14 @@ void PoolSrv::addRender(RenderAf * i_render)
 	m_renders_list.push_back(i_render);
 }
 
-void PoolSrv::removeRender(RenderAf * i_render)
+void PoolSrv::removeRender(RenderAf *i_render)
 {
 	appendLogInfo(std::string("Removing a render: ") + i_render->getName(), false);
 
 	m_renders_list.remove(i_render);
 }
 
-bool PoolSrv::assignRender(RenderAf * i_render)
+bool PoolSrv::assignRender(RenderAf *i_render)
 {
 	if (false == isRoot())
 	{
@@ -369,7 +366,7 @@ bool PoolSrv::assignRender(RenderAf * i_render)
 			return false;
 	}
 
-	for (PoolSrv * child : m_pools_list)
+	for (PoolSrv *child : m_pools_list)
 		if (child->assignRender(i_render))
 			return true;
 
@@ -379,20 +376,20 @@ bool PoolSrv::assignRender(RenderAf * i_render)
 	return true;
 }
 
-void PoolSrv::actionHealSick(Action & i_action)
+void PoolSrv::actionHealSick(Action &i_action)
 {
-	for (auto & it : m_renders_list)
+	for (auto &it : m_renders_list)
 		it->actionHealSick(i_action);
 
-	for (auto & it : m_pools_list)
+	for (auto &it : m_pools_list)
 		it->actionHealSick(i_action);
 
 	appendLog(i_action.log);
 }
 
-void PoolSrv::actionLaunchCmd(Action & i_action, const std::string & i_cmd, bool i_exit)
+void PoolSrv::actionLaunchCmd(Action &i_action, const std::string &i_cmd, bool i_exit)
 {
-	for (auto & it : m_renders_list)
+	for (auto &it : m_renders_list)
 	{
 		if (it->isOffline())
 			continue;
@@ -401,17 +398,17 @@ void PoolSrv::actionLaunchCmd(Action & i_action, const std::string & i_cmd, bool
 		it->launchAndExit(i_cmd, i_exit);
 	}
 
-	for (auto & it : m_pools_list)
+	for (auto &it : m_pools_list)
 	{
 		it->actionLaunchCmd(i_action, i_cmd, i_exit);
 		it->appendLog(i_action.log);
 	}
 }
 
-void PoolSrv::actionEjectTasks(Action & i_action)
+void PoolSrv::actionEjectTasks(Action &i_action)
 {
 
-	for (auto & it : m_renders_list)
+	for (auto &it : m_renders_list)
 	{
 		if (false == it->isBusy())
 			continue;
@@ -420,16 +417,16 @@ void PoolSrv::actionEjectTasks(Action & i_action)
 		it->ejectTasks(i_action.jobs, i_action.monitors, af::TaskExec::UPEject);
 	}
 
-	for (auto & it : m_pools_list)
+	for (auto &it : m_pools_list)
 	{
 		it->actionEjectTasks(i_action);
 		it->appendLog(i_action.log);
 	}
 }
 
-void PoolSrv::actionExitRenders(Action & i_action)
+void PoolSrv::actionExitRenders(Action &i_action)
 {
-	for (auto & it : m_renders_list)
+	for (auto &it : m_renders_list)
 	{
 		if (it->isOffline())
 			continue;
@@ -438,19 +435,19 @@ void PoolSrv::actionExitRenders(Action & i_action)
 		it->exitClient("exit", i_action.jobs, i_action.monitors);
 	}
 
-	for (auto & it : m_pools_list)
+	for (auto &it : m_pools_list)
 	{
 		it->actionExitRenders(i_action);
 		it->appendLog(i_action.log);
 	}
 }
 
-void PoolSrv::actionDeleteRenders(Action & i_action)
+void PoolSrv::actionDeleteRenders(Action &i_action)
 {
 	// We should operate a temporary list, as on deletion, primary list will change.
 	// And we can't perform a simple for cycle on a changing list.
-	std::list<RenderAf*> _renders_list(m_renders_list);
-	for (auto & it : _renders_list)
+	std::list<RenderAf *> _renders_list(m_renders_list);
+	for (auto &it : _renders_list)
 	{
 		if (it->isOnline())
 			continue;
@@ -459,14 +456,15 @@ void PoolSrv::actionDeleteRenders(Action & i_action)
 		it->offline(NULL, 0, i_action.monitors, true);
 	}
 
-	for (auto & it : m_pools_list)
+	for (auto &it : m_pools_list)
 	{
 		it->actionDeleteRenders(i_action);
 		it->appendLog(i_action.log);
 	}
 }
 
-bool PoolSrv::hasPoolTicket(const std::string & i_name, const int32_t & i_count, const bool i_ticket_running) const
+bool PoolSrv::hasPoolTicket(const std::string &i_name, const int32_t &i_count,
+							const bool i_ticket_running) const
 {
 	std::unordered_map<std::string, af::Farm::Tiks>::const_iterator it = m_farm->m_tickets_pool.find(i_name);
 	if (it != m_farm->m_tickets_pool.end())
@@ -509,10 +507,11 @@ bool PoolSrv::hasPoolTicket(const std::string & i_name, const int32_t & i_count,
 	return true;
 }
 
-void PoolSrv::taskAcuire(const af::TaskExec * i_taskexec, const std::list<std::string> & i_new_tickets, MonitorContainer * i_monitoring)
+void PoolSrv::taskAcuire(const af::TaskExec *i_taskexec, const std::list<std::string> &i_new_tickets,
+						 MonitorContainer *i_monitoring)
 {
 	// Increment tickets:
-	for (auto const& eIt : i_taskexec->getTickets())
+	for (auto const &eIt : i_taskexec->getTickets())
 	{
 		std::unordered_map<std::string, af::Farm::Tiks>::iterator it = m_tickets_pool.find(eIt.first);
 		if (it != m_tickets_pool.end())
@@ -529,7 +528,7 @@ void PoolSrv::taskAcuire(const af::TaskExec * i_taskexec, const std::list<std::s
 	incrementService(i_taskexec->getServiceType());
 
 	// Increment running tasks and capacity:
-	m_run_tasks ++;
+	m_run_tasks++;
 	m_run_capacity += i_taskexec->getCapacity();
 	if (false == isBusy())
 	{
@@ -544,10 +543,11 @@ void PoolSrv::taskAcuire(const af::TaskExec * i_taskexec, const std::list<std::s
 		m_parent->taskAcuire(i_taskexec, i_new_tickets, i_monitoring);
 }
 
-void PoolSrv::taskRelease(const af::TaskExec * i_taskexec, const std::list<std::string> & i_exp_tickets, MonitorContainer * i_monitoring)
+void PoolSrv::taskRelease(const af::TaskExec *i_taskexec, const std::list<std::string> &i_exp_tickets,
+						  MonitorContainer *i_monitoring)
 {
 	// Decrement tickets
-	for (auto const& eIt : i_taskexec->getTickets())
+	for (auto const &eIt : i_taskexec->getTickets())
 	{
 		std::unordered_map<std::string, af::Farm::Tiks>::iterator it = m_tickets_pool.find(eIt.first);
 		if (it != m_tickets_pool.end())
@@ -558,9 +558,8 @@ void PoolSrv::taskRelease(const af::TaskExec * i_taskexec, const std::list<std::
 			if (it->second.usage < 0)
 			{
 				// It should never happen!
-				AF_ERR << "Pool \"" << getName()
-					<< "\" has got a negative ticket \"" << it->first
-					<< "\" count. Resetting to zero.";
+				AF_ERR << "Pool \"" << getName() << "\" has got a negative ticket \"" << it->first
+					   << "\" count. Resetting to zero.";
 				it->second.usage = 0;
 			}
 
@@ -572,12 +571,10 @@ void PoolSrv::taskRelease(const af::TaskExec * i_taskexec, const std::list<std::
 			if (it->second.hosts < 0)
 			{
 				// It should never happen!
-				AF_ERR << "Pool \"" << getName()
-					<< "\" has got a negative ticket \"" << it->first
-					<< "\" hosts. Resetting to zero.";
+				AF_ERR << "Pool \"" << getName() << "\" has got a negative ticket \"" << it->first
+					   << "\" hosts. Resetting to zero.";
 				it->second.hosts = 0;
 			}
-
 		}
 	}
 
@@ -585,7 +582,7 @@ void PoolSrv::taskRelease(const af::TaskExec * i_taskexec, const std::list<std::
 	decrementService(i_taskexec->getServiceType());
 
 	// Decrement running tasks and capacity:
-	m_run_tasks --;
+	m_run_tasks--;
 	m_run_capacity -= i_taskexec->getCapacity();
 	if (m_run_tasks == 0)
 	{
@@ -600,74 +597,77 @@ void PoolSrv::taskRelease(const af::TaskExec * i_taskexec, const std::list<std::
 		m_parent->taskRelease(i_taskexec, i_exp_tickets, i_monitoring);
 }
 
-void PoolSrv::v_refresh(time_t i_currentTime, AfContainer * i_container, MonitorContainer * i_monitoring)
+void PoolSrv::v_refresh(time_t i_currentTime, AfContainer *i_container, MonitorContainer *i_monitoring)
 {
 	bool changed = false;
 	bool tostore = false;
 
 	// Init counters:
-	int32_t _pools_total     = 0;
-	int32_t _renders_total   = 0;
-	int32_t _renders_busy    = 0;
-	int32_t _renders_ready   = 0;
-	int32_t _renders_online  = 0;
+	int32_t _pools_total = 0;
+	int32_t _renders_total = 0;
+	int32_t _renders_busy = 0;
+	int32_t _renders_ready = 0;
+	int32_t _renders_online = 0;
 	int32_t _renders_offline = 0;
-	int32_t _renders_nimby   = 0;
-	int32_t _renders_paused  = 0;
-	int32_t _renders_sick    = 0;
+	int32_t _renders_nimby = 0;
+	int32_t _renders_paused = 0;
+	int32_t _renders_sick = 0;
 
 	// Iterate pools
-	for (std::list<PoolSrv*>::const_iterator it = m_pools_list.begin(); it != m_pools_list.end(); it++)
+	for (std::list<PoolSrv *>::const_iterator it = m_pools_list.begin(); it != m_pools_list.end(); it++)
 	{
 		_pools_total++;
 
-		_pools_total     += (*it)->m_pools_total;
-		_renders_total   += (*it)->m_renders_total;
-		_renders_busy    += (*it)->m_renders_busy;
-		_renders_ready   += (*it)->m_renders_ready;
-		_renders_online  += (*it)->m_renders_online;
+		_pools_total += (*it)->m_pools_total;
+		_renders_total += (*it)->m_renders_total;
+		_renders_busy += (*it)->m_renders_busy;
+		_renders_ready += (*it)->m_renders_ready;
+		_renders_online += (*it)->m_renders_online;
 		_renders_offline += (*it)->m_renders_offline;
-		_renders_nimby   += (*it)->m_renders_nimby;
-		_renders_paused  += (*it)->m_renders_paused;
-		_renders_sick    += (*it)->m_renders_sick;
+		_renders_nimby += (*it)->m_renders_nimby;
+		_renders_paused += (*it)->m_renders_paused;
+		_renders_sick += (*it)->m_renders_sick;
 	}
 
 	// Iterate renders
-	for (std::list<RenderAf*>::const_iterator it = m_renders_list.begin(); it != m_renders_list.end(); it++)
+	for (std::list<RenderAf *>::const_iterator it = m_renders_list.begin(); it != m_renders_list.end(); it++)
 	{
 		_renders_total++;
 
-		if ((*it)->isBusy()   ) _renders_busy   ++;
-		if ((*it)->isReady()  ) _renders_ready  ++;
-		if ((*it)->isOnline() ) _renders_online ++;
-		if ((*it)->isOffline()) _renders_offline++;
-		if ((*it)->isPaused() ) _renders_paused ++;
-		if ((*it)->isSick()   ) _renders_sick   ++;
-		if ((*it)->isNIMBY() || (*it)->isNimby()) _renders_nimby  ++;
+		if ((*it)->isBusy())
+			_renders_busy++;
+		if ((*it)->isReady())
+			_renders_ready++;
+		if ((*it)->isOnline())
+			_renders_online++;
+		if ((*it)->isOffline())
+			_renders_offline++;
+		if ((*it)->isPaused())
+			_renders_paused++;
+		if ((*it)->isSick())
+			_renders_sick++;
+		if ((*it)->isNIMBY() || (*it)->isNimby())
+			_renders_nimby++;
 	}
 
 	// Compare changes
-	if ((_pools_total     != m_pools_total    ) ||
-		(_renders_total   != m_renders_total  ) ||
-		(_renders_busy    != m_renders_busy   ) ||
-		(_renders_ready   != m_renders_ready  ) ||
-		(_renders_online  != m_renders_online ) ||
-		(_renders_offline != m_renders_offline) ||
-		(_renders_nimby   != m_renders_nimby  ) ||
-		(_renders_paused  != m_renders_paused ) ||
-		(_renders_sick    != m_renders_sick   ))
+	if ((_pools_total != m_pools_total) || (_renders_total != m_renders_total) ||
+		(_renders_busy != m_renders_busy) || (_renders_ready != m_renders_ready) ||
+		(_renders_online != m_renders_online) || (_renders_offline != m_renders_offline) ||
+		(_renders_nimby != m_renders_nimby) || (_renders_paused != m_renders_paused) ||
+		(_renders_sick != m_renders_sick))
 		changed = true;
 
 	// Store new calculations
-	m_pools_total     = _pools_total;
-	m_renders_total   = _renders_total;
-	m_renders_busy    = _renders_busy;
-	m_renders_ready   = _renders_ready;
-	m_renders_online  = _renders_online;
+	m_pools_total = _pools_total;
+	m_renders_total = _renders_total;
+	m_renders_busy = _renders_busy;
+	m_renders_ready = _renders_ready;
+	m_renders_online = _renders_online;
 	m_renders_offline = _renders_offline;
-	m_renders_nimby   = _renders_nimby;
-	m_renders_paused  = _renders_paused;
-	m_renders_sick    = _renders_sick;
+	m_renders_nimby = _renders_nimby;
+	m_renders_paused = _renders_paused;
+	m_renders_sick = _renders_sick;
 
 	// Emit events on changes
 	if (changed && i_monitoring)
@@ -702,4 +702,3 @@ int PoolSrv::v_calcWeight() const
 	weight += sizeof(PoolSrv) - sizeof(af::Pool);
 	return weight;
 }
-

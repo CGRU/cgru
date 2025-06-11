@@ -15,10 +15,10 @@
 #endif
 
 #ifdef _WIN32
-#	define _WIN32_WINNT 0x0400 /* for TryEnterCriticalSection */
-#	include <windows.h>
+#define _WIN32_WINNT 0x0400 /* for TryEnterCriticalSection */
+#include <windows.h>
 #else
-#	include <pthread.h>
+#include <pthread.h>
 #endif
 
 #ifdef _WIN32
@@ -30,13 +30,13 @@ DlMutex::DlMutex()
 {
 	compile_assert(sizeof(m_data) >= sizeof(pthread_mutex_t));
 
-	pthread_mutex_t *mutex = (pthread_mutex_t*) &m_data[0];
+	pthread_mutex_t *mutex = (pthread_mutex_t *)&m_data[0];
 
 #ifdef _WIN32
 	InitializeCriticalSection(mutex);
 #else
 	pthread_mutexattr_t attr;
-	
+
 	pthread_mutexattr_init(&attr);
 	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
 
@@ -48,7 +48,7 @@ DlMutex::DlMutex()
 
 DlMutex::~DlMutex()
 {
-	pthread_mutex_t *mutex = (pthread_mutex_t*) &m_data[0];
+	pthread_mutex_t *mutex = (pthread_mutex_t *)&m_data[0];
 
 #ifdef _WIN32
 	DeleteCriticalSection(mutex);
@@ -59,7 +59,7 @@ DlMutex::~DlMutex()
 
 void DlMutex::Acquire()
 {
-	pthread_mutex_t *mutex = (pthread_mutex_t*) &m_data[0];
+	pthread_mutex_t *mutex = (pthread_mutex_t *)&m_data[0];
 
 #ifdef _WIN32
 	EnterCriticalSection(mutex);
@@ -70,7 +70,7 @@ void DlMutex::Acquire()
 
 bool DlMutex::TryAcquire()
 {
-	pthread_mutex_t *mutex = (pthread_mutex_t*) &m_data[0];
+	pthread_mutex_t *mutex = (pthread_mutex_t *)&m_data[0];
 
 #ifdef _WIN32
 	return 0 != TryEnterCriticalSection(mutex);
@@ -81,7 +81,7 @@ bool DlMutex::TryAcquire()
 
 void DlMutex::Release()
 {
-	pthread_mutex_t *mutex = (pthread_mutex_t*) &m_data[0];
+	pthread_mutex_t *mutex = (pthread_mutex_t *)&m_data[0];
 
 #ifdef _WIN32
 	LeaveCriticalSection(mutex);

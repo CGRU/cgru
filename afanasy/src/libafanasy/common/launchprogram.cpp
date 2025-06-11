@@ -11,7 +11,7 @@
 	o_err     : If set, redirects standard error
 	program   : Name of the executable program.
 	...       : List of argument(char*) terminated by a NULL.
-	
+
 	RETURNS
 	The process id of the new process executed. If negative, an
 	error occurred during startup. When giving pointers to
@@ -25,10 +25,10 @@
 
 	NOTES CGRU-AFANASY:
 	Added working directory.
-    UNIX: setup child process function pointer called
-        just after fork() and before exec()
-    MSWindows: Added statining process flags,
-        PROCESS_INFORMATION structure as io parameter
+	UNIX: setup child process function pointer called
+		just after fork() and before exec()
+	MSWindows: Added statining process flags,
+		PROCESS_INFORMATION structure as io parameter
 */
 
 #include <fcntl.h>
@@ -39,20 +39,13 @@
 #include <windows.h>
 #else
 #include <unistd.h>
-void (*fp_setupChildProcess)( void) = NULL;
+void (*fp_setupChildProcess)(void) = NULL;
 #endif
 
 #ifdef _WIN32
-bool LaunchProgramV(
-	PROCESS_INFORMATION * o_pinfo,
-	HANDLE * o_in,
-	HANDLE * o_out,
-	HANDLE * o_err,
-    const char * i_commandline,
-    const char * i_wdir,
-	char * i_environ,
-    DWORD i_flags,
-	bool alwaysCreateWindow)
+bool LaunchProgramV(PROCESS_INFORMATION *o_pinfo, HANDLE *o_in, HANDLE *o_out, HANDLE *o_err,
+					const char *i_commandline, const char *i_wdir, char *i_environ, DWORD i_flags,
+					bool alwaysCreateWindow)
 {
 #if 0
 	char* args = (char*)malloc(1);
@@ -94,34 +87,34 @@ bool LaunchProgramV(
 	saAttr.bInheritHandle = true;
 	saAttr.lpSecurityDescriptor = NULL;
 
-    if (o_in && !CreatePipe( &hStdinRead, o_in, &saAttr, 1024))
+	if (o_in && !CreatePipe(&hStdinRead, o_in, &saAttr, 1024))
 	{
 		return false;
 	}
 
-    if (o_out && !CreatePipe( o_out,  &hStdoutWrite, &saAttr, 1024*1024))
+	if (o_out && !CreatePipe(o_out, &hStdoutWrite, &saAttr, 1024 * 1024))
 	{
 		if (o_in)
 		{
-			CloseHandle( hStdinRead);
-			CloseHandle( *o_in);
+			CloseHandle(hStdinRead);
+			CloseHandle(*o_in);
 		}
 
 		return false;
 	}
 
-    if (o_err && !CreatePipe( o_err,  &hStderrWrite, &saAttr, 1024*1024))
+	if (o_err && !CreatePipe(o_err, &hStderrWrite, &saAttr, 1024 * 1024))
 	{
 		if (o_in)
 		{
-			CloseHandle( hStdinRead);
-			CloseHandle( *o_in);
+			CloseHandle(hStdinRead);
+			CloseHandle(*o_in);
 		}
 
 		if (o_out)
 		{
-			CloseHandle( *o_out);
-			CloseHandle( hStdoutWrite);
+			CloseHandle(*o_out);
+			CloseHandle(hStdoutWrite);
 		}
 
 		return false;
@@ -132,118 +125,111 @@ bool LaunchProgramV(
 	{
 		HANDLE hDupPipe;
 
-		if (o_in && !DuplicateHandle(
-			GetCurrentProcess(), *o_in,
-			GetCurrentProcess(), &hDupPipe,
-			0, false, DUPLICATE_CLOSE_SOURCE | DUPLICATE_SAME_ACCESS))
+		if (o_in && !DuplicateHandle(GetCurrentProcess(), *o_in, GetCurrentProcess(), &hDupPipe, 0, false,
+									 DUPLICATE_CLOSE_SOURCE | DUPLICATE_SAME_ACCESS))
 		{
-			CloseHandle( hStdinRead);
+			CloseHandle(hStdinRead);
 
 			if (o_out)
 			{
-				CloseHandle( *o_out);
-				CloseHandle( hStdoutWrite);
+				CloseHandle(*o_out);
+				CloseHandle(hStdoutWrite);
 			}
 
 			if (o_err)
 			{
-				CloseHandle( *o_err);
-				CloseHandle( hStderrWrite);
+				CloseHandle(*o_err);
+				CloseHandle(hStderrWrite);
 			}
 
 			return false;
 		}
-		
+
 		if (o_in)
 			*o_in = hDupPipe;
 
-		if (o_out && !DuplicateHandle(
-			GetCurrentProcess(), *o_out,
-			GetCurrentProcess(), &hDupPipe,
-			0, false, DUPLICATE_CLOSE_SOURCE | DUPLICATE_SAME_ACCESS))
+		if (o_out && !DuplicateHandle(GetCurrentProcess(), *o_out, GetCurrentProcess(), &hDupPipe, 0, false,
+									  DUPLICATE_CLOSE_SOURCE | DUPLICATE_SAME_ACCESS))
 		{
 			if (o_in)
 			{
-				CloseHandle( hStdinRead);
-				CloseHandle( *o_in);
+				CloseHandle(hStdinRead);
+				CloseHandle(*o_in);
 			}
 
-			CloseHandle( hStdoutWrite);
+			CloseHandle(hStdoutWrite);
 
 			if (o_err)
 			{
-				CloseHandle( *o_err);
-				CloseHandle( hStderrWrite);
+				CloseHandle(*o_err);
+				CloseHandle(hStderrWrite);
 			}
 
 			return false;
 		}
-	
-		if (o_out)	
+
+		if (o_out)
 			*o_out = hDupPipe;
 
-		if (o_err && !DuplicateHandle(
-			GetCurrentProcess(), *o_err,
-			GetCurrentProcess(), &hDupPipe,
-			0, false, DUPLICATE_CLOSE_SOURCE | DUPLICATE_SAME_ACCESS))
+		if (o_err && !DuplicateHandle(GetCurrentProcess(), *o_err, GetCurrentProcess(), &hDupPipe, 0, false,
+									  DUPLICATE_CLOSE_SOURCE | DUPLICATE_SAME_ACCESS))
 		{
 			if (o_in)
 			{
-				CloseHandle( hStdinRead);
-				CloseHandle( *o_in);
+				CloseHandle(hStdinRead);
+				CloseHandle(*o_in);
 			}
 
 			if (o_out)
 			{
-				CloseHandle( *o_out);
-				CloseHandle( hStdoutWrite);
+				CloseHandle(*o_out);
+				CloseHandle(hStdoutWrite);
 			}
 
-			CloseHandle( hStderrWrite);
+			CloseHandle(hStderrWrite);
 
 			return false;
 		}
-		
+
 		if (o_err)
 			*o_err = hDupPipe;
-			
 	}
-	
+
 	// Create the process
 
 	STARTUPINFO startInfo;
-	
+
 	memset(&startInfo, 0, sizeof(STARTUPINFO));
 	startInfo.cb = sizeof(STARTUPINFO);
-	if( o_in || o_out || o_err )
+	if (o_in || o_out || o_err)
 		startInfo.dwFlags = STARTF_USESTDHANDLES;
-/*
-    if ( ! SetHandleInformation( *o_in, HANDLE_FLAG_INHERIT, 0) )
-        printf("SetHandleInformation error = %d", GetLastError()); 
-    if ( ! SetHandleInformation( *o_out, HANDLE_FLAG_INHERIT, 0) )
-        printf("SetHandleInformation error = %d", GetLastError()); 
-    if ( ! SetHandleInformation( *o_err, HANDLE_FLAG_INHERIT, 0) )
-        printf("SetHandleInformation error = %d", GetLastError()); 
-*/
+	/*
+		if ( ! SetHandleInformation( *o_in, HANDLE_FLAG_INHERIT, 0) )
+			printf("SetHandleInformation error = %d", GetLastError());
+		if ( ! SetHandleInformation( *o_out, HANDLE_FLAG_INHERIT, 0) )
+			printf("SetHandleInformation error = %d", GetLastError());
+		if ( ! SetHandleInformation( *o_err, HANDLE_FLAG_INHERIT, 0) )
+			printf("SetHandleInformation error = %d", GetLastError());
+	*/
 	if (o_in)
-		startInfo.hStdInput = hStdinRead;		// pipe
+		startInfo.hStdInput = hStdinRead; // pipe
 	else
 		startInfo.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
 
 	if (o_out)
-		startInfo.hStdOutput = hStdoutWrite;	// pipe
+		startInfo.hStdOutput = hStdoutWrite; // pipe
 	else
 		startInfo.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 
 	if (o_err)
-		startInfo.hStdError = hStderrWrite;	   // pipe
+		startInfo.hStdError = hStderrWrite; // pipe
 	else
 		startInfo.hStdError = GetStdHandle(STD_ERROR_HANDLE);
 
 	size_t bufSize = strlen(i_commandline) + 1;
-	char * argsAndProgram = (char *)malloc( bufSize);
-	strncpy( argsAndProgram, i_commandline, bufSize-1);
-	argsAndProgram[bufSize-1] = '\0';
+	char *argsAndProgram = (char *)malloc(bufSize);
+	strncpy(argsAndProgram, i_commandline, bufSize - 1);
+	argsAndProgram[bufSize - 1] = '\0';
 
 	/*
 		Check if we have a console by calling GetConsoleScreenBufferInfo().
@@ -253,30 +239,25 @@ bool LaunchProgramV(
 	*/
 	CONSOLE_SCREEN_BUFFER_INFO cinfos;
 	DWORD flags = i_flags;
-	if(( false == alwaysCreateWindow ) &&
-	   ( false == GetConsoleScreenBufferInfo( GetStdHandle( STD_OUTPUT_HANDLE ), &cinfos )))
+	if ((false == alwaysCreateWindow) &&
+		(false == GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cinfos)))
 		flags = flags | CREATE_NO_WINDOW;
 
-	BOOL processCreated = CreateProcess(
-		0x0, argsAndProgram,
-		NULL, NULL,
-		o_in || o_out || o_err,
-		flags,
-		(LPVOID) i_environ, i_wdir,
-		&startInfo, o_pinfo);
+	BOOL processCreated = CreateProcess(0x0, argsAndProgram, NULL, NULL, o_in || o_out || o_err, flags,
+										(LPVOID)i_environ, i_wdir, &startInfo, o_pinfo);
 
 	free(argsAndProgram);
 
 	// Close the unneeded pipe handles (they were inherited)
 
 	if (o_in)
-		CloseHandle( hStdinRead);
+		CloseHandle(hStdinRead);
 
 	if (o_out)
-		CloseHandle( hStdoutWrite);
+		CloseHandle(hStdoutWrite);
 
 	if (o_err)
-		CloseHandle( hStderrWrite);
+		CloseHandle(hStderrWrite);
 
 	if (!processCreated)
 		return false;
@@ -284,19 +265,13 @@ bool LaunchProgramV(
 	return true;
 }
 
-#else	
+#else
 /////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////    UNIX VERSION    ///////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
 
-int LaunchProgramV(
-	FILE **o_in,
-	FILE **o_out,
-	FILE **o_err,
-    const char * i_program,
-    const char * i_args[],
-    const char * i_wdir = NULL,
-	char ** i_environ = NULL)
+int LaunchProgramV(FILE **o_in, FILE **o_out, FILE **o_err, const char *i_program, const char *i_args[],
+				   const char *i_wdir = NULL, char **i_environ = NULL)
 {
 	if (o_in)
 	{
@@ -314,16 +289,16 @@ int LaunchProgramV(
 	}
 
 	int pid, err;
-	int i,n;
+	int i, n;
 	const char *Args[1024];
 	const char **pArg = Args;
 	const char **pInArgs = i_args;
 
 	// Create pipes
 
-	int pipein[2];		// to send data in the program (child stdin)
-	int pipeout[2];		// to get data out of the program (child stdout)
-	int pipeerr[2];		// to get data out of the program (child stderr)
+	int pipein[2];	// to send data in the program (child stdin)
+	int pipeout[2]; // to get data out of the program (child stdout)
+	int pipeerr[2]; // to get data out of the program (child stderr)
 	bool pipesGood = true;
 
 	if (o_in)
@@ -383,7 +358,7 @@ int LaunchProgramV(
 		child process as its memory is likely to be shared with the parent
 		until the exec.
 	*/
-	if ( (pid = vfork()) == 0 )
+	if ((pid = vfork()) == 0)
 	{
 		if (o_in)
 		{
@@ -409,7 +384,7 @@ int LaunchProgramV(
 				pipesGood = false;
 		}
 
-		if (!pipesGood )
+		if (!pipesGood)
 		{
 			_exit(1);
 		}
@@ -427,40 +402,40 @@ int LaunchProgramV(
 			close(i);
 		}
 
-                if( fp_setupChildProcess )
-                    fp_setupChildProcess();
-                if( i_wdir )
-                    if( chdir( i_wdir) != 0 )
-                        perror("LaunchProgram: chdir(): ");
+		if (fp_setupChildProcess)
+			fp_setupChildProcess();
+		if (i_wdir)
+			if (chdir(i_wdir) != 0)
+				perror("LaunchProgram: chdir(): ");
 
-		if( i_program[0] == '/')
+		if (i_program[0] == '/')
 		{
-			if( i_environ )
-				err = execve( i_program, const_cast<char*const*>(Args), i_environ);
+			if (i_environ)
+				err = execve(i_program, const_cast<char *const *>(Args), i_environ);
 			else
-				err = execv(  i_program, const_cast<char*const*>(Args));
+				err = execv(i_program, const_cast<char *const *>(Args));
 		}
 		else
 		{
-			if( i_environ )
+			if (i_environ)
 #ifdef MACOSX
-				err = execve( i_program, const_cast<char*const*>(Args), i_environ);
+				err = execve(i_program, const_cast<char *const *>(Args), i_environ);
 #elif defined BSD // TODO: BSD environment support
-				err = execvp(  i_program, const_cast<char*const*>(Args));
+				err = execvp(i_program, const_cast<char *const *>(Args));
 #else
-				err = execvpe( i_program, const_cast<char*const*>(Args), i_environ);
+				err = execvpe(i_program, const_cast<char *const *>(Args), i_environ);
 #endif
 			else
-				err = execvp(  i_program, const_cast<char*const*>(Args));
+				err = execvp(i_program, const_cast<char *const *>(Args));
 		}
 
 		// If we get here, something is definitely bad in child process
 
-		_exit( err );
+		_exit(err);
 
 		return pid; /* stupid but compiler asked for a return value */
 	}
-	else if( pid == -1 )
+	else if (pid == -1)
 	{
 		/* fork failure */
 		return 0;
@@ -491,7 +466,7 @@ int LaunchProgramV(
 	{
 		close(pipeerr[1]);
 
-		*o_err =  fdopen(pipeerr[0], "r");
+		*o_err = fdopen(pipeerr[0], "r");
 
 		if (!*o_err)
 			pipesGood = false;

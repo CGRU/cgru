@@ -31,9 +31,7 @@
    Just use an AVL tree! An stl sorted container for example.
 */
 
-AfList::AfList()
-{
-}
+AfList::AfList() {}
 
 AfList::~AfList()
 {
@@ -46,7 +44,7 @@ AfList::~AfList()
 	*/
 }
 
-bool AfList::has(const AfNodeSolve * i_node)
+bool AfList::has(const AfNodeSolve *i_node)
 {
 	for (std::list<AfNodeSolve *>::const_iterator it = m_nodes_list.begin(); it != m_nodes_list.end(); it++)
 		if (*it == i_node)
@@ -84,7 +82,8 @@ int AfList::add(AfNodeSolve *node)
 			lessPriorityFound = true;
 			break;
 		}
-		if (lessPriorityFound == false) m_nodes_list.push_back(node);
+		if (lessPriorityFound == false)
+			m_nodes_list.push_back(node);
 	}
 	else
 		m_nodes_list.push_back(node);
@@ -210,13 +209,15 @@ void AfList::moveNodes(const std::vector<int32_t> &i_list, int i_type)
 		AfNodeSolve *node;
 		if ((i_type == MoveDown) || (i_type == MoveTop))
 		{
-			if (it_move == it_move_begin) break;
+			if (it_move == it_move_begin)
+				break;
 			it_move--;
 			node = *it_move;
 		}
 		else
 		{
-			if (it_move == it_move_end) break;
+			if (it_move == it_move_end)
+				break;
 			node = *it_move;
 			it_move++;
 		}
@@ -226,19 +227,21 @@ void AfList::moveNodes(const std::vector<int32_t> &i_list, int i_type)
 		std::list<AfNodeSolve *>::iterator it_insert = m_nodes_list.begin();
 		while (it_insert != it_end)
 		{
-			if ((*it_insert) == node) break;
+			if ((*it_insert) == node)
+				break;
 			it_insert++;
 		}
 		if (it_insert == it_end)
 		{
 			AFERRAR("AfList::moveNodes: Lost node - \"%s\" - %d", node->node()->getName().c_str(),
-				node->node()->getId());
+					node->node()->getId());
 			continue;
 		}
 
 		switch (i_type)
 		{
-			case MoveUp: {
+			case MoveUp:
+			{
 #ifdef AFOUTPUT
 				printf("AfList::MoveUp:\n");
 #endif
@@ -259,7 +262,8 @@ void AfList::moveNodes(const std::vector<int32_t> &i_list, int i_type)
 				}
 				break;
 			}
-			case MoveDown: {
+			case MoveDown:
+			{
 #ifdef AFOUTPUT
 				printf("AfList::MoveDown:\n");
 #endif
@@ -281,7 +285,8 @@ void AfList::moveNodes(const std::vector<int32_t> &i_list, int i_type)
 				it_insert++;
 				break;
 			}
-			case MoveTop: {
+			case MoveTop:
+			{
 #ifdef AFOUTPUT
 				printf("AfList::MoveTop:\n");
 #endif
@@ -300,7 +305,8 @@ void AfList::moveNodes(const std::vector<int32_t> &i_list, int i_type)
 						it_insert++;
 						break;
 					}
-					if (it_insert == it_begin) break;
+					if (it_insert == it_begin)
+						break;
 				}
 				break;
 			}
@@ -319,11 +325,13 @@ void AfList::moveNodes(const std::vector<int32_t> &i_list, int i_type)
 #endif
 				for (;;)
 				{
-					if ((*it_insert)->priority() != node->priority()) break;
+					if ((*it_insert)->priority() != node->priority())
+						break;
 
 					it_insert++;
 
-					if (it_insert == it_end) break;
+					if (it_insert == it_end)
+						break;
 				}
 				break;
 			}
@@ -374,23 +382,20 @@ const std::vector<int32_t> AfList::generateIdsList() const
 /////////////////////        Iterator        /////////////////////////
 //////////////////////////////////////////////////////////////////////
 
-AfListIt::AfListIt(AfList *i_aflist) : m_node(NULL), m_list(i_aflist)
-{
-	reset();
-}
+AfListIt::AfListIt(AfList *i_aflist) : m_node(NULL), m_list(i_aflist) { reset(); }
 
-AfListIt::~AfListIt()
-{
-}
+AfListIt::~AfListIt() {}
 
 void AfListIt::next()
 {
 	m_node = NULL;
 	m_it++;
-	if (m_it == m_it_end) return;
+	if (m_it == m_it_end)
+		return;
 
 	while ((*m_it)->node()->isZombie())
-		if (++m_it == m_it_end) return;
+		if (++m_it == m_it_end)
+			return;
 
 	m_node = *m_it;
 }
@@ -399,10 +404,12 @@ void AfListIt::reset()
 {
 	m_it = m_list->m_nodes_list.begin();
 	m_it_end = m_list->m_nodes_list.end();
-	if (m_it == m_it_end) return;
+	if (m_it == m_it_end)
+		return;
 
 	while ((*m_it)->node()->isZombie())
-		if (++m_it == m_it_end) return;
+		if (++m_it == m_it_end)
+			return;
 
 	m_node = *m_it;
 }

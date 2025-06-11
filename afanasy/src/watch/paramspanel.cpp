@@ -18,27 +18,23 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-ParamsPanel::ParamsPanel():
-	m_splitter(NULL),
-	m_position(-1),
-	m_params_show(PS_CHANGED),
-	m_cur_item(NULL)
+ParamsPanel::ParamsPanel() : m_splitter(NULL), m_position(-1), m_params_show(PS_CHANGED), m_cur_item(NULL)
 {
-	QWidget * widget = new QWidget();
+	QWidget *widget = new QWidget();
 
 	m_layout_name = new QVBoxLayout();
 	m_layout_name->setAlignment(Qt::AlignTop);
 	widget->setLayout(m_layout_name);
 
 	// Node name and layout buttons:
-	QHBoxLayout * btns_layout = new QHBoxLayout();
+	QHBoxLayout *btns_layout = new QHBoxLayout();
 	m_layout_name->addLayout(btns_layout);
 
 	// ⏵ ⏷ ▶ ▼ ◥ ⯆ ⯈ This characters may not work,
 	// even on a machine where they correctly shown in the code.
 	m_btn_layout_bottom = new QPushButton("<<<");
 	btns_layout->addWidget(m_btn_layout_bottom);
-	m_btn_layout_bottom->setFixedSize(32,12);
+	m_btn_layout_bottom->setFixedSize(32, 12);
 	connect(m_btn_layout_bottom, SIGNAL(pressed()), this, SLOT(slot_moveBottom()));
 	m_btn_layout_bottom->setToolTip("Move panel bottom.");
 
@@ -52,10 +48,9 @@ ParamsPanel::ParamsPanel():
 
 	m_btn_layout_right = new QPushButton("^^^");
 	btns_layout->addWidget(m_btn_layout_right);
-	m_btn_layout_right->setFixedSize(32,12);
+	m_btn_layout_right->setFixedSize(32, 12);
 	connect(m_btn_layout_right, SIGNAL(pressed()), this, SLOT(slot_moveRight()));
 	m_btn_layout_right->setToolTip("Move panel right.");
-
 
 	// Info and params layout:
 	m_layout_info = new QBoxLayout(QBoxLayout::TopToBottom);
@@ -66,9 +61,8 @@ ParamsPanel::ParamsPanel():
 	m_layout_params->setAlignment(Qt::AlignTop);
 	m_layout_info->addLayout(m_layout_params);
 
-
 	// Node parameters:
-	m_params_frame =  new QFrame();
+	m_params_frame = new QFrame();
 	m_layout_params->addWidget(m_params_frame);
 	m_params_frame->setFrameShape(QFrame::StyledPanel);
 	m_params_frame->setFrameShadow(QFrame::Plain);
@@ -76,19 +70,18 @@ ParamsPanel::ParamsPanel():
 	m_params_layout->setSpacing(0);
 
 	// Parametes label and buttons:
-	QHBoxLayout * params_caption_layout = new QHBoxLayout();
+	QHBoxLayout *params_caption_layout = new QHBoxLayout();
 	m_params_layout->addLayout(params_caption_layout);
 	// Label
 	m_params_label = new QLabel("<b>Parameters</b>");
 	params_caption_layout->addWidget(m_params_label);
 	params_caption_layout->addStretch();
 	// "Show" button
-	m_params_btn_show= new QPushButton();
+	m_params_btn_show = new QPushButton();
 	params_caption_layout->addWidget(m_params_btn_show);
 	m_params_btn_show->setFixedSize(32, 12);
 	connect(m_params_btn_show, SIGNAL(clicked()), this, SLOT(slot_paramsShow()));
 	updateParamShowButton();
-
 
 	// Node info:
 	m_info_frame = new QFrame();
@@ -110,7 +103,7 @@ ParamsPanel::ParamsPanel():
 	setWidgetResizable(true);
 }
 
-void ParamsPanel::initPanel(const QList<Param*> & i_params, QSplitter * i_splitter, const QString & i_type)
+void ParamsPanel::initPanel(const QList<Param *> &i_params, QSplitter *i_splitter, const QString &i_type)
 {
 	// Remember type and splitter pointer
 	m_splitter = i_splitter;
@@ -124,7 +117,7 @@ void ParamsPanel::initPanel(const QList<Param*> & i_params, QSplitter * i_splitt
 	else
 	{
 		// Add wiget to each parameter:
-		QList<Param*>::const_iterator it;
+		QList<Param *>::const_iterator it;
 		for (it = i_params.begin(); it != i_params.end(); it++)
 			addParamWidget((*it));
 	}
@@ -134,8 +127,8 @@ void ParamsPanel::initPanel(const QList<Param*> & i_params, QSplitter * i_splitt
 	move();
 }
 
-void ParamsPanel::slot_moveRight() { move(AFGUI::RIGHT );}
-void ParamsPanel::slot_moveBottom(){ move(AFGUI::BOTTOM);}
+void ParamsPanel::slot_moveRight() { move(AFGUI::RIGHT); }
+void ParamsPanel::slot_moveBottom() { move(AFGUI::BOTTOM); }
 void ParamsPanel::move(int i_position)
 {
 	if (m_position == i_position)
@@ -175,7 +168,7 @@ void ParamsPanel::storeState()
 	QList<int> sizes = m_splitter->sizes();
 	if (sizes.size() != 2)
 	{
-		AF_ERR << "sizes.size() = " <<sizes.size();
+		AF_ERR << "sizes.size() = " << sizes.size();
 		return;
 	}
 
@@ -188,11 +181,9 @@ void ParamsPanel::storeState()
 	afqt::QEnvironment::ms_attrs_panel[m_type + "_size_" + pos_str + "_1"].n = sizes[1];
 }
 
-ParamsPanel::~ParamsPanel()
-{
-}
+ParamsPanel::~ParamsPanel() {}
 
-void ParamsPanel::v_updatePanel(Item * i_item, const QList<Item*> * i_selected)
+void ParamsPanel::v_updatePanel(Item *i_item, const QList<Item *> *i_selected)
 {
 	m_cur_item = i_item;
 
@@ -220,16 +211,16 @@ void ParamsPanel::v_updatePanel(Item * i_item, const QList<Item*> * i_selected)
 	m_info_label->setHidden(true);
 }
 
-void ParamsPanel::addParamWidget(Param * i_param)
+void ParamsPanel::addParamWidget(Param *i_param)
 {
 	if (i_param->isSeparator())
 	{
-		ParamSeparator * ps = new ParamSeparator(i_param);
+		ParamSeparator *ps = new ParamSeparator(i_param);
 		m_params_layout->addWidget(ps);
 		m_separatos.append(ps);
 		return;
 	}
-	ParamWidget * pw = new ParamWidget(i_param);
+	ParamWidget *pw = new ParamWidget(i_param);
 	m_params_layout->addWidget(pw);
 	m_params_list.append(pw);
 
@@ -238,35 +229,29 @@ void ParamsPanel::addParamWidget(Param * i_param)
 
 void ParamsPanel::updateParams()
 {
-	QList<ParamWidget*>::iterator pIt;
+	QList<ParamWidget *>::iterator pIt;
 	for (pIt = m_params_list.begin(); pIt != m_params_list.end(); pIt++)
 		(*pIt)->update(m_cur_item, m_params_show);
 
-	QList<ParamSeparator*>::iterator sIt;
+	QList<ParamSeparator *>::iterator sIt;
 	for (sIt = m_separatos.begin(); sIt != m_separatos.end(); sIt++)
 		(*sIt)->update(m_cur_item, m_params_show);
 }
 
 void ParamsPanel::v_setEditable(bool i_editable)
 {
-	QList<ParamWidget*>::iterator pIt;
+	QList<ParamWidget *>::iterator pIt;
 	for (pIt = m_params_list.begin(); pIt != m_params_list.end(); pIt++)
 		(*pIt)->v_setEditable(i_editable);
 }
 
 void ParamsPanel::updateParamShowButton()
 {
-	switch(m_params_show)
+	switch (m_params_show)
 	{
-	case PS_CHANGED:
-		m_params_btn_show->setText(">>>");
-		break;
-	case PS_ALL:
-		m_params_btn_show->setText("^^^");
-		break;
-	case PS_NONE:
-		m_params_btn_show->setText("<<<");
-		break;
+		case PS_CHANGED: m_params_btn_show->setText(">>>"); break;
+		case PS_ALL: m_params_btn_show->setText("^^^"); break;
+		case PS_NONE: m_params_btn_show->setText("<<<"); break;
 	}
 }
 
@@ -279,20 +264,15 @@ void ParamsPanel::slot_paramsShow()
 	updateParams();
 }
 
-void ParamsPanel::slot_changeParam(const Param * i_param)
-{
-	emit sig_changeParam(i_param);
-}
-
+void ParamsPanel::slot_changeParam(const Param *i_param) { emit sig_changeParam(i_param); }
 
 /////////////////////////////////////////////////
 ////////////////   ParamWidget   ////////////////
 /////////////////////////////////////////////////
 
-ParamWidget::ParamWidget(const Param * i_param):
-	m_param(i_param)
+ParamWidget::ParamWidget(const Param *i_param) : m_param(i_param)
 {
-	QHBoxLayout * layout = new QHBoxLayout(this);
+	QHBoxLayout *layout = new QHBoxLayout(this);
 	layout->setContentsMargins(0, 4, 0, 4);
 
 	m_label_widget = new QLabel(m_param->label);
@@ -316,11 +296,9 @@ ParamWidget::ParamWidget(const Param * i_param):
 	setHidden(true);
 }
 
-ParamWidget::~ParamWidget()
-{
-}
+ParamWidget::~ParamWidget() {}
 
-void ParamWidget::update(const Item * i_item, int i_params_show)
+void ParamWidget::update(const Item *i_item, int i_params_show)
 {
 	if ((NULL == i_item) || (i_params_show == ParamsPanel::PS_NONE))
 	{
@@ -345,7 +323,7 @@ void ParamWidget::update(const Item * i_item, int i_params_show)
 	}
 }
 
-void ParamWidget::update(const QMap<QString, QVariant> & i_var_map, bool i_show_all)
+void ParamWidget::update(const QMap<QString, QVariant> &i_var_map, bool i_show_all)
 {
 	QMap<QString, QVariant>::const_iterator vIt = i_var_map.find(m_param->name);
 	if (vIt == i_var_map.end())
@@ -363,12 +341,9 @@ void ParamWidget::update(const QMap<QString, QVariant> & i_var_map, bool i_show_
 		setHidden(is_default);
 }
 
-void ParamWidget::v_setEditable(bool i_editable)
-{
-	m_btn_edit->setHidden(false == i_editable);
-}
+void ParamWidget::v_setEditable(bool i_editable) { m_btn_edit->setHidden(false == i_editable); }
 
-void ParamWidget::paintEvent(QPaintEvent * event)
+void ParamWidget::paintEvent(QPaintEvent *event)
 {
 	QPainter painter(this);
 
@@ -380,21 +355,18 @@ void ParamWidget::paintEvent(QPaintEvent * event)
 	painter.drawLine(0, 0, width(), 0);
 }
 
-void ParamWidget::slot_Edit()
-{
-	emit sig_changeParam(m_param);
-}
+void ParamWidget::slot_Edit() { emit sig_changeParam(m_param); }
 
 // Separator:
-ParamSeparator::ParamSeparator(Param * i_param)
+ParamSeparator::ParamSeparator(Param *i_param)
 {
 	setFixedHeight(8);
 	setHidden(true);
 }
 
-ParamSeparator::~ParamSeparator(){}
+ParamSeparator::~ParamSeparator() {}
 
-void ParamSeparator::update(Item * i_item, int i_params_show)
+void ParamSeparator::update(Item *i_item, int i_params_show)
 {
 	if ((NULL != i_item) && (ParamsPanel::PS_ALL == i_params_show))
 		setHidden(false);
@@ -402,7 +374,7 @@ void ParamSeparator::update(Item * i_item, int i_params_show)
 		setHidden(true);
 }
 
-void ParamSeparator::paintEvent(QPaintEvent * event)
+void ParamSeparator::paintEvent(QPaintEvent *event)
 {
 	QPainter painter(this);
 
@@ -414,20 +386,20 @@ void ParamSeparator::paintEvent(QPaintEvent * event)
 	painter.drawLine(0, 0, width(), 0);
 }
 
-ParamTicket::ParamTicket(const QString & i_name, int i_count, int i_usage, int i_hosts, int i_max_hosts):
-	m_name(i_name)
+ParamTicket::ParamTicket(const QString &i_name, int i_count, int i_usage, int i_hosts, int i_max_hosts)
+	: m_name(i_name)
 {
-	QHBoxLayout * layout = new QHBoxLayout(this);
-	layout->setContentsMargins(0,0,0,0);
+	QHBoxLayout *layout = new QHBoxLayout(this);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	m_name_label = new QLabel(m_name);
 	m_name_label->setTextInteractionFlags(Qt::TextBrowserInteraction);
 	layout->addWidget(m_name_label);
 
-	const QPixmap * icon = Watch::getTicketIcon(m_name);
+	const QPixmap *icon = Watch::getTicketIcon(m_name);
 	if (icon)
 	{
-		QLabel * licon = new QLabel();
+		QLabel *licon = new QLabel();
 		licon->setPixmap(*icon);
 		layout->addWidget(licon);
 	}
@@ -445,14 +417,9 @@ ParamTicket::ParamTicket(const QString & i_name, int i_count, int i_usage, int i
 	update(i_count, i_usage, i_hosts, i_max_hosts);
 }
 
-ParamTicket::~ParamTicket()
-{
-}
+ParamTicket::~ParamTicket() {}
 
-void ParamTicket::setEditable(bool i_editable)
-{
-	m_edit_btn->setHidden(false == i_editable);
-}
+void ParamTicket::setEditable(bool i_editable) { m_edit_btn->setHidden(false == i_editable); }
 
 void ParamTicket::update(int i_count, int i_usage, int i_hosts, int i_max_hosts)
 {
@@ -461,12 +428,12 @@ void ParamTicket::update(int i_count, int i_usage, int i_hosts, int i_max_hosts)
 		m_name_label->setText(QString("<i>%1</i>").arg(m_name));
 		// Do we need to hide edit button on a dummy ticket?
 		// May be needed make dummy ticket not dummy?
-		//m_edit_btn->setHidden(true);
+		// m_edit_btn->setHidden(true);
 	}
 	else
 	{
 		m_name_label->setText(QString("<b>%1</b>").arg(m_name));
-		//m_edit_btn->setHidden(false);
+		// m_edit_btn->setHidden(false);
 	}
 
 	QString counts;
@@ -481,8 +448,4 @@ void ParamTicket::update(int i_count, int i_usage, int i_hosts, int i_max_hosts)
 	m_count_label->setText(counts);
 }
 
-void ParamTicket::slot_Edit()
-{
-	emit sig_Edit(m_name);
-}
-
+void ParamTicket::slot_Edit() { emit sig_Edit(m_name); }

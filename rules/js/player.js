@@ -14,7 +14,7 @@
 	player.js - TODO: description
 */
 
-"use strict";
+'use strict';
 
 var p_PLAYER = true;
 
@@ -112,7 +112,7 @@ function p_Init()
 	for (var i = 0; i < p_buttons.length; i++)
 		p_elb[p_buttons[i]] = document.getElementById('btn_' + p_buttons[i]);
 
-	n_Request({"send": {"start": {}}, "func": p_StartReceived, "info": 'start'});
+	n_Request({'send': {'start': {}}, 'func': p_StartReceived, 'info': 'start'});
 }
 function p_StartReceived(i_data)
 {
@@ -125,7 +125,7 @@ function p_StartReceived(i_data)
 		return;
 	}
 
-	n_Request({"send": {"initialize": {}}, "func": p_InitializeReceived, "info": 'init'});
+	n_Request({'send': {'initialize': {}}, 'func': p_InitializeReceived, 'info': 'init'});
 }
 function p_InitializeReceived(i_data)
 {
@@ -164,7 +164,7 @@ function p_InitializeReceived(i_data)
 	}
 	document.getElementById('player_usewebgl').textContent = localStorage.player_usewebgl;
 
-	u_DrawColorBars({"el": $('paint_palette'), "onclick": p_PaintColorSet, "height": 25});
+	u_DrawColorBars({'el': $('paint_palette'), 'onclick': p_PaintColorSet, 'height': 25});
 	p_el.view.onmousedown = p_ViewOnMouseDown;
 	p_el.view.onmousemove = p_ViewOnMouseMove;
 	p_el.view.onmouseup = p_ViewOnMouseUp;
@@ -178,7 +178,9 @@ function p_InitializeReceived(i_data)
 	window.onhashchange = p_PathChanged;
 	//	window.onresize = p_ViewHome;
 
-	$('paint_size_num').onblur = function(e) { p_PaintSizeSet() };
+	$('paint_size_num').onblur = function(e) {
+		p_PaintSizeSet()
+	};
 	$('paint_size_num').onkeydown = p_PaintSizeKeyDown;
 	p_PaintColorSet(p_paintColor);
 	p_PaintSizeSet(p_paintSize);
@@ -263,9 +265,8 @@ function p_PathChanged()
 	p_rules_path = c_PathDir(p_rules_path);
 	if (p_rules_path.indexOf('//') != -1)
 		p_rules_path = p_rules_path.substr(0, p_rules_path.indexOf('//'));
-	$('rules_link')
-		.href = window.location.protocol + '//' + window.location.host + c_PathDir(window.location.pathname) +
-		'/#' + p_rules_path;
+	$('rules_link').href = window.location.protocol + '//' + window.location.host +
+		c_PathDir(window.location.pathname) + '/#' + p_rules_path;
 
 	c_Info('Navigating to: ' + p_rules_path);
 	var folders = p_rules_path.split('/');
@@ -306,7 +307,7 @@ function p_WalkNavigateReceived(i_data, i_args)
 	// console.log(JSON.stringify(i_data));
 
 	n_WalkDir(
-		{"paths": [p_path], "wfunc": p_WalkSequenceReceived, "info": 'walk images', "rufiles": ['player']});
+		{'paths': [p_path], 'wfunc': p_WalkSequenceReceived, 'info': 'walk images', 'rufiles': ['player']});
 }
 
 function p_WalkSequenceReceived(i_data)
@@ -318,7 +319,7 @@ function p_WalkSequenceReceived(i_data)
 	{
 		if (c_FileCanEdit(p_path))
 		{
-			walk.files = [{"name": c_PathBase(p_path)}];
+			walk.files = [{'name': c_PathBase(p_path)}];
 			p_path = c_PathDir(p_path);
 			p_imageMode = true;
 			$('playback_controls').style.display = 'none';
@@ -349,8 +350,12 @@ function p_WalkSequenceReceived(i_data)
 			continue;
 		var img = new Image();
 		img.src = RULES.root + p_path + '/' + file;
-		img.onload = function(e) { p_ImgLoaded(e); };
-		img.onerror = function(e) { p_ImgLoadError(e); };
+		img.onload = function(e) {
+			p_ImgLoaded(e);
+		};
+		img.onerror = function(e) {
+			p_ImgLoadError(e);
+		};
 		img.m_file = walk.files[i];
 		p_filenames.push(file);
 		p_images.push(img);
@@ -469,10 +474,10 @@ function p_ImgLoaded(e)
 
 	// Process saved comments:
 	n_WalkDir({
-		"paths": [p_savepath],
-		"wfunc": p_WalkReceivedComments,
-		"info": 'walk comments',
-		"rufiles": ['player']
+		'paths': [p_savepath],
+		'wfunc': p_WalkReceivedComments,
+		'info': 'walk comments',
+		'rufiles': ['player']
 	});
 }
 function p_WalkReceivedComments(i_data)
@@ -536,7 +541,9 @@ function p_CreateImages()
 		elImg.src = RULES.root + p_path + '/' + p_filenames[i];
 		if (localStorage.player_precreate == 'ON')
 			elImg.style.display = 'none';
-		elImg.onmousedown = function() { return false; };
+		elImg.onmousedown = function() {
+			return false;
+		};
 		p_elImg.push(elImg);
 	}
 }
@@ -646,7 +653,7 @@ function p_OnKeyDown(e)
 	else if (e.keyCode == 35)
 		p_ShowFrame(-1);  // End
 	else if (e.keyCode == 36)
-		p_ShowFrame(0);  // Home
+		p_ShowFrame(0);	 // Home
 	else if (e.keyCode == 219)
 		p_NextFrame(-1);  // [
 	else if (e.keyCode == 221)
@@ -661,11 +668,11 @@ function p_OnKeyDown(e)
 		p_Reverse();  // <
 
 	else if (e.keyCode == 39)
-		p_ViewRight();  // Right
+		p_ViewRight();	// Right
 	else if (e.keyCode == 37)
 		p_ViewLeft();  // Left
 	else if (e.keyCode == 38)
-		p_ViewUp();  // Up
+		p_ViewUp();	 // Up
 	else if (e.keyCode == 40)
 		p_ViewDown();  // Down
 	else if (e.keyCode == 173)
@@ -673,28 +680,28 @@ function p_OnKeyDown(e)
 	else if (e.keyCode == 109)
 		p_ViewZoomOut();  // - (NumPad)
 	else if (e.keyCode == 61)
-		p_ViewZoomIn();  // +
+		p_ViewZoomIn();	 // +
 	else if (e.keyCode == 107)
-		p_ViewZoomIn();  // + (NumPad)
+		p_ViewZoomIn();	 // + (NumPad)
 	else if (e.keyCode == 72)
 		p_ViewHome();  // H
 	else if (e.keyCode == 70)
-		p_FullScreen();  // F
+		p_FullScreen();	 // F
 
 	else if (e.keyCode == 80)
-		p_Paint();  // P
+		p_Paint();	// P
 	else if (e.keyCode == 57)
-		p_PaintSizeChange(-1);  // 9
+		p_PaintSizeChange(-1);	// 9
 	else if (e.keyCode == 48)
-		p_PaintSizeChange(+1);  // 0
+		p_PaintSizeChange(+1);	// 0
 
 	else if (e.keyCode == 67)
 		p_Comment();  // C
 
 	else if (e.keyCode == 59)
-		p_NextEditedFrame(-1);  // ;
+		p_NextEditedFrame(-1);	// ;
 	else if (e.keyCode == 222)
-		p_NextEditedFrame(+1);  // '
+		p_NextEditedFrame(+1);	// '
 
 	else if (e.keyCode == 83)
 		p_Save();  // S
@@ -1141,12 +1148,12 @@ function p_PaintSizeKeyDown(e)
 	{
 		p_PaintSizeChange(1);
 		return false;
-	};  // UP
+	};	// UP
 	if (e.keyCode == 40)
 	{
 		p_PaintSizeChange(-1);
 		return false;
-	};  // DOWN
+	};	// DOWN
 }
 
 function p_PaintClear()
@@ -1176,7 +1183,7 @@ function p_PaintSave()
 		{
 			if (p_comments[f] == null)
 				continue;
-			canvas = document.createElement("canvas");
+			canvas = document.createElement('canvas');
 			canvas.width = p_images[f].width;
 			canvas.height = p_images[f].height;
 			canvas.m_edited = true;
@@ -1201,12 +1208,12 @@ function p_PaintSave()
 			p_filestosave++;
 
 			n_Request({
-				"send": {"save": {"file": png_path, "data": png, "type": "base64"}},
-				"func": p_SavedFile,
-				"file": png_path,
-				"info": "save png",
-				"wait": false,
-				"parse": true
+				'send': {'save': {'file': png_path, 'data': png, 'type': 'base64'}},
+				'func': p_SavedFile,
+				'file': png_path,
+				'info': 'save png',
+				'wait': false,
+				'parse': true
 			});
 		}
 
@@ -1217,12 +1224,12 @@ function p_PaintSave()
 		data = data.substr(data.indexOf(',') + 1);
 
 		n_Request({
-			"send": {"save": {"file": path, "data": data, "type": "base64"}},
-			"func": p_SavedFile,
-			"file": path,
-			"info": "save jpg",
-			"wait": false,
-			"parse": true
+			'send': {'save': {'file': path, 'data': data, 'type': 'base64'}},
+			'func': p_SavedFile,
+			'file': path,
+			'info': 'save jpg',
+			'wait': false,
+			'parse': true
 		});
 	}
 
@@ -1399,10 +1406,10 @@ function p_CommentsSave()
 
 	var edit = {};
 	edit.add = true;
-	edit.object = {"player": {"comments": pcms}};
+	edit.object = {'player': {'comments': pcms}};
 	edit.file = RULES.root + p_savepath + '/' + RULES.rufolder + '/player.json';
 	n_Request(
-		{"send": {"editobj": edit}, "func": p_CommentsSavedPlayer, "info": 'player comments', 'cm': rcm});
+		{'send': {'editobj': edit}, 'func': p_CommentsSavedPlayer, 'info': 'player comments', 'cm': rcm});
 	c_Info('Saving comments for Player...');
 	// console.log(JSON.stringify( rcm));
 }
@@ -1416,9 +1423,9 @@ function p_CommentsSavedPlayer(i_data, i_args)
 	comments[key] = i_args.cm;
 	var edit = {};
 	edit.add = true;
-	edit.object = {"comments": comments};
+	edit.object = {'comments': comments};
 	edit.file = RULES.root + p_rules_path + '/' + RULES.rufolder + '/comments.json';
-	n_Request({"send": {"editobj": edit}, 'func': p_CommentsSavedRules, 'info': 'rules comments'});
+	n_Request({'send': {'editobj': edit}, 'func': p_CommentsSavedRules, 'info': 'rules comments'});
 	c_Info('Saving comments for RULES...');
 }
 function p_CommentsSavedRules(i_data)
@@ -1473,7 +1480,7 @@ function gl_Init()
 
 	try
 	{
-		gl = gl_elCanvas.getContext("webgl") || gl_elCanvas.getContext("experimental-webgl");
+		gl = gl_elCanvas.getContext('webgl') || gl_elCanvas.getContext('experimental-webgl');
 	}
 	catch (e)
 	{
@@ -1493,7 +1500,7 @@ function gl_Start()
 	gl_elCanvas.height = p_images[0].height;
 	gl.viewport(0, 0, p_images[0].width, p_images[0].height);
 
-	gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
+	gl.clearColor(0.0, 0.0, 0.0, 1.0);	// Clear to black, fully opaque
 	gl.clearDepth(1.0);					// Clear everything
 	gl.enable(gl.DEPTH_TEST);			// Enable depth testing
 	gl.depthFunc(gl.LEQUAL);			// Near things obscure far things
@@ -1523,9 +1530,9 @@ function gl_InitShaders()
 		c_Error('Unable to initialize the shader program.');
 
 	gl.useProgram(gl_shaderProgram);
-	gl_vtxPosAttr = gl.getAttribLocation(gl_shaderProgram, "aVertexPosition");
+	gl_vtxPosAttr = gl.getAttribLocation(gl_shaderProgram, 'aVertexPosition');
 	gl.enableVertexAttribArray(gl_vtxPosAttr);
-	gl_uvAttr = gl.getAttribLocation(gl_shaderProgram, "aTextureCoord");
+	gl_uvAttr = gl.getAttribLocation(gl_shaderProgram, 'aTextureCoord');
 	gl.enableVertexAttribArray(gl_uvAttr);
 }
 function gl_InitShader(i_src, i_type)
@@ -1562,7 +1569,7 @@ function gl_InitTexture(i_tex, i_img)
 	gl.bindTexture(gl.TEXTURE_2D, gl_textures[i_tex]);
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, p_images[i_img]);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);  // NEAREST
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);	// NEAREST
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	gl.bindTexture(gl.TEXTURE_2D, null);

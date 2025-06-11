@@ -15,11 +15,9 @@
 	These are the monitor sessions with username, ip, ...
 */
 
-"use strict";
+'use strict';
 
-function MonitorNode()
-{
-}
+function MonitorNode() {}
 
 MonitorNode.prototype.init = function() {
 	this.element.classList.add('mnode');
@@ -115,7 +113,7 @@ MonitorNode.prototype.update = function(i_obj) {
 MonitorNode.prototype.refresh = function() {};
 
 MonitorNode.prototype.onDoubleClick = function(e) {
-	g_ShowObject({"object": this.params}, {"evt": e, "wnd": this.monitor.window});
+	g_ShowObject({'object': this.params}, {'evt': e, 'wnd': this.monitor.window});
 };
 
 MonitorNode.prototype.updatePanels = function() {
@@ -136,9 +134,10 @@ MonitorNode.prototype.updatePanels = function() {
 	info += '<p>Registered at: ' + cm_DateTimeStrFromSec(this.params.time_register) + '</p>';
 	info += '<p>Last activity at: ' + cm_DateTimeStrFromSec(this.params.time_activity) + '</p>';
 
-	info += '<p>ID = ' + this.params.id + '</p>'
+	info += '<p>ID = ' + this.params.id +
+		'</p>'
 
-	this.monitor.setPanelInfo(info);
+		this.monitor.setPanelInfo(info);
 };
 
 

@@ -6,11 +6,11 @@
 
 class WndCustomizeGUI : public Wnd
 {
-Q_OBJECT
-public:
-    WndCustomizeGUI();
-    ~WndCustomizeGUI();
+	Q_OBJECT
+  public:
+	WndCustomizeGUI();
+	~WndCustomizeGUI();
 
-private slots:
-    void save();
+  private slots:
+	void save();
 };

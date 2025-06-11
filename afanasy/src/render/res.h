@@ -2,6 +2,6 @@
 
 #include "../libafanasy/hostres.h"
 
-void GetResources(af::HostRes & hres, bool verbose = false);
+void GetResources(af::HostRes &hres, bool verbose = false);
 
 void FreeResources();

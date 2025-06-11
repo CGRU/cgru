@@ -3,94 +3,86 @@
 #define BOOST_PYTHON_STATIC_LIB
 #endif
 
-
-
 #include "libafanasy/msg.h"
-#include "watch/monitorhost.h"
 #include "libafqt/qafclient.h"
-
+#include "watch/monitorhost.h"
 
 #include "common.h"
 #include "state.hpp"
 
-
-#include <QtNetwork/QTcpSocket>
 #include <QObject>
+#include <QtNetwork/QTcpSocket>
 
 namespace afermer
 {
 
 class Waves
 {
-public:
-    AFERMER_TYPEDEF_SMART_PTRS(af::Msg)
-    AFERMER_DEFINE_CREATE_FUNC_2_ARGS(af::Msg, size_t, size_t)
-    AFERMER_DEFINE_CREATE_FUNC_2_ARGS(af::Msg, size_t, af::Af *)
+  public:
+	AFERMER_TYPEDEF_SMART_PTRS(af::Msg)
+	AFERMER_DEFINE_CREATE_FUNC_2_ARGS(af::Msg, size_t, size_t)
+	AFERMER_DEFINE_CREATE_FUNC_2_ARGS(af::Msg, size_t, af::Af *)
 };
 
 class RadiolocationStation : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 
-protected:
-    QTcpSocket socket;
-    af::Address addresses;
+  protected:
+	QTcpSocket socket;
+	af::Address addresses;
 
+  private slots:
+	void pullMessage(af::Msg *msg);
+	void connectionLost();
 
-private slots:
-    void pullMessage( af::Msg *msg);
-    void connectionLost();
+  signals:
+	void outputComplited();
 
-signals:
-    void outputComplited();
+  public:
+	AFERMER_TYPEDEF_SMART_PTRS(RadiolocationStation)
+	AFERMER_DEFINE_CREATE_FUNC(RadiolocationStation)
 
-public:
-    AFERMER_TYPEDEF_SMART_PTRS(RadiolocationStation)
-    AFERMER_DEFINE_CREATE_FUNC(RadiolocationStation)
+	static void QStringFromMsg(QString &, Waves::Ptr);
+	static int getAvalibleSlotsAndJobNames(af::Render *, int, QString &, QList<int> &);
+	static void getItemInfo(std::ostringstream &, const std::string &, const std::string &, int);
 
-    static void QStringFromMsg(QString&, Waves::Ptr);
-    static int getAvalibleSlotsAndJobNames(af::Render *, int, QString&, QList<int>&);
-    static void getItemInfo( std::ostringstream&, const std::string &, const std::string &, int);
+	bool setParameter(const std::string &, const std::vector<int> &, const std::string &, const std::string &,
+					  bool);
+	bool setOperation(const std::string &, const std::vector<int> &, const std::string &);
 
+	RadiolocationStation();
+	~RadiolocationStation();
+	Waves::Ptr push(const std::ostringstream &);
+	void addJobId(int i_jid, bool i_add);
 
-    bool setParameter(const std::string&, const std::vector<int>&, const std::string&, const std::string&, bool);
-    bool setOperation(const std::string&, const std::vector<int>&, const std::string&);
+	size_t getId();
+	size_t getUserId();
+	void getServerIPAddress(std::string &);
+	void getUserName(std::string &);
+	void getComputerName(std::string &);
 
+	MonitorHost *m_monitor;
+	size_t monitor_id;
 
-    RadiolocationStation();
-    ~RadiolocationStation();
-    Waves::Ptr push(const std::ostringstream&);
-    void addJobId( int i_jid, bool i_add);
+	void getTaskOutput(QString &, int, int, int, TaskState::State);
 
-    size_t getId();
-    size_t getUserId();
-    void getServerIPAddress(std::string&);
-    void getUserName(std::string&);
-    void getComputerName(std::string&);
+	bool isConnected();
 
-    MonitorHost* m_monitor;
-    size_t monitor_id;
+  private:
+	afqt::QAfClient m_qafclient;
 
-    void getTaskOutput(QString&, int, int, int, TaskState::State);
+	Waves::Ptr push(Waves::Ptr);
 
-    bool isConnected();
+	std::string task_output_body;
+	bool wait_task_stdout;
+	bool m_connected;
 
-private:
+	size_t user_id;
+	std::string user_name;
+	std::string comp_name;
 
-    afqt::QAfClient m_qafclient;
-
-    Waves::Ptr push(Waves::Ptr);
-    
-    std::string task_output_body;
-    bool wait_task_stdout;
-    bool m_connected;
-
-    size_t user_id;
-    std::string user_name;
-    std::string comp_name;
-
-    af::Msg* msg_monitor_id;
-
+	af::Msg *msg_monitor_id;
 };
 
-}
+} // namespace afermer

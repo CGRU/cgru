@@ -6,17 +6,17 @@
 
 namespace afsql
 {
-class DBJob: public DBItem
+class DBJob : public DBItem
 {
-public:
+  public:
 	DBJob();
 	virtual ~DBJob();
 
-	void add( const af::Job * i_job, std::list<std::string> * o_queries);
+	void add(const af::Job *i_job, std::list<std::string> *o_queries);
 
-	inline const std::string & v_dbGetTableName()  const { return ms_TableName;}
+	inline const std::string &v_dbGetTableName() const { return ms_TableName; }
 
-private:
+  private:
 	std::string m_annotation;
 	std::string m_blockname;
 	std::string m_description;
@@ -36,7 +36,7 @@ private:
 	int64_t m_time_start;
 	int64_t m_time_done;
 
-private:
+  private:
 	static const std::string ms_TableName;
 };
-}
+} // namespace afsql

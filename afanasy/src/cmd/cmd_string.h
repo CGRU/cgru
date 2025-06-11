@@ -4,8 +4,8 @@
 
 class CmdString : public Cmd
 {
-public:
-   CmdString();
-   ~CmdString();
-   bool v_processArguments( int argc, char** argv, af::Msg &msg);
+  public:
+	CmdString();
+	~CmdString();
+	bool v_processArguments(int argc, char **argv, af::Msg &msg);
 };

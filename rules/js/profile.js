@@ -14,24 +14,24 @@
 	profile.js - profile settgins
 */
 
-"use strict";
+'use strict';
 
 var prof_avatar_max_size = 24 * 1024;
-var prof_avatar_min_size =  1 * 1024;
+var prof_avatar_min_size = 1 * 1024;
 var prof_avatars_location = 'users/avatars'
 
 var prof_props = {
-	id /**********/: {"disabled": true, "label": 'ID'},
-	role /********/: {"disabled": true},
+	id /**********/: {'disabled': true, 'label': 'ID'},
+	role /********/: {'disabled': true},
 	title /*******/: {},
 	avatar /******/: {},
 	news_limit /**/: {},
-	email /*******/: {"width": '70%'},
-	email_news /**/: {"width": '30%', 'type': "bool", 'default': false},
+	email /*******/: {'width': '70%'},
+	email_news /**/: {'width': '30%', 'type': 'bool', 'default': false},
 	signature /***/: {}
 };
 
-var prof_avatar_exts = ['jpg','png','gif'];
+var prof_avatar_exts = ['jpg', 'png', 'gif'];
 
 var prof_wnd = null;
 
@@ -48,7 +48,7 @@ function prof_Open()
 	else
 		prof_props.avatar.disabled = true;
 
-	prof_wnd = new cgru_Window({"name": 'profile', "title": 'My Profile'});
+	prof_wnd = new cgru_Window({'name': 'profile', 'title': 'My Profile'});
 	prof_wnd.elContent.classList.add('profile');
 
 	let elAvatarDiv = document.createElement('div');
@@ -66,7 +66,7 @@ function prof_Open()
 
 	let elSelectLabel = document.createElement('label');
 	elAvatarDiv.appendChild(elSelectLabel);
-	elSelectLabel.classList.add('button','upload');
+	elSelectLabel.classList.add('button', 'upload');
 	elSelectLabel.innerHTML = 'Select<br>Avatar';
 
 	let elAvatarInput = document.createElement('input');
@@ -89,7 +89,7 @@ function prof_Open()
 
 	prof_wnd.elUploadAvatar = document.createElement('div');
 	elAvatarDiv.appendChild(prof_wnd.elUploadAvatar);
-	prof_wnd.elUploadAvatar.classList.add('pav_upload','button');
+	prof_wnd.elUploadAvatar.classList.add('pav_upload', 'button');
 	prof_wnd.elUploadAvatar.innerHTML = 'Upload Avatar';
 	prof_wnd.elUploadAvatar.style.display = 'none';
 	prof_wnd.elUploadAvatar.onclick = prof_UploadAvatar;
@@ -101,8 +101,9 @@ function prof_Open()
 	elBtns.classList.add('buttons_div');
 	elBtns.style.clear = 'both';
 
-	prof_wnd.elContent.onkeydown = function(e) {
-		if (e.keyCode == 13) // Enter
+	prof_wnd.elContent.onkeydown =
+		function(e) {
+		if (e.keyCode == 13)  // Enter
 			prof_Save();
 	}
 
@@ -110,13 +111,17 @@ function prof_Open()
 	elBtns.appendChild(el);
 	el.textContent = 'Save';
 	el.classList.add('button');
-	el.onclick = function(e) {prof_Save();};
+	el.onclick = function(e) {
+		prof_Save();
+	};
 
 	el = document.createElement('div');
 	elBtns.appendChild(el);
 	el.textContent = 'Cancel';
 	el.classList.add('button');
-	el.onclick = function(e) {prof_wnd.destroy();};
+	el.onclick = function(e) {
+		prof_wnd.destroy();
+	};
 
 	if (c_CanSetPassword())
 	{
@@ -124,7 +129,9 @@ function prof_Open()
 		elBtns.appendChild(el);
 		el.textContent = 'Set Password';
 		el.classList.add('button');
-		el.onclick = function(e) {ad_SetPasswordDialog(g_auth_user.id);};
+		el.onclick = function(e) {
+			ad_SetPasswordDialog(g_auth_user.id);
+		};
 	}
 
 	prof_StatusClear();
@@ -144,7 +151,7 @@ function prof_Save()
 		return;
 	}
 
-	let save_obj = {'id':g_auth_user.id};
+	let save_obj = {'id': g_auth_user.id};
 	for (let p in params)
 	{
 		g_auth_user[p] = params[p];
@@ -182,12 +189,14 @@ function prof_AvatarSelected(e)
 	}
 	if (file.size < prof_avatar_min_size)
 	{
-		prof_StatusError('File size < ' + c_Bytes2KMG(prof_avatar_min_size) + '<br>' + c_Bytes2KMG(file.size));
+		prof_StatusError(
+			'File size < ' + c_Bytes2KMG(prof_avatar_min_size) + '<br>' + c_Bytes2KMG(file.size));
 		return;
 	}
 	if (file.size > prof_avatar_max_size)
 	{
-		prof_StatusError('File size > ' + c_Bytes2KMG(prof_avatar_max_size) + '<br>' + c_Bytes2KMG(file.size));
+		prof_StatusError(
+			'File size > ' + c_Bytes2KMG(prof_avatar_max_size) + '<br>' + c_Bytes2KMG(file.size));
 		return;
 	}
 
@@ -239,7 +248,7 @@ function prof_UploadAvatar()
 	formData.append('upload_replace', 1);
 
 	let xhr = new XMLHttpRequest();
-	xhr.addEventListener('load',  prof_AvatarUpload_Load,  false);
+	xhr.addEventListener('load', prof_AvatarUpload_Load, false);
 	xhr.addEventListener('error', prof_AvatarUpload_Error, false);
 	xhr.addEventListener('abort', prof_AvatarUpload_Abort, false);
 	xhr.open('POST', n_server);
@@ -258,10 +267,12 @@ function prof_UploadAvatar()
 	};
 }
 function prof_AvatarUpload_Load() {}
-function prof_AvatarUpload_Error() {
+function prof_AvatarUpload_Error()
+{
 	prof_StatusError('Upload error.');
 }
-function prof_AvatarUpload_Abort() {
+function prof_AvatarUpload_Abort()
+{
 	prof_StatusError('Upload aborted.');
 }
 function prof_AvatarUploadFinished(i_args)

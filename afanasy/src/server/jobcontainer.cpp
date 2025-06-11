@@ -15,16 +15,16 @@
 */
 #include "jobcontainer.h"
 
+#include <memory.h>
 #include <stdio.h>
 #include <string.h>
-#include <memory.h>
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msgclasses/mcafnodes.h"
 
 #include "afcommon.h"
-#include "branchsrv.h"
 #include "branchescontainer.h"
+#include "branchsrv.h"
 #include "monitorcontainer.h"
 #include "rendercontainer.h"
 #include "useraf.h"
@@ -35,65 +35,65 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-JobContainer::JobContainer():
-    AfContainer( "Jobs", AFJOB::MAXQUANTITY)
+JobContainer::JobContainer() : AfContainer("Jobs", AFJOB::MAXQUANTITY) { JobAf::setJobContainer(this); }
+
+JobContainer::~JobContainer() { AFINFO("JobContainer::~JobContainer:") }
+
+void JobContainer::updateTaskState(af::MCTaskUp &taskup, RenderContainer *renders,
+								   MonitorContainer *monitoring)
 {
-	JobAf::setJobContainer( this);
+	switch (taskup.getStatus())
+	{
+		case af::TaskExec::UPNULL:
+		case af::TaskExec::UPNoTaskRunning:
+		case af::TaskExec::UPNoJob:
+		case af::TaskExec::UPLAST:
+			AFERRAR("JobContainer::updateTaskState: Bad task update status (jobID=%d).\n",
+					taskup.getNumJob());
+			return;
+	}
+
+	JobContainerIt jobsIt(this);
+	JobAf *job = jobsIt.getJob(taskup.getNumJob());
+	if (job != NULL)
+	{
+		job->v_updateTaskState(taskup, renders, monitoring);
+		return;
+	}
+
+	// Job does not exist!
+	AFERRAR("JobContainer::updateTaskState: Job with id=%d does not exists.", taskup.getNumJob())
+	if (taskup.getStatus() == af::TaskExec::UPPercent)
+		RenderAf::closeLostTask(taskup);
 }
 
-JobContainer::~JobContainer()
+void JobContainer::reconnectTask(af::TaskExec *i_taskexec, RenderAf &i_render, MonitorContainer *i_monitoring)
 {
-AFINFO("JobContainer::~JobContainer:")
-}
-
-void JobContainer::updateTaskState( af::MCTaskUp &taskup, RenderContainer * renders, MonitorContainer * monitoring)
-{
-    switch( taskup.getStatus())
-    {
-    case af::TaskExec::UPNULL:
-    case af::TaskExec::UPNoTaskRunning:
-    case af::TaskExec::UPNoJob:
-    case af::TaskExec::UPLAST:
-        AFERRAR("JobContainer::updateTaskState: Bad task update status (jobID=%d).\n", taskup.getNumJob());
-    return;
-    }
-
-    JobContainerIt jobsIt( this);
-    JobAf* job = jobsIt.getJob( taskup.getNumJob());
-    if( job != NULL )
-    {
-        job->v_updateTaskState( taskup, renders, monitoring);
-        return;
-    }
-
-    // Job does not exist!
-    AFERRAR("JobContainer::updateTaskState: Job with id=%d does not exists.", taskup.getNumJob())
-            if( taskup.getStatus() == af::TaskExec::UPPercent) RenderAf::closeLostTask( taskup);
-}
-
-void JobContainer::reconnectTask( af::TaskExec * i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring)
-{
-	#ifdef AFOUTPUT
+#ifdef AFOUTPUT
 	AF_DEBUG << "Reconnecting task " << i_taskexec << " with " << i_render;
-	#endif
+#endif
 
-	JobContainerIt jobsIt( this);
-	JobAf* job = jobsIt.getJob( i_taskexec->getJobId());
-	if( NULL == job )
+	JobContainerIt jobsIt(this);
+	JobAf *job = jobsIt.getJob(i_taskexec->getJobId());
+	if (NULL == job)
 	{
 		AF_ERR << "Job with id=" << i_taskexec->getJobId() << " does not exists.";
 		delete i_taskexec;
 		return;
 	}
 
-	return job->reconnectTask( i_taskexec, i_render, i_monitoring);
+	return job->reconnectTask(i_taskexec, i_render, i_monitoring);
 }
 
-af::Msg * JobContainer::registerJob(JSON & i_object, const af::Address & i_address, BranchesContainer * i_branches, UserContainer * i_users, MonitorContainer * i_monitors)
+af::Msg *JobContainer::registerJob(JSON &i_object, const af::Address &i_address,
+								   BranchesContainer *i_branches, UserContainer *i_users,
+								   MonitorContainer *i_monitors)
 {
-	JobAf * job = new JobAf(i_object);
+	JobAf *job = new JobAf(i_object);
 
-	int32_t id = 0; int64_t serial = 0; std::string err;
+	int32_t id = 0;
+	int64_t serial = 0;
+	std::string err;
 	if (registerJob(job, err, i_branches, i_users, i_monitors))
 	{
 		id = job->getId();
@@ -133,7 +133,8 @@ af::Msg * JobContainer::registerJob(JSON & i_object, const af::Address & i_addre
 	return af::jsonMsg(oss);
 }
 
-bool JobContainer::registerJob(JobAf * i_job, std::string & o_err, BranchesContainer * i_branches, UserContainer * i_users, MonitorContainer * i_monitors)
+bool JobContainer::registerJob(JobAf *i_job, std::string &o_err, BranchesContainer *i_branches,
+							   UserContainer *i_users, MonitorContainer *i_monitors)
 {
 	if (i_job == NULL)
 	{
@@ -156,17 +157,16 @@ bool JobContainer::registerJob(JobAf * i_job, std::string & o_err, BranchesConta
 		return false;
 	}
 
-
 	// Process job banch and user
-	BranchSrv * branch;
-	UserAf * user;
+	BranchSrv *branch;
+	UserAf *user;
 	{
 		// Lock containers:
 		AfContainerLock bLock(i_branches, AfContainerLock::WRITELOCK);
-		AfContainerLock jLock(this,       AfContainerLock::WRITELOCK);
-		AfContainerLock uLock(i_users,    AfContainerLock::WRITELOCK);
+		AfContainerLock jLock(this, AfContainerLock::WRITELOCK);
+		AfContainerLock uLock(i_users, AfContainerLock::WRITELOCK);
 		if (i_monitors)
-			AfContainerLock mLock( i_monitors, AfContainerLock::WRITELOCK);
+			AfContainerLock mLock(i_monitors, AfContainerLock::WRITELOCK);
 
 		// Process branch:
 		AF_DEBUG << "JobContainer::registerJob: Checking job branch: " << i_job->getBranch();
@@ -212,12 +212,11 @@ bool JobContainer::registerJob(JobAf * i_job, std::string & o_err, BranchesConta
 		if (i_monitors)
 		{
 			AF_DEBUG << "JobContainer::registerJob: monitor new job events.";
-			i_monitors->addJobEvent( af::Monitor::EVT_jobs_add, i_job->getId(), user->getId());
-			i_monitors->addEvent( af::Monitor::EVT_branches_change, branch->getId());
-			i_monitors->addEvent( af::Monitor::EVT_users_change, user->getId());
+			i_monitors->addJobEvent(af::Monitor::EVT_jobs_add, i_job->getId(), user->getId());
+			i_monitors->addEvent(af::Monitor::EVT_branches_change, branch->getId());
+			i_monitors->addEvent(af::Monitor::EVT_users_change, user->getId());
 		}
 	}
-
 
 	// initialize job ( create tasks output root_dir, execute "pre"commands if any)
 	AF_DEBUG << "JobContainer::registerJob: initiaizing new job with user.";
@@ -227,19 +226,19 @@ bool JobContainer::registerJob(JobAf * i_job, std::string & o_err, BranchesConta
 
 		if (i_monitors)
 		{
-			AfContainerLock mLock( i_monitors, AfContainerLock::WRITELOCK);
-			i_monitors->addJobEvent( af::Monitor::EVT_jobs_del, i_job->getId(), user->getId());
-			i_monitors->addEvent( af::Monitor::EVT_users_change, user->getId());
-			i_monitors->addEvent( af::Monitor::EVT_branches_change, user->getId());
+			AfContainerLock mLock(i_monitors, AfContainerLock::WRITELOCK);
+			i_monitors->addJobEvent(af::Monitor::EVT_jobs_del, i_job->getId(), user->getId());
+			i_monitors->addEvent(af::Monitor::EVT_users_change, user->getId());
+			i_monitors->addEvent(af::Monitor::EVT_branches_change, user->getId());
 		}
 
-		{   // Set job to zombie:
-			AfContainerLock bLock( i_branches, AfContainerLock::WRITELOCK);
-			AfContainerLock jLock( this,       AfContainerLock::WRITELOCK);
-			AfContainerLock uLock( i_users,    AfContainerLock::WRITELOCK);
+		{ // Set job to zombie:
+			AfContainerLock bLock(i_branches, AfContainerLock::WRITELOCK);
+			AfContainerLock jLock(this, AfContainerLock::WRITELOCK);
+			AfContainerLock uLock(i_users, AfContainerLock::WRITELOCK);
 			branch->unLock();
 			user->unLock();
-			i_job->deleteNode( NULL, NULL);
+			i_job->deleteNode(NULL, NULL);
 		}
 
 		return false;
@@ -248,12 +247,12 @@ bool JobContainer::registerJob(JobAf * i_job, std::string & o_err, BranchesConta
 	// If monotors is NULL, this is a server start, and this job is from store.
 	if (i_monitors)
 	{
-		AfContainerLock mLock( i_monitors, AfContainerLock::WRITELOCK);
+		AfContainerLock mLock(i_monitors, AfContainerLock::WRITELOCK);
 
 		AF_DEBUG << "JobContainer::registerJob: monitor unlock job and user events.";
-		i_monitors->addJobEvent( af::Monitor::EVT_jobs_change, i_job->getId(), user->getId());
-		i_monitors->addEvent( af::Monitor::EVT_branches_change, branch->getId());
-		i_monitors->addEvent( af::Monitor::EVT_users_change, user->getId());
+		i_monitors->addJobEvent(af::Monitor::EVT_jobs_change, i_job->getId(), user->getId());
+		i_monitors->addEvent(af::Monitor::EVT_branches_change, branch->getId());
+		i_monitors->addEvent(af::Monitor::EVT_users_change, user->getId());
 
 		AFCommon::QueueLog("Job registered: " + i_job->v_generateInfoString());
 	}
@@ -261,9 +260,9 @@ bool JobContainer::registerJob(JobAf * i_job, std::string & o_err, BranchesConta
 	// Unlocking nodes:
 	{
 		AF_DEBUG << "JobContainer::registerJob: unlocking user and job.";
-		AfContainerLock bLock( i_branches, AfContainerLock::WRITELOCK);
-		AfContainerLock jLock( this,       AfContainerLock::WRITELOCK);
-		AfContainerLock uLock( i_users,    AfContainerLock::WRITELOCK);
+		AfContainerLock bLock(i_branches, AfContainerLock::WRITELOCK);
+		AfContainerLock jLock(this, AfContainerLock::WRITELOCK);
+		AfContainerLock uLock(i_users, AfContainerLock::WRITELOCK);
 		branch->unLock();
 		user->unLock();
 		i_job->unLock();
@@ -272,56 +271,47 @@ bool JobContainer::registerJob(JobAf * i_job, std::string & o_err, BranchesConta
 	return true;
 }
 
-const std::vector<int32_t> JobContainer::getIdsBySerials( const std::vector<int64_t> & i_serials)
+const std::vector<int32_t> JobContainer::getIdsBySerials(const std::vector<int64_t> &i_serials)
 {
 	std::vector<int32_t> ids;
 
-	JobContainerIt jobsIt( this);
-	for( JobAf *job = jobsIt.job(); job != NULL; jobsIt.next(), job = jobsIt.job())
+	JobContainerIt jobsIt(this);
+	for (JobAf *job = jobsIt.job(); job != NULL; jobsIt.next(), job = jobsIt.job())
 	{
-		for( int i = 0; i < i_serials.size(); i++)
+		for (int i = 0; i < i_serials.size(); i++)
 		{
-			if( i_serials[i] == job->getSerial())
+			if (i_serials[i] == job->getSerial())
 			{
-				ids.push_back( job->getId());
+				ids.push_back(job->getId());
 				break;
 			}
 		}
 	}
 
-	if( ids.size() == 0 )
+	if (ids.size() == 0)
 		ids.push_back(-1);
 
 	return ids;
 }
 
-void JobContainer::getWeight( af::MCJobsWeight & jobsWeight )
+void JobContainer::getWeight(af::MCJobsWeight &jobsWeight)
 {
-   JobContainerIt jobsIt( this);
-   for( JobAf *job = jobsIt.job(); job != NULL; jobsIt.next(), job = jobsIt.job())
-   {
-      int weight = job->v_calcWeight();
-      jobsWeight.add(
-            job->getName(),
-            job->getId(),
-            job->getLogsWeight(),
-            job->getBlackListsWeight(),
-            job->getProgressWeight(),
-            weight
-         );
-   }
+	JobContainerIt jobsIt(this);
+	for (JobAf *job = jobsIt.job(); job != NULL; jobsIt.next(), job = jobsIt.job())
+	{
+		int weight = job->v_calcWeight();
+		jobsWeight.add(job->getName(), job->getId(), job->getLogsWeight(), job->getBlackListsWeight(),
+					   job->getProgressWeight(), weight);
+	}
 }
 
+// ############################################################################
+//                                JobQueueIt
+// ############################################################################
 
-//############################################################################
-//                               JobQueueIt
-//############################################################################
-
-JobContainerIt::JobContainerIt( JobContainer* jobContainer, bool skipZombies):
-   AfContainerIt( (AfContainer*)jobContainer, skipZombies)
+JobContainerIt::JobContainerIt(JobContainer *jobContainer, bool skipZombies)
+	: AfContainerIt((AfContainer *)jobContainer, skipZombies)
 {
 }
 
-JobContainerIt::~JobContainerIt()
-{
-}
+JobContainerIt::~JobContainerIt() {}

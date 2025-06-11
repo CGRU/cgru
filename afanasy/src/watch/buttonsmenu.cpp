@@ -10,16 +10,12 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-
-ButtonsMenuLabel::ButtonsMenuLabel(const QString & i_text, QWidget * i_parent):
-	QWidget(i_parent),
-	m_text(i_text),
-	m_hidden(false),
-	m_active(false)
+ButtonsMenuLabel::ButtonsMenuLabel(const QString &i_text, QWidget *i_parent)
+	: QWidget(i_parent), m_text(i_text), m_hidden(false), m_active(false)
 {
 	setFixedHeight(24);
 }
-ButtonsMenuLabel::~ButtonsMenuLabel(){}
+ButtonsMenuLabel::~ButtonsMenuLabel() {}
 
 void ButtonsMenuLabel::setHidden(bool i_hide)
 {
@@ -29,7 +25,7 @@ void ButtonsMenuLabel::setHidden(bool i_hide)
 	m_hidden = i_hide;
 	setHidden(m_hidden);
 }
-void ButtonsMenuLabel::paintEvent(QPaintEvent * i_evt)
+void ButtonsMenuLabel::paintEvent(QPaintEvent *i_evt)
 {
 	if (m_hidden)
 		return;
@@ -48,20 +44,11 @@ void ButtonsMenuLabel::paintEvent(QPaintEvent * i_evt)
 	painter.drawText(rect(), Qt::AlignCenter, text);
 }
 
-
-
-ButtonsMenu::ButtonsMenu(
-		ListItems * i_listitems,
-		Item::EType i_type,
-		const QString & i_label,
-		const QString & i_tip):
-	m_listitems(i_listitems),
-	m_type(i_type),
-	m_hovered(false),
-	m_active(false),
-	m_opened(false)
+ButtonsMenu::ButtonsMenu(ListItems *i_listitems, Item::EType i_type, const QString &i_label,
+						 const QString &i_tip)
+	: m_listitems(i_listitems), m_type(i_type), m_hovered(false), m_active(false), m_opened(false)
 {
-	QVBoxLayout * layout = new QVBoxLayout(this);
+	QVBoxLayout *layout = new QVBoxLayout(this);
 	layout->setContentsMargins(0, 0, 0, 0);
 
 	m_label = new ButtonsMenuLabel(i_label);
@@ -83,13 +70,13 @@ ButtonsMenu::ButtonsMenu(
 
 ButtonsMenu::~ButtonsMenu() {}
 
-void ButtonsMenu::addButton(ButtonPanel * i_bp)
+void ButtonsMenu::addButton(ButtonPanel *i_bp)
 {
 	m_btns_layout->addWidget(i_bp);
 	m_buttons.push_back(i_bp);
 }
 
-void ButtonsMenu::paintEvent(QPaintEvent * i_evt)
+void ButtonsMenu::paintEvent(QPaintEvent *i_evt)
 {
 	QPainter painter(this);
 	painter.setRenderHint(QPainter::Antialiasing);
@@ -111,13 +98,21 @@ void ButtonsMenu::paintEvent(QPaintEvent * i_evt)
 
 	painter.setPen(pen);
 	painter.setBrush(QBrush(color, Qt::SolidPattern));
-	painter.drawRoundedRect(1, 1, width()-2, height()-2, 2.5, 2.5);
+	painter.drawRoundedRect(1, 1, width() - 2, height() - 2, 2.5, 2.5);
 }
 
-void ButtonsMenu::enterEvent(QEvent * i_evt){ m_hovered = true;  repaint();}
-void ButtonsMenu::leaveEvent(QEvent * i_evt){ m_hovered = false; repaint();}
-void ButtonsMenu::mousePressEvent(QMouseEvent * i_evt) { clicked(i_evt, false);}
-void ButtonsMenu::clicked(QMouseEvent * i_evt, bool i_dbl)
+void ButtonsMenu::enterEvent(QEvent *i_evt)
+{
+	m_hovered = true;
+	repaint();
+}
+void ButtonsMenu::leaveEvent(QEvent *i_evt)
+{
+	m_hovered = false;
+	repaint();
+}
+void ButtonsMenu::mousePressEvent(QMouseEvent *i_evt) { clicked(i_evt, false); }
+void ButtonsMenu::clicked(QMouseEvent *i_evt, bool i_dbl)
 {
 	if (m_opened)
 		closeMenu();
@@ -150,4 +145,3 @@ void ButtonsMenu::closeMenu()
 
 	repaint();
 }
-

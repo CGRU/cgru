@@ -16,28 +16,28 @@
 
 class DlMutex
 {
-	DlMutex(const DlMutex&);
-	void operator=(const DlMutex&);
+	DlMutex(const DlMutex &);
+	void operator=(const DlMutex &);
 
 	/* Needs access to pthread mutex. */
 	friend class DlConditionVariable;
 
-public:
+  public:
 	DlMutex();
 	~DlMutex();
-	
+
 	void Acquire();
 	bool TryAcquire();
 	void Release();
-	
+
 	/* convenient synonyms */
 	void Lock() { Acquire(); }
 	bool TryLock() { return TryAcquire(); }
 	void Unlock() { Release(); }
 
-private:
+  private:
 	/* opaque data for system specific implementation */
-	
+
 #if defined(_WIN32)
 #if defined(_WIN64)
 	unsigned m_data[10];
@@ -59,8 +59,6 @@ private:
 #else
 	unsigned m_data[1];
 #endif
-
 };
 
 #endif // __dlMutex_h
-

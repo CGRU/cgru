@@ -8,14 +8,9 @@
 
 using namespace af;
 
-RegExp::RegExp():
-	m_flags(0)
-{
-}
+RegExp::RegExp() : m_flags(0) {}
 
-RegExp::~RegExp()
-{
-}
+RegExp::~RegExp() {}
 
 void RegExp::setFind()
 {
@@ -31,7 +26,7 @@ void RegExp::setRegEx()
 		setPattern(m_pattern);
 }
 
-bool RegExp::setPattern(const std::string & i_str, std::string * o_strError)
+bool RegExp::setPattern(const std::string &i_str, std::string *o_strError)
 {
 	m_pattern = i_str;
 
@@ -43,7 +38,7 @@ bool RegExp::setPattern(const std::string & i_str, std::string * o_strError)
 			return true;
 
 		std::vector<std::string> strings = af::strSplit(m_pattern);
-		for (auto & str : strings)
+		for (auto &str : strings)
 			if (str.size())
 				m_strings.push_back(str);
 
@@ -67,7 +62,7 @@ bool RegExp::setPattern(const std::string & i_str, std::string * o_strError)
 	}
 }
 
-bool RegExp::match(const std::string & i_str) const
+bool RegExp::match(const std::string &i_str) const
 {
 	if (m_pattern.empty())
 		return true;
@@ -76,7 +71,7 @@ bool RegExp::match(const std::string & i_str) const
 
 	if (isFind())
 	{
-		for (auto & str : m_strings)
+		for (auto &str : m_strings)
 		{
 			if (isContain())
 			{
@@ -113,12 +108,9 @@ bool RegExp::match(const std::string & i_str) const
 	return ((retval == 0) != isExclude());
 }
 
-int RegExp::weigh() const
-{
-	return sizeof(RegExp) + af::weigh(m_pattern);
-}
+int RegExp::weigh() const { return sizeof(RegExp) + af::weigh(m_pattern); }
 
-bool RegExp::Validate(const std::string & i_str, std::string * o_errOutput)
+bool RegExp::Validate(const std::string &i_str, std::string *o_errOutput)
 {
 	if (i_str.empty())
 		return true;
@@ -126,23 +118,24 @@ bool RegExp::Validate(const std::string & i_str, std::string * o_errOutput)
 	bool valid = true;
 
 	std::string errStr;
-	try 
+	try
 	{
 		std::regex rx(i_str);
 	}
-	catch(const std::regex_error& rerr)
+	catch (const std::regex_error &rerr)
 	{
 		errStr = rerr.what();
 		valid = false;
 	}
-	catch (...) 
+	catch (...)
 	{
 		errStr = "Unknown exception.";
 		valid = false;
 	}
 	if (false == valid)
 	{
-		if (o_errOutput) *o_errOutput = errStr;
+		if (o_errOutput)
+			*o_errOutput = errStr;
 		else
 			AF_ERR << errStr;
 	}

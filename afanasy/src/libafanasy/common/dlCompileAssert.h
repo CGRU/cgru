@@ -1,13 +1,11 @@
 #ifndef __dlCompileAssert_h
 #define __dlCompileAssert_h
 
-template<bool truth>
-struct DlCompileAssert
+template <bool truth> struct DlCompileAssert
 {
 };
 
-template<>
-struct DlCompileAssert<true>
+template <> struct DlCompileAssert<true>
 {
 	static void assertion_failed() {}
 };

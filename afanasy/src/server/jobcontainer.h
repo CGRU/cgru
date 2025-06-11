@@ -31,19 +31,21 @@ class BranchesContainer;
 class UserContainer;
 
 /// All Afanasy jobs store in this container.
-class JobContainer: public AfContainer
+class JobContainer : public AfContainer
 {
-public:
+  public:
 	JobContainer();
 	~JobContainer();
 
 	/// Register a new job:
-	af::Msg * registerJob(JSON & i_object, const af::Address & i_address, BranchesContainer * i_branches, UserContainer * i_users, MonitorContainer * i_monitoring);
-	bool registerJob(JobAf *job, std::string & o_err, BranchesContainer * i_branches, UserContainer *users, MonitorContainer * monitoring);
+	af::Msg *registerJob(JSON &i_object, const af::Address &i_address, BranchesContainer *i_branches,
+						 UserContainer *i_users, MonitorContainer *i_monitoring);
+	bool registerJob(JobAf *job, std::string &o_err, BranchesContainer *i_branches, UserContainer *users,
+					 MonitorContainer *monitoring);
 
 	/// Update some task state of some job.
-	void updateTaskState( af::MCTaskUp &taskup, RenderContainer * renders, MonitorContainer * monitoring);
-	
+	void updateTaskState(af::MCTaskUp &taskup, RenderContainer *renders, MonitorContainer *monitoring);
+
 	/**
 	 * @brief Reconnect a running task to the server.
 	 * This method taks the ownership of `i_taskexec`
@@ -52,24 +54,27 @@ public:
 	 * @param renders: renders pool
 	 * @param monitoring: monitors pool
 	 */
-	void reconnectTask(af::TaskExec * i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring);
+	void reconnectTask(af::TaskExec *i_taskexec, RenderAf &i_render, MonitorContainer *i_monitoring);
 
-	const std::vector<int32_t> getIdsBySerials( const std::vector<int64_t> & i_serials);
+	const std::vector<int32_t> getIdsBySerials(const std::vector<int64_t> &i_serials);
 
-	void getWeight( af::MCJobsWeight & jobsWeight );
+	void getWeight(af::MCJobsWeight &jobsWeight);
 };
 
-//########################## Iterator ##############################
+// ########################## Iterator ##############################
 
 /// Afanasy jobs interator.
-class JobContainerIt: public AfContainerIt
+class JobContainerIt : public AfContainerIt
 {
-public:
-	JobContainerIt( JobContainer* jobContainer, bool skipZombies = true);
+  public:
+	JobContainerIt(JobContainer *jobContainer, bool skipZombies = true);
 	~JobContainerIt();
 
-	inline JobAf * job() { return (JobAf*)(getNode()); }
-	inline JobAf * getJob(int i_id, const af::Msg * i_msg = NULL) {return static_cast<JobAf*>(get(i_id, i_msg));}
+	inline JobAf *job() { return (JobAf *)(getNode()); }
+	inline JobAf *getJob(int i_id, const af::Msg *i_msg = NULL)
+	{
+		return static_cast<JobAf *>(get(i_id, i_msg));
+	}
 
-private:
+  private:
 };

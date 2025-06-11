@@ -25,9 +25,9 @@ class MsgAf;
 class RenderAf;
 
 /// Users container.
-class PoolsContainer: public AfContainer
+class PoolsContainer : public AfContainer
 {
-public:
+  public:
 	PoolsContainer();
 	~PoolsContainer();
 
@@ -37,34 +37,36 @@ public:
 	// Or it was read from store or will be created a new one.
 	void createRootPool();
 
-	bool addRootPool(PoolSrv * i_root_pool);
+	bool addRootPool(PoolSrv *i_root_pool);
 
-	bool addPoolFromStore(PoolSrv * i_pool);
+	bool addPoolFromStore(PoolSrv *i_pool);
 
-	int addPoolToContainer(PoolSrv * i_pool);
+	int addPoolToContainer(PoolSrv *i_pool);
 
-	PoolSrv * getPool(const std::string & i_path);
+	PoolSrv *getPool(const std::string &i_path);
 
-	void assignRender(RenderAf * i_render);
+	void assignRender(RenderAf *i_render);
 
-	PoolSrv * getRootPool() {return m_root_pool;}
+	PoolSrv *getRootPool() { return m_root_pool; }
 
-private:
-	PoolSrv * m_root_pool;
+  private:
+	PoolSrv *m_root_pool;
 };
 
-//########################## Iterator ##############################
+// ########################## Iterator ##############################
 
 /// Users iterator.
-class PoolsContainerIt: public AfContainerIt
+class PoolsContainerIt : public AfContainerIt
 {
-public:
-	PoolsContainerIt(PoolsContainer * i_container, bool i_skipZombies = true);
+  public:
+	PoolsContainerIt(PoolsContainer *i_container, bool i_skipZombies = true);
 	~PoolsContainerIt();
 
-	inline PoolSrv * pool() { return (PoolSrv*)(getNode()); }
-	inline PoolSrv * getPool(int i_id, const af::Msg * i_msg = NULL) { return static_cast<PoolSrv*>(get(i_id, i_msg));}
+	inline PoolSrv *pool() { return (PoolSrv *)(getNode()); }
+	inline PoolSrv *getPool(int i_id, const af::Msg *i_msg = NULL)
+	{
+		return static_cast<PoolSrv *>(get(i_id, i_msg));
+	}
 
-private:
+  private:
 };
-

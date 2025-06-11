@@ -55,22 +55,20 @@ void Branch::initDefaultValues()
 
 	m_branches_total = 0;
 
-	m_jobs_total     = 0;
-	m_jobs_running   = 0;
-	m_jobs_done      = 0;
-	m_jobs_error     = 0;
-	m_jobs_ready     = 0;
+	m_jobs_total = 0;
+	m_jobs_running = 0;
+	m_jobs_done = 0;
+	m_jobs_error = 0;
+	m_jobs_ready = 0;
 
-	m_tasks_ready    = 0;
-	m_tasks_error    = 0;
+	m_tasks_ready = 0;
+	m_tasks_error = 0;
 
 	m_time_creation = 0;
 	m_time_empty = 0;
 }
 
-Branch::~Branch()
-{
-}
+Branch::~Branch() {}
 
 void Branch::v_readwrite(Msg *msg)
 {
@@ -80,20 +78,20 @@ void Branch::v_readwrite(Msg *msg)
 	rw_int8_t(m_flags_branch, msg);
 
 	rw_int64_t(m_time_creation, msg);
-	rw_int64_t(m_time_empty,    msg);
+	rw_int64_t(m_time_empty, msg);
 
 	rw_String(m_parent_path, msg);
 
 	rw_int32_t(m_branches_total, msg);
 
-	rw_int32_t(m_jobs_total,     msg);
-	rw_int32_t(m_jobs_running,   msg);
-	rw_int32_t(m_jobs_done,      msg);
-	rw_int32_t(m_jobs_ready,     msg);
-	rw_int32_t(m_jobs_error,     msg);
+	rw_int32_t(m_jobs_total, msg);
+	rw_int32_t(m_jobs_running, msg);
+	rw_int32_t(m_jobs_done, msg);
+	rw_int32_t(m_jobs_ready, msg);
+	rw_int32_t(m_jobs_error, msg);
 
-	rw_int32_t(m_tasks_ready,    msg);
-	rw_int32_t(m_tasks_error,    msg);
+	rw_int32_t(m_tasks_ready, msg);
+	rw_int32_t(m_tasks_error, msg);
 }
 
 void Branch::v_jsonWrite(std::ostringstream &o_str, int i_type) const
@@ -104,9 +102,12 @@ void Branch::v_jsonWrite(std::ostringstream &o_str, int i_type) const
 
 	Work::jsonWrite(o_str, i_type);
 
-	if (isCreateChilds()) o_str << ",\n\"create_childs\":true";
-	if (isSolveJobs()) o_str << ",\n\"solve_jobs\":true";
-	if (isPaused()) o_str << ",\n\"paused\":true";
+	if (isCreateChilds())
+		o_str << ",\n\"create_childs\":true";
+	if (isSolveJobs())
+		o_str << ",\n\"solve_jobs\":true";
+	if (isPaused())
+		o_str << ",\n\"paused\":true";
 
 	o_str << ",\n\"time_creation\":" << m_time_creation;
 	if (m_time_empty)
@@ -114,25 +115,36 @@ void Branch::v_jsonWrite(std::ostringstream &o_str, int i_type) const
 
 	o_str << ",\n\"parent\":\"" << m_parent_path << "\"";
 
-	if (m_branches_total > 0) o_str << ",\n\"branches_total\":" << m_branches_total;
-	if (m_jobs_total     > 0) o_str << ",\n\"jobs_total\":"     << m_jobs_total;
-	if (m_jobs_running   > 0) o_str << ",\n\"jobs_running\":"   << m_jobs_running;
-	if (m_jobs_done      > 0) o_str << ",\n\"jobs_done\":"      << m_jobs_done;
-	if (m_jobs_ready     > 0) o_str << ",\n\"jobs_ready\":"     << m_jobs_ready;
-	if (m_jobs_error     > 0) o_str << ",\n\"jobs_error\":"     << m_jobs_error;
-	if (m_tasks_ready    > 0) o_str << ",\n\"tasks_ready\":"    << m_tasks_ready;
-	if (m_tasks_error    > 0) o_str << ",\n\"tasks_error\":"    << m_tasks_error;
+	if (m_branches_total > 0)
+		o_str << ",\n\"branches_total\":" << m_branches_total;
+	if (m_jobs_total > 0)
+		o_str << ",\n\"jobs_total\":" << m_jobs_total;
+	if (m_jobs_running > 0)
+		o_str << ",\n\"jobs_running\":" << m_jobs_running;
+	if (m_jobs_done > 0)
+		o_str << ",\n\"jobs_done\":" << m_jobs_done;
+	if (m_jobs_ready > 0)
+		o_str << ",\n\"jobs_ready\":" << m_jobs_ready;
+	if (m_jobs_error > 0)
+		o_str << ",\n\"jobs_error\":" << m_jobs_error;
+	if (m_tasks_ready > 0)
+		o_str << ",\n\"tasks_ready\":" << m_tasks_ready;
+	if (m_tasks_error > 0)
+		o_str << ",\n\"tasks_error\":" << m_tasks_error;
 
 	o_str << ",\n\"active_jobs\":[";
-	for (std::list<Job *>::const_iterator it = m_active_jobs_list.begin(); it != m_active_jobs_list.end(); it++)
+	for (std::list<Job *>::const_iterator it = m_active_jobs_list.begin(); it != m_active_jobs_list.end();
+		 it++)
 	{
-		if (it != m_active_jobs_list.begin()) o_str << ",";
+		if (it != m_active_jobs_list.begin())
+			o_str << ",";
 
 		o_str << "\n{";
 		o_str << "\n\"id\":" << (*it)->getId();
 		o_str << ",\n\"name\":\"" << (*it)->getName() << "\"";
 		o_str << ",\n\"user_name\":\"" << (*it)->getUserName() << "\"";
-		o_str << ",\n"; jw_stateJob((*it)->getState(), o_str);
+		o_str << ",\n";
+		jw_stateJob((*it)->getState(), o_str);
 
 		if ((*it)->getRunningTasksNum() > 0)
 			o_str << ",\n\"running_tasks_num\":" << (*it)->getRunningTasksNum();
@@ -145,12 +157,15 @@ void Branch::v_jsonWrite(std::ostringstream &o_str, int i_type) const
 	o_str << "\n]";
 
 	o_str << ",\n\"active_users\":[";
-	for (std::list<BranchUserData*>::const_iterator it = m_active_users_list.begin(); it != m_active_users_list.end(); it++)
+	for (std::list<BranchUserData *>::const_iterator it = m_active_users_list.begin();
+		 it != m_active_users_list.end(); it++)
 	{
-		if (it != m_active_users_list.begin()) o_str << ",";
+		if (it != m_active_users_list.begin())
+			o_str << ",";
 
 		o_str << "\n{";
-		o_str << "\n\"id\":" << (*it)->user->getId();;
+		o_str << "\n\"id\":" << (*it)->user->getId();
+		;
 		o_str << ",\n\"name\":\"" << (*it)->user->getName() << "\"";
 
 		if ((*it)->running_tasks_num > 0)
@@ -190,12 +205,13 @@ bool Branch::jsonRead(const JSON &i_object, std::string *io_changes)
 
 	//
 	// Paramers below are not editable and are read only on creation.
-	if (io_changes) return true;
+	if (io_changes)
+		return true;
 	// Log provided to store changes, on parameters editing.
 	//
 
 	jr_int64("time_creation", m_time_creation, i_object);
-	jr_int64("time_empty",    m_time_empty,    i_object);
+	jr_int64("time_empty", m_time_empty, i_object);
 
 	jr_string("parent", m_parent_path, i_object);
 
@@ -221,7 +237,8 @@ void Branch::v_generateInfoStream(std::ostringstream &stream, bool full) const
 const std::string Branch::FilterPath(const std::string &i_path)
 {
 	// Zero path will be treated as root "/"
-	if (i_path.size() == 0) return "/";
+	if (i_path.size() == 0)
+		return "/";
 
 	std::string o_path(i_path);
 
@@ -235,11 +252,14 @@ const std::string Branch::FilterPath(const std::string &i_path)
 	o_path.clear();
 	for (int i = 0; i < folders.size(); i++)
 	{
-		if (folders[i].size() == 0) continue;
+		if (folders[i].size() == 0)
+			continue;
 
-		if (folders[i] == ".") continue;
+		if (folders[i] == ".")
+			continue;
 
-		if (folders[i] == "..") continue;
+		if (folders[i] == "..")
+			continue;
 
 		folders[i] = af::pathFilterFileName(folders[i]);
 
@@ -247,7 +267,8 @@ const std::string Branch::FilterPath(const std::string &i_path)
 	}
 
 	// Zero path will be treated as root "/"
-	if (o_path.size() == 0) o_path = "/";
+	if (o_path.size() == 0)
+		o_path = "/";
 
 	return o_path;
 }

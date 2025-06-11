@@ -6,13 +6,6 @@
 
 using namespace af;
 
-MsgQueue::MsgQueue( const std::string & QueueName):
-	AfQueue( QueueName, e_no_thread),
-	m_verbose( VerboseOn)
-{
-}
+MsgQueue::MsgQueue(const std::string &QueueName) : AfQueue(QueueName, e_no_thread), m_verbose(VerboseOn) {}
 
-MsgQueue::~MsgQueue()
-{
-}
-
+MsgQueue::~MsgQueue() {}

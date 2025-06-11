@@ -24,39 +24,34 @@
 
 #include "action.h"
 #include "afcommon.h"
-#include "renderaf.h"
 #include "monitorcontainer.h"
+#include "renderaf.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-BranchesContainer::BranchesContainer():
-	m_root_branch(NULL),
-	AfContainer("Branches", AFBRANCH::MAXCOUNT)
+BranchesContainer::BranchesContainer() : m_root_branch(NULL), AfContainer("Branches", AFBRANCH::MAXCOUNT)
 {
 	BranchSrv::setBranchesContainer(this);
 }
 
-BranchesContainer::~BranchesContainer()
-{
-AFINFO("BranchesContainer::~BranchesContainer:\n");
-}
+BranchesContainer::~BranchesContainer() { AFINFO("BranchesContainer::~BranchesContainer:\n"); }
 
-BranchSrv * BranchesContainer::addBranchFromPath(const std::string & i_path, MonitorContainer * i_monitors)
+BranchSrv *BranchesContainer::addBranchFromPath(const std::string &i_path, MonitorContainer *i_monitors)
 {
-//AF_DEBUG << i_path;
-//Filter branch path
-//std::string path = Branch::FilterPath(i_path);
+	// AF_DEBUG << i_path;
+	// Filter branch path
+	// std::string path = Branch::FilterPath(i_path);
 
 	// Look for an existing branch
-	BranchSrv * branch = getBranch(i_path);
+	BranchSrv *branch = getBranch(i_path);
 	if (branch)
 		return branch;
 
 	// Look for a parent branch if it is not the root
-	BranchSrv * parent = NULL;
+	BranchSrv *parent = NULL;
 	if (i_path != "/")
 	{
 		std::string up_path = af::pathUp(i_path);
@@ -100,13 +95,13 @@ BranchSrv * BranchesContainer::addBranchFromPath(const std::string & i_path, Mon
 	return branch;
 }
 
-bool BranchesContainer::addBranchFromStore(BranchSrv * i_branch)
+bool BranchesContainer::addBranchFromStore(BranchSrv *i_branch)
 {
 	std::string path = i_branch->getName();
 	if (path != "/")
 	{
 		std::string up_path = af::pathUp(path);
-		BranchSrv * parent = getBranch(up_path);
+		BranchSrv *parent = getBranch(up_path);
 		if (NULL == parent)
 		{
 			AF_ERR << "Can't process parent of a stored branch:\n" << path << "\n" << up_path;
@@ -124,7 +119,7 @@ bool BranchesContainer::addBranchFromStore(BranchSrv * i_branch)
 	return (addBranchToContainer(i_branch) != 0);
 }
 
-int BranchesContainer::addBranchToContainer(BranchSrv * i_branch)
+int BranchesContainer::addBranchToContainer(BranchSrv *i_branch)
 {
 	// Add node to container
 	if (false == add(i_branch))
@@ -137,24 +132,22 @@ int BranchesContainer::addBranchToContainer(BranchSrv * i_branch)
 	return i_branch->getId();
 }
 
-BranchSrv * BranchesContainer::getBranch(const std::string & i_path)
+BranchSrv *BranchesContainer::getBranch(const std::string &i_path)
 {
 	BranchesContainerIt it(this);
-	for (BranchSrv * branch = it.branch(); branch != NULL; it.next(), branch = it.branch())
+	for (BranchSrv *branch = it.branch(); branch != NULL; it.next(), branch = it.branch())
 		if (branch->getName() == i_path)
 			return branch;
 	return NULL;
 }
 
-//############################################################################
-//                               BranchesContainerIt
-//############################################################################
+// ############################################################################
+//                                BranchesContainerIt
+// ############################################################################
 
-BranchesContainerIt::BranchesContainerIt(BranchesContainer * i_container, bool i_skipZombies):
-	AfContainerIt((AfContainer*)i_container, i_skipZombies)
+BranchesContainerIt::BranchesContainerIt(BranchesContainer *i_container, bool i_skipZombies)
+	: AfContainerIt((AfContainer *)i_container, i_skipZombies)
 {
 }
 
-BranchesContainerIt::~BranchesContainerIt()
-{
-}
+BranchesContainerIt::~BranchesContainerIt() {}

@@ -14,13 +14,13 @@
 	editlist.js - Edit a list of items, such as tags, artists, flags.
 */
 
-"use strict";
+'use strict';
 
 function EditList(i_args)
 {
-	this.name     = i_args.name;
-	this.label    = i_args.label;
-	this.list     = i_args.list;
+	this.name = i_args.name;
+	this.label = i_args.label;
+	this.list = i_args.list;
 	this.list_all = i_args.list_all;
 	this.elParent = i_args.elParent;
 	this.onChange = i_args.onChange;
@@ -34,14 +34,14 @@ function EditList(i_args)
 	{
 		let objects = {};
 		for (let id of this.list)
-			objects[id] = {'selected':true};
+			objects[id] = {'selected': true};
 		this.list = objects;
 	}
 	else
 	{
 		// Prepare items list
 		for (let id in this.list)
-			if ( ! this.list[id].half_selected)
+			if (!this.list[id].half_selected)
 				this.list[id].selected = true;
 	}
 
@@ -64,7 +64,9 @@ function EditList(i_args)
 	this.elAllShowBtn.classList.add('button');
 	this.elAllShowBtn.textContent = this.label;
 	this.elAllShowBtn.m_editlist = this;
-	this.elAllShowBtn.onclick = function(e) {e.currentTarget.m_editlist.showAllItems();};
+	this.elAllShowBtn.onclick = function(e) {
+		e.currentTarget.m_editlist.showAllItems();
+	};
 	this.elItems = document.createElement('div');
 	this.elRoot.appendChild(this.elItems);
 
@@ -73,14 +75,16 @@ function EditList(i_args)
 	this.elAddItem.classList.add('editing');
 	this.elAddItem.contentEditable = 'true';
 	this.elAddItem.m_editlist = this;
-	this.elAddItem.oninput = function(e){e.currentTarget.m_editlist.addInputProcess();}
+	this.elAddItem.oninput =
+		function(e) {
+		e.currentTarget.m_editlist.addInputProcess();
+	}
 
-	for (let id in this.list)
-		this.appendItem(id, this.list[id]);
+		for (let id in this.list) this.appendItem(id, this.list[id]);
 };
 
-EditList.prototype.appendItem = function(i_id, i_item)
-{
+EditList.prototype.appendItem =
+	function(i_id, i_item) {
 	let el = document.createElement('div');
 	el.classList.add('tag');
 	this.elItems.insertBefore(el, this.elAddItem);
@@ -124,11 +128,12 @@ EditList.prototype.appendItem = function(i_id, i_item)
 
 	// Delete button
 	let elBtnDel = document.createElement('div');
-	elBtnDel.classList.add('button','delete','right');
+	elBtnDel.classList.add('button', 'delete', 'right');
 	elBtnDel.m_el = el;
 	elBtnDel.m_editlist = this;
-	elBtnDel.onclick = function(e){e.currentTarget.m_editlist.deleteItem(e.currentTarget.m_el);}
-	el.appendChild(elBtnDel);
+	elBtnDel.onclick = function(e) {
+		e.currentTarget.m_editlist.deleteItem(e.currentTarget.m_el);
+	} el.appendChild(elBtnDel);
 
 	this.addInputProcess();
 
@@ -136,8 +141,8 @@ EditList.prototype.appendItem = function(i_id, i_item)
 		this.onChange();
 }
 
-EditList.prototype.deleteItem = function(i_el)
-{
+	EditList.prototype.deleteItem =
+		function(i_el) {
 	i_el.parentNode.removeChild(i_el);
 	this.list[i_el.m_id].selected = false;
 	this.list[i_el.m_id].half_selected = false;
@@ -147,10 +152,10 @@ EditList.prototype.deleteItem = function(i_el)
 		this.onChange();
 }
 
-EditList.prototype.addInputProcess = function()
-{
+		EditList.prototype.addInputProcess =
+			function() {
 	let text = this.elAddItem.textContent.toLowerCase();
-	//console.log(text);
+	// console.log(text);
 
 	if (this.elMenu)
 	{
@@ -197,20 +202,21 @@ EditList.prototype.addInputProcess = function()
 		array.push(item);
 	}
 
-	array.sort(function(a,b) {return a.title < b.title});
+	array.sort(function(a, b) {
+		return a.title < b.title
+	});
 
-	let ids = []
-	for (let i = 0; i < array.length; i++)
-		ids.push(array[i].id);
+	let ids = [] for (let i = 0; i < array.length; i++)
+	ids.push(array[i].id);
 
 	let elements = [];
 
 	if (this.name == 'artists')
-		elements = st_SetElArtists({'artists':ids}, this.elMenu);
+		elements = st_SetElArtists({'artists': ids}, this.elMenu);
 	else if (this.name == 'tags')
-		elements = st_SetElTags({'tags':ids}, this.elMenu);
+		elements = st_SetElTags({'tags': ids}, this.elMenu);
 	else if (this.name == 'flags')
-		elements = st_SetElFlags({'flags':ids}, this.elMenu);
+		elements = st_SetElFlags({'flags': ids}, this.elMenu);
 	else
 		for (let i = 0; i < array.length; i++)
 		{
@@ -229,21 +235,22 @@ EditList.prototype.addInputProcess = function()
 		el.classList.add('item');
 
 		el.m_editlist = this;
-		el.onclick = function(e){e.currentTarget.m_editlist.menuItemOnclick(e.currentTarget.m_name);};
+		el.onclick = function(e) {
+			e.currentTarget.m_editlist.menuItemOnclick(e.currentTarget.m_name);
+		};
 	}
 }
 
-EditList.prototype.menuItemOnclick = function(i_id)
-{
-	let item = {'selected':true};
+			EditList.prototype.menuItemOnclick =
+				function(i_id) {
+	let item = {'selected': true};
 	this.list[i_id] = item;
 	this.elAddItem.textContent = '';
 	this.appendItem(i_id, item);
 	this.elAddItem.focus();
 }
 
-EditList.prototype.showAllItems = function()
-{
+				EditList.prototype.showAllItems = function() {
 	if (this.m_showing_all)
 		return;
 
@@ -304,10 +311,10 @@ EditList.prototype.showAllItems = function()
 			if (this.list[item].half_selected)
 			{
 				el.m_half_selected = true;
-                el.m_half_selected_initially = true;
+				el.m_half_selected_initially = true;
 				el.classList.add('half_selected');
 			}
-			else if(this.list[item].selected)
+			else if (this.list[item].selected)
 			{
 				el.m_selected = true;
 				el.classList.add('selected');
@@ -324,8 +331,7 @@ EditList.prototype.showAllItems = function()
 	}
 };
 
-EditList.prototype.editArtists = function()
-{
+EditList.prototype.editArtists = function() {
 	let roles = c_GetRolesArtists(this.list);
 
 	for (let r = 0; r < roles.length; r++)
@@ -407,8 +413,8 @@ EditList.prototype.editArtists = function()
 	}
 };
 
-EditList.prototype.getSelectedObjects = function()
-{
+EditList.prototype.getSelectedObjects =
+	function() {
 	let objects = {};
 
 	if (this.elAllItems)
@@ -416,25 +422,25 @@ EditList.prototype.getSelectedObjects = function()
 		for (let i = 0; i < this.elAllItems.length; i++)
 		{
 			if (this.elAllItems[i].m_selected)
-				objects[this.elAllItems[i].m_item] = {'selected':true};
+				objects[this.elAllItems[i].m_item] = {'selected': true};
 			else if (this.elAllItems[i].classList.contains('half_selected'))
-				objects[this.elAllItems[i].m_item] = {'half_selected':true};
+				objects[this.elAllItems[i].m_item] = {'half_selected': true};
 		}
 	}
 	else
 	{
 		for (let id in this.list)
 			if (this.list[id].selected)
-				objects[id] = {'selected':true};
+				objects[id] = {'selected': true};
 			else if (this.list[id].half_selected)
-				objects[id] = {'half_selected':true};
+				objects[id] = {'half_selected': true};
 	}
 
 	return objects;
 }
 
-EditList.prototype.getSelectedNames = function ()
-{
+	EditList.prototype.getSelectedNames =
+		function() {
 	let names = [];
 
 	if (this.elAllItems)
@@ -453,8 +459,8 @@ EditList.prototype.getSelectedNames = function ()
 	return names;
 }
 
-EditList.prototype.getHalfSelectedNames = function ()
-{
+		EditList.prototype.getHalfSelectedNames =
+			function() {
 	let names = [];
 
 	if (this.elAllItems)
@@ -473,39 +479,37 @@ EditList.prototype.getHalfSelectedNames = function ()
 	return names;
 }
 
-function editlist_ToggleSelection(e)
-{
+function editlist_ToggleSelection(e) {
 	let el = e.currentTarget;
 	if (el.m_selected)
 	{
 		el.classList.remove('selected');
 		el.classList.remove('half_selected');
 		el.m_selected = false;
-        el.m_half_selected = false;
+		el.m_half_selected = false;
 	}
 	else if (el.m_half_selected)
 	{
 		el.classList.add('selected');
 		el.classList.remove('half_selected');
 		el.m_selected = true;
-        el.m_half_selected = false;
+		el.m_half_selected = false;
 	}
 	else if (el.m_half_selected_initially)
 	{
 		el.classList.remove('selected');
 		el.classList.add('half_selected');
 		el.m_selected = false;
-        el.m_half_selected = true;
+		el.m_half_selected = true;
 	}
 	else
 	{
 		el.classList.add('selected');
 		el.classList.remove('half_selected');
 		el.m_selected = true;
-        el.m_half_selected = false;
+		el.m_half_selected = false;
 	}
 
 	if (el.m_editlist.onChange)
 		el.m_editlist.onChange();
 }
-

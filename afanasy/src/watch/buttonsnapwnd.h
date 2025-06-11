@@ -8,35 +8,41 @@
 
 class ButtonSnapWnd : public QWidget
 {
-public:
-	ButtonSnapWnd(const int i_button_position, QWidget * i_parent);
+  public:
+	ButtonSnapWnd(const int i_button_position, QWidget *i_parent);
 	~ButtonSnapWnd();
 
-	enum{NoSnap, Left, Right, LAST};
+	enum
+	{
+		NoSnap,
+		Left,
+		Right,
+		LAST
+	};
 
-	inline static int getType() {return ms_CurrentType;}
+	inline static int getType() { return ms_CurrentType; }
 
 	void setSelected();
 	void setUnSelected();
 
 	void reloadImages();
 
-protected:
-	virtual void mousePressEvent(QMouseEvent * i_event);
-	virtual void paintEvent(QPaintEvent * i_event);
+  protected:
+	virtual void mousePressEvent(QMouseEvent *i_event);
+	virtual void paintEvent(QPaintEvent *i_event);
 
-private:
+  private:
 	bool m_selected;
-	int  m_type;
+	int m_type;
 
 	QPixmap m_img_off;
 	QPixmap m_img_on;
 
-private:
+  private:
 	static const int ms_width;
 	static const int ms_height;
 
-	static ButtonSnapWnd * ms_Buttons[LAST];
-	static ButtonSnapWnd * ms_Current;
+	static ButtonSnapWnd *ms_Buttons[LAST];
+	static ButtonSnapWnd *ms_Current;
 	static int ms_CurrentType;
 };

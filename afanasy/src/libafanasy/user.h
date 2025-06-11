@@ -26,58 +26,61 @@ namespace af
 {
 /// Afanasy user class
 /** When Afanasy register a new job, it register a new user, or add job to existing user (with the same name).
-**/
+ **/
 class User : public Work
 {
-public:
-
+  public:
 	/// Construct a new user from job.
-	User( const std::string & username, const std::string & host);
+	User(const std::string &username, const std::string &host);
 
 	/// Construct user from id only.
-	User( int i_id = 0);
+	User(int i_id = 0);
 
 	/// Build user data from buffer.
-	User( Msg * msg);
+	User(Msg *msg);
 
-	virtual ~User();                       ///< Destructor.
+	virtual ~User(); ///< Destructor.
 
-	void v_generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
+	void v_generateInfoStream(std::ostringstream &stream, bool full = false) const; /// Generate information.
 
-	inline const std::string & getHostName() const { return m_host_name;}
-	inline void  setHostName( const std::string & str) { m_host_name = str;}
+	inline const std::string &getHostName() const { return m_host_name; }
+	inline void setHostName(const std::string &str) { m_host_name = str; }
 
-	inline int getNumJobs()              const { return m_jobs_num;               }
-	inline int getNumRunningJobs()       const { return m_running_jobs_num;       }
-	inline int getJobsLifeTime()         const { return m_jobs_life_time;         }
+	inline int getNumJobs() const { return m_jobs_num; }
+	inline int getNumRunningJobs() const { return m_running_jobs_num; }
+	inline int getJobsLifeTime() const { return m_jobs_life_time; }
 
-	inline int getErrorsAvoidHost()    const { return m_errors_avoid_host;     }
-	inline int getErrorsRetries()      const { return m_errors_retries;        }
+	inline int getErrorsAvoidHost() const { return m_errors_avoid_host; }
+	inline int getErrorsRetries() const { return m_errors_retries; }
 	inline int getErrorsTaskSameHost() const { return m_errors_task_same_host; }
-	inline int getErrorsForgiveTime()  const { return m_errors_forgive_time;   }
+	inline int getErrorsForgiveTime() const { return m_errors_forgive_time; }
 
 	inline int64_t getTimeRegister() const { return m_time_register; } ///< Get register time.
 	inline int64_t getTimeActivity() const { return m_time_activity; } ///< Get activity time.
 
-	inline void setTimeRegister()    { m_time_register = time( NULL ); m_time_activity = m_time_register; }
-	inline void updateTimeActivity() { m_time_activity = time( NULL ); }
+	inline void setTimeRegister()
+	{
+		m_time_register = time(NULL);
+		m_time_activity = m_time_register;
+	}
+	inline void updateTimeActivity() { m_time_activity = time(NULL); }
 
 	virtual int v_calcWeight() const; ///< Calculate and return memory size.
 
-	virtual void v_jsonWrite( std::ostringstream & o_str, int i_type) const;
+	virtual void v_jsonWrite(std::ostringstream &o_str, int i_type) const;
 
-	bool jsonRead( const JSON & i_object, std::string * io_changes = NULL);
+	bool jsonRead(const JSON &i_object, std::string *io_changes = NULL);
 
 	enum State
 	{
 		SPaused = 1ULL << 0
 	};
 
-	inline bool isPaused() const {return m_state & SPaused;}
-	inline void setPaused(bool set) {m_state = set ? m_state | SPaused : m_state & (~SPaused);}
+	inline bool isPaused() const { return m_state & SPaused; }
+	inline void setPaused(bool set) { m_state = set ? m_state | SPaused : m_state & (~SPaused); }
 
-protected:
-	std::string m_host_name;          ///< User host name.
+  protected:
+	std::string m_host_name; ///< User host name.
 
 	/// Maximum number of errors in task to retry it automatically
 	uint8_t m_errors_retries;
@@ -88,18 +91,17 @@ protected:
 	/// Time from last error to remove host from error list
 	int32_t m_errors_forgive_time;
 
-	int32_t m_jobs_life_time;        ///< User jobs default life time.
+	int32_t m_jobs_life_time; ///< User jobs default life time.
 
-	int32_t m_jobs_num;              ///< User jobs quantity.
-	int32_t m_running_jobs_num;       ///< User active jobs quantity.
+	int32_t m_jobs_num;			///< User jobs quantity.
+	int32_t m_running_jobs_num; ///< User active jobs quantity.
 
-private:
+  private:
+	int64_t m_time_register; ///< User registration time.
+	int64_t m_time_activity; ///< User last activity time.
 
-	int64_t m_time_register;        ///< User registration time.
-	int64_t m_time_activity;        ///< User last activity time.
-
-private:
-   void initDefaultValues();
-   void v_readwrite( Msg * msg);   ///< Read or write user in buffer.
+  private:
+	void initDefaultValues();
+	void v_readwrite(Msg *msg); ///< Read or write user in buffer.
 };
-}
+} // namespace af

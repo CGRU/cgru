@@ -13,107 +13,118 @@ class Task;
 
 class Block
 {
-public:
-	Block( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress);
+  public:
+	Block(JobAf *blockJob, af::BlockData *blockData, af::JobProgress *progress);
 	virtual ~Block();
 
-	inline bool isInitialized() const { return m_initialized;}
+	inline bool isInitialized() const { return m_initialized; }
 
-	inline void setUser( UserAf * jobOwner) { m_user = jobOwner;}
+	inline void setUser(UserAf *jobOwner) { m_user = jobOwner; }
 
 	bool storeTasks();
 	bool readStoredTasks();
 
 	inline int getErrorsAvoidHost() const
-	  { return ( m_data->getErrorsAvoidHost() > -1) ? m_data->getErrorsAvoidHost() : m_user->getErrorsAvoidHost();}
+	{
+		return (m_data->getErrorsAvoidHost() > -1) ? m_data->getErrorsAvoidHost()
+												   : m_user->getErrorsAvoidHost();
+	}
 	inline int getErrorsRetries() const
-	  { return ( m_data->getErrorsRetries() > -1) ? m_data->getErrorsRetries() : m_user->getErrorsRetries();}
+	{
+		return (m_data->getErrorsRetries() > -1) ? m_data->getErrorsRetries() : m_user->getErrorsRetries();
+	}
 	inline int getErrorsTaskSameHost() const
-	  { return ( m_data->getErrorsTaskSameHost() > -1) ? m_data->getErrorsTaskSameHost() : m_user->getErrorsTaskSameHost();}
+	{
+		return (m_data->getErrorsTaskSameHost() > -1) ? m_data->getErrorsTaskSameHost()
+													  : m_user->getErrorsTaskSameHost();
+	}
 	inline int getErrorsForgiveTime() const
-	  { return ( m_data->getErrorsForgiveTime() > -1) ? m_data->getErrorsForgiveTime() : m_user->getErrorsForgiveTime();}
+	{
+		return (m_data->getErrorsForgiveTime() > -1) ? m_data->getErrorsForgiveTime()
+													 : m_user->getErrorsForgiveTime();
+	}
 
 	int calcWeight() const;
 	int logsWeight() const;
 	int blackListWeight() const;
 
-    virtual void v_errorHostsAppend( int task, int hostId, RenderContainer * renders);
-    bool avoidHostsCheck( const std::string & hostname) const;
-    virtual void v_getErrorHostsList( std::list<std::string> & o_list) const;
-    virtual void v_errorHostsReset();
+	virtual void v_errorHostsAppend(int task, int hostId, RenderContainer *renders);
+	bool avoidHostsCheck(const std::string &hostname) const;
+	virtual void v_getErrorHostsList(std::list<std::string> &o_list) const;
+	virtual void v_errorHostsReset();
 
-	bool canRunOn( RenderAf * render);
+	bool canRunOn(RenderAf *render);
 
-	virtual bool v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
-	
+	virtual bool v_startTask(af::TaskExec *taskexec, RenderAf *render, MonitorContainer *monitoring);
+
 	/// Records that a task execution is being performed by a given running
 	/// render. This is used when restarting the server without restarting the
 	/// renders.
 	/// This method taks the ownership of `i_taskexec`
-	void reconnectTask( af::TaskExec * i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring);
+	void reconnectTask(af::TaskExec *i_taskexec, RenderAf &i_render, MonitorContainer *i_monitoring);
 
 	/// Refresh block. Retrun true if block progress changed, needed for jobs monitoring (watch jobs list).
-	virtual bool v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
+	virtual bool v_refresh(time_t currentTime, RenderContainer *renders, MonitorContainer *monitoring);
 
 	void checkStatesOnAppend();
 
-	bool checkBlockDependStatus(MonitorContainer * i_monitoring);
-	bool checkTasksDependStatus(MonitorContainer * i_monitoring);
+	bool checkBlockDependStatus(MonitorContainer *i_monitoring);
+	bool checkTasksDependStatus(MonitorContainer *i_monitoring);
 	void constructDependTasks();
 
 	/// Return \c true if some job block progess parameter needs to updated for monitoring
-	bool action( Action & i_action);
+	bool action(Action &i_action);
 
-	bool tasksDependsOn( int block);
+	bool tasksDependsOn(int block);
 
-	void addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
-	void remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
+	void addSolveCounts(MonitorContainer *i_monitoring, af::TaskExec *i_exec, RenderAf *i_render);
+	void remSolveCounts(MonitorContainer *i_monitoring, af::TaskExec *i_exec, RenderAf *i_render);
 
-public:
-	JobAf * m_job;
-	af::BlockData * m_data;
-	Task ** m_tasks;                 ///< Tasks.
-	UserAf * m_user;
+  public:
+	JobAf *m_job;
+	af::BlockData *m_data;
+	Task **m_tasks; ///< Tasks.
+	UserAf *m_user;
 
-protected:
-	void appendJobLog(const std::string & i_info, bool i_store = true);
-    bool v_errorHostsAppend( const std::string & hostname);
+  protected:
+	void appendJobLog(const std::string &i_info, bool i_store = true);
+	bool v_errorHostsAppend(const std::string &hostname);
 
-private:
-	af::JobProgress * m_jobprogress;
+  private:
+	af::JobProgress *m_jobprogress;
 
-	std::list<std::string>  m_errorHosts;       ///< Avoid error hosts list.
-	std::list<int>          m_errorHostsCounts; ///< Number of errors on error host.
-	std::list<time_t>       m_errorHostsTime;   ///< Time of the last error
+	std::list<std::string> m_errorHosts; ///< Avoid error hosts list.
+	std::list<int> m_errorHostsCounts;	 ///< Number of errors on error host.
+	std::list<time_t> m_errorHostsTime;	 ///< Time of the last error
 
-	std::list<RenderAf*> m_renders_ptrs;
+	std::list<RenderAf *> m_renders_ptrs;
 	std::list<int> m_renders_counts;
 
 	std::list<int> m_dependBlocks;
 	std::list<int> m_dependTasksBlocks;
-	bool m_initialized;             ///< Where the block was successfully  initialized.
+	bool m_initialized; ///< Where the block was successfully  initialized.
 
-private:
+  private:
 	/// Allocate, or reallocate when appending tasks, Task objects.
 	/// When reallocating, one must provide the number of alread allocated tasks
 	bool allocateTasks(int alreadyAllocated = 0);
 
 	void constructDependBlocks();
 
-	bool resetTasksDependStatus(MonitorContainer * i_monitoring);
+	bool resetTasksDependStatus(MonitorContainer *i_monitoring);
 
 	const std::string getStoreTasksFileName() const;
 
-	bool editTickets(Action & i_action, const JSON & operation);
+	bool editTickets(Action &i_action, const JSON &operation);
 
-	void tasksOperation(Action & i_action, const JSON & i_operation, uint32_t i_with_state, uint32_t i_set_state);
+	void tasksOperation(Action &i_action, const JSON &i_operation, uint32_t i_with_state,
+						uint32_t i_set_state);
 
-	bool tryTasksNext(Action & i_action, const JSON & i_operation);
+	bool tryTasksNext(Action &i_action, const JSON &i_operation);
 
-	void addRenderCount(RenderAf * i_render);
-	int  getRenderCount(RenderAf * i_render) const;
-	void remRenderCount(RenderAf * i_render);
+	void addRenderCount(RenderAf *i_render);
+	int getRenderCount(RenderAf *i_render) const;
+	void remRenderCount(RenderAf *i_render);
 
-	bool appendTasks(Action & i_action, const JSON & i_operation);
+	bool appendTasks(Action &i_action, const JSON &i_operation);
 };
-

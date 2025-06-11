@@ -20,9 +20,9 @@
 #include "action.h"
 #include "afcommon.h"
 #include "jobaf.h"
+#include "monitorcontainer.h"
 #include "renderaf.h"
 #include "solver.h"
-#include "monitorcontainer.h"
 #include "usercontainer.h"
 
 #define AFOUTPUT
@@ -30,53 +30,48 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-UserContainer * UserAf::ms_users = NULL;
+UserContainer *UserAf::ms_users = NULL;
 
-UserAf::UserAf(const std::string & username, const std::string & host):
-	af::User(username, host),
-	AfNodeSolve(this, "user", "")
+UserAf::UserAf(const std::string &username, const std::string &host)
+	: af::User(username, host), AfNodeSolve(this, "user", "")
 {
 	appendLogInfo("Registered from job.");
 }
 
-UserAf::UserAf(JSON & i_object):
-	af::User(),
-	AfNodeSolve(this, "user", "")
-{
-	jsonRead(i_object);
-}
+UserAf::UserAf(JSON &i_object) : af::User(), AfNodeSolve(this, "user", "") { jsonRead(i_object); }
 
-UserAf::UserAf( const std::string & i_store_dir):
-	af::User(),
-	AfNodeSolve(this, "user", i_store_dir)
+UserAf::UserAf(const std::string &i_store_dir) : af::User(), AfNodeSolve(this, "user", i_store_dir)
 {
 	int size;
-	char * data = af::fileRead( getStoreFile(), &size);
-	if( data == NULL ) return;
+	char *data = af::fileRead(getStoreFile(), &size);
+	if (data == NULL)
+		return;
 
 	rapidjson::Document document;
-	char * res = af::jsonParseData( document, data, size);
-	if( res == NULL )
+	char *res = af::jsonParseData(document, data, size);
+	if (res == NULL)
 	{
-		delete [] data;
+		delete[] data;
 		return;
 	}
 
-	if( jsonRead( document))
+	if (jsonRead(document))
 		setStoredOk();
 
-	delete [] res;
-	delete [] data;
+	delete[] res;
+	delete[] data;
 }
 
 bool UserAf::initialize()
 {
-	if( isFromStore())
+	if (isFromStore())
 	{
-		if(( getTimeRegister() == 0 ) || ( getTimeActivity() == 0 ))
+		if ((getTimeRegister() == 0) || (getTimeActivity() == 0))
 		{
-			if( getTimeRegister() == 0 ) setTimeRegister();
-			if( getTimeActivity() == 0 ) updateTimeActivity();
+			if (getTimeRegister() == 0)
+				setTimeRegister();
+			if (getTimeActivity() == 0)
+				updateTimeActivity();
 			store();
 		}
 		appendLogInfo("Initialized from store.", false);
@@ -85,7 +80,7 @@ bool UserAf::initialize()
 	{
 		setTimeRegister();
 		updateTimeActivity();
-		setStoreDir( AFCommon::getStoreDirUser( *this));
+		setStoreDir(AFCommon::getStoreDirUser(*this));
 		store();
 		appendLogInfo("Registered.", false);
 	}
@@ -93,60 +88,59 @@ bool UserAf::initialize()
 	return true;
 }
 
-UserAf::~UserAf()
-{
-}
+UserAf::~UserAf() {}
 
-void UserAf::v_action( Action & i_action)
+void UserAf::v_action(Action &i_action)
 {
-	const JSON & operation = (*i_action.data)["operation"];
-	if( operation.IsObject())
+	const JSON &operation = (*i_action.data)["operation"];
+	if (operation.IsObject())
 	{
 		std::string type;
 		af::jr_string("type", type, operation);
-		if( type.find("move_jobs_") == 0 )
+		if (type.find("move_jobs_") == 0)
 		{
 			std::vector<int32_t> jids;
 			af::jr_int32vec("jids", jids, operation);
-			if( type == "move_jobs_up" )
-				m_jobs_list.moveNodes( jids, AfList::MoveUp);
-			else if( type == "move_jobs_down" )
-				m_jobs_list.moveNodes( jids, AfList::MoveDown);
-			else if( type == "move_jobs_top" )
-				m_jobs_list.moveNodes( jids, AfList::MoveTop);
-			else if( type == "move_jobs_bottom" )
-				m_jobs_list.moveNodes( jids, AfList::MoveBottom);
+			if (type == "move_jobs_up")
+				m_jobs_list.moveNodes(jids, AfList::MoveUp);
+			else if (type == "move_jobs_down")
+				m_jobs_list.moveNodes(jids, AfList::MoveDown);
+			else if (type == "move_jobs_top")
+				m_jobs_list.moveNodes(jids, AfList::MoveTop);
+			else if (type == "move_jobs_bottom")
+				m_jobs_list.moveNodes(jids, AfList::MoveBottom);
 			updateJobsOrder();
-		  	i_action.monitors->addUser( this);
+			i_action.monitors->addUser(this);
 		}
-		else if( type == "delete")
+		else if (type == "delete")
 		{
-			if( m_jobs_num != 0 ) return;
+			if (m_jobs_num != 0)
+				return;
 			deleteNode(i_action.monitors);
 			return;
 		}
 	}
 
-	const JSON & params = (*i_action.data)["params"];
+	const JSON &params = (*i_action.data)["params"];
 	if (params.IsObject())
 		jsonRead(params, &i_action.log.info);
 
 	if (i_action.log.info.size())
 	{
 		store();
-		i_action.monitors->addEvent( af::Monitor::EVT_users_change, m_id);
+		i_action.monitors->addEvent(af::Monitor::EVT_users_change, m_id);
 	}
 }
 
-void UserAf::jobPriorityChanged( JobAf * i_job, MonitorContainer * i_monitoring)
+void UserAf::jobPriorityChanged(JobAf *i_job, MonitorContainer *i_monitoring)
 {
 	AF_DEBUG << "UserAf::jobPriorityChanged:";
-	m_jobs_list.sortPriority( i_job);
+	m_jobs_list.sortPriority(i_job);
 	updateJobsOrder();
-	i_monitoring->addUser( this);
+	i_monitoring->addUser(this);
 }
 
-void UserAf::logAction(const Action & i_action, const std::string & i_node_name)
+void UserAf::logAction(const Action &i_action, const std::string &i_node_name)
 {
 	if (i_action.log.info.empty())
 		return;
@@ -155,17 +149,18 @@ void UserAf::logAction(const Action & i_action, const std::string & i_node_name)
 	updateTimeActivity();
 }
 
-void UserAf::deleteNode( MonitorContainer * i_monitoring)
+void UserAf::deleteNode(MonitorContainer *i_monitoring)
 {
-	AFCommon::QueueLog("Deleting user: " + v_generateInfoString( false));
+	AFCommon::QueueLog("Deleting user: " + v_generateInfoString(false));
 	appendLogInfo("Became a zombie.");
 
 	setZombie();
 
-	if( i_monitoring ) i_monitoring->addEvent( af::Monitor::EVT_users_del, m_id);
+	if (i_monitoring)
+		i_monitoring->addEvent(af::Monitor::EVT_users_del, m_id);
 }
 
-void UserAf::addJob( JobAf * i_job)
+void UserAf::addJob(JobAf *i_job)
 {
 	appendLogInfo(std::string("Adding a job: ") + i_job->getName(), false);
 
@@ -176,16 +171,16 @@ void UserAf::addJob( JobAf * i_job)
 	// Add renders counts (for max tasks per host) to AfNodeSolve
 	addRendersCounts(*i_job);
 
-	m_jobs_list.add( i_job );
+	m_jobs_list.add(i_job);
 
 	m_jobs_num++;
 
-	updateJobsOrder( i_job);
+	updateJobsOrder(i_job);
 
-	i_job->setUser( this);
+	i_job->setUser(this);
 }
 
-void UserAf::removeJob( JobAf * i_job)
+void UserAf::removeJob(JobAf *i_job)
 {
 	appendLogInfo(std::string("Removing a job: ") + i_job->getName(), false);
 
@@ -194,52 +189,51 @@ void UserAf::removeJob( JobAf * i_job)
 	// Remove renders counts (for max tasks per host) from AfNodeSolve
 	remRendersCounts(*i_job);
 
-	m_jobs_list.remove( i_job );
+	m_jobs_list.remove(i_job);
 
 	m_jobs_num--;
 }
 
-void UserAf::updateJobsOrder( af::Job * newJob)
+void UserAf::updateJobsOrder(af::Job *newJob)
 {
-	AfListIt jobsListIt( &m_jobs_list);
+	AfListIt jobsListIt(&m_jobs_list);
 	int userlistorder = 0;
-	for( AfNodeSrv *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
-		((JobAf*)(job))->setUserListOrder( userlistorder++, ((void*)(job)) != ((void*)(newJob)));
+	for (AfNodeSrv *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
+		((JobAf *)(job))->setUserListOrder(userlistorder++, ((void *)(job)) != ((void *)(newJob)));
 }
 
-bool UserAf::getJobs( std::ostringstream & o_str)
+bool UserAf::getJobs(std::ostringstream &o_str)
 {
-	AfListIt jobsListIt( &m_jobs_list);
+	AfListIt jobsListIt(&m_jobs_list);
 	bool first = true;
 	bool has_jobs = false;
-	for( AfNodeSrv *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
+	for (AfNodeSrv *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
 	{
-		if( false == first )
+		if (false == first)
 			o_str << ",\n";
 		first = false;
-		((JobAf*)(job))->v_jsonWrite( o_str, af::Msg::TJobsList);
+		((JobAf *)(job))->v_jsonWrite(o_str, af::Msg::TJobsList);
 		has_jobs = true;
 	}
 	return has_jobs;
 }
 
-void UserAf::jobsinfo( af::MCAfNodes &mcjobs)
+void UserAf::jobsinfo(af::MCAfNodes &mcjobs)
 {
-	AfListIt jobsListIt( &m_jobs_list);
-	for( AfNodeSrv *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
-		mcjobs.addNode( job->node());
+	AfListIt jobsListIt(&m_jobs_list);
+	for (AfNodeSrv *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
+		mcjobs.addNode(job->node());
 }
 
-af::Msg * UserAf::writeJobdsOrder( bool i_binary) const
+af::Msg *UserAf::writeJobdsOrder(bool i_binary) const
 {
-	if( i_binary )
+	if (i_binary)
 	{
 		af::MCGeneral ids;
-		ids.setId( getId());
-		ids.setList( generateJobsIds());
-		return new af::Msg( af::Msg::TUserJobsOrder, &ids);
+		ids.setId(getId());
+		ids.setList(generateJobsIds());
+		return new af::Msg(af::Msg::TUserJobsOrder, &ids);
 	}
-
 
 	std::vector<int32_t> jids = m_jobs_list.generateIdsList();
 	std::ostringstream str;
@@ -247,17 +241,18 @@ af::Msg * UserAf::writeJobdsOrder( bool i_binary) const
 	str << "{\"events\":{\"jobs_order\":{\"uids\":[";
 	str << getId();
 	str << "],\"jids\":[[";
-	for( int j = 0; j < jids.size(); j++)
+	for (int j = 0; j < jids.size(); j++)
 	{
-		if( j > 0 ) str << ",";
+		if (j > 0)
+			str << ",";
 		str << jids[j];
 	}
 	str << "]]}}}";
 
-	return af::jsonMsg( str);
+	return af::jsonMsg(str);
 }
 
-void UserAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
+void UserAf::v_refresh(time_t currentTime, AfContainer *pointer, MonitorContainer *monitoring)
 {
 	bool changed = refreshCounters();
 
@@ -267,8 +262,8 @@ void UserAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContai
 		clearRunningServices();
 	}
 
-	if( changed && monitoring )
-		monitoring->addEvent( af::Monitor::EVT_users_change, m_id);
+	if (changed && monitoring)
+		monitoring->addEvent(af::Monitor::EVT_users_change, m_id);
 }
 
 bool UserAf::refreshCounters()
@@ -278,14 +273,13 @@ bool UserAf::refreshCounters()
 
 	AfListIt jobsListIt(&m_jobs_list);
 	for (AfNodeSrv *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
-		if (((JobAf*)job)->isRunning())
+		if (((JobAf *)job)->isRunning())
 			_numrunningjobs++;
 
 	bool changed = false;
 
-	if (( _numjobs              != m_jobs_num               ) ||
-		( _numrunningjobs       != m_running_jobs_num       ))
-			changed = true;
+	if ((_numjobs != m_jobs_num) || (_numrunningjobs != m_running_jobs_num))
+		changed = true;
 
 	m_jobs_num = _numjobs;
 	m_running_jobs_num = _numrunningjobs;
@@ -295,7 +289,7 @@ bool UserAf::refreshCounters()
 
 bool UserAf::v_canRun()
 {
-	if( m_jobs_num < 1 )
+	if (m_jobs_num < 1)
 	{
 		// Nothing to run
 		return false;
@@ -308,16 +302,17 @@ bool UserAf::v_canRun()
 	return true;
 }
 
-bool UserAf::v_canRunOn( RenderAf * i_render)
+bool UserAf::v_canRunOn(RenderAf *i_render)
 {
 	// Returning that user is able to run on specified render
 	return true;
 	//^No more checks above AfNodeSolve::canRunOn() needed
 }
 
-RenderAf * UserAf::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring, BranchSrv * i_branch)
+RenderAf *UserAf::v_solve(std::list<RenderAf *> &i_renders_list, MonitorContainer *i_monitoring,
+						  BranchSrv *i_branch)
 {
-	std::list<AfNodeSolve*> solve_list;
+	std::list<AfNodeSolve *> solve_list;
 
 	if (NULL == i_branch)
 	{
@@ -326,9 +321,9 @@ RenderAf * UserAf::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContai
 	}
 
 	AfListIt it(&m_jobs_list);
-	for (AfNodeSolve * node = it.node(); node != NULL; it.next(), node = it.node())
+	for (AfNodeSolve *node = it.node(); node != NULL; it.next(), node = it.node())
 	{
-		if (i_branch != (static_cast<JobAf*>(node))->getBranchPtr())
+		if (i_branch != (static_cast<JobAf *>(node))->getBranchPtr())
 			continue;
 
 		if (false == node->canRun())
@@ -345,13 +340,13 @@ RenderAf * UserAf::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContai
 	return Solver::SolveList(solve_list, i_renders_list, NULL);
 }
 
-void UserAf::addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
+void UserAf::addSolveCounts(MonitorContainer *i_monitoring, af::TaskExec *i_exec, RenderAf *i_render)
 {
 	AfNodeSolve::addSolveCounts(i_exec, i_render);
 	i_monitoring->addEvent(af::Monitor::EVT_users_change, getId());
 }
 
-void UserAf::remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
+void UserAf::remSolveCounts(MonitorContainer *i_monitoring, af::TaskExec *i_exec, RenderAf *i_render)
 {
 	AfNodeSolve::remSolveCounts(i_exec, i_render);
 	i_monitoring->addEvent(af::Monitor::EVT_users_change, getId());
@@ -360,6 +355,6 @@ void UserAf::remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_ex
 int UserAf::v_calcWeight() const
 {
 	int weight = User::v_calcWeight();
-	weight += sizeof(UserAf) - sizeof( User);
+	weight += sizeof(UserAf) - sizeof(User);
 	return weight;
 }

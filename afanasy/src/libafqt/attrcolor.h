@@ -7,18 +7,18 @@
 class QByteArray;
 class QDomDocument;
 
-class afqt::AttrColor: public Attr
+class afqt::AttrColor : public Attr
 {
-public:
-   AttrColor( const QString & Name, const QString & Label, const QString & initString);
-   ~AttrColor();
+  public:
+	AttrColor(const QString &Name, const QString &Label, const QString &initString);
+	~AttrColor();
 
-	virtual bool v_read( const JSON & i_obj);
+	virtual bool v_read(const JSON &i_obj);
 	const QString v_writeData();
 
-public:
-   QColor c;
+  public:
+	QColor c;
 
-private:
+  private:
 	bool readColor();
 };

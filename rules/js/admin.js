@@ -14,7 +14,7 @@
 	admin.js - user administration page
 */
 
-"use strict";
+'use strict';
 
 var ad_initialized = false;
 var ad_permissions = null;
@@ -25,13 +25,13 @@ var ad_wnd_sort_prop = 'role';
 var ad_wnd_sort_dir = 0;
 
 var ad_states = {
-	notart /*****/: {"short": 'NA', "label": 'NotArt' /*****/, "tooltip": 'Not an artist.'},
-	aux           : {"short": 'AX', "label": 'Auxiliary'     , "tooltip": 'Auxiliary user, no news, no bookmarks.'},
-	passwd /*****/: {"short": 'PS', "label": 'Passwd' /*****/, "tooltip": 'Can change password.'},
-	playlist /***/: {"short": 'PL', "label": 'Playlist' /***/, "tooltip": 'Can edit playlist.'},
-	assignart /**/: {"short": 'AA', "label": 'AssignArt' /**/, "tooltip": 'Can assign artists.'},
-	edittasks /**/: {"short": 'TS', "label": 'EditTasks' /**/, "tooltip": 'Can edit tasks.'},
-	editbody /***/: {"short": 'BD', "label": 'EditBody' /***/, "tooltip": 'Can edit body.'}
+	notart /*****/: {'short': 'NA', 'label': 'NotArt' /*****/, 'tooltip': 'Not an artist.'},
+	aux: {'short': 'AX', 'label': 'Auxiliary', 'tooltip': 'Auxiliary user, no news, no bookmarks.'},
+	passwd /*****/: {'short': 'PS', 'label': 'Passwd' /*****/, 'tooltip': 'Can change password.'},
+	playlist /***/: {'short': 'PL', 'label': 'Playlist' /***/, 'tooltip': 'Can edit playlist.'},
+	assignart /**/: {'short': 'AA', 'label': 'AssignArt' /**/, 'tooltip': 'Can assign artists.'},
+	edittasks /**/: {'short': 'TS', 'label': 'EditTasks' /**/, 'tooltip': 'Can edit tasks.'},
+	editbody /***/: {'short': 'BD', 'label': 'EditBody' /***/, 'tooltip': 'Can edit body.'}
 };
 
 function ad_GetUserFileName(i_uid, i_type)
@@ -67,7 +67,7 @@ function ad_Init()
 	$('admin_button').style.display = 'block';
 	$('sidepanel_permissions').style.display = 'block';
 
-	if (localStorage.permissions_opened == "true")
+	if (localStorage.permissions_opened == 'true')
 		ad_PermissionsOpen();
 	else
 		ad_PermissionsClose();
@@ -99,20 +99,20 @@ function ad_Login()
 	{
 		localStorage.auth_digest = '';
 		new cgru_Dialog({
-			"handle": 'ad_LoginGetPassword',
-			"param": 'user_id',
-			"name": 'login',
-			"title": 'Login',
-			"info": 'Enter User ID'
+			'handle': 'ad_LoginGetPassword',
+			'param': 'user_id',
+			'name': 'login',
+			'title': 'Login',
+			'info': 'Enter User ID'
 		});
 	}
 	else
-		ad_LoginProcess({"realm": cgru_Config.realm});
+		ad_LoginProcess({'realm': cgru_Config.realm});
 }
 
 function ad_LoginProcess(i_obj)
 {
-	n_Request({"send": {"login": i_obj}, "func": ad_LoginReceived, "info": 'login'});
+	n_Request({'send': {'login': i_obj}, 'func': ad_LoginReceived, 'info': 'login'});
 }
 
 function ad_LoginReceived(i_data)
@@ -136,18 +136,18 @@ function ad_LoginReceived(i_data)
 function ad_LoginGetPassword(i_user_id)
 {
 	new cgru_Dialog({
-		"handle": 'ad_LoginConstruct',
-		"param": i_user_id,
-		"name": 'login',
-		"title": 'Login',
-		"info": 'Enter Password'
+		'handle': 'ad_LoginConstruct',
+		'param': i_user_id,
+		'name': 'login',
+		'title': 'Login',
+		'info': 'Enter Password'
 	});
 }
 
 function ad_LoginConstruct(i_password, i_user_id)
 {
 	var digest = ad_ConstructDigest(i_password, i_user_id);
-	ad_LoginProcess({"digest": digest});
+	ad_LoginProcess({'digest': digest});
 }
 
 function ad_ConstructDigest(i_password, i_user_id)
@@ -221,7 +221,7 @@ function ad_PermissionsProcess()
 {
 	if (false == ad_initialized)
 		return;
-	if (localStorage.permissions_opened == "true")
+	if (localStorage.permissions_opened == 'true')
 		ad_PermissionsLoad();
 }
 
@@ -252,13 +252,13 @@ function ad_PermissionsClose()
 {
 	$('sidepanel_permissions').classList.remove('opened');
 	$('permissions').innerHTML = '';
-	localStorage.permissions_opened = "false";
+	localStorage.permissions_opened = 'false';
 }
 
 function ad_PermissionsOpen()
 {
 	$('sidepanel_permissions').classList.add('opened');
-	localStorage.permissions_opened = "true";
+	localStorage.permissions_opened = 'true';
 	ad_PermissionsLoad();
 }
 
@@ -271,7 +271,7 @@ function ad_PermissionsLoad()
 		return;
 	ad_permissions = {};
 	ad_permissions.path = RULES.root + path;
-	n_Request({"send": {"permissionsget": ad_permissions}, "func": ad_PermissionsReceived});
+	n_Request({'send': {'permissionsget': ad_permissions}, 'func': ad_PermissionsReceived});
 }
 
 function ad_PermissionsReceived(i_data)
@@ -313,7 +313,9 @@ function ad_PermissionsReceived(i_data)
 			elBtn.classList.add('button');
 			elBtn.classList.add('delete');
 			elBtn.m_group_id = group;
-			elBtn.ondblclick = function(e) { ad_PermissionsRemove('groups', e.currentTarget.m_group_id) };
+			elBtn.ondblclick = function(e) {
+				ad_PermissionsRemove('groups', e.currentTarget.m_group_id)
+			};
 		}
 
 		var elName = document.createElement('div');
@@ -341,7 +343,9 @@ function ad_PermissionsReceived(i_data)
 		elBtn.classList.add('button');
 		elBtn.classList.add('delete');
 		elBtn.m_user_id = user;
-		elBtn.ondblclick = function(e) { ad_PermissionsRemove('users', e.currentTarget.m_user_id) };
+		elBtn.ondblclick = function(e) {
+			ad_PermissionsRemove('users', e.currentTarget.m_user_id)
+		};
 
 		var elName = document.createElement('div');
 		el.appendChild(elName);
@@ -353,23 +357,23 @@ function ad_PermissionsReceived(i_data)
 function ad_PermissionsGrpAddOnClick()
 {
 	new cgru_Dialog({
-		"handle": 'ad_PermissionsAdd',
-		"param": 'groups',
-		"value": 'admins',
-		"name": 'permissions',
-		"title": 'Add Group',
-		"info": 'Enter Group ID, default groups are: ' + JSON.stringify(RULES.permissions.default_groups)
+		'handle': 'ad_PermissionsAdd',
+		'param': 'groups',
+		'value': 'admins',
+		'name': 'permissions',
+		'title': 'Add Group',
+		'info': 'Enter Group ID, default groups are: ' + JSON.stringify(RULES.permissions.default_groups)
 	});
 }
 
 function ad_PermissionsUsrAddOnClick()
 {
 	new cgru_Dialog({
-		"handle": 'ad_PermissionsAdd',
-		"param": 'users',
-		"name": 'permissions',
-		"title": 'Add User',
-		"info": 'Enter User ID, default groups are: ' + JSON.stringify(RULES.permissions.default_groups)
+		'handle': 'ad_PermissionsAdd',
+		'param': 'users',
+		'name': 'permissions',
+		'title': 'Add User',
+		'info': 'Enter User ID, default groups are: ' + JSON.stringify(RULES.permissions.default_groups)
 	});
 }
 
@@ -397,11 +401,11 @@ function ad_PermissionsAdd(i_id, i_type)
 		ad_permissions[i_type].push(i_id);
 
 	n_Request({
-		"send": {"permissionsset": ad_permissions},
-		"func": ad_ChangesFinished,
-		"ad_func": ad_PermissionsLoad,
-		"info": 'perm add',
-		"ad_msg": 'Permissions ' + i_type + ' added'
+		'send': {'permissionsset': ad_permissions},
+		'func': ad_ChangesFinished,
+		'ad_func': ad_PermissionsLoad,
+		'info': 'perm add',
+		'ad_msg': 'Permissions ' + i_type + ' added'
 	});
 }
 
@@ -415,22 +419,22 @@ function ad_PermissionsRemove(i_type, i_id)
 	}
 	ad_permissions[i_type].splice(index, 1);
 	n_Request({
-		"send": {"permissionsset": ad_permissions},
-		"func": ad_ChangesFinished,
-		"ad_func": ad_PermissionsLoad,
-		"info": 'perm rem',
-		"ad_msg": 'Permissions ' + i_type + ' removed'
+		'send': {'permissionsset': ad_permissions},
+		'func': ad_ChangesFinished,
+		'ad_func': ad_PermissionsLoad,
+		'info': 'perm rem',
+		'ad_msg': 'Permissions ' + i_type + ' removed'
 	});
 }
 
 function ad_PermissionsClearOnClick()
 {
 	n_Request({
-		"send": {"permissionsclear": {"path": RULES.root + g_CurPath()}},
-		"func": ad_ChangesFinished,
-		"ad_func": ad_PermissionsLoad,
-		"info": 'perm clear',
-		"ad_msg": 'Permissions cleared'
+		'send': {'permissionsclear': {'path': RULES.root + g_CurPath()}},
+		'func': ad_ChangesFinished,
+		'ad_func': ad_PermissionsLoad,
+		'info': 'perm clear',
+		'ad_msg': 'Permissions cleared'
 	});
 }
 
@@ -448,7 +452,7 @@ function ad_ChangesFinished(i_data, i_args)
 function ad_OpenWindow()
 {
 	u_OpenCloseHeader();
-	ad_wnd = new cgru_Window({"name": 'administrate', "title": 'Administrate', 'padding': '3% 1%'});
+	ad_wnd = new cgru_Window({'name': 'administrate', 'title': 'Administrate', 'padding': '3% 1%'});
 	ad_wnd.elContent.classList.add('administrate');
 	ad_wnd.closeOnEsc = false;
 
@@ -518,7 +522,9 @@ function ad_OpenWindow()
 		el.textContent = ad_states[st].label;
 		el.title = ad_states[st].tooltip;
 		el.m_state = st;
-		el.onclick = function(e) { ad_WndStateSelect(e.currentTarget); };
+		el.onclick = function(e) {
+			ad_WndStateSelect(e.currentTarget);
+		};
 		if (st == ad_wnd_curstate)
 			el.classList.add('selected');
 	}
@@ -644,43 +650,57 @@ function ad_WndDrawUsers()
 	elTr.appendChild(el);
 	el.textContent = 'A';
 	el.title = 'User avatar.\nDouble click to edit.';
-	el.onclick = function(e) { ad_WndSortUsers('avatar'); };
+	el.onclick = function(e) {
+		ad_WndSortUsers('avatar');
+	};
 
 	var el = document.createElement('th');
 	elTr.appendChild(el);
 	el.textContent = 'ID';
 	el.title = 'User login and unique ID';
-	el.onclick = function(e) { ad_WndSortUsers('id'); };
+	el.onclick = function(e) {
+		ad_WndSortUsers('id');
+	};
 
 	var el = document.createElement('th');
 	elTr.appendChild(el);
 	el.textContent = 'Title';
 	el.title = 'User full name.\nDouble click to edit.';
-	el.onclick = function(e) { ad_WndSortUsers('title'); };
+	el.onclick = function(e) {
+		ad_WndSortUsers('title');
+	};
 
 	var el = document.createElement('th');
 	elTr.appendChild(el);
 	el.textContent = 'Role';
 	el.title = 'Needed for sorting.\nDouble click to edit.';
-	el.onclick = function(e) { ad_WndSortUsers('role'); };
+	el.onclick = function(e) {
+		ad_WndSortUsers('role');
+	};
 
 	var el = document.createElement('th');
 	elTr.appendChild(el);
 	el.textContent = 'DOS';
 	el.title = 'Dossier record.';
-	el.onclick = function(e) { ad_WndSortUsers('dossier'); };
+	el.onclick = function(e) {
+		ad_WndSortUsers('dossier');
+	};
 
 	var el = document.createElement('th');
 	elTr.appendChild(el);
 	el.textContent = 'Tag';
 	el.title = 'Default tag.\nDouble click to edit.';
-	el.onclick = function(e) { ad_WndSortUsers('tag'); };
+	el.onclick = function(e) {
+		ad_WndSortUsers('tag');
+	};
 
 	var el = document.createElement('th');
 	elTr.appendChild(el);
 	el.textContent = 'Email';
 	el.title = 'User email address.\nDouble click to edit.';
-	el.onclick = function(e) { ad_WndSortUsers('email'); };
+	el.onclick = function(e) {
+		ad_WndSortUsers('email');
+	};
 
 	var el = document.createElement('th');
 	elTr.appendChild(el);
@@ -691,49 +711,65 @@ function ad_WndDrawUsers()
 	elTr.appendChild(el);
 	el.textContent = 'Bmrs';
 	el.title = 'Bookmarks count.\nDouble click clear bookmarks.';
-	el.onclick = function(e) { ad_WndSortUsers('bookmarks'); };
+	el.onclick = function(e) {
+		ad_WndSortUsers('bookmarks');
+	};
 
 	var el = document.createElement('th');
 	elTr.appendChild(el);
 	el.textContent = 'Cnls';
 	el.title = 'News subscribed channels.\nDouble click clear channels.';
-	el.onclick = function(e) { ad_WndSortUsers('channels'); };
+	el.onclick = function(e) {
+		ad_WndSortUsers('channels');
+	};
 
 	var el = document.createElement('th');
 	elTr.appendChild(el);
 	el.textContent = 'News';
 	el.title = 'News count.\nDouble click clear news.';
-	el.onclick = function(e) { ad_WndSortUsers('news'); };
+	el.onclick = function(e) {
+		ad_WndSortUsers('news');
+	};
 
 	var el = document.createElement('th');
 	elTr.appendChild(el);
 	el.textContent = 'Lim';
 	el.title = 'News count limit.\nDouble click to set limit.';
-	el.onclick = function(e) { ad_WndSortUsers('news_limit'); };
+	el.onclick = function(e) {
+		ad_WndSortUsers('news_limit');
+	};
 
 	var el = document.createElement('th');
 	elTr.appendChild(el);
 	el.textContent = 'Created';
 	el.title = 'Time when the user wan created';
-	el.onclick = function(e) { ad_WndSortUsers('ctime'); };
+	el.onclick = function(e) {
+		ad_WndSortUsers('ctime');
+	};
 
 	var el = document.createElement('th');
 	elTr.appendChild(el);
 	el.textContent = 'Entered';
 	el.title = 'Last login(F5) time';
-	el.onclick = function(e) { ad_WndSortUsers('rtime'); };
+	el.onclick = function(e) {
+		ad_WndSortUsers('rtime');
+	};
 
 	var el = document.createElement('th');
 	elTr.appendChild(el);
 	el.textContent = 'Latest News';
 	el.title = 'Last news time';
-	el.onclick = function(e) { ad_WndSortUsers('ntime'); };
+	el.onclick = function(e) {
+		ad_WndSortUsers('ntime');
+	};
 
 	var el = document.createElement('th');
 	elTr.appendChild(el);
 	el.textContent = 'State';
 	el.title = 'User states';
-	el.onclick = function(e) { ad_WndSortUsers('states'); };
+	el.onclick = function(e) {
+		ad_WndSortUsers('states');
+	};
 
 	var el = document.createElement('th');
 	elTr.appendChild(el);
@@ -749,11 +785,11 @@ function ad_GetType(i_type, i_func)
 	var request = {};
 	request['getall' + i_type] = true;
 	n_Request({
-		"send": request,
-		"func": ad_GetTypeReceived,
-		"ad_get_type": i_type,
-		"ad_func": i_func,
-		"info": i_type
+		'send': request,
+		'func': ad_GetTypeReceived,
+		'ad_get_type': i_type,
+		'ad_func': i_func,
+		'info': i_type
 	});
 }
 
@@ -882,7 +918,9 @@ function ad_WndAddUser(i_el, i_user, i_row)
 	el.textContent = 'G';
 	el.style.cursor = 'pointer';
 	el.m_user = i_user;
-	el.ondblclick = function(e) { ad_WndUserGroupOnClick(e.currentTarget.m_user); };
+	el.ondblclick = function(e) {
+		ad_WndUserGroupOnClick(e.currentTarget.m_user);
+	};
 
 	var el = document.createElement('td');
 	elTr.appendChild(el);
@@ -891,7 +929,9 @@ function ad_WndAddUser(i_el, i_user, i_row)
 	if (avatar)
 		el.style.backgroundImage = 'url(' + avatar + ')';
 	el.m_user_id = i_user.id;
-	el.ondblclick = function(e) { ad_ChangeAvatarOnClick(e.currentTarget.m_user_id); };
+	el.ondblclick = function(e) {
+		ad_ChangeAvatarOnClick(e.currentTarget.m_user_id);
+	};
 
 	var el = document.createElement('td');
 	elTr.appendChild(el);
@@ -901,13 +941,17 @@ function ad_WndAddUser(i_el, i_user, i_row)
 	elTr.appendChild(el);
 	el.textContent = i_user.title;
 	el.m_user_id = i_user.id;
-	el.ondblclick = function(e) { ad_ChangeTitleOnClick(e.currentTarget.m_user_id); };
+	el.ondblclick = function(e) {
+		ad_ChangeTitleOnClick(e.currentTarget.m_user_id);
+	};
 
 	var el = document.createElement('td');
 	elTr.appendChild(el);
 	el.textContent = i_user.role;
 	el.m_user_id = i_user.id;
-	el.ondblclick = function(e) { ad_ChangeRoleOnClick(e.currentTarget.m_user_id); };
+	el.ondblclick = function(e) {
+		ad_ChangeRoleOnClick(e.currentTarget.m_user_id);
+	};
 
 	var el = document.createElement('td');
 	elTr.appendChild(el);
@@ -916,19 +960,25 @@ function ad_WndAddUser(i_el, i_user, i_row)
 		dossier = i_user.dossier.split(' ')[0].split('\u00a0')[0];
 	el.innerHTML = dossier;
 	el.m_user_id = i_user.id;
-	el.ondblclick = function(e) { ad_ChangeDossierOnClick(e.currentTarget.m_user_id); };
+	el.ondblclick = function(e) {
+		ad_ChangeDossierOnClick(e.currentTarget.m_user_id);
+	};
 
 	var el = document.createElement('td');
 	elTr.appendChild(el);
 	el.textContent = i_user.tag;
 	el.m_user_id = i_user.id;
-	el.ondblclick = function(e) { ad_ChangeTagOnClick(e.currentTarget.m_user_id); };
+	el.ondblclick = function(e) {
+		ad_ChangeTagOnClick(e.currentTarget.m_user_id);
+	};
 
 	var el = document.createElement('td');
 	elTr.appendChild(el);
 	el.textContent = i_user.email;
 	el.m_user_id = i_user.id;
-	el.ondblclick = function(e) { ad_ChangeEmailOnClick(e.currentTarget.m_user_id); };
+	el.ondblclick = function(e) {
+		ad_ChangeEmailOnClick(e.currentTarget.m_user_id);
+	};
 
 	var el = document.createElement('td');
 	elTr.appendChild(el);
@@ -936,7 +986,9 @@ function ad_WndAddUser(i_el, i_user, i_row)
 	{
 		el.textContent = '***';
 		el.m_user_id = i_user.id;
-		el.ondblclick = function(e) { ad_SetPasswordDialog(e.currentTarget.m_user_id); };
+		el.ondblclick = function(e) {
+			ad_SetPasswordDialog(e.currentTarget.m_user_id);
+		};
 	}
 
 	var el = document.createElement('td');
@@ -944,7 +996,9 @@ function ad_WndAddUser(i_el, i_user, i_row)
 	if (i_user.bookmarks)
 		el.textContent = i_user.bookmarks.length;
 	el.m_user_id = i_user.id;
-	el.ondblclick = function(e) { ad_UserBookmarksClean(e.currentTarget.m_user_id); };
+	el.ondblclick = function(e) {
+		ad_UserBookmarksClean(e.currentTarget.m_user_id);
+	};
 
 	var el = document.createElement('td');
 	elTr.appendChild(el);
@@ -958,14 +1012,18 @@ function ad_WndAddUser(i_el, i_user, i_row)
 		el.title = channels;
 	}
 	el.m_user_id = i_user.id;
-	el.ondblclick = function(e) { ad_UserChannelsClean(e.currentTarget.m_user_id); };
+	el.ondblclick = function(e) {
+		ad_UserChannelsClean(e.currentTarget.m_user_id);
+	};
 
 	var el = document.createElement('td');
 	elTr.appendChild(el);
 	if (i_user.news)
 		el.textContent = i_user.news.length;
 	el.m_user_id = i_user.id;
-	el.ondblclick = function(e) { ad_UserNewsClean(e.currentTarget.m_user_id); };
+	el.ondblclick = function(e) {
+		ad_UserNewsClean(e.currentTarget.m_user_id);
+	};
 
 	var el = document.createElement('td');
 	elTr.appendChild(el);
@@ -974,7 +1032,9 @@ function ad_WndAddUser(i_el, i_user, i_row)
 	else
 		el.innerHTML = '<i>' + RULES.news.limit + '</i>';
 	el.m_user_id = i_user.id;
-	el.ondblclick = function(e) { ad_UserNewsLimitDialog(e.currentTarget.m_user_id); };
+	el.ondblclick = function(e) {
+		ad_UserNewsLimitDialog(e.currentTarget.m_user_id);
+	};
 
 	var el = document.createElement('td');
 	elTr.appendChild(el);
@@ -984,7 +1044,9 @@ function ad_WndAddUser(i_el, i_user, i_row)
 	elTr.appendChild(el);
 	el.m_user = i_user;
 	ad_UserShowEntries(el);
-	el.ondblclick = function(e) { ad_UserShowEntries(e.currentTarget, true); };
+	el.ondblclick = function(e) {
+		ad_UserShowEntries(e.currentTarget, true);
+	};
 
 	var el = document.createElement('td');
 	elTr.appendChild(el);
@@ -1003,7 +1065,9 @@ function ad_WndAddUser(i_el, i_user, i_row)
 	el.textContent = 'S';
 	el.style.cursor = 'pointer';
 	el.m_user = i_user;
-	el.ondblclick = function(e) { ad_WndUserStateToggle(e.currentTarget.m_user); };
+	el.ondblclick = function(e) {
+		ad_WndUserStateToggle(e.currentTarget.m_user);
+	};
 }
 
 function ad_WndUserStateToggle(i_user)
@@ -1022,7 +1086,7 @@ function ad_WndUserStateToggle(i_user)
 	else
 		i_user.states.splice(i_user.states.indexOf(ad_wnd_curstate), 1);
 
-	ad_SaveUser({"id": i_user.id, "states": i_user.states}, ad_WndRefresh);
+	ad_SaveUser({'id': i_user.id, 'states': i_user.states}, ad_WndRefresh);
 }
 
 function ad_WndSortUsers(i_prop)
@@ -1038,7 +1102,7 @@ function ad_WndSortUsers(i_prop)
 function ad_CreateGrpOnClick()
 {
 	new cgru_Dialog(
-		{"handle": 'ad_CreateGroup', "name": 'users', "title": 'Create Group', "info": 'Enter Group Name'});
+		{'handle': 'ad_CreateGroup', 'name': 'users', 'title': 'Create Group', 'info': 'Enter Group Name'});
 }
 
 function ad_CreateGroup(i_group)
@@ -1055,7 +1119,7 @@ function ad_CreateGroup(i_group)
 function ad_DeleteGrpOnClick()
 {
 	new cgru_Dialog(
-		{"handle": 'ad_DeleteGroup', "name": 'users', "title": 'Delete Group', "info": 'Enter Group Name'});
+		{'handle': 'ad_DeleteGroup', 'name': 'users', 'title': 'Delete Group', 'info': 'Enter Group Name'});
 }
 
 function ad_DeleteGroup(i_group)
@@ -1119,92 +1183,92 @@ function ad_WriteGroups()
 	}
 
 	n_Request({
-		"send": {"writegroups": g_groups},
-		"func": ad_ChangesFinished,
-		"ad_func": ad_WndRefresh,
-		"ad_msg": 'Groups written.',
-		"info": 'writegroups'
+		'send': {'writegroups': g_groups},
+		'func': ad_ChangesFinished,
+		'ad_func': ad_WndRefresh,
+		'ad_msg': 'Groups written.',
+		'info': 'writegroups'
 	});
 }
 
 function ad_ChangeAvatarOnClick(i_user_id)
 {
 	new cgru_Dialog({
-		"handle": 'ad_ChangeAvatar',
-		"param": i_user_id,
-		"value": g_users[i_user_id].avatar,
-		"name": 'users',
-		"title": 'Change Avatar',
-		"info": 'Enter new avatar link for ' + c_GetUserTitle(i_user_id) + ' [' + i_user_id + ']'
+		'handle': 'ad_ChangeAvatar',
+		'param': i_user_id,
+		'value': g_users[i_user_id].avatar,
+		'name': 'users',
+		'title': 'Change Avatar',
+		'info': 'Enter new avatar link for ' + c_GetUserTitle(i_user_id) + ' [' + i_user_id + ']'
 	});
 }
 
 function ad_ChangeAvatar(i_avatar, i_user_id)
 {
-	ad_SaveUser({"id": i_user_id, "avatar": i_avatar}, ad_WndRefresh);
+	ad_SaveUser({'id': i_user_id, 'avatar': i_avatar}, ad_WndRefresh);
 }
 
 function ad_ChangeTitleOnClick(i_user_id)
 {
 	new cgru_Dialog({
-		"handle": 'ad_ChangeTitle',
-		"param": i_user_id,
-		"value": g_users[i_user_id].title,
-		"name": 'users',
-		"title": 'Change Title',
-		"info": 'Enter new title for ' + c_GetUserTitle(i_user_id)
+		'handle': 'ad_ChangeTitle',
+		'param': i_user_id,
+		'value': g_users[i_user_id].title,
+		'name': 'users',
+		'title': 'Change Title',
+		'info': 'Enter new title for ' + c_GetUserTitle(i_user_id)
 	});
 }
 
 function ad_ChangeTitle(i_title, i_user_id)
 {
-	ad_SaveUser({"id": i_user_id, "title": i_title}, ad_WndRefresh);
+	ad_SaveUser({'id': i_user_id, 'title': i_title}, ad_WndRefresh);
 }
 
 function ad_ChangeRoleOnClick(i_user_id)
 {
 	new cgru_Dialog({
-		"handle": 'ad_ChangeRole',
-		"param": i_user_id,
-		"value": g_users[i_user_id].role,
-		"name": 'users',
-		"title": 'Change Role',
-		"info": 'Enter new role for ' + c_GetUserTitle(i_user_id)
+		'handle': 'ad_ChangeRole',
+		'param': i_user_id,
+		'value': g_users[i_user_id].role,
+		'name': 'users',
+		'title': 'Change Role',
+		'info': 'Enter new role for ' + c_GetUserTitle(i_user_id)
 	});
 }
 
 function ad_ChangeRole(i_role, i_user_id)
 {
-	ad_SaveUser({"id": i_user_id, "role": i_role}, ad_WndRefresh);
+	ad_SaveUser({'id': i_user_id, 'role': i_role}, ad_WndRefresh);
 }
 
 function ad_ChangeDossierOnClick(i_user_id)
 {
 	new cgru_Dialog({
-		"handle": 'ad_ChangeDossier',
-		"param": i_user_id,
-		"value": g_users[i_user_id].dossier,
-		"name": 'users',
-		"title": 'Edit Dossier',
-		"type": 'text',
-		"info": c_GetUserTitle(i_user_id) + ' dossier:'
+		'handle': 'ad_ChangeDossier',
+		'param': i_user_id,
+		'value': g_users[i_user_id].dossier,
+		'name': 'users',
+		'title': 'Edit Dossier',
+		'type': 'text',
+		'info': c_GetUserTitle(i_user_id) + ' dossier:'
 	});
 }
 
 function ad_ChangeDossier(i_dossier, i_user_id)
 {
-	ad_SaveUser({"id": i_user_id, "dossier": i_dossier}, ad_WndRefresh);
+	ad_SaveUser({'id': i_user_id, 'dossier': i_dossier}, ad_WndRefresh);
 }
 
 function ad_ChangeTagOnClick(i_user_id)
 {
 	new cgru_Dialog({
-		"handle": 'ad_ChangeTag',
-		"param": i_user_id,
-		"value": g_users[i_user_id].tag,
-		"name": 'users',
-		"title": 'Change Role',
-		"info": 'Enter new tag for ' + c_GetUserTitle(i_user_id)
+		'handle': 'ad_ChangeTag',
+		'param': i_user_id,
+		'value': g_users[i_user_id].tag,
+		'name': 'users',
+		'title': 'Change Role',
+		'info': 'Enter new tag for ' + c_GetUserTitle(i_user_id)
 	});
 }
 
@@ -1215,50 +1279,50 @@ function ad_ChangeTag(i_tag, i_user_id)
 		c_Error('No such tag: "' + i_tag + '"');
 		return;
 	}
-	ad_SaveUser({"id": i_user_id, "tag": i_tag}, ad_WndRefresh);
+	ad_SaveUser({'id': i_user_id, 'tag': i_tag}, ad_WndRefresh);
 }
 
 function ad_ChangeEmailOnClick(i_user_id)
 {
 	new cgru_Dialog({
-		"handle": 'ad_ChangeEmail',
-		"param": i_user_id,
-		"value": g_users[i_user_id].email,
-		"name": 'users',
-		"title": 'Change Email',
-		"info": 'Enter new email for ' + c_GetUserTitle(i_user_id)
+		'handle': 'ad_ChangeEmail',
+		'param': i_user_id,
+		'value': g_users[i_user_id].email,
+		'name': 'users',
+		'title': 'Change Email',
+		'info': 'Enter new email for ' + c_GetUserTitle(i_user_id)
 	});
 }
 
 function ad_ChangeEmail(i_email, i_user_id)
 {
-	ad_SaveUser({"id": i_user_id, "email": i_email}, ad_WndRefresh);
+	ad_SaveUser({'id': i_user_id, 'email': i_email}, ad_WndRefresh);
 }
 
 function ad_UserChannelsClean(i_user_id)
 {
-	ad_SaveUser({"id": i_user_id, "channels": []}, ad_WndRefresh);
+	ad_SaveUser({'id': i_user_id, 'channels': []}, ad_WndRefresh);
 }
 
 function ad_UserNewsClean(i_user_id)
 {
-	ad_SaveUser({"id": i_user_id, "news": []}, ad_WndRefresh, 'news');
+	ad_SaveUser({'id': i_user_id, 'news': []}, ad_WndRefresh, 'news');
 }
 
 function ad_UserBookmarksClean(i_user_id)
 {
-	ad_SaveUser({"id": i_user_id, "bookmarks": []}, ad_WndRefresh, 'bookmarks');
+	ad_SaveUser({'id': i_user_id, 'bookmarks': []}, ad_WndRefresh, 'bookmarks');
 }
 
 function ad_UserNewsLimitDialog(i_user_id)
 {
 	new cgru_Dialog({
-		"handle": 'ad_UserNewsLimitSet',
-		"param": i_user_id,
-		"value": g_users[i_user_id].news_limit,
-		"name": 'users',
-		"title": 'Change News Limit',
-		"info": 'Enter news limit for ' + c_GetUserTitle(i_user_id)
+		'handle': 'ad_UserNewsLimitSet',
+		'param': i_user_id,
+		'value': g_users[i_user_id].news_limit,
+		'name': 'users',
+		'title': 'Change News Limit',
+		'info': 'Enter news limit for ' + c_GetUserTitle(i_user_id)
 	});
 }
 
@@ -1270,7 +1334,7 @@ function ad_UserNewsLimitSet(i_limit, i_user_id)
 		c_Error('Invalid news limit: ' + i_limit);
 		return;
 	}
-	ad_SaveUser({"id": i_user_id, "news_limit": limit}, ad_WndRefresh);
+	ad_SaveUser({'id': i_user_id, 'news_limit': limit}, ad_WndRefresh);
 }
 
 function ad_UserShowEntries(i_el, i_show_ips)
@@ -1306,20 +1370,20 @@ function ad_SaveUser(i_user, i_func, i_type)
 	obj.file = ad_GetUserFileName(i_user.id, i_type);
 
 	n_Request({
-		"send": {"editobj": obj},
-		"func": ad_ChangesFinished,
-		"ad_func": i_func,
-		"ad_msg": 'User ' + i_user.id + ' saved'
+		'send': {'editobj': obj},
+		'func': ad_ChangesFinished,
+		'ad_func': i_func,
+		'ad_msg': 'User ' + i_user.id + ' saved'
 	});
 }
 
 function ad_CreateUserOnClick()
 {
 	new cgru_Dialog({
-		"handle": 'ad_CreateUser',
-		"name": 'users',
-		"title": 'Create New User',
-		"info": 'Enter User Login Name'
+		'handle': 'ad_CreateUser',
+		'name': 'users',
+		'title': 'Create New User',
+		'info': 'Enter User Login Name'
 	});
 }
 
@@ -1335,20 +1399,20 @@ function ad_CreateUser(i_user_id)
 	obj.file = ad_GetUserFileName(i_user_id);
 
 	n_Request({
-		"send": {"editobj": obj},
-		"func": ad_ChangesFinished,
-		"ad_func": ad_WndRefresh,
-		"ad_msg": 'User "' + i_user_id + '" created.'
+		'send': {'editobj': obj},
+		'func': ad_ChangesFinished,
+		'ad_func': ad_WndRefresh,
+		'ad_msg': 'User "' + i_user_id + '" created.'
 	});
 }
 
 function ad_EnableUserOnClick()
 {
 	new cgru_Dialog({
-		"handle": 'ad_EnableUser',
-		"name": 'users',
-		"title": 'Enable User',
-		"info": 'Enter user login name to enable:'
+		'handle': 'ad_EnableUser',
+		'name': 'users',
+		'title': 'Enable User',
+		'info': 'Enter user login name to enable:'
 	});
 }
 
@@ -1360,16 +1424,16 @@ function ad_EnableUser(i_user_id)
 		return;
 	}
 
-	ad_SaveUser({"id": i_user_id, "disabled": false}, ad_WndRefresh);
+	ad_SaveUser({'id': i_user_id, 'disabled': false}, ad_WndRefresh);
 }
 
 function ad_DisableUserOnClick()
 {
 	new cgru_Dialog({
-		"handle": 'ad_DisableUser',
-		"name": 'users',
-		"title": 'Disable User',
-		"info": 'Enter user login name to disable:'
+		'handle': 'ad_DisableUser',
+		'name': 'users',
+		'title': 'Disable User',
+		'info': 'Enter user login name to disable:'
 	});
 }
 
@@ -1392,20 +1456,20 @@ function ad_DisableUser(i_user_id)
 	*/
 
 	n_Request({
-		"send": {"disableuser": {"uid": i_user_id, "uobj": uobj}},
-		"func": ad_ChangesFinished,
-		"ad_func": ad_WndRefresh,
-		"ad_msg": 'User "' + i_user_id + '" disabled.'
+		'send': {'disableuser': {'uid': i_user_id, 'uobj': uobj}},
+		'func': ad_ChangesFinished,
+		'ad_func': ad_WndRefresh,
+		'ad_msg': 'User "' + i_user_id + '" disabled.'
 	});
 }
 
 function ad_DeleteUserOnClick()
 {
 	new cgru_Dialog({
-		"handle": 'ad_DeleteUser',
-		"name": 'users',
-		"title": 'Delete User',
-		"info": 'Enter user login name to <b>delete</b>:'
+		'handle': 'ad_DeleteUser',
+		'name': 'users',
+		'title': 'Delete User',
+		'info': 'Enter user login name to <b>delete</b>:'
 	});
 }
 
@@ -1417,10 +1481,10 @@ function ad_DeleteUser(i_user_id)
 		return;
 	}
 	n_Request({
-		"send": {"disableuser": {"uid": i_user_id}},
-		"func": ad_ChangesFinished,
-		"ad_func": ad_WndRefresh,
-		"ad_msg": 'User "' + i_user_id + '" deleted.'
+		'send': {'disableuser': {'uid': i_user_id}},
+		'func': ad_ChangesFinished,
+		'ad_func': ad_WndRefresh,
+		'ad_msg': 'User "' + i_user_id + '" deleted.'
 	});
 }
 
@@ -1431,12 +1495,12 @@ function ad_SetPasswordDialog(i_user_id)
 		pw += Math.random().toString(36).substring(2);
 	pw = btoa(pw).substr(0, 60);
 	new cgru_Dialog({
-		"handle": 'ad_SetPassword',
-		"param": i_user_id,
-		"value": pw,
-		"name": 'password',
-		"title": 'Set Password',
-		"info": 'Enter new password for ' + c_GetUserTitle(i_user_id)
+		'handle': 'ad_SetPassword',
+		'param': i_user_id,
+		'value': pw,
+		'name': 'password',
+		'title': 'Set Password',
+		'info': 'Enter new password for ' + c_GetUserTitle(i_user_id)
 	});
 }
 
@@ -1466,8 +1530,8 @@ function ad_SetPassword(i_passwd, i_user_id)
 	digest = i_user_id + ':' + cgru_Config.realm + ':' + digest;
 
 	var obj = {};
-	obj.send = {"htdigest": {"user": i_user_id, "digest": digest}};
-	obj.encode = SERVER.php_version >= "5.3";
+	obj.send = {'htdigest': {'user': i_user_id, 'digest': digest}};
+	obj.encode = SERVER.php_version >= '5.3';
 	obj.func = ad_SetPasswordFinished;
 	n_Request(obj);
 }
@@ -1493,4 +1557,3 @@ function ad_SetPasswordFinished(i_data)
 	if (i_data.error)
 		c_Error(i_data.error);
 }
-

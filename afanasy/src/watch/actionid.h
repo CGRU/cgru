@@ -9,36 +9,36 @@ class Param;
 class ActionId : public QAction
 {
 
-Q_OBJECT
+	Q_OBJECT
 
-public:
-	ActionId( int i_id, const QString & text, QObject * parent );
+  public:
+	ActionId(int i_id, const QString &text, QObject *parent);
 
-signals:
-	void triggeredId( int);
+  signals:
+	void triggeredId(int);
 
-private slots:
+  private slots:
 	void triggeredId_Slot();
 
-private:
+  private:
 	int m_id;
 };
 
 class ActionIdId : public QAction
 {
 
-Q_OBJECT
+	Q_OBJECT
 
-public:
-	ActionIdId ( int i_id_1, int i_id_2, const QString & text, QObject * parent );
+  public:
+	ActionIdId(int i_id_1, int i_id_2, const QString &text, QObject *parent);
 
-signals:
-	void triggeredId( int, int);
+  signals:
+	void triggeredId(int, int);
 
-private slots:
+  private slots:
 	void triggeredId_Slot();
 
-private:
+  private:
 	int m_id_1;
 	int m_id_2;
 };
@@ -46,18 +46,18 @@ private:
 class ActionIdIdId : public QAction
 {
 
-Q_OBJECT
+	Q_OBJECT
 
-public:
-	ActionIdIdId ( int i_id_1, int i_id_2, int i_id_3, const QString & text, QObject * parent );
+  public:
+	ActionIdIdId(int i_id_1, int i_id_2, int i_id_3, const QString &text, QObject *parent);
 
-signals:
-	void triggeredId( int, int, int);
+  signals:
+	void triggeredId(int, int, int);
 
-private slots:
+  private slots:
 	void triggeredId_Slot();
 
-private:
+  private:
 	int m_id_1;
 	int m_id_2;
 	int m_id_3;
@@ -66,36 +66,36 @@ private:
 class ActionString : public QAction
 {
 
-Q_OBJECT
+	Q_OBJECT
 
-public:
-	ActionString( const QString & i_string, const QString & i_text, QObject * i_parent );
+  public:
+	ActionString(const QString &i_string, const QString &i_text, QObject *i_parent);
 
-signals:
-	void triggeredString( QString );
+  signals:
+	void triggeredString(QString);
 
-private slots:
+  private slots:
 	void triggeredString_Slot();
 
-private:
+  private:
 	QString m_string;
 };
 
 class ActionIdString : public QAction
 {
 
-Q_OBJECT
+	Q_OBJECT
 
-public:
-	ActionIdString( int i_id, const QString & i_string, const QString & i_text, QObject * i_parent );
+  public:
+	ActionIdString(int i_id, const QString &i_string, const QString &i_text, QObject *i_parent);
 
-signals:
-	void triggeredId( int, QString);
+  signals:
+	void triggeredId(int, QString);
 
-private slots:
+  private slots:
 	void triggeredId_Slot();
 
-private:
+  private:
 	int m_id;
 	QString m_string;
 };
@@ -103,18 +103,17 @@ private:
 class ActionParam : public QAction
 {
 
-Q_OBJECT
+	Q_OBJECT
 
-public:
-	ActionParam(const Param * i_param);
+  public:
+	ActionParam(const Param *i_param);
 
-signals:
+  signals:
 	void triggeredParam(const Param *);
 
-private slots:
+  private slots:
 	void triggeredParam_Slot();
 
-private:
-	const Param * m_param;
+  private:
+	const Param *m_param;
 };
-

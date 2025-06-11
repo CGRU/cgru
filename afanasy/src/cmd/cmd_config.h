@@ -4,8 +4,8 @@
 
 class CmdConfigLoad : public Cmd
 {
-public:
+  public:
 	CmdConfigLoad();
 	~CmdConfigLoad();
-	bool v_processArguments( int argc, char** argv, af::Msg &msg) final;
+	bool v_processArguments(int argc, char **argv, af::Msg &msg) final;
 };

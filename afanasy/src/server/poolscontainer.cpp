@@ -32,29 +32,24 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-PoolsContainer::PoolsContainer():
-	m_root_pool(NULL),
-	AfContainer("Pools", AFBRANCH::MAXCOUNT)
+PoolsContainer::PoolsContainer() : m_root_pool(NULL), AfContainer("Pools", AFBRANCH::MAXCOUNT)
 {
 	PoolSrv::setPoolsContainer(this);
 }
 
-PoolsContainer::~PoolsContainer()
-{
-AFINFO("PoolsContainer::~PoolsContainer:\n");
-}
+PoolsContainer::~PoolsContainer() { AFINFO("PoolsContainer::~PoolsContainer:\n"); }
 
 void PoolsContainer::createRootPool()
 {
 	if (m_root_pool)
 		return;
 
-	addRootPool(new PoolSrv(NULL,"/"));
+	addRootPool(new PoolSrv(NULL, "/"));
 
 	AF_LOG << "Root pool created: " << m_root_pool;
 }
 
-bool PoolsContainer::addRootPool(PoolSrv * i_root_pool)
+bool PoolsContainer::addRootPool(PoolSrv *i_root_pool)
 {
 	if (m_root_pool)
 	{
@@ -76,7 +71,7 @@ bool PoolsContainer::addRootPool(PoolSrv * i_root_pool)
 	return true;
 }
 
-int PoolsContainer::addPoolToContainer(PoolSrv * i_pool)
+int PoolsContainer::addPoolToContainer(PoolSrv *i_pool)
 {
 	// Add node to container
 	if (false == add(i_pool))
@@ -89,7 +84,7 @@ int PoolsContainer::addPoolToContainer(PoolSrv * i_pool)
 	return i_pool->getId();
 }
 
-bool PoolsContainer::addPoolFromStore(PoolSrv * i_pool)
+bool PoolsContainer::addPoolFromStore(PoolSrv *i_pool)
 {
 	std::string path = i_pool->getName();
 
@@ -109,7 +104,7 @@ bool PoolsContainer::addPoolFromStore(PoolSrv * i_pool)
 	}
 
 	std::string up_path = af::pathUp(path);
-	PoolSrv * parent = getPool(up_path);
+	PoolSrv *parent = getPool(up_path);
 	if (NULL == parent)
 	{
 		AF_ERR << "Can't find a parent of a stored pool:\n" << path << "\n" << up_path;
@@ -119,30 +114,28 @@ bool PoolsContainer::addPoolFromStore(PoolSrv * i_pool)
 	return parent->addPool(i_pool);
 }
 
-PoolSrv * PoolsContainer::getPool(const std::string & i_path)
+PoolSrv *PoolsContainer::getPool(const std::string &i_path)
 {
 	PoolsContainerIt it(this);
-	for (PoolSrv * pool = it.pool(); pool != NULL; it.next(), pool = it.pool())
+	for (PoolSrv *pool = it.pool(); pool != NULL; it.next(), pool = it.pool())
 		if (pool->getName() == i_path)
 			return pool;
 	return NULL;
 }
 
-void PoolsContainer::assignRender(RenderAf * i_render)
+void PoolsContainer::assignRender(RenderAf *i_render)
 {
 	if (false == m_root_pool->assignRender(i_render))
 		AF_ERR << "Can`t assign render '" << i_render->getName() << "' to any pool.";
 }
 
-//############################################################################
-//                               PoolsContainerIt
-//############################################################################
+// ############################################################################
+//                                PoolsContainerIt
+// ############################################################################
 
-PoolsContainerIt::PoolsContainerIt(PoolsContainer * i_container, bool i_skipZombies):
-	AfContainerIt((AfContainer*)i_container, i_skipZombies)
+PoolsContainerIt::PoolsContainerIt(PoolsContainer *i_container, bool i_skipZombies)
+	: AfContainerIt((AfContainer *)i_container, i_skipZombies)
 {
 }
 
-PoolsContainerIt::~PoolsContainerIt()
-{
-}
+PoolsContainerIt::~PoolsContainerIt() {}

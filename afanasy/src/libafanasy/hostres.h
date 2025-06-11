@@ -6,9 +6,9 @@ namespace af
 {
 class HostResCustom : public Af
 {
-public:
+  public:
 	HostResCustom();
-	HostResCustom(Msg * msg);
+	HostResCustom(Msg *msg);
 
 	int32_t value;
 	int32_t valuemax;
@@ -27,22 +27,22 @@ public:
 	std::string label;
 	std::string tooltip;
 
-	void v_generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
+	void v_generateInfoStream(std::ostringstream &stream, bool full = false) const; /// Generate information.
 
-	void v_readwrite( Msg * msg); ///< Read or write Host Resources in message.
+	void v_readwrite(Msg *msg); ///< Read or write Host Resources in message.
 
-	void jsonWrite( std::ostringstream & o_str) const;
+	void jsonWrite(std::ostringstream &o_str) const;
 };
 
 class HostRes : public Af
 {
-public:
+  public:
 	HostRes();
 	~HostRes();
 
-	HostRes( Msg * msg);
+	HostRes(Msg *msg);
 
-public:
+  public:
 	uint8_t cpu_loadavg[3];
 
 	int32_t cpu_num;
@@ -69,13 +69,13 @@ public:
 	int32_t hdd_free_gb;
 	int32_t hdd_rd_kbsec;
 	int32_t hdd_wr_kbsec;
-	int8_t  hdd_busy;
+	int8_t hdd_busy;
 
 	int32_t net_recv_kbsec;
 	int32_t net_send_kbsec;
 
-	int8_t  gpu_gpu_util;
-	int8_t  gpu_gpu_temp;
+	int8_t gpu_gpu_util;
+	int8_t gpu_gpu_temp;
 	int32_t gpu_mem_total_mb;
 	int32_t gpu_mem_used_mb;
 	std::string gpu_string;
@@ -85,19 +85,19 @@ public:
 
 	std::string hw_info;
 
-	std::vector<HostResCustom*> custom;
+	std::vector<HostResCustom *> custom;
 
-public:
+  public:
 	/// Generate information.
-	void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
+	void v_generateInfoStream(std::ostringstream &stream, bool full = false) const;
 
 	inline bool isEmpty() const { return cpu_num == 0; }
 	inline bool notEmpty() const { return cpu_num > 0; }
 
-	void copy( const HostRes & other);
+	void copy(const HostRes &other);
 
-	void jsonWrite( std::ostringstream & o_str) const;
+	void jsonWrite(std::ostringstream &o_str) const;
 
-	void v_readwrite( Msg * msg); ///< Read or write Host Resources in message.
+	void v_readwrite(Msg *msg); ///< Read or write Host Resources in message.
 };
-}
+} // namespace af

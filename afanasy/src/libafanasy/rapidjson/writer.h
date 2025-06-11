@@ -1,13 +1,14 @@
 #ifndef RAPIDJSON_WRITER_H_
 #define RAPIDJSON_WRITER_H_
 
-#include "rapidjson.h"
 #include "internal/stack.h"
 #include "internal/strfunc.h"
-#include <cstdio>	// snprintf() or _sprintf_s()
-#include <new>		// placement new
+#include "rapidjson.h"
+#include <cstdio> // snprintf() or _sprintf_s()
+#include <new>	  // placement new
 
-namespace rapidjson {
+namespace rapidjson
+{
 
 //! JSON writer
 /*! Writer implements the concept Handler.
@@ -15,7 +16,7 @@ namespace rapidjson {
 
 	User may programmatically calls the functions of a writer to generate JSON text.
 
-	On the other side, a writer can also be passed to objects that generates events, 
+	On the other side, a writer can also be passed to objects that generates events,
 
 	for example Reader::Parse() and Document::Accept().
 
@@ -24,137 +25,207 @@ namespace rapidjson {
 	\tparam TargetEncoding Encoding of and output stream.
 	\implements Handler
 */
-template<typename OutputStream, typename SourceEncoding = UTF8<>, typename TargetEncoding = UTF8<>, typename Allocator = MemoryPoolAllocator<> >
-class Writer {
-public:
+template <typename OutputStream, typename SourceEncoding = UTF8<>, typename TargetEncoding = UTF8<>,
+		  typename Allocator = MemoryPoolAllocator<>>
+class Writer
+{
+  public:
 	typedef typename SourceEncoding::Ch Ch;
 
-	Writer(OutputStream& os, Allocator* allocator = 0, size_t levelDepth = kDefaultLevelDepth) : 
-		os_(os), level_stack_(allocator, levelDepth * sizeof(Level)) {}
+	Writer(OutputStream &os, Allocator *allocator = 0, size_t levelDepth = kDefaultLevelDepth)
+		: os_(os), level_stack_(allocator, levelDepth * sizeof(Level))
+	{
+	}
 
 	//@name Implementation of Handler
 	//@{
-	Writer& Null()					{ Prefix(kNullType);   WriteNull();			return *this; }
-	Writer& Bool(bool b)			{ Prefix(b ? kTrueType : kFalseType); WriteBool(b); return *this; }
-	Writer& Int(int i)				{ Prefix(kNumberType); WriteInt(i);			return *this; }
-	Writer& Uint(unsigned u)		{ Prefix(kNumberType); WriteUint(u);		return *this; }
-	Writer& Int64(int64_t i64)		{ Prefix(kNumberType); WriteInt64(i64);		return *this; }
-	Writer& Uint64(uint64_t u64)	{ Prefix(kNumberType); WriteUint64(u64);	return *this; }
-	Writer& Double(double d)		{ Prefix(kNumberType); WriteDouble(d);		return *this; }
+	Writer &Null()
+	{
+		Prefix(kNullType);
+		WriteNull();
+		return *this;
+	}
+	Writer &Bool(bool b)
+	{
+		Prefix(b ? kTrueType : kFalseType);
+		WriteBool(b);
+		return *this;
+	}
+	Writer &Int(int i)
+	{
+		Prefix(kNumberType);
+		WriteInt(i);
+		return *this;
+	}
+	Writer &Uint(unsigned u)
+	{
+		Prefix(kNumberType);
+		WriteUint(u);
+		return *this;
+	}
+	Writer &Int64(int64_t i64)
+	{
+		Prefix(kNumberType);
+		WriteInt64(i64);
+		return *this;
+	}
+	Writer &Uint64(uint64_t u64)
+	{
+		Prefix(kNumberType);
+		WriteUint64(u64);
+		return *this;
+	}
+	Writer &Double(double d)
+	{
+		Prefix(kNumberType);
+		WriteDouble(d);
+		return *this;
+	}
 
-	Writer& String(const Ch* str, SizeType length, bool copy = false) {
+	Writer &String(const Ch *str, SizeType length, bool copy = false)
+	{
 		Prefix(kStringType);
 		WriteString(str, length);
 		return *this;
 	}
 
-	Writer& StartObject() {
+	Writer &StartObject()
+	{
 		Prefix(kObjectType);
 		new (level_stack_.template Push<Level>()) Level(false);
 		WriteStartObject();
 		return *this;
 	}
 
-	Writer& EndObject(SizeType memberCount = 0) {
+	Writer &EndObject(SizeType memberCount = 0)
+	{
 		RAPIDJSON_ASSERT(level_stack_.GetSize() >= sizeof(Level));
 		RAPIDJSON_ASSERT(!level_stack_.template Top<Level>()->inArray);
 		level_stack_.template Pop<Level>(1);
 		WriteEndObject();
-		if (level_stack_.Empty())	// end of json text
+		if (level_stack_.Empty()) // end of json text
 			os_.Flush();
 		return *this;
 	}
 
-	Writer& StartArray() {
+	Writer &StartArray()
+	{
 		Prefix(kArrayType);
 		new (level_stack_.template Push<Level>()) Level(true);
 		WriteStartArray();
 		return *this;
 	}
 
-	Writer& EndArray(SizeType elementCount = 0) {
+	Writer &EndArray(SizeType elementCount = 0)
+	{
 		RAPIDJSON_ASSERT(level_stack_.GetSize() >= sizeof(Level));
 		RAPIDJSON_ASSERT(level_stack_.template Top<Level>()->inArray);
 		level_stack_.template Pop<Level>(1);
 		WriteEndArray();
-		if (level_stack_.Empty())	// end of json text
+		if (level_stack_.Empty()) // end of json text
 			os_.Flush();
 		return *this;
 	}
 	//@}
 
 	//! Simpler but slower overload.
-	Writer& String(const Ch* str) { return String(str, internal::StrLen(str)); }
+	Writer &String(const Ch *str) { return String(str, internal::StrLen(str)); }
 
-protected:
+  protected:
 	//! Information for each nested level
-	struct Level {
+	struct Level
+	{
 		Level(bool inArray) : inArray(inArray), valueCount(0) {}
-		bool inArray;		//!< true if in array, otherwise in object
-		size_t valueCount;	//!< number of values in this level
+		bool inArray;	   //!< true if in array, otherwise in object
+		size_t valueCount; //!< number of values in this level
 	};
 
 	static const size_t kDefaultLevelDepth = 32;
 
-	void WriteNull()  {
-		os_.Put('n'); os_.Put('u'); os_.Put('l'); os_.Put('l');
+	void WriteNull()
+	{
+		os_.Put('n');
+		os_.Put('u');
+		os_.Put('l');
+		os_.Put('l');
 	}
 
-	void WriteBool(bool b)  {
-		if (b) {
-			os_.Put('t'); os_.Put('r'); os_.Put('u'); os_.Put('e');
+	void WriteBool(bool b)
+	{
+		if (b)
+		{
+			os_.Put('t');
+			os_.Put('r');
+			os_.Put('u');
+			os_.Put('e');
 		}
-		else {
-			os_.Put('f'); os_.Put('a'); os_.Put('l'); os_.Put('s'); os_.Put('e');
+		else
+		{
+			os_.Put('f');
+			os_.Put('a');
+			os_.Put('l');
+			os_.Put('s');
+			os_.Put('e');
 		}
 	}
 
-	void WriteInt(int i) {
-		if (i < 0) {
+	void WriteInt(int i)
+	{
+		if (i < 0)
+		{
 			os_.Put('-');
 			i = -i;
 		}
 		WriteUint((unsigned)i);
 	}
 
-	void WriteUint(unsigned u) {
+	void WriteUint(unsigned u)
+	{
 		char buffer[10];
 		char *p = buffer;
-		do {
+		do
+		{
 			*p++ = (u % 10) + '0';
 			u /= 10;
 		} while (u > 0);
 
-		do {
+		do
+		{
 			--p;
 			os_.Put(*p);
 		} while (p != buffer);
 	}
 
-	void WriteInt64(int64_t i64) {
-		if (i64 < 0) {
+	void WriteInt64(int64_t i64)
+	{
+		if (i64 < 0)
+		{
 			os_.Put('-');
 			i64 = -i64;
 		}
 		WriteUint64((uint64_t)i64);
 	}
 
-	void WriteUint64(uint64_t u64) {
+	void WriteUint64(uint64_t u64)
+	{
 		char buffer[20];
 		char *p = buffer;
-		do {
+		do
+		{
 			*p++ = char(u64 % 10) + '0';
 			u64 /= 10;
 		} while (u64 > 0);
 
-		do {
+		do
+		{
 			--p;
 			os_.Put(*p);
 		} while (p != buffer);
 	}
 
 	//! \todo Optimization with custom double-to-string converter.
-	void WriteDouble(double d) {
+	void WriteDouble(double d)
+	{
 		char buffer[100];
 #if _MSC_VER
 		int ret = sprintf_s(buffer, sizeof(buffer), "%g", d);
@@ -166,29 +237,34 @@ protected:
 			os_.Put(buffer[i]);
 	}
 
-	void WriteString(const Ch* str, SizeType length)  {
-		static const char hexDigits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+	void WriteString(const Ch *str, SizeType length)
+	{
+		static const char hexDigits[16] = {'0', '1', '2', '3', '4', '5', '6', '7',
+										   '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 		static const char escape[256] = {
-#define Z16 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-			//0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
-			'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'b', 't', 'n', 'u', 'f', 'r', 'u', 'u', // 00
-			'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', // 10
-			  0,   0, '"',   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, // 20
-			Z16, Z16,																		// 30~4F
-			  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,'\\',   0,   0,   0, // 50
-			Z16, Z16, Z16, Z16, Z16, Z16, Z16, Z16, Z16, Z16								// 60~FF
+#define Z16 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+			// 0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
+			'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'b', 't', 'n', 'u', 'f',  'r', 'u', 'u', // 00
+			'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u',  'u', 'u', 'u', // 10
+			0,	 0,	  '"', 0,	0,	 0,	  0,   0,	0,	 0,	  0,   0,	0,	  0,   0,	0,	 // 20
+			Z16, Z16,																		 // 30~4F
+			0,	 0,	  0,   0,	0,	 0,	  0,   0,	0,	 0,	  0,   0,	'\\', 0,   0,	0,	 // 50
+			Z16, Z16, Z16, Z16, Z16, Z16, Z16, Z16, Z16, Z16								 // 60~FF
 #undef Z16
 		};
 
 		os_.Put('\"');
 		GenericStringStream<SourceEncoding> is(str);
-		while (is.Tell() < length) {
+		while (is.Tell() < length)
+		{
 			const Ch c = is.Peek();
-			if ((sizeof(Ch) == 1 || (unsigned)c < 256) && escape[(unsigned char)c])  {
+			if ((sizeof(Ch) == 1 || (unsigned)c < 256) && escape[(unsigned char)c])
+			{
 				is.Take();
 				os_.Put('\\');
 				os_.Put(escape[(unsigned char)c]);
-				if (escape[(unsigned char)c] == 'u') {
+				if (escape[(unsigned char)c] == 'u')
+				{
 					os_.Put('0');
 					os_.Put('0');
 					os_.Put(hexDigits[(unsigned char)c >> 4]);
@@ -201,29 +277,32 @@ protected:
 		os_.Put('\"');
 	}
 
-	void WriteStartObject()	{ os_.Put('{'); }
-	void WriteEndObject()	{ os_.Put('}'); }
-	void WriteStartArray()	{ os_.Put('['); }
-	void WriteEndArray()	{ os_.Put(']'); }
+	void WriteStartObject() { os_.Put('{'); }
+	void WriteEndObject() { os_.Put('}'); }
+	void WriteStartArray() { os_.Put('['); }
+	void WriteEndArray() { os_.Put(']'); }
 
-	void Prefix(Type type) {
-		if (level_stack_.GetSize() != 0) { // this value is not at root
-			Level* level = level_stack_.template Top<Level>();
-			if (level->valueCount > 0) {
-				if (level->inArray) 
+	void Prefix(Type type)
+	{
+		if (level_stack_.GetSize() != 0)
+		{ // this value is not at root
+			Level *level = level_stack_.template Top<Level>();
+			if (level->valueCount > 0)
+			{
+				if (level->inArray)
 					os_.Put(','); // add comma if it is not the first element in array
-				else  // in object
+				else			  // in object
 					os_.Put((level->valueCount % 2 == 0) ? ',' : ':');
 			}
 			if (!level->inArray && level->valueCount % 2 == 0)
-				RAPIDJSON_ASSERT(type == kStringType);  // if it's in object, then even number should be a name
+				RAPIDJSON_ASSERT(type == kStringType); // if it's in object, then even number should be a name
 			level->valueCount++;
 		}
 		else
 			RAPIDJSON_ASSERT(type == kObjectType || type == kArrayType);
 	}
 
-	OutputStream& os_;
+	OutputStream &os_;
 	internal::Stack<Allocator> level_stack_;
 };
 

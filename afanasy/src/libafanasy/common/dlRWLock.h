@@ -21,7 +21,7 @@
 
 class DlRWLock
 {
-public:
+  public:
 	DlRWLock();
 	~DlRWLock();
 
@@ -31,7 +31,7 @@ public:
 	void WriteLock();
 	void WriteUnlock();
 
-private:
+  private:
 	void *m_data;
 };
 

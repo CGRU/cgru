@@ -2,25 +2,17 @@
 
 #include "../libafqt/qenvironment.h"
 
-ItemButton::ItemButton(const QString & i_name,
-		int i_pos_x, int i_pos_y, int i_size,
-		const QString & i_label, const QString & i_tip):
-	m_name(i_name),
-	m_pos_x(i_pos_x),
-	m_pos_y(i_pos_y),
-	m_size(i_size),
-	m_label(i_label),
-	m_tip(i_tip),
+ItemButton::ItemButton(const QString &i_name, int i_pos_x, int i_pos_y, int i_size, const QString &i_label,
+					   const QString &i_tip)
+	: m_name(i_name), m_pos_x(i_pos_x), m_pos_y(i_pos_y), m_size(i_size), m_label(i_label), m_tip(i_tip),
 
-	m_hidden(false)
+	  m_hidden(false)
 {
 }
 
-ItemButton::~ItemButton()
-{
-}
+ItemButton::~ItemButton() {}
 
-void ItemButton::paint(QPainter * i_painter, const QRect & i_item_rect) const
+void ItemButton::paint(QPainter *i_painter, const QRect &i_item_rect) const
 {
 	if (m_hidden)
 		return;
@@ -43,14 +35,18 @@ void ItemButton::paint(QPainter * i_painter, const QRect & i_item_rect) const
 
 bool ItemButton::isClicked(int i_x, int i_y) const
 {
-	if (m_hidden) return false;
+	if (m_hidden)
+		return false;
 
-	if (i_x < m_pos_x) return false;
-	if (i_y < m_pos_y) return false;
+	if (i_x < m_pos_x)
+		return false;
+	if (i_y < m_pos_y)
+		return false;
 
-	if (i_x > m_pos_x + m_size) return false;
-	if (i_y > m_pos_y + m_size) return false;
+	if (i_x > m_pos_x + m_size)
+		return false;
+	if (i_y > m_pos_y + m_size)
+		return false;
 
 	return true;
 }
-

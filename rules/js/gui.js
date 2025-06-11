@@ -14,7 +14,7 @@
 	gui.js - TODO: description
 */
 
-"use strict";
+'use strict';
 
 function gui_Create(i_wnd, i_params, i_values)
 {
@@ -130,7 +130,7 @@ function gui_Create(i_wnd, i_params, i_values)
 		}
 
 		if (i_params[p].pulldown)
-			gui_PullDownCreate({"elParent": elDiv, "elValue": elValue, "menu": i_params[p].pulldown});
+			gui_PullDownCreate({'elParent': elDiv, 'elValue': elValue, 'menu': i_params[p].pulldown});
 
 		var values = [];
 		if (i_params[p].default)

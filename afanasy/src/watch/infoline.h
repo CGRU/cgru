@@ -6,16 +6,15 @@
 
 class InfoLine : public QLineEdit
 {
-public:
+  public:
 	InfoLine(QWidget *parent);
 	~InfoLine();
 
 	void clear();
 
-	void displayInfo(   const QString &i_message);
+	void displayInfo(const QString &i_message);
 	void displayWarning(const QString &i_message);
-	void displayError(  const QString &i_message);
+	void displayError(const QString &i_message);
 
-private:
-
+  private:
 };

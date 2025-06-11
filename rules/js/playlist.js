@@ -14,7 +14,7 @@
 	playlist.js - TODO: description
 */
 
-"use strict";
+'use strict';
 
 var p_elCurFolder = null;
 var p_elCurItem = null;
@@ -82,11 +82,11 @@ function p_OnClick()
 function p_NewOnClick()
 {
 	new cgru_Dialog({
-		"handle": 'p_NewFolder',
-		"value": g_auth_user.id,
-		"name": 'playlist',
-		"title": 'New Playlist Folder',
-		"info": 'Enter Folder Name'
+		'handle': 'p_NewFolder',
+		'value': g_auth_user.id,
+		'name': 'playlist',
+		'title': 'New Playlist Folder',
+		'info': 'Enter Folder Name'
 	});
 }
 function p_RenameOnClick()
@@ -94,11 +94,11 @@ function p_RenameOnClick()
 	if (p_elCurItem == null)
 		return;
 	new cgru_Dialog({
-		"handle": 'p_Rename',
-		"value": p_elCurItem.m_obj.label,
-		"name": 'playlist',
-		"title": 'Rename Playlist Item',
-		"info": 'Enter New Name'
+		'handle': 'p_Rename',
+		'value': p_elCurItem.m_obj.label,
+		'name': 'playlist',
+		'title': 'Rename Playlist Item',
+		'info': 'Enter New Name'
 	});
 }
 
@@ -149,7 +149,7 @@ function p_AddLink(i_id_before, i_abc)
 		obj.item = fv_cur_item.m_path;
 		obj.id = p_elCurFolder.m_obj.id + '/' + obj.label;
 		obj.id += '_' + c_PathBase(obj.item);
-		obj.path = g_GetLocationArgs({"fv_Goto": fv_cur_item.m_path});
+		obj.path = g_GetLocationArgs({'fv_Goto': fv_cur_item.m_path});
 		objs.push(obj);
 	}
 	else if (
@@ -303,7 +303,7 @@ function p_Action(i_objects, i_action, i_id_before)
 		}
 		else
 		{
-			obj.object = {"id": "", "playlist": i_objects};
+			obj.object = {'id': '', 'playlist': i_objects};
 			obj.add = true;
 		}
 	}
@@ -323,7 +323,7 @@ function p_Action(i_objects, i_action, i_id_before)
 		return;
 	}
 	obj.file = p_file;
-	n_Request({"send": {"editobj": obj}, "func": p_EditFinished});
+	n_Request({'send': {'editobj': obj}, 'func': p_EditFinished});
 }
 function p_EditFinished(i_data)
 {
@@ -341,7 +341,7 @@ function p_RefreshOnClick(i_evt)
 function p_Load()
 {
 	$('playlist').innerHTML = 'Loading...';
-	n_Request({"send": {"getfile": p_file}, "func": p_Received, "info": 'playlist'});
+	n_Request({'send': {'getfile': p_file}, 'func': p_Received, 'info': 'playlist'});
 	p_elLinks = [];
 }
 function p_Received(obj)
@@ -478,8 +478,10 @@ function p_CreateElement(i_obj, i_elParent)
 	elDel.classList.add('button');
 	elDel.classList.add('delete');
 	elDel.title = 'Double click to remove this item.';
-	elDel.onclick = function(e) {e.stopPropagation(); return false;}
-	elDel.ondblclick = p_ItemDelOnClick;
+	elDel.onclick = function(e) {
+		e.stopPropagation();
+		return false;
+	} elDel.ondblclick = p_ItemDelOnClick;
 
 	el.m_title = title;
 	if (title != '')
@@ -492,7 +494,7 @@ function p_ItemDelOnClick(i_evt)
 {
 	i_evt.stopPropagation();
 	var obj = i_evt.currentTarget.m_obj;
-	p_Action([{"id": obj.id}], 'del');
+	p_Action([{'id': obj.id}], 'del');
 	return false;
 }
 

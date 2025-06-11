@@ -5,8 +5,20 @@ sc_elCurShot = null;
 sc_elImgThumbs = [];
 
 sc_thumb_params = {};
-sc_thumb_params.force_update = {"width":'30%',"lwidth":'150px','type':"bool",'default':false,"tooltip":'Update or skip existing thumbnails'};
-sc_thumb_params.skip_movies = {"width":'30%',"lwidth":'150px','type':"bool",'default':true,"tooltip":'Do not create thumbnails from movie files'};
+sc_thumb_params.force_update = {
+	'width': '30%',
+	'lwidth': '150px',
+	'type': 'bool',
+	'default': false,
+	'tooltip': 'Update or skip existing thumbnails'
+};
+sc_thumb_params.skip_movies = {
+	'width': '30%',
+	'lwidth': '150px',
+	'type': 'bool',
+	'default': true,
+	'tooltip': 'Do not create thumbnails from movie files'
+};
 
 sc_thumb_params_values = {};
 
@@ -35,9 +47,10 @@ function sc_Init()
 	sc_elShots = [];
 	sc_elScenes = [];
 
-	n_GetFile({"path":'rules/assets/scenes.html',"func":sc_InitHTML,"info":'scenes.html',"parse":false});
+	n_GetFile(
+		{'path': 'rules/assets/scenes.html', 'func': sc_InitHTML, 'info': 'scenes.html', 'parse': false});
 }
-function sc_InitHTML( i_data)
+function sc_InitHTML(i_data)
 {
 	$('asset').innerHTML = i_data;
 
@@ -66,7 +79,8 @@ function sc_InitHTML( i_data)
 	elBtnShowAux.textContent = 'Show Aux';
 	elBtnShowAux.classList.add('button');
 	$('asset_top_left').appendChild(elBtnShowAux);
-	elBtnShowAux.onclick = function(e){
+	elBtnShowAux.onclick =
+		function(e) {
 		let el = e.currentTarget;
 		c_ElToggleSelected(el);
 		sc_show_aux = el.m_selected;
@@ -77,21 +91,27 @@ function sc_InitHTML( i_data)
 	elBtnShowOmit.textContent = 'Show Omit';
 	elBtnShowOmit.classList.add('button');
 	$('asset_top_left').appendChild(elBtnShowOmit);
-	elBtnShowOmit.onclick = function(e){
+	elBtnShowOmit.onclick =
+		function(e) {
 		let el = e.currentTarget;
 		c_ElToggleSelected(el);
 		sc_show_omit = el.m_selected;
 	}
 
 
-	gui_Create( $('scenes_make_thumbnails'), sc_thumb_params);
-	gui_CreateChoices({"wnd":$('scenes_make_thumbnails'),"name":'colorspace',"value":RULES.thumbnail.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
+	gui_Create($('scenes_make_thumbnails'), sc_thumb_params);
+	gui_CreateChoices({
+		'wnd': $('scenes_make_thumbnails'),
+		'name': 'colorspace',
+		'value': RULES.thumbnail.colorspace,
+		'label': 'Colorspace:',
+		'keys': RULES.dailies.colorspaces
+	});
 
 	if (sc_area)
 	{
 		$('scenes_load_btn').textContent = 'Load All Shots';
-		$('scenes_load_btn').onclick = function()
-		{
+		$('scenes_load_btn').onclick = function() {
 			sc_Show_Loaded();
 			scenes_Show();
 		}
@@ -99,8 +119,7 @@ function sc_InitHTML( i_data)
 	else
 	{
 		$('scenes_load_btn').textContent = 'Show Scene Shots';
-		$('scenes_load_btn').onclick = function()
-		{
+		$('scenes_load_btn').onclick = function() {
 			sc_Show_Loaded();
 			scene_Show();
 		}
@@ -154,7 +173,7 @@ function sc_Create_Scene()
 		let numbers = ASSET.name.match(/\d+/g);
 		if ((numbers != null) && numbers.length)
 		{
-			let number = numbers[numbers.length-1];
+			let number = numbers[numbers.length - 1];
 			let numplus = '' + (parseInt(number) + 1);
 			// Apply padding
 			while (numplus.length < number.length)
@@ -176,15 +195,15 @@ function sc_Show_Loaded()
 
 function sc_Post()
 {
-	if( g_arguments )
-		if( g_arguments.s_Search )
-			s_Found(sc_FilterShots( g_arguments.s_Search));
+	if (g_arguments)
+		if (g_arguments.s_Search)
+			s_Found(sc_FilterShots(g_arguments.s_Search));
 }
 
 function scene_Show()
 {
 	var folders = g_elCurFolder.m_dir.folders;
-	for( var f = 0; f < folders.length; f++ )
+	for (var f = 0; f < folders.length; f++)
 	{
 		if (sc_AuxFolder(folders[f]))
 		{
@@ -194,37 +213,37 @@ function scene_Show()
 		var path = g_elCurFolder.m_path + '/' + folders[f].name;
 
 		var elShot = document.createElement('div');
-		sc_elShots.push( elShot);
+		sc_elShots.push(elShot);
 		elShot.m_filtered = false;
 		elShot.m_status = folders[f].status;
 		elShot.m_path = path;
-		$('scenes_div').appendChild( elShot);
+		$('scenes_div').appendChild(elShot);
 		elShot.style.padding = '4px';
 		elShot.classList.add('shot');
 
 		// Thumbnail:
 		var elImg = document.createElement('img');
-		elShot.appendChild( elImg);
+		elShot.appendChild(elImg);
 		elImg.classList.add('thumbnail');
 		elImg.m_path = path;
 		elImg.m_src = RULES.root + path + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename;
-		sc_elImgThumbs.push( elImg);
+		sc_elImgThumbs.push(elImg);
 		elImg.src = elImg.m_src;
 
 		// Right float div:
 		var elDiv = document.createElement('div');
-		elShot.appendChild( elDiv);
+		elShot.appendChild(elDiv);
 		elDiv.classList.add('name_body');
 		// Name:
 		var elName = document.createElement('a');
-		elDiv.appendChild( elName);
+		elDiv.appendChild(elName);
 		elName.href = '#' + path;
 		elName.textContent = folders[f].name;
 		// Body:
-		if( g_auth_user )
+		if (g_auth_user)
 		{
 			var elBodyEditBtn = document.createElement('div');
-			elDiv.appendChild( elBodyEditBtn);
+			elDiv.appendChild(elBodyEditBtn);
 			elBodyEditBtn.classList.add('button');
 			elBodyEditBtn.classList.add('edit');
 			elBodyEditBtn.title = 'Edit shot body.';
@@ -233,13 +252,13 @@ function scene_Show()
 			elShot.m_elBodyEditBtn = elBodyEditBtn;
 
 			var elBodyEditPanel = document.createElement('div');
-			elDiv.appendChild( elBodyEditPanel);
+			elDiv.appendChild(elBodyEditPanel);
 			elBodyEditPanel.classList.add('edit_panel');
 			elBodyEditPanel.style.display = 'none';
 			elShot.m_elBodyEditPanel = elBodyEditPanel;
 
 			var elBodyCancelBtn = document.createElement('div');
-			elBodyEditPanel.appendChild( elBodyCancelBtn);
+			elBodyEditPanel.appendChild(elBodyCancelBtn);
 			elBodyCancelBtn.classList.add('button');
 			elBodyCancelBtn.innerHTML = 'CANCEL <small>[ESC]</small>.';
 			elBodyCancelBtn.title = 'Cancel shot body editing.';
@@ -247,7 +266,7 @@ function scene_Show()
 			elBodyCancelBtn.onclick = sc_EditBodyCancel;
 
 			var elBodySaveBtn = document.createElement('div');
-			elBodyEditPanel.appendChild( elBodySaveBtn);
+			elBodyEditPanel.appendChild(elBodySaveBtn);
 			elBodySaveBtn.classList.add('button');
 			elBodySaveBtn.innerHTML = '<b>SAVE</b> <small>[CTRL+ENTER]</small>.';
 			elBodySaveBtn.title = 'Save shot body.';
@@ -256,8 +275,9 @@ function scene_Show()
 		}
 
 		elShot.m_elBody = document.createElement('div');
-		elShot.m_elBody.onclick = function(i_e){i_e.stopPropagation();}
-		elDiv.appendChild( elShot.m_elBody);
+		elShot.m_elBody.onclick = function(i_e) {
+			i_e.stopPropagation();
+		} elDiv.appendChild(elShot.m_elBody);
 		elShot.m_elBody.classList.add('body');
 		elShot.m_elBody.m_elShot = elShot;
 
@@ -265,23 +285,23 @@ function scene_Show()
 		var elSt = {};
 
 		var elFramesNumDiv = document.createElement('div');
-		elDiv.insertBefore( elFramesNumDiv, elName);
+		elDiv.insertBefore(elFramesNumDiv, elName);
 		elFramesNumDiv.classList.add('frames_num_div');
 		elSt.elFramesNum = document.createElement('div');
-		elFramesNumDiv.appendChild( elSt.elFramesNum);
+		elFramesNumDiv.appendChild(elSt.elFramesNum);
 		elSt.elFramesNum.classList.add('frames_num');
 		var elFramesNumLabel = document.createElement('div');
-		elFramesNumDiv.appendChild( elFramesNumLabel);
+		elFramesNumDiv.appendChild(elFramesNumLabel);
 		elFramesNumLabel.textContent = 'F:';
 		elFramesNumLabel.classList.add('frames_num_label');
 
 		// Timecode:
 		elSt.elTimeCode = document.createElement('div');
-		elDiv.insertBefore( elSt.elTimeCode, elName);
+		elDiv.insertBefore(elSt.elTimeCode, elName);
 		elSt.elTimeCode.classList.add('timecode');
 
 		elSt.elFinish = document.createElement('div');
-		elShot.appendChild( elSt.elFinish);
+		elShot.appendChild(elSt.elFinish);
 
 		elShot.m_elStatus = document.createElement('div');
 		elShot.appendChild(elShot.m_elStatus);
@@ -299,15 +319,15 @@ function scene_Show()
 		elSt.elShowCompact.appendChild(elSt.elProgress);
 		elSt.elProgress.classList.add('progress');
 		elSt.elProgressBar = document.createElement('div');
-		elSt.elProgress.appendChild( elSt.elProgressBar);
+		elSt.elProgress.appendChild(elSt.elProgressBar);
 		elSt.elProgressBar.classList.add('progressbar');
 
 		let elEditBtn = document.createElement('div');
-		elSt.elShowCompact.appendChild( elEditBtn);
+		elSt.elShowCompact.appendChild(elEditBtn);
 		elEditBtn.classList.add('button');
 		elEditBtn.classList.add('edit');
 		elEditBtn.title = 'Edit status.\nSelect several shots to edit.';
-		if( g_auth_user == null )
+		if (g_auth_user == null)
 			elEditBtn.style.display = 'none';
 
 		elSt.elPercentage = document.createElement('div');
@@ -327,7 +347,7 @@ function scene_Show()
 		elSt.elTasksBadges.classList.add('tasks_badges');
 
 		elSt.elTags = document.createElement('div');
-		elSt.elShowCompact.appendChild( elSt.elTags);
+		elSt.elShowCompact.appendChild(elSt.elTags);
 		elSt.elTags.classList.add('tags');
 
 		elSt.elArtists = document.createElement('div');
@@ -337,10 +357,13 @@ function scene_Show()
 		elSt.elTasks = document.createElement('div');
 		elSt.elShow.appendChild(elSt.elTasks);
 		elSt.elTasks.classList.add('tasks');
-		elSt.elTasks.onclick = function(e){e.stopPropagation();return false;}
+		elSt.elTasks.onclick =
+			function(e) {
+			e.stopPropagation();
+			return false;
+		}
 
-		function sc_CreateSceneShot(i_status)
-		{
+		function sc_CreateSceneShot(i_status) {
 			for (let el in elSt)
 				i_status[el] = elSt[el];
 
@@ -349,12 +372,14 @@ function scene_Show()
 		}
 
 		if (folders[f].status && folders[f].status.flags)
-			for(let fl = 0; fl < folders[f].status.flags.length; fl++)
-				elShot.classList.add(folders[f].status.flags[fl]);
+		for (let fl = 0; fl < folders[f].status.flags.length; fl++)
+		elShot.classList.add(folders[f].status.flags[fl]);
 
-		let st_obj = new Status( folders[f].status, {"path":path,"createGUI": sc_CreateSceneShot,'multi':true,'tasks_badges':true});
+		let st_obj = new Status(
+			folders[f].status,
+			{'path': path, 'createGUI': sc_CreateSceneShot, 'multi': true, 'tasks_badges': true});
 		elShot.m_status = st_obj;
-        st_Statuses[path] = st_obj;
+		st_Statuses[path] = st_obj;
 		elEditBtn.m_status = st_obj;
 		elEditBtn.onclick = sc_EditStatus;
 
@@ -365,20 +390,27 @@ function scene_Show()
 	sc_Post();
 
 	// Get scene shots bodies:
-	for( var i = 0; i < sc_elShots.length; i++)
+	for (var i = 0; i < sc_elShots.length; i++)
 	{
 		var path = sc_elShots[i].m_path;
 		path = RULES.root + path + '/' + RULES.rufolder + '/' + u_body_filename;
-		n_GetFile({"path":path,"func":sc_BodyReceived,"info":'scene_bodies',"elShot":sc_elShots[i],"parse":false});
+		n_GetFile({
+			'path': path,
+			'func': sc_BodyReceived,
+			'info': 'scene_bodies',
+			'elShot': sc_elShots[i],
+			'parse': false
+		});
 	}
 }
-function sc_BodyReceived( i_data, i_args)
+function sc_BodyReceived(i_data, i_args)
 {
-	if( i_data.indexOf('No such file: ' + RULES.root) != -1 ) return;
+	if (i_data.indexOf('No such file: ' + RULES.root) != -1)
+		return;
 
 	// Replace <br> with spaces through some pattern:
-	i_args.elShot.m_elBody.innerHTML = i_data.replace(/\<\s*br\s*\/?\s*\>/g,'@@BR@@');
-	i_args.elShot.m_elBody.innerHTML = i_args.elShot.m_elBody.textContent.replace(/@@BR@@/g,' ');
+	i_args.elShot.m_elBody.innerHTML = i_data.replace(/\<\s*br\s*\/?\s*\>/g, '@@BR@@');
+	i_args.elShot.m_elBody.innerHTML = i_args.elShot.m_elBody.textContent.replace(/@@BR@@/g, ' ');
 
 	if (i_args.elShot.m_status && i_args.elShot.m_status.obj)
 	{
@@ -390,105 +422,117 @@ function sc_BodyReceived( i_data, i_args)
 
 function scenes_Show()
 {
-	n_WalkDir({"paths":[ASSET.path],"wfunc":scenes_Received,"info":'walk area',"depth":1,"rufiles":['rules','status'],"lookahead":['status'],"local":true});
+	n_WalkDir({
+		'paths': [ASSET.path],
+		'wfunc': scenes_Received,
+		'info': 'walk area',
+		'depth': 1,
+		'rufiles': ['rules', 'status'],
+		'lookahead': ['status'],
+		'local': true
+	});
 	$('asset').classList.add('waiting');
 	scenes_elWaiting = document.createElement('div');
 	scenes_elWaiting.innerHTML = '<h3 style="text-align:center">Loading all project shots...</h3>';
-	$('asset').appendChild( scenes_elWaiting);
+	$('asset').appendChild(scenes_elWaiting);
 }
 
-function scenes_Received( i_data, i_args)
+function scenes_Received(i_data, i_args)
 {
 	$('asset').classList.remove('waiting');
-	$('asset').removeChild( scenes_elWaiting);
-	
-	var walk = i_data[0];
-	if( walk.folders == null ) return;
-	walk.folders.sort( c_CompareFiles );
+	$('asset').removeChild(scenes_elWaiting);
 
-	for( var sc = 0; sc < walk.folders.length; sc++)
+	var walk = i_data[0];
+	if (walk.folders == null)
+		return;
+	walk.folders.sort(c_CompareFiles);
+
+	for (var sc = 0; sc < walk.folders.length; sc++)
 	{
 		var fobj = walk.folders[sc];
 		if (sc_AuxFolder(fobj))
 			continue;
 
 		var elScene = document.createElement('div');
-		sc_elScenes.push( elScene);
+		sc_elScenes.push(elScene);
 		elScene.m_filtered = false;
 		elScene.m_elThumbnails = [];
 		elScene.m_elShots = [];
-		$('scenes_div').appendChild( elScene);
+		$('scenes_div').appendChild(elScene);
 		elScene.classList.add('scene');
 		elScene.m_path = ASSET.path + '/' + fobj.name;
-		elScene.onclick = function(e){scenes_SelectScene(e.currentTarget)};
+		elScene.onclick = function(e) {
+			scenes_SelectScene(e.currentTarget)
+		};
 
 		var elName = document.createElement('a');
-		elScene.appendChild( elName);
+		elScene.appendChild(elName);
 		elName.classList.add('name');
 		elName.textContent = fobj.name;
-		elName.href = '#'+elScene.m_path;
+		elName.href = '#' + elScene.m_path;
 
 		var elStatus = document.createElement('div');
-		elScene.appendChild( elStatus);
+		elScene.appendChild(elStatus);
 		elStatus.classList.add('status');
-		st_SetElLabel( fobj.status, elStatus);
-		st_SetElColor( fobj.status, elScene);
+		st_SetElLabel(fobj.status, elStatus);
+		st_SetElColor(fobj.status, elScene);
 
-		if( walk.folders[sc].folders == null ) continue;
+		if (walk.folders[sc].folders == null)
+			continue;
 
-		walk.folders[sc].folders.sort( c_CompareFiles );
-		for( var s = 0; s < walk.folders[sc].folders.length; s++)
+		walk.folders[sc].folders.sort(c_CompareFiles);
+		for (var s = 0; s < walk.folders[sc].folders.length; s++)
 		{
 			var fobj = walk.folders[sc].folders[s];
 			if (sc_AuxFolder(fobj))
 				continue;
 
 			var elShot = document.createElement('div');
-			sc_elShots.push( elShot);
-			elScene.m_elShots.push( elShot);
+			sc_elShots.push(elShot);
+			elScene.m_elShots.push(elShot);
 			elShot.m_status = fobj.status;
 			elShot.m_filtered = false;
-			elScene.appendChild( elShot);
-			elScene.m_elThumbnails.push( elShot);
+			elScene.appendChild(elShot);
+			elScene.m_elThumbnails.push(elShot);
 			elShot.classList.add('shot');
 			elShot.m_path = elScene.m_path + '/' + fobj.name;
 
 			var elImg = document.createElement('img');
-			elShot.appendChild( elImg);
+			elShot.appendChild(elImg);
 			elImg.m_path = elShot.m_path;
-			elImg.m_src = RULES.root + elShot.m_path +'/'+ RULES.rufolder +'/'+ RULES.thumbnail.filename;
-			sc_elImgThumbs.push( elImg);
+			elImg.m_src = RULES.root + elShot.m_path + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename;
+			sc_elImgThumbs.push(elImg);
 			elImg.src = elImg.m_src;
 
 			var elSt = {};
 
 			elSt.elShow = document.createElement('div');
-			elShot.appendChild( elSt.elShow);
-			elSt.elShow.classList.add('status','status_show','status_show_compact');
+			elShot.appendChild(elSt.elShow);
+			elSt.elShow.classList.add('status', 'status_show', 'status_show_compact');
 
 			elSt.elAnnotation = document.createElement('div');
-			elSt.elShow.appendChild( elSt.elAnnotation);
+			elSt.elShow.appendChild(elSt.elAnnotation);
 			elSt.elAnnotation.classList.add('annotation');
 
 			elSt.elPercentage = document.createElement('div');
-			elSt.elShow.appendChild( elSt.elPercentage);
+			elSt.elShow.appendChild(elSt.elPercentage);
 			elSt.elPercentage.classList.add('percent');
 
 			var elName = document.createElement('a');
-			elSt.elShow.appendChild( elName);
+			elSt.elShow.appendChild(elName);
 			elName.classList.add('name');
 			elName.textContent = fobj.name;
-			elName.href = '#'+elShot.m_path;
+			elName.href = '#' + elShot.m_path;
 
 			elSt.elProgress = document.createElement('div');
-			elSt.elShow.appendChild( elSt.elProgress);
+			elSt.elShow.appendChild(elSt.elProgress);
 			elSt.elProgress.classList.add('progress');
 			elSt.elProgressBar = document.createElement('div');
-			elSt.elProgress.appendChild( elSt.elProgressBar);
+			elSt.elProgress.appendChild(elSt.elProgressBar);
 			elSt.elProgressBar.classList.add('progressbar');
 
 			elSt.elFlags = document.createElement('div');
-			elSt.elShow.appendChild( elSt.elFlags);
+			elSt.elShow.appendChild(elSt.elFlags);
 			elSt.elFlags.classList.add('flags');
 
 			elSt.elTasksBadges = document.createElement('div');
@@ -496,32 +540,38 @@ function scenes_Received( i_data, i_args)
 			elSt.elTasksBadges.classList.add('tasks_badges');
 
 			elSt.elTags = document.createElement('div');
-			elSt.elShow.appendChild( elSt.elTags);
+			elSt.elShow.appendChild(elSt.elTags);
 			elSt.elTags.classList.add('tags');
 
 			elSt.elArtists = document.createElement('div');
-			elSt.elShow.appendChild( elSt.elArtists);
+			elSt.elShow.appendChild(elSt.elArtists);
 			elSt.elArtists.classList.add('artists');
 
-/*			elSt.elFinish = document.createElement('div');
-			elSt.elShow.appendChild( elSt.elFinish);
-			elSt.elFinish.classList.add('finish');*/
+			/*			elSt.elFinish = document.createElement('div');
+						elSt.elShow.appendChild( elSt.elFinish);
+						elSt.elFinish.classList.add('finish');*/
 
-			function sc_CreateAreaShot( i_status)
+			function sc_CreateAreaShot(i_status)
 			{
-				for( var el in elSt ) i_status[el] = elSt[el];
+				for (var el in elSt)
+					i_status[el] = elSt[el];
 				i_status.elParent = elShot;
 				i_status.elColor = elShot;
 				i_status.elShow = elSt.elShow;
 			}
 
-			if( fobj.status && fobj.status.flags )
-				for( var f = 0; f < fobj.status.flags.length; f++)
-					elShot.classList.add( fobj.status.flags[f]);
+			if (fobj.status && fobj.status.flags)
+				for (var f = 0; f < fobj.status.flags.length; f++)
+					elShot.classList.add(fobj.status.flags[f]);
 
-			let st_obj = new Status(fobj.status, {"path":elShot.m_path,"createGUI": sc_CreateAreaShot,"display_short":true,'tasks_badges':true});
+			let st_obj = new Status(fobj.status, {
+				'path': elShot.m_path,
+				'createGUI': sc_CreateAreaShot,
+				'display_short': true,
+				'tasks_badges': true
+			});
 			elShot.m_status = st_obj;
-            st_Statuses[elShot.m_path] = st_obj;
+			st_Statuses[elShot.m_path] = st_obj;
 
 			elShot.ondblclick = sc_EditStatus;
 			elShot.onclick = sc_ShotClicked;
@@ -532,18 +582,18 @@ function scenes_Received( i_data, i_args)
 	sc_Post();
 }
 
-function sc_EditStatus( e)
+function sc_EditStatus(e)
 {
 	e.stopPropagation();
 
 	var status = e.currentTarget.m_status;
 	var shots = scenes_GetSelectedShots();
 	var statuses = [];
-	for( var i = 0; i < shots.length; i++)
-		if( shots[i].m_status != status )
-			statuses.push( shots[i].m_status);
+	for (var i = 0; i < shots.length; i++)
+		if (shots[i].m_status != status)
+			statuses.push(shots[i].m_status);
 
-	status.edit({"statuses":statuses});
+	status.edit({'statuses': statuses});
 
 	return false;
 }
@@ -562,7 +612,7 @@ function sc_EditTask(e)
 			paths.push(path);
 	}
 
-	task.edit({"paths":paths});
+	task.edit({'paths': paths});
 
 	return false;
 }
@@ -578,10 +628,10 @@ function sc_AddTask(i_status)
 			paths.push(path);
 	}
 
-	new Task(i_status, /* task = */null/* as it is a new task*/,{"paths":paths});
+	new Task(i_status, /* task = */ null /* as it is a new task*/, {'paths': paths});
 }
 
-function sc_EditBody( i_e)
+function sc_EditBody(i_e)
 {
 	i_e.stopPropagation();
 
@@ -593,16 +643,16 @@ function sc_EditBody( i_e)
 	el.m_elBodyEditBtn.style.display = 'none';
 	el.m_elBodyEditPanel.style.display = 'block';
 
-	el.m_elBody.onkeydown = function( i_e)
-	{
-		if(( i_e.keyCode == 13 ) && i_e.ctrlKey ) // CTRL + ENTER
+	el.m_elBody.onkeydown =
+		function(i_e) {
+		if ((i_e.keyCode == 13) && i_e.ctrlKey)	 // CTRL + ENTER
 		{
-			sc_EditBodySave( i_e);
+			sc_EditBodySave(i_e);
 			i_e.currentTarget.blur();
 		}
-		if( i_e.keyCode == 27 ) // ESC
+		if (i_e.keyCode == 27)	// ESC
 		{
-			sc_EditBodyCancel( i_e);
+			sc_EditBodyCancel(i_e);
 			i_e.currentTarget.blur();
 		}
 	}
@@ -610,7 +660,7 @@ function sc_EditBody( i_e)
 	return false;
 }
 
-function sc_EditBodyCancel( i_e)
+function sc_EditBodyCancel(i_e)
 {
 	i_e.stopPropagation();
 
@@ -626,74 +676,87 @@ function sc_EditBodyCancel( i_e)
 	return false;
 }
 
-function sc_EditBodySave( i_e)
+function sc_EditBodySave(i_e)
 {
 	var el = i_e.currentTarget.m_elShot;
 	var text = el.m_elBody.textContent;
 
-	sc_EditBodyCancel( i_e);
+	sc_EditBodyCancel(i_e);
 
 	var shots = scenes_GetSelectedShots();
-	if( shots.indexOf( el) == -1 )
-		shots.push( el);
+	if (shots.indexOf(el) == -1)
+		shots.push(el);
 
 	var news = [];
 
-	for( var i = 0; i < shots.length; i++)
+	for (var i = 0; i < shots.length; i++)
 	{
-		if( shots[i].m_status.obj == null )
+		if (shots[i].m_status.obj == null)
 			shots[i].m_status.obj = {};
 
-		n_Request({"send":{"save":{"file":c_GetRuFilePath( u_body_filename, shots[i].m_path),"data":text}},
-		"func":sc_EditBodyFinished,"elShot":shots[i],"info":'body save'});
+		n_Request({
+			'send': {'save': {'file': c_GetRuFilePath(u_body_filename, shots[i].m_path), 'data': text}},
+			'func': sc_EditBodyFinished,
+			'elShot': shots[i],
+			'info': 'body save'
+		});
 
-		news.push( nw_CreateNews({'title':'body','path':shots[i].m_path,'artists':shots[i].m_status.obj.artists}));
+		news.push(nw_CreateNews(
+			{'title': 'body', 'path': shots[i].m_path, 'artists': shots[i].m_status.obj.artists}));
 
 		st_BodyModified(shots[i].m_status.obj, shots[i].m_path);
 	}
 
-	nw_SendNews( news);
+	nw_SendNews(news);
 
 	return false;
 }
-function sc_EditBodyFinished( i_data, i_args)
+function sc_EditBodyFinished(i_data, i_args)
 {
 	var shot = i_args.elShot;
-	var path = c_GetRuFilePath( u_body_filename, shot.m_path);
-	n_GetFile({"path":path,"func":sc_BodyReceived,"info":'scene_bodies',"elShot":shot,
-		"cache_time":-1,"parse":false});
+	var path = c_GetRuFilePath(u_body_filename, shot.m_path);
+	n_GetFile({
+		'path': path,
+		'func': sc_BodyReceived,
+		'info': 'scene_bodies',
+		'elShot': shot,
+		'cache_time': -1,
+		'parse': false
+	});
 }
 
-function sc_ShotClicked( i_evt)
+function sc_ShotClicked(i_evt)
 {
 	i_evt.stopPropagation();
 	var el = i_evt.currentTarget;
-	sc_SelectShot( el, el.m_selected !== true );
-	if( i_evt.shiftKey && sc_elCurShot )
+	sc_SelectShot(el, el.m_selected !== true);
+	if (i_evt.shiftKey && sc_elCurShot)
 	{
-		var i_p = sc_elShots.indexOf( sc_elCurShot );
-		var i_c = sc_elShots.indexOf( el);
-		if( i_p != i_c )
+		var i_p = sc_elShots.indexOf(sc_elCurShot);
+		var i_c = sc_elShots.indexOf(el);
+		if (i_p != i_c)
 		{
 			var select = false;
-			if( el.m_selected ) select = true;
+			if (el.m_selected)
+				select = true;
 			var step = 1;
-			if( i_c < i_p ) step = -1;
-			while( i_p != i_c )
+			if (i_c < i_p)
+				step = -1;
+			while (i_p != i_c)
 			{
-				sc_SelectShot( sc_elShots[i_p], select);
+				sc_SelectShot(sc_elShots[i_p], select);
 				i_p += step;
 			}
 		}
 	}
 	sc_elCurShot = el;
 
-//	c_Info( scenes_GetSelectedShots().length + ' shots selected.');
+	//	c_Info( scenes_GetSelectedShots().length + ' shots selected.');
 	sc_DisplayStatistics();
 }
-function sc_SelectShot( i_elShot, i_select)
+function sc_SelectShot(i_elShot, i_select)
 {
-	if( i_select )
+	if (i_select)
 	{
 		i_elShot.m_selected = true;
 		i_elShot.classList.add('selected');
@@ -704,74 +767,74 @@ function sc_SelectShot( i_elShot, i_select)
 		i_elShot.classList.remove('selected');
 	}
 }
-function scenes_SelectAll( i_select)
+function scenes_SelectAll(i_select)
 {
-	for( var i = 0; i < sc_elShots.length; i++)
-		sc_SelectShot( sc_elShots[i], i_select);
+	for (var i = 0; i < sc_elShots.length; i++)
+		sc_SelectShot(sc_elShots[i], i_select);
 
 	sc_DisplayStatistics();
 }
 function scenes_SelectInvert()
 {
-	for( var i = 0; i < sc_elShots.length; i++)
-		sc_SelectShot( sc_elShots[i], sc_elShots[i].m_selected != true);
+	for (var i = 0; i < sc_elShots.length; i++)
+		sc_SelectShot(sc_elShots[i], sc_elShots[i].m_selected != true);
 
 	sc_DisplayStatistics();
 }
 function scenes_SelectSameColor()
 {
 	var sel = scenes_GetSelectedShots()
-	if( sel.length == 0 )
+	if (sel.length == 0)
 	{
 		c_Error('No shots selected.');
 		return;
 	}
 
 	var clr = null;
-	if( sel[0].m_status && sel[0].m_status.obj && sel[0].m_status.obj.color )
+	if (sel[0].m_status && sel[0].m_status.obj && sel[0].m_status.obj.color)
 		clr = sel[0].m_status.obj.color;
 
-	scenes_SelectAll( false);
+	scenes_SelectAll(false);
 
-	for( var i = 0; i < sc_elShots.length; i++)
+	for (var i = 0; i < sc_elShots.length; i++)
 	{
 		var c = null;
 		var s = sc_elShots[i];
-		if( s.m_status && s.m_status.obj && s.m_status.obj.color )
+		if (s.m_status && s.m_status.obj && s.m_status.obj.color)
 			c = s.m_status.obj.color;
 
-		if( c && c.length && clr && clr.length )
+		if (c && c.length && clr && clr.length)
 		{
-			if(( clr[0] == c[0] ) && ( clr[1] == c[1] ) && ( clr[2] == c[2] ))
-				sc_SelectShot( s, true);
+			if ((clr[0] == c[0]) && (clr[1] == c[1]) && (clr[2] == c[2]))
+				sc_SelectShot(s, true);
 		}
-		else if(( c == null ) && ( clr == null ))
-			sc_SelectShot( s, true);
+		else if ((c == null) && (clr == null))
+			sc_SelectShot(s, true);
 	}
 
 	sc_DisplayStatistics();
 }
 function scenes_SelectPlaylist()
 {
-	scenes_SelectAll( false);
+	scenes_SelectAll(false);
 	var shots = p_GetCurrentShots();
-	for( var i = 0; i < sc_elShots.length; i++)
-		if( shots.indexOf( sc_elShots[i].m_path) != -1 )
-			sc_SelectShot( sc_elShots[i], true);
+	for (var i = 0; i < sc_elShots.length; i++)
+		if (shots.indexOf(sc_elShots[i].m_path) != -1)
+			sc_SelectShot(sc_elShots[i], true);
 
 	sc_DisplayStatistics();
 }
-function scenes_SelectScene( i_elScene)
+function scenes_SelectScene(i_elScene)
 {
 	var shots = i_elScene.m_elShots;
-	if( shots.length == 0 )
+	if (shots.length == 0)
 		return;
 
 	var select = shots[0].m_selected != true;
 
-	for( var i = 0; i < shots.length; i++)
+	for (var i = 0; i < shots.length; i++)
 	{
-		sc_SelectShot( shots[i], select);
+		sc_SelectShot(shots[i], select);
 	}
 
 	sc_DisplayStatistics();
@@ -780,15 +843,15 @@ function scenes_SelectScene( i_elScene)
 function scenes_GetSelectedShots()
 {
 	var shots = [];
-	for( var i = 0; i < sc_elShots.length; i++)
+	for (var i = 0; i < sc_elShots.length; i++)
 	{
-		if( sc_elShots[i].m_selected != true )
+		if (sc_elShots[i].m_selected != true)
 			continue;
 
-		if( sc_elShots[i].m_filtered )
+		if (sc_elShots[i].m_filtered)
 			continue;
 
-		shots.push( sc_elShots[i]);
+		shots.push(sc_elShots[i]);
 	}
 	return shots;
 }
@@ -825,8 +888,8 @@ function sc_FilterShots(i_args)
 		}
 	}
 
-	let tags_and  = false;
-	let tags_tsk  = false;
+	let tags_and = false;
+	let tags_tsk = false;
 	if (i_args.tags)
 	{
 		let index = i_args.tags.indexOf('_AND_');
@@ -844,12 +907,12 @@ function sc_FilterShots(i_args)
 	}
 
 	let anns = null;
-	if (i_args.ann )
+	if (i_args.ann)
 	{
 		let anns_or = i_args.ann.split('|');
 		anns = [];
 		for (let o = 0; o < anns_or.length; o++)
-			anns.push( anns_or[o].split('+'));
+			anns.push(anns_or[o].split('+'));
 	}
 
 	let bodies = null;
@@ -869,7 +932,7 @@ function sc_FilterShots(i_args)
 		let st_obj = {};
 		if (el.m_status && el.m_status.obj)
 			st_obj = c_CloneObj(el.m_status.obj);
-			//st_obj = Object.assign({}, el.m_status.obj);
+		// st_obj = Object.assign({}, el.m_status.obj);
 
 		// Join status with tasks
 		if (st_obj.tasks)
@@ -942,7 +1005,8 @@ function sc_FilterShots(i_args)
 					}
 				}
 		}
-		else found = true;
+		else
+			found = true;
 
 		if (bodies && found)
 		{
@@ -975,7 +1039,8 @@ function sc_FilterShots(i_args)
 				for (let f of i_args.flags)
 				{
 					// skip special flags
-					if (f.charAt(0) == '_') continue;
+					if (f.charAt(0) == '_')
+						continue;
 
 					if (st_obj.flags.includes(f))
 					{
@@ -1003,7 +1068,8 @@ function sc_FilterShots(i_args)
 				for (let t of i_args.tags)
 				{
 					// skip special tags
-					if (t.charAt(0) == '_') continue;
+					if (t.charAt(0) == '_')
+						continue;
 
 					if (st_obj.tags.includes(t))
 					{
@@ -1109,13 +1175,16 @@ function sc_FilterShots(i_args)
 			{
 				for (let i = 0; i < i_args.artists.length; i++)
 					if (st_obj.artists.indexOf(i_args.artists[i]) != -1)
-						{ found = true; break; }
+					{
+						found = true;
+						break;
+					}
 			}
 			else if (i_args.artists.indexOf('_null_') != -1)
 				found = true;
 		}
 
-		if( i_args.priority && found )
+		if (i_args.priority && found)
 		{
 			found = false;
 			if ((st_obj.priority != null) &&
@@ -1124,7 +1193,7 @@ function sc_FilterShots(i_args)
 				found = true;
 		}
 
-		if( i_args.percent && found )
+		if (i_args.percent && found)
 		{
 			found = false;
 			if ((st_obj.progress != null) &&
@@ -1139,8 +1208,8 @@ function sc_FilterShots(i_args)
 			if (st_obj.finish)
 			{
 				let days = c_DT_DaysLeft(st_obj.finish);
-				if (((i_args.finish[0] == null) ||  days >= i_args.finish[0]) &&
-					((i_args.finish[1] == null) ||  days <= i_args.finish[1]))
+				if (((i_args.finish[0] == null) || days >= i_args.finish[0]) &&
+					((i_args.finish[1] == null) || days <= i_args.finish[1]))
 					found = true;
 			}
 		}
@@ -1173,8 +1242,8 @@ function sc_FilterShots(i_args)
 
 			// Remove duplicates from arrays:
 			o_res.artists = Array.from(new Set(o_res.artists));
-			o_res.flags   = Array.from(new Set(o_res.flags));
-			o_res.tags    = Array.from(new Set(o_res.tags));
+			o_res.flags = Array.from(new Set(o_res.flags));
+			o_res.tags = Array.from(new Set(o_res.tags));
 		}
 		else
 		{
@@ -1215,16 +1284,17 @@ function sc_FilterShots(i_args)
 
 function sc_ShowAllShots()
 {
-	if( sc_elShots == null ) return;
+	if (sc_elShots == null)
+		return;
 
-	for( var i = 0; i < sc_elShots.length; i++)
+	for (var i = 0; i < sc_elShots.length; i++)
 	{
 		sc_elShots[i].style.display = 'block';
 		sc_elShots[i].m_filtered = false;
 	}
 
-	if( sc_elScenes )
-		for( var i = 0; i < sc_elScenes.length; i++)
+	if (sc_elScenes)
+		for (var i = 0; i < sc_elScenes.length; i++)
 		{
 			sc_elScenes[i].style.display = 'block';
 			sc_elScenes[i].m_filtered = false;
@@ -1236,23 +1306,23 @@ function sc_ShowAllShots()
 function sc_DisplayStatistics()
 {
 	var selShots = scenes_GetSelectedShots();
-//	c_Info( selShots.length + ' shots selected.');
+	//	c_Info( selShots.length + ' shots selected.');
 
 	// Gather shots:
 	var filtered = 0;
 	var shots = [];
-	for( var i = 0; i < sc_elShots.length; i++)
+	for (var i = 0; i < sc_elShots.length; i++)
 	{
-		if( sc_elShots[i].m_filtered == true )
+		if (sc_elShots[i].m_filtered == true)
 		{
 			filtered++;
 			continue;
 		}
 
-		if( selShots.length && ( sc_elShots[i].m_selected != true ))
+		if (selShots.length && (sc_elShots[i].m_selected != true))
 			continue;
 
-		shots.push( sc_elShots[i]);
+		shots.push(sc_elShots[i]);
 	}
 
 	// Shots count, progress, frames count:
@@ -1261,42 +1331,46 @@ function sc_DisplayStatistics()
 	var omits = 0;
 	var progress = 0;
 	var frames_count = 0;
-	for( var i = 0; i < shots.length; i++)
+	for (var i = 0; i < shots.length; i++)
 	{
 		var stat = shots[i].m_status.obj;
-		if( stat == null) continue;
+		if (stat == null)
+			continue;
 
-		if( stat && stat.flags && ( stat.flags.indexOf('omit') != -1 ))
+		if (stat && stat.flags && (stat.flags.indexOf('omit') != -1))
 		{
 			omits++;
 			continue;
 		}
 
-		statuses.push( stat);
+		statuses.push(stat);
 
-		if( stat.progress && ( stat.progress > 0 ))
+		if (stat.progress && (stat.progress > 0))
 			progress += stat.progress;
 
-		if( stat.frames_num )
+		if (stat.frames_num)
 			frames_count += stat.frames_num;
 	}
 
 	var info = 'Shots count: <big><b>' + (shots.length - omits) + '</big></b>';
-	if( omits ) info += ' (+' + omits + ' omits)';
-	if( filtered ) info += ' (+' + filtered + ' filtered)';
-	if( shots.length )
-		info += '<br>Average progress: ' + Math.floor(progress/(shots.length-omits)) + '%';
+	if (omits)
+		info += ' (+' + omits + ' omits)';
+	if (filtered)
+		info += ' (+' + filtered + ' filtered)';
+	if (shots.length)
+		info += '<br>Average progress: ' + Math.floor(progress / (shots.length - omits)) + '%';
 
-	info += '<br>Frames count: ' + frames_count + ' = ' + c_DT_DurFromSec( frames_count / RULES.fps) + ' at ' + RULES.fps + ' FPS';
+	info += '<br>Frames count: ' + frames_count + ' = ' + c_DT_DurFromSec(frames_count / RULES.fps) + ' at ' +
+		RULES.fps + ' FPS';
 
 	if (ASSET.type == 'area')
 	{
 		var scenes_count = 0;
-		for( var i = 0; i < sc_elScenes.length; i++)
+		for (var i = 0; i < sc_elScenes.length; i++)
 		{
-			for( var s = 0; s < sc_elScenes[i].m_elShots.length; s++ )
+			for (var s = 0; s < sc_elScenes[i].m_elShots.length; s++)
 			{
-				if( shots.indexOf( sc_elScenes[i].m_elShots[s]) != -1 )
+				if (shots.indexOf(sc_elScenes[i].m_elShots[s]) != -1)
 				{
 					scenes_count++;
 					break;
@@ -1306,13 +1380,13 @@ function sc_DisplayStatistics()
 		info += '<br>Scenes count: ' + scenes_count;
 	}
 
-	if( selShots.length )
+	if (selShots.length)
 		info = '<i><b>Selected</b></i> ' + info;
 
 	$('scenes_info').innerHTML = info;
 
-//return;
-	// Statistics:
+	// return;
+	//  Statistics:
 	//
 	var args = {};
 	args.statuses = statuses;
@@ -1325,36 +1399,36 @@ function sc_DisplayStatistics()
 	args.main_artists = true;
 	args.draw_bars = true;
 
-	stcs_Show( args);
+	stcs_Show(args);
 }
 
 function scenes_makeThumbnails()
 {
-	for( var i = 0; i < sc_elImgThumbs.length; i++)
+	for (var i = 0; i < sc_elImgThumbs.length; i++)
 		sc_elImgThumbs[i].updated = false;
 
-	sc_thumb_params_values = gui_GetParams( $('scenes_make_thumbnails'), sc_thumb_params);
-	for( key in $('scenes_make_thumbnails').m_choises )
+	sc_thumb_params_values = gui_GetParams($('scenes_make_thumbnails'), sc_thumb_params);
+	for (key in $('scenes_make_thumbnails').m_choises)
 		sc_thumb_params_values[key] = $('scenes_make_thumbnails').m_choises[key].value;
 
 	scenes_makeThumbnail();
 }
 
-//limit = 10; limit_count = 0;
-function scenes_makeThumbnail( i_data, i_args)
+// limit = 10; limit_count = 0;
+function scenes_makeThumbnail(i_data, i_args)
 {
-//limit_count ++; if( limit_count > limit ) return;
-	if( i_data )
+	// limit_count ++; if( limit_count > limit ) return;
+	if (i_data)
 	{
-		if( i_data.error )
+		if (i_data.error)
 		{
-			c_Error( i_data.error);
+			c_Error(i_data.error);
 			return;
 		}
-		if( i_data.cmdexec && i_data.cmdexec.length )
+		if (i_data.cmdexec && i_data.cmdexec.length)
 		{
 			var img = i_data.cmdexec[0].thumbnail;
-			if( img == null )
+			if (img == null)
 			{
 				c_Error('No thumbnail output received');
 				return;
@@ -1372,9 +1446,9 @@ function scenes_makeThumbnail( i_data, i_args)
 
 	var el = null;
 	var num_updated = 0;
-	for( var i = 0; i < sc_elImgThumbs.length; i++)
+	for (var i = 0; i < sc_elImgThumbs.length; i++)
 	{
-		if( sc_elImgThumbs[i].updated )
+		if (sc_elImgThumbs[i].updated)
 		{
 			num_updated++;
 			continue;
@@ -1383,22 +1457,33 @@ function scenes_makeThumbnail( i_data, i_args)
 		break;
 	}
 
-	if( el == null )
+	if (el == null)
 	{
 		c_Info('Thumbnails generation finished.');
 		return;
 	}
 
 	var thumb = RULES.root + el.m_path + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename;
-	var cmd = RULES.thumbnail.cmd_asset.replace(/@INPUT@/g, RULES.root + el.m_path).replace(/@OUTPUT@/g, thumb);
+	var cmd =
+		RULES.thumbnail.cmd_asset.replace(/@INPUT@/g, RULES.root + el.m_path).replace(/@OUTPUT@/g, thumb);
 
-	if( sc_thumb_params_values.force_update ) cmd += ' --force';
-	if( sc_thumb_params_values.skip_movies ) cmd += ' --nomovie';
+	if (sc_thumb_params_values.force_update)
+		cmd += ' --force';
+	if (sc_thumb_params_values.skip_movies)
+		cmd += ' --nomovie';
 	cmd += ' -c ' + sc_thumb_params_values.colorspace;
 
 	c_Info('Generating thumbnail for ' + el.m_path + ' (' + num_updated + '/' + sc_elImgThumbs.length + ')');
 
-	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":scenes_makeThumbnail,"elThumb":el,"info":'shot thumbnail',"local":true,"wait":false,"parse":true});
+	n_Request({
+		'send': {'cmdexec': {'cmds': [cmd]}},
+		'func': scenes_makeThumbnail,
+		'elThumb': el,
+		'info': 'shot thumbnail',
+		'local': true,
+		'wait': false,
+		'parse': true
+	});
 }
 
 function scenes_Put()
@@ -1411,7 +1496,7 @@ function scenes_Put()
 	for (let i = 0; i < elShots.length; i++)
 		args.paths.push(elShots[i].m_path);
 
-	if (args.paths.length < 1 )
+	if (args.paths.length < 1)
 	{
 		c_Error('Select at least one shot.');
 		return;
@@ -1425,10 +1510,10 @@ function scenes_Convert()
 	var args = {};
 	args.paths = [];
 	var paths = scenes_GetSelectedShots();
-	for( var i = 0; i < paths.length; i++)
-		args.paths.push( paths[i].m_path);
+	for (var i = 0; i < paths.length; i++)
+		args.paths.push(paths[i].m_path);
 
-	if( args.paths.length < 1 )
+	if (args.paths.length < 1)
 	{
 		c_Error('Select at least one shot.');
 		return;
@@ -1436,7 +1521,7 @@ function scenes_Convert()
 
 	args.results = true;
 
-	d_Convert( args);
+	d_Convert(args);
 }
 
 function scenes_MakeCut()
@@ -1467,27 +1552,26 @@ function scenes_ExportTable()
 	args.shots = [];
 
 	var elShots = scenes_GetSelectedShots();
-	if( elShots.length < 1 )
+	if (elShots.length < 1)
 		elShots = sc_elShots;
 
-	for( var i = 0; i < elShots.length; i++)
+	for (var i = 0; i < elShots.length; i++)
 	{
-		if( elShots[i].m_filtered )
+		if (elShots[i].m_filtered)
 			continue;
 
 		var shot = {};
 		shot.path = elShots[i].m_path;
 		shot.status = elShots[i].m_status.obj;
 
-		args.shots.push( shot);
+		args.shots.push(shot);
 	}
 
-	if( args.shots.length < 1 )
+	if (args.shots.length < 1)
 	{
 		c_Error('No shots to export.');
 		return;
 	}
 
-	table_Export( args);
+	table_Export(args);
 }
-

@@ -4,8 +4,8 @@
 #include <QFrame>
 #include <QLabel>
 #include <QMessageBox>
-#include <QPainter>
 #include <QPaintEvent>
+#include <QPainter>
 #include <QPushButton>
 
 #include "itemfarm.h"
@@ -19,26 +19,25 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-ParamsPanelFarm::ParamsPanelFarm(ListRenders * i_list_renders):
-	m_list_renders(i_list_renders)
+ParamsPanelFarm::ParamsPanelFarm(ListRenders *i_list_renders) : m_list_renders(i_list_renders)
 {
 	// Services
-	QFrame * services_frame = new QFrame();
+	QFrame *services_frame = new QFrame();
 	services_frame->setFrameShape(QFrame::StyledPanel);
 	services_frame->setFrameShadow(QFrame::Plain);
 	getPublicLayout()->insertWidget(0, services_frame);
 
-	QVBoxLayout * services_frame_layout = new QVBoxLayout(services_frame);
+	QVBoxLayout *services_frame_layout = new QVBoxLayout(services_frame);
 	services_frame_layout->setSpacing(10);
 
 	m_services_widget = new QWidget();
 	services_frame_layout->addWidget(m_services_widget);
 
 	m_services_layout = new QVBoxLayout(m_services_widget);
-	m_services_layout->setContentsMargins(0,0,0,0);
+	m_services_layout->setContentsMargins(0, 0, 0, 0);
 	m_services_layout->setSpacing(0);
 
-	QHBoxLayout * services_caption_layout = new QHBoxLayout();
+	QHBoxLayout *services_caption_layout = new QHBoxLayout();
 	m_services_layout->addLayout(services_caption_layout);
 	services_caption_layout->addWidget(new QLabel("<b>Services</b>"));
 	m_btn_service_add = new QPushButton("add");
@@ -49,14 +48,14 @@ ParamsPanelFarm::ParamsPanelFarm(ListRenders * i_list_renders):
 
 	// Disabled services
 	m_disservs_widget = new QWidget();
-//	m_disservs_widget->setHidden(true);
+	//	m_disservs_widget->setHidden(true);
 	services_frame_layout->addWidget(m_disservs_widget);
 
 	m_disservs_layout = new QVBoxLayout(m_disservs_widget);
-	m_disservs_layout->setContentsMargins(0,0,0,0);
+	m_disservs_layout->setContentsMargins(0, 0, 0, 0);
 	m_disservs_layout->setSpacing(0);
 
-	QHBoxLayout * disservs_caption_layout = new QHBoxLayout();
+	QHBoxLayout *disservs_caption_layout = new QHBoxLayout();
 	m_disservs_layout->addLayout(disservs_caption_layout);
 	disservs_caption_layout->addWidget(new QLabel("<b>Disabled Services</b>"));
 	m_btn_disserv_add = new QPushButton("add");
@@ -65,14 +64,13 @@ ParamsPanelFarm::ParamsPanelFarm(ListRenders * i_list_renders):
 	connect(m_btn_disserv_add, SIGNAL(clicked()), m_list_renders, SLOT(slot_ServiceDisable()));
 	m_btn_disserv_add->setHidden(true);
 
-
 	// Tickets
-	QFrame * tickets_frame = new QFrame();
+	QFrame *tickets_frame = new QFrame();
 	tickets_frame->setFrameShape(QFrame::StyledPanel);
 	tickets_frame->setFrameShadow(QFrame::Plain);
 	getPublicLayout()->insertWidget(1, tickets_frame);
 
-	QVBoxLayout * tickets_frame_layout = new QVBoxLayout(tickets_frame);
+	QVBoxLayout *tickets_frame_layout = new QVBoxLayout(tickets_frame);
 	tickets_frame_layout->setSpacing(10);
 
 	m_tickets_label = new QLabel("<b>Tickets</b>");
@@ -84,9 +82,9 @@ ParamsPanelFarm::ParamsPanelFarm(ListRenders * i_list_renders):
 	tickets_frame_layout->addWidget(m_tickets_pool_widget);
 
 	m_tickets_pool_layout = new QVBoxLayout(m_tickets_pool_widget);
-	m_tickets_pool_layout->setContentsMargins(0,0,0,0);
+	m_tickets_pool_layout->setContentsMargins(0, 0, 0, 0);
 	m_tickets_pool_layout->setSpacing(0);
-	QHBoxLayout * tickets_pool_caption = new QHBoxLayout();
+	QHBoxLayout *tickets_pool_caption = new QHBoxLayout();
 	m_tickets_pool_layout->addLayout(tickets_pool_caption);
 	tickets_pool_caption->addWidget(new QLabel("<b>Tickets Pool</b>"));
 
@@ -102,9 +100,9 @@ ParamsPanelFarm::ParamsPanelFarm(ListRenders * i_list_renders):
 	tickets_frame_layout->addWidget(m_tickets_host_widget);
 
 	m_tickets_host_layout = new QVBoxLayout(m_tickets_host_widget);
-	m_tickets_host_layout->setContentsMargins(0,0,0,0);
+	m_tickets_host_layout->setContentsMargins(0, 0, 0, 0);
 	m_tickets_host_layout->setSpacing(0);
-	QHBoxLayout * tickets_host_caption = new QHBoxLayout();
+	QHBoxLayout *tickets_host_caption = new QHBoxLayout();
 	m_tickets_host_layout->addLayout(tickets_host_caption);
 	tickets_host_caption->addWidget(new QLabel("<b>Tickets Host</b>"));
 
@@ -114,16 +112,13 @@ ParamsPanelFarm::ParamsPanelFarm(ListRenders * i_list_renders):
 	connect(m_btn_ticket_host_add, SIGNAL(clicked()), m_list_renders, SLOT(slot_TicketHostEdit()));
 }
 
-ParamsPanelFarm::~ParamsPanelFarm()
-{
-	clearServices();
-}
+ParamsPanelFarm::~ParamsPanelFarm() { clearServices(); }
 
-void ParamsPanelFarm::v_updatePanel(Item * i_item, const QList<Item*> * i_selected)
+void ParamsPanelFarm::v_updatePanel(Item *i_item, const QList<Item *> *i_selected)
 {
 	ParamsPanel::v_updatePanel(i_item, i_selected);
 
-	ItemFarm * item_farm = (ItemFarm*)(i_item);
+	ItemFarm *item_farm = (ItemFarm *)(i_item);
 
 	updateServices(item_farm);
 
@@ -132,16 +127,18 @@ void ParamsPanelFarm::v_updatePanel(Item * i_item, const QList<Item*> * i_select
 
 void ParamsPanelFarm::clearServices()
 {
-	for (QMap<QString, ServiceWidget*>::iterator it = m_services_widgets.begin(); it != m_services_widgets.end(); it++)
+	for (QMap<QString, ServiceWidget *>::iterator it = m_services_widgets.begin();
+		 it != m_services_widgets.end(); it++)
 		delete it.value();
 	m_services_widgets.clear();
 
-	for (QMap<QString, ServiceWidget*>::iterator it = m_disservs_widgets.begin(); it != m_disservs_widgets.end(); it++)
+	for (QMap<QString, ServiceWidget *>::iterator it = m_disservs_widgets.begin();
+		 it != m_disservs_widgets.end(); it++)
 		delete it.value();
 	m_disservs_widgets.clear();
 }
 
-void ParamsPanelFarm::updateServices(ItemFarm * i_item)
+void ParamsPanelFarm::updateServices(ItemFarm *i_item)
 {
 	m_services_widget->setHidden(false);
 
@@ -165,7 +162,7 @@ void ParamsPanelFarm::updateServices(ItemFarm * i_item)
 	}
 
 	// Delete not existing services:
-	QMap<QString, ServiceWidget*>::iterator swIt = m_services_widgets.begin();
+	QMap<QString, ServiceWidget *>::iterator swIt = m_services_widgets.begin();
 	while (swIt != m_services_widgets.end())
 		if (i_item->m_services.contains(swIt.key()))
 		{
@@ -187,14 +184,15 @@ void ParamsPanelFarm::updateServices(ItemFarm * i_item)
 			continue;
 
 		bool disabled = i_item->m_services_disabled.contains(s);
-		ServiceWidget * srv_widget = new ServiceWidget(s, false, false == disabled);
-		connect(srv_widget, SIGNAL(sig_EditService(QString, QString)), m_list_renders, SLOT(slot_ServiceEdit(QString, QString)));
+		ServiceWidget *srv_widget = new ServiceWidget(s, false, false == disabled);
+		connect(srv_widget, SIGNAL(sig_EditService(QString, QString)), m_list_renders,
+				SLOT(slot_ServiceEdit(QString, QString)));
 		m_services_widgets[s] = srv_widget;
 		m_services_layout->addWidget(srv_widget);
 	}
 
 	// Delete not existing disabled services:
-	QMap<QString, ServiceWidget*>::iterator dwIt = m_disservs_widgets.begin();
+	QMap<QString, ServiceWidget *>::iterator dwIt = m_disservs_widgets.begin();
 	while (dwIt != m_disservs_widgets.end())
 		if (i_item->m_services_disabled.contains(dwIt.key()))
 			dwIt++;
@@ -211,12 +209,12 @@ void ParamsPanelFarm::updateServices(ItemFarm * i_item)
 		if (m_disservs_widgets.contains(s))
 			continue;
 
-		ServiceWidget * srv_widget = new ServiceWidget(s, true);
-		connect(srv_widget, SIGNAL(sig_EditService(QString, QString)), m_list_renders, SLOT(slot_ServiceEdit(QString, QString)));
+		ServiceWidget *srv_widget = new ServiceWidget(s, true);
+		connect(srv_widget, SIGNAL(sig_EditService(QString, QString)), m_list_renders,
+				SLOT(slot_ServiceEdit(QString, QString)));
 		m_disservs_widgets[s] = srv_widget;
 		m_disservs_layout->addWidget(srv_widget);
 	}
-
 
 	// We hide "Services" label only if there is no services, but some disabled services exists
 	if (i_item->m_services_disabled.size() == 0)
@@ -235,12 +233,12 @@ void ParamsPanelFarm::updateServices(ItemFarm * i_item)
 
 void ParamsPanelFarm::clearTickets()
 {
-	QMap<QString, ParamTicket*>::iterator tpIt = m_ticket_pool_widgets.begin();
+	QMap<QString, ParamTicket *>::iterator tpIt = m_ticket_pool_widgets.begin();
 	for (; tpIt != m_ticket_pool_widgets.end(); tpIt++)
 		delete tpIt.value();
 	m_ticket_pool_widgets.clear();
 
-	QMap<QString, ParamTicket*>::iterator thIt = m_ticket_host_widgets.begin();
+	QMap<QString, ParamTicket *>::iterator thIt = m_ticket_host_widgets.begin();
 	for (; thIt != m_ticket_host_widgets.end(); thIt++)
 		delete thIt.value();
 	m_ticket_host_widgets.clear();
@@ -250,7 +248,7 @@ void ParamsPanelFarm::clearTickets()
 	m_tickets_host_widget->setHidden(true);
 }
 
-void ParamsPanelFarm::updateTickets(ItemFarm * i_item)
+void ParamsPanelFarm::updateTickets(ItemFarm *i_item)
 {
 	if (NULL == i_item)
 	{
@@ -278,16 +276,15 @@ void ParamsPanelFarm::updateTickets(ItemFarm * i_item)
 	}
 
 	updateTickets(i_item->m_tickets_pool, m_ticket_pool_widgets, false, m_tickets_pool_layout);
-	updateTickets(i_item->m_tickets_host, m_ticket_host_widgets, true,  m_tickets_host_layout);
+	updateTickets(i_item->m_tickets_host, m_ticket_host_widgets, true, m_tickets_host_layout);
 }
 
-void ParamsPanelFarm::updateTickets(
-		const QMap<QString, af::Farm::Tiks> & i_tickets,
-		QMap<QString, ParamTicket*> & i_widgets,
-		bool i_host, QVBoxLayout * i_layout)
+void ParamsPanelFarm::updateTickets(const QMap<QString, af::Farm::Tiks> &i_tickets,
+									QMap<QString, ParamTicket *> &i_widgets, bool i_host,
+									QVBoxLayout *i_layout)
 {
 	// Update or delete tickets:
-	QMap<QString, ParamTicket*>::iterator wIt = i_widgets.begin();
+	QMap<QString, ParamTicket *>::iterator wIt = i_widgets.begin();
 	while (wIt != i_widgets.end())
 	{
 		QMap<QString, af::Farm::Tiks>::const_iterator tIt = i_tickets.find(wIt.key());
@@ -298,7 +295,8 @@ void ParamsPanelFarm::updateTickets(
 		}
 		else
 		{
-			wIt.value()->update(tIt.value().count, tIt.value().usage, tIt.value().hosts, tIt.value().max_hosts);
+			wIt.value()->update(tIt.value().count, tIt.value().usage, tIt.value().hosts,
+								tIt.value().max_hosts);
 			wIt++;
 		}
 	}
@@ -307,10 +305,11 @@ void ParamsPanelFarm::updateTickets(
 	QMap<QString, af::Farm::Tiks>::const_iterator tIt = i_tickets.begin();
 	while (tIt != i_tickets.end())
 	{
-		QMap<QString, ParamTicket*>::const_iterator wIt = i_widgets.find(tIt.key());
+		QMap<QString, ParamTicket *>::const_iterator wIt = i_widgets.find(tIt.key());
 		if (wIt == i_widgets.end())
 		{
-			ParamTicket * tw = new ParamTicket(tIt.key(), tIt.value().count, tIt.value().usage, tIt.value().hosts, tIt.value().max_hosts);
+			ParamTicket *tw = new ParamTicket(tIt.key(), tIt.value().count, tIt.value().usage,
+											  tIt.value().hosts, tIt.value().max_hosts);
 			i_widgets[tIt.key()] = tw;
 			i_layout->addWidget(tw);
 			if (i_host)
@@ -322,18 +321,16 @@ void ParamsPanelFarm::updateTickets(
 	}
 }
 
-ServiceWidget::ServiceWidget(const QString & i_name, bool i_disabled_service, bool i_enabled):
-	m_name(i_name),
-	m_disabled_service(i_disabled_service),
-	m_enabled(i_enabled)
+ServiceWidget::ServiceWidget(const QString &i_name, bool i_disabled_service, bool i_enabled)
+	: m_name(i_name), m_disabled_service(i_disabled_service), m_enabled(i_enabled)
 {
-	QHBoxLayout * layout = new QHBoxLayout(this);
-	layout->setContentsMargins(6,4,0,2);
+	QHBoxLayout *layout = new QHBoxLayout(this);
+	layout->setContentsMargins(6, 4, 0, 2);
 
-	QLabel * icon = new QLabel();
+	QLabel *icon = new QLabel();
 	icon->setFixedSize(16, 16);
 	layout->addWidget(icon);
-	const QPixmap * pixmap = Watch::getServiceIconSmall(m_name);
+	const QPixmap *pixmap = Watch::getServiceIconSmall(m_name);
 	if (pixmap)
 		icon->setPixmap(*pixmap);
 
@@ -345,7 +342,7 @@ ServiceWidget::ServiceWidget(const QString & i_name, bool i_disabled_service, bo
 	{
 		m_label->setText(QString("<i><b><font color=\"#A00\">%1<font></b></i>").arg(m_name));
 
-		QPushButton * btn = new QPushButton("enable");
+		QPushButton *btn = new QPushButton("enable");
 		btn->setFixedSize(64, 16);
 		layout->addWidget(btn);
 		connect(btn, SIGNAL(clicked()), this, SLOT(slot_Enable()));
@@ -358,16 +355,14 @@ ServiceWidget::ServiceWidget(const QString & i_name, bool i_disabled_service, bo
 		connect(m_btn_disable, SIGNAL(clicked()), this, SLOT(slot_Disable()));
 		setEnanbled(i_enabled);
 
-		QPushButton * btn = new QPushButton("rm");
+		QPushButton *btn = new QPushButton("rm");
 		btn->setFixedSize(32, 16);
 		layout->addWidget(btn);
 		connect(btn, SIGNAL(clicked()), this, SLOT(slot_Remove()));
 	}
 }
 
-ServiceWidget::~ServiceWidget()
-{
-}
+ServiceWidget::~ServiceWidget() {}
 
 void ServiceWidget::setEnanbled(bool i_enabled)
 {
@@ -388,7 +383,7 @@ void ServiceWidget::setEnanbled(bool i_enabled)
 	}
 }
 
-void ServiceWidget::paintEvent(QPaintEvent * i_evt)
+void ServiceWidget::paintEvent(QPaintEvent *i_evt)
 {
 	QPainter painter(this);
 	painter.setPen(afqt::QEnvironment::clr_Dark.c);
@@ -420,13 +415,13 @@ void ServiceWidget::slot_Enable()
 	emit sig_EditService("service_enable", m_name);
 }
 
-bool ServiceWidget::confirm(const QString & i_action) const
+bool ServiceWidget::confirm(const QString &i_action) const
 {
 	QMessageBox mb;
 	mb.setIcon(QMessageBox::Warning);
 	if (i_action == "Remove")
 		mb.setIcon(QMessageBox::Critical);
-	const QPixmap * pixmap = Watch::getServiceIconLarge(m_name);
+	const QPixmap *pixmap = Watch::getServiceIconLarge(m_name);
 	if (pixmap)
 		mb.setIconPixmap(*pixmap);
 

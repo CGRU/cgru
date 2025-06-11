@@ -24,7 +24,7 @@
 #ifdef WINNT
 #include <direct.h>
 #include <io.h>
-//#include <winsock2.h>
+// #include <winsock2.h>
 #define getcwd _getcwd
 #define open _open
 #define read _read
@@ -41,7 +41,7 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-const std::string af::pathBase(const std::string & i_path)
+const std::string af::pathBase(const std::string &i_path)
 {
 	if (i_path.size() == 0)
 		return i_path;
@@ -52,30 +52,35 @@ const std::string af::pathBase(const std::string & i_path)
 	if (slash_pos == std::string::npos)
 		return i_path;
 
-	std::string base = i_path.substr(slash_pos+1);
+	std::string base = i_path.substr(slash_pos + 1);
 
 	return base;
 }
 
-void af::pathFilter( std::string & path)
+void af::pathFilter(std::string &path)
 {
-	if( path.size() <= 2 ) return;
+	if (path.size() <= 2)
+		return;
 	static const int r_num = 4;
-	static const char * r_str[] = {"//","/",   "\\\\","\\",   "./","",   ".\\", ""};
-	for( int i = 0; i < r_num; i++)
-		for(;;)
+	static const char *r_str[] = {"//", "/", "\\\\", "\\", "./", "", ".\\", ""};
+	for (int i = 0; i < r_num; i++)
+		for (;;)
 		{
-			size_t pos = path.find( r_str[i*2], 1);
-			if( pos == std::string::npos ) break;
-			path.replace( pos, 2, r_str[i*2+1]);
+			size_t pos = path.find(r_str[i * 2], 1);
+			if (pos == std::string::npos)
+				break;
+			path.replace(pos, 2, r_str[i * 2 + 1]);
 		}
 }
 
-bool af::pathIsAbsolute( const std::string & path)
+bool af::pathIsAbsolute(const std::string &path)
 {
-	if( path.find('/' ) == 0) return true;
-	if( path.find('\\') == 0) return true;
-	if( path.find(':' ) == 1) return true;
+	if (path.find('/') == 0)
+		return true;
+	if (path.find('\\') == 0)
+		return true;
+	if (path.find(':') == 1)
+		return true;
 	return false;
 }
 
@@ -83,16 +88,16 @@ const std::string af::pathCurrent()
 {
 	static const int buffer_len = 4096;
 	char buffer[buffer_len];
-	char * ptr = getcwd(buffer, buffer_len);
+	char *ptr = getcwd(buffer, buffer_len);
 	if (ptr == NULL)
 	{
-        AF_ERR << "af::pathCurrent: " << strerror(errno);
+		AF_ERR << "af::pathCurrent: " << strerror(errno);
 		return "";
 	}
 	return std::string(ptr);
 }
 
-const std::string af::pathAbsolute(const std::string & i_path)
+const std::string af::pathAbsolute(const std::string &i_path)
 {
 	std::string absPath(i_path);
 	if (false == pathIsAbsolute(absPath))
@@ -104,7 +109,7 @@ const std::string af::pathAbsolute(const std::string & i_path)
 	return absPath;
 }
 
-const std::string af::pathUp(const std::string & i_path, bool i_use_cwd)
+const std::string af::pathUp(const std::string &i_path, bool i_use_cwd)
 {
 	// Null path is considered as root
 	if (i_path.size() == 0)
@@ -124,8 +129,8 @@ const std::string af::pathUp(const std::string & i_path, bool i_use_cwd)
 	}
 
 	// Remove slashes from the end if exist
-	while (up_path.size() && ((up_path[up_path.size()-1] == '/') || (up_path[up_path.size()-1] == '\\')))
-		up_path = up_path.substr(0, up_path.size()-1);
+	while (up_path.size() && ((up_path[up_path.size() - 1] == '/') || (up_path[up_path.size() - 1] == '\\')))
+		up_path = up_path.substr(0, up_path.size() - 1);
 
 	// Null path is considered as root
 	if (up_path.size() == 0)
@@ -167,38 +172,39 @@ const std::string af::pathUp(const std::string & i_path, bool i_use_cwd)
 	return up_path;
 }
 
-const std::string af::pathFilterFileName( const std::string & i_filename)
+const std::string af::pathFilterFileName(const std::string &i_filename)
 {
-	std::string o_filename( i_filename);
-	for( int c = 0; c < o_filename.size(); c++)
+	std::string o_filename(i_filename);
+	for (int c = 0; c < o_filename.size(); c++)
 	{
-		if(( o_filename.at(c) <= ' ' ) ||
-			( o_filename.at(c) > 'z' ))
-			o_filename.replace( c, 1, 1, AFGENERAL::FILENAME_INVALID_CHARACTER_REPLACE);
+		if ((o_filename.at(c) <= ' ') || (o_filename.at(c) > 'z'))
+			o_filename.replace(c, 1, 1, AFGENERAL::FILENAME_INVALID_CHARACTER_REPLACE);
 
-		for( int i = 0; i < AFGENERAL::FILENAME_INVALID_CHARACTERS_LENGTH; i++)
-			if( o_filename.at(c) == AFGENERAL::FILENAME_INVALID_CHARACTERS[i] )
+		for (int i = 0; i < AFGENERAL::FILENAME_INVALID_CHARACTERS_LENGTH; i++)
+			if (o_filename.at(c) == AFGENERAL::FILENAME_INVALID_CHARACTERS[i])
 			{
-				o_filename.replace( c, 1, 1, AFGENERAL::FILENAME_INVALID_CHARACTER_REPLACE);
+				o_filename.replace(c, 1, 1, AFGENERAL::FILENAME_INVALID_CHARACTER_REPLACE);
 				break;
 			}
 	}
 	return o_filename;
 }
 
-bool af::pathFileExists( const std::string & path)
+bool af::pathFileExists(const std::string &path)
 {
 	struct stat st;
-	int retval = stat( path.c_str(), &st);
+	int retval = stat(path.c_str(), &st);
 	return (retval == 0);
 }
 
-bool af::pathIsFolder( const std::string & path)
+bool af::pathIsFolder(const std::string &path)
 {
 	struct stat st;
-	int retval = stat( path.c_str(), &st);
-	if( retval != 0 ) return false;
-	if( st.st_mode & S_IFDIR ) return true;
+	int retval = stat(path.c_str(), &st);
+	if (retval != 0)
+		return false;
+	if (st.st_mode & S_IFDIR)
+		return true;
 	return false;
 }
 
@@ -207,174 +213,196 @@ const std::string af::pathHome()
 	std::string home;
 #ifdef WINNT
 	home = af::getenv("APPDATA");
-	if( false == af::pathIsFolder( home ))
+	if (false == af::pathIsFolder(home))
 		home = "c:\\temp";
 #else
 	home = af::getenv("HOME");
-	if( false == af::pathIsFolder( home ))
+	if (false == af::pathIsFolder(home))
 		home = "/tmp";
 #endif
-	af::pathMakeDir( home, VerboseOn);
+	af::pathMakeDir(home, VerboseOn);
 	return home;
 }
 
-bool af::pathMakeDir( const std::string & i_path, VerboseMode i_verbose)
+bool af::pathMakeDir(const std::string &i_path, VerboseMode i_verbose)
 {
 	AF_DEBUG << "af::pathMakeDir: " << i_path;
-	if( false == af::pathIsFolder( i_path))
+	if (false == af::pathIsFolder(i_path))
 	{
-		if( i_verbose == VerboseOn)
+		if (i_verbose == VerboseOn)
 			AF_LOG << "Creating folder: " << i_path;
 #ifdef WINNT
-		if( _mkdir( i_path.c_str()) == -1)
+		if (_mkdir(i_path.c_str()) == -1)
 #else
-		if( mkdir( i_path.c_str(), 0777) == -1)
+		if (mkdir(i_path.c_str(), 0777) == -1)
 #endif
 		{
-			AF_ERR << "af::pathMakeDir: " << strerror(errno) << ": " <<  i_path;
+			AF_ERR << "af::pathMakeDir: " << strerror(errno) << ": " << i_path;
 			return false;
 		}
 #ifndef WINNT
-		chmod( i_path.c_str(), 0777);
+		chmod(i_path.c_str(), 0777);
 #endif
 	}
 	return true;
 }
 
-bool af::pathMakePath( const std::string & i_path, VerboseMode i_verbose)
+bool af::pathMakePath(const std::string &i_path, VerboseMode i_verbose)
 {
 	char sc = '/';
-	if( i_path.find('\\') != -1 )
+	if (i_path.find('\\') != -1)
 		sc = '\\';
-	bool startsWithSep = ( i_path.find( sc) == 0 );
+	bool startsWithSep = (i_path.find(sc) == 0);
 
-	std::vector<std::string> folders = af::strSplit( i_path, std::string( 1, sc));
+	std::vector<std::string> folders = af::strSplit(i_path, std::string(1, sc));
 
 	std::string path;
-	for( int i = 0; i < folders.size(); i++)
+	for (int i = 0; i < folders.size(); i++)
 	{
-		if(( i == 0 ) && ( startsWithSep == false ))
+		if ((i == 0) && (startsWithSep == false))
 			path = folders[i];
 		else
 			path += sc + folders[i];
 #ifdef WINNT
-		if( folders[i].find(':') == 1 ) continue; // Skip MS Windows disk:
+		if (folders[i].find(':') == 1)
+			continue; // Skip MS Windows disk:
 #endif
-		if( false == af::pathMakeDir( path, i_verbose))
+		if (false == af::pathMakeDir(path, i_verbose))
 			return false;
 	}
 	return true;
 }
 
-char * af::fileRead( const std::string & i_filename, int * o_size, int i_maxfilesize, std::string * o_err)
+char *af::fileRead(const std::string &i_filename, int *o_size, int i_maxfilesize, std::string *o_err)
 {
 	struct stat st;
 	int fd = -1;
-	int retval = stat( i_filename.c_str(), &st);
-	if( retval != 0 )
+	int retval = stat(i_filename.c_str(), &st);
+	if (retval != 0)
 	{
-		std::string err = std::string("Can't get file:\n") + i_filename + "\n" + strerror( errno);
-		if( o_err ) *o_err = err; else AFERROR( err)
+		std::string err = std::string("Can't get file:\n") + i_filename + "\n" + strerror(errno);
+		if (o_err)
+			*o_err = err;
+		else
+			AFERROR(err)
 		return NULL;
 	}
-	else if( false == (st.st_mode & S_IFREG))
+	else if (false == (st.st_mode & S_IFREG))
 	{
 		std::string err = std::string("It is not a regular file:\n") + i_filename;
-		if( o_err ) *o_err = err; else AFERROR( err)
+		if (o_err)
+			*o_err = err;
+		else
+			AFERROR(err)
 		return NULL;
 	}
-	else if( st.st_size < 1 )
+	else if (st.st_size < 1)
 	{
 		std::string err = std::string("File is empty:\n") + i_filename;
-		if( o_err ) *o_err = err; else AFERROR( err)
+		if (o_err)
+			*o_err = err;
+		else
+			AFERROR(err)
 		return NULL;
 	}
 	else
 	{
-		#ifdef WINNT
-		fd = ::open( i_filename.c_str(), O_RDONLY | _O_BINARY);
-		#else
-		fd = ::open( i_filename.c_str(), O_RDONLY);
-		#endif
+#ifdef WINNT
+		fd = ::open(i_filename.c_str(), O_RDONLY | _O_BINARY);
+#else
+		fd = ::open(i_filename.c_str(), O_RDONLY);
+#endif
 	}
 
-	if( fd == -1 )
+	if (fd == -1)
 	{
 		std::string err = std::string("Can't open file:\n") + i_filename;
-		if( o_err ) *o_err = err; else AFERROR( err)
+		if (o_err)
+			*o_err = err;
+		else
+			AFERROR(err)
 		return NULL;
 	}
 
 	int maxsize = st.st_size;
-	if( i_maxfilesize > 0 )
+	if (i_maxfilesize > 0)
 	{
-		if( maxsize > i_maxfilesize )
+		if (maxsize > i_maxfilesize)
 		{
 			maxsize = i_maxfilesize;
 			std::string err = std::string("File size overflow:\n") + i_filename;
-			if( o_err ) *o_err = err; else AFERROR( err)
+			if (o_err)
+				*o_err = err;
+			else
+				AFERROR(err)
 		}
 	}
-	char * buffer = new char[maxsize+1];
+	char *buffer = new char[maxsize + 1];
 	int readsize = 0;
-	while( maxsize > 0 )
+	while (maxsize > 0)
 	{
-		int bytes = ::read( fd, buffer+readsize, maxsize);
-		if( bytes == -1 )
+		int bytes = ::read(fd, buffer + readsize, maxsize);
+		if (bytes == -1)
 		{
-			std::string err = std::string("Reading file failed:\n") + i_filename + "\n" + strerror( errno);
-			if( o_err ) *o_err = err; else AFERROR( err)
+			std::string err = std::string("Reading file failed:\n") + i_filename + "\n" + strerror(errno);
+			if (o_err)
+				*o_err = err;
+			else
+				AFERROR(err)
 			buffer[readsize] = '\0';
 			break;
 		}
-		if( bytes == 0 ) break;
+		if (bytes == 0)
+			break;
 		maxsize -= bytes;
 		readsize += bytes;
 	}
-	::close( fd);
+	::close(fd);
 	buffer[readsize] = '\0';
-	if( o_size ) *o_size = readsize;
+	if (o_size)
+		*o_size = readsize;
 	return buffer;
 }
 
-const std::vector<std::string> af::getFilesList( const std::string & i_path)
+const std::vector<std::string> af::getFilesList(const std::string &i_path)
 {
 	std::vector<std::string> list;
 
-	if( i_path.size() == 0 )
+	if (i_path.size() == 0)
 		return list;
 
 #ifdef WINNT
 	HANDLE dir;
 	WIN32_FIND_DATA file_data;
-	if(( dir = FindFirstFile((i_path + "\\*").c_str(), &file_data)) != INVALID_HANDLE_VALUE)
+	if ((dir = FindFirstFile((i_path + "\\*").c_str(), &file_data)) != INVALID_HANDLE_VALUE)
 	{
 		do
 		{
-			std::string filename( file_data.cFileName);
+			std::string filename(file_data.cFileName);
 
-			if( filename.find(".") == 0 )
+			if (filename.find(".") == 0)
 				continue;
 
-			list.push_back( filename);
+			list.push_back(filename);
 
-		} while ( FindNextFile( dir, &file_data));
-		FindClose( dir);
+		} while (FindNextFile(dir, &file_data));
+		FindClose(dir);
 	}
 
 #else
 
 	struct dirent *de = NULL;
-	DIR * dir = opendir( i_path.c_str());
-	if( dir == NULL)
+	DIR *dir = opendir(i_path.c_str());
+	if (dir == NULL)
 	{
 		return list;
 	}
 
-	while( (de = readdir(dir)) )
+	while ((de = readdir(dir)))
 	{
-		if( de->d_name[0] == '.' ) continue;
-		list.push_back( de->d_name);
+		if (de->d_name[0] == '.')
+			continue;
+		list.push_back(de->d_name);
 	}
 
 	closedir(dir);
@@ -384,68 +412,65 @@ const std::vector<std::string> af::getFilesList( const std::string & i_path)
 	return list;
 }
 
-const std::vector<std::string> af::getFilesListSafe( const std::string & i_path)
+const std::vector<std::string> af::getFilesListSafe(const std::string &i_path)
 {
 	std::vector<std::string> empty;
 
-	if( i_path.size() == 0 )
+	if (i_path.size() == 0)
 		return empty;
 
-	std::string path( i_path);
+	std::string path(i_path);
 
-	if(( path.find("..") != -1  ) ||
-	   ( path.find(':')  != -1  ) ||
-	   ( path[0]         == '/' ) ||
-	   ( path[0]         == '\\'))
+	if ((path.find("..") != -1) || (path.find(':') != -1) || (path[0] == '/') || (path[0] == '\\'))
 		return empty;
 
-	if( af::Environment::getHTTPServeDir().empty())
+	if (af::Environment::getHTTPServeDir().empty())
 		path = af::Environment::getCGRULocation() + AFGENERAL::PATH_SEPARATOR + path;
 	else
 		path = af::Environment::getHTTPServeDir() + AFGENERAL::PATH_SEPARATOR + path;
 
-	return af::getFilesList( path);
+	return af::getFilesList(path);
 }
 
-bool af::removeDir( const std::string & i_folder )
+bool af::removeDir(const std::string &i_folder)
 {
 #ifdef WINNT
 	HANDLE dir;
 	WIN32_FIND_DATA file_data;
-	if(( dir = FindFirstFile(( i_folder + "\\*").c_str(), &file_data)) != INVALID_HANDLE_VALUE)
+	if ((dir = FindFirstFile((i_folder + "\\*").c_str(), &file_data)) != INVALID_HANDLE_VALUE)
 	{
 		do
 		{
-			std::string filename( file_data.cFileName);
+			std::string filename(file_data.cFileName);
 
-			if(( filename == ".") || ( filename == ".."))
+			if ((filename == ".") || (filename == ".."))
 				continue;
 
 			filename = i_folder + '\\' + filename;
-			if( false == af::pathFileExists( filename))
+			if (false == af::pathFileExists(filename))
 				continue;
 
-			if( GetFileAttributes( filename.c_str()) & FILE_ATTRIBUTE_DIRECTORY )
+			if (GetFileAttributes(filename.c_str()) & FILE_ATTRIBUTE_DIRECTORY)
 			{
-				if( false == af::removeDir( filename))
+				if (false == af::removeDir(filename))
 					return false;
 			}
-			else if( DeleteFile( filename.c_str()) == FALSE)
+			else if (DeleteFile(filename.c_str()) == FALSE)
 			{
-				 AFERRPA("af::removeDir: Can't delete file:\n%s", filename.c_str())
-				 return false;
+				AFERRPA("af::removeDir: Can't delete file:\n%s", filename.c_str())
+				return false;
 			}
 
-		} while ( FindNextFile( dir, &file_data));
-		FindClose( dir);
+		} while (FindNextFile(dir, &file_data));
+		FindClose(dir);
 	}
 	else
 	{
-		  AFERRPA("af::removeDir: Can't open folder:\n%s", i_folder.c_str())
-		  return false;
+		AFERRPA("af::removeDir: Can't open folder:\n%s", i_folder.c_str())
+		return false;
 	}
 
-	if( RemoveDirectory( i_folder.c_str()) == FALSE)
+	if (RemoveDirectory(i_folder.c_str()) == FALSE)
 	{
 		AFERRPA("af::removeDir: Can't remove folder:\n%s", i_folder.c_str())
 		return false;
@@ -455,23 +480,23 @@ bool af::removeDir( const std::string & i_folder )
 
 	// Opeining folder
 	struct dirent *de = NULL;
-	DIR * dir = opendir( i_folder.c_str());
-	if( dir == NULL)
+	DIR *dir = opendir(i_folder.c_str());
+	if (dir == NULL)
 	{
 		AFERRPA("af::removeDir: Can't open folder:\n%s", i_folder.c_str())
 		return false;
 	}
 
 	// Removing all files in folder
-	while( (de = readdir(dir)) )
+	while ((de = readdir(dir)))
 	{
-		std::string filename( de->d_name);
-		if(( filename == ".") || ( filename == ".."))
+		std::string filename(de->d_name);
+		if ((filename == ".") || (filename == ".."))
 			continue;
 
 		filename = i_folder + '/' + filename;
 		struct stat st;
-		if( -1 == stat( filename.c_str(), &st))
+		if (-1 == stat(filename.c_str(), &st))
 		{
 			AFERRPA("af::removeDir: %s", filename.c_str())
 			continue;
@@ -483,12 +508,12 @@ bool af::removeDir( const std::string & i_folder )
 		//     have full support for returning the file type in `d_type`
 		// So we should use `st_mode` for check
 		// (which is more expensive, but not for our needs)
-		if( S_ISDIR( st.st_mode))
+		if (S_ISDIR(st.st_mode))
 		{
-			if( false == af::removeDir( filename))
+			if (false == af::removeDir(filename))
 				return false;
 		}
-		else if( unlink( filename.c_str()) != 0)
+		else if (unlink(filename.c_str()) != 0)
 		{
 			AFERRPA("af::removeDir: Can't delete file:\n%s", filename.c_str())
 			return false;
@@ -498,7 +523,7 @@ bool af::removeDir( const std::string & i_folder )
 	closedir(dir);
 
 	// Removing folder
-	if( rmdir( i_folder.c_str()) != 0)
+	if (rmdir(i_folder.c_str()) != 0)
 	{
 		AFERRPA("af::removeDir: Can't delete folder:\n%s\n", i_folder.c_str())
 		return false;
@@ -507,4 +532,3 @@ bool af::removeDir( const std::string & i_folder )
 
 	return true;
 }
-

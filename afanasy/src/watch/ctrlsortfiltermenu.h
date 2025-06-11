@@ -6,25 +6,25 @@
 
 class CtrlSortFilterMenu : public QLabel
 {
-Q_OBJECT
-public:
-	CtrlSortFilterMenu( QWidget * i_parent, const int * i_checked_type);
+	Q_OBJECT
+  public:
+	CtrlSortFilterMenu(QWidget *i_parent, const int *i_checked_type);
 	~CtrlSortFilterMenu();
 
-	inline void addItem( int i_type) {m_types.push_back( i_type);}
+	inline void addItem(int i_type) { m_types.push_back(i_type); }
 
-signals:
-	void sig_changed( int i_type);
+  signals:
+	void sig_changed(int i_type);
 	void sig_dblclick();
 
-protected:
-	void contextMenuEvent( QContextMenuEvent * i_event);
-	void mouseDoubleClickEvent( QMouseEvent * i_event);
+  protected:
+	void contextMenuEvent(QContextMenuEvent *i_event);
+	void mouseDoubleClickEvent(QMouseEvent *i_event);
 
-private slots:
-	void slot_changed( int i_type);
+  private slots:
+	void slot_changed(int i_type);
 
-private:
+  private:
 	std::vector<int> m_types;
-	const int * m_checked_type;
+	const int *m_checked_type;
 };

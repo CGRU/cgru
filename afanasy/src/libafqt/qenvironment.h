@@ -1,8 +1,8 @@
 #pragma once
 
-#include "name_afqt.h"
 #include "attr.h"
 #include "attrcolor.h"
+#include "name_afqt.h"
 
 #include <QtGui/QColor>
 #include <QtGui/QFont>
@@ -14,24 +14,24 @@ class QDomElement;
 
 class afqt::QEnvironment
 {
-public:
-	QEnvironment( const QString & i_name);
+  public:
+	QEnvironment(const QString &i_name);
 	~QEnvironment();
 
-	static inline bool isValid() { return ms_valid;}
+	static inline bool isValid() { return ms_valid; }
 
 	static void initFonts();
 
-	static void setPalette( QPalette & palette);
+	static void setPalette(QPalette &palette);
 
-	static const QString & getFileName() { return ms_filename; }
+	static const QString &getFileName() { return ms_filename; }
 
 	static bool save();
-	static void saveGUI( QByteArray & data);
-	static void saveHotkeys( QByteArray & data);
+	static void saveGUI(QByteArray &data);
+	static void saveHotkeys(QByteArray &data);
 
-	static bool getRect( const QString & i_name, QRect & rect);
-	static void setRect( const QString & i_name, const QRect & rect);
+	static bool getRect(const QString &i_name, QRect &rect);
+	static void setRect(const QString &i_name, const QRect &rect);
 	static void resetAllRects();
 
 	static QMap<QString, AttrNumber> ms_attrs_panel;
@@ -60,11 +60,11 @@ public:
 	static AttrNumber star_rotate;
 
 	static AttrNumber ntf_job_added_alert;
-	static Attr       ntf_job_added_sound;
+	static Attr ntf_job_added_sound;
 	static AttrNumber ntf_job_done_alert;
-	static Attr       ntf_job_done_sound;
+	static Attr ntf_job_done_sound;
 	static AttrNumber ntf_job_error_alert;
-	static Attr       ntf_job_error_sound;
+	static Attr ntf_job_error_sound;
 
 	static AttrNumber savePrefsOnExit;
 	static AttrNumber saveWndRectsOnExit;
@@ -90,8 +90,8 @@ public:
 
 	static AttrColor clr_Highlight;
 	static AttrColor clr_HighlightedText;
-	static AttrColor clr_Link;              // Visor mode
-	static AttrColor clr_LinkVisited;       // GOD mode
+	static AttrColor clr_Link;		  // Visor mode
+	static AttrColor clr_LinkVisited; // GOD mode
 
 	static AttrColor clr_item;
 	static AttrColor clr_selected;
@@ -155,56 +155,56 @@ public:
 	static AttrNumber thumb_work_height;
 	static AttrNumber render_item_size;
 
-	inline static const QString & getServerName() { return ms_servername; }
-	inline static const QString & getUserName()   { return ms_username;   }
-	inline static const QString & getHostName()   { return ms_hostname;   }
+	inline static const QString &getServerName() { return ms_servername; }
+	inline static const QString &getUserName() { return ms_username; }
+	inline static const QString &getHostName() { return ms_hostname; }
 
 	/// Get Afanasy server QHostAddress.
-	inline static const QHostAddress & getAfServerQHostAddress()  { return ms_qafserveraddress;}
+	inline static const QHostAddress &getAfServerQHostAddress() { return ms_qafserveraddress; }
 
 	static const QStringList getThemes();
 
-	static const QString & getDateTimeFormat();
+	static const QString &getDateTimeFormat();
 
-	static bool loadTheme( const QString & i_theme);
+	static bool loadTheme(const QString &i_theme);
 
-	static bool loadAttrs( const QString & i_filename );
+	static bool loadAttrs(const QString &i_filename);
 
-	static void getHotkey( const QString & i_name, QString & o_str);
-	static void setHotkey( const QString & i_name, const QString & i_str);
+	static void getHotkey(const QString &i_name, QString &o_str);
+	static void setHotkey(const QString &i_name, const QString &i_str);
 
 	static bool hasCollapsedJobSerial(int64_t i_serial);
 	static void addCollapsedJobSerial(int64_t i_serial);
 	static void delCollapsedJobSerial(int64_t i_serial);
 	static void clearCollapsedJobSerials();
-	inline static bool collapseNewJobs() {return ms_jobs_collapse_new;}
-	inline static void setCollapseNewJobs(bool i_collapse) {ms_jobs_collapse_new = i_collapse;}
+	inline static bool collapseNewJobs() { return ms_jobs_collapse_new; }
+	inline static void setCollapseNewJobs(bool i_collapse) { ms_jobs_collapse_new = i_collapse; }
 
-private:
-   static void solveServerAddress();
+  private:
+	static void solveServerAddress();
 
-	static void loadWndRects(const JSON & i_obj);
-	static void saveWndRects(QByteArray & o_data);
+	static void loadWndRects(const JSON &i_obj);
+	static void saveWndRects(QByteArray &o_data);
 
-	static void loadCollapsedJobsSerials(const JSON & i_obj);
-	static void saveCollapsedJobsSerials(QByteArray & o_data);
+	static void loadCollapsedJobsSerials(const JSON &i_obj);
+	static void saveCollapsedJobsSerials(QByteArray &o_data);
 
-private:
+  private:
 	static bool ms_valid;
 	static QString ms_appname;
 
 	static QString ms_themes_folder;
 
-	static QHostAddress ms_qafserveraddress;    ///< QHostAddress class. Point to Afanasy server address.
+	static QHostAddress ms_qafserveraddress; ///< QHostAddress class. Point to Afanasy server address.
 	static QString ms_servername;
 	static QString ms_username;
 	static QString ms_hostname;
 
 	static QString ms_filename;
-	static QList<Attr*> ms_attrs_prefs;
-	static QList<AttrRect*> ms_attrs_wndrects;
-	static QList<Attr*> ms_attrs_gui;
-	static QMap<QString, Attr*> ms_attrs_hotkeys;
+	static QList<Attr *> ms_attrs_prefs;
+	static QList<AttrRect *> ms_attrs_wndrects;
+	static QList<Attr *> ms_attrs_gui;
+	static QMap<QString, Attr *> ms_attrs_hotkeys;
 	static QStringList ms_hotkeys_names;
 	static QList<int64_t> ms_jobs_serials_collapsed;
 	static bool ms_jobs_collapse_new;

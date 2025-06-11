@@ -6,8 +6,7 @@
 
 class WndNotifications : public Wnd
 {
-public:
-   WndNotifications();
-   ~WndNotifications();
-
+  public:
+	WndNotifications();
+	~WndNotifications();
 };

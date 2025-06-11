@@ -1,4 +1,5 @@
-/** '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+/**
+ * '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
  *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
  *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
  *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
@@ -11,9 +12,10 @@
  * common.js - common js stuff for the afanasy web-page
  * This file contains common structures, misc formatting and user permission functions used throughout
  * all afanasy/browser/*.js files.
- * ....................................................................................................... */
+ * .......................................................................................................
+ */
 
-"use strict";
+'use strict';
 
 var cm_Attrs = [
 	['name' /***********/, 'Name' /******/, 'Name' /***********/],
@@ -79,7 +81,9 @@ function cm_Init()
 		{
 			el.classList.add('button');
 			el.title = 'Double click to set ' + cm_UILevels[i] + ' UI level.';
-			el.ondblclick = function(e) { cm_ApplyUILevel(e.currentTarget.textContent); };
+			el.ondblclick = function(e) {
+				cm_ApplyUILevel(e.currentTarget.textContent);
+			};
 		}
 	}
 }
@@ -124,11 +128,21 @@ function cm_ApplyUILevel(i_level)
 	elT.classList.add('ui_level_text');
 	elT.textContent = text;
 
-	elB.onclick = function(e) { document.location.reload(); };
-	elB.onkeydown = function(e) { document.location.reload(); };
-	elT.onclick = function(e) { document.location.reload(); };
-	elT.onkeydown = function(e) { document.location.reload(); };
-	setTimeout(function() { document.location.reload() }, 3000);
+	elB.onclick = function(e) {
+		document.location.reload();
+	};
+	elB.onkeydown = function(e) {
+		document.location.reload();
+	};
+	elT.onclick = function(e) {
+		document.location.reload();
+	};
+	elT.onkeydown = function(e) {
+		document.location.reload();
+	};
+	setTimeout(function() {
+		document.location.reload()
+	}, 3000);
 }
 
 function cm_IsPadawan()
@@ -177,8 +191,10 @@ function cm_CompareItems(i_itemA, i_itemB, i_param, i_greater)
 		else if (i_itemA.node_type != i_itemB.node_type)
 		{
 			// If path is the same we should show parent node first:
-			if (i_itemA.node_type == 'branches') return true;
-			if (i_itemA.node_type == 'pools') return true;
+			if (i_itemA.node_type == 'branches')
+				return true;
+			if (i_itemA.node_type == 'pools')
+				return true;
 			return false;
 		}
 	}
@@ -413,8 +429,8 @@ function cm_ValueToString(i_value, i_type)
 	{
 		// word-wrap long regular expressions:
 		o_str = i_value.replace(/\./g, '.&shy;');
-		o_str =   o_str.replace(/\|/g, '|&shy;');
-		o_str =   o_str.replace(/\)/g, ')&shy;');
+		o_str = o_str.replace(/\|/g, '|&shy;');
+		o_str = o_str.replace(/\)/g, ')&shy;');
 	}
 	else if (i_type == 'msi')
 	{
@@ -492,7 +508,7 @@ function cm_FillNumbers(i_string, i_number)
 		if (replace_mask.length > i_number.toString().length)
 		{
 			var replace_string =
-				Array(replace_mask.length - i_number.toString().length - 1).join("0") + i_number.toString();
+				Array(replace_mask.length - i_number.toString().length - 1).join('0') + i_number.toString();
 			i_string = i_string.replace(replace_mask, replace_string);
 		}
 	}

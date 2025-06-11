@@ -12,7 +12,7 @@ namespace af
  */
 class Logger
 {
-public:
+  public:
 	enum Level
 	{
 		LDEBUG,
@@ -23,19 +23,19 @@ public:
 		LERROR
 	};
 
-public:
-	Logger(const char *func, const char *file, int line, enum Level level = LINFO, bool display_pid=false);
+  public:
+	Logger(const char *func, const char *file, int line, enum Level level = LINFO, bool display_pid = false);
 	~Logger();
 
 	inline std::ostream &stream() { return m_ss; }
 
-private:
+  private:
 	/**
 	 * @brief Reduces /a/b/c/d/e/f.foo into e/f.foo
 	 * @param filename file name to reduce
 	 * TODO: handle filesystems where separator is not a slash (like, a backslash)
 	 */
-	static const char * shorterFilename(const char *filename);
+	static const char *shorterFilename(const char *filename);
 
 	/**
 	 * @brief Make stringstreams have the same width.
@@ -45,13 +45,13 @@ private:
 	 */
 	static void align(std::stringstream &ss);
 
-public:
+  public:
 	static std::stringstream *log_batch;
 
-private:
-	std::ostringstream m_ss;  ///< accumulation stream
+  private:
+	std::ostringstream m_ss; ///< accumulation stream
 
-private:
+  private:
 	static size_t align_width;
 };
 
@@ -64,23 +64,33 @@ private:
  */
 class NoLogger
 {
-public:
+  public:
 	NoLogger() {}
-	template<typename T> friend const NoLogger& operator<<(const NoLogger& l, const T &) { return l; }
+	template <typename T> friend const NoLogger &operator<<(const NoLogger &l, const T &) { return l; }
 };
 
 } // namespace af
 
 #define DISPLAY_PID false
 #define AF_VERBOSE af::Logger(__func__, __FILE__, __LINE__, af::Logger::LVERBOSE, DISPLAY_PID).stream()
-#define AF_LOG     af::Logger(__func__, __FILE__, __LINE__, af::Logger::LINFO,    DISPLAY_PID).stream()
-#define AF_WARN    af::Logger(__func__, __FILE__, __LINE__, af::Logger::LWARNING, DISPLAY_PID).stream()
-#define AF_ERR     af::Logger(__func__, __FILE__, __LINE__, af::Logger::LERROR,   DISPLAY_PID).stream()
-#define AF_DEV     af::Logger(__func__, __FILE__, __LINE__, af::Logger::LDEVEL,   DISPLAY_PID).stream()
+#define AF_LOG af::Logger(__func__, __FILE__, __LINE__, af::Logger::LINFO, DISPLAY_PID).stream()
+#define AF_WARN af::Logger(__func__, __FILE__, __LINE__, af::Logger::LWARNING, DISPLAY_PID).stream()
+#define AF_ERR af::Logger(__func__, __FILE__, __LINE__, af::Logger::LERROR, DISPLAY_PID).stream()
+#define AF_DEV af::Logger(__func__, __FILE__, __LINE__, af::Logger::LDEVEL, DISPLAY_PID).stream()
 
-#define AF_LOGBATCH_BEGIN() { if (NULL != af::Logger::log_batch) delete af::Logger::log_batch; af::Logger::log_batch = new std::stringstream(); }
+#define AF_LOGBATCH_BEGIN()                                                                                  \
+	{                                                                                                        \
+		if (NULL != af::Logger::log_batch)                                                                   \
+			delete af::Logger::log_batch;                                                                    \
+		af::Logger::log_batch = new std::stringstream();                                                     \
+	}
 #define AF_LOGBATCH_PRINT() std::cerr << af::Logger::log_batch->str() << std::flush
-#define AF_LOGBATCH_END() { if (NULL != af::Logger::log_batch) delete af::Logger::log_batch; af::Logger::log_batch = NULL; }
+#define AF_LOGBATCH_END()                                                                                    \
+	{                                                                                                        \
+		if (NULL != af::Logger::log_batch)                                                                   \
+			delete af::Logger::log_batch;                                                                    \
+		af::Logger::log_batch = NULL;                                                                        \
+	}
 
 #endif // LOGGER_H
 
@@ -88,8 +98,7 @@ public:
 // This block must NOT be inside `#ifdef LOGGER_H` so that the test is performed
 // again for every single C++ file
 #ifdef AFOUTPUT
-#define AF_DEBUG af::Logger(__func__, __FILE__, __LINE__, af::Logger::LDEBUG,   DISPLAY_PID).stream()
+#define AF_DEBUG af::Logger(__func__, __FILE__, __LINE__, af::Logger::LDEBUG, DISPLAY_PID).stream()
 #else
 #define AF_DEBUG af::NoLogger()
 #endif // AFOUTPUT
-

@@ -14,7 +14,7 @@
 	search.js - TODO: description
 */
 
-"use strict";
+'use strict';
 
 function s_SearchOnClick()
 {
@@ -71,8 +71,8 @@ function s_SearchOnClick()
 				elLabel.textContent = c_GetTagTitle(tag) + ':';
 				elLabel.classList.add('label');
 				elTag.appendChild(elLabel);
-				elLabel.title = c_GetTagTip(tag)
-					+ '\nClick to (un)select all artists with "' + c_GetTagTitle(tag) + '" tag.';
+				elLabel.title = c_GetTagTip(tag) + '\nClick to (un)select all artists with "' +
+					c_GetTagTitle(tag) + '" tag.';
 				elLabel.m_elTag = elTag;
 				elLabel.onclick = function(e) {
 					let el = e.currentTarget.m_elTag;
@@ -89,7 +89,7 @@ function s_SearchOnClick()
 
 					let el = document.createElement('div');
 					el.m_hidden = false;
-					//elRole.appendChild(el);
+					// elRole.appendChild(el);
 					elTag.appendChild(el);
 					elRole.m_elArtists.push(el);
 					elTag.m_elArtists.push(el);
@@ -129,7 +129,7 @@ function s_SearchOnClick()
 
 		let el = $('search_artists_notassigned');
 		$('search_artists').m_elArtists.push(el);
-		el.m_user = {'id':'_null_'};
+		el.m_user = {'id': '_null_'};
 		el.classList.add('tag');
 		el.classList.add('artist');
 		el.onclick = function(e) {
@@ -193,19 +193,19 @@ function s_SearchOnClick()
 			};
 			$('search_flags').m_elFlags.push(el);
 		}
-		{// Search no flags:
+		{  // Search no flags:
 			let el = $('search_noflags');
 			$('search_flags').m_elFlags.push(el);
 			el.m_flag = '_null_';
 			specialElements.push(el);
 		}
-		{// Search AND flags:
+		{  // Search AND flags:
 			let el = $('search_flags_and');
 			$('search_flags').m_elFlags.push(el);
 			el.m_flag = '_AND_';
 			specialElements.push(el);
 		}
-		{// Search TSK flags:
+		{  // Search TSK flags:
 			let el = $('search_flags_tasks');
 			$('search_flags').m_elFlags.push(el);
 			el.m_flag = '_TSK_';
@@ -214,7 +214,7 @@ function s_SearchOnClick()
 
 		// Tags:
 		if ($('search_tags').m_elTags)
-		// Remove old, as a new location can has own tags.
+			// Remove old, as a new location can has own tags.
 			for (let i = 0; i < $('search_tags').m_elTags.length; i++)
 				if ($('search_tags').m_elTags[i].m_tag.indexOf('_') != 0)
 					$('search_tags').removeChild($('search_tags').m_elTags[i]);
@@ -234,19 +234,19 @@ function s_SearchOnClick()
 			};
 			$('search_tags').m_elTags.push(el);
 		}
-		{// Search no tags
+		{  // Search no tags
 			let el = $('search_notags');
 			$('search_tags').m_elTags.push(el);
 			el.m_tag = '_null_';
 			specialElements.push(el);
 		}
-		{// Search AND tags
+		{  // Search AND tags
 			let el = $('search_tags_and');
 			$('search_tags').m_elTags.push(el);
 			el.m_tag = '_AND_';
 			specialElements.push(el);
 		}
-		{// Search TSK tags:
+		{  // Search TSK tags:
 			let el = $('search_tags_tasks');
 			$('search_tags').m_elTags.push(el);
 			el.m_tag = '_TSK_';
@@ -255,8 +255,7 @@ function s_SearchOnClick()
 
 		for (let el of specialElements)
 		{
-			el.onclick = function(e)
-			{
+			el.onclick = function(e) {
 				c_ElToggleSelected(e);
 				if (ASSET && ASSET.filter)
 					s_ProcessGUI();
@@ -281,21 +280,20 @@ function s_ShowArtists()
 
 function s_ShowHideRoles()
 {
-	var show_disabled    = $('search_artists').m_show_disabled;
+	var show_disabled = $('search_artists').m_show_disabled;
 	var show_not_artists = $('search_artists').m_show_not_artists;
-	var elRoles          = $('search_artists').m_elRoles;
+	var elRoles = $('search_artists').m_elRoles;
 
 	for (let r = 0; r < elRoles.length; r++)
 	{
 		let role_hidden = true;
 
-		for (let t= 0; t < elRoles[r].m_elTags.length; t++)
+		for (let t = 0; t < elRoles[r].m_elTags.length; t++)
 		{
 			let tag_hidden = true;
 
 			for (let a = 0; a < elRoles[r].m_elTags[t].m_elArtists.length; a++)
 			{
-
 				let el = elRoles[r].m_elTags[t].m_elArtists[a];
 				el.m_hidden = false;
 
@@ -435,7 +433,7 @@ function s_ProcessGUI()
 				args.tags.push($('search_tags').m_elTags[i].m_tag);
 			}
 
-	let parm = ['priority','percent', 'finish', 'statmod', 'bodymod'];
+	let parm = ['priority', 'percent', 'finish', 'statmod', 'bodymod'];
 	for (let i = 0; i < parm.length; i++)
 	{
 		let min = c_GetElInteger($('search_' + parm[i] + 'min'));
@@ -449,7 +447,7 @@ function s_ProcessGUI()
 	if (c_Strip($('search_comment').textContent).length)
 		args.comment = c_Strip($('search_comment').textContent);
 
-	g_SetLocationArgs({"s_Search": args});
+	g_SetLocationArgs({'s_Search': args});
 }
 
 function s_Search(i_args)
@@ -487,7 +485,7 @@ function s_Search(i_args)
 			c_ElSetSelected(
 				$('search_tags').m_elTags[i], i_args.tags.indexOf($('search_tags').m_elTags[i].m_tag) != -1)
 
-	let parm = ['priority','percent', 'finish', 'statmod', 'bodymod'];
+			let parm = ['priority', 'percent', 'finish', 'statmod', 'bodymod'];
 	for (let i = 0; i < parm.length; i++)
 		if (i_args[parm[i]])
 		{
@@ -541,7 +539,7 @@ function s_Search(i_args)
 	}
 	args.path = RULES.root + g_CurPath();
 
-	n_Request({"send": {"search": args}, "func": s_ResultReceived});
+	n_Request({'send': {'search': args}, 'func': s_ResultReceived});
 	$('search').classList.add('waiting');
 }
 
@@ -595,19 +593,20 @@ function s_Found(i_args)
 		return;
 
 	var artists = i_args.artists;
-	var   flags = i_args.flags;
-	var    tags = i_args.tags;
+	var flags = i_args.flags;
+	var tags = i_args.tags;
 
 	var elArtists = $('search_artists').m_elArtists;
-	var elFlags   = $('search_flags').m_elFlags;
-	var elTags    = $('search_tags').m_elTags;
+	var elFlags = $('search_flags').m_elFlags;
+	var elTags = $('search_tags').m_elTags;
 
 	for (let e = 0; e < elArtists.length; e++)
 	{
 		let el = elArtists[e];
 		let artist = el.m_user.id;
 		// Skip special elements:
-		if (artist.charAt(0) == '_') continue;
+		if (artist.charAt(0) == '_')
+			continue;
 
 		if (artists.indexOf(artist) == -1)
 			el.classList.add('notfound');
@@ -620,7 +619,8 @@ function s_Found(i_args)
 		let el = elFlags[e];
 		let flag = el.m_flag;
 		// Skip special elements:
-		if (flag.charAt(0) == '_') continue;
+		if (flag.charAt(0) == '_')
+			continue;
 
 		if (flags.indexOf(flag) == -1)
 			el.classList.add('notfound');
@@ -633,7 +633,8 @@ function s_Found(i_args)
 		let el = elTags[e];
 		let tag = el.m_tag;
 		// Skip special elements:
-		if (tag.charAt(0) == '_') continue;
+		if (tag.charAt(0) == '_')
+			continue;
 
 		if (tags.indexOf(tag) == -1)
 			el.classList.add('notfound');
@@ -641,4 +642,3 @@ function s_Found(i_args)
 			el.classList.remove('notfound');
 	}
 }
-

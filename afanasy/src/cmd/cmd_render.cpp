@@ -1,8 +1,8 @@
 #include "cmd_render.h"
 
 #include "../libafanasy/environment.h"
-#include "../libafanasy/msgclasses/mcgeneral.h"
 #include "../libafanasy/msgclasses/mcafnodes.h"
+#include "../libafanasy/msgclasses/mcgeneral.h"
 #include "../libafanasy/regexp.h"
 #include "../libafanasy/render.h"
 
@@ -16,18 +16,18 @@ CmdRenderList::CmdRenderList()
 {
 	setCmd("rlist");
 	setInfo("List of online Renders.");
-	setMsgType( af::Msg::TJSON);
+	setMsgType(af::Msg::TJSON);
 }
-CmdRenderList::~CmdRenderList(){}
-bool CmdRenderList::v_processArguments( int argc, char** argv, af::Msg &msg)
+CmdRenderList::~CmdRenderList() {}
+bool CmdRenderList::v_processArguments(int argc, char **argv, af::Msg &msg)
 {
 	m_str << "{\"get\":{\"type\":\"renders\"}}";
 	return true;
 }
-void CmdRenderList::v_msgOut( af::Msg& msg)
+void CmdRenderList::v_msgOut(af::Msg &msg)
 {
-	af::MCAfNodes list( &msg);
-	list.v_stdOut( Verbose);
+	af::MCAfNodes list(&msg);
+	list.v_stdOut(Verbose);
 }
 
 CmdRenderResoucesList::CmdRenderResoucesList()
@@ -35,25 +35,25 @@ CmdRenderResoucesList::CmdRenderResoucesList()
 	setCmd("rrlist");
 	setArgsCount(1);
 	setInfo("List of resources of Renders specified by mask.");
-	setMsgType( af::Msg::TRendersResourcesRequestIds);
-	setMsgOutType( af::Msg::TRendersResources);
+	setMsgType(af::Msg::TRendersResourcesRequestIds);
+	setMsgOutType(af::Msg::TRendersResources);
 }
-CmdRenderResoucesList::~CmdRenderResoucesList(){}
-bool CmdRenderResoucesList::v_processArguments( int argc, char** argv, af::Msg &msg)
+CmdRenderResoucesList::~CmdRenderResoucesList() {}
+bool CmdRenderResoucesList::v_processArguments(int argc, char **argv, af::Msg &msg)
 {
 	std::string name = argv[0];
-	af::MCGeneral mcgeneral( name, 0);
-	msg.set( getMsgType(), &mcgeneral);
+	af::MCGeneral mcgeneral(name, 0);
+	msg.set(getMsgType(), &mcgeneral);
 	return true;
 }
-void CmdRenderResoucesList::v_msgOut( af::Msg& msg)
+void CmdRenderResoucesList::v_msgOut(af::Msg &msg)
 {
-	af::MCAfNodes list( &msg);
+	af::MCAfNodes list(&msg);
 	printf("size=%zu\n", list.getCount());
-	for( int i = 0; i < list.getCount(); i++)
+	for (int i = 0; i < list.getCount(); i++)
 	{
-	   af::Render * render = (af::Render*)(list.getNode(i));
-	   render->getHostRes().v_stdOut( false);
+		af::Render *render = (af::Render *)(list.getNode(i));
+		render->getHostRes().v_stdOut(false);
 	}
 }
 
@@ -63,17 +63,17 @@ CmdRenderPriority::CmdRenderPriority()
 	setArgsCount(2);
 	setInfo("Change render priority.");
 	setHelp("rpri [name] [priority] Set render priority.");
-	setMsgType( af::Msg::TJSON);
+	setMsgType(af::Msg::TJSON);
 }
-CmdRenderPriority::~CmdRenderPriority(){}
-bool CmdRenderPriority::v_processArguments( int argc, char** argv, af::Msg &msg)
+CmdRenderPriority::~CmdRenderPriority() {}
+bool CmdRenderPriority::v_processArguments(int argc, char **argv, af::Msg &msg)
 {
 	std::string name = af::toLower(argv[0]);
 	int priority = atoi(argv[1]);
 
-	af::jsonActionParamsStart( m_str, "renders", name);
+	af::jsonActionParamsStart(m_str, "renders", name);
 	m_str << "\n\"priority\":" << priority;
-	af::jsonActionParamsFinish( m_str);
+	af::jsonActionParamsFinish(m_str);
 
 	return true;
 }
@@ -84,16 +84,16 @@ CmdRenderNimby::CmdRenderNimby()
 	setArgsCount(1);
 	setInfo("Set render nimby.");
 	setHelp("rnimby [name] Set render to nimby state.");
-	setMsgType( af::Msg::TJSON);
+	setMsgType(af::Msg::TJSON);
 }
-CmdRenderNimby::~CmdRenderNimby(){}
-bool CmdRenderNimby::v_processArguments( int argc, char** argv, af::Msg &msg)
+CmdRenderNimby::~CmdRenderNimby() {}
+bool CmdRenderNimby::v_processArguments(int argc, char **argv, af::Msg &msg)
 {
 	std::string name = af::toLower(argv[0]);
 
-	af::jsonActionParamsStart( m_str, "renders", name);
+	af::jsonActionParamsStart(m_str, "renders", name);
 	m_str << "\n\"nimby\":true";
-	af::jsonActionParamsFinish( m_str);
+	af::jsonActionParamsFinish(m_str);
 
 	return true;
 }
@@ -104,16 +104,16 @@ CmdRenderNIMBY::CmdRenderNIMBY()
 	setArgsCount(1);
 	setInfo("Set render NIMBY.");
 	setHelp("rNIMBY [name] Set render to NIMBY state.");
-	setMsgType( af::Msg::TJSON);
+	setMsgType(af::Msg::TJSON);
 }
-CmdRenderNIMBY::~CmdRenderNIMBY(){}
-bool CmdRenderNIMBY::v_processArguments( int argc, char** argv, af::Msg &msg)
+CmdRenderNIMBY::~CmdRenderNIMBY() {}
+bool CmdRenderNIMBY::v_processArguments(int argc, char **argv, af::Msg &msg)
 {
 	std::string name = af::toLower(argv[0]);
 
-	af::jsonActionParamsStart( m_str, "renders", name);
+	af::jsonActionParamsStart(m_str, "renders", name);
 	m_str << "\n\"NIMBY\":true";
-	af::jsonActionParamsFinish( m_str);
+	af::jsonActionParamsFinish(m_str);
 
 	return true;
 }
@@ -124,17 +124,17 @@ CmdRenderUser::CmdRenderUser()
 	setArgsCount(2);
 	setInfo("Set render user.");
 	setHelp("ruser [name] [user] Set render for specified user.");
-	setMsgType( af::Msg::TJSON);
+	setMsgType(af::Msg::TJSON);
 }
-CmdRenderUser::~CmdRenderUser(){}
-bool CmdRenderUser::v_processArguments( int argc, char** argv, af::Msg &msg)
+CmdRenderUser::~CmdRenderUser() {}
+bool CmdRenderUser::v_processArguments(int argc, char **argv, af::Msg &msg)
 {
 	std::string name = af::toLower(argv[0]);
 	std::string user = argv[1];
 
-	af::jsonActionParamsStart( m_str, "renders", name);
+	af::jsonActionParamsStart(m_str, "renders", name);
 	m_str << "\n\"user_name\":" << "\"" << user << "\"";
-	af::jsonActionParamsFinish( m_str);
+	af::jsonActionParamsFinish(m_str);
 
 	return true;
 }
@@ -145,16 +145,16 @@ CmdRenderFree::CmdRenderFree()
 	setArgsCount(1);
 	setInfo("Set render free.");
 	setHelp("rfree [name] Set render free - unset nimby and NIMBY state.");
-	setMsgType( af::Msg::TJSON);
+	setMsgType(af::Msg::TJSON);
 }
-CmdRenderFree::~CmdRenderFree(){}
-bool CmdRenderFree::v_processArguments( int argc, char** argv, af::Msg &msg)
+CmdRenderFree::~CmdRenderFree() {}
+bool CmdRenderFree::v_processArguments(int argc, char **argv, af::Msg &msg)
 {
 	std::string name = af::toLower(argv[0]);
 
-	af::jsonActionParamsStart( m_str, "renders", name);
+	af::jsonActionParamsStart(m_str, "renders", name);
 	m_str << "\n\"nimby\":false";
-	af::jsonActionParamsFinish( m_str);
+	af::jsonActionParamsFinish(m_str);
 
 	return true;
 }
@@ -165,16 +165,16 @@ CmdRenderPause::CmdRenderPause()
 	setArgsCount(1);
 	setInfo("Set render paused.");
 	setHelp("rpause [name] Set render paused state.");
-	setMsgType( af::Msg::TJSON);
+	setMsgType(af::Msg::TJSON);
 }
-CmdRenderPause::~CmdRenderPause(){}
-bool CmdRenderPause::v_processArguments( int argc, char** argv, af::Msg &msg)
+CmdRenderPause::~CmdRenderPause() {}
+bool CmdRenderPause::v_processArguments(int argc, char **argv, af::Msg &msg)
 {
 	std::string name = af::toLower(argv[0]);
 
-	af::jsonActionParamsStart( m_str, "renders", name);
+	af::jsonActionParamsStart(m_str, "renders", name);
 	m_str << "\n\"paused\":true";
-	af::jsonActionParamsFinish( m_str);
+	af::jsonActionParamsFinish(m_str);
 
 	return true;
 }
@@ -184,16 +184,16 @@ CmdRenderUnpause::CmdRenderUnpause()
 	setArgsCount(1);
 	setInfo("Set render unpaused.");
 	setHelp("runpause [name] Unset render paused state.");
-	setMsgType( af::Msg::TJSON);
+	setMsgType(af::Msg::TJSON);
 }
-CmdRenderUnpause::~CmdRenderUnpause(){}
-bool CmdRenderUnpause::v_processArguments( int argc, char** argv, af::Msg &msg)
+CmdRenderUnpause::~CmdRenderUnpause() {}
+bool CmdRenderUnpause::v_processArguments(int argc, char **argv, af::Msg &msg)
 {
 	std::string name = af::toLower(argv[0]);
 
-	af::jsonActionParamsStart( m_str, "renders", name);
+	af::jsonActionParamsStart(m_str, "renders", name);
 	m_str << "\n\"paused\":false";
-	af::jsonActionParamsFinish( m_str);
+	af::jsonActionParamsFinish(m_str);
 
 	return true;
 }
@@ -204,13 +204,13 @@ CmdRenderEjectTasks::CmdRenderEjectTasks()
 	setArgsCount(1);
 	setInfo("Eject tasks from render.");
 	setHelp("reject [name] Eject tasks from specified render.");
-	setMsgType( af::Msg::TJSON);
+	setMsgType(af::Msg::TJSON);
 }
-CmdRenderEjectTasks::~CmdRenderEjectTasks(){}
-bool CmdRenderEjectTasks::v_processArguments( int argc, char** argv, af::Msg &msg)
+CmdRenderEjectTasks::~CmdRenderEjectTasks() {}
+bool CmdRenderEjectTasks::v_processArguments(int argc, char **argv, af::Msg &msg)
 {
 	std::string name = af::toLower(argv[0]);
-	af::jsonActionOperation( m_str, "renders", "eject_tasks", name);
+	af::jsonActionOperation(m_str, "renders", "eject_tasks", name);
 	return true;
 }
 
@@ -220,13 +220,13 @@ CmdRenderEjectNotMyTasks::CmdRenderEjectNotMyTasks()
 	setArgsCount(1);
 	setInfo("Eject not my tasks from render.");
 	setHelp("rejnotmy [name] Eject not my tasks from specified render.");
-	setMsgType( af::Msg::TJSON);
+	setMsgType(af::Msg::TJSON);
 }
-CmdRenderEjectNotMyTasks::~CmdRenderEjectNotMyTasks(){}
-bool CmdRenderEjectNotMyTasks::v_processArguments( int argc, char** argv, af::Msg &msg)
+CmdRenderEjectNotMyTasks::~CmdRenderEjectNotMyTasks() {}
+bool CmdRenderEjectNotMyTasks::v_processArguments(int argc, char **argv, af::Msg &msg)
 {
 	std::string name = af::toLower(argv[0]);
-	af::jsonActionOperation( m_str, "renders", "eject_tasks_keep_my", name);
+	af::jsonActionOperation(m_str, "renders", "eject_tasks_keep_my", name);
 	return true;
 }
 
@@ -235,10 +235,10 @@ CmdRenderExit::CmdRenderExit()
 	setCmd("rexit");
 	setInfo("Exit render.");
 	setHelp("rexit [name] Exit render with specified name, in no name porivieded, local host name used.");
-	setMsgType( af::Msg::TJSON);
+	setMsgType(af::Msg::TJSON);
 }
-CmdRenderExit::~CmdRenderExit(){}
-bool CmdRenderExit::v_processArguments( int argc, char** argv, af::Msg &msg)
+CmdRenderExit::~CmdRenderExit() {}
+bool CmdRenderExit::v_processArguments(int argc, char **argv, af::Msg &msg)
 {
 	std::string name(af::Environment::getHostName());
 	if (argc > 0)
@@ -252,15 +252,15 @@ CmdRenderDelete::CmdRenderDelete()
 	setCmd("rdel");
 	setInfo("Delete render.");
 	setHelp("rdel [name] Delete render with specified name, in no name porivieded, local host name used.");
-	setMsgType( af::Msg::TJSON);
+	setMsgType(af::Msg::TJSON);
 }
-CmdRenderDelete::~CmdRenderDelete(){}
-bool CmdRenderDelete::v_processArguments( int argc, char** argv, af::Msg &msg)
+CmdRenderDelete::~CmdRenderDelete() {}
+bool CmdRenderDelete::v_processArguments(int argc, char **argv, af::Msg &msg)
 {
 	std::string name(af::Environment::getHostName());
 	if (argc > 0)
 		name = af::toLower(argv[0]);
-	af::jsonActionOperation( m_str, "renders", "delete", name);
+	af::jsonActionOperation(m_str, "renders", "delete", name);
 	return true;
 }
 
@@ -270,14 +270,15 @@ CmdRenderWOLSleep::CmdRenderWOLSleep()
 	setInfo("Ask render(s) to sleep.");
 	setHelp("rsleep [name] Ask render(s) to sleep.");
 	setArgsCount(1);
-	setMsgType( af::Msg::TJSON);
+	setMsgType(af::Msg::TJSON);
 }
-CmdRenderWOLSleep::~CmdRenderWOLSleep(){}
-bool CmdRenderWOLSleep::v_processArguments( int argc, char** argv, af::Msg &msg)
+CmdRenderWOLSleep::~CmdRenderWOLSleep() {}
+bool CmdRenderWOLSleep::v_processArguments(int argc, char **argv, af::Msg &msg)
 {
 	std::string mask = af::toLower(argv[0]);
-	if( af::RegExp::Validate( mask) == false ) return false;
-	af::jsonActionOperation( m_str, "renders", "wol_sleep", mask);
+	if (af::RegExp::Validate(mask) == false)
+		return false;
+	af::jsonActionOperation(m_str, "renders", "wol_sleep", mask);
 	return true;
 }
 
@@ -287,14 +288,15 @@ CmdRenderWOLWake::CmdRenderWOLWake()
 	setInfo("Ask sleeping render(s) to wake up.");
 	setHelp("rwake [name] Ask render(s) to wake up.");
 	setArgsCount(1);
-	setMsgType( af::Msg::TJSON);
+	setMsgType(af::Msg::TJSON);
 }
-CmdRenderWOLWake::~CmdRenderWOLWake(){}
-bool CmdRenderWOLWake::v_processArguments( int argc, char** argv, af::Msg &msg)
+CmdRenderWOLWake::~CmdRenderWOLWake() {}
+bool CmdRenderWOLWake::v_processArguments(int argc, char **argv, af::Msg &msg)
 {
 	std::string mask = af::toLower(argv[0]);
-	if( af::RegExp::Validate( mask) == false ) return false;
-	af::jsonActionOperation( m_str, "renders", "wol_wake", mask);
+	if (af::RegExp::Validate(mask) == false)
+		return false;
+	af::jsonActionOperation(m_str, "renders", "wol_wake", mask);
 	return true;
 }
 
@@ -304,18 +306,19 @@ CmdRenderServiceOn::CmdRenderServiceOn()
 	setInfo("Enable disabled render service.");
 	setHelp("rsrvon [name|mask] [service] Enable disabled render service.");
 	setArgsCount(2);
-	setMsgType( af::Msg::TJSON);
+	setMsgType(af::Msg::TJSON);
 }
-CmdRenderServiceOn::~CmdRenderServiceOn(){}
-bool CmdRenderServiceOn::v_processArguments( int argc, char** argv, af::Msg &msg)
+CmdRenderServiceOn::~CmdRenderServiceOn() {}
+bool CmdRenderServiceOn::v_processArguments(int argc, char **argv, af::Msg &msg)
 {
 	std::string mask = af::toLower(argv[0]);
-	if( af::RegExp::Validate( mask) == false ) return false;
+	if (af::RegExp::Validate(mask) == false)
+		return false;
 
-	af::jsonActionOperationStart( m_str, "renders", "service", mask);
+	af::jsonActionOperationStart(m_str, "renders", "service", mask);
 	m_str << ",\n\"name\":\"" << argv[1] << "\"";
 	m_str << ",\n\"enable\":true";
-	af::jsonActionOperationFinish( m_str);
+	af::jsonActionOperationFinish(m_str);
 
 	return true;
 }
@@ -326,18 +329,19 @@ CmdRenderServiceOff::CmdRenderServiceOff()
 	setInfo("Disable render service.");
 	setHelp("rsrvoff [name|mask] [service] Disable render service.");
 	setArgsCount(2);
-	setMsgType( af::Msg::TJSON);
+	setMsgType(af::Msg::TJSON);
 }
-CmdRenderServiceOff::~CmdRenderServiceOff(){}
-bool CmdRenderServiceOff::v_processArguments( int argc, char** argv, af::Msg &msg)
+CmdRenderServiceOff::~CmdRenderServiceOff() {}
+bool CmdRenderServiceOff::v_processArguments(int argc, char **argv, af::Msg &msg)
 {
 	std::string mask = af::toLower(argv[0]);
-	if( af::RegExp::Validate( mask) == false ) return false;
+	if (af::RegExp::Validate(mask) == false)
+		return false;
 
-	af::jsonActionOperationStart( m_str, "renders", "service", mask);
+	af::jsonActionOperationStart(m_str, "renders", "service", mask);
 	m_str << ",\n\"name\":\"" << argv[1] << "\"";
 	m_str << ",\n\"enable\":false";
-	af::jsonActionOperationFinish( m_str);
+	af::jsonActionOperationFinish(m_str);
 
 	return true;
 }

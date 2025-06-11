@@ -2,8 +2,8 @@
 
 #include "../libafanasy/msg.h"
 
-#include "watch.h"
 #include "listitems.h"
+#include "watch.h"
 
 #include <QLayout>
 
@@ -11,28 +11,20 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-WndList::WndList( const QString & Name, int monType ):
-   Wnd( Name),
-   type( monType)
+WndList::WndList(const QString &Name, int monType) : Wnd(Name), type(monType)
 {
-   layout = new QVBoxLayout( this);
-   layout->setContentsMargins( 1, 1, 1, 1);
+	layout = new QVBoxLayout(this);
+	layout->setContentsMargins(1, 1, 1, 1);
 
-   Watch::opened[type] = this;
+	Watch::opened[type] = this;
 }
 
-WndList::~WndList()
+WndList::~WndList() { Watch::opened[type] = NULL; }
+
+void WndList::setList(ListItems *list)
 {
-   Watch::opened[type] = NULL;
+	itemslist = list;
+	layout->addWidget(itemslist);
 }
 
-void WndList::setList( ListItems * list)
-{
-   itemslist = list;
-   layout->addWidget( itemslist);
-}
-
-void WndList::repaintItems()
-{
-   itemslist ->repaintItems();
-}
+void WndList::repaintItems() { itemslist->repaintItems(); }

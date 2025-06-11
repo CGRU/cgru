@@ -14,46 +14,46 @@ class ListItems;
 
 class ItemDelegate : public QAbstractItemDelegate
 {
-public:
-    ItemDelegate( QWidget *parent = 0);
+  public:
+	ItemDelegate(QWidget *parent = 0);
 
-    void paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+	void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+	QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-    void emitSizeHintChanged( const QModelIndex &index);
+	void emitSizeHintChanged(const QModelIndex &index);
 };
 
-class ViewItems: public QListView
+class ViewItems : public QListView
 {
-public:
-    ViewItems( ListItems * parent);
-    virtual ~ViewItems();
+  public:
+	ViewItems(ListItems *parent);
+	virtual ~ViewItems();
 
-    void emitSizeHintChanged( const QModelIndex &index);
+	void emitSizeHintChanged(const QModelIndex &index);
 
-    inline void updateGeometries() { QListView::updateGeometries();}
+	inline void updateGeometries() { QListView::updateGeometries(); }
 
-    void repaintViewport();
+	void repaintViewport();
 
-protected:
-    void keyPressEvent( QKeyEvent * event);
-    void mousePressEvent( QMouseEvent * event);
-    #ifdef DRAWBACK
-    void paintEvent ( QPaintEvent * event );
-    #endif
+  protected:
+	void keyPressEvent(QKeyEvent *event);
+	void mousePressEvent(QMouseEvent *event);
+#ifdef DRAWBACK
+	void paintEvent(QPaintEvent *event);
+#endif
 
-private:
-    void loadImage();
+  private:
+	void loadImage();
 
-private:
-    ItemDelegate * itemDelegate;
+  private:
+	ItemDelegate *itemDelegate;
 
- 	ListItems * m_listitems;
+	ListItems *m_listitems;
 
-    QPixmap m_back_pixmap;
-    QString m_back_filename;
-    int m_back_angle;
-    int m_back_offset_x;
-    int m_back_offset_y;
+	QPixmap m_back_pixmap;
+	QString m_back_filename;
+	int m_back_angle;
+	int m_back_offset_x;
+	int m_back_offset_y;
 };

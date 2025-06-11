@@ -53,9 +53,12 @@ const char *BlockData::DataModeFromMsgType(int i_type)
 }
 int32_t BlockData::DataModeFromString(const std::string &i_mode)
 {
-	if (i_mode == DataMode_Progress) return af::Msg::TBlocksProgress;
-	if (i_mode == DataMode_Properties) return af::Msg::TBlocksProperties;
-	if (i_mode == DataMode_Full) return af::Msg::TBlocks;
+	if (i_mode == DataMode_Progress)
+		return af::Msg::TBlocksProgress;
+	if (i_mode == DataMode_Properties)
+		return af::Msg::TBlocksProperties;
+	if (i_mode == DataMode_Full)
+		return af::Msg::TBlocks;
 	AFERRAR("BlockData::DataModeFromString: Unknown data mode '%s'", i_mode.c_str())
 	return 0;
 }
@@ -85,10 +88,10 @@ void BlockData::initDefaults()
 	m_need_memory /************/ = -1;
 	m_need_power /*************/ = -1;
 	m_need_hdd /***************/ = -1;
-	m_need_cpu_freq_mgz          = -1;
-	m_need_cpu_cores             = -1;
-	m_need_cpu_freq_cores        = -1;
-	m_need_gpu_mem_mb            = -1;
+	m_need_cpu_freq_mgz = -1;
+	m_need_cpu_cores = -1;
+	m_need_cpu_freq_cores = -1;
+	m_need_gpu_mem_mb = -1;
 	m_errors_retries /*********/ = -1;
 	m_errors_avoid_host /******/ = -1;
 	m_errors_task_same_host /**/ = -1;
@@ -106,17 +109,17 @@ void BlockData::initDefaults()
 	m_time_started /***********/ = 0;
 	m_time_done /**************/ = 0;
 
-	p_percentage         = 0;
-	p_error_hosts        = 0;
-	p_avoid_hosts        = 0;
-	p_tasks_ready        = 0;
-	p_tasks_done         = 0;
-	p_tasks_error        = 0;
-	p_tasks_skipped      = 0;
-	p_tasks_warning      = 0;
-	p_tasks_waitrec      = 0;
-	p_tasks_waitdep      = 0;
-	p_tasks_suspended    = 0;
+	p_percentage = 0;
+	p_error_hosts = 0;
+	p_avoid_hosts = 0;
+	p_tasks_ready = 0;
+	p_tasks_done = 0;
+	p_tasks_error = 0;
+	p_tasks_skipped = 0;
+	p_tasks_warning = 0;
+	p_tasks_waitrec = 0;
+	p_tasks_waitdep = 0;
+	p_tasks_suspended = 0;
 	p_tasks_run_time_min = 0;
 	p_tasks_run_time_max = 0;
 	p_tasks_run_time_sum = 0;
@@ -171,10 +174,10 @@ void BlockData::jsonRead(const JSON &i_object, std::string *io_changes)
 	jr_int32("need_memory" /***********/, m_need_memory /************/, i_object, io_changes);
 	jr_int32("need_power" /************/, m_need_power /*************/, i_object, io_changes);
 	jr_int32("need_hdd" /**************/, m_need_hdd /***************/, i_object, io_changes);
-	jr_int32("need_cpu_freq_mgz",         m_need_cpu_freq_mgz,          i_object, io_changes);
-	jr_int32("need_cpu_cores",            m_need_cpu_cores,             i_object, io_changes);
-	jr_int32("need_cpu_freq_cores",       m_need_cpu_freq_cores,        i_object, io_changes);
-	jr_int32("need_gpu_mem_mb",           m_need_gpu_mem_mb,            i_object, io_changes);
+	jr_int32("need_cpu_freq_mgz", m_need_cpu_freq_mgz, i_object, io_changes);
+	jr_int32("need_cpu_cores", m_need_cpu_cores, i_object, io_changes);
+	jr_int32("need_cpu_freq_cores", m_need_cpu_freq_cores, i_object, io_changes);
+	jr_int32("need_gpu_mem_mb", m_need_gpu_mem_mb, i_object, io_changes);
 	jr_regexp("depend_mask" /**********/, m_depend_mask /************/, i_object, io_changes);
 	jr_regexp("tasks_depend_mask" /****/, m_tasks_depend_mask /******/, i_object, io_changes);
 	jr_regexp("hosts_mask" /***********/, m_hosts_mask /*************/, i_object, io_changes);
@@ -208,13 +211,15 @@ void BlockData::jsonRead(const JSON &i_object, std::string *io_changes)
 	jr_int64("time_started" /***********/, m_time_started /***********/, i_object, io_changes);
 	jr_int64("time_done" /**************/, m_time_done /**************/, i_object, io_changes);
 	jr_stringmap("environment" /********/, m_environment /************/, i_object, io_changes);
-	jr_intmap("tickets",                   m_tickets,                    i_object, io_changes);
+	jr_intmap("tickets", m_tickets, i_object, io_changes);
 
-	if (m_capacity < 1) m_capacity = 1;
+	if (m_capacity < 1)
+		m_capacity = 1;
 
 	// Paramers below are not editable and read only on creation
 	// When use edit parameters, log provided to store changes
-	if (io_changes) return;
+	if (io_changes)
+		return;
 
 	jr_int64("st", m_state, i_object);
 	jr_int64("flags", m_flags, i_object);
@@ -274,15 +279,16 @@ void BlockData::jsonRead(const JSON &i_object, std::string *io_changes)
 
 		// Frames per tasks for not-nueric needed
 		// to compute tasks dependency with other block
-		if (frames_per_task != 0) m_frames_per_task = frames_per_task;
+		if (frames_per_task != 0)
+			m_frames_per_task = frames_per_task;
 	}
 
 	if ((capacity_coeff_min != -1) || (capacity_coeff_max != -1))
 		setVariableCapacity(capacity_coeff_min, capacity_coeff_max);
 
 	if (isMultiHost())
-		setMultiHost(
-			multihost_min, multihost_max, multihost_max_wait, multihost_service, multihost_service_wait);
+		setMultiHost(multihost_min, multihost_max, multihost_max_wait, multihost_service,
+					 multihost_service_wait);
 	else
 		m_flags = m_flags & (~FMultiHost);
 }
@@ -346,7 +352,7 @@ void BlockData::jsonReadAndAppendTasks(const JSON &i_object)
 	}
 
 	if (NULL != old_tasks_data)
-		delete [] old_tasks_data;
+		delete[] old_tasks_data;
 
 	setHasAppendedTasks();
 }
@@ -389,7 +395,8 @@ void BlockData::jsonWrite(std::ostringstream &o_str, int i_type) const
 		case Msg::TBlocksProperties:
 			o_str << "\n\"command\":\"" << af::strEscape(m_command) << "\"";
 			o_str << ",\n\"tasks_name\":\"" << m_tasks_name << "\"";
-			if (m_parser.size()) o_str << ",\n\"parser\":\"" << m_parser << "\"";
+			if (m_parser.size())
+				o_str << ",\n\"parser\":\"" << m_parser << "\"";
 			if (m_working_directory.size())
 				o_str << ",\n\"working_directory\":\"" << af::strEscape(m_working_directory) << "\"";
 			if (m_files.size())
@@ -397,17 +404,22 @@ void BlockData::jsonWrite(std::ostringstream &o_str, int i_type) const
 				o_str << ",\n\"files\":[";
 				for (int i = 0; i < m_files.size(); i++)
 				{
-					if (i) o_str << ",";
+					if (i)
+						o_str << ",";
 					o_str << "\"" << af::strEscape(m_files[i]) << "\"";
 				}
 				o_str << "]";
 			}
-			if (m_command_pre.size()) o_str << ",\n\"cmd_pre\":\"" << af::strEscape(m_command_pre) << "\"";
-			if (m_command_post.size()) o_str << ",\n\"cmd_post\":\"" << af::strEscape(m_command_post) << "\"";
+			if (m_command_pre.size())
+				o_str << ",\n\"cmd_pre\":\"" << af::strEscape(m_command_pre) << "\"";
+			if (m_command_post.size())
+				o_str << ",\n\"cmd_post\":\"" << af::strEscape(m_command_post) << "\"";
 			if (m_multihost_service.size())
 				o_str << ",\n\"multihost_service\":\"" << m_multihost_service << "\"";
-			if (m_custom_data.size()) o_str << ",\n\"custom_data\":\"" << af::strEscape(m_custom_data) << "\"";
-			if (m_environment.size()) af::jw_stringmap("environment", m_environment, o_str);
+			if (m_custom_data.size())
+				o_str << ",\n\"custom_data\":\"" << af::strEscape(m_custom_data) << "\"";
+			if (m_environment.size())
+				af::jw_stringmap("environment", m_environment, o_str);
 			// o_str << ",\n\"parser_coeff\":\:"        << m_parser_coeff              << "\"";
 			o_str << ',';
 
@@ -425,7 +437,8 @@ void BlockData::jsonWrite(std::ostringstream &o_str, int i_type) const
 			o_str << ",\n\"frames_inc\":" << m_frames_inc;
 			if (m_sequential != 1) // this is the default value
 				o_str << ",\n\"sequential\":" << m_sequential;
-			if (isDependSubTask()) o_str << ",\n\"depend_sub_task\":true";
+			if (isDependSubTask())
+				o_str << ",\n\"depend_sub_task\":true";
 			if (canVarCapacity())
 			{
 				o_str << ",\n\"capacity_coeff_min\":" << m_capacity_coeff_min;
@@ -440,42 +453,61 @@ void BlockData::jsonWrite(std::ostringstream &o_str, int i_type) const
 				//			if( canMasterRunOnSlaveHost())
 				//                o_str << ",\n\"multihost_master_on_slave\":true";
 			}
-			if (m_file_size_min > 0) o_str << ",\n\"file_size_min\":" << m_file_size_min;
-			if (m_file_size_max > 0) o_str << ",\n\"file_size_max\":" << m_file_size_max;
-			if (m_time_started > 0) o_str << ",\n\"time_started\":" << m_time_started;
-			if (m_time_done > 0) o_str << ",\n\"time_done\":" << m_time_done;
-			if (m_max_running_tasks != -1) o_str << ",\n\"max_running_tasks\":" << m_max_running_tasks;
+			if (m_file_size_min > 0)
+				o_str << ",\n\"file_size_min\":" << m_file_size_min;
+			if (m_file_size_max > 0)
+				o_str << ",\n\"file_size_max\":" << m_file_size_max;
+			if (m_time_started > 0)
+				o_str << ",\n\"time_started\":" << m_time_started;
+			if (m_time_done > 0)
+				o_str << ",\n\"time_done\":" << m_time_done;
+			if (m_max_running_tasks != -1)
+				o_str << ",\n\"max_running_tasks\":" << m_max_running_tasks;
 			if (m_max_running_tasks_per_host != -1)
 				o_str << ",\n\"max_running_tasks_per_host\":" << m_max_running_tasks_per_host;
-			if (m_need_memory > 0) o_str << ",\n\"need_memory\":" << m_need_memory;
-			if (m_need_power > 0) o_str << ",\n\"need_power\":" << m_need_power;
-			if (m_need_hdd > 0) o_str << ",\n\"need_hdd\":" << m_need_hdd;
+			if (m_need_memory > 0)
+				o_str << ",\n\"need_memory\":" << m_need_memory;
+			if (m_need_power > 0)
+				o_str << ",\n\"need_power\":" << m_need_power;
+			if (m_need_hdd > 0)
+				o_str << ",\n\"need_hdd\":" << m_need_hdd;
 
-			if (m_need_cpu_freq_mgz   > -1) o_str << ",\n\"need_cpu_freq_mgz\":"   << m_need_cpu_freq_mgz;
-			if (m_need_cpu_cores      > -1) o_str << ",\n\"need_cpu_cores\":"      << m_need_cpu_cores;
-			if (m_need_cpu_freq_cores > -1) o_str << ",\n\"need_cpu_freq_cores\":" << m_need_cpu_freq_cores;
-			if (m_need_gpu_mem_mb     > -1) o_str << ",\n\"need_gpu_mem_mb\":"     << m_need_gpu_mem_mb;
+			if (m_need_cpu_freq_mgz > -1)
+				o_str << ",\n\"need_cpu_freq_mgz\":" << m_need_cpu_freq_mgz;
+			if (m_need_cpu_cores > -1)
+				o_str << ",\n\"need_cpu_cores\":" << m_need_cpu_cores;
+			if (m_need_cpu_freq_cores > -1)
+				o_str << ",\n\"need_cpu_freq_cores\":" << m_need_cpu_freq_cores;
+			if (m_need_gpu_mem_mb > -1)
+				o_str << ",\n\"need_gpu_mem_mb\":" << m_need_gpu_mem_mb;
 
-			if (m_errors_retries != -1) o_str << ",\n\"errors_retries\":" << int(m_errors_retries);
-			if (m_errors_avoid_host != -1) o_str << ",\n\"errors_avoid_host\":" << int(m_errors_avoid_host);
+			if (m_errors_retries != -1)
+				o_str << ",\n\"errors_retries\":" << int(m_errors_retries);
+			if (m_errors_avoid_host != -1)
+				o_str << ",\n\"errors_avoid_host\":" << int(m_errors_avoid_host);
 			if (m_errors_task_same_host != -1)
 				o_str << ",\n\"errors_task_same_host\":" << int(m_errors_task_same_host);
 			if (m_errors_forgive_time != -1)
 				o_str << ",\n\"errors_forgive_time\":" << int(m_errors_forgive_time);
 			if (m_task_progress_change_timeout != -1)
 				o_str << ",\n\"task_progress_change_timeout\":" << int(m_task_progress_change_timeout);
-			if (m_task_max_run_time > 0) o_str << ",\n\"task_max_run_time\":" << int(m_task_max_run_time);
-			if (m_task_min_run_time > 0) o_str << ",\n\"task_min_run_time\":" << int(m_task_min_run_time);
+			if (m_task_max_run_time > 0)
+				o_str << ",\n\"task_max_run_time\":" << int(m_task_max_run_time);
+			if (m_task_min_run_time > 0)
+				o_str << ",\n\"task_min_run_time\":" << int(m_task_min_run_time);
 
-			if (hasDependMask()) o_str << ",\n\"depend_mask\":\"" << m_depend_mask.getPattern() << "\"";
+			if (hasDependMask())
+				o_str << ",\n\"depend_mask\":\"" << m_depend_mask.getPattern() << "\"";
 			if (hasTasksDependMask())
 				o_str << ",\n\"tasks_depend_mask\":\"" << m_tasks_depend_mask.getPattern() << "\"";
-			if (hasHostsMask()) o_str << ",\n\"hosts_mask\":\"" << m_hosts_mask.getPattern() << "\"";
+			if (hasHostsMask())
+				o_str << ",\n\"hosts_mask\":\"" << m_hosts_mask.getPattern() << "\"";
 			if (hasHostsMaskExclude())
 				o_str << ",\n\"hosts_mask_exclude\":\"" << m_hosts_mask_exclude.getPattern() << "\"";
 			if (hasNeedProperties())
 				o_str << ",\n\"need_properties\":\"" << m_need_properties.getPattern() << "\"";
-			if (m_tickets.size()) af::jw_intmap("tickets", m_tickets, o_str);
+			if (m_tickets.size())
+				af::jw_intmap("tickets", m_tickets, o_str);
 
 			o_str << ',';
 
@@ -484,7 +516,8 @@ void BlockData::jsonWrite(std::ostringstream &o_str, int i_type) const
 			o_str << "\n\"block_num\":" << m_block_num;
 
 			// Below parameters are calculated and not needed to store:
-			if (i_type == 0) break;
+			if (i_type == 0)
+				break;
 
 			o_str << ",\n\"st\":" << m_state;
 			if (m_state != 0)
@@ -492,27 +525,42 @@ void BlockData::jsonWrite(std::ostringstream &o_str, int i_type) const
 				o_str << ",\n";
 				jw_stateJob(m_state, o_str);
 			}
-			if (m_job_id != 0) o_str << ",\n\"job_id\":" << m_job_id;
+			if (m_job_id != 0)
+				o_str << ",\n\"job_id\":" << m_job_id;
 
 			if (m_running_tasks_counter > 0)
 				o_str << ",\n\"running_tasks_counter\":" << m_running_tasks_counter;
 			if (m_running_capacity_counter > 0)
 				o_str << ",\n\"running_capacity_total\":" << m_running_capacity_counter;
 
-			if (p_percentage > 0) o_str << ",\n\"p_percentage\":" << int(p_percentage);
-			if (p_error_hosts > 0) o_str << ",\n\"p_error_hosts\":" << p_error_hosts;
-			if (p_avoid_hosts > 0) o_str << ",\n\"p_avoid_hosts\":" << p_avoid_hosts;
-			if (p_tasks_ready > 0) o_str << ",\n\"p_tasks_ready\":" << p_tasks_ready;
-			if (p_tasks_done > 0) o_str << ",\n\"p_tasks_done\":" << p_tasks_done;
-			if (p_tasks_error > 0) o_str << ",\n\"p_tasks_error\":" << p_tasks_error;
-			if (p_tasks_skipped > 0) o_str << ",\n\"p_tasks_skipped\":" << p_tasks_skipped;
-			if (p_tasks_warning > 0) o_str << ",\n\"p_tasks_warning\":" << p_tasks_warning;
-			if (p_tasks_waitrec > 0) o_str << ",\n\"p_tasks_waitrec\":" << p_tasks_waitrec;
-			if (p_tasks_waitdep > 0) o_str << ",\n\"p_tasks_waitdep\":" << p_tasks_waitdep;
-			if (p_tasks_suspended > 0) o_str << ",\n\"p_tasks_suspended\":" << p_tasks_suspended;
-			if (p_tasks_run_time_min > 0) o_str << ",\n\"p_tasks_run_time_min\":" << p_tasks_run_time_min;
-			if (p_tasks_run_time_max > 0) o_str << ",\n\"p_tasks_run_time_max\":" << p_tasks_run_time_max;
-			if (p_tasks_run_time_sum > 0) o_str << ",\n\"p_tasks_run_time_sum\":" << p_tasks_run_time_sum;
+			if (p_percentage > 0)
+				o_str << ",\n\"p_percentage\":" << int(p_percentage);
+			if (p_error_hosts > 0)
+				o_str << ",\n\"p_error_hosts\":" << p_error_hosts;
+			if (p_avoid_hosts > 0)
+				o_str << ",\n\"p_avoid_hosts\":" << p_avoid_hosts;
+			if (p_tasks_ready > 0)
+				o_str << ",\n\"p_tasks_ready\":" << p_tasks_ready;
+			if (p_tasks_done > 0)
+				o_str << ",\n\"p_tasks_done\":" << p_tasks_done;
+			if (p_tasks_error > 0)
+				o_str << ",\n\"p_tasks_error\":" << p_tasks_error;
+			if (p_tasks_skipped > 0)
+				o_str << ",\n\"p_tasks_skipped\":" << p_tasks_skipped;
+			if (p_tasks_warning > 0)
+				o_str << ",\n\"p_tasks_warning\":" << p_tasks_warning;
+			if (p_tasks_waitrec > 0)
+				o_str << ",\n\"p_tasks_waitrec\":" << p_tasks_waitrec;
+			if (p_tasks_waitdep > 0)
+				o_str << ",\n\"p_tasks_waitdep\":" << p_tasks_waitdep;
+			if (p_tasks_suspended > 0)
+				o_str << ",\n\"p_tasks_suspended\":" << p_tasks_suspended;
+			if (p_tasks_run_time_min > 0)
+				o_str << ",\n\"p_tasks_run_time_min\":" << p_tasks_run_time_min;
+			if (p_tasks_run_time_max > 0)
+				o_str << ",\n\"p_tasks_run_time_max\":" << p_tasks_run_time_max;
+			if (p_tasks_run_time_sum > 0)
+				o_str << ",\n\"p_tasks_run_time_sum\":" << p_tasks_run_time_sum;
 
 			if (m_srv_info.size())
 				o_str << ",\n\"srv_info\":\"" << m_srv_info << "\"";
@@ -541,7 +589,8 @@ void BlockData::jsonWriteTasks(std::ostringstream &o_str) const
 	o_str << "\"tasks\":[\n";
 	for (int t = 0; t < m_tasks_num; t++)
 	{
-		if (t != 0) o_str << ",\n";
+		if (t != 0)
+			o_str << ",\n";
 		m_tasks_data[t]->jsonWrite(o_str);
 	}
 	o_str << "\n]";
@@ -557,16 +606,16 @@ void BlockData::isValid(std::string *o_err) const
 	{
 		if (m_tasks_data == NULL)
 		{
-			*o_err += "Block '" + m_name + "'[" + af::itos(m_block_num)
-					  + "]: Tasks data is null on not numeric block.";
+			*o_err += "Block '" + m_name + "'[" + af::itos(m_block_num) +
+					  "]: Tasks data is null on not numeric block.";
 		}
 		else
 			for (int t = 0; t < m_tasks_num; t++)
 			{
 				if (m_tasks_data[t] == NULL)
 				{
-					*o_err += "Block '" + m_name + "'[" + af::itos(m_block_num) + "]: Task[" + af::itos(t)
-							  + "] data is null on not numeric block.";
+					*o_err += "Block '" + m_name + "'[" + af::itos(m_block_num) + "]: Task[" + af::itos(t) +
+							  "] data is null on not numeric block.";
 					return;
 				}
 			}
@@ -579,7 +628,8 @@ BlockData::~BlockData()
 	if (m_tasks_data)
 	{
 		for (int t = 0; t < m_tasks_num; t++)
-			if (m_tasks_data[t]) delete m_tasks_data[t];
+			if (m_tasks_data[t])
+				delete m_tasks_data[t];
 		delete[] m_tasks_data;
 	}
 }
@@ -592,7 +642,8 @@ void BlockData::v_readwrite(Msg *msg)
 		case Msg::TJob:
 		case Msg::TBlocks:
 			rw_int64_t(m_flags, msg);
-			if (isNotNumeric()) rw_tasks(msg);
+			if (isNotNumeric())
+				rw_tasks(msg);
 
 		case Msg::TBlocksProperties:
 			rw_int32_t(m_parser_coeff, msg);
@@ -629,10 +680,10 @@ void BlockData::v_readwrite(Msg *msg)
 			rw_int32_t(m_need_power, msg);
 			rw_int32_t(m_need_hdd, msg);
 
-			rw_int32_t(m_need_cpu_freq_mgz,   msg);
-			rw_int32_t(m_need_cpu_cores,      msg);
+			rw_int32_t(m_need_cpu_freq_mgz, msg);
+			rw_int32_t(m_need_cpu_cores, msg);
 			rw_int32_t(m_need_cpu_freq_cores, msg);
-			rw_int32_t(m_need_gpu_mem_mb,     msg);
+			rw_int32_t(m_need_gpu_mem_mb, msg);
 
 			rw_RegExp(m_depend_mask, msg);
 			rw_RegExp(m_tasks_depend_mask, msg);
@@ -730,20 +781,16 @@ void BlockData::rw_tasks(Msg *msg)
 	}
 }
 
-TaskData *BlockData::createTask(const JSON &i_object)
-{
-	return new TaskData(i_object);
-}
+TaskData *BlockData::createTask(const JSON &i_object) { return new TaskData(i_object); }
 
-TaskData *BlockData::createTask(Msg *msg)
-{
-	return new TaskData(msg);
-}
+TaskData *BlockData::createTask(Msg *msg) { return new TaskData(msg); }
 
 void BlockData::setVariableCapacity(int i_capacity_coeff_min, int i_capacity_coeff_max)
 {
-	if (i_capacity_coeff_min < 0) i_capacity_coeff_min = 0;
-	if (i_capacity_coeff_max < 0) i_capacity_coeff_max = 0;
+	if (i_capacity_coeff_min < 0)
+		i_capacity_coeff_min = 0;
+	if (i_capacity_coeff_max < 0)
+		i_capacity_coeff_max = 0;
 	m_flags = m_flags | FVarCapacity;
 	m_capacity_coeff_min = i_capacity_coeff_min;
 	m_capacity_coeff_max = i_capacity_coeff_max;
@@ -763,8 +810,8 @@ bool BlockData::setMultiHost(int i_min, int i_max, int i_waitmax, const std::str
 	}
 	if ((i_min > AFJOB::TASK_MULTIHOSTMAXHOSTS) || (i_max > AFJOB::TASK_MULTIHOSTMAXHOSTS))
 	{
-		AFERRAR(
-			"BlockData::setMultiHost: Maximum hosts number is limited to %d.", AFJOB::TASK_MULTIHOSTMAXHOSTS)
+		AFERRAR("BlockData::setMultiHost: Maximum hosts number is limited to %d.",
+				AFJOB::TASK_MULTIHOSTMAXHOSTS)
 		return false;
 	}
 	if (canMasterRunOnSlaveHost() && (false == i_service.empty()))
@@ -779,7 +826,8 @@ bool BlockData::setMultiHost(int i_min, int i_max, int i_waitmax, const std::str
 	m_multihost_max = i_max;
 	m_multihost_max_wait = i_waitmax;
 	m_multihost_service_wait = i_waitsrv;
-	if (false == i_service.empty()) m_multihost_service = i_service;
+	if (false == i_service.empty())
+		m_multihost_service = i_service;
 
 	return true;
 }
@@ -803,8 +851,8 @@ bool BlockData::setNumeric(long long start, long long end, long long perTask, lo
 	}
 	if (start > end)
 	{
-		AFERRAR(
-			"BlockData::setNumeric(): start > end ( %lld > %lld - setting end to %lld)", start, end, start)
+		AFERRAR("BlockData::setNumeric(): start > end ( %lld > %lld - setting end to %lld)", start, end,
+				start)
 		end = start;
 	}
 	m_flags = m_flags | FNumeric;
@@ -816,7 +864,8 @@ bool BlockData::setNumeric(long long start, long long end, long long perTask, lo
 
 	long long numframes = (m_frame_last - m_frame_first) / m_frames_inc + 1;
 	m_tasks_num = numframes / m_frames_per_task;
-	if ((numframes % perTask) != 0) m_tasks_num++;
+	if ((numframes % perTask) != 0)
+		m_tasks_num++;
 
 	return true;
 }
@@ -825,7 +874,8 @@ bool BlockData::genNumbers(long long &start, long long &end, int num, long long 
 {
 	start = 0;
 	end = 0;
-	if (frames_num) *frames_num = 1;
+	if (frames_num)
+		*frames_num = 1;
 
 	if (num > m_tasks_num)
 	{
@@ -858,12 +908,15 @@ bool BlockData::genNumbers(long long &start, long long &end, int num, long long 
 	}
 
 	long long offset = num * m_frames_per_task * m_frames_inc;
-	if (m_frames_inc > 1) offset -= offset % m_frames_inc;
+	if (m_frames_inc > 1)
+		offset -= offset % m_frames_inc;
 	start = m_frame_first + offset;
 
 	offset = m_frames_per_task * m_frames_inc - 1;
-	if ((start + offset) > m_frame_last) offset = m_frame_last - start;
-	if (m_frames_inc > 1) offset -= offset % m_frames_inc;
+	if ((start + offset) > m_frame_last)
+		offset = m_frame_last - start;
+	if (m_frames_inc > 1)
+		offset -= offset % m_frames_inc;
 	end = start + offset;
 
 	if (frames_num)
@@ -886,7 +939,8 @@ int BlockData::calcTaskNumber(long long i_frame, bool &o_valid_range) const
 	else
 		o_tasknum = o_tasknum * (-m_frames_per_task);
 
-	if (m_frames_inc > 1) o_tasknum = o_tasknum / m_frames_inc;
+	if (m_frames_inc > 1)
+		o_tasknum = o_tasknum / m_frames_inc;
 
 	o_valid_range = true;
 	if (o_tasknum < 0)
@@ -899,7 +953,8 @@ int BlockData::calcTaskNumber(long long i_frame, bool &o_valid_range) const
 		o_tasknum = m_tasks_num - 1;
 		o_valid_range = false;
 	}
-	if ((i_frame < m_frame_first) || (i_frame > m_frame_last)) o_valid_range = false;
+	if ((i_frame < m_frame_first) || (i_frame > m_frame_last))
+		o_valid_range = false;
 
 	return o_tasknum;
 }
@@ -929,7 +984,8 @@ int BlockData::getReadyTaskNumber(TaskProgress **i_tp, const int64_t &i_job_flag
 		{
 			if (i_tp[task]->state & AFJOB::STATE_READY_MASK)
 			{
-				if (genTaskName(task) == i_render->getName()) return task;
+				if (genTaskName(task) == i_render->getName())
+					return task;
 			}
 		}
 
@@ -941,18 +997,21 @@ int BlockData::getReadyTaskNumber(TaskProgress **i_tp, const int64_t &i_job_flag
 		// Task solving with a positive step:
 		long long frame = m_frame_first;
 		frame -= frame % m_sequential;
-		if (frame < m_frame_first) frame += m_sequential;
+		if (frame < m_frame_first)
+			frame += m_sequential;
 
 		// Check the first task:
 		{
 			int task = 0;
-			if (i_tp[task]->state & AFJOB::STATE_READY_MASK) return task;
+			if (i_tp[task]->state & AFJOB::STATE_READY_MASK)
+				return task;
 		}
 
 		// Check the last task:
 		{
 			int task = m_tasks_num - 1;
-			if (i_tp[task]->state & AFJOB::STATE_READY_MASK) return task;
+			if (i_tp[task]->state & AFJOB::STATE_READY_MASK)
+				return task;
 		}
 
 		// Iterate sequential tasks:
@@ -966,21 +1025,26 @@ int BlockData::getReadyTaskNumber(TaskProgress **i_tp, const int64_t &i_job_flag
 				break;
 			}
 
-			if (i_tp[task]->isSolved()) continue;
+			if (i_tp[task]->isSolved())
+				continue;
 			i_tp[task]->setSolved();
 
-			if (i_tp[task]->state & AFJOB::STATE_READY_MASK) return task;
+			if (i_tp[task]->state & AFJOB::STATE_READY_MASK)
+				return task;
 		}
 
-		if (i_job_flags & af::Job::FPPApproval) return AFJOB::TASK_NUM_NO_SEQUENTIAL;
+		if (i_job_flags & af::Job::FPPApproval)
+			return AFJOB::TASK_NUM_NO_SEQUENTIAL;
 
 		for (int task = 0; task < m_tasks_num; task++)
 		{
 			// Common tasks solving:
-			if (i_tp[task]->isSolved()) continue;
+			if (i_tp[task]->isSolved())
+				continue;
 			i_tp[task]->setSolved();
 
-			if (i_tp[task]->state & AFJOB::STATE_READY_MASK) return task;
+			if (i_tp[task]->state & AFJOB::STATE_READY_MASK)
+				return task;
 
 			continue;
 		}
@@ -1005,19 +1069,23 @@ int BlockData::getReadyTaskNumber(TaskProgress **i_tp, const int64_t &i_job_flag
 				break;
 			}
 
-			if (i_tp[task]->isSolved()) continue;
+			if (i_tp[task]->isSolved())
+				continue;
 			i_tp[task]->setSolved();
 
-			if (i_tp[task]->state & AFJOB::STATE_READY_MASK) return task;
+			if (i_tp[task]->state & AFJOB::STATE_READY_MASK)
+				return task;
 		}
 
 		for (int task = m_tasks_num - 1; task >= 0; task--)
 		{
 			// Common tasks solving:
-			if (i_tp[task]->isSolved()) continue;
+			if (i_tp[task]->isSolved())
+				continue;
 			i_tp[task]->setSolved();
 
-			if (i_tp[task]->state & AFJOB::STATE_READY_MASK) return task;
+			if (i_tp[task]->state & AFJOB::STATE_READY_MASK)
+				return task;
 
 			continue;
 		}
@@ -1030,10 +1098,12 @@ int BlockData::getReadyTaskNumber(TaskProgress **i_tp, const int64_t &i_job_flag
 		if (isSequential())
 		{
 			// Common tasks solving:
-			if (i_tp[task]->isSolved()) continue;
+			if (i_tp[task]->isSolved())
+				continue;
 			i_tp[task]->setSolved();
 
-			if (i_tp[task]->state & AFJOB::STATE_READY_MASK) return task;
+			if (i_tp[task]->state & AFJOB::STATE_READY_MASK)
+				return task;
 
 			continue;
 		}
@@ -1043,10 +1113,12 @@ int BlockData::getReadyTaskNumber(TaskProgress **i_tp, const int64_t &i_job_flag
 			// Reverse tasks solving:
 			int index = m_tasks_num - 1 - task;
 
-			if (i_tp[index]->isSolved()) continue;
+			if (i_tp[index]->isSolved())
+				continue;
 			i_tp[index]->setSolved();
 
-			if (i_tp[index]->state & AFJOB::STATE_READY_MASK) return index;
+			if (i_tp[index]->state & AFJOB::STATE_READY_MASK)
+				return index;
 
 			continue;
 		}
@@ -1067,14 +1139,18 @@ int BlockData::getReadyTaskNumber(TaskProgress **i_tp, const int64_t &i_job_flag
 		for (int64_t i = 0; i <= powered; i++)
 		{
 			int index = i;
-			if (false == nodivision_needed) index = int(i * int64_t(m_tasks_num) / powered);
+			if (false == nodivision_needed)
+				index = int(i * int64_t(m_tasks_num) / powered);
 
-			if (index >= m_tasks_num) index = m_tasks_num - 1;
+			if (index >= m_tasks_num)
+				index = m_tasks_num - 1;
 
-			if (i_tp[index]->isSolved()) continue;
+			if (i_tp[index]->isSolved())
+				continue;
 			i_tp[index]->setSolved();
 
-			if (i_tp[index]->state & AFJOB::STATE_READY_MASK) return index;
+			if (i_tp[index]->state & AFJOB::STATE_READY_MASK)
+				return index;
 		}
 	}
 
@@ -1095,23 +1171,22 @@ TaskExec *BlockData::genTask(int num) const
 	long long end = -1;
 	long long frames_num = -1;
 
-	if (false == genNumbers(start, end, num, &frames_num)) return NULL;
+	if (false == genNumbers(start, end, num, &frames_num))
+		return NULL;
 
-	TaskExec *taskExec =
-		new TaskExec(
-			genTaskName(num, &start, &end), m_service, m_parser,
+	TaskExec *taskExec = new TaskExec(genTaskName(num, &start, &end), m_service, m_parser,
 
-			m_capacity,
+									  m_capacity,
 
-			m_command,
+									  m_command,
 
-			m_files,
+									  m_files,
 
-			start, end, m_frames_inc, frames_num,
+									  start, end, m_frames_inc, frames_num,
 
-			m_working_directory, m_environment,
+									  m_working_directory, m_environment,
 
-			m_job_id, m_block_num, m_flags, num);
+									  m_job_id, m_block_num, m_flags, num);
 
 	taskExec->setBlockName(m_name);
 	taskExec->setTickets(m_tickets);
@@ -1156,16 +1231,19 @@ const std::string BlockData::genTaskName(int num, long long *fstart, long long *
 		else
 			ok = genNumbers(start, end, num);
 
-		if (false == ok) return std::string("Error generating numbers.");
+		if (false == ok)
+			return std::string("Error generating numbers.");
 
-		if (m_tasks_name.size()) return fillNumbers(m_tasks_name, start, end);
+		if (m_tasks_name.size())
+			return fillNumbers(m_tasks_name, start, end);
 
 		std::string str("frame ");
 		str += itos(start);
 		if (start != end)
 		{
 			str += std::string("-") + itos(end);
-			if (m_frames_inc > 1) str += std::string(" / ") + itos(m_frames_inc);
+			if (m_frames_inc > 1)
+				str += std::string(" / ") + itos(m_frames_inc);
 		}
 		return str;
 	}
@@ -1186,7 +1264,7 @@ void BlockData::setStateDependent(bool depend)
 	}
 }
 
-const TaskData * BlockData::getTaskData(int i_num_task) const
+const TaskData *BlockData::getTaskData(int i_num_task) const
 {
 	if (NULL == m_tasks_data)
 		return NULL;
@@ -1237,32 +1315,41 @@ void BlockData::generateInfoStreamTyped(std::ostringstream &o_str, int type, boo
 {
 	switch (type)
 	{
-		/*   case Msg::TJob:
-		   case Msg::TBlocks:
-			  break;*/
+			/*   case Msg::TJob:
+			   case Msg::TBlocks:
+				  break;*/
 
 		case Msg::TBlocksProperties:
 
-			if (full) o_str << "\nProperties:";
+			if (full)
+				o_str << "\nProperties:";
 
 			if (isNumeric())
 			{
 				o_str << "\n Frames: " << m_frame_first << " - " << m_frame_last
 					  << ": Per Task = " << m_frames_per_task;
-				if (m_frames_inc > 1) o_str << ", Increment = " << m_frames_inc;
-				if (notSequential()) o_str << ", Sequential = " << m_sequential;
+				if (m_frames_inc > 1)
+					o_str << ", Increment = " << m_frames_inc;
+				if (notSequential())
+					o_str << ", Sequential = " << m_sequential;
 			}
 
-			if (full && (m_parser_coeff != 1)) o_str << "\n Parser Coefficient = " << m_parser_coeff;
+			if (full && (m_parser_coeff != 1))
+				o_str << "\n Parser Coefficient = " << m_parser_coeff;
 
-			if (false == m_tasks_name.empty()) o_str << "\n Tasks Name Pattern = " << m_tasks_name;
+			if (false == m_tasks_name.empty())
+				o_str << "\n Tasks Name Pattern = " << m_tasks_name;
 
-			if (full || (!m_parser.empty())) o_str << "\n Parser = " << m_parser;
-			if (full && (m_parser.empty())) o_str << " is empty (no parser)";
+			if (full || (!m_parser.empty()))
+				o_str << "\n Parser = " << m_parser;
+			if (full && (m_parser.empty()))
+				o_str << " is empty (no parser)";
 
-			if (full && m_command_post.size()) o_str << "\n Post Command:\n" << m_command_post;
+			if (full && m_command_post.size())
+				o_str << "\n Post Command:\n" << m_command_post;
 
-			if (full && m_environment.size()) o_str << "\n Environment: " << af::strJoin(m_environment);
+			if (full && m_environment.size())
+				o_str << "\n Environment: " << af::strJoin(m_environment);
 			/*
 				  if( false == m_working_directory.empty()) o_str << "\n Working Directory:\n" <<
 			   m_working_directory;
@@ -1277,91 +1364,126 @@ void BlockData::generateInfoStreamTyped(std::ostringstream &o_str, int type, boo
 			if ((m_file_size_min != -1) && (m_file_size_max != -1))
 				o_str << "Files Size: " << m_file_size_min << " - " << m_file_size_max;
 
-			if (full) o_str << "\n Capacity = " << m_capacity;
-			if (canVarCapacity()) o_str << " x" << m_capacity_coeff_min << " - x" << m_capacity_coeff_max;
+			if (full)
+				o_str << "\n Capacity = " << m_capacity;
+			if (canVarCapacity())
+				o_str << " x" << m_capacity_coeff_min << " - x" << m_capacity_coeff_max;
 
 			if (isMultiHost())
 			{
 				o_str << "\n MultiHost '" << m_multihost_service << "': x" << int(m_multihost_min) << " -x"
 					  << int(m_multihost_max);
-				if (canMasterRunOnSlaveHost()) o_str << "\n    Master can run on the same slave host.";
+				if (canMasterRunOnSlaveHost())
+					o_str << "\n    Master can run on the same slave host.";
 				o_str << "\n    Wait service wait = " << m_multihost_service_wait;
 				o_str << "\n    Wait maximum wait = " << m_multihost_max_wait;
 			}
 
-			if (isDependSubTask()) o_str << "\n   Sub Task Dependence.";
+			if (isDependSubTask())
+				o_str << "\n   Sub Task Dependence.";
 
 			if (full || (m_max_running_tasks != -1))
 				o_str << "\n Max Running Tasks = " << m_max_running_tasks;
-			if (full && (m_max_running_tasks == -1)) o_str << " (no limit)";
+			if (full && (m_max_running_tasks == -1))
+				o_str << " (no limit)";
 			if (full || (m_max_running_tasks_per_host != -1))
 				o_str << "\n Max Running Tasks Per Host = " << m_max_running_tasks_per_host;
-			if (full && (m_max_running_tasks_per_host == -1)) o_str << " (no limit)";
+			if (full && (m_max_running_tasks_per_host == -1))
+				o_str << " (no limit)";
 
-			if (m_need_memory > 0) o_str << "\n Needed Memory = " << m_need_memory;
-			if (m_need_power > 0) o_str << "\n Need Power = " << m_need_power;
-			if (m_need_hdd > 0) o_str << "\n Need HDD = " << m_need_hdd;
+			if (m_need_memory > 0)
+				o_str << "\n Needed Memory = " << m_need_memory;
+			if (m_need_power > 0)
+				o_str << "\n Need Power = " << m_need_power;
+			if (m_need_hdd > 0)
+				o_str << "\n Need HDD = " << m_need_hdd;
 			if (m_need_properties.notEmpty())
 				o_str << "\n Need Properties = " << m_need_properties.getPattern();
 
-			if (m_need_cpu_freq_mgz   > -1) o_str << "\n Need CPU Freq MHz = "  << m_need_cpu_freq_mgz;
-			if (m_need_cpu_cores      > -1) o_str << "\n Need CPU Cores = "     << m_need_cpu_cores;
-			if (m_need_cpu_freq_cores > -1) o_str << "\n Need CPU MHz*Cores = " << m_need_cpu_freq_cores;
-			if (m_need_gpu_mem_mb     > -1) o_str << "\n Need GPU Mem MB = "    << m_need_gpu_mem_mb;
+			if (m_need_cpu_freq_mgz > -1)
+				o_str << "\n Need CPU Freq MHz = " << m_need_cpu_freq_mgz;
+			if (m_need_cpu_cores > -1)
+				o_str << "\n Need CPU Cores = " << m_need_cpu_cores;
+			if (m_need_cpu_freq_cores > -1)
+				o_str << "\n Need CPU MHz*Cores = " << m_need_cpu_freq_cores;
+			if (m_need_gpu_mem_mb > -1)
+				o_str << "\n Need GPU Mem MB = " << m_need_gpu_mem_mb;
 
-			if (m_depend_mask.notEmpty()) o_str << "\n Depend Mask = " << m_depend_mask.getPattern();
+			if (m_depend_mask.notEmpty())
+				o_str << "\n Depend Mask = " << m_depend_mask.getPattern();
 			if (m_tasks_depend_mask.notEmpty())
 				o_str << "\n Tasks Depend Mask = " << m_tasks_depend_mask.getPattern();
-			if (m_hosts_mask.notEmpty()) o_str << "\n Hosts Mask = " << m_hosts_mask.getPattern();
+			if (m_hosts_mask.notEmpty())
+				o_str << "\n Hosts Mask = " << m_hosts_mask.getPattern();
 			if (m_hosts_mask_exclude.notEmpty())
 				o_str << "\n Exclude Hosts Mask = " << m_hosts_mask_exclude.getPattern();
 
-			if (full) o_str << "\n Service = " << m_service;
-			if (full) o_str << "\n Tasks Number = " << m_tasks_num;
+			if (full)
+				o_str << "\n Service = " << m_service;
+			if (full)
+				o_str << "\n Tasks Number = " << m_tasks_num;
 
 			if (full || (m_max_running_tasks != -1))
 				o_str << "\n Maximum running tasks = " << m_max_running_tasks;
-			if (full && (m_max_running_tasks == -1)) o_str << " (no limit)";
+			if (full && (m_max_running_tasks == -1))
+				o_str << " (no limit)";
 
-			if (full) o_str << "\nErrors solving:";
+			if (full)
+				o_str << "\nErrors solving:";
 			if (full || (m_errors_avoid_host != -1))
 				o_str << "\n Errors for block avoid host = " << int(m_errors_avoid_host);
-			if (full && (m_errors_avoid_host == -1)) o_str << " (user settings used)";
+			if (full && (m_errors_avoid_host == -1))
+				o_str << " (user settings used)";
 			if (full || (m_errors_task_same_host != -1))
 				o_str << "\n Errors for task avoid host = " << int(m_errors_task_same_host);
-			if (full && (m_errors_task_same_host == -1)) o_str << " (user settings used)";
+			if (full && (m_errors_task_same_host == -1))
+				o_str << " (user settings used)";
 			if (full || (m_errors_retries != -1))
 				o_str << "\n Error task retries = " << int(m_errors_retries);
-			if (full && (m_errors_retries == -1)) o_str << " (user settings used)";
+			if (full && (m_errors_retries == -1))
+				o_str << " (user settings used)";
 			if (full || (m_errors_forgive_time != -1))
 				o_str << "\n Errors forgive time = " << m_errors_forgive_time << " seconds";
-			if (full && (m_errors_forgive_time == -1)) o_str << " (infinite)";
+			if (full && (m_errors_forgive_time == -1))
+				o_str << " (infinite)";
 			if (full || (m_task_progress_change_timeout > 0))
 				o_str << "\n Task progress change timeout = " << m_task_progress_change_timeout << " seconds";
-			if (full && (m_task_progress_change_timeout <= 0)) o_str << " (infinite)";
+			if (full && (m_task_progress_change_timeout <= 0))
+				o_str << " (infinite)";
 
 			break;
 
 		case Msg::TBlocksProgress:
 
-			if (full) o_str << "\nRunning Progress:";
+			if (full)
+				o_str << "\nRunning Progress:";
 
 			if (p_tasks_done)
 				o_str << "\n Run Time: Sum = " << af::time2strHMS(p_tasks_run_time_sum, true)
 					  << " / Average = " << af::time2strHMS(p_tasks_run_time_sum / p_tasks_done, true);
 
-			if (full) o_str << "\n Tasks Ready = " << p_tasks_ready;
-			if (full) o_str << "\n Tasks Done = " << p_tasks_done;
-			if (full) o_str << "\n Tasks Error = " << p_tasks_error;
-			if (full) o_str << "\n Tasks Skipped = " << p_tasks_skipped;
-			if (full) o_str << "\n Tasks Warning = " << p_tasks_warning;
-			if (full) o_str << "\n Tasks Wait Reconnect = " << p_tasks_waitrec;
+			if (full)
+				o_str << "\n Tasks Ready = " << p_tasks_ready;
+			if (full)
+				o_str << "\n Tasks Done = " << p_tasks_done;
+			if (full)
+				o_str << "\n Tasks Error = " << p_tasks_error;
+			if (full)
+				o_str << "\n Tasks Skipped = " << p_tasks_skipped;
+			if (full)
+				o_str << "\n Tasks Warning = " << p_tasks_warning;
+			if (full)
+				o_str << "\n Tasks Wait Reconnect = " << p_tasks_waitrec;
 
-			if (full && (m_time_started > 0)) o_str << "\n Start time = " << af::time2str(m_time_started);
-			if (full && (m_time_done > 0)) o_str << "\n Done time = " << af::time2str(m_time_done);
+			if (full && (m_time_started > 0))
+				o_str << "\n Start time = " << af::time2str(m_time_started);
+			if (full && (m_time_done > 0))
+				o_str << "\n Done time = " << af::time2str(m_time_done);
 
-			if (p_error_hosts) o_str << "\n Error hosts count = " << p_error_hosts;
-			if (p_avoid_hosts) o_str << "\n Avoid hosts count = " << p_avoid_hosts;
+			if (p_error_hosts)
+				o_str << "\n Error hosts count = " << p_error_hosts;
+			if (p_avoid_hosts)
+				o_str << "\n Avoid hosts count = " << p_avoid_hosts;
 
 			break;
 
@@ -1371,11 +1493,14 @@ void BlockData::generateInfoStreamTyped(std::ostringstream &o_str, int type, boo
 
 void BlockData::generateInfoStreamTasks(std::ostringstream &o_str, bool full) const
 {
-	if (m_tasks_num < 1) return;
-	if (m_tasks_data == NULL) return;
+	if (m_tasks_num < 1)
+		return;
+	if (m_tasks_data == NULL)
+		return;
 	for (int t = 0; t < m_tasks_num; t++)
 	{
-		if (t > 0) o_str << std::endl;
+		if (t > 0)
+			o_str << std::endl;
 		m_tasks_data[t]->v_generateInfoStream(o_str, full);
 	}
 }
@@ -1387,7 +1512,7 @@ void BlockData::v_generateInfoStream(std::ostringstream &o_str, bool full) const
 	generateInfoStreamTyped(o_str, Msg::TBlocksProperties, full);
 }
 
-void BlockData::addSolveCounts(TaskExec *i_exec, Render * i_render)
+void BlockData::addSolveCounts(TaskExec *i_exec, Render *i_render)
 {
 	m_running_tasks_counter++;
 	m_running_capacity_counter += i_exec->getCapResult();
@@ -1395,7 +1520,7 @@ void BlockData::addSolveCounts(TaskExec *i_exec, Render * i_render)
 	m_srv_info = i_render->getName();
 }
 
-void BlockData::remSolveCounts(TaskExec *i_exec, Render * i_render)
+void BlockData::remSolveCounts(TaskExec *i_exec, Render *i_render)
 {
 	if (m_running_tasks_counter <= 0)
 		AF_ERR << "Tasks counter is zero or negative: " << m_running_tasks_counter;
@@ -1449,7 +1574,8 @@ bool BlockData::updateProgress(JobProgress *progress)
 			task_percent = 100;
 			if (false == (task_state & AFJOB::STATE_SKIPPED_MASK))
 			{
-				int run_time = progress->tp[m_block_num][t]->time_done - progress->tp[m_block_num][t]->time_start;
+				int run_time =
+					progress->tp[m_block_num][t]->time_done - progress->tp[m_block_num][t]->time_start;
 
 				new_tasks_run_time_sum += run_time;
 				if (new_tasks_run_time_max < run_time)
@@ -1504,13 +1630,12 @@ bool BlockData::updateProgress(JobProgress *progress)
 	}
 	new_percentage = new_percentage / m_tasks_num;
 
-	if ((p_tasks_ready != new_tasks_ready) || (p_tasks_done != new_tasks_done)
-		|| (p_tasks_error != new_tasks_error) || (p_tasks_skipped != new_tasks_skipped)
-		|| (p_tasks_warning != new_tasks_warning) || (p_tasks_waitrec != new_tasks_waitrec)
-		|| (p_tasks_waitdep != new_tasks_waitdep)
-		|| (p_tasks_suspended != new_tasks_suspended)
-		|| (p_percentage != new_percentage) || (p_tasks_run_time_sum != new_tasks_run_time_sum)
-		|| (p_tasks_run_time_min != new_tasks_run_time_min) || (p_tasks_run_time_max != new_tasks_run_time_max))
+	if ((p_tasks_ready != new_tasks_ready) || (p_tasks_done != new_tasks_done) ||
+		(p_tasks_error != new_tasks_error) || (p_tasks_skipped != new_tasks_skipped) ||
+		(p_tasks_warning != new_tasks_warning) || (p_tasks_waitrec != new_tasks_waitrec) ||
+		(p_tasks_waitdep != new_tasks_waitdep) || (p_tasks_suspended != new_tasks_suspended) ||
+		(p_percentage != new_percentage) || (p_tasks_run_time_sum != new_tasks_run_time_sum) ||
+		(p_tasks_run_time_min != new_tasks_run_time_min) || (p_tasks_run_time_max != new_tasks_run_time_max))
 		changed = true;
 
 	p_tasks_ready = new_tasks_ready;
@@ -1529,21 +1654,27 @@ bool BlockData::updateProgress(JobProgress *progress)
 	if (new_tasks_ready && (false == (m_state & AFJOB::STATE_WAITDEP_MASK)))
 		m_state = m_state | AFJOB::STATE_READY_MASK;
 
-	if (m_running_tasks_counter) m_state = m_state | AFJOB::STATE_RUNNING_MASK;
+	if (m_running_tasks_counter)
+		m_state = m_state | AFJOB::STATE_RUNNING_MASK;
 
 	if (new_tasks_done == m_tasks_num)
 	{
-		if (m_time_done == 0) m_time_done = time(NULL);
+		if (m_time_done == 0)
+			m_time_done = time(NULL);
 		m_state = m_state | AFJOB::STATE_DONE_MASK;
 	}
 
-	if (new_tasks_warning) m_state = m_state | AFJOB::STATE_WARNING_MASK;
+	if (new_tasks_warning)
+		m_state = m_state | AFJOB::STATE_WARNING_MASK;
 
-	if (new_tasks_suspended) m_state = m_state | AFJOB::STATE_SUSPENDED_MASK;
+	if (new_tasks_suspended)
+		m_state = m_state | AFJOB::STATE_SUSPENDED_MASK;
 
-	if (new_tasks_error) m_state = m_state | AFJOB::STATE_ERROR_MASK;
+	if (new_tasks_error)
+		m_state = m_state | AFJOB::STATE_ERROR_MASK;
 
-	if (new_tasks_skipped) m_state = m_state | AFJOB::STATE_SKIPPED_MASK;
+	if (new_tasks_skipped)
+		m_state = m_state | AFJOB::STATE_SKIPPED_MASK;
 
 	return changed;
 }
@@ -1560,21 +1691,24 @@ void BlockData::updateBars(JobProgress *progress)
 		// Get maximum ASCII state for this task:
 		int value = 0;
 		for (int i = 0; i < AFJOB::ASCII_PROGRESS_COUNT; i++)
-			if ((progress->tp[m_block_num][t]->state & AFJOB::ASCII_PROGRESS_MASK)
-				== AFJOB::ASCII_PROGRESS_STATES[i * 2 + 1])
+			if ((progress->tp[m_block_num][t]->state & AFJOB::ASCII_PROGRESS_MASK) ==
+				AFJOB::ASCII_PROGRESS_STATES[i * 2 + 1])
 				if (value < i) // More important for monitoring value
 					value = i;
 
 		// Calculate range:
 		int pos_a = AFJOB::ASCII_PROGRESS_LENGTH * (t) / m_tasks_num;
 		int pos_b = AFJOB::ASCII_PROGRESS_LENGTH * (t + 1) / m_tasks_num;
-		if (pos_b > pos_a) pos_b--;
-		if (pos_b > AFJOB::ASCII_PROGRESS_LENGTH) pos_b = AFJOB::ASCII_PROGRESS_LENGTH - 1;
+		if (pos_b > pos_a)
+			pos_b--;
+		if (pos_b > AFJOB::ASCII_PROGRESS_LENGTH)
+			pos_b = AFJOB::ASCII_PROGRESS_LENGTH - 1;
 
 		for (int p = pos_a; p <= pos_b; p++)
 		{
 			// Set new value only if it is more important:
-			if (value > p_progressbar[p]) p_progressbar[p] = value;
+			if (value > p_progressbar[p])
+				p_progressbar[p] = value;
 		}
 	}
 
@@ -1585,10 +1719,7 @@ void BlockData::updateBars(JobProgress *progress)
 	//::write(1, p_progressbar, AFJOB::ASCII_PROGRESS_LENGTH);::write(1, "\n", 1);
 }
 
-void BlockData::stdOutProgress() const
-{
-	std::cout << generateProgressString() << std::endl;
-}
+void BlockData::stdOutProgress() const { std::cout << generateProgressString() << std::endl; }
 
 const std::string BlockData::generateProgressString() const
 {
@@ -1605,17 +1736,16 @@ void BlockData::generateProgressStream(std::ostringstream &o_str) const
 
 void BlockData::setTimeStarted(long long value, bool reset)
 {
-	if (m_time_started == 0) m_time_started = value;
+	if (m_time_started == 0)
+		m_time_started = value;
 
-	if (reset == true) m_time_started = value;
+	if (reset == true)
+		m_time_started = value;
 }
 
-void BlockData::setTimeDone(long long value)
-{
-	m_time_done = value;
-}
+void BlockData::setTimeDone(long long value) { m_time_done = value; }
 
-void BlockData::editTicket(std::string & i_name, int32_t & i_count)
+void BlockData::editTicket(std::string &i_name, int32_t &i_count)
 {
 	if (i_count == -1)
 		m_tickets.erase(i_name);

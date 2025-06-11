@@ -16,11 +16,9 @@
 	   JobNode  - the representation of a job (one committed work-payload)
 */
 
-"use strict";
+'use strict';
 
-function JobNode()
-{
-}
+function JobNode() {}
 
 var Block_ProgressBarLength = 128;
 var Block_ProgressBarHeight = 10;
@@ -346,11 +344,11 @@ JobNode.prototype.refresh = function() {
 
 JobNode.prototype.onDoubleClick = function(i_evt) {
 	g_OpenMonitor({
-		"type": 'tasks',
-		"evt": i_evt,
-		"id": this.params.id,
-		"name": this.params.name,
-		"wnd": this.monitor.window
+		'type': 'tasks',
+		'evt': i_evt,
+		'id': this.params.id,
+		'name': this.params.name,
+		'wnd': this.monitor.window
 	});
 };
 
@@ -397,7 +395,9 @@ JobNode.prototype.showThumb = function(i_path) {
 	{
 		var img = document.createElement('img');
 		thumb.appendChild(img);
-		img.ondragstart = function() { return false; };
+		img.ondragstart = function() {
+			return false;
+		};
 		img.src = '/@TMP@' + i_path;
 		img.style.display = 'none';
 		img.m_height = this.monitor.view_opts.jobs_thumbs_height;
@@ -612,13 +612,13 @@ JobBlock.setDialog = function(i_args) {
 	}
 
 	new cgru_Dialog({
-		"wnd": i_args.monitor.window,
-		"receiver": block,
-		"handle": 'setParameter',
-		"param": i_args.name,
-		"type": i_args.type,
-		"value": block.params[i_args.name],
-		"name": 'jobblock_parameter'
+		'wnd': i_args.monitor.window,
+		'receiver': block,
+		'handle': 'setParameter',
+		'param': i_args.name,
+		'type': i_args.type,
+		'value': block.params[i_args.name],
+		'name': 'jobblock_parameter'
 	});
 };
 
@@ -954,23 +954,26 @@ JobBlock.prototype.update = function(i_displayFull) {
 				this.elMinRunTime.textContent = '';
 
 			if (this.params.task_progress_change_timeout != null)
-				this.elProgressTimeout.innerHTML =
-					'TaskProgessTimeout:<b>' + cm_TimeStringFromSeconds(this.params.task_progress_change_timeout) + '</b>';
+				this.elProgressTimeout.innerHTML = 'TaskProgessTimeout:<b>' +
+					cm_TimeStringFromSeconds(this.params.task_progress_change_timeout) + '</b>';
 			else
 				this.elProgressTimeout.textContent = '';
 
 			if (this.params.need_memory)
-				this.elNeedMem.innerHTML = 'Memory><b>' + (this.params.need_memory/1024.0).toFixed(1) + 'Gb</b>';
+				this.elNeedMem.innerHTML =
+					'Memory><b>' + (this.params.need_memory / 1024.0).toFixed(1) + 'Gb</b>';
 			else
 				this.elNeedMem.textContent = '';
 
 			if (this.params.need_gpu_mem_mb)
-				this.elNeed_GPU_Mem.innerHTML = 'GPU Memory><b>' + (this.params.need_gpu_mem_mb/1024.0).toFixed(1) + 'Gb</b>';
+				this.elNeed_GPU_Mem.innerHTML =
+					'GPU Memory><b>' + (this.params.need_gpu_mem_mb / 1024.0).toFixed(1) + 'Gb</b>';
 			else
 				this.elNeed_GPU_Mem.textContent = '';
 
 			if (this.params.need_cpu_freq_mgz)
-				this.elNeed_CPU_Freq.innerHTML = 'CPU Frequency><b>' + (this.params.need_cpu_freq_mgz/1000.0).toFixed(1) + 'GHz</b>';
+				this.elNeed_CPU_Freq.innerHTML =
+					'CPU Frequency><b>' + (this.params.need_cpu_freq_mgz / 1000.0).toFixed(1) + 'GHz</b>';
 			else
 				this.elNeed_CPU_Freq.textContent = '';
 
@@ -980,7 +983,8 @@ JobBlock.prototype.update = function(i_displayFull) {
 				this.elNeed_CPU_Cores.textContent = '';
 
 			if (this.params.need_cpu_freq_cores)
-				this.elNeed_CPU_FreqCores.innerHTML = 'CPU Frequency*Cores><b>' + (this.params.need_cpu_freq_cores/1000.0).toFixed(1) + 'GHz</b>';
+				this.elNeed_CPU_FreqCores.innerHTML = 'CPU Frequency*Cores><b>' +
+					(this.params.need_cpu_freq_cores / 1000.0).toFixed(1) + 'GHz</b>';
 			else
 				this.elNeed_CPU_FreqCores.textContent = '';
 
@@ -1043,23 +1047,26 @@ JobBlock.prototype.update = function(i_displayFull) {
 				this.elMinRunTime.textContent = '';
 
 			if (this.params.task_progress_change_timeout != null)
-				this.elProgressTimeout.innerHTML =
-					'ProgessTimeout:<b>' + cm_TimeStringFromSeconds(this.params.task_progress_change_timeout) + '</b>';
+				this.elProgressTimeout.innerHTML = 'ProgessTimeout:<b>' +
+					cm_TimeStringFromSeconds(this.params.task_progress_change_timeout) + '</b>';
 			else
 				this.elProgressTimeout.textContent = '';
 
 			if (this.params.need_memory)
-				this.elNeedMem.innerHTML = 'Mem><b>' + (this.params.need_memory/1024.0).toFixed(1) + 'Gb</b>';
+				this.elNeedMem.innerHTML =
+					'Mem><b>' + (this.params.need_memory / 1024.0).toFixed(1) + 'Gb</b>';
 			else
 				this.elNeedMem.textContent = '';
 
 			if (this.params.need_gpu_mem_mb)
-				this.elNeed_GPU_Mem.innerHTML = 'GPU Mem><b>' + (this.params.need_gpu_mem_mb/1024.0).toFixed(1) + 'Gb</b>';
+				this.elNeed_GPU_Mem.innerHTML =
+					'GPU Mem><b>' + (this.params.need_gpu_mem_mb / 1024.0).toFixed(1) + 'Gb</b>';
 			else
 				this.elNeed_GPU_Mem.textContent = '';
 
 			if (this.params.need_cpu_freq_mgz)
-				this.elNeed_CPU_Freq.innerHTML = 'CPU Freq><b>' + (this.params.need_cpu_freq_mgz/1000.0).toFixed(1) + 'GHz</b>';
+				this.elNeed_CPU_Freq.innerHTML =
+					'CPU Freq><b>' + (this.params.need_cpu_freq_mgz / 1000.0).toFixed(1) + 'GHz</b>';
 			else
 				this.elNeed_CPU_Freq.textContent = '';
 
@@ -1069,7 +1076,8 @@ JobBlock.prototype.update = function(i_displayFull) {
 				this.elNeed_CPU_Cores.textContent = '';
 
 			if (this.params.need_cpu_freq_cores)
-				this.elNeed_CPU_FreqCores.innerHTML = 'CPU Freq*Cores><b>' + (this.params.need_cpu_freq_cores/1000.0).toFixed(1) + 'GHz</b>';
+				this.elNeed_CPU_FreqCores.innerHTML =
+					'CPU Freq*Cores><b>' + (this.params.need_cpu_freq_cores / 1000.0).toFixed(1) + 'GHz</b>';
 			else
 				this.elNeed_CPU_FreqCores.textContent = '';
 
@@ -1137,17 +1145,19 @@ JobBlock.prototype.update = function(i_displayFull) {
 				this.elProgressTimeout.textContent = '';
 
 			if (this.params.need_memory)
-				this.elNeedMem.innerHTML = 'm><b>' + (this.params.need_memory/1024.0).toFixed(1) + '</b>';
+				this.elNeedMem.innerHTML = 'm><b>' + (this.params.need_memory / 1024.0).toFixed(1) + '</b>';
 			else
 				this.elNeedMem.textContent = '';
 
 			if (this.params.need_gpu_mem_mb)
-				this.elNeed_GPU_Mem.innerHTML = 'gm><b>' + (this.params.need_gpu_mem_mb/1024.0).toFixed(1) + 'Gb</b>';
+				this.elNeed_GPU_Mem.innerHTML =
+					'gm><b>' + (this.params.need_gpu_mem_mb / 1024.0).toFixed(1) + 'Gb</b>';
 			else
 				this.elNeed_GPU_Mem.textContent = '';
 
 			if (this.params.need_cpu_freq_mgz)
-				this.elNeed_CPU_Freq.innerHTML = 'cf><b>' + (this.params.need_cpu_freq_mgz/1000.0).toFixed(1) + 'GHz</b>';
+				this.elNeed_CPU_Freq.innerHTML =
+					'cf><b>' + (this.params.need_cpu_freq_mgz / 1000.0).toFixed(1) + 'GHz</b>';
 			else
 				this.elNeed_CPU_Freq.textContent = '';
 
@@ -1157,7 +1167,8 @@ JobBlock.prototype.update = function(i_displayFull) {
 				this.elNeed_CPU_Cores.textContent = '';
 
 			if (this.params.need_cpu_freq_cores)
-				this.elNeed_CPU_FreqCores.innerHTML = 'cfc><b>' + (this.params.need_cpu_freq_cores/1000.0).toFixed(1) + 'GHz</b>';
+				this.elNeed_CPU_FreqCores.innerHTML =
+					'cfc><b>' + (this.params.need_cpu_freq_cores / 1000.0).toFixed(1) + 'GHz</b>';
 			else
 				this.elNeed_CPU_FreqCores.textContent = '';
 
@@ -1190,7 +1201,8 @@ JobBlock.prototype.update = function(i_displayFull) {
 				this.elRunTime.innerHTML = 'rt:' + timings;
 		}
 
-		if ((this.params.p_tasks_run_time_sum && this.params.p_tasks_done) || (this.params.p_tasks_run_time_min > 0) || (this.params.p_tasks_run_time_max > 0))
+		if ((this.params.p_tasks_run_time_sum && this.params.p_tasks_done) ||
+			(this.params.p_tasks_run_time_min > 0) || (this.params.p_tasks_run_time_max > 0))
 		{
 			let timings = 'Tasks Running Time:';
 			if (this.params.p_tasks_run_time_sum && this.params.p_tasks_done)
@@ -1433,36 +1445,17 @@ JobBlock.prototype.update = function(i_displayFull) {
 				var rgb = '#000';
 				switch (this.params.p_progressbar.charAt(i))
 				{
-					case 'r':
-						continue;  // RDY
+					case 'r': continue;	 // RDY
 					case 'D': rgb = BarDONrgb; break;
-					case 'S':
-						rgb = BarSKPrgb;
-						break;  // SKP
-					case 'G':
-						rgb = BarDWRrgb;
-						break;  // DON | WRN
-					case 'U':
-						rgb = BarSUSrgb;
-						break;  // SUS
-					case 'W':
-						rgb = BarWDPrgb;
-						break;  // WDP
-					case 'R':
-						rgb = BarRUNrgb;
-						break;  // RUN
-					case 'N':
-						rgb = BarRWRrgb;
-						break;  // RUN | WRN
-					case 'Y':
-						rgb = BarRERrgb;
-						break;  // RER
-					case 'E':
-						rgb = BarERRrgb;
-						break;  // ERR
-					case 'C':
-						rgb = BarWRCrgb;
-						break;  // WRC
+					case 'S': rgb = BarSKPrgb; break;  // SKP
+					case 'G': rgb = BarDWRrgb; break;  // DON | WRN
+					case 'U': rgb = BarSUSrgb; break;  // SUS
+					case 'W': rgb = BarWDPrgb; break;  // WDP
+					case 'R': rgb = BarRUNrgb; break;  // RUN
+					case 'N': rgb = BarRWRrgb; break;  // RUN | WRN
+					case 'Y': rgb = BarRERrgb; break;  // RER
+					case 'E': rgb = BarERRrgb; break;  // ERR
+					case 'C': rgb = BarWRCrgb; break;  // WRC
 				}
 				ctx.strokeStyle = rgb;
 				ctx.beginPath();
@@ -1474,7 +1467,8 @@ JobBlock.prototype.update = function(i_displayFull) {
 	}
 };
 
-JobBlock.prototype.updateTickets = function() {
+JobBlock.prototype.updateTickets =
+	function() {
 	this.elTickets.textContent = '';
 
 	var tickets = this.params.tickets;
@@ -1505,7 +1499,7 @@ JobBlock.prototype.updateTickets = function() {
 	}
 }
 
-JobNode.prototype.updatePanels = function(i_selected) {
+	JobNode.prototype.updatePanels = function(i_selected) {
 	var elPanelR = this.monitor.elPanelR;
 
 	// Blocks:
@@ -1574,7 +1568,7 @@ JobNode.prototype.updatePanels = function(i_selected) {
 		elDiv.classList.add('param');
 		elDiv.classList.add('folder');
 
-		var elCmdExec = cgru_CmdExecCreateOpen({"parent": elDiv, "path": path});
+		var elCmdExec = cgru_CmdExecCreateOpen({'parent': elDiv, 'path': path});
 
 		var elLabel = document.createElement('div');
 		elDiv.appendChild(elLabel);
@@ -1595,8 +1589,7 @@ JobNode.prototype.updatePanels = function(i_selected) {
 	}
 };
 
-JobNode.getMultiSelectionInfo = function(i_selected)
-{
+JobNode.getMultiSelectionInfo = function(i_selected) {
 	let jobs_count = 0;
 	let time_started_min = 0;
 	let time_finished_max = 0;
@@ -1608,9 +1601,10 @@ JobNode.getMultiSelectionInfo = function(i_selected)
 		if (job.node_type != 'jobs')
 			continue;
 
-		jobs_count ++;
+		jobs_count++;
 
-		if (job.params.time_started && ((job.params.time_started < time_started_min) || (time_started_min == 0)))
+		if (job.params.time_started &&
+			((job.params.time_started < time_started_min) || (time_started_min == 0)))
 			time_started_min = job.params.time_started;
 
 		if ((job.state.DON == true) && (job.params.time_done > time_finished_max))
@@ -1619,20 +1613,20 @@ JobNode.getMultiSelectionInfo = function(i_selected)
 		if (job.state.DON == true)
 		{
 			time_run_sum += job.params.time_done - job.params.time_started;
-			time_run_count ++;
+			time_run_count++;
 		}
 	}
 
 	let info = '<b><i>' + jobs_count + ' Jobs Selected</i></b>';
 
 	if (time_started_min)
-		info += "<br>Started First: <b>" + cm_DateTimeStrFromSec(time_started_min) + "</b>";
+		info += '<br>Started First: <b>' + cm_DateTimeStrFromSec(time_started_min) + '</b>';
 	if (time_finished_max)
-		info += "<br>Finished Last: <b>" + cm_DateTimeStrFromSec(time_finished_max) + "</b>";
+		info += '<br>Finished Last: <b>' + cm_DateTimeStrFromSec(time_finished_max) + '</b>';
 	if (time_run_count > 1)
 	{
-		info += "<br>Time Run Avg: <b>" + cm_TimeStringFromSeconds(time_run_sum / time_run_count) + "</b>";
-		info += "<br>Time Run Sum: <b>" + cm_TimeStringFromSeconds(time_run_sum) + "</b>";
+		info += '<br>Time Run Avg: <b>' + cm_TimeStringFromSeconds(time_run_sum / time_run_count) + '</b>';
+		info += '<br>Time Run Sum: <b>' + cm_TimeStringFromSeconds(time_run_sum) + '</b>';
 	}
 
 	return info;
@@ -1657,33 +1651,33 @@ JobNode.createPanels = function(i_monitor) {
 
 	// Errors:
 	var acts = {};
-	acts.error_hosts       = {'label':'Get',     'handle':'mh_Get',  'tooltip':'Show error hosts.'};
-	acts.reset_error_hosts = {'label':'Reset',   'handle':'mh_Oper', 'tooltip':'Reset error hosts.'};
-	acts.restart_errors    = {'label':'Restart', 'handle':'mh_Oper', 'tooltip':'Restart error tasks.'};
+	acts.error_hosts = {'label': 'Get', 'handle': 'mh_Get', 'tooltip': 'Show error hosts.'};
+	acts.reset_error_hosts = {'label': 'Reset', 'handle': 'mh_Oper', 'tooltip': 'Reset error hosts.'};
+	acts.restart_errors = {'label': 'Restart', 'handle': 'mh_Oper', 'tooltip': 'Restart error tasks.'};
 	i_monitor.createCtrlBtn(
 		{'name': 'errors', 'label': 'Errors', 'tooltip': 'Error tasks and hosts.', 'sub_menu': acts});
 
 
 	// Restart:
 	var acts = {};
-	acts.restart         = {'label':'All',       'tooltip':'Restart all tasks.'};
-	acts.restart_pause   = {'label':'All&Pause', 'tooltip':'Restart all and pause.'};
-	acts.restart_errors  = {'label':'Errors',    'tooltip':'Restart error tasks.'};
-	acts.restart_running = {'label':'Running',   'tooltip':'Restart running tasks.'};
-	acts.restart_skipped = {'label':'Skipped',   'tooltip':'Restart skipped tasks.'};
-	acts.restart_done    = {'label':'Done',      'tooltip':'Restart done task.'};
+	acts.restart = {'label': 'All', 'tooltip': 'Restart all tasks.'};
+	acts.restart_pause = {'label': 'All&Pause', 'tooltip': 'Restart all and pause.'};
+	acts.restart_errors = {'label': 'Errors', 'tooltip': 'Restart error tasks.'};
+	acts.restart_running = {'label': 'Running', 'tooltip': 'Restart running tasks.'};
+	acts.restart_skipped = {'label': 'Skipped', 'tooltip': 'Restart skipped tasks.'};
+	acts.restart_done = {'label': 'Done', 'tooltip': 'Restart done task.'};
 	i_monitor.createCtrlBtn(
 		{'name': 'restart_tasks', 'label': 'Restart', 'tooltip': 'Restart job tasks.', 'sub_menu': acts});
 
 
 	// Move:
-	if(false == g_VISOR())
+	if (false == g_VISOR())
 	{
 		var acts = {};
-		acts.move_jobs_top    = {'label':'Top',    'tooltip':'Move jobs top.'};
-		acts.move_jobs_up     = {'label':'Up',     'tooltip':'Move jobs up.'};
-		acts.move_jobs_down   = {'label':'Down',   'tooltip':'Move jobs down.'};
-		acts.move_jobs_bottom = {'label':'Bottom', 'tooltip':'Move jobs bottom.'};
+		acts.move_jobs_top = {'label': 'Top', 'tooltip': 'Move jobs top.'};
+		acts.move_jobs_up = {'label': 'Up', 'tooltip': 'Move jobs up.'};
+		acts.move_jobs_down = {'label': 'Down', 'tooltip': 'Move jobs down.'};
+		acts.move_jobs_bottom = {'label': 'Bottom', 'tooltip': 'Move jobs bottom.'};
 		i_monitor.createCtrlBtn({
 			'name': 'move_jobs',
 			'label': 'Move',
@@ -1695,19 +1689,20 @@ JobNode.createPanels = function(i_monitor) {
 
 	// Actions:
 	var acts = {};
-	acts.start  = {'label':'START',  'tooltip':'Start job.'};
-	acts.pause  = {'label':'PAUSE',  'tooltip':'Pause job.'};
-	acts.stop   = {'label':'STOP',   'tooltip':'Double click to stop job running tasks.', 'ondblclick': true};
-	acts.listen = {'label':'LISTEN', 'tooltip':'Double click to listen job.','ondblclick':true, 'handle':'listen'};
-	acts.delete = {'label':'DELETE', 'tooltip':'Double click to delete job(s).', 'ondblclick':true};
-	if(false == g_VISOR())
+	acts.start = {'label': 'START', 'tooltip': 'Start job.'};
+	acts.pause = {'label': 'PAUSE', 'tooltip': 'Pause job.'};
+	acts.stop = {'label': 'STOP', 'tooltip': 'Double click to stop job running tasks.', 'ondblclick': true};
+	acts.listen =
+		{'label': 'LISTEN', 'tooltip': 'Double click to listen job.', 'ondblclick': true, 'handle': 'listen'};
+	acts.delete = {'label': 'DELETE', 'tooltip': 'Double click to delete job(s).', 'ondblclick': true};
+	if (false == g_VISOR())
 	{
 		acts.deldone = {
-			"label": "DELDONE",
-			"tooltip": 'Double click to delete all done jobs.',
-			"ondblclick": true,
-			"always_active": true,
-			"handle": 'delDoneJobs'
+			'label': 'DELDONE',
+			'tooltip': 'Double click to delete all done jobs.',
+			'ondblclick': true,
+			'always_active': true,
+			'handle': 'delDoneJobs'
 		};
 	}
 	i_monitor.createCtrlBtns(acts);
@@ -1823,7 +1818,7 @@ JobNode.delDoneJobs = function(i_args) {
 		return;
 	}
 
-	nw_Action('jobs', ids, {"type": 'delete'});
+	nw_Action('jobs', ids, {'type': 'delete'});
 	i_args.monitor.info('Deleting all done jobs.');
 };
 
@@ -1843,15 +1838,15 @@ JobNode.listen = function(i_args) {
 };
 
 JobNode.params_job = {
-	depend_mask /************/: {"type": 'reg', "label": 'Depend Mask'},
-	depend_mask_global /*****/: {"type": 'reg', "label": 'Global Depend Mask'},
-	time_wait /**************/: {"type": 'tim', "label": 'Time Wait'},
-	need_os /****************/: {"type": 'reg', "label": 'OS Needed'},
-	need_properties /********/: {"type": 'reg', "label": 'Need Properties'},
-	time_life /**************/: {"type": 'hrs', "label": 'Life Time'},
-	hidden /*****************/: {"type": 'bl1', "label": 'Hidden'},
-	ppa /********************/: {"type": 'bl1', "label": 'Preview Pending Approval'},
-	user_name /**************/: {"type": 'str', "label": 'Owner', "permissions": 'visor'}
+	depend_mask /************/: {'type': 'reg', 'label': 'Depend Mask'},
+	depend_mask_global /*****/: {'type': 'reg', 'label': 'Global Depend Mask'},
+	time_wait /**************/: {'type': 'tim', 'label': 'Time Wait'},
+	need_os /****************/: {'type': 'reg', 'label': 'OS Needed'},
+	need_properties /********/: {'type': 'reg', 'label': 'Need Properties'},
+	time_life /**************/: {'type': 'hrs', 'label': 'Life Time'},
+	hidden /*****************/: {'type': 'bl1', 'label': 'Hidden'},
+	ppa /********************/: {'type': 'bl1', 'label': 'Preview Pending Approval'},
+	user_name /**************/: {'type': 'str', 'label': 'Owner', 'permissions': 'visor'}
 };
 
 JobNode.createParams = function() {
@@ -1868,34 +1863,36 @@ JobNode.createParams = function() {
 };
 
 JobNode.view_opts = {
-	jobs_thumbs_num: {"type": 'num', "label": "THUMBNAIS COUNT", "tooltip": 'Thumbnails quantity.', "default": 12},
-	jobs_thumbs_height: {"type": 'num', "label": "THUMBNAIS SIZE", "tooltip": 'Thumbnails height.', "default": 100}
+	jobs_thumbs_num:
+		{'type': 'num', 'label': 'THUMBNAIS COUNT', 'tooltip': 'Thumbnails quantity.', 'default': 12},
+	jobs_thumbs_height:
+		{'type': 'num', 'label': 'THUMBNAIS SIZE', 'tooltip': 'Thumbnails height.', 'default': 100}
 };
 
 
 JobBlock.params = {
-	capacity /***************/: {"type": 'num', "label": 'Capacity'},
-	sequential /*************/: {"type": 'num', "label": 'Sequential'},
-	max_running_tasks /******/: {"type": 'num', "label": 'Max Running Tasks'},
-	max_running_tasks_per_host: {"type": 'num', "label": 'Max Run Tasks Per Host'},
-	errors_retries /*********/: {"type": 'num', "label": 'Errors Retries'},
-	errors_avoid_host /******/: {"type": 'num', "label": 'Errors Avoid Host'},
-	errors_task_same_host /**/: {"type": 'num', "label": 'Errors Task Same Host'},
-	errors_forgive_time /****/: {"type": 'hrs', "label": 'Errors Forgive Time'},
-	task_max_run_time /******/: {"type": 'hrs', "label": 'Task Max Run Time'},
-	task_min_run_time /******/: {"type": 'num', "label": 'Task Min Run Time'},
-	task_progress_change_timeout:{"type":'hrs', "label": 'Task Progress Change Timeout'},
-	hosts_mask /*************/: {"type": 'reg', "label": 'Hosts Mask'},
-	hosts_mask_exclude /*****/: {"type": 'reg', "label": 'Exclude Hosts Mask'},
-	depend_mask /************/: {"type": 'reg', "label": 'Depend Mask'},
-	tasks_depend_mask /******/: {"type": 'reg', "label": 'Tasks Depend Mask'},
-	need_memory                 :{"type":'mib', "label": 'Needed Free Memory GB'},
-	need_gpu_mem_mb             :{"type":'mib', "label": 'Needed Free GPU Memory GB'},
-	need_cpu_freq_mgz           :{"type":'meg', "label": 'Needed GPU Frequency GHz'},
-	need_cpu_cores              :{"type":'num', "label": 'Needed GPU Cores'},
-	need_cpu_freq_cores         :{"type":'meg', "label": 'Needed GPU Freq*Cores GHz'},
-	need_hdd                    :{"type":'gib', "label": 'Needed Free HDD Space GB'},
-	need_properties /********/: {"type": 'reg', "label": 'Properties Needed'}
+	capacity /***************/: {'type': 'num', 'label': 'Capacity'},
+	sequential /*************/: {'type': 'num', 'label': 'Sequential'},
+	max_running_tasks /******/: {'type': 'num', 'label': 'Max Running Tasks'},
+	max_running_tasks_per_host: {'type': 'num', 'label': 'Max Run Tasks Per Host'},
+	errors_retries /*********/: {'type': 'num', 'label': 'Errors Retries'},
+	errors_avoid_host /******/: {'type': 'num', 'label': 'Errors Avoid Host'},
+	errors_task_same_host /**/: {'type': 'num', 'label': 'Errors Task Same Host'},
+	errors_forgive_time /****/: {'type': 'hrs', 'label': 'Errors Forgive Time'},
+	task_max_run_time /******/: {'type': 'hrs', 'label': 'Task Max Run Time'},
+	task_min_run_time /******/: {'type': 'num', 'label': 'Task Min Run Time'},
+	task_progress_change_timeout: {'type': 'hrs', 'label': 'Task Progress Change Timeout'},
+	hosts_mask /*************/: {'type': 'reg', 'label': 'Hosts Mask'},
+	hosts_mask_exclude /*****/: {'type': 'reg', 'label': 'Exclude Hosts Mask'},
+	depend_mask /************/: {'type': 'reg', 'label': 'Depend Mask'},
+	tasks_depend_mask /******/: {'type': 'reg', 'label': 'Tasks Depend Mask'},
+	need_memory: {'type': 'mib', 'label': 'Needed Free Memory GB'},
+	need_gpu_mem_mb: {'type': 'mib', 'label': 'Needed Free GPU Memory GB'},
+	need_cpu_freq_mgz: {'type': 'meg', 'label': 'Needed GPU Frequency GHz'},
+	need_cpu_cores: {'type': 'num', 'label': 'Needed GPU Cores'},
+	need_cpu_freq_cores: {'type': 'meg', 'label': 'Needed GPU Freq*Cores GHz'},
+	need_hdd: {'type': 'gib', 'label': 'Needed Free HDD Space GB'},
+	need_properties /********/: {'type': 'reg', 'label': 'Properties Needed'}
 };
 
 // First array item will be used by default (on load)
