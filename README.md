@@ -67,6 +67,31 @@ The typical file header and code style for C++ and JS files can automatically be
 
 The file header shall contain as much information as possible about the file, you can find a good example here:
 [afanasy/browser/monitor.js](https://github.com/CGRU/cgru/blob/master/afanasy/browser/monitor.js)
+
+### Code Formatting
+
+This code uses [clang-format](https://clang.llvm.org/docs/ClangFormat.html) to format both the Javascript as well as the C++ code.
+
+#### Auto formatting
+
+It provides a [pre-commit](https://pre-commit.com/) hook for auto-formatting. It can be installed by running:
+
+```sh
+pipx install pre-commit
+pre-commit install
+```
+
+This hook will run and format the code on the next "git commmit".
+
+#### Manual formatting
+
+You can also manually format the code by running:
+
+```sh
+clang-format -i the-source-file.cpp the-header-file.h
+```
+
+
 ### Some names:
 **CGRU** - came from CG - Rules. It has two meanings: computer graphics principles and computer graphics is a cool thing.
 
