@@ -61,7 +61,7 @@ Msg::Msg( const char * rawData, int rawDataLen):
 	}
 	if( rawDataLen > Msg::SizeBufferLimit )  // Check maximum message size.
 	{
-		AFERRAR("Msg::Msg: rawDataLen > Msg::SizeHeader (%d>%d).", rawDataLen, Msg::SizeBufferLimit)
+		AFERRAR("Msg::Msg: rawDataLen > Msg::SizeBufferLimit (%d>%d).", rawDataLen, Msg::SizeBufferLimit)
 		setInvalid();
 		return;
 	}
