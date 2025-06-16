@@ -206,14 +206,15 @@ class Status:
                 if progress is not None:
                     self.data['progress'] = progress
 
-                # Stage flag should remove other stage flags:
                 mode = rulib.RULES_TOP[item_name][i].get('mode')
-                if mode == 'stage':
-                    for f in self.data[item_name]:
-                        if f in rulib.RULES_TOP[item_name]:
-                            other_mode = rulib.RULES_TOP[item_name][f].get('mode')
-                            if other_mode == 'stage':
-                                self.data[item_name].remove(f)
+                if mode and len(mode):
+                    # Stage flag should remove other stage flags:
+                    if 'stage' in mode:
+                        for f in self.data[item_name]:
+                            if f in rulib.RULES_TOP[item_name]:
+                                other_mode = rulib.RULES_TOP[item_name][f].get('mode')
+                                if other_mode and len(other_mode) and 'stage' in other_mode:
+                                    self.data[item_name].remove(f)
 
             self.data[item_name].append(i)
 

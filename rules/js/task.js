@@ -196,17 +196,7 @@ Task.prototype.show = function()
 	//st_SetElTags(this.obj, this.elName);
 	this.elName.textContent = this.obj.name;
 
-	if (this.obj.priority && (this.obj.progress != 100))
-	{
-		this.elPriority.textContent = this.obj.priority;
-		this.elPriority.style.display = 'block';
-		task_PriorityStyle(this.elPriority, this.obj.priority)
-	}
-	else
-	{
-		this.elPriority.textContent = '';
-		this.elPriority.style.display = 'none';
-	}
+	task_SetPriority(this.elPriority, this.obj)
 
 	st_SetElArtists(this.obj, this.elArtists,/*short = */false,/*clickable = */true);
 	st_SetElFlags(this.obj, this.elFlags,/*short = */false,/*clickable = */true);
@@ -736,14 +726,10 @@ function task_DrawBadges(i_status, i_el, i_args)
 		elName.textContent = task.tags.join('_');
 		elTask.appendChild(elName);
 
-		if (task.priority && (task.progress != 100))
-		{
-			let elPri = document.createElement('div');
-			elPri.classList.add('priority');
-			elPri.textContent = task.priority;
-			elTask.appendChild(elPri);
-			task_PriorityStyle(elPri, task.priority);
-		}
+		let elPri = document.createElement('div');
+		elPri.classList.add('priority');
+		elTask.appendChild(elPri);
+		task_SetPriority(elPri, task);
 
 		if ( ! i_args.hide_artists)
 		{
@@ -796,18 +782,40 @@ function task_StatusArtistClicked(i_name)
 	new Task(null, {'artists':[i_name],'tags':tags});
 }
 
-function task_PriorityStyle(i_el, i_priority)
+function task_SetPriority(i_el, i_obj)
 {
-	let priority = 0;
-	if (i_priority == 1)
+	let show_priority = false;
+	if (i_obj && i_obj.priority && (i_obj.progress != 100))
+	{
+		show_priority = true;
+		if (i_obj.flags)
+			for (let f of i_obj.flags)
+				if (RULES.flags[f] && RULES.flags[f].mode && RULES.flags[f].mode.includes('hide_priority'))
+					show_priority = false;
+	}
+
+	if (show_priority)
+	{
+		i_el.textContent = i_obj.priority;
+		i_el.style.display = 'block';
+	}
+	else
+	{
+		i_el.textContent = '';
+		i_el.style.display = 'none';
+		return;
+	}
+
+	let priority = i_obj.priority;
+
+	if (priority == 1)
 		priority = 5;
-	else if (i_priority == 2)
+	else if (priority == 2)
 		priority = 10;
-	else if (i_priority == 3)
+	else if (priority == 3)
 		priority = 25;
-	else if (i_priority >= 4)
+	else if (priority >= 4)
 		priority = 100;
-	else priority = i_priority;
 
 	// Backgound color:
 	let r = Math.round(priority / 10.0 * 255);

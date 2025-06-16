@@ -1818,13 +1818,17 @@ function st_SetStatusFlags(o_status, i_flags)
 				if (progress != null)
 					o_status.progress = progress;
 
-				// Stage flag shuold remove other stage flags:
-				if (RULES.flags[id].mode && (RULES.flags[id].mode == 'stage'))
+				let mode = RULES.flags[id].mode;
+				if (mode && mode.length)
 				{
-					o_status.flags.forEach((item, index) => {
-						if (RULES.flags[item].mode === 'stage')
-							o_status.flags.splice(index, 1);
-					});
+					// Stage flag should remove other stage flags:
+					if (mode.includes('stage'))
+					{
+						o_status.flags.forEach((item, index) => {
+							if (RULES.flags[item].mode && (RULES.flags[item].mode.includes('stage')))
+								o_status.flags.splice(index, 1);
+						});
+					}
 				}
 			}
 
