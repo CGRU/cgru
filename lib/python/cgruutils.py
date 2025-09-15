@@ -12,7 +12,7 @@ import webbrowser
 
 import cgruconfig
 
-ImgExtensions = ['dpx', 'exr', 'jpg', 'jpeg', 'png', 'tif', 'tiff', 'psd', 'xcf']
+ImgExtensions = ['dpx', 'exr', 'jpg', 'jpeg', 'png', 'tif', 'tiff', 'psd', 'xcf','insp','dng']
 MovExtensions = ['mov', 'avi', 'mp4','ogg','mxf', 'mpg', 'mpeg']
 
 def isImageExt(i_file):
