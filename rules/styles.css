@@ -800,7 +800,9 @@ border-radius: 0 0 0 4px;
 .playlist_ctrl_top .button { width: 20px; height: 20px; }
 .playlist_ctrl_bot .button { width: 16px; height: 16px; margin: 1px; }
 .playlist_ctrl_bot { border-top: 1px solid rgba(98,98,98,.5); }
+.playlist_ctrl_bot
 #playlist { padding: 2px; }
+#playlist_add_location_button { width: 100px; background-size: auto 100%; background-position-x: left; font-size: 10px;}
 #playlist .item {
 font-weight: normal;
 }
@@ -815,14 +817,15 @@ margin: 1px;
 #playlist .item .button.delete {
 float: right; width: 10px; height: 10px; opacity: .7;
 }
-#playlist .location { font-size: 14px; padding: 0px 0px 0px 8px; border-top: 1px solid rgba(100,100,100,.5); }
-#playlist .location.cur_path { background: rgba( 100, 255, 255, .2 ); }
-#playlist .location a { display: block; }
-#playlist .location .anchor { float: right; }
-#playlist .location .link { float: left; }
-#playlist .location .anchor { font-size: 10px; text-align: right; margin-bottom: 2px; padding: 1px 4px; }
-#playlist .folder > .folder, #playlist .folder > .location { display: none;}
-#playlist .folder.opened > .folder, #playlist .folder.opened > .location { display: block;}
+#playlist .pathlink { font-size: 14px; padding: 0px 0px 0px 8px; border-top: 1px solid rgba(100,100,100,.5); }
+#playlist .pathlink.cur_path { background: rgba( 100, 255, 255, .2 ); }
+#playlist .pathlink a { display: block; }
+#playlist .pathlink .anchor { float: right; }
+#playlist .pathlink .link { float: left; }
+#playlist .pathlink .anchor { font-size: 10px; text-align: right; margin-bottom: 2px; padding: 1px 4px; }
+#playlist .folder > .folder, #playlist .folder > .pathlink { display: none;}
+#playlist .folder.opened > .folder, #playlist .folder.opened > .pathlink { display: block;}
+#playlist .folder .button.location {float: right; font-size: 8px; margin: 1px; padding: 1px;}
 #playlist .current {font-weight: bold;}
 #playlist .folder:hover { border: 1px solid #555;}
 

@@ -203,8 +203,9 @@ function ad_Logout()
 	console.log( JSON.stringify( i_data));
 	*/
 	///*
-	var xhr = new XMLHttpRequest;
+	let xhr = new XMLHttpRequest;
 	xhr.open('GET', '/', true, 'null', 'null');
+	//xhr.setRequestHeader('Authorization', '')
 	xhr.send('');
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState == 4)

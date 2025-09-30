@@ -37,6 +37,7 @@ from . import comments
 from . import editobj
 from . import functions
 from . import news
+from . import playlist
 from . import search
 from . import status
 

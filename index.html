@@ -486,12 +486,14 @@ this bookmark will be visible only for you.
 Use playlist for bookmarks for all users of the RULES site.
 Guests can't edit playlist.
 "				></div>
-				<div class="button" onclick="p_NewOnClick()" title="Create new folder"
+				<div class="button" onclick="p_AddFolderOnClick()" title="Create new folder"
 					style="background-image:url(rules/icons/folder_new.png);"></div>
 				<div class="button" onclick="p_AddLinkAbc()" title="Add current location to selected folder alphabetically"
 					style="background-image:url(rules/icons/bookmark.png);"></div>
 				<div class="button" onclick="p_RenameOnClick()" title="Rename current item"
 					style="background-image:url(rules/icons/rename.png);;"></div>
+				<div class="button" ondblclick="p_AddLocationOnClick()" title="Add location playlist" id="playlist_add_location_button"
+					style="background-image:url(rules/icons/folder_new.png);">Location</div>
 			</div>
 			<div id="playlist"></div>
 			<div class="playlist_ctrl playlist_ctrl_bot">

@@ -395,6 +395,28 @@ class Requests:
         return
 
 
+    def req_playlist(self, i_args, o_out):
+        if not 'location' in i_args:
+            o_out['error'] = 'Location is not specified.'
+            return
+        pl = rulib.playlist.Playlist(i_args['location'])
+
+        if 'action' in i_args:
+            if hasattr(pl, i_args['action']):
+                kwargs = i_args['args']
+                kwargs['out'] = dict()
+                kwargs['uid'] = self.session.USER_ID
+                getattr(pl, i_args['action'])(**kwargs)
+                if 'error' in kwargs['out']:
+                    o_out['error'] = kwargs['out']['error']
+                    return
+            else:
+                o_out['error'] = 'Playlist action="%s" does not exist.' % i_args['action']
+                return
+
+        o_out['playlist'] = pl.generatePlaylist()
+
+
     def req_search(self, i_args, o_out):
         if not 'path' in i_args:
             o_out['error'] = 'Search path is not specified.'
