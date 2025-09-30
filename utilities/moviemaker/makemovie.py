@@ -7,6 +7,7 @@ import time
 import shutil
 import signal
 import subprocess
+import traceback
 
 print('MakeMovie: "%s"' % __file__)
 
@@ -65,6 +66,7 @@ Parser.add_option('--tmpformat',        dest='tmpformat',   type  ='string',    
 Parser.add_option('--tmpquality',       dest='tmpquality',  type  ='string',     default='',          help='Temporary image quality, or format options')
 Parser.add_option('--audio',            dest='audio',       type  ='string',     default=None,        help='Add sound from audio file')
 Parser.add_option('--acodec',           dest='acodec',      type  ='string',     default='aac',       help='Audio codec')
+Parser.add_option('--copy',             dest='copy',        type  ='string',     default=None,        help='Copy result into folders, comma separated')
 
 # Options to makeframe:
 Parser.add_option('-i', '--imgcmd',     dest='imgcmd',         type  ='string',     default='convert',   help='Image convert and draw command')
@@ -780,66 +782,94 @@ if Options.afanasy:
 
 # Commands execution:
 if Options.afanasy:
-	j.send(Verbose)
+    j.send(Verbose)
 else:
-	if len(cmd_precomp) or need_convert:
-		os.mkdir(TmpDir, 0o777)
-	if len(cmd_precomp):
-		n = 0
-		print('ACTIVITY: Precomp')
-		sys.stdout.flush()
-		for cmd in cmd_precomp:
-			print(name_precomp[n])
-			if Verbose: print(cmd)
-			os.system(cmd)
-			n += 1
-		print('')
-	if need_convert:
-		n = 0
-		print('ACTIVITY: Convert')
-		sys.stdout.flush()
-		for cmd in cmd_convert:
-			print(name_convert[n])
+    if len(cmd_precomp) or need_convert:
+        os.mkdir(TmpDir, 0o777)
+    if len(cmd_precomp):
+        n = 0
+        print('ACTIVITY: Precomp')
+        sys.stdout.flush()
+        for cmd in cmd_precomp:
+            print(name_precomp[n])
+            if Verbose: print(cmd)
+            os.system(cmd)
+            n += 1
+        print('')
+    if need_convert:
+        n = 0
+        print('ACTIVITY: Convert')
+        sys.stdout.flush()
+        for cmd in cmd_convert:
+            print(name_convert[n])
 
-			if n <= 1 or n == len(cmd_convert)-1 or n%10 == 0:
-				# Generate thumbnail while task is running:
-				print('@IMAGE!@' + img_convert[n])
+            if n <= 1 or n == len(cmd_convert)-1 or n%10 == 0:
+                # Generate thumbnail while task is running:
+                print('@IMAGE!@' + img_convert[n])
 
-			if Verbose: print(cmd)
-			# output = subprocess.Popen( cmd, stdout=subprocess.PIPE).communicate()[0]
-			cmd_array = []
-			#         if os.platform.find('win')
-			subprocess.Popen(cmd, shell=True).communicate()
-			#         subprocess.Popen(['bash','-c',cmd]).communicate()
-			#         os.system( cmd)
-			#         print( output)
-			n += 1
-			print('PROGRESS: %d' % (100.0 * n / imgCount) + '%')
-			sys.stdout.flush()
-		print('')
+            if Verbose: print(cmd)
+            # output = subprocess.Popen( cmd, stdout=subprocess.PIPE).communicate()[0]
+            cmd_array = []
+            #         if os.platform.find('win')
+            subprocess.Popen(cmd, shell=True).communicate()
+            #         subprocess.Popen(['bash','-c',cmd]).communicate()
+            #         os.system( cmd)
+            #         print( output)
+            n += 1
+            print('PROGRESS: %d' % (100.0 * n / imgCount) + '%')
+            sys.stdout.flush()
+        print('')
 
-	print('ACTIVITY: Encode')
-	print(cmd_encode)
-	sys.stdout.flush()
-	if (os.system(cmd_encode) != 0):
-		shutil.rmtree(TmpDir)
-		sys.exit(1)
+    print('ACTIVITY: Encode')
+    print(cmd_encode)
+    sys.stdout.flush()
+    if (os.system(cmd_encode) != 0):
+        shutil.rmtree(TmpDir)
+        sys.exit(1)
 
-	if cmd_preview != '':
-		print('ACTIVITY: Preview')
-		if Verbose: print(cmd_preview)
-		sys.stdout.flush()
-		os.system(cmd_preview)
+    if cmd_preview != '':
+        print('ACTIVITY: Preview')
+        if Verbose: print(cmd_preview)
+        sys.stdout.flush()
+        os.system(cmd_preview)
 
-	if not Debug:
-		if os.path.isdir(TmpDir):
-			shutil.rmtree(TmpDir)
-			if os.path.isdir(TmpDir):
-				print('Warning: Temporary directory still exsists:')
-				print(TmpDir)
-		else:
-			print('Warning: Temporary directory does not exsist:')
-			print(TmpDir)
+    if not Debug:
+        if os.path.isdir(TmpDir):
+            shutil.rmtree(TmpDir)
+            if os.path.isdir(TmpDir):
+                print('Warning: Temporary directory still exsists:')
+                print(TmpDir)
+        else:
+            print('Warning: Temporary directory does not exsist:')
+            print(TmpDir)
 
-	print('')
-	print('Done')
+    print('')
+
+    if Options.copy:
+        outfile = Output + '.' + Container
+        if not os.path.isfile(outfile):
+            print('Output file does not exists:')
+            print(outfile)
+        else:
+            for folder in Options.copy.split(','):
+                if not os.path.isdir(folder):
+                    print('Creating a folder for copy:')
+                    print(folder)
+                    try:
+                        os.makedirs(folder)
+                    except:
+                        print(traceback.format_exc())
+                        continue
+                if not os.path.isdir(folder):
+                    print('Copy folder does not exist:')
+                    print(folder)
+                    continue
+                print('Creating a copy in: "%s"' % folder)
+                try:
+                    shutil.copy2(outfile, folder)
+                except:
+                    print('Failed to create a copy:')
+                    print(traceback.format_exc())
+
+    print('')
+    print('Done')

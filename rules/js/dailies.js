@@ -39,6 +39,7 @@ d_params.general = {
 	comments : {}
 };
 d_params.settings = {
+	copy_folder    : {"label":'Copy Folder', "default":"", "tooltip":'Copy to folder'},
 	audio_file     : {"label":'Audio', "default":"REF/sound.flac", "tooltip":'Sound file'},
 	af_depend_mask : {"label":'Depends', "tooltip":'Afanasy job depend mask'},
 	af_hostsmask   : {'label':'Hosts Mask'},
@@ -153,6 +154,14 @@ function d_Make(i_path, i_outfolder)
 			d_params.general.artist.pulldown = usrTitles;
 		}
 	}
+
+
+	let copy_folder = null;
+	if (ASSETS.project)
+		copy_folder = ASSETS.project.path;
+		copy_folder += '/DAILIES';
+		copy_folder += '/' + activity;
+		params.copy_folder = c_PathPM_Rules2Client(copy_folder);
 
 
 	var dateObj = new Date();
@@ -409,6 +418,7 @@ function d_ProcessGUI(i_wnd)
 	//console.log(task.command);
 	//console.log(JSON.stringify(job));
 	//return;
+
 	n_SendJob(job);
 
 	let news_path = g_CurPath();
@@ -497,6 +507,8 @@ function d_MakeCmd(i_params)
 		cmd += ' --draw235 ' + params.draw235;
 
 	cmd += ' --createoutdir';
+
+	cmd += ' --copy "' + params.copy_folder + '"';
 
 	cmd += ' "' + input + '"';
 	cmd += ' "' + output + '"';
