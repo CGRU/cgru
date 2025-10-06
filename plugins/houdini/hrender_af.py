@@ -286,11 +286,13 @@ multisampled_rops = ["alembic"]
 fetched_rop = drivertypename
 
 # Add USDs Rops to multisamples if need
-if drivertypename in ["usd_rop", "usd"]:
+if drivertypename in ["usd_rop", "usd", "usdexport"]:
     try:
-        mode = ropnode.evalParm('fileperframe')
+        #mode = ropnode.evalParm('fileperframe')
         trange = ropnode.evalParm('trange')
-        if mode == 0 and trange != 0:
+        #if mode == 0 and trange != 0:
+        output_file = ropnode.parm('lopoutput').rawValue()
+        if not "$F" in output_file and trange != 0:
             multisampled_rops.append(drivertypename)
     except:
         pass
