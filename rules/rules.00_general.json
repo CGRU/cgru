@@ -38,7 +38,7 @@
 	"hqres"       :{"title":"HQRES",       "clr":[100,250,100], "short":"HQR", "p_min":98, "p_max":98, "mode":null,      "tip":"Render high quality results"},
 	"cbb"         :{"title":"CBB",         "clr":[140,145,121], "short":"CBB", "p_min":100,            "mode":["hide_priority"],         "tip":"Could be better"},
 	"done"        :{"title":"DONE",        "clr":[121,155,121], "short":"DON", "p_min":100,            "mode":["stage","hide_priority"], "tip":"Done"},
-	"closed"      :{"title":"CLOSED",      "clr":[ 11, 55, 11], "short":"CLS", "p_min":100,            "mode":["stage","hide_priority"], "tip":"Closed"},
+	"closed"      :{"title":"CLOSED",      "clr":[ 11, 55, 11], "short":"CLS", "p_min":100,            "mode":["stage","hide_priority","done"], "tip":"Closed"},
 	"aux"         :{"title":"AUX",         "clr":[127,127,127], "short":"AUX",             "p_max":-1, "mode":["stage"], "tip":"Auxiliary",
 		"new_line":true},
 	"precomp"     :{"title":"PRECOMP",     "clr":[ 80, 96,115], "short":"PC",  "p_min":10, "p_max":30, "tip":"Precomp exists"}
