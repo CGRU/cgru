@@ -127,7 +127,7 @@ class Status:
         if 'flags' in self.data:
             for f in self.data['flags']:
                 #if f == 'done' or (f in rulib.RULES_TOP['flags'] and 'mode' in rulib.RULES_TOP['flags'][f] and rulib.RULES_TOP['flags'][f]['mode'] == 'done'):
-                if f in rulib.RULES_TOP['flags'] and 'mode' in rulib.RULES_TOP['flags'][f] and 'done' in rulib.RULES_TOP['flags'][f]['mode']:
+                if f in rulib.RULES_TOP['flags'] and 'mode' in rulib.RULES_TOP['flags'][f] and type(rulib.RULES_TOP['flags'][f]['mode']) == list and 'done' in rulib.RULES_TOP['flags'][f]['mode']:
                     if 'tasks' in self.data:
                         for t in self.data['tasks']:
                             task = self.data['tasks'][t]
