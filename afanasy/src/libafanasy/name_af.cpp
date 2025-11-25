@@ -145,6 +145,14 @@ char ** af::processEnviron( const std::map<std::string, std::string> & i_env_map
 		env_vec.push_back( str);
 	}
 	FreeEnvironmentStrings( env_str);
+
+	for( std::map<std::string,std::string>::const_iterator it = i_env_map.begin(); it != i_env_map.end(); it++)
+		if ((it->first).size() && (it->second).size())
+		{
+			std::string str = it->first + '=' + it->second;
+			env_vec.insert(env_vec.begin(), str);
+			env_size += str.size() + 1; ///< For "name=value" '\0' termination
+		}
 	#else
 	for (char ** e = environ; *e != 0; e++)
 	{
@@ -153,7 +161,6 @@ char ** af::processEnviron( const std::map<std::string, std::string> & i_env_map
 		env_vec.push_back(str);
 		env_size += str.size() + 1; ///< For "name=value" '\0' termination
 	}
-	#endif
 
 	for( std::map<std::string,std::string>::const_iterator it = i_env_map.begin(); it != i_env_map.end(); it++)
 		if ((it->first).size() && (it->second).size())
@@ -162,6 +169,7 @@ char ** af::processEnviron( const std::map<std::string, std::string> & i_env_map
 			env_vec.push_back( str);
 			env_size += str.size() + 1; ///< For "name=value" '\0' termination
 		}
+	#endif
 
 	env_size++; ///< For the last '\0' termination
 
