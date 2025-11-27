@@ -348,6 +348,13 @@ void ListTasks::generateMenu(QMenu &o_menu, Item * i_item)
 			connect( action, SIGNAL( triggered() ), this, SLOT( actTasksRestart() ));
 			o_menu.addAction( action);
 
+			if (m_blocks.size() && itemTask->getItemBlock()->getInfo()->tasks_depend_mask.size())
+			{
+				action = new QAction("Restart With Depends", this);
+				connect(action, SIGNAL(triggered()), this, SLOT(actTasksRestartWithDepends()));
+				o_menu.addAction(action);
+			}
+
 			break;
 		}
 		default:
@@ -688,13 +695,14 @@ void ListTasks::actTaskOpen()
 	openTask(static_cast<ItemJobTask*>(item));
 }
 
-void ListTasks::actTasksSkip()   {tasksOperation("skip");   }
-void ListTasks::actTasksDone()   {tasksOperation("done");   }
-void ListTasks::actTasksRestart(){tasksOperation("restart");}
-void ListTasks::actTasksSuspend(){tasksOperation("suspend");}
-void ListTasks::actTasksContinue(){tasksOperation("continue");}
-void ListTasks::actTaskTryNext() {tasksOperation("trynext","append");}
-void ListTasks::actTaskDoNotTry(){tasksOperation("trynext","remove");}
+void ListTasks::actTasksSkip()               {tasksOperation("skip");   }
+void ListTasks::actTasksDone()               {tasksOperation("done");   }
+void ListTasks::actTasksRestart()            {tasksOperation("restart");}
+void ListTasks::actTasksRestartWithDepends() {tasksOperation("restart","affect_depends");}
+void ListTasks::actTasksSuspend()            {tasksOperation("suspend");}
+void ListTasks::actTasksContinue()           {tasksOperation("continue");}
+void ListTasks::actTaskTryNext()             {tasksOperation("trynext","append");}
+void ListTasks::actTaskDoNotTry()            {tasksOperation("trynext","remove");}
 
 void ListTasks::openTask( ItemJobTask * i_itemTask)
 {

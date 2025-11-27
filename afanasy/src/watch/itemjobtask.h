@@ -25,6 +25,8 @@ public:
 
 	void upProgress( const af::TaskProgress & tp);
 
+	inline ItemJobBlock * getItemBlock() const {return m_block;}
+
 	inline bool isBlockNumeric() const { return m_block->numeric;}
 
 	inline int getBlockNum() const { return m_blocknum; }

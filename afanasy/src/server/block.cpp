@@ -510,7 +510,7 @@ bool Block::checkTasksDependStatus(MonitorContainer * i_monitoring)
 			if (dep_on_task->isDone())
 				continue;
 
-			// Check subframe depend, is depend task is running:
+			// Check subframe depend, if depend task is running:
 			if (dep_on_task->getBlock()->m_data->isDependSubTask() && dep_on_task->isRunning())
 			{
 				long long firstdependframe, lastdependframe;
@@ -711,16 +711,25 @@ void Block::tasksOperation(Action & i_action, const JSON & i_operation, uint32_t
 	af::jr_int32vec("task_ids", tasks_vec, i_operation);
 
 	int length = m_data->getTasksNum();
-	if( tasks_vec.size())
+	if (tasks_vec.size())
 		length = tasks_vec.size();
 
-	for( int i = 0; i < length; i++)
+	std::string mode;
+	af::jr_string("mode", mode, i_operation);
+	if (mode.size())
+		i_action.log.appendType(mode);
+
+	bool affect_depends = false;
+	if (mode == "affect_depends")
+		affect_depends = true;
+
+	for (int i = 0; i < length; i++)
 	{
 		int t = i;
-		if( tasks_vec.size())
+		if (tasks_vec.size())
 		{
 			t = tasks_vec[i];
-			if(( t >= m_data->getTasksNum()) || ( t < 0 ))
+			if ((t >= m_data->getTasksNum()) || (t < 0))
 			{
 				i_action.answerError("Invalid operation task numer = " + af::itos(t));
 				return;
@@ -729,8 +738,20 @@ void Block::tasksOperation(Action & i_action, const JSON & i_operation, uint32_t
 
 		m_tasks[t]->operation(i_action.log, i_action.renders, i_action.monitors, i_with_state, i_set_state);
 
-		m_job->forceRefresh();
+		if (affect_depends && m_tasks[t]->m_depend_on.size())
+		{
+			for (const auto task: m_tasks[t]->m_depend_on)
+			{
+				i_action.log.info += " D:" + af::itos(task->getBlock()->getBlockNum()) + "," + af::itos(task->getNumber()) + " ";
+				task->operation(i_action.log, i_action.renders, i_action.monitors, i_with_state, i_set_state);
+			}
+		}
+
 	}
+
+	checkTasksDependStatus(i_action.monitors);
+
+	m_job->forceRefresh();
 }
 
 bool Block::tryTasksNext(Action & i_action, const JSON & i_operation)

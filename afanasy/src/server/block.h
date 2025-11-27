@@ -19,6 +19,9 @@ public:
 
 	inline bool isInitialized() const { return m_initialized;}
 
+	inline const std::string & getName() const {return m_data->getName();}
+	inline int getBlockNum() const {return m_data->getBlockNum();}
+
 	inline void setUser( UserAf * jobOwner) { m_user = jobOwner;}
 
 	bool storeTasks();
