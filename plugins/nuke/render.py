@@ -120,10 +120,10 @@ if not os.path.isfile(xscene):
 	errorExit('File "%s" not found.' % xscene, False)
 
 # Create and check temp directory:
-tmpdir = os.path.join(
-	tempfile.gettempdir(),
-	'.afrender.nuke.%s.%s' % (os.path.basename(xscene), os.getpid())
-)
+tmpdir = tempfile.gettempdir()
+if tmpdir == os.getcwd():
+    tmpdir = '/tmp'
+tmpdir = os.path.join(tmpdir,'.afrender.nuke.%s.%s' % (os.path.basename(xscene), os.getpid()))
 
 if os.path.exists(tmpdir):
 	shutil.rmtree(tmpdir)
