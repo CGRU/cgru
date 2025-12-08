@@ -508,7 +508,7 @@ function d_MakeCmd(i_params)
 
 	cmd += ' --createoutdir';
 
-	cmd += ' --copy "' + params.copy_folder + '"';
+	cmd += ' --copy "' + c_PathPM_Client2Server(params.copy_folder) + '"';
 
 	cmd += ' "' + input + '"';
 	cmd += ' "' + output + '"';
