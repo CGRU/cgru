@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 import os
 import optparse
+import random
+import re
 import shutil
 # import signal
+import string
 import sys
 import tempfile
-import re
+import traceback
 
 import nuke
 
@@ -124,6 +127,7 @@ tmpdir = tempfile.gettempdir()
 if tmpdir == os.getcwd():
     tmpdir = '/tmp'
 tmpdir = os.path.join(tmpdir,'.afrender.nuke.%s.%s' % (os.path.basename(xscene), os.getpid()))
+tmpdir += '.' + ''.join(random.choices(string.ascii_letters + string.digits, k=8))
 
 if os.path.exists(tmpdir):
 	shutil.rmtree(tmpdir)
@@ -355,7 +359,11 @@ while frame <= flast:
 		break
 
 # Remove temp directory:
-shutil.rmtree(tmpdir)
+try:
+    shutil.rmtree(tmpdir)
+except:
+    print('WARNING: Can`t delete temp folder:')
+    traceback.print_exc()
 
 # Exit:
 exit(exitcode)
