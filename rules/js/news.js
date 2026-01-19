@@ -63,6 +63,9 @@ function nw_Init()
 
 function nw_InitConfigured()
 {
+	if (g_auth_user == null)
+		return;
+
 	nw_UpdateChannels();
 	nw_FiltersUpdate();
 
@@ -142,6 +145,9 @@ function nw_SortOrderToggle()
 
 function nw_UpdateChannels()
 {
+	if (g_auth_user == null)
+		return;
+
 	var elChannels = $('channels');
 	elChannels.innerHTML = '';
 	elChannels.m_elChan = [];
@@ -808,6 +814,9 @@ function nw_NavigatePost()
 
 function nw_HighlightCurrent()
 {
+	if (g_auth_user == null)
+		return;
+
 	var path = g_CurPath();
 	if (nw_elArray == null)
 		return;
@@ -823,6 +832,9 @@ function nw_HighlightCurrent()
 
 function nw_HighlightChannels()
 {
+	if (g_auth_user == null)
+		return;
+
 	if (g_CurPath() == null)
 		return;
 
