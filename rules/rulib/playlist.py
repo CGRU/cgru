@@ -1,7 +1,7 @@
 '''
 # Example:
 
-python3 -c 'import sys; sys.path.append("/data/cgru/rules"); import rulib; from rulib import playlist; pl=playlist.Playlist("/TEST/SHOTS/API");'
+python3 -c 'import sys; sys.path.append("/data/cgru/rules"); import rulib; from rulib import playlist; pl=playlist.Playlist("/TEST/SHOTS/API"); pl.stdout();'
 
 '''
 import copy
@@ -83,7 +83,8 @@ class Playlist:
             obj['id'] = '/'
             obj['location'] = '/'
             obj['playlist'] = []
-            self.location_objects = append(obj)
+            self.location_objects = [obj]
+            self.saveLocation(obj)
 
 
     def generatePlaylist(self):
