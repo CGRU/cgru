@@ -9,6 +9,8 @@ import signal
 import subprocess
 import traceback
 
+import movutils
+
 print('MakeMovie: "%s"' % __file__)
 
 TmpDir = ''
@@ -533,18 +535,32 @@ imgCount = 0
 cmd_precomp = []
 name_precomp = []
 
-# Extract audio track(s) from file to flac if it is not flac already:
+# Extract audio track:
 if Audio is not None:
+    if os.path.isdir(Audio):
+        audio_file = movutils.findSoundRef(Audio)
+        if audio_file is None:
+            print('No files with sound found in "%s"' % Audio)
+            Audio = None
+        else:
+            Audio = audio_file
+            print('Found audio: "%s"' % Audio)
+
     if not os.path.isfile(Audio):
         print('Audio file "%s" does not exist.' % Audio)
         Audio = None
     else:
         audio_name, audio_ext = os.path.splitext(Audio)
-        if audio_ext != '.flac':
-            audio_flac = '%s.%s' % (audio_name,'flac')
-            cmd_precomp.append('ffmpeg -y -i "%s" -vn -acodec flac "%s"' % (Audio,audio_flac))
+        if audio_ext != '.wav':
+            audio_file = '%s.%s' % (audio_name,'wav')
+            cmd_precomp.append('ffmpeg -y -i "%s" -vn "%s"' % (Audio, audio_file))
             name_precomp.append('Audio "%s"' % os.path.basename(Audio))
-            Audio = audio_flac
+            Audio = audio_file
+
+        if Audio != movutils.SoundRef:
+            cmd_precomp.append('cp -v "%s" "%s"' % (Audio, movutils.SoundRef))
+            name_precomp.append('Store audio in "%s"' % movutils.SoundRef)
+            Audio = movutils.SoundRef
 
 # Reformat logo:
 logopath = [Options.lgspath, Options.lgfpath]

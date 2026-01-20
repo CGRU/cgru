@@ -2,8 +2,11 @@
 import os
 import sys
 import re
+import shutil
 import subprocess
 import time
+
+import movutils
 
 from optparse import OptionParser
 
@@ -36,22 +39,37 @@ Options, argv = Parser.parse_args()
 
 if len(argv) < 1:
     print('ERROR: Movie file not specified.')
-    sys.exit(0)
+    sys.exit(1)
 
-# Extract audio track(s) from file to flac if it is not flac already:
+# Extract audio track(s) from file to wav if it is not wav already:
 if Options.audio is not None:
+
+    if os.path.isdir(Options.audio):
+        audio_file = movutils.findSoundRef(Options.audio)
+        if audio_file is None:
+            print('No files with sound found in "%s"' % Options.audio)
+            Options.audio = None
+        else:
+            Options.audio = audio_file
+            print('Found audio: "%s"' % Options.audio)
+
     if not os.path.isfile(Options.audio):
         print('Audio file "%s" does not exist.' % Options.audio)
         Options.audio = None
     else:
         audio_name, audio_ext = os.path.splitext(Options.audio)
-        if audio_ext != '.flac':
-            audio_flac = '%s.%s' % (audio_name,'flac')
-            print('Executing command to convert audio:')
-            cmd_audio = 'ffmpeg -y -i "%s" -vn -acodec flac "%s"' % (Options.audio,audio_flac)
+        if audio_ext != '.wav':
+            audio_file = '%s.%s' % (audio_name,'wav')
+            print('Executing command to extract audio:')
+            cmd_audio = 'ffmpeg -y -i "%s" -vn "%s"' % (Options.audio, audio_file)
             print(cmd_audio)
             subprocess.call(cmd_audio,shell=True)
-            Options.audio = audio_flac
+            Options.audio = audio_file
+
+        if Options.audio != movutils.SoundRef:
+            shutil.copy(Options.audio, movutils.SoundRef)
+            print('Audio stored in: "%s"' % movutils.SoundRef)
+            Options.audio = movutils.SoundRef
 
 Input = argv[0]
 Output = Options.output
