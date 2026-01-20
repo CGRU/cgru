@@ -40,7 +40,7 @@ d_params.general = {
 };
 d_params.settings = {
 	copy_folder    : {"label":'Copy Folder', "default":"", "tooltip":'Copy to folder'},
-	audio_file     : {"label":'Audio', "default":"REF/sound.flac", "tooltip":'Sound file'},
+	audio_file     : {"label":'Audio', "default":"REF", "tooltip":'Sound file'},
 	af_depend_mask : {"label":'Depends', "tooltip":'Afanasy job depend mask'},
 	af_hostsmask   : {'label':'Hosts Mask'},
 	cacher_aspect  : {'width':'25%', 'lwidth':'160px', 'label':'Cacher Aspect',  'tooltip':'Cacher aspect (float aspect: 2.39)'},
@@ -540,7 +540,7 @@ var d_cvtguiparams = {
 		'default': 10,
 		'tooltip': 'Frames Per Task'
 	},
-	audio_file /****/: {"label": 'Audio', "default": "REF/sound.flac", "tooltip": 'Sound file', 'width': '40%'},
+	audio_file /****/: {"label": 'Audio', "default": "REF", "tooltip": 'Sound file', 'width': '40%'},
 	af_hostsmask /**/: {'label': 'Hosts Mask', 'width': '40%'},
 	af_paused /*****/: {'label': 'Start Job Paused', 'width': '20%', 'lwidth': '160px', 'type': 'bool'}
 };
