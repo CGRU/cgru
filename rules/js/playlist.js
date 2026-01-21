@@ -23,6 +23,8 @@ var p_fileExist = false;
 
 var p_elLinks = [];
 
+var p_Pinned = [];
+
 function p_Init()
 {
 	var ctrls = $('sidepanel_playlist').getElementsByClassName('playlist_ctrl');
@@ -42,12 +44,22 @@ function p_Init()
 
 	if (localStorage.playlist_opened == null)
 		localStorage.playlist_opened = 'false';
+
 	if (localStorage.playlist_opened == 'true')
 		p_Open(false);
 	else
 		p_Close();
+
 	if (localStorage.playlist_opened_folders == null)
 		localStorage.playlist_opened_folders = '';
+
+	if (localStorage.playlist_pinned == null)
+		localStorage.playlist_pinned = '';
+	else
+	{
+		p_Pinned = localStorage.playlist_pinned.split(' ');
+		p_Pinned = p_Pinned.filter(e => e != '');
+	}
 }
 
 function p_NavigatePost()
@@ -103,6 +115,7 @@ function p_AddLocationOnClick()
 	obj.action = 'addLocation';
 	obj.args = {};
 	obj.args.location = g_CurPath();
+	obj.pinned = p_Pinned;
 	n_Request({"send":{'playlist':obj}, "func": p_Received, "info": 'playlist'});
 }
 function p_RenameOnClick()
@@ -140,6 +153,7 @@ function p_AddFolder(i_value)
 	obj.args = {};
 	obj.args.label = i_value;
 	obj.args.id_parent = p_elCurFolder.m_obj.id;
+	obj.pinned = p_Pinned;
 	n_Request({"send":{'playlist':obj}, "func": p_Received, "info": 'playlist'});
 }
 
@@ -235,6 +249,7 @@ function p_AddLink(i_id_before)
 	if (i_id_before != null)
 		obj.args.id_before = i_id_before;
 	obj.args.paths = objs;
+	obj.pinned = p_Pinned;
 
 	n_Request({"send":{'playlist':obj}, "func": p_Received, "info": 'playlist'});
 	//p_Action(objs, 'add', i_id_before);
@@ -247,6 +262,7 @@ function p_Rename(i_value)
 	obj.args = {};
 	obj.args.new_label = i_value;
 	obj.args.id = p_elCurItem.m_obj.id;
+	obj.pinned = p_Pinned;
 	n_Request({"send":{'playlist':obj}, "func": p_Received, "info": 'playlist'});
 //	p_Action([obj], 'rename');
 }
@@ -333,6 +349,7 @@ function p_MoveObject(i_mode)
 	obj.args = {};
 	obj.args.id = p_elCurItem.m_obj.id;
 	obj.args.mode = i_mode;
+	obj.pinned = p_Pinned;
 	n_Request({"send":{'playlist':obj}, "func": p_Received, "info": 'playlist'});
 }
 function p_SetCurItem(i_el)
@@ -409,6 +426,7 @@ function p_Load()
 	//n_Request({"send": {"getfile": p_file}, "func": p_Received, "info": 'playlist'});
 	let obj = {};
 	obj.location = g_CurPath();
+	obj.pinned = p_Pinned;
 	n_Request({"send":{'playlist':obj}, "func": p_Received, "info": 'playlist'});
 	p_elLinks = [];
 }
@@ -558,12 +576,24 @@ function p_CreateElement(i_obj, i_elParent)
 	if (i_obj.location)
 	{
 		// It is a location playlist:
+
 		let elLink = document.createElement('a');
 		el.appendChild(elLink);
 		elLink.textContent = 'GOTO';
 		elLink.classList.add('button');
 		elLink.classList.add('location');
 		elLink.href = '#' + i_obj.location;
+		// Try to disable folder open/close on link click
+		//elLink.onclick = function(e) {e.stopPropagation(); return false;}
+
+		let elPin = document.createElement('div');
+		el.appendChild(elPin);
+		elPin.classList.add('button');
+		elPin.classList.add('pin');
+		elPin.m_obj = i_obj;
+		elPin.onclick = p_LocationPin;
+		if (p_Pinned.includes(i_obj.id))
+			c_ElSetSelected(elPin, true);
 	}
 	else
 	{
@@ -585,6 +615,24 @@ function p_CreateElement(i_obj, i_elParent)
 	return el;
 }
 
+function p_LocationPin(i_evt)
+{
+	i_evt.stopPropagation();
+
+	let el = i_evt.currentTarget;
+
+	c_ElToggleSelected(el);
+
+	p_Pinned = p_Pinned.filter(e => e != el.m_obj.id);
+
+	if (el.m_selected)
+		p_Pinned.push(el.m_obj.id);
+
+	localStorage.playlist_pinned = p_Pinned.join(' ');
+
+	return false;
+}
+
 function p_ItemDelOnClick(i_evt)
 {
 	i_evt.stopPropagation();
@@ -597,6 +645,7 @@ function p_ItemDelOnClick(i_evt)
 	obj.action = 'deleteObject';
 	obj.args = {};
 	obj.args.id = i_evt.currentTarget.m_obj.id;
+	obj.pinned = p_Pinned;
 	n_Request({"send":{'playlist':obj}, "func": p_Received, "info": 'playlist'});
 
 	return false;

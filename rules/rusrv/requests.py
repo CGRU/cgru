@@ -399,7 +399,7 @@ class Requests:
         if not 'location' in i_args:
             o_out['error'] = 'Location is not specified.'
             return
-        pl = rulib.playlist.Playlist(i_args['location'])
+        pl = rulib.playlist.Playlist(i_args['location'], i_args['pinned'])
 
         if 'action' in i_args:
             if hasattr(pl, i_args['action']):

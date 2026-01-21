@@ -825,7 +825,8 @@ float: right; width: 10px; height: 10px; opacity: .7;
 #playlist .pathlink .anchor { font-size: 10px; text-align: right; margin-bottom: 2px; padding: 1px 4px; }
 #playlist .folder > .folder, #playlist .folder > .pathlink { display: none;}
 #playlist .folder.opened > .folder, #playlist .folder.opened > .pathlink { display: block;}
-#playlist .folder .button.location {float: right; font-size: 8px; margin: 1px; padding: 1px;}
+#playlist .folder .button {float: right; font-size: 8px; margin: 1px; padding: 1px;}
+#playlist .folder .button.pin {width: 12px; height: 12px; background-image: url(icons/pin.png);}
 #playlist .current {font-weight: bold;}
 #playlist .folder:hover { border: 1px solid #555;}
 
