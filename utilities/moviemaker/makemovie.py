@@ -546,21 +546,22 @@ if Audio is not None:
             Audio = audio_file
             print('Found audio: "%s"' % Audio)
 
-    if not os.path.isfile(Audio):
-        print('Audio file "%s" does not exist.' % Audio)
-        Audio = None
-    else:
-        audio_name, audio_ext = os.path.splitext(Audio)
-        if audio_ext != '.wav':
-            audio_file = '%s.%s' % (audio_name,'wav')
-            cmd_precomp.append('ffmpeg -y -i "%s" -vn "%s"' % (Audio, audio_file))
-            name_precomp.append('Audio "%s"' % os.path.basename(Audio))
-            Audio = audio_file
+    if Audio is not None:
+        if not os.path.isfile(Audio):
+            print('Audio file "%s" does not exist.' % Audio)
+            Audio = None
+        else:
+            audio_name, audio_ext = os.path.splitext(Audio)
+            if audio_ext != '.wav':
+                audio_file = '%s.%s' % (audio_name,'wav')
+                cmd_precomp.append('ffmpeg -y -i "%s" -vn "%s"' % (Audio, audio_file))
+                name_precomp.append('Audio "%s"' % os.path.basename(Audio))
+                Audio = audio_file
 
-        if Audio != movutils.SoundRef:
-            cmd_precomp.append('cp -v "%s" "%s"' % (Audio, movutils.SoundRef))
-            name_precomp.append('Store audio in "%s"' % movutils.SoundRef)
-            Audio = movutils.SoundRef
+            if Audio != movutils.SoundRef:
+                cmd_precomp.append('cp -v "%s" "%s"' % (Audio, movutils.SoundRef))
+                name_precomp.append('Store audio in "%s"' % movutils.SoundRef)
+                Audio = movutils.SoundRef
 
 # Reformat logo:
 logopath = [Options.lgspath, Options.lgfpath]
