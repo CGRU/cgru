@@ -1,10 +1,26 @@
 # -*- coding: utf-8 -*-
 
 import os
+import subprocess
+import sys
 
 SoundRef = 'REF/sound.wav'
 
 SoundFileExt = ['.flac','.mp3','.mp4','.mov','.wav']
+
+def hasAudio(i_file):
+    if not os.path.isfile(i_file):
+        return False
+
+    cmd = 'ffprobe'
+    cmd += ' -i "%s"' % i_file
+    cmd += ' -show_streams -select_streams a -loglevel error'
+
+    data = subprocess.check_output(cmd, shell=True)
+    if len(data) == 0:
+        return False
+
+    return True
 
 def findSoundRef(i_folder):
     if not os.path.isdir(i_folder):
@@ -27,6 +43,9 @@ def findSoundRef(i_folder):
 
         if afile == SoundRef:
             return afile
+
+        if not hasAudio(afile):
+            continue
 
         if os.path.basename(afile).find(shot) == 0:
             files_shot.append(afile)

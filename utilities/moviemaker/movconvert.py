@@ -67,10 +67,13 @@ if Options.audio is not None:
                 subprocess.call(cmd_audio,shell=True)
                 Options.audio = audio_file
 
-            if Options.audio != movutils.SoundRef:
-                shutil.copy(Options.audio, movutils.SoundRef)
-                print('Audio stored in: "%s"' % movutils.SoundRef)
-                Options.audio = movutils.SoundRef
+            if os.path.isfile(Options.audio):
+                if Options.audio != movutils.SoundRef:
+                    shutil.copy(Options.audio, movutils.SoundRef)
+                    print('Audio stored in: "%s"' % movutils.SoundRef)
+                    Options.audio = movutils.SoundRef
+            else:
+                Options.audio = None
 
 Input = argv[0]
 Output = Options.output
