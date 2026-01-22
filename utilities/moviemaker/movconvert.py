@@ -53,23 +53,24 @@ if Options.audio is not None:
             Options.audio = audio_file
             print('Found audio: "%s"' % Options.audio)
 
-    if not os.path.isfile(Options.audio):
-        print('Audio file "%s" does not exist.' % Options.audio)
-        Options.audio = None
-    else:
-        audio_name, audio_ext = os.path.splitext(Options.audio)
-        if audio_ext != '.wav':
-            audio_file = '%s.%s' % (audio_name,'wav')
-            print('Executing command to extract audio:')
-            cmd_audio = 'ffmpeg -y -i "%s" -vn "%s"' % (Options.audio, audio_file)
-            print(cmd_audio)
-            subprocess.call(cmd_audio,shell=True)
-            Options.audio = audio_file
+    if Options.audio is not None:
+        if not os.path.isfile(Options.audio):
+            print('Audio file "%s" does not exist.' % Options.audio)
+            Options.audio = None
+        else:
+            audio_name, audio_ext = os.path.splitext(Options.audio)
+            if audio_ext != '.wav':
+                audio_file = '%s.%s' % (audio_name,'wav')
+                print('Executing command to extract audio:')
+                cmd_audio = 'ffmpeg -y -i "%s" -vn "%s"' % (Options.audio, audio_file)
+                print(cmd_audio)
+                subprocess.call(cmd_audio,shell=True)
+                Options.audio = audio_file
 
-        if Options.audio != movutils.SoundRef:
-            shutil.copy(Options.audio, movutils.SoundRef)
-            print('Audio stored in: "%s"' % movutils.SoundRef)
-            Options.audio = movutils.SoundRef
+            if Options.audio != movutils.SoundRef:
+                shutil.copy(Options.audio, movutils.SoundRef)
+                print('Audio stored in: "%s"' % movutils.SoundRef)
+                Options.audio = movutils.SoundRef
 
 Input = argv[0]
 Output = Options.output
