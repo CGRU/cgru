@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import imp
+import importlib
 import time
 import os
 import sys
