@@ -22,7 +22,7 @@ g_graph_intervals.week   = {"seconds":60 * 60 * 24 * 7,"intervals":[ 1 ],"offset
 g_args = {};
 g_args.action = 'jobs_table';
 //g_args.time_max = Math.round((new Date()).valueOf() / 1000);
-g_args.time_min = Math.round((new Date()).valueOf() / 1000) - (60*60 * 24 * 48);
+//g_args.time_min = Math.round((new Date()).valueOf() / 1000) - (60*60 * 24 * 48);
 g_args.folder = '/';
 
 g_folders = [];

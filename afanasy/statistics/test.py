@@ -29,7 +29,7 @@ print('# Folder = "%s"' % folder)
 args = dict()
 args['select'] = 'folder'
 #args['time_max'] = int(time.time())
-args['time_min'] = int(time.time()) - 60*60 * 24 * 48
+#args['time_min'] = int(time.time()) - 60*60 * 24 * 48
 args['folder'] = folder
 out = request('get_jobs_folders', args)
 

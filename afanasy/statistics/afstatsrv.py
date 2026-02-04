@@ -76,9 +76,8 @@ class Requests:
 
 
     def req_get_logs_table(self, i_args, o_out):
-        time_min = i_args['time_min']
-        time_max = getTimeMax(i_args)
-        order    = i_args['order']
+        time_min, time_max = getTimeArgs(i_args)
+        order = i_args['order']
 
         # Select:
         query=("SELECT * FROM \"logs\"" \
@@ -92,11 +91,10 @@ class Requests:
         table = 'jobs'
 
         select   = i_args['select']
-        time_min = i_args['time_min']
-        time_max = getTimeMax(i_args)
         folder   = i_args['folder'].rstrip('/')
         f_depth  = folder.count('/') + 1
         order    = 'jobs_quantity'
+        time_min, time_max = getTimeArgs(i_args)
 
         o_out['select'] = select;
         o_out['table']  = [];
@@ -173,9 +171,8 @@ class Requests:
 
         select   = i_args['select']
         favorite = i_args['favorite']
-        time_min = i_args['time_min']
-        time_max = getTimeMax(i_args)
         folder   = i_args['folder'].rstrip('/')
+        time_min, time_max = getTimeArgs(i_args)
 
         if 'order_u' in i_args: order_u = i_args['order_u']
         if 'order_s' in i_args: order_s = i_args['order_s']
@@ -231,11 +228,10 @@ class Requests:
         table = 'tasks'
 
         select   = i_args['select']
-        time_min = i_args['time_min']
-        time_max = getTimeMax(i_args)
         folder   = i_args['folder'].rstrip('/')
         f_depth  = folder.count('/') + 1
         order    = 'tasks_quantity'
+        time_min, time_max = getTimeArgs(i_args)
 
         o_out['select'] = select
         o_out['table']  = []
@@ -309,9 +305,8 @@ class Requests:
         table = 'tasks'
         select   = i_args['select']
         favorite = i_args['favorite']
-        time_min = i_args['time_min']
-        time_max = getTimeMax(i_args)
         folder   = i_args['folder']
+        time_min, time_max = getTimeArgs(i_args)
 
         order_s = 'run_time_sum'
         order_u = 'run_time_sum'
@@ -365,12 +360,11 @@ class Requests:
         table = 'tasks'
 
         select   = i_args['select']
-        time_min = i_args['time_min']
-        time_max = getTimeMax(i_args)
         interval = i_args['interval']
         folder   = i_args['folder'].rstrip('/')
         f_depth  = folder.count('/') + 1
         order    = 'quantity'
+        time_min, time_max = getTimeArgs(i_args)
 
         o_out['time_min'] = time_min
         o_out['time_max'] = time_max
@@ -423,11 +417,10 @@ class Requests:
     def req_get_tasks_graph(self, i_args, o_out):
 
         table    = 'tasks'
-        time_min = i_args['time_min']
-        time_max = getTimeMax(i_args)
         interval = i_args['interval']
         folder   = i_args['folder']
         select   = i_args['select']
+        time_min, time_max = getTimeArgs(i_args)
 
         o_out['time_min'] = time_min
         o_out['time_max'] = time_max
@@ -523,10 +516,18 @@ def application(environ, start_response):
     return [rawout]
 
 
-def getTimeMax(i_args):
+def getTimeArgs(i_args):
+    time_min = None
     time_max = None
+
+    if 'time_min' in i_args:
+        time_min = i_args['time_min']
+    if time_min is None or time_min == 0:
+        time_min = int(time.time()) - (60*60*24)
+
     if 'time_max' in i_args:
         time_max = i_args['time_max']
     if time_max is None or time_max == 0:
         time_max = int(time.time()) + (60*60*24)
-    return time_max
+
+    return time_min, time_max
