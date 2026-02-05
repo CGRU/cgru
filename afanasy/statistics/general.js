@@ -64,7 +64,10 @@ function g_Start(i_data, i_args)
 
 	// Time fields on key down:
 	for (let i = 0; i < g_time_ids.length; i++)
+	{
 		$(g_time_ids[i]).onkeydown = g_TimeKeyDown;
+		$(g_time_ids[i]).onfocus = g_TimeFocus;
+	}
 
 
 	let hash = document.location.hash;
@@ -835,6 +838,29 @@ function g_FoldersDeleted(i_data, i_args)
 		g_Info(info);
 		g_HashChanged();
 	}
+}
+
+function g_TimeFocus(i_evt)
+{
+	// If there is no text entered:
+	let el = i_evt.currentTarget;
+	let str = el.textContent;
+	if (str && str.length)
+		return;
+
+	// Set current date:
+	let date = new Date();
+	date = date.toISOString();
+	date = date.substr(0, date.indexOf('T'));
+	el.textContent = date;
+
+	// Move cusor to the end:
+	let range = document.createRange();//Create a range (a range is a like the selection but invisible)
+	range.selectNodeContents(el);//Select the entire contents of the element with the range
+	range.collapse(false);//collapse the range to the end point. false means collapse to end rather than the start
+	let selection = window.getSelection();//get the selection object (allows you to change selection)
+	selection.removeAllRanges();//remove any selections already made
+	selection.addRange(range);//make the range you have just created the visible selection
 }
 
 function g_TimeKeyDown(i_evt)
