@@ -20,7 +20,7 @@ g_graph_intervals.week   = {"seconds":60 * 60 * 24 * 7,"intervals":[ 1 ],"offset
 
 
 g_args = {};
-g_args.action = 'jobs_table';
+g_args.action = 'logs_table';
 //g_args.time_max = Math.round((new Date()).valueOf() / 1000);
 //g_args.time_min = Math.round((new Date()).valueOf() / 1000) - (60*60 * 24 * 48);
 g_args.folder = '/';
@@ -281,6 +281,7 @@ function g_HashChanged()
 function g_Action_LogsTable(i_args)
 {
 	g_Info('Requesting logs table...');
+	$('folders_div').style.display = 'none';
 	i_args.table = 'logs';
 	i_args.order = 'time';
 	g_Request({"send":{"get_logs_table":i_args},"func":g_ShowTable,"args":i_args});
@@ -289,6 +290,7 @@ function g_Action_LogsTable(i_args)
 function g_Action_JobsTable(i_args)
 {
 	g_Info('Requesting jobs folders statistics table...');
+	$('folders_div').style.display = 'block';
 	i_args.table = 'jobs';
 	i_args.select = 'folder'
 	g_Request({"send":{"get_jobs_folders":i_args},"func":g_ShowTable,"args":i_args,"service":'get_jobs_table'});
@@ -297,6 +299,7 @@ function g_Action_JobsTable(i_args)
 function g_Action_TasksTable(i_args)
 {
 	g_Info('Requesting tasks folders statistics table...');
+	$('folders_div').style.display = 'block';
 	i_args.table = 'tasks';
 	i_args.select = 'folder';
 	g_Request({"send":{"get_tasks_folders":i_args},"func":g_ShowTable,"args":i_args,"service":'get_tasks_table'});
@@ -305,6 +308,7 @@ function g_Action_TasksTable(i_args)
 function g_Action_TasksGraph(i_args)
 {
 	g_Info('Requesting tasks folders statistics graph...');
+	$('folders_div').style.display = 'block';
 	i_args.select = 'folder';
 	i_args.interval = g_TimeIntervalGet();
 	g_Request({"send":{"get_tasks_folders_graph":i_args},"func":g_ShowGraph,"args":i_args});
