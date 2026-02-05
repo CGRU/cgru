@@ -409,6 +409,8 @@ border-radius: 3px;
 padding: 4px;
 }
 
+#body_div.updating {border: 2px solid #FFFF00; box-shadow: 0 0 4px #FFFF00 inset, 0 0 4px #FFFF00;}
+
 #status.updating {border: 2px solid #FFFF00; box-shadow: 0 0 4px #FFFF00 inset, 0 0 4px #FFFF00;}
 
 #content > .view {

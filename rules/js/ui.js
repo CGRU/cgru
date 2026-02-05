@@ -30,6 +30,7 @@ var u_body_filename = 'body.html';
 var u_body_text = '';
 var u_body_editing = false;
 var u_body_edit_markup = 0;
+var u_body_mtime = 0;
 
 var u_background = '#A0A0A0';
 var u_textColor = '#000000';
@@ -710,6 +711,8 @@ function u_BodyReceived(i_data, i_args)
 	u_body_text = i_data;
 	$('body_body').innerHTML = u_body_text;
 	u_BodyShowInfo();
+
+	u_BodyUpdatedFlash();
 }
 
 function u_BodyShowInfo()
@@ -717,6 +720,8 @@ function u_BodyShowInfo()
 	var info = '';
 	if (RULES.status && RULES.status.body)
 	{
+		u_body_mtime = RULES.status.body.ctime;
+
 		var avatar = c_GetAvatar(RULES.status.body.cuser, RULES.status.body.guest);
 		if (avatar)
 		{
@@ -731,6 +736,8 @@ function u_BodyShowInfo()
 		info += ' at ' + c_DT_StrFromSec(RULES.status.body.ctime);
 		if (RULES.status.body.muser)
 		{
+			u_body_mtime = RULES.status.body.mtime;
+
 			if (RULES.status.body.cuser != RULES.status.body.muser)
 			{
 				var avatar = c_GetAvatar(RULES.status.body.muser);
@@ -781,6 +788,65 @@ function u_BodyShowInfo()
 
 	$('body_info').innerHTML = info;
 	// console.log(info);
+}
+
+function u_BodyEditClicked()
+{
+	if (g_auth_user == null)
+		return;
+
+	if (u_body_mtime)
+	{
+		// Check if modified by loading status:
+		n_GetFile({
+			"path": c_GetRuFilePath('status.json'),
+			"func": u_BodyStatusReceived,
+			"info": 'body status',
+			"parse": true,
+			"local": true,
+			"cache_time":-1
+		});
+
+		return;
+	}
+
+	u_BodyEditStart();
+}
+
+function u_BodyStatusReceived(i_data, i_args)
+{
+	if (i_data.status && i_data.status.body && i_data.status.body.mtime)
+	{
+		if (i_data.status.body.mtime > u_body_mtime)
+		{
+			RULES.status = i_data.status;
+			st_Show(RULES.status);
+
+			$('body_div').classList.remove('fading');
+			$('body_div').classList.add('updating');
+
+			u_BodyLoad({"cache":false});
+			c_Info("Body changed.");
+
+			return;
+		}
+	}
+
+	u_BodyEditStart();
+}
+
+function u_BodyUpdatedFlash()
+{
+	if($('body_div').classList.contains('fading'))
+	{
+		$('body_div').classList.remove('fading');
+		return;
+	}
+
+	$('body_div').classList.add('fading');
+	$('body_div').classList.remove('updating');
+
+	setTimeout(u_BodyUpdatedFlash, 1000);
 }
 
 function u_BodyEditStart()
