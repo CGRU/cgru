@@ -473,6 +473,8 @@ class Requests:
         cursor.execute(query)
         o_out['deleted_tasks'] = cursor.rowcount
 
+        self.dbconn.commit()
+
 
 def application(environ, start_response):
 

@@ -815,6 +815,10 @@ function g_ShowGraph(i_data, i_args)
 function g_FolderDelete(i_evt)
 {
 	let folder = $('folder_delete').textContent;
+	if (folder == null) return;
+	if (folder.length == 0) return;
+	folder = folder + '%';
+
 	g_Log('Deleting folder: ' + folder);
 	g_Request({"send":{"folder_delete":{"folder":folder}},"func":g_FoldersDeleted});
 }

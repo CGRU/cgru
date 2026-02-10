@@ -58,6 +58,16 @@ text-shadow: 0 0 2px #FFF;
 font-style: italic;
 }
 
+.button {
+user-select: none;
+cursor: pointer;
+text-align: center;
+border-radius: 2px;
+box-shadow: 0 0 3px #000, 0 0 3px #FFF inset;
+margin: 6px 12px;
+padding: 2px 12px;
+}
+
 .title {
 text-transform: capitalize;
 text-align: center;
@@ -112,6 +122,10 @@ padding: 2px;
 #folders_ctrl_div {
 float: right;
 }
+#folders_ctrl_delete .button {
+float: right;
+}
+
 #folders_div .folder {
 cursor: pointer;
 float: left;
