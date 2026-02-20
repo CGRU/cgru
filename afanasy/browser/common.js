@@ -19,6 +19,7 @@ var cm_Attrs = [
 	['name' /***********/, 'Name' /******/, 'Name' /***********/],
 	['user_name' /******/, 'User' /******/, 'User Name' /******/],
 	['host_name' /******/, 'Host' /******/, 'Host Name' /******/],
+	['state' /******/, 'State' /******/, 'State' /******/],
 	['priority' /*******/, 'Priority' /**/, 'Priority' /*******/],
 	['service' /********/, 'Service' /***/, 'Service Name' /***/],
 	['time_creation' /**/, 'Created' /***/, 'Time Created' /***/],

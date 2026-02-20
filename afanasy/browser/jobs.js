@@ -1902,5 +1902,5 @@ JobBlock.params = {
 JobNode.sort = ['order', 'time_creation', 'priority', 'user_name', 'name', 'host_name', 'service'];
 JobNode.sortVisor = 'time_creation';
 // If user is visor, special parameter will be used as the default
-JobNode.filter = ['name', 'host_name', 'user_name', 'service'];
+JobNode.filter = ['name', 'host_name', 'user_name', 'service', 'state'];
 JobNode.filterVisor = 'user_name';

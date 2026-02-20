@@ -354,6 +354,23 @@ function Monitor(i_args)
 	this.selected_items = [];
 	this.cur_item = null;
 
+	if (localStorage[this.type + '_filter_text']) {
+		this.elCtrlFilterInput.textContent = localStorage[this.type + '_filter_text'];
+		this.filterExpr = null;
+		var expr = this.elCtrlFilterInput.textContent;
+		if (expr && expr.length) {
+			this.info('Filter: ' + expr);
+			try {
+				this.filterExpr = new RegExp(expr);
+			}
+			catch (err) {
+				this.filterExpr = null;
+				this.error(err.message);
+			}
+		}
+		this.filterItems();
+	}
+
 	g_receivers.push(this);
 	g_monitors.push(this);
 	this.setWindowTitle();
@@ -1619,6 +1636,7 @@ Monitor.prototype.filterKeyUp = function(i_evt) {
 	}
 	this.filterExpr = null;
 	var expr = this.elCtrlFilterInput.textContent;
+	localStorage[this.type + '_filter_text'] = expr;
 	if (expr && expr.length)
 	{
 		this.info('Filter: ' + expr);
@@ -1640,12 +1658,31 @@ Monitor.prototype.filterItem = function(i_item) {
 	var hide = false;
 	if (i_item.params.hidden)
 		hide = true;
-	else if (this.filterExpr && this.filterParm && i_item.params[this.filterParm])
+	else if (this.filterExpr && this.filterParm)
 	{
-		if (false == this.filterExpr.test(i_item.params[this.filterParm]))
-			hide = (this.filterExclude ? false : true);
-		else
-			hide = (this.filterExclude ? true : false);
+		if (this.filterParm == 'state')
+		{
+			var states = this.elCtrlFilterInput.textContent.toUpperCase().split(' ');
+			if (states.length > 0 && i_item.params.state)
+			{
+				var found = false;
+				for( var i = 0; i < states.length; i++ )
+				{
+					if( states[i] == '' ) continue;
+					if( i_item.params.state.indexOf( states[i]) != -1 )
+					{ found = true; break; }
+				}
+				if( found == false ) hide = (this.filterExclude ? false : true);
+				else hide = (this.filterExclude ? true : false);
+			}
+		}
+		else if (i_item.params[this.filterParm])
+		{
+			if (false == this.filterExpr.test(i_item.params[this.filterParm]))
+				hide = (this.filterExclude ? false : true);
+			else
+				hide = (this.filterExclude ? true : false);
+		}
 	}
 	if (hide)
 	{

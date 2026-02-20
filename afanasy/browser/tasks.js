@@ -49,14 +49,90 @@ BlockItem.prototype.update = function() {
 	}
 };
 
-function TaskItem(i_job, i_block, i_task_num)
-{
+
+
+BlockItem.prototype.setDialog = function(i_args) {
+	new cgru_Dialog({
+		"wnd": this.monitor.window,
+		"receiver": this,
+		"handle": 'setParameter',
+		"param": i_args.param,
+		"type": TaskItem.params[i_args.param].type,
+		"value": this.params[i_args.param],
+		"name": 'block_parameter'
+	});
+};
+
+BlockItem.prototype.setParameter = function(i_value, i_parameter) {
+	var params = {};
+	params[i_parameter] = i_value;
+
+    var bids = [];
+    var selected_blocks = [];
+    for( var i = 0; i < this.monitor.selected_items.length; i++)
+    {
+        var item = this.monitor.selected_items[i];
+        if( item instanceof BlockItem )
+        {
+            bids.push(item.block_num);
+            selected_blocks.push(item);
+        }
+    }
+
+    if(bids.length == 0)
+        return;
+
+    nw_Action('jobs', [this.monitor.job.id], null, params, bids);
+
+    // Local update
+    for( var i = 0; i < selected_blocks.length; i++)
+    {
+        selected_blocks[i].params[i_parameter] = i_value;
+    }
+    this.monitor.updatePanels(this.monitor.cur_item);
+};
+
+function TaskItem(i_job, i_block, i_task_num) {
 	this.job = i_job;
 	this.block = i_block;
 	this.task_num = i_task_num;
 }
 
-TaskItem.prototype.init = function() {
+TaskItem.params = {
+	'capacity': { 'type': 'num', 'label': 'Capacity' },
+	'sequential': { 'type': 'num', 'label': 'Sequential' },
+	'max_running_tasks': { 'type': 'num', 'label': 'Max Running Tasks' },
+	'max_running_tasks_per_host': { 'type': 'num', 'label': 'Max Run Tasks Per Host' },
+	'errors_retries': { 'type': 'num', 'label': 'Errors Retries' },
+	'errors_avoid_host': { 'type': 'num', 'label': 'Errors Avoid Host' },
+	'errors_task_same_host': { 'type': 'num', 'label': 'Errors Task Same Host' },
+	'errors_forgive_time': { 'type': 'hrs', 'label': 'Errors Forgive Time' },
+	'task_max_run_time': { 'type': 'hrs', 'label': 'Task Max Run Time' },
+	'task_min_run_time': { 'type': 'hrs', 'label': 'Task Min Run Time' },
+	'task_progress_change_timeout': { 'type': 'hrs', 'label': 'Task Progress Change Timeout' },
+	'hosts_mask': { 'type': 'reg', 'label': 'Hosts Mask' },
+	'hosts_mask_exclude': { 'type': 'reg', 'label': 'Exclude Hosts Mask' },
+	'depend_mask': { 'type': 'reg', 'label': 'Depend Mask' },
+	'tasks_depend_mask': { 'type': 'reg', 'label': 'Tasks Depend Mask' },
+	'need_memory': { 'type': 'mib', 'label': 'Needed Free Memory GB' },
+	'need_gpu_mem_mb': { 'type': 'mib', 'label': 'Needed Free GPU Memory GB' },
+	'need_cpu_freq_mgz': { 'type': 'meg', 'label': 'Needed GPU Frequency GHz' },
+	'need_cpu_cores': { 'type': 'num', 'label': 'Needed GPU Cores' },
+	'need_cpu_freq_cores': { 'type': 'meg', 'label': 'Needed GPU Freq*Cores GHz' },
+	'need_hdd': { 'type': 'gib', 'label': 'Needed Free HDD Space GB' },
+	'need_properties': { 'type': 'reg', 'label': 'Properties Needed' }
+};
+
+TaskItem.onMonitorCreate = function(monitor) {
+    monitor.mh_Dialog = function(i_param) {
+        if (this.cur_item && (this.cur_item instanceof BlockItem))
+        {
+            this.cur_item.setDialog({param: i_param.name});
+        }
+    }
+};
+
+TaskItem.prototype.init = function () {
 	this.element.classList.add('task');
 
 	this.elBar = this.monitor.document.createElement('div');
