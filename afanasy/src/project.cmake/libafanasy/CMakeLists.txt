@@ -3,8 +3,16 @@ file(GLOB_RECURSE inc RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SO
 
 add_library(afanasy ${src} ${inc})
 if(UNIX AND NOT APPLE)
-   set_target_properties(afanasy PROPERTIES COMPILE_FLAGS "-fPIC $ENV{AF_ADD_CFLAGS}")
+   set_target_properties(afanasy PROPERTIES COMPILE_FLAGS "-fPIC")
 endif(UNIX AND NOT APPLE)
+
+if( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
+   if(UNIX AND NOT APPLE)
+      set_target_properties(afanasy PROPERTIES COMPILE_FLAGS "-fPIC $ENV{AF_ADD_CFLAGS}")
+   else()
+      set_target_properties(afanasy PROPERTIES COMPILE_FLAGS "$ENV{AF_ADD_CFLAGS}")
+   endif()
+endif( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
 target_link_libraries(afanasy ${PYTHON_LIBRARIES})
 
 add_definitions(-DCGRU_REVISION=$ENV{CGRU_REVISION})

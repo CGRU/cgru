@@ -11,7 +11,7 @@ endif( PostgreSQL_FOUND )
 add_executable(afcmd ${src} ${inc})
 
 if( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
-   set_target_properties(afcmd PROPERTIES LINK_FLAGS $ENV{AF_ADD_CFLAGS})
+   set_target_properties(afcmd PROPERTIES COMPILE_FLAGS $ENV{AF_ADD_CFLAGS})
 endif( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
 
 if( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )

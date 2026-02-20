@@ -73,14 +73,16 @@ int setNonblocking(int fd)
 	// size is 65KB butcan be increased to ~1MB, which is again limited
 	// by sysctl and can be raised there.
 
-	std::ifstream pipe_max_size_file("/proc/sys/fs/pipe-max-size");
-	if (pipe_max_size_file.is_open()) {
-		int max_pipe_size = 0;
-		if (pipe_max_size_file >> max_pipe_size) {
-			int new_size = fcntl(fd, F_SETPIPE_SZ, max_pipe_size);
-			AF_DEBUG << "Set pipe size: " << new_size << " max: " << max_pipe_size;
+		#if defined(LINUX) && defined(F_SETPIPE_SZ)
+		std::ifstream pipe_max_size_file("/proc/sys/fs/pipe-max-size");
+		if (pipe_max_size_file.is_open()) {
+			int max_pipe_size = 0;
+			if (pipe_max_size_file >> max_pipe_size) {
+				int new_size = fcntl(fd, F_SETPIPE_SZ, max_pipe_size);
+				AF_DEBUG << "Set pipe size: " << new_size << " max: " << max_pipe_size;
+			}
 		}
-	}
+		#endif
 
 	return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 #else
@@ -894,4 +896,3 @@ void TaskProcess::generateInfoStream( std::ostringstream & o_str, bool i_full) c
 
 	o_str << " UP:" << int(m_update_status);
 }
-

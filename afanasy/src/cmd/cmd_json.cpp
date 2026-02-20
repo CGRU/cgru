@@ -1,7 +1,6 @@
 #include "cmd_json.h"
 
 #include "../libafanasy/rapidjson/document.h"
-#include "../libafanasy/rapidjson/filestream.h"
 #include "../libafanasy/rapidjson/prettywriter.h"
 #include "../libafanasy/rapidjson/writer.h"
 

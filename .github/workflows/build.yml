@@ -1,0 +1,411 @@
+name: CGRU Build Matrix
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cgru-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-ubuntu:
+    name: Build Ubuntu ${{ matrix.ubuntu }}
+    runs-on: ubuntu-${{ matrix.ubuntu }}
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu: ["22.04", "24.04"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            build-essential \
+            cmake \
+            git \
+            libpq-dev \
+            libzip-dev \
+            python3 \
+            python3-dev \
+            qtbase5-dev \
+            qtmultimedia5-dev
+
+      - name: Build (SQL + GUI)
+        working-directory: afanasy/src/project.cmake
+        run: |
+          set -euo pipefail
+          ./clear.py
+          ./build.sh --quiet -j"$(nproc)"
+
+  build-linux-container:
+    name: Build ${{ matrix.name }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Debian 12
+            image: debian:12
+          - name: Debian 13
+            image: debian:13
+          - name: Rocky 9
+            image: rockylinux/rockylinux:9
+          - name: Rocky 10
+            image: rockylinux/rockylinux:10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build In Container (SQL + GUI)
+        run: |
+          set -euo pipefail
+          docker run --rm \
+            -v "${GITHUB_WORKSPACE}:/src" \
+            -w /src \
+            "${{ matrix.image }}" \
+            /bin/bash -lc '
+              set -euo pipefail
+
+              if command -v apt-get >/dev/null 2>&1; then
+                export DEBIAN_FRONTEND=noninteractive
+                apt-get update
+                apt-get install -y \
+                  build-essential \
+                  cmake \
+                  git \
+                  libpq-dev \
+                  libzip-dev \
+                  python3 \
+                  python3-dev \
+                  qtbase5-dev \
+                  qtmultimedia5-dev
+              else
+                dnf -y install dnf-plugins-core || true
+                crb enable || dnf config-manager --set-enabled crb || true
+                dnf -y install epel-release || true
+                dnf -y makecache
+
+                if ! dnf -y install \
+                  cmake \
+                  gcc \
+                  gcc-c++ \
+                  git \
+                  libzip-devel \
+                  make \
+                  postgresql-devel \
+                  python3 \
+                  python3-devel \
+                  qt5-qtbase-devel \
+                  qt5-qtmultimedia-devel \
+                  which; then
+                  dnf -y install \
+                    cmake \
+                    gcc \
+                    gcc-c++ \
+                    git \
+                    libzip5-devel \
+                    make \
+                    postgresql-devel \
+                    python3 \
+                    python3-devel \
+                    qt5-qtbase-devel \
+                    qt5-qtmultimedia-devel \
+                    which
+                fi
+              fi
+
+              cd /src/afanasy/src/project.cmake
+              ./clear.py
+              ./build.sh --quiet -j"$(nproc)"
+            '
+
+  build-macos:
+    name: Build macOS 15 Intel (SQL + GUI)
+    runs-on: macos-15-intel
+    timeout-minutes: 120
+    env:
+      VCPKG_REF: 2026.01.16
+      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/.cache/vcpkg/archives
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Restore pip Cache
+        id: cache-pip-macos
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/Library/Caches/pip
+          key: macos-15-intel-pip-3.10-${{ hashFiles('.github/workflows/build.yml') }}
+          restore-keys: |
+            macos-15-intel-pip-3.10-
+
+      - name: Install aqtinstall
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ~/Library/Caches/pip
+          python -m pip install --upgrade pip aqtinstall
+
+      - name: Save pip Cache
+        if: always() && steps.cache-pip-macos.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/Library/Caches/pip
+          key: ${{ steps.cache-pip-macos.outputs.cache-primary-key }}
+
+      - name: Restore Qt Cache
+        id: cache-qt-macos
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/Qt/5.15.2/clang_64
+          key: macos-15-intel-qt-5.15.2-clang_64
+
+      - name: Install Qt 5.15.2 (clang_64)
+        if: steps.cache-qt-macos.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m aqt install-qt mac desktop 5.15.2 clang_64 -O "$HOME/Qt"
+
+      - name: Save Qt Cache
+        if: always() && steps.cache-qt-macos.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/Qt/5.15.2/clang_64
+          key: ${{ steps.cache-qt-macos.outputs.cache-primary-key }}
+
+      - name: Export Qt Environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "QT_ROOT=$HOME/Qt/5.15.2/clang_64" >> "$GITHUB_ENV"
+          echo "$HOME/Qt/5.15.2/clang_64/bin" >> "$GITHUB_PATH"
+
+      - name: Prepare vcpkg
+        shell: bash
+        run: |
+          set -euo pipefail
+          vcpkg_tag_ref="refs/tags/$VCPKG_REF"
+          if [ -d "$HOME/vcpkg/.git" ]; then
+            echo "Using existing vcpkg checkout at '$HOME/vcpkg'"
+            git -C "$HOME/vcpkg" fetch --depth 1 origin "$vcpkg_tag_ref"
+            git -C "$HOME/vcpkg" checkout --force FETCH_HEAD
+          else
+            rm -rf "$HOME/vcpkg"
+            git clone --depth 1 https://github.com/microsoft/vcpkg.git "$HOME/vcpkg"
+            git -C "$HOME/vcpkg" fetch --depth 1 origin "$vcpkg_tag_ref"
+            git -C "$HOME/vcpkg" checkout --force FETCH_HEAD
+          fi
+          echo "VCPKG_ROOT=$HOME/vcpkg" >> "$GITHUB_ENV"
+
+      - name: Restore vcpkg Cache
+        id: cache-vcpkg-macos
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/vcpkg/downloads
+            ~/vcpkg/installed
+            ~/vcpkg/packages
+            ${{ github.workspace }}/.cache/vcpkg/archives
+          key: macos-15-intel-vcpkg-${{ env.VCPKG_REF }}-x64-libpq-libzip
+          restore-keys: |
+            macos-15-intel-vcpkg-${{ env.VCPKG_REF }}-x64-
+            macos-15-intel-vcpkg-x64-
+
+      - name: Install vcpkg Dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$VCPKG_DEFAULT_BINARY_CACHE"
+          "$VCPKG_ROOT/bootstrap-vcpkg.sh" -disableMetrics
+          "$VCPKG_ROOT/vcpkg" install libpq:x64-osx libzip:x64-osx
+
+      - name: Save vcpkg Cache
+        if: always() && steps.cache-vcpkg-macos.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/vcpkg/downloads
+            ~/vcpkg/installed
+            ~/vcpkg/packages
+            ${{ github.workspace }}/.cache/vcpkg/archives
+          key: ${{ steps.cache-vcpkg-macos.outputs.cache-primary-key }}
+
+      - name: Configure
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          export CGRU_VERSION="$(tr -d '\r\n' < version.txt)"
+          export CGRU_REVISION="$(git rev-parse HEAD)"
+          export AF_POSTGRESQL="REQUIRED"
+          export AF_OSTYPE="macosx"
+          export AF_GUI="YES"
+          export AF_FERMER="NO"
+          export AF_ADD_CFLAGS="-w"
+
+          export AF_PYTHON_INCLUDE_PATH="$(python -c 'import sysconfig; print(sysconfig.get_path("include"))')"
+          export AF_PYTHON_LIBRARIES="$(python -c 'import pathlib,sysconfig; print(pathlib.Path(sysconfig.get_config_var("LIBDIR") or "", sysconfig.get_config_var("LDLIBRARY") or ""))')"
+
+          vcpkg_installed="$VCPKG_ROOT/installed/x64-osx"
+          export CMAKE_PREFIX_PATH="$QT_ROOT:$vcpkg_installed"
+          postgres_lib="$vcpkg_installed/lib/libpq.dylib"
+          if [ ! -f "$postgres_lib" ]; then
+            postgres_lib="$vcpkg_installed/lib/libpq.a"
+          fi
+
+          cmake \
+            -S afanasy/src/project.cmake \
+            -B afanasy/src/project.cmake/build-mac \
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+            -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
+            -DCMAKE_C_FLAGS="-w" \
+            -DCMAKE_CXX_FLAGS="-w" \
+            -DCMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH" \
+            -DPostgreSQL_INCLUDE_DIR="$vcpkg_installed/include" \
+            -DPostgreSQL_LIBRARY="$postgres_lib"
+
+      - name: Build
+        shell: bash
+        run: cmake --build afanasy/src/project.cmake/build-mac --parallel "$(sysctl -n hw.logicalcpu)"
+
+  build-windows:
+    name: Build Windows 2022 (SQL + GUI)
+    runs-on: windows-2022
+    timeout-minutes: 90
+    env:
+      VCPKG_REF: 2026.01.16
+      VCPKG_DEFAULT_BINARY_CACHE: C:\Users\runneradmin\AppData\Local\vcpkg\archives
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Restore Qt Cache
+        id: cache-qt
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Qt\5.15.2\msvc2019_64
+          key: windows-2022-qt-5.15.2-msvc2019_64
+
+      - name: Install Qt 5.15.2 (MSVC2019)
+        if: steps.cache-qt.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip aqtinstall
+          python -m aqt install-qt windows desktop 5.15.2 win64_msvc2019_64 -O C:\Qt
+
+      - name: Save Qt Cache
+        if: always() && steps.cache-qt.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: C:\Qt\5.15.2\msvc2019_64
+          key: ${{ steps.cache-qt.outputs.cache-primary-key }}
+
+      - name: Export Qt Environment
+        shell: pwsh
+        run: |
+          "QT_ROOT=C:\Qt\5.15.2\msvc2019_64" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "C:\Qt\5.15.2\msvc2019_64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Prepare vcpkg
+        shell: pwsh
+        run: |
+          $vcpkgTagRef = "refs/tags/$env:VCPKG_REF"
+          if (Test-Path "C:\vcpkg\.git") {
+            Write-Host "Using existing vcpkg checkout at C:\\vcpkg"
+            git -C C:\vcpkg fetch --depth 1 origin "$vcpkgTagRef"
+            git -C C:\vcpkg checkout --force FETCH_HEAD
+          } elseif (Test-Path "C:\vcpkg\vcpkg.exe") {
+            Write-Host "Using existing vcpkg install at C:\\vcpkg"
+          } else {
+            git clone --depth 1 https://github.com/microsoft/vcpkg.git C:\vcpkg
+            git -C C:\vcpkg fetch --depth 1 origin "$vcpkgTagRef"
+            git -C C:\vcpkg checkout --force FETCH_HEAD
+          }
+          "VCPKG_ROOT=C:\vcpkg" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Restore vcpkg Cache
+        id: cache-vcpkg
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            C:\vcpkg\downloads
+            C:\vcpkg\installed
+            C:\vcpkg\packages
+            C:\Users\runneradmin\AppData\Local\vcpkg\archives
+          key: windows-2022-vcpkg-v2-${{ env.VCPKG_REF }}-x64-libpq-libzip
+          restore-keys: |
+            windows-2022-vcpkg-v2-${{ env.VCPKG_REF }}-x64-
+            windows-2022-vcpkg-v2-x64-
+
+      - name: Install vcpkg Dependencies
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "$env:VCPKG_DEFAULT_BINARY_CACHE" | Out-Null
+          C:\vcpkg\bootstrap-vcpkg.bat -disableMetrics
+          C:\vcpkg\vcpkg.exe install libpq:x64-windows libzip:x64-windows
+
+      - name: Save vcpkg Cache
+        if: always() && steps.cache-vcpkg.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            C:\vcpkg\downloads
+            C:\vcpkg\installed
+            C:\vcpkg\packages
+            C:\Users\runneradmin\AppData\Local\vcpkg\archives
+          key: ${{ steps.cache-vcpkg.outputs.cache-primary-key }}
+
+      - name: Configure
+        shell: pwsh
+        run: |
+          # Mirror setup.cmd/getrevision.cmd inputs used by win_build_msvc.cmd.
+          $env:CGRU_VERSION = (Get-Content version.txt -Raw).Trim()
+          $env:CGRU_REVISION = (git rev-parse HEAD).Trim()
+          $env:AF_POSTGRESQL = "REQUIRED"
+          $env:AF_OSTYPE = "windows"
+          $env:AF_GUI = "YES"
+          $env:AF_FERMER = "NO"
+          $env:AF_ADD_CFLAGS = "/w /EHsc /wd4530"
+          $env:AF_PYTHON_INCLUDE_PATH = python -c "import sysconfig; print(sysconfig.get_path('include'))"
+          $env:AF_PYTHON_LIBRARIES = python -c "import pathlib,sys; print(pathlib.Path(sys.base_prefix,'libs',f'python{sys.version_info[0]}{sys.version_info[1]}.lib'))"
+
+          $vcpkgInstalled = "$env:VCPKG_ROOT\installed\x64-windows"
+
+          cmake `
+            -S afanasy/src/project.cmake `
+            -B afanasy/src/project.cmake/build-win `
+            -G "Visual Studio 17 2022" `
+            -A x64 `
+            -T v142 `
+            -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake" `
+            -DCMAKE_C_FLAGS="/W0" `
+            -DCMAKE_CXX_FLAGS="/W0" `
+            -DCMAKE_PREFIX_PATH="$env:QT_ROOT" `
+            -DPostgreSQL_INCLUDE_DIR="$vcpkgInstalled\include" `
+            -DPostgreSQL_LIBRARY="$vcpkgInstalled\lib\libpq.lib"
+
+      - name: Build
+        shell: pwsh
+        run: cmake --build afanasy/src/project.cmake/build-win --config Release -- /m
