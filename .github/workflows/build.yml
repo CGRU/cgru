@@ -320,14 +320,20 @@ jobs:
           key: windows-2022-qt-5.15.2-msvc2019_64
 
       - name: Install Qt 5.15.2 (MSVC2019)
-        if: steps.cache-qt.outputs.cache-hit != 'true'
         shell: pwsh
         run: |
+          $qtConfig = "C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5\Qt5Config.cmake"
+          if (Test-Path $qtConfig) {
+            Write-Host "Qt cache is usable: $qtConfig"
+            exit 0
+          }
+
+          Write-Host "Qt cache missing/incomplete, installing Qt 5.15.2..."
           python -m pip install --upgrade pip aqtinstall
           python -m aqt install-qt windows desktop 5.15.2 win64_msvc2019_64 -O C:\Qt
 
       - name: Save Qt Cache
-        if: always() && steps.cache-qt.outputs.cache-hit != 'true'
+        if: always()
         uses: actions/cache/save@v4
         with:
           path: C:\Qt\5.15.2\msvc2019_64
@@ -403,6 +409,10 @@ jobs:
           $env:AF_PYTHON_LIBRARIES = python -c "import pathlib,sys; print(pathlib.Path(sys.base_prefix,'libs',f'python{sys.version_info[0]}{sys.version_info[1]}.lib'))"
 
           $vcpkgInstalled = "$env:VCPKG_ROOT\installed\x64-windows"
+          $qtConfigDir = "$env:QT_ROOT\lib\cmake\Qt5"
+          if (!(Test-Path "$qtConfigDir\Qt5Config.cmake")) {
+            throw "Qt5Config.cmake not found at '$qtConfigDir'."
+          }
 
           cmake `
             -S afanasy/src/project.cmake `
@@ -414,7 +424,8 @@ jobs:
             -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake" `
             -DCMAKE_C_FLAGS="/W0" `
             -DCMAKE_CXX_FLAGS="/W0" `
-            -DCMAKE_PREFIX_PATH="$env:QT_ROOT" `
+            -DCMAKE_PREFIX_PATH="$env:QT_ROOT;$vcpkgInstalled" `
+            -DQt5_DIR="$qtConfigDir" `
             -DPostgreSQL_INCLUDE_DIR="$vcpkgInstalled\include" `
             -DPostgreSQL_LIBRARY="$vcpkgInstalled\lib\libpq.lib"
 
