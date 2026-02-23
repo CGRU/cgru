@@ -67,6 +67,8 @@ if(POLICY CMP0020)
 	cmake_policy(SET CMP0020 NEW)
 endif()
 
+include(CTest)
+
 add_subdirectory(libafanasy)
 add_subdirectory(render)
 add_subdirectory(libafsql)
@@ -87,4 +89,8 @@ if( "$ENV{AF_GUI}" STREQUAL "YES" )
     endif()
 else()
 	message("\nWARNING! Building without GUI.\n")
+endif()
+
+if(BUILD_TESTING)
+	add_subdirectory(tests)
 endif()

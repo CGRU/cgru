@@ -48,6 +48,10 @@ jobs:
           ./clear.py
           ./build.sh --quiet -j"$(nproc)"
 
+      - name: Run CTest
+        working-directory: afanasy/src/project.cmake
+        run: ctest --test-dir . --output-on-failure
+
   build-linux-container:
     name: Build ${{ matrix.name }}
     runs-on: ubuntu-24.04
@@ -128,6 +132,7 @@ jobs:
               cd /src/afanasy/src/project.cmake
               ./clear.py
               ./build.sh --quiet -j"$(nproc)"
+              ctest --test-dir . --output-on-failure
             '
 
   build-macos:
@@ -151,8 +156,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ~/Library/Caches/pip
-          key: macos-15-intel-pip-3.10-${{ hashFiles('.github/workflows/build.yml') }}
+          key: macos-15-intel-pip-3.10-aqtinstall-v1
           restore-keys: |
+            macos-15-intel-pip-3.10-aqtinstall-
             macos-15-intel-pip-3.10-
 
       - name: Install aqtinstall
@@ -274,6 +280,7 @@ jobs:
             -S afanasy/src/project.cmake \
             -B afanasy/src/project.cmake/build-mac \
             -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+            -DBUILD_TESTING=ON \
             -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
             -DCMAKE_C_FLAGS="-w" \
             -DCMAKE_CXX_FLAGS="-w" \
@@ -284,6 +291,10 @@ jobs:
       - name: Build
         shell: bash
         run: cmake --build afanasy/src/project.cmake/build-mac --parallel "$(sysctl -n hw.logicalcpu)"
+
+      - name: Run CTest
+        shell: bash
+        run: ctest --test-dir afanasy/src/project.cmake/build-mac --output-on-failure
 
   build-windows:
     name: Build Windows 2022 (SQL + GUI)
@@ -309,14 +320,20 @@ jobs:
           key: windows-2022-qt-5.15.2-msvc2019_64
 
       - name: Install Qt 5.15.2 (MSVC2019)
-        if: steps.cache-qt.outputs.cache-hit != 'true'
         shell: pwsh
         run: |
+          $qtConfig = "C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5\Qt5Config.cmake"
+          if (Test-Path $qtConfig) {
+            Write-Host "Qt cache is usable: $qtConfig"
+            exit 0
+          }
+
+          Write-Host "Qt cache missing/incomplete, installing Qt 5.15.2..."
           python -m pip install --upgrade pip aqtinstall
           python -m aqt install-qt windows desktop 5.15.2 win64_msvc2019_64 -O C:\Qt
 
       - name: Save Qt Cache
-        if: always() && steps.cache-qt.outputs.cache-hit != 'true'
+        if: always()
         uses: actions/cache/save@v4
         with:
           path: C:\Qt\5.15.2\msvc2019_64
@@ -392,6 +409,10 @@ jobs:
           $env:AF_PYTHON_LIBRARIES = python -c "import pathlib,sys; print(pathlib.Path(sys.base_prefix,'libs',f'python{sys.version_info[0]}{sys.version_info[1]}.lib'))"
 
           $vcpkgInstalled = "$env:VCPKG_ROOT\installed\x64-windows"
+          $qtConfigDir = "$env:QT_ROOT\lib\cmake\Qt5"
+          if (!(Test-Path "$qtConfigDir\Qt5Config.cmake")) {
+            throw "Qt5Config.cmake not found at '$qtConfigDir'."
+          }
 
           cmake `
             -S afanasy/src/project.cmake `
@@ -399,13 +420,19 @@ jobs:
             -G "Visual Studio 17 2022" `
             -A x64 `
             -T v142 `
+            -DBUILD_TESTING=ON `
             -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake" `
             -DCMAKE_C_FLAGS="/W0" `
             -DCMAKE_CXX_FLAGS="/W0" `
-            -DCMAKE_PREFIX_PATH="$env:QT_ROOT" `
+            -DCMAKE_PREFIX_PATH="$env:QT_ROOT;$vcpkgInstalled" `
+            -DQt5_DIR="$qtConfigDir" `
             -DPostgreSQL_INCLUDE_DIR="$vcpkgInstalled\include" `
             -DPostgreSQL_LIBRARY="$vcpkgInstalled\lib\libpq.lib"
 
       - name: Build
         shell: pwsh
         run: cmake --build afanasy/src/project.cmake/build-win --config Release -- /m
+
+      - name: Run CTest
+        shell: pwsh
+        run: ctest --test-dir afanasy/src/project.cmake/build-win -C Release --output-on-failure

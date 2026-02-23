@@ -28,6 +28,7 @@
 #include "../include/afpynames.h"
 
 #include "common/passwd.h"
+#include "platform_info.h"
 
 #include "msg.h"
 
@@ -626,23 +627,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 //
 //############ Platform: #############################
 	{
-	// OS Type:
-	#ifdef WINNT
-		platform.push_back("windows");
-	#else
-		platform.push_back("unix");
-	#endif
-	#ifdef MACOSX
-		platform.push_back("macosx");
-	#endif
-	#ifdef LINUX
-		platform.push_back("linux");
-	#endif
-	switch( sizeof(void*))
-	{
-		case 4: platform.push_back("32"); break;
-		case 8: platform.push_back("64"); break;
-	}
+		platform = af::platformGetTokens();
 	}
 	PRINT("Platform: '%s'\n", af::strJoin( platform).c_str());
 
