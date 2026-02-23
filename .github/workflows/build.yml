@@ -156,8 +156,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ~/Library/Caches/pip
-          key: macos-15-intel-pip-3.10-${{ hashFiles('.github/workflows/build.yml') }}
+          key: macos-15-intel-pip-3.10-aqtinstall-v1
           restore-keys: |
+            macos-15-intel-pip-3.10-aqtinstall-
             macos-15-intel-pip-3.10-
 
       - name: Install aqtinstall
