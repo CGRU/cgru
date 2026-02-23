@@ -109,4 +109,4 @@ case ${DISTRIBUTIVE} in
 esac
 
 # Build:
-cmake . && make $@
+cmake -DBUILD_TESTING=ON . && make $@

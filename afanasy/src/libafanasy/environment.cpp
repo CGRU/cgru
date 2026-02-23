@@ -28,9 +28,9 @@
 #include "../include/afpynames.h"
 
 #include "common/passwd.h"
+#include "platform_info.h"
 
 #include "msg.h"
-#include <fstream>
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -627,55 +627,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 //
 //############ Platform: #############################
 	{
-	// OS Type:
-	#ifdef WINNT
-		platform.push_back("windows");
-	#else
-		platform.push_back("unix");
-	#endif
-	#ifdef MACOSX
-		platform.push_back("macosx");
-	#endif
-	#ifdef LINUX
-		platform.push_back("linux");
-
-		std::ifstream os_release("/etc/os-release");
-		if( os_release.is_open())
-		{
-			std::string line;
-			std::string os_name;
-			std::string os_version;
-			while( std::getline( os_release, line))
-			{
-				if( line.empty() || (line[0] == '#'))
-					continue;
-
-				size_t pos = line.find('=');
-				if( pos == std::string::npos)
-					continue;
-
-				std::string key   = line.substr( 0, pos);
-				std::string value = line.substr( pos + 1);
-				if(( value.size() > 1) && (value[0] == '"') && (value[value.size() - 1] == '"'))
-					value = value.substr( 1, value.size() - 2);
-
-				if( key == "NAME")
-					os_name = value;
-				else if( key == "VERSION_ID")
-					os_version = value;
-			}
-
-			if( os_name.size())
-				platform.push_back( os_name);
-			if( os_version.size())
-				platform.push_back( os_version);
-		}
-	#endif
-	switch( sizeof(void*))
-	{
-		case 4: platform.push_back("32"); break;
-		case 8: platform.push_back("64"); break;
-	}
+		platform = af::platformGetTokens();
 	}
 	PRINT("Platform: '%s'\n", af::strJoin( platform).c_str());
 
