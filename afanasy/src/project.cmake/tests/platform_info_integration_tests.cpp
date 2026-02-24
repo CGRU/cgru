@@ -209,6 +209,13 @@ bool testTokenVectorIntegration()
 		return false;
 #endif
 
+#if defined(__aarch64__) || defined(__arm64__)
+	if( false == expect(hasToken(tokens, "aarch64"), "aarch64 token should be present"))
+		return false;
+#elif defined(__arm__)
+	if( false == expect(hasToken(tokens, "arm32"), "arm32 token should be present"))
+		return false;
+#else
 	if( sizeof(void*) == 4 )
 	{
 		if( false == expect(hasToken(tokens, "32"), "32 token should be present"))
@@ -219,6 +226,7 @@ bool testTokenVectorIntegration()
 		if( false == expect(hasToken(tokens, "64"), "64 token should be present"))
 			return false;
 	}
+#endif
 
 	std::string name;
 	std::string version;
