@@ -288,21 +288,20 @@ std::vector<std::string> af::platformGetTokens()
 	addUniqueToken(tokens, "linux");
 #endif
 
-	bool bitness_known = false;
+#if defined(__aarch64__) || defined(__arm64__)
+	addUniqueToken(tokens, "aarch64");
+#elif defined(__arm__)
+	addUniqueToken(tokens, "arm32");
+#else
 	switch( sizeof(void*))
 	{
 	case 4:
 		addUniqueToken(tokens, "32");
-		bitness_known = true;
 		break;
 	case 8:
 		addUniqueToken(tokens, "64");
-		bitness_known = true;
 		break;
 	}
-#if defined(__aarch64__)
-	if( bitness_known == false)
-		addUniqueToken(tokens, "arm64");
 #endif
 
 	std::string name_token;
