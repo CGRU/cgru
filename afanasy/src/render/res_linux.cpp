@@ -31,6 +31,10 @@
 	Various helper funcuntions.
 */
 static float get_cpu_frequency();
+static bool read_cpuinfo_value( const char * i_buffer, const char * i_key, float & o_value );
+#if defined(__aarch64__) || defined(__arm64__) || defined(__arm__)
+static bool read_cpufreq_khz_file( const char * i_file_name, float & o_value_mhz );
+#endif
 static void get_disk_stats();
 static long get_sector_size();
 static bool get_network_statistics(
@@ -294,8 +298,9 @@ void GetResources_LINUX(af::HostRes & hres, bool verbose)
       }
       else
       {
-         hres.hdd_total_gb = ((fsd.f_blocks >> 10) * fsd.f_bsize) >> 20;
-         hres.hdd_free_gb  = ((fsd.f_bfree  >> 10) * fsd.f_bsize) >> 20;
+         hres.hdd_total_gb = ((fsd.f_blocks  >> 10) * fsd.f_bsize) >> 20;
+         // Use user-available blocks, excluding root-reserved space.
+         hres.hdd_free_gb  = ((fsd.f_bavail >> 10) * fsd.f_bsize) >> 20;
       }
 
       // io:
@@ -463,18 +468,57 @@ static float get_cpu_frequency( )
 
    while( fgets(buffer, sizeof(buffer)-1, cpufd) )
    {
-      if( strncmp(buffer, "cpu MHz", 7) != 0 )
-         continue;
-
       float cpu_frequency;
-      int items = sscanf( buffer, "cpu MHz\t: %f\n", &cpu_frequency );
-
-      if( items == 1 )
+      if( read_cpuinfo_value( buffer, "cpu MHz", cpu_frequency ) )
       {
          fclose( cpufd );
          return cpu_frequency;
       }
    }
+
+#if defined(__aarch64__) || defined(__arm64__) || defined(__arm__)
+   // On heterogeneous ARM (big.LITTLE), cpu0 may be a small/slow core.
+   // Iterate all CPUs, reading the first available sysfs freq file for each,
+   // and return the highest frequency seen across all cores.
+   static const char * freq_suffixes[] =
+   {
+      "cpuinfo_max_freq",
+      "scaling_max_freq",
+      "scaling_cur_freq"
+   };
+
+   float max_freq = 0.0f;
+   char freq_path[256];
+
+   int cpu_count = int(sysconf(_SC_NPROCESSORS_CONF));
+   if( cpu_count < 1 )
+      cpu_count = int(sysconf(_SC_NPROCESSORS_ONLN));
+   if( cpu_count < 1 )
+      cpu_count = 1;
+
+   for( int cpu = 0; cpu < cpu_count; cpu++ )
+   {
+      for( unsigned s = 0; s < (sizeof(freq_suffixes) / sizeof(freq_suffixes[0])); s++ )
+      {
+         snprintf( freq_path, sizeof(freq_path),
+            "/sys/devices/system/cpu/cpu%d/cpufreq/%s", cpu, freq_suffixes[s] );
+         float cpu_frequency;
+         if( read_cpufreq_khz_file( freq_path, cpu_frequency ) )
+         {
+            if( cpu_frequency > max_freq )
+               max_freq = cpu_frequency;
+            break;
+         }
+      }
+   }
+
+   if( max_freq > 0.0f )
+   {
+      fclose( cpufd );
+      return max_freq;
+   }
+
+#endif
  
    fprintf( stderr, "couldn't find cpu frequency in '/proc/cpuinfo' file.\n" );
 
@@ -482,6 +526,51 @@ static float get_cpu_frequency( )
 
    return 2000;
 }
+
+static bool read_cpuinfo_value( const char * i_buffer, const char * i_key, float & o_value )
+{
+   size_t key_length = strlen( i_key );
+   if( strncmp(i_buffer, i_key, key_length) != 0 )
+      return false;
+
+   char next = i_buffer[key_length];
+   if( next != '\0' && next != ' ' && next != '\t' && next != ':' )
+      return false;
+
+   const char * value_pos = i_buffer + key_length;
+   while( (*value_pos == ' ') || (*value_pos == '\t') )
+      value_pos++;
+
+   if( *value_pos != ':' )
+      return false;
+
+   value_pos++;
+   while( (*value_pos == ' ') || (*value_pos == '\t') )
+      value_pos++;
+
+   return sscanf( value_pos, "%f", &o_value ) == 1;
+}
+
+#if defined(__aarch64__) || defined(__arm64__) || defined(__arm__)
+static bool read_cpufreq_khz_file( const char * i_file_name, float & o_value_mhz )
+{
+   FILE * file = ::fopen( i_file_name, "r" );
+   if( file == NULL )
+      return false;
+
+   unsigned long frequency_khz = 0;
+   int items = fscanf( file, "%lu", &frequency_khz );
+   fclose( file );
+
+   if( (items == 1) && (frequency_khz > 0) )
+   {
+      o_value_mhz = float(frequency_khz) / 1000.0f;
+      return true;
+   }
+
+   return false;
+}
+#endif
 
 static double
 compute_etime(struct timeval cur_time, struct timeval prev_time)

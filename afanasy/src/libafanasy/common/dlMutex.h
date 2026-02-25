@@ -47,7 +47,7 @@ private:
 #elif defined(LINUX) || defined(BSD)
 #if defined(__x86_64__) || defined(__powerpc64__)
 	unsigned m_data[10];
-#elif defined(__aarch64__)
+#elif defined(__aarch64__) || defined(__arm64__) || defined(__LP64__) || defined(_LP64)
 	unsigned m_data[16];
 #else
 	unsigned m_data[6];
@@ -63,4 +63,3 @@ private:
 };
 
 #endif // __dlMutex_h
-
