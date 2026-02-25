@@ -201,6 +201,15 @@ void Block::reconnectTask(af::TaskExec *i_taskexec, RenderAf & i_render, Monitor
 
 bool Block::canRunOn( RenderAf * render)
 {
+	// Apply pools: block pools override job pools when present.
+	bool canrunon = true;
+	if (m_data->hasPools())
+		m_data->getPoolPriority(render->getPool(), canrunon);
+	else
+		m_job->getJobPoolPriority(render->getPool(), canrunon);
+	if (false == canrunon)
+		return false;
+
 	// Check max running tasks on the same host:
 	if (m_data->getMaxRunTasksPerHost() == 0)
 		return false;

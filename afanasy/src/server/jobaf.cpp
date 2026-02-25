@@ -821,6 +821,44 @@ bool JobAf::v_canRunOn( RenderAf * i_render)
 	return true;
 }
 
+int JobAf::getJobPoolPriority(const std::string & i_pool, bool & o_canrunon) const
+{
+	return af::Work::getPoolPriority(i_pool, o_canrunon);
+}
+
+int JobAf::getPoolPriority(const RenderAf * i_render) const
+{
+	int renderPriority = i_render->calcPoolPriority();
+	int bestPriority = renderPriority;
+	bool found = false;
+
+	for (int b = 0; b < m_blocks_num; b++)
+	{
+		const af::BlockData * blockData = m_blocks_data[b];
+		if (false == (blockData->getState() & AFJOB::STATE_READY_MASK))
+			continue;
+
+		bool canrunon = true;
+		int poolPriority = 0;
+		if (blockData->hasPools())
+			poolPriority = blockData->getPoolPriority(i_render->getPool(), canrunon);
+		else
+			poolPriority = getJobPoolPriority(i_render->getPool(), canrunon);
+
+		if (false == canrunon)
+			continue;
+
+		int candidate = renderPriority + poolPriority;
+		if ((false == found) || (candidate > bestPriority))
+		{
+			bestPriority = candidate;
+			found = true;
+		}
+	}
+
+	return found ? bestPriority : renderPriority;
+}
+
 void JobAf::addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
 {
 	m_user->addSolveCounts(i_monitoring, i_exec, i_render);
