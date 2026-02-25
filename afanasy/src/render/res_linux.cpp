@@ -298,8 +298,9 @@ void GetResources_LINUX(af::HostRes & hres, bool verbose)
       }
       else
       {
-         hres.hdd_total_gb = ((fsd.f_blocks >> 10) * fsd.f_bsize) >> 20;
-         hres.hdd_free_gb  = ((fsd.f_bfree  >> 10) * fsd.f_bsize) >> 20;
+         hres.hdd_total_gb = ((fsd.f_blocks  >> 10) * fsd.f_bsize) >> 20;
+         // Use user-available blocks, excluding root-reserved space.
+         hres.hdd_free_gb  = ((fsd.f_bavail >> 10) * fsd.f_bsize) >> 20;
       }
 
       // io:
