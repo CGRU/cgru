@@ -476,6 +476,22 @@ class Requests:
         self.dbconn.commit()
 
 
+    def req_table_delete(self, i_args, o_out):
+        table = i_args['table']
+        time_val = i_args['time_max']
+        time_key = 'time_done'
+        if table == 'logs':
+            time_key = 'time'
+
+        cursor = self.dbconn.cursor()
+
+        query = "DELETE FROM %s WHERE %s < %d;" % (table, time_key, time_val)
+        cursor.execute(query)
+        o_out['deleted_rows'] = cursor.rowcount
+
+        self.dbconn.commit()
+
+
 def application(environ, start_response):
 
     out = dict()

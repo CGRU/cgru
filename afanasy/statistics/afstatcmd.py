@@ -14,15 +14,18 @@ import afstatsrv
 from optparse import OptionParser
 Parser = OptionParser(usage="%prog [Options]\nType \"%prog -h\" for help", version="%prog 1.0")
 Parser.add_option('-t', '--table',    dest='table',    type   = 'string',     default = None,       help = 'Table: logs, jobs, tasks')
-Parser.add_option(      '--min',      dest='timemin',  type   = 'string',     default = None,       help = 'Record minimum time: 2026-02-23')
-Parser.add_option(      '--max',      dest='timemax',  type   = 'string',     default = None,       help = 'Record maximum time: 2026-03-08')
+Parser.add_option(      '--tmin',     dest='timemin',  type   = 'string',     default = None,       help = 'Record minimum time: 2026-02-23')
+Parser.add_option(      '--tmax',     dest='timemax',  type   = 'string',     default = None,       help = 'Record maximum time: 2026-03-08')
 Parser.add_option(      '--select',   dest='select',   type   = 'string',     default = 'folder',   help = 'Select column')
 Parser.add_option(      '--favorite', dest='favorite', type   = 'string',     default = 'username', help = 'Favourite column')
+Parser.add_option(      '--delete',   dest='delete',   action = 'store_true', default = False,      help = 'Delete records')
 Parser.add_option('-V', '--verbose',  dest='verbose',  action = 'store_true', default = False,      help = 'Verbose mode')
 Parser.add_option('-D', '--debug',    dest='debug',    action = 'store_true', default = False,      help = 'Debug mode')
 Options, Args = Parser.parse_args()
 
-r = afstatsrv.Requests()
+def errExit(i_msg):
+    print('ERROR: ' + i_msg)
+    sys.exit(1)
 
 TimeMin = Options.timemin
 TimeMax = Options.timemax
@@ -30,6 +33,8 @@ if TimeMin:
     TimeMin = int(datetime.fromisoformat(TimeMin).timestamp())
 if TimeMax:
     TimeMax = int(datetime.fromisoformat(TimeMax).timestamp())
+
+r = afstatsrv.Requests()
 
 def request(i_name, i_args = None):
     func = 'req_' + i_name
@@ -47,6 +52,10 @@ def showDemo():
     print('# Folder = "%s"' % folder)
 
     args = dict()
+    if TimeMin:
+        args['time_min'] = TimeMin
+    if TimeMax:
+        args['time_max'] = TimeMax
     args['select'] = Options.select
     args['folder'] = folder
     out = request('get_jobs_folders', args)
@@ -79,8 +88,13 @@ if Options.table:
         args['time_min'] = TimeMin
     if TimeMax:
         args['time_max'] = TimeMax
-    print(args)
     reqest_name = 'get_%s_table' % Options.table
+
+    if Options.delete:
+        if TimeMax is None:
+            errExit('TIme Max should be specified to delete records ("--tmax").')
+        reqest_name = 'table_delete'
+
     out = request(reqest_name, args)
 else:
     showDemo()
