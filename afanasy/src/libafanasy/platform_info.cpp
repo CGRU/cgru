@@ -288,11 +288,21 @@ std::vector<std::string> af::platformGetTokens()
 	addUniqueToken(tokens, "linux");
 #endif
 
+#if defined(__aarch64__) || defined(__arm64__)
+	addUniqueToken(tokens, "aarch64");
+#elif defined(__arm__)
+	addUniqueToken(tokens, "arm32");
+#else
 	switch( sizeof(void*))
 	{
-	case 4: addUniqueToken(tokens, "32"); break;
-	case 8: addUniqueToken(tokens, "64"); break;
+	case 4:
+		addUniqueToken(tokens, "32");
+		break;
+	case 8:
+		addUniqueToken(tokens, "64");
+		break;
 	}
+#endif
 
 	std::string name_token;
 	std::string version_token;
