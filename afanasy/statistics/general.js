@@ -863,8 +863,17 @@ function g_RecordsDelete()
 		return;
 	date = Math.round(date.valueOf() / 1000);
 
-console.log(table);
-console.log(date);
+	g_Log('Deleting from ' + table + ' where time < ' + str);
+	g_Request({"send":{"table_delete":{"table":table,"time_max":date}},"func":g_RecordsDeleted});
+}
+
+function g_RecordsDeleted(i_data, i_args)
+{
+	if (i_data.deleted_rows)
+	{
+		g_Info('Deleted records: ' + i_data.deleted_rows);
+		g_HashChanged();
+	}
 }
 
 function g_TimeFocus(i_evt)
