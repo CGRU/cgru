@@ -18,6 +18,7 @@ g_graph_intervals.hour   = {"seconds":60 * 60,"intervals":[ 1, 3, 6, 12, 24 ],"o
 g_graph_intervals.day    = {"seconds":60 * 60 * 24,"intervals":[ 1, 7, 7, 7 ],"offsets":[[0],[1,3,5],[1,5],[1]]};
 g_graph_intervals.week   = {"seconds":60 * 60 * 24 * 7,"intervals":[ 1 ],"offsets":[[0]]};
 
+g_like = null;
 
 g_args = {};
 g_args.action = 'logs_table';
@@ -375,11 +376,26 @@ function g_ShowTable(i_data, i_args)
 		else
 			elCol.textContent = [col];
 
-		if (table == 'logs')
+		if (table == 'logs' && (col != 'time'))
 		{
-			elCol.style.backgroundColor = '#FF0';
-			elCol.contentEditable = true;
+			let elEdit = document.createElement('div');
+			elCol.appendChild(elEdit);
+			elEdit.classList.add('editing');
+			elEdit.contentEditable = true;
+
+			elEdit.m_col = col;
+			elEdit.onkeydown = g_LogsLikeKeyDown;
+
+			if (g_args.like && g_args.like[col])
+				elEdit.textContent = g_args.like[col];
 		}
+	}
+
+	if (i_data.table.length == 0)
+	{
+		elCol.textContent = 'No records found.';
+		if (table == 'logs')
+			elCol.textContent = 'No logs found.';
 	}
 
 	for (let r = 0; r < i_data.table.length; r++)
@@ -441,6 +457,31 @@ function g_ShowTable(i_data, i_args)
 	{
 		g_WaintingReset();
 	}
+}
+
+function g_LogsLikeKeyDown(i_evt)
+{
+	if (i_evt.keyCode != 13) // Enter
+		return;
+
+	i_evt.stopPropagation();
+
+	let el = i_evt.currentTarget;
+	let text = i_evt.currentTarget.textContent;
+	if ((text == null) || (text.length == 0))
+	{
+		return false;
+	}
+
+	let col = el.m_col;
+	let like = g_args.like;
+	if (like == null)
+		like = {};
+	like[col] = text;
+	g_args['like'] = like;
+	g_HashSet();
+
+	return false;
 }
 
 function g_FolderStrip(i_folder)

@@ -17,6 +17,7 @@ Parser.add_option('-t', '--table',    dest='table',    type   = 'string',     de
 Parser.add_option(      '--tmin',     dest='timemin',  type   = 'string',     default = None,       help = 'Record minimum time: 2026-02-23')
 Parser.add_option(      '--tmax',     dest='timemax',  type   = 'string',     default = None,       help = 'Record maximum time: 2026-03-08')
 Parser.add_option(      '--select',   dest='select',   type   = 'string',     default = 'folder',   help = 'Select column')
+Parser.add_option('-l', '--like',     dest='like',     type   = 'string',     default = None,       help = 'Select like: -l subject:afanasy')
 Parser.add_option(      '--favorite', dest='favorite', type   = 'string',     default = 'username', help = 'Favourite column')
 Parser.add_option(      '--delete',   dest='delete',   action = 'store_true', default = False,      help = 'Delete records')
 Parser.add_option('-V', '--verbose',  dest='verbose',  action = 'store_true', default = False,      help = 'Verbose mode')
@@ -84,10 +85,19 @@ if Options.table:
     args['select']   = Options.select
     args['favorite'] = Options.favorite
     args['folder']   = '/'
+
     if TimeMin:
         args['time_min'] = TimeMin
     if TimeMax:
         args['time_max'] = TimeMax
+
+    if Options.like:
+        col = Options.like.split('=')[0]
+        val = Options.like.split('=')[1]
+        like = dict()
+        like[col] = val
+        args['like'] = like
+
     reqest_name = 'get_%s_table' % Options.table
 
     if Options.delete:
