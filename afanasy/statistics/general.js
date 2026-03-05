@@ -376,7 +376,7 @@ function g_ShowTable(i_data, i_args)
 		else
 			elCol.textContent = [col];
 
-		if (table == 'logs' && (col != 'time'))
+		if ((table == 'logs') && (col != 'time'))
 		{
 			let elEdit = document.createElement('div');
 			elCol.appendChild(elEdit);
@@ -394,8 +394,36 @@ function g_ShowTable(i_data, i_args)
 	if (i_data.table.length == 0)
 	{
 		elCol.textContent = 'No records found.';
+
 		if (table == 'logs')
+		{
 			elCol.textContent = 'No logs found.';
+
+			if (g_args.like)
+			{
+				// On logs, we should add like colums
+				for (col in g_args.like)
+				{
+					let elCol = document.createElement('th');
+					elCol.classList.add(col);
+					elRow.appendChild(elCol);
+					if (g_parm[col] && g_parm[col].label)
+						elCol.textContent = g_parm[col].label;
+					else
+						elCol.textContent = [col];
+
+					let elEdit = document.createElement('div');
+					elCol.appendChild(elEdit);
+					elEdit.classList.add('editing');
+					elEdit.contentEditable = true;
+
+					elEdit.m_col = col;
+					elEdit.onkeydown = g_LogsLikeKeyDown;
+
+					elEdit.textContent = g_args.like[col];
+				}
+			}
+		}
 	}
 
 	for (let r = 0; r < i_data.table.length; r++)
@@ -467,13 +495,19 @@ function g_LogsLikeKeyDown(i_evt)
 	i_evt.stopPropagation();
 
 	let el = i_evt.currentTarget;
+	let col = el.m_col;
 	let text = i_evt.currentTarget.textContent;
 	if ((text == null) || (text.length == 0))
 	{
+		if (g_args.like && g_args.like[col])
+		{
+			delete g_args.like[col];
+			g_HashSet();
+		}
+
 		return false;
 	}
 
-	let col = el.m_col;
 	let like = g_args.like;
 	if (like == null)
 		like = {};
