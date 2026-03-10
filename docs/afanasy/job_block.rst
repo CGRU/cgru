@@ -205,6 +205,14 @@ hosts_mask_exclude
 
 Block can not run on renders which host name matches this mask.
 
+pools
+-----
+``af.Block.setPools(dict)``
+
+Pools is a string and number pairs (map<string,int>).
+Each pair represents pool name string and pool priority number.
+If block pools are set they override job pools for this block.
+
 depend_mask
 -----------
 ``af.Block.setDependMask(str)``

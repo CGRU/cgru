@@ -325,6 +325,9 @@ public:
 
 	inline const std::string & getSrvInfo() const {return m_srv_info;}
 	inline void setSrvInfo(const std::string & i_str) {m_srv_info = i_str;}
+	inline const std::map<std::string, int32_t> & getPools() const { return m_pools; }
+	inline bool hasPools() const { return m_pools.empty() == false; }
+	int getPoolPriority(const std::string & i_pool, bool & o_canrunon) const;
 
 protected:
 	/// Read or write block.
@@ -378,6 +381,7 @@ protected:
 
 	std::string m_working_directory;				  ///< Block tasks working directory.
 	std::map<std::string, std::string> m_environment; ///< Block tasks extra environment.
+	std::map<std::string, int32_t> m_pools;
 
 	std::map<std::string, int32_t> m_tickets;
 
@@ -435,6 +439,7 @@ private:
 
 	void setVariableCapacity(int i_capacity_coeff_min, int i_capacity_coeff_max);
 	bool setMultiHost(int i_min, int i_max, int i_waitmax, const std::string &i_service, int i_waitsrv);
+	void checkPools();
 
 	/// Set one exact \c pos bit in \c array to \c value .
 	static void setProgressBit(uint8_t *array, int pos, bool value);

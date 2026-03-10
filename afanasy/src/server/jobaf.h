@@ -63,6 +63,9 @@ public:
 	/// Whether the job can produce a task
 	/** Used to limit nodes for heavy solve algorithm **/
 	bool v_canRunOn( RenderAf * i_render);
+	virtual bool useWorkPoolCheck() const { return false; }
+	virtual int getPoolPriority(const RenderAf * i_render) const;
+	int getJobPoolPriority(const std::string & i_pool, bool & o_canrunon) const;
 
 	/// Solve a job. Job send ready task to Render, if any.
 	virtual RenderAf * v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring, BranchSrv * i_branch);
