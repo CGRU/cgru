@@ -955,5 +955,7 @@ function ArtPageBM(i_el, i_bm, i_artist)
 	this.elPath.target = '_blank';
 
 	st_SetElStatus(this.elRoot, this.bm.status, /*show all tasks = */ false, this.artist);
+
+	this.elRoot.style.backgroundImage = 'url(' + RULES.root + this.bm.path + '/' + RUFOLDER + '/thumbnail.jpg)';
 }
 
