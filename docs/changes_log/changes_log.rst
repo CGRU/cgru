@@ -12,6 +12,20 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
   You can upgrade only one client or server for changes.
 
 
+v3.4.1
+======
+*2026.03.16 (not released)*
+
+-   Server can restart task with will dependencies. AfWatch got tasks list a menu item for it.
+
+-   RapidJSON library updated to 1.1.0
+
+
+- **Bugfixes:**
+
+    - AfRender windows bug. Task process environment not being overridden with extra environment.
+
+
 .. _changes-log-latest:
 
 
