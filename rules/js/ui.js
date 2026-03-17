@@ -1412,6 +1412,7 @@ function u_CmdExecServerCreate(i_exec, i_path)
 	cmd = cmd.replace('@PATH@', c_PathPM_Rules2Server(i_path));
 	cmd = cmd.replace('@USER@', g_auth_user.id);
 	el.m_cmd = cmd;
+	el.m_exec = i_exec;
 
 	el.onclick = u_CmdExecServerOnClick;
 	el.ondblclick = u_CmdExecServerOnDblClick;
@@ -1436,16 +1437,127 @@ function u_CmdExecServerOnDblClick(i_evt)
 	let cmd = el.m_cmd;
 	cmd = activity_ChangeCmd(cmd);
 	cmd = fv_CmdExecFilter(cmd);
-	c_Info('Executing:\n' + cmd);
+
+	let exec = el.m_exec;
+	if (exec.file_dialog)
+	{
+		let args2 = {};
+		args2.el = el;
+		n_Request({
+			"send": {"listdir": exec.file_dialog},
+			"func": u_CmdExecServerListDir,
+			"el"  : el,
+			"info": 'exec server file_dialog'
+		});
+		return;
+	}
+
+	u_CmdExecServer(el, cmd);
+}
+
+function u_CmdExecServer(i_el, i_cmd)
+{
+	c_Info('Executing:\n' + i_cmd);
 
 	n_Request({
-		"send": {"cmdexec": {"cmds": [cmd]}},
+		"send": {"cmdexec": {"cmds": [i_cmd]}},
 		"func": u_CmdExecServerFinished,
-		"el"  : el,
+		"el"  : i_el,
 		"info": 'cmdexec_server'
 	});
 
-	el.classList.add('running');
+	i_el.classList.add('running');
+}
+
+function u_CmdExecServerListDir(i_data, i_args)
+{
+	if (i_data == null)
+	{
+		c_Error('No data received.');
+		return;
+	}
+
+	if (i_data.error)
+	{
+		c_Error(i_data.error);
+		return;
+	}
+
+	let listdir = i_data.listdir;
+	if (listdir == null)
+	{
+		c_Error('No files received.');
+		return;
+	}
+	if (listdir.length == 0)
+	{
+		c_Error('No files found.');
+		return;
+	}
+
+	let exec = i_args.el.m_exec;
+
+	let args = {};
+	args.name = exec.file_dialog.name;
+	args.title = exec.file_dialog.title;
+	args.items = listdir;
+	args.func = u_CmdExecServerSceneSelected;
+	args.fargs = {"el": i_args.el};
+	u_SelectDialog(args);
+}
+
+function u_SelectDialog(i_args)
+{
+	let wnd = new cgru_Window(i_args);
+	wnd.m_args = i_args;
+
+	let keys = {};
+	for (let item of i_args.items)
+		keys[item.name] = item;
+
+	//gui_Create(wnd.elContent, {}, []);
+	gui_CreateChoices({
+		"wnd": wnd.elContent,
+		"name": 'scene',
+		"value": 'scene_common.nk',
+		"label": 'Scenes:',
+		"keys": keys
+	});
+
+	let elBtns = document.createElement('div');
+	wnd.elContent.appendChild(elBtns);
+	elBtns.style.clear = 'both';
+	elBtns.classList.add('buttons');
+
+	let elExecute = document.createElement('div');
+	elBtns.appendChild(elExecute);
+	elExecute.textContent = 'Execute';
+	elExecute.classList.add('button');
+	elExecute.m_wnd = wnd;
+	elExecute.onclick = function(e) {u_SelectDialogProcessGUI(e.currentTarget.m_wnd);};
+}
+
+function u_SelectDialogProcessGUI(i_wnd)
+{
+	let params = {};
+	if (i_wnd.elContent.m_choises)
+		for (let key in i_wnd.elContent.m_choises)
+			params[key] = i_wnd.elContent.m_choises[key].value;
+
+	i_wnd.m_args.func(params, i_wnd.m_args.fargs);
+
+	i_wnd.destroy();
+}
+
+function u_CmdExecServerSceneSelected(i_params, i_args)
+{
+	let el = i_args.el;
+	let cmd = el.m_cmd;
+	let exec = el.m_exec;
+	cmd = cmd.replace(exec.file_dialog.argument, i_params.scene);
+
+//console.log(cmd);
+	u_CmdExecServer(el, cmd);
 }
 
 function u_CmdExecServerFinished(i_data, i_args)

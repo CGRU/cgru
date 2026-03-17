@@ -269,6 +269,28 @@ class Requests:
         o_out['makefolder'] = dirname
 
 
+    def req_listdir(self, i_args, o_out):
+        dirname = i_args['path']
+
+        if not os.path.isdir(dirname):
+            o_out['error'] = 'No such folder: ' + dirname;
+            return
+
+        items = []
+        for afile in os.listdir(dirname):
+            if 'ext' in i_args:
+                name, ext = os.path.splitext(afile)
+                if ext != i_args['ext']:
+                    continue
+
+            item = dict()
+            item['name'] = afile
+
+            items.append(item)
+
+        o_out['listdir'] = items
+
+
     def req_copytemplate(self, i_args, o_out):
         if self.session.USER_ID is None:
             o_out['error'] = 'Guests are not allowed create new assets.'
