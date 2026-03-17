@@ -210,8 +210,9 @@ And set it as System job events block service name in your configuration file:
 Statistics
 ----------
 
-Afanasy server can store jobs and tasks statistics in SQL database.
+Afanasy server can store logs, jobs and tasks statistics in SQL database.
 It uses PostgreSQL engine.
+Almost any change on server produce a log that will be stored in database.
 On job deletion and task finish (with any result) server insert some job and task data into database tables.
 
 
@@ -219,6 +220,17 @@ Database Schema
 ~~~~~~~~~~~~~~~
 
 .. code-block:: bash
+
+        afanasy=# \d logs
+                                Table "public.logs"
+         Column  |          Type           | Collation | Nullable | Default
+        ---------+-------------------------+-----------+----------+---------
+         time    | bigint                  |           |          | 0
+         subject | character varying(512)  |           |          |
+         type    | character varying(512)  |           |          |
+         object  | character varying(512)  |           |          |
+         info    | character varying(4096) |           |          |
+
 
         afanasy=# \d jobs;
                                    Table "public.jobs"
@@ -326,14 +338,31 @@ In most Linux-es all this can be provided by packages:
 The site is located in ``cgru/afanasy/statistics`` folder.
 
 
-Web Page
+Web Site
 ~~~~~~~~
 
-There is a Web page to view Afanasy SQL statistics database.
+There is a site to view Afanasy SQL statistics database.
+
+Logs Page
+"""""""""
+
+.. figure:: images/stat_logs.png
+
+    Logs Page
+
+Jobs Page
+"""""""""
+
+.. figure:: images/stat_jobs.png
+
+    Jobs Page
+
+Tasks Graphs Page
+"""""""""""""""""
 
 .. figure:: images/stat_tasks.png
 
-    Statistics Tasks Graph Page
+    Tasks Graph Page
 
 TIME-WAIT
 ---------

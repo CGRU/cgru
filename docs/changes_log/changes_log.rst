@@ -16,9 +16,18 @@ v3.4.1
 ======
 *2026.03.16 (not released)*
 
--   Server can restart task with will dependencies. AfWatch got tasks list a menu item for it.
+-   New server node logs system. Any action log stored in SQL database
+    `logs <../afanasy/server.html#database-schema>`_ table.
+
+-   Afanasy statistics site can
+    `show <../afanasy/server.html#logs-page>`_ logs.
+    You can filter logs to find something special.
+
+-   Server can restart task with will dependencies. AfWatch tasks list got a menu item for it.
 
 -   RapidJSON library updated to 1.1.0
+
+-   Linux distro/version added to platform string.
 
 
 - **Bugfixes:**
