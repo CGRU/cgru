@@ -321,7 +321,32 @@ function g_Action_TasksGraph(i_args)
 	g_Info('Requesting tasks folders statistics graph...');
 	$('folders_div').style.display = 'block';
 	i_args.select = 'folder';
-	i_args.interval = g_TimeIntervalGet();
+
+	// Calculate time min and max to last 7 days:
+	time_max = g_args.time_max;
+	if ((time_max == null) || (time_max == 0))
+		time_max = Math.round((new Date()).valueOf() / 1000);
+	time_min = g_args.time_min;
+	if ((time_min == null) || (time_min == 0) || (time_max - time_min < 1000))
+		time_min = time_max - (60 * 60 * 24 * 7);
+
+	// Calculate time interval:
+	let interval = 1;
+	let i = 0;
+	while((time_max - time_min) / interval > 100)
+	{
+		if (i < g_graph_intervals.names.length)
+			interval = g_graph_intervals[g_graph_intervals.names[i]].seconds;
+		else
+			interval *= 10;
+		i++;
+	}
+	i_args.interval = interval;
+
+	// Snap time min and max to interval
+	i_args.time_min = Math.floor(time_min / interval) * interval;
+	i_args.time_max = Math.ceil( time_max / interval) * interval;
+
 	g_Request({"send":{"get_tasks_folders_graph":i_args},"func":g_ShowGraph,"args":i_args});
 }
 
@@ -1003,27 +1028,6 @@ function g_TimeShow()
 		date = date.substr(0, date.indexOf('T'));
 		$(g_time_ids[i]).textContent = date;
 	}	
-}
-
-function g_TimeIntervalGet()
-{
-	let interval = 1;
-	let i = 0;
-	time_max = g_args.time_max;
-	if ((time_max == null) || (time_max == 0))
-		time_max = Math.round((new Date()).valueOf() / 1000);
-	while((time_max - g_args.time_min) / interval > 100)
-	{
-		if (i < g_graph_intervals.names.length)
-			interval = g_graph_intervals[g_graph_intervals.names[i]].seconds;
-		else
-			interval *= 10;
-		i++;
-	}
-	g_args.time_min = Math.floor(g_args.time_min / interval) * interval;
-	g_args.time_max = Math.ceil( g_args.time_max / interval) * interval;
-
-	return interval;
 }
 
 function g_MoveCursorToTheEnd(i_el)
