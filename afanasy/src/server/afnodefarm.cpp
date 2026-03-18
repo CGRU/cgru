@@ -110,19 +110,21 @@ bool AfNodeFarm::actionFarm(Action & i_action)
 					it  = m_farm->m_services.erase(it);
 					end = m_farm->m_services.end();
 					found = true;
+					i_action.answerLog("Service \"" + *it + "\" removed.");
 					continue;
 				}
 				else if ((mode == "service_disable") && (false == isServiceDisabled(*it)))
 				{
 					m_farm->m_services_disabled.push_back(*it);
 					found = true;
-					i_action.answerLog("Service \"" + *it + "\" disabled");
+					i_action.answerLog("Service \"" + *it + "\" disabled.");
 				}
 				else if ((mode == "service_enable") && isServiceDisabled(*it))
 				{
 					it  = m_farm->m_services_disabled.erase(it);
 					end = m_farm->m_services_disabled.end();
 					found = true;
+					i_action.answerLog("Service \"" + *it + "\" enabled.");
 					continue;
 				}
 			}
@@ -145,7 +147,6 @@ bool AfNodeFarm::actionFarm(Action & i_action)
 			}
 		}
 
-		i_action.answerInfo("Services '" + mask.getPattern() + "' " + "removed/enabled/disabled.");
 		return true;
 	}
 
