@@ -346,21 +346,21 @@ There is a site to view Afanasy SQL statistics database.
 Logs Page
 """""""""
 
-.. figure:: images/stat_logs.png
+.. figure:: images/stat_logs.jpg
 
     Logs Page
 
 Jobs Page
 """""""""
 
-.. figure:: images/stat_jobs.png
+.. figure:: images/stat_jobs.jpg
 
     Jobs Page
 
 Tasks Graphs Page
 """""""""""""""""
 
-.. figure:: images/stat_tasks.png
+.. figure:: images/stat_tasks.jpg
 
     Tasks Graph Page
 
