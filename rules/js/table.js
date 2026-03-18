@@ -465,16 +465,17 @@ function table_Gen_tasks(i_shot)
 				for (let g = 0; g < task.tags.length; g++)
 					line += ' ' + c_GetTagTitle(task.tags[g]);
 
+			if (task.flags && task.flags.length)
+				for (let g = 0; g < task.flags.length; g++)
+					line += ' ' + c_GetFlagTitle(task.flags[g]);
+
 			line += ' - ';
 
 			if (task.artists && task.artists.length)
 				for (let a = 0; a < task.artists.length; a++)
 					line += ' ' + c_GetUserTitle(task.artists[a]);
 
-			if (data.length)
-				data += '<br>';
-
-			data += line;
+			data += '<div style="white-space: nowrap">' + line + '</div>';
 		}
 
 	table_WriteTD({'data': data, 'status': i_shot.status});
