@@ -84,7 +84,7 @@ class Requests:
         query += " WHERE time BETWEEN " + str(time_min) + " AND " + str(time_max)
         if 'like' in i_args:
             for col in i_args['like']:
-                query += " AND %s like '%%%s%%'" % (col, i_args['like'][col])
+                query += " AND %s ILIKE '%%%s%%'" % (col, i_args['like'][col])
         query += " ORDER BY " + order + " DESC;"
 
         o_out['table'] = self.execQuery(query)
