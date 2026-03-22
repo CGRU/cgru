@@ -318,6 +318,16 @@ function c_ConstantError(i_msg)
 	el.innerHTML = i_msg;
 }
 
+function c_MoveCursorToTheEnd(i_el)
+{
+	let range = document.createRange();//Create a range (a range is a like the selection but invisible)
+	range.selectNodeContents(i_el);//Select the entire contents of the element with the range
+	range.collapse(false);//collapse the range to the end point. false means collapse to end rather than the start
+	let selection = window.getSelection();//get the selection object (allows you to change selection)
+	selection.removeAllRanges();//remove any selections already made
+	selection.addRange(range);//make the range you have just created the visible selection
+}
+
 function c_AuxFolder(i_folder)
 {
 	if (i_folder.status)
@@ -838,6 +848,20 @@ function c_GetElInteger(i_el)
 		return null;
 	}
 	return num;
+}
+
+function c_GetElTime(i_el)
+{
+	let str = c_Strip(i_el.textContent);
+	if (str.length == 0)
+		return null;
+
+	let date = new Date(Date.parse(str));
+	if (date == null)
+		return null;
+
+	let time = Math.round(date.valueOf() / 1000);
+	return time;
 }
 
 function c_FileDragStart(i_evt, i_path)

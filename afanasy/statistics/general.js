@@ -1009,7 +1009,7 @@ function g_TimeKeyDown(i_evt)
 		let date = new Date(Date.parse(str));
 		if (date == null)
 			continue;
-		time = Math.round(date.valueOf() / 1000);
+		let time = Math.round(date.valueOf() / 1000);
 		g_args[g_time_ids[i]] = time;
 	}
 

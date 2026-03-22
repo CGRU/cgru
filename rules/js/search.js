@@ -137,6 +137,11 @@ function s_SearchOnClick()
 			if (ASSET && ASSET.filter)
 				s_ProcessGUI();
 		};
+
+		$('search_statmodmin').onfocus = s_TimeFocus;
+		$('search_statmodmax').onfocus = s_TimeFocus;
+		$('search_bodymodmin').onfocus = s_TimeFocus;
+		$('search_bodymodmax').onfocus = s_TimeFocus;
 	}
 
 	$('search_result').textContent = '';
@@ -271,6 +276,23 @@ function s_SearchOnClick()
 
 	if (ASSET && window[ASSET.filter])
 		s_Found(window[ASSET.filter]());
+}
+
+function s_TimeFocus(i_evt)
+{
+	// If there is no text entered:
+	let el = i_evt.currentTarget;
+	let str = el.textContent;
+	if (str && str.length)
+		return;
+
+	// Set current date:
+	let date = new Date();
+	date = date.toISOString();
+	date = date.substr(0, date.indexOf('T'));
+	el.textContent = date;
+
+	c_MoveCursorToTheEnd(el);
 }
 
 function s_ShowArtists()
@@ -435,11 +457,20 @@ function s_ProcessGUI()
 				args.tags.push($('search_tags').m_elTags[i].m_tag);
 			}
 
-	let parm = ['priority','percent', 'finish', 'statmod', 'bodymod'];
+	let parm = ['priority','percent', 'finish'];
 	for (let i = 0; i < parm.length; i++)
 	{
 		let min = c_GetElInteger($('search_' + parm[i] + 'min'));
 		let max = c_GetElInteger($('search_' + parm[i] + 'max'));
+		if ((min != null) || (max != null))
+			args[parm[i]] = [min, max];
+	}
+
+	parm = ['statmod', 'bodymod'];
+	for (let i = 0; i < parm.length; i++)
+	{
+		let min = c_GetElTime($('search_' + parm[i] + 'min'));
+		let max = c_GetElTime($('search_' + parm[i] + 'max'));
 		if ((min != null) || (max != null))
 			args[parm[i]] = [min, max];
 	}
@@ -487,7 +518,7 @@ function s_Search(i_args)
 			c_ElSetSelected(
 				$('search_tags').m_elTags[i], i_args.tags.indexOf($('search_tags').m_elTags[i].m_tag) != -1)
 
-	let parm = ['priority','percent', 'finish', 'statmod', 'bodymod'];
+	let parm = ['priority','percent', 'finish'];
 	for (let i = 0; i < parm.length; i++)
 		if (i_args[parm[i]])
 		{
@@ -500,6 +531,19 @@ function s_Search(i_args)
 			}
 			$('search_' + parm[i] + 'min').textContent = i_args[parm[i]][0];
 			$('search_' + parm[i] + 'max').textContent = i_args[parm[i]][1];
+		}
+
+	parm = ['statmod', 'bodymod'];
+	for (let i = 0; i < parm.length; i++)
+		if (i_args[parm[i]])
+		{
+			let min = new Date(1000 * i_args[parm[i]][0]);
+			let max = new Date(1000 * i_args[parm[i]][1]);
+			min = min.toISOString();
+			max = max.toISOString();
+
+			$('search_' + parm[i] + 'min').textContent = min.substr(0, min.indexOf('T'));
+			$('search_' + parm[i] + 'max').textContent = max.substr(0, max.indexOf('T'));
 		}
 
 	if (i_args.body)
