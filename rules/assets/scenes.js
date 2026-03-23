@@ -1043,8 +1043,8 @@ function sc_FilterShots(i_args)
 						found = false;
 						let flags = [];
 						// Join this task flags with status flags
-						if (st_obj.flags && st_obj.flags.length)
-							flags = flags.concat(st_obj.flags);
+						//if (st_obj.flags && st_obj.flags.length)
+						//	flags = flags.concat(st_obj.flags);
 						if (task.flags && task.flags.length)
 							flags = flags.concat(task.flags);
 
@@ -1070,8 +1070,8 @@ function sc_FilterShots(i_args)
 						found = false;
 						let tags = [];
 						// Join this task tags with status tags
-						if (st_obj.tags && st_obj.tags.length)
-							tags = tags.concat(st_obj.tags);
+						//if (st_obj.tags && st_obj.tags.length)
+						//	tags = tags.concat(st_obj.tags);
 						if (task.tags && task.tags.length)
 							tags = tags.concat(task.tags);
 
