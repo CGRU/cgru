@@ -56,7 +56,7 @@ if len(RULES_TOP) == 0:
             ROOT = os.path.join(CGRU_LOCATION, RULES_TOP['root'])
 
 
-def setStatus(paths=None, uid=None, name=None, tags=None, tags_keep=None, artists=None, artists_keep=None, flags=None, flags_keep=None, progress=None, annotation=None, color=None, nonews=False, out=None):
+def setStatus(paths=None, uid=None, name=None, tags=None, tags_keep=None, artists=None, artists_keep=None, flags=None, flags_keep=None, progress=None, annotation=None, color=None, finish=None, nonews=False, out=None):
     if out is None:
         out = dict()
     if paths is None or paths == []:
@@ -67,7 +67,7 @@ def setStatus(paths=None, uid=None, name=None, tags=None, tags_keep=None, artist
 
     for path in paths:
         st = status.Status(uid, path)
-        st.set(tags=tags, tags_keep=tags_keep, artists=artists, artists_keep=artists_keep, flags=flags, flags_keep=flags_keep, progress=progress, annotation=annotation, color=color, out=out)
+        st.set(tags=tags, tags_keep=tags_keep, artists=artists, artists_keep=artists_keep, flags=flags, flags_keep=flags_keep, progress=progress, annotation=annotation, color=color, finish=finish, out=out)
         if 'error' in out:
             break
         if st.progress_changed:

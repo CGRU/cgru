@@ -1154,14 +1154,17 @@ function sc_FilterShots(i_args)
 
 		if (i_args.finish && found)
 		{
-			found = false;
 			if (st_obj.finish)
 			{
-				let days = c_DT_DaysLeft(st_obj.finish);
-				if (((i_args.finish[0] == null) ||  days >= i_args.finish[0]) &&
-					((i_args.finish[1] == null) ||  days <= i_args.finish[1]))
-					found = true;
+				let min = i_args.finish[0];
+				let max = i_args.finish[1];
+				if (min && (min > st_obj.finish))
+					found = false;
+				if (max && (max < st_obj.finish))
+					found = false;
 			}
+			else
+				fouund = false;
 		}
 
 		if (i_args.statmod && found)

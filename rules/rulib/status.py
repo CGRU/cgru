@@ -99,7 +99,7 @@ class Status:
         return None
 
 
-    def set(self, tags=None, tags_keep=None, artists=None, artists_keep=None, flags=None, flags_keep=None, progress=None, annotation=None, color=None, out=None):
+    def set(self, tags=None, tags_keep=None, artists=None, artists_keep=None, flags=None, flags_keep=None, progress=None, annotation=None, color=None, finish=None, out=None):
         # Store original progress to compare later
         # and find out that is was changed.
         _progress = self.data.get('progress')
@@ -118,6 +118,9 @@ class Status:
             if progress < -1: progress = -1
             elif progress > 100: progress = 100
             self.data['progress'] = progress
+
+        if finish is not None and type(finish) is int:
+            self.data['finish'] = finish
 
         self.setItems('flags',   items_keep=flags_keep,   items_add=flags)
         self.setItems('tags',    items_keep=tags_keep,    items_add=tags)

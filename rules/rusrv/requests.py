@@ -332,6 +332,7 @@ class Requests:
         progress     = None
         annotation   = None
         color        = None
+        finish       = None
         nonews       = False
 
         if 'name'         in i_args: name         = i_args['name']
@@ -344,9 +345,10 @@ class Requests:
         if 'progress'     in i_args: progress     = i_args['progress']
         if 'annotation'   in i_args: annotation   = i_args['annotation']
         if 'color'        in i_args: color        = i_args['color']
+        if 'finish'       in i_args: finish       = i_args['finish']
         if 'nonews'       in i_args and i_args['nonews']: nonews = True
 
-        rulib.setStatus(uid=self.session.USER_ID, paths=i_args['paths'], name=name, tags=tags, tags_keep=tags_keep, artists=artists, artists_keep=artists_keep, flags=flags, flags_keep=flags_keep, progress=progress, annotation=annotation, color=color, nonews=nonews, out=out)
+        rulib.setStatus(uid=self.session.USER_ID, paths=i_args['paths'], name=name, tags=tags, tags_keep=tags_keep, artists=artists, artists_keep=artists_keep, flags=flags, flags_keep=flags_keep, progress=progress, annotation=annotation, color=color, finish=finish, nonews=nonews, out=out)
 
         return
 

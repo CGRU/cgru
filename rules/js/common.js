@@ -318,6 +318,23 @@ function c_ConstantError(i_msg)
 	el.innerHTML = i_msg;
 }
 
+function c_ElCurDateSet(i_evt)
+{
+	// If there is no text entered:
+	let el = i_evt.currentTarget;
+	let str = el.textContent;
+	if (str && str.length)
+		return;
+
+	// Set current date:
+	let date = new Date();
+	date = date.toISOString();
+	date = date.substr(0, date.indexOf('T'));
+	el.textContent = date;
+
+	c_MoveCursorToTheEnd(el);
+}
+
 function c_MoveCursorToTheEnd(i_el)
 {
 	let range = document.createRange();//Create a range (a range is a like the selection but invisible)

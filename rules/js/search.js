@@ -138,10 +138,11 @@ function s_SearchOnClick()
 				s_ProcessGUI();
 		};
 
-		$('search_statmodmin').onfocus = s_TimeFocus;
-		$('search_statmodmax').onfocus = s_TimeFocus;
-		$('search_bodymodmin').onfocus = s_TimeFocus;
-		$('search_bodymodmax').onfocus = s_TimeFocus;
+		for (let name of ['statmod','bodymod','finish'])
+		{
+			$('search_' + name + 'min').onfocus = c_ElCurDateSet;
+			$('search_' + name + 'max').onfocus = c_ElCurDateSet;
+		}
 	}
 
 	$('search_result').textContent = '';
@@ -276,23 +277,6 @@ function s_SearchOnClick()
 
 	if (ASSET && window[ASSET.filter])
 		s_Found(window[ASSET.filter]());
-}
-
-function s_TimeFocus(i_evt)
-{
-	// If there is no text entered:
-	let el = i_evt.currentTarget;
-	let str = el.textContent;
-	if (str && str.length)
-		return;
-
-	// Set current date:
-	let date = new Date();
-	date = date.toISOString();
-	date = date.substr(0, date.indexOf('T'));
-	el.textContent = date;
-
-	c_MoveCursorToTheEnd(el);
 }
 
 function s_ShowArtists()
@@ -457,7 +441,7 @@ function s_ProcessGUI()
 				args.tags.push($('search_tags').m_elTags[i].m_tag);
 			}
 
-	let parm = ['priority','percent', 'finish'];
+	let parm = ['priority','percent'];
 	for (let i = 0; i < parm.length; i++)
 	{
 		let min = c_GetElInteger($('search_' + parm[i] + 'min'));
@@ -466,7 +450,7 @@ function s_ProcessGUI()
 			args[parm[i]] = [min, max];
 	}
 
-	parm = ['statmod', 'bodymod'];
+	parm = ['statmod','bodymod','finish'];
 	for (let i = 0; i < parm.length; i++)
 	{
 		let min = c_GetElTime($('search_' + parm[i] + 'min'));
@@ -518,7 +502,7 @@ function s_Search(i_args)
 			c_ElSetSelected(
 				$('search_tags').m_elTags[i], i_args.tags.indexOf($('search_tags').m_elTags[i].m_tag) != -1)
 
-	let parm = ['priority','percent', 'finish'];
+	let parm = ['priority','percent'];
 	for (let i = 0; i < parm.length; i++)
 		if (i_args[parm[i]])
 		{
@@ -533,7 +517,7 @@ function s_Search(i_args)
 			$('search_' + parm[i] + 'max').textContent = i_args[parm[i]][1];
 		}
 
-	parm = ['statmod', 'bodymod'];
+	parm = ['statmod', 'bodymod','finish'];
 	for (let i = 0; i < parm.length; i++)
 		if (i_args[parm[i]])
 		{

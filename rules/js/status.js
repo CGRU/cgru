@@ -1057,7 +1057,8 @@ Status.prototype.edit = function(i_args) {
 	this.elEdit_finish = document.createElement('div');
 	elFinishDiv.appendChild(this.elEdit_finish);
 	this.elEdit_finish.classList.add('editing');
-	this.elEdit_finish.contentEditable = 'true';
+	this.elEdit_finish.contentEditable = 'true'
+	this.elEdit_finish.onfocus = c_ElCurDateSet;
 	elFinishLabel.m_elEdit_finish = this.elEdit_finish;
 
 	var elProgressDiv = document.createElement('div');
