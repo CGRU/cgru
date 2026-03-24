@@ -1092,6 +1092,25 @@ function sc_FilterShots(i_args)
 						}
 					}
 
+					if (found && i_args.statmod)
+					{
+						let time = task.ctime;
+						if (task.mtime)
+							time = task.mtime;
+
+						if (time)
+						{
+							let min = i_args.statmod[0];
+							let max = i_args.statmod[1];
+							if (min && (min > time))
+								found = false;
+							if (max && (max < time))
+								found = false;
+						}
+						else
+							found = false;
+					}
+
 					// We found one task matching flags and tags.
 					// One matching task it is enough to show entire shot.
 					if (found)
@@ -1143,6 +1162,41 @@ function sc_FilterShots(i_args)
 					((i_args.finish[1] == null) ||  days <= i_args.finish[1]))
 					found = true;
 			}
+		}
+
+		if (i_args.statmod && found)
+			if ((false == flags_tsk) || (false == tags_tsk))
+			{
+				if (st_obj.mtime)
+				{
+					let min = i_args.statmod[0];
+					let max = i_args.statmod[1];
+					if (min && (min > st_obj.mtime))
+						found = false;
+					if (max && (max < st_obj.mtime))
+						found = false;
+				}
+				else
+					fouund = false;
+			}
+
+		if (i_args.bodymod && st_obj.body && found)
+		{
+			let time = st_obj.body.ctime;
+			if (st_obj.body.mtime)
+				time = st_obj.body.mtime;
+
+			if (time)
+			{
+				let min = i_args.bodymod[0];
+				let max = i_args.bodymod[1];
+				if (min && (min > time))
+					found = false;
+				if (max && (max < time))
+					found = false;
+			}
+			else
+				fouund = false;
 		}
 
 		if (found)

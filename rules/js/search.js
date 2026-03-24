@@ -537,13 +537,19 @@ function s_Search(i_args)
 	for (let i = 0; i < parm.length; i++)
 		if (i_args[parm[i]])
 		{
-			let min = new Date(1000 * i_args[parm[i]][0]);
-			let max = new Date(1000 * i_args[parm[i]][1]);
-			min = min.toISOString();
-			max = max.toISOString();
+			if (i_args[parm[i]][0])
+			{
+				let min = new Date(1000 * i_args[parm[i]][0]);
+				min = min.toISOString();
+				$('search_' + parm[i] + 'min').textContent = min.substr(0, min.indexOf('T'));
+			}
 
-			$('search_' + parm[i] + 'min').textContent = min.substr(0, min.indexOf('T'));
-			$('search_' + parm[i] + 'max').textContent = max.substr(0, max.indexOf('T'));
+			if (i_args[parm[i]][1])
+			{
+				let max = new Date(1000 * i_args[parm[i]][1]);
+				max = max.toISOString();
+				$('search_' + parm[i] + 'max').textContent = max.substr(0, max.indexOf('T'));
+			}
 		}
 
 	if (i_args.body)
