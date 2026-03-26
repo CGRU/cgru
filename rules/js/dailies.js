@@ -41,15 +41,16 @@ d_params.general = {
 d_params.settings = {
 	copy_folder    : {"label":'Copy Folder', "default":"", "tooltip":'Copy to folder'},
 	audio_file     : {"label":'Audio', "default":"REF", "tooltip":'Sound file'},
+	overlay_file   : {"label":'Overlay', "tooltip":'Overlay video file'},
 	af_depend_mask : {"label":'Depends', "tooltip":'Afanasy job depend mask'},
 	af_hostsmask   : {'label':'Hosts Mask'},
 	cacher_aspect  : {'width':'25%', 'lwidth':'160px', 'label':'Cacher Aspect',  'tooltip':'Cacher aspect (float aspect: 2.39)'},
 	cacher_opacity : {'width':'25%', 'lwidth':'160px', 'label':'Cacher Opacity', 'tooltip':'Cacher opacity (integer percentage: 100)'},
 	draw169        : {'width':'25%', 'lwidth':'160px', 'label':'Cacher 16x9',    'tooltip':'Cacher 16x9 opacity percentage.'},
 	draw235        : {'width':'25%', 'lwidth':'160px', 'label':'Cacher 2.35',    'tooltip':'Cacher 2.35 opacity percentage.'},
-	fffirst        : {"label":"F.F.First", "tooltip":'First frame is "1"\nNo matter image file name number.'},
-	aspect_in      : {"label":'Aspect In'},
-	gamma          : {}
+	fffirst        : {'width':'33%', "label":"F.F.First", "tooltip":'First frame is "1"\nNo matter image file name number.'},
+	aspect_in      : {'width':'33%', "label":'Aspect In'},
+	gamma          : {'width':'34%', }
 };
 
 function d_Make(i_path, i_outfolder)
@@ -229,6 +230,10 @@ function d_DailiesWalkReceived(i_data, i_args)
 		}
 	}
 	params.comments = comments.replaceAll('"',"'");
+
+	// Overlay video:
+	if (activity_Current.indexOf('anim') != -1)
+		params.overlay_file = 'REF/' + c_PathBase(g_CurPath()) + '_anim.mp4';
 
 	//console.log(JSON.stringify(data));
 	// Get files sequence pattern and comments:
@@ -505,6 +510,9 @@ function d_MakeCmd(i_params)
 		cmd += ' --draw169 ' + params.draw169;
 	if ((params.draw235 != null) && (params.draw235 != ''))
 		cmd += ' --draw235 ' + params.draw235;
+
+	if ((params.overlay_file != null) && (params.overlay_file.length))
+		cmd += ' --ovrfile "' + params.overlay_file + '"';
 
 	cmd += ' --createoutdir';
 

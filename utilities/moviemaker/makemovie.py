@@ -101,6 +101,7 @@ Parser.add_option('--draw169',          dest='draw169',        type  ='int',    
 Parser.add_option('--draw235',          dest='draw235',        type  ='int',        default=0,           help='Draw 2.35 cacher opacity')
 Parser.add_option('--line169',          dest='line169',        type  ='string',     default='',          help='Draw 16:9 line color: "255,255,0"')
 Parser.add_option('--line235',          dest='line235',        type  ='string',     default='',          help='Draw 2.35 line color: "255,255,0"')
+Parser.add_option('--ovrfile',          dest='ovrfile',        type  = 'string',    default=None,        help='Overlay video file')
 Parser.add_option('--pcodec',           dest='pcodec',         type  = 'string',    default='',          help='Preview codec')
 Parser.add_option('--pargs',            dest='pargs',          type  = 'string',    default='',          help='Preview codec arguments')
 Parser.add_option('--pdir',             dest='pdir',           type  = 'string',    default='',          help='Preview output folder')
@@ -466,7 +467,7 @@ print(TmpDir)
 
 # Commands construction:
 cmd_makeframe = os.path.join(os.path.dirname(sys.argv[0]), 'makeframe.py')
-cmd_makeframe = '"%s" "%s"' % (os.getenv('CGRU_PYTHONEXE', 'python'), cmd_makeframe)
+cmd_makeframe = '"%s" "%s"' % (os.getenv('CGRU_PYTHONEXE', 'python3'), cmd_makeframe)
 if Verbose: cmd_makeframe += ' -V'
 
 # Calculate frame range:
@@ -657,8 +658,16 @@ if need_convert:
 
 # Encode commands:
 auxargs = ''
-if Options.scale:
-	auxargs = '-vf scale=%d:-1' % Options.scale
+#if Options.scale:
+#	auxargs += ' -vf scale=%d:-1' % Options.scale
+
+if Options.ovrfile:
+    if not os.path.isfile(Options.ovrfile):
+        print('Overlay video file does not exist:')
+        print(Options.ovrfile)
+    else:
+        auxargs += ' -i "%s"' % Options.ovrfile
+        auxargs += ' -filter_complex "[1:v] scale=400:-1 [ovr], [0:v][ovr] overlay=W-w-20:150"'
 
 preview_input = os.path.join(inputdir, prefix + '%0' + str(padding) + 'd' + suffix)
 
