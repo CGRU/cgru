@@ -658,16 +658,8 @@ if need_convert:
 
 # Encode commands:
 auxargs = ''
-#if Options.scale:
-#	auxargs += ' -vf scale=%d:-1' % Options.scale
-
-if Options.ovrfile:
-    if not os.path.isfile(Options.ovrfile):
-        print('Overlay video file does not exist:')
-        print(Options.ovrfile)
-    else:
-        auxargs += ' -i "%s"' % Options.ovrfile
-        auxargs += ' -filter_complex "[1:v] scale=400:-1 [ovr], [0:v][ovr] overlay=W-w-20:150"'
+if Options.scale:
+	auxargs += ' -vf scale=%d:-1' % Options.scale
 
 preview_input = os.path.join(inputdir, prefix + '%0' + str(padding) + 'd' + suffix)
 
@@ -684,8 +676,17 @@ else:
 	print('Unknown encoder type = "%s"' % EncType)
 	exit(1)
 
+inputmask += '"'
+
+if Options.ovrfile:
+    if not os.path.isfile(Options.ovrfile):
+        print('Overlay video file does not exist:')
+        print(Options.ovrfile)
+    else:
+        inputmask += ' -i "%s"' % Options.ovrfile
+        auxargs += ' -filter_complex "[1:v] scale=400:-1 [ovr], [0:v][ovr] overlay=W-w-20:150"'
+
 if Audio is not None and EncType == 'ffmpeg':
-    inputmask += '"'
     if Options.slate is not None:
         inputmask += ' -itsoffset %.3f' % ( 1.0 / float(Options.fps))
     inputmask += ' -i "%s"' % Audio
