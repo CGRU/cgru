@@ -102,6 +102,9 @@ Parser.add_option('--draw235',          dest='draw235',        type  ='int',    
 Parser.add_option('--line169',          dest='line169',        type  ='string',     default='',          help='Draw 16:9 line color: "255,255,0"')
 Parser.add_option('--line235',          dest='line235',        type  ='string',     default='',          help='Draw 2.35 line color: "255,255,0"')
 Parser.add_option('--ovrfile',          dest='ovrfile',        type  = 'string',    default=None,        help='Overlay video file')
+Parser.add_option('--ovrscale',         dest='ovrscale',       type  = 'float',     default=0.25,        help='Overlay video scale')
+Parser.add_option('--ovrleft',          dest='ovrleft',        action='store_true', default=False,       help='Overlay video file on left side')
+Parser.add_option('--ovrbottom',        dest='ovrbottom',      action='store_true', default=False,       help='Overlay video file bottom')
 Parser.add_option('--pcodec',           dest='pcodec',         type  = 'string',    default='',          help='Preview codec')
 Parser.add_option('--pargs',            dest='pargs',          type  = 'string',    default='',          help='Preview codec arguments')
 Parser.add_option('--pdir',             dest='pdir',           type  = 'string',    default='',          help='Preview output folder')
@@ -661,7 +664,7 @@ auxargs = ''
 if Options.scale:
 	auxargs += ' -vf scale=%d:-1' % Options.scale
 
-preview_input = os.path.join(inputdir, prefix + '%0' + str(padding) + 'd' + suffix)
+preview_input = '"%s"' % os.path.join(inputdir, prefix + '%0' + str(padding) + 'd' + suffix)
 
 if len(cmd_convert):
 	preview_input = os.path.join(TmpDir, tmpname + '.%07d.' + TmpFormat)
@@ -676,7 +679,6 @@ else:
 	print('Unknown encoder type = "%s"' % EncType)
 	exit(1)
 
-inputmask += '"'
 
 if Options.ovrfile:
     if not os.path.isfile(Options.ovrfile):
@@ -684,14 +686,21 @@ if Options.ovrfile:
         print(Options.ovrfile)
     else:
         inputmask += ' -i "%s"' % Options.ovrfile
-        auxargs += ' -filter_complex "[1:v] scale=400:-1 [ovr], [0:v][ovr] overlay=W-w-20:150"'
+        ovr_pos = 'W-w-W/100:H/7'
+        if Options.ovrleft and Options.ovrbottom:
+            ovr_pos = 'W/100:H-h-H/7'
+        elif Options.ovrbottom:
+            ovr_pos = 'W-w-W/100:H-h-H/7'
+        elif Options.ovrleft:
+            ovr_pos = 'W/100:H/7'
+        auxargs += ' -filter_complex "[1:v][0:v] scale2ref=w=iw*%f:-1 [ovr][base], [base][ovr] overlay=%s"' % (Options.ovrscale, ovr_pos)
 
 if Audio is not None and EncType == 'ffmpeg':
     if Options.slate is not None:
         inputmask += ' -itsoffset %.3f' % ( 1.0 / float(Options.fps))
     inputmask += ' -i "%s"' % Audio
     inputmask += ' -af apad -shortest'
-    inputmask += ' -acodec "%s' % Options.acodec
+    inputmask += ' -acodec "%s"' % Options.acodec
 
 # Process avcmd:
 AVCMD = Options.avcmd
