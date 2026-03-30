@@ -232,7 +232,7 @@ function d_DailiesWalkReceived(i_data, i_args)
 	params.comments = comments.replaceAll('"',"'");
 
 	// Overlay video:
-	if (activity_Current.indexOf('anim') != -1)
+	if ((activity_Current != null) && (activity_Current.indexOf('anim') != -1))
 		params.overlay_file = 'REF/' + c_PathBase(g_CurPath()) + '_anim.mp4';
 
 	//console.log(JSON.stringify(data));
