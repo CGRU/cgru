@@ -356,6 +356,17 @@
 		"avi": {"name":"AVI", "tooltip":"Microsoft Audio Video Interleave"}
 	},
 
+	"overlay":{
+		"ovrpos":"top_right",
+		"ovrpos_choises":{
+			"top_right": {"name":"Top Right"},
+			"bot_right": {"name":"Bottom Right"},
+			"bot_left":  {"name":"Bottom Left"},
+			"top_left":  {"name":"Top Left"}
+		},
+		"ovrscale":0.25
+	},
+
 	"preview":{
 		"codec":"h264_mid",
 		"args":"-vf scale=640:-1"

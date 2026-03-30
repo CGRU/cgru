@@ -41,7 +41,6 @@ d_params.general = {
 d_params.settings = {
 	copy_folder    : {"label":'Copy Folder', "default":"", "tooltip":'Copy to folder'},
 	audio_file     : {"label":'Audio', "default":"REF", "tooltip":'Sound file'},
-	overlay_file   : {"label":'Overlay', "tooltip":'Overlay video file'},
 	af_depend_mask : {"label":'Depends', "tooltip":'Afanasy job depend mask'},
 	af_hostsmask   : {'label':'Hosts Mask'},
 	cacher_aspect  : {'width':'25%', 'lwidth':'160px', 'label':'Cacher Aspect',  'tooltip':'Cacher aspect (float aspect: 2.39)'},
@@ -50,7 +49,9 @@ d_params.settings = {
 	draw235        : {'width':'25%', 'lwidth':'160px', 'label':'Cacher 2.35',    'tooltip':'Cacher 2.35 opacity percentage.'},
 	fffirst        : {'width':'33%', "label":"F.F.First", "tooltip":'First frame is "1"\nNo matter image file name number.'},
 	aspect_in      : {'width':'33%', "label":'Aspect In'},
-	gamma          : {'width':'34%', }
+	gamma          : {'width':'34%', },
+	overlay_file   : {'width':'75%', "label":'Overlay', "tooltip":'Overlay video file'},
+	overlay_scale  : {'width':'25%', "label":'Scale', "tooltip":'Overlay video scale'}
 };
 
 function d_Make(i_path, i_outfolder)
@@ -233,7 +234,10 @@ function d_DailiesWalkReceived(i_data, i_args)
 
 	// Overlay video:
 	if ((activity_Current != null) && (activity_Current.indexOf('anim') != -1))
+	{
 		params.overlay_file = 'REF/' + c_PathBase(g_CurPath()) + '_anim.mp4';
+		params.overlay_scale = RULES.dailies.overlay.ovrscale;
+	}
 
 	//console.log(JSON.stringify(data));
 	// Get files sequence pattern and comments:
@@ -290,7 +294,6 @@ function d_DailiesWalkReceived(i_data, i_args)
 
 	for (var type in d_params_types)
 		gui_Create(wnd.elTabs[type], d_params[type], [RULES.dailies, params]);
-		//gui_Create(wnd.elTabs[type], d_params[type], [params, RULES.dailies]);
 
 	gui_CreateChoices({
 		"wnd": wnd.elTabs.general,
@@ -326,6 +329,14 @@ function d_DailiesWalkReceived(i_data, i_args)
 		"value": RULES.dailies.container,
 		"label": 'Container:',
 		"keys": RULES.dailies.containers
+	});
+
+	gui_CreateChoices({
+		"wnd": wnd.elTabs.settings,
+		"name": 'ovrpos',
+		"value": RULES.dailies.overlay.ovrpos,
+		"label": 'Position:',
+		"keys": RULES.dailies.overlay.ovrpos_choises
 	});
 
 	gui_CreateChoices({
@@ -511,8 +522,19 @@ function d_MakeCmd(i_params)
 	if ((params.draw235 != null) && (params.draw235 != ''))
 		cmd += ' --draw235 ' + params.draw235;
 
+	// Video overlay:
 	if ((params.overlay_file != null) && (params.overlay_file.length))
+	{
 		cmd += ' --ovrfile "' + params.overlay_file + '"';
+		if ((params.overlay_scale != null) && (params.overlay_scale.length))
+		{
+			let overlay_scale = parseFloat(param.overlay_scale);
+			if (Number.isNaN(overlay_scale))
+				c_Error('Overlay scale is not a number: ' + params.overlay_scale);
+			else
+				cmd += ' --overlay_scale ' + overlay_scale;
+		}
+	}
 
 	cmd += ' --createoutdir';
 
