@@ -532,7 +532,7 @@ function d_MakeCmd(i_params)
 			if (Number.isNaN(overlay_scale))
 				c_Error('Overlay scale is not a number: ' + params.overlay_scale);
 			else
-				cmd += ' --overlay_scale ' + overlay_scale;
+				cmd += ' --ovrscale ' + overlay_scale;
 		}
 
 		if (params.ovrpos == 'bot_right')
