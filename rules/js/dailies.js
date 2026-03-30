@@ -528,12 +528,19 @@ function d_MakeCmd(i_params)
 		cmd += ' --ovrfile "' + params.overlay_file + '"';
 		if ((params.overlay_scale != null) && (params.overlay_scale.length))
 		{
-			let overlay_scale = parseFloat(param.overlay_scale);
+			let overlay_scale = parseFloat(params.overlay_scale);
 			if (Number.isNaN(overlay_scale))
 				c_Error('Overlay scale is not a number: ' + params.overlay_scale);
 			else
 				cmd += ' --overlay_scale ' + overlay_scale;
 		}
+
+		if (params.ovrpos == 'bot_right')
+			cmd += ' --ovrbottom';
+		else if (params.ovrpos == 'bot_left')
+			cmd += ' --ovrbottom --ovrleft';
+		else if (params.ovrpos == 'top_left')
+			cmd += ' --ovrleft';
 	}
 
 	cmd += ' --createoutdir';
