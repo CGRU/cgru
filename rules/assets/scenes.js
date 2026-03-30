@@ -1038,6 +1038,21 @@ function sc_FilterShots(i_args)
 					}
 					found = true;
 
+					if (i_args.artists && found)
+					{
+						found = false;
+						let artists = [];
+						if (task.artists && task.artists.length)
+						{
+							artists = artists.concat(task.artists);
+							for (let i = 0; i < i_args.artists.length; i++)
+								if (artists.indexOf(i_args.artists[i]) != -1)
+									{ found = true; break; }
+						}
+						else if (i_args.artists.indexOf('_null_') != -1)
+							found = true;
+					}
+
 					if (found && i_args.flags && i_args.flags.length)
 					{
 						found = false;
@@ -1120,18 +1135,36 @@ function sc_FilterShots(i_args)
 			else
 				found = false;
 		}
-
-		if (i_args.artists && found)
+		else
 		{
-			found = false;
-			if (st_obj.artists && st_obj.artists.length)
+			if (i_args.artists && found)
 			{
-				for (let i = 0; i < i_args.artists.length; i++)
-					if (st_obj.artists.indexOf(i_args.artists[i]) != -1)
-						{ found = true; break; }
+				found = false;
+				if (st_obj.artists && st_obj.artists.length)
+				{
+					for (let i = 0; i < i_args.artists.length; i++)
+						if (st_obj.artists.indexOf(i_args.artists[i]) != -1)
+							{ found = true; break; }
+				}
+				else if (i_args.artists.indexOf('_null_') != -1)
+					found = true;
 			}
-			else if (i_args.artists.indexOf('_null_') != -1)
-				found = true;
+
+			if (i_args.statmod && found)
+				if ((false == flags_tsk) || (false == tags_tsk))
+				{
+					if (st_obj.mtime)
+					{
+						let min = i_args.statmod[0];
+						let max = i_args.statmod[1];
+						if (min && (min > st_obj.mtime))
+							found = false;
+						if (max && (max < st_obj.mtime))
+							found = false;
+					}
+					else
+						fouund = false;
+				}
 		}
 
 		if( i_args.priority && found )
@@ -1166,22 +1199,6 @@ function sc_FilterShots(i_args)
 			else
 				fouund = false;
 		}
-
-		if (i_args.statmod && found)
-			if ((false == flags_tsk) || (false == tags_tsk))
-			{
-				if (st_obj.mtime)
-				{
-					let min = i_args.statmod[0];
-					let max = i_args.statmod[1];
-					if (min && (min > st_obj.mtime))
-						found = false;
-					if (max && (max < st_obj.mtime))
-						found = false;
-				}
-				else
-					fouund = false;
-			}
 
 		if (i_args.bodymod && st_obj.body && found)
 		{
