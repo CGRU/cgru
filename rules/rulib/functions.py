@@ -4,6 +4,7 @@ import getpass
 import os
 import shutil
 import sys
+import threading
 import time
 import traceback
 
@@ -126,7 +127,7 @@ def fileRead(i_file, i_lock = True, i_verbose = False):
     return data
 
 def fileWrite(i_file, i_data, o_out=None):
-    tmp_name = ('%s-%s') % (i_file, os.getpid())
+    tmp_name = '%s-%d-%d' % (i_file, os.getpid(), threading.current_thread().ident)
     try:
         if isinstance(i_data, str):
             f = open(tmp_name, mode='w', encoding='utf-8')
