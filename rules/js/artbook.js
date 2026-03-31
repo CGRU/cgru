@@ -552,9 +552,12 @@ ArtPage.prototype.activityReceived = function(i_data)
 	stat.flags = {};
 	stat.tags = {};
 
-	for (let path in i_data)
+	for (let key in i_data)
 	{
-		let act = i_data[path];
+		let act = i_data[key];
+		let path = act.path;
+		if (path == null)
+			path = key;
 
 		let elAct = document.createElement('div');
 		this.elActivity.appendChild(elAct);

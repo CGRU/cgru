@@ -330,16 +330,20 @@ def taskChanged(i_task, i_path):
 
         curtime = getCurSeconds()
         record = dict()
-        # Get record by path, or create a new:
-        if i_path in activity:
+        key = '%s_%s' % (i_path, '_'.join(i_task['tags']))
+        # Get record by key, or create a new:
+        if key in activity:
+            record = activity.pop(key)
+        elif i_path in activity:
             record = activity.pop(i_path)
         else:
             record['ctime'] = curtime
+        record['path'] = i_path
         record['mtime'] = curtime
         record['task'] = i_task
 
         # Insert activity as fisrt item (the latest time)
-        activity = {i_path:record, **activity}
+        activity = {key:record, **activity}
 
         # Keep maximum number of records:
         while len(activity) > 1000: #TODO
