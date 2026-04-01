@@ -16,16 +16,16 @@ function debianArch(){
 	packages="$packages g++"
 	packages="$packages git-core"
 	packages="$packages python3-dev"
-	packages="$packages python3-pyqt5"
+	#packages="$packages python3-pyqt5"
 	packages="$packages libpq-dev"
 	packages="$packages make"
 	packages="$packages p7zip-full"
 	packages="$packages libzip-dev"
 	packages="$packages rsync"
 
-	# Qt5:
-	packages="$packages qtbase5-dev"
-	packages="$packages qtmultimedia5-dev"
+	# Qt6:
+	packages="$packages qt6-base-dev"
+	packages="$packages qt6-multimedia-dev"
 
 	pkg_manager_cmd="apt-get install"
 	pkg_extension=""
@@ -38,9 +38,9 @@ function redhatArch(){
 	packages="$packages git"
 	packages="$packages python3-devel"
 	packages="$packages libpq-devel"
-	packages="$packages python3-qt5"
-	packages="$packages qt5-qtbase-devel"
-	packages="$packages qt5-qtmultimedia-devel"
+	#packages="$packages python3-qt5"
+	#packages="$packages qt5-qtbase-devel"
+	#packages="$packages qt5-qtmultimedia-devel"
 	#packages="$packages libzip libzip-devel"
 	packages="$packages rpm-build"
 

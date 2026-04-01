@@ -35,7 +35,7 @@ export AF_POSTGRESQL=$sql
 # Configure GUI:
 export AF_GUI=$gui
 export AF_FERMER=$fermer
-export AF_QT_VER="5"
+export AF_QT_VER="6"
 #export AF_ADD_CFLAGS="$AF_ADD_CFLAGS -std=c++17"
 
 # Configure building
