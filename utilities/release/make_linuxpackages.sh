@@ -39,7 +39,7 @@ mkdir -p $tmpdir
 chmod a+rwx $tmpdir
 
 # Processing icons:
-./process_icons.sh
+#./process_icons.sh
 
 # Exporting CGRU:
 cgruExp="cgru_export"

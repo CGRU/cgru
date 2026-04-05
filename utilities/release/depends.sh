@@ -39,7 +39,7 @@ case ${DISTRIBUTIVE} in
 		;;
 	*)
 		export DEPENDS_AFANASY="python3 libpq"
-		export DEPENDS_QTGUI="qt5-qtbase-gui qt5-qtmultimedia"
+		export DEPENDS_QTGUI="qt6-qtbase-gui qt6-qtmultimedia"
 		export DEPENDS_CGRU="python3-qt5"
 		;;
 esac
