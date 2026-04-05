@@ -7,7 +7,8 @@ source ./distribution.sh
 # List packages:
 
 #packages="yasm p7zip wget inkscape cmake subversion"
-packages="inkscape cmake subversion"
+#packages="inkscape cmake subversion"
+packages="cmake"
 packages_noarch=""
 
 # Packages for Debian distributions:
@@ -38,10 +39,9 @@ function redhatArch(){
 	packages="$packages git"
 	packages="$packages python3-devel"
 	packages="$packages libpq-devel"
-	#packages="$packages python3-qt5"
-	#packages="$packages qt5-qtbase-devel"
-	#packages="$packages qt5-qtmultimedia-devel"
-	#packages="$packages libzip libzip-devel"
+	packages="$packages python3-qt5"
+	packages="$packages qt6-qtbase-devel"
+	packages="$packages qt6-qtmultimedia-devel"
 	packages="$packages rpm-build"
 
 	pkg_manager_cmd="yum install"
