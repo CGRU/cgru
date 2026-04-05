@@ -1439,7 +1439,7 @@ function u_CmdExecServerOnDblClick(i_evt)
 	cmd = fv_CmdExecFilter(cmd);
 
 	let exec = el.m_exec;
-	if (exec.file_dialog)
+	if (exec && exec.file_dialog)
 	{
 		let args2 = {};
 		args2.el = el;
