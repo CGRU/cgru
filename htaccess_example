@@ -15,7 +15,7 @@ AuthUserFile /data/cgru/.htdigest
 Require valid-user
 
 # Needed modules:
-# sudo a2enmod ssl auth_digest authz_groupfile
+# sudo a2enmod ssl auth_digest authz_groupfile wsgi
 
 # Remove /icons/ alias
 # sudo rm /etc/apache2/mods-enabled/alias.conf
