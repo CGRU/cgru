@@ -8,17 +8,17 @@ echo "Depends for $DISTRIBUTIVE:"
 case ${DISTRIBUTIVE} in
 	Ubuntu | Mint | Astra )
 		export DEPENDS_AFANASY="libpq5"
-		export DEPENDS_QTGUI="libqt5network5 libqt5widgets5 libqt5multimedia5"
+		export DEPENDS_QTGUI="libqt6network6 libqt6widgets6 libqt6multimedia6"
 		export DEPENDS_CGRU="python3-pyqt5 openexr imagemagick"
 		;;
 	Debian )
 		export DEPENDS_AFANASY="libpq5"
-		export DEPENDS_QTGUI="libqt5network5 libqt5widgets5 libqt5multimedia5"
+		export DEPENDS_QTGUI="libqt6network6 libqt6widgets6 libqt5multimedia6"
 		export DEPENDS_CGRU="python3-pyqt5 openexr imagemagick"
 		;;
 	Fedora )
 		export DEPENDS_AFANASY="libpqxx"
-		export DEPENDS_QTGUI="qt5-qtmultimedia"
+		export DEPENDS_QTGUI="qt6-qtmultimedia"
 		export DEPENDS_CGRU="python3-pyside2 OpenEXR ImageMagick"
 		;;
 	openSUSE )
