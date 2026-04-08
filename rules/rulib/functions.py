@@ -580,11 +580,12 @@ def upload(i_env, o_out):
         o_out['info'] = 'Upload directory created: %s' % dirname
 
     # If file exists add a nubmer
-    basename, ext = os.path.splitext(os.path.basename(path))
-    i = 0
-    while os.path.isfile(os.fsdecode(path.encode())):
-        i += 1
-        path = os.path.join(dirname, '%s-%d' % (basename, i)) + ext
+    if '_CACHE' not in path:
+        basename, ext = os.path.splitext(os.path.basename(path))
+        i = 0
+        while os.path.isfile(os.fsdecode(path.encode())):
+            i += 1
+            path = os.path.join(dirname, '%s-%d' % (basename, i)) + ext
 
     file = None
     try:
