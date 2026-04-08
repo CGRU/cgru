@@ -376,26 +376,41 @@ function ad_PermissionsUsrAddOnClick()
 
 function ad_PermissionsAdd(i_id, i_type)
 {
-	i_id = c_Strip(i_id);
-	if (i_id.length < 1)
-	{
-		c_Error('Empty name.');
-		return;
-	}
-	if (ad_permissions[i_type].indexOf(i_id) != -1)
-	{
-		c_Error(i_id + ' is already in ' + i_type);
-		return;
-	}
-
 	// Set default minimal permissions:
 	if (RULES.permissions.default_groups)
 		if ((ad_permissions.groups.length == 0) && (ad_permissions.users.length == 0))
 			for (let grp of RULES.permissions.default_groups)
 				ad_permissions.groups.push(grp);
 
-	if (ad_permissions[i_type].indexOf(i_id) == -1)
-		ad_permissions[i_type].push(i_id);
+	let  ids = [];
+	if (Array.isArray(i_id))
+		ids = i_id;
+	else
+		ids.push(i_id);
+
+	let perms_modified = false;
+	for (let id of ids)
+	{
+		id = c_Strip(id);
+		if (id.length < 1)
+		{
+			c_Error('Empty name.');
+			continue;
+		}
+		if (ad_permissions[i_type].indexOf(id) != -1)
+		{
+			c_Error(id + ' is already in ' + i_type);
+			continue;
+		}
+
+		if (ad_permissions[i_type].indexOf(id) == -1)
+			ad_permissions[i_type].push(id);
+
+		perms_modified = true;
+	}
+
+	if (false == perms_modified)
+		return;
 
 	n_Request({
 		"send": {"permissionsset": ad_permissions},

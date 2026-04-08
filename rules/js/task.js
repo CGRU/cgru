@@ -395,6 +395,17 @@ Task.prototype.edit = function(i_args)
 	this.elEditAnnotationDiv.appendChild(this.elEditAnnotationContent);
 
 
+	if (g_admin)
+	{
+		this.elBtnSavePerms = document.createElement('div');
+		this.elBtnSavePerms.classList.add('button','left');
+		this.elBtnSavePerms.textContent = 'Save & Permissions';
+		this.elBtnSavePerms.m_task = this;
+		this.elBtnSavePerms.onclick = function(e){e.stopPropagation();e.currentTarget.m_task.editProcess(i_args, true);}
+		this.elEdit.appendChild(this.elBtnSavePerms);
+	}
+
+
 	// If there is no name, we just adding this task.
 	// So we should not delete it, we can cancel adding.
 	if (this.obj.name)
@@ -431,7 +442,7 @@ Task.prototype.editCancel = function()
 	this.elShow.style.display = 'block';
 }
 
-Task.prototype.editProcess = function(i_args)
+Task.prototype.editProcess = function(i_args, i_perms = false)
 {
 	if (i_args == null)
 		i_args = {};
@@ -541,15 +552,6 @@ Task.prototype.editProcess = function(i_args)
 		this.obj.annotation = '';
 
 
-	if (0)//document.location.hostname != 'localhost')
-	{
-	// We should calculate status progress
-	// if task progress is changed
-	// or if it is a new task
-		this.save(this_is_a_new_task || (progress_prevous != this.obj.progress));
-		return;
-	}
-
 	let obj = {};
 	if (i_args.paths && i_args.paths.length)
 		obj.paths = i_args.paths;
@@ -563,10 +565,31 @@ Task.prototype.editProcess = function(i_args)
 		obj.nonews = true;
 
 	n_Request({'send':{'settask':obj},'func':st_StatusesSaved,'info':'status.setTask','wait':false});
+
+	if (i_perms != true)
+		return;
+	if (false == g_admin)
+		return;
+	// Add artist(s) to shot permissions:
+	if ((obj.artists == null) || (obj.artists.length == 0))
+		return;
+	let uids = [];
+	for (let uid of obj.artists)
+	{
+		let user = g_users[uid];
+		if (user == null)
+			continue;
+		if (user.role == 'freelance')
+			uids.push(uid);
+	}
+
+	ad_PermissionsAdd(uids,'users')
 }
 
 Task.prototype.save = function(i_progress_changed)
 {
+alert('Task.prototype.save');
+
 	// Save constructed status
 	//this.statusClass.save();
 	let obj = {};
@@ -654,12 +677,6 @@ Task.prototype.editDelete = function(i_args = {})
 	this.obj.mtime = c_DT_CurSeconds();
 
 	this.obj.deleted = true;
-
-	if (0)//document.location.hostname != 'localhost')
-	{
-	this.save(this.obj.progress);
-	return;
-	}
 
 	let obj = {'name':this.obj.name,'deleted':true};
 	if (i_args.paths && i_args.paths.length)
