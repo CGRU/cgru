@@ -47,4 +47,4 @@ class Dialog(QtWidgets.QWidget):
 app = QtWidgets.QApplication(sys.argv)
 app.setWindowIcon( QtGui.QIcon(cgruutils.getIconFileName('regexp')))
 dialog = Dialog()
-app.exec_()
+app.exec()

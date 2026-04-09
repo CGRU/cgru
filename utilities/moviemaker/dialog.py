@@ -1149,7 +1149,7 @@ class Dialog(QtWidgets.QWidget):
         self.btnStop.pressed.connect( self.processStop)
         layout.addWidget(self.btnStop)
 
-        layout.addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding))
+        layout.addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Policy.Expanding))
         layout.addWidget(QtWidgets.QLabel('Recent:', self))
 
         self.cbRecent = QtWidgets.QComboBox(self)
@@ -1298,7 +1298,7 @@ class Dialog(QtWidgets.QWidget):
                     'one sequence.'
                 )
                 self.stereoStatusLabel.setAutoFillBackground(True)
-                self.stereoStatusLabel.setBackgroundRole( QtGui.QPalette.Window)
+                self.stereoStatusLabel.setBackgroundRole(QtGui.QPalette.ColorRole.Window)
         else:
             self.fields['stereodub'].setChecked(False)
             self.fields['stereodub'].setEnabled(False)
@@ -2116,4 +2116,4 @@ app = QtWidgets.QApplication(sys.argv)
 app.setWindowIcon( QtGui.QIcon(cgruutils.getIconFileName(Options.wndicon)))
 dialog = Dialog()
 dialog.show()
-app.exec_()
+app.exec()

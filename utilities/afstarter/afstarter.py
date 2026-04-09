@@ -1010,4 +1010,4 @@ class Dialog(QtWidgets.QWidget):
 app = QtWidgets.QApplication(sys.argv)
 dialog = Dialog()
 dialog.show()
-app.exec_()
+app.exec()
