@@ -1126,6 +1126,24 @@ function sc_FilterShots(i_args)
 							found = false;
 					}
 
+					if (i_args.priority && found)
+					{
+						found = false;
+						if ((task.priority != null) && ((task.flags == null) || (task.flags.includes('done') == false)) &&
+							((i_args.priority[0] == null) || (task.priority >= i_args.priority[0])) &&
+							((i_args.priority[1] == null) || (task.priority <= i_args.priority[1])))
+							found = true;
+					}
+
+					if (i_args.percent && found)
+					{
+						found = false;
+						if ((task.progress != null) &&
+							((i_args.percent[0] == null) || (task.progress >= i_args.percent[0])) &&
+							((i_args.percent[1] == null) || (task.progress <= i_args.percent[1])))
+							found = true;
+					}
+
 					// We found one task matching flags and tags.
 					// One matching task it is enough to show entire shot.
 					if (found)
@@ -1163,26 +1181,26 @@ function sc_FilterShots(i_args)
 							found = false;
 					}
 					else
-						fouund = false;
+						found = false;
 				}
-		}
 
-		if( i_args.priority && found )
-		{
-			found = false;
-			if ((st_obj.priority != null) &&
-				((i_args.priority[0] == null) || (st_obj.priority >= i_args.priority[0])) &&
-				((i_args.priority[1] == null) || (st_obj.priority <= i_args.priority[1])))
-				found = true;
-		}
+			if (i_args.priority && found)
+			{
+				found = false;
+				if ((st_obj.priority != null) &&
+					((i_args.priority[0] == null) || (st_obj.priority >= i_args.priority[0])) &&
+					((i_args.priority[1] == null) || (st_obj.priority <= i_args.priority[1])))
+					found = true;
+			}
 
-		if( i_args.percent && found )
-		{
-			found = false;
-			if ((st_obj.progress != null) &&
-				((i_args.percent[0] == null) || (st_obj.progress >= i_args.percent[0])) &&
-				((i_args.percent[1] == null) || (st_obj.progress <= i_args.percent[1])))
-				found = true;
+			if (i_args.percent && found)
+			{
+				found = false;
+				if ((st_obj.progress != null) &&
+					((i_args.percent[0] == null) || (st_obj.progress >= i_args.percent[0])) &&
+					((i_args.percent[1] == null) || (st_obj.progress <= i_args.percent[1])))
+					found = true;
+			}
 		}
 
 		if (i_args.finish && found)
@@ -1197,7 +1215,7 @@ function sc_FilterShots(i_args)
 					found = false;
 			}
 			else
-				fouund = false;
+				found = false;
 		}
 
 		if (i_args.bodymod && st_obj.body && found)
@@ -1216,7 +1234,7 @@ function sc_FilterShots(i_args)
 					found = false;
 			}
 			else
-				fouund = false;
+				found = false;
 		}
 
 		if (found)
