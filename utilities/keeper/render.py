@@ -217,7 +217,7 @@ def drawIconState( i_painter):
     i_painter.fillRect(rect_back, back_color)
     i_painter.setFont(text_font)
     i_painter.setPen(text_color)
-    i_painter.drawText(rect_render, QtCore.Qt.AlignCenter, 'R')
+    i_painter.drawText(rect_render, QtCore.Qt.AlignmentFlag.AlignCenter, 'R')
 
 def setUserDialog():
     name, ok = QtWidgets.QInputDialog.getText(

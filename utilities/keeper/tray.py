@@ -242,7 +242,7 @@ class Tray(QtWidgets.QSystemTrayIcon):
 
         # Some general menu items:
         self.addAction('menu', True,  'Documentation...', cmd.cgruDocs)
-        self.addAction('menu', False, 'Forum...',         cmd.cgruForum)
+        #self.addAction('menu', False, 'Forum...',         cmd.cgruForum)
         # System sub-menu:
         self.addMenu(self.menu['menu'],'System')
         self.addAction('System', True,'Show Info...', self.cgruInfo,'info')
