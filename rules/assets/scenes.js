@@ -1129,7 +1129,7 @@ function sc_FilterShots(i_args)
 					if (i_args.priority && found)
 					{
 						found = false;
-						if ((task.priority != null) &&
+						if ((task.priority != null) && ((task.flags == null) || (task.flags.includes('done') == false)) &&
 							((i_args.priority[0] == null) || (task.priority >= i_args.priority[0])) &&
 							((i_args.priority[1] == null) || (task.priority <= i_args.priority[1])))
 							found = true;
