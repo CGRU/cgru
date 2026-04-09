@@ -32,8 +32,10 @@ if sys.platform.find('darwin') == 0:
     except:
         print("WARNING: pyobjc-framework-Cocoa is not installed, can't hide dock icon.")
 
-
+import Qt
 from Qt import QtWidgets
+
+print('Qt: ' + ('%s %s (%s)' % ( Qt.__qt_version__, Qt.__binding__, Qt.__binding_version__)))
 
 import cgruconfig
 import cmd
@@ -59,4 +61,4 @@ cmd.Tray = Tray(app)
 refresh = Refresh(app)
 render.Refresh = refresh
 server = Server()
-app.exec_()
+app.exec()

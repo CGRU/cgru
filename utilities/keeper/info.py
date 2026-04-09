@@ -21,10 +21,10 @@ class Window(QtWidgets.QTextEdit):
         )
 
         self.ftitle = QtGui.QTextCharFormat()
-        self.ftitle.setFontWeight( QtGui.QFont.Bold)
+        self.ftitle.setFontWeight(QtGui.QFont.Weight.Bold)
         self.ftitle.setFontItalic(True)
         self.fname = QtGui.QTextCharFormat()
-        self.fname.setFontWeight( QtGui.QFont.Bold)
+        self.fname.setFontWeight(QtGui.QFont.Weight.Bold)
         self.fvalue = QtGui.QTextCharFormat()
         self.fundefined = QtGui.QTextCharFormat()
         self.fundefined.setFontItalic(True)
@@ -61,7 +61,7 @@ class Window(QtWidgets.QTextEdit):
             self.setWindowIcon( QtGui.QIcon(iconpath))
 
         self.resize(self.viewport().size())
-        self.moveCursor( QtGui.QTextCursor.Start)
+        self.moveCursor(QtGui.QTextCursor.MoveOperation.Start)
         self.setReadOnly(True)
         self.show()
 
