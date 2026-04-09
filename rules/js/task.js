@@ -395,7 +395,7 @@ Task.prototype.edit = function(i_args)
 	this.elEditAnnotationDiv.appendChild(this.elEditAnnotationContent);
 
 
-	if (g_admin)
+	if (g_admin && ad_permissions)
 	{
 		this.elBtnSavePerms = document.createElement('div');
 		this.elBtnSavePerms.classList.add('button','left');

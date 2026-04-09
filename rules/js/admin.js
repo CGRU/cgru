@@ -376,6 +376,9 @@ function ad_PermissionsUsrAddOnClick()
 
 function ad_PermissionsAdd(i_id, i_type)
 {
+	if (ad_permissions == null)
+		return;
+
 	// Set default minimal permissions:
 	if (RULES.permissions.default_groups)
 		if ((ad_permissions.groups.length == 0) && (ad_permissions.users.length == 0))
