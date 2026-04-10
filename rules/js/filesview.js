@@ -965,6 +965,23 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 		};
 	}
 
+
+	// Folder HTML player button:
+	if (i_isFolder && ASSET && ((ASSET.path != g_CurPath()) || (ASSET.play_folders !== false)))
+	{
+		let play_path = path;
+		if (ASSET.path)
+			play_path = play_path.replace(ASSET.path, ASSET.path + '/');
+		let el = document.createElement('a');
+		elBody.appendChild(el);
+		el.classList.add('button');
+		el.setAttribute('href', 'player.html#' + play_path);
+		el.setAttribute('target', '_blank');
+		el.style.backgroundImage = 'url(rules/icons/player.png)';
+		el.title = "Open RULES player in a new window.";
+	}
+
+
 	// Folder count files button:
 	if (i_isFolder && this.can_count)
 	{
@@ -1043,21 +1060,6 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 			e.stopPropagation();
 			e.currentTarget.m_view.deleteFilesDialog(elItem.m_path)
 		};
-	}
-
-	// Folder HTML player button:
-	if (i_isFolder && ASSET && ((ASSET.path != g_CurPath()) || (ASSET.play_folders !== false)))
-	{
-		var play_path = path;
-		if (ASSET.path)
-			play_path = play_path.replace(ASSET.path, ASSET.path + '/');
-		var el = document.createElement('a');
-		elItem.m_elMenu.appendChild(el);
-		el.classList.add('button');
-		el.setAttribute('href', 'player.html#' + play_path);
-		el.setAttribute('target', '_blank');
-		el.style.backgroundImage = 'url(rules/icons/player.png)';
-		el.title = "Open RULES player in a new window.";
 	}
 
 	// Sequence execute on server custom buttons:
