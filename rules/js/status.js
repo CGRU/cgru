@@ -231,7 +231,7 @@ Status.prototype.show = function(i_status, i_update = false)
 	if (this.elProgress)
 		st_SetElProgress(this.obj, this.elProgressBar, this.elProgress, this.elPercentage);
 	if (this.elArtists)
-		st_SetElArtists(this.obj, this.elArtists, this.args.display_short, true);
+		st_SetElArtists(this.obj, this.elArtists, {'short': this.args.display_short, 'clickable': true});
 	if (this.elFlags)
 		st_SetElFlags(this.obj, this.elFlags, this.args.display_short, true);
 	if (this.elTags)
@@ -287,7 +287,7 @@ Status.prototype.show = function(i_status, i_update = false)
 
 	if (this.args.tasks_badges)
 	{
-		let elBages = task_DrawBadges(this.obj, this.elTasksBadges/*, {'only_my':this.args.display_short}*/);
+		let elBages = task_DrawBadges(this.obj, this.elTasksBadges, {'display_short':this.args.display_short});
 		if (this.multi)
 		{
 			if (elBages && elBages.length)
@@ -548,7 +548,8 @@ function st_SetElText(i_status, i_el, i_field, i_full)
 	else
 		i_el.innerHTML = '';
 }
-function st_SetElArtists(i_status, i_el, i_short, i_clickable, i_onclick)
+//function st_SetElArtists(i_status, i_el, i_short, i_clickable, i_onclick)
+function st_SetElArtists(i_status, i_el, i_args)
 {
 	i_el.textContent = '';
 	let elements = [];
@@ -558,13 +559,13 @@ function st_SetElArtists(i_status, i_el, i_short, i_clickable, i_onclick)
 
 	for (let i = 0; i < i_status.artists.length; i++)
 	{
-		let el = st_CreateElArtist(i_status.artists[i], i_short);
+		let el = st_CreateElArtist(i_status.artists[i], i_args);
 		elements.push(el);
 		i_el.appendChild(el);
 		el.m_name = i_status.artists[i];
 		st_TagHilight(el, 'artist');
 
-		if (i_clickable)
+		if (i_args.clickable)
 		{
 			el.onclick = st_TagClicked;
 			el.ondblclick = st_ArtistDblClicked;
@@ -575,17 +576,18 @@ function st_SetElArtists(i_status, i_el, i_short, i_clickable, i_onclick)
 
 	return elements;
 }
-function st_CreateElArtist(i_id, i_short)
+//function st_CreateElArtist(i_id, i_short)
+function st_CreateElArtist(i_id, i_args)
 {
 	let el = document.createElement('div');
 	el.classList.add('tag');
 	el.classList.add('artist');
-	el.textContent = c_GetUserTitle(i_id, null, i_short);
+	el.textContent = c_GetUserTitle(i_id, null, i_args.short);
 
 	if (g_users[i_id] && g_users[i_id].disabled)
 		el.classList.add('disabled');
 
-	if (i_short)
+	if (i_args.short)
 	{
 		el.classList.add('short');
 		if (g_auth_user && (g_auth_user.id == i_id))
@@ -598,17 +600,20 @@ function st_CreateElArtist(i_id, i_short)
 	{
 		el.classList.add('me');
 
-		if (i_short !== true)
+		if (i_args.short !== true)
 		{
 			el.title = 'It`s me!\n - may be i should do something here?';
 		}
 	}
 
-	let avatar = c_GetAvatar(i_id);
-	if (avatar)
+	if ((i_args.avatar == null) || (i_args.avatar == true))
 	{
-		el.classList.add('with_icon');
-		el.style.backgroundImage = 'url(' + avatar + ')';
+		let avatar = c_GetAvatar(i_id);
+		if (avatar)
+		{
+			el.classList.add('with_icon');
+			el.style.backgroundImage = 'url(' + avatar + ')';
+		}
 	}
 
 	return el;

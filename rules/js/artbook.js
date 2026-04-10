@@ -573,7 +573,7 @@ ArtPage.prototype.activityReceived = function(i_data)
 
 		if (act.task.cuser)
 		{
-			let elCUser = st_CreateElArtist(act.task.cuser, true);
+			let elCUser = st_CreateElArtist(act.task.cuser, {'short': true});
 			elAct.appendChild(elCUser);
 			elCUser.classList.add('user','cuser');
 			let tip = 'Created by ' + c_GetUserTitle(act.task.cuser);
@@ -590,7 +590,7 @@ ArtPage.prototype.activityReceived = function(i_data)
 
 		if (act.task.muser)
 		{
-			let elMUser = st_CreateElArtist(act.task.muser, true);
+			let elMUser = st_CreateElArtist(act.task.muser, {'short': true});
 			elAct.appendChild(elMUser);
 			elMUser.classList.add('user','muser');
 			let tip = 'Modified by ' + c_GetUserTitle(act.task.muser);

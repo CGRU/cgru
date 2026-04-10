@@ -198,7 +198,7 @@ Task.prototype.show = function()
 
 	task_SetPriority(this.elPriority, this.obj)
 
-	st_SetElArtists(this.obj, this.elArtists,/*short = */false,/*clickable = */true);
+	st_SetElArtists(this.obj, this.elArtists,{'short': false, 'clickable': true});
 	st_SetElFlags(this.obj, this.elFlags,/*short = */false,/*clickable = */true);
 	st_SetElProgress(this.obj, this.elProgressBar, this.elProgress, this.elPercent);
 
@@ -697,6 +697,7 @@ function task_DrawBadges(i_status, i_el, i_args)
 
 	let update = i_args.update;
 	let short_names = ! i_args.full_names;
+	let avatar = i_args.avatar;
 	let only_my = i_args.only_my;
 
 	if ( ! update)
@@ -752,7 +753,7 @@ function task_DrawBadges(i_status, i_el, i_args)
 		{
 			let elArtists = document.createElement('div');
 			elArtists.classList.add('artists');
-			st_SetElArtists(task, elArtists, short_names);
+			st_SetElArtists(task, elArtists, {'short': short_names,'avatar': i_args.display_short != true});
 			elTask.appendChild(elArtists);
 		}
 
@@ -760,15 +761,18 @@ function task_DrawBadges(i_status, i_el, i_args)
 		st_SetElFlags(task, elFlags, short_names);
 		elTask.appendChild(elFlags);
 
-		let elProgress = document.createElement('div');
-		elProgress.classList.add('progress');
-		elTask.appendChild(elProgress);
+		if (i_args.display_short != true)
+		{
+			let elProgress = document.createElement('div');
+			elProgress.classList.add('progress');
+			elTask.appendChild(elProgress);
 
-		let elProgressBar = document.createElement('div');
-		elProgressBar.classList.add('progressbar');
-		elProgress.appendChild(elProgressBar);
+			let elProgressBar = document.createElement('div');
+			elProgressBar.classList.add('progressbar');
+			elProgress.appendChild(elProgressBar);
 
-		st_SetElProgress(task, elProgressBar, elProgress);
+			st_SetElProgress(task, elProgressBar, elProgress);
+		}
 
 		activity_TaskBadgeFilter(elTask);
 

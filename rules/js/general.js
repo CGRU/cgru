@@ -993,7 +993,7 @@ function g_FolderSetStatus(i_status, i_elFolder, i_up_params)
 	if ((i_up_params == null) || i_up_params.color)
 		st_SetElColor(i_status, i_elFolder.m_elFBody);
 	if ((i_up_params == null) || i_up_params.artists)
-		st_SetElArtists(i_status, i_elFolder.m_elArtists, true);
+		st_SetElArtists(i_status, i_elFolder.m_elArtists, {'short': true});
 	if ((i_up_params == null) || i_up_params.duration)
 		st_SetElDuration(i_status, i_elFolder.m_elDuration);
 	if ((i_up_params == null) || i_up_params.price)
