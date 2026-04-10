@@ -553,7 +553,6 @@ function c_CanAssignArtists(i_user)
 
 function c_CanEditTasks(i_user)
 {
-// Not used now. Was used in OLD tasks.
 	return c_IsUserStateSet(i_user, 'edittasks');
 }
 
@@ -618,7 +617,7 @@ function c_CanEditTask(i_task, i_user)
 	if (i_user == null)
 		return false;
 
-	if ((['admin', 'coord', 'user']).indexOf(i_user.role) != -1)
+	if ((['admin', 'coord', 'user', 'leader']).indexOf(i_user.role) != -1)
 		return true;
 
 	if (c_CanEditTasks())
