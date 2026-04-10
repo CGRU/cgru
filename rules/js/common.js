@@ -621,6 +621,9 @@ function c_CanEditTask(i_task, i_user)
 	if ((['admin', 'coord', 'user']).indexOf(i_user.role) != -1)
 		return true;
 
+	if (c_CanEditTasks())
+		return true;
+
 	if ((i_task == null) || (i_task.artists == null))
 		return false;
 	if (i_task.artists.indexOf(i_user.id) != -1)
