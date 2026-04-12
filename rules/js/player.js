@@ -305,12 +305,15 @@ function p_WalkNavigateReceived(i_data, i_args)
 
 	// console.log(JSON.stringify(i_data));
 
-	n_WalkDir(
-		{"paths": [p_path], "wfunc": p_WalkSequenceReceived, "info": 'walk images', "rufiles": ['player']});
+	//n_WalkDir({"paths": [p_path], "wfunc": p_WalkSequenceReceived, "info": 'walk images', "rufiles": ['player']});
+
+
+	n_Request({'send':{'player_init':{'path':p_path}},'func':p_WalkSequenceReceived,'info':'player init','wait':false});
 }
 
 function p_WalkSequenceReceived(i_data)
 {
+	/*
 	var walk = i_data[0];
 	c_RulesMergeDir(RULES, walk);
 	RULES.rufiles = walk.rufiles;
@@ -329,6 +332,27 @@ function p_WalkSequenceReceived(i_data)
 			return;
 		}
 	}
+	*/
+	if (i_data == null)
+	{
+		return;
+	}
+
+	let player = i_data.player;
+	if (player == null)
+	{
+		return;
+	}
+
+	let images = player.images;
+	if (images == null)
+	{
+		return;
+	}
+	if ((images.length == null) || (images.length == 0))
+	{
+		return;
+	}
 
 	p_filenames = [];
 	p_fileObjs = {};
@@ -336,35 +360,33 @@ function p_WalkSequenceReceived(i_data)
 	p_fileSizeLoaded = 0;
 	p_loadStartMS = (new Date()).valueOf();
 
-	walk.files.sort(c_CompareFiles);
+	//images.sort(c_CompareFiles);
 
-	for (var i = 0; i < walk.files.length; i++)
+	//for (var i = 0; i < walk.files.length; i++)
+	for (let iobj of images)
 	{
-		var file = walk.files[i].name;
-		p_fileObjs[file] = walk.files[i];
-		if (walk.files[i].size)
-			p_fileSizeTotal += walk.files[i].size;
-		var type = file.split('.').pop().toLowerCase();
+		let file = iobj.name;
+		p_fileObjs[file] = iobj;
+		if (iobj.size)
+			p_fileSizeTotal += iobj.size;
+		let type = file.split('.').pop().toLowerCase();
 		if (p_imgTypes.indexOf(type) == -1)
 			continue;
-		var img = new Image();
+		let img = new Image();
 		img.src = RULES.root + p_path + '/' + file;
 		img.onload = function(e) { p_ImgLoaded(e); };
 		img.onerror = function(e) { p_ImgLoadError(e); };
-		img.m_file = walk.files[i];
+		img.m_file = iobj;
 		p_filenames.push(file);
 		p_images.push(img);
 	}
 
 	if (p_filenames == null || (p_filenames.length == 0))
 	{
-		if (walk.error)
-			c_Error(walk.error);
-		else
-			c_Error('No JPEG or PNG Files Found.');
+		c_Error('No JPEG or PNG Files Found.');
 		return;
 	}
-
+/*
 	if (p_imageMode)
 	{
 		p_savepath = p_path;
@@ -375,6 +397,8 @@ function p_WalkSequenceReceived(i_data)
 		var folder = p_path.substr(p_path.lastIndexOf('/') + 1);
 		p_savepath = path + '/' + folder + p_savepath;
 	}
+*/
+	p_savepath = c_PathDir(p_path) + '/.rules/' + c_PathBase(p_path) + '.player';
 
 	c_Info('Loading ' + p_images.length + ' images: ' + c_Bytes2KMG(p_fileSizeTotal));
 	p_Info('Loading images sequence');

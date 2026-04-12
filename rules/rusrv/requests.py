@@ -441,6 +441,15 @@ class Requests:
         o_out['playlist'] = pl.generatePlaylist()
 
 
+    def req_player_init(self, i_args, o_out):
+        if not 'path' in i_args:
+            o_out['error'] = 'Path is not specified.'
+            return
+        out = dict()
+        rulib.functions.playerInit(path=i_args['path'], out=out)
+        o_out['player'] = out
+
+
     def req_search(self, i_args, o_out):
         if not 'path' in i_args:
             o_out['error'] = 'Search path is not specified.'
