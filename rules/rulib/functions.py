@@ -14,6 +14,12 @@ import cgruutils
 
 import mediainfo
 
+'''
+
+python3 -c 'import sys; sys.path.append("/data/cgru/rules"); import rulib; print(rulib.functions.playerInit(path="CG_PROJECT/SCENES/A_SCENE/A_SHOT_01//RESULT/JPG/v002"));'
+
+'''
+
 def randMD5():
     hashlib = __import__('hashlib', globals(), locals(), [])
     random = __import__('random', globals(), locals(), [])

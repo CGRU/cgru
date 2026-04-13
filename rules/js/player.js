@@ -16,6 +16,7 @@
 
 "use strict";
 
+var player = null;
 var p_PLAYER = true;
 
 // TODO: not pollute the global scope with so much vars, should be bundled into struct objects
@@ -338,7 +339,7 @@ function p_WalkSequenceReceived(i_data)
 		return;
 	}
 
-	let player = i_data.player;
+	player = i_data.player;
 	if (player == null)
 	{
 		return;
@@ -354,6 +355,8 @@ function p_WalkSequenceReceived(i_data)
 		return;
 	}
 
+	let comments = player.comments;
+
 	p_filenames = [];
 	p_fileObjs = {};
 	p_fileSizeTotal = 0;
@@ -363,8 +366,9 @@ function p_WalkSequenceReceived(i_data)
 	//images.sort(c_CompareFiles);
 
 	//for (var i = 0; i < walk.files.length; i++)
-	for (let iobj of images)
+	for (let i = 0; i < images.length; i++)
 	{
+		let iobj = images[i];
 		let file = iobj.name;
 		p_fileObjs[file] = iobj;
 		if (iobj.size)
@@ -379,6 +383,9 @@ function p_WalkSequenceReceived(i_data)
 		img.m_file = iobj;
 		p_filenames.push(file);
 		p_images.push(img);
+
+		if (comments && comments[file])
+			p_comments[i] = comments[file];
 	}
 
 	if (p_filenames == null || (p_filenames.length == 0))
@@ -491,6 +498,8 @@ function p_ImgLoaded(e)
 		info += ' - ' + loaderror + ' errors!';
 	p_Info(info);
 
+/*
+	p_WalkReceivedComments();
 	// Process saved comments:
 	n_WalkDir({
 		"paths": [p_savepath],
@@ -499,8 +508,11 @@ function p_ImgLoaded(e)
 		"rufiles": ['player']
 	});
 }
+
 function p_WalkReceivedComments(i_data)
 {
+*/
+/*
 	var walk = i_data[0];
 	c_RulesMergeDir(RULES, walk);
 	if (RULES.player && RULES.player.comments)
@@ -512,16 +524,18 @@ function p_WalkReceivedComments(i_data)
 				p_comments[f] = cm;
 		}
 	}
+*/
 
 	// Process saved painted images:
-	if (RULES.rufiles && RULES.rufiles.length)
+	//if (RULES.rufiles && RULES.rufiles.length)
 		for (var f = 0; f < p_filenames.length; f++)
 		{
 			var pngname = p_filenames[f] + '.png';
-			if (RULES.rufiles.indexOf(pngname) == -1)
+			//if (RULES.rufiles.indexOf(pngname) == -1)
+			if ((player.canvas == null) || (player.canvas.indexOf(pngname) == -1))
 				continue;
 			var p_png = new Image();
-			p_png.src = RULES.root + p_path + '/.rules/' + pngname;
+			p_png.src = RULES.root + p_savepath + '/canvas/' + pngname;
 			p_png.m_frame = f;
 			p_png.onload = function(e) {
 				var img = e.currentTarget;
@@ -1220,7 +1234,7 @@ function p_PaintSave()
 		{
 			var png = canvas.toDataURL('image/png');
 			png = png.substr(png.indexOf(',') + 1);
-			var png_path = RULES.root + p_path + '/.rules/' + p_filenames[f] + '.png';
+			var png_path = RULES.root + p_savepath + '/canvas/' + p_filenames[f] + '.png';
 
 			p_filestosave++;
 
@@ -1423,8 +1437,8 @@ function p_CommentsSave()
 
 	var edit = {};
 	edit.add = true;
-	edit.object = {"player": {"comments": pcms}};
-	edit.file = RULES.root + p_savepath + '/' + RULES.rufolder + '/player.json';
+	edit.object = {"comments": pcms};
+	edit.file = RULES.root + p_savepath + '/data.json';
 	n_Request(
 		{"send": {"editobj": edit}, "func": p_CommentsSavedPlayer, "info": 'player comments', 'cm': rcm});
 	c_Info('Saving comments for Player...');
