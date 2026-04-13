@@ -549,7 +549,7 @@ function st_SetElText(i_status, i_el, i_field, i_full)
 		i_el.innerHTML = '';
 }
 //function st_SetElArtists(i_status, i_el, i_short, i_clickable, i_onclick)
-function st_SetElArtists(i_status, i_el, i_args)
+function st_SetElArtists(i_status, i_el, i_args = {})
 {
 	i_el.textContent = '';
 	let elements = [];
@@ -577,7 +577,7 @@ function st_SetElArtists(i_status, i_el, i_args)
 	return elements;
 }
 //function st_CreateElArtist(i_id, i_short)
-function st_CreateElArtist(i_id, i_args)
+function st_CreateElArtist(i_id, i_args = {})
 {
 	let el = document.createElement('div');
 	el.classList.add('tag');
