@@ -91,8 +91,8 @@ function c_GetHash()
 	if (path.charAt(0) != '/')
 		path = '/' + path;
 
-//	while (path.indexOf('//') != -1)
-//		path = path.replace(/\/\//g, '/');
+	while (path.indexOf('//') != -1)
+		path = path.replace(/\/\//g, '/');
 
 	if ((path.length > 1) && (path.charAt(path.length - 1) == '/'))
 		path = path.substr(0, path.length - 1);

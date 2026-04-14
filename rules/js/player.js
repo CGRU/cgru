@@ -25,6 +25,7 @@ var p_savepath = null;
 
 var p_imgTypes = ['jpg', 'jpeg', 'png'];
 
+var p_path_hash = null;
 var p_path = null;
 var p_args = {};
 var p_rules_path = null;
@@ -259,10 +260,11 @@ function p_PathChanged()
 	p_images = [];
 	p_paintElCanvas = [];
 
-	p_rules_path = document.location.hash;
-	if (p_rules_path.indexOf('#') == 0)
-		p_rules_path = p_rules_path.substr(1);
-	p_rules_path = c_PathDir(p_rules_path);
+	p_path_hash = document.location.hash;
+	if (p_path_hash.indexOf('#') == 0)
+		p_path_hash = p_path_hash.substr(1);
+	p_path_hash = p_path_hash.split('?')[0];
+	p_rules_path = c_PathDir(p_path_hash);
 	if (p_rules_path.indexOf('//') != -1)
 		p_rules_path = p_rules_path.substr(0, p_rules_path.indexOf('//'));
 	$('rules_link')
@@ -296,7 +298,7 @@ function p_PathChanged()
 function p_Link()
 {
 	p_args.f = p_frame;
-	var hash = p_path + '?' + encodeURI(JSON.stringify(p_args));
+	let hash = p_path_hash + '?' + encodeURI(JSON.stringify(p_args));
 	document.location.hash = hash;
 }
 
@@ -310,7 +312,7 @@ function p_WalkNavigateReceived(i_data, i_args)
 	//n_WalkDir({"paths": [p_path], "wfunc": p_WalkSequenceReceived, "info": 'walk images', "rufiles": ['player']});
 
 
-	n_Request({'send':{'player_init':{'path':p_path}},'func':p_PlayerInit,'info':'player init','wait':false});
+	n_Request({'send':{'player_init':{'path':p_path_hash}},'func':p_PlayerInit,'info':'player init','wait':false});
 }
 
 function p_PlayerInit(i_data)
