@@ -1884,7 +1884,7 @@ function fv_PreviewOpen(i_el)
 	var elSource = document.createElement('source');
 	elVideo.appendChild(elSource);
 	elSource.src = RULES.root + i_el.m_preview_file;
-	elSource.type = 'video/ogg';
+	elSource.type = 'video/mp4';
 }
 function fv_PreviewClose(i_el)
 {
