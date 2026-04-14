@@ -19,7 +19,7 @@ def playerInit(path=None, out=None):
 
     if not os.path.isdir(abspath):
         out['error'] = 'Folder %s does not exist.' % path
-        return
+        return out
 
     out['path'] = path
     out['images'] = []
@@ -30,6 +30,13 @@ def playerInit(path=None, out=None):
         img['name'] = name
         img['size'] = os.path.getsize(os.path.join(abspath, name))
         out['images'].append(img)
+
+
+    sound_path = path.split('//')[0] + '/REF/sound.wav'
+    print(sound_path)
+    if os.path.isfile(rulib.functions.getAbsPath(sound_path)):
+        out['sound'] = sound_path
+
 
     save_path = os.path.dirname(abspath) + '/.rules/' + os.path.basename(abspath) + '.player'
     if os.path.isdir(save_path):

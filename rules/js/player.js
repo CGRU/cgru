@@ -16,11 +16,12 @@
 
 "use strict";
 
-var player = null;
 var p_PLAYER = true;
 
 // TODO: not pollute the global scope with so much vars, should be bundled into struct objects
-var p_savepath = '.commented';
+var player = null;
+var p_audio = null;
+var p_savepath = null;
 
 var p_imgTypes = ['jpg', 'jpeg', 'png'];
 
@@ -79,7 +80,7 @@ var p_fps = 24.0;
 var p_interval = 40;
 var p_drawTime = new Date();
 
-var p_elements = ['player_content', 'play_slider', 'frame_bar', 'view', 'preview', 'framerate'];
+var p_elements = ['player_content', 'play_slider', 'frame_bar', 'view', 'preview', 'framerate','audio'];
 var p_el = {};
 var p_buttons = ['play', 'prev', 'next', 'reverse', 'rewind', 'forward'];
 var p_elb = {};
@@ -309,10 +310,10 @@ function p_WalkNavigateReceived(i_data, i_args)
 	//n_WalkDir({"paths": [p_path], "wfunc": p_WalkSequenceReceived, "info": 'walk images', "rufiles": ['player']});
 
 
-	n_Request({'send':{'player_init':{'path':p_path}},'func':p_WalkSequenceReceived,'info':'player init','wait':false});
+	n_Request({'send':{'player_init':{'path':p_path}},'func':p_PlayerInit,'info':'player init','wait':false});
 }
 
-function p_WalkSequenceReceived(i_data)
+function p_PlayerInit(i_data)
 {
 	/*
 	var walk = i_data[0];
@@ -336,26 +337,28 @@ function p_WalkSequenceReceived(i_data)
 	*/
 	if (i_data == null)
 	{
+		c_Error('No data received.');
 		return;
 	}
 
 	player = i_data.player;
 	if (player == null)
 	{
+		c_Error('No player data received.');
 		return;
 	}
 
 	let images = player.images;
 	if (images == null)
 	{
+		c_Error('No images data received.');
 		return;
 	}
 	if ((images.length == null) || (images.length == 0))
 	{
+		c_Error('No images received.');
 		return;
 	}
-
-	let comments = player.comments;
 
 	p_filenames = [];
 	p_fileObjs = {};
@@ -384,14 +387,20 @@ function p_WalkSequenceReceived(i_data)
 		p_filenames.push(file);
 		p_images.push(img);
 
-		if (comments && comments[file])
-			p_comments[i] = comments[file];
+		if (player.comments && player.comments[file])
+			p_comments[i] = player.comments[file];
 	}
 
 	if (p_filenames == null || (p_filenames.length == 0))
 	{
 		c_Error('No JPEG or PNG Files Found.');
 		return;
+	}
+
+	if (player.sound)
+	{
+		p_audio = p_el.audio;
+		p_audio.src = RULES.root + player.sound;
 	}
 /*
 	if (p_imageMode)
@@ -787,6 +796,9 @@ function p_Play()
 	p_playing = 1;
 	p_interval = Math.round(1000 / p_fps);
 	p_NextFrame();
+
+	if (p_audio)
+		p_audio.currentTime = p_frame / p_fps;
 }
 
 function p_Reverse()
@@ -815,6 +827,9 @@ function p_Pause()
 		return;
 	p_PushButton();
 	p_playing = 0;
+
+	if (p_audio)
+		p_audio.pause();
 }
 
 function p_StopTimer()
@@ -860,16 +875,38 @@ function p_NextFrame(i_val)
 		p_playing = 0;
 		p_PushButton();
 		p_frame += i_val;
+
+		if (p_audio)
+			p_audio.pause();
 	}
 	else
 	{
 		p_frame += p_playing;
+
+		if (p_audio)
+		{
+			if ((p_playing == 1)/* && p_audio.paused*/)
+			{
+				//p_audio.currentTime = p_frame / p_fps;
+				p_audio.play();
+			}
+			else
+				p_audio.pause();
+		}
 	}
 
 	if (p_frame >= p_images.length)
+	{
 		p_frame = 0;
+		if (p_audio)
+			p_audio.currentTime = 0;
+	}
 	if (p_frame < 0)
+	{
 		p_frame = p_images.length - 1;
+		if (p_audio)
+			p_audio.currentTime = 0;
+	}
 
 	if (localStorage.player_usewebgl == 'ON')
 		gl_DrawScene();
