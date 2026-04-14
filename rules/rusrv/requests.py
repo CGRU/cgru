@@ -446,7 +446,7 @@ class Requests:
             o_out['error'] = 'Path is not specified.'
             return
         out = dict()
-        rulib.functions.playerInit(path=i_args['path'], out=out)
+        rulib.player.playerInit(path=i_args['path'], out=out)
         o_out['player'] = out
 
 
