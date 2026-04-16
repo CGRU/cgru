@@ -247,10 +247,13 @@ bool AfNodeSolve::canRunOn(RenderAf *i_render)
 	}
 
 
-	bool canrunon;
-	int priority = m_work->getPoolPriority(i_render->getPool(), canrunon);
-	if (false == canrunon)
-		return false;
+	if (useWorkPoolCheck())
+	{
+		bool canrunon;
+		m_work->getPoolPriority(i_render->getPool(), canrunon);
+		if (false == canrunon)
+			return false;
+	}
 
 	// Perform each node type scpecific check
 	return v_canRunOn(i_render);

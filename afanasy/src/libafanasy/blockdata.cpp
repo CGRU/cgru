@@ -105,6 +105,7 @@ void BlockData::initDefaults()
 	m_parser_coeff /***********/ = 1;
 	m_time_started /***********/ = 0;
 	m_time_done /**************/ = 0;
+	m_pools.clear();
 
 	p_percentage         = 0;
 	p_error_hosts        = 0;
@@ -152,6 +153,27 @@ void BlockData::construct()
 	m_hosts_mask_exclude.setExclude();
 
 	m_need_properties.setContain();
+}
+
+void BlockData::checkPools()
+{
+	if (m_pools.empty())
+		return;
+
+	std::map<std::string, int32_t>::iterator it = m_pools.begin();
+	while (it != m_pools.end())
+	{
+		if (it->first.empty() || (it->second == 0))
+		{
+			it = m_pools.erase(it);
+			continue;
+		}
+
+		if (it->second > 100) it->second = 100;
+		if (it->second < -100) it->second = -100;
+
+		it++;
+	}
 }
 
 /// Construct data from JSON:
@@ -208,6 +230,16 @@ void BlockData::jsonRead(const JSON &i_object, std::string *io_changes)
 	jr_int64("time_started" /***********/, m_time_started /***********/, i_object, io_changes);
 	jr_int64("time_done" /**************/, m_time_done /**************/, i_object, io_changes);
 	jr_stringmap("environment" /********/, m_environment /************/, i_object, io_changes);
+	// Pools:
+	// When "pools" is present in JSON, treat it as the complete desired set
+	// and replace any existing pools (including clearing on empty object).
+	// When "pools" is not present, leave existing pools unchanged.
+	if (i_object.HasMember("pools"))
+	{
+		m_pools.clear();
+		jr_intmap("pools", m_pools, i_object, io_changes);
+		checkPools();
+	}
 	jr_intmap("tickets",                   m_tickets,                    i_object, io_changes);
 
 	if (m_capacity < 1) m_capacity = 1;
@@ -476,6 +508,7 @@ void BlockData::jsonWrite(std::ostringstream &o_str, int i_type) const
 			if (hasNeedProperties())
 				o_str << ",\n\"need_properties\":\"" << m_need_properties.getPattern() << "\"";
 			if (m_tickets.size()) af::jw_intmap("tickets", m_tickets, o_str);
+			if (m_pools.size()) af::jw_intmap("pools", m_pools, o_str);
 
 			o_str << ',';
 
@@ -606,6 +639,9 @@ void BlockData::v_readwrite(Msg *msg)
 			rw_String(m_custom_data, msg);
 			rw_StringVect(m_files, msg);
 			rw_StringMap(m_environment, msg);
+			if (msg->isReading()) m_pools.clear();
+			rw_IntMap(m_pools, msg);
+			if (msg->isReading()) checkPools();
 
 		case Msg::TJobsList:
 			rw_int64_t(m_flags, msg);
@@ -1200,6 +1236,55 @@ const TaskData * BlockData::getTaskData(int i_num_task) const
 	return m_tasks_data[i_num_task];
 }
 
+int BlockData::getPoolPriority(const std::string & i_pool, bool & o_canrunon) const
+{
+	o_canrunon = true;
+	if (m_pools.empty())
+		return 0;
+
+	int priority = 0;
+
+	bool found_some = false;
+	bool found_100 = false;
+
+	for (auto const & it : m_pools)
+	{
+		if (it.first.empty())
+			continue;
+
+		bool found_cur = false;
+
+		if (it.first[0] == '/')
+		{
+			if (i_pool.find(it.first) == 0)
+				found_cur = true;
+		}
+		else
+		{
+			if (i_pool.find(it.first) != std::string::npos)
+				found_cur = true;
+		}
+
+		if (found_cur)
+		{
+			found_some = true;
+
+			if (it.second <= -100)
+				o_canrunon = false;
+			else
+				priority += it.second;
+		}
+
+		if (it.second >= 100)
+			found_100 = true;
+	}
+
+	if (found_100 && (false == found_some))
+		o_canrunon = false;
+
+	return priority;
+}
+
 int BlockData::calcWeight() const
 {
 	int weight = sizeof(BlockData);
@@ -1217,6 +1302,7 @@ int BlockData::calcWeight() const
 	weight += weigh(m_name);
 	weight += weigh(m_working_directory);
 	weight += weigh(m_environment);
+	weight += weigh(m_pools);
 	weight += weigh(m_command);
 	weight += weigh(m_files);
 	weight += weigh(m_command_pre);
@@ -1315,6 +1401,12 @@ void BlockData::generateInfoStreamTyped(std::ostringstream &o_str, int type, boo
 			if (m_hosts_mask.notEmpty()) o_str << "\n Hosts Mask = " << m_hosts_mask.getPattern();
 			if (m_hosts_mask_exclude.notEmpty())
 				o_str << "\n Exclude Hosts Mask = " << m_hosts_mask_exclude.getPattern();
+			if (m_pools.size())
+			{
+				o_str << "\n Pools:";
+				for (auto const & p : m_pools)
+					o_str << " " << p.first << ":" << p.second;
+			}
 
 			if (full) o_str << "\n Service = " << m_service;
 			if (full) o_str << "\n Tasks Number = " << m_tasks_num;
