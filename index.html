@@ -93,89 +93,94 @@ Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
 		</div>
 	</div>
 	<div id="search" style="display:none">
-		<div>
-			<div id="search_depth" class="editing" style="float:right;width:40px;text-align:center;" contenteditable="true">1</div>
+		<div id="search_depth_div" style="float: right">
+			<div id="search_depth" class="editing"
+				style="float:right; width:40px; min-height:12px; text-align:center; margin: 0px 4px; padding: 0px 4px;"
+				contenteditable="true">1</div>
 			<div style="float:right">Depth:</div>
+		</div>
 
-			<div style="float:left">Priority:</div>
-			<div id="search_prioritymin" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
-			<div style="float:left"> - </div>
-			<div id="search_prioritymax" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
+		<div class="search_tab_btn" onclick="s_TabBtnCicked('status')" id="search_tab_btn_status">Status</div>
+		<div class="search_tab_btn" onclick="s_TabBtnCicked('task')"   id="search_tab_btn_task"  >Task</div>
+
+		<div class="search_tab_div" id="search_tab_div_status">
+		<div class="search_grp">
 			<div style="float:left">Percent:</div>
-			<div id="search_percentmin" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
+			<div id="search_percentmin_status" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
 			<div style="float:left"> - </div>
-			<div id="search_percentmax" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
+			<div id="search_percentmax_status" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
 			<div style="float:left">Finish:</div>
-			<div id="search_finishmin" class="editing" style="float:left;width:90px;text-align:center;" contenteditable="true"></div>
+			<div id="search_finishmin_status" class="editing" style="float:left;width:90px;text-align:center;" contenteditable="true"></div>
 			<div style="float:left"> - </div>
-			<div id="search_finishmax" class="editing" style="float:left;width:90px;text-align:center;" contenteditable="true"></div>
+			<div id="search_finishmax_status" class="editing" style="float:left;width:90px;text-align:center;" contenteditable="true"></div>
+
+			<div style="clear: both;">
+				<div style="float:left;">Annotation:</div>
+				<div id="search_annotation_status" class="editing" contenteditable="true"></div>
+			</div>
 		</div>
-		<div>
-			<div style="float:left;">Annotation:</div>
-			<div id="search_annotation" class="editing" contenteditable="true"></div>
-		</div>
-		<div id="search_artists_grp" class="search_grp" style="display:none">
-			<div id="search_artists_btn" class="button" onclick="s_ShowArtists()">Search Artists</div>
-			<div id="search_artists_div" _class="_search_grp" style="display:none">
+
+
+		<div id="search_artists_grp_status" class="search_grp" style="display:none">
+			<div id="search_artists_btn_status" class="button" onclick="s_ShowArtists('status')">Search Artists</div>
+			<div id="search_artists_div_status" style="display:none">
 				<div class="search_grp_ctrl">
 					<div>Artists:</div>
-					<div class="button" onclick="s_ShowDisabledArtists(this)" title="Show disabled artists.">Dis</div>
-					<div class="button" onclick="s_ShowNotArtists(this)" title="Show not only artists.">All</div>
-					<div class="button" id="search_artists_notassigned"
+					<div class="button" onclick="s_ShowDisabledArtists(this,'status')" title="Show disabled artists.">Dis</div>
+					<div class="button" onclick="s_ShowNotArtists(this,'status')" title="Show not only artists.">All</div>
+					<div class="button" id="search_artists_notassigned_status"
 						title="Search shots that not assigned to any artist.">
 						N/A
 					</div>
 				</div>
-				<div id="search_artists" class="artists"></div>
+				<div id="search_artists_status" class="artists"></div>
 			</div>
 		</div>
+
 		<div class="search_grp">
 			<div class="search_grp_ctrl">
 				<div>Flags:</div>
-				<div class="button" id="search_noflags"
+				<div class="button" id="search_noflags_status"
 					title="Search shots that has not any flags.">
 					N/F
 				</div>
-				<div class="button" id="search_flags_and"
+				<div class="button" id="search_flags_and_status"
 					title="Search flags with AND logic.">
 					AND
 				</div>
-				<div class="button" id="search_flags_tasks"
-					title="Search flags in tasks.">
-					TSK
-				</div>
 			</div>
-			<div id="search_flags" class="flags"></div>
+			<div id="search_flags_status" class="flags"></div>
 		</div>
+
 		<div class="search_grp">
 			<div class="search_grp_ctrl">
 				<div>Tags:</div>
-				<div class="button" id="search_notags"
+				<div class="button" id="search_notags_status"
 					title="Search shots that has not any tags.">
 					N/T
 				</div>
-				<div class="button" id="search_tags_and"
+				<div class="button" id="search_tags_and_status"
 					title="Search tags with AND logic.">
 					AND
 				</div>
-				<div class="button" id="search_tags_tasks"
-					title="Search tags in tasks.">
-					TSK
-				</div>
 			</div>
-			<div id="search_tags" class="tags"></div>
+			<div id="search_tags_status" class="tags"></div>
 		</div>
+
 		<div class="search_grp">
 			<div>
 				<div style="float:left">Status Modified:</div>
-				<div id="search_statmodmin" class="editing time" style="float:left;width:100px;text-align:center;" contenteditable="true"></div>
+				<div id="search_modifiedmin_status" class="editing time" style="float:left;width:100px;text-align:center;" contenteditable="true"></div>
 				<div style="float:left"> - </div>
-				<div id="search_statmodmax" class="editing time" style="float:left;width:100px;text-align:center;" contenteditable="true"></div>
-				<div style="float:left">Body Modified:</div>
-				<div id="search_bodymodmin" class="editing time" style="float:left;width:100px;text-align:center;" contenteditable="true"></div>
+				<div id="search_modifiedmax_status" class="editing time" style="float:left;width:100px;text-align:center;" contenteditable="true"></div>
+				<div style="float:left; clear:both;">Body Modified:</div>
+				<div id="search_bodymodmin_status" class="editing time" style="float:left;width:100px;text-align:center;" contenteditable="true"></div>
 				<div style="float:left"> - </div>
-				<div id="search_bodymodmax" class="editing time" style="float:left;width:100px;text-align:center;" contenteditable="true"></div>
+				<div id="search_bodymodmax_status" class="editing time" style="float:left;width:100px;text-align:center;" contenteditable="true"></div>
 			</div>
+		</div>
+
+		<div class="search_grp" id="search_nofilter_div">
 			<div>
 				<div style="float:left;">Body:</div>
 				<div id="search_body" class="editing" contenteditable="true"></div>
@@ -185,6 +190,82 @@ Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
 				<div id="search_comment" class="editing" contenteditable="true"></div>
 			</div>
 		</div>
+		</div>
+
+		<div class="search_tab_div" id="search_tab_div_task">
+		<div class="search_grp">
+			<div style="float:left">Priority:</div>
+			<div id="search_prioritymin_task" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
+			<div style="float:left"> - </div>
+			<div id="search_prioritymax_task" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
+			<div style="float:left">Percent:</div>
+			<div id="search_percentmin_task" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
+			<div style="float:left"> - </div>
+			<div id="search_percentmax_task" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
+
+			<div style="clear: both;">
+				<div style="float:left;">Annotation:</div>
+				<div id="search_annotation_task" class="editing" contenteditable="true"></div>
+			</div>
+		</div>
+
+
+		<div id="search_artists_grp_task" class="search_grp" style="display:none">
+			<div id="search_artists_btn_task" class="button" onclick="s_ShowArtists('task')">Search Artists</div>
+			<div id="search_artists_div_task" style="display:none">
+				<div class="search_grp_ctrl">
+					<div>Artists:</div>
+					<div class="button" onclick="s_ShowDisabledArtists(this,'task')" title="Show disabled artists.">Dis</div>
+					<div class="button" onclick="s_ShowNotArtists(this,'task')" title="Show not only artists.">All</div>
+					<div class="button" id="search_artists_notassigned_task"
+						title="Search shots that not assigned to any artist.">
+						N/A
+					</div>
+				</div>
+				<div id="search_artists_task" class="artists"></div>
+			</div>
+		</div>
+
+		<div class="search_grp">
+			<div class="search_grp_ctrl">
+				<div>Flags:</div>
+				<div class="button" id="search_noflags_task"
+					title="Search shots that has not any flags.">
+					N/F
+				</div>
+				<div class="button" id="search_flags_and_task"
+					title="Search flags with AND logic.">
+					AND
+				</div>
+			</div>
+			<div id="search_flags_task" class="flags"></div>
+		</div>
+
+		<div class="search_grp">
+			<div class="search_grp_ctrl">
+				<div>Tags:</div>
+				<div class="button" id="search_notags_task" style="display:none"
+					title="Search shots that has not any tags.">
+					N/T
+				</div>
+				<div class="button" id="search_tags_and_task"
+					title="Search tags with AND logic.">
+					AND
+				</div>
+			</div>
+			<div id="search_tags_task" class="tags"></div>
+		</div>
+
+		<div class="search_grp">
+			<div>
+				<div style="float:left">Task Modified:</div>
+				<div id="search_modifiedmin_task" class="editing time" style="float:left;width:100px;text-align:center;" contenteditable="true"></div>
+				<div style="float:left"> - </div>
+				<div id="search_modifiedmax_task" class="editing time" style="float:left;width:100px;text-align:center;" contenteditable="true"></div>
+			</div>
+		</div>
+		</div>
+
 		<div id="search_result_div" style="display:none; box-shadow:0 0 3px #000 inset;">
 			<div id="search_info">
 				<div style="float:left;">Search Path = </div>

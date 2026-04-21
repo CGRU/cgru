@@ -321,7 +321,7 @@ function g_PostLaunchFunc(i_msg)
 	if (g_arguments == null)
 		return;
 
-	for (var func in g_arguments)
+	for (let func in g_arguments)
 	{
 		if (window[func])
 			window[func](g_arguments[func]);

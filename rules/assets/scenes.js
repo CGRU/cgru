@@ -793,448 +793,259 @@ function scenes_GetSelectedShots()
 	return shots;
 }
 
-function sc_FilterShots(i_args)
+function sc_FilterStatus(i_status, i_args)
 {
-	let o_res = {};
-	o_res.artists = [];
-	o_res.flags = [];
-	o_res.tags = [];
-
-	if (sc_elShots == null)
-		return;
-
 	if (i_args == null)
 		i_args = {};
 
+	let found = true;
+
+	if (i_args.ann && found)
+	{
+		found = false;
+		if (i_status.annotation)
+		{
+			for (let ann of i_args.ann)
+			{
+				if (i_status.annotation.toLowerCase().indexOf(ann.toLowerCase()) != -1)
+				{
+					found = true;
+					break;
+				}
+			}
+		}
+	}
+
+	if (i_args.body && found)
+	{
+		found = false;
+		if (i_status.body && i_status.body.data)
+		{
+			for (let body of i_args.body)
+			{
+				if (i_status.body.data.toLowerCase().indexOf(body.toLowerCase()) != -1)
+				{
+					found = true;
+					break;
+				}
+			}
+		}
+	}
+
+	if (i_args.flags && i_args.flags.length && found)
+	{
+		found = false;
+		if (i_status.flags && i_status.flags.length)
+		{
+			for (const f of i_args.flags)
+			{
+				// skip special flags
+				if (f.charAt(0) == '_') continue;
+
+				if (i_status.flags.includes(f))
+				{
+					found = true;
+					if (! i_args.flags_and)
+						break;
+				}
+				else
+				{
+					found = false;
+					if (i_args.flags_and)
+						break;
+				}
+			}
+		}
+		else if (i_args.flags.indexOf('_null_') != -1)
+			found = true;
+	}
+
+	if (i_args.tags && i_args.tags.length && found)
+	{
+		found = false;
+		if (i_status.tags && i_status.tags.length)
+		{
+			for (const t of i_args.tags)
+			{
+				// skip special tags
+				if (t.charAt(0) == '_') continue;
+
+				if (i_status.tags.includes(t))
+				{
+					found = true;
+					if (! i_args.tags_and)
+						break;
+				}
+				else
+				{
+					found = false;
+					if (i_args.tags_and)
+						break;
+				}
+			}
+		}
+		else if (i_args.tags.indexOf('_null_') != -1)
+			found = true;
+	}
+
+	if (i_args.artists && found)
+	{
+		found = false;
+		if (i_status.artists && i_status.artists.length)
+		{
+			for (let i = 0; i < i_args.artists.length; i++)
+				if (i_status.artists.indexOf(i_args.artists[i]) != -1)
+					{found = true; break;}
+		}
+		else if (i_args.artists.indexOf('_null_') != -1)
+			found = true;
+	}
+
+	if (i_args.modified && found)
+	{
+		if (i_status.mtime)
+		{
+			let min = i_args.modified[0];
+			let max = i_args.modified[1];
+			if (min && (min > i_status.mtime))
+				found = false;
+			if (max && (max < i_status.mtime))
+				found = false;
+		}
+		else
+			found = false;
+	}
+
+	if (i_args.priority && found)
+	{
+		found = false;
+		if ((i_status.priority != null) &&
+			((i_args.priority[0] == null) || (i_status.priority >= i_args.priority[0])) &&
+			((i_args.priority[1] == null) || (i_status.priority <= i_args.priority[1])))
+			found = true;
+	}
+
+	if (i_args.percent && found)
+	{
+		found = false;
+		if ((i_status.progress != null) &&
+			((i_args.percent[0] == null) || (i_status.progress >= i_args.percent[0])) &&
+			((i_args.percent[1] == null) || (i_status.progress <= i_args.percent[1])))
+			found = true;
+	}
+
+	if (i_args.finish && found)
+	{
+		if (i_status.finish)
+		{
+			let min = i_args.finish[0];
+			let max = i_args.finish[1];
+			if (min && (min > i_status.finish))
+				found = false;
+			if (max && (max < i_status.finish))
+				found = false;
+		}
+		else
+			found = false;
+	}
+
+	if (i_args.bodymod && i_status.body && found)
+	{
+		let time = i_status.body.ctime;
+		if (i_status.body.mtime)
+			time = i_status.body.mtime;
+
+		if (time)
+		{
+			let min = i_args.bodymod[0];
+			let max = i_args.bodymod[1];
+			if (min && (min > time))
+				found = false;
+			if (max && (max < time))
+				found = false;
+		}
+		else
+			found = false;
+	}
+/*
+if (found)
+{
+console.log(JSON.stringify(i_args));
+console.log(JSON.stringify(i_status));
+}
+*/
+	return found;
+}
+
+
+function sc_FilterShots(i_args)
+{
+	if (sc_elShots == null)
+		return;
+//console.log(JSON.stringify(i_args));
+	if (i_args == null)
+		i_args = {};
+
+	let o_res = {};
+	for (const tab of ['status','task'])
+	{
+		o_res[tab] = {};
+		o_res[tab].artists = [];
+		o_res[tab].flags = [];
+		o_res[tab].tags = [];
+	}
+
 	// Prepare special flags and tags:
-	let flags_and = false;
-	let flags_tsk = false;
-	if (i_args.flags)
-	{
-		let index = i_args.flags.indexOf('_AND_');
-		if (index != -1)
-		{
-			flags_and = true;
-			i_args.flags.splice(index, 1);
-		}
-		index = i_args.flags.indexOf('_TSK_');
-		if (index != -1)
-		{
-			flags_tsk = true;
-			i_args.flags.splice(index, 1);
-		}
-	}
+	for (const tab of ['status','task'])
+		for (const key of ['flags','tags'])
+			if (i_args[tab] && i_args[tab][key])
+			{
+				const index = i_args[tab][key].indexOf('_AND_');
+				if (index != -1)
+				{
+					i_args[tab][key+'_and'] = true;
+					i_args[tab][key].splice(index, 1);
+				}
+			}
 
-	let tags_and  = false;
-	let tags_tsk  = false;
-	if (i_args.tags)
-	{
-		let index = i_args.tags.indexOf('_AND_');
-		if (index != -1)
-		{
-			tags_and = true;
-			i_args.tags.splice(index, 1);
-		}
-		index = i_args.tags.indexOf('_TSK_');
-		if (index != -1)
-		{
-			tags_tsk = true;
-			i_args.tags.splice(index, 1);
-		}
-	}
+	// Prepare bodies and annotatios:
+	for (const tab of ['status','task'])
+		for (const key of ['ann','body'])
+			if (i_args[tab] && i_args[tab][key] && (false == Array.isArray(i_args[tab][key])))
+				i_args[tab][key] = i_args[tab][key].split('+');
 
-	let anns = null;
-	if (i_args.ann )
-	{
-		let anns_or = i_args.ann.split('|');
-		anns = [];
-		for (let o = 0; o < anns_or.length; o++)
-			anns.push( anns_or[o].split('+'));
-	}
-
-	let bodies = null;
-	if (i_args.body)
-	{
-		let bodies_or = i_args.body.split('|');
-		bodies = [];
-		for (let o = 0; o < bodies_or.length; o++)
-			bodies.push(bodies_or[o].split('+'));
-	}
+//console.log(JSON.stringify(i_args));
 
 	for (let th = 0; th < sc_elShots.length; th++)
 	{
-		let found = (i_args == null);
+//		let found = (i_args == null);
+		let found = true;
 
-		let el = sc_elShots[th];
+		const el = sc_elShots[th];
 		let st_obj = {};
 		if (el.m_status && el.m_status.obj)
 			st_obj = c_CloneObj(el.m_status.obj);
-			//st_obj = Object.assign({}, el.m_status.obj);
 
-		// Join status with tasks
-		if (st_obj.tasks)
-		{
-			let keys = ['artists'];
-			// Join flags or tags, never join and flags and tags.
-			// If task search enabled for both tags and flags,
-			// we should search tasks, not just join shot status with tasks status.
-			if (false == (flags_tsk && tags_tsk))
-			{
-				if (flags_tsk)
-					keys.push('flags');
-				if (tags_tsk)
-					keys.push('tags');
-			}
+		if (i_args.status)
+			found = sc_FilterStatus(st_obj, i_args.status);
 
-			for (let t in st_obj.tasks)
-			{
-				let task = st_obj.tasks[t];
-				if (task.deleted)
-				{
-					found = false;
-					continue;
-				}
-
-				for (let key of keys)
-					if (task[key])
-					{
-						if (null == st_obj[key])
-							st_obj[key] = [];
-						for (let val of task[key])
-							if (st_obj[key].indexOf(val) == -1)
-								st_obj[key].push(val);
-					}
-
-				// Calc maximum priority, but task should be completed:
-				if ((task.priority != null) && (task.progress < 100) && (task.flags.indexOf('done') == -1))
-				{
-					if (st_obj.priority == null)
-					{
-						st_obj.priority = task.priority;
-					}
-					else
-					{
-						if (task.priority > st_obj.priority)
-							st_obj.priority = task.priority;
-					}
-				}
-			}
-		}
-
-		if (anns)
-		{
-			if (st_obj.annotation)
-				for (let o = 0; o < anns.length; o++)
-				{
-					let found_and = true;
-					for (let a = 0; a < anns[o].length; a++)
-					{
-						if (st_obj.annotation.toLowerCase().indexOf(anns[o][a].toLowerCase()) == -1)
-						{
-							found_and = false;
-							break;
-						}
-					}
-					if (found_and)
-					{
-						found = true;
-						break;
-					}
-				}
-		}
-		else found = true;
-
-		if (bodies && found)
+		if (i_args.task && found)
 		{
 			found = false;
-			if (st_obj.body && st_obj.body.data)
-				for (let o = 0; o < bodies.length; o++)
-				{
-					let found_and = true;
-					for (let b = 0; b < bodies[o].length; b++)
-					{
-						if (st_obj.body.data.toLowerCase().indexOf(bodies[o][b].toLowerCase()) == -1)
-						{
-							found_and = false;
-							break;
-						}
-					}
-					if (found_and)
-					{
-						found = true;
-						break;
-					}
-				}
-		}
 
-		if (i_args.flags && i_args.flags.length && found)
-		{
-			found = false;
-			if (st_obj.flags && st_obj.flags.length)
-			{
-				for (let f of i_args.flags)
-				{
-					// skip special flags
-					if (f.charAt(0) == '_') continue;
-
-					if (st_obj.flags.includes(f))
-					{
-						found = true;
-						if (false == flags_and)
-							break;
-					}
-					else
-					{
-						found = false;
-						if (flags_and)
-							break;
-					}
-				}
-			}
-			else if (i_args.flags.indexOf('_null_') != -1)
-				found = true;
-		}
-
-		if (i_args.tags && i_args.tags.length && found)
-		{
-			found = false;
-			if (st_obj.tags && st_obj.tags.length)
-			{
-				for (let t of i_args.tags)
-				{
-					// skip special tags
-					if (t.charAt(0) == '_') continue;
-
-					if (st_obj.tags.includes(t))
-					{
-						found = true;
-						if (false == tags_and)
-							break;
-					}
-					else
-					{
-						found = false;
-						if (tags_and)
-							break;
-					}
-				}
-			}
-			else if (i_args.tags.indexOf('_null_') != -1)
-				found = true;
-		}
-
-		// Search tasks:
-		if (flags_tsk && tags_tsk)
-		{
 			if (st_obj.tasks)
 			{
-				for (let t in st_obj.tasks)
+				for (const t in st_obj.tasks)
 				{
-					let task = st_obj.tasks[t];
+					const task = st_obj.tasks[t];
 					if (task.deleted)
-					{
-						found = false;
 						continue;
-					}
-					found = true;
 
-					if (i_args.artists && found)
-					{
-						found = false;
-						let artists = [];
-						if (task.artists && task.artists.length)
-						{
-							artists = artists.concat(task.artists);
-							for (let i = 0; i < i_args.artists.length; i++)
-								if (artists.indexOf(i_args.artists[i]) != -1)
-									{ found = true; break; }
-						}
-						else if (i_args.artists.indexOf('_null_') != -1)
-							found = true;
-					}
-
-					if (found && i_args.flags && i_args.flags.length)
-					{
-						found = false;
-						let flags = [];
-						// Join this task flags with status flags
-						//if (st_obj.flags && st_obj.flags.length)
-						//	flags = flags.concat(st_obj.flags);
-						if (task.flags && task.flags.length)
-							flags = flags.concat(task.flags);
-
-						for (let i = 0; i < i_args.flags.length; i++)
-						{
-							if (flags.includes(i_args.flags[i]))
-							{
-								found = true;
-								if (false == flags_and)
-									break;
-							}
-							else
-							{
-								found = false;
-								if (flags_and)
-									break;
-							}
-						}
-					}
-
-					if (found && i_args.tags && i_args.tags.length)
-					{
-						found = false;
-						let tags = [];
-						// Join this task tags with status tags
-						//if (st_obj.tags && st_obj.tags.length)
-						//	tags = tags.concat(st_obj.tags);
-						if (task.tags && task.tags.length)
-							tags = tags.concat(task.tags);
-
-						for (let i = 0; i < i_args.tags.length; i++)
-						{
-							if (tags.includes(i_args.tags[i]))
-							{
-								found = true;
-								if (false == tags_and)
-									break;
-							}
-							else
-							{
-								found = false;
-								if (tags_and)
-									break;
-							}
-						}
-					}
-
-					if (found && i_args.statmod)
-					{
-						let time = task.ctime;
-						if (task.mtime)
-							time = task.mtime;
-
-						if (time)
-						{
-							let min = i_args.statmod[0];
-							let max = i_args.statmod[1];
-							if (min && (min > time))
-								found = false;
-							if (max && (max < time))
-								found = false;
-						}
-						else
-							found = false;
-					}
-
-					if (i_args.priority && found)
-					{
-						found = false;
-						if ((task.priority != null) && ((task.flags == null) || (task.flags.includes('done') == false)) &&
-							((i_args.priority[0] == null) || (task.priority >= i_args.priority[0])) &&
-							((i_args.priority[1] == null) || (task.priority <= i_args.priority[1])))
-							found = true;
-					}
-
-					if (i_args.percent && found)
-					{
-						found = false;
-						if ((task.progress != null) &&
-							((i_args.percent[0] == null) || (task.progress >= i_args.percent[0])) &&
-							((i_args.percent[1] == null) || (task.progress <= i_args.percent[1])))
-							found = true;
-					}
-
-					// We found one task matching flags and tags.
-					// One matching task it is enough to show entire shot.
+					found = sc_FilterStatus(task, i_args.task);
 					if (found)
 						break;
 				}
 			}
-			else
-				found = false;
-		}
-		else
-		{
-			if (i_args.artists && found)
-			{
-				found = false;
-				if (st_obj.artists && st_obj.artists.length)
-				{
-					for (let i = 0; i < i_args.artists.length; i++)
-						if (st_obj.artists.indexOf(i_args.artists[i]) != -1)
-							{ found = true; break; }
-				}
-				else if (i_args.artists.indexOf('_null_') != -1)
-					found = true;
-			}
-
-			if (i_args.statmod && found)
-				if ((false == flags_tsk) || (false == tags_tsk))
-				{
-					if (st_obj.mtime)
-					{
-						let min = i_args.statmod[0];
-						let max = i_args.statmod[1];
-						if (min && (min > st_obj.mtime))
-							found = false;
-						if (max && (max < st_obj.mtime))
-							found = false;
-					}
-					else
-						found = false;
-				}
-
-			if (i_args.priority && found)
-			{
-				found = false;
-				if ((st_obj.priority != null) &&
-					((i_args.priority[0] == null) || (st_obj.priority >= i_args.priority[0])) &&
-					((i_args.priority[1] == null) || (st_obj.priority <= i_args.priority[1])))
-					found = true;
-			}
-
-			if (i_args.percent && found)
-			{
-				found = false;
-				if ((st_obj.progress != null) &&
-					((i_args.percent[0] == null) || (st_obj.progress >= i_args.percent[0])) &&
-					((i_args.percent[1] == null) || (st_obj.progress <= i_args.percent[1])))
-					found = true;
-			}
-		}
-
-		if (i_args.finish && found)
-		{
-			if (st_obj.finish)
-			{
-				let min = i_args.finish[0];
-				let max = i_args.finish[1];
-				if (min && (min > st_obj.finish))
-					found = false;
-				if (max && (max < st_obj.finish))
-					found = false;
-			}
-			else
-				found = false;
-		}
-
-		if (i_args.bodymod && st_obj.body && found)
-		{
-			let time = st_obj.body.ctime;
-			if (st_obj.body.mtime)
-				time = st_obj.body.mtime;
-
-			if (time)
-			{
-				let min = i_args.bodymod[0];
-				let max = i_args.bodymod[1];
-				if (min && (min > time))
-					found = false;
-				if (max && (max < time))
-					found = false;
-			}
-			else
-				found = false;
 		}
 
 		if (found)
@@ -1244,29 +1055,20 @@ function sc_FilterShots(i_args)
 
 			// We should return not filtered shots all artists,
 			// flags and tags for search field to mute it.
-			if (st_obj.artists)
-				o_res.artists = o_res.artists.concat(st_obj.artists);
+			for (const key of ['artists','flags','tags'])
+				if (st_obj[key])
+					o_res.status[key] = o_res.status[key].concat(st_obj[key]);
 
-			if (st_obj.flags)
-				o_res.flags = o_res.flags.concat(st_obj.flags);
-
-			if (st_obj.tags)
-				o_res.tags = o_res.tags.concat(st_obj.tags);
-
-			if (flags_tsk && tags_tsk && st_obj.tasks)
-				for (let t in st_obj.tasks)
-				{
-					let task = st_obj.tasks[t];
-					if (task.flags)
-						o_res.flags = o_res.flags.concat(task.flags);
-					if (task.tags)
-						o_res.tags = o_res.tags.concat(task.tags);
-				}
+			if (st_obj.tasks)
+				for (const t in st_obj.tasks)
+					for (const key of ['artists','flags','tags'])
+						if (st_obj.tasks[t])
+							o_res.task[key] = o_res.task[key].concat(st_obj.tasks[t][key]);
 
 			// Remove duplicates from arrays:
-			o_res.artists = Array.from(new Set(o_res.artists));
-			o_res.flags   = Array.from(new Set(o_res.flags));
-			o_res.tags    = Array.from(new Set(o_res.tags));
+			for (const tab of ['status','task'])
+				for (const key of ['artists','flags','tags'])
+					o_res[tab][key] = Array.from(new Set(o_res[tab][key]));
 		}
 		else
 		{
@@ -1280,7 +1082,7 @@ function sc_FilterShots(i_args)
 		for (let f = 0; f < sc_elScenes.length; f++)
 		{
 			let oneShown = false;
-			for (var t = 0; t < sc_elScenes[f].m_elThumbnails.length; t++)
+			for (let t = 0; t < sc_elScenes[f].m_elThumbnails.length; t++)
 			{
 				if (sc_elScenes[f].m_elThumbnails[t].m_filtered != true)
 				{
@@ -1401,7 +1203,8 @@ function sc_DisplayStatistics()
 	if( selShots.length )
 		info = '<i><b>Selected</b></i> ' + info;
 
-	$('scenes_info').innerHTML = info;
+	if ($('scenes_info'))
+		$('scenes_info').innerHTML = info;
 
 //return;
 	// Statistics:
