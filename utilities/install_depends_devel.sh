@@ -40,7 +40,7 @@ function redhatArch(){
 	packages="$packages git"
 	packages="$packages python3-devel"
 	packages="$packages libpq-devel"
-	packages="$packages python3-qt6"
+	packages="$packages python3-pyqt6"
 	packages="$packages qt6-qtbase-devel"
 	packages="$packages qt6-qtmultimedia-devel"
 	packages="$packages rpm-build"
