@@ -1002,8 +1002,9 @@ class Dialog(QtWidgets.QWidget):
             else:
                 output = str(output, 'utf-8')
         print(output)
-        self.teCmd.insertPlainText(output)
-        self.teCmd.moveCursor(QtGui.QTextCursor.End)
+        #self.teCmd.insertPlainText(output)
+        #self.teCmd.moveCursor(QtGui.QTextCursor.End)
+        self.teCmd.append(output)
         self.output += output
 
 
