@@ -975,11 +975,11 @@ class Dialog(QtWidgets.QWidget):
         self.teCmd.clear()
         time.sleep(.1)
         self.process = QtCore.QProcess(self)
-        self.process.setProcessChannelMode(QtCore.QProcess.MergedChannels)
+        self.process.setProcessChannelMode(QtCore.QProcess.ProcessChannelMode.MergedChannels)
         self.process.finished.connect( self.processfinished)
         self.process.readyRead.connect( self.processoutput)
         self.output = ''
-        self.process.start(command)
+        self.process.startCommand(command)
 
     def processfinished(self, exitCode):
         print('Exit code = %d' % exitCode)

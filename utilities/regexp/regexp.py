@@ -38,7 +38,7 @@ class Dialog(QtWidgets.QWidget):
         if not rx.isValid():
             self.leResult.setText('ERROR: %s' % rx.errorString())
             return
-        if rx.exactMatch(self.leName.text()):
+        if rx.match(self.leName.text()).hasMatch():
             self.leResult.setText('MATCH')
         else:
             self.leResult.setText('NOT MATCH')
