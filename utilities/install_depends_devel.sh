@@ -16,7 +16,7 @@ function debianArch(){
 	packages="$packages vim"
 	packages="$packages g++"
 	packages="$packages git-core"
-	packages="$packages glibc-tools"
+	#packages="$packages glibc-tools"
 	packages="$packages python3-dev"
 	packages="$packages python3-pyqt6"
 	packages="$packages libpq-dev"
