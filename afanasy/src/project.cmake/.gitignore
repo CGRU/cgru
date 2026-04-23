@@ -5,6 +5,8 @@ CMakeFiles
 CMakeCache.txt
 Makefile
 
+DartConfiguration.tcl
+
 # Qt moc files
 */__/
 *moc_*.cpp
