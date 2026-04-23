@@ -14,15 +14,25 @@ AuthUserFile /data/cgru/.htdigest
 
 Require valid-user
 
-# Needed modules:
-# sudo a2enmod ssl auth_digest authz_groupfile wsgi
-
-# Remove /icons/ alias
-# sudo rm /etc/apache2/mods-enabled/alias.conf
+<FilesMatch "\.(js|css)$">
+FileETag None
+Header unset ETag
+Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
+Header set Pragma "no-cache"
+Header set Expires "Wed, 11 Jan 1984 05:00:00 GMT"
+</FilesMatch>
 
 # Needed utils:
 # sudo apt-get install apache2-utils libapache2-mod-wsgi-py3 python3-psycopg2
 # sudo apt-get install exiftool mediainfo imagemagick ffmpeg
+
+# Remove /icons/ alias
+# sudo rm /etc/apache2/mods-enabled/alias.conf
+
+# Needed modules:
+# sudo a2enmod ssl auth_digest authz_groupfile wsgi headers
+
+# Crate first user and group:
 # # Usage: htdigest [-c] passwordfile realm username
 # # The -c flag creates a new file.
 # htdigest -c .htdigest CGRU admin
