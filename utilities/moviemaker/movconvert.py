@@ -34,6 +34,11 @@ Parser.add_option('-u', '--suffix',    dest='suffix',    type  ='string', defaul
 Parser.add_option(      '--imgname',   dest='imgname',   type  ='string', default=None,     help='Images files name (frame)')
 Parser.add_option(      '--audio',     dest='audio',     type  ='string', default=None,     help='Add sound from an audio file')
 Parser.add_option(      '--acodec',    dest='acodec',    type  ='string', default='aac',    help='Audio codec')
+Parser.add_option(      '--ovrfile',   dest='ovrfile',   type  = 'string',    default=None,  help='Overlay video file')
+Parser.add_option(      '--ovrscale',  dest='ovrscale',  type  = 'float',     default=0.25,  help='Overlay video scale')
+Parser.add_option(      '--ovrleft',   dest='ovrleft',   action='store_true', default=False, help='Overlay video file on left side')
+Parser.add_option(      '--ovrbottom', dest='ovrbottom', action='store_true', default=False, help='Overlay video file bottom')
+Parser.add_option('-D', '--debug',     dest='debug',     action='store_true', default=False, help='Debug mode (verbose mode, no commands execution)')
 
 Options, argv = Parser.parse_args()
 
@@ -215,17 +220,48 @@ else:
         filter_complex.append('crop=%s:min(%s\\,ih)' % (resize[0],resize[1]))
         filter_complex.append('pad=%s:%s:0:max((%s-ih)/2\\,0)' % (resize[0],resize[1],resize[1]))
         Output += '.r%s' % Options.resize
+
+    if len(filter_complex_scale):
+        filter_complex_scale = "scale=%s" % (':'.join(filter_complex_scale))
+        filter_complex = [filter_complex_scale] + filter_complex
+
+    for i in range(0, len(filter_complex)):
+        if i == 0:
+            filter_complex[i] = '[0:v] ' + filter_complex[i]
+        else:
+            filter_complex[i] = '[base] ' + filter_complex[i]
+        if i < len(filter_complex)-1:
+            filter_complex[i] = filter_complex[i] + ' [base]'
+
     if Options.watermark is not None:
         if not os.path.isfile( Options.watermark):
             print('ERROR: Watermark file does not exist:\n' + Options.watermark)
             sys.exit(1)
         auxargs += ' -i "%s"' % Options.watermark
         filter_complex.append('overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2')
-    if len(filter_complex_scale):
-        filter_complex_scale = "scale=%s" % (':'.join(filter_complex_scale))
-        filter_complex = [filter_complex_scale] + filter_complex
+
+    if Options.ovrfile is not None:
+        if os.path.isfile(Options.ovrfile):
+            pass
+        else:
+            print('Overlay video does not exist: ' + Options.ovrfile)
+        auxargs += ' -i "%s"' % Options.ovrfile
+
+        ovr_pos = 'W-w-W/100:H/7'
+        if Options.ovrleft and Options.ovrbottom:
+            ovr_pos = 'W/100:H-h-H/7'
+        elif Options.ovrbottom:
+            ovr_pos = 'W-w-W/100:H-h-H/7'
+        elif Options.ovrleft:
+            ovr_pos = 'W/100:H/7'
+
+        filter_complex[-1] += ' [base]'
+        filter_complex.append('[1:v][base] scale2ref=w=iw*%f:h=-1 [ovr][base]' % Options.ovrscale)
+        filter_complex.append('[base][ovr] overlay=%s' % ovr_pos)
+
     if len(filter_complex):
         auxargs += ' -filter_complex "%s"' % (','.join(filter_complex))
+
     if Options.timestart:
         auxargs += ' -ss "%s"' % Options.timestart
     if Options.duration:
@@ -248,6 +284,9 @@ else:
 
 
 print(cmd)
+
+if Options.debug:
+    sys.exit(0)
 
 try:
     process = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE)
@@ -386,5 +425,6 @@ while True:
 
 
 returncode = process.wait()
+print(cmd)
 sys.exit(returncode)
 
