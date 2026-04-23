@@ -14,7 +14,7 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
 
 v3.4.1
 ======
-*2026.03.16 (not released)*
+*2026.04.23 (not released)*
 
 -   New server node logs system. Any action log stored in SQL database
     `logs <../afanasy/server.html#database-schema>`_ table.
@@ -24,6 +24,8 @@ v3.4.1
     You can filter logs to find something special.
 
 -   Server can restart task with will dependencies. AfWatch tasks list got a menu item for it.
+
+-   PyQt6 and PySide6 supported by Keeper, Starter and other Python-Qt utilities.
 
 -   RapidJSON library updated to 1.1.0
 
