@@ -579,7 +579,9 @@ var d_cvtguiparams = {
 	},
 	audio_file /****/: {"label": 'Audio', "default": "REF", "tooltip": 'Sound file', 'width': '40%'},
 	af_hostsmask /**/: {'label': 'Hosts Mask', 'width': '40%'},
-	af_paused /*****/: {'label': 'Start Job Paused', 'width': '20%', 'lwidth': '160px', 'type': 'bool'}
+	af_paused /*****/: {'label': 'Start Job Paused', 'width': '20%', 'lwidth': '160px', 'type': 'bool'},
+	overlay_file     : {'width':'75%', "label":'Overlay', "tooltip":'Overlay video file'},
+	overlay_scale    : {'width':'25%', "label":'Scale', "tooltip":'Overlay video scale'}
 };
 
 var d_cvtmulti_params = {
@@ -592,12 +594,20 @@ var d_cvtmulti_params = {
 
 function d_Convert(i_args)
 {
-	var params = {};
+	let params = {};
+
 	params.fps = RULES.fps;
 	if (RULES.dailies.fps)
 		params.fps = RULES.dailies.fps;
 
-	var title = 'Convert ';
+	// Overlay video:
+	if ((activity_Current != null) && (activity_Current.indexOf('anim') != -1))
+	{
+		params.overlay_file = 'REF/' + c_PathBase(g_CurPath()) + '_anim.mp4';
+		params.overlay_scale = RULES.dailies.overlay.ovrscale;
+	}
+
+	let title = 'Convert ';
 	if (i_args.images)
 		title += ' Images';
 	else if (i_args.folders)
@@ -606,11 +616,11 @@ function d_Convert(i_args)
 		title += ' Movies';
 	else if (i_args.results)
 		title += ' Results';
-	var wnd = new cgru_Window({"name": 'dailies', "title": title});
+	let wnd = new cgru_Window({"name": 'dailies', "title": title});
 	wnd.m_args = i_args;
 	wnd.onDestroy = d_CvtOnDestroy;
 
-	var img_types = {
+	let img_types = {
 		jpg /****/: {"name": 'JPG'},
 		png /****/: {"name": 'PNG'},
 		dpx /****/: {"name": 'DPX'},
@@ -629,6 +639,14 @@ function d_Convert(i_args)
 	});
 
 	gui_Create(wnd.elContent, d_cvtguiparams, [params, RULES, RULES.dailies]);
+
+	gui_CreateChoices({
+		"wnd": wnd.elContent,
+		"name": 'ovrpos',
+		"value": RULES.dailies.overlay.ovrpos,
+		"label": 'Position:',
+		"keys": RULES.dailies.overlay.ovrpos_choises
+	});
 
 	gui_CreateChoices(
 		{"wnd": wnd.elContent, "name": 'imgtype', "value": 'jpg', "label": 'Image Type:', "keys": img_types});
@@ -1010,6 +1028,27 @@ function d_CvtMovies(i_wnd, i_params, i_to_sequence)
 		{
 			cmd += ' -w "' + i_wnd.wm.file + '"';
 			cmd += ' -u "' + i_wnd.wm.params.text + '"';
+		}
+
+		// Video overlay:
+		if ((i_params.overlay_file != null) && (i_params.overlay_file.length))
+		{
+			cmd += ' --ovrfile "' + i_params.overlay_file + '"';
+			if ((i_params.overlay_scale != null) && (i_params.overlay_scale.length))
+			{
+				let overlay_scale = parseFloat(i_params.overlay_scale);
+				if (Number.isNaN(overlay_scale))
+					c_Error('Overlay scale is not a number: ' + i_params.overlay_scale);
+				else
+					cmd += ' --ovrscale ' + overlay_scale;
+			}
+
+			if (i_params.ovrpos == 'bot_right')
+				cmd += ' --ovrbottom';
+			else if (i_params.ovrpos == 'bot_left')
+				cmd += ' --ovrbottom --ovrleft';
+			else if (i_params.ovrpos == 'top_left')
+				cmd += ' --ovrleft';
 		}
 	}
 

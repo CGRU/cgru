@@ -255,8 +255,11 @@ else:
         elif Options.ovrleft:
             ovr_pos = 'W/100:H/7'
 
-        filter_complex[-1] += ' [base]'
-        filter_complex.append('[1:v][base] scale2ref=w=iw*%f:h=-1 [ovr][base]' % Options.ovrscale)
+        if len(filter_complex):
+            filter_complex[-1] += ' [base]'
+            filter_complex.append('[1:v][base] scale2ref=w=iw*%f:h=-1 [ovr][base]' % Options.ovrscale)
+        else:
+            filter_complex.append('[1:v][0:v] scale2ref=w=iw*%f:h=-1 [ovr][base]' % Options.ovrscale)
         filter_complex.append('[base][ovr] overlay=%s' % ovr_pos)
 
     if len(filter_complex):
