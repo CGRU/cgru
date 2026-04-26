@@ -22,6 +22,7 @@ for archive_dir in `ls`; do
 	find "${archive_dir}" -type f -name .gitignore -exec rm -vf {} \;
 	find "${archive_dir}" -type f -name config.json -exec rm -vf {} \;
 	find "${archive_dir}" -type f -name farm.json -exec rm -vf {} \;
+	find "${archive_dir}" -type f -name '*Zone.Identifier' -exec rm -vf {} \;
 	rm -fv ${archive_dir}/software_setup/locate_*
 
 	# Run specific script:

@@ -1184,6 +1184,10 @@ width: 18px; height: 18px;
 padding: 0px;
 margin: 0px 4px;
 }
+.filesview .item .button.player_edited {
+	background-color: rgba(255,155,0,0.5);
+	border: 3px solid #FFAA00;
+}
 .filesview .item .anchor, .filesview .item .icon {
 background-size: 100%;
 background-repeat: no-repeat;
