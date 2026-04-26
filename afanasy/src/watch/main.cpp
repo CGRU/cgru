@@ -106,8 +106,11 @@ int WINAPI WinMain(
   __in  int nCmdShow
 )
 {
-   char * name = "afwatch";
+   const char * cname = "afwatch";
+   char * name = new char[8];
+   strcpy(name, cname);
    char ** ptr = &name;
+
    return main( 1, ptr);
 }
 #endif

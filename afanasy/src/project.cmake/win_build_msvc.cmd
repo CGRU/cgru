@@ -1,5 +1,5 @@
 rem @echo off
-set CMAKE_GENERATOR=Visual Studio 16 2019
+set CMAKE_GENERATOR=Visual Studio 17 2022
 
 pushd ..\..\..
 call setup.cmd
@@ -9,44 +9,46 @@ setlocal EnableDelayedExpansion
 
 rem Cmake finds 'Qt' by searching for 'qmake' in 'PATH'
 set "cgru_qt=C:\Qt"
-For /F "Tokens=*" %%I in ('dir /b "%cgru_qt%\5.*"') Do set "cgru_qt=%cgru_qt%\%%I"
-set "cgru_qt=%cgru_qt%\msvc2019_64"
+For /F "Tokens=*" %%I in ('dir /b "%cgru_qt%\6.*"') Do set "cgru_qt=%cgru_qt%\%%I"
+set "cgru_qt=%cgru_qt%\msvc2022_64"
 if exist !cgru_qt! (
 	echo Adding "!cgru_qt!\bin" to PATH
 	SET "PATH=!cgru_qt!\bin;%PATH%"
 )
 
 set "AF_GUI=YES"
-set "AF_QT_VER=5"
+set "AF_QT_VER=6"
 
 rem Specify Python:
 if exist %CGRU_LOCATION%\python-devel set CGRU_PYTHONDIR=%CGRU_LOCATION%\python-devel
 if defined CGRU_PYTHONDIR (
    echo Building with CGRU Python: "!CGRU_PYTHONDIR!"
    SET "AF_PYTHON_INCLUDE_PATH=!CGRU_PYTHONDIR!\include"
-   SET "AF_PYTHON_LIBRARIES=!CGRU_PYTHONDIR!\libs\python310.lib"
+   SET "AF_PYTHON_LIBRARIES=!CGRU_PYTHONDIR!\libs\python314.lib"
 )
 
 rem Boost:
-set "cgru_boost_install_dir=C:\local"
-For /F "Tokens=*" %%I in ('dir /b "%cgru_boost_install_dir%\boost*"') Do set "BOOST_ROOT=%%I"
-if defined BOOST_ROOT (
-	set "BOOST_ROOT=!cgru_boost_install_dir!\!BOOST_ROOT!"
-	echo BOOST_ROOT set to "!BOOST_ROOT!"
-)
+rem set "cgru_boost_install_dir=C:\local"
+rem For /F "Tokens=*" %%I in ('dir /b "%cgru_boost_install_dir%\boost*"') Do set "BOOST_ROOT=%%I"
+rem if defined BOOST_ROOT (
+rem 	set "BOOST_ROOT=!cgru_boost_install_dir!\!BOOST_ROOT!"
+rem 	echo BOOST_ROOT set to "!BOOST_ROOT!"
+rem )
 
-rem Local overrides:
+echo Local overrides:
 if exist override.cmd call override.cmd
 
-rem Get Afanasy sources revision:
+echo Get Afanasy sources revision:
 pushd ..
 set folder=%CD%
 cd %CGRU_LOCATION%\utilities
 call getrevision.cmd %folder%
 popd
 
+echo Running CMAKE_GENERATOR...
 cmake -G "%CMAKE_GENERATOR%" .
 
+echo Running CMake...
 cmake .
 
 pause
