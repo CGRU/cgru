@@ -977,8 +977,15 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 		el.classList.add('button');
 		el.setAttribute('href', 'player.html#' + play_path);
 		el.setAttribute('target', '_blank');
+		el.title = "Open RULES player.";
 		el.style.backgroundImage = 'url(rules/icons/player.png)';
-		el.title = "Open RULES player in a new window.";
+		if (this.walk.rufiles && this.walk.rufiles.includes(c_PathBase(path) + '.player'))
+		{
+			el.title += "\nEdited.";
+			el.classList.add('player_edited');
+			//el.style.backgroundColor = 'rgba(255,255,0,0.5)';
+			//el.style.backgroundImage = 'url(rules/icons/put.png)';
+		}
 	}
 
 
