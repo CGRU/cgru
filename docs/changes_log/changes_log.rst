@@ -12,9 +12,12 @@ If Afanasy **network protocol changed**, it became incompatible with old one.
   You can upgrade only one client or server for changes.
 
 
+.. _changes-log-latest:
+
+
 v3.4.1
 ======
-*2026.04.23 (not released)*
+2026.04.26
 
 -   New server node logs system. Any action log stored in SQL database
     `logs <../afanasy/server.html#database-schema>`_ table.
@@ -31,13 +34,12 @@ v3.4.1
 
 -   Linux distro/version added to platform string.
 
+-   MS Windows release libs updated to MSVC 2022, Python3.14, Qt6, PySide6.
+
 
 - **Bugfixes:**
 
     - AfRender windows bug. Task process environment not being overridden with extra environment.
-
-
-.. _changes-log-latest:
 
 
 v3.4.0
