@@ -6,9 +6,9 @@ import rulib
 
 '''
 
-python3 -c 'import sys; sys.path.append("/data/cgru/rules"); import rulib; print(rulib.player.init(path="CG_PROJECT/SCENES/A_SCENE/A_SHOT_01//RESULT/JPG/v002"));'
+python3 -c 'import sys; sys.path.append("/data/cgru/rules"); import rulib; print(rulib.player.init(path="/CG_PROJECT/SCENES/A_SCENE/A_SHOT_01//RESULT/JPG/v002"));'
 
-python3 -c 'import sys; sys.path.append("/data/cgru/rules"); import rulib; print(rulib.player.save({"path":"/CHEBURASHKA_II/SHOTS/P1_DEN/P1_DEN_0030//RESULT/JPG/P1_DEN_0030_v004","comments":{"asdf":{"text":"fghddfghg"}},"jpegs":[{"name":"asdf","data":"qwer"}]}));'
+python3 -c 'import sys; sys.path.append("/data/cgru/rules"); import rulib; print(rulib.player.save({"path":"/CG_PROJECT/SCENES/A_SCENE/A_SHOT_01//RESULT/JPG/v002","comments":{"asdf":{"text":"fghddfghg"}},"jpegs":[{"name":"asdf","data":"qwer"}]}));'
 
 '''
 
@@ -100,6 +100,8 @@ def savePNGs(i_obj, out):
     if len(pngs) == 0:
         return
 
+    out['pngs'] = []
+
     for png in pngs:
         path = getPNGPath(i_obj['path'], png['name'])
         path = rulib.functions.getAbsPath(path)
@@ -113,7 +115,9 @@ def savePNGs(i_obj, out):
                 return
 
         if not rulib.functions.fileWrite(path, base64.b64decode(png['data'])):
-            o_out['error'] = 'Unable to open save file: ' + filename
+            out['error'] = 'Unable to open save file: ' + filename
+        else:
+            out['pngs'].append(png['name'])
 
 def saveJPEGs(i_obj, out):
     if not 'jpegs' in i_obj:
@@ -156,7 +160,7 @@ def saveComments(i_obj, uid, out):
     if not 'comments' in comments_obj:
         comments_obj['comments'] = dict()
 
-    text = '<div class="player"><div class="player_title">Player comments:</div>'
+    text = '<div class="player"><a target="_blank" class="player_title" href="%s">Player comments:</a>' % ('player.html#' + i_obj['path'])
     for name in icomments:
         cm = icomments[name]
         if 'cuser' in cm:
@@ -171,10 +175,8 @@ def saveComments(i_obj, uid, out):
         img_path = rulib.RULES_TOP['root'] + '/' + img_path
 
         text += '<p class="player_comment">'
-        text += '<a class="player_img_link" target="_blank" href="%s">' % img_path
-        text += '<div class="player_img_name">' + name + '</div>'
-        text += '<img class="player_img" src="%s" href="%s">' % (img_path, img_path)
-        text += '</a>'
+        text += '<a target="_blank" href="%s" class="player_name_link"><div class="player_name">%s</div></a>' % (img_path, name)
+        text += '<a target="_blank" href="%s" class="player_img_link"><img class="player_img" src="%s"></a>' % (img_path, img_path)
         text += '<div class="player_comment_text">' + cm['text'] + '</div>';
         text += '</p>'
     text += '</div>'

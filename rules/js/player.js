@@ -1415,12 +1415,45 @@ function p_SavedFile(i_data, i_args)
 	}
 }
 
-function p_SavingFinished(i_args, i_data)
+function p_SavingFinished(i_data, i_args)
 {
+	if (i_data == null)
+	{
+		c_Error('Saving failed.');
+		return;
+	}
+	if (i_data.error)
+	{
+		c_Error(i_data.error);
+		return;
+	}
+	i_data = i_data.player;
+	if (i_data == null)
+	{
+		c_Error('Invalid data received.');
+		return;
+	}
+	if (i_data.error)
+	{
+		c_Error(iplayer.error);
+		return;
+	}
+
+	if (i_data.pngs && i_data.pngs.length)
+	{
+		for (name of i_data.pngs)
+		{
+			let frame = p_filenames.indexOf(name);
+			if (p_imageMode)
+				frame = 0;
+			if (p_paintElCanvas[frame])
+				p_paintElCanvas[frame].m_saved = true;
+		}
+	}
+
 	p_saving = false;
 	$('save_btn').classList.remove('pushed');
-//	if (folder && p_filessaved)
-//		c_Info('Saved ' + p_filessaved + ' images to "' + folder + '"');
+	c_Info('Saved.');
 	p_SetEditingState(true);
 }
 

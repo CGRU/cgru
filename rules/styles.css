@@ -1388,11 +1388,18 @@ border-radius: 2px;
 
 .comment .text.editing {border: 1px solid rgba(0,0,0,.5);}
 
+.comment .player {
+	text-align: center;
+}
 .comment .player_img_link {
-	display: block;
+	text-align: center;
+	display: inline;
+	border: 2px solid rgba(98,98,98,.5);
+	box-shadow: inset 0px 0px 16px rgba(0,0,0,0.5);
 }
 .comment .player_img {
-	display: block;
+	display: inline;
+	border-radius: 24px;
 	width: 75%;
 }
 

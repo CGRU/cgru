@@ -49,18 +49,18 @@ def thumbnailArgs(i_args):
                 # print('ERROR: folder "%s" does not exist.' % folder)
                 continue
             for root, dirs, files in os.walk(folder):
+                if i_args.verbose:
+                    print('\nROOT='+root)
                 # Skip folder:
                 if len(files) == 0:
                     continue
                 to_skip = False
 
-                root_basename = os.path.basename(root)
-                if len(root_basename):
-                    if root_basename[0] in '._':
-                        to_skip = True
+                if root.find('/.') != -1 or root.find('/_') != -1:
+                    to_skip = True
                 if not to_skip:
                     for skip in SkipFolders:
-                        if root_basename.lower().find(skip) != -1:
+                        if root.lower().find(skip) != -1:
                             to_skip = True
                             break
                 if to_skip:
