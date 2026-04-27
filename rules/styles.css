@@ -817,7 +817,7 @@ padding: 2px 0px 2px 8px;
 margin: 1px;
 }
 #playlist .item .button.delete {
-float: right; width: 10px; height: 10px; opacity: .7;
+float: right; width: 10px; height: 10px; margin-right: 8px; opacity: .7;
 }
 #playlist .pathlink { font-size: 14px; padding: 0px 0px 0px 8px; border-top: 1px solid rgba(100,100,100,.5); }
 #playlist .pathlink.cur_path { background: rgba( 100, 255, 255, .2 ); }
