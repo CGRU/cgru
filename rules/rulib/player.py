@@ -1,3 +1,4 @@
+import base64
 import os
 
 import rulib
@@ -5,11 +6,22 @@ import rulib
 
 '''
 
-python3 -c 'import sys; sys.path.append("/data/cgru/rules"); import rulib; print(rulib.player.playerInit(path="CG_PROJECT/SCENES/A_SCENE/A_SHOT_01//RESULT/JPG/v002"));'
+python3 -c 'import sys; sys.path.append("/data/cgru/rules"); import rulib; print(rulib.player.init(path="CG_PROJECT/SCENES/A_SCENE/A_SHOT_01//RESULT/JPG/v002"));'
+
+python3 -c 'import sys; sys.path.append("/data/cgru/rules"); import rulib; print(rulib.player.save({"path":"/CHEBURASHKA_II/SHOTS/P1_DEN/P1_DEN_0030//RESULT/JPG/P1_DEN_0030_v004","comments":{"asdf":{"text":"fghddfghg"}},"jpegs":[{"name":"asdf","data":"qwer"}]}));'
 
 '''
 
-def playerInit(path=None, out=None):
+def getSavePath(i_path):
+    return os.path.dirname(i_path) + '/.rules/' + os.path.basename(i_path) + '.player'
+def getJPEGPath(i_path, i_name):
+    path = getSavePath(i_path)
+    return path + '/' + i_name + '.jpg'
+def getPNGPath(i_path, i_name):
+    path = getSavePath(i_path)
+    return path + '/canvas/' + i_name + '.png'
+
+def init(path=None, out=None):
     if out is None:
         out = dict()
 
@@ -38,7 +50,7 @@ def playerInit(path=None, out=None):
         out['sound'] = sound_path
 
 
-    save_path = os.path.dirname(abspath) + '/.rules/' + os.path.basename(abspath) + '.player'
+    save_path = getSavePath(abspath)
     if os.path.isdir(save_path):
 
         data = rulib.functions.readObj(os.path.join(save_path, 'data.json'))
@@ -59,4 +71,116 @@ def playerInit(path=None, out=None):
                 out['painted'].append(name)
 
     return out
+
+
+def save(i_obj, uid=None, out=None):
+    if out is None:
+        out = dict()
+    if uid is None:
+        uid = rulib.functions.getCurUser()
+
+    if not os.path.isdir(rulib.functions.getAbsPath(i_obj['path'])):
+        out['error'] = 'Folder %s does not exist.' % path
+        return out
+
+    out['path'] = i_obj['path']
+
+    savePNGs(i_obj, out);
+    saveJPEGs(i_obj, out);
+    saveComments(i_obj, uid, out);
+
+    return out
+
+def savePNGs(i_obj, out):
+    if not 'pngs' in i_obj:
+        return
+
+    pngs = i_obj['pngs']
+
+    if len(pngs) == 0:
+        return
+
+    for png in pngs:
+        path = getPNGPath(i_obj['path'], png['name'])
+        path = rulib.functions.getAbsPath(path)
+        dirname = os.path.dirname(path)
+
+        if not os.path.isdir(dirname):
+            try:
+                os.makedirs(dirname, mode=0o777)
+            except:
+                out['error'] = '%s' % traceback.format_exc()
+                return
+
+        if not rulib.functions.fileWrite(path, base64.b64decode(png['data'])):
+            o_out['error'] = 'Unable to open save file: ' + filename
+
+def saveJPEGs(i_obj, out):
+    if not 'jpegs' in i_obj:
+        return
+
+    jpegs = i_obj['jpegs']
+
+    if len(jpegs) == 0:
+        return
+
+    for jpg in jpegs:
+        path = getJPEGPath(i_obj['path'], jpg['name'])
+        path = rulib.functions.getAbsPath(path)
+        dirname = os.path.dirname(path)
+
+        if not os.path.isdir(dirname):
+            try:
+                os.makedirs(dirname, mode=0o777)
+            except:
+                out['error'] = '%s' % traceback.format_exc()
+                return
+
+        if not rulib.functions.fileWrite(path, base64.b64decode(jpg['data'])):
+            o_out['error'] = 'Unable to open save file: ' + filename
+
+def saveComments(i_obj, uid, out):
+    if not 'comments' in i_obj:
+        return
+
+    icomments = i_obj['comments']
+
+    if len(icomments) == 0:
+        return
+
+    comments_path = getSavePath(i_obj['path']) + '/data.json'
+    comments_path = rulib.functions.getAbsPath(comments_path)
+    comments_obj = rulib.functions.readObj(comments_path)
+    if comments_obj is None:
+        comments_obj = dict()
+    if not 'comments' in comments_obj:
+        comments_obj['comments'] = dict()
+
+    text = '<div class="player"><div class="player_title">Player comments:</div>'
+    for name in icomments:
+        cm = icomments[name]
+        if 'cuser' in cm:
+            cm['muser'] = uid
+            cm['mtime'] = rulib.functions.getCurSeconds()
+        else:
+            cm['cuser'] = uid
+            cm['ctime'] = rulib.functions.getCurSeconds()
+        comments_obj['comments'][name] = cm
+
+        img_path = getJPEGPath(i_obj['path'], name)
+        img_path = rulib.RULES_TOP['root'] + '/' + img_path
+
+        text += '<p class="player_comment">'
+        text += '<a class="player_img_link" target="_blank" href="%s">' % img_path
+        text += '<div class="player_img_name">' + name + '</div>'
+        text += '<img class="player_img" src="%s" href="%s">' % (img_path, img_path)
+        text += '</a>'
+        text += '<div class="player_comment_text">' + cm['text'] + '</div>';
+        text += '</p>'
+    text += '</div>'
+
+    rulib.functions.writeObj(comments_path, comments_obj)
+
+    rules_path = i_obj['path'].split('//')[0]
+    rulib.setComment(paths=[rules_path], uid=uid, ctype=None, text=text, tags=None, duration=None, color=None, uploads=None, deleted=False, nonews=None, out=out, key=None)
 

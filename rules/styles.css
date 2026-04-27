@@ -1388,6 +1388,14 @@ border-radius: 2px;
 
 .comment .text.editing {border: 1px solid rgba(0,0,0,.5);}
 
+.comment .player_img_link {
+	display: block;
+}
+.comment .player_img {
+	display: block;
+	width: 75%;
+}
+
 .inserted_image_div {
 text-align: center;
 margin: 8px;

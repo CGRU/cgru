@@ -446,7 +446,15 @@ class Requests:
             o_out['error'] = 'Path is not specified.'
             return
         out = dict()
-        rulib.player.playerInit(path=i_args['path'], out=out)
+        rulib.player.init(path=i_args['path'], out=out)
+        o_out['player'] = out
+
+    def req_player_save(self, i_args, o_out):
+        if not 'path' in i_args:
+            o_out['error'] = 'Path is not specified.'
+            return
+        out = dict()
+        rulib.player.save(i_args, self.session.USER_ID, out=out)
         o_out['player'] = out
 
 

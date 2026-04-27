@@ -1025,15 +1025,98 @@ function p_Save()
 
 	if (p_saving)
 		return;
-
-	p_saving = true;
-	$('save_btn').classList.add('pushed');
-
+/*
 	p_filestosave = 0;
 	p_filessaved = 0;
 
 	p_CommentsSave();
 	p_PaintSave();
+*/
+	let obj = {};
+	obj.path = p_path_hash;
+	obj.comments = {};
+	obj.pngs = [];
+	obj.jpegs = [];
+	let need_save = false;
+
+	// Collect comments:
+	for (let f = 0; f < p_images.length; f++)
+	{
+		if (p_comments[f] == null)
+			continue;
+		if (p_comments[f].text == null)
+			continue;
+		if (p_comments[f].text.length == 0)
+			continue;
+
+		let cm = p_comments[f];
+		if (cm.saved)
+			continue;
+		cm.saved = true;
+
+		obj.comments[p_filenames[f]] = cm;
+
+		need_save = true;
+	}
+
+	// Collect images:
+	for (let f = 0; f < p_images.length; f++)
+	{
+		let canvas = p_paintElCanvas[f];
+		let canvas_dummy = false;
+		if (canvas == null)
+		{
+			if (p_comments[f] == null)
+				continue;
+			canvas = document.createElement("canvas");
+			canvas.width = p_images[f].width;
+			canvas.height = p_images[f].height;
+			canvas.m_edited = true;
+			canvas_dummy = true;
+		}
+		if (canvas.m_edited != true)
+			continue;
+		if (canvas.m_saved)
+			continue;
+
+		//p_filestosave++;
+
+		if (p_imageMode)
+		{
+			let path = RULES.root + p_savepath + '/' + p_filenames[f];
+		}
+		else if (true != canvas_dummy)
+		{
+			let png_data = canvas.toDataURL('image/png');
+			png_data = png_data.substr(png_data.indexOf(',') + 1);
+			//let png_path = RULES.root + p_savepath + '/canvas/' + p_filenames[f] + '.png';
+
+			//p_filestosave++;
+			obj.pngs.push({"name":p_filenames[f],"data":png_data});
+		}
+
+		// Create JPG for comments:
+		let ctx = canvas.getContext('2d');
+		ctx.globalCompositeOperation = 'destination-over';
+		ctx.drawImage(p_images[f], 0, 0);
+		let jpg_data = canvas.toDataURL('image/jpeg', .7);
+		jpg_data = jpg_data.substr(jpg_data.indexOf(',') + 1);
+
+		obj.jpegs.push({"name":p_filenames[f],"data":jpg_data});
+
+		need_save = true;
+	}
+
+
+	if (false == need_save)
+		return;
+
+
+	//console.log(JSON.stringify(obj));
+	p_saving = true;
+	$('save_btn').classList.add('pushed');
+
+	n_Request({'send':{'player_save':obj},'func':p_SavingFinished,'info':'player save','wait':false});
 }
 
 function p_SetEditingState(i_update_whole_bar)
@@ -1332,12 +1415,12 @@ function p_SavedFile(i_data, i_args)
 	}
 }
 
-function p_SavingFinished(folder)
+function p_SavingFinished(i_args, i_data)
 {
 	p_saving = false;
 	$('save_btn').classList.remove('pushed');
-	if (folder && p_filessaved)
-		c_Info('Saved ' + p_filessaved + ' images to "' + folder + '"');
+//	if (folder && p_filessaved)
+//		c_Info('Saved ' + p_filessaved + ' images to "' + folder + '"');
 	p_SetEditingState(true);
 }
 
