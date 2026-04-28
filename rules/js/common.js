@@ -605,7 +605,7 @@ function c_CanEditShot(i_user)
 	if (i_user == null)
 		return false;
 
-	if ((['admin', 'coord', 'user']).indexOf(i_user.role) != -1)
+	if ((['admin', 'coord', 'user','leader']).indexOf(i_user.role) != -1)
 		return true;
 	return false;
 }
