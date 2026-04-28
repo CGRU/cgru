@@ -1475,6 +1475,42 @@ function p_PaintSetState()
 	$('paint_btn').style.boxShadow = shadow;
 }
 
+function p_DeleteAll()
+{
+	c_Info('Deleting all comments and painted...');
+	n_Request({'send':{'player_delete_all':{'path':p_path_hash}},'func':p_DeleteAllFinished,'info':'player delete','wait':false});
+}
+function p_DeleteAllFinished(i_data, i_args)
+{
+	if (i_data == null)
+	{
+		c_Error('Data is NULL.');
+		return;
+	}
+	if (i_data.error)
+	{
+		c_Error(i_data.error);
+		return;
+	}
+	i_data = i_data.player;
+	if (i_data == null)
+	{
+		c_Error('Data is NULL.');
+		return;
+	}
+	if (i_data.error)
+	{
+		c_Error(i_data.error);
+		return;
+	}
+
+	if (i_data.save_path)
+	{
+		c_Info('Folder "'+i_data.save_path+'" deleted. Refresh browser.');
+		document.location.reload();
+	}
+}
+
 // ===================== Comments: ===================
 
 function p_Comment()

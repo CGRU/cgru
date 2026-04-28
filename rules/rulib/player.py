@@ -1,5 +1,7 @@
 import base64
 import os
+import shutil
+import traceback
 
 import rulib
 
@@ -187,3 +189,24 @@ def saveComments(i_obj, uid, out):
     rules_path = i_obj['path'].split('//')[0]
     rulib.setComment(paths=[rules_path], uid=uid, ctype=None, text=text, tags=None, duration=None, color=None, uploads=None, deleted=False, nonews=None, out=out, key=None)
 
+
+def deleteAll(path=None, out=None):
+    if out is None:
+        out = dict()
+
+    abspath = os.getcwd()
+    if path:
+        abspath = rulib.functions.getAbsPath(path)
+
+    save_path = getSavePath(abspath)
+    if not os.path.isdir(abspath):
+        out['error'] = 'Folder %s does not exist.' % path
+        return out
+
+    try:
+        shutil.rmtree(save_path)
+    except:
+        out['error'] = '%s' % traceback.format_exc()
+        return out
+
+    out['save_path'] = save_path
