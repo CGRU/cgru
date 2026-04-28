@@ -21,6 +21,7 @@ var p_PLAYER = true;
 // TODO: not pollute the global scope with so much vars, should be bundled into struct objects
 var player = null;
 var p_audio = null;
+var p_video = null;
 var p_savepath = null;
 
 var p_imgTypes = ['jpg', 'jpeg', 'png'];
@@ -81,7 +82,7 @@ var p_fps = 24.0;
 var p_interval = 40;
 var p_drawTime = new Date();
 
-var p_elements = ['player_content', 'play_slider', 'frame_bar', 'view', 'preview', 'framerate','audio'];
+var p_elements = ['player_content', 'play_slider', 'frame_bar', 'view', 'preview', 'framerate','audio','video'];
 var p_el = {};
 var p_buttons = ['play', 'prev', 'next', 'reverse', 'rewind', 'forward'];
 var p_elb = {};
@@ -350,52 +351,69 @@ function p_PlayerInit(i_data)
 		return;
 	}
 
-	let images = player.images;
-	if (images == null)
-	{
-		c_Error('No images data received.');
-		return;
-	}
-	if ((images.length == null) || (images.length == 0))
-	{
-		c_Error('No images received.');
-		return;
-	}
-
 	p_filenames = [];
 	p_fileObjs = {};
 	p_fileSizeTotal = 0;
 	p_fileSizeLoaded = 0;
 	p_loadStartMS = (new Date()).valueOf();
 
-	//images.sort(c_CompareFiles);
+	let movie = player.movie;
+	let images = player.images;
 
-	//for (var i = 0; i < walk.files.length; i++)
-	for (let i = 0; i < images.length; i++)
+	if (movie)
 	{
-		let iobj = images[i];
-		let file = iobj.name;
-		p_fileObjs[file] = iobj;
-		if (iobj.size)
-			p_fileSizeTotal += iobj.size;
-		let type = file.split('.').pop().toLowerCase();
-		if (p_imgTypes.indexOf(type) == -1)
-			continue;
-		let img = new Image();
-		img.src = RULES.root + p_path + '/' + file;
-		img.onload = function(e) { p_ImgLoaded(e); };
-		img.onerror = function(e) { p_ImgLoadError(e); };
-		img.m_file = iobj;
-		p_filenames.push(file);
-		p_images.push(img);
-
-		if (player.comments && player.comments[file])
-			p_comments[i] = player.comments[file];
+		c_Info('Loading video: ' + movie.name + ' ' + c_Bytes2KMG(movie.size));
+		p_video = p_el.video;
+		p_video.src = RULES.root + p_path;
+		p_video.play();
+		p_video.oncanplay = p_VideoCanPlay;
 	}
-
-	if (p_filenames == null || (p_filenames.length == 0))
+	else if (images)
 	{
-		c_Error('No JPEG or PNG Files Found.');
+		if ((images.length == null) || (images.length == 0))
+		{
+			c_Error('No images received.');
+			return;
+		}
+
+		for (let i = 0; i < images.length; i++)
+		{
+			let iobj = images[i];
+			let file = iobj.name;
+			p_fileObjs[file] = iobj;
+			if (iobj.size)
+				p_fileSizeTotal += iobj.size;
+			let type = file.split('.').pop().toLowerCase();
+			if (p_imgTypes.indexOf(type) == -1)
+				continue;
+			let img = new Image();
+			img.src = RULES.root + p_path + '/' + file;
+			img.onload = function(e) { p_ImgLoaded(e); };
+			img.onerror = function(e) { p_ImgLoadError(e); };
+			img.m_file = iobj;
+			p_filenames.push(file);
+			p_images.push(img);
+
+			if (player.comments && player.comments[file])
+			{
+				let cm = player.comments[file];
+				cm.saved = true;
+				p_comments[i] = cm;
+			}
+		}
+
+		if (p_filenames == null || (p_filenames.length == 0))
+		{
+			c_Error('No JPEG or PNG Files Found.');
+			return;
+		}
+
+		c_Info('Loading ' + p_images.length + ' images: ' + c_Bytes2KMG(p_fileSizeTotal));
+		p_Info('Loading images sequence');
+	}
+	else
+	{
+		c_Error('No valid data received.');
 		return;
 	}
 
@@ -418,41 +436,54 @@ function p_PlayerInit(i_data)
 */
 	p_savepath = c_PathDir(p_path) + '/.rules/' + c_PathBase(p_path) + '.player';
 
-	c_Info('Loading ' + p_images.length + ' images: ' + c_Bytes2KMG(p_fileSizeTotal));
-	p_Info('Loading images sequence');
-
 	window.document.title = p_path.substr(p_path.lastIndexOf('/') + 1) + '/' + p_filenames[0];
+}
+
+function p_VideoCanPlay(e)
+{
+console.log(p_video);
+	p_video.oncanplay = null;
+	video.pause();
+	video.currentTime = 0;
+	const frames_num = Math.floor(video.duration * p_fps);
+	for (let f = 0; f < frames_num; f++)
+	{
+		video.currentTime = f * p_fps;
+		let img = new Image();
+		//img.m_file = iobj;
+		let name = '';
+		p_filenames.push(name);
+		p_images.push(img);
+	}
 }
 
 function p_ImgLoadError(e)
 {
 	p_ImgLoaded(e);
-	var img = e.currentTarget;
+	let img = e.currentTarget;
 	img.m_loaderror = true;
 	c_Error('Image load error: ' + img.m_file.name);
 }
 function p_ImgLoaded(e)
 {
-	var img = e.currentTarget;
+	let img = e.currentTarget;
 	p_numloaded++;
 	if (img.m_file && img.m_file.size)
 		p_fileSizeLoaded += img.m_file.size;
 
-	var info = 'Loaded ' + p_numloaded + ' of ' + p_filenames.length + ' images';
+	let info = 'Loaded ' + p_numloaded + ' of ' + p_filenames.length + ' images';
 	info += ': ' + c_Bytes2KMG(p_fileSizeLoaded) + ' of ' + c_Bytes2KMG(p_fileSizeTotal);
 
-	var now_ms = (new Date()).valueOf();
-	var sec = (now_ms - p_loadStartMS) / 1000;
+	let now_ms = (new Date()).valueOf();
+	let sec = (now_ms - p_loadStartMS) / 1000;
 	if (sec > 0)
 	{
-		var speed = p_fileSizeLoaded / sec;
+		let speed = p_fileSizeLoaded / sec;
 		info += ': ' + c_Bytes2KMG(speed) + '/s';
 	}
 
 	c_Info(info, false);
 	p_el.play_slider.style.width = Math.round(100.0 * p_numloaded / p_filenames.length) + '%';
-
-	//	if( img.complete != true ) c_Error('Image load incomplete: ' + img.m_file.name);
 
 	// Show loaded image, but not more often than half a second (500ms)
 	if ((p_loadLastMS == null) || (now_ms - p_loadLastMS > 500))
@@ -461,8 +492,12 @@ function p_ImgLoaded(e)
 		p_loadLastMS = now_ms;
 	}
 
-	if (p_numloaded < p_filenames.length)
-		return;
+	if (p_numloaded >= p_filenames.length)
+		p_AllImagesReady();
+}
+
+function p_AllImagesReady()
+{
 
 	// Hide preview element:
 	p_el.preview.style.display = 'none';
@@ -492,17 +527,19 @@ function p_ImgLoaded(e)
 	//	setTimeout('p_ViewHome();',100);
 
 	// Just information:
-	var info = p_images.length + ' images ' + p_images[0].width + 'x' + p_images[0].height;
+	let now_ms = (new Date()).valueOf();
+	let sec = (now_ms - p_loadStartMS) / 1000;
+	let info = p_images.length + ' images ' + p_images[0].width + 'x' + p_images[0].height;
 	if (p_fileSizeTotal)
 		info += ': loaded ' + c_Bytes2KMG(p_fileSizeTotal);
 	info += ' at ' + sec.toFixed(1) + ' seconds';
 	if ((sec > 0) && p_fileSizeTotal)
 	{
-		var speed = p_fileSizeLoaded / sec;
+		let speed = p_fileSizeLoaded / sec;
 		info += ': ' + c_Bytes2KMG(speed) + '/s';
 	}
-	var loaderror = 0;
-	for (var f = 0; f < p_images.length; f++)
+	let loaderror = 0;
+	for (let f = 0; f < p_images.length; f++)
 		if (p_images[f].m_loaderror)
 			loaderror++;
 	if (loaderror)

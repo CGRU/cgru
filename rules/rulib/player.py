@@ -31,23 +31,33 @@ def init(path=None, out=None):
     if path:
         abspath = rulib.functions.getAbsPath(path)
 
-    if not os.path.isdir(abspath):
-        out['error'] = 'Folder %s does not exist.' % path
-        return out
+    if os.path.isfile(abspath):
+        name, ext = os.path.splitext(abspath)
+        if ext in ['.mp4']:
+            movie = dict()
+            movie['name'] = os.path.basename(abspath)
+            movie['size'] = os.path.getsize(abspath)
+            out['movie'] = movie
+        else:
+            out['error'] = 'File %s not recognized.' % path
+            return out
+    else:
+        if not os.path.isdir(abspath):
+            out['error'] = 'Folder %s does not exist.' % path
+            return out
 
-    out['path'] = path
-    out['images'] = []
-    for name in sorted(os.listdir(abspath)):
-        if name[0] == '.':
-            continue
-        img = dict()
-        img['name'] = name
-        img['size'] = os.path.getsize(os.path.join(abspath, name))
-        out['images'].append(img)
+        out['path'] = path
+        out['images'] = []
+        for name in sorted(os.listdir(abspath)):
+            if name[0] == '.':
+                continue
+            img = dict()
+            img['name'] = name
+            img['size'] = os.path.getsize(os.path.join(abspath, name))
+            out['images'].append(img)
 
 
     sound_path = path.split('//')[0] + '/REF/sound.wav'
-    print(sound_path)
     if os.path.isfile(rulib.functions.getAbsPath(sound_path)):
         out['sound'] = sound_path
 
