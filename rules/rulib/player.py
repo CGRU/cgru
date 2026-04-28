@@ -173,6 +173,7 @@ def saveComments(i_obj, uid, out):
 
         img_path = getJPEGPath(i_obj['path'], name)
         img_path = rulib.RULES_TOP['root'] + '/' + img_path
+        img_path = img_path.replace('//','/')
 
         text += '<p class="player_comment">'
         text += '<a target="_blank" href="%s" class="player_name_link"><div class="player_name">%s</div></a>' % (img_path, name)
