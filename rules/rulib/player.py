@@ -176,7 +176,7 @@ def saveComments(i_obj, uid, out):
 
         text += '<p class="player_comment">'
         text += '<a target="_blank" href="%s" class="player_name_link"><div class="player_name">%s</div></a>' % (img_path, name)
-        text += '<a target="_blank" href="%s" class="player_img_link"><img class="player_img" src="%s"></a>' % (img_path, img_path)
+        text += '<a target="_blank" href="%s" class="player_img_link"><div class="player_img" style="background-image:url(%s)"></div></a>' % (img_path, img_path)
         text += '<div class="player_comment_text">' + cm['text'] + '</div>';
         text += '</p>'
     text += '</div>'
