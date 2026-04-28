@@ -366,7 +366,8 @@ function p_PlayerInit(i_data)
 		p_video = p_el.video;
 		p_video.src = RULES.root + p_path;
 		p_video.play();
-		p_video.oncanplay = p_VideoCanPlay;
+		//p_video.onloadeddata = p_VideoCanPlay;
+		p_video.oncanplaythrough = p_VideoCanPlay;
 	}
 	else if (images)
 	{
@@ -441,20 +442,42 @@ function p_PlayerInit(i_data)
 
 function p_VideoCanPlay(e)
 {
-console.log(p_video);
-	p_video.oncanplay = null;
-	video.pause();
-	video.currentTime = 0;
+//console.log(p_video);
+	p_video.oncanplaythrough = null;
+	p_video.pause();
+	p_video.currentTime = 0;
 	const frames_num = Math.floor(video.duration * p_fps);
 	for (let f = 0; f < frames_num; f++)
 	{
-		video.currentTime = f * p_fps;
-		let img = new Image();
-		//img.m_file = iobj;
-		let name = '';
+		let name = c_PathBase(p_path) + '.' + f;
 		p_filenames.push(name);
-		p_images.push(img);
 	}
+
+	p_video.onseeked = p_VideoCaptureFrame;
+}
+function p_VideoCaptureFrame()
+{
+	let img = new Image();
+	p_images.push(img);
+	//img.m_file = iobj;
+
+	let canvas = document.createElement('canvas');
+	canvas.height = p_video.videoHeight;
+	canvas.width = p_video.videoWidth;
+	let ctx = canvas.getContext('2d');
+	ctx.drawImage(p_video, 0, 0, canvas.width, canvas.height);
+	img.src = canvas.toDataURL();
+
+	p_numloaded++;
+
+	if (p_numloaded >= p_filenames.length)
+	{
+		p_video.style.display = 'none';
+		p_AllImagesReady();
+		return;
+	}
+
+	video.currentTime = p_numloaded / p_fps;
 }
 
 function p_ImgLoadError(e)
