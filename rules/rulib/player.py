@@ -154,24 +154,10 @@ def saveComments(i_obj, uid, out):
     if len(icomments) == 0:
         return
 
-    comments_path = getSavePath(i_obj['path']) + '/data.json'
-    comments_path = rulib.functions.getAbsPath(comments_path)
-    comments_obj = rulib.functions.readObj(comments_path)
-    if comments_obj is None:
-        comments_obj = dict()
-    if not 'comments' in comments_obj:
-        comments_obj['comments'] = dict()
-
+    # Generate comments for RULES:
     text = '<div class="player"><a target="_blank" class="player_title" href="%s">Player comments:</a>' % ('player.html#' + i_obj['path'])
     for name in icomments:
         cm = icomments[name]
-        if 'cuser' in cm:
-            cm['muser'] = uid
-            cm['mtime'] = rulib.functions.getCurSeconds()
-        else:
-            cm['cuser'] = uid
-            cm['ctime'] = rulib.functions.getCurSeconds()
-        comments_obj['comments'][name] = cm
 
         img_path = getJPEGPath(i_obj['path'], name)
         img_path = rulib.RULES_TOP['root'] + '/' + img_path
@@ -183,14 +169,46 @@ def saveComments(i_obj, uid, out):
         text += '<div class="player_comment_text">' + cm['text'] + '</div>';
         text += '</p>'
     text += '</div>'
+    # Save RULES comments:
+    rules_path = i_obj['path'].split('//')[0]
+    cm_out = dict()
+    rulib.setComment(paths=[rules_path], uid=uid, ctype=None, text=text, tags=None, duration=None, color=None, uploads=None, deleted=False, nonews=None, out=cm_out, key=None)
+    cm_key = cm_out['comments'][rules_path]['key']
 
+    # Prepare PLAYER comments:
+    comments_path = getSavePath(i_obj['path']) + '/data.json'
+    comments_path = rulib.functions.getAbsPath(comments_path)
+    comments_obj = rulib.functions.readObj(comments_path)
+    if comments_obj is None:
+        comments_obj = dict()
+    if not 'comments' in comments_obj:
+        comments_obj['comments'] = dict()
+    # Generate PLAYER comments:
+    for name in icomments:
+        cm = dict()
+        if name in comments_obj['comments']:
+            cm = comments_obj['comments'][name]
+
+        cm['text'] = icomments[name]['text']
+
+        if not 'keys' in cm:
+            cm['keys'] = []
+        cm['keys'].append(cm_key)
+
+        if 'cuser' in cm:
+            cm['muser'] = uid
+            cm['mtime'] = rulib.functions.getCurSeconds()
+        else:
+            cm['cuser'] = uid
+            cm['ctime'] = rulib.functions.getCurSeconds()
+
+        comments_obj['comments'][name] = cm
+
+    # Save PLAYER comments:
     rulib.functions.writeObj(comments_path, comments_obj)
 
-    rules_path = i_obj['path'].split('//')[0]
-    rulib.setComment(paths=[rules_path], uid=uid, ctype=None, text=text, tags=None, duration=None, color=None, uploads=None, deleted=False, nonews=None, out=out, key=None)
 
-
-def deleteAll(path=None, out=None):
+def deleteAll(path=None, uid=None, out=None):
     if out is None:
         out = dict()
 
@@ -199,10 +217,30 @@ def deleteAll(path=None, out=None):
         abspath = rulib.functions.getAbsPath(path)
 
     save_path = getSavePath(abspath)
-    if not os.path.isdir(abspath):
+    if not os.path.isdir(save_path):
         out['error'] = 'Folder %s does not exist.' % path
         return out
 
+    # Delete comments from RULES:
+    comments_path = save_path + '/data.json'
+    comments_obj = rulib.functions.readObj(comments_path)
+    if comments_obj and 'comments' in comments_obj:
+        rupath = path.split('//')[0]
+        rcms = rulib.comments.Comments(uid, rupath)
+        for name in comments_obj['comments']:
+            cm = comments_obj['comments'][name]
+            if 'keys' in cm:
+                for key in cm['keys']:
+                    cout = dict()
+                    rcms.add(deleted=True, out=cout, key=key)
+                    if 'error' in cout:
+                        out['error'] = cout['error']
+                cout = dict()
+                rcms.save(cout)
+                if 'error' in cout:
+                    out['error'] = cout['error']
+
+    # Delete player save path:
     try:
         shutil.rmtree(save_path)
     except:
@@ -210,3 +248,5 @@ def deleteAll(path=None, out=None):
         return out
 
     out['save_path'] = save_path
+
+    return out
