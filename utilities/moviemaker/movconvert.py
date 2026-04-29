@@ -182,6 +182,8 @@ else:
         print('ERROR: Can`t find codec "%s"' % Codec)
         sys.exit(1)
 
+    inputs = '"%s"' % Input
+
     with open(Codec) as f:
         lines = f.readlines()
 
@@ -277,7 +279,7 @@ else:
         avcmd += ' -pattern_type glob'
 
     cmd = cmd.replace('@AVCMD@', avcmd)
-    cmd = cmd.replace('@INPUT@', Input)
+    cmd = cmd.replace('@INPUT@', inputs)
     cmd = cmd.replace('@MOVIEMAKER@', MOVIEMAKER)
     cmd = cmd.replace('@CODECSDIR@', CODECSDIR)
     cmd = cmd.replace('@FPS@', Options.fps)
