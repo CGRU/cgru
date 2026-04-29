@@ -967,7 +967,8 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 
 
 	// Folder HTML player button:
-	if (i_isFolder && ASSET && ((ASSET.path != g_CurPath()) || (ASSET.play_folders !== false)))
+	if ((i_isFolder && ASSET && ((ASSET.path != g_CurPath()) || (ASSET.play_folders !== false)))
+	||	((i_isFolder == false) && c_FileIsMovieHTML(i_obj.name)))
 	{
 		let play_path = path;
 		if (ASSET.path)

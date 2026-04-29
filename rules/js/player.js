@@ -18,12 +18,9 @@
 
 var p_PLAYER = true;
 
-// TODO: not pollute the global scope with so much vars, should be bundled into struct objects
-var player = null;
-var p_audio = null;
-var p_video = null;
-var p_savepath = null;
+var Player = {};
 
+// TODO: not pollute the global scope with so much vars, should be bundled into struct objects
 var p_imgTypes = ['jpg', 'jpeg', 'png'];
 
 var p_path_hash = null;
@@ -71,7 +68,6 @@ var p_frame_bar_height = 16;
 var p_frame_bar_width = 2000;
 
 var p_commenting = false;
-var p_comments = [];
 var p_cm_keytime = (new Date()).getTime();
 
 var p_saving = false;
@@ -344,8 +340,8 @@ function p_PlayerInit(i_data)
 		return;
 	}
 
-	player = i_data.player;
-	if (player == null)
+	Player = i_data.player;
+	if (Player == null)
 	{
 		c_Error('No player data received.');
 		return;
@@ -357,17 +353,18 @@ function p_PlayerInit(i_data)
 	p_fileSizeLoaded = 0;
 	p_loadStartMS = (new Date()).valueOf();
 
-	let movie = player.movie;
-	let images = player.images;
+	let movie = Player.movie;
+	let images = Player.images;
 
 	if (movie)
 	{
 		c_Info('Loading video: ' + movie.name + ' ' + c_Bytes2KMG(movie.size));
-		p_video = p_el.video;
-		p_video.src = RULES.root + p_path;
-		p_video.play();
-		//p_video.onloadeddata = p_VideoCanPlay;
-		p_video.oncanplaythrough = p_VideoCanPlay;
+		Player.Video = p_el.video;
+		Player.Video.src = RULES.root + p_path;
+		Player.Video.play();
+		//Player.Video.oncanplay = p_VideoCanPlay;
+		Player.Video.oncanplaythrough = p_VideoCanPlay;
+		//Player.Video.onloadeddata = p_VideoCanPlay;
 	}
 	else if (images)
 	{
@@ -394,13 +391,6 @@ function p_PlayerInit(i_data)
 			img.m_file = iobj;
 			p_filenames.push(file);
 			p_images.push(img);
-
-			if (player.comments && player.comments[file])
-			{
-				let cm = player.comments[file];
-				cm.saved = true;
-				p_comments[i] = cm;
-			}
 		}
 
 		if (p_filenames == null || (p_filenames.length == 0))
@@ -408,6 +398,8 @@ function p_PlayerInit(i_data)
 			c_Error('No JPEG or PNG Files Found.');
 			return;
 		}
+
+		Player.frames_total = images.length;
 
 		c_Info('Loading ' + p_images.length + ' images: ' + c_Bytes2KMG(p_fileSizeTotal));
 		p_Info('Loading images sequence');
@@ -418,42 +410,46 @@ function p_PlayerInit(i_data)
 		return;
 	}
 
-	if (player.sound)
+	if (Player.sound)
 	{
-		p_audio = p_el.audio;
-		p_audio.src = RULES.root + player.sound;
+		Player.Audio = p_el.audio;
+		Player.Audio.src = RULES.root + Player.sound;
 	}
 /*
 	if (p_imageMode)
 	{
-		p_savepath = p_path;
+		Player.save_path = p_path;
 	}
 	else
 	{
 		var path = p_path.substr(0, p_path.lastIndexOf('/'));
 		var folder = p_path.substr(p_path.lastIndexOf('/') + 1);
-		p_savepath = path + '/' + folder + p_savepath;
+		Player.save_path = path + '/' + folder + Player.save_path;
 	}
 */
-	p_savepath = c_PathDir(p_path) + '/.rules/' + c_PathBase(p_path) + '.player';
+	Player.save_path = c_PathDir(p_path) + '/.rules/' + c_PathBase(p_path) + '.player';
 
 	window.document.title = p_path.substr(p_path.lastIndexOf('/') + 1) + '/' + p_filenames[0];
 }
 
 function p_VideoCanPlay(e)
 {
-//console.log(p_video);
-	p_video.oncanplaythrough = null;
-	p_video.pause();
-	p_video.currentTime = 0;
-	const frames_num = Math.floor(video.duration * p_fps);
-	for (let f = 0; f < frames_num; f++)
+//console.log(Player.Video);
+	Player.Video.oncanplaythrough = null;
+	Player.Video.pause();
+	Player.Video.currentTime = 0;
+	Player.frames_total = Math.floor(video.duration * p_fps);
+
+	// Need to generate names for each frame:
+	for (let f = 0; f < Player.frames_total; f++)
 	{
-		let name = c_PathBase(p_path) + '.' + f;
+		let name = f + 1;
+		name = name.toString().padStart(4, '0');
+		name = c_PathBase(p_path) + '.' + name;
 		p_filenames.push(name);
 	}
 
-	p_video.onseeked = p_VideoCaptureFrame;
+	Player.Video.onseeked = p_VideoCaptureFrame;
 }
 function p_VideoCaptureFrame()
 {
@@ -462,17 +458,19 @@ function p_VideoCaptureFrame()
 	//img.m_file = iobj;
 
 	let canvas = document.createElement('canvas');
-	canvas.height = p_video.videoHeight;
-	canvas.width = p_video.videoWidth;
+	canvas.height = Player.Video.videoHeight;
+	canvas.width = Player.Video.videoWidth;
 	let ctx = canvas.getContext('2d');
-	ctx.drawImage(p_video, 0, 0, canvas.width, canvas.height);
+	ctx.drawImage(Player.Video, 0, 0, canvas.width, canvas.height);
 	img.src = canvas.toDataURL();
 
 	p_numloaded++;
+	p_el.play_slider.style.width = Math.round(100.0 * p_numloaded / p_filenames.length) + '%';
+	c_Info('Loading video: ' + p_filenames[p_numloaded] + ' ' + c_Bytes2KMG(Player.movie.size));
 
-	if (p_numloaded >= p_filenames.length)
+	if (p_numloaded >= Player.frames_total)
 	{
-		p_video.style.display = 'none';
+		Player.Video.style.display = 'none';
 		p_AllImagesReady();
 		return;
 	}
@@ -521,6 +519,21 @@ function p_ImgLoaded(e)
 
 function p_AllImagesReady()
 {
+	// Process comments:
+	// Convert comments[file_name] object comments[frame] array:
+	let comments = [];
+	for (let f = 0; f < Player.frames_total; f++)
+	{
+		let cm = null;
+		let name = p_filenames[f];
+		if (Player.comments && Player.comments[name])
+		{
+			cm = Player.comments[name];
+			cm.saved = true;
+		}
+		comments.push(cm);
+	}
+	Player.comments = comments;
 
 	// Hide preview element:
 	p_el.preview.style.display = 'none';
@@ -573,7 +586,7 @@ function p_AllImagesReady()
 	p_WalkReceivedComments();
 	// Process saved comments:
 	n_WalkDir({
-		"paths": [p_savepath],
+		"paths": [Player.save_path],
 		"wfunc": p_WalkReceivedComments,
 		"info": 'walk comments',
 		"rufiles": ['player']
@@ -592,7 +605,7 @@ function p_WalkReceivedComments(i_data)
 		{
 			var cm = RULES.player.comments[p_filenames[f]];
 			if (cm)
-				p_comments[f] = cm;
+				Player.comments[f] = cm;
 		}
 	}
 */
@@ -603,10 +616,10 @@ function p_WalkReceivedComments(i_data)
 		{
 			var pngname = p_filenames[f] + '.png';
 			//if (RULES.rufiles.indexOf(pngname) == -1)
-			if ((player.canvas == null) || (player.canvas.indexOf(pngname) == -1))
+			if ((Player.canvas == null) || (Player.canvas.indexOf(pngname) == -1))
 				continue;
 			var p_png = new Image();
-			p_png.src = RULES.root + p_savepath + '/canvas/' + pngname;
+			p_png.src = RULES.root + Player.save_path + '/canvas/' + pngname;
 			p_png.m_frame = f;
 			p_png.onload = function(e) {
 				var img = e.currentTarget;
@@ -859,8 +872,8 @@ function p_Play()
 	p_interval = Math.round(1000 / p_fps);
 	p_NextFrame();
 
-	if (p_audio)
-		p_audio.currentTime = p_frame / p_fps;
+	if (Player.Audio)
+		Player.Audio.currentTime = p_frame / p_fps;
 }
 
 function p_Reverse()
@@ -890,8 +903,8 @@ function p_Pause()
 	p_PushButton();
 	p_playing = 0;
 
-	if (p_audio)
-		p_audio.pause();
+	if (Player.Audio)
+		Player.Audio.pause();
 }
 
 function p_StopTimer()
@@ -938,36 +951,36 @@ function p_NextFrame(i_val)
 		p_PushButton();
 		p_frame += i_val;
 
-		if (p_audio)
-			p_audio.pause();
+		if (Player.Audio)
+			Player.Audio.pause();
 	}
 	else
 	{
 		p_frame += p_playing;
 
-		if (p_audio)
+		if (Player.Audio)
 		{
-			if ((p_playing == 1)/* && p_audio.paused*/)
+			if ((p_playing == 1)/* && Player.Audio.paused*/)
 			{
-				//p_audio.currentTime = p_frame / p_fps;
-				p_audio.play();
+				//Player.Audio.currentTime = p_frame / p_fps;
+				Player.Audio.play();
 			}
 			else
-				p_audio.pause();
+				Player.Audio.pause();
 		}
 	}
 
 	if (p_frame >= p_images.length)
 	{
 		p_frame = 0;
-		if (p_audio)
-			p_audio.currentTime = 0;
+		if (Player.Audio)
+			Player.Audio.currentTime = 0;
 	}
 	if (p_frame < 0)
 	{
 		p_frame = p_images.length - 1;
-		if (p_audio)
-			p_audio.currentTime = 0;
+		if (Player.Audio)
+			Player.Audio.currentTime = 0;
 	}
 
 	if (localStorage.player_usewebgl == 'ON')
@@ -1027,7 +1040,7 @@ function p_NextEditedFrame(i_dir)
 	if (p_loaded == false)
 		return;
 	var f = p_frame + i_dir;
-	while ((p_paintElCanvas[f] == null) && (p_comments[f] == null))
+	while ((p_paintElCanvas[f] == null) && (Player.comments[f] == null))
 	{
 		if ((f < 0) || (f >= p_images.length))
 			return;
@@ -1102,14 +1115,14 @@ function p_Save()
 	// Collect comments:
 	for (let f = 0; f < p_images.length; f++)
 	{
-		if (p_comments[f] == null)
+		if (Player.comments[f] == null)
 			continue;
-		if (p_comments[f].text == null)
+		if (Player.comments[f].text == null)
 			continue;
-		if (p_comments[f].text.length == 0)
+		if (Player.comments[f].text.length == 0)
 			continue;
 
-		let cm = p_comments[f];
+		let cm = Player.comments[f];
 		if (cm.saved)
 			continue;
 		cm.saved = true;
@@ -1126,7 +1139,7 @@ function p_Save()
 		let canvas_dummy = false;
 		if (canvas == null)
 		{
-			if (p_comments[f] == null)
+			if (Player.comments[f] == null)
 				continue;
 			canvas = document.createElement("canvas");
 			canvas.width = p_images[f].width;
@@ -1143,13 +1156,13 @@ function p_Save()
 
 		if (p_imageMode)
 		{
-			let path = RULES.root + p_savepath + '/' + p_filenames[f];
+			let path = RULES.root + Player.save_path + '/' + p_filenames[f];
 		}
 		else if (true != canvas_dummy)
 		{
 			let png_data = canvas.toDataURL('image/png');
 			png_data = png_data.substr(png_data.indexOf(',') + 1);
-			//let png_path = RULES.root + p_savepath + '/canvas/' + p_filenames[f] + '.png';
+			//let png_path = RULES.root + Player.save_path + '/canvas/' + p_filenames[f] + '.png';
 
 			//p_filestosave++;
 			obj.pngs.push({"name":p_filenames[f],"data":png_data});
@@ -1197,16 +1210,16 @@ function p_SetEditingState(i_update_whole_bar)
 	{
 		var pos = p_frame_bar_width * f / (p_images.length - 1) - .5 * width;
 
-		if (p_paintElCanvas[f] || p_comments[f])
+		if (p_paintElCanvas[f] || Player.comments[f])
 		{
 			var color = p_bar_clr_canvas;
-			if ((p_paintElCanvas[f] && p_paintElCanvas[f].m_edited) || p_comments[f])
+			if ((p_paintElCanvas[f] && p_paintElCanvas[f].m_edited) || Player.comments[f])
 			{
 				color = p_bar_clr_edited;
-				if ((p_paintElCanvas[f] && p_paintElCanvas[f].m_saved && p_comments[f] &&
-					 p_comments[f].saved) ||
-					((p_paintElCanvas[f] == null) && p_comments[f].saved) ||
-					((p_comments[f] == null) && p_paintElCanvas[f].m_saved))
+				if ((p_paintElCanvas[f] && p_paintElCanvas[f].m_saved && Player.comments[f] &&
+					 Player.comments[f].saved) ||
+					((p_paintElCanvas[f] == null) && Player.comments[f].saved) ||
+					((Player.comments[f] == null) && p_paintElCanvas[f].m_saved))
 					color = p_bar_clr_saved;
 			}
 			p_bar_ctx.fillStyle = 'rgb(' + color.join(',') + ')';
@@ -1394,7 +1407,7 @@ function p_PaintSave()
 		var canvas_dummy = false;
 		if (canvas == null)
 		{
-			if (p_comments[f] == null)
+			if (Player.comments[f] == null)
 				continue;
 			canvas = document.createElement("canvas");
 			canvas.width = p_images[f].width;
@@ -1409,14 +1422,14 @@ function p_PaintSave()
 
 		p_filestosave++;
 
-		var path = RULES.root + p_savepath + '/' + p_filenames[f];
+		var path = RULES.root + Player.save_path + '/' + p_filenames[f];
 		if (p_imageMode)
 			path += '.painted.jpg';
 		else if (true != canvas_dummy)
 		{
 			var png = canvas.toDataURL('image/png');
 			png = png.substr(png.indexOf(',') + 1);
-			var png_path = RULES.root + p_savepath + '/canvas/' + p_filenames[f] + '.png';
+			var png_path = RULES.root + Player.save_path + '/canvas/' + p_filenames[f] + '.png';
 
 			p_filestosave++;
 
@@ -1600,7 +1613,7 @@ function p_CmProcess()
 	// console.log('p_CmProcess: ' + text);
 	if (text.length)
 	{
-		var cm = p_comments[p_frame];
+		var cm = Player.comments[p_frame];
 		if (cm && (cm.text == text))
 			return;
 		if (cm == null)
@@ -1608,10 +1621,10 @@ function p_CmProcess()
 
 		cm.text = text;
 		cm.saved = false;
-		p_comments[p_frame] = cm;
+		Player.comments[p_frame] = cm;
 	}
 	else
-		p_comments[p_frame] = null;
+		Player.comments[p_frame] = null;
 
 	p_SetEditingState();
 }
@@ -1620,7 +1633,7 @@ function p_CmSetCurrent()
 {
 	var shadow = '0 0 4px #000';
 	$('comments_label').textContent = 'Comments';
-	var cm = p_comments[p_frame];
+	var cm = Player.comments[p_frame];
 	if (cm)
 	{
 		shadow = '0 0 4px #F00';
@@ -1653,23 +1666,23 @@ function p_CommentsSave()
 	var need_save = false;
 	for (var f = 0; f < p_images.length; f++)
 	{
-		if (p_comments[f] == null)
+		if (Player.comments[f] == null)
 			continue;
-		if (p_comments[f].text == null)
+		if (Player.comments[f].text == null)
 			continue;
-		if (p_comments[f].text.length == 0)
+		if (Player.comments[f].text.length == 0)
 			continue;
 
 		// Collect comments for RULES for each frame always,
 		// whenever they are saved or not,
 		// or we will loose saved comments
 		rcm.text += '<br>';
-		rcm.text += '<br><a target="_blank" href="' + RULES.root + p_savepath + '/' + p_filenames[f] + '">' +
+		rcm.text += '<br><a target="_blank" href="' + RULES.root + Player.save_path + '/' + p_filenames[f] + '">' +
 			p_filenames[f] + '</a>';
-		rcm.text += '<br>' + p_comments[f].text;
+		rcm.text += '<br>' + Player.comments[f].text;
 
 		// Collect only unsaved comments for player:
-		var cm = p_comments[f];
+		var cm = Player.comments[f];
 		if (cm.saved)
 			continue;
 		cm.saved = true;
@@ -1689,7 +1702,7 @@ function p_CommentsSave()
 	var edit = {};
 	edit.add = true;
 	edit.object = {"comments": pcms};
-	edit.file = RULES.root + p_savepath + '/data.json';
+	edit.file = RULES.root + Player.save_path + '/data.json';
 	n_Request(
 		{"send": {"editobj": edit}, "func": p_CommentsSavedPlayer, "info": 'player comments', 'cm': rcm});
 	c_Info('Saving comments for Player...');

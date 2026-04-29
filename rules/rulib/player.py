@@ -91,8 +91,9 @@ def save(i_obj, uid=None, out=None):
     if uid is None:
         uid = rulib.functions.getCurUser()
 
-    if not os.path.isdir(rulib.functions.getAbsPath(i_obj['path'])):
-        out['error'] = 'Folder %s does not exist.' % path
+
+    if not os.path.exists(rulib.functions.getAbsPath(i_obj['path'])):
+        out['error'] = 'Folder %s does not exist.' % i_obj['path']
         return out
 
     out['path'] = i_obj['path']
