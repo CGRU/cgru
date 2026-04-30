@@ -859,6 +859,23 @@ function sc_FilterStatus(i_status, i_args)
 		else if (i_args.flags.indexOf('_null_') != -1)
 			found = true;
 	}
+	if (i_args.noflags && i_args.noflags.length && found)
+	{
+		if (i_status.flags && i_status.flags.length)
+		{
+			for (const f of i_args.noflags)
+			{
+				// skip special flags
+				if (f.charAt(0) == '_') continue;
+
+				if (i_status.flags.includes(f))
+				{
+					found = false;
+					break;
+				}
+			}
+		}
+	}
 
 	if (i_args.tags && i_args.tags.length && found)
 	{
@@ -886,6 +903,23 @@ function sc_FilterStatus(i_status, i_args)
 		}
 		else if (i_args.tags.indexOf('_null_') != -1)
 			found = true;
+	}
+	if (i_args.notags && i_args.notags.length && found)
+	{
+		if (i_status.tags && i_status.tags.length)
+		{
+			for (const t of i_args.notags)
+			{
+				// skip special tags
+				if (t.charAt(0) == '_') continue;
+
+				if (i_status.tags.includes(t))
+				{
+					found = false;
+					break;
+				}
+			}
+		}
 	}
 
 	if (i_args.artists && found)

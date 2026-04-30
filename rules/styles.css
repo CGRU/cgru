@@ -1007,6 +1007,8 @@ table.statistics .duration { text-align: center; border-left-width: 0; }
 #search div { margin: 1px 4px; }
 #search .notfound { opacity: .5; }
 
+#search .exclude { background-color: rgba(255,0,0,0.5); }
+
 #search .search_tab_btn {
 	cursor: pointer;
 	float: left;

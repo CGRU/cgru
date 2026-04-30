@@ -191,6 +191,13 @@ function s_CreateFlagsAndTags(i_tab)
 			if (ASSET && ASSET.filter)
 				s_ProcessGUI();
 		};
+		el.oncontextmenu = function(e) {
+			e.stopPropagation();
+			c_ElToggleSelected(e.currentTarget, 'exclude');
+			if (ASSET && ASSET.filter)
+				s_ProcessGUI();
+			return false;
+		};
 		$('search_flags_' + i_tab).m_elFlags.push(el);
 	}
 	{// Search no flags:
@@ -225,6 +232,13 @@ function s_CreateFlagsAndTags(i_tab)
 			c_ElToggleSelected(e);
 			if (ASSET && ASSET.filter)
 				s_ProcessGUI();
+		};
+		el.oncontextmenu = function(e) {
+			e.stopPropagation();
+			c_ElToggleSelected(e.currentTarget, 'exclude');
+			if (ASSET && ASSET.filter)
+				s_ProcessGUI();
+			return false;
 		};
 		$('search_tags_' + i_tab).m_elTags.push(el);
 	}
@@ -455,7 +469,13 @@ function s_ProcessGUI()
 		}
 		else
 			for (let i = 0; i < $('search_flags_'+tab).m_elFlags.length; i++)
-				if ($('search_flags_'+tab).m_elFlags[i].m_selected)
+				if ($('search_flags_'+tab).m_elFlags[i].m_exclude)
+				{
+					if (args[tab].noflags == null)
+						args[tab].noflags = [];
+					args[tab].noflags.push($('search_flags_'+tab).m_elFlags[i].m_flag);
+				}
+				else if ($('search_flags_'+tab).m_elFlags[i].m_selected)
 				{
 					if (args[tab].flags == null)
 						args[tab].flags = [];
@@ -475,7 +495,13 @@ function s_ProcessGUI()
 		}
 		else
 			for (let i = 0; i < $('search_tags_'+tab).m_elTags.length; i++)
-				if ($('search_tags_'+tab).m_elTags[i].m_selected)
+				if ($('search_tags_'+tab).m_elTags[i].m_exclude)
+				{
+					if (args[tab].notags == null)
+						args[tab].notags = [];
+					args[tab].notags.push($('search_tags_'+tab).m_elTags[i].m_tag);
+				}
+				else if ($('search_tags_'+tab).m_elTags[i].m_selected)
 				{
 					if (args[tab].tags == null)
 						args[tab].tags = [];
@@ -562,10 +588,20 @@ function s_Search(i_args)
 				c_ElSetSelected(
 					$('search_flags_'+tab).m_elFlags[i],
 					args.flags.indexOf($('search_flags_'+tab).m_elFlags[i].m_flag) != -1);
+		if (args.noflags)
+			for (let i = 0; i < $('search_flags_'+tab).m_elFlags.length; i++)
+				c_ElSetSelected(
+					$('search_flags_'+tab).m_elFlags[i],
+					args.noflags.indexOf($('search_flags_'+tab).m_elFlags[i].m_flag) != -1, 'exclude');
 		if (args.tags)
 			for (let i = 0; i < $('search_tags_'+tab).m_elTags.length; i++)
 				c_ElSetSelected(
 					$('search_tags_'+tab).m_elTags[i], args.tags.indexOf($('search_tags_'+tab).m_elTags[i].m_tag) != -1)
+		if (args.notags)
+			for (let i = 0; i < $('search_tags_'+tab).m_elTags.length; i++)
+				c_ElSetSelected(
+					$('search_tags_'+tab).m_elTags[i],
+					args.notags.indexOf($('search_tags_'+tab).m_elTags[i].m_tag) != -1, 'exclude')
 
 		let parm = ['priority','percent'];
 		for (let i = 0; i < parm.length; i++)
