@@ -20,21 +20,22 @@ var p_PLAYER = true;
 
 var Player = {};
 
+Player.img_extensions = ['jpg', 'jpeg', 'png'];
+Player.filenames = [];
+Player.view_zoom = 1;
+Player.el_images = [];
+Player.images_objs = [];
+
 // TODO: not pollute the global scope with so much vars, should be bundled into struct objects
-var p_imgTypes = ['jpg', 'jpeg', 'png'];
 
 var p_path_hash = null;
 var p_path = null;
 var p_args = {};
 var p_rules_path = null;
 var p_imageMode = false;
-var p_elImg = [];
-var p_images = [];
 var p_frame = null;
 var p_playing = null;
 var p_timer = null;
-var p_filenames = null;
-var p_fileObjs = null;
 var p_fileSizeTotal = null;
 var p_fileSizeLoaded = null;
 var p_loadStartMS = null;
@@ -51,7 +52,6 @@ var p_view_tx = 0;
 var p_view_ty = 0;
 var p_view_dx = 10;
 var p_view_dy = 10;
-var p_view_zoom = 1;
 var p_view_dz = .1;
 
 var p_painting = false;
@@ -175,6 +175,7 @@ function p_InitializeReceived(i_data)
 	p_el.frame_bar.onmousemove = p_SliderOnMouseMove;
 	p_el.frame_bar.onmouseout = p_SliderOnMouseOut;
 	document.body.onkeydown = p_OnKeyDown;
+	document.body.onkeyup = p_OnKeyUp;
 	window.onhashchange = p_PathChanged;
 	//	window.onresize = p_ViewHome;
 
@@ -254,7 +255,7 @@ function p_PathChanged()
 		p_frame = p_args.f;
 	p_playing = 0;
 
-	p_images = [];
+	Player.images_objs = [];
 	p_paintElCanvas = [];
 
 	p_path_hash = document.location.hash;
@@ -340,15 +341,15 @@ function p_PlayerInit(i_data)
 		return;
 	}
 
-	Player = i_data.player;
-	if (Player == null)
+	if (i_data.player == null)
 	{
 		c_Error('No player data received.');
 		return;
 	}
 
-	p_filenames = [];
-	p_fileObjs = {};
+	for (let key in i_data.player)
+		Player[key] = i_data.player[key];
+
 	p_fileSizeTotal = 0;
 	p_fileSizeLoaded = 0;
 	p_loadStartMS = (new Date()).valueOf();
@@ -378,22 +379,21 @@ function p_PlayerInit(i_data)
 		{
 			let iobj = images[i];
 			let file = iobj.name;
-			p_fileObjs[file] = iobj;
 			if (iobj.size)
 				p_fileSizeTotal += iobj.size;
 			let type = file.split('.').pop().toLowerCase();
-			if (p_imgTypes.indexOf(type) == -1)
+			if (Player.img_extensions.indexOf(type) == -1)
 				continue;
 			let img = new Image();
 			img.src = RULES.root + p_path + '/' + file;
 			img.onload = function(e) { p_ImgLoaded(e); };
 			img.onerror = function(e) { p_ImgLoadError(e); };
 			img.m_file = iobj;
-			p_filenames.push(file);
-			p_images.push(img);
+			Player.filenames.push(file);
+			Player.images_objs.push(img);
 		}
 
-		if (p_filenames == null || (p_filenames.length == 0))
+		if (Player.filenames == null || (Player.filenames.length == 0))
 		{
 			c_Error('No JPEG or PNG Files Found.');
 			return;
@@ -401,7 +401,7 @@ function p_PlayerInit(i_data)
 
 		Player.frames_total = images.length;
 
-		c_Info('Loading ' + p_images.length + ' images: ' + c_Bytes2KMG(p_fileSizeTotal));
+		c_Info('Loading ' + Player.images_objs.length + ' images: ' + c_Bytes2KMG(p_fileSizeTotal));
 		p_Info('Loading images sequence');
 	}
 	else
@@ -429,7 +429,7 @@ function p_PlayerInit(i_data)
 */
 	Player.save_path = c_PathDir(p_path) + '/.rules/' + c_PathBase(p_path) + '.player';
 
-	window.document.title = p_path.substr(p_path.lastIndexOf('/') + 1) + '/' + p_filenames[0];
+	window.document.title = p_path.substr(p_path.lastIndexOf('/') + 1) + '/' + Player.filenames[0];
 }
 
 function p_VideoCanPlay(e)
@@ -446,7 +446,7 @@ function p_VideoCanPlay(e)
 		let name = f + 1;
 		name = name.toString().padStart(4, '0');
 		name = c_PathBase(p_path) + '.' + name;
-		p_filenames.push(name);
+		Player.filenames.push(name);
 	}
 
 	Player.Video.onseeked = p_VideoCaptureFrame;
@@ -454,7 +454,7 @@ function p_VideoCanPlay(e)
 function p_VideoCaptureFrame()
 {
 	let img = new Image();
-	p_images.push(img);
+	Player.images_objs.push(img);
 	//img.m_file = iobj;
 
 	let canvas = document.createElement('canvas');
@@ -465,8 +465,8 @@ function p_VideoCaptureFrame()
 	img.src = canvas.toDataURL();
 
 	p_numloaded++;
-	p_el.play_slider.style.width = Math.round(100.0 * p_numloaded / p_filenames.length) + '%';
-	c_Info('Loading video: ' + p_filenames[p_numloaded] + ' ' + c_Bytes2KMG(Player.movie.size));
+	p_el.play_slider.style.width = Math.round(100.0 * p_numloaded / Player.filenames.length) + '%';
+	c_Info('Loading video: ' + Player.filenames[p_numloaded] + ' ' + c_Bytes2KMG(Player.movie.size));
 
 	if (p_numloaded >= Player.frames_total)
 	{
@@ -492,7 +492,7 @@ function p_ImgLoaded(e)
 	if (img.m_file && img.m_file.size)
 		p_fileSizeLoaded += img.m_file.size;
 
-	let info = 'Loaded ' + p_numloaded + ' of ' + p_filenames.length + ' images';
+	let info = 'Loaded ' + p_numloaded + ' of ' + Player.filenames.length + ' images';
 	info += ': ' + c_Bytes2KMG(p_fileSizeLoaded) + ' of ' + c_Bytes2KMG(p_fileSizeTotal);
 
 	let now_ms = (new Date()).valueOf();
@@ -504,7 +504,7 @@ function p_ImgLoaded(e)
 	}
 
 	c_Info(info, false);
-	p_el.play_slider.style.width = Math.round(100.0 * p_numloaded / p_filenames.length) + '%';
+	p_el.play_slider.style.width = Math.round(100.0 * p_numloaded / Player.filenames.length) + '%';
 
 	// Show loaded image, but not more often than half a second (500ms)
 	if ((p_loadLastMS == null) || (now_ms - p_loadLastMS > 500))
@@ -513,7 +513,7 @@ function p_ImgLoaded(e)
 		p_loadLastMS = now_ms;
 	}
 
-	if (p_numloaded >= p_filenames.length)
+	if (p_numloaded >= Player.filenames.length)
 		p_AllImagesReady();
 }
 
@@ -525,7 +525,7 @@ function p_AllImagesReady()
 	for (let f = 0; f < Player.frames_total; f++)
 	{
 		let cm = null;
-		let name = p_filenames[f];
+		let name = Player.filenames[f];
 		if (Player.comments && Player.comments[name])
 		{
 			cm = Player.comments[name];
@@ -565,7 +565,7 @@ function p_AllImagesReady()
 	// Just information:
 	let now_ms = (new Date()).valueOf();
 	let sec = (now_ms - p_loadStartMS) / 1000;
-	let info = p_images.length + ' images ' + p_images[0].width + 'x' + p_images[0].height;
+	let info = Player.images_objs.length + ' images ' + Player.images_objs[0].width + 'x' + Player.images_objs[0].height;
 	if (p_fileSizeTotal)
 		info += ': loaded ' + c_Bytes2KMG(p_fileSizeTotal);
 	info += ' at ' + sec.toFixed(1) + ' seconds';
@@ -575,8 +575,8 @@ function p_AllImagesReady()
 		info += ': ' + c_Bytes2KMG(speed) + '/s';
 	}
 	let loaderror = 0;
-	for (let f = 0; f < p_images.length; f++)
-		if (p_images[f].m_loaderror)
+	for (let f = 0; f < Player.images_objs.length; f++)
+		if (Player.images_objs[f].m_loaderror)
 			loaderror++;
 	if (loaderror)
 		info += ' - ' + loaderror + ' errors!';
@@ -601,9 +601,9 @@ function p_WalkReceivedComments(i_data)
 	c_RulesMergeDir(RULES, walk);
 	if (RULES.player && RULES.player.comments)
 	{
-		for (var f = 0; f < p_filenames.length; f++)
+		for (var f = 0; f < Player.filenames.length; f++)
 		{
-			var cm = RULES.player.comments[p_filenames[f]];
+			var cm = RULES.player.comments[Player.filenames[f]];
 			if (cm)
 				Player.comments[f] = cm;
 		}
@@ -612,9 +612,9 @@ function p_WalkReceivedComments(i_data)
 
 	// Process saved painted images:
 	//if (RULES.rufiles && RULES.rufiles.length)
-		for (var f = 0; f < p_filenames.length; f++)
+		for (var f = 0; f < Player.filenames.length; f++)
 		{
-			var pngname = p_filenames[f] + '.png';
+			var pngname = Player.filenames[f] + '.png';
 			//if (RULES.rufiles.indexOf(pngname) == -1)
 			if ((Player.canvas == null) || (Player.canvas.indexOf(pngname) == -1))
 				continue;
@@ -644,22 +644,22 @@ function p_WalkReceivedComments(i_data)
 
 function p_CreateImages()
 {
-	for (var i = 0; i < p_elImg.length; i++)
-		p_el.view.removeChild(p_elImg[i]);
-	p_elImg = [];
+	for (var i = 0; i < Player.el_images.length; i++)
+		p_el.view.removeChild(Player.el_images[i]);
+	Player.el_images = [];
 
 	var imgnum = 1;
 	if (localStorage.player_precreate == 'ON')
-		imgnum = p_images.length;
+		imgnum = Player.images_objs.length;
 	for (var i = 0; i < imgnum; i++)
 	{
 		var elImg = document.createElement('img');
 		p_el.view.appendChild(elImg);
-		elImg.src = RULES.root + p_path + '/' + p_filenames[i];
+		elImg.src = RULES.root + p_path + '/' + Player.filenames[i];
 		if (localStorage.player_precreate == 'ON')
 			elImg.style.display = 'none';
 		elImg.onmousedown = function() { return false; };
-		p_elImg.push(elImg);
+		Player.el_images.push(elImg);
 	}
 }
 
@@ -669,33 +669,33 @@ function p_ViewHome()
 }
 function p_ViewLeft()
 {
-	p_ViewTransform(p_view_tx - p_view_dx, p_view_ty, p_view_zoom);
+	p_ViewTransform(p_view_tx - p_view_dx, p_view_ty, Player.view_zoom);
 }
 function p_ViewRight()
 {
-	p_ViewTransform(p_view_tx + p_view_dx, p_view_ty, p_view_zoom);
+	p_ViewTransform(p_view_tx + p_view_dx, p_view_ty, Player.view_zoom);
 }
 function p_ViewUp()
 {
-	p_ViewTransform(p_view_tx, p_view_ty - p_view_dy, p_view_zoom);
+	p_ViewTransform(p_view_tx, p_view_ty - p_view_dy, Player.view_zoom);
 }
 function p_ViewDown()
 {
-	p_ViewTransform(p_view_tx, p_view_ty + p_view_dy, p_view_zoom);
+	p_ViewTransform(p_view_tx, p_view_ty + p_view_dy, Player.view_zoom);
 }
 function p_ViewZoomIn()
 {
-	p_ViewTransform(p_view_tx, p_view_ty, (1.0 + p_view_dz) * p_view_zoom);
+	p_ViewTransform(p_view_tx, p_view_ty, (1.0 + p_view_dz) * Player.view_zoom);
 }
 function p_ViewZoomOut()
 {
-	p_ViewTransform(p_view_tx, p_view_ty, (1.0 - p_view_dz) * p_view_zoom);
+	p_ViewTransform(p_view_tx, p_view_ty, (1.0 - p_view_dz) * Player.view_zoom);
 }
 
 function p_ViewTransform(i_tx, i_ty, i_zoom)
 {
 	// console.log( 'p_ViewTransform: ' + i_tx + ',' + i_ty + 'x' + i_zoom);
-	// console.log(p_elImg[0].width+' x '+p_elImg[0].height);
+	// console.log(Player.el_images[0].width+' x '+Player.el_images[0].height);
 	// console.log(p_el.player_content.clientWidth+' x '+p_el.player_content.clientHeight);
 	if (i_zoom <= 0)
 		return;
@@ -704,29 +704,29 @@ function p_ViewTransform(i_tx, i_ty, i_zoom)
 	if (Math.abs(1.0 - i_zoom) < (.7 * p_view_dz))
 		i_zoom = 1;
 
-	p_view_zoom = i_zoom;
+	Player.view_zoom = i_zoom;
 	p_view_tx = i_tx;
 	p_view_ty = i_ty;
 
-	var ml = 0, mt = 0;
-	var img_w = p_images[0].width;
-	var img_h = p_images[0].height;
+	let margin_left = 0, margin_top = 0;
+	const img_w = Player.images_objs[0].width;
+	const img_h = Player.images_objs[0].height;
 	if ((img_w > 0) && (img_h > 0))
 	{
-		var wnd_w = p_el.player_content.clientWidth;
-		var wnd_h = p_el.player_content.clientHeight;
-		ml = Math.round((wnd_w - img_w) / 2);
-		mt = Math.round((wnd_h - img_h) / 2);
+		const wnd_w = p_el.player_content.clientWidth;
+		const wnd_h = p_el.player_content.clientHeight;
+		margin_left = Math.round((wnd_w - img_w) / 2);
+		margin_top = Math.round((wnd_h - img_h) / 2);
 	}
-	ml += p_view_tx;
-	mt += p_view_ty;
+	margin_left += p_view_tx;
+	margin_top += p_view_ty;
 
 	p_el.view.style.width = img_w + 'px';
 	p_el.view.style.height = img_h + 'px';
-	p_el.view.style.marginLeft = ml + 'px';
-	p_el.view.style.marginTop = mt + 'px';
+	p_el.view.style.marginLeft = margin_left + 'px';
+	p_el.view.style.marginTop = margin_top + 'px';
 
-	if (p_view_zoom === 1)
+	if (Player.view_zoom === 1)
 	{
 		$('view_zoom').classList.remove('zoomed');
 		$('view_zoom').textContent = 'x1';
@@ -735,18 +735,29 @@ function p_ViewTransform(i_tx, i_ty, i_zoom)
 	else
 	{
 		$('view_zoom').classList.add('zoomed');
-		$('view_zoom').textContent = 'x' + p_view_zoom.toFixed(2);
-		p_el.view.style.transform = 'scale(' + p_view_zoom + ',' + p_view_zoom + ')';
+		$('view_zoom').textContent = 'x' + Player.view_zoom.toFixed(2);
+		p_el.view.style.transform = 'scale(' + Player.view_zoom + ',' + Player.view_zoom + ')';
 	}
 }
 
 function p_OnKeyDown(e)
 {
-	// window.console.log(e.keyCode);
+	//console.log(e.keyCode);
 	if (e.keyCode == 116)  // F5
 	{
 		c_Info('Use CTRL+R to refresh. All loaded and painted images will be lost!');
 		return false;
+	}
+
+	if (e.keyCode == 17) // CTRL
+	{
+		Player.pressed_ctrl = true;
+		return;
+	}
+	if (e.keyCode == 16) // SHIFT
+	{
+		Player.pressed_shift = true;
+		return;
 	}
 
 	if (e.ctrlKey)
@@ -820,6 +831,21 @@ function p_OnKeyDown(e)
 
 	else if (e.keyCode == 83)
 		p_Save();  // S
+}
+function p_OnKeyUp(e)
+{
+	//console.log(e.keyCode);
+	if (e.keyCode == 17) // CTRL
+	{
+		Player.pressed_ctrl = false;
+		return;
+	}
+
+	if (e.keyCode == 16) // SHIFT
+	{
+		Player.pressed_shift = false;
+		return;
+	}
 }
 
 function p_FullScreen()
@@ -918,7 +944,7 @@ function p_Rewind(i_dir)
 	if (p_loaded == false)
 		return;
 	if (i_dir)
-		p_ShowFrame(p_images.length - 1);
+		p_ShowFrame(Player.images_objs.length - 1);
 	else
 		p_ShowFrame(0);
 }
@@ -928,7 +954,7 @@ function p_ShowFrame(i_val)
 	if (p_loaded == false)
 		return;
 	if (i_val == -1)
-		i_val = p_images.length - 1;
+		i_val = Player.images_objs.length - 1;
 	p_NextFrame(i_val - p_frame);
 }
 
@@ -939,7 +965,7 @@ function p_NextFrame(i_val)
 
 	if (localStorage.player_usewebgl == 'OFF')
 		if (localStorage.player_precreate == 'ON')
-			p_elImg[p_frame].style.display = 'none';
+			Player.el_images[p_frame].style.display = 'none';
 
 	if (p_paintElCanvas[p_frame])
 		p_paintElCanvas[p_frame].style.display = 'none';
@@ -970,7 +996,7 @@ function p_NextFrame(i_val)
 		}
 	}
 
-	if (p_frame >= p_images.length)
+	if (p_frame >= Player.images_objs.length)
 	{
 		p_frame = 0;
 		if (Player.Audio)
@@ -978,7 +1004,7 @@ function p_NextFrame(i_val)
 	}
 	if (p_frame < 0)
 	{
-		p_frame = p_images.length - 1;
+		p_frame = Player.images_objs.length - 1;
 		if (Player.Audio)
 			Player.Audio.currentTime = 0;
 	}
@@ -988,16 +1014,16 @@ function p_NextFrame(i_val)
 	else
 	{
 		if (localStorage.player_precreate == 'ON')
-			p_elImg[p_frame].style.display = 'block';
+			Player.el_images[p_frame].style.display = 'block';
 		else
-			p_elImg[0].src = RULES.root + p_path + '/' + p_filenames[p_frame];
+			Player.el_images[0].src = RULES.root + p_path + '/' + Player.filenames[p_frame];
 	}
 
 	if (p_paintElCanvas[p_frame])
 		p_paintElCanvas[p_frame].style.display = 'block';
 
-	var info = p_filenames[p_frame];
-	if (p_images[p_frame].m_loaderror && (u_el.info.classList.contains('error') == false))
+	var info = Player.filenames[p_frame];
+	if (Player.images_objs[p_frame].m_loaderror && (u_el.info.classList.contains('error') == false))
 	{
 		u_el.info.classList.add('error');
 		info += ' loaded with an error.';
@@ -1007,8 +1033,8 @@ function p_NextFrame(i_val)
 	c_Info(info, false);
 
 	var width = '100%';
-	if (p_images.length > 1)
-		width = 100.0 * p_frame / (p_images.length - 1) + '%';
+	if (Player.images_objs.length > 1)
+		width = 100.0 * p_frame / (Player.images_objs.length - 1) + '%';
 	p_el.play_slider.style.width = width;
 
 	p_SetEditingState();
@@ -1042,7 +1068,7 @@ function p_NextEditedFrame(i_dir)
 	var f = p_frame + i_dir;
 	while ((p_paintElCanvas[f] == null) && (Player.comments[f] == null))
 	{
-		if ((f < 0) || (f >= p_images.length))
+		if ((f < 0) || (f >= Player.images_objs.length))
 			return;
 		f += i_dir;
 	}
@@ -1072,7 +1098,7 @@ function p_SliderOnMouseMove(i_evt)
 	var width = p_el.frame_bar.clientWidth - 1;
 	var offset = i_evt.clientX - p_el.frame_bar.offsetLeft;
 	//	p_el.play_slider.style.width = 100.0*offset/width + '%';
-	p_ShowFrame(Math.floor(p_images.length * offset / width));
+	p_ShowFrame(Math.floor(Player.images_objs.length * offset / width));
 	return false;
 }
 function p_SliderOnMouseUp()
@@ -1113,7 +1139,7 @@ function p_Save()
 	let need_save = false;
 
 	// Collect comments:
-	for (let f = 0; f < p_images.length; f++)
+	for (let f = 0; f < Player.images_objs.length; f++)
 	{
 		if (Player.comments[f] == null)
 			continue;
@@ -1127,13 +1153,13 @@ function p_Save()
 			continue;
 		cm.saved = true;
 
-		obj.comments[p_filenames[f]] = cm;
+		obj.comments[Player.filenames[f]] = cm;
 
 		need_save = true;
 	}
 
 	// Collect images:
-	for (let f = 0; f < p_images.length; f++)
+	for (let f = 0; f < Player.images_objs.length; f++)
 	{
 		let canvas = p_paintElCanvas[f];
 		let canvas_dummy = false;
@@ -1142,8 +1168,8 @@ function p_Save()
 			if (Player.comments[f] == null)
 				continue;
 			canvas = document.createElement("canvas");
-			canvas.width = p_images[f].width;
-			canvas.height = p_images[f].height;
+			canvas.width = Player.images_objs[f].width;
+			canvas.height = Player.images_objs[f].height;
 			canvas.m_edited = true;
 			canvas_dummy = true;
 		}
@@ -1156,26 +1182,26 @@ function p_Save()
 
 		if (p_imageMode)
 		{
-			let path = RULES.root + Player.save_path + '/' + p_filenames[f];
+			let path = RULES.root + Player.save_path + '/' + Player.filenames[f];
 		}
 		else if (true != canvas_dummy)
 		{
 			let png_data = canvas.toDataURL('image/png');
 			png_data = png_data.substr(png_data.indexOf(',') + 1);
-			//let png_path = RULES.root + Player.save_path + '/canvas/' + p_filenames[f] + '.png';
+			//let png_path = RULES.root + Player.save_path + '/canvas/' + Player.filenames[f] + '.png';
 
 			//p_filestosave++;
-			obj.pngs.push({"name":p_filenames[f],"data":png_data});
+			obj.pngs.push({"name":Player.filenames[f],"data":png_data});
 		}
 
 		// Create JPG for comments:
 		let ctx = canvas.getContext('2d');
 		ctx.globalCompositeOperation = 'destination-over';
-		ctx.drawImage(p_images[f], 0, 0);
+		ctx.drawImage(Player.images_objs[f], 0, 0);
 		let jpg_data = canvas.toDataURL('image/jpeg', .7);
 		jpg_data = jpg_data.substr(jpg_data.indexOf(',') + 1);
 
-		obj.jpegs.push({"name":p_filenames[f],"data":jpg_data});
+		obj.jpegs.push({"name":Player.filenames[f],"data":jpg_data});
 
 		need_save = true;
 	}
@@ -1203,12 +1229,12 @@ function p_SetEditingState(i_update_whole_bar)
 	if (i_update_whole_bar)
 	{
 		start_frame = 0;
-		end_frame = p_images.length - 1;
+		end_frame = Player.images_objs.length - 1;
 	}
-	var width = p_frame_bar_width / (p_images.length - 1);
+	var width = p_frame_bar_width / (Player.images_objs.length - 1);
 	for (var f = start_frame; f <= end_frame; f++)
 	{
-		var pos = p_frame_bar_width * f / (p_images.length - 1) - .5 * width;
+		var pos = p_frame_bar_width * f / (Player.images_objs.length - 1) - .5 * width;
 
 		if (p_paintElCanvas[f] || Player.comments[f])
 		{
@@ -1250,11 +1276,36 @@ function p_Paint()
 	}
 }
 
+function p_ViewPanStart(i_evt)
+{
+	Player.view_panning = true;
+	Player.view_panning_x = i_evt.screenX;
+	Player.view_panning_y = i_evt.screenY;
+}
+function p_ViewZoomStart(i_evt)
+{
+	Player.view_zooming = true;
+	Player.view_zooming_x = i_evt.screenX;
+	Player.view_zooming_y = i_evt.screenY;
+}
+
 function p_ViewOnMouseDown(i_evt)
 {
 	i_evt.stopPropagation();
 	if (p_loaded == false)
 		return;
+
+	if (Player.pressed_ctrl)
+	{
+		p_ViewPanStart(i_evt);
+		return;
+	}
+	if (Player.pressed_shift)
+	{
+		p_ViewZoomStart(i_evt);
+		return;
+	}
+
 	if (p_painting == false)
 		return;
 
@@ -1283,11 +1334,11 @@ function p_PaintCreateCanvas(i_frame)
 	var canvas = document.createElement('canvas');
 	p_paintElCanvas[i_frame] = canvas;
 	$('canvases').appendChild(canvas);
-	canvas.width = p_images[i_frame].width;
-	canvas.height = p_images[i_frame].height;
+	canvas.width = Player.images_objs[i_frame].width;
+	canvas.height = Player.images_objs[i_frame].height;
 	canvas.style.width = canvas.width + 'px';
 	canvas.style.height = canvas.height + 'px';
-	c_Info('Canvas for "' + p_filenames[i_frame] + '" created.');
+	c_Info('Canvas for "' + Player.filenames[i_frame] + '" created.');
 	return canvas;
 }
 function p_GetCtxCoords(i_evt)
@@ -1302,14 +1353,14 @@ function p_GetCtxCoords(i_evt)
 	var c = {};
 	c.x = i_evt.clientX - p_el.view.offsetLeft - p_el.player_content.offsetLeft;
 	c.y = i_evt.clientY - p_el.view.offsetTop - p_el.player_content.offsetTop;
-	if (p_view_zoom !== 1)
+	if (Player.view_zoom !== 1)
 	{
-		var img_w = p_images[0].width;
-		var img_h = p_images[0].height;
+		var img_w = Player.images_objs[0].width;
+		var img_h = Player.images_objs[0].height;
 		c.x -= 0.5 * img_w;
 		c.y -= 0.5 * img_h;
-		c.x /= p_view_zoom;
-		c.y /= p_view_zoom;
+		c.x /= Player.view_zoom;
+		c.y /= Player.view_zoom;
 		c.x += 0.5 * img_w;
 		c.y += 0.5 * img_h;
 		c.x = Math.round(c.x);
@@ -1318,8 +1369,41 @@ function p_GetCtxCoords(i_evt)
 	// console.log(c);
 	return c;
 }
+function p_ViewPan(i_evt)
+{
+	let delta_x = i_evt.screenX - Player.view_panning_x;
+	let delta_y = i_evt.screenY - Player.view_panning_y;
+
+	p_ViewTransform(p_view_tx + delta_x, p_view_ty + delta_y, Player.view_zoom);
+
+	Player.view_panning_x = i_evt.screenX;
+	Player.view_panning_y = i_evt.screenY;
+}
+function p_ViewZoom(i_evt)
+{
+	let delta_x = i_evt.screenX - Player.view_zooming_x;
+	let delta_y = i_evt.screenY - Player.view_zooming_y;
+
+	let delta_z = 0.01 * (delta_x + delta_y);
+
+	p_ViewTransform(p_view_tx + delta_x, p_view_ty + delta_y, Player.view_zoom + delta_z);
+
+	Player.view_zooming_x = i_evt.screenX;
+	Player.view_zooming_y = i_evt.screenY;
+}
 function p_ViewOnMouseMove(i_evt)
 {
+	if (Player.view_panning)
+	{
+		p_ViewPan(i_evt);
+		return;
+	}
+	if (Player.view_zooming)
+	{
+		p_ViewZoom(i_evt);
+		return;
+	}
+
 	if (p_paintCtx == null)
 		return;
 	var c = p_GetCtxCoords(i_evt);
@@ -1331,10 +1415,14 @@ function p_ViewOnMouseMove(i_evt)
 }
 function p_ViewOnMouseUp()
 {
+	Player.view_panning = false;
+	Player.view_zooming = false;
 	p_paintCtx = null;
 }
 function p_ViewOnMouseOver()
 {
+	Player.view_panning = false;
+	Player.view_zooming = false;
 	p_paintCtx = null;
 }
 
@@ -1401,7 +1489,7 @@ function p_PaintClear()
 
 function p_PaintSave()
 {
-	for (var f = 0; f < p_images.length; f++)
+	for (var f = 0; f < Player.images_objs.length; f++)
 	{
 		var canvas = p_paintElCanvas[f];
 		var canvas_dummy = false;
@@ -1410,8 +1498,8 @@ function p_PaintSave()
 			if (Player.comments[f] == null)
 				continue;
 			canvas = document.createElement("canvas");
-			canvas.width = p_images[f].width;
-			canvas.height = p_images[f].height;
+			canvas.width = Player.images_objs[f].width;
+			canvas.height = Player.images_objs[f].height;
 			canvas.m_edited = true;
 			canvas_dummy = true;
 		}
@@ -1422,14 +1510,14 @@ function p_PaintSave()
 
 		p_filestosave++;
 
-		var path = RULES.root + Player.save_path + '/' + p_filenames[f];
+		var path = RULES.root + Player.save_path + '/' + Player.filenames[f];
 		if (p_imageMode)
 			path += '.painted.jpg';
 		else if (true != canvas_dummy)
 		{
 			var png = canvas.toDataURL('image/png');
 			png = png.substr(png.indexOf(',') + 1);
-			var png_path = RULES.root + Player.save_path + '/canvas/' + p_filenames[f] + '.png';
+			var png_path = RULES.root + Player.save_path + '/canvas/' + Player.filenames[f] + '.png';
 
 			p_filestosave++;
 
@@ -1445,7 +1533,7 @@ function p_PaintSave()
 
 		var ctx = canvas.getContext('2d');
 		ctx.globalCompositeOperation = 'destination-over';
-		ctx.drawImage(p_images[f], 0, 0);
+		ctx.drawImage(Player.images_objs[f], 0, 0);
 		var data = canvas.toDataURL('image/jpeg', .8);
 		data = data.substr(data.indexOf(',') + 1);
 
@@ -1476,7 +1564,7 @@ function p_SavedFile(i_data, i_args)
 	{
 		p_filessaved++;
 		var name = file.substr(file.lastIndexOf('/') + 1);
-		var frame = p_filenames.indexOf(name);
+		var frame = Player.filenames.indexOf(name);
 		if (p_imageMode)
 			frame = 0;
 		if (p_paintElCanvas[frame])
@@ -1516,7 +1604,7 @@ function p_SavingFinished(i_data, i_args)
 	{
 		for (name of i_data.pngs)
 		{
-			let frame = p_filenames.indexOf(name);
+			let frame = Player.filenames.indexOf(name);
 			if (p_imageMode)
 				frame = 0;
 			if (p_paintElCanvas[frame])
@@ -1664,7 +1752,7 @@ function p_CommentsSave()
 	rcm.text = 'Player comments:';
 
 	var need_save = false;
-	for (var f = 0; f < p_images.length; f++)
+	for (var f = 0; f < Player.images_objs.length; f++)
 	{
 		if (Player.comments[f] == null)
 			continue;
@@ -1677,8 +1765,8 @@ function p_CommentsSave()
 		// whenever they are saved or not,
 		// or we will loose saved comments
 		rcm.text += '<br>';
-		rcm.text += '<br><a target="_blank" href="' + RULES.root + Player.save_path + '/' + p_filenames[f] + '">' +
-			p_filenames[f] + '</a>';
+		rcm.text += '<br><a target="_blank" href="' + RULES.root + Player.save_path + '/' + Player.filenames[f] + '">' +
+			Player.filenames[f] + '</a>';
 		rcm.text += '<br>' + Player.comments[f].text;
 
 		// Collect only unsaved comments for player:
@@ -1689,7 +1777,7 @@ function p_CommentsSave()
 		cm.cuser = g_auth_user.id;
 		cm.ctime = rcm.ctime;
 
-		pcms[p_filenames[f]] = cm;
+		pcms[Player.filenames[f]] = cm;
 
 		// We need to save if at least one comment changed
 		need_save = true;
@@ -1791,9 +1879,9 @@ function gl_Start()
 		return;
 	}
 
-	gl_elCanvas.width = p_images[0].width;
-	gl_elCanvas.height = p_images[0].height;
-	gl.viewport(0, 0, p_images[0].width, p_images[0].height);
+	gl_elCanvas.width = Player.images_objs[0].width;
+	gl_elCanvas.height = Player.images_objs[0].height;
+	gl.viewport(0, 0, Player.images_objs[0].width, Player.images_objs[0].height);
 
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
 	gl.clearDepth(1.0);					// Clear everything
@@ -1850,7 +1938,7 @@ function gl_InitTextures()
 {
 	var numtex = 1;
 	if (localStorage.player_precreate == 'ON')
-		numtex = p_images.length;
+		numtex = Player.images_objs.length;
 	for (var i = 0; i < numtex; i++)
 	{
 		gl_textures[i] = gl.createTexture();
@@ -1859,10 +1947,10 @@ function gl_InitTextures()
 }
 function gl_InitTexture(i_tex, i_img)
 {
-	if (p_images[i_img].m_loaderror)
+	if (Player.images_objs[i_img].m_loaderror)
 		return;
 	gl.bindTexture(gl.TEXTURE_2D, gl_textures[i_tex]);
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, p_images[i_img]);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, Player.images_objs[i_img]);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);  // NEAREST
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
