@@ -519,6 +519,9 @@ function p_ImgLoaded(e)
 
 function p_AllImagesReady()
 {
+	Player.images_width  = Player.images_objs[0].width;
+	Player.images_height = Player.images_objs[0].height;
+
 	// Process comments:
 	// Convert comments[file_name] object comments[frame] array:
 	let comments = [];
@@ -565,7 +568,7 @@ function p_AllImagesReady()
 	// Just information:
 	let now_ms = (new Date()).valueOf();
 	let sec = (now_ms - p_loadStartMS) / 1000;
-	let info = Player.images_objs.length + ' images ' + Player.images_objs[0].width + 'x' + Player.images_objs[0].height;
+	let info = Player.images_objs.length + ' images ' + Player.images_width + 'x' + Player.images_height;
 	if (p_fileSizeTotal)
 		info += ': loaded ' + c_Bytes2KMG(p_fileSizeTotal);
 	info += ' at ' + sec.toFixed(1) + ' seconds';
@@ -692,37 +695,21 @@ function p_ViewZoomOut()
 	p_ViewTransform(p_view_tx, p_view_ty, (1.0 - p_view_dz) * Player.view_zoom);
 }
 
-function p_ViewTransform(i_tx, i_ty, i_zoom)
+function p_ViewTransform(i_tx, i_ty, i_zoom, i_clamp_zoom = true)
 {
-	// console.log( 'p_ViewTransform: ' + i_tx + ',' + i_ty + 'x' + i_zoom);
-	// console.log(Player.el_images[0].width+' x '+Player.el_images[0].height);
-	// console.log(p_el.player_content.clientWidth+' x '+p_el.player_content.clientHeight);
 	if (i_zoom <= 0)
 		return;
 
 	// If we are near 1.0 we set to 1 (no zoom)
-	if (Math.abs(1.0 - i_zoom) < (.7 * p_view_dz))
+	if (i_clamp_zoom && (Math.abs(1.0 - i_zoom) < (.7 * p_view_dz)))
 		i_zoom = 1;
 
 	Player.view_zoom = i_zoom;
 	p_view_tx = i_tx;
 	p_view_ty = i_ty;
 
-	let margin_left = 0, margin_top = 0;
-	const img_w = Player.images_objs[0].width;
-	const img_h = Player.images_objs[0].height;
-	if ((img_w > 0) && (img_h > 0))
-	{
-		const wnd_w = p_el.player_content.clientWidth;
-		const wnd_h = p_el.player_content.clientHeight;
-		margin_left = Math.round((wnd_w - img_w) / 2);
-		margin_top = Math.round((wnd_h - img_h) / 2);
-	}
-	margin_left += p_view_tx;
-	margin_top += p_view_ty;
-
-	p_el.view.style.width = img_w + 'px';
-	p_el.view.style.height = img_h + 'px';
+	const margin_left = Math.round((p_el.player_content.clientWidth  - Player.images_width ) / 2);
+	const margin_top  = Math.round((p_el.player_content.clientHeight - Player.images_height) / 2);
 	p_el.view.style.marginLeft = margin_left + 'px';
 	p_el.view.style.marginTop = margin_top + 'px';
 
@@ -730,14 +717,15 @@ function p_ViewTransform(i_tx, i_ty, i_zoom)
 	{
 		$('view_zoom').classList.remove('zoomed');
 		$('view_zoom').textContent = 'x1';
-		p_el.view.style.transform = '';
 	}
 	else
 	{
 		$('view_zoom').classList.add('zoomed');
 		$('view_zoom').textContent = 'x' + Player.view_zoom.toFixed(2);
-		p_el.view.style.transform = 'scale(' + Player.view_zoom + ',' + Player.view_zoom + ')';
 	}
+
+	let transform = 'translate('+p_view_tx+'px,'+p_view_ty+'px) scale(' + Player.view_zoom + ',' + Player.view_zoom + ')';
+	p_el.view.style.transform = transform;
 }
 
 function p_OnKeyDown(e)
@@ -1282,12 +1270,6 @@ function p_ViewPanStart(i_evt)
 	Player.view_panning_x = i_evt.screenX;
 	Player.view_panning_y = i_evt.screenY;
 }
-function p_ViewZoomStart(i_evt)
-{
-	Player.view_zooming = true;
-	Player.view_zooming_x = i_evt.screenX;
-	Player.view_zooming_y = i_evt.screenY;
-}
 
 function p_ViewOnMouseDown(i_evt)
 {
@@ -1317,7 +1299,6 @@ function p_ViewOnMouseDown(i_evt)
 	else
 		canvas = p_PaintCreateCanvas();
 
-	// var c = p_GetCtxCoords( i_evt);
 	p_paintCtx = canvas.getContext('2d');
 	p_paintCtx.globalCompositeOperation = 'source-over';
 	p_paintCtx.beginPath();
@@ -1350,19 +1331,19 @@ function p_GetCtxCoords(i_evt)
 	' c['+p_el.player_content.offsetLeft+','+p_el.player_content.offsetTop+']'+
 	'');
 	*/
-	var c = {};
+	let c = {};
 	c.x = i_evt.clientX - p_el.view.offsetLeft - p_el.player_content.offsetLeft;
 	c.y = i_evt.clientY - p_el.view.offsetTop - p_el.player_content.offsetTop;
+	c.x -= p_view_tx;
+	c.y -= p_view_ty;
 	if (Player.view_zoom !== 1)
 	{
-		var img_w = Player.images_objs[0].width;
-		var img_h = Player.images_objs[0].height;
-		c.x -= 0.5 * img_w;
-		c.y -= 0.5 * img_h;
+		c.x -= 0.5 * Player.images_width;
+		c.y -= 0.5 * Player.images_height;
 		c.x /= Player.view_zoom;
 		c.y /= Player.view_zoom;
-		c.x += 0.5 * img_w;
-		c.y += 0.5 * img_h;
+		c.x += 0.5 * Player.images_width;
+		c.y += 0.5 * Player.images_height;
 		c.x = Math.round(c.x);
 		c.y = Math.round(c.y);
 	}
@@ -1379,17 +1360,46 @@ function p_ViewPan(i_evt)
 	Player.view_panning_x = i_evt.screenX;
 	Player.view_panning_y = i_evt.screenY;
 }
-function p_ViewZoom(i_evt)
+
+function p_ViewZoomStart(i_evt)
 {
-	let delta_x = i_evt.screenX - Player.view_zooming_x;
-	let delta_y = i_evt.screenY - Player.view_zooming_y;
-
-	let delta_z = 0.01 * (delta_x + delta_y);
-
-	p_ViewTransform(p_view_tx + delta_x, p_view_ty + delta_y, Player.view_zoom + delta_z);
+	Player.view_zooming = true;
 
 	Player.view_zooming_x = i_evt.screenX;
 	Player.view_zooming_y = i_evt.screenY;
+
+	Player.view_zooming_tx = p_view_tx;
+	Player.view_zooming_ty = p_view_ty;
+
+	let coords = p_GetCtxCoords(i_evt);
+	coords.x -= Math.round(Player.images_width  / 2);
+	coords.y -= Math.round(Player.images_height / 2);
+	Player.view_zooming_ctr_x = coords.x;
+	Player.view_zooming_ctr_y = coords.y;
+
+	Player.view_zooming_zoom = Player.view_zoom;
+}
+function p_ViewZoom(i_evt)
+{
+	const screen_x = i_evt.screenX;
+	const screen_y = i_evt.screenY;
+
+	let delta_x = screen_x - Player.view_zooming_x;
+	let delta_y = screen_y - Player.view_zooming_y;
+
+	let delta_z = Player.view_zoom * 0.01 * (delta_x + delta_y);
+	Player.view_zoom += delta_z;
+	// If we are near 1.0 we set to 1 (no zoom)
+	if (Math.abs(1.0 - Player.view_zoom) < .05)
+		Player.view_zoom = 1;
+
+	let ctr_x = (Player.view_zooming_zoom - Player.view_zoom) * (Player.view_zooming_ctr_x);
+	let ctr_y = (Player.view_zooming_zoom - Player.view_zoom) * (Player.view_zooming_ctr_y);
+
+	p_ViewTransform(Player.view_zooming_tx + ctr_x, Player.view_zooming_ty + ctr_y, Player.view_zoom, false);
+
+	Player.view_zooming_x = screen_x;
+	Player.view_zooming_y = screen_y;
 }
 function p_ViewOnMouseMove(i_evt)
 {
