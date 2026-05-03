@@ -23,7 +23,6 @@ var Player = {};
 Player.img_extensions = ['jpg', 'jpeg', 'png'];
 Player.filenames = [];
 Player.view_zoom = 1;
-Player.el_images = [];
 Player.images_objs = [];
 
 // TODO: not pollute the global scope with so much vars, should be bundled into struct objects
@@ -145,9 +144,6 @@ function p_InitializeReceived(i_data)
 	if (RULES.cgru_config)
 		cgru_ConfigJoin(RULES.cgru_config);
 
-	if (localStorage.player_precreate == null)
-		localStorage.player_precreate = 'OFF';
-	document.getElementById('player_precreate').textContent = localStorage.player_precreate;
 	if (localStorage.player_usewebgl == null)
 		localStorage.player_usewebgl = 'ON';
 	if (localStorage.player_usewebgl == 'ON')
@@ -195,15 +191,6 @@ function p_Info(i_text)
 	$('info_panel').innerHTML = i_text;
 }
 
-function p_PrecreateOnClick()
-{
-	if (localStorage.player_precreate == 'ON')
-		localStorage.player_precreate = 'OFF';
-	else
-		localStorage.player_precreate = 'ON';
-	document.getElementById('player_precreate').textContent = localStorage.player_precreate;
-	p_Deactivate();
-}
 function p_UseWebGLOnClick()
 {
 	if (localStorage.player_usewebgl == 'ON')
@@ -464,6 +451,10 @@ function p_VideoCaptureFrame()
 	ctx.drawImage(Player.Video, 0, 0, canvas.width, canvas.height);
 	img.src = canvas.toDataURL();
 
+	img.onload = function(e) { p_VideoImgLoaded(e); };
+}
+function p_VideoImgLoaded(e)
+{
 	p_numloaded++;
 	p_el.play_slider.style.width = Math.round(100.0 * p_numloaded / Player.filenames.length) + '%';
 	c_Info('Loading video: ' + Player.filenames[p_numloaded] + ' ' + c_Bytes2KMG(Player.movie.size));
@@ -475,7 +466,7 @@ function p_VideoCaptureFrame()
 		return;
 	}
 
-	video.currentTime = p_numloaded / p_fps;
+	Player.Video.currentTime = p_numloaded / p_fps;
 }
 
 function p_ImgLoadError(e)
@@ -647,22 +638,12 @@ function p_WalkReceivedComments(i_data)
 
 function p_CreateImages()
 {
-	for (var i = 0; i < Player.el_images.length; i++)
-		p_el.view.removeChild(Player.el_images[i]);
-	Player.el_images = [];
-
-	var imgnum = 1;
-	if (localStorage.player_precreate == 'ON')
-		imgnum = Player.images_objs.length;
-	for (var i = 0; i < imgnum; i++)
+	for (let i = 0; i < Player.images_objs.length; i++)
 	{
-		var elImg = document.createElement('img');
+		let elImg = Player.images_objs[i];
 		p_el.view.appendChild(elImg);
-		elImg.src = RULES.root + p_path + '/' + Player.filenames[i];
-		if (localStorage.player_precreate == 'ON')
-			elImg.style.display = 'none';
+		elImg.style.display = 'none';
 		elImg.onmousedown = function() { return false; };
-		Player.el_images.push(elImg);
 	}
 }
 
@@ -952,8 +933,7 @@ function p_NextFrame(i_val)
 		return;
 
 	if (localStorage.player_usewebgl == 'OFF')
-		if (localStorage.player_precreate == 'ON')
-			Player.el_images[p_frame].style.display = 'none';
+		Player.images_objs[p_frame].style.display = 'none';
 
 	if (p_paintElCanvas[p_frame])
 		p_paintElCanvas[p_frame].style.display = 'none';
@@ -1001,10 +981,7 @@ function p_NextFrame(i_val)
 		gl_DrawScene();
 	else
 	{
-		if (localStorage.player_precreate == 'ON')
-			Player.el_images[p_frame].style.display = 'block';
-		else
-			Player.el_images[0].src = RULES.root + p_path + '/' + Player.filenames[p_frame];
+		Player.images_objs[p_frame].style.display = 'block';
 	}
 
 	if (p_paintElCanvas[p_frame])
@@ -1946,10 +1923,7 @@ function gl_InitShader(i_src, i_type)
 
 function gl_InitTextures()
 {
-	var numtex = 1;
-	if (localStorage.player_precreate == 'ON')
-		numtex = Player.images_objs.length;
-	for (var i = 0; i < numtex; i++)
+	for (let i = 0; i < Player.images_objs.length; i++)
 	{
 		gl_textures[i] = gl.createTexture();
 		gl_InitTexture(i, i);
@@ -1959,6 +1933,7 @@ function gl_InitTexture(i_tex, i_img)
 {
 	if (Player.images_objs[i_img].m_loaderror)
 		return;
+
 	gl.bindTexture(gl.TEXTURE_2D, gl_textures[i_tex]);
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, Player.images_objs[i_img]);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -2023,13 +1998,7 @@ function gl_DrawScene()
 
 	// Specify the texture to map onto the faces
 	gl.activeTexture(gl.TEXTURE0);
-	if (localStorage.player_precreate == 'ON')
-		gl.bindTexture(gl.TEXTURE_2D, gl_textures[p_frame]);
-	else
-	{
-		gl_InitTexture(0, p_frame);
-		gl.bindTexture(gl.TEXTURE_2D, gl_textures[0]);
-	}
+	gl.bindTexture(gl.TEXTURE_2D, gl_textures[p_frame]);
 	gl.uniform1i(gl.getUniformLocation(gl_shaderProgram, 'uSampler'), 0);
 
 	// Draw plane
