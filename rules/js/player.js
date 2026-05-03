@@ -146,8 +146,10 @@ function p_InitializeReceived(i_data)
 
 	if (localStorage.player_usewebgl == null)
 		localStorage.player_usewebgl = 'ON';
+
 	if (localStorage.player_usewebgl == 'ON')
 	{
+		Player.usewebgl = true;
 		gl_Init();
 		if (gl == null)
 		{
@@ -157,7 +159,14 @@ function p_InitializeReceived(i_data)
 				'It is disabled now, 2d canvas will be used.\n' +
 				'You can open settings in upper left corner.');
 		}
+
+		gl_Start();
 	}
+	else
+	{
+		Player.usewebgl = false;
+	}
+
 	document.getElementById('player_usewebgl').textContent = localStorage.player_usewebgl;
 
 	u_DrawColorBars({"el": $('paint_palette'), "onclick": p_PaintColorSet, "height": 25});
@@ -443,21 +452,30 @@ function p_VideoCaptureFrame()
 	let img = new Image();
 	Player.images_objs.push(img);
 	//img.m_file = iobj;
+	Player.images_width  = Player.Video.videoWidth;
+	Player.images_height = Player.Video.videoHeight;
+	if (Player.usewebgl)
+	{
+		gl_SetWidthHeight();
 
+		gl_CreateTexture(Player.Video);
+	}
+/*
 	let canvas = document.createElement('canvas');
+	canvas.width  = Player.Video.videoWidth;
 	canvas.height = Player.Video.videoHeight;
-	canvas.width = Player.Video.videoWidth;
 	let ctx = canvas.getContext('2d');
 	ctx.drawImage(Player.Video, 0, 0, canvas.width, canvas.height);
-	img.src = canvas.toDataURL();
+	img.src = canvas.toDataURL('image/jpeg');
 
 	img.onload = function(e) { p_VideoImgLoaded(e); };
 }
 function p_VideoImgLoaded(e)
 {
+*/
+	c_Info('Loading video: ' + Player.filenames[p_numloaded] + ' ' + c_Bytes2KMG(Player.movie.size));
 	p_numloaded++;
 	p_el.play_slider.style.width = Math.round(100.0 * p_numloaded / Player.filenames.length) + '%';
-	c_Info('Loading video: ' + Player.filenames[p_numloaded] + ' ' + c_Bytes2KMG(Player.movie.size));
 
 	if (p_numloaded >= Player.frames_total)
 	{
@@ -479,6 +497,15 @@ function p_ImgLoadError(e)
 function p_ImgLoaded(e)
 {
 	let img = e.currentTarget;
+	Player.images_width  = img.width;
+	Player.images_height = img.height;
+	if (Player.usewebgl)
+	{
+		gl_SetWidthHeight();
+
+		gl_CreateTexture(img);
+	}
+
 	p_numloaded++;
 	if (img.m_file && img.m_file.size)
 		p_fileSizeLoaded += img.m_file.size;
@@ -510,9 +537,6 @@ function p_ImgLoaded(e)
 
 function p_AllImagesReady()
 {
-	Player.images_width  = Player.images_objs[0].width;
-	Player.images_height = Player.images_objs[0].height;
-
 	// Process comments:
 	// Convert comments[file_name] object comments[frame] array:
 	let comments = [];
@@ -541,12 +565,7 @@ function p_AllImagesReady()
 	p_bar_ctx = $('bar_canvas').getContext('2d');
 	p_bar_ctx.globalCompositeOperation = 'source-over';
 
-	if (localStorage.player_usewebgl == 'ON')
-	{
-		p_Info('Starting web GL');
-		gl_Start();
-	}
-	else
+	if ( ! Player.usewebgl)
 	{
 		p_Info('Creating images');
 		p_CreateImages();
@@ -932,7 +951,7 @@ function p_NextFrame(i_val)
 	if (p_loaded == false)
 		return;
 
-	if (localStorage.player_usewebgl == 'OFF')
+	if ( ! Player.usewebgl)
 		Player.images_objs[p_frame].style.display = 'none';
 
 	if (p_paintElCanvas[p_frame])
@@ -977,7 +996,7 @@ function p_NextFrame(i_val)
 			Player.Audio.currentTime = 0;
 	}
 
-	if (localStorage.player_usewebgl == 'ON')
+	if (Player.usewebgl)
 		gl_DrawScene();
 	else
 	{
@@ -1866,10 +1885,6 @@ function gl_Start()
 		return;
 	}
 
-	gl_elCanvas.width = Player.images_objs[0].width;
-	gl_elCanvas.height = Player.images_objs[0].height;
-	gl.viewport(0, 0, Player.images_objs[0].width, Player.images_objs[0].height);
-
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
 	gl.clearDepth(1.0);					// Clear everything
 	gl.enable(gl.DEPTH_TEST);			// Enable depth testing
@@ -1882,9 +1897,14 @@ function gl_Start()
 
 	gl_InitShaders();
 	gl_InitBuffers();
-	gl_InitTextures();
-
-	//	setInterval("drawScene()", 40);
+}
+function gl_SetWidthHeight()
+{
+	const width  = Player.images_width;
+	const height = Player.images_height;
+	gl_elCanvas.width  = width;
+	gl_elCanvas.height = height;
+	gl.viewport(0, 0, width, height);
 }
 
 function gl_InitShaders()
@@ -1921,26 +1941,24 @@ function gl_InitShader(i_src, i_type)
 	return shader;
 }
 
-function gl_InitTextures()
+function gl_CreateAllTextures()
 {
 	for (let i = 0; i < Player.images_objs.length; i++)
-	{
-		gl_textures[i] = gl.createTexture();
-		gl_InitTexture(i, i);
-	}
+		gl_CreateTexture(Player.images_objs[i]);
 }
-function gl_InitTexture(i_tex, i_img)
+function gl_CreateTexture(i_img)
 {
-	if (Player.images_objs[i_img].m_loaderror)
-		return;
+	const glTex = gl.createTexture();
 
-	gl.bindTexture(gl.TEXTURE_2D, gl_textures[i_tex]);
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, Player.images_objs[i_img]);
+	gl.bindTexture(gl.TEXTURE_2D, glTex);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, i_img);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);  // NEAREST
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	gl.bindTexture(gl.TEXTURE_2D, null);
+
+	gl_textures.push(glTex);
 }
 
 function gl_InitBuffers()
