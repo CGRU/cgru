@@ -458,7 +458,7 @@ function p_VideoCaptureFrame()
 	{
 		gl_SetWidthHeight();
 
-		gl_CreateTexture(Player.Video);
+//		gl_CreateTexture(Player.Video);
 	}
 
 	let canvas = document.createElement('canvas');
@@ -503,7 +503,7 @@ function p_ImgLoaded(e)
 	{
 		gl_SetWidthHeight();
 
-		gl_CreateTexture(img);
+//		gl_CreateTexture(img);
 	}
 
 	p_numloaded++;
@@ -570,6 +570,8 @@ function p_AllImagesReady()
 		p_Info('Creating images');
 		p_CreateImages();
 	}
+	else
+		gl_CreateAllTextures();
 
 	p_ShowFrame(p_frame);
 	p_ViewHome();
