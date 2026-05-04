@@ -460,7 +460,7 @@ function p_VideoCaptureFrame()
 
 		gl_CreateTexture(Player.Video);
 	}
-/*
+
 	let canvas = document.createElement('canvas');
 	canvas.width  = Player.Video.videoWidth;
 	canvas.height = Player.Video.videoHeight;
@@ -472,7 +472,7 @@ function p_VideoCaptureFrame()
 }
 function p_VideoImgLoaded(e)
 {
-*/
+
 	c_Info('Loading video: ' + Player.filenames[p_numloaded] + ' ' + c_Bytes2KMG(Player.movie.size));
 	p_numloaded++;
 	p_el.play_slider.style.width = Math.round(100.0 * p_numloaded / Player.filenames.length) + '%';
