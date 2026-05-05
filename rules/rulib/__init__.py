@@ -5,7 +5,7 @@ import traceback
 CGRU_LOCATION = None
 CGRU_VERSION = None
 
-FILE_MAX_LENGTH = 3000000
+FILE_MAX_LENGTH = 10000000
 
 HT_ACCESS_FILE_NAME = '.htaccess'
 HT_GROUPS_FILE_NAME = '.htgroups'
