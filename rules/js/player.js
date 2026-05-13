@@ -69,8 +69,6 @@ var p_commenting = false;
 var p_cm_keytime = (new Date()).getTime();
 
 var p_saving = false;
-var p_filestosave = 0;
-var p_filessaved = 0;
 
 var p_fps = 24.0;
 var p_interval = 40;
@@ -301,9 +299,17 @@ function p_WalkNavigateReceived(i_data, i_args)
 	for (let i = 0; i < i_data.length; i++)
 		c_RulesMergeDir(RULES, i_data[i]);
 
-	for (let type in RULES.comments)
+	if ( ! Player.gui_constructed)
+		p_ConstructGUI();
+
+	n_Request({'send':{'player_init':{'path':p_path_hash}},'func':p_PlayerInit,'info':'player init','wait':false});
+}
+
+function p_ConstructGUI()
+{
+	for (const type in RULES.comments)
 	{
-		let el = document.createElement('div');
+		const el = document.createElement('div');
 		$('comments_types').appendChild(el);
 		el.classList.add('tag');
 		el.textContent = RULES.comments[type].title;
@@ -320,9 +326,9 @@ function p_WalkNavigateReceived(i_data, i_args)
 	if (localStorage.player_comment_tags)
 		tags = JSON.parse(localStorage.player_comment_tags);
 
-	for (let tag in RULES.tags)
+	for (const tag in RULES.tags)
 	{
-		let el = document.createElement('div');
+		const el = document.createElement('div');
 		$('comments_tags').appendChild(el);
 		el.classList.add('tag');
 		el.m_tag = tag;
@@ -338,18 +344,27 @@ function p_WalkNavigateReceived(i_data, i_args)
 		el.onclick = p_CommentTagOnClick;
 	}
 
-	n_Request({'send':{'player_init':{'path':p_path_hash}},'func':p_PlayerInit,'info':'player init','wait':false});
+	Player.gui_constructed = true;
 }
-
+function p_CommentShowAllTagsOnClick()
+{
+	if ($('comments_tags').classList.contains('show_all'))
+		$('comments_tags').classList.remove('show_all');
+	else
+		$('comments_tags').classList.add('show_all');
+}
 function p_CommentTagOnClick(i_evt)
 {
+	if ( ! $('comments_tags').classList.contains('show_all'))
+		return;
+
 	const el = i_evt.currentTarget;
 
 	c_ElToggleSelected(el);
 
 	let tags = [];
 	for (const el of $('comments_tags').children)
-		if (el.classList.contains('selected'))
+		if (el.m_tag && el.classList.contains('selected'))
 			tags.push(el.m_tag);
 
 	localStorage.player_comment_tags = JSON.stringify(tags);
@@ -1164,13 +1179,7 @@ function p_Save()
 
 	if (p_saving)
 		return;
-/*
-	p_filestosave = 0;
-	p_filessaved = 0;
 
-	p_CommentsSave();
-	p_PaintSave();
-*/
 	let obj = {};
 	obj.path = p_path_hash;
 	obj.comments = {};
@@ -1231,7 +1240,6 @@ function p_Save()
 		if (canvas.m_saved)
 			continue;
 
-		//p_filestosave++;
 
 		if (p_imageMode)
 		{
@@ -1242,8 +1250,6 @@ function p_Save()
 			let png_data = canvas.toDataURL('image/png');
 			png_data = png_data.substr(png_data.indexOf(',') + 1);
 			//let png_path = RULES.root + Player.save_path + '/canvas/' + Player.filenames[f] + '.png';
-
-			//p_filestosave++;
 			obj.pngs.push({"name":Player.filenames[f],"data":png_data});
 		}
 
@@ -1562,95 +1568,6 @@ function p_PaintClear()
 	p_SetEditingState();
 }
 
-function p_PaintSave()
-{
-	for (var f = 0; f < Player.images_objs.length; f++)
-	{
-		var canvas = p_paintElCanvas[f];
-		var canvas_dummy = false;
-		if (canvas == null)
-		{
-			if (Player.comments[f] == null)
-				continue;
-			canvas = document.createElement("canvas");
-			canvas.width = Player.images_objs[f].width;
-			canvas.height = Player.images_objs[f].height;
-			canvas.m_edited = true;
-			canvas_dummy = true;
-		}
-		if (canvas.m_edited != true)
-			continue;
-		if (canvas.m_saved)
-			continue;
-
-		p_filestosave++;
-
-		var path = RULES.root + Player.save_path + '/' + Player.filenames[f];
-		if (p_imageMode)
-			path += '.painted.jpg';
-		else if (true != canvas_dummy)
-		{
-			var png = canvas.toDataURL('image/png');
-			png = png.substr(png.indexOf(',') + 1);
-			var png_path = RULES.root + Player.save_path + '/canvas/' + Player.filenames[f] + '.png';
-
-			p_filestosave++;
-
-			n_Request({
-				"send": {"save": {"file": png_path, "data": png, "type": "base64"}},
-				"func": p_SavedFile,
-				"file": png_path,
-				"info": "save png",
-				"wait": false,
-				"parse": true
-			});
-		}
-
-		var ctx = canvas.getContext('2d');
-		ctx.globalCompositeOperation = 'destination-over';
-		ctx.drawImage(Player.images_objs[f], 0, 0);
-		var data = canvas.toDataURL('image/jpeg', .8);
-		data = data.substr(data.indexOf(',') + 1);
-
-		n_Request({
-			"send": {"save": {"file": path, "data": data, "type": "base64"}},
-			"func": p_SavedFile,
-			"file": path,
-			"info": "save jpg",
-			"wait": false,
-			"parse": true
-		});
-	}
-
-	if (p_filestosave == 0)
-		p_SavingFinished();
-}
-
-function p_SavedFile(i_data, i_args)
-{
-	// window.console.log(JSON.stringify(i_msg));
-	if (i_data.error)
-	{
-		c_Error(i_data.error);
-		return;
-	}
-	var file = i_args.file;
-	if (file)
-	{
-		p_filessaved++;
-		var name = file.substr(file.lastIndexOf('/') + 1);
-		var frame = Player.filenames.indexOf(name);
-		if (p_imageMode)
-			frame = 0;
-		if (p_paintElCanvas[frame])
-			p_paintElCanvas[frame].m_saved = true;
-		// p_SetEditingState();
-		c_Info('Saved "' + name + '" ' + p_filessaved + ' of ' + p_filestosave);
-		if (p_filessaved >= p_filestosave)
-			p_SavingFinished(file.substr(0, file.lastIndexOf('/')).substr(file.indexOf('/')));
-	}
-}
-
 function p_SavingFinished(i_data, i_args)
 {
 	if (i_data == null)
@@ -1814,90 +1731,6 @@ function p_CmSetCurrent()
 	else
 		$('comments_body').innerHTML = '';
 	$('comments_btn').style.boxShadow = shadow;
-}
-
-function p_CommentsSave()
-{
-	var pcms = {};
-
-	var rcm = {};
-	rcm.user_name = g_auth_user.id;
-	rcm.ctime = (new Date()).getTime();
-	rcm.sequence = p_path;
-	rcm.text = 'Player comments:';
-
-	var need_save = false;
-	for (var f = 0; f < Player.images_objs.length; f++)
-	{
-		if (Player.comments[f] == null)
-			continue;
-		if (Player.comments[f].text == null)
-			continue;
-		if (Player.comments[f].text.length == 0)
-			continue;
-
-		// Collect comments for RULES for each frame always,
-		// whenever they are saved or not,
-		// or we will loose saved comments
-		rcm.text += '<br>';
-		rcm.text += '<br><a target="_blank" href="' + RULES.root + Player.save_path + '/' + Player.filenames[f] + '">' +
-			Player.filenames[f] + '</a>';
-		rcm.text += '<br>' + Player.comments[f].text;
-
-		// Collect only unsaved comments for player:
-		var cm = Player.comments[f];
-		if (cm.saved)
-			continue;
-		cm.saved = true;
-		cm.cuser = g_auth_user.id;
-		cm.ctime = rcm.ctime;
-
-		pcms[Player.filenames[f]] = cm;
-
-		// We need to save if at least one comment changed
-		need_save = true;
-		// RULES comments will be saved all (see above)
-	}
-
-	if (false == need_save)
-		return;
-
-	var edit = {};
-	edit.add = true;
-	edit.object = {"comments": pcms};
-	edit.file = RULES.root + Player.save_path + '/data.json';
-	n_Request(
-		{"send": {"editobj": edit}, "func": p_CommentsSavedPlayer, "info": 'player comments', 'cm': rcm});
-	c_Info('Saving comments for Player...');
-	// console.log(JSON.stringify( rcm));
-}
-function p_CommentsSavedPlayer(i_data, i_args)
-{
-	if (c_NullOrErrorMsg(i_data))
-		return;
-
-	var key = p_cm_keytime + '_' + g_auth_user.id;
-	var comments = {};
-	comments[key] = i_args.cm;
-	var edit = {};
-	edit.add = true;
-	edit.object = {"comments": comments};
-	edit.file = RULES.root + p_rules_path + '/' + RULES.rufolder + '/comments.json';
-	n_Request({"send": {"editobj": edit}, 'func': p_CommentsSavedRules, 'info': 'rules comments'});
-	c_Info('Saving comments for RULES...');
-}
-function p_CommentsSavedRules(i_data)
-{
-	if (c_NullOrErrorMsg(i_data))
-		return;
-
-	c_Info('Comments saved.');
-
-	var artists = [];
-	if (RULES.status && RULES.status.artists)
-		artists = RULES.status.artists;
-
-	nw_MakeNews({'title': 'comment', 'path': p_rules_path, 'artists': artists});
 }
 
 // ====================================================

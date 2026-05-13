@@ -68,6 +68,7 @@ box-shadow: 0 0 4px #000, 0 0 4px #777 inset;
 }
 #comments_label { text-align: center; font-size: 14px; }
 #comments_body {
+clear: both;
 background: #222;
 color: #999;
 _position: absolute;
@@ -76,14 +77,18 @@ box-shadow: 0 0 2px #000 inset, 0 0 2px #777;
 border-radius: 4px;
 padding: 4px;
 }
-#comments_types .tag {
-	opacity: 0.5;
-}
+#comments_types { float: right; }
+#comments_types .tag { opacity: 0.5; }
 #comments_types .tag.selected {
 	opacity: 1.0;
 	border: 1px solid #FFF;
 	box-shadow: 0 0 4px #FFF inset, 0 0 4px #FFF;
 }
+#comments_tags { _float: right; }
+#comments_tags_btn_show_all { float: left; }
+#comments_tags .tag { display: none; }
+#comments_tags .tag.selected { display: block; }
+#comments_tags.show_all .tag { display: block; }
 
 /* ==================== FOOTER ======================= */
 #footer { height: 50px; }
