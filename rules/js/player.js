@@ -45,7 +45,6 @@ var p_top = '38px';
 var p_bottom = '50px';
 
 var p_slidering = false;
-var p_slidertimer = null;
 
 var p_view_tx = 0;
 var p_view_ty = 0;
@@ -176,9 +175,10 @@ function p_InitializeReceived(i_data)
 	p_el.view.onmouseover = p_ViewOnMouseOver;
 
 	p_el.frame_bar.onmousedown = p_SliderOnMouseDown;
-	p_el.frame_bar.onmouseup = p_SliderOnMouseUp;
-	p_el.frame_bar.onmousemove = p_SliderOnMouseMove;
-	p_el.frame_bar.onmouseout = p_SliderOnMouseOut;
+//	p_el.frame_bar.onmouseup = p_SliderOnMouseUp;
+	document.body.onmouseup = p_SliderOnMouseUp;
+//	p_el.frame_bar.onmousemove = p_SliderOnMouseMove;
+	document.body.onmousemove = p_SliderOnMouseMove;
 	document.body.onkeydown = p_OnKeyDown;
 	document.body.onkeyup = p_OnKeyUp;
 	window.onhashchange = p_PathChanged;
@@ -1138,17 +1138,13 @@ function p_SliderOnMouseDown(i_evt)
 }
 function p_SliderOnMouseMove(i_evt)
 {
-	// window.console.log('p_SliderOnMouseMove');
 	i_evt.stopPropagation();
-	if (p_slidertimer)
-		clearInterval(p_slidertimer);
 	if (p_loaded == false)
 		return;
 	if (false == p_slidering)
 		return;
-	var width = p_el.frame_bar.clientWidth - 1;
-	var offset = i_evt.clientX - p_el.frame_bar.offsetLeft;
-	//	p_el.play_slider.style.width = 100.0*offset/width + '%';
+	const width = p_el.frame_bar.clientWidth - 1;
+	const offset = i_evt.clientX - p_el.frame_bar.offsetLeft;
 	p_ShowFrame(Math.floor(Player.images_objs.length * offset / width));
 	return false;
 }
@@ -1156,13 +1152,6 @@ function p_SliderOnMouseUp()
 {
 	// window.console.log('p_SliderOnMouseUp');
 	p_slidering = false;
-}
-function p_SliderOnMouseOut()
-{
-	// window.console.log('p_SliderOnMouseOut');
-	if (p_slidertimer)
-		clearInterval(p_slidertimer);
-	p_slidertimer = setTimeout('p_slidering = false;', 1000);
 }
 
 function p_Save()
