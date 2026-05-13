@@ -298,15 +298,80 @@ function p_Link()
 
 function p_WalkNavigateReceived(i_data, i_args)
 {
-	for (var i = 0; i < i_data.length; i++)
+	for (let i = 0; i < i_data.length; i++)
 		c_RulesMergeDir(RULES, i_data[i]);
 
-	// console.log(JSON.stringify(i_data));
+	for (let type in RULES.comments)
+	{
+		let el = document.createElement('div');
+		$('comments_types').appendChild(el);
+		el.classList.add('tag');
+		el.textContent = RULES.comments[type].title;
+		el.m_type = type;
+		st_SetElColor({"color": RULES.comments[type].color}, el);
 
-	//n_WalkDir({"paths": [p_path], "wfunc": p_WalkSequenceReceived, "info": 'walk images', "rufiles": ['player']});
+		if (localStorage.player_comment_type == type)
+			el.classList.add('selected');
 
+		el.onclick = p_CommentTypeOnClick;
+	}
+
+	let tags = [];
+	if (localStorage.player_comment_tags)
+		tags = JSON.parse(localStorage.player_comment_tags);
+
+	for (let tag in RULES.tags)
+	{
+		let el = document.createElement('div');
+		$('comments_tags').appendChild(el);
+		el.classList.add('tag');
+		el.m_tag = tag;
+
+		if (RULES.tags[tag].title)
+			el.textContent = RULES.tags[tag].title;
+		else
+			el.textContent = tag;
+
+		if (tags.includes(tag))
+			c_ElSetSelected(el, true);
+
+		el.onclick = p_CommentTagOnClick;
+	}
 
 	n_Request({'send':{'player_init':{'path':p_path_hash}},'func':p_PlayerInit,'info':'player init','wait':false});
+}
+
+function p_CommentTagOnClick(i_evt)
+{
+	const el = i_evt.currentTarget;
+
+	c_ElToggleSelected(el);
+
+	let tags = [];
+	for (const el of $('comments_tags').children)
+		if (el.classList.contains('selected'))
+			tags.push(el.m_tag);
+
+	localStorage.player_comment_tags = JSON.stringify(tags);
+}
+
+function p_CommentTypeOnClick(i_evt)
+{
+	const el = i_evt.currentTarget;
+	const selected = el.classList.contains('selected');
+
+	for (const el of $('comments_types').children)
+		el.classList.remove('selected');
+
+	if (false == selected)
+	{
+		el.classList.add('selected');
+		localStorage.player_comment_type = el.m_type;
+	}
+	else
+	{
+		localStorage.removeItem('player_comment_type');
+	}
 }
 
 function p_PlayerInit(i_data)
@@ -1124,6 +1189,13 @@ function p_Save()
 	obj.jpegs = [];
 	let need_save = false;
 
+	let type = null;
+	if (localStorage.player_comment_type && localStorage.player_comment_type.length)
+		type = localStorage.player_comment_type;
+	let tags = [];
+	if (localStorage.player_comment_tags && localStorage.player_comment_tags.length)
+		tags = JSON.parse(localStorage.player_comment_tags);
+
 	// Collect comments:
 	for (let f = 0; f < Player.images_objs.length; f++)
 	{
@@ -1137,7 +1209,13 @@ function p_Save()
 		let cm = Player.comments[f];
 		if (cm.saved)
 			continue;
+
 		cm.saved = true;
+
+		if (type)
+			cm.type = type;
+		if (tags.length)
+			cm.tags = tags;
 
 		obj.comments[Player.filenames[f]] = cm;
 

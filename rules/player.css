@@ -61,7 +61,7 @@ overflow: hidden;
 #comments {
 position: absolute;
 bottom: 50px; left: 0px; right: 0px;
-height: 100px;
+_height: 100px;
 background: #444;
 border: 1px solid #222;
 box-shadow: 0 0 4px #000, 0 0 4px #777 inset;
@@ -70,14 +70,20 @@ box-shadow: 0 0 4px #000, 0 0 4px #777 inset;
 #comments_body {
 background: #222;
 color: #999;
-position: absolute;
+_position: absolute;
 top: 16px; left: 4px; right: 4px; bottom: 4px;
 box-shadow: 0 0 2px #000 inset, 0 0 2px #777;
 border-radius: 4px;
 padding: 4px;
 }
-
-
+#comments_types .tag {
+	opacity: 0.5;
+}
+#comments_types .tag.selected {
+	opacity: 1.0;
+	border: 1px solid #FFF;
+	box-shadow: 0 0 4px #FFF inset, 0 0 4px #FFF;
+}
 
 /* ==================== FOOTER ======================= */
 #footer { height: 50px; }

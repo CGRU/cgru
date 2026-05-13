@@ -165,10 +165,16 @@ def saveComments(i_obj, uid, out):
     if len(icomments) == 0:
         return
 
+    tags = None
+    ctype = None
     # Generate comments for RULES:
     text = '<div class="player"><a target="_blank" class="player_title" href="%s">Player comments:</a>' % ('player.html#' + i_obj['path'])
     for name in icomments:
         cm = icomments[name]
+        if 'tags' in cm:
+            tags = cm['tags']
+        if 'type' in cm:
+            ctype = cm['type']
 
         img_path = getJPEGPath(i_obj['path'], name)
         img_path = rulib.RULES_TOP['root'] + '/' + img_path
@@ -183,7 +189,7 @@ def saveComments(i_obj, uid, out):
     # Save RULES comments:
     rules_path = i_obj['path'].split('//')[0]
     cm_out = dict()
-    rulib.setComment(paths=[rules_path], uid=uid, ctype=None, text=text, tags=None, duration=None, color=None, uploads=None, deleted=False, nonews=None, out=cm_out, key=None)
+    rulib.setComment(paths=[rules_path], uid=uid, ctype=ctype, text=text, tags=tags, duration=None, color=None, uploads=None, deleted=False, nonews=None, out=cm_out, key=None)
     cm_key = cm_out['comments'][rules_path]['key']
 
     # Prepare PLAYER comments:
@@ -200,7 +206,9 @@ def saveComments(i_obj, uid, out):
         if name in comments_obj['comments']:
             cm = comments_obj['comments'][name]
 
-        cm['text'] = icomments[name]['text']
+        for field in ['text','type','tags']:
+            if field in icomments[name]:
+                cm[field] = icomments[name][field]
 
         if not 'keys' in cm:
             cm['keys'] = []
