@@ -823,7 +823,7 @@ function p_ViewTransform(i_tx, i_ty, i_zoom, i_clamp_zoom = true)
 
 function p_OnKeyDown(e)
 {
-	console.log(e.keyCode);
+	//console.log(e.keyCode);
 	if (e.keyCode == 116)  // F5
 	{
 		c_Info('Use CTRL+R to refresh. All loaded and painted images will be lost!');
