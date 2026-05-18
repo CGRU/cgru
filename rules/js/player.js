@@ -25,6 +25,8 @@ Player.filenames = [];
 Player.view_zoom = 1;
 Player.images_objs = [];
 Player.frame = null;
+Player.last_frame = null;
+Player.frame_offset = null;
 
 // TODO: not pollute the global scope with so much vars, should be bundled into struct objects
 
@@ -74,7 +76,7 @@ var p_fps = 24.0;
 var p_interval = 40;
 var p_drawTime = new Date();
 
-var p_elements = ['player_content', 'play_slider', 'frame_bar', 'view', 'preview', 'framerate','audio','video'];
+var p_elements = ['player_content', 'play_slider', 'frame_number', 'frame_bar', 'view', 'preview', 'framerate','audio','video'];
 var p_el = {};
 var p_buttons = ['play', 'prev', 'next', 'reverse', 'rewind', 'forward'];
 var p_elb = {};
@@ -178,6 +180,9 @@ function p_InitializeReceived(i_data)
 	document.body.onkeydown = p_OnKeyDown;
 	document.body.onkeyup = p_OnKeyUp;
 	window.onhashchange = p_PathChanged;
+
+	p_el.frame_number.onkeydown = p_FrameNumberOnKeyDown;
+	p_el.frame_number.onblur = p_FrameNumberOnBlur;
 
 	$('paint_size_num').onblur = function(e) { p_PaintSizeSet() };
 	$('paint_size_num').onkeydown = p_PaintSizeKeyDown;
@@ -464,7 +469,18 @@ function p_PlayerInit(i_data)
 			img.m_file = iobj;
 			Player.filenames.push(file);
 			Player.images_objs.push(img);
+
+			// Get Frame number:
+			if (Player.frame_offset == null)
+			{
+				const match = file.match(/(\d+)\.[^.]*$/);
+				if (match)
+					Player.frame_offset = parseInt(match[1], 10);
+			}
 		}
+
+		if (Player.frame_offset == null)
+			Player.frame_offset = 0;
 
 		if (Player.filenames == null || (Player.filenames.length == 0))
 		{
@@ -512,11 +528,12 @@ function p_VideoCanPlay(e)
 	Player.Video.pause();
 	Player.Video.currentTime = 0;
 	Player.frames_total = Math.floor(video.duration * p_fps);
+	Player.frame_offset = 1;
 
 	// Need to generate names for each frame:
 	for (let f = 0; f < Player.frames_total; f++)
 	{
-		let name = f + 1;
+		let name = f + Player.frame_offset;
 		name = name.toString().padStart(4, '0');
 		name = c_PathBase(p_path) + '.' + name;
 		Player.filenames.push(name);
@@ -1108,7 +1125,7 @@ function p_NextFrame(i_val)
 	if (p_paintElCanvas[Player.frame])
 		p_paintElCanvas[Player.frame].style.display = 'block';
 
-	var info = Player.filenames[Player.frame];
+	let info = Player.filenames[Player.frame];
 	if (Player.images_objs[Player.frame].m_loaderror && (u_el.info.classList.contains('error') == false))
 	{
 		u_el.info.classList.add('error');
@@ -1118,17 +1135,19 @@ function p_NextFrame(i_val)
 		u_el.info.classList.remove('error');
 	c_Info(info, false);
 
-	var width = '100%';
+	let width = '100%';
 	if (Player.images_objs.length > 1)
 		width = 100.0 * Player.frame / (Player.images_objs.length - 1) + '%';
 	p_el.play_slider.style.width = width;
 
+	const frame = Player.frame + Player.frame_offset;
+	p_el.frame_number.textContent = frame.toString().padStart(4, '0');
+
 	p_SetEditingState();
 
-	var now = new Date();
-	var delta = now.valueOf() - p_drawTime.valueOf();
-	var fps = 1000 / delta;
-	//	p_el.framerate.textContent = (''+fps).substr(0,5);
+	const now = new Date();
+	const delta = now.valueOf() - p_drawTime.valueOf();
+	let fps = 1000 / delta;
 	p_el.framerate.textContent = Math.round(fps);
 	p_drawTime = now;
 	if (fps < p_fps)
@@ -1145,6 +1164,48 @@ function p_NextFrame(i_val)
 		p_StopTimer();
 		p_timer = setTimeout('p_NextFrame()', p_interval);
 	}
+}
+
+function p_FrameNumberOnKeyDown(i_evt)
+{
+//console.log(i_evt.keyCode);
+	i_evt.stopPropagation();
+
+	const keyCode = i_evt.keyCode || i_evt.which;
+
+	// On Enter we change frame:
+	if (keyCode == 13) // Enter
+	{
+		p_el.frame_number.blur();
+		return false;
+	}
+
+    // Allow: 0–9, Backspace, Tab, Delete, Left/Right arrows, Home, End
+    if (
+        (keyCode >= 48 && keyCode <= 57) || // Digits 0–9
+        (keyCode >= 96 && keyCode <= 105) || // Numpad 0–9
+        keyCode === 8 ||  // Backspace
+        keyCode === 9 ||  // Tab
+        keyCode === 46 || // Delete
+        (keyCode >= 37 && keyCode <= 40) || // Arrow keys
+        keyCode === 36 || // Home
+        keyCode === 35    // End
+    )
+	{
+        return true;
+    }
+
+    i_evt.preventDefault();
+
+    return false;
+}
+function p_FrameNumberOnBlur(i_evt)
+{
+	const frame = parseInt(p_el.frame_number.textContent);
+	if ((frame == null) || isNaN(frame))
+		return;
+
+	p_ShowFrame(frame - Player.frame_offset);
 }
 
 function p_NextEditedFrame(i_dir)
