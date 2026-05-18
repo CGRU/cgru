@@ -24,6 +24,7 @@ Player.img_extensions = ['jpg', 'jpeg', 'png'];
 Player.filenames = [];
 Player.view_zoom = 1;
 Player.images_objs = [];
+Player.frame = null;
 
 // TODO: not pollute the global scope with so much vars, should be bundled into struct objects
 
@@ -32,7 +33,6 @@ var p_path = null;
 var p_args = {};
 var p_rules_path = null;
 var p_imageMode = false;
-var p_frame = null;
 var p_playing = null;
 var p_timer = null;
 var p_fileSizeTotal = null;
@@ -241,9 +241,9 @@ function p_PathChanged()
 	p_PushAllButtons();
 
 	p_StopTimer();
-	p_frame = 0;
+	Player.frame = 0;
 	if (p_args.f)
-		p_frame = p_args.f;
+		Player.frame = p_args.f;
 	p_playing = 0;
 
 	Player.images_objs = [];
@@ -286,7 +286,7 @@ function p_PathChanged()
 
 function p_Link()
 {
-	p_args.f = p_frame;
+	p_args.f = Player.frame;
 	let hash = p_path_hash + '?' + encodeURI(JSON.stringify(p_args));
 	document.location.hash = hash;
 }
@@ -650,7 +650,7 @@ function p_AllImagesReady()
 	else
 		gl_CreateAllTextures();
 
-	p_ShowFrame(p_frame);
+	p_ShowFrame(Player.frame);
 	p_ViewHome();
 
 	// Just information:
@@ -715,7 +715,7 @@ function p_WalkReceivedComments(i_data)
 			p_png.onload = function(e) {
 				var img = e.currentTarget;
 				var canvas = p_PaintCreateCanvas(img.m_frame);
-				if (img.m_frame != p_frame)
+				if (img.m_frame != Player.frame)
 					canvas.style.display = 'none';
 				canvas.m_edited = true;
 				canvas.m_saved = true;
@@ -726,7 +726,7 @@ function p_WalkReceivedComments(i_data)
 			}
 		}
 
-	p_ShowFrame(p_frame);
+	p_ShowFrame(Player.frame);
 	p_SetEditingState(true);
 
 	if (p_args.f == null)
@@ -823,7 +823,7 @@ function p_ViewTransform(i_tx, i_ty, i_zoom, i_clamp_zoom = true)
 
 function p_OnKeyDown(e)
 {
-	//console.log(e.keyCode);
+	console.log(e.keyCode);
 	if (e.keyCode == 116)  // F5
 	{
 		c_Info('Use CTRL+R to refresh. All loaded and painted images will be lost!');
@@ -869,6 +869,8 @@ function p_OnKeyDown(e)
 		p_Play();
 	else if (e.keyCode == 82) // R
 		p_Reverse();
+	else if (e.keyCode == 220) // \
+		p_ShowFrame(Player.last_frame);
 
 	else if (e.keyCode == 39) // Right
 		p_NextFrame(+1);
@@ -985,7 +987,7 @@ function p_Play()
 	p_NextFrame();
 
 	if (Player.Audio)
-		Player.Audio.currentTime = p_frame / p_fps;
+		Player.Audio.currentTime = Player.frame / p_fps;
 }
 
 function p_Reverse()
@@ -1041,7 +1043,7 @@ function p_ShowFrame(i_val)
 		return;
 	if (i_val == -1)
 		i_val = Player.images_objs.length - 1;
-	p_NextFrame(i_val - p_frame);
+	p_NextFrame(i_val - Player.frame);
 }
 
 function p_NextFrame(i_val)
@@ -1049,31 +1051,33 @@ function p_NextFrame(i_val)
 	if (p_loaded == false)
 		return;
 
-	if ( ! Player.usewebgl)
-		Player.images_objs[p_frame].style.display = 'none';
+	Player.last_frame = Player.frame;
 
-	if (p_paintElCanvas[p_frame])
-		p_paintElCanvas[p_frame].style.display = 'none';
+	if ( ! Player.usewebgl)
+		Player.images_objs[Player.frame].style.display = 'none';
+
+	if (p_paintElCanvas[Player.frame])
+		p_paintElCanvas[Player.frame].style.display = 'none';
 
 	if (i_val)
 	{
 		p_StopTimer();
 		p_playing = 0;
 		p_PushButton();
-		p_frame += i_val;
+		Player.frame += i_val;
 
 		if (Player.Audio)
 			Player.Audio.pause();
 	}
 	else
 	{
-		p_frame += p_playing;
+		Player.frame += p_playing;
 
 		if (Player.Audio)
 		{
 			if ((p_playing == 1)/* && Player.Audio.paused*/)
 			{
-				//Player.Audio.currentTime = p_frame / p_fps;
+				//Player.Audio.currentTime = Player.frame / p_fps;
 				Player.Audio.play();
 			}
 			else
@@ -1081,15 +1085,15 @@ function p_NextFrame(i_val)
 		}
 	}
 
-	if (p_frame >= Player.images_objs.length)
+	if (Player.frame >= Player.images_objs.length)
 	{
-		p_frame = 0;
+		Player.frame = 0;
 		if (Player.Audio)
 			Player.Audio.currentTime = 0;
 	}
-	if (p_frame < 0)
+	if (Player.frame < 0)
 	{
-		p_frame = Player.images_objs.length - 1;
+		Player.frame = Player.images_objs.length - 1;
 		if (Player.Audio)
 			Player.Audio.currentTime = 0;
 	}
@@ -1098,14 +1102,14 @@ function p_NextFrame(i_val)
 		gl_DrawScene();
 	else
 	{
-		Player.images_objs[p_frame].style.display = 'block';
+		Player.images_objs[Player.frame].style.display = 'block';
 	}
 
-	if (p_paintElCanvas[p_frame])
-		p_paintElCanvas[p_frame].style.display = 'block';
+	if (p_paintElCanvas[Player.frame])
+		p_paintElCanvas[Player.frame].style.display = 'block';
 
-	var info = Player.filenames[p_frame];
-	if (Player.images_objs[p_frame].m_loaderror && (u_el.info.classList.contains('error') == false))
+	var info = Player.filenames[Player.frame];
+	if (Player.images_objs[Player.frame].m_loaderror && (u_el.info.classList.contains('error') == false))
 	{
 		u_el.info.classList.add('error');
 		info += ' loaded with an error.';
@@ -1116,7 +1120,7 @@ function p_NextFrame(i_val)
 
 	var width = '100%';
 	if (Player.images_objs.length > 1)
-		width = 100.0 * p_frame / (Player.images_objs.length - 1) + '%';
+		width = 100.0 * Player.frame / (Player.images_objs.length - 1) + '%';
 	p_el.play_slider.style.width = width;
 
 	p_SetEditingState();
@@ -1147,7 +1151,7 @@ function p_NextEditedFrame(i_dir)
 {
 	if (p_loaded == false)
 		return;
-	var f = p_frame + i_dir;
+	var f = Player.frame + i_dir;
 	while ((p_paintElCanvas[f] == null) && (Player.comments[f] == null))
 	{
 		if ((f < 0) || (f >= Player.images_objs.length))
@@ -1299,8 +1303,8 @@ function p_SetEditingState(i_update_whole_bar)
 	p_CmSetCurrent();
 
 	// Draw frame bar:
-	var start_frame = p_frame;
-	var end_frame = p_frame;
+	var start_frame = Player.frame;
+	var end_frame = Player.frame;
 	if (i_update_whole_bar)
 	{
 		start_frame = 0;
@@ -1381,8 +1385,8 @@ function p_ViewOnMouseDown(i_evt)
 	p_CmProcess();
 
 	var canvas = null;
-	if (p_paintElCanvas[p_frame])
-		canvas = p_paintElCanvas[p_frame];
+	if (p_paintElCanvas[Player.frame])
+		canvas = p_paintElCanvas[Player.frame];
 	else
 		canvas = p_PaintCreateCanvas();
 
@@ -1398,7 +1402,7 @@ function p_ViewOnMouseDown(i_evt)
 function p_PaintCreateCanvas(i_frame)
 {
 	if (i_frame == null)
-		i_frame = p_frame;
+		i_frame = Player.frame;
 	var canvas = document.createElement('canvas');
 	p_paintElCanvas[i_frame] = canvas;
 	$('canvases').appendChild(canvas);
@@ -1505,8 +1509,8 @@ function p_ViewOnMouseMove(i_evt)
 		return;
 	var c = p_GetCtxCoords(i_evt);
 	p_paintCtx.lineTo(c.x, c.y);
-	p_paintElCanvas[p_frame].m_edited = true;
-	p_paintElCanvas[p_frame].m_saved = false;
+	p_paintElCanvas[Player.frame].m_edited = true;
+	p_paintElCanvas[Player.frame].m_saved = false;
 	p_paintCtx.stroke();
 	p_SetEditingState();
 }
@@ -1574,11 +1578,11 @@ function p_PaintClear()
 	if (p_painting == false)
 		return;
 
-	var canvas = p_paintElCanvas[p_frame];
+	var canvas = p_paintElCanvas[Player.frame];
 	if (canvas == null)
 		return;
 
-	p_paintElCanvas[p_frame] = null;
+	p_paintElCanvas[Player.frame] = null;
 	$('canvases').removeChild(canvas);
 
 	p_SetEditingState();
@@ -1629,13 +1633,13 @@ function p_SavingFinished(i_data, i_args)
 function p_PaintSetState()
 {
 	var shadow = '0 0 4px #000';
-	if (p_paintElCanvas[p_frame])
+	if (p_paintElCanvas[Player.frame])
 	{
 		shadow = '0 0 4px #FF0';
-		if (p_paintElCanvas[p_frame].m_edited)
+		if (p_paintElCanvas[Player.frame].m_edited)
 		{
 			shadow = '0 0 4px #F00';
-			if (p_paintElCanvas[p_frame].m_saved)
+			if (p_paintElCanvas[Player.frame].m_saved)
 				shadow = '0 0 4px #0F0';
 		}
 	}
@@ -1709,7 +1713,7 @@ function p_CmProcess()
 	// console.log('p_CmProcess: ' + text);
 	if (text.length)
 	{
-		var cm = Player.comments[p_frame];
+		var cm = Player.comments[Player.frame];
 		if (cm && (cm.text == text))
 			return;
 		if (cm == null)
@@ -1717,10 +1721,10 @@ function p_CmProcess()
 
 		cm.text = text;
 		cm.saved = false;
-		Player.comments[p_frame] = cm;
+		Player.comments[Player.frame] = cm;
 	}
 	else
-		Player.comments[p_frame] = null;
+		Player.comments[Player.frame] = null;
 
 	p_SetEditingState();
 }
@@ -1729,7 +1733,7 @@ function p_CmSetCurrent()
 {
 	var shadow = '0 0 4px #000';
 	$('comments_label').textContent = 'Comments';
-	var cm = Player.comments[p_frame];
+	var cm = Player.comments[Player.frame];
 	if (cm)
 	{
 		shadow = '0 0 4px #F00';
@@ -1934,7 +1938,7 @@ function gl_DrawScene()
 
 	// Specify the texture to map onto the faces
 	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, gl_textures[p_frame]);
+	gl.bindTexture(gl.TEXTURE_2D, gl_textures[Player.frame]);
 	gl.uniform1i(gl.getUniformLocation(gl_shaderProgram, 'uSampler'), 0);
 
 	// Draw plane
