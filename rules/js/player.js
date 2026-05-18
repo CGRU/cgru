@@ -173,14 +173,11 @@ function p_InitializeReceived(i_data)
 	p_el.view.onmouseover = p_ViewOnMouseOver;
 
 	p_el.frame_bar.onmousedown = p_SliderOnMouseDown;
-//	p_el.frame_bar.onmouseup = p_SliderOnMouseUp;
 	document.body.onmouseup = p_SliderOnMouseUp;
-//	p_el.frame_bar.onmousemove = p_SliderOnMouseMove;
 	document.body.onmousemove = p_SliderOnMouseMove;
 	document.body.onkeydown = p_OnKeyDown;
 	document.body.onkeyup = p_OnKeyUp;
 	window.onhashchange = p_PathChanged;
-	//	window.onresize = p_ViewHome;
 
 	$('paint_size_num').onblur = function(e) { p_PaintSizeSet() };
 	$('paint_size_num').onkeydown = p_PaintSizeKeyDown;
@@ -654,8 +651,7 @@ function p_AllImagesReady()
 		gl_CreateAllTextures();
 
 	p_ShowFrame(p_frame);
-	p_ViewHome();
-	//	setTimeout('p_ViewHome();',100);
+	p_ViewFitZoom();
 
 	// Just information:
 	let now_ms = (new Date()).valueOf();
@@ -748,6 +744,21 @@ function p_CreateImages()
 	}
 }
 
+function p_ViewFitZoom()
+{
+	const view_w = p_el.player_content.clientWidth;
+	const view_h = p_el.player_content.clientHeight;
+	const img_w = Player.images_width;
+	const img_h = Player.images_height;
+
+	let zoom = 1;
+	if ((view_w / view_h) < (img_w / img_h))
+		zoom = view_w / img_w;
+	else
+		zoom = view_h / img_h;
+
+	p_ViewTransform(0, 0, zoom);
+}
 function p_ViewHome()
 {
 	p_ViewTransform(0, 0, 1);
@@ -880,7 +891,7 @@ function p_OnKeyDown(e)
 	else if (e.keyCode == 107)
 		p_ViewZoomIn();  // + (NumPad)
 	else if (e.keyCode == 72)
-		p_ViewHome();  // H
+		p_ViewFitZoom();  // H
 	else if (e.keyCode == 70)
 		p_FullScreen();  // F
 
@@ -925,18 +936,13 @@ function p_FullScreen()
 		$('header').m_hidden = false;
 		$('header').style.display = 'block';
 		$('footer').style.display = 'block';
-		// p_el.player_content.style.top = p_top;
-		// p_el.player_content.style.bottom = p_bottom;
 	}
 	else
 	{
 		$('header').m_hidden = true;
 		$('header').style.display = 'none';
 		$('footer').style.display = 'none';
-		// p_el.player_content.style.top = '0';
-		// p_el.player_content.style.bottom = '0';
 	}
-	// p_ViewHome();
 }
 
 function p_PushButton(i_btn)
