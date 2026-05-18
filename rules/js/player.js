@@ -651,7 +651,7 @@ function p_AllImagesReady()
 		gl_CreateAllTextures();
 
 	p_ShowFrame(p_frame);
-	p_ViewFitZoom();
+	p_ViewHome();
 
 	// Just information:
 	let now_ms = (new Date()).valueOf();
@@ -744,7 +744,7 @@ function p_CreateImages()
 	}
 }
 
-function p_ViewFitZoom()
+function p_ViewHome()
 {
 	const view_w = p_el.player_content.clientWidth;
 	const view_h = p_el.player_content.clientHeight;
@@ -759,7 +759,7 @@ function p_ViewFitZoom()
 
 	p_ViewTransform(0, 0, zoom);
 }
-function p_ViewHome()
+function p_ViewResetTransform()
 {
 	p_ViewTransform(0, 0, 1);
 }
@@ -850,68 +850,78 @@ function p_OnKeyDown(e)
 	{
 		cgru_ClosePopus();
 		p_ShowFrame(0);
-		p_ViewHome();
+		p_ViewResetTransform();
 	}
 
-	else if (e.keyCode == 33)
-		p_NextFrame(-10);  // PageUp
-	else if (e.keyCode == 34)
-		p_NextFrame(+10);  // PageDown
-	else if (e.keyCode == 35)
-		p_ShowFrame(-1);  // End
-	else if (e.keyCode == 36)
-		p_ShowFrame(0);  // Home
-	else if (e.keyCode == 219)
-		p_NextFrame(-1);  // [
-	else if (e.keyCode == 221)
-		p_NextFrame(+1);  // ]
-	else if (e.keyCode == 32)
-		p_Play();  // Space
-	else if (e.keyCode == 190)
-		p_Play();  // >
-	else if (e.keyCode == 82)
-		p_Reverse();  // R
-	else if (e.keyCode == 188)
-		p_Reverse();  // <
+	else if (e.keyCode == 33) // PageUp
+		p_NextFrame(-10);
+	else if (e.keyCode == 34) // PageDown
+		p_NextFrame(+10);
+	else if (e.keyCode == 35) // End
+		p_ShowFrame(-1);
+	else if (e.keyCode == 36) // Home
+		p_ShowFrame(0);
+	else if (e.keyCode == 219) // [
+		p_NextFrame(-1);
+	else if (e.keyCode == 221) // ]
+		p_NextFrame(+1);
+	else if (e.keyCode == 32) // Space
+		p_Play();
+	else if (e.keyCode == 82) // R
+		p_Reverse();
 
-	else if (e.keyCode == 39)
-		p_ViewRight();  // Right
-	else if (e.keyCode == 37)
-		p_ViewLeft();  // Left
-	else if (e.keyCode == 38)
-		p_ViewUp();  // Up
-	else if (e.keyCode == 40)
-		p_ViewDown();  // Down
+	else if (e.keyCode == 39) // Right
+		p_NextFrame(+1);
+	else if (e.keyCode == 37) // Left
+		p_NextFrame(-1);
+	else if (e.keyCode == 38) // Up
+		p_Play();
+	else if (e.keyCode == 40) // Down
+		p_Reverse();
+
+	else if (e.keyCode == 73) // I
+		p_ViewUp();
+	else if (e.keyCode == 75) // K
+		p_ViewDown();
+	else if (e.keyCode == 74) // J
+		p_ViewLeft();
+	else if (e.keyCode == 76) // L
+		p_ViewRight();
+
 	else if (e.keyCode == 173)
 		p_ViewZoomOut();  // -
 	else if (e.keyCode == 109)
 		p_ViewZoomOut();  // - (NumPad)
-	else if (e.keyCode == 61)
-		p_ViewZoomIn();  // +
-	else if (e.keyCode == 107)
-		p_ViewZoomIn();  // + (NumPad)
-	else if (e.keyCode == 72)
-		p_ViewFitZoom();  // H
-	else if (e.keyCode == 70)
-		p_FullScreen();  // F
+	else if (e.keyCode == 61) // +
+		p_ViewZoomIn();
+	else if (e.keyCode == 107) // + (NumPad)
+		p_ViewZoomIn();
+	else if (e.keyCode == 72) // H
+		p_ViewHome();
+	else if (e.keyCode == 70) // F
+		p_FullScreen();
 
-	else if (e.keyCode == 80)
-		p_Paint();  // P
-	else if (e.keyCode == 57)
-		p_PaintSizeChange(-1);  // 9
-	else if (e.keyCode == 48)
-		p_PaintSizeChange(+1);  // 0
+	else if (e.keyCode == 80) // P
+		p_Paint();
+	else if (e.keyCode == 57) // 9
+		p_PaintSizeChange(-1);
+	else if (e.keyCode == 48) // 0
+		p_PaintSizeChange(+1);
 
-	else if (e.keyCode == 67)
-		p_Comment();  // C
+	else if (e.keyCode == 67) // C
+		p_Comment();
 
-	else if (e.keyCode == 59)
-		p_NextEditedFrame(-1);  // ;
-	else if (e.keyCode == 222)
-		p_NextEditedFrame(+1);  // '
+	else if (e.keyCode == 59) // ;
+		p_NextEditedFrame(-1);
+	else if (e.keyCode == 222) // '
+		p_NextEditedFrame(+1);
+	else if (e.keyCode == 188) // <
+		p_NextEditedFrame(-1);
+	else if (e.keyCode == 190) // >
+		p_NextEditedFrame(+1);
 
-	else if (e.keyCode == 83)
-		p_Save();  // S
+	else if (e.keyCode == 83) // S
+		p_Save();
 }
 function p_OnKeyUp(e)
 {
