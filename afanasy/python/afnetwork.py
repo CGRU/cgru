@@ -46,7 +46,7 @@ def sendServer(i_data, i_verbose=False, i_without_answer=False):
     for res in reslist:
         af, socktype, proto, canonname, sa = res
         if i_verbose:
-            print('Trying to connect to "%s"' % str(sa[0]))
+            print('Trying to connect to "%s:%s"' % (str(sa[0]), str(port)))
         try:
             s = socket.socket(af, socktype, proto)
         except:  # TODO: Too broad exception clause
