@@ -69,6 +69,8 @@ public:
 	void addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
 	void remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
 
+	void readingStoreFinished();
+
 private:
 	bool refreshCounters();
 

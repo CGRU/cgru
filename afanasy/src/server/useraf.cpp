@@ -180,9 +180,29 @@ void UserAf::addJob( JobAf * i_job)
 
 	m_jobs_num++;
 
-	updateJobsOrder( i_job);
+	// New jobs has user_list_order == -1
+	// Jobs from store has user_list_order > -1
+	// We should not update jobs order reading store
+	if (i_job->getUserListOrder() <= -1)
+		updateJobsOrder(i_job);
 
 	i_job->setUser( this);
+}
+
+void UserAf::readingStoreFinished()
+{
+	// We should sort jobs by order.
+	// Less order goes first.
+	struct LessOrder
+	{
+		inline bool operator()(const AfNodeSolve * a, const AfNodeSolve * b)
+		{
+			const JobAf * job_a = static_cast<const JobAf*>(a);
+			const JobAf * job_b = static_cast<const JobAf*>(b);
+			return job_a->getUserListOrder() < job_b->getUserListOrder();
+		}
+	};
+	m_jobs_list.sort(LessOrder());
 }
 
 void UserAf::removeJob( JobAf * i_job)

@@ -325,6 +325,7 @@ int main(int argc, char *argv[])
 			delete job;
 		}
 	}
+	users.readingStoreFinished();
 	AF_LOG << jobs.getCount() << " jobs registered from store.";
 	}
 

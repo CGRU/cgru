@@ -114,7 +114,8 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	jr_string("host_name", m_host_name,     i_object);
 	//jr_uint32("flags",   m_flags,         i_object);
 	jr_int64("st",        m_state,         i_object);
-	//jr_int32 ("user_list_order",          m_user_list_order,            i_object);
+
+	jr_int32 ("user_list_order", m_user_list_order, i_object);
 
 	jr_int64 ("time_creation", m_time_creation, i_object);
 	jr_int64 ("time_started",  m_time_started,  i_object);

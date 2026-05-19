@@ -203,6 +203,13 @@ af::Msg * UserContainer::generateJobsList( const std::vector<int32_t> & ids, con
 	return msg;
 }
 
+void UserContainer::readingStoreFinished()
+{
+	UserContainerIt usersIt(this);
+	for (UserAf * user = usersIt.user(); user != NULL; usersIt.next(), user = usersIt.user())
+		user->readingStoreFinished();
+}
+
 //############################################################################
 //                               UserContainerIt
 //############################################################################

@@ -37,6 +37,8 @@ public:
 	/// Generate MCJobs message for users with provided names:
 	af::Msg * generateJobsList( const std::vector<std::string> & i_names, const std::string & i_type_name, bool i_json = false);
 
+	void readingStoreFinished();
+
 	UserAf * getUser( const std::string & i_name );
 	void updateTimeActivity( const std::string & i_name );
 	void logAction( const Action & i_action, const std::string & i_node_name);

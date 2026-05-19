@@ -101,6 +101,16 @@ void AfList::remove(AfNodeSolve *i_node)
 	i_node->m_lists.remove(this);
 }
 
+void AfList::clear()
+{
+	while (m_nodes_list.size())
+	{
+		AfNodeSolve * node = m_nodes_list.back();
+		m_nodes_list.pop_back();
+		node->m_lists.remove(this);
+	}
+}
+
 int AfList::sortPriority(AfNodeSolve *i_node)
 {
 	if (m_nodes_list.size() < 2)

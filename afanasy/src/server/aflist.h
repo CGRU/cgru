@@ -57,6 +57,11 @@ public:
 
 	int sortPriority( AfNodeSolve * i_node);   ///< Sort nodes by priority.
 
+	void clear();
+
+	template<typename Comparator>
+	inline void sort(Comparator comp){m_nodes_list.sort(comp);}
+
 private:
 	std::list<AfNodeSolve*> m_nodes_list;      ///< Nodes list.
 };
