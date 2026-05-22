@@ -170,12 +170,12 @@ def reformatAnnotate(infile, outfile):
 	global FILEIN
 
 	# Check ouptut folder:
-	outdir = os.path.dirname( outfile)
-	if not os.path.isdir( outdir):
+	outdir = os.path.dirname(outfile)
+	if len(outdir) and not os.path.isdir(outdir):
 		if Options.mkdir:
-			os.makedirs( outdir)
+			os.makedirs(outdir)
 		else:
-			Parser.error('Output folder doos not exit:\n' + outdir)
+			Parser.error('Output folder does not exist: "%s"\n' % outdir)
 
 	cmd = Options.imgcmd
 

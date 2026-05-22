@@ -3,8 +3,9 @@
 -stroke black -strokewidth 3
 -fill "#888" -pointsize @SIZE_1/30Y@ -gravity northwest -annotate +@SIZE_1/50X@+@SIZE_1/50Y@ "%(PROJECT)s %(SHOT)s"
 -fill "#888" -pointsize @SIZE_1/30Y@ -gravity northeast -annotate +@SIZE_1/50X@+@SIZE_1/50Y@ "%(ARTIST)s %(ACTIVITY)s %(VERSION)s"
+-fill "#CCC" -pointsize @SIZE_1/30Y@ -gravity southwest -annotate +@SIZE_1/50X@+@SIZE_1/12Y@ "%(COMMENTS)s"
 -fill "#888" -pointsize @SIZE_1/30Y@ -gravity southwest -annotate +@SIZE_1/30X@+@SIZE_1/30Y@ "%(DATETIME)s"
--fill "#888" -pointsize @SIZE_1/50Y@ -gravity southwest -annotate +@SIZE_1/50X@+@SIZE_1/99Y@ "%(MOVIENAME)s %(COMMENTS)s"
+-fill "#888" -pointsize @SIZE_1/50Y@ -gravity southwest -annotate +@SIZE_1/50X@+@SIZE_1/99Y@ "%(MOVIENAME)s"
 -fill "#5A5" -pointsize @SIZE_1/20Y@ -gravity southeast -annotate +@SIZE_1/30X@+@SIZE_1/30Y@ "%(FRAME)s"
 -fill "#888" -pointsize @SIZE_1/40Y@ -gravity southeast -annotate +@SIZE_1/30X@+@SIZE_1/99Y@ "%(FRAMERANGE)s"
 
@@ -14,7 +15,8 @@
 -stroke none
 -fill "#888" -pointsize @SIZE_1/30Y@ -gravity northwest -annotate +@SIZE_1/50X@+@SIZE_1/50Y@ "%(PROJECT)s %(SHOT)s"
 -fill "#888" -pointsize @SIZE_1/30Y@ -gravity northeast -annotate +@SIZE_1/50X@+@SIZE_1/50Y@ "%(ARTIST)s %(ACTIVITY)s %(VERSION)s"
+-fill "#CCC" -pointsize @SIZE_1/30Y@ -gravity southwest -annotate +@SIZE_1/50X@+@SIZE_1/12Y@ "%(COMMENTS)s"
 -fill "#888" -pointsize @SIZE_1/30Y@ -gravity southwest -annotate +@SIZE_1/30X@+@SIZE_1/30Y@ "%(DATETIME)s"
--fill "#888" -pointsize @SIZE_1/50Y@ -gravity southwest -annotate +@SIZE_1/50X@+@SIZE_1/99Y@ "%(MOVIENAME)s %(COMMENTS)s"
+-fill "#888" -pointsize @SIZE_1/50Y@ -gravity southwest -annotate +@SIZE_1/50X@+@SIZE_1/99Y@ "%(MOVIENAME)s"
 -fill "#5A5" -pointsize @SIZE_1/20Y@ -gravity southeast -annotate +@SIZE_1/30X@+@SIZE_1/30Y@ "%(FRAME)s"
 -fill "#888" -pointsize @SIZE_1/40Y@ -gravity southeast -annotate +@SIZE_1/30X@+@SIZE_1/99Y@ "%(FRAMERANGE)s"
