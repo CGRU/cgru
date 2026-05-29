@@ -244,25 +244,24 @@ else:
 
     if Options.ovrfile is not None:
         if os.path.isfile(Options.ovrfile):
-            pass
+            auxargs += ' -i "%s"' % Options.ovrfile
+
+            ovr_pos = 'W-w-W/100:H/7'
+            if Options.ovrleft and Options.ovrbottom:
+                ovr_pos = 'W/100:H-h-H/7'
+            elif Options.ovrbottom:
+                ovr_pos = 'W-w-W/100:H-h-H/7'
+            elif Options.ovrleft:
+                ovr_pos = 'W/100:H/7'
+
+            if len(filter_complex):
+                filter_complex[-1] += ' [base]'
+                filter_complex.append('[1:v][base] scale2ref=w=iw*%f:h=-1 [ovr][base]' % Options.ovrscale)
+            else:
+                filter_complex.append('[1:v][0:v] scale2ref=w=iw*%f:h=-1 [ovr][base]' % Options.ovrscale)
+            filter_complex.append('[base][ovr] overlay=%s' % ovr_pos)
         else:
             print('Overlay video does not exist: ' + Options.ovrfile)
-        auxargs += ' -i "%s"' % Options.ovrfile
-
-        ovr_pos = 'W-w-W/100:H/7'
-        if Options.ovrleft and Options.ovrbottom:
-            ovr_pos = 'W/100:H-h-H/7'
-        elif Options.ovrbottom:
-            ovr_pos = 'W-w-W/100:H-h-H/7'
-        elif Options.ovrleft:
-            ovr_pos = 'W/100:H/7'
-
-        if len(filter_complex):
-            filter_complex[-1] += ' [base]'
-            filter_complex.append('[1:v][base] scale2ref=w=iw*%f:h=-1 [ovr][base]' % Options.ovrscale)
-        else:
-            filter_complex.append('[1:v][0:v] scale2ref=w=iw*%f:h=-1 [ovr][base]' % Options.ovrscale)
-        filter_complex.append('[base][ovr] overlay=%s' % ovr_pos)
 
     if len(filter_complex):
         auxargs += ' -filter_complex "%s"' % (','.join(filter_complex))
