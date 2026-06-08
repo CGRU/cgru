@@ -1584,6 +1584,12 @@ margin: 3px;
 padding: 3px;
 }
 .artpage_prj .title {font-weight: bold;}
+.artpage_prj .pri_info {
+	float: right;
+	margin: 2px;
+	padding: 2px;
+	_border: 1px solid #F00;
+}
 .artpage_prj .panel .button {float: right;}
 .artpage_prj .prj_act {
 border-top: 1px solid rgba(98,98,98,.5);
