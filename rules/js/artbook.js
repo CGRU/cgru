@@ -276,6 +276,7 @@ function ab_ProcessArtists()
 		let artist =  user;
 		artist.projects = [];
 		artist.bm_count = 0;
+		artist.priorities = 0;
 		let projects = bm_CollectProjects(bookmarks);
 		for (let prj of projects)
 		{
@@ -297,7 +298,22 @@ function ab_ProcessArtists()
 
 			for (let sc of prj.scenes)
 				for (let bm of sc.bms)
+				{
 					artist.bm_count += 1;
+
+					if (bm.status == null) continue;
+					if (bm.status.tasks == null) continue;
+					for (let name in bm.status.tasks)
+					{
+						let t = bm.status.tasks[name];
+						if (t.deleted) continue;
+						if (t.artists == null) continue;
+						if (t.artists.indexOf(artist.id) == -1) continue;
+						if (t.priority)
+							artist.priorities += 1;
+					}
+				}
+
 
 			artist.projects.push(prj);
 		}
@@ -451,6 +467,8 @@ function ArtPage(i_el, i_artist)
 		info += '<br>Bookmarks: ' + this.artist.bm_count;
 	else
 		this.elRoot.classList.add('empty');
+	if (this.artist.priorities)
+		info += '<br>Priorities: ' + this.artist.priorities;
 
 	this.elInfo = document.createElement('div');
 	this.elBrief.appendChild(this.elInfo);
