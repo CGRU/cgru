@@ -6,10 +6,22 @@ Contacts
 .. image:: dr.strangelove.gif
 
 
-- Telegram channel
+- Messengers:
+
+  - Yandex:
+
+    https://yandex.ru/chat#/chats/0%2F0%2F00f1b5fc-636e-4a9c-8f45-594923bc9c4d
+
+  - MAX:
+
+    https://max.ru/join/sA8Zlc1iY9qXu0ZaxslkPQnPmTrx-fK8hCxsUMN181U
+
+  - Telegram
+
     https://t.me/cgruafanasy
 
-    *It is mostly Russian, but there are many English speaking people who will be happy to help you.*
+
+  *Messangers are mostly Russian, but there are many English speaking people who will be happy to help you.*
 
 
 - GitHub Issues
