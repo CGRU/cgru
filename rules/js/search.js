@@ -132,6 +132,14 @@ function s_FirstConstruct(i_tab)
 					if (ASSET && ASSET.filter)
 						s_ProcessGUI();
 				};
+
+				el.oncontextmenu = function(e) {
+					e.stopPropagation();
+					c_ElToggleSelected(e.currentTarget, 'exclude');
+					if (ASSET && ASSET.filter)
+						s_ProcessGUI();
+					return false;
+				};
 			}
 		}
 
@@ -448,7 +456,13 @@ function s_ProcessGUI()
 		}
 		else
 			for (let i = 0; i < $('search_artists_'+tab).m_elArtists.length; i++)
-				if ($('search_artists_'+tab).m_elArtists[i].m_selected)
+				if ($('search_artists_'+tab).m_elArtists[i].m_exclude)
+				{
+					if (args[tab].noartists == null)
+						args[tab].noartists = [];
+					args[tab].noartists.push($('search_artists_'+tab).m_elArtists[i].m_user.id);
+				}
+				else if ($('search_artists_'+tab).m_elArtists[i].m_selected)
 				{
 					if (args[tab].artists == null)
 						args[tab].artists = [];
@@ -583,6 +597,11 @@ function s_Search(i_args)
 				c_ElSetSelected(
 					$('search_artists_'+tab).m_elArtists[i],
 					args.artists.indexOf($('search_artists_'+tab).m_elArtists[i].m_user.id) != -1);
+		if (args.noartists)
+			for (let i = 0; i < $('search_artists_'+tab).m_elArtists.length; i++)
+				c_ElSetSelected(
+					$('search_artists_'+tab).m_elArtists[i],
+					args.noartists.indexOf($('search_artists_'+tab).m_elArtists[i].m_user.id) != -1, 'exclude');
 		if (args.flags)
 			for (let i = 0; i < $('search_flags_'+tab).m_elFlags.length; i++)
 				c_ElSetSelected(

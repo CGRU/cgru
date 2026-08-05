@@ -934,6 +934,23 @@ function sc_FilterStatus(i_status, i_args)
 		else if (i_args.artists.indexOf('_null_') != -1)
 			found = true;
 	}
+	if (i_args.noartists && i_args.noartists.length && found)
+	{
+		if (i_status.artists && i_status.artists.length)
+		{
+			for (const f of i_args.noartists)
+			{
+				// skip special flags
+				if (f.charAt(0) == '_') continue;
+
+				if (i_status.artists.includes(f))
+				{
+					found = false;
+					break;
+				}
+			}
+		}
+	}
 
 	if (i_args.modified && found)
 	{
