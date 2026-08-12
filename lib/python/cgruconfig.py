@@ -198,7 +198,8 @@ class Config:
         if not os.path.isfile(filename):
             return
 
-        with open(filename, 'r') as f:
+        # utf-8-sig skips an UTF-8 BOM if present (Windows editors often write it):
+        with open(filename, 'r', encoding='utf-8-sig') as f:
             filedata = f.read()
 
         success = True
