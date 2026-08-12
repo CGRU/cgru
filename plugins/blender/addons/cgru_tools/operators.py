@@ -17,7 +17,7 @@ LAYER_TEXT_BLOCK = '''#
 import bpy
 bpy.context.scene.render.use_sequencer = False
 bpy.context.scene.render.use_compositing = False
-layers = bpy.context.scene.render.layers
+layers = bpy.context.scene.view_layers
 for layer in layers:
     layer.use = False
 layers['{0}'].use = True
@@ -116,17 +116,7 @@ class CGRU_Submit(bpy.types.Operator):
 
         servicename = 'blender'
         renderlayer_names = []
-        # layers = bpy.context.scene.render.layers
-        active_scene = bpy.context.active_object
-
-        layers = utils.layers_get(active_scene)
-
-        # if hasattr(active_scene, "layers"):
-        #    layers = active_scene.layers
-        # else:
-        #    obj_colls = active_scene.users_collection # get all collections object is in
-        #    collection_names = [coll.name for coll in obj_colls]
-        #    layers = [str(i) in collection_names for i in range(20)] # ordered bool list
+        layers = sce.view_layers
 
         if cgru_props.splitRenderLayers and len(layers) > 1:
             for layer in layers:

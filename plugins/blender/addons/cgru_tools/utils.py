@@ -28,18 +28,6 @@ def get_cgru_version(path):
     except:
         return CGRU_NOT_FOUND
 
-def layers_get(object):
-    """Gets membership of object in 0-19 numbered layers/collections
-
-    returns: list of booleans with length of 20
-    """
-    if hasattr(object, "layers"):
-        return object.layers
-    else:
-        obj_colls = object.users_collection # get all collections object is in
-        collection_names = [coll.name for coll in obj_colls]
-        return [str(i) in collection_names for i in range(20)] # ordered bool list
-
 def add_cgru_module_to_syspath(path):
     cgrumodule = os.path.join(path, 'lib', 'python')
     if cgrumodule not in sys.path:
