@@ -27,6 +27,14 @@ char * af::jsonParseData( rapidjson::Document & o_doc, const char * i_data, int 
         AFERRAR("jsonParseData: size > Msg::SizeBufferLimit ( %d > %d)", i_data_len, Msg::SizeBufferLimit);
         return NULL;
     }
+
+	// Skip UTF-8 BOM if present (Windows editors often write it):
+	if(( i_data_len >= 3 ) && ( memcmp( i_data, "\xEF\xBB\xBF", 3) == 0 ))
+	{
+		i_data += 3;
+		i_data_len -= 3;
+	}
+
 	char * data = new char[i_data_len+1];
 	memcpy( data, i_data, i_data_len);
 	data[i_data_len] = '\0';
