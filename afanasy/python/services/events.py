@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import collections
 import json
 import sys
 
@@ -19,6 +20,10 @@ class events(service.service):
         data = self.taskInfo['command']
         self.taskInfo['command'] = ''
         self.skip_task = True
+
+        # Received and configured data, getMethodCommand() can use it:
+        self.objects = None
+        self.custom_obj = None
 
         # print('Event data:\n%s' % data)
 
@@ -62,7 +67,11 @@ class events(service.service):
             # print('No configured events found.')
             return
 
-        email_events = []
+        self.objects = objects
+        self.custom_obj = custom_obj
+
+        # Received events for each configured method:
+        methods_events = collections.OrderedDict()
 
         # Iterate all interested events:
         for event in custom_obj['events']:
@@ -90,45 +99,80 @@ class events(service.service):
                 print('Event data:\n%s' % data)
                 continue
 
-            if 'email' in methods and 'emails' in custom_obj and len(custom_obj['emails']):
-                email_events.append(event)
+            for method in methods:
+                if method not in methods_events:
+                    methods_events[method] = []
+                methods_events[method].append(event)
 
-            # Essentially for debugging
-            if 'notify-send' in methods:
-                self.taskInfo['command'] = "notify-send Afanasy 'Job " + task_info['job_name'].replace("'", "'\\''") + ": " + event + "'"
+        # Construct a command for each configured method.
+        # Methods are sorted to keep the original commands priority:
+        # 'notify-send' is the weakest and 'email' is the strongest,
+        # as it was constructed after all events were processed.
+        methods = list(methods_events.keys())
+        methods.sort(key=lambda i_method: {'notify-send': 0, 'email': 2}.get(i_method, 1))
 
-            # execute any command and give job ID of the source job
-            for m in methods:
-                if m not in ["email", "notify-send"]:
-                    self.taskInfo["command"] = "%s -jobid %s" % (m, objects['job']['id'])
-
-
-        if len(email_events):
-            cmd = cgruconfig.VARS['email_send_cmd']
-            cmd += ' -V'  # Verbose mode
-            cmd += ' -f "noreply@%s"' % cgruconfig.VARS['email_sender_address_host']
-            for addr in custom_obj['emails']:
-                cmd += ' -t "%s"' % addr
-            _fmt_events = ', '.join(email_events).replace("_", " ").title()
-            cmd += ' -s "%s - %s"' % (_fmt_events, cgruutils.toStr(task_info['job_name'])) # e.g.: Job Error - MY_JOB_v01
-            cmd += ' "<p>Events: <b>%s</b></p>"' % (_fmt_events)
-            if 'render' in objects:
-                cmd += ' "<p>Render Name: <b>%s</b>' % objects['render']['name']
-                if 'host_resources' in objects:
-                    hres = objects['host_resources']
-                    cmd += '<ul>'
-                    cmd += '<li>CPU: %(cpu_mhz)dMHz x%(cpu_num)d / idle = %(cpu_idle)d%%</li>' % hres
-                    cmd += '<li>MEM: %dGB / free = %dGB</li>' % (hres['mem_total_mb']/1024, hres['mem_free_mb']/1024)
-                    cmd += '<li>SWP: %dGB / free = %dGB</li>' % (hres['swap_total_mb']/1024, (hres['swap_total_mb']-hres['swap_used_mb'])/1024)
-                    cmd += '<li>HDD: %(hdd_total_gb)dGB / free = %(hdd_free_gb)dGB / busy = %(hdd_busy)d%%</li>' % hres
-                    cmd += '</ul>'
-                cmd += '</p>"'
-            cmd += ' "<p>Job Name: <b>%s</b></p>"' % cgruutils.toStr(task_info['job_name'])
-            cmd += ' "<p>User Name: <b>%s</b></p>"' % cgruutils.toStr(task_info['user_name'])
-            self.taskInfo['command'] = cmd
+        for method in methods:
+            command = self.getMethodCommand(method, methods_events[method], objects)
+            if command is not None and len(command):
+                self.taskInfo['command'] = command
 
         if len(self.taskInfo['command']):
             self.skip_task = False
+
+
+    def getMethodCommand(self, i_method, i_events, i_objects):
+        """Construct a command for a method.
+
+        i_method:  a method name from custom data, 'email' for example
+        i_events:  received events list this method is configured for
+        i_objects: received data (job, user, render, ...)
+
+        Returns a command string or None if there is nothing to execute.
+        Custom services can override this to implement other methods,
+        merged custom data is available as self.custom_obj.
+        """
+
+        if i_method == 'email':
+            return self.getEmailCommand(i_events, i_objects)
+
+        # Essentially for debugging
+        if i_method == 'notify-send':
+            return "notify-send Afanasy 'Job " + self.taskInfo['job_name'].replace("'", "'\\''") + ": " + i_events[-1] + "'"
+
+        # An example of any other command, it gets the source job:
+        return '%s -jobname "%s" -jobserial %s' % (
+            i_method, i_objects['job']['name'], i_objects['job']['serial'])
+
+
+    def getEmailCommand(self, i_events, i_objects):
+        """Construct an email sending command."""
+
+        if 'emails' not in self.custom_obj or len(self.custom_obj['emails']) == 0:
+            return None
+
+        cmd = cgruconfig.VARS['email_send_cmd']
+        cmd += ' -V'  # Verbose mode
+        cmd += ' -f "noreply@%s"' % cgruconfig.VARS['email_sender_address_host']
+        for addr in self.custom_obj['emails']:
+            cmd += ' -t "%s"' % addr
+        _fmt_events = ', '.join(i_events).replace("_", " ").title()
+        cmd += ' -s "%s - %s"' % (_fmt_events, cgruutils.toStr(self.taskInfo['job_name'])) # e.g.: Job Error - MY_JOB_v01
+        cmd += ' "<p>Events: <b>%s</b></p>"' % (_fmt_events)
+        if 'render' in i_objects:
+            cmd += ' "<p>Render Name: <b>%s</b>' % i_objects['render']['name']
+            if 'host_resources' in i_objects:
+                hres = i_objects['host_resources']
+                cmd += '<ul>'
+                cmd += '<li>CPU: %(cpu_mhz)dMHz x%(cpu_num)d / idle = %(cpu_idle)d%%</li>' % hres
+                cmd += '<li>MEM: %dGB / free = %dGB</li>' % (hres['mem_total_mb']/1024, hres['mem_free_mb']/1024)
+                cmd += '<li>SWP: %dGB / free = %dGB</li>' % (hres['swap_total_mb']/1024, (hres['swap_total_mb']-hres['swap_used_mb'])/1024)
+                cmd += '<li>HDD: %(hdd_total_gb)dGB / free = %(hdd_free_gb)dGB / busy = %(hdd_busy)d%%</li>' % hres
+                cmd += '</ul>'
+            cmd += '</p>"'
+        cmd += ' "<p>Job Name: <b>%s</b></p>"' % cgruutils.toStr(self.taskInfo['job_name'])
+        cmd += ' "<p>User Name: <b>%s</b></p>"' % cgruutils.toStr(self.taskInfo['user_name'])
+
+        return cmd
 
 
     def combineCustomObj(self, o_output_obj, i_input_obj):
