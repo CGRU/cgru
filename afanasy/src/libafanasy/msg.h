@@ -241,5 +241,13 @@ private:
 
 	void rw_header( bool write); ///< Read or write message header.
 	void v_readwrite( Msg * msg);
+
+	// Delete copy constructor and copy assignment as they are not implemented
+	Msg(const Msg &) = delete;
+	Msg &operator=(const Msg &) = delete;
+
+	// Delete move constructor and move assignment as they are not implemented
+	Msg(Msg &&) = delete;
+	Msg &operator=(Msg &&) = delete;
 };
 }
