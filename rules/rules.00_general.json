@@ -357,6 +357,8 @@
 	},
 
 	"overlay":{
+		"ovract":[],
+		"-ovract":["anim"],
 		"ovrpos":"top_right",
 		"ovrpos_choises":{
 			"top_right": {"name":"Top Right"},

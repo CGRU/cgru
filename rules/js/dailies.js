@@ -233,10 +233,16 @@ function d_DailiesWalkReceived(i_data, i_args)
 	params.comments = comments.replaceAll('"',"'");
 
 	// Overlay video:
-	if ((activity_Current != null) && (activity_Current.indexOf('anim') != -1))
+	if (RULES.dailies.overlay.ovract && RULES.dailies.overlay.ovract.length)
 	{
-		params.overlay_file = 'REF/' + c_PathBase(g_CurPath()) + '_anim.mp4';
-		params.overlay_scale = RULES.dailies.overlay.ovrscale;
+		for (let act of RULES.dailies.overlay.ovract)
+		{
+			if ((activity_Current != null) && (activity_Current.indexOf(act) != -1))
+			{
+				params.overlay_file = 'REF/' + c_PathBase(g_CurPath()) + '_' + act + '.mp4';
+				params.overlay_scale = RULES.dailies.overlay.ovrscale;
+			}
+		}
 	}
 
 	//console.log(JSON.stringify(data));
