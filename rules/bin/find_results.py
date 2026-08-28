@@ -85,7 +85,10 @@ for src in args:
             continue
 
         version = None
-        for item in os.listdir(respath):
+        for item in sorted(os.listdir(respath)):
+            if len(item) == 0:
+                continue
+
             if item[0] in '._':
                 continue
 
@@ -114,17 +117,15 @@ for src in args:
             ver = item
             if os.path.isfile(path):
                 ver, ext = os.path.splitext(item)
-            ver = simiralName(ver).replace(simiralName(name), '').strip('!_-. ')
+            ver = simiralName(ver).replace(simiralName(name), '')
 
-            ver_digits = re.findall(r'\d+', ver)
-            if len(ver_digits):
-                ver_digits = ver_digits[0]
-                ver_number = int(ver_digits)
-                ver_number = ('%0' + str(Options.padding) + 'd') % ver_number
-                ver = ver.replace(ver_digits, ver_number, 1)
-
-            if len(ver) and ver[0].isdigit():
-                ver = 'v' + ver
+            vdigits = re.findall(r'_v\d+', ver)
+            if len(vdigits):
+                vdigits = vdigits[0][1:]
+                ver = ver[ver.find(vdigits):]
+            else:
+                ver = 'v000'
+            #print(item,ver)
 
             if version is not None:
                 if version > ver:
