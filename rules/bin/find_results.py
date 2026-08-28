@@ -17,7 +17,7 @@ Parser = OptionParser(
 
 Parser.add_option('-r', '--respaths',     dest='respaths',     type  ='string',     default='RESULT/JPG,RESULT/TIF,RESULT/DPX')
 Parser.add_option('-a', '--activity',     dest='activity',     type  ='string',     default=None,  help='Activity (comp,anim)')
-Parser.add_option('-f', '--filesext',     dest='filesext',     type  ='string',     default='mp4,mov', help='Include files with extensions')
+Parser.add_option('-f', '--filesext',     dest='filesext',     type  ='string',     default=None,  help='Include files with extensions')
 Parser.add_option('-d', '--dest',         dest='dest',         type  ='string',     default=None,  help='Destination')
 Parser.add_option('-p', '--padding',      dest='padding',      type  ='int',        default=3,     help='Version padding')
 Parser.add_option('-s', '--skipcheck',    dest='skipcheck',    action='store_true', default=False, help='Skip destination check')
@@ -30,6 +30,9 @@ Out = dict()
 Out['status'] = 'success'
 Results = []
 Out['results'] = Results
+SequencesCount = 0
+MoviesCount = 0
+NotFoundCount = 0
 
 def Output():
     json.dump({"find_results":Out}, sys.stdout, indent=1)
@@ -60,6 +63,7 @@ if Options.dest is not None:
         DestFiles = os.listdir( Options.dest)
 
 ResPaths = Options.respaths.split(',')
+ResPaths.reverse()
 
 SimilarCharactrers = ' .-()[]{}!'
 def simiralName(i_name):
@@ -73,7 +77,6 @@ for src in args:
     result = dict()
     result['src'] = None
 
-    version = None
     name = os.path.basename(src)
 
     for res in ResPaths:
@@ -81,6 +84,7 @@ for src in args:
         if not os.path.isdir(respath):
             continue
 
+        version = None
         for item in os.listdir(respath):
             if item[0] in '._':
                 continue
@@ -95,10 +99,16 @@ for src in args:
                     continue
 
             path = os.path.join(respath, item)
-            if os.path.isfile(path):
-                n, ext = os.path.splitext(item)
-                ext = ext.strip('.')
-                if not ext in Options.filesext.split(','):
+            if Options.filesext is None:
+                if os.path.isfile(path):
+                    continue
+            else:
+                if os.path.isfile(path):
+                    n, ext = os.path.splitext(item)
+                    ext = ext.strip('.')
+                    if not ext in Options.filesext.split(','):
+                        continue
+                else:
                     continue
 
             ver = item
@@ -141,6 +151,15 @@ for src in args:
     result['version'] = version
     result['asset'] = src
 
+    if result['src'] is not None:
+        if 'file' in result:
+            MoviesCount += 1
+        else:
+            SequencesCount += 1
+    else:
+        NotFoundCount += 1
+
+
     if Options.dest is not None:
         if 'file' in result:
             result['dest'] = os.path.join(Options.dest, result['file'])
@@ -155,7 +174,7 @@ for src in args:
     Results.append(result)
 
 
-Out['info'] = "%d sequences found" % len(Results)
+Out['info'] = "%d results found: %d sequences, %d movies, %d not found." % ((len(Results) - NotFoundCount), SequencesCount, MoviesCount, NotFoundCount)
 
 Output()
 
