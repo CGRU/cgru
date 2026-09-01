@@ -304,10 +304,10 @@ void ListWork::calcTitle()
 
 	QString jobs;
 	if (jblocksrun)
-		jobs = QString("Jobs: %1, Run %2 (%3%), Error %4, Done %5")
+		jobs = QString("Work: %1, Run %2 (%3%), Error %4, Done %5")
 		.arg(jtotal).arg(jrunning).arg(jpercent / jblocksrun).arg(jerror).arg(jdone);
 	else
-		jobs = QString("Jobs: %1 Done").arg(jtotal);
+		jobs = QString("Work: %1 Done").arg(jtotal);
 
 	this->setWindowTitleWithPrefix(jobs + "; " + branches);
 }
