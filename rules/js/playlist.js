@@ -595,7 +595,7 @@ function p_CreateElement(i_obj, i_elParent)
 		if (p_Pinned.includes(i_obj.id))
 			c_ElSetSelected(elPin, true);
 	}
-	else
+	else if (i_obj.user == g_auth_user.id)
 	{
 		// It is a path or a folder and can be removed:
 		let elDel = document.createElement('div');
