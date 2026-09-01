@@ -30,7 +30,7 @@ Parser.add_option('--flipversion',      dest='flipversion', action='store_true',
 Parser.add_option('--getcomments',      dest='getcomments', action='store_true', default=False,   help='Get comments from sequence.')
 Parser.add_option('-f', '--fps',        dest='fps',         type  ='string', default='24',        help='FPS')
 Parser.add_option('-r', '--resolution', dest='resolution',  type  ='string', default='1280x720',  help='Resolution: 1280x720')
-Parser.add_option('-c', '--codec',      dest='codec',       type  ='string', default='h264_good', help='Codec')
+Parser.add_option('-c', '--codec',      dest='codec',       type  ='string', default='h264_mid',  help='Codec')
 Parser.add_option(      '--font',       dest='font' ,       type  ='string', default=None,        help='Annotations font')
 Parser.add_option('--colorspace',       dest='colorspace',  type  ='string', default='auto',      help='Input images colorspace')
 Parser.add_option('-o', '--outdir',     dest='outdir',      type  ='string', default='cut',       help='Output folder')
@@ -67,6 +67,7 @@ if len(args) < 1:
     errExit('Not enough arguments provided.')
 
 Inputs = Options.inputs.split(',')
+Inputs.reverse()
 Shots = args
 CutName = Options.cutname
 
@@ -111,7 +112,6 @@ for shot in Shots:
         continue
 
     folder = None
-    version = None
     name = os.path.basename(shot)
 
     for inp in Inputs:
@@ -119,12 +119,26 @@ for shot in Shots:
         if not os.path.isdir(inp):
             continue
 
-        for item in os.listdir(inp):
+        version = None
+
+        for item in sorted(os.listdir(inp)):
+            if len(item) == 0:
+                continue
+
             if item[0] in '._-':
                 continue
+
             if not os.path.isdir(os.path.join(inp, item)):
                 continue
-            ver = item.replace(name, '').strip('_. ')
+
+            ver = item
+            vdigits = re.findall(r'_v\d+', ver)
+            if len(vdigits):
+                vdigits = vdigits[0][1:]
+                ver = ver[ver.find(vdigits):]
+            else:
+                ver = 'v000'
+
             if version is not None:
                 if Options.flipversion:
                     if version <= ver:
@@ -132,7 +146,9 @@ for shot in Shots:
                 else:
                     if version >= ver:
                         continue
+
             version = ver
+
             folder = os.path.join(inp, item)
 
     if folder is None:
