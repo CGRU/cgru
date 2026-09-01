@@ -671,7 +671,7 @@ function d_Convert(i_args)
 	gui_CreateChoices({
 		"wnd": wnd.elContent,
 		"name": 'codec',
-		"value": RULES.dailies.codec,
+		"value": 'h264_mid',
 		"label": 'Codec:',
 		"keys": RULES.dailies.codecs
 	});
@@ -1239,7 +1239,7 @@ function d_MakeCut(i_args)
 
 	var params = {};
 	params.cut_name = i_args.cut_name;
-	params.audio = c_PathPM_Rules2Client(g_CurPath()) + '/REF/' + params.cut_name + '.flac';
+	params.audio = c_PathPM_Rules2Client(g_CurPath()) + '/REF/' + params.cut_name + '.wav';
 	params.output = c_PathPM_Rules2Client(i_args.output);
 	params.input = RULES.assets.shot.result.path.join(',');
 	params.fps = RULES.fps;
@@ -1252,7 +1252,7 @@ function d_MakeCut(i_args)
 	gui_CreateChoices({
 		"wnd": wnd.elContent,
 		"name": 'format',
-		"value": RULES.dailies.format,
+		"value": RULES.cut.format,
 		"label": 'Formats:',
 		"keys": RULES.dailies.formats
 	});
@@ -1266,7 +1266,7 @@ function d_MakeCut(i_args)
 	gui_CreateChoices({
 		"wnd": wnd.elContent,
 		"name": 'codec',
-		"value": RULES.dailies.codec,
+		"value": RULES.cut.codec,
 		"label": 'Codecs:',
 		"keys": RULES.dailies.codecs
 	});

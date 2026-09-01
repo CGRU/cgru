@@ -387,8 +387,10 @@
 },
 
 "cut":{
-	"input":"RESULT/ANIM,RESULT/JPG,RESULT/EXR",
+	"input":"RESULT/JPG,RESULT/ANIM",
 	"output":"COMMON/RESULT/JPG",
+	"format":"1280x720",
+	"codec":"h264_mid",
 	"af_capacity":500,
 	"af_maxtasks":10,
 	"af_perhost":-1,
