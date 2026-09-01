@@ -467,14 +467,14 @@ void BlockData::jsonWrite(std::ostringstream &o_str, int i_type) const
 			if (m_task_max_run_time > 0) o_str << ",\n\"task_max_run_time\":" << int(m_task_max_run_time);
 			if (m_task_min_run_time > 0) o_str << ",\n\"task_min_run_time\":" << int(m_task_min_run_time);
 
-			if (hasDependMask()) o_str << ",\n\"depend_mask\":\"" << m_depend_mask.getPattern() << "\"";
+			if (hasDependMask()) o_str << ",\n\"depend_mask\":\"" << af::strEscape(m_depend_mask.getPattern()) << "\"";
 			if (hasTasksDependMask())
-				o_str << ",\n\"tasks_depend_mask\":\"" << m_tasks_depend_mask.getPattern() << "\"";
-			if (hasHostsMask()) o_str << ",\n\"hosts_mask\":\"" << m_hosts_mask.getPattern() << "\"";
+				o_str << ",\n\"tasks_depend_mask\":\"" << af::strEscape(m_tasks_depend_mask.getPattern()) << "\"";
+			if (hasHostsMask()) o_str << ",\n\"hosts_mask\":\"" << af::strEscape(m_hosts_mask.getPattern()) << "\"";
 			if (hasHostsMaskExclude())
-				o_str << ",\n\"hosts_mask_exclude\":\"" << m_hosts_mask_exclude.getPattern() << "\"";
+				o_str << ",\n\"hosts_mask_exclude\":\"" << af::strEscape(m_hosts_mask_exclude.getPattern()) << "\"";
 			if (hasNeedProperties())
-				o_str << ",\n\"need_properties\":\"" << m_need_properties.getPattern() << "\"";
+				o_str << ",\n\"need_properties\":\"" << af::strEscape(m_need_properties.getPattern()) << "\"";
 			if (m_tickets.size()) af::jw_intmap("tickets", m_tickets, o_str);
 
 			o_str << ',';
