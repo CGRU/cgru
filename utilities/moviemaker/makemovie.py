@@ -562,7 +562,7 @@ if Audio is not None:
                 name_precomp.append('Audio "%s"' % os.path.basename(Audio))
                 Audio = audio_file
 
-            if Audio != movutils.SoundRef:
+            if Audio != movutils.SoundRef and os.path.isdir(movutils.SoundRef):
                 cmd_precomp.append('cp -v "%s" "%s"' % (Audio, movutils.SoundRef))
                 name_precomp.append('Store audio in "%s"' % movutils.SoundRef)
                 Audio = movutils.SoundRef

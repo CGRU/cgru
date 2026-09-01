@@ -73,7 +73,7 @@ if Options.audio is not None:
                 Options.audio = audio_file
 
             if os.path.isfile(Options.audio):
-                if Options.audio != movutils.SoundRef:
+                if Options.audio != movutils.SoundRef and os.path.isdir(movutils.SoundRef):
                     shutil.copy(Options.audio, movutils.SoundRef)
                     print('Audio stored in: "%s"' % movutils.SoundRef)
                     Options.audio = movutils.SoundRef

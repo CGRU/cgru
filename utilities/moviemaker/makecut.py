@@ -41,6 +41,7 @@ Parser.add_option('--afmaxtasks',       dest='afmaxtasks',  type  ='int',    def
 Parser.add_option('--afperhost',        dest='afperhost',   type  ='int',    default=-1,          help='Afanasy max tasks per host')
 Parser.add_option('--afmaxruntime',     dest='afmaxruntime',type  ='int',    default=120,         help='Afanasy max tasks run time')
 Parser.add_option('-p', '--afpertask',  dest='afpertask',   type  ='int',    default=100,         help='Afanasy frames per task')
+Parser.add_option('--afpaused',         dest='afpaused',    action='store_true', default=False,   help='Afanasy job paused')
 Parser.add_option('-t', '--testonly',   dest='testonly',    action='store_true', default=False,   help='Test input only')
 Parser.add_option('-V', '--verbose',    dest='verbose',     action='store_true', default=False,   help='Verbose')
 
@@ -254,6 +255,7 @@ job = af.Job('CUT ' + CutName)
 job.setMaxRunningTasks( Options.afmaxtasks)
 job.setMaxRunTasksPerHost( Options.afperhost)
 if Options.afuser != '': job.setUserName(Options.afuser)
+if Options.afpaused: job.pause()
 
 # Delete previous sequence block:
 delete_name = None
