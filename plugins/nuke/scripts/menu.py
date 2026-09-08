@@ -21,7 +21,7 @@ cgru_submenu.addCommand('Open Translated', 'cgru.pmOpenTranslated()')
 
 cgru_menu.addCommand("-", "", "")
 
-cgru_menu.addCommand('Forum...',         'cgrudocs.showForum("nuke")')
+#cgru_menu.addCommand('Forum...',         'cgrudocs.showForum("nuke")')
 cgru_menu.addCommand('Documentation...', 'cgrudocs.showSoftware("nuke")')
 
 # Add afanasy gizmo to nodes:
