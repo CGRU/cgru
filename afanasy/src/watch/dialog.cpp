@@ -388,10 +388,11 @@ void Dialog::showMenuHelp()
     action = new QAction("Documentation...", m_helpMenu);
     connect( action, SIGNAL( triggered() ), this, SLOT( actShowDocs() ));
     m_helpMenu->addAction( action);
-
+/*
     action = new QAction("Forum...", m_helpMenu);
     connect( action, SIGNAL( triggered() ), this, SLOT( actShowForum() ));
     m_helpMenu->addAction( action);
+*/
 }
 
 void Dialog::contextMenuEvent(QContextMenuEvent *event)
