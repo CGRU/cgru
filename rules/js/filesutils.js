@@ -493,20 +493,23 @@ function fu_ResultsReceived(i_data, i_args)
 
 function fu_PutMultiDo(i_wnd)
 {
-	var params = gui_GetParams(i_wnd.elContent, fu_putmulti_params);
+	let params = gui_GetParams(i_wnd.elContent, fu_putmulti_params);
 	if (RULES.put.ftp)
 		gui_GetParams(i_wnd.elContent, fu_putftp_params, params);
 
-	var result = i_wnd.m_result;
+	let result = i_wnd.m_result;
 
-	var job = {};
+	let job = {};
 	job.name = 'PUT ' + g_CurPath();
+	job.name += ' ' + params.input;
+	job.name += ' ' + params.filesext;
+	job.name += ' ' + params.dest;
 	job.max_running_tasks = params.af_maxtasks;
 	job.max_running_tasks_per_host = params.af_perhost;
 	job.hosts_mask = params.af_hostsmask;
 	job.offline = params.af_paused;
 
-	var block = {};
+	let block = {};
 	job.blocks = [block];
 	block.name = 'put';
 	block.service = RULES.put.af_service;
@@ -514,7 +517,7 @@ function fu_PutMultiDo(i_wnd)
 	block.parser = 'generic';
 	block.tasks = [];
 
-	var put = c_PathPM_Client2Server(RULES.put.cmd);
+	let put = c_PathPM_Client2Server(RULES.put.cmd);
 	if (RULES.put.ftp)
 	{
 		put += ' --ftp ' + params.host;
@@ -548,8 +551,8 @@ function fu_PutMultiDo(i_wnd)
 	else
 	{
 		n_SendJob(job);
-		for (var i = 0; i < i_wnd.m_res_btns_show.length; i++)
-			i_wnd.m_res_btns_show[i].style.display = 'none';
+		for (let elBtn of i_wnd.m_res_btns_show)
+			elBtn.style.display = 'none';
 	}
 	// console.log(JSON.stringify(job));
 }
