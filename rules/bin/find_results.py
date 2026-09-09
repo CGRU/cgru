@@ -19,7 +19,6 @@ Parser.add_option('-r', '--respaths',     dest='respaths',     type  ='string', 
 Parser.add_option('-a', '--activity',     dest='activity',     type  ='string',     default=None,  help='Activity (comp,anim)')
 Parser.add_option('-f', '--filesext',     dest='filesext',     type  ='string',     default=None,  help='Include files with extensions')
 Parser.add_option('-d', '--dest',         dest='dest',         type  ='string',     default=None,  help='Destination')
-Parser.add_option('-p', '--padding',      dest='padding',      type  ='int',        default=3,     help='Version padding')
 Parser.add_option('-s', '--skipcheck',    dest='skipcheck',    action='store_true', default=False, help='Skip destination check')
 Parser.add_option('-e', '--skiperrors',   dest='skiperrors',   action='store_true', default=True,  help='Skip error folders')
 Parser.add_option('-V', '--verbose',      dest='verbose',      action='store_true', default=False, help='Verbose mode')
@@ -58,9 +57,9 @@ DestFiles = None
 if Options.dest is not None:
     Out['dest'] = Options.dest
     if not Options.skipcheck:
-        if not os.path.isdir( Options.dest):
+        if not os.path.isdir(Options.dest):
             errExit('Destination folder does not exist: ' + Options.dest)
-        DestFiles = os.listdir( Options.dest)
+        DestFiles = os.listdir(Options.dest)
 
 ResPaths = Options.respaths.split(',')
 ResPaths.reverse()
@@ -134,9 +133,17 @@ for src in args:
             version = ver
             if os.path.isfile(path):
                 result['file'] = item
+            else:
+                result['folder'] = item
 
             result['src'] = os.path.join(respath, item)
             result['respath'] = res
+
+            # If item name does not starts with shot name we should add it:
+            resname = item
+            if resname.find(name) != 0:
+                resname = name + '_' + resname
+            result['name'] = resname
 
     if result['src'] is None:
         if not 'error' in result:
@@ -144,11 +151,6 @@ for src in args:
         if not Options.skiperrors:
             errExit('Input not found for: %s' % src)
 
-    if version == '' or version is None:
-        version = ('v%0' + str(Options.padding) + 'd') % 0
-    name += '_' + version
-
-    result['name'] = name
     result['version'] = version
     result['asset'] = src
 
@@ -162,13 +164,13 @@ for src in args:
 
 
     if Options.dest is not None:
-        if 'file' in result:
-            result['dest'] = os.path.join(Options.dest, result['file'])
-        else:
-            result['dest'] = os.path.join(Options.dest, name)
+#        if 'file' in result:
+#            result['dest'] = os.path.join(Options.dest, result['file'])
+#        else:
+#            result['dest'] = os.path.join(Options.dest, name)
         if DestFiles is not None:
             for afile in DestFiles:
-                if afile.find( result['name']) == 0:
+                if afile.find(result['name']) == 0:
                     result['exist'] = True
                     break
 

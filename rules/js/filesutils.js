@@ -525,26 +525,20 @@ function fu_PutMultiDo(i_wnd)
 	}
 	put += ' -d "' + result.dest + '"';
 
-	for (var i = 0; i < result.results.length; i++)
+	for (let res of result.results)
 	{
-		var res = result.results[i];
-
 		if (res.error)
 			continue;
 
 		if (res.exist && params.skipexisting)
 			continue;
 
-		let name = res.name;
-		if (res.file)
-			name = res.file;
-
-		var cmd = put;
+		let cmd = put;
 		cmd += ' -s "' + res.src + '"';
-		cmd += ' -n "' + name + '"';
+		cmd += ' -n "' + res.name + '"';
 
-		var task = {};
-		task.name = name;
+		let task = {};
+		task.name = res.name;
 		task.command = cmd;
 		block.tasks.push(task);
 	}
