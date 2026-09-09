@@ -168,7 +168,7 @@ for src in args:
 #            result['dest'] = os.path.join(Options.dest, result['file'])
 #        else:
 #            result['dest'] = os.path.join(Options.dest, name)
-        if DestFiles is not None:
+        if DestFiles is not None and 'name' in result:
             for afile in DestFiles:
                 if afile.find(result['name']) == 0:
                     result['exist'] = True
