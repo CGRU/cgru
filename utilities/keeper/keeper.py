@@ -37,7 +37,6 @@ from Qt import QtWidgets
 
 print('Qt: ' + ('%s %s (%s)' % ( Qt.__qt_version__, Qt.__binding__, Qt.__binding_version__)))
 
-import af
 import cgruconfig
 import cmd
 from refresh import Refresh
@@ -62,5 +61,4 @@ cmd.Tray = Tray(app)
 refresh = Refresh(app)
 render.Refresh = refresh
 server = Server()
-af.Cmd().renderSetUserName(cgruconfig.VARS['USERNAME'])
 app.exec()

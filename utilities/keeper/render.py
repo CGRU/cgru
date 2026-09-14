@@ -47,6 +47,7 @@ def refresh():
         renders = af.Cmd().renderGetLocal()
         if renders is not None and len(renders):
             Render = renders[0]
+            af.Cmd().renderSetUserName(cgruconfig.VARS['USERNAME'])
 
     if Render is not None:
         # Get render by ID, as we already know it
