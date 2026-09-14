@@ -74,6 +74,8 @@ class Config:
                 print('Platform: "%s"' % ','.join( self.Vars['platform']))
 
             self.Vars['HOSTNAME'] = socket.gethostname().lower()
+            if 'AF_HOSTNAME' in os.environ:
+                self.Vars['HOSTNAME'] = os.environ['AF_HOSTNAME']
 
             try:
                 cgrulocation = os.environ['CGRU_LOCATION']
