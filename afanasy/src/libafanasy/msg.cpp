@@ -48,7 +48,7 @@ Msg::Msg( const struct sockaddr_storage * ss):
 }
 
 Msg::Msg( const char * rawData, int rawDataLen):
-	m_buffer( NULL),
+	m_buffer(nullptr),
 	// This message not for write any more data. All data will be written in this constuctor.
 	// We will only read node parameters to constuct af::Af based classes.
 	m_writing( false)
@@ -72,7 +72,8 @@ Msg::Msg( const char * rawData, int rawDataLen):
 
 Msg::~Msg()
 {
-	if( m_buffer != NULL) delete [] m_buffer;
+	if (m_buffer != nullptr)
+		delete[] m_buffer;
 }
 //
 //########################## Message methods: #################################
@@ -88,7 +89,7 @@ void Msg::construct()
 	m_writing = false;
 	m_writtensize = 0;
 
-	m_buffer = NULL;
+	m_buffer = nullptr;
 	allocateBuffer( Msg::SizeBuffer);
 }
 
@@ -107,7 +108,7 @@ bool Msg::allocateBuffer( int i_size, int i_copy_len, int i_copy_offset)
 	m_buffer_size = i_size;
 	AFINFA("Msg::allocateBuffer(%s): trying %d bytes ( %d written at %p)", TNAMES[m_type], i_size, m_writtensize, old_buffer)
 	m_buffer = new char[m_buffer_size];
-	if( m_buffer == NULL )
+	if (m_buffer == nullptr)
 	{
 		AFERRAR("Msg::allocateBuffer: can't allocate %d bytes for buffer.", m_buffer_size)
 		setInvalid();
@@ -117,7 +118,7 @@ bool Msg::allocateBuffer( int i_size, int i_copy_len, int i_copy_offset)
 	m_data         = m_buffer      + Msg::SizeHeader;
 	m_data_maxsize = m_buffer_size - Msg::SizeHeader;
 
-	if( old_buffer != NULL )
+	if (old_buffer != nullptr)
 	{
 //printf("Copying old buffer: offset=%d size=%d\n", i_copy_offset, i_copy_len);
 		if( i_copy_len > 0) memcpy( m_data, old_buffer + i_copy_offset, i_copy_len);
@@ -129,13 +130,14 @@ bool Msg::allocateBuffer( int i_size, int i_copy_len, int i_copy_offset)
 
 char * Msg::writtenBuffer( int size)
 {
-	if( m_type == Msg::TInvalid) return NULL;
-//printf("Msg::writtenBuffer: size=%d, msgwrittensize=%d, address=%p\n", size, msgwrittensize, mdata + msgwrittensize);
+	if (m_type == Msg::TInvalid)
+		return nullptr;
 	if( m_writtensize+size > m_data_maxsize)
 	{
 		int newsize = m_buffer_size << 3;
 		if( m_writtensize+size > newsize) newsize = m_writtensize+size+Msg::SizeHeader;
-		if( allocateBuffer( newsize, m_writtensize) == false ) return NULL;
+		if (allocateBuffer(newsize, m_writtensize) == false)
+			return nullptr;
 	}
 	char * wBuffer = m_data + m_writtensize;
 //printf("Msg::writtenBuffer: size=%d, msgwrittensize=%d (wBuffer=%p)\n", size, msgwrittensize, wBuffer);
@@ -178,9 +180,7 @@ bool Msg::setData( int i_size, const char * i_msgData, int i_type)
 
 	m_type = i_type;
 
-	if(( i_size    <= 0                ) ||
-		( i_size    >  Msg::SizeDataMax ) ||
-		( i_msgData == NULL             ) )
+	if ((i_size <= 0) || (i_size > Msg::SizeDataMax) || (i_msgData == nullptr))
 	{
 		AFERROR("Msg::setData(): invalid arguments.")
 		setInvalid();
@@ -241,7 +241,7 @@ bool Msg::set( int msgType, Af * afClass)
 	if( m_type == Msg::TInvalid)
 	{
 		delete m_buffer;
-		m_buffer = NULL;
+		m_buffer = nullptr;
 		m_type = TNULL;
 		allocateBuffer(100);
 		w_String( "Maximum message size overload !", this);
