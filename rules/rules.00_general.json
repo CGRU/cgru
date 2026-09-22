@@ -211,8 +211,8 @@
 	"cmdexec":{
 		"play_sequence":[
 			{"name":"DJV",
-				"cmd":"djv_view \"@PATH@\"",
-				"tooltip":"Open sequence within 'djv_view'."},
+				"cmd":"djv \"@PATH@\"",
+				"tooltip":"Open sequence within DJV player."},
 			{"name":"NkCp",
 				"cmd":"nukecopy \"@PATH@\"",
 				"tooltip":"Copy Nuke Read.\nPaste it in a scene.",
@@ -226,9 +226,9 @@
 			{"name":"VLC",
 				"cmd":"vlc \"@PATH@\"",
 				"tooltip":"Open with VLC media player."},
-			{"name":"Totem",
-				"cmd":"totem \"@PATH@\"",
-				"tooltip":"Open with Totem video player."}
+			{"name":"DJV",
+				"cmd":"djv \"@PATH@\"",
+				"tooltip":"Open with DJV player."}
 		]
 	}
 },
