@@ -1087,21 +1087,22 @@ FilesView.prototype.showItem = function(i_obj, i_isFolder) {
 	// Folder play sequence custom buttons:
 	if (i_isFolder && c_HasFileSystem())
 	{
-		var cmds = RULES.cmdexec.play_sequence;
+		let cmds = RULES.cmdexec.play_sequence;
 		if (cmds)
-			for (var c = 0; c < cmds.length; c++)
+			for (let c = 0; c < cmds.length; c++)
 			{
-				var cmd = cmds[c].cmd;
+				let cmd = cmds[c].cmd;
 				cmd = cmd.replace('@PATH@', c_PathPM_Rules2Client(path));
 				cmd = cmd.replace('@USER@', g_auth_user.id);
 				cmd = cmd.replace('@FPS@', RULES.fps);
 
-				var elParent = elBody;
+				let elParent = elBody;
 				if (cmds[c].submenu)
 					elParent = elItem.m_elMenu;
 
 				cgru_CmdExecCreate(
-					{"cmd": cmd, "parent": elParent, "label": cmds[c].name, "tooltip": cmds[c].tooltip});
+					{"cmd": cmd, "parent": elParent, "label": cmds[c].name, "tooltip": cmds[c].tooltip,
+					"cwd": c_PathPM_Rules2Client(g_CurPath())});
 			}
 	}
 

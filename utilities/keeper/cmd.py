@@ -167,14 +167,18 @@ def execute( i_str):
 
     cmdexec = obj['cmdexec']
     cmd = None
+    cwd = None
+
+    if 'cwd' in cmdexec:
+        cwd = cmdexec['cwd']
 
     if 'cmds' in cmdexec:
         cmds = cmdexec['cmds']
 
         for cmd in cmds:
-            print('Executing command:')
+            print('Executing command: (cwd=%s)' % str(cwd))
             print(cmd)
-            subprocess.Popen(cmd, shell=True)
+            subprocess.Popen(cmd, shell=True, cwd=cwd)
 
         return True, None
 
@@ -185,7 +189,7 @@ def execute( i_str):
                 cmd = 'start cmd.exe /C "%s"' % cmd
             else:
                 cmd = cgruconfig.VARS['open_terminal_cmd'].replace('@CMD@', cmd)
-        print('Executing command:')
+        print('Executing command: (cwd=%s)' % str(cwd))
 
     elif 'open' in cmdexec:
         folder = cmdexec['open']
@@ -215,7 +219,7 @@ def execute( i_str):
         return False, 'Invalid request object. No command to execute.'
 
     print(cmd)
-    p = subprocess.Popen(cmd, shell=True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+    p = subprocess.Popen(cmd, shell=True, cwd=cwd, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
     status = None
     stderr = None
     stdout = None
