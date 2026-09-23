@@ -72,13 +72,21 @@ function d_Make(i_path, i_outfolder)
 
 		if (ASSET.dailies.folders)
 		{
-			for (let f in ASSET.dailies.folders)
+			let paths = i_path.replace(ASSET.path,'').toLowerCase().split('/');
+			let found = false;
+			for (let folder of ASSET.dailies.folders)
 			{
-				if (i_path.toLowerCase().indexOf(f.toLowerCase()) !== -1)
+				for (let seek of folder.seek)
 				{
-					out_path = ASSET.path + '/' + ASSET.dailies.folders[f];
-					break;
+					if (paths.indexOf(seek) !== -1)
+					{
+						out_path = ASSET.path + '/' + folder.put;
+						found = true;
+						break;
+					}
 				}
+				if (found)
+					break;
 			}
 		}
 	}

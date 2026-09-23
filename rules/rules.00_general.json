@@ -177,11 +177,14 @@
 			"path":["RESULT/DAILIES"],
 			"path_precomp":"RESULT/PRECOMP",
 				"":"put not 'comp' activity dailies in precomp",
-			"folders":{
-				"result/freelance":"RESULT/FREELANCE",
-				"result/anim":"RESULT/ANIM",
-				"render":"RESULT/RENDER"
-			}
+			"folders":[
+				{"seek":["fx"],"put":"RESULT/FX"},
+				{"seek":["layout"],"put":"RESULT/LAYOUT"},
+				{"seek":["freelance"],"put":"RESULT/FREELANCE"},
+				{"seek":["anim"],"put":"RESULT/ANIM"},
+				{"seek":["precomp"],"put":"RESULT/PRECOMP"},
+				{"seek":["render"],"put":"RESULT/RENDER"}
+			]
 		},
 		"template":"rules/assets/templates/shot",
 
