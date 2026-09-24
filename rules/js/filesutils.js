@@ -267,9 +267,10 @@ var fu_putmulti_params = {
 	input /*********/: {"label": 'Result Paths', "width":'50%'},
 	activity         : {"label": 'Activity', "width":'25%'},
 	filesext         : {"label": 'Files Extensions', "default":'mp4,mov', "width":'25%', "lwidth":'150px'},
-	skipexisting /**/: {"label": 'Skip Existing', 'type': "bool", 'default': true, "width": '33%'},
-	skiperrors /****/: {"label": 'Skip Errors', 'type': "bool", 'default': true, "width": '33%'},
-	skipcheck /*****/: {"label": 'Skip Check', 'type': "bool", 'default': false, "width": '33%'},
+	skipexisting /**/: {"label": 'Skip Existing', 'type': "bool", 'default': true, "width": '25%'},
+	skiperrors /****/: {"label": 'Skip Errors', 'type': "bool", 'default': true, "width": '25%'},
+	skipcheck /*****/: {"label": 'Skip Check', 'type': "bool", 'default': false, "width": '25%'},
+	minversion       : {"label": 'Min Version', 'type': "bool", 'default': false, "width": '25%'},
 	dest /**********/: {"label": 'Destination'},
 	af_capacity /***/: {'label': 'Capacity', 'width': '20%', 'type': 'int'},
 	af_maxtasks /***/: {'label': 'Max Tasks', 'width': '15%', 'lwidth': '80px', 'type': 'int'},
@@ -283,7 +284,8 @@ var fu_findres_params = {
 	input: {},
 	dest: {},
 	skiperrors: {'type': "bool", 'default': true},
-	skipcheck: {'type': "bool", 'default': false}
+	skipcheck: {'type': "bool", 'default': false},
+	minversion: {'type': "bool", 'default': false}
 };
 
 function fu_PutMultiDialog(i_args)
@@ -354,15 +356,15 @@ function fu_PutMultiDialog(i_args)
 
 function fu_ResultsFind(i_wnd)
 {
-	var elWait = document.createElement('div');
+	let elWait = document.createElement('div');
 	i_wnd.elContent.appendChild(elWait);
 	i_wnd.m_elWait = elWait;
 	elWait.classList.add('wait');
 
-	var paths = i_wnd.m_args.paths;
-	var params = gui_GetParams(i_wnd.elContent, fu_findres_params);
+	let paths = i_wnd.m_args.paths;
+	let params = gui_GetParams(i_wnd.elContent, fu_findres_params);
 
-	var cmd = 'rules/bin/find_results.py';
+	let cmd = 'rules/bin/find_results.py';
 	cmd += ' -r "' + params.input + '"';
 	if (params.activity.length)
 		cmd += ' --activity "' + params.activity + '"';
@@ -373,9 +375,11 @@ function fu_ResultsFind(i_wnd)
 		cmd += ' --skipcheck';
 	if (params.skiperrors)
 		cmd += ' --skiperrors';
+	if (params.minversion)
+		cmd += ' --minversion';
 
-	for (var i = 0; i < paths.length; i++)
-		cmd += ' "' + c_PathPM_Client2Server(paths[i]) + '"';
+	for (let p of paths)
+		cmd += ' "' + c_PathPM_Client2Server(p) + '"';
 
 	n_Request({"send": {"cmdexec": {"cmds": [cmd], 'ignore_errors': true}}, "func": fu_ResultsReceived, "wnd": i_wnd});
 }

@@ -19,6 +19,7 @@ Parser.add_option('-r', '--respaths',     dest='respaths',     type  ='string', 
 Parser.add_option('-a', '--activity',     dest='activity',     type  ='string',     default=None,  help='Activity (comp,anim)')
 Parser.add_option('-f', '--filesext',     dest='filesext',     type  ='string',     default=None,  help='Include files with extensions')
 Parser.add_option('-d', '--dest',         dest='dest',         type  ='string',     default=None,  help='Destination')
+Parser.add_option('-m', '--minversion',   dest='minversion',   action='store_true', default=False, help='Minimal version')
 Parser.add_option('-s', '--skipcheck',    dest='skipcheck',    action='store_true', default=False, help='Skip destination check')
 Parser.add_option('-e', '--skiperrors',   dest='skiperrors',   action='store_true', default=True,  help='Skip error folders')
 Parser.add_option('-V', '--verbose',      dest='verbose',      action='store_true', default=False, help='Verbose mode')
@@ -127,8 +128,12 @@ for src in args:
             #print(item,ver)
 
             if version is not None:
-                if version > ver:
-                    continue
+                if Options.minversion:
+                    if version < ver:
+                        continue
+                else:
+                    if version > ver:
+                        continue
 
             version = ver
             if os.path.isfile(path):
