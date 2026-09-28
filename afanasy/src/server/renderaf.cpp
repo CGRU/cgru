@@ -292,7 +292,7 @@ void RenderAf::online( RenderAf * render, JobContainer * i_jobs, MonitorContaine
 	// Job::reconnectTask took the ownership of the taskexecs, so we prevent
 	// them from being cleaned by render's dtor:
 	render->m_tasks.clear();
-	
+
 	appendLogTypeInfo("online",std::string("Online '") + m_engine + "'.");
 
 	if (monitoring)
@@ -1151,7 +1151,7 @@ void RenderAf::v_refresh( time_t i_current_time,  AfContainer * pointer, Monitor
 		{
 			m_idle_time = i_current_time;
 		}
-		else 
+		else
 		{
 			// Automatic WOL sleep:
 			if ((m_parent->get_idle_wolsleep_time() > 0) && isOnline() && (isWOLSleeping() == false) && (isWOLFalling() == false)
@@ -1373,14 +1373,14 @@ af::Msg * RenderAf::writeFullInfo( bool i_binary) const
 	str << ",\"render\":";
 	af::Render::v_jsonWrite( str, af::Msg::TRendersList);
 
-	str << ",\"custom_data\":\"" << m_custom_data << '"';
+	str << ",\"custom_data\":\"" << af::strEscape(m_custom_data) << '"';
 
 	if( isOnline())
 	{
 		str << ",";
 		m_hres.jsonWrite( str);
 	}
-	
+
 	str << "}}";
 	return af::jsonMsg( str);
 }
