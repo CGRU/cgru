@@ -47,7 +47,8 @@ var table_params = {
 	frames_num : {'type': 'bool', 'default': false, 'width': '20%'},
 	duration   : {'type': 'bool', 'default': true,  'width': '20%'},
 	tasks      : {'type': 'bool', 'default': false, 'width': '20%'},
-	price      : {'type': 'bool', 'default': true,  'width': '20%'}
+	price      : {'type': 'bool', 'default': true,  'width': '20%'},
+	info       : {'type': 'bool', 'default': true,  'width': '20%'}
 };
 
 function table_Export(i_args)
