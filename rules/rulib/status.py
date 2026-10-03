@@ -264,8 +264,6 @@ class Status:
 
         if artists is not None and type(artists) is list:
             task['artists'] = artists
-        if flags is not None and type(flags) is list:
-            task['flags'] = flags
         if annotation is not None and type(annotation) is str:
             task['annotation'] = annotation
         if deleted:
@@ -284,6 +282,8 @@ class Status:
             progress = task['progress']
         else:
             progress = 0
+
+        self.setTaskFlags(task, flags)
 
         # Task flags can detemine task progress (eg done=100%)
         if flags is not None and len(flags):
@@ -325,22 +325,65 @@ class Status:
                 if 'progress' not in self.data or self.data['progress'] != avg_progress:
                     self.data['progress'] = avg_progress
                     self.progress_changed = True
-                else:
-                    self.progress_changed = False
-
-
-        # Remove status tags, artists and flags if the task has the same
-        #for arr in ['tags','artists','flags']:
-        #    if arr in self.data and len(self.data[arr]):
-        #        for item in task[arr]:
-        #            if item in self.data[arr]:
-        #                self.data[arr].remove(item)
+                #else:
+                #    self.progress_changed = False
 
         # Set task changed.
         # It needed for news to know what was changed in status.
         task['changed'] = True
 
         return task
+
+
+    def setTaskFlags(self, i_task, i_flags):
+        if i_flags is None:
+            return
+        if not type(i_flags) is list:
+            return
+
+        flags_prev = i_task['flags']
+        if flags_prev is None:
+            flags_prev = []
+        i_task['flags'] = i_flags
+
+        if len(self.data['tasks']) < 2:
+            return
+
+        # Find triggers:
+        for flag in i_flags:
+            if flag in flags_prev:
+                # This flag is not new, skiping it
+                continue
+
+            triggers = None
+            if flag in rulib.RULES_TOP['flags'] and 'triggers' in rulib.RULES_TOP['flags'][flag]:
+                triggers = rulib.RULES_TOP['flags'][flag]['triggers']
+            if triggers is None:
+                continue
+
+            for trigger in triggers:
+                for tag in trigger:
+                    if not tag in i_task['tags']:
+                        continue
+
+                    for trig in trigger[tag]:
+                        for tflag in trig:
+                            for ttag in trig[tflag]:
+                                self.triggerTasks(i_task['name'], ttag, tflag)
+
+
+    def triggerTasks(self, i_emmiter, i_tag, i_flag):
+        for task in self.data['tasks']:
+            task = self.data['tasks'][task]
+            if task['name'] == i_emmiter:
+                # Skip emmiter to prevent recursion
+                continue
+            if 'deleted' in task and task['deleted']:
+                # Skip deleted task
+                continue
+            if i_tag in task['tags']:
+                if not i_flag in task['flags']:
+                    self.setTask(name=task['name'], flags=[i_flag])
 
 
     def prepareDataForSave(self):
