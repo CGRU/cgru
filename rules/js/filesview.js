@@ -1544,7 +1544,7 @@ FilesView.prototype.thumbsHideShow = function(i_toggle)
 		if (this.thumbs_hidden)
 			el.style.display = 'none';
 		else
-			el.style.display = 'block';
+			el.style.display = 'span';
 	}
 }
 
