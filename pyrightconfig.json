@@ -1,0 +1,9 @@
+{
+	"executionEnvironments": [
+		{
+			"extraPaths": ["lib/python","afanasy/python"]
+		}
+	],
+	"typeCheckingMode": "off",
+}
+
