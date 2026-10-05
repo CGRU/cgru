@@ -313,13 +313,22 @@ generate thumbnails.";
 		el.onclick = function(e) { e.currentTarget.m_view.thumbsCrop() };
 		el.title = 'Show thumbnails cropped';
 
-		this.elThumbsBtn = document.createElement('div');
-		elThumbDiv.appendChild(this.elThumbsBtn);
-		this.elThumbsBtn.classList.add('button');
-		this.elThumbsBtn.style.backgroundImage = 'url(rules/icons/thumbnails.png)';
-		this.elThumbsBtn.m_view = this;
-		this.elThumbsBtn.onclick = function(e) { e.currentTarget.m_view.thumbsMake() };
-		this.elThumbsBtn.title = 'Generate thumbnails';
+		this.elThumbsGenBtn = document.createElement('div');
+		elThumbDiv.appendChild(this.elThumbsGenBtn);
+		this.elThumbsGenBtn.classList.add('button');
+		this.elThumbsGenBtn.style.backgroundImage = 'url(rules/icons/thumbnails.png)';
+		this.elThumbsGenBtn.m_view = this;
+		this.elThumbsGenBtn.onclick = function(e) { e.currentTarget.m_view.thumbsMake() };
+		this.elThumbsGenBtn.title = 'Generate thumbnails';
+
+		this.elThumbHideBtn = document.createElement('div');
+		elThumbDiv.appendChild(this.elThumbHideBtn);
+		this.elThumbHideBtn.classList.add('button');
+		this.elThumbHideBtn.style.backgroundImage = 'url(rules/icons/hide.png)';
+		this.elThumbHideBtn.m_view = this;
+		this.elThumbHideBtn.onclick = function(e) {e.currentTarget.m_view.thumbsHideShow(true)};
+		this.elThumbHideBtn.title = 'Hide thumbnails';
+		this.thumbsHideShow(false);
 	}
 
 	if (RULES.checksum)
@@ -1478,6 +1487,8 @@ FilesView.prototype.makeThumbEl = function(i_el, i_path, i_type) {
 	this.elThumbnails.push(elThumbnail);
 	elThumbnail.classList.add('thumbnail');
 	elThumbnail.m_type = i_type;
+	if (this.thumbs_hidden)
+		elThumbnail.style.display = 'none';
 
 	elThumbnail.m_path = i_path;
 	var thumbFile = RULES.root + c_GetThumbFileName(i_path);
@@ -1495,6 +1506,47 @@ FilesView.prototype.makeThumbEl = function(i_el, i_path, i_type) {
 	fv_FileThumbResize(elImg);
 	elImg.onload = fv_FileThumbOnLoad;
 };
+
+FilesView.prototype.thumbsHideShow = function(i_toggle)
+{
+	if (i_toggle)
+	{
+		if (this.getLocalStorageAttr('thumbs_hidden') == 'ON')
+			this.thumbs_hidden = false;
+		else
+			this.thumbs_hidden = true;
+	}
+	else
+	{
+		if (this.getLocalStorageAttr('thumbs_hidden') == 'ON')
+			this.thumbs_hidden = true;
+		else
+			this.thumbs_hidden = false;
+	}
+
+	if (this.thumbs_hidden)
+	{
+		this.setLocalStorageAttr('thumbs_hidden','ON');
+		this.elThumbHideBtn.classList.add('pushed');
+	}
+	else
+	{
+		this.setLocalStorageAttr('thumbs_hidden','OFF');
+		this.elThumbHideBtn.classList.remove('pushed');
+	}
+
+	// View was just created, no files received
+	if (this.elThumbnails == null)
+		return;
+
+	for (let el of this.elThumbnails)
+	{
+		if (this.thumbs_hidden)
+			el.style.display = 'none';
+		else
+			el.style.display = 'block';
+	}
+}
 
 FilesView.prototype.thumbsBigger = function(i_bigger) {
 	var s = parseInt(localStorage.thumb_file_size);
@@ -1539,7 +1591,7 @@ FilesView.prototype.thumbsMake = function() {
 		return;
 
 	for (var i = 0; i < fv_views.length; i++)
-		fv_views[i].elThumbsBtn.classList.remove('button');
+		fv_views[i].elThumbsGenBtn.classList.remove('button');
 
 	fv_thumbnails_tomake_files = [];
 	for (var i = 0; i < this.elThumbnails.length; i++)
@@ -1987,7 +2039,7 @@ function fv_MakeThumbnailsFinish()
 {
 	for (var i = 0; i < fv_views.length; i++)
 		if (fv_views[i].has_thumbs)
-			fv_views[i].elThumbsBtn.classList.add('button');
+			fv_views[i].elThumbsGenBtn.classList.add('button');
 	fv_thumbnails_tomake = 0;
 }
 
