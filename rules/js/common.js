@@ -36,12 +36,11 @@ var c_elLogs = [];
 var c_lastLog = null;
 var c_lastLogCount = 1;
 
-var $ = function(id) {
+var $ = function (id) {
 	return document.getElementById(id);
 };
 
-function c_Init()
-{
+function c_Init() {
 	cgru_ConstructSettingsGUI();
 	cgru_InitParameters();
 	cgru_Info = c_Info;
@@ -53,34 +52,32 @@ function c_Init()
 	u_ApplyStyles();
 }
 
-function cgru_CmdExecFilter(i_cmd)
-{
+function cgru_CmdExecFilter(i_cmd) {
 	let cmd = i_cmd;
 
 	cmd = activity_ChangeCmd(cmd);
-/*
-	// '@arg@' will be replaced with '--arg [arg value]'
-	// Value will be the first defined in action, ASSET, RULES
-	// For example: '@fps@' will be replaces with '--fps 24'
-	let matches = cmd.match(/@\w*@/g);
-	if (matches && matches.length)
-		for (let i = 0; i < matches.length; i++)
-		{
-			let match = matches[i];
-			let arg = match.replace(/@/g,'');
-			let val = action[arg];
-			if (null == val) val = ASSET[arg];
-			if (null == val) val = RULES[arg];
-			if (val) val = '--' + arg + ' ' + val;
-			else val = '';
-			cmd = cmd.replace(match, val);
-		}
-*/
+	/*
+		// '@arg@' will be replaced with '--arg [arg value]'
+		// Value will be the first defined in action, ASSET, RULES
+		// For example: '@fps@' will be replaces with '--fps 24'
+		let matches = cmd.match(/@\w*@/g);
+		if (matches && matches.length)
+			for (let i = 0; i < matches.length; i++)
+			{
+				let match = matches[i];
+				let arg = match.replace(/@/g,'');
+				let val = action[arg];
+				if (null == val) val = ASSET[arg];
+				if (null == val) val = RULES[arg];
+				if (val) val = '--' + arg + ' ' + val;
+				else val = '';
+				cmd = cmd.replace(match, val);
+			}
+	*/
 	return cmd;
 }
 
-function c_GetHash()
-{
+function c_GetHash() {
 	var path = decodeURI(document.location.hash);
 	// window.console.log( 'hash = ' + path);
 	if (path.indexOf('#') == 0)
@@ -100,18 +97,15 @@ function c_GetHash()
 	return path;
 }
 
-function c_Parse(i_data)
-{
+function c_Parse(i_data) {
 	if (i_data == null)
 		return null;
 
 	var obj = null;
-	try
-	{
+	try {
 		obj = JSON.parse(i_data);
 	}
-	catch (err)
-	{
+	catch (err) {
 		c_Error(err.message + '<br/><br/>' + i_data);
 		console.log(err.message + '\n' + i_data);
 		obj = null;
@@ -123,46 +117,38 @@ function c_Parse(i_data)
 	return obj;
 }
 
-function c_NullOrErrorMsg(i_obj)
-{
+function c_NullOrErrorMsg(i_obj) {
 	// console.log(JSON.stringify(i_obj));
-	if (i_obj == null)
-	{
+	if (i_obj == null) {
 		c_Error('No response received.');
 		return true;
 	}
-	if (i_obj.error)
-	{
+	if (i_obj.error) {
 		c_Error(i_obj.error);
 		return true;
 	}
 	return false;
 }
 
-function c_NullOrErrorCmd(i_obj, i_name)
-{
+function c_NullOrErrorCmd(i_obj, i_name) {
 	// console.log(JSON.stringify(i_obj));
 	if (c_NullOrErrorMsg(i_obj))
 		return true;
 
-	if (i_obj.cmdexec == null)
-	{
+	if (i_obj.cmdexec == null) {
 		c_Error('Null command execution data.');
 		return true;
 	}
 
-	if (!i_obj.cmdexec.length)
-	{
+	if (!i_obj.cmdexec.length) {
 		c_Error('Zero command execution data.');
 		return true;
 	}
 
 	var ret = false;
-	for (var i = 0; i < i_obj.cmdexec.length; i++)
-	{
+	for (var i = 0; i < i_obj.cmdexec.length; i++) {
 		var obj = i_obj.cmdexec[i];
-		if (obj[i_name] == null)
-		{
+		if (obj[i_name] == null) {
 			c_Error('Command execution has no "' + i_name + '" data.');
 			ret = true;
 		}
@@ -174,13 +160,11 @@ function c_NullOrErrorCmd(i_obj, i_name)
 	return ret;
 }
 
-function c_CloneObj(i_obj)
-{
+function c_CloneObj(i_obj) {
 	return JSON.parse(JSON.stringify(i_obj));
 }
 
-function c_RulesMergeDir(o_rules, i_dir)
-{
+function c_RulesMergeDir(o_rules, i_dir) {
 	if (i_dir == null)
 		return;
 	if (i_dir.rules == null)
@@ -193,52 +177,45 @@ function c_RulesMergeDir(o_rules, i_dir)
 		keys.push(key);
 	keys.sort();
 
-	for (let k = 0; k < keys.length; k++)
-	{
+	for (let k = 0; k < keys.length; k++) {
 		let obj = i_dir.rules[keys[k]];
-		if (obj == null)
-        {
+		if (obj == null) {
 			c_Error('RULES file "' + keys[k] + '" in "' + g_CurPath() + '/' + RUFOLDER + '" is invalid.');
-            continue;
-        }
-        if (obj.ruerror)
-        {
-            if (obj.ruerror.info)
-                c_Log(obj.ruerror.info);
-            if (obj.ruerror.error)
-                c_Error(obj.ruerror.error);
+			continue;
+		}
+		if (obj.ruerror) {
+			if (obj.ruerror.info)
+				c_Log(obj.ruerror.info);
+			if (obj.ruerror.error)
+				c_Error(obj.ruerror.error);
 			c_ConstantError(obj.ruerror.error);
-            continue;
-        }
+			continue;
+		}
 
 		c_RulesMergeObjs(o_rules, obj);
 	}
 }
 
-function c_RulesMergeObjs(o_rules, i_rules_new)
-{
+function c_RulesMergeObjs(o_rules, i_rules_new) {
 	if ((o_rules == null) || (i_rules_new == null))
 		return;
 
-	for (var attr in i_rules_new)
-	{
+	for (var attr in i_rules_new) {
 		if (attr.length < 1)
 			continue;
 		if (attr.charAt(0) == '-')
 			continue;
 		if (attr.charAt(0) == ' ')
 			continue;
-		if (attr.indexOf('OS_') == 0)
-		{
+		if (attr.indexOf('OS_') == 0) {
 			for (var i = 0; i < cgru_Platform.length; i++)
 				if (attr == ('OS_' + cgru_Platform[i]))
 					c_RulesMergeObjs(o_rules, i_rules_new[attr]);
 			continue;
 		}
-		if ((typeof(i_rules_new[attr]) == 'object') &&
-				(false == Array.isArray(i_rules_new[attr])) &&
-				(o_rules[attr] != null))
-		{
+		if ((typeof (i_rules_new[attr]) == 'object') &&
+			(false == Array.isArray(i_rules_new[attr])) &&
+			(o_rules[attr] != null)) {
 			c_RulesMergeObjs(o_rules[attr], i_rules_new[attr]);
 			continue;
 		}
@@ -246,8 +223,7 @@ function c_RulesMergeObjs(o_rules, i_rules_new)
 	}
 }
 
-function c_PadZero(i_num, i_len)
-{
+function c_PadZero(i_num, i_len) {
 	if (i_len == null)
 		i_len = 2;
 	var str = '' + i_num;
@@ -256,8 +232,7 @@ function c_PadZero(i_num, i_len)
 	return str;
 }
 
-function c_Info(i_msg, i_log)
-{
+function c_Info(i_msg, i_log) {
 	u_el.info.classList.remove('error');
 
 	if (i_log == null)
@@ -267,14 +242,12 @@ function c_Info(i_msg, i_log)
 		c_Log(i_msg);
 }
 
-function c_Error(i_err)
-{
+function c_Error(i_err) {
 	c_Info('<b style="font-size:15px;color:#700">Error:</b> ' + i_err);
 	u_el.info.classList.add('error');
 }
 
-function c_Log(i_msg)
-{
+function c_Log(i_msg) {
 	var date = new Date();
 	var time = c_PadZero(date.getHours()) + ':' + c_PadZero(date.getMinutes()) + ':' +
 		c_PadZero(date.getSeconds()) + '.' + c_PadZero(date.getMilliseconds(), 3);
@@ -282,13 +255,11 @@ function c_Log(i_msg)
 	var lastEl = c_elLogs[c_elLogs.length - 1];
 	var elLine = lastEl;
 	var innerHTML = '<i><b>#</b>' + c_logCount + ' ' + time + ':</i> ' + i_msg;
-	if (c_lastLog == i_msg)
-	{
+	if (c_lastLog == i_msg) {
 		c_lastLogCount++;
 		innerHTML = c_lastLogCount + 'x ' + innerHTML;
 	}
-	else
-	{
+	else {
 		c_lastLog = i_msg;
 		c_lastLogCount = 1;
 		elLine = document.createElement('div');
@@ -301,8 +272,7 @@ function c_Log(i_msg)
 	c_logCount++;
 }
 
-function c_LogClear()
-{
+function c_LogClear() {
 	c_logCount = 0;
 	c_elLogs = [];
 	c_lastLog = null;
@@ -311,15 +281,13 @@ function c_LogClear()
 	u_el.log.innerHTML = '';
 }
 
-function c_ConstantError(i_msg)
-{
+function c_ConstantError(i_msg) {
 	let el = $('constant_error');
 	el.style.display = 'block';
 	el.innerHTML = i_msg;
 }
 
-function c_ElCurDateSet(i_evt)
-{
+function c_ElCurDateSet(i_evt) {
 	// If there is no text entered:
 	let el = i_evt.currentTarget;
 	let str = el.textContent;
@@ -335,8 +303,7 @@ function c_ElCurDateSet(i_evt)
 	c_MoveCursorToTheEnd(el);
 }
 
-function c_MoveCursorToTheEnd(i_el)
-{
+function c_MoveCursorToTheEnd(i_el) {
 	let range = document.createRange();//Create a range (a range is a like the selection but invisible)
 	range.selectNodeContents(i_el);//Select the entire contents of the element with the range
 	range.collapse(false);//collapse the range to the end point. false means collapse to end rather than the start
@@ -345,10 +312,8 @@ function c_MoveCursorToTheEnd(i_el)
 	selection.addRange(range);//make the range you have just created the visible selection
 }
 
-function c_AuxFolder(i_folder)
-{
-	if (i_folder.status)
-	{
+function c_AuxFolder(i_folder) {
+	if (i_folder.status) {
 		if (i_folder.status.flags && (i_folder.status.flags.indexOf('aux') != -1))
 			return true;
 
@@ -356,8 +321,7 @@ function c_AuxFolder(i_folder)
 			return true;
 	}
 
-	if (i_folder.name)
-	{
+	if (i_folder.name) {
 		var name = c_PathBase(i_folder.name);
 		for (var i = 0; i < RULES.aux_folders.length; i++)
 			if (name.toLowerCase().indexOf(RULES.aux_folders[i]) === 0)
@@ -367,15 +331,13 @@ function c_AuxFolder(i_folder)
 	return false;
 }
 
-function c_DT_StrFromSec(i_time, i_nosec)
-{
+function c_DT_StrFromSec(i_time, i_nosec) {
 	if (i_time == null)
 		return '';
 	return c_DT_StrFromMSec(i_time * 1000, i_nosec);
 }
 
-function c_DT_StrFromMSec(i_time, i_nosec)
-{
+function c_DT_StrFromMSec(i_time, i_nosec) {
 	if (i_time == null)
 		return '';
 	var date = new Date(i_time);
@@ -388,23 +350,19 @@ function c_DT_StrFromMSec(i_time, i_nosec)
 
 /* ---------------- [ Time and format functions ] -------------------------------------------------------- */
 
-function c_DT_CurSeconds()
-{
+function c_DT_CurSeconds() {
 	return Math.round((new Date).valueOf() / 1000);
 }
 
-function c_DT_FormStrNow()
-{
+function c_DT_FormStrNow() {
 	return c_DT_FormStrFromSec(c_DT_CurSeconds());
 }
 
-function c_DT_SecFromStr(i_str)
-{
+function c_DT_SecFromStr(i_str) {
 	return Math.round(c_DT_DateFromStr(i_str).valueOf() / 1000);
 }
 
-function c_DT_DateFromStr(i_str)
-{
+function c_DT_DateFromStr(i_str) {
 	var nums = c_Strip(i_str).split(/\D+/);
 	//	c_Error('Invalid date: "'+i_str+'"');
 	var date = new Date(0);
@@ -415,8 +373,7 @@ function c_DT_DateFromStr(i_str)
 	var year = nums[2];
 	var hour = 0;
 	var mins = 0;
-	if (nums[0].length == 4)
-	{
+	if (nums[0].length == 4) {
 		day = nums[2];
 		year = nums[0];
 	}
@@ -436,8 +393,7 @@ function c_DT_DateFromStr(i_str)
 	return date;
 }
 
-function c_DT_FormStrFromSec(i_sec)
-{
+function c_DT_FormStrFromSec(i_sec) {
 	var date = new Date(i_sec * 1000);
 	var str = date.getFullYear();
 	str += '.' + c_PadZero(date.getMonth() + 1, 2);
@@ -447,8 +403,7 @@ function c_DT_FormStrFromSec(i_sec)
 	return str;
 }
 
-function c_DT_DurFromSec(i_sec)
-{
+function c_DT_DurFromSec(i_sec) {
 	var hours = Math.floor(i_sec / 3600);
 	var secs = i_sec - (hours * 3600);
 	var mins = Math.floor(secs / 60);
@@ -456,18 +411,15 @@ function c_DT_DurFromSec(i_sec)
 	return hours + ':' + c_PadZero(mins) + ':' + c_PadZero(secs);
 }
 
-function c_DT_DurFromNow(i_sec)
-{
+function c_DT_DurFromNow(i_sec) {
 	return c_DT_DurFromSec((new Date()) / 1000 - i_sec);
 }
 
-function c_DT_DaysLeft(i_sec)
-{
+function c_DT_DaysLeft(i_sec) {
 	return (i_sec - (new Date() / 1000)) / (60 * 60 * 24);
 }
 
-function c_TC_FromFrame(i_frame, fps, clamp)
-{
+function c_TC_FromFrame(i_frame, fps, clamp) {
 	if (fps == null)
 		fps = RULES.fps;
 
@@ -496,12 +448,10 @@ function c_TC_FromFrame(i_frame, fps, clamp)
 	return tc;
 }
 
-function c_TC_FromSting(i_str)
-{
+function c_TC_FromSting(i_str) {
 	// console.log('c_TC_FromSting: ' + i_str);
 	var nums = i_str.split(/\D+/);
-	if (nums.length == 0)
-	{
+	if (nums.length == 0) {
 		c_Error('Invalid time code: ' + i_str);
 		return null;
 	}
@@ -513,8 +463,7 @@ function c_TC_FromSting(i_str)
 	var mult = [1, fps, fps * 60, fps * 3600];
 	// console.log( mult);
 	var j = 0;
-	for (var i = nums.length - 1; i >= 0; i--)
-	{
+	for (var i = nums.length - 1; i >= 0; i--) {
 		// console.log(nums[i]);
 		if (nums[i].length == 0)
 			continue;
@@ -526,8 +475,7 @@ function c_TC_FromSting(i_str)
 }
 
 
-function c_ElDisplayToggle(i_el)
-{
+function c_ElDisplayToggle(i_el) {
 	if (i_el.style.display == 'none')
 		i_el.style.display = 'block';
 	else
@@ -536,38 +484,31 @@ function c_ElDisplayToggle(i_el)
 
 /* ---------------- [ User information functions ] ------------------------------------------------------- */
 
-function c_IsNotAnArtist(i_user)
-{
+function c_IsNotAnArtist(i_user) {
 	return c_IsUserStateSet(i_user, 'notart');
 }
 
-function c_CanEditPlaylist(i_user)
-{
+function c_CanEditPlaylist(i_user) {
 	return c_IsUserStateSet(i_user, 'playlist');
 }
 
-function c_CanAssignArtists(i_user)
-{
+function c_CanAssignArtists(i_user) {
 	return c_IsUserStateSet(i_user, 'assignart');
 }
 
-function c_CanEditTasks(i_user)
-{
+function c_CanEditTasks(i_user) {
 	return c_IsUserStateSet(i_user, 'edittasks');
 }
 
-function c_CanEditBody(i_user)
-{
+function c_CanEditBody(i_user) {
 	return c_IsUserStateSet(i_user, 'editbody');
 }
 
-function c_CanSetPassword(i_user)
-{
+function c_CanSetPassword(i_user) {
 	return c_IsUserStateSet(i_user, 'passwd');
 }
 
-function c_IsUserStateSet(i_user, i_state)
-{
+function c_IsUserStateSet(i_user, i_state) {
 	if (i_user == null)
 		i_user = g_auth_user;
 	if (i_user == null)
@@ -586,8 +527,7 @@ function c_IsUserStateSet(i_user, i_state)
 	return false;
 }
 
-function c_CanCreateShot(i_user)
-{
+function c_CanCreateShot(i_user) {
 	if (i_user == null)
 		i_user = g_auth_user;
 	if (i_user == null)
@@ -598,20 +538,18 @@ function c_CanCreateShot(i_user)
 	return false;
 }
 
-function c_CanEditShot(i_user)
-{
+function c_CanEditShot(i_user) {
 	if (i_user == null)
 		i_user = g_auth_user;
 	if (i_user == null)
 		return false;
 
-	if ((['admin', 'coord', 'user','leader']).indexOf(i_user.role) != -1)
+	if ((['admin', 'coord', 'user', 'leader']).indexOf(i_user.role) != -1)
 		return true;
 	return false;
 }
 
-function c_CanEditTask(i_task, i_user)
-{
+function c_CanEditTask(i_task, i_user) {
 	if (i_user == null)
 		i_user = g_auth_user;
 	if (i_user == null)
@@ -631,26 +569,22 @@ function c_CanEditTask(i_task, i_user)
 	return false;
 }
 
-function c_CanCreateProject(i_user)
-{
+function c_CanCreateProject(i_user) {
 	if (g_admin)
 		return true;
 	return false;
 }
-function c_CanEditProjectTags(i_user)
-{
+function c_CanEditProjectTags(i_user) {
 	if (g_admin)
 		return true;
 	return false;
 }
 
-function c_HasFileSystem()
-{
+function c_HasFileSystem() {
 	return localStorage.has_filesystem == 'ON';
 }
 
-function c_CanExecuteSoft(i_user)
-{
+function c_CanExecuteSoft(i_user) {
 	if (localStorage.has_filesystem != 'ON')
 		return false;
 
@@ -670,15 +604,12 @@ function c_CanExecuteSoft(i_user)
 
 // Construct from g_users sorted roles with sorted artists:
 // Provide i_users to show specified users even if he is disabled or not an artist
-function c_GetRolesArtists(i_users)
-{
+function c_GetRolesArtists(i_users) {
 	var roles_obj = {};
 	// Collect users by roles:
-	for (let uid in g_users)
-	{
+	for (let uid in g_users) {
 		// console.log(g_users[uid].states);
-		if ((i_users == null) || (i_users[uid] == null))
-		{
+		if ((i_users == null) || (i_users[uid] == null)) {
 			if (g_users[uid].disabled)
 				continue;
 			if (c_IsNotAnArtist(g_users[uid]))
@@ -688,17 +619,15 @@ function c_GetRolesArtists(i_users)
 		let role = g_users[uid].role;
 
 		if (roles_obj[role] == null)
-			roles_obj[role] = {'users':[]};
+			roles_obj[role] = { 'users': [] };
 
 		roles_obj[role].users.push(g_users[uid]);
 	}
 
 	// Collect users by tag for earch role:
-	for (let role in roles_obj)
-	{
+	for (let role in roles_obj) {
 		roles_obj[role].tags_obj = {};
-		for (let u in roles_obj[role].users)
-		{
+		for (let u in roles_obj[role].users) {
 			let user = roles_obj[role].users[u];
 			let tag = user.tag;
 			if (tag == null) tag = '';
@@ -711,36 +640,32 @@ function c_GetRolesArtists(i_users)
 	}
 
 	var roles = [];
-	for (let role in roles_obj)
-	{
-		roles_obj[role].users.sort(function(a, b) { return a.title > b.title });
+	for (let role in roles_obj) {
+		roles_obj[role].users.sort(function (a, b) { return a.title > b.title });
 
 		let role_obj = {};
 		role_obj.role = role;
 		role_obj.artists = roles_obj[role].users;
 		role_obj.tags = [];
 
-		for (let tag in roles_obj[role].tags_obj)
-		{
-			roles_obj[role].tags_obj[tag].sort(function(a, b) { return a.title > b.title });
+		for (let tag in roles_obj[role].tags_obj) {
+			roles_obj[role].tags_obj[tag].sort(function (a, b) { return a.title > b.title });
 
-			role_obj.tags.push({'tag':tag,'artists':roles_obj[role].tags_obj[tag]});
+			role_obj.tags.push({ 'tag': tag, 'artists': roles_obj[role].tags_obj[tag] });
 		}
 
-		role_obj.tags.sort(function(a, b) { return a.tag > b.tag });
+		role_obj.tags.sort(function (a, b) { return a.tag > b.tag });
 
 		roles.push(role_obj);
 
 	}
-	roles.sort(function(a, b) { return a.role < b.role });
+	roles.sort(function (a, b) { return a.role < b.role });
 
 	return roles;
 }
 
-function c_GetUserTitle(i_uid, i_guest, i_short)
-{
-	if (i_uid == null)
-	{
+function c_GetUserTitle(i_uid, i_guest, i_short) {
+	if (i_uid == null) {
 		if (g_auth_user == null)
 			return 'Guest';
 		i_uid = g_auth_user.id;
@@ -750,18 +675,15 @@ function c_GetUserTitle(i_uid, i_guest, i_short)
 
 	var title = i_uid;
 
-	if (g_users && g_users[i_uid])
-	{
+	if (g_users && g_users[i_uid]) {
 		if (g_users[i_uid].title)
 			title = g_users[i_uid].title;
 	}
-	else if (i_guest && i_guest.title)
-	{
+	else if (i_guest && i_guest.title) {
 		title = i_guest.title;
 	}
 
-	if (i_short && (title.length > 4))
-	{
+	if (i_short && (title.length > 4)) {
 		title = title.split(' ');
 		if (title.length > 1)
 			title = title[0].substr(0, 1) + title[1].substr(0, 3);
@@ -771,38 +693,31 @@ function c_GetUserTitle(i_uid, i_guest, i_short)
 	return title;
 }
 
-function c_GetFlagTitle(i_flag)
-{
+function c_GetFlagTitle(i_flag) {
 	return c_GetTagProp(i_flag, 'flag', 'title');
 }
 
-function c_GetTagTitle(i_tag)
-{
+function c_GetTagTitle(i_tag) {
 	return c_GetTagProp(i_tag, 'tag', 'title');
 }
 
-function c_GetFlagTip(i_flag)
-{
+function c_GetFlagTip(i_flag) {
 	return c_GetTagProp(i_flag, 'flag', 'tip');
 }
 
-function c_GetTagTip(i_tag)
-{
+function c_GetTagTip(i_tag) {
 	return c_GetTagProp(i_tag, 'tag', 'tip');
 }
 
-function c_GetFlagShort(i_flag)
-{
+function c_GetFlagShort(i_flag) {
 	return c_GetTagProp(i_flag, 'flag', 'short', 3);
 }
 
-function c_GetTagShort(i_tag)
-{
+function c_GetTagShort(i_tag) {
 	return c_GetTagProp(i_tag, 'tag', 'short', 3);
 }
 
-function c_GetTagProp(i_name, i_type, i_key, i_clamp)
-{
+function c_GetTagProp(i_name, i_type, i_key, i_clamp) {
 	var val = i_name;
 	var types = i_type + 's';
 	if (RULES[types][i_name] && RULES[types][i_name][i_key])
@@ -812,8 +727,7 @@ function c_GetTagProp(i_name, i_type, i_key, i_clamp)
 	return val;
 }
 
-function c_CompareFiles(a, b)
-{
+function c_CompareFiles(a, b) {
 	var attr = 'name';
 	if (a[attr] < b[attr])
 		return -1;
@@ -822,55 +736,47 @@ function c_CompareFiles(a, b)
 	return 0;
 }
 
-function c_ElToggleSelected(i_e, i_toggleClassList = 'selected')
-{
+function c_ElToggleSelected(i_e, i_toggleClassList = 'selected') {
 	let el = i_e;
 	if (i_e.currentTarget)
 		el = i_e.currentTarget;
-	c_ElSetSelected(el, el['m_'+i_toggleClassList] != true, i_toggleClassList);
+	c_ElSetSelected(el, el['m_' + i_toggleClassList] != true, i_toggleClassList);
 	return el.m_selected;
 }
 
-function c_ElSetSelected(i_e, i_selected, i_toggleClassList = 'selected')
-{
+function c_ElSetSelected(i_e, i_selected, i_toggleClassList = 'selected') {
 	let el = i_e;
 	if (i_e.currentTarget)
 		el = i_e.currentTarget;
-	if (i_selected)
-	{
-		el['m_'+i_toggleClassList] = true;
+	if (i_selected) {
+		el['m_' + i_toggleClassList] = true;
 		if (i_toggleClassList)
 			el.classList.add(i_toggleClassList);
 	}
-	else
-	{
-		el['m_'+i_toggleClassList] = false;
+	else {
+		el['m_' + i_toggleClassList] = false;
 		if (i_toggleClassList)
 			el.classList.remove(i_toggleClassList);
 	}
 }
 
-function c_Strip(i_str)
-{
+function c_Strip(i_str) {
 	return i_str.replace(/^\s+|\s+$|^\n+|\n+$|^<br>|<br>$/g, '');
 }
 
-function c_GetElInteger(i_el)
-{
+function c_GetElInteger(i_el) {
 	var str = c_Strip(i_el.textContent);
 	if (str.length == 0)
 		return null;
 	var num = parseInt(str);
-	if (isNaN(num))
-	{
+	if (isNaN(num)) {
 		c_Error('Invalid number: "' + str + '"');
 		return null;
 	}
 	return num;
 }
 
-function c_GetElTime(i_el)
-{
+function c_GetElTime(i_el) {
 	let str = c_Strip(i_el.textContent);
 	if (str.length == 0)
 		return null;
@@ -883,8 +789,7 @@ function c_GetElTime(i_el)
 	return time;
 }
 
-function c_FileDragStart(i_evt, i_path)
-{
+function c_FileDragStart(i_evt, i_path) {
 	var el = i_evt.currentTarget;
 	var path = c_PathPM_Rules2Client(i_path);
 	if (cgru_Platform.indexOf('windows') == -1)
@@ -898,8 +803,7 @@ function c_FileDragStart(i_evt, i_path)
 
 /* ---------------- [ RU file functions ] ---------------------------------------------------------------- */
 
-function c_GetRuFilePath(i_file, i_path)
-{
+function c_GetRuFilePath(i_file, i_path) {
 	var path = i_path;
 	if (path == null)
 		path = g_CurPath();
@@ -910,8 +814,7 @@ function c_GetRuFilePath(i_file, i_path)
 	return path;
 }
 
-function c_RuFileExists(i_file)
-{
+function c_RuFileExists(i_file) {
 	if (g_elCurFolder.m_dir == null)
 		return false;
 	if (g_elCurFolder.m_dir.rufiles == null)
@@ -923,8 +826,7 @@ function c_RuFileExists(i_file)
 	return true;
 }
 
-function c_RuFileAdd(i_file)
-{
+function c_RuFileAdd(i_file) {
 	if (g_elCurFolder.m_dir == null)
 		g_elCurFolder.m_dir = {};
 	if (g_elCurFolder.m_dir.rufiles == null)
@@ -935,40 +837,35 @@ function c_RuFileAdd(i_file)
 
 /* ---------------- [ File functions ] ------------------------------------------------------------------- */
 
-function c_FileIsMovie(i_file)
-{
+function c_FileIsMovie(i_file) {
 	var type = i_file.substr(i_file.lastIndexOf('.') + 1).toLowerCase();
 	if (c_movieTypes.indexOf(type) != -1)
 		return true;
 	return false;
 }
 
-function c_FileIsMovieHTML(i_file)
-{
+function c_FileIsMovieHTML(i_file) {
 	var type = i_file.substr(i_file.lastIndexOf('.') + 1).toLowerCase();
 	if (c_movieTypesHTML.indexOf(type) != -1)
 		return true;
 	return false;
 }
 
-function c_FileIsImage(i_file)
-{
+function c_FileIsImage(i_file) {
 	var type = i_file.substr(i_file.lastIndexOf('.') + 1).toLowerCase();
 	if (c_imageTypes.indexOf(type) != -1)
 		return true;
 	return false;
 }
 
-function c_FileCanEdit(i_file)
-{
+function c_FileCanEdit(i_file) {
 	var type = i_file.substr(i_file.lastIndexOf('.') + 1).toLowerCase();
 	if (c_imageEditableTypes.indexOf(type) != -1)
 		return true;
 	return false;
 }
 
-function c_FileCanThumbnail(i_file)
-{
+function c_FileCanThumbnail(i_file) {
 	if (c_FileIsImage(i_file))
 		return true;
 	if (c_FileIsMovie(i_file))
@@ -976,8 +873,7 @@ function c_FileCanThumbnail(i_file)
 	return false;
 }
 
-function c_FileIsArchive(i_file)
-{
+function c_FileIsArchive(i_file) {
 	var type = i_file.substr(i_file.lastIndexOf('.') + 1).toLowerCase();
 	if (c_archives.indexOf(type) != -1)
 		return true;
@@ -985,12 +881,10 @@ function c_FileIsArchive(i_file)
 }
 
 
-function c_Bytes2KMG(i_bytes)
-{
+function c_Bytes2KMG(i_bytes) {
 	var lables = ['B', 'KB', 'MB', 'GB', 'TB'];
 	var th = 1, log = 0;
-	while (th * 1024 < i_bytes)
-	{
+	while (th * 1024 < i_bytes) {
 		th *= 1024;
 		log++;
 	}
@@ -998,8 +892,7 @@ function c_Bytes2KMG(i_bytes)
 	return (i_bytes / th).toFixed(1) + ' ' + lables[log];
 }
 
-function c_NumToStr(i_num, i_prec)
-{
+function c_NumToStr(i_num, i_prec) {
 	if (i_prec == null)
 		i_prec = 2;
 
@@ -1014,25 +907,22 @@ function c_NumToStr(i_num, i_prec)
 	return str;
 }
 
-function c_GetThumbFileName(i_file)
-{
+function c_GetThumbFileName(i_file) {
 	var name = c_PathBase(i_file);
 	var path = c_PathDir(i_file);
 	return path + '/' + RUFOLDER + '/thumbnail.' + name + '.jpg';
 }
 
-function c_MakeThumbnail(i_file, i_func)
-{
+function c_MakeThumbnail(i_file, i_func) {
 	var cmd = RULES.thumbnail.create_file;
 	cmd = cmd.replace(/@INPUT@/g, RULES.root + i_file);
 	cmd = cmd.replace(/@OUTPUT@/g, RULES.root + c_GetThumbFileName(i_file));
 	cmd += ' -c ' + RULES.thumbnail.colorspace;
-	n_Request({"send": {"cmdexec": {"cmds": [cmd]}}, "func": i_func, "file": i_file, "info": 'thumbnail'});
+	n_Request({ "send": { "cmdexec": { "cmds": [cmd] } }, "func": i_func, "file": i_file, "info": 'thumbnail' });
 }
 
-var c_file_good_symbols = ['_','-','.'];
-function c_IsFileGoodChar(i_char)
-{
+var c_file_good_symbols = ['_', '-', '.'];
+function c_IsFileGoodChar(i_char) {
 	var code = i_char.charCodeAt(0);
 
 	// Not ASCII
@@ -1057,17 +947,14 @@ function c_IsFileGoodChar(i_char)
 	return false;
 }
 
-function c_HighlightBadChars(i_file)
-{
+function c_HighlightBadChars(i_file) {
 	var o_file = '';
 
-	for (let c = 0; c < i_file.length; c++)
-	{
+	for (let c = 0; c < i_file.length; c++) {
 		let ch = i_file.charAt(c);
 		let bad = false == c_IsFileGoodChar(ch);
 
-		if (bad)
-		{
+		if (bad) {
 			o_file += '<span class="file_bad_char">';
 			if (ch == ' ')
 				ch = '_';
@@ -1082,50 +969,49 @@ function c_HighlightBadChars(i_file)
 
 /* ---------------- [ Path transposing functions ] ------------------------------------------------------- */
 
-function c_PathBase(i_file)
-{
+function c_PathBase(i_file) {
 	return i_file.substr(i_file.lastIndexOf('/') + 1);
 }
 
-function c_PathDir(i_file)
-{
+function c_PathDir(i_file) {
 	return i_file.substr(0, i_file.lastIndexOf('/'));
 }
 
-function c_PathSplitExt(i_file)
-{
-	let split = [i_file,''];
+function c_PathSplitExt(i_file) {
+	let split = [i_file, ''];
 	let dot = i_file.lastIndexOf('.');
 	if (dot != -1)
-		split = [i_file.substr(0, dot), i_file.substr(dot+1)];
+		split = [i_file.substr(0, dot), i_file.substr(dot + 1)];
 	return split;
 }
 
-function c_PathPM_Rules2Server(i_path)
-{
+function c_PathPM_Rules2Server(i_path) {
 	if (ROOT)
 		return (ROOT + i_path);
 	else
 		return (RULES.root + i_path);
 }
 
-function c_PathPM_Rules2Client(i_path)
-{
+function c_PathPM_Server2Rules(i_path) {
+	if (ROOT)
+		return i_path.replace(ROOT, '');
+	else
+		return i_path.replace(RULES.root, '');
+}
+
+function c_PathPM_Rules2Client(i_path) {
 	return cgru_PM(c_PathPM_Rules2Server(i_path));
 }
 
-function c_PathPM_Client2Server(i_path)
-{
+function c_PathPM_Client2Server(i_path) {
 	return cgru_PM(i_path, true);
 }
 
-function c_PathPM_Server2Client(i_path)
-{
+function c_PathPM_Server2Client(i_path) {
 	return cgru_PM(i_path);
 }
 
-function c_IsUserSubsribedOnPath(i_path)
-{
+function c_IsUserSubsribedOnPath(i_path) {
 	if ((null == g_auth_user) || (null == g_auth_user.channels))
 		return false;
 
@@ -1140,8 +1026,7 @@ function c_IsUserSubsribedOnPath(i_path)
 }
 
 // Check where i_subfolder is located in i_folder
-function c_PathIsInFolder(i_folder, i_subfolder)
-{
+function c_PathIsInFolder(i_folder, i_subfolder) {
 	var folders = i_folder.split('/');
 	var subs = i_subfolder.split('/');
 
@@ -1155,8 +1040,7 @@ function c_PathIsInFolder(i_folder, i_subfolder)
 	return true;
 }
 
-function c_CreateOpenButton(i_args)
-{
+function c_CreateOpenButton(i_args) {
 	if (false == c_HasFileSystem())
 		return null;
 
@@ -1165,43 +1049,36 @@ function c_CreateOpenButton(i_args)
 	return cgru_CmdExecCreateOpen(i_args);
 }
 
-function c_MD5(i_str)
-{
+function c_MD5(i_str) {
 	return hex_md5(i_str);
 }
 
 /* ---------------- [ Email functions ] ------------------------------------------------------------------ */
 
-function c_EmailFromTitle()
-{
+function c_EmailFromTitle() {
 	return 'RULES: ' + RULES.company;
 }
 
-function c_EmailValidate(i_email)
-{
+function c_EmailValidate(i_email) {
 	var re =
 		/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 	return re.test(i_email);
 }
 
-function c_EmailEncode(i_email)
-{
+function c_EmailEncode(i_email) {
 	if (i_email.indexOf('@') == -1)
 		return i_email;
 	return btoa(JSON.stringify(i_email.split('@')));
 }
 
-function c_EmailDecode(i_email)
-{
+function c_EmailDecode(i_email) {
 	if (i_email.indexOf('@') != -1)
 		return i_email;
 	var email = null;
-	try
-	{
+	try {
 		email = JSON.parse(atob(i_email)).join('@');
 	}
-	catch (err)
-	{
+	catch (err) {
 		email = null;
 		c_Error(err);
 	}
@@ -1209,8 +1086,7 @@ function c_EmailDecode(i_email)
 }
 
 
-function c_GetAvatar(i_user_id, i_guest)
-{
+function c_GetAvatar(i_user_id, i_guest) {
 	var avatar = null;
 
 	var user = null;
@@ -1219,20 +1095,17 @@ function c_GetAvatar(i_user_id, i_guest)
 	else
 		user = g_auth_user;
 
-	if (user == null)
-	{
+	if (user == null) {
 		if (i_guest)
 			user = i_guest;
 		else
 			return null
 	}
 
-	if (user.avatar && user.avatar.length)
-	{
+	if (user.avatar && user.avatar.length) {
 		avatar = user.avatar;
 	}
-	else if (user.email && user.email.length)
-	{
+	else if (user.email && user.email.length) {
 		avatar = user.email;
 		if (i_guest)
 			avatar = c_EmailDecode(avatar);
@@ -1246,44 +1119,38 @@ function c_GetAvatar(i_user_id, i_guest)
 	return null;
 }
 
-function c_LinksProcess(i_text)
-{
+function c_LinksProcess(i_text) {
 	return c_LinksToRelative(c_HttpToLinks(i_text));
 }
 
-function c_HttpToLinks(i_text)
-{
+function c_HttpToLinks(i_text) {
 	// console.log('c_HttpToLinks in:'+i_text);
 	var a_re =
 		/(((\b(https?|ftp|file):\/\/)|(#\/))[-A-Z0-9+&@#\/%?=~_|!:,.;"\{\}]*[-A-Z0-9+&@#\/%=~_|"\{\}])/ig;
 	var a_parts = i_text.split(/<a /gi);
 	var out = null;
-	for (var i = 0; i < a_parts.length; i++)
-	{
+	for (var i = 0; i < a_parts.length; i++) {
 		var text = a_parts[i];
 		var link = '';
 		var pos = text.indexOf('</a>');
-		if (pos > 0)
-		{
+		if (pos > 0) {
 			link = text.substr(0, pos);
 			text = text.substr(pos);
 		}
 		//text = text.replace(a_re, '<a target="_blank" class="link_auto" href="$1">$1</a>');
 		let found_links = [];
 		let matches = text.matchAll(a_re);
-		for (const match of matches)
-		{
+		for (const match of matches) {
 			let href = match[0];
 			if (found_links.includes(href))
 				continue;
 			found_links.push(href);
 			console.log(href);
 			let name = href;
-			if (name.includes('fv_Goto'))
-			{
+			if (name.includes('fv_Goto')) {
 				name = name.split('fv_Goto');
-				name = name[name.length-1];
-				name = name.replace(/[:\"\{\}]|%22|%7D|/g,'');
+				name = name[name.length - 1];
+				name = name.replace(/[:\"\{\}]|%22|%7D|/g, '');
 			}
 			name = name.replace(g_CurPath(), '');
 			while ((name.indexOf('/') == 0) && name.length) name = name.substr(1);
@@ -1300,16 +1167,14 @@ function c_HttpToLinks(i_text)
 	return out;
 }
 
-function c_LinksToRelative(i_text)
-{
+function c_LinksToRelative(i_text) {
 	var address = document.location.protocol + '//' + document.location.host + document.location.pathname;
 	while (i_text.indexOf(address) != -1)
 		i_text = i_text.replace(address, '');
 	return i_text;
 }
 
-function c_elMarkupRemove(i_el)
-{
+function c_elMarkupRemove(i_el) {
 	var html = i_el.innerHTML;
 
 	html = html.replace(/<br/gi, '@BR@<br');
@@ -1328,8 +1193,7 @@ function c_elMarkupRemove(i_el)
 	i_el.innerHTML = i_el.textContent.replace(/@BR@/g, '<br>');
 }
 
-function c_LoadingElSet(i_el)
-{
+function c_LoadingElSet(i_el) {
 	if (i_el.m_elWaiting)
 		return;
 
@@ -1342,17 +1206,14 @@ function c_LoadingElSet(i_el)
 	i_el.m_elWaiting = el;
 }
 
-function c_LoadingElReset(i_el)
-{
-	if (i_el.m_elWaiting)
-	{
+function c_LoadingElReset(i_el) {
+	if (i_el.m_elWaiting) {
 		i_el.removeChild(i_el.m_elWaiting);
 		i_el.m_elWaiting = null;
 	}
 }
 
-function c_GuestCheck(i_msg)
-{
+function c_GuestCheck(i_msg) {
 	if (g_auth_user)
 		return false;
 	if (i_msg == null)
