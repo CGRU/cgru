@@ -264,13 +264,15 @@ function fu_ChecksumDo(i_wnd)
 
 /* ---------------- [ Multi Put structs and functions ] -------------------------------------------------- */
 var fu_putmulti_params = {
-	input /*********/: {"label": 'Result Paths', "width":'50%'},
-	activity         : {"label": 'Activity', "width":'25%'},
-	filesext         : {"label": 'Files Extensions', "default":'mp4,mov', "width":'25%', "lwidth":'150px'},
-	skipexisting /**/: {"label": 'Skip Existing', 'type': "bool", 'default': true, "width": '25%'},
-	skiperrors /****/: {"label": 'Skip Errors', 'type': "bool", 'default': true, "width": '25%'},
-	skipcheck /*****/: {"label": 'Skip Check', 'type': "bool", 'default': false, "width": '25%'},
-	minversion       : {"label": 'Min Version', 'type': "bool", 'default': false, "width": '25%'},
+	input /*********/: {"label": 'Result Paths', "width":'40%'},
+	activity         : {"label": 'Activity', "width":'20%'},
+	filesext         : {"label": 'Extensions', "default":'mp4,mov', "width":'20%'},
+	datemin          : {"label": 'Min Date', 'lwidth': '80px', "width": '20%'},
+	skipexisting /**/: {"label": 'Skip Existing', 'type': "bool", 'default': true, "width": '20%'},
+	skiperrors /****/: {"label": 'Skip Errors', 'type': "bool", 'default': true, "width": '20%'},
+	skipcheck /*****/: {"label": 'Skip Check', 'type': "bool", 'default': false, "width": '20%'},
+	minversion       : {"label": 'Min Version', 'type': "bool", 'default': false, "width": '20%'},
+	datemax          : {"label": 'Max Date', 'lwidth': '80px', "width": '20%'},
 	dest /**********/: {"label": 'Destination'},
 	af_capacity /***/: {'label': 'Capacity', 'width': '20%', 'type': 'int'},
 	af_maxtasks /***/: {'label': 'Max Tasks', 'width': '15%', 'lwidth': '80px', 'type': 'int'},
@@ -283,6 +285,8 @@ var fu_findres_params = {
 	filesext: {},
 	input: {},
 	dest: {},
+	datemin: {},
+	datemax: {},
 	skiperrors: {'type': "bool", 'default': true},
 	skipcheck: {'type': "bool", 'default': false},
 	minversion: {'type': "bool", 'default': false}
@@ -366,6 +370,10 @@ function fu_ResultsFind(i_wnd)
 
 	let cmd = 'rules/bin/find_results.py';
 	cmd += ' -r "' + params.input + '"';
+	if (params.datemin.length)
+		cmd += ' --datemin "' + params.datemin + '"';
+	if (params.datemax.length)
+		cmd += ' --datemax "' + params.datemax + '"';
 	if (params.activity.length)
 		cmd += ' --activity "' + params.activity + '"';
 	if (params.filesext.length)
@@ -390,10 +398,10 @@ function fu_ResultsReceived(i_data, i_args)
 	// console.log( JSON.stringify( i_args));
 	i_args.wnd.elContent.removeChild(i_args.wnd.m_elWait);
 
-	var elResults = i_args.wnd.m_elResults;
+	const elResults = i_args.wnd.m_elResults;
 	elResults.textContent = '';
-	for (var i = 0; i < i_args.wnd.m_res_btns_show.length; i++)
-		i_args.wnd.m_res_btns_show[i].style.display = 'none';
+	for (let elBtn of i_args.wnd.m_res_btns_show)
+		elBtn.style.display = 'none';
 
 	if ((i_data.cmdexec == null) || (!i_data.cmdexec.length) || (i_data.cmdexec[0].find_results == null))
 	{
@@ -402,11 +410,11 @@ function fu_ResultsReceived(i_data, i_args)
 		return;
 	}
 
-	var result = i_data.cmdexec[0].find_results;
+	const result = i_data.cmdexec[0].find_results;
 
 	if (result.error)
 	{
-		var el = document.createElement('div');
+		const el = document.createElement('div');
 		elResults.appendChild(el);
 		el.textContent = result.error;
 		el.style.color = '#F42';
@@ -414,7 +422,7 @@ function fu_ResultsReceived(i_data, i_args)
 
 	if (result.info)
 	{
-		var el = document.createElement('div');
+		const el = document.createElement('div');
 		elResults.appendChild(el);
 		el.textContent = result.info;
 	}
@@ -424,34 +432,36 @@ function fu_ResultsReceived(i_data, i_args)
 
 	if (result.results.length == 0)
 	{
-		var el = document.createElement('div');
+		const el = document.createElement('div');
 		elResults.appendChild(el);
 		el.textContent = 'No results found.';
 		el.style.color = '#F42';
 		return;
 	}
 
-	var elTable = document.createElement('table');
+	const elTable = document.createElement('table');
 	elResults.appendChild(elTable);
 
-	var found = false;
-	for (var i = 0; i < result.results.length; i++)
+	let datemin = '9999.99.99';
+	let datemax = '0000.00.00';
+
+	let found = false;
+	for (let res of result.results)
 	{
-		var res = result.results[i];
 		// console.log( JSON.stringify( res));
 
-		var elTr = document.createElement('tr');
+		const elTr = document.createElement('tr');
 		elTable.appendChild(elTr);
 
-		var el = document.createElement('td');
+		let el = document.createElement('td');
 		elTr.appendChild(el);
 		el.textContent = res.asset;
 
-		var el = document.createElement('td');
+		el = document.createElement('td');
 		elTr.appendChild(el);
 		el.textContent = res.respath;
 
-		var el = document.createElement('td');
+		el = document.createElement('td');
 		elTr.appendChild(el);
 		if (res.file)
 		{
@@ -461,17 +471,30 @@ function fu_ResultsReceived(i_data, i_args)
 		else
 			el.textContent = res.name;
 
-		var el = document.createElement('td');
+		el = document.createElement('td');
+		elTr.appendChild(el);
+		el.textContent = res.date;
+		if (res.date < datemin)
+			datemin = res.date;
+		if (res.date > datemax)
+			datemax = res.date;
+
+		el = document.createElement('td');
 		elTr.appendChild(el);
 		el.textContent = res.version;
 
-		var el = document.createElement('td');
+		el = document.createElement('td');
 		elTr.appendChild(el);
 
-		var msg = '';
+		let msg = '';
 		if (res.exist)
 		{
 			msg += ' EXIST';
+			elTr.style.color = '#888';
+		}
+		if (res.skip)
+		{
+			msg += ' skipping';
 			elTr.style.color = '#888';
 		}
 
@@ -489,10 +512,14 @@ function fu_ResultsReceived(i_data, i_args)
 	if (found)
 	{
 		i_args.wnd.m_result = result;
-		for (var i = 0; i < i_args.wnd.m_res_btns_show.length; i++)
-			i_args.wnd.m_res_btns_show[i].style.display = 'block';
+		for (let elBtn of i_args.wnd.m_res_btns_show)
+			elBtn.style.display = 'block';
+
+		i_args.wnd.elContent.m_elements['datemin'].textContent = datemin;
+		i_args.wnd.elContent.m_elements['datemax'].textContent = datemax;
 	}
 	// console.log(JSON.stringify(result));
+	//
 }
 
 function fu_PutMultiDo(i_wnd)
@@ -535,6 +562,9 @@ function fu_PutMultiDo(i_wnd)
 	for (let res of result.results)
 	{
 		if (res.error)
+			continue;
+
+		if (res.skip)
 			continue;
 
 		if (res.exist && params.skipexisting)

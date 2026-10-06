@@ -7,6 +7,7 @@ import re
 import signal
 import sys
 
+from datetime import datetime
 from optparse import OptionParser
 
 Parser = OptionParser(
@@ -18,6 +19,8 @@ Parser = OptionParser(
 Parser.add_option('-r', '--respaths',     dest='respaths',     type  ='string',     default='RESULT/JPG,RESULT/TIF,RESULT/DPX')
 Parser.add_option('-a', '--activity',     dest='activity',     type  ='string',     default=None,  help='Activity (comp,anim)')
 Parser.add_option('-f', '--filesext',     dest='filesext',     type  ='string',     default=None,  help='Include files with extensions')
+Parser.add_option('-t', '--datemin',      dest='datemin',      type  ='string',     default=None,  help='Minimum modification time')
+Parser.add_option('-x', '--datemax',      dest='datemax',      type  ='string',     default=None,  help='Maximum modification time')
 Parser.add_option('-d', '--dest',         dest='dest',         type  ='string',     default=None,  help='Destination')
 Parser.add_option('-m', '--minversion',   dest='minversion',   action='store_true', default=False, help='Minimal version')
 Parser.add_option('-s', '--skipcheck',    dest='skipcheck',    action='store_true', default=False, help='Skip destination check')
@@ -143,6 +146,14 @@ for src in args:
 
             result['src'] = os.path.join(respath, item)
             result['respath'] = res
+
+            result['skip'] = False
+            date = datetime.fromtimestamp(os.path.getmtime(path)).strftime('%Y.%m.%d')
+            if Options.datemin is not None and date < Options.datemin:
+                result['skip'] = True
+            if Options.datemax is not None and date > Options.datemax:
+                result['skip'] = True
+            result['date'] = date
 
             # If item name does not starts with shot name we should add it:
             resname = item
