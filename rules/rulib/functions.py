@@ -397,9 +397,11 @@ def copyTemplate(i_uid, i_template, i_destination, i_names, o_out):
                shutil.copytree(i_template, dest)
             except PermissionError:
                 copy['error'] = 'Permission denied: %s' % dest
+                o_out['copies'].append(copy)
                 continue
             except:
                 copy['error'] = '%s' % traceback.format_exc()
+                o_out['copies'].append(copy)
                 continue
 
             try:
