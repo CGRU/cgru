@@ -3,6 +3,7 @@ import json
 import getpass
 import os
 import shutil
+import subprocess
 import sys
 import threading
 import time
@@ -410,6 +411,16 @@ def copyTemplate(i_uid, i_template, i_destination, i_names, o_out):
             except:
                 copy['error'] = 'Unable to write rules file.'
                 copy['info'] = '%s' % traceback.format_exc()
+
+            # Run script on copy, if exists:
+            runfile = os.path.join(dest, rulib.RUFOLDER, 'runOnCopy.py')
+            if os.path.isfile(runfile):
+                result = subprocess.run([runfile, i_uid], shell=True, capture_output=True, text=True, check=False)
+                if result.returncode != 0:
+                    copy['run_error'] = result.stderr
+                else:
+                    copy['run'] = result.stdout
+
 
         o_out['copies'].append(copy)
 
