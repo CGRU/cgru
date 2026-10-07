@@ -282,14 +282,12 @@ var fu_findres_params = {
 
 function fu_PutMultiDialog(i_args) {
 	// console.log( JSON.stringify( i_args));
-	var wnd = new cgru_Window({ "name": 'put', "title": 'Put Results' });
+	const wnd = new cgru_Window({ "name": 'put', "title": 'Put Results' });
 	wnd.m_args = i_args;
 
-	var params = {};
-
-	params.input = RULES.assets.shot.result.path.join(',');
-	if (RULES.put.input)
-		params.input = RULES.put.input;
+	let params = {};
+	params.input = RULES.put.inputs[0];
+	fu_putmulti_params.input.pulldown = RULES.put.inputs;
 
 	if (RULES.put.dest.indexOf('/') !== 0)
 		if (ASSETS.project)

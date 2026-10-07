@@ -390,7 +390,7 @@
 },
 
 "cut":{
-	"input":"RESULT/JPG,RESULT/ANIM",
+	"inputs":["RESULT/JPG,RESULT/ANIM","RESULT/ANIM,RESULT/JPG"],
 	"output":"COMMON/RESULT/JPG",
 	"format":"1280x720",
 	"codec":"h264_mid",
@@ -406,7 +406,7 @@
 },
 
 "put":{
-	"input":"RESULT/EXR,RESULT/DAILIES",
+	"inputs":["RESULT/DAILIES","RESULT/ANIM","RESULT/EXR","RESULT/JPG","RESULT/TIF"],
 	"dest":"OUT",
 	"-dest":"/incoming",
 	"cmd":"python3 /cgru/utilities/put.py",
