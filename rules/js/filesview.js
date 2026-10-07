@@ -1389,7 +1389,7 @@ FilesView.prototype.getItemPath = function (i_path) {
 };
 
 FilesView.prototype.makeThumbEl = function (i_el, i_path, i_type) {
-	var elThumbnail = document.createElement('span');
+	const elThumbnail = document.createElement('span');
 	i_el.appendChild(elThumbnail);
 	this.elThumbnails.push(elThumbnail);
 	elThumbnail.classList.add('thumbnail');
@@ -1398,15 +1398,17 @@ FilesView.prototype.makeThumbEl = function (i_el, i_path, i_type) {
 		elThumbnail.style.display = 'none';
 
 	elThumbnail.m_path = i_path;
-	var thumbFile = RULES.root + c_GetThumbFileName(i_path);
-	var thumbName = c_PathBase(thumbFile);
+	const thumbFile = RULES.root + c_GetThumbFileName(i_path);
+	const thumbName = c_PathBase(thumbFile);
 	elThumbnail.m_thumbFile = thumbFile;
 
-	var elImg = document.createElement('img');
+	const elImg = document.createElement('img');
 	elThumbnail.appendChild(elImg);
 	elThumbnail.m_elImg = elImg;
-	if (this.walk.rufiles && (this.walk.rufiles.indexOf(thumbName) != -1))
+	if (this.walk.rufiles && (this.walk.rufiles.indexOf(thumbName) != -1)) {
 		elImg.src = thumbFile;
+		elThumbnail.m_fileExists = true;
+	}
 	else
 		elThumbnail.style.display = 'none';
 
@@ -1442,10 +1444,12 @@ FilesView.prototype.thumbsHideShow = function (i_toggle) {
 		return;
 
 	for (let el of this.elThumbnails) {
-		if (this.thumbs_hidden)
-			el.style.display = 'none';
-		else
-			el.style.display = 'span';
+		if (el.m_fileExists) {
+			if (this.thumbs_hidden)
+				el.style.display = 'none';
+			else
+				el.style.display = 'block';
+		}
 	}
 }
 
