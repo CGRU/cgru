@@ -30,6 +30,7 @@ def findSoundRef(i_folder):
     shot = os.path.basename(os.getcwd())
 
     files_shot = []
+    files_like_shot = []
     files_other = []
 
     for afile in os.listdir(i_folder):
@@ -47,16 +48,22 @@ def findSoundRef(i_folder):
         if not hasAudio(afile):
             continue
 
-        if os.path.basename(afile).find(shot) == 0:
+        if os.path.basename(name) == shot:
             files_shot.append(afile)
+        elif os.path.basename(afile).find(shot) == 0:
+            files_like_shot.append(afile)
         else:
             files_other.append(afile)
 
     files_shot.sort()
+    files_like_shot.sort()
     files_other.sort()
 
     if len(files_shot):
         return files_shot[-1]
+
+    if len(files_like_shot):
+        return files_like_shot[-1]
 
     if len(files_other):
         return files_other[-1]
