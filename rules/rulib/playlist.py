@@ -7,6 +7,7 @@ python3 -c 'import sys; sys.path.append("/data/cgru/rules"); import rulib; from 
 import copy
 import os
 import time
+import traceback
 
 import json
 import rulib

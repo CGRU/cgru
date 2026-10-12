@@ -21,41 +21,40 @@ var d_moviemaker = '/cgru/utilities/moviemaker';
 var d_makemovie = d_moviemaker + '/makemovie.py';
 
 var d_params_types = {
-	general /***/: {"label": 'General' /***/, "tooltip": 'General parameters.'},
-	settings /**/: {"label": 'Settings' /**/, "tooltip": 'Other parameters.'}
+	general /***/: { "label": 'General' /***/, "tooltip": 'General parameters.' },
+	settings /**/: { "label": 'Settings' /**/, "tooltip": 'Other parameters.' }
 };
 
-var d_params = {"general": {}, "settings": {}};
+var d_params = { "general": {}, "settings": {} };
 d_params.general = {
-	project  : {"width": '50%'},
-	shot     : {"width": '50%', "lwidth": '70px'},
-	artist   : {"width": '50%'},
-	activity : {"width": '25%', "lwidth": '70px'},
-	version  : {"width": '25%', "lwidth": '70px'},
-	input    : {},
-	output   : {},
-	filename : {"width": '75%'},
-	fps      : {"label": 'FPS', "width": '25%', "lwidth": '70px'},
-	comments : {}
+	project: { "width": '50%' },
+	shot: { "width": '50%', "lwidth": '70px' },
+	artist: { "width": '50%' },
+	activity: { "width": '25%', "lwidth": '70px' },
+	version: { "width": '25%', "lwidth": '70px' },
+	input: {},
+	output: {},
+	filename: { "width": '75%' },
+	fps: { "label": 'FPS', "width": '25%', "lwidth": '70px' },
+	comments: {}
 };
 d_params.settings = {
-	copy_folder    : {"label":'Copy Folder', "default":"", "tooltip":'Copy to folder'},
-	audio_file     : {"label":'Audio', "default":"REF", "tooltip":'Sound file'},
-	af_depend_mask : {"label":'Depends', "tooltip":'Afanasy job depend mask'},
-	af_hostsmask   : {'label':'Hosts Mask'},
-	cacher_aspect  : {'width':'25%', 'lwidth':'160px', 'label':'Cacher Aspect',  'tooltip':'Cacher aspect (float aspect: 2.39)'},
-	cacher_opacity : {'width':'25%', 'lwidth':'160px', 'label':'Cacher Opacity', 'tooltip':'Cacher opacity (integer percentage: 100)'},
-	draw169        : {'width':'25%', 'lwidth':'160px', 'label':'Cacher 16x9',    'tooltip':'Cacher 16x9 opacity percentage.'},
-	draw235        : {'width':'25%', 'lwidth':'160px', 'label':'Cacher 2.35',    'tooltip':'Cacher 2.35 opacity percentage.'},
-	fffirst        : {'width':'33%', "label":"F.F.First", "tooltip":'First frame is "1"\nNo matter image file name number.'},
-	aspect_in      : {'width':'33%', "label":'Aspect In'},
-	gamma          : {'width':'34%', },
-	overlay_file   : {'width':'75%', "label":'Overlay', "tooltip":'Overlay video file'},
-	overlay_scale  : {'width':'25%', "label":'Scale', "tooltip":'Overlay video scale'}
+	copy_folder: { "label": 'Copy Folder', "default": "", "tooltip": 'Copy to folder' },
+	audio_file: { "label": 'Audio', "default": "REF", "tooltip": 'Sound file' },
+	af_depend_mask: { "label": 'Depends', "tooltip": 'Afanasy job depend mask' },
+	af_hostsmask: { 'label': 'Hosts Mask' },
+	cacher_aspect: { 'width': '25%', 'lwidth': '160px', 'label': 'Cacher Aspect', 'tooltip': 'Cacher aspect (float aspect: 2.39)' },
+	cacher_opacity: { 'width': '25%', 'lwidth': '160px', 'label': 'Cacher Opacity', 'tooltip': 'Cacher opacity (integer percentage: 100)' },
+	draw169: { 'width': '25%', 'lwidth': '160px', 'label': 'Cacher 16x9', 'tooltip': 'Cacher 16x9 opacity percentage.' },
+	draw235: { 'width': '25%', 'lwidth': '160px', 'label': 'Cacher 2.35', 'tooltip': 'Cacher 2.35 opacity percentage.' },
+	fffirst: { 'width': '33%', "label": "F.F.First", "tooltip": 'First frame is "1"\nNo matter image file name number.' },
+	aspect_in: { 'width': '33%', "label": 'Aspect In' },
+	gamma: { 'width': '34%', },
+	overlay_file: { 'width': '75%', "label": 'Overlay', "tooltip": 'Overlay video file' },
+	overlay_scale: { 'width': '25%', "label": 'Scale', "tooltip": 'Overlay video scale' }
 };
 
-function d_Make(i_path, i_outfolder)
-{
+function d_Make(i_path, i_outfolder) {
 	c_Log('Make Dailies: ' + i_path);
 
 	let activity = RULES.dailies.activity;
@@ -63,23 +62,18 @@ function d_Make(i_path, i_outfolder)
 		activity = activity_Current;
 
 	let out_path = c_PathDir(i_path);
-	if (ASSET && (ASSET.dailies))
-	{
+	if (ASSET && (ASSET.dailies)) {
 		out_path = ASSET.path + '/' + ASSET.dailies.path[0];
 
 		if (ASSET.dailies.path_precomp && (activity != RULES.dailies.activity))
 			out_path = ASSET.path + '/' + ASSET.dailies.path_precomp;
 
-		if (ASSET.dailies.folders)
-		{
-			let paths = i_path.replace(ASSET.path,'').toLowerCase().split('/');
+		if (ASSET.dailies.folders) {
+			let paths = i_path.replace(ASSET.path, '').toLowerCase().split('/');
 			let found = false;
-			for (let folder of ASSET.dailies.folders)
-			{
-				for (let seek of folder.seek)
-				{
-					if (paths.indexOf(seek) !== -1)
-					{
+			for (let folder of ASSET.dailies.folders) {
+				for (let seek of folder.seek) {
+					if (paths.indexOf(seek) !== -1) {
 						out_path = ASSET.path + '/' + folder.put;
 						found = true;
 						break;
@@ -114,22 +108,19 @@ function d_Make(i_path, i_outfolder)
 	params.output = c_PathPM_Rules2Client(out_path);
 	params.activity = activity;
 
-	d_params.general.artist = {"width": '50%'};
+	d_params.general.artist = { "width": '50%' };
 	params.artist = c_GetUserTitle();
 
 	// Collect artists
 	let artists = [];
-    if (RULES.status && RULES.status.tasks)
-    {
-		if (activity_Current && RULES.status.tasks[activity_Current])
-		{
+	if (RULES.status && RULES.status.tasks) {
+		if (activity_Current && RULES.status.tasks[activity_Current]) {
 			// Collect artist from current task if selected
 			let task = RULES.status.tasks[activity_Current];
 			if (task.artists && task.artists.length)
 				artists = task.artists;
 		}
-		else for (let task in RULES.status.tasks)
-		{
+		else for (let task in RULES.status.tasks) {
 			// Collect artists from all tasks
 			task = RULES.status.tasks[task];
 			if (task.deleted) continue;
@@ -138,25 +129,21 @@ function d_Make(i_path, i_outfolder)
 					if (artists.indexOf(artist) == -1)
 						artists.push(artist);
 		}
-    }
-    if (RULES.status && RULES.status.artists && RULES.status.artists.length)
-    {
+	}
+	if (RULES.status && RULES.status.artists && RULES.status.artists.length) {
 		// Collect attists from status
 		for (let artist of RULES.status.artists)
 			if (artists.indexOf(artist) == -1)
 				artists.push(artist);
 	}
-	if (artists.length)
-	{
-		if (artists.indexOf(g_auth_user.id) == -1)
-		{
+	if (artists.length) {
+		if (artists.indexOf(g_auth_user.id) == -1) {
 			// If currect user does not exist we should add him.
 			// And choose the first from artists.
 			artists.push(g_auth_user.id);
 			params.artist = c_GetUserTitle(artists[0]);
 		}
-		if (artists.length > 1)
-		{
+		if (artists.length > 1) {
 			// Create a pull down menu of artists
 			let usrTitles = [];
 			for (let artist of artists)
@@ -169,9 +156,9 @@ function d_Make(i_path, i_outfolder)
 	let copy_folder = null;
 	if (ASSETS.project)
 		copy_folder = ASSETS.project.path;
-		copy_folder += '/DAILIES';
-		copy_folder += '/' + activity;
-		params.copy_folder = c_PathPM_Rules2Client(copy_folder);
+	copy_folder += '/DAILIES';
+	copy_folder += '/' + activity;
+	params.copy_folder = c_PathPM_Rules2Client(copy_folder);
 
 
 	var dateObj = new Date();
@@ -198,12 +185,12 @@ function d_Make(i_path, i_outfolder)
 	filename = filename.replace('(U)', params.artist.toUpperCase());
 	params.filename = filename;
 
-	var wnd = new cgru_Window({"name": 'dailies', "title": 'Make Dailies'});
+	var wnd = new cgru_Window({ "name": 'dailies', "title": 'Make Dailies' });
 	wnd.elContent.classList.add('dailies');
 
 	var cmd = 'rules/bin/walk.sh -m "' + RULES.root + i_path + '"';
 	n_Request({
-		"send": {"cmdexec": {"cmds": [cmd]}},
+		"send": { "cmdexec": { "cmds": [cmd] } },
 		"func": d_DailiesWalkReceived,
 		"info": 'walk dailies',
 		"wpath": i_path,
@@ -212,8 +199,7 @@ function d_Make(i_path, i_outfolder)
 	});
 }
 
-function d_DailiesWalkReceived(i_data, i_args)
-{
+function d_DailiesWalkReceived(i_data, i_args) {
 	//console.log(JSON.stringify(i_data));
 	var wnd = i_args.d_wnd;
 	var params = i_args.d_params;
@@ -228,25 +214,20 @@ function d_DailiesWalkReceived(i_data, i_args)
 	if (RULES.dailies.comment_annotation && RULES.status && RULES.status.annotation && RULES.status.annotation.length)
 		comments = RULES.status.annotation.trim();
 	// Comments from body
-	if (RULES.dailies.comment_body)
-	{
-		let text = $('body_body').innerText.replaceAll('\n','; ').trim();
-		if (text && text.length)
-		{
+	if (RULES.dailies.comment_body) {
+		let text = $('body_body').innerText.replaceAll('\n', '; ').trim();
+		if (text && text.length) {
 			if (comments.length)
 				comments += '; ';
 			comments += text;
 		}
 	}
-	params.comments = comments.replaceAll('"',"'");
+	params.comments = comments.replaceAll('"', "'");
 
 	// Overlay video:
-	if (RULES.dailies.overlay.ovract && RULES.dailies.overlay.ovract.length)
-	{
-		for (let act of RULES.dailies.overlay.ovract)
-		{
-			if ((activity_Current != null) && (activity_Current.indexOf(act) != -1))
-			{
+	if (RULES.dailies.overlay.ovract && RULES.dailies.overlay.ovract.length) {
+		for (let act of RULES.dailies.overlay.ovract) {
+			if ((activity_Current != null) && (activity_Current.indexOf(act) != -1)) {
 				params.overlay_file = 'REF/' + c_PathBase(g_CurPath()) + '_' + act + '.mp4';
 				params.overlay_scale = RULES.dailies.overlay.ovrscale;
 			}
@@ -256,15 +237,13 @@ function d_DailiesWalkReceived(i_data, i_args)
 	//console.log(JSON.stringify(data));
 	// Get files sequence pattern and comments:
 	let found = false;
-	if (data && data.walk && data.walk.exif)
-	{
+	if (data && data.walk && data.walk.exif) {
 		var exif = data.walk.exif;
 
 		// Get files pattern (from one file):
 		var file = exif.file;
 		var match = file.match(/\d+\./g);
-		if (match)
-		{
+		if (match) {
 			match = match[match.length - 1];
 			var pos = file.lastIndexOf(match);
 			var pattern = file.substr(0, pos);
@@ -280,17 +259,14 @@ function d_DailiesWalkReceived(i_data, i_args)
 			params.comments += ' ' + exif.comments.trim();
 	}
 
-	if (false == found)
-	{
-		if (data && data.walk)
-		{
+	if (false == found) {
+		if (data && data.walk) {
 			let msg = 'ERROR: No valid sequence found.<br>';
 			msg += '<br>' + c_PathPM_Rules2Client(params.input) + '<br>';
 			msg += '<br><a href="#' + params.input + '" target="blank">#' + params.input + '</a><br>';
 			wnd.elContent.innerHTML = msg;
 		}
-		else
-		{
+		else {
 			wnd.elContent.innerHTML = 'ERROR: Invalid data received:<br><br>' + JSON.stringify(i_data);
 		}
 		wnd.elContent.classList.add('error');
@@ -304,7 +280,7 @@ function d_DailiesWalkReceived(i_data, i_args)
 		fv_UpdateFromWalk(data, i_args.wpath);
 
 	wnd.elTabs =
-		gui_CreateTabs({"tabs": d_params_types, "elParent": wnd.elContent, "name": 'd_params_types'});
+		gui_CreateTabs({ "tabs": d_params_types, "elParent": wnd.elContent, "name": 'd_params_types' });
 
 	for (var type in d_params_types)
 		gui_Create(wnd.elTabs[type], d_params[type], [RULES.dailies, params]);
@@ -387,20 +363,19 @@ function d_DailiesWalkReceived(i_data, i_args)
 	elAfDiv.appendChild(elSend);
 	elSend.textContent = 'Send Job';
 	elSend.classList.add('button');
-	elSend.onclick = function(e) { d_ProcessGUI(e.currentTarget.m_wnd); };
+	elSend.onclick = function (e) { d_ProcessGUI(e.currentTarget.m_wnd); };
 	elSend.m_wnd = wnd;
 
 	wnd.elContent.focus();
 	wnd.elContent.m_wnd = wnd;
-	wnd.elContent.onkeydown = function(e) {
+	wnd.elContent.onkeydown = function (e) {
 		// console.log( e.keyCode);
 		if (e.keyCode == 13)
 			d_ProcessGUI(e.currentTarget.m_wnd);
 	}
 }
 
-function d_ProcessGUI(i_wnd)
-{
+function d_ProcessGUI(i_wnd) {
 	var params = {};
 	for (var type in d_params_types)
 		gui_GetParams(i_wnd.elTabs[type], d_params[type], params);
@@ -413,8 +388,7 @@ function d_ProcessGUI(i_wnd)
 
 	i_wnd.destroy();
 
-	if (g_auth_user == null)
-	{
+	if (g_auth_user == null) {
 		c_Error("Guests can't generate dailies.");
 		return;
 	}
@@ -454,11 +428,10 @@ function d_ProcessGUI(i_wnd)
 	let news_path = g_CurPath();
 	if (ASSET && ASSET.dailies && ASSET.dailies.paths)
 		news_path = ASSET.path;
-	nw_MakeNews({'title':'dailies','path':news_path});
+	nw_MakeNews({ 'title': 'dailies', 'path': news_path });
 }
 
-function d_MakeCmd(i_params)
-{
+function d_MakeCmd(i_params) {
 	var params = c_CloneObj(RULES.dailies);
 	for (var parm in i_params)
 		params[parm] = i_params[parm];
@@ -517,8 +490,7 @@ function d_MakeCmd(i_params)
 	if (RULES.dailies.imgcmd)
 		cmd += ' -i ' + RULES.dailies.imgcmd;
 
-	if (RULES.dailies.preview)
-	{
+	if (RULES.dailies.preview) {
 		cmd += ' --pcodec "' + RULES.dailies.preview.codec + '"';
 		cmd += ' --pargs "' + RULES.dailies.preview.args + '"';
 		cmd += ' --pdir "' + RUFOLDER + '"';
@@ -537,11 +509,9 @@ function d_MakeCmd(i_params)
 		cmd += ' --draw235 ' + params.draw235;
 
 	// Video overlay:
-	if ((params.overlay_file != null) && (params.overlay_file.length))
-	{
+	if ((params.overlay_file != null) && (params.overlay_file.length)) {
 		cmd += ' --ovrfile "' + params.overlay_file + '"';
-		if ((params.overlay_scale != null) && (params.overlay_scale.length))
-		{
+		if ((params.overlay_scale != null) && (params.overlay_scale.length)) {
 			let overlay_scale = parseFloat(params.overlay_scale);
 			if (Number.isNaN(overlay_scale))
 				c_Error('Overlay scale is not a number: ' + params.overlay_scale);
@@ -574,16 +544,16 @@ function d_MakeCmd(i_params)
 
 
 var d_cvtguiparams = {
-	fps /**********/: {"label": 'FPS', "width": '20%'},
-	time_start /***/: {"default": '00:00:00', "width": '20%'},
-	duration /*****/: {"default": '00:00:00', "width": '20%'},
-	quality /******/: {"label": 'JPEG Quality', 'type': 'int', "default": 100, 'width': '20%',"lwidth":'160px'},
-	ipar /*********/: {"label": 'Input pixel aspect', "width": '20%',"lwidth":'160px'},
-	padding /******/: {"label": 'Padding', 'width': '20%', "default": 4},
-	first_frame /**/: {"label": 'First Frame', 'width': '20%'},
-	af_capacity /**/: {'label': 'Capacity', 'width': '15%', 'type': 'int'},
-	af_maxtasks /***/: {'label': 'Max Tasks', 'width': '15%', 'type': 'int', 'default': -1},
-	af_perhost /****/: {'label': 'Per Host', 'width': '15%', 'type': 'int', 'default': 1},
+	fps /**********/: { "label": 'FPS', "width": '20%' },
+	time_start /***/: { "default": '00:00:00', "width": '20%' },
+	duration /*****/: { "default": '00:00:00', "width": '20%' },
+	quality /******/: { "label": 'JPEG Quality', 'type': 'int', "default": 100, 'width': '20%', "lwidth": '160px' },
+	ipar /*********/: { "label": 'Input pixel aspect', "width": '20%', "lwidth": '160px' },
+	padding /******/: { "label": 'Padding', 'width': '20%', "default": 4 },
+	first_frame /**/: { "label": 'First Frame', 'width': '20%' },
+	af_capacity /**/: { 'label': 'Capacity', 'width': '15%', 'type': 'int' },
+	af_maxtasks /***/: { 'label': 'Max Tasks', 'width': '15%', 'type': 'int', 'default': -1 },
+	af_perhost /****/: { 'label': 'Per Host', 'width': '15%', 'type': 'int', 'default': 1 },
 	af_fpt /********/: {
 		'label': 'FPT',
 		'width': '15%',
@@ -591,23 +561,22 @@ var d_cvtguiparams = {
 		'default': 10,
 		'tooltip': 'Frames Per Task'
 	},
-	audio_file /****/: {"label": 'Audio', "default": "REF", "tooltip": 'Sound file', 'width': '40%'},
-	af_hostsmask /**/: {'label': 'Hosts Mask', 'width': '40%'},
-	af_paused /*****/: {'label': 'Start Job Paused', 'width': '20%', 'lwidth': '160px', 'type': 'bool'},
-	overlay_file     : {'width':'75%', "label":'Overlay', "tooltip":'Overlay video file'},
-	overlay_scale    : {'width':'25%', "label":'Scale', "tooltip":'Overlay video scale'}
+	audio_file /****/: { "label": 'Audio', "default": "REF", "tooltip": 'Sound file', 'width': '40%' },
+	af_hostsmask /**/: { 'label': 'Hosts Mask', 'width': '40%' },
+	af_paused /*****/: { 'label': 'Start Job Paused', 'width': '20%', 'lwidth': '160px', 'type': 'bool' },
+	overlay_file: { 'width': '75%', "label": 'Overlay', "tooltip": 'Overlay video file' },
+	overlay_scale: { 'width': '25%', "label": 'Scale', "tooltip": 'Overlay video scale' }
 };
 
 var d_cvtmulti_params = {
-	input /*********/: {"label": 'Result Paths'},
-	skipexisting /**/: {"label": 'Skip Existing', 'type': "bool", 'default': true, "width": '33%'},
-	skiperrors /****/: {"label": 'Skip Errors', 'type': "bool", 'default': false, "width": '33%'},
-	skipcheck /*****/: {"label": 'Skip Check', 'type': "bool", 'default': false, "width": '34%'},
-	dest /**********/: {"label": 'Destination'}
+	input /*********/: { "label": 'Result Paths' },
+	skipexisting /**/: { "label": 'Skip Existing', 'type': "bool", 'default': true, "width": '33%' },
+	skiperrors /****/: { "label": 'Skip Errors', 'type': "bool", 'default': false, "width": '33%' },
+	skipcheck /*****/: { "label": 'Skip Check', 'type': "bool", 'default': false, "width": '34%' },
+	dest /**********/: { "label": 'Destination' }
 };
 
-function d_Convert(i_args)
-{
+function d_Convert(i_args) {
 	let params = {};
 
 	params.fps = RULES.fps;
@@ -615,8 +584,7 @@ function d_Convert(i_args)
 		params.fps = RULES.dailies.fps;
 
 	// Overlay video:
-	if ((activity_Current != null) && (activity_Current.indexOf('anim') != -1))
-	{
+	if ((activity_Current != null) && (activity_Current.indexOf('anim') != -1)) {
 		params.overlay_file = 'REF/' + c_PathBase(g_CurPath()) + '_anim.mp4';
 		params.overlay_scale = RULES.dailies.overlay.ovrscale;
 	}
@@ -630,19 +598,19 @@ function d_Convert(i_args)
 		title += ' Movies';
 	else if (i_args.results)
 		title += ' Results';
-	let wnd = new cgru_Window({"name": 'dailies', "title": title});
+	let wnd = new cgru_Window({ "name": 'dailies', "title": title });
 	wnd.m_args = i_args;
 	wnd.onDestroy = d_CvtOnDestroy;
 
 	let img_types = {
-		jpg /****/: {"name": 'JPG'},
-		png /****/: {"name": 'PNG'},
-		dpx /****/: {"name": 'DPX'},
-		tif8 /***/: {"name": 'TIF8', "tooltip": '8  bits TIF'},
-		tif16 /**/: {"name": 'TIF16', "tooltip": '16 bits TIF'}
+		jpg /****/: { "name": 'JPG' },
+		png /****/: { "name": 'PNG' },
+		dpx /****/: { "name": 'DPX' },
+		tif8 /***/: { "name": 'TIF8', "tooltip": '8  bits TIF' },
+		tif16 /**/: { "name": 'TIF16', "tooltip": '16 bits TIF' }
 	};
 	if (i_args.movies !== true)
-		img_types.exr = {"name": 'EXR'};
+		img_types.exr = { "name": 'EXR' };
 
 	gui_CreateChoices({
 		"wnd": wnd.elContent,
@@ -663,10 +631,9 @@ function d_Convert(i_args)
 	});
 
 	gui_CreateChoices(
-		{"wnd": wnd.elContent, "name": 'imgtype', "value": 'jpg', "label": 'Image Type:', "keys": img_types});
+		{ "wnd": wnd.elContent, "name": 'imgtype', "value": 'jpg', "label": 'Image Type:', "keys": img_types });
 
-	if (i_args.movies !== true)
-	{
+	if (i_args.movies !== true) {
 		RULES.dailies.codecs.copy.disabled = true;
 		gui_CreateChoices({
 			"wnd": wnd.elContent,
@@ -693,8 +660,7 @@ function d_Convert(i_args)
 		"keys": RULES.dailies.containers
 	});
 
-	if (i_args.results)
-	{
+	if (i_args.results) {
 		if (RULES.put.dest.indexOf('/') !== 0)
 			if (ASSETS.project)
 				params.dest = c_PathPM_Rules2Client(ASSETS.project.path + '/' + RULES.put.dest);
@@ -713,26 +679,24 @@ function d_Convert(i_args)
 	elLabel.innerHTML = '<a href="http://' + cgru_Config.af_servername + ':' + cgru_Config.af_serverport +
 		'" target="_blank">AFANASY</a>';
 
-	if (i_args.results)
-	{
+	if (i_args.results) {
 		var el = document.createElement('div');
 		elBtns.appendChild(el);
 		el.classList.add('button');
 		el.style.cssFloat = 'right';
 		el.textContent = 'Find Results';
 		el.m_wnd = wnd;
-		el.onclick = function(e) { fu_ResultsFind(e.currentTarget.m_wnd); }
+		el.onclick = function (e) { fu_ResultsFind(e.currentTarget.m_wnd); }
 	}
 
 	wnd.m_res_btns_show = [];
 
-	if (!i_args.images)
-	{
+	if (!i_args.images) {
 		var elCvtBtn = document.createElement('div');
 		elBtns.appendChild(elCvtBtn);
 		elCvtBtn.textContent = title + ' To Movies';
 		elCvtBtn.classList.add('button');
-		elCvtBtn.onclick = function(e) { d_CvtProcessGUI(e.currentTarget.m_wnd, false); };
+		elCvtBtn.onclick = function (e) { d_CvtProcessGUI(e.currentTarget.m_wnd, false); };
 		elCvtBtn.m_wnd = wnd;
 		wnd.m_res_btns_show.push(elCvtBtn);
 		if (i_args.results)
@@ -746,21 +710,20 @@ function d_Convert(i_args)
 	else
 		elExpBtn.textContent = title + ' To Sequences';
 	elExpBtn.classList.add('button');
-	elExpBtn.onclick = function(e) { d_CvtProcessGUI(e.currentTarget.m_wnd, true); };
+	elExpBtn.onclick = function (e) { d_CvtProcessGUI(e.currentTarget.m_wnd, true); };
 	elExpBtn.m_wnd = wnd;
 	wnd.m_res_btns_show.push(elExpBtn);
 	if (i_args.results)
 		elExpBtn.style.display = 'none';
 
-	if (!i_args.images)
-	{
+	if (!i_args.images) {
 		var elWmBtn = document.createElement('div');
 		elBtns.appendChild(elWmBtn);
 		elWmBtn.textContent = 'Add Movie Watermark';
 		elWmBtn.classList.add('button');
 		elWmBtn.style.cssFloat = 'right';
 		elWmBtn.m_wnd = wnd;
-		elWmBtn.onclick = function(e) { d_WmDialog(e.currentTarget.m_wnd) };
+		elWmBtn.onclick = function (e) { d_WmDialog(e.currentTarget.m_wnd) };
 		wnd.elWmBtn = elWmBtn;
 	}
 
@@ -771,8 +734,7 @@ function d_Convert(i_args)
 	else
 		wnd.m_elResults.classList.add('source');
 
-	for (var i = 0; i < i_args.paths.length; i++)
-	{
+	for (var i = 0; i < i_args.paths.length; i++) {
 		i_args.paths[i] = c_PathPM_Rules2Client(i_args.paths[i]);
 		var el = document.createElement('div');
 		wnd.m_elResults.appendChild(el);
@@ -780,8 +742,7 @@ function d_Convert(i_args)
 	}
 }
 
-function d_CvtProcessGUI(i_wnd, i_to_sequence)
-{
+function d_CvtProcessGUI(i_wnd, i_to_sequence) {
 	// Get GUI parameters:
 	var params = gui_GetParams(i_wnd.elContent, d_cvtguiparams);
 
@@ -793,14 +754,12 @@ function d_CvtProcessGUI(i_wnd, i_to_sequence)
 
 	// Process paths:
 	var paths = i_wnd.m_args.paths;
-	if (i_wnd.m_args.results)
-	{
+	if (i_wnd.m_args.results) {
 		// Paths are founded with find_results.py:
 		var results = i_wnd.m_result.results;
 		var res_skipped = [];
 		paths = [];
-		for (var i = 0; i < results.length; i++)
-		{
+		for (var i = 0; i < results.length; i++) {
 			if (results[i].error)
 				continue;
 
@@ -813,15 +772,13 @@ function d_CvtProcessGUI(i_wnd, i_to_sequence)
 
 		i_wnd.m_result.results = res_skipped;
 	}
-	else
-	{
+	else {
 		// Paths are just selected in filesview:
 		for (var i = 0; i < paths.length; i++)
 			paths[i] = c_PathPM_Client2Server(paths[i]);
 	}
 
-	if (paths.length == 0)
-	{
+	if (paths.length == 0) {
 		c_Error('Nothing to convert founded.');
 		return;
 	}
@@ -829,18 +786,15 @@ function d_CvtProcessGUI(i_wnd, i_to_sequence)
 	i_wnd.m_args.cvt_paths = paths;
 
 	// Run specific functions:
-	if (i_wnd.m_args.movies || (i_to_sequence == false))
-	{
+	if (i_wnd.m_args.movies || (i_to_sequence == false)) {
 		d_CvtMovies(i_wnd, params, i_to_sequence);
 	}
-	else
-	{
+	else {
 		d_CvtImages(i_wnd, params);
 	}
 }
 
-function d_CvtImages(i_wnd, i_params)
-{
+function d_CvtImages(i_wnd, i_params) {
 	// console.log( JSON.stringify( i_wnd.m_args));
 	// console.log( JSON.stringify( i_params));
 	var paths = i_wnd.m_args.cvt_paths;
@@ -863,8 +817,7 @@ function d_CvtImages(i_wnd, i_params)
 		cmd += ' -r ' + i_params.format;
 
 	var afanasy = false;
-	if (i_wnd.m_args.folders || (paths.length > 1))
-	{
+	if (i_wnd.m_args.folders || (paths.length > 1)) {
 		afanasy = true;
 		cmd += ' -A';
 		cmd += ' --afuser "' + g_auth_user.id + '"';
@@ -884,20 +837,18 @@ function d_CvtImages(i_wnd, i_params)
 	for (var i = 0; i < paths.length; i++)
 		cmd += ' "' + paths[i] + '"'
 
-			n_Request({
-				   "send": {"cmdexec": {"cmds": [cmd]}},
-				   "func": d_CvtImagesFinished,
-				   "wnd": i_wnd,
-				   "afanasy": afanasy
-			   });
+	n_Request({
+		"send": { "cmdexec": { "cmds": [cmd] } },
+		"func": d_CvtImagesFinished,
+		"wnd": i_wnd,
+		"afanasy": afanasy
+	});
 }
 
-function d_CvtImagesFinished(i_data, i_args)
-{
+function d_CvtImagesFinished(i_data, i_args) {
 	// console.log( JSON.stringify( i_data));
 	// console.log( JSON.stringify( i_args));
-	if (i_args.afanasy == false)
-	{
+	if (i_args.afanasy == false) {
 		i_args.wnd.destroy();
 		i_args.wnd.m_args.filesview.refresh();
 		//		fv_ReloadAll();
@@ -911,8 +862,7 @@ function d_CvtImagesFinished(i_data, i_args)
 	elOut.classList.remove('source');
 	elOut.classList.add('output');
 
-	if ((i_data.cmdexec == null) || (i_data.cmdexec.length == 0) || (i_data.cmdexec[0].convert == null))
-	{
+	if ((i_data.cmdexec == null) || (i_data.cmdexec.length == 0) || (i_data.cmdexec[0].convert == null)) {
 		elOut.textContent = JSON.stringify(i_data);
 		return;
 	}
@@ -925,8 +875,7 @@ function d_CvtImagesFinished(i_data, i_args)
 	if (convert.error)
 		c_Error(convert.error);
 
-	for (var i = 0; i < convert.length; i++)
-	{
+	for (var i = 0; i < convert.length; i++) {
 		var mkdir = convert[i].mkdir;
 		var seqs = convert[i].sequences;
 
@@ -938,15 +887,13 @@ function d_CvtImagesFinished(i_data, i_args)
 			el.textContent = convert[i].input;
 
 
-		for (var j = 0; j < seqs.length; j++)
-		{
+		for (var j = 0; j < seqs.length; j++) {
 			var seq = seqs[j];
 			var el = document.createElement('div');
 			elOut.appendChild(el);
 			var text = c_PathBase(seq.inseq) + ' -> ' + c_PathBase(seq.outseq);
 
-			if (seq.warning)
-			{
+			if (seq.warning) {
 				text += ' ' + seq.warning;
 				el.style.color = '#F82';
 			}
@@ -956,8 +903,7 @@ function d_CvtImagesFinished(i_data, i_args)
 	}
 }
 
-function d_CvtMovies(i_wnd, i_params, i_to_sequence)
-{
+function d_CvtMovies(i_wnd, i_params, i_to_sequence) {
 	var paths = i_wnd.m_args.cvt_paths;
 
 	var job = {};
@@ -1001,8 +947,7 @@ function d_CvtMovies(i_wnd, i_params, i_to_sequence)
 	if (i_params.duration != d_cvtguiparams.duration.default)
 		cmd += ' -d ' + i_params.duration;
 
-	if (i_to_sequence)
-	{
+	if (i_to_sequence) {
 		block.name = 'Explode to ' + i_params.imgtype.toUpperCase();
 
 		cmd += ' -t ' + i_params.imgtype;
@@ -1019,13 +964,11 @@ function d_CvtMovies(i_wnd, i_params, i_to_sequence)
 		if (i_params.first_frame)
 			cmd += ' --first ' + i_params.first_frame;
 	}
-	else
-	{
+	else {
 		job.name += '.' + i_params.codec.toUpperCase();
 		block.name = 'Convert to ' + i_params.codec.toUpperCase();
 		cmd += ' -c "' + i_params.codec + '"';
-		if (i_params.container != 'DEFAULT')
-		{
+		if (i_params.container != 'DEFAULT') {
 			cmd += ' -n ' + i_params.container;
 			job.name += '.' + i_params.container.toUpperCase();
 			block.name += '.' + i_params.container.toUpperCase();
@@ -1038,18 +981,15 @@ function d_CvtMovies(i_wnd, i_params, i_to_sequence)
 		if (i_params.audio_file != '')
 			cmd += ' --audio "' + i_params.audio_file + '"';
 
-		if (i_wnd.wm)
-		{
+		if (i_wnd.wm) {
 			cmd += ' -w "' + i_wnd.wm.file + '"';
 			cmd += ' -u "' + i_wnd.wm.params.text + '"';
 		}
 
 		// Video overlay:
-		if ((i_params.overlay_file != null) && (i_params.overlay_file.length))
-		{
+		if ((i_params.overlay_file != null) && (i_params.overlay_file.length)) {
 			cmd += ' --ovrfile "' + i_params.overlay_file + '"';
-			if ((i_params.overlay_scale != null) && (i_params.overlay_scale.length))
-			{
+			if ((i_params.overlay_scale != null) && (i_params.overlay_scale.length)) {
 				let overlay_scale = parseFloat(i_params.overlay_scale);
 				if (Number.isNaN(overlay_scale))
 					c_Error('Overlay scale is not a number: ' + i_params.overlay_scale);
@@ -1066,8 +1006,7 @@ function d_CvtMovies(i_wnd, i_params, i_to_sequence)
 		}
 	}
 
-	for (var i = 0; i < paths.length; i++)
-	{
+	for (var i = 0; i < paths.length; i++) {
 		var path = paths[i];
 		var task = {};
 		block.tasks.push(task);
@@ -1084,8 +1023,7 @@ function d_CvtMovies(i_wnd, i_params, i_to_sequence)
 	// console.log(JSON.stringify(job));
 }
 
-function d_CvtOnDestroy(i_wnd)
-{
+function d_CvtOnDestroy(i_wnd) {
 	// Destroy watermark window if any:
 	if (i_wnd.wm)
 		d_WmDiscard(i_wnd.wm)
@@ -1095,14 +1033,13 @@ function d_CvtOnDestroy(i_wnd)
 
 var d_wm_params = {
 	file /*******/: {},
-	text /*******/: {'width': '35%'},
-	color /******/: {'width': '30%', 'default': 'rgba(200,200,200,0.20)'},
-	pointsize /**/: {'width': '15%', 'default': '300'},
-	size /*******/: {'width': '20%'}
+	text /*******/: { 'width': '35%' },
+	color /******/: { 'width': '30%', 'default': 'rgba(200,200,200,0.20)' },
+	pointsize /**/: { 'width': '15%', 'default': '300' },
+	size /*******/: { 'width': '20%' }
 };
 
-function d_WmDialog(i_wnd)
-{
+function d_WmDialog(i_wnd) {
 	var wm = {};
 	wm.wnd = i_wnd;
 	i_wnd.wm = wm;
@@ -1138,14 +1075,14 @@ function d_WmDialog(i_wnd)
 	wm.elCreate.classList.add('button');
 	wm.elCreate.textContent = 'Create & Show';
 	wm.elCreate.wm = wm;
-	wm.elCreate.onclick = function(e) { d_WmCreate(e.currentTarget.wm) };
+	wm.elCreate.onclick = function (e) { d_WmCreate(e.currentTarget.wm) };
 
 	wm.elEnable = document.createElement('div');
 	wm.elBtns.appendChild(wm.elEnable);
 	wm.elEnable.classList.add('button');
 	wm.elEnable.textContent = 'Enable & Exit';
 	wm.elEnable.wm = wm;
-	wm.elEnable.onclick = function(e) { d_WmEnable(e.currentTarget.wm) };
+	wm.elEnable.onclick = function (e) { d_WmEnable(e.currentTarget.wm) };
 	wm.elEnable.style.display = 'none';
 
 	wm.elDiscard = document.createElement('div');
@@ -1153,11 +1090,10 @@ function d_WmDialog(i_wnd)
 	wm.elDiscard.classList.add('button');
 	wm.elDiscard.textContent = 'Discard Watermark';
 	wm.elDiscard.wm = wm;
-	wm.elDiscard.onclick = function(e) { d_WmDiscard(e.currentTarget.wm) };
+	wm.elDiscard.onclick = function (e) { d_WmDiscard(e.currentTarget.wm) };
 }
 
-function d_WmCreate(i_wm)
-{
+function d_WmCreate(i_wm) {
 	var params = gui_GetParams(i_wm.elParams, d_wm_params);
 	i_wm.params = params;
 
@@ -1179,7 +1115,7 @@ function d_WmCreate(i_wm)
 	var folder = c_PathDir(i_wm.file);
 
 	n_Request({
-		"send": {"makefolder": {"path": folder}, "cmdexec": {"cmds": [cmd]}},
+		"send": { "makefolder": { "path": folder }, "cmdexec": { "cmds": [cmd] } },
 		"func": d_WmCreateFinished,
 		"wm": i_wm,
 		"info": 'watermark'
@@ -1187,8 +1123,7 @@ function d_WmCreate(i_wm)
 	//	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":d_WmCreateFinished,"wm":i_wm,"info":'watermark'});
 }
 
-function d_WmCreateFinished(i_data, i_args)
-{
+function d_WmCreateFinished(i_data, i_args) {
 	var wm = i_args.wm;
 
 	if (wm.elImg)
@@ -1201,8 +1136,7 @@ function d_WmCreateFinished(i_data, i_args)
 	wm.elEnable.style.display = 'block';
 }
 
-function d_WmEnable(i_wm)
-{
+function d_WmEnable(i_wm) {
 	d_WmDiscard(i_wm);
 
 	i_wm.wnd.wm = i_wm;
@@ -1210,8 +1144,7 @@ function d_WmEnable(i_wm)
 	i_wm.wnd.elWmBtn.classList.add('watermark_enabled');
 }
 
-function d_WmDiscard(i_wm)
-{
+function d_WmDiscard(i_wm) {
 	i_wm.wnd.wm = null;
 	i_wm.wnd.elContent.style.display = 'block';
 	i_wm.wnd.elWmBtn.classList.remove('watermark_enabled');
@@ -1224,37 +1157,35 @@ function d_WmDiscard(i_wm)
 ########################################################################################################### */
 
 var d_cutparams = {
-	cut_name      : {'width': '30%'},
-	audio         : {'width': '70%'},
-	input         : {},
-	fps           : {"label": 'FPS', 'width': '25%'},
-	af_pertask    : {"label": 'Frames Per Task', 'width': '25%', 'lwidth': '140px'},
-	af_maxtasks   : {"label": 'Max Run Tasks', 'width': '25%', 'lwidth': '120px'},
-	af_perhost    : {"label": 'Per Host', 'width': '25%', 'lwidth': '140px'},
-	af_capacity   : {"label": 'Capacity', 'width': '20%'},
-	af_maxruntime : {"label": 'Max Run Time', 'width': '20%', 'lwidth': '140px'},
-	skipnosrc     : {"label": 'Skip No Src', 'width': '20%', 'lwidth': '120px', 'type':'bool', default: false},
-	getcomments   : {"label": 'Get Comments', 'width': '20%', 'lwidth': '140px', 'type':'bool', default: false},
-	flipversion   : {"label": 'Flip Version', 'width': '20%', 'lwidth': '140px', 'type':'bool', default: false},
-	output        : {}
+	cut_name: { 'width': '30%' },
+	audio: { 'width': '70%' },
+	input: {},
+	fps: { "label": 'FPS', 'width': '25%' },
+	af_pertask: { "label": 'Frames Per Task', 'width': '25%', 'lwidth': '140px' },
+	af_maxtasks: { "label": 'Max Run Tasks', 'width': '25%', 'lwidth': '120px' },
+	af_perhost: { "label": 'Per Host', 'width': '25%', 'lwidth': '140px' },
+	af_capacity: { "label": 'Capacity', 'width': '20%' },
+	af_maxruntime: { "label": 'Max Run Time', 'width': '20%', 'lwidth': '140px' },
+	skipnosrc: { "label": 'Skip No Src', 'width': '20%', 'lwidth': '120px', 'type': 'bool', default: false },
+	getcomments: { "label": 'Get Comments', 'width': '20%', 'lwidth': '140px', 'type': 'bool', default: false },
+	flipversion: { "label": 'Flip Version', 'width': '20%', 'lwidth': '140px', 'type': 'bool', default: false },
+	output: {}
 };
 
-function d_MakeCut(i_args)
-{
+function d_MakeCut(i_args) {
 	// console.log( JSON.stringify( i_args));
-	var wnd = new cgru_Window({"name": 'cut', "title": 'Make Cut'});
+	var wnd = new cgru_Window({ "name": 'cut', "title": 'Make Cut' });
 	wnd.m_args = i_args;
 
 	var params = {};
 	params.cut_name = i_args.cut_name;
 	params.audio = c_PathPM_Rules2Client(g_CurPath()) + '/REF/' + params.cut_name + '.wav';
 	params.output = c_PathPM_Rules2Client(i_args.output);
-	params.input = RULES.assets.shot.result.path.join(',');
 	params.fps = RULES.fps;
 	if (RULES.dailies.fps)
 		params.fps = RULES.dailies.fps;
-	if (RULES.cut.input)
-		params.input = RULES.cut.input;
+	params.input = RULES.cut.inputs[0];
+	d_cutparams.input.pulldown = RULES.cut.inputs;
 
 	gui_Create(wnd.elContent, d_cutparams, [RULES.dailies, RULES.cut, params]);
 	gui_CreateChoices({
@@ -1299,32 +1230,30 @@ function d_MakeCut(i_args)
 	elTest.textContent = 'Find Results';
 	elTest.classList.add('button');
 	elTest.m_wnd = wnd;
-	elTest.onclick = function(e) { d_CutProcessGUI(e.currentTarget.m_wnd, true); };
+	elTest.onclick = function (e) { d_CutProcessGUI(e.currentTarget.m_wnd, true); };
 
 	var elSend = document.createElement('div');
 	elAfDiv.appendChild(elSend);
 	elSend.textContent = 'Send Job';
 	elSend.classList.add('button');
-    elSend.style.display = 'none';
+	elSend.style.display = 'none';
 	elSend.m_wnd = wnd;
-    wnd.m_elSend = elSend;
-	elSend.onclick = function(e) { d_CutProcessGUI(e.currentTarget.m_wnd, false); };
+	wnd.m_elSend = elSend;
+	elSend.onclick = function (e) { d_CutProcessGUI(e.currentTarget.m_wnd, false); };
 
 	var elResults = document.createElement('div');
 	wnd.elContent.appendChild(elResults);
 	wnd.m_elResults = elResults;
 	elResults.classList.add('output');
 
-	for (var i = 0; i < i_args.shots.length; i++)
-	{
+	for (var i = 0; i < i_args.shots.length; i++) {
 		var el = document.createElement('div');
 		elResults.appendChild(el);
 		el.textContent = i_args.shots[i];
 	}
 }
 
-function d_CutProcessGUI(i_wnd, i_test)
-{
+function d_CutProcessGUI(i_wnd, i_test) {
 	var elWait = document.createElement('div');
 	i_wnd.elContent.appendChild(elWait);
 	i_wnd.m_elWait = elWait;
@@ -1337,13 +1266,13 @@ function d_CutProcessGUI(i_wnd, i_test)
 
 	var cmd = 'rules/bin/makecut.sh';
 
-	cmd += ' --inputs "'     + params.input      + '"';
-	cmd += ' --audio "'      + params.audio      + '"';
-	cmd += ' --cutname "'    + params.cut_name   + '"';
-	cmd += ' --afuser "'     + g_auth_user.id    + '"';
-	cmd += ' --fps "'        + params.fps        + '"';
-	cmd += ' --resolution "' + params.format     + '"';
-	cmd += ' --codec "'      + params.codec      + '"';
+	cmd += ' --inputs "' + params.input + '"';
+	cmd += ' --audio "' + params.audio + '"';
+	cmd += ' --cutname "' + params.cut_name + '"';
+	cmd += ' --afuser "' + g_auth_user.id + '"';
+	cmd += ' --fps "' + params.fps + '"';
+	cmd += ' --resolution "' + params.format + '"';
+	cmd += ' --codec "' + params.codec + '"';
 	cmd += ' --colorspace "' + params.colorspace + '"';
 
 	if (params.getcomments)
@@ -1370,37 +1299,32 @@ function d_CutProcessGUI(i_wnd, i_test)
 
 	for (var i = 0; i < shots.length; i++)
 		cmd += ' "' + c_PathPM_Rules2Server(shots[i]) + '"'
-			n_Request({"send": {"cmdexec": {"cmds": [cmd], 'ignore_errors': true}}, "func": d_CutFinished, "wnd": i_wnd});
+	n_Request({ "send": { "cmdexec": { "cmds": [cmd], 'ignore_errors': true } }, "func": d_CutFinished, "wnd": i_wnd });
 }
 
-function d_CutFinished(i_data, i_args)
-{
+function d_CutFinished(i_data, i_args) {
 	// console.log( JSON.stringify( i_data));
 	// console.log( JSON.stringify( i_args));
 	i_args.wnd.elContent.removeChild(i_args.wnd.m_elWait);
 	var elResults = i_args.wnd.m_elResults;
 	elResults.textContent = '';
 
-	if ((i_data.cmdexec == null) || (!i_data.cmdexec.length) || (i_data.cmdexec[0].cut == null))
-	{
+	if ((i_data.cmdexec == null) || (!i_data.cmdexec.length) || (i_data.cmdexec[0].cut == null)) {
 		elResults.textContent = (JSON.stringify(i_data));
-        i_args.wnd.m_elSend.style.display = 'none';
+		i_args.wnd.m_elSend.style.display = 'none';
 		return;
 	}
 
-    i_args.wnd.m_elSend.style.display = 'block';
+	i_args.wnd.m_elSend.style.display = 'block';
 
 	var cut = i_data.cmdexec[0].cut;
 
-	for (var i = cut.length - 1; i >= 0; i--)
-	{
+	for (var i = cut.length - 1; i >= 0; i--) {
 		var el = document.createElement('div');
 		elResults.appendChild(el);
 		var text = '';
-		for (var msg in cut[i])
-		{
-			if (msg == 'sequence')
-			{
+		for (var msg in cut[i]) {
+			if (msg == 'sequence') {
 				text = cut[i][msg] + ': ' + cut[i].first + ' - ' + cut[i].last + ' = ' + cut[i].count;
 				break;
 			}
@@ -1410,11 +1334,10 @@ function d_CutFinished(i_data, i_args)
 		if (text.indexOf('warning') != -1)
 			el.style.color = '#FF2';
 
-		if (text.indexOf('error') != -1)
-        {
+		if (text.indexOf('error') != -1) {
 			el.style.color = '#F42';
-            i_args.wnd.m_elSend.style.display = 'none';
-        }
+			i_args.wnd.m_elSend.style.display = 'none';
+		}
 
 		el.textContent = text;
 	}
