@@ -1159,16 +1159,17 @@ function d_WmDiscard(i_wm) {
 var d_cutparams = {
 	cut_name: { 'width': '30%' },
 	audio: { 'width': '70%' },
-	input: {},
+	input: { 'width': '75%' },
 	fps: { "label": 'FPS', 'width': '25%' },
-	af_pertask: { "label": 'Frames Per Task', 'width': '25%', 'lwidth': '140px' },
-	af_maxtasks: { "label": 'Max Run Tasks', 'width': '25%', 'lwidth': '120px' },
-	af_perhost: { "label": 'Per Host', 'width': '25%', 'lwidth': '140px' },
 	af_capacity: { "label": 'Capacity', 'width': '20%' },
+	af_pertask: { "label": 'Frames Per Task', 'width': '20%', 'lwidth': '140px' },
+	af_maxtasks: { "label": 'Max Run Tasks', 'width': '20%', 'lwidth': '120px' },
+	af_perhost: { "label": 'Per Host', 'width': '20%', 'lwidth': '140px' },
 	af_maxruntime: { "label": 'Max Run Time', 'width': '20%', 'lwidth': '140px' },
-	skipnosrc: { "label": 'Skip No Src', 'width': '20%', 'lwidth': '120px', 'type': 'bool', default: false },
-	getcomments: { "label": 'Get Comments', 'width': '20%', 'lwidth': '140px', 'type': 'bool', default: false },
-	flipversion: { "label": 'Flip Version', 'width': '20%', 'lwidth': '140px', 'type': 'bool', default: false },
+	skipnosrc: { "label": 'Skip No Src', 'width': '25%', 'type': 'bool', default: false },
+	getcomments: { "label": 'Get Comments', 'width': '25%', 'lwidth': '140px', 'type': 'bool', default: false },
+	flipversion: { "label": 'Flip Version', 'width': '25%', 'lwidth': '140px', 'type': 'bool', default: false },
+	zerover: { "label": 'Zero Version', 'width': '25%', 'lwidth': '140px', 'type': 'bool', default: false },
 	output: {}
 };
 
@@ -1283,6 +1284,9 @@ function d_CutProcessGUI(i_wnd, i_test) {
 
 	if (params.flipversion)
 		cmd += ' --flipversion'
+
+	if (params.zerover)
+		cmd += ' --zerover'
 
 	if (RULES.dailies.font)
 		cmd += ' --font "' + RULES.dailies.font + '"';
