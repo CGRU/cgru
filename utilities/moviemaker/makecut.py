@@ -27,6 +27,7 @@ Parser.add_option('-a', '--audio',      dest='audio',       type  ='string', def
 Parser.add_option('-n', '--cutname',    dest='cutname',     type  ='string', default='',          help='Cut name')
 Parser.add_option('-s', '--skipnosrc',  dest='skipnosrc',   action='store_true', default=False,   help='Skip sources not found')
 Parser.add_option('--flipversion',      dest='flipversion', action='store_true', default=False,   help='Find the lowest versions')
+Parser.add_option('-z', '--zerover',    dest='zerover',     action='store_true', default=False,   help='Zero (v000) version priority')
 Parser.add_option('--getcomments',      dest='getcomments', action='store_true', default=False,   help='Get comments from sequence.')
 Parser.add_option('-f', '--fps',        dest='fps',         type  ='string', default='24',        help='FPS')
 Parser.add_option('-r', '--resolution', dest='resolution',  type  ='string', default='1280x720',  help='Resolution: 1280x720')
@@ -138,15 +139,20 @@ for shot in Shots:
                 vdigits = vdigits[0][1:]
                 ver = ver[ver.find(vdigits):]
             else:
-                ver = 'v000'
+                ver = 'none'
 
-            if version is not None:
-                if Options.flipversion:
-                    if version <= ver:
+            if ver == 'v000' and Options.zerover and not Options.flipversion:
+                ver = 'z000'
+            else:
+                if version is not None:
+                    if ver == 'none':
                         continue
-                else:
-                    if version >= ver:
-                        continue
+                    if Options.flipversion:
+                        if version <= ver:
+                            continue
+                    else:
+                        if version >= ver:
+                            continue
 
             version = ver
 
