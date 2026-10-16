@@ -17,7 +17,7 @@ Extensions = ['jpg','jpeg','png','dpx','exr','tif','tiff']
 TmpFiles = 'img.%07d.jpg'
 
 Parser = OptionParser(
-    usage="%prog [options] input\n"
+    usage="%prog [options] inputs\n"
           "Pattern examples = \"img.####.jpg\" or \"img.%04d.jpg\".\n"
           "Type \"%prog -h\" for help", version="%prog 1.0"
 )
@@ -56,6 +56,18 @@ def errExit(i_msg):
 def interrupt(signum, frame):
     errExit('Interrupt received')
 
+
+def getFolderImages(i_folder):
+    imgfiles = []
+    for item in os.listdir(i_folder):
+        valid = False
+        for ext in Extensions:
+            if item[-len(ext):].lower() == ext:
+                valid = True
+                break
+        if valid:
+            imgfiles.append(os.path.join(i_folder, item))
+    return imgfiles
 
 signal.signal(signal.SIGTERM, interrupt)
 signal.signal(signal.SIGABRT, interrupt)
@@ -115,25 +127,27 @@ for shot in Shots:
 
     folder = None
     name = os.path.basename(shot)
+    version = None
 
-    for inp in Inputs:
-        inp = os.path.join(shot, inp)
-        if not os.path.isdir(inp):
+    for result_folder in Inputs:
+        result_folder = os.path.join(shot, result_folder)
+        if not os.path.isdir(result_folder):
             continue
 
         version = None
 
-        for item in sorted(os.listdir(inp)):
-            if len(item) == 0:
+        for images_folder in sorted(os.listdir(result_folder)):
+
+            if len(images_folder) == 0:
                 continue
 
-            if item[0] in '._-':
+            if images_folder[0] in '._-':
                 continue
 
-            if not os.path.isdir(os.path.join(inp, item)):
+            if not os.path.isdir(os.path.join(result_folder, images_folder)):
                 continue
 
-            ver = item
+            ver = images_folder
             vdigits = re.findall(r'_v\d+', ver)
             if len(vdigits):
                 vdigits = vdigits[0][1:]
@@ -154,9 +168,12 @@ for shot in Shots:
                         if version >= ver:
                             continue
 
-            version = ver
+            images_folder = os.path.join(result_folder, images_folder)
+            if len(getFolderImages(images_folder)) == 0:
+                continue
 
-            folder = os.path.join(inp, item)
+            version = ver
+            folder = images_folder
 
     if folder is None:
         if Options.skipnosrc:
@@ -165,41 +182,29 @@ for shot in Shots:
         else:
             errExit('Input not found for: %s' % shot)
 
-    files = []
-    for item in os.listdir(folder):
-        valid = False
-        for ext in Extensions:
-            if item[-len(ext):].lower() == ext:
-                valid = True
-                break
-        if valid:
-            files.append(os.path.join(folder, item))
+    imgfiles = getFolderImages(folder)
+    imgfiles.sort()
 
-    if len(files) == 0:
-        errExit('No files found in folder: %s' % folder)
-
-    files.sort()
-
-    nums = re.findall(r'\d+',files[0])
+    nums = re.findall(r'\d+',imgfiles[0])
     if len(nums) == 0:
-        errExit('Can`t find numbers in %s', files[0])
+        errExit('Can`t find numbers in %s', imgfiles[0])
     nums = nums[-1]
-    sequence = files[0][:files[0].rfind(nums)]
+    sequence = imgfiles[0][:imgfiles[0].rfind(nums)]
     padding = len(nums)
     sequence += '%0' + str(padding) + 'd'
-    sequence += files[0][files[0].rfind(nums)+padding:]
+    sequence += imgfiles[0][imgfiles[0].rfind(nums)+padding:]
     frame_first = int(nums)
-    nums = re.findall(r'\d+',files[-1])
+    nums = re.findall(r'\d+',imgfiles[-1])
     if len(nums) == 0:
-        errExit('Can`t find numbers in %s', files[-1])
+        errExit('Can`t find numbers in %s', imgfiles[-1])
     frame_last = int(nums[-1])
 
-    print('{"sequence":"%s","first":%d,"last":%d,"count":%d},' % (sequence, frame_first, frame_last, len(files)))
+    print('{"sequence":"%s","first":%d,"last":%d,"count":%d},' % (sequence, frame_first, frame_last, len(imgfiles)))
 
     # Get comments:
     comments = None
     if Options.getcomments:
-        obj = mediainfo.processExif(files[0])
+        obj = mediainfo.processExif(imgfiles[0])
         if obj and 'mediainfo' in obj:
             obj = obj['mediainfo']
             if 'exif' in obj:
@@ -212,7 +217,7 @@ for shot in Shots:
 
     f = frame_first
     while f <= frame_last:
-        num_frames = len(files)
+        num_frames = len(imgfiles)
 
         if num_frames > Options.afpertask:        
             num_frames = Options.afpertask
