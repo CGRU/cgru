@@ -30,6 +30,9 @@
 #include "taskdata.h"
 #include "taskexec.h"
 
+#include "rapidjson/reader.h"
+#include "rapidjson/error/en.h"
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -315,6 +318,101 @@ void BlockData::jsonReadTasks(const JSON &i_object)
 			}
 		}
 	}
+}
+
+namespace
+{
+struct TasksSAXHandler : public rapidjson::BaseReaderHandler<rapidjson::UTF8<>, TasksSAXHandler>
+{
+	std::vector<TaskData *> tasks;
+	int depth = 0;
+	bool in_tasks_array = false;
+	int task_depth = 0;
+	std::string current_key;
+	TaskData *current_task = nullptr;
+	bool in_files = false;
+
+	bool StartObject()
+	{
+		depth++;
+		if (in_tasks_array && depth == 2)
+		{
+			current_task = new TaskData();
+			task_depth = depth;
+		}
+		return true;
+	}
+
+	bool EndObject(rapidjson::SizeType)
+	{
+		if (current_task && depth == task_depth)
+		{
+			tasks.push_back(current_task);
+			current_task = nullptr;
+		}
+		depth--;
+		return true;
+	}
+
+	bool StartArray()
+	{
+		if (depth == 1 && current_key == "tasks")
+			in_tasks_array = true;
+		else if (current_key == "files")
+			in_files = true;
+		return true;
+	}
+
+	bool EndArray(rapidjson::SizeType)
+	{
+		if (in_files)
+			in_files = false;
+		else if (in_tasks_array && depth == 1)
+			in_tasks_array = false;
+		return true;
+	}
+
+	bool Key(const char *str, rapidjson::SizeType length, bool)
+	{
+		current_key.assign(str, length);
+		return true;
+	}
+
+	bool String(const char *str, rapidjson::SizeType length, bool)
+	{
+		if (current_task)
+		{
+			if (in_files)
+				current_task->addFile(std::string(str, length));
+			else if (current_key == "name")
+				current_task->setName(std::string(str, length));
+			else if (current_key == "command")
+				current_task->setCommand(std::string(str, length));
+			else if (current_key == "custom_data")
+				current_task->setCustomData(std::string(str, length));
+		}
+		return true;
+	}
+};
+}
+
+bool BlockData::jsonReadTasksFast(char *i_buffer, int i_size)
+{
+	rapidjson::Reader reader;
+	rapidjson::InsituStringStream ss(i_buffer);
+	TasksSAXHandler handler;
+	rapidjson::ParseResult ok = reader.Parse<rapidjson::kParseInsituFlag>(ss, handler);
+	if (!ok)
+		return false;
+
+	m_tasks_num = handler.tasks.size();
+	if (m_tasks_num > 0)
+	{
+		m_tasks_data = new TaskData *[m_tasks_num];
+		for (int t = 0; t < m_tasks_num; t++)
+			m_tasks_data[t] = handler.tasks[t];
+	}
+	return true;
 }
 
 void BlockData::jsonReadAndAppendTasks(const JSON &i_object)
