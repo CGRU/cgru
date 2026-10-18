@@ -17,6 +17,9 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <thread>
+#include <atomic>
+#include <vector>
 
 #include "../include/afanasy.h"
 
@@ -286,14 +289,54 @@ int main(int argc, char *argv[])
 	std::string sysjob_folder = AFCommon::getStoreDir( ENV.getStoreFolderJobs(), AFJOB::SYSJOB_ID, AFJOB::SYSJOB_NAME);
 
 	AF_LOG << folders.size() << " jobs found.";
-	for( int i = 0; i < folders.size(); i++)
-	{
-		JobAf * job = NULL;
 
-		if( folders[i] == sysjob_folder)
-			job = new SysJob( folders[i]);
-		else
-			job = new JobAf( folders[i]);
+	// Phase 1: Parallel loading of jobs and tasks from store
+	std::vector<JobAf*> preloaded_jobs(folders.size(), NULL);
+	unsigned int num_threads = std::thread::hardware_concurrency();
+	if (num_threads < 1) num_threads = 1;
+	if (num_threads > 16) num_threads = 16;
+	if (folders.size() < num_threads) num_threads = folders.size();
+
+	if (num_threads > 1)
+	{
+		AF_LOG << "Parallel loading jobs with " << num_threads << " threads...";
+		std::atomic<size_t> folder_index(0);
+		std::vector<std::thread> workers;
+		for (unsigned int t = 0; t < num_threads; ++t)
+		{
+			workers.emplace_back([&]() {
+				while (true)
+				{
+					size_t idx = folder_index.fetch_add(1);
+					if (idx >= folders.size())
+						break;
+
+					if (folders[idx] == sysjob_folder)
+						preloaded_jobs[idx] = new SysJob(folders[idx]);
+					else
+						preloaded_jobs[idx] = new JobAf(folders[idx]);
+				}
+			});
+		}
+		for (auto & w : workers)
+			w.join();
+	}
+	else
+	{
+		for (size_t i = 0; i < folders.size(); ++i)
+		{
+			if (folders[i] == sysjob_folder)
+				preloaded_jobs[i] = new SysJob(folders[i]);
+			else
+				preloaded_jobs[i] = new JobAf(folders[i]);
+		}
+	}
+
+	// Phase 2: Sequential container registration
+	for (int i = 0; i < folders.size(); i++)
+	{
+		JobAf * job = preloaded_jobs[i];
+		if (job == NULL) continue;
 
 		if( job->isValidConstructed())
 		{
