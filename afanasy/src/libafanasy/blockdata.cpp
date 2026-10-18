@@ -196,8 +196,11 @@ void BlockData::jsonRead(const JSON &i_object, std::string *io_changes)
 		jr_string("working_directory", m_working_directory, i_object, io_changes);
 		jr_string("command" /*******/, m_command /*******/, i_object, io_changes);
 		jr_stringvec("files" /******/, m_files /*********/, i_object);
-		jr_string("command_pre" /***/, m_command_pre /***/, i_object, io_changes);
-		jr_string("command_post" /**/, m_command_post /**/, i_object, io_changes);
+		// Jobs stored by older builds have "cmd_pre"/"cmd_post":
+		if (false == jr_string("command_pre", m_command_pre, i_object, io_changes))
+			jr_string("cmd_pre", m_command_pre, i_object, io_changes);
+		if (false == jr_string("command_post", m_command_post, i_object, io_changes))
+			jr_string("cmd_post", m_command_post, i_object, io_changes);
 	}
 	jr_int32("max_running_tasks" /******/, m_max_running_tasks /******/, i_object, io_changes);
 	jr_int32("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object, io_changes);
@@ -402,8 +405,8 @@ void BlockData::jsonWrite(std::ostringstream &o_str, int i_type) const
 				}
 				o_str << "]";
 			}
-			if (m_command_pre.size()) o_str << ",\n\"cmd_pre\":\"" << af::strEscape(m_command_pre) << "\"";
-			if (m_command_post.size()) o_str << ",\n\"cmd_post\":\"" << af::strEscape(m_command_post) << "\"";
+			if (m_command_pre.size()) o_str << ",\n\"command_pre\":\"" << af::strEscape(m_command_pre) << "\"";
+			if (m_command_post.size()) o_str << ",\n\"command_post\":\"" << af::strEscape(m_command_post) << "\"";
 			if (m_multihost_service.size())
 				o_str << ",\n\"multihost_service\":\"" << m_multihost_service << "\"";
 			if (m_custom_data.size()) o_str << ",\n\"custom_data\":\"" << af::strEscape(m_custom_data) << "\"";
