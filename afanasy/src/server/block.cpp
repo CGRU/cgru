@@ -60,19 +60,14 @@ bool Block::readStoredTasks()
 	char * data = af::fileRead( getStoreTasksFileName(), &size);
 	if( data == NULL ) return false;
 
-	rapidjson::Document document;
-	char * res = af::jsonParseData( document, data, size);
-	if( res == NULL )
+	if (!m_data->jsonReadTasksFast(data, size))
 	{
+		AF_ERR << "Block::readStoredTasks: Failed fast SAX parse: " << getStoreTasksFileName();
 		delete [] data;
 		return false;
 	}
 
-	m_data->jsonReadTasks( document);
-
 	delete [] data;
-	delete [] res;
-
 	return true;
 }
 

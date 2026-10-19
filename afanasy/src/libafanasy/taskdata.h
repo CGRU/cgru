@@ -27,6 +27,11 @@ public:
 	inline const std::vector<std::string> & getFiles() const { return m_files;}
 	inline const std::map<std::string, std::string> & getEnvironment() const {return m_environment;}
 
+	inline void setName(const std::string & i_name) { m_name = i_name; }
+	inline void setCommand(const std::string & i_cmd) { m_command = i_cmd; }
+	inline void setCustomData(const std::string & i_data) { m_custom_data = i_data; }
+	inline void addFile(const std::string & i_file) { m_files.push_back(i_file); }
+
 	inline bool hasFiles()        const { return       m_files.size(); }  ///< Whether files are set.
 	inline bool hasDependMask()   const { return m_depend_mask.size(); }  ///< Whether depend mask is set.
 	inline bool hasCustomData()   const { return m_custom_data.size();}  ///< Whether files are set.

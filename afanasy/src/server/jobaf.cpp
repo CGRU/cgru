@@ -101,16 +101,15 @@ void JobAf::readStore()
 	if( NULL == data ) return;
 
 	rapidjson::Document document;
-	char * res = af::jsonParseData( document, data, size);
-	if( NULL == res )
+	if (document.ParseInsitu<0>(data).HasParseError() || !document.IsObject())
 	{
+		AF_ERR << "JobAf::readStore: Failed to parse job JSON: " << getStoreFile();
 		delete [] data;
 		return;
 	}
 
 	jsonRead( document);
 
-	delete [] res;
 	delete [] data;
 
 	m_progress = new af::JobProgress( this);
