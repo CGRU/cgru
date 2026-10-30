@@ -14,15 +14,42 @@ if sys.platform.find('win') == 0 and sys.executable.find('pythonw') != -1:
 if sys.platform.find('win') == 0:
 	qtconfs = []
 	qtconfs.append(sys.prefix + '/qt.conf')
-	qtconfs.append(os.getenv('AF_ROOT') + '/bin/qt.conf')
-	qtdll = os.getenv('CGRU_LOCATION').replace('\\', '/') + '/dll'
+	af_root = os.getenv('AF_ROOT')
+	if af_root:
+		qtconfs.append(os.path.join(af_root, 'bin', 'qt.conf'))
+	cgru_loc = os.getenv('CGRU_LOCATION')
+	# Prefer CGRU/dll from the Windows release package; fall back to PySide2
+	# (git/source clones often do not include dll/ or afanasy/bin).
+	qtdll = None
+	if cgru_loc and os.path.isdir(os.path.join(cgru_loc, 'dll')):
+		qtdll = cgru_loc.replace('\\', '/') + '/dll'
+	else:
+		pyside = os.path.join(sys.prefix, 'Lib', 'site-packages', 'PySide2')
+		if not os.path.isdir(pyside):
+			pyside = os.path.join(sys.prefix, 'Lib', 'site-packages', 'PySide6')
+		if os.path.isdir(pyside):
+			qtdll = pyside.replace('\\', '/')
+			print('WARNING: CGRU dll/ not found, using Qt from: ' + qtdll)
+		elif cgru_loc:
+			qtdll = cgru_loc.replace('\\', '/') + '/dll'
+		else:
+			qtdll = 'dll'
 	qtconf_txt = '[Paths]\nPrefix = ' + qtdll + '\n'
 	for qtconf in qtconfs:
-		if os.path.isfile(qtconf):
-			os.remove(qtconf)
-		qtconf_file = open(qtconf, mode='w')
-		qtconf_file.write(qtconf_txt)
-		qtconf_file.close()
+		qtconf_dir = os.path.dirname(qtconf)
+		if qtconf_dir and not os.path.isdir(qtconf_dir):
+			try:
+				os.makedirs(qtconf_dir)
+			except Exception:
+				continue
+		try:
+			if os.path.isfile(qtconf):
+				os.remove(qtconf)
+			qtconf_file = open(qtconf, mode='w')
+			qtconf_file.write(qtconf_txt)
+			qtconf_file.close()
+		except Exception as err:
+			print('WARNING: Can`t write "%s": %s' % (qtconf, err))
 
 if sys.platform.find('darwin') == 0:
     try:
@@ -61,4 +88,5 @@ cmd.Tray = Tray(app)
 refresh = Refresh(app)
 render.Refresh = refresh
 server = Server()
-app.exec()
+# PySide6: exec(); PySide2: exec_()
+getattr(app, 'exec', getattr(app, 'exec_', None))()
