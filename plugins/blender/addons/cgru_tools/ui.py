@@ -18,6 +18,8 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         cgru_props = scene.cgru
+        frames = context.window_manager.cgru_frames
+        prefs = utils.get_preferences()
 
         col = layout.column()
         col.prop(cgru_props, 'jobname')
@@ -26,6 +28,7 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
         layout.separator()
         row = layout.row(align=False)
         col = row.column(align=True)
+        col.active = not frames.strip()
         col.prop(scene, 'frame_start')
         col.prop(scene, 'frame_end')
         col.prop(scene, 'frame_step')
@@ -34,6 +37,11 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
         col.prop(cgru_props, 'sequential')
         col.prop(cgru_props, 'priority')
         col.prop(cgru_props, 'maxruntasks')
+
+        layout.prop(context.window_manager, 'cgru_frames')
+        if frames.strip() and prefs.cgru_version != utils.CGRU_NOT_FOUND:
+            import afcommon
+            layout.label(text=afcommon.frameListInfo(frames))
 
         layout.separator()
         row = layout.row()
@@ -71,7 +79,6 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
         row = layout.row(align=True)
         row.operator(operators.CGRU_Submit.bl_idname, icon='RENDER_STILL')
         row.operator(operators.CGRU_Browse.bl_idname)
-        prefs = utils.get_preferences()
 
         if prefs.cgru_version == utils.CGRU_NOT_FOUND:
             row.enabled = False

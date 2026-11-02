@@ -69,6 +69,17 @@ class CGRU_Submit(bpy.types.Operator):
 
         # Import Afanasy module:
         import af
+        import afcommon
+
+        # Frame list replaces start, end and step:
+        frames = context.window_manager.cgru_frames
+        frame_list = None
+        if frames.strip():
+            try:
+                frame_list = afcommon.frameListParse(frames)[0]
+            except ValueError as e:
+                self.report({'ERROR'}, str(e))
+                return {'CANCELLED'}
 
         # Calculate temporary scene path:
         scenefile = bpy.data.filepath
@@ -110,6 +121,16 @@ class CGRU_Submit(bpy.types.Operator):
             fpertask = 1
         if fend < fstart:
             fend = fstart
+
+        make_movie = cgru_props.make_movie
+        if frame_list is not None:
+            finc = 1
+            # The movie block can wait for one block only:
+            ranges, singles = afcommon.frameListParts(frame_list)
+            if make_movie and (len(ranges) != 1 or singles):
+                make_movie = False
+                self.report({'WARNING'},
+                            "No movie: the frames are not one range.")
 
         # Create a job:
         job = af.Job(jobname)
@@ -184,12 +205,17 @@ class CGRU_Submit(bpy.types.Operator):
                     frame_inc=finc)
 
             block.setCommand(cmd)
-            block.setNumeric(fstart, fend, fpertask, finc)
+            if frame_list is None:
+                block.setNumeric(fstart, fend, fpertask, finc)
             block.setSequential(sequential)
 
-            job.blocks.append(block)
+            if frame_list is None:
+                job.blocks.append(block)
+            else:
+                job.blocks.extend(
+                    af.frameListBlocks(block, frame_list, fpertask))
 
-            if cgru_props.make_movie:
+            if make_movie:
                 movie_block = af.Block(
                     cgru_props.mov_name + '-movie',
                     'movgen')

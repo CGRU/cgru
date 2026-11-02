@@ -40,6 +40,11 @@ def register():
     bpy.utils.register_class(operators.CGRU_Browse)
     bpy.utils.register_class(operators.CGRU_Submit)
     Scene.cgru = bpy.props.PointerProperty(type=properties.CGRUProperties)
+    # not saved with the scene, a forgotten list would render the wrong frames
+    bpy.types.WindowManager.cgru_frames = bpy.props.StringProperty(
+        name='Frames',
+        description='Frame list like "1-100, 105, 151-200", '
+                    'replaces Start, End and Step')
 
     prefs = bpy.context.preferences.addons[__name__].preferences
     location=os.environ.get("CGRU_LOCATION")
@@ -50,6 +55,7 @@ def register():
 
 def unregister():
     del bpy.types.Scene.cgru
+    del bpy.types.WindowManager.cgru_frames
 
     bpy.utils.unregister_class(addon_prefs.CGRUAddonPreferences)
     bpy.utils.unregister_class(properties.CGRUProperties)
