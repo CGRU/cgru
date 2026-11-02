@@ -191,6 +191,19 @@ class UI(object):
                 )
 
             with pm.rowLayout(nc=2, adj=2, cw2=(labels_width, 50)):
+                pm.text(l='<b>Frames</b>')
+                pm.textField(
+                    'cgru_afanasy__frames',
+                    ann='Frame list, replaces Start, End and By Frame',
+                    placeholderText='e.g. 1-100, 105, 151-200',
+                    tcc=self.frames_info
+                )
+
+            with pm.rowLayout(nc=2, adj=2, cw2=(labels_width, 50)):
+                pm.text(l='')
+                pm.text('cgru_afanasy__frames_info', l='', al='left')
+
+            with pm.rowLayout(nc=2, adj=2, cw2=(labels_width, 50)):
                 pm.text(l='<b>Global Depend Mask</b>')
                 pm.textField(
                     'cgru_afanasy__depend_mask_global',
@@ -389,6 +402,17 @@ class UI(object):
             v = value
         control.setValue(v)
 
+    def frames_info(self, *args, **kwargs):
+        """shows what the frame list renders
+        """
+        pm.text(
+            'cgru_afanasy__frames_info',
+            e=1,
+            l=afcommon.frameListInfo(
+                pm.textField('cgru_afanasy__frames', q=1, text=True)
+            )
+        )
+
     def launch(self, *args, **kwargs):
         """launch renderer command
         """
@@ -497,6 +521,7 @@ class UI(object):
         frames_per_task = \
             pm.intField('cgru_afanasy__frames_per_task', q=1, v=1)
         by_frame = pm.intField('cgru_afanasy__by_frame', q=1, v=1)
+        frames = pm.textField('cgru_afanasy__frames', q=1, text=True)
         depend_mask_global = pm.textField('cgru_afanasy__depend_mask_global',
                                           q=1, text=True)
         hosts_mask = pm.textField('cgru_afanasy__hosts_mask', q=1, text=True)
@@ -556,6 +581,16 @@ class UI(object):
         pm.optionVar['cgru_afanasy__wt_minutes_ov'] = wt_minutes
 
         pm.optionVar['cgru_afanasy__generate_previews_ov'] = generate_previews
+
+        # a frame list replaces start, end and by frame
+        frame_list = None
+        if frames.strip():
+            try:
+                frame_list = afcommon.frameListParse(frames)[0]
+            except ValueError as e:
+                pm.PopupError(str(e))
+                return
+            by_frame = 1
 
         # get paths
         scene_name = pm.sceneName()
@@ -687,9 +722,10 @@ class UI(object):
                     ).split(';')
                     block.setFiles(outputs_split)
 
-                block.setNumeric(
-                    start_frame, end_frame, frames_per_task, by_frame
-                )
+                if frame_list is None:
+                    block.setNumeric(
+                        start_frame, end_frame, frames_per_task, by_frame
+                    )
                 command = mrc_layer.build_command()
 
                 block.setErrorsAvoidHost(errors_avoid_host)
@@ -699,12 +735,18 @@ class UI(object):
 
                 block.setCommand(command)
 
+                layer_blocks = [block]
+                if frame_list is not None:
+                    layer_blocks = af.frameListBlocks(
+                        block, frame_list, frames_per_task
+                    )
+
                 if separate_layers == 2:
-                    blocks.append(block)
+                    blocks.extend(layer_blocks)
                 else:
                     job = af.Job('%s - %s' % (job_name, layer_name))
                     # add blocks
-                    job.blocks = [block]
+                    job.blocks = layer_blocks
                     jobs.append(job)
 
         else:
@@ -723,13 +765,19 @@ class UI(object):
                     ).split(';')
                 )
 
-            block.setNumeric(
-                start_frame, end_frame, frames_per_task, by_frame
-            )
+            if frame_list is None:
+                block.setNumeric(
+                    start_frame, end_frame, frames_per_task, by_frame
+                )
             command = mrc.build_command()
             block.setCommand(command)
 
-            blocks.append(block)
+            if frame_list is None:
+                blocks.append(block)
+            else:
+                blocks.extend(
+                    af.frameListBlocks(block, frame_list, frames_per_task)
+                )
 
         for job in jobs:
             job.setAnnotation(annotation)
