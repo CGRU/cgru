@@ -31,5 +31,16 @@ elif sys.argv[1] == 'patd':
         print('Usage: %s %s str' % (sys.argv[0], sys.argv[1]))
     else:
         print(afcommon.patternFromDigits(sys.argv[2], True))
+elif sys.argv[1] == 'frames':
+    if len(sys.argv) < 3:
+        print('Usage: %s %s "1-100, 105, 151-200"' % (sys.argv[0], sys.argv[1]))
+    else:
+        print(afcommon.frameListInfo(sys.argv[2]))
+        try:
+            ranges, singles = afcommon.frameListParts(afcommon.frameListParse(sys.argv[2])[0])
+        except ValueError:
+            sys.exit(1)
+        print('ranges: %s' % ' '.join(['%d-%d' % r for r in ranges]))
+        print('singles: %s' % ' '.join([str(f) for f in singles]))
 else:
     print('Unknown command: "%s"' % sys.argv[1])

@@ -292,3 +292,77 @@ def timeWaitFromHM(i_hours, i_minutes):
         wait_sec += (24*3600)
 
     return wait_sec
+
+
+def frameListParse(text):
+    """Parse a frame list like "1-100, 105, 151-200"
+    Returns sorted frames and frames listed more than once.
+    Raises ValueError with a message for the user.
+    """
+    count = dict()
+    total = 0
+    for item in text.split(','):
+        item = item.strip()
+        if not item:
+            continue
+        match = re.match(r'^(\d+)\s*(?:-\s*(\d+))?$', item)
+        if match is None:
+            raise ValueError("'%s' is not a frame or a range" % item)
+        first = int(match.group(1))
+        last = first if match.group(2) is None else int(match.group(2))
+        if last < first:
+            raise ValueError("'%s': the range ends before it starts" % item)
+        total += last - first + 1
+        if total > 100000:
+            raise ValueError('more than 100000 frames')
+        for frame in range(first, last + 1):
+            count[frame] = count.get(frame, 0) + 1
+
+    if not count:
+        raise ValueError('no frames')
+
+    frames = sorted(count)
+    return frames, [frame for frame in frames if count[frame] > 1]
+
+
+def frameListParts(frames):
+    """Split sorted frames into ranges of consecutive frames and single frames
+    """
+    ranges = []
+    singles = []
+    start = 0
+    for i in range(1, len(frames) + 1):
+        if i < len(frames) and frames[i] == frames[i - 1] + 1:
+            continue
+        if i - start > 1:
+            ranges.append((frames[start], frames[i - 1]))
+        else:
+            singles.append(frames[start])
+        start = i
+
+    return ranges, singles
+
+
+def frameListInfo(text):
+    """Describe a frame list for a submit dialog: what will be rendered or what is wrong
+    """
+    if not text.strip():
+        return ''
+    try:
+        frames, twice = frameListParse(text)
+    except ValueError as e:
+        return str(e)
+
+    ranges, singles = frameListParts(frames)
+    parts = []
+    if ranges:
+        parts.append('%d range%s' % (len(ranges), '' if len(ranges) == 1 else 's'))
+    if singles:
+        parts.append('%d single frame%s' % (len(singles), '' if len(singles) == 1 else 's'))
+    info = '%d frame%s: %s' % (len(frames), '' if len(frames) == 1 else 's', ', '.join(parts))
+    if twice:
+        info += '; listed twice: %s' % ', '.join([str(frame) for frame in twice[:10]])
+        if len(twice) > 10:
+            info += ', ...'
+
+    return info

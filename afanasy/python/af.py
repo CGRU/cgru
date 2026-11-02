@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import copy
 import json
 import os
 import re
@@ -48,6 +49,41 @@ def checkClass(name, folder):
     if filename in os.listdir(path):
         return True
     return False
+
+
+def frameListBlocks(block, frames, pertask=1):
+    """Copies of a block to render a frame list, see afcommon.frameListParse:
+    a numeric block for each range, one block with a task per single frame.
+
+    :param block: block with command and files, not numeric
+    :param frames: sorted frames
+    :param int pertask: frames per task of the ranges
+    :return: list of blocks
+    """
+    ranges, singles = afcommon.frameListParts(frames)
+    blocks = []
+    for first, last in ranges:
+        range_block = copy.deepcopy(block)
+        range_block.setName('%s %d-%d' % (block.data['name'], first, last))
+        range_block.setNumeric(first, last, pertask)
+        blocks.append(range_block)
+
+    if singles:
+        # Afanasy puts the task command into @#@ of the block command and files
+        singles_block = copy.deepcopy(block)
+        singles_block.setName('%s frames' % block.data['name'])
+        files = singles_block.data.pop('files', None)
+        if files:
+            singles_block.setFiles(['@#@'], False)
+        for frame in singles:
+            task = Task('frame %d' % frame)
+            task.setCommand(str(frame), False)
+            if files:
+                task.setFiles([afcommon.fillNumbers(f, frame, frame) for f in files], False)
+            singles_block.tasks.append(task)
+        blocks.append(singles_block)
+
+    return blocks
 
 
 class Task:
