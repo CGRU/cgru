@@ -321,7 +321,10 @@ class Tray(QtWidgets.QSystemTrayIcon):
         if reason == QtWidgets.QSystemTrayIcon.ActivationReason.Trigger:
             return
         elif reason == QtWidgets.QSystemTrayIcon.ActivationReason.DoubleClick:
-            render.refresh()
+            if render.Refresh is not None:
+                render.Refresh.refresh()
+            else:
+                render.refresh()
         elif reason == QtWidgets.QSystemTrayIcon.ActivationReason.MiddleClick:
             return
         elif reason == QtWidgets.QSystemTrayIcon.ActivationReason.Context:

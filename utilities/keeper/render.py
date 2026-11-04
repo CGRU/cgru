@@ -257,10 +257,14 @@ def setUserDialog():
     af.Cmd().renderSetUserName( name)
     refreshAfter()
 
-def refreshAfter( i_sec = 3):
-    timer = QtCore.QTimer( cmd.Application)
-    timer.timeout.connect( refresh)
-    timer.setInterval( 1000 * i_sec)
-    timer.setSingleShot( True)
+def refreshAfter(i_sec=3):
+    """Schedule a refresh. Safe from UI or worker threads when Refresh exists."""
+    if Refresh is not None:
+        Refresh.scheduleRefresh(i_sec)
+        return
+    timer = QtCore.QTimer(cmd.Application)
+    timer.timeout.connect(refresh)
+    timer.setInterval(1000 * i_sec)
+    timer.setSingleShot(True)
     timer.start()
 
