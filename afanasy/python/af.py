@@ -189,6 +189,65 @@ class Block:
         self.data["frames_per_task"] = pertask
         self.data["frames_inc"] = increment
 
+    def setFrames(self, frames):
+        """Render frames like "1-100, 105, 151-200", one task per frame.
+        Call it after setFiles: the block files become @#@
+        and every task gets them filled with its frame.
+        The job output folder is not taken from these files,
+        set it with Job.setFolder.
+
+        :param str frames: frames and ranges, separated by commas
+        :raises ValueError: if the text is not a list of frames
+        :return:
+        """
+        if len(self.tasks):
+            print('Error: Block.setFrames: Block already has tasks.')
+            return
+        if afcommon.checkBlockFlag(self.data['flags'], 'numeric'):
+            print('Error: Block.setFrames: Block is numeric.')
+            return
+
+        frames_set = set()
+        for item in frames.split(','):
+            item = item.strip()
+            if not item:
+                continue
+            match = re.match(r'^([0-9]+)\s*(?:-\s*([0-9]+))?$', item)
+            if match is None:
+                raise ValueError("'%s' is not a frame or a range" % item)
+            first = int(match.group(1))
+            last = int(match.group(2) or first)
+            if last < first:
+                raise ValueError("'%s': the range ends before it starts" % item)
+            if len(frames_set) + last - first >= 100000:
+                raise ValueError('more than 100000 frames')
+            frames_set.update(range(first, last + 1))
+        if not frames_set:
+            raise ValueError('no frames')
+
+        files = self.data.get('files')
+        if files:
+            self.data["files"] = ['@#@']
+        for frame in sorted(frames_set):
+            task = self.addFrame(frame)
+            if files:
+                task.setFiles(
+                    [afcommon.fillNumbers(f, frame, frame) for f in files], False)
+
+    def addFrame(self, frame):
+        """Add a task that renders one frame.
+        The task command is the frame, use @#@ in the block command.
+        It sets no files, setFrames does.
+
+        :param int frame:
+        :return: the task
+        """
+        frame = int(frame)
+        task = Task('frame %d' % frame)
+        task.setCommand(str(frame), False)
+        self.tasks.append(task)
+        return task
+
     def setFramesPerTask(self, value):
         """Missing DocString
 
