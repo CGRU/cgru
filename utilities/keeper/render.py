@@ -38,9 +38,21 @@ def showInfo(tray=None):
 
 
 def refresh():
+    """Network + UI. Prefer refreshNetwork/refreshUI when called from a worker thread."""
+    interval = refreshNetwork()
+    applyRefreshInterval(interval)
+    refreshUI()
 
+
+def refreshNetwork():
+    """Talk to Afanasy server. Safe to call from a background thread.
+
+    Returns interval hint: 'default', 'slow', or None.
+    """
     global Render
     global RenderFull
+
+    interval = None
 
     if Render is None:
         # Get render by local host name
@@ -51,12 +63,11 @@ def refresh():
 
     if Render is not None:
         # Get render by ID, as we already know it
-        obj = af.Cmd().renderGetId(Render['id'],'full')
+        obj = af.Cmd().renderGetId(Render['id'], 'full')
         if obj is not None and 'object' in obj and 'render' in obj['object']:
             RenderFull = obj['object']
             Render = RenderFull['render']
-            if Refresh:
-                Refresh.setDefaultInterval()
+            interval = 'default'
         else:
             if obj is None:
                 print('ERROR: NULL object reveived.')
@@ -76,10 +87,25 @@ def refresh():
             Render = None
             RenderFull = None
             # Increase refresh interval by 10 times
-            if Refresh:
-                Refresh.setIntervalKoeff(10)
+            interval = 'slow'
 
-    cmd.Tray.showIcon( makeIcon())
+    return interval
+
+
+def applyRefreshInterval(interval):
+    if not Refresh or not interval:
+        return
+    if interval == 'default':
+        Refresh.setDefaultInterval()
+    elif interval == 'slow':
+        Refresh.setIntervalKoeff(10)
+
+
+def refreshUI():
+    """Update tray icon/tooltip. Must run on the Qt UI thread."""
+    if cmd.Tray is None:
+        return
+    cmd.Tray.showIcon(makeIcon())
     cmd.Tray.updateToolTip(makeTip())
 
 
@@ -231,10 +257,14 @@ def setUserDialog():
     af.Cmd().renderSetUserName( name)
     refreshAfter()
 
-def refreshAfter( i_sec = 3):
-    timer = QtCore.QTimer( cmd.Application)
-    timer.timeout.connect( refresh)
-    timer.setInterval( 1000 * i_sec)
-    timer.setSingleShot( True)
+def refreshAfter(i_sec=3):
+    """Schedule a refresh. Safe from UI or worker threads when Refresh exists."""
+    if Refresh is not None:
+        Refresh.scheduleRefresh(i_sec)
+        return
+    timer = QtCore.QTimer(cmd.Application)
+    timer.timeout.connect(refresh)
+    timer.setInterval(1000 * i_sec)
+    timer.setSingleShot(True)
     timer.start()
 
