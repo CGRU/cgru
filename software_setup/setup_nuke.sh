@@ -25,6 +25,16 @@ else
     NUKE_INSTALL_DIR="/usr/local"
 fi
 
+# If job already pinned NUKE_EXEC, keep it (do not run locate_*).
+NUKE_FROM_ENV=0
+if [ -n "$NUKE_EXEC" ]; then
+	NUKE_FROM_ENV=1
+	echo "NUKE_EXEC from environment: ${NUKE_EXEC}"
+elif [ -n "$NUKE_LOCATION" ]; then
+	NUKE_FROM_ENV=1
+	echo "NUKE_LOCATION from environment: ${NUKE_LOCATION}"
+fi
+
 # Get the latest Nuke location if not set
 if [ -z "$NUKE_LOCATION" ]; then
 	if [ -z "$NUKE_EXEC" ]; then
@@ -37,7 +47,7 @@ if [ -z "$NUKE_LOCATION" ]; then
 		NUKE_LOCATION=`dirname "$NUKE_EXEC"`
 	fi
 fi
-# Pocess Nuke executable if not set
+# Process Nuke executable if not set
 if [ -z "$NUKE_EXEC" ]; then
 	NUKE_FOLDER=`basename "$NUKE_LOCATION"`
 	if [ "`uname`" == "Darwin" ]; then
@@ -51,9 +61,11 @@ fi
 export APP_DIR=$NUKE_LOCATION
 export APP_EXE=$NUKE_EXEC
 
-#override nuke location based on locate_nuke.sh
-locate_nuke="$CGRU_LOCATION/software_setup/locate_nuke.sh"
-[ -f "$locate_nuke" ] && source "$locate_nuke"
+# Keeper locate_* only for interactive default when env did not pin a build
+if [ "$NUKE_FROM_ENV" = "0" ]; then
+	locate_nuke="$CGRU_LOCATION/software_setup/locate_nuke.sh"
+	[ -f "$locate_nuke" ] && source "$locate_nuke"
+fi
 echo "NUKE = '${APP_EXE}'"
 
 export NUKE_LOCATION="$APP_DIR"
