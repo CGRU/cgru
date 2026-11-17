@@ -312,6 +312,25 @@ function Stop-OwnedProcesses($Processes) {
     }
 }
 
+function Get-CgruLauncher([string]$Kind, [string]$Root) {
+    # Official start scripts call setup.cmd / AFANASY _setup and set PATH, AF_ROOT, Python, etc.
+    switch ($Kind) {
+        'keeper'   { return (Join-Path $Root 'start.cmd') }
+        'afserver' { return (Join-Path $Root 'start\AFANASY\_afserver.cmd') }
+        'afrender' { return (Join-Path $Root 'start\AFANASY\99.render.cmd') }
+        'afwatch'  { return (Join-Path $Root 'start\AFANASY\10.afwatch.cmd') }
+        default    { return $null }
+    }
+}
+
+function Start-ViaCgruLauncher([string]$Launcher, [string]$Root) {
+    # Must "call" the .cmd so %0 / relative _setup.cmd resolve and setup env applies
+    # (e.g. afrender via start\AFANASY\99.render.cmd -> AF_ROOT, PATH, ...).
+    Start-Process -FilePath 'cmd.exe' `
+        -ArgumentList @('/c', 'call', "`"$Launcher`"") `
+        -WorkingDirectory $Root
+}
+
 function Start-OwnedProcesses($Processes) {
     if (-not $Processes -or $Processes.Count -eq 0) { return }
 
@@ -323,11 +342,18 @@ function Start-OwnedProcesses($Processes) {
         'afwatch'   = 4
         'keeper'    = 5
     }
+    # One restart per known role (via launcher script), not per raw exe cmdline.
     $unique = @{}
     foreach ($p in $Processes) {
-        $key = if ($p.CommandLine) { $p.CommandLine.Trim() }
-               elseif ($p.ExecutablePath) { $p.ExecutablePath }
-               else { "$($p.Kind):$($p.Name)" }
+        $key = if ($p.Kind -in @('keeper', 'afserver', 'afrender', 'afwatch', 'afservice')) {
+            $p.Kind
+        } elseif ($p.CommandLine) {
+            $p.CommandLine.Trim()
+        } elseif ($p.ExecutablePath) {
+            $p.ExecutablePath
+        } else {
+            "$($p.Kind):$($p.Name)"
+        }
         if (-not $unique.ContainsKey($key)) {
             $unique[$key] = $p
         }
@@ -339,22 +365,45 @@ function Start-OwnedProcesses($Processes) {
 
         Write-Step ("Restarting {0} ..." -f $p.Kind)
 
-        if ($p.Kind -eq 'keeper') {
-            $startCmd = Join-Path $script:DestRoot 'start.cmd'
-            if (Test-Path -LiteralPath $startCmd) {
-                Start-Process -FilePath 'cmd.exe' -ArgumentList @('/c', "`"$startCmd`"") -WorkingDirectory $script:DestRoot
-                Start-Sleep -Seconds 1
-                continue
+        $launcher = Get-CgruLauncher -Kind $p.Kind -Root $script:DestRoot
+        if ($launcher -and (Test-Path -LiteralPath $launcher)) {
+            Write-Step ("  via {0}" -f $launcher)
+            Start-ViaCgruLauncher -Launcher $launcher -Root $script:DestRoot
+            Start-Sleep -Seconds 1
+            continue
+        }
+
+        # Fallback for unknown tools: wrap raw cmdline in a setup.cmd shell so CGRU env exists.
+        $setupCmd = Join-Path $script:DestRoot 'setup.cmd'
+        if (($p.CommandLine) -and (Test-Path -LiteralPath $setupCmd)) {
+            $batch = @(
+                '@echo off'
+                "cd /d `"$script:DestRoot`""
+                'call setup.cmd'
+                $p.CommandLine
+            ) -join "`r`n"
+            $tmp = Join-Path $env:TEMP ("cgru_restart_" + [guid]::NewGuid().ToString('N') + '.cmd')
+            Set-Content -LiteralPath $tmp -Value $batch -Encoding ASCII
+            try {
+                Write-Step '  via setup.cmd + original command line'
+                Start-Process -FilePath 'cmd.exe' -ArgumentList @('/c', "`"$tmp`"") -WorkingDirectory $script:DestRoot
+                Start-Sleep -Milliseconds 800
+            } finally {
+                Start-Sleep -Milliseconds 500
+                Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue
             }
+            continue
         }
 
         if ($p.CommandLine -and $p.CommandLine.Trim().Length -gt 0) {
+            Write-Warning '  fallback: raw command line (no setup.cmd env)'
             Start-Process -FilePath 'cmd.exe' -ArgumentList @('/c', $p.CommandLine) -WorkingDirectory $script:DestRoot
             Start-Sleep -Milliseconds 800
             continue
         }
 
         if ($p.ExecutablePath -and (Test-Path -LiteralPath $p.ExecutablePath)) {
+            Write-Warning '  fallback: raw executable (no setup.cmd env)'
             Start-Process -FilePath $p.ExecutablePath -WorkingDirectory (Split-Path -Parent $p.ExecutablePath)
             Start-Sleep -Milliseconds 800
             continue

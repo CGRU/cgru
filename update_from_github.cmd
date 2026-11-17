@@ -4,7 +4,7 @@ setlocal EnableExtensions
 rem Update this CGRU install from the latest GitHub Windows release.
 rem 1) Stops Keeper / Afanasy processes and services from this folder (remembers them)
 rem 2) Mirrors the zip into this folder (adds/updates AND deletes files missing in release)
-rem 3) Restarts what was running
+rem 3) Restarts via official start scripts (setup.cmd / AFANASY _setup env)
 rem
 rem Kept locally even if absent from zip:
 rem   update_from_github.cmd / .ps1, software_setup\locate_*, .git\
