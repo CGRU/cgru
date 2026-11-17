@@ -14,7 +14,16 @@ else
     FUSION_INSTALL_DIR="/opt/BlackmagicDesign"
 fi
 
-if [ -z "$FUSION_LOCATION" ]; then
+# If job/Keeper already pinned FUSION_LOCATION, keep it (do not run locate_*).
+FUSION_FROM_ENV=0
+if [ -n "$FUSION_LOCATION" ]; then
+  FUSION_FROM_ENV=1
+  echo "FUSION_LOCATION from environment: ${FUSION_LOCATION}"
+  # The user also needs to setup the following environment variables for a complete setup
+  # $FUSION_EXEC
+  # $FUSION_RENDERNODE_LOCATION
+  # $FUSION_RENDERNODE_EXEC
+elif [ -z "$FUSION_LOCATION" ]; then
   FUSION_FOLDERS=`ls "$FUSION_INSTALL_DIR"`
   FUSION_LOCATION=""
   FUSION_EXEC=""
@@ -43,13 +52,6 @@ if [ -z "$FUSION_LOCATION" ]; then
   export FUSION_LOCATION
   export FUSION_EXEC="${FUSION_LOCATION}/${FUSION_EXEC}"
   export FUSION_RENDERNODE_EXEC="${FUSION_RENDERNODE_LOCATION}/${FUSION_RENDERNODE_EXEC}"
-else
-  echo "FUSION_LOCATION is already set: ${FUSION_LOCATION}"
-  # FUSION_LOCATION is already set by an external process (ex: Rez)
-  # The user also needs to setup the following environment variables for a complete setup
-  # $FUSION_EXEC
-  # $FUSION_RENDERNODE_LOCATION
-  # $FUSION_RENDERNODE_EXEC
 fi
 
 #
@@ -61,9 +63,11 @@ export RENDER_DIR=$FUSION_RENDERNODE_LOCATION
 export RENDER_EXE=$FUSION_RENDERNODE_EXEC
 
 #
-# Override fusion location based on locate_fusion.sh:
+# Keeper locate_* only when env did not pin a build
 #
-locate_fusion="$CGRU_LOCATION/software_setup/locate_fusion.sh"
-[ -f $locate_fusion ] && source $locate_fusion
+if [ "$FUSION_FROM_ENV" = "0" ]; then
+  locate_fusion="$CGRU_LOCATION/software_setup/locate_fusion.sh"
+  [ -f "$locate_fusion" ] && source "$locate_fusion"
+fi
 
 echo "FUSION = '${APP_EXE}'"

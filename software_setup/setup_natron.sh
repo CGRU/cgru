@@ -28,20 +28,31 @@ else
 	NATRON_INSTALL_DIR="/opt"
 fi
 
-NATRON_LOCATION="${NATRON_INSTALL_DIR}/Natron"
-if [ `uname` == "Darwin" ]; then
-	NATRON_LOCATION="${NATRON_INSTALL_DIR}/Natron.app/Contents/MacOS/"
+# If job/Keeper already pinned NATRON_LOCATION, keep it (do not run locate_*).
+NATRON_FROM_ENV=0
+if [ -n "$NATRON_LOCATION" ]; then
+	NATRON_FROM_ENV=1
+	echo "NATRON_LOCATION from environment: ${NATRON_LOCATION}"
+	if [ -z "$NATRON_EXEC" ]; then
+		export NATRON_EXEC="${NATRON_LOCATION}/Natron"
+	fi
+else
+	NATRON_LOCATION="${NATRON_INSTALL_DIR}/Natron"
+	if [ `uname` == "Darwin" ]; then
+		NATRON_LOCATION="${NATRON_INSTALL_DIR}/Natron.app/Contents/MacOS/"
+	fi
+	NATRON_EXEC="Natron"
+	export NATRON_EXEC="${NATRON_LOCATION}/${NATRON_EXEC}"
 fi
-NATRON_EXEC="Natron"
-
-export NATRON_EXEC="${NATRON_LOCATION}/${NATRON_EXEC}"
 
 export APP_DIR=$NATRON_LOCATION
 export APP_EXE=$NATRON_EXEC
 
 
-#override natron location based on locate_natron.sh
-locate_natron="$CGRU_LOCATION/software_setup/locate_natron.sh"
-[ -f $locate_natron ] && source $locate_natron
+# Keeper locate_* only when env did not pin a build
+if [ "$NATRON_FROM_ENV" = "0" ]; then
+	locate_natron="$CGRU_LOCATION/software_setup/locate_natron.sh"
+	[ -f "$locate_natron" ] && source "$locate_natron"
+fi
 
 echo "NATRON = '${APP_EXE}'"

@@ -3,8 +3,14 @@
 # Source general for all soft directives:
 source "$CGRU_LOCATION/software_setup/setup__all.sh"
 
+# If job/Keeper already pinned BLENDER_LOCATION, keep it (do not run locate_*).
+BLENDER_FROM_ENV=0
+if [ -n "$BLENDER_LOCATION" ]; then
+	BLENDER_FROM_ENV=1
+	echo "BLENDER_LOCATION from environment: ${BLENDER_LOCATION}"
+fi
+
 # Setup default Blender location:
-# Do not override if BLENDER_LOCATION is already set
 if [ -z "$BLENDER_LOCATION" ]; then
 	if [ -x "/snap/bin/blender" ]; then
 		export BLENDER_LOCATION="/snap/bin"
@@ -26,6 +32,8 @@ fi
 export APP_DIR="${BLENDER_LOCATION}"
 export APP_EXE="${BLENDER_LOCATION}/blender"
 
-# Define location:
-locate_file="$CGRU_LOCATION/software_setup/locate_blender.sh"
-[ -f "${locate_file}" ] && source "${locate_file}"
+# Keeper locate_* only when env did not pin a build
+if [ "$BLENDER_FROM_ENV" = "0" ]; then
+	locate_file="$CGRU_LOCATION/software_setup/locate_blender.sh"
+	[ -f "${locate_file}" ] && source "${locate_file}"
+fi

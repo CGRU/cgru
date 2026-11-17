@@ -5,13 +5,21 @@ source "$CGRU_LOCATION/software_setup/setup__all.sh"
 
 
 # Locate C4D:
-C4D_LOCATION=""
 C4D_EXEC="CINEMA 4D"
 C4D_USER_FOLDER=""
 C4D_USER_FOLDER_LOCATION="${HOME}/Library/Preferences/MAXON"
 
+# If job/Keeper already pinned C4D_LOCATION, keep it (do not run locate_*).
+C4D_FROM_ENV=0
+if [ -n "$C4D_LOCATION" ]; then
+    C4D_FROM_ENV=1
+    echo "C4D_LOCATION from environment: ${C4D_LOCATION}"
+else
+    C4D_LOCATION=""
+fi
+
 # Find the most recent C4D-Version-User-Folder
-STDOUT=$(ls -1 "$C4D_USER_FOLDER_LOCATION")
+STDOUT=$(ls -1 "$C4D_USER_FOLDER_LOCATION" 2>/dev/null)
 while read line; do
     if [ "`echo $line | awk '{print match( \$1, "CINEMA")}'`" == "1" ]; then
         C4D_USER_FOLDER="${C4D_USER_FOLDER_LOCATION}/${line}"
@@ -35,20 +43,20 @@ export C4D_PREFERENCES_LOCATION=${C4D_USER_FOLDER}/prefs
 
 C4D_INSTALL_DIR="/Applications/MAXON"
 
+# Find the most recent C4D-Version (only when not pinned)
+if [ "$C4D_FROM_ENV" = "0" ]; then
+    STDOUT=$(ls -1 "$C4D_INSTALL_DIR" 2>/dev/null)
+    while read line; do
+        if [ "`echo $line | awk '{print match( \$1, "CINEMA")}'`" == "1" ]; then
+            C4D_LOCATION="${C4D_INSTALL_DIR}/${line}/CINEMA 4D.app/Contents/MacOS"
+        fi
+    done <<< "$STDOUT"
 
-# Find the most recent C4D-Version
-STDOUT=$(ls -1 "$C4D_INSTALL_DIR")
-while read line; do
-    if [ "`echo $line | awk '{print match( \$1, "CINEMA")}'`" == "1" ]; then
-        C4D_LOCATION="${C4D_INSTALL_DIR}/${line}/CINEMA 4D.app/Contents/MacOS"
-    fi
-done <<< "$STDOUT"
+    locate_c4d="$CGRU_LOCATION/software_setup/locate_c4d.sh"
+    [ -f "$locate_c4d" ] && source "$locate_c4d"
+fi
 
-
-#override c4d location based on locate_nuke.sh
-locate_c4d="$CGRU_LOCATION/software_setup/locate_c4d.sh"
-[ -f $locate_c4d ] && source $locate_c4d
-
+export C4D_LOCATION
 
 # Define that the c4d-render-script can get found. Gets used by "c4drender"
 export C4D_RENDER_SCRIPT="${C4D_CGRU_LOCATION}/render.py"
@@ -63,7 +71,11 @@ else
     echo "       Please set C4D_USER_FOLDER to point to the User-Directory!"
 fi
 
-export C4D_EXEC="${C4D_LOCATION}/${C4D_EXEC}"
+# Relative default exec name → full path under C4D_LOCATION
+case "$C4D_EXEC" in
+    /*) ;;
+    *) export C4D_EXEC="${C4D_LOCATION}/${C4D_EXEC}" ;;
+esac
 export APP_DIR="${C4D_LOCATION}"
 export APP_EXE="${C4D_EXEC}"
 

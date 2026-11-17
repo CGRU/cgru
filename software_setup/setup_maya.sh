@@ -23,7 +23,12 @@ if [ -z "$MAYA_LOCATION" ]; then
     fi
   done
 else
-  echo "MAYA_LOCATION is already set: ${MAYA_LOCATION}"
+  echo "MAYA_LOCATION from environment: ${MAYA_LOCATION}"
+  # Derive version from folder name when not set (same idea as setup_maya.cmd)
+  if [ -z "$MAYA_VERSION" ]; then
+    MAYA_FOLDER=`basename "$MAYA_LOCATION"`
+    MAYA_VERSION="`echo $MAYA_FOLDER | gawk '{print substr( \$1, 5, 4)}'`"
+  fi
 fi
 
 if [ -z "$MAYA_EXEC" ]; then
@@ -33,7 +38,7 @@ if [ -z "$MAYA_EXEC" ]; then
   fi
   MAYA_EXEC="${MAYA_LOCATION}/bin/maya${MAYA_VERSION}"
 else
-  echo "MAYA_EXEC is already set: ${MAYA_EXEC}"
+  echo "MAYA_EXEC from environment: ${MAYA_EXEC}"
 fi
 echo "MAYA: ${MAYA_EXEC}"
 echo "MAYA_VERSION: ${MAYA_VERSION}"

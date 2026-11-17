@@ -3,6 +3,13 @@
 # Source general for all soft directives:
 source "$CGRU_LOCATION/software_setup/setup__all.sh"
 
+# If job/Keeper already pinned HOUDINI_LOCATION, keep it (do not run locate_*).
+HOUDINI_FROM_ENV=0
+if [ -n "$HOUDINI_LOCATION" ]; then
+	HOUDINI_FROM_ENV=1
+	echo "HOUDINI_LOCATION from environment: ${HOUDINI_LOCATION}"
+fi
+
 # Search directory where Houdini installed:
 HOUDINI_INSTALL_DIR="/opt"
 if [ -z "$HOUDINI_LOCATION" ]; then
@@ -11,15 +18,15 @@ if [ -z "$HOUDINI_LOCATION" ]; then
 			export HOUDINI_LOCATION="${HOUDINI_INSTALL_DIR}/${folder}"
 		fi
 	done
-else
-	echo "HOUDINI_LOCATION is already set: ${HOUDINI_LOCATION}"
 fi
 
-#Override houdini location based on locate_houdini.sh
-locate_houdini="$CGRU_LOCATION/software_setup/locate_houdini.sh"
-if [ -f $locate_houdini ]; then
-	source $locate_houdini
-	HOUDINI_LOCATION="$APP_DIR"
+# Keeper locate_* only when env did not pin a build
+if [ "$HOUDINI_FROM_ENV" = "0" ]; then
+	locate_houdini="$CGRU_LOCATION/software_setup/locate_houdini.sh"
+	if [ -f "$locate_houdini" ]; then
+		source "$locate_houdini"
+		HOUDINI_LOCATION="$APP_DIR"
+	fi
 fi
 
 # Check Houdini location:
@@ -49,5 +56,3 @@ export PYTHONPATH=$HOUDINI_CGRU_PATH:$PYTHONPATH
 
 export APP_DIR="$HOUDINI_LOCATION"
 export APP_EXE="houdini"
-
-
