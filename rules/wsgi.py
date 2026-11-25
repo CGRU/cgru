@@ -1,10 +1,7 @@
-import cgi
 import json
 import os
 import sys
 import traceback
-
-import cgitb; cgitb.enable()
 
 os.umask(0000)
 

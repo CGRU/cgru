@@ -1,4 +1,5 @@
-import cgi
+import email.parser
+import email.policy
 import json
 import getpass
 import os
@@ -577,13 +578,29 @@ def walkDir(i_admin, i_recv, i_dir, o_out, i_depth):
         o_out['folders'].append(folderObj)
 
 
+def parseMultipartForm(i_env):
+    """Return {field name: bytes} for a multipart/form-data WSGI request.
+    Replaces cgi.FieldStorage (the cgi module was removed in Python 3.13)."""
+    length = int(i_env.get('CONTENT_LENGTH') or 0)
+    body = i_env['wsgi.input'].read(length)
+    head = ('Content-Type: %s\r\n\r\n' % i_env.get('CONTENT_TYPE', '')).encode()
+    msg = email.parser.BytesParser(policy=email.policy.HTTP).parsebytes(head + body)
+    fields = dict()
+    if msg.is_multipart():
+        for part in msg.iter_parts():
+            name = part.get_param('name', header='content-disposition')
+            if name is not None:
+                fields[name] = part.get_payload(decode=True) or b''
+    return fields
+
+
 def upload(i_env, o_out):
-    fieldStorage = cgi.FieldStorage(fp=i_env['wsgi.input'], environ=i_env, keep_blank_values=True)
-    if 'upload_path' not in fieldStorage or 'upload_file' not in fieldStorage:
+    fields = parseMultipartForm(i_env)
+    if 'upload_path' not in fields or 'upload_file' not in fields:
         o_out['error'] = 'Upload form should contain upload_path and upload_file fields.'
         return
 
-    path = fieldStorage['upload_path'].value
+    path = fields['upload_path'].decode('utf-8')
     dirname = os.path.dirname(path)
 
     # Create a download directory
@@ -612,11 +629,7 @@ def upload(i_env, o_out):
         o_out['info'] = '%s' % traceback.format_exc()
         return
 
-    while 1:
-        data = fieldStorage['upload_file'].file.read(1024)
-        if not data:
-            break
-        file.write(data)
+    file.write(fields['upload_file'])
 
     o_out['upload'] = dict()
     o_out['upload']['path'] = path

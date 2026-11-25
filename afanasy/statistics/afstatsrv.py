@@ -1,4 +1,3 @@
-import cgi
 import json
 import os
 import sys
