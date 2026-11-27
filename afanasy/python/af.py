@@ -1285,11 +1285,16 @@ class Cmd:
         return None
 
     def renderGetLocal(self):
-        """Missing DocString
+        """Get renders whose name equals this host.
 
-        :return:
+        Server get-by-mask still uses prefix find, so hostname
+        "valstation2" would also match "valstation20". Filter exact.
         """
-        return self.renderGetList(cgruconfig.VARS['HOSTNAME'])
+        hostname = cgruconfig.VARS['HOSTNAME']
+        renders = self.renderGetList(hostname)
+        if renders is None:
+            return None
+        return [r for r in renders if r.get('name') == hostname]
 
     def appendBlocks(self, jobId, blocks, verbose=False):
         """Append new blocks to an existing job
